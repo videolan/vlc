@@ -80,25 +80,23 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
 {
     int level = AV_LOG_QUIET;
 
-    if (!var_InheritBool(obj, "quiet")) {
-        int64_t verbose = var_InheritInteger(obj, "verbose");
-        if (verbose >= 0) switch(verbose + VLC_MSG_ERR) {
-        case VLC_MSG_ERR:
-            level = AV_LOG_ERROR;
-            break;
-        case VLC_MSG_WARN:
-            level = AV_LOG_WARNING;
-            break;
-        case VLC_MSG_INFO:
-            level = AV_LOG_INFO;
-            break;
-        case VLC_MSG_DBG:
-            level = AV_LOG_VERBOSE;
-            break;
-        default:
-            level = AV_LOG_DEBUG;
-            break;
-        }
+    int64_t verbose = var_InheritInteger(obj, "verbose");
+    if (verbose >= 0) switch(verbose + VLC_MSG_ERR) {
+    case VLC_MSG_ERR:
+        level = AV_LOG_ERROR;
+        break;
+    case VLC_MSG_WARN:
+        level = AV_LOG_WARNING;
+        break;
+    case VLC_MSG_INFO:
+        level = AV_LOG_INFO;
+        break;
+    case VLC_MSG_DBG:
+        level = AV_LOG_VERBOSE;
+        break;
+    default:
+        level = AV_LOG_DEBUG;
+        break;
     }
 
     av_log_set_level(level);
