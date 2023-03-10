@@ -70,9 +70,6 @@ vlc_module_begin()
     set_va_callback(Open, 110)
 vlc_module_end()
 
-#include <initguid.h> /* must be last included to not redefine existing GUIDs */
-DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
-
 typedef struct
 {
     d3d11_device_t               *d3d_dev;
@@ -628,7 +625,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             score = 2;
         else
             continue;
-        if (IsEqualGUID(&cfg->guidConfigBitstreamEncryption, &DXVA2_NoEncrypt))
+        if (IsEqualGUID(&cfg->guidConfigBitstreamEncryption, &DXVA_NoEncrypt))
             score += 16;
 
         if (cfg_score < score) {
