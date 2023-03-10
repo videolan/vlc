@@ -167,7 +167,7 @@ int DASHManager::doControl(int i_query, va_list args)
 
 bool DASHManager::isDASH(xml::Node *root)
 {
-    const std::string namespaces[] = {
+    static const std::string namespaces[] = {
         "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011",
         "urn:mpeg:schema:dash:mpd:2011",
         "urn:mpeg:DASH:schema:MPD:2011",
