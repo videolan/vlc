@@ -480,10 +480,10 @@ CloseAAudioStream(aout_stream_t *stream)
 
     RequestStop(stream);
 
-    if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) == VLC_SUCCESS)
-        vt.AAudioStream_close(sys->as);
-    else
+    if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) != VLC_SUCCESS)
         msg_Warn(stream, "Error waiting for stopped state");
+
+    vt.AAudioStream_close(sys->as);
 
     sys->as = NULL;
 }
