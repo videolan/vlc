@@ -270,7 +270,7 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
 
     if( count == 0 || list == NULL )
-        return NULL;
+        return list;
 
     for( size_t i = 0; i < count; ++i )
     {
