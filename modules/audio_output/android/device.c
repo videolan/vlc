@@ -276,6 +276,7 @@ Open(vlc_object_t *obj)
     sys->encoding_flags = 0;
     sys->volume = 1.f;
     sys->mute = false;
+    sys->stream = NULL;
 
     aout->start = Start;
     aout->stop = Stop;
