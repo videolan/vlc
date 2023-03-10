@@ -43,6 +43,7 @@ struct sys
     {
         aaudio_format_t format;
         int32_t session_id;
+        int32_t device_id;
         bool low_latency;
     } cfg;
 
@@ -85,6 +86,7 @@ static struct {
     void *handle;
     aaudio_result_t       (*AAudio_createStreamBuilder)(AAudioStreamBuilder **);
     const char           *(*AAudio_convertResultToText)(aaudio_result_t);
+    void                  (*AAudioStreamBuilder_setDeviceId)(AAudioStreamBuilder *, int32_t);
     void                  (*AAudioStreamBuilder_setFormat)(AAudioStreamBuilder *, aaudio_format_t);
     void                  (*AAudioStreamBuilder_setChannelCount)(AAudioStreamBuilder *, int32_t);
     void                  (*AAudioStreamBuilder_setDataCallback)(AAudioStreamBuilder *, AAudioStream_dataCallback, void *);
@@ -98,6 +100,7 @@ static struct {
     aaudio_result_t       (*AAudioStream_requestStop)(AAudioStream *);
     aaudio_result_t       (*AAudioStream_requestPause)(AAudioStream *);
     aaudio_result_t       (*AAudioStream_requestFlush)(AAudioStream *);
+    int32_t               (*AAudioStream_getDeviceId)(AAudioStream *);
     int32_t               (*AAudioStream_getSampleRate)(AAudioStream *);
     aaudio_result_t       (*AAudioStream_getTimestamp)(AAudioStream *, clockid_t,
                                                        int64_t *framePosition, int64_t *timeNanoseconds);
@@ -151,6 +154,7 @@ LoadSymbols(aout_stream_t *stream)
     AAUDIO_DLSYM(AAudio_createStreamBuilder);
     AAUDIO_DLSYM(AAudio_convertResultToText);
     AAUDIO_DLSYM(AAudioStreamBuilder_setChannelCount);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setDeviceId);
     AAUDIO_DLSYM(AAudioStreamBuilder_setFormat);
     AAUDIO_DLSYM(AAudioStreamBuilder_setDataCallback);
     AAUDIO_DLSYM(AAudioStreamBuilder_setErrorCallback);
@@ -163,6 +167,7 @@ LoadSymbols(aout_stream_t *stream)
     AAUDIO_DLSYM(AAudioStream_requestStop);
     AAUDIO_DLSYM(AAudioStream_requestPause);
     AAUDIO_DLSYM(AAudioStream_requestFlush);
+    AAUDIO_DLSYM(AAudioStream_getDeviceId);
     AAUDIO_DLSYM(AAudioStream_getSampleRate);
     AAUDIO_DLSYM(AAudioStream_getTimestamp);
     AAUDIO_DLSYM(AAudioStream_write);
@@ -531,6 +536,9 @@ OpenAAudioStream(aout_stream_t *stream)
         vt.AAudioStreamBuilder_setPerformanceMode(builder,
             AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
 
+    if (sys->cfg.device_id != AAUDIO_UNSPECIFIED)
+        vt.AAudioStreamBuilder_setDeviceId(builder, sys->cfg.device_id);
+
     AAudioStream *as;
     result = vt.AAudioStreamBuilder_openStream(builder, &as);
     if (result != AAUDIO_OK)
@@ -550,6 +558,8 @@ static void
 PrepareAudioFormat(aout_stream_t *stream, audio_sample_format_t *fmt)
 {
     struct sys *sys = stream->sys;
+
+    sys->cfg.device_id = AAUDIO_UNSPECIFIED;
 
     sys->cfg.session_id = var_InheritInteger(stream, "audiotrack-session-id");
     if (sys->cfg.session_id == 0)
@@ -847,6 +857,8 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
 
     if (sys->dp == NULL)
         msg_Warn(stream, "failed to attach DynamicsProcessing to the stream)");
+
+    sys->cfg.device_id = vt.AAudioStream_getDeviceId(sys->as);
 
     stream->stop = Stop;
     stream->play = Play;
