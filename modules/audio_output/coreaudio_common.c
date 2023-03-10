@@ -26,6 +26,7 @@
 #include <CoreAudio/CoreAudioTypes.h>
 
 #define TIMING_REPORT_DELAY_TICKS VLC_TICK_FROM_MS(1000)
+#define COREAUDIO_DELAY_LATENCY VLC_TICK_FROM_MS(100)
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
@@ -281,7 +282,7 @@ ca_Flush(audio_output_t *p_aout)
     p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
     p_sys->first_play_date = VLC_TICK_INVALID;
-    p_sys->timing_report_delay_bytes =
+    p_sys->timing_report_delay_bytes = TicksToBytes(p_sys, COREAUDIO_DELAY_LATENCY);
     p_sys->timing_report_last_written_bytes = 0;
 
     ca_ClearOutBuffers(p_aout);
@@ -377,7 +378,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
         p_sys->get_latency = get_latency;
     else
         p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
-    p_sys->timing_report_delay_bytes =
+    p_sys->timing_report_delay_bytes = TicksToBytes(p_sys, COREAUDIO_DELAY_LATENCY);
     p_sys->timing_report_last_written_bytes = 0;
 
     ca_ClearOutBuffers(p_aout);
@@ -410,7 +411,7 @@ void ca_ResetDeviceLatency(audio_output_t *p_aout)
 
     lock_lock(p_sys);
     /* Trigger aout_TimingReport() to be called from the next render callback */
-    p_sys->timing_report_delay_bytes = 0;
+    p_sys->timing_report_delay_bytes = TicksToBytes(p_sys, COREAUDIO_DELAY_LATENCY);
     lock_unlock(p_sys);
 }
 
