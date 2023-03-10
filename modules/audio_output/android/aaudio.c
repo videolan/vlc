@@ -473,6 +473,86 @@ ErrorCallback(AAudioStream *as, void *user, aaudio_result_t error)
     aout_stream_RestartRequest(stream, AOUT_RESTART_OUTPUT);
 }
 
+static int
+OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
+{
+    struct sys *sys = stream->sys;
+    aaudio_result_t result;
+
+    AAudioStreamBuilder *builder;
+    result = vt.AAudio_createStreamBuilder(&builder);
+    if (result != AAUDIO_OK)
+    {
+        LogAAudioError(stream, "Failed to create AAudio stream builder", result);
+        return VLC_EGENERIC;
+    }
+
+    aaudio_format_t format;
+    if (fmt->i_format == VLC_CODEC_S16N)
+        format = AAUDIO_FORMAT_PCM_I16;
+    else
+    {
+        if (fmt->i_format != VLC_CODEC_FL32)
+        {
+            /* override to request conversion */
+            fmt->i_format = VLC_CODEC_FL32;
+            fmt->i_bytes_per_frame = 4 * fmt->i_channels;
+        }
+        format = AAUDIO_FORMAT_PCM_FLOAT;
+    }
+
+    vt.AAudioStreamBuilder_setFormat(builder, format);
+    vt.AAudioStreamBuilder_setChannelCount(builder, fmt->i_channels);
+
+    /* Setup the session-id */
+    int32_t session_id = var_InheritInteger(stream, "audiotrack-session-id");
+    if (session_id == 0)
+        session_id = AAUDIO_SESSION_ID_ALLOCATE;
+    vt.AAudioStreamBuilder_setSessionId(builder, session_id);
+
+    /* Setup the role */
+    char *vlc_role = var_InheritString(stream, "role");
+    if (vlc_role != NULL)
+    {
+        aaudio_usage_t usage = GetUsageFromVLCRole(vlc_role);
+        vt.AAudioStreamBuilder_setUsage(builder, usage);
+        free(vlc_role);
+    } /* else if not set, default is MEDIA usage */
+
+    bool low_latency = false;
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+        low_latency = true;
+    }
+
+    vt.AAudioStreamBuilder_setDataCallback(builder, DataCallback, stream);
+    vt.AAudioStreamBuilder_setErrorCallback(builder, ErrorCallback, stream);
+
+    if (low_latency)
+        vt.AAudioStreamBuilder_setPerformanceMode(builder,
+            AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
+
+    AAudioStream *as;
+    result = vt.AAudioStreamBuilder_openStream(builder, &as);
+    if (result != AAUDIO_OK)
+    {
+        LogAAudioError(stream, "Failed to open AAudio stream", result);
+        vt.AAudioStreamBuilder_delete(builder);
+        return VLC_EGENERIC;
+    }
+    vt.AAudioStreamBuilder_delete(builder);
+
+    /* Use the native sample rate of the device */
+    fmt->i_rate = vt.AAudioStream_getSampleRate(as);
+    assert(fmt->i_rate > 0);
+
+    sys->as = as;
+    sys->fmt = *fmt;
+
+    return VLC_SUCCESS;
+}
+
 static void
 Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
 {
@@ -669,85 +749,6 @@ MuteSet(aout_stream_t *stream, bool mute)
                                            mute ? 0.0f : sys->volume);
     if (ret != VLC_SUCCESS)
         msg_Warn(stream, "failed to mute via DynamicsProcessing");
-}
-
-static int OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
-{
-    struct sys *sys = stream->sys;
-    aaudio_result_t result;
-
-    AAudioStreamBuilder *builder;
-    result = vt.AAudio_createStreamBuilder(&builder);
-    if (result != AAUDIO_OK)
-    {
-        LogAAudioError(stream, "Failed to create AAudio stream builder", result);
-        return VLC_EGENERIC;
-    }
-
-    aaudio_format_t format;
-    if (fmt->i_format == VLC_CODEC_S16N)
-        format = AAUDIO_FORMAT_PCM_I16;
-    else
-    {
-        if (fmt->i_format != VLC_CODEC_FL32)
-        {
-            /* override to request conversion */
-            fmt->i_format = VLC_CODEC_FL32;
-            fmt->i_bytes_per_frame = 4 * fmt->i_channels;
-        }
-        format = AAUDIO_FORMAT_PCM_FLOAT;
-    }
-
-    vt.AAudioStreamBuilder_setFormat(builder, format);
-    vt.AAudioStreamBuilder_setChannelCount(builder, fmt->i_channels);
-
-    /* Setup the session-id */
-    int32_t session_id = var_InheritInteger(stream, "audiotrack-session-id");
-    if (session_id == 0)
-        session_id = AAUDIO_SESSION_ID_ALLOCATE;
-    vt.AAudioStreamBuilder_setSessionId(builder, session_id);
-
-    /* Setup the role */
-    char *vlc_role = var_InheritString(stream, "role");
-    if (vlc_role != NULL)
-    {
-        aaudio_usage_t usage = GetUsageFromVLCRole(vlc_role);
-        vt.AAudioStreamBuilder_setUsage(builder, usage);
-        free(vlc_role);
-    } /* else if not set, default is MEDIA usage */
-
-    bool low_latency = false;
-    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
-    {
-        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
-        low_latency = true;
-    }
-
-    vt.AAudioStreamBuilder_setDataCallback(builder, DataCallback, stream);
-    vt.AAudioStreamBuilder_setErrorCallback(builder, ErrorCallback, stream);
-
-    if (low_latency)
-        vt.AAudioStreamBuilder_setPerformanceMode(builder,
-            AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
-
-    AAudioStream *as;
-    result = vt.AAudioStreamBuilder_openStream(builder, &as);
-    if (result != AAUDIO_OK)
-    {
-        LogAAudioError(stream, "Failed to open AAudio stream", result);
-        vt.AAudioStreamBuilder_delete(builder);
-        return VLC_EGENERIC;
-    }
-    vt.AAudioStreamBuilder_delete(builder);
-
-    /* Use the native sample rate of the device */
-    fmt->i_rate = vt.AAudioStream_getSampleRate(as);
-    assert(fmt->i_rate > 0);
-
-    sys->as = as;
-    sys->fmt = *fmt;
-
-    return VLC_SUCCESS;
 }
 
 static void
