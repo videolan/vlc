@@ -331,7 +331,7 @@ GetFrameTimestampLocked(aout_stream_t *stream, int64_t *pos_frames,
                                          pos_frames, &time_ns);
     if (result != AAUDIO_OK)
     {
-        msg_Err(stream, "AAudioStream_getTimestamp failed: %d", result);
+        LogAAudioError(stream, "AAudioStream_getTimestamp failed", result);
         return VLC_EGENERIC;
     }
     if (*pos_frames <= 0)
