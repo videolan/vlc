@@ -249,6 +249,8 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         }
     }
 
+    p_sys->timing_report_last_written_bytes += bytes_copied;
+
     if (p_sys->timing_report_last_written_bytes >=
         p_sys->timing_report_delay_bytes)
     {
@@ -258,8 +260,6 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         aout_LatencyReport(p_aout, latency_ticks);
         aout_TimingReport(p_aout, end_ticks, pos_ticks);
     }
-    else
-        p_sys->timing_report_last_written_bytes += bytes_copied;
 
     lock_unlock(p_sys);
 }
