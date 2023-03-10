@@ -34,7 +34,7 @@ Widgets.StackViewExt {
     /*
       A component for loading view subtypes depending on model or user preferences.
       It also handles common actions across sub views such as -
-      restoring of initialIndex when view is reloaded
+      restoring of initialIndex when view is reloaded and navigation cancel.
 
       Following are required inputs -
     */
@@ -131,4 +131,17 @@ Widgets.StackViewExt {
                 currentItem.currentIndex = initialIndex
         }
     }
+
+    // handle cancelAction, if currentIndex is set reset it to 0
+    // otherwise perform default Navigation action
+    Navigation.cancelAction: function () {
+        if (Helpers.get(currentItem, "currentIndex", 0) <= 0) {
+            return false // transfer cancel action to parent
+        }
+
+        currentItem.currentIndex = 0
+        currentItem.positionViewAtIndex(0, ItemView.Contain)
+        return true
+    }
+
 }

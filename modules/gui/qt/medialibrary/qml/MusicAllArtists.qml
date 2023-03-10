@@ -36,15 +36,6 @@ MainInterface.MainViewLoader {
 
     signal requestArtistAlbumView(int reason)
 
-    function _onNavigationCancel() {
-        if (currentIndex <= 0) {
-            root.Navigation.defaultNavigationCancel()
-        } else if (model.count > 0) {
-            currentItem.currentIndex = 0
-            currentItem.positionViewAtIndex(0, ItemView.Contain)
-        }
-    }
-
     model: MLArtistModel {
         id: artistModel
         ml: MediaLib
@@ -83,7 +74,6 @@ MainInterface.MainViewLoader {
             cellHeight: VLCStyle.gridItem_music_height
 
             Navigation.parentItem: root
-            Navigation.cancelAction: root._onNavigationCancel
 
             onActionAtIndex: {
                 if (selectionModel.selectedIndexes.length > 1) {
@@ -182,7 +172,6 @@ MainInterface.MainViewLoader {
             headerTopPadding: VLCStyle.margin_normal
 
             Navigation.parentItem: root
-            Navigation.cancelAction: root._onNavigationCancel
 
             onActionForSelection: {
                 if (selection.length > 1) {

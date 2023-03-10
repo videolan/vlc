@@ -97,16 +97,6 @@ MainInterface.MainViewLoader {
             Navigation.defaultNavigationUp()
     }
 
-    function _onNavigationCancel() {
-        if (currentItem.currentIndex <= 0) {
-            Navigation.defaultNavigationCancel()
-        } else {
-            currentItem.currentIndex = 0
-
-            currentItem.positionViewAtIndex(0, ItemView.Contain)
-        }
-    }
-
     Widgets.MLDragItem {
         id: dragItem
 
@@ -145,9 +135,6 @@ MainInterface.MainViewLoader {
             Navigation.parentItem: root
 
             Navigation.upAction: _onNavigationUp
-
-            // NOTE: cancelAction takes a function, we pass it directly.
-            Navigation.cancelAction: root._onNavigationCancel
 
             // Events
 
@@ -269,9 +256,6 @@ MainInterface.MainViewLoader {
             Navigation.parentItem: root
 
             Navigation.upAction: _onNavigationUp
-
-            //cancelAction takes a *function* pass it directly
-            Navigation.cancelAction: root._onNavigationCancel
 
             // Events
 

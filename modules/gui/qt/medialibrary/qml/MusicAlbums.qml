@@ -67,16 +67,6 @@ MainInterface.MainViewLoader {
         }
     }
 
-    function _onNavigationCancel() {
-        if (currentIndex <= 0) {
-            root.Navigation.defaultNavigationCancel()
-        } else if (model.count > 0) {
-            currentItem.currentIndex = 0;
-            currentItem.positionViewAtIndex(0, ItemView.Contain)
-        }
-    }
-
-
     MLAlbumModel {
         id: albumModelId
 
@@ -168,7 +158,6 @@ MainInterface.MainViewLoader {
             }
 
             Navigation.parentItem: root
-            Navigation.cancelAction: root._onNavigationCancel
 
             Connections {
                 target: contextMenu
@@ -248,8 +237,6 @@ MainInterface.MainViewLoader {
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
-
-            Navigation.cancelAction: root._onNavigationCancel
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)

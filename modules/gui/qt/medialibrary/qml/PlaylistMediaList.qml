@@ -121,15 +121,6 @@ MainInterface.MainViewLoader {
             return I18n.qtr("99+");
     }
 
-    function _onNavigationCancel() {
-        if (_currentView.currentIndex <= 0) {
-            Navigation.defaultNavigationCancel()
-        } else {
-            _currentView.currentIndex = 0;
-            _currentView.positionViewAtIndex(0, ItemView.Contain);
-        }
-    }
-
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
@@ -175,8 +166,6 @@ MainInterface.MainViewLoader {
             selectionDelegateModel: selectionModel
 
             Navigation.parentItem: root
-
-            Navigation.cancelAction: root._onNavigationCancel
 
             delegate: VideoGridItem {
                 //---------------------------------------------------------------------------------
@@ -313,7 +302,6 @@ MainInterface.MainViewLoader {
             dragItem: dragItemPlaylist
 
             Navigation.parentItem: root
-            Navigation.cancelAction: root._onNavigationCancel
 
             //-------------------------------------------------------------------------------------
             // Events

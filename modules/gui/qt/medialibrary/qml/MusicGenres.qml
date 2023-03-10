@@ -189,12 +189,6 @@ MainInterface.MainViewLoader {
             onActionAtIndex: _actionAtIndex(index)
 
             Navigation.parentItem: root
-            Navigation.cancelAction: function() {
-                if (_currentView.currentIndex <= 0)
-                    root.Navigation.defaultNavigationCancel()
-                else
-                    _currentView.currentIndex = 0;
-            }
         }
     }
 
@@ -257,12 +251,6 @@ MainInterface.MainViewLoader {
             focus: true
             onActionForSelection: _actionAtIndex(selection)
             Navigation.parentItem: root
-            Navigation.cancelAction: function() {
-                if (_currentView.currentIndex <= 0)
-                    root.Navigation.defaultNavigationCancel()
-                else
-                    _currentView.currentIndex = 0;
-            }
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal
