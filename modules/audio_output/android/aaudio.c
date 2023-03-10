@@ -54,7 +54,6 @@ struct sys
     bool muted;
 
     audio_sample_format_t fmt;
-    int64_t frames_flush_pos;
     bool error;
 
     /* Spinlock that protect all the following variables */
@@ -448,9 +447,6 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
             sys->timing_report_delay_bytes =
                 TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
 
-            pos_frames -= sys->frames_flush_pos;
-            if (unlikely(pos_frames < 0))
-                pos_frames = 0;
             vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
 
             /* Add the start silence to the system time and don't subtract
@@ -601,8 +597,7 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
     struct sys *sys = stream->sys;
 
     aaudio_stream_state_t state = GetState(stream);
-    if (state == AAUDIO_STREAM_STATE_OPEN
-     || state == AAUDIO_STREAM_STATE_FLUSHED)
+    if (state == AAUDIO_STREAM_STATE_OPEN)
     {
         if (RequestStart(stream) != VLC_SUCCESS)
             goto bailout;
@@ -686,7 +681,6 @@ Flush(aout_stream_t *stream)
     aaudio_stream_state_t state = GetState(stream);
 
     if (state == AAUDIO_STREAM_STATE_UNINITIALIZED
-     || state == AAUDIO_STREAM_STATE_FLUSHED
      || state == AAUDIO_STREAM_STATE_OPEN)
         return;
 
@@ -702,12 +696,13 @@ Flush(aout_stream_t *stream)
      && WaitState(stream, AAUDIO_STREAM_STATE_PAUSED) != VLC_SUCCESS)
         return;
 
-    /* The doc states that "Pausing a stream will freeze the data flow but not
-     * flush any buffers" but this does not seem to be the case for all
-     * arch/devices/versions. So, flush everything with the lock held in the
-     * unlikely case that the data callback is called between PAUSED and
-     * FLUSHING */
-    vlc_mutex_lock(&sys->lock);
+    if (RequestFlush(stream) != VLC_SUCCESS)
+        return;
+
+    if (WaitState(stream, AAUDIO_STREAM_STATE_FLUSHED) != VLC_SUCCESS)
+        return;
+
+    CloseAAudioStream(stream);
 
     vlc_frame_ChainRelease(sys->frame_chain);
     sys->frame_chain = NULL;
@@ -722,20 +717,21 @@ Flush(aout_stream_t *stream)
     sys->timing_report_delay_bytes = 0;
     sys->underrun_bytes = 0;
 
-    vlc_tick_t unused;
-    if (GetFrameTimestampLocked(stream, &sys->frames_flush_pos, &unused) != VLC_SUCCESS)
+    int ret = OpenAAudioStream(stream);
+    if (ret != VLC_SUCCESS)
     {
-        sys->frames_flush_pos = 0;
-        msg_Warn(stream, "Flush: can't get paused position");
+        sys->error = true;
+        return;
     }
 
-    vlc_mutex_unlock(&sys->lock);
-
-    if (RequestFlush(stream) != VLC_SUCCESS)
-        return;
-
-    if (WaitState(stream, AAUDIO_STREAM_STATE_FLUSHED) != VLC_SUCCESS)
-        return;
+    int32_t new_rate = vt.AAudioStream_getSampleRate(sys->as);
+    assert(new_rate > 0);
+    if ((unsigned) new_rate != sys->fmt.i_rate)
+    {
+        msg_Err(stream, "rate changed after flush, from %u to %d",
+                sys->fmt.i_rate, new_rate);
+        aout_stream_RestartRequest(stream, AOUT_RESTART_OUTPUT);
+    }
 }
 
 static void
@@ -799,7 +795,8 @@ Stop(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
 
-    CloseAAudioStream(stream);
+    if (sys->as != NULL)
+        CloseAAudioStream(stream);
 
     if (sys->dp != NULL)
         DynamicsProcessing_Delete(stream, sys->dp);
@@ -827,7 +824,6 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
 
     sys->volume = 1.0f;
     sys->muted = false;
-    sys->frames_flush_pos = 0;
     sys->error = false;
 
     vlc_mutex_init(&sys->lock);
