@@ -31,6 +31,8 @@ import "qrc:///menus/" as Menus
 FocusScope{
     id: root
 
+    // Properties
+
     /* required */ property int textWidth
 
     property string title
@@ -45,6 +47,12 @@ FocusScope{
     property int reservedHeight: 0
 
     readonly property int _sideMargin: VLCStyle.margin_small + sideMargin
+
+    // Aliases
+
+    property alias resumeVisible: resumeDialog.visible
+
+    // Signals
 
     signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock)
@@ -202,11 +210,11 @@ FocusScope{
         anchors.top: root.top
         anchors.leftMargin:  root._sideMargin
 
-        implicitWidth: resumeDialog.visible ? resumeDialog.implicitWidth
-                                            : logoGroup.implicitWidth
+        implicitWidth: resumeVisible ? resumeDialog.implicitWidth
+                                     : logoGroup.implicitWidth
 
-        implicitHeight: resumeDialog.visible ? resumeDialog.implicitHeight
-                                             : logoGroup.implicitHeight
+        implicitHeight: resumeVisible ? resumeDialog.implicitHeight
+                                      : logoGroup.implicitHeight
 
         onImplicitHeightChanged: root._layout()
 
@@ -214,7 +222,7 @@ FocusScope{
             id: logoGroup
 
             anchors.fill: parent
-            visible: !resumeDialog.visible
+            visible: !resumeVisible
 
             implicitHeight: VLCStyle.icon_banner + VLCStyle.margin_xxsmall * 2
             implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall
@@ -296,7 +304,7 @@ FocusScope{
         readonly property bool _alignHCenter: _centerX > _leftLimit
                                               && _centerX + centerTitleText.implicitWidth < _rightLimit
 
-        visible: root.pinControls && !resumeDialog.visible
+        visible: root.pinControls && !resumeVisible
 
         width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
 
