@@ -473,6 +473,21 @@ ErrorCallback(AAudioStream *as, void *user, aaudio_result_t error)
     aout_stream_RestartRequest(stream, AOUT_RESTART_OUTPUT);
 }
 
+static void
+CloseAAudioStream(aout_stream_t *stream)
+{
+    struct sys *sys = stream->sys;
+
+    RequestStop(stream);
+
+    if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) == VLC_SUCCESS)
+        vt.AAudioStream_close(sys->as);
+    else
+        msg_Warn(stream, "Error waiting for stopped state");
+
+    sys->as = NULL;
+}
+
 static int
 OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
 {
@@ -756,12 +771,7 @@ Stop(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
 
-    RequestStop(stream);
-
-    if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) == VLC_SUCCESS)
-        vt.AAudioStream_close(sys->as);
-    else
-        msg_Warn(stream, "Error waiting for stopped state");
+    CloseAAudioStream(stream);
 
     if (sys->dp != NULL)
         DynamicsProcessing_Delete(stream, sys->dp);
