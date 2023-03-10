@@ -233,6 +233,8 @@ WaitState(aout_stream_t *stream, aaudio_result_t wait_state)
     if (sys->error)
         return VLC_EGENERIC;
 
+    assert(sys->as);
+
     aaudio_stream_state_t next_state = vt.AAudioStream_getState(sys->as);
     aaudio_stream_state_t current_state = next_state;
 
@@ -256,8 +258,12 @@ GetState(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
 
-    return sys->error ? AAUDIO_STREAM_STATE_UNINITIALIZED
-                      : vt.AAudioStream_getState(sys->as);
+    if (sys->error)
+        return AAUDIO_STREAM_STATE_UNINITIALIZED;
+
+    assert(sys->as);
+
+    return vt.AAudioStream_getState(sys->as);
 }
 
 #define Request(x) do { \
@@ -593,7 +599,6 @@ static void
 Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
 {
     struct sys *sys = stream->sys;
-    assert(sys->as);
 
     aaudio_stream_state_t state = GetState(stream);
     if (state == AAUDIO_STREAM_STATE_OPEN
@@ -609,6 +614,8 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
         assert(state == AAUDIO_STREAM_STATE_STARTING
             || state == AAUDIO_STREAM_STATE_STARTED);
     }
+
+    assert(sys->as);
 
     vlc_mutex_lock(&sys->lock);
 
