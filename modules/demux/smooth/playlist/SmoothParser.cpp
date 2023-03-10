@@ -238,7 +238,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             adaptSet->addAttribute(new TimescaleAttr(timescale));
         }
 
-        const std::string url = streamIndexNode->getAttributeValue("Url");
+        const std::string &url = streamIndexNode->getAttributeValue("Url");
         if(!url.empty())
         {
             /* SmoothSegment is a template holder */
@@ -252,7 +252,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             }
 
             unsigned nextid = 1;
-            const std::string type = streamIndexNode->getAttributeValue("Type");
+            const std::string &type = streamIndexNode->getAttributeValue("Type");
             std::vector<Node *> qualLevels = DOMHelper::getElementByTagName(streamIndexNode, "QualityLevel", true);
             std::vector<Node *>::const_iterator it;
             for(it = qualLevels.begin(); it != qualLevels.end(); ++it)

@@ -179,7 +179,7 @@ bool DASHManager::isDASH(xml::Node *root)
     if(root->getName() != "MPD")
         return false;
 
-    std::string ns = root->getAttributeValue("xmlns");
+    const std::string &ns = root->getAttributeValue("xmlns");
     for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
     {
         if ( adaptive::Helper::ifind(ns, namespaces[i]) )

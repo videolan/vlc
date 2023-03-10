@@ -250,7 +250,7 @@ size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, Segme
     if(templateNode->hasAttribute("initialization")) /* /!\ != Initialization */
     {
         SegmentTemplateInit *initTemplate;
-        std::string initurl = templateNode->getAttributeValue("initialization");
+        const std::string &initurl = templateNode->getAttributeValue("initialization");
         if(!initurl.empty() && (initTemplate = new (std::nothrow) SegmentTemplateInit(mediaTemplate, info)))
         {
             initTemplate->setSourceUrl(initurl);
@@ -317,7 +317,7 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
         Node *role = DOMHelper::getFirstChildElementByName((*it), "Role");
         if(role && role->hasAttribute("schemeIdUri") && role->hasAttribute("value"))
         {
-            std::string uri = role->getAttributeValue("schemeIdUri");
+            const std::string &uri = role->getAttributeValue("schemeIdUri");
             if(uri == "urn:mpeg:dash:role:2011")
             {
                 const std::string &rolevalue = role->getAttributeValue("value");
@@ -462,13 +462,13 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
                 if(!seg)
                     continue;
 
-                std::string mediaUrl = segmentURL->getAttributeValue("media");
+                const std::string &mediaUrl = segmentURL->getAttributeValue("media");
                 if(!mediaUrl.empty())
                     seg->setSourceUrl(mediaUrl);
 
                 if(segmentURL->hasAttribute("mediaRange"))
                 {
-                    std::string range = segmentURL->getAttributeValue("mediaRange");
+                    const std::string &range = segmentURL->getAttributeValue("mediaRange");
                     size_t pos = range.find("-");
                     seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
                 }
@@ -499,7 +499,7 @@ void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<InitSegment
 
     if(initNode->hasAttribute("range"))
     {
-        std::string range = initNode->getAttributeValue("range");
+        const std::string &range = initNode->getAttributeValue("range");
         size_t pos = range.find("-");
         seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
     }
