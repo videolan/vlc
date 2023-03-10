@@ -37,7 +37,7 @@ namespace adaptive
             static std::string getDirectoryPath (const std::string &path);
             static std::string getFileExtension (const std::string &uri);
             static bool        icaseEquals     (std::string str1, std::string str2);
-            static bool        ifind            (std::string haystack, std::string needle);
+            static bool        ifind            (const std::string & haystack, const std::string & needle);
             static std::list<std::string> tokenize(const std::string &, char);
             static std::string & rtrim(std::string &, const std::string &);
             static std::string & ltrim(std::string &, const std::string &);

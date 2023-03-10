@@ -80,11 +80,15 @@ bool Helper::icaseEquals(std::string str1, std::string str2)
     return str1 == str2;
 }
 
-bool Helper::ifind(std::string haystack, std::string needle)
+bool Helper::ifind(const std::string & haystack, const std::string & needle)
 {
-    transform(haystack.begin(), haystack.end(), haystack.begin(), toupper);
-    transform(needle.begin(), needle.end(), needle.begin(), toupper);
-    return haystack.find(needle) != std::string::npos;
+    return std::search(
+        haystack.cbegin(), haystack.cend(),
+        needle.cbegin(),   needle.cend(),
+        [](unsigned char ch1, unsigned char ch2) {
+            return toupper(ch1) == toupper(ch2);
+        }
+    ) != haystack.end();
 }
 
 std::list<std::string> Helper::tokenize(const std::string &str, char c)
