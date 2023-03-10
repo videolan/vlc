@@ -196,7 +196,7 @@ struct vlc_input_decoder_t
     bool reset_out_state;
     vlc_tick_t pause_date;
     vlc_tick_t delay;
-    float request_rate, output_rate;
+    float rate, output_rate;
     unsigned frames_countdown;
     bool paused;
 
@@ -1746,9 +1746,9 @@ static void *DecoderThread( void *p_data )
             continue;
         }
 
-        if( rate != p_owner->request_rate )
+        if( rate != p_owner->rate )
         {
-            rate = p_owner->request_rate;
+            rate = p_owner->rate;
             Decoder_ChangeOutputRate( p_owner, rate );
             continue;
         }
@@ -1894,7 +1894,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 
     p_owner->reset_out_state = false;
     p_owner->delay = 0;
-    p_owner->output_rate = p_owner->request_rate = 1.f;
+    p_owner->output_rate = p_owner->rate = 1.f;
     p_owner->paused = false;
     p_owner->pause_date = VLC_TICK_INVALID;
     p_owner->frames_countdown = 0;
@@ -2555,7 +2555,7 @@ void vlc_input_decoder_ChangePause( vlc_input_decoder_t *p_owner,
 void vlc_input_decoder_ChangeRate( vlc_input_decoder_t *owner, float rate )
 {
     vlc_fifo_Lock( owner->p_fifo );
-    owner->request_rate = rate;
+    owner->rate = rate;
     vlc_fifo_Unlock( owner->p_fifo );
 }
 
