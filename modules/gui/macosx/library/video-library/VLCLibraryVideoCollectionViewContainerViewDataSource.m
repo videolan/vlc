@@ -87,6 +87,14 @@
     }];
 }
 
+- (void)reloadDataForIndex:(NSUInteger)index
+{
+    [self reloadDataWithCompletion:^{
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    }];
+}
+
 - (void)reloadDataWithCompletion:(void(^)(void))completionHandler
 {
     if(!_collectionView || !_groupDescriptor) {
