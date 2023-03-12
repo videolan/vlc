@@ -341,6 +341,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (void)currentPlaylistItemChanged:(size_t)index
 {
     _currentPlaylistIndex = index;
+    [_playlistDataSource scrollToCurrentPlaylistItem];
     [_defaultNotificationCenter postNotificationName:VLCPlaylistCurrentItemChanged object:self];
 }
 
