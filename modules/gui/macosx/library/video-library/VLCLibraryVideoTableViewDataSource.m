@@ -93,6 +93,30 @@
     }];
 }
 
+- (void)reloadDataForIndex:(NSUInteger)index
+{
+    [self reloadDataWithCompletion:^{
+        // Don't regenerate the groups by index as these do not change according to the notification
+        // Stick to the selection table view
+        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
+
+        NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
+        NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
+
+        [self->_groupsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
+    }];
+}
+
+- (void)deleteDataForIndex:(NSUInteger)index
+{
+    [self reloadDataWithCompletion:^{
+        // Don't regenerate the groups by index as these do not change according to the notification
+        // Stick to the selection table view
+        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
+        [self->_groupsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+    }];
+}
+
 #pragma mark - table view data source and delegation
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
