@@ -32,18 +32,23 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCMediaLibraryGenre;
 @class VLCMediaLibraryEntryPoint;
 
-extern NSString *VLCLibraryModelAudioMediaListUpdated;
 extern NSString *VLCLibraryModelArtistListUpdated;
 extern NSString *VLCLibraryModelAlbumListUpdated;
 extern NSString *VLCLibraryModelGenreListUpdated;
-extern NSString *VLCLibraryModelVideoMediaListUpdated;
-extern NSString *VLCLibraryModelRecentMediaListUpdated;
 extern NSString *VLCLibraryModelListOfMonitoredFoldersUpdated;
 extern NSString *VLCLibraryModelMediaItemThumbnailGenerated;
+
+extern NSString *VLCLibraryModelAudioMediaListReset;
+extern NSString *VLCLibraryModelVideoMediaListReset;
+extern NSString *VLCLibraryModelRecentsMediaListReset;
 
 extern NSString *VLCLibraryModelAudioMediaItemDeleted;
 extern NSString *VLCLibraryModelVideoMediaItemDeleted;
 extern NSString *VLCLibraryModelRecentsMediaItemDeleted;
+
+extern NSString *VLCLibraryModelAudioMediaItemUpdated;
+extern NSString *VLCLibraryModelVideoMediaItemUpdated;
+extern NSString *VLCLibraryModelRecentsMediaItemUpdated;
 
 @interface VLCLibraryModel : NSObject
 

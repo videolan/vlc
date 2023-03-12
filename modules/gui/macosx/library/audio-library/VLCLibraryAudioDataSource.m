@@ -89,7 +89,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelAudioMediaListUpdated
+                                   name:VLCLibraryModelAudioMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)

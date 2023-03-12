@@ -38,7 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryVideoGroup group;
 @property (readonly) SEL libraryModelDataSelector;
 @property (readonly) NSMethodSignature *libraryModelDataMethodSignature;
-@property (readonly) NSNotificationName libraryModelUpdatedNotificationName;
 @property (readonly) NSString *name;
 @property (readonly) BOOL isHorizontalBarCollectionView;
 

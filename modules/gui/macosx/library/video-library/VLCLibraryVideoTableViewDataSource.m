@@ -55,11 +55,11 @@
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelVideoMediaListUpdated
+                                   name:VLCLibraryModelVideoMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelRecentMediaListUpdated
+                                   name:VLCLibraryModelRecentsMediaListReset
                                  object:nil];
     }
     return self;

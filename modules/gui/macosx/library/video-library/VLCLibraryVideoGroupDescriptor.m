@@ -37,13 +37,11 @@
 
         switch (_group) {
             case VLCLibraryVideoRecentsGroup:
-                _libraryModelUpdatedNotificationName = VLCLibraryModelRecentMediaListUpdated;
                 _libraryModelDataSelector = @selector(listOfRecentMedia);
                 _isHorizontalBarCollectionView = YES;
                 _name = _NS("Recents");
                 break;
             case VLCLibraryVideoLibraryGroup:
-                _libraryModelUpdatedNotificationName = VLCLibraryModelVideoMediaListUpdated;
                 _libraryModelDataSelector = @selector(listOfVideoMedia);
                 _isHorizontalBarCollectionView = NO;
                 _name = _NS("Library");
