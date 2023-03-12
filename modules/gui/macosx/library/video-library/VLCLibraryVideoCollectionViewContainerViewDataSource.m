@@ -50,11 +50,11 @@
     if(self) {
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelVideosUpdated:)
                                    name:VLCLibraryModelVideoMediaListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelRecentsUpdated:)
                                    name:VLCLibraryModelRecentMediaListUpdated
                                  object:nil];
         _libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
@@ -62,8 +62,21 @@
     return self;
 }
 
-- (void)libraryModelUpdated:(NSNotification *)aNotification
+- (void)libraryModelVideosUpdated:(NSNotification *)aNotification
 {
+    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+        return;
+    }
+
+    [self reloadData];
+}
+
+- (void)libraryModelRecentsUpdated:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+        return;
+    }
+
     [self reloadData];
 }
 
