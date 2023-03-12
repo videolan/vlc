@@ -67,6 +67,10 @@
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelVideoMediaListReset
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelVideoMediaItemDeleted
+                                 object:nil];
     }
 
     return self;
@@ -218,8 +222,7 @@
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
     NSParameterAssert(aNotification);
-    VLCLibraryModel *model = (VLCLibraryModel *)aNotification.object;
-    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    VLCLibraryModel *model = VLCMain.sharedInstance.libraryController.libraryModel;
     NSArray<VLCMediaLibraryMediaItem *> * videoList = model.listOfVideoMedia;
 
     if (_segmentedTitleControl.selectedSegment == VLCLibraryVideoSegment &&
