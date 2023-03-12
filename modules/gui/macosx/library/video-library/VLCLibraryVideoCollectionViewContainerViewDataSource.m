@@ -58,6 +58,11 @@
                                    name:VLCLibraryModelVideoMediaItemUpdated
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelVideoItemDeleted:)
+                                   name:VLCLibraryModelVideoMediaItemDeleted
+                                 object:nil];
+
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelRecentsListReset:)
                                    name:VLCLibraryModelRecentsMediaListReset
                                  object:nil];
@@ -65,18 +70,14 @@
                                selector:@selector(libraryModelRecentsItemUpdated:)
                                    name:VLCLibraryModelRecentsMediaItemUpdated
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelRecentsItemDeleted:)
+                                   name:VLCLibraryModelRecentsMediaItemDeleted
+                                 object:nil];
+
         _libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
     }
     return self;
-}
-
-- (void)libraryModelVideoListReset:(NSNotification *)aNotification
-{
-    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
-        return;
-    }
-
-    [self reloadData];
 }
 
 - (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification
@@ -91,6 +92,15 @@
     return modelIndexNumber.longLongValue;
 }
 
+- (void)libraryModelVideoListReset:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+        return;
+    }
+
+    [self reloadData];
+}
+
 - (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
@@ -99,6 +109,16 @@
 
     const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
     [self reloadDataForIndex:modelIndex];
+}
+
+- (void)libraryModelVideoItemDeleted:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+        return;
+    }
+
+    const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
+    [self deleteDataForIndex:modelIndex];
 }
 
 - (void)libraryModelRecentsListReset:(NSNotification *)aNotification
@@ -118,6 +138,16 @@
 
     const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
     [self reloadDataForIndex:modelIndex];
+}
+
+- (void)libraryModelRecentsItemDeleted:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+        return;
+    }
+
+    const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
+    [self deleteDataForIndex:modelIndex];
 }
 
 - (void)reloadDataWithCompletion:(void(^)(void))completionHandler
