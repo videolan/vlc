@@ -120,21 +120,6 @@
     [self reloadDataForIndex:modelIndex];
 }
 
-- (void)reloadData
-{
-    [self reloadDataWithCompletion:^{
-        [self->_collectionView reloadData];
-    }];
-}
-
-- (void)reloadDataForIndex:(NSUInteger)index
-{
-    [self reloadDataWithCompletion:^{
-        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    }];
-}
-
 - (void)reloadDataWithCompletion:(void(^)(void))completionHandler
 {
     if(!_collectionView || !_groupDescriptor) {
@@ -152,6 +137,29 @@
 
         completionHandler();
     });
+}
+
+- (void)reloadData
+{
+    [self reloadDataWithCompletion:^{
+        [self->_collectionView reloadData];
+    }];
+}
+
+- (void)reloadDataForIndex:(NSUInteger)index
+{
+    [self reloadDataWithCompletion:^{
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    }];
+}
+
+- (void)deleteDataForIndex:(NSUInteger)index
+{
+    [self reloadDataWithCompletion:^{
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    }];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
