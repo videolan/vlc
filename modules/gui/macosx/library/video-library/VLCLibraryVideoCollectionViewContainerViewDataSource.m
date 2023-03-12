@@ -61,6 +61,10 @@
                                selector:@selector(libraryModelRecentsListReset:)
                                    name:VLCLibraryModelRecentsMediaListReset
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelRecentsItemUpdated:)
+                                   name:VLCLibraryModelRecentsMediaItemUpdated
+                                 object:nil];
         _libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
     }
     return self;
@@ -104,6 +108,16 @@
     }
 
     [self reloadData];
+}
+
+- (void)libraryModelRecentsItemUpdated:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+        return;
+    }
+
+    const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
+    [self reloadDataForIndex:modelIndex];
 }
 
 - (void)reloadData
