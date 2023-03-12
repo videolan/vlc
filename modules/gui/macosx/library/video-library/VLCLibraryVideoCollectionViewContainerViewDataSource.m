@@ -82,6 +82,13 @@
 
 - (void)reloadData
 {
+    [self reloadDataWithCompletion:^{
+        [self->_collectionView reloadData];
+    }];
+}
+
+- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
+{
     if(!_collectionView || !_groupDescriptor) {
         NSLog(@"Null collection view or video group descriptor");
         return;
@@ -95,7 +102,7 @@
         [modelDataInvocation invokeWithTarget:self->_libraryModel];
         [modelDataInvocation getReturnValue:&self->_collectionArray];
 
-        [self->_collectionView reloadData];
+        completionHandler();
     });
 }
 
