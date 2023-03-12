@@ -84,6 +84,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelAudioMediaListReset
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAudioMediaItemDeleted
+                                 object:nil];
     }
 
     return self;
