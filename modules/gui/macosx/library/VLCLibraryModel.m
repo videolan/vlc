@@ -517,4 +517,41 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListUpdated object:self];
 }
 
+- (void)performActionOnMediaItemFromCache:(const int64_t)libraryId action:(void (^)(NSArray *, const NSUInteger, NSError * const))action
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        BOOL (^idCheckBlock)(VLCMediaLibraryMediaItem * const, const NSUInteger, BOOL * const) = ^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
+            return mediaItem.libraryID == libraryId;
+        };
+
+        const NSUInteger recentsIndex = [self->_cachedRecentMedia indexOfObjectPassingTest:idCheckBlock];
+        if (recentsIndex != NSNotFound) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                action(self->_cachedRecentMedia, recentsIndex, nil);
+            });
+        }
+
+        const NSUInteger videoIndex = [self->_cachedVideoMedia indexOfObjectPassingTest:idCheckBlock];
+        if (videoIndex != NSNotFound) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                action(self->_cachedVideoMedia, videoIndex, nil);
+            });
+            return;
+        }
+
+        const NSUInteger audioIndex = [self->_cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];
+        if (audioIndex != NSNotFound) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                action(self->_cachedAudioMedia, audioIndex, nil);
+            });
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            action(nil, 0, [NSError errorWithDomain:NSCocoaErrorDomain code:NSNotFound userInfo:nil]);
+        });
+    });
+}
+
 @end
