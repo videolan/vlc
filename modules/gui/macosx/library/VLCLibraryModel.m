@@ -161,6 +161,18 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 @implementation VLCLibraryModel
 
++ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification
+{
+    NSParameterAssert(aNotification);
+    NSDictionary * const notificationUserInfo = aNotification.userInfo;
+    NSAssert(notificationUserInfo != nil, @"Video item-related notification should carry valid user info");
+
+    NSNumber * const modelIndexNumber = (NSNumber * const)[notificationUserInfo objectForKey:@"index"];
+    NSAssert(modelIndexNumber != nil, @"Video item notification user info should carry index for updated item");
+
+    return modelIndexNumber.longLongValue;
+}
+
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library
 {
     self = [super init];

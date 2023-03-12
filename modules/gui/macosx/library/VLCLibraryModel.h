@@ -52,6 +52,8 @@ extern NSString *VLCLibraryModelRecentsMediaItemUpdated;
 
 @interface VLCLibraryModel : NSObject
 
++ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification;
+
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
 
 @property (readonly) size_t numberOfAudioMedia;
