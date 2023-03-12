@@ -54,6 +54,10 @@
                                    name:VLCLibraryModelVideoMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelVideoItemUpdated:)
+                                   name:VLCLibraryModelVideoMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelRecentsListReset:)
                                    name:VLCLibraryModelRecentsMediaListReset
                                  object:nil];
@@ -69,6 +73,23 @@
     }
 
     [self reloadData];
+}
+
+- (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
+{
+    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+        return;
+    }
+
+    NSParameterAssert(aNotification);
+    NSDictionary * const notificationUserInfo = aNotification.userInfo;
+    NSAssert(notificationUserInfo != nil, @"Video item update notification should carry valid user info");
+
+    NSNumber * const modelIndexNumber = (NSNumber * const)[notificationUserInfo objectForKey:@"index"];
+    NSAssert(modelIndexNumber != nil, @"Video item update user info should carry index for updated item");
+
+    const NSUInteger modelIndex = modelIndexNumber.longLongValue;
+    [self reloadDataForIndex:modelIndex];
 }
 
 - (void)libraryModelRecentsListReset:(NSNotification *)aNotification
