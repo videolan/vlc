@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)prepareForUse;
 - (void)playlistUpdated;
+- (void)scrollToCurrentPlaylistItem;
 
 @end
 

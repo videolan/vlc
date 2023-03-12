@@ -180,4 +180,9 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     return YES;
 }
 
+- (void)scrollToCurrentPlaylistItem
+{
+    [_tableView scrollRowToVisible:_playlistController.currentPlaylistIndex];
+}
+
 @end
