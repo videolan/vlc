@@ -41,6 +41,10 @@ extern NSString *VLCLibraryModelRecentMediaListUpdated;
 extern NSString *VLCLibraryModelListOfMonitoredFoldersUpdated;
 extern NSString *VLCLibraryModelMediaItemThumbnailGenerated;
 
+extern NSString *VLCLibraryModelAudioMediaItemDeleted;
+extern NSString *VLCLibraryModelVideoMediaItemDeleted;
+extern NSString *VLCLibraryModelRecentsMediaItemDeleted;
+
 @interface VLCLibraryModel : NSObject
 
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
