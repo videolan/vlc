@@ -75,20 +75,25 @@
     [self reloadData];
 }
 
+- (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification
+{
+    NSParameterAssert(aNotification);
+    NSDictionary * const notificationUserInfo = aNotification.userInfo;
+    NSAssert(notificationUserInfo != nil, @"Video item-related notification should carry valid user info");
+
+    NSNumber * const modelIndexNumber = (NSNumber * const)[notificationUserInfo objectForKey:@"index"];
+    NSAssert(modelIndexNumber != nil, @"Video item notification user info should carry index for updated item");
+
+    return modelIndexNumber.longLongValue;
+}
+
 - (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
         return;
     }
 
-    NSParameterAssert(aNotification);
-    NSDictionary * const notificationUserInfo = aNotification.userInfo;
-    NSAssert(notificationUserInfo != nil, @"Video item update notification should carry valid user info");
-
-    NSNumber * const modelIndexNumber = (NSNumber * const)[notificationUserInfo objectForKey:@"index"];
-    NSAssert(modelIndexNumber != nil, @"Video item update user info should carry index for updated item");
-
-    const NSUInteger modelIndex = modelIndexNumber.longLongValue;
+    const NSUInteger modelIndex = [self modelIndexFromModelItemNotification:aNotification];
     [self reloadDataForIndex:modelIndex];
 }
 
