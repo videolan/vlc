@@ -54,19 +54,36 @@
     if(self) {
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelVideoListReset:)
                                    name:VLCLibraryModelVideoMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelRecentsListReset:)
                                    name:VLCLibraryModelRecentsMediaListReset
                                  object:nil];
     }
     return self;
 }
 
-- (void)libraryModelUpdated:(NSNotification *)aNotification
+- (void)libraryModelVideoListReset:(NSNotification *)aNotification
 {
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
+    [self reloadData];
+}
+
+- (void)libraryModelRecentsListReset:(NSNotification *)aNotification
+{
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
     [self reloadData];
 }
 
@@ -88,7 +105,8 @@
 - (void)reloadData
 {
     [self reloadDataWithCompletion:^{
-        [self->_groupsTableView reloadData];
+        // Don't regenerate the groups by index as these do not change according to the notification
+        // Stick to the selection table view
         [self->_groupSelectionTableView reloadData];
     }];
 }
