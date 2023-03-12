@@ -33,7 +33,7 @@ NSString *VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
 NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaListUpdated";
 NSString *VLCLibraryModelRecentMediaListUpdated = @"VLCLibraryModelRecentMediaListUpdated";
 NSString *VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
-NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
+NSString *VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
 @interface VLCLibraryModel ()
 {
@@ -64,7 +64,7 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 - (void)updateCachedListOfAlbums;
 - (void)updateCachedListOfGenres;
 - (void)updateCachedListOfMonitoredFolders;
-- (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem;
+- (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 
 @end
 
@@ -90,7 +90,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                    [libraryModel mediaItemWasUpdated:mediaItem];
+                    [libraryModel mediaItemThumbnailGenerated:mediaItem];
                 });
             }
             break;
@@ -178,9 +178,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [_defaultNotificationCenter removeObserver:self];
 }
 
-- (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem
+- (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem
 {
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelMediaItemUpdated object:mediaItem];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelMediaItemThumbnailGenerated object:mediaItem];
 }
 
 - (size_t)numberOfAudioMedia

@@ -39,7 +39,7 @@ extern NSString *VLCLibraryModelGenreListUpdated;
 extern NSString *VLCLibraryModelVideoMediaListUpdated;
 extern NSString *VLCLibraryModelRecentMediaListUpdated;
 extern NSString *VLCLibraryModelListOfMonitoredFoldersUpdated;
-extern NSString *VLCLibraryModelMediaItemUpdated;
+extern NSString *VLCLibraryModelMediaItemThumbnailGenerated;
 
 @interface VLCLibraryModel : NSObject
 

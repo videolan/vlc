@@ -92,8 +92,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     if (self) {
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
-                               selector:@selector(mediaItemUpdated:)
-                                   name:VLCLibraryModelMediaItemUpdated
+                               selector:@selector(mediaItemThumbnailGenerated:)
+                                   name:VLCLibraryModelMediaItemThumbnailGenerated
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(updateFontBasedOnSetting:)
@@ -211,7 +211,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _highlightBox.hidden = !selected;
 }
 
-- (void)mediaItemUpdated:(NSNotification *)aNotification
+- (void)mediaItemThumbnailGenerated:(NSNotification *)aNotification
 {
     VLCMediaLibraryMediaItem *updatedMediaItem = aNotification.object;
     if (updatedMediaItem == nil || _representedItem == nil || ![_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
