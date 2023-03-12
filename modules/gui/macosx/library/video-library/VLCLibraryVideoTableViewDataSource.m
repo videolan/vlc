@@ -70,7 +70,7 @@
     [self reloadData];
 }
 
-- (void)reloadData
+- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
 {
     if(!_libraryModel) {
         return;
@@ -81,9 +81,16 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_recentsArray = [self->_libraryModel listOfRecentMedia];
         self->_libraryArray = [self->_libraryModel listOfVideoMedia];
+        completionHandler();
+    });
+}
+
+- (void)reloadData
+{
+    [self reloadDataWithCompletion:^{
         [self->_groupsTableView reloadData];
         [self->_groupSelectionTableView reloadData];
-    });
+    }];
 }
 
 #pragma mark - table view data source and delegation
