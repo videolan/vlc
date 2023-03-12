@@ -549,11 +549,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return mediaItem.libraryID == libraryId;
         };
 
+        // Recents can contain media items the other two do, so don't stop when we check recents.
+        // At the same time, do not return an error if we have checked recents.
+        BOOL recentsChecked = NO;
         const NSUInteger recentsIndex = [self->_cachedRecentMedia indexOfObjectPassingTest:idCheckBlock];
         if (recentsIndex != NSNotFound) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 action(self->_cachedRecentMedia, recentsIndex, nil);
             });
+            recentsChecked = YES;
         }
 
         const NSUInteger videoIndex = [self->_cachedVideoMedia indexOfObjectPassingTest:idCheckBlock];
@@ -572,9 +576,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            action(nil, 0, [NSError errorWithDomain:NSCocoaErrorDomain code:NSNotFound userInfo:nil]);
-        });
+        if (!recentsChecked) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                action(nil, 0, [NSError errorWithDomain:NSCocoaErrorDomain code:NSNotFound userInfo:nil]);
+            });
+        }
     });
 }
 
