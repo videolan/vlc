@@ -475,6 +475,28 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }];
 }
 
+- (void)deleteDataForMediaLibraryItem:(VLCMediaLibraryMediaItem*)mediaItemToReload
+{
+    [self reloadDataWithCompletion:^{
+        const NSUInteger index = [self->_displayedCollection indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
+            return mediaItem.libraryID == mediaItemToReload.libraryID;
+        }];
+
+        if (index == NSNotFound) {
+            return;
+        }
+
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
+
+        [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+        [self.songsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+
+        // Comment in reloadDataForMediaLibraryItem will be informative
+    }];
+}
+
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
 {
     if (audioLibrarySegment == _audioLibrarySegment) {
