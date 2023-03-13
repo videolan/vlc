@@ -58,8 +58,25 @@
                                    name:VLCLibraryModelVideoMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelVideoItemUpdated:)
+                                   name:VLCLibraryModelVideoMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelVideoItemDeleted:)
+                                   name:VLCLibraryModelVideoMediaItemDeleted
+                                 object:nil];
+
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelRecentsListReset:)
                                    name:VLCLibraryModelRecentsMediaListReset
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelRecentsItemUpdated:)
+                                   name:VLCLibraryModelRecentsMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelRecentsItemDeleted:)
+                                   name:VLCLibraryModelRecentsMediaItemDeleted
                                  object:nil];
     }
     return self;
@@ -76,6 +93,30 @@
     [self reloadData];
 }
 
+- (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
+{
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
+    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
+    [self reloadDataForIndex:modelIndex];
+}
+
+- (void)libraryModelVideoItemDeleted:(NSNotification *)aNotification
+{
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
+    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
+    [self deleteDataForIndex:modelIndex];
+}
+
 - (void)libraryModelRecentsListReset:(NSNotification *)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
@@ -85,6 +126,30 @@
     }
 
     [self reloadData];
+}
+
+- (void)libraryModelRecentsItemUpdated:(NSNotification *)aNotification
+{
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
+    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
+    [self reloadDataForIndex:modelIndex];
+}
+
+- (void)libraryModelRecentsItemDeleted:(NSNotification *)aNotification
+{
+    if (_groupsTableView.selectedRow == -1 ||
+        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+
+        return;
+    }
+
+    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
+    [self deleteDataForIndex:modelIndex];
 }
 
 - (void)reloadDataWithCompletion:(void(^)(void))completionHandler
