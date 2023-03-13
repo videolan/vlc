@@ -443,6 +443,38 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }];
 }
 
+- (void)reloadDataForMediaLibraryItem:(VLCMediaLibraryMediaItem*)mediaItemToReload
+{
+    [self reloadDataWithCompletion:^{
+        const NSUInteger index = [self->_displayedCollection indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
+            return mediaItem.libraryID == mediaItemToReload.libraryID;
+        }];
+
+        if (index == NSNotFound) {
+            return;
+        }
+
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
+
+        NSRange songsTableColumnRange = NSMakeRange(0, self->_songsTableView.numberOfColumns);
+        NSIndexSet * const songsTableColumnIndexSet = [NSIndexSet indexSetWithIndexesInRange:songsTableColumnRange];
+
+        [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+        [self.songsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:songsTableColumnIndexSet];
+
+        // Don't update gridModeListSelectionCollectionView, let its VLCLibraryAudioGroupDataSource do it.
+        // TODO: Stop splitting functionality for these audio source selection views between this data source
+        // TODO: and the VLCLibraryAudioGroupDataSource, it is super confusing
+
+        // Also don't update:
+        // - gridModeListTableView, as this will only show artists/genres
+        // - collectionSelectionTableView, as this will only show artists/genres/albums
+        // - groupSelectionTableView, as this shows cells for albums (and each cell has its own data source with media items)
+    }];
+}
+
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
 {
     if (audioLibrarySegment == _audioLibrarySegment) {
