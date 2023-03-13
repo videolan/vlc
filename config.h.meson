@@ -501,11 +501,6 @@
 /* version revision number */
 #mesondefine PACKAGE_VERSION_REVISION
 
-/* Define so that reentrant versions of several functions get declared. */
-#ifndef _REENTRANT
-#mesondefine _REENTRANT
-#endif
-
 /* Same as _REENTANT for some other OSes. */
 #ifndef _THREAD_SAFE
 #mesondefine _THREAD_SAFE
