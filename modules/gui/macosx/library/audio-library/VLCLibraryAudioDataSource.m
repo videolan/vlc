@@ -178,13 +178,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSSet* originalCollectionSet = [[NSSet alloc] initWithArray:self->_displayedCollection];
-        NSSet* newCollectionSet = [[NSSet alloc] initWithArray:collectionToDisplay];
-
-        if([originalCollectionSet isEqual:newCollectionSet]) {
-            return;
-        }
-
         [self retainSelectedMediaItem];
         self->_displayedCollection = collectionToDisplay;
         [self reloadData];
