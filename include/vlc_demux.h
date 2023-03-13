@@ -312,6 +312,183 @@ static inline int demux_Control( demux_t *p_demux, int i_query, ... )
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
+VLC_USED static inline bool vlc_demux_CanSeek(demux_t *demux)
+{
+    bool can_seek = false;
+    demux_Control(demux, DEMUX_CAN_SEEK, &can_seek);
+    return can_seek;
+}
+
+VLC_USED static inline bool vlc_demux_CanPause(demux_t *demux)
+{
+    bool can_pause = false;
+    demux_Control(demux, DEMUX_CAN_PAUSE, &can_pause);
+    return can_pause;
+}
+
+VLC_USED static inline bool vlc_demux_CanPace(demux_t *demux)
+{
+    bool can_control_pace = false;
+    demux_Control(demux, DEMUX_CAN_CONTROL_PACE, &can_control_pace);
+    return can_control_pace;
+}
+
+VLC_USED static inline bool vlc_demux_CanRate(demux_t *demux)
+{
+    bool can_control_rate = false;
+    demux_Control(demux, DEMUX_CAN_CONTROL_RATE, &can_control_rate);
+    return can_control_rate;
+}
+
+VLC_USED static inline bool vlc_demux_CanRecord(demux_t *demux)
+{
+    bool can_record = false;
+    demux_Control(demux, DEMUX_CAN_RECORD, &can_record);
+    return can_record;
+}
+
+VLC_USED static inline bool vlc_demux_HasUnsupportedMeta(demux_t *demux)
+{
+    bool has_unsupported_meta = false;
+    demux_Control(demux, DEMUX_HAS_UNSUPPORTED_META, &has_unsupported_meta);
+    return has_unsupported_meta;
+}
+
+VLC_USED static inline int vlc_demux_GetPtsDelay(demux_t *demux, vlc_tick_t *pts_delay)
+{
+    return demux_Control(demux, DEMUX_GET_PTS_DELAY, pts_delay);
+}
+
+VLC_USED static inline int vlc_demux_GetSeekpoint(demux_t *demux, int *seekpoint)
+{
+    return demux_Control(demux, DEMUX_GET_SEEKPOINT, seekpoint);
+}
+
+VLC_USED static inline int vlc_demux_GetSignal(demux_t *demux, double *quality, double *strength)
+{
+    return demux_Control(demux, DEMUX_GET_SIGNAL, quality, strength);
+}
+
+VLC_USED static inline int vlc_demux_GetTitle(demux_t *demux, int *title)
+{
+    return demux_Control(demux, DEMUX_GET_TITLE, title);
+}
+
+VLC_USED static inline int vlc_demux_GetMeta(demux_t *demux, vlc_meta_t *meta)
+{
+    return demux_Control(demux, DEMUX_GET_META, meta);
+}
+
+VLC_USED static inline int vlc_demux_GetType(demux_t *demux, int *type)
+{
+    return demux_Control(demux, DEMUX_GET_TYPE, type);
+}
+
+VLC_USED static inline int vlc_demux_GetTitleInfo(demux_t *demux, input_title_t ***title_info, int *size, int *pi_title_offset, int *pi_seekpoint_offset)
+{
+    return demux_Control(demux, DEMUX_GET_TITLE_INFO, title_info, size, pi_title_offset, pi_seekpoint_offset);
+}
+
+VLC_USED static inline int vlc_demux_GetPosition(demux_t *demux, double *position)
+{
+    return demux_Control(demux, DEMUX_GET_POSITION, position);
+}
+
+VLC_USED static inline int vlc_demux_GetLength(demux_t *demux, vlc_tick_t *length)
+{
+    return demux_Control(demux, DEMUX_GET_LENGTH, length);
+}
+
+VLC_USED static inline int vlc_demux_GetTime(demux_t *demux, vlc_tick_t *time)
+{
+    return demux_Control(demux, DEMUX_GET_TIME, time);
+}
+
+VLC_USED static inline int vlc_demux_GetNormalTime(demux_t *demux, vlc_tick_t *normal_time)
+{
+    return demux_Control(demux, DEMUX_GET_NORMAL_TIME, normal_time);
+}
+
+VLC_USED static inline int vlc_demux_GetFPS(demux_t *demux, double *fps)
+{
+    return demux_Control(demux, DEMUX_GET_FPS, fps);
+}
+
+VLC_USED static inline int vlc_demux_GetAttachments(demux_t *demux, input_attachment_t ***attachments)
+{
+    return demux_Control(demux, DEMUX_GET_ATTACHMENTS, attachments);
+}
+
+VLC_USED static inline int vlc_demux_SetPauseState(demux_t *demux, bool pause_state)
+{
+    return demux_Control(demux, DEMUX_SET_PAUSE_STATE, pause_state);
+}
+
+VLC_USED static inline int vlc_demux_SetSeekPoint(demux_t *demux, int seekpoint)
+{
+    return demux_Control(demux, DEMUX_SET_SEEKPOINT, seekpoint);
+}
+
+VLC_USED static inline int vlc_demux_SetTitle(demux_t *demux, int title)
+{
+    return demux_Control(demux, DEMUX_SET_TITLE, title);
+}
+
+VLC_USED static inline int vlc_demux_SetRate(demux_t *demux, float rate)
+{
+    return demux_Control(demux, DEMUX_SET_RATE, rate);
+}
+
+VLC_USED static inline int vlc_demux_SetRecordState(demux_t *demux, bool record_state, const char *dir_path, const char *ext)
+{
+    return demux_Control(demux, DEMUX_SET_RECORD_STATE, record_state, dir_path, ext);
+}
+
+VLC_USED static inline int vlc_demux_NavActivate(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_ACTIVATE);
+}
+
+VLC_USED static inline int vlc_demux_NavUp(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_UP);
+}
+
+VLC_USED static inline int vlc_demux_NavDown(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_DOWN);
+}
+
+VLC_USED static inline int vlc_demux_NavLeft(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_LEFT);
+}
+
+VLC_USED static inline int vlc_demux_NavRight(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_RIGHT);
+}
+
+VLC_USED static inline int vlc_demux_NavPopup(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_POPUP);
+}
+
+VLC_USED static inline int vlc_demux_NavMenu(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_NAV_MENU);
+}
+
+VLC_USED static inline int vlc_demux_FilterEnable(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_FILTER_ENABLE);
+}
+
+VLC_USED static inline int vlc_demux_FilterDisable(demux_t *demux)
+{
+    return demux_Control(demux, DEMUX_FILTER_DISABLE);
+}
+
 #ifndef __cplusplus
 static inline void demux_UpdateTitleFromStream( demux_t *demux,
     int *restrict titlep, int *restrict seekpointp,
@@ -373,7 +550,7 @@ static inline int demux_SetPosition( demux_t *p_demux, double pos, bool precise,
     if( !absolute )
     {
         double current_pos;
-        int ret = demux_Control( p_demux, DEMUX_GET_POSITION, &current_pos );
+        int ret = vlc_demux_GetPosition( p_demux, &current_pos );
         if( ret != VLC_SUCCESS )
             return ret;
         pos += current_pos;
@@ -392,7 +569,7 @@ static inline int demux_SetTime( demux_t *p_demux, vlc_tick_t time, bool precise
     if( !absolute )
     {
         vlc_tick_t current_time;
-        int ret = demux_Control( p_demux, DEMUX_GET_TIME, &current_time );
+        int ret = vlc_demux_GetTime( p_demux, &current_time );
         if( ret != VLC_SUCCESS )
             return ret;
         time += current_time;
