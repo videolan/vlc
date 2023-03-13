@@ -175,10 +175,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self retainSelectedMediaItem];
-        self->_displayedCollection = [self collectionToDisplay];
         [self reloadData];
-        [self restoreSelectionState];
     });
 }
 
@@ -429,6 +426,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (void)reloadDataWithCompletion:(void(^)(void))completionHandler
 {
     [self retainSelectedMediaItem];
+    self->_displayedCollection = [self collectionToDisplay];
     [self reloadViewsWithCompletion:completionHandler];
     [self restoreSelectionState];
 }
