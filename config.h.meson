@@ -176,9 +176,6 @@
 /* Define to 1 if you have inet_pton function */
 #mesondefine HAVE_INET_PTON
 
-/* Define to 1 if you have inet_ntop function */
-#mesondefine HAVE_INET_NTOP
-
 /* Define to 1 if you have the `isatty' function. */
 #mesondefine HAVE_ISATTY
 
