@@ -501,11 +501,6 @@
 /* version revision number */
 #mesondefine PACKAGE_VERSION_REVISION
 
-/* Same as _REENTANT for some other OSes. */
-#ifndef _THREAD_SAFE
-#mesondefine _THREAD_SAFE
-#endif
-
 /* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE
 #mesondefine _GNU_SOURCE
