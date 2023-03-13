@@ -92,6 +92,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                    name:VLCLibraryModelAudioMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelAudioItemUpdated:)
+                                   name:VLCLibraryModelAudioMediaItemUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelAudioItemDeleted:)
+                                   name:VLCLibraryModelAudioMediaItemDeleted
+                                 object:nil];
+
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelArtistListUpdated
                                  object:nil];
@@ -176,6 +185,36 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self reloadData];
+    });
+}
+
+- (void)libraryModelAudioItemUpdated:(NSNotification * const)aNotification
+{
+    if(_libraryModel == nil) {
+        return;
+    }
+
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem * const)aNotification.object;
+    NSAssert(mediaItem != nil, @"Audio item-related notification should carry valid media item");
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadDataForMediaLibraryItem:mediaItem];
+    });
+}
+
+- (void)libraryModelAudioItemDeleted:(NSNotification * const)aNotification
+{
+    if(_libraryModel == nil) {
+        return;
+    }
+
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem * const)aNotification.object;
+    NSAssert(mediaItem != nil, @"Audio item-related notification should carry valid media item");
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self deleteDataForMediaLibraryItem:mediaItem];
     });
 }
 
