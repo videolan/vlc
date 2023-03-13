@@ -52,7 +52,7 @@
 /* Define to 1 for stream output support. */
 #mesondefine ENABLE_SOUT
 
-/* Define to 1 for VideoLAN manager support */
+/* Define if you want the VideoLAN manager support */
 #mesondefine ENABLE_VLM
 
 /* Enable compile-time and run-time bounds-checking, and some warnings,
@@ -67,10 +67,10 @@
 /* Define to 1 if you have the `aligned_alloc' function. */
 #mesondefine HAVE_ALIGNED_ALLOC
 
-/* Define to 1 if your have the <arpa/inet.h> header file. */
+/* Define to 1 if you have the <arpa/inet.h> header file. */
 #mesondefine HAVE_ARPA_INET_H
 
-/* Define to 1 if you have asprintf function */
+/* Define to 1 if you have the `asprintf' function. */
 #mesondefine HAVE_ASPRINTF
 
 /* Define to 1 if you have the `atof' function. */
@@ -164,10 +164,10 @@
 /* Define to 1 if you have the <GL/wglew.h> header file. */
 #mesondefine HAVE_GL_WGLEW_H
 
-/* Define to 1 if you have the `gmtime_r' function */
+/* Define to 1 if you have the `gmtime_r' function. */
 #mesondefine HAVE_GMTIME_R
 
-/* Define to 1 if you have the `iconv' function */
+/* Define if you have the iconv() function and it works. */
 #mesondefine HAVE_ICONV
 
 /* Define to 1 if you have GNU libidn. */
@@ -176,7 +176,7 @@
 /* Define to 1 if you have the `if_nameindex' function. */
 #mesondefine HAVE_IF_NAMEINDEX
 
-/* Define to 1 if you have the `if_nametoindex' function. */
+/* Define to 1 if you have if_nametoindex function */
 #mesondefine HAVE_IF_NAMETOINDEX
 
 /* Define to 1 if you have inet_pton function */
@@ -217,7 +217,7 @@
 /* Define to 1 if you have the `lldiv' function. */
 #mesondefine HAVE_LLDIV
 
-/* Define to 1 if you have localtime_r function */
+/* Define to 1 if you have the `localtime_r' function. */
 #mesondefine HAVE_LOCALTIME_R
 
 /* Define to 1 if the system has the type `max_align_t'. */
@@ -238,7 +238,8 @@
 /* Define to 1 if you have the `mmap' function. */
 #mesondefine HAVE_MMAP
 
-/* Define to 1 if you have the `nanf' function */
+
+/* Define to 1 if you have the NANF function */
 #mesondefine HAVE_NANF
 
 /* Define to 1 if you have the <netinet/tcp.h> header file. */
@@ -265,7 +266,7 @@
 /* Define to 1 if you have the `poll' function. */
 #mesondefine HAVE_POLL
 
-/* Define to 1 if your have the <poll.h> header file. */
+/* Define to 1 if you have the <poll.h> header file. */
 #mesondefine HAVE_POLL_H
 
 /* Define to 1 if you have the `posix_fadvise' function. */
@@ -326,7 +327,8 @@
 /* Define to 1 if you have the `strcasestr' function. */
 #mesondefine HAVE_STRCASESTR
 
-/* Define to 1 if you have the `strcoll' function */
+/* Define to 1 if you have the `strcoll' function and it is properly defined.
+   */
 #mesondefine HAVE_STRCOLL
 
 /* Define to 1 if you have the `strdup' function. */
@@ -360,7 +362,7 @@
 /* Define to 1 if you have the `strtoll' function. */
 #mesondefine HAVE_STRTOLL
 
-/* Define to 1 if you have the type `if_nameindex' struct */
+/* Define to 1 if the system has the type `struct if_nameindex'. */
 #mesondefine HAVE_STRUCT_IF_NAMEINDEX
 
 /* Define to 1 if the system has the type `struct pollfd'. */
@@ -418,7 +420,7 @@
 /* Define to 1 if you have the <valgrind/valgrind.h> header file. */
 #mesondefine HAVE_VALGRIND_VALGRIND_H
 
-/* Define to 1 if you have vasprintf function */
+/* Define to 1 if you have the `vasprintf' function. */
 #mesondefine HAVE_VASPRINTF
 
 /* Define to 1 if you have the `vmsplice' function. */
@@ -555,7 +557,7 @@
 /* Define to 1 for Unicode (Wide Chars) APIs. */
 #mesondefine UNICODE
 
-/* Define for Windows 7 APIs. */
+/* Define to '0x0601' for Windows 7 APIs. */
 #mesondefine _WIN32_WINNT
 
 /* Define to 1 to force use of MinGW provided C99 *printf over msvcrt */
@@ -563,10 +565,11 @@
 
 #endif /* _WIN32 */
 
-/* Define to 1 if build machine is big endian */
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
 #mesondefine WORDS_BIGENDIAN
 
-/* Define to 1 is X display is not avaliable */
+/* Define to 1 if the X Window System is missing or not being used. */
 #mesondefine X_DISPLAY_MISSING
 
 /* Define if the zvbi module is built */
@@ -580,7 +583,7 @@
 
 /* Define to the equivalent of the C99 'restrict' keyword, or to
    nothing if this is not supported.  Do not define if restrict is
-   supported directly.  */
+   supported only directly.  */
 #mesondefine restrict
 
 /* Define to `sockaddr' if <sys/socket.h> does not define. */
