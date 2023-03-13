@@ -809,9 +809,9 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
             }
             return VLC_EGENERIC;
         case STREAM_GET_SEEKPOINT:
-            if (s->ops->get_seekpoint != NULL) {
+            if (s->ops->stream.get_seekpoint != NULL) {
                 unsigned *seekpoint = va_arg(args, unsigned *);
-                return s->ops->get_seekpoint(s, seekpoint);
+                return s->ops->stream.get_seekpoint(s, seekpoint);
             }
             return VLC_EGENERIC;
         case STREAM_GET_META:
