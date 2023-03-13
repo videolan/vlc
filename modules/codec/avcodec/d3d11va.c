@@ -397,17 +397,20 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     const d3d_format_t *decoder_format;
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
-                                      mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
+                                      mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1, 0,
                                       DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
+        // other chroma sub-sampling
         decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
-                                        mode->bit_depth, 0, 0, DXGI_CHROMA_GPU, supportFlags );
+                                        mode->bit_depth, 0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL && mode->bit_depth > 10)
+        // 10 bits instead of 8/12/14/16
         decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
-                                        10, 0, 0, DXGI_CHROMA_GPU, supportFlags );
+                                        10, 0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
+        // any bit depth
         decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
-                                        0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
+                                        0, 0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format != NULL)
     {
         msg_Dbg(va, "favor decoder format %s", decoder_format->name);

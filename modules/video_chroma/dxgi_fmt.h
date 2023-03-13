@@ -64,8 +64,8 @@ UINT DxgiResourceCount(const d3d_format_t *);
 
 bool DxgiIsRGBFormat(const d3d_format_t *);
 
-#define DXGI_RGB_FORMAT  1
-#define DXGI_YUV_FORMAT  2
+#define DXGI_RGB_FORMAT    (1 << 0)
+#define DXGI_YUV_FORMAT    (1 << 1)
 
 #define DXGI_CHROMA_CPU 1
 #define DXGI_CHROMA_GPU 2
