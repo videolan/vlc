@@ -1,104 +1,7 @@
 /* Config template used by meson to generate config.h */
 
-/* Define so that reentrant versions of several functions get declared. */
-#ifndef _REENTRANT
-#mesondefine _REENTRANT
-#endif
-
-/* Same as _REENTANT for some other OSes. */
-#ifndef _THREAD_SAFE
-#mesondefine _THREAD_SAFE
-#endif
-
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-#mesondefine _GNU_SOURCE
-#endif
-
-/* Define if the zvbi module is built */
-// #undef ZVBI_COMPILED
-
-/* Define to 64 for large files support. */
-#mesondefine _FILE_OFFSET_BITS
-
-/* Enable compile-time and run-time bounds-checking, and some warnings,
-   without upsetting glibc 2.15+ or toolchains predefining _FORTIFY_SOURCE */
-#if !defined _FORTIFY_SOURCE && defined __OPTIMIZE__ && __OPTIMIZE__
-# define _FORTIFY_SOURCE 2
-#endif
-
-/* Define to 1 is X display is not avaliable */
-#mesondefine X_DISPLAY_MISSING
-
-#ifdef _WIN32
-
-/* Define to limit the scope of <windows.h>. */
-#define WIN32_LEAN_AND_MEAN 1
-
-/* Define to 1 for Unicode (Wide Chars) APIs. */
-#mesondefine UNICODE
-
-/* Define for Windows 7 APIs. */
-#mesondefine _WIN32_WINNT
-
-/* Define to 1 to force use of MinGW provided C99 *printf over msvcrt */
-#mesondefine __USE_MINGW_ANSI_STDIO
-
-#endif /* _WIN32 */
-
-/* Define within the LibVLC source code tree. */
-#define LIBVLC_INTERNAL_
-
-/* Define to the libdir */
-#mesondefine LIBDIR
-
-/* Define to the libexecdir */
-#mesondefine LIBEXECDIR
-
-/* Define to the pkgdatadir */
-#mesondefine PKGDATADIR
-
-/* Define to the pkglibdir */
-#mesondefine PKGLIBDIR
-
-/* Define to the pkglibexecdir */
-#mesondefine PKGLIBEXECDIR
-
-/* Define to the sysdatadir */
-#mesondefine SYSDATADIR
-
-/* Define to the localedir */
-#mesondefine LOCALEDIR
-
-/* Default font family */
-#mesondefine DEFAULT_FAMILY
-
-/* Default font */
-#mesondefine DEFAULT_FONT_FILE
-
-/* Default monospace font family */
-#mesondefine DEFAULT_MONOSPACE_FAMILY
-
-/* Default monospace font */
-#mesondefine DEFAULT_MONOSPACE_FONT_FILE
-
 /* Define to 1 to allow running VLC as root (uid 0). */
 #mesondefine ALLOW_RUN_AS_ROOT
-
-/* Binary specific version */
-#mesondefine DISTRO_VERSION
-
-/* Define to 1 for stream output support. */
-#mesondefine ENABLE_SOUT
-
-/* Define to 1 for VideoLAN manager support */
-#mesondefine ENABLE_VLM
-
-/* Define if you want to optimize memory usage over performance */
-#mesondefine OPTIMIZE_MEMORY
-
-/* Define to 1 if SSE2 intrinsics are available. */
-#mesondefine HAVE_SSE2_INTRINSICS
 
 /* Define to 1 if SSE2 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSE2
@@ -121,143 +24,51 @@
 /* The ./configure command line */
 #mesondefine CONFIGURE_LINE
 
-/* The copyright years */
-#mesondefine COPYRIGHT_YEARS
-
 /* Copyright string */
 #mesondefine COPYRIGHT_MESSAGE
 
-/* Dynamic object extension */
-#mesondefine LIBEXT
+/* The copyright years */
+#mesondefine COPYRIGHT_YEARS
 
-/* libvlc version major number */
-#mesondefine LIBVLC_ABI_MAJOR
+/* Default font family */
+#mesondefine DEFAULT_FAMILY
 
-/* libvlc version micro number */
-#mesondefine LIBVLC_ABI_MICRO
+/* Default font */
+#mesondefine DEFAULT_FONT_FILE
 
-/* libvlc version minor number */
-#mesondefine LIBVLC_ABI_MINOR
+/* Default monospace font family */
+#mesondefine DEFAULT_MONOSPACE_FAMILY
+
+/* Default monospace font */
+#mesondefine DEFAULT_MONOSPACE_FONT_FILE
+
+/* Binary specific version */
+#mesondefine DISTRO_VERSION
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #mesondefine ENABLE_NLS
 
+/* Define to 1 for stream output support. */
+#mesondefine ENABLE_SOUT
 
-/*
- *   Type/attributes/etc macros
- */
+/* Define to 1 for VideoLAN manager support */
+#mesondefine ENABLE_VLM
 
-/* Support for __attribute__((packed)) for structs */
-#mesondefine HAVE_ATTRIBUTE_PACKED
-
-/* Define to 1 if C++ headers define locale_t */
-#mesondefine HAVE_CXX_LOCALE_T
-
-/* Defined to 1 if C11 _Thread_local storage qualifier is supported */
-#mesondefine HAVE_THREAD_LOCAL
-
-
-/*
- * Library check macros
- */
-
-/* Define to 1 if you have GNU libidn. */
-#mesondefine HAVE_IDN
-
-
-/*
- * Header check macros
- */
-
-/* TODO: Properly check for the avformat header
- */
-#define HAVE_LIBAVFORMAT_AVFORMAT_H 1
-
-/* Define to 1 if you have the <execinfo.h> header file. */
-#mesondefine HAVE_EXECINFO_H
-
-/* Define to 1 if you have the <features.h> header file. */
-#mesondefine HAVE_FEATURES_H
-
-/* Define to 1 if you have the <getopt.h> header file. */
-#mesondefine HAVE_GETOPT_H
-
-/* Define to 1 if you have the <GL/wglew.h> header file. */
-#mesondefine HAVE_GL_WGLEW_H
-
-/* Define to 1 if you have the <linux/dccp.h> header file. */
-#mesondefine HAVE_LINUX_DCCP_H
-
-/* Define to 1 if you have the <linux/magic.h> header file. */
-#mesondefine HAVE_LINUX_MAGIC_H
-
-/* Define to 1 if you have the <netinet/tcp.h> header file. */
-#mesondefine HAVE_NETINET_TCP_H
-
-/* Define to 1 if you have the <netinet/udplite.h> header file. */
-#mesondefine HAVE_NETINET_UDPLITE_H
-
-/* Define to 1 if you have the <net/if.h> header file. */
-#mesondefine HAVE_NET_IF_H
-
-/* Define to 1 if you have the <pthread.h> header file. */
-#mesondefine HAVE_PTHREAD_H
-
-/* Define to 1 if your have the <arpa/inet.h> header file. */
-#mesondefine HAVE_ARPA_INET_H
-
-/* Define to 1 if your have the <poll.h> header file. */
-#mesondefine HAVE_POLL_H
-
-/* Define to 1 if you have the <search.h> header file. */
-#mesondefine HAVE_SEARCH_H
-
-/* Define to 1 if you have the <sys/eventfd.h> header file. */
-#mesondefine HAVE_SYS_EVENTFD_H
-
-/* Define to 1 if you have the <sys/mount.h> header file. */
-#mesondefine HAVE_SYS_MOUNT_H
-
-/* Define to 1 if you have the <sys/shm.h> header file. */
-#mesondefine HAVE_SYS_SHM_H
-
-/* Define to 1 if you have the <sys/socket.h> header file. */
-#mesondefine HAVE_SYS_SOCKET_H
-
-/* Define to 1 if you have the <sys/soundcard.h> header file. */
-#mesondefine HAVE_SYS_SOUNDCARD_H
-
-/* Define to 1 if you have the <sys/uio.h> header file. */
-#mesondefine HAVE_SYS_UIO_H
-
-/* Define to 1 if you have the <threads.h> header file. */
-#mesondefine HAVE_THREADS_H
-
-/* Define to 1 if you have the <valgrind/valgrind.h> header file. */
-#mesondefine HAVE_VALGRIND_VALGRIND_H
-
-/* Define to 1 if you have the <X11/Xlib.h> header file. */
-#mesondefine HAVE_X11_XLIB_H
-
-/* Define to 1 if you have the <xlocale.h> header file. */
-#mesondefine HAVE_XLOCALE_H
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#mesondefine HAVE_ZLIB_H
-
-/* Define to 1 if you have the <wordexp.h> header file. */
-#mesondefine HAVE_WORDEXP_H
-
-/*
- *   Function check macros
- */
+/* Enable compile-time and run-time bounds-checking, and some warnings,
+   without upsetting glibc 2.15+ or toolchains predefining _FORTIFY_SOURCE */
+#if !defined _FORTIFY_SOURCE && defined __OPTIMIZE__ && __OPTIMIZE__
+# define _FORTIFY_SOURCE 2
+#endif
 
 /* Define to 1 if you have the `accept4' function. */
 #mesondefine HAVE_ACCEPT4
 
 /* Define to 1 if you have the `aligned_alloc' function. */
 #mesondefine HAVE_ALIGNED_ALLOC
+
+/* Define to 1 if your have the <arpa/inet.h> header file. */
+#mesondefine HAVE_ARPA_INET_H
 
 /* Define to 1 if you have asprintf function */
 #mesondefine HAVE_ASPRINTF
@@ -268,29 +79,42 @@
 /* Define to 1 if you have the `atoll' function. */
 #mesondefine HAVE_ATOLL
 
-/* Define to 1 if you have the `qsort_r' function. */
-#mesondefine HAVE_QSORT_R
-
-/* Define to 1 if you have the `_lock_file' function. */
-#mesondefine HAVE__LOCK_FILE
+/* Support for __attribute__((packed)) for structs */
+#mesondefine HAVE_ATTRIBUTE_PACKED
 
 /* Define to 1 if you have the `backtrace' function. */
 #mesondefine HAVE_BACKTRACE
 
+/* Defined to 1 if the qsort_r() prototype contradicts the upcoming POSIX
+   standard. */
+#mesondefine HAVE_BROKEN_QSORT_R
+
+/* Define to 1 if C++ headers define locale_t */
+#mesondefine HAVE_CXX_LOCALE_T
+
+/* Define if the compiler supports typeof. */
+#mesondefine HAVE_CXX_TYPEOF
+
 /* Define to 1 if you have the `dirfd' function. */
 #mesondefine HAVE_DIRFD
+
+/* Define to 1 if you have the `dup3' function. */
+#mesondefine HAVE_DUP3
 
 /* Define to 1 if you have the `eventfd' function. */
 #mesondefine HAVE_EVENTFD
 
-/* Define to 1 if you have the `dup3' function. */
-#mesondefine HAVE_DUP3
+/* Define to 1 if you have the <execinfo.h> header file. */
+#mesondefine HAVE_EXECINFO_H
 
 /* Define to 1 if you have the `fcntl' function. */
 #mesondefine HAVE_FCNTL
 
 /* Define to 1 if you have the `fdopendir' function. */
 #mesondefine HAVE_FDOPENDIR
+
+/* Define to 1 if you have the <features.h> header file. */
+#mesondefine HAVE_FEATURES_H
 
 /* Define to 1 if you have the `flock' function. */
 #mesondefine HAVE_FLOCK
@@ -310,6 +134,9 @@
 /* Define to 1 if you have the `fsync' function. */
 #mesondefine HAVE_FSYNC
 
+/* Define to 1 if you have the `getauxval' function. */
+#mesondefine HAVE_GETAUXVAL
+
 /* Define to 1 if you have the `getdelim' function. */
 #mesondefine HAVE_GETDELIM
 
@@ -318,6 +145,9 @@
 
 /* Define to 1 if you have the `getmntent_r' function. */
 #mesondefine HAVE_GETMNTENT_R
+
+/* Define to 1 if you have the <getopt.h> header file. */
+#mesondefine HAVE_GETOPT_H
 
 /* Define to 1 if you have the `getpid' function. */
 #mesondefine HAVE_GETPID
@@ -331,20 +161,20 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #mesondefine HAVE_GETTIMEOFDAY
 
+/* Define to 1 if you have the <GL/wglew.h> header file. */
+#mesondefine HAVE_GL_WGLEW_H
+
 /* Define to 1 if you have the `gmtime_r' function */
 #mesondefine HAVE_GMTIME_R
 
 /* Define to 1 if you have the `iconv' function */
 #mesondefine HAVE_ICONV
 
-/* Define as const if the declaration of iconv() needs const. */
-#mesondefine ICONV_CONST
+/* Define to 1 if you have GNU libidn. */
+#mesondefine HAVE_IDN
 
 /* Define to 1 if you have the `if_nameindex' function. */
 #mesondefine HAVE_IF_NAMEINDEX
-
-/* Define to 1 if you have the type `if_nameindex' struct */
-#mesondefine HAVE_STRUCT_IF_NAMEINDEX
 
 /* Define to 1 if you have the `if_nametoindex' function. */
 #mesondefine HAVE_IF_NAMETOINDEX
@@ -355,14 +185,34 @@
 /* Define to 1 if you have inet_ntop function */
 #mesondefine HAVE_INET_NTOP
 
-/* Define to 1 if you have the `getauxval' function. */
-#mesondefine HAVE_GETAUXVAL
-
 /* Define to 1 if you have the `isatty' function. */
 #mesondefine HAVE_ISATTY
 
 /* Define to 1 if you have the `lfind' function. */
 #mesondefine HAVE_LFIND
+
+/*
+ *   Type/attributes/etc macros
+ */
+
+/*
+ * Library check macros
+ */
+
+
+
+/* TODO: Properly check for the avformat header
+ */
+#define HAVE_LIBAVFORMAT_AVFORMAT_H 1
+
+/*
+ * Header check macros
+ */
+/* Define to 1 if you have the <linux/dccp.h> header file. */
+#mesondefine HAVE_LINUX_DCCP_H
+
+/* Define to 1 if you have the <linux/magic.h> header file. */
+#mesondefine HAVE_LINUX_MAGIC_H
 
 /* Define to 1 if you have the `lldiv' function. */
 #mesondefine HAVE_LLDIV
@@ -391,6 +241,15 @@
 /* Define to 1 if you have the `nanf' function */
 #mesondefine HAVE_NANF
 
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#mesondefine HAVE_NETINET_TCP_H
+
+/* Define to 1 if you have the <netinet/udplite.h> header file. */
+#mesondefine HAVE_NETINET_UDPLITE_H
+
+/* Define to 1 if you have the <net/if.h> header file. */
+#mesondefine HAVE_NET_IF_H
+
 /* Define to 1 if you have the `newlocale' function. */
 #mesondefine HAVE_NEWLOCALE
 
@@ -406,6 +265,9 @@
 /* Define to 1 if you have the `poll' function. */
 #mesondefine HAVE_POLL
 
+/* Define to 1 if your have the <poll.h> header file. */
+#mesondefine HAVE_POLL_H
+
 /* Define to 1 if you have the `posix_fadvise' function. */
 #mesondefine HAVE_POSIX_FADVISE
 
@@ -415,6 +277,12 @@
 /* Define to 1 if the system has the type
    `PROCESS_MITIGATION_IMAGE_LOAD_POLICY'. */
 #mesondefine HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#mesondefine HAVE_PTHREAD_H
+
+/* Define to 1 if you have the `qsort_r' function. */
+#mesondefine HAVE_QSORT_R
 
 /* Define to 1 if you have the `readv' function. */
 #mesondefine HAVE_READV
@@ -434,6 +302,9 @@
 /* Define to 1 if you have the `sched_getaffinity' function. */
 #mesondefine HAVE_SCHED_GETAFFINITY
 
+/* Define to 1 if you have the <search.h> header file. */
+#mesondefine HAVE_SEARCH_H
+
 /* Define to 1 if you have the `sendmsg' function. */
 #mesondefine HAVE_SENDMSG
 
@@ -446,6 +317,9 @@
 /* Define to 1 if you have the sincos function. */
 #mesondefine HAVE_SINCOS
 
+/* Define to 1 if SSE2 intrinsics are available. */
+#mesondefine HAVE_SSE2_INTRINSICS
+
 /* Define to 1 if you have the `strcasecmp' function. */
 #mesondefine HAVE_STRCASECMP
 
@@ -457,6 +331,10 @@
 
 /* Define to 1 if you have the `strdup' function. */
 #mesondefine HAVE_STRDUP
+
+/*
+ *   Function check macros
+ */
 
 /* Define to 1 if you have the `strlcpy' function. */
 #mesondefine HAVE_STRLCPY
@@ -482,6 +360,9 @@
 /* Define to 1 if you have the `strtoll' function. */
 #mesondefine HAVE_STRTOLL
 
+/* Define to 1 if you have the type `if_nameindex' struct */
+#mesondefine HAVE_STRUCT_IF_NAMEINDEX
+
 /* Define to 1 if the system has the type `struct pollfd'. */
 #mesondefine HAVE_STRUCT_POLLFD
 
@@ -494,11 +375,36 @@
 /* Define to 1 if you have the `swab' function. */
 #mesondefine HAVE_SWAB
 
+/* Define to 1 if you have the <sys/eventfd.h> header file. */
+#mesondefine HAVE_SYS_EVENTFD_H
+
+/* Define to 1 if you have the <sys/mount.h> header file. */
+#mesondefine HAVE_SYS_MOUNT_H
+
+/* Define to 1 if you have the <sys/shm.h> header file. */
+#mesondefine HAVE_SYS_SHM_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#mesondefine HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/soundcard.h> header file. */
+#mesondefine HAVE_SYS_SOUNDCARD_H
+
+/* Define to 1 if you have the <sys/uio.h> header file. */
+#mesondefine HAVE_SYS_UIO_H
+
 /* Define to 1 if you have the `tdestroy' function. */
 #mesondefine HAVE_TDESTROY
 
 /* Define to 1 if you have the `tfind' function. */
 #mesondefine HAVE_TFIND
+
+/* Define to 1 if you have the <threads.h> header file. */
+#mesondefine HAVE_THREADS_H
+
+/* Defined to 1 if C11 _Thread_local storage qualifier is supported */
+#mesondefine HAVE_THREAD_LOCAL
+
 
 /* Define to 1 if you have the `timegm' function. */
 #mesondefine HAVE_TIMEGM
@@ -509,6 +415,9 @@
 /* Define to 1 if you have the `uselocale' function. */
 #mesondefine HAVE_USELOCALE
 
+/* Define to 1 if you have the <valgrind/valgrind.h> header file. */
+#mesondefine HAVE_VALGRIND_VALGRIND_H
+
 /* Define to 1 if you have vasprintf function */
 #mesondefine HAVE_VASPRINTF
 
@@ -518,15 +427,65 @@
 /* Define to 1 if you have the `wordexp' function. */
 #mesondefine HAVE_WORDEXP
 
+/* Define to 1 if you have the <wordexp.h> header file. */
+#mesondefine HAVE_WORDEXP_H
+
 /* Define to 1 if you have the `writev' function. */
 #mesondefine HAVE_WRITEV
+
+/* Define to 1 if you have the <X11/Xlib.h> header file. */
+#mesondefine HAVE_X11_XLIB_H
+
+/* Define to 1 if you have the <xlocale.h> header file. */
+#mesondefine HAVE_XLOCALE_H
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#mesondefine HAVE_ZLIB_H
 
 /* Define to 1 if you have the `_lock_file' function. */
 #mesondefine HAVE__LOCK_FILE
 
-/* Defined to 1 if the qsort_r() prototype contradicts the upcoming POSIX
-   standard. */
-#mesondefine HAVE_BROKEN_QSORT_R
+/* Define as const if the declaration of iconv() needs const. */
+#mesondefine ICONV_CONST
+
+/* Dynamic object extension */
+#mesondefine LIBEXT
+
+/* libvlc version major number */
+#mesondefine LIBVLC_ABI_MAJOR
+
+/* libvlc version micro number */
+#mesondefine LIBVLC_ABI_MICRO
+
+/* libvlc version minor number */
+#mesondefine LIBVLC_ABI_MINOR
+
+/* Define within the LibVLC source code tree. */
+#define LIBVLC_INTERNAL_
+
+/* Define to the libdir */
+#mesondefine LIBDIR
+
+/* Define to the libexecdir */
+#mesondefine LIBEXECDIR
+
+/* Define to the pkgdatadir */
+#mesondefine PKGDATADIR
+
+/* Define to the pkglibdir */
+#mesondefine PKGLIBDIR
+
+/* Define to the pkglibexecdir */
+#mesondefine PKGLIBEXECDIR
+
+/* Define to the sysdatadir */
+#mesondefine SYSDATADIR
+
+/* Define to the localedir */
+#mesondefine LOCALEDIR
+
+/* Define if you want to optimize memory usage over performance */
+#mesondefine OPTIMIZE_MEMORY
 
 /* Name of package */
 #mesondefine PACKAGE
@@ -555,6 +514,21 @@
 /* version revision number */
 #mesondefine PACKAGE_VERSION_REVISION
 
+/* Define so that reentrant versions of several functions get declared. */
+#ifndef _REENTRANT
+#mesondefine _REENTRANT
+#endif
+
+/* Same as _REENTANT for some other OSes. */
+#ifndef _THREAD_SAFE
+#mesondefine _THREAD_SAFE
+#endif
+
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+#mesondefine _GNU_SOURCE
+#endif
+
 /* Version number of package */
 #mesondefine VERSION
 
@@ -573,8 +547,33 @@
 /* Define to 1 if building for Windows Store. */
 #mesondefine VLC_WINSTORE_APP
 
+#ifdef _WIN32
+
+/* Define to limit the scope of <windows.h>. */
+#define WIN32_LEAN_AND_MEAN 1
+
+/* Define to 1 for Unicode (Wide Chars) APIs. */
+#mesondefine UNICODE
+
+/* Define for Windows 7 APIs. */
+#mesondefine _WIN32_WINNT
+
+/* Define to 1 to force use of MinGW provided C99 *printf over msvcrt */
+#mesondefine __USE_MINGW_ANSI_STDIO
+
+#endif /* _WIN32 */
+
 /* Define to 1 if build machine is big endian */
 #mesondefine WORDS_BIGENDIAN
+
+/* Define to 1 is X display is not avaliable */
+#mesondefine X_DISPLAY_MISSING
+
+/* Define if the zvbi module is built */
+// #undef ZVBI_COMPILED
+
+/* Define to 64 for large files support. */
+#mesondefine _FILE_OFFSET_BITS
 
 /* Alias fdatasync() to fsync() if missing. */
 #mesondefine fdatasync
@@ -583,9 +582,6 @@
    nothing if this is not supported.  Do not define if restrict is
    supported directly.  */
 #mesondefine restrict
-
-/* Define if the compiler supports typeof. */
-#mesondefine HAVE_CXX_TYPEOF
 
 /* Define to `sockaddr' if <sys/socket.h> does not define. */
 #mesondefine sockaddr_storage
@@ -598,6 +594,7 @@
 #mesondefine SSIZE_MAX
 
 #include <vlc_fixups.h>
+
 
 #if defined(_MSC_VER) && !defined(__clang__)
 # pragma fenv_access(off)
