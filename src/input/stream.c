@@ -803,9 +803,9 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
             }
             return VLC_EGENERIC;
         case STREAM_GET_TITLE:
-            if (s->ops->get_title != NULL) {
+            if (s->ops->stream.get_title != NULL) {
                 unsigned *title = va_arg(args, unsigned *);
-                return s->ops->get_title(s, title);
+                return s->ops->stream.get_title(s, title);
             }
             return VLC_EGENERIC;
         case STREAM_GET_SEEKPOINT:

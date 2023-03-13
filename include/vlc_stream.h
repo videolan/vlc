@@ -48,7 +48,6 @@ struct vlc_stream_operations {
 
     int (*get_pts_delay)(stream_t *, vlc_tick_t *);
     int (*get_signal)(stream_t *, double *, double *);
-    int (*get_title)(stream_t *, unsigned *);
     int (*get_meta)(stream_t *, vlc_meta_t *);
     int (*get_type)(stream_t *, int *);
 
@@ -62,6 +61,7 @@ struct vlc_stream_operations {
         struct {
             bool (*can_fastseek)(stream_t *);
 
+            int (*get_title)(stream_t *, unsigned *);
             int (*get_seekpoint)(stream_t *, unsigned *);
             int (*get_size)(stream_t *, uint64_t *);
             int (*get_title_info)(stream_t *, input_title_t ***, int *);
