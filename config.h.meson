@@ -9,14 +9,8 @@
 /* Define to 1 if SSE3 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSE3
 
-/* Define to 1 if SSE4A inline assembly is available. */
-#mesondefine CAN_COMPILE_SSE4A
-
 /* Define to 1 if SSE4_1 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSE4_1
-
-/* Define to 1 if SSE4_2 inline assembly is available. */
-#mesondefine CAN_COMPILE_SSE4_2
 
 /* Define to 1 if SSSE3 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSSE3
