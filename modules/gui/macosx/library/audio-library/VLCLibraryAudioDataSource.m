@@ -420,14 +420,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     return VLCLibraryTitleSortDescriptorKey;
 }
 
-- (void)reloadData
-{
-    [self retainSelectedMediaItem];
-    [self reloadViews];
-    [self restoreSelectionState];
-}
-
-- (void)reloadViews
+- (void)reloadViewsWithCompletion:(void(^)(void))completionHandler
 {
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_collectionView.collectionViewLayout;
     if (collectionViewFlowLayout) {
@@ -439,13 +432,27 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [gridModeListSelectionCollectionViewFlowLayout resetLayout];
     }
 
-    [self.collectionView reloadData];
-    [self.gridModeListTableView reloadData];
-    [self.gridModeListSelectionCollectionView reloadData];
-    [self.collectionSelectionTableView reloadData];
-    [self.groupSelectionTableView reloadData];
-    [self.songsTableView reloadData];
+    completionHandler();
     [self setupExistingSortForTableView:_songsTableView];
+}
+
+- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
+{
+    [self retainSelectedMediaItem];
+    [self reloadViewsWithCompletion:completionHandler];
+    [self restoreSelectionState];
+}
+
+- (void)reloadData
+{
+    [self reloadDataWithCompletion:^{
+        [self.collectionView reloadData];
+        [self.gridModeListTableView reloadData];
+        [self.gridModeListSelectionCollectionView reloadData];
+        [self.collectionSelectionTableView reloadData];
+        [self.groupSelectionTableView reloadData];
+        [self.songsTableView reloadData];
+    }];
 }
 
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
