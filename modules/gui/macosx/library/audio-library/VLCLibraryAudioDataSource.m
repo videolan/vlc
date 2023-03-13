@@ -152,34 +152,31 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 }
 
-- (void)libraryModelUpdated:(NSNotification *)aNotification
+- (NSArray *)collectionToDisplay
 {
-    if(self.libraryModel == nil) {
-        return;
-    }
-    
-    NSArray *collectionToDisplay;
-
     switch(_currentParentType) {
         case VLC_ML_PARENT_UNKNOWN:
-            collectionToDisplay = [self.libraryModel listOfAudioMedia];
-            break;
+            return [_libraryModel listOfAudioMedia];
         case VLC_ML_PARENT_ALBUM:
-            collectionToDisplay = [self.libraryModel listOfAlbums];
-            break;
+            return [_libraryModel listOfAlbums];
         case VLC_ML_PARENT_ARTIST:
-            collectionToDisplay = [self.libraryModel listOfArtists];
-            break;
+            return [_libraryModel listOfArtists];
         case VLC_ML_PARENT_GENRE:
-            collectionToDisplay = [self.libraryModel listOfGenres];
-            break;
+            return [_libraryModel listOfGenres];
         default:
-            return;
+            return nil;
+    }
+}
+
+- (void)libraryModelUpdated:(NSNotification *)aNotification
+{
+    if(_libraryModel == nil) {
+        return;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self retainSelectedMediaItem];
-        self->_displayedCollection = collectionToDisplay;
+        self->_displayedCollection = [self collectionToDisplay];
         [self reloadData];
         [self restoreSelectionState];
     });
