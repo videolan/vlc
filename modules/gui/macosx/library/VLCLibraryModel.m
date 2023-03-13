@@ -69,6 +69,7 @@ NSString *VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMedia
 - (void)resetCachedListOfAudioMedia;
 - (void)resetCachedListOfVideoMedia;
 - (void)resetCachedListOfRecentMedia;
+- (void)resetCachedMediaItemLists;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
@@ -86,9 +87,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_ADDED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedListOfRecentMedia];
-                [libraryModel resetCachedListOfAudioMedia];
-                [libraryModel resetCachedListOfVideoMedia];
+                [libraryModel resetCachedMediaItemLists];
             });
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
@@ -465,6 +464,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         });
     }
     return _cachedRecentMedia;
+}
+
+- (void)resetCachedMediaItemLists
+{
+    [self resetCachedListOfRecentMedia];
+    [self resetCachedListOfAudioMedia];
+    [self resetCachedListOfVideoMedia];
 }
 
 - (void)resetCachedListOfMonitoredFolders
