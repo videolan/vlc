@@ -273,9 +273,6 @@
 /* Define to 1 if you have the <pthread.h> header file. */
 #mesondefine HAVE_PTHREAD_H
 
-/* Define to 1 if you have the `qsort_r' function. */
-#mesondefine HAVE_QSORT_R
-
 /* Define to 1 if you have the `readv' function. */
 #mesondefine HAVE_READV
 
