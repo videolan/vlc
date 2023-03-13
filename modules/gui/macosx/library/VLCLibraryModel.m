@@ -604,6 +604,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
+    [self resetCachedMediaItemLists];
+
     NSParameterAssert(p_event != NULL);
     const int64_t itemId = p_event->modification.i_entity_id;
 
@@ -647,6 +649,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event
 {
+    [self resetCachedMediaItemLists];
+
     NSParameterAssert(p_event != NULL);
     const int64_t itemId = p_event->deletion.i_entity_id;
 
