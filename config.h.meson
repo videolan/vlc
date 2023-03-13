@@ -423,9 +423,6 @@
 /* Define to 1 if you have the `writev' function. */
 #mesondefine HAVE_WRITEV
 
-/* Define to 1 if you have the <X11/Xlib.h> header file. */
-#mesondefine HAVE_X11_XLIB_H
-
 /* Define to 1 if you have the <xlocale.h> header file. */
 #mesondefine HAVE_XLOCALE_H
 
