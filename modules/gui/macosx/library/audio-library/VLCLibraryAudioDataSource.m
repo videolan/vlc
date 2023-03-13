@@ -168,7 +168,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 }
 
-- (void)libraryModelUpdated:(NSNotification *)aNotification
+- (void)libraryModelUpdated:(NSNotification * const)aNotification
 {
     if(_libraryModel == nil) {
         return;
@@ -443,7 +443,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }];
 }
 
-- (NSUInteger)indexForMediaLibraryItemWithId:(int64_t)itemId
+- (NSUInteger)indexForMediaLibraryItemWithId:(const int64_t)itemId
 {
     return [_displayedCollection indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem, const NSUInteger idx, BOOL * const stop) {
         NSAssert(mediaItem != nil, @"Cache list should not contain nil media items");
@@ -451,7 +451,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }];
 }
 
-- (void)reloadDataForMediaLibraryItem:(VLCMediaLibraryMediaItem*)mediaItem
+- (void)reloadDataForMediaLibraryItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
     [self reloadDataWithCompletion:^{
         const NSUInteger index = [self indexForMediaLibraryItemWithId:mediaItem.libraryID];
@@ -479,7 +479,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }];
 }
 
-- (void)deleteDataForMediaLibraryItem:(VLCMediaLibraryMediaItem*)mediaItemToReload
+- (void)deleteDataForMediaLibraryItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
     [self reloadDataWithCompletion:^{
         const NSUInteger index = [self indexForMediaLibraryItemWithId:mediaItem.libraryID];

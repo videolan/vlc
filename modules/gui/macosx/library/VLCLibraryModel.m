@@ -161,7 +161,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 @implementation VLCLibraryModel
 
-+ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification
++ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification * const)aNotification
 {
     NSParameterAssert(aNotification);
     NSDictionary * const notificationUserInfo = aNotification.userInfo;

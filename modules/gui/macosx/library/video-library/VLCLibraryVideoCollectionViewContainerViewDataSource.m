@@ -80,7 +80,7 @@
     return self;
 }
 
-- (void)libraryModelVideoListReset:(NSNotification *)aNotification
+- (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
         return;
@@ -89,7 +89,7 @@
     [self reloadData];
 }
 
-- (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
+- (void)libraryModelVideoItemUpdated:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
         return;
@@ -99,7 +99,7 @@
     [self reloadDataForIndex:modelIndex];
 }
 
-- (void)libraryModelVideoItemDeleted:(NSNotification *)aNotification
+- (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
         return;
@@ -109,7 +109,7 @@
     [self deleteDataForIndex:modelIndex];
 }
 
-- (void)libraryModelRecentsListReset:(NSNotification *)aNotification
+- (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
         return;
@@ -118,7 +118,7 @@
     [self reloadData];
 }
 
-- (void)libraryModelRecentsItemUpdated:(NSNotification *)aNotification
+- (void)libraryModelRecentsItemUpdated:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
         return;
@@ -128,7 +128,7 @@
     [self reloadDataForIndex:modelIndex];
 }
 
-- (void)libraryModelRecentsItemDeleted:(NSNotification *)aNotification
+- (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
         return;
@@ -148,7 +148,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAssert(self->_groupDescriptor.libraryModelDataMethodSignature, @"Group descriptor's library model data method signature cannot be nil");
 
-        NSInvocation *modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
+        NSInvocation * const modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
         modelDataInvocation.selector = self->_groupDescriptor.libraryModelDataSelector;
         [modelDataInvocation invokeWithTarget:self->_libraryModel];
         [modelDataInvocation getReturnValue:&self->_collectionArray];
@@ -164,7 +164,7 @@
     }];
 }
 
-- (void)reloadDataForIndex:(NSUInteger)index
+- (void)reloadDataForIndex:(const NSUInteger)index
 {
     [self reloadDataWithCompletion:^{
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
@@ -172,7 +172,7 @@
     }];
 }
 
-- (void)deleteDataForIndex:(NSUInteger)index
+- (void)deleteDataForIndex:(const NSUInteger)index
 {
     [self reloadDataWithCompletion:^{
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];

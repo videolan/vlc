@@ -52,7 +52,7 @@ extern NSString *VLCLibraryModelRecentsMediaItemUpdated;
 
 @interface VLCLibraryModel : NSObject
 
-+ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification *)aNotification;
++ (NSUInteger)modelIndexFromModelItemNotification:(NSNotification * const)aNotification;
 
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
 

@@ -82,7 +82,7 @@
     return self;
 }
 
-- (void)libraryModelVideoListReset:(NSNotification *)aNotification
+- (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -93,7 +93,7 @@
     [self reloadData];
 }
 
-- (void)libraryModelVideoItemUpdated:(NSNotification *)aNotification
+- (void)libraryModelVideoItemUpdated:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -105,7 +105,7 @@
     [self reloadDataForIndex:modelIndex];
 }
 
-- (void)libraryModelVideoItemDeleted:(NSNotification *)aNotification
+- (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -117,7 +117,7 @@
     [self deleteDataForIndex:modelIndex];
 }
 
-- (void)libraryModelRecentsListReset:(NSNotification *)aNotification
+- (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -128,7 +128,7 @@
     [self reloadData];
 }
 
-- (void)libraryModelRecentsItemUpdated:(NSNotification *)aNotification
+- (void)libraryModelRecentsItemUpdated:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -140,7 +140,7 @@
     [self reloadDataForIndex:modelIndex];
 }
 
-- (void)libraryModelRecentsItemDeleted:(NSNotification *)aNotification
+- (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
@@ -176,7 +176,7 @@
     }];
 }
 
-- (void)reloadDataForIndex:(NSUInteger)index
+- (void)reloadDataForIndex:(NSUInteger const)index
 {
     [self reloadDataWithCompletion:^{
         // Don't regenerate the groups by index as these do not change according to the notification
@@ -190,7 +190,7 @@
     }];
 }
 
-- (void)deleteDataForIndex:(NSUInteger)index
+- (void)deleteDataForIndex:(NSUInteger const)index
 {
     [self reloadDataWithCompletion:^{
         // Don't regenerate the groups by index as these do not change according to the notification
