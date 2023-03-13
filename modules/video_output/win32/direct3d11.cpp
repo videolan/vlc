@@ -908,7 +908,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
 
     // look for any pixel format that we can handle
     if ( !sys->picQuad.generic.textureFormat )
-        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, 0, 0, 0, false, false);
+        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, 0, 0, 0, false, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
 
     if ( !sys->picQuad.generic.textureFormat )
     {
