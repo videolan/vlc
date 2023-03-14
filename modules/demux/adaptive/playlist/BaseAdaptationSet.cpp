@@ -93,7 +93,7 @@ const std::string & BaseAdaptationSet::getLang() const
 
 void BaseAdaptationSet::setLang( const std::string &lang_ )
 {
-    std::size_t pos = lang.find_first_of('-');
+    std::size_t pos = lang_.find_first_of('-');
     if(pos != std::string::npos && pos > 0)
         lang = lang_.substr(0, pos);
     else if(lang_.size() < 4)
