@@ -123,7 +123,6 @@ typedef struct
 
 // Don't use Float for now since 5.1/7.1 Float is down sampled to Stereo Float
 //#define AUDIOTRACK_USE_FLOAT
-//#define AUDIOTRACK_HW_LATENCY
 
 /* Get AudioTrack native sample rate: if activated, most of  the resampling
  * will be done by VLC */
@@ -301,9 +300,7 @@ AudioTrack_InitJNI( vlc_object_t *p_aout)
     GET_ID( GetMethodID, AudioTrack.getBufferSizeInFrames,
             "getBufferSizeInFrames", "()I", false );
 
-#ifdef AUDIOTRACK_HW_LATENCY
     GET_ID( GetMethodID, AudioTrack.getLatency, "getLatency", "()I", false );
-#endif
 
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
@@ -1851,7 +1848,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     else
         p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
-#ifdef AUDIOTRACK_HW_LATENCY
     if( jfields.AudioTimestamp.clazz )
     {
         /* create AudioTimestamp object */
@@ -1865,7 +1861,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
         if( !p_sys->timestamp.p_obj )
             goto error;
     }
-#endif
 
     p_sys->jbuffer.array = NULL;
     p_sys->jbuffer.size = p_sys->jbuffer.offset = 0;
