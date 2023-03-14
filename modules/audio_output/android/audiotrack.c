@@ -104,7 +104,6 @@ typedef struct
 
     vlc_thread_t thread;    /* AudioTrack_Thread */
     vlc_mutex_t lock;
-    vlc_cond_t aout_cond;   /* cond owned by aout */
     vlc_cond_t thread_cond; /* cond owned by AudioTrack_Thread */
 
     /* These variables need locking on read and write */
@@ -1439,10 +1438,7 @@ AudioTrack_Thread( void *p_data )
 
             }
             else
-            {
                 i_last_time_blocked = 0;
-                vlc_cond_signal( &p_sys->aout_cond );
-            }
         }
 
         vlc_mutex_unlock( &p_sys->lock );
@@ -1960,7 +1956,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
         return VLC_ENOMEM;
 
     vlc_mutex_init(&p_sys->lock);
-    vlc_cond_init(&p_sys->aout_cond);
     vlc_cond_init(&p_sys->thread_cond);
 
     p_sys->volume = 1.0f;
