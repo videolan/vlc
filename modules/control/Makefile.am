@@ -27,10 +27,6 @@ control_LTLIBRARIES += liblirc_plugin.la
 endif
 
 libvlc_motion_la_SOURCES = control/motionlib.c control/motionlib.h
-if HAVE_DARWIN
-libvlc_motion_la_SOURCES += control/unimotion.c control/unimotion.h
-libvlc_motion_la_CFLAGS = $(AM_CFLAGS) -fconstant-cfstrings
-endif
 libvlc_motion_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libvlc_motion.la
 

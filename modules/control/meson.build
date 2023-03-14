@@ -55,8 +55,6 @@ vlc_motion_sources = [
 
 if host_system == 'darwin'
   vlc_motion_cflags += ['-fconstant-cfstrings']
-  vlc_motion_sources += ['unimotion.c']
-  vlc_motion_deps += [corefoundation_dep, iokit_dep]
 endif
 
 vlc_motion_lib = static_library('vlc_motion',

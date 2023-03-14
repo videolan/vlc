@@ -31,26 +31,11 @@
 
 #include <vlc_common.h>
 
-#ifdef __APPLE__
-# include "TargetConditionals.h"
-# if !TARGET_OS_IPHONE
-#  define HAVE_MACOS_UNIMOTION
-# endif
-#endif
-
-#ifdef HAVE_MACOS_UNIMOTION
-# include "unimotion.h"
-#endif
-
 #include "motionlib.h"
 
 struct motion_sensors_t
 {
-    enum { HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR,
-           UNIMOTION_SENSOR } sensor;
-#ifdef HAVE_MACOS_UNIMOTION
-    enum sms_hardware unimotion_hw;
-#endif
+    enum { HDAPS_SENSOR, AMS_SENSOR, APPLESMC_SENSOR } sensor;
     int i_calibrate;
 
     int p_oldx[16];
@@ -94,13 +79,6 @@ motion_sensors_t *motion_create( vlc_object_t *obj )
         motion->sensor = APPLESMC_SENSOR;
         msg_Dbg( obj, "Apple SMC motion detection correctly loaded" );
     }
-#ifdef HAVE_MACOS_UNIMOTION
-    else if( (motion->unimotion_hw = detect_sms()) )
-    {
-        motion->sensor = UNIMOTION_SENSOR;
-        msg_Dbg( obj, "UniMotion motion detection correctly loaded" );
-    }
-#endif
     else
     {
         /* No motion sensor support */
@@ -176,22 +154,6 @@ static int GetOrientation( motion_sensors_t *motion )
         else
             return ( i_x - motion->i_calibrate ) * 10;
 
-#ifdef HAVE_MACOS_UNIMOTION
-    case UNIMOTION_SENSOR:
-        if( read_sms_raw( motion->unimotion_hw, &i_x, &i_y, &i_z ) )
-        {
-            double d_norm = sqrt( i_x*i_x+i_z*i_z );
-            if( d_norm < 100 )
-                return 0;
-            double d_x = i_x / d_norm;
-            if( i_z > 0 )
-                return -asin(d_x)*3600/3.141;
-            else
-                return 3600 + asin(d_x)*3600/3.141;
-        }
-        else
-            return 0;
-#endif
     default:
         vlc_assert_unreachable();
     }
