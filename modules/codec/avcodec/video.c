@@ -574,12 +574,8 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->framedrop = FRAMEDROP_NONE;
 
     /* Set output properties */
-    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
-    {
-        /* we are doomed. but not really, because most codecs set their pix_fmt later on */
-        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
-    }
-    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
+    if (GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) == VLC_SUCCESS)
+        p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     p_dec->fmt_out.video.orientation = p_dec->fmt_in->video.orientation;
 
