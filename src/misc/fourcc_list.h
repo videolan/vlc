@@ -521,8 +521,14 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_VP8, "Google/On2's VP8 Video"),
         A("VP80"),
 
+    B(VLC_CODEC_VP8ALPHA_ES, "Google/On2's VP8 Alpha"),
+        A("VP8a"),
+
     B(VLC_CODEC_VP9, "Google/On2's VP9 Video"),
         A("VP90"),
+
+    B(VLC_CODEC_VP9ALPHA_ES, "Google/On2's VP9 Alpha"),
+        A("VP9a"),
 
     B(VLC_CODEC_AV1, "AOMedia's AV1 Video"),
         A("av10"),
