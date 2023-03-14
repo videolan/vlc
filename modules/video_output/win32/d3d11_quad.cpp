@@ -362,6 +362,7 @@ void d3d11_quad_t::UpdateViewport(const RECT *rect, const d3d_format_t *display)
             /* fallthrough */
         case VLC_CODEC_I420_10L:
         case VLC_CODEC_I420:
+        case VLC_CODEC_YUV420A:
             cropViewport[1].TopLeftX = cropViewport[0].TopLeftX / 2;
             cropViewport[1].TopLeftY = cropViewport[0].TopLeftY / 2;
             cropViewport[1].Width    = cropViewport[0].Width / 2;
