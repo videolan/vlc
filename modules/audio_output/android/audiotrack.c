@@ -1106,30 +1106,6 @@ AudioTrack_Create( JNIEnv *env, aout_stream_t *stream,
     return 0;
 }
 
-bool
-AudioTrack_HasEncoding( long long encoding_flags, vlc_fourcc_t i_format )
-{
-#define MATCH_ENCODING_FLAG(x) jfields.AudioFormat.has_##x && \
-    (encoding_flags == 0 || encoding_flags & (1 << jfields.AudioFormat.x) )
-
-    switch( i_format )
-    {
-        case VLC_CODEC_DTSHD:
-            return MATCH_ENCODING_FLAG( ENCODING_DTS_HD );
-        case VLC_CODEC_DTS:
-            return MATCH_ENCODING_FLAG( ENCODING_DTS );
-        case VLC_CODEC_A52:
-            return MATCH_ENCODING_FLAG( ENCODING_AC3 );
-        case VLC_CODEC_EAC3:
-            return MATCH_ENCODING_FLAG( ENCODING_E_AC3 );
-        case VLC_CODEC_TRUEHD:
-        case VLC_CODEC_MLP:
-            return MATCH_ENCODING_FLAG( ENCODING_DOLBY_TRUEHD );
-        default:
-            return true;
-    }
-}
-
 static int GetPassthroughFmt( bool compat, audio_sample_format_t *fmt, int *at_format )
 {
     if( !compat && jfields.AudioFormat.has_ENCODING_IEC61937 )
@@ -1206,9 +1182,6 @@ static int
 StartPassthrough( JNIEnv *env, aout_stream_t *stream )
 {
     aout_sys_t *p_sys = stream->sys;
-
-    if( !AudioTrack_HasEncoding( p_sys->i_encoding_flags, p_sys->fmt.i_format ) )
-        return VLC_EGENERIC;
 
     /* Try ENCODING_IEC61937 first, then fallback to ENCODING_[AC3|DTS|...] */
     unsigned nb_fmt = jfields.AudioFormat.has_ENCODING_IEC61937 ? 2 : 1;
