@@ -619,6 +619,31 @@ static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
     }
 }
 
+static void ReadMetaFromBasicTag(const Tag* tag, vlc_meta_t *dest)
+{
+#define SET( accessor, meta )                                                  \
+    if( !tag->accessor().isEmpty() )                                           \
+        vlc_meta_Set##meta( dest, tag->accessor().toCString(true) )
+#define SETINT( accessor, meta )                                               \
+    if( tag->accessor() )                                                      \
+    {                                                                          \
+        char tmp[10];                                                          \
+        snprintf( tmp, 10, "%d", tag->accessor() );                            \
+        vlc_meta_Set##meta( dest, tmp );                                       \
+    }
+
+    SET( title, Title );
+    SET( artist, Artist );
+    SET( album, Album );
+    SET( comment, Description );
+    SET( genre, Genre );
+    SETINT( year, Date );
+    SETINT( track, TrackNum );
+
+#undef SETINT
+#undef SET
+}
+
 /**
  * Read meta information from id3v2 tags
  * @param tag: the id3v2 tag
@@ -958,29 +983,7 @@ static int ReadMeta( vlc_object_t* p_this)
 
 
     // Read the tags from the file
-    Tag* p_tag = f.tag();
-
-#define SET( tag, meta )                                                       \
-    if( !p_tag->tag().isEmpty() )                                              \
-        vlc_meta_Set##meta( p_meta, p_tag->tag().toCString(true) )
-#define SETINT( tag, meta )                                                    \
-    if( p_tag->tag() )                                                         \
-    {                                                                          \
-        char psz_tmp[10];                                                      \
-        snprintf( psz_tmp, 10, "%d", p_tag->tag() );                           \
-        vlc_meta_Set##meta( p_meta, psz_tmp );                                 \
-    }
-
-    SET( title, Title );
-    SET( artist, Artist );
-    SET( album, Album );
-    SET( comment, Description );
-    SET( genre, Genre );
-    SETINT( year, Date );
-    SETINT( track, TrackNum );
-
-#undef SETINT
-#undef SET
+    ReadMetaFromBasicTag(f.tag(), p_meta);
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
 
