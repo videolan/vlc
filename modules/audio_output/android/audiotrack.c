@@ -35,6 +35,7 @@
 #include <vlc_aout.h>
 #include "../video_output/android/env.h"
 #include "device.h"
+#include "audioformat_jni.h"
 
 #define SMOOTHPOS_SAMPLE_COUNT 10
 #define SMOOTHPOS_INTERVAL_US VLC_TICK_FROM_MS(30) // 30ms
@@ -191,16 +192,6 @@ static struct
         bool has_ENCODING_PCM_32BIT;
         jint ENCODING_PCM_FLOAT;
         bool has_ENCODING_PCM_FLOAT;
-        jint ENCODING_AC3;
-        bool has_ENCODING_AC3;
-        jint ENCODING_E_AC3;
-        bool has_ENCODING_E_AC3;
-        jint ENCODING_DOLBY_TRUEHD;
-        bool has_ENCODING_DOLBY_TRUEHD;
-        jint ENCODING_DTS;
-        bool has_ENCODING_DTS;
-        jint ENCODING_DTS_HD;
-        bool has_ENCODING_DTS_HD;
         jint ENCODING_IEC61937;
         bool has_ENCODING_IEC61937;
         jint CHANNEL_OUT_MONO;
@@ -421,20 +412,6 @@ AudioTrack_InitJNI( audio_output_t *p_aout,
     }
     else
         jfields.AudioFormat.has_ENCODING_IEC61937 = false;
-
-    GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
-    jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
-    GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
-    jfields.AudioFormat.has_ENCODING_E_AC3 = field != NULL;
-
-    GET_CONST_INT( AudioFormat.ENCODING_DTS, "ENCODING_DTS", false );
-    jfields.AudioFormat.has_ENCODING_DTS = field != NULL;
-    GET_CONST_INT( AudioFormat.ENCODING_DTS_HD, "ENCODING_DTS_HD", false );
-    jfields.AudioFormat.has_ENCODING_DTS_HD = field != NULL;
-
-    GET_CONST_INT( AudioFormat.ENCODING_DOLBY_TRUEHD, "ENCODING_DOLBY_TRUEHD",
-                   false );
-    jfields.AudioFormat.has_ENCODING_DOLBY_TRUEHD = field != NULL;
 
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
@@ -1148,26 +1125,9 @@ static int GetPassthroughFmt( bool compat, audio_sample_format_t *fmt, int *at_f
     }
     else
     {
-        switch( fmt->i_format )
-        {
-            case VLC_CODEC_A52:
-                if( !jfields.AudioFormat.has_ENCODING_AC3 )
-                    return VLC_EGENERIC;
-                *at_format = jfields.AudioFormat.ENCODING_AC3;
-                break;
-            case VLC_CODEC_EAC3:
-                if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
-                    return VLC_EGENERIC;
-                *at_format = jfields.AudioFormat.ENCODING_E_AC3;
-                break;
-            case VLC_CODEC_DTS:
-                if( !jfields.AudioFormat.has_ENCODING_DTS )
-                    return VLC_EGENERIC;
-                *at_format = jfields.AudioFormat.ENCODING_DTS;
-                break;
-            default:
-                return VLC_EGENERIC;
-        }
+        if( vlc_android_AudioFormat_FourCCToEncoding( fmt->i_format, at_format )
+                != VLC_SUCCESS )
+            return VLC_EGENERIC;
         fmt->i_bytes_per_frame = 4;
         fmt->i_frame_length = 1;
         fmt->i_physical_channels = AOUT_CHANS_STEREO;

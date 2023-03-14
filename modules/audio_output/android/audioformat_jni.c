@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_fourcc.h>
@@ -73,6 +74,32 @@ bool vlc_android_AudioFormat_HasEncoding(long long encoding_flags,
         default:
             return true;
     }
+}
+
+int vlc_android_AudioFormat_FourCCToEncoding(vlc_fourcc_t format, int *encoding)
+{
+    switch(format)
+    {
+        case VLC_CODEC_A52:
+            if( !jfields.AudioFormat.has_ENCODING_AC3 )
+                return VLC_EGENERIC;
+            *encoding = jfields.AudioFormat.ENCODING_AC3;
+            return VLC_SUCCESS;
+        case VLC_CODEC_EAC3:
+            if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
+                return VLC_EGENERIC;
+            *encoding = jfields.AudioFormat.ENCODING_E_AC3;
+            return VLC_SUCCESS;
+        case VLC_CODEC_DTS:
+            if( !jfields.AudioFormat.has_ENCODING_DTS )
+                return VLC_EGENERIC;
+            *encoding = jfields.AudioFormat.ENCODING_DTS;
+            return VLC_SUCCESS;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    vlc_assert_unreachable();
 }
 
 /* init all jni fields.

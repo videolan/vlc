@@ -23,6 +23,8 @@
 bool vlc_android_AudioFormat_HasEncoding(long long encoding_flags,
                                          vlc_fourcc_t i_format);
 
+int vlc_android_AudioFormat_FourCCToEncoding(vlc_fourcc_t format, int *encoding);
+
 /* init all jni fields.
  * Done only one time during the first initialisation */
 int vlc_android_AudioFormat_InitJNI(vlc_object_t *p_aout);
