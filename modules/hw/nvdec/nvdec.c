@@ -813,7 +813,10 @@ static int OpenDecoder(vlc_object_t *p_this)
         case VLC_CODEC_MP2V:
         case VLC_CODEC_MPGV:
         case VLC_CODEC_MP4V:
+            break;
         case VLC_CODEC_VP8:
+            if (p_dec->fmt_in->i_level) // contains alpha extradata
+                goto early_exit;
             break;
         case VLC_CODEC_VP9:
             if (p_dec->fmt_in->i_profile != 0 && p_dec->fmt_in->i_profile != 2)
@@ -821,6 +824,8 @@ static int OpenDecoder(vlc_object_t *p_this)
                 msg_Warn(p_dec, "Unsupported VP9 profile %d", p_dec->fmt_in->i_profile);
                 goto early_exit;
             }
+            if (p_dec->fmt_in->i_level) // contains alpha extradata
+                goto early_exit;
             break;
         default:
             goto early_exit;

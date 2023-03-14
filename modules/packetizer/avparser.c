@@ -87,7 +87,9 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
 
     /* Restrict to VP9 for now */
     if( p_dec->fmt_in->i_codec != VLC_CODEC_VP9 )
-        return VLC_EGENERIC;
+        return VLC_ENOTSUP;
+    if( p_dec->fmt_in->i_level ) // contains alpha extradata
+        return VLC_ENOTSUP;
 
     enum AVCodecID i_avcodec_id;
 

@@ -568,6 +568,9 @@ libvpx_plugin_la_LIBADD = $(VPX_LIBS)
 EXTRA_LTLIBRARIES += libvpx_plugin.la
 codec_LTLIBRARIES += $(LTLIBvpx)
 
+libvpx_alpha_plugin_la_SOURCES = codec/vpx_alpha.c
+codec_LTLIBRARIES += libvpx_alpha_plugin.la
+
 libaom_plugin_la_SOURCES = codec/aom.c \
                            packetizer/iso_color_tables.h
 libaom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)

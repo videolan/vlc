@@ -810,6 +810,13 @@ if vpx_dep.found()
   }
 endif
 
+# VP8/VP9 with alpha pseudo-decoder
+vlc_modules += {
+    'name' : 'vpx_alpha',
+    'sources' : files('vpx_alpha.c')
+}
+
+
 # libaom AV1 codec
 aom_dep = dependency('aom', required: get_option('aom'))
 if aom_dep.found()
