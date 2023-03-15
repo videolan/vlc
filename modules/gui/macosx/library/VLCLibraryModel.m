@@ -82,23 +82,23 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     switch(p_event->i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedMediaItemListsWithNotification:YES completionHandler:nil];
-            });
+        {
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel resetCachedMediaItemListsWithNotification:YES completionHandler:nil];
             break;
+        }
         case VLC_ML_EVENT_MEDIA_UPDATED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel handleMediaItemUpdateEvent:p_event];
-            });
+        {
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel handleMediaItemUpdateEvent:p_event];
             break;
+        }
         case VLC_ML_EVENT_MEDIA_DELETED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel handleMediaItemDeletionEvent:p_event];
-            });
+        {
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel handleMediaItemDeletionEvent:p_event];
             break;
+        }
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             if (p_event->media_thumbnail_generated.b_success) {
                 VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:(struct vlc_ml_media_t *)p_event->media_thumbnail_generated.p_media];
@@ -115,40 +115,33 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_ARTIST_UPDATED:
         case VLC_ML_EVENT_ARTIST_DELETED:
         {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedListOfArtists];
-            });
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel resetCachedListOfArtists];
             break;
         }
         case VLC_ML_EVENT_ALBUM_ADDED:
         case VLC_ML_EVENT_ALBUM_UPDATED:
         case VLC_ML_EVENT_ALBUM_DELETED:
         {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedListOfAlbums];
-            });
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel resetCachedListOfAlbums];
             break;
         }
         case VLC_ML_EVENT_GENRE_ADDED:
         case VLC_ML_EVENT_GENRE_UPDATED:
         case VLC_ML_EVENT_GENRE_DELETED:
         {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedListOfGenres];
-            });
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel resetCachedListOfGenres];
             break;
         }
         case VLC_ML_EVENT_FOLDER_ADDED:
         case VLC_ML_EVENT_FOLDER_UPDATED:
         case VLC_ML_EVENT_FOLDER_DELETED:
         {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedListOfMonitoredFolders];
-            });
+            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+            [libraryModel resetCachedListOfMonitoredFolders];
+            break;
         }
         default:
             break;
@@ -215,9 +208,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (size_t)numberOfAudioMedia
 {
     if (!_cachedAudioMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfAudioMediaWithNotification:YES completionHandler:nil];
-        });
+        [self resetCachedListOfAudioMediaWithNotification:YES completionHandler:nil];
 
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAudioCount;
@@ -379,10 +370,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (size_t)numberOfVideoMedia
 {
     if (!_cachedVideoMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Fetching num video media");
-            [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
-        });
+        [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
 
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialVideoCount;
@@ -423,9 +411,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfVideoMedia
 {
     if (!_cachedVideoMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
-        });
+        [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
     }
     return _cachedVideoMedia;
 }
@@ -534,9 +520,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<VLCMediaLibraryEntryPoint *> *)listOfMonitoredFolders
 {
     if(!_cachedListOfMonitoredFolders) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfMonitoredFolders];
-        });
+        [self resetCachedListOfMonitoredFolders];
     }
 
     return _cachedListOfMonitoredFolders;
@@ -692,34 +676,28 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     const int64_t itemId = p_event->modification.i_entity_id;
 
-    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:itemId];
-    if (mediaItem == nil) {
-        NSLog(@"Could not find a library media item with this ID. Can't handle deletion event.");
-        return;
-    }
-
     [self resetCachedMediaItemListsWithNotification:NO completionHandler:^{
         [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
             if (error != nil) {
                 NSLog(@"Could not handle deletion for media library item with id %lld in model, received error: %@", itemId, error.localizedDescription);
                 return;
             }
-            
+
             // Delete the item from the array...
             NSMutableArray * const mutableItemArrayCopy = [itemArray mutableCopy];
             [mutableItemArrayCopy removeObjectAtIndex:index];
             itemArray = [mutableItemArrayCopy copy];
-            
+
             // Notify what happened
             VLCMediaLibraryMediaItem * const mediaItem = [itemArray objectAtIndex:index];
-            
+
             if (itemArray == self->_cachedRecentMedia) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted
                                                                 object:mediaItem
                                                               userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
                 return;
             }
-            
+
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
                     [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemDeleted
