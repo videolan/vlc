@@ -646,43 +646,43 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemListsWithNotification:NO completionHandler:nil];
+    [self resetCachedMediaItemListsWithNotification:NO completionHandler:^{
+        [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
+            if (error != nil) {
+                NSLog(@"Could not handle update for media library item with id %lld in model, received error: %@", itemId, error.localizedDescription);
+                return;
+            }
 
-    [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
-        if (error != nil) {
-            NSLog(@"Could not handle update for media library item with id %lld in model, received error: %@", itemId, error.localizedDescription);
-            return;
-        }
+            // Modify the item from the array...
+            VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:itemId];
+            NSMutableArray * const mutableItemArrayCopy = [itemArray mutableCopy];
+            [mutableItemArrayCopy replaceObjectAtIndex:index withObject:mediaItem];
+            itemArray = [mutableItemArrayCopy copy];
 
-        // Modify the item from the array...
-        VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:itemId];
-        NSMutableArray * const mutableItemArrayCopy = [itemArray mutableCopy];
-        [mutableItemArrayCopy replaceObjectAtIndex:index withObject:mediaItem];
-        itemArray = [mutableItemArrayCopy copy];
-
-        // Notify what happened
-        if (itemArray == self->_cachedRecentMedia) {
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated
-                                                            object:mediaItem
-                                                          userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-            return;
-        }
-
-        switch (mediaItem.mediaType) {
-            case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemUpdated
+            // Notify what happened
+            if (itemArray == self->_cachedRecentMedia) {
+                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated
                                                                 object:mediaItem
                                                               userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-                break;
-            case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemUpdated
-                                                                object:mediaItem
-                                                              userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-                break;
-            case VLC_ML_MEDIA_TYPE_UNKNOWN:
-                NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
-                break;
-        }
+                return;
+            }
+
+            switch (mediaItem.mediaType) {
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemUpdated
+                                                                    object:mediaItem
+                                                                  userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
+                    break;
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemUpdated
+                                                                    object:mediaItem
+                                                                  userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
+                    break;
+                case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                    NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                    break;
+            }
+        }];
     }];
 }
 
@@ -698,44 +698,44 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemListsWithNotification:NO completionHandler:nil];
-
-    [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
-        if (error != nil) {
-            NSLog(@"Could not handle deletion for media library item with id %lld in model, received error: %@", itemId, error.localizedDescription);
-            return;
-        }
-
-        // Delete the item from the array...
-        NSMutableArray * const mutableItemArrayCopy = [itemArray mutableCopy];
-        [mutableItemArrayCopy removeObjectAtIndex:index];
-        itemArray = [mutableItemArrayCopy copy];
-
-        // Notify what happened
-        VLCMediaLibraryMediaItem * const mediaItem = [itemArray objectAtIndex:index];
-
-        if (itemArray == self->_cachedRecentMedia) {
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted
-                                                            object:mediaItem
-                                                          userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-            return;
-        }
-
-        switch (mediaItem.mediaType) {
-            case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemDeleted
+    [self resetCachedMediaItemListsWithNotification:NO completionHandler:^{
+        [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
+            if (error != nil) {
+                NSLog(@"Could not handle deletion for media library item with id %lld in model, received error: %@", itemId, error.localizedDescription);
+                return;
+            }
+            
+            // Delete the item from the array...
+            NSMutableArray * const mutableItemArrayCopy = [itemArray mutableCopy];
+            [mutableItemArrayCopy removeObjectAtIndex:index];
+            itemArray = [mutableItemArrayCopy copy];
+            
+            // Notify what happened
+            VLCMediaLibraryMediaItem * const mediaItem = [itemArray objectAtIndex:index];
+            
+            if (itemArray == self->_cachedRecentMedia) {
+                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted
                                                                 object:mediaItem
                                                               userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-                break;
-            case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemDeleted
-                                                                object:mediaItem
-                                                              userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
-                break;
-            case VLC_ML_MEDIA_TYPE_UNKNOWN:
-                NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
-                break;
-        }
+                return;
+            }
+            
+            switch (mediaItem.mediaType) {
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemDeleted
+                                                                    object:mediaItem
+                                                                  userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
+                    break;
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemDeleted
+                                                                    object:mediaItem
+                                                                  userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
+                    break;
+                case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                    NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                    break;
+            }
+        }];
     }];
 }
 
