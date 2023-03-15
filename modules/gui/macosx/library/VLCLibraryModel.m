@@ -403,7 +403,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Updating cached video media");
             self->_cachedVideoMedia = [mutableArray copy];
 
             if (sendNotification) {
@@ -417,7 +416,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedVideoMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Getting list video media");
             [self resetCachedListOfVideoMedia:YES];
         });
     }
@@ -610,10 +608,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
-    [self resetCachedMediaItemLists:NO];
-
     NSParameterAssert(p_event != NULL);
+
     const int64_t itemId = p_event->modification.i_entity_id;
+
+    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:itemId];
+    if (mediaItem == nil) {
+        NSLog(@"Could not find a library media item with this ID. Can't handle update.");
+        return;
+    }
+
+    [self resetCachedMediaItemLists:NO];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
@@ -655,10 +660,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event
 {
-    [self resetCachedMediaItemLists:NO];
-
     NSParameterAssert(p_event != NULL);
-    const int64_t itemId = p_event->deletion.i_entity_id;
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+
+    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:itemId];
+    if (mediaItem == nil) {
+        NSLog(@"Could not find a library media item with this ID. Can't handle deletion event.");
+        return;
+    }
+
+    [self resetCachedMediaItemLists:NO];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
