@@ -95,7 +95,7 @@ Item {
         Repeater {
             model: root.toolbarModel
 
-            T.Button {
+            T.MenuItem {
                 id: control
 
                 text: modelData.text

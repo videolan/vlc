@@ -28,7 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-T.Control {
+T.ItemDelegate {
     id: root
 
     // Properties
@@ -37,8 +37,6 @@ T.Control {
     property real pictureHeight: pictureWidth
     property int titleMargin: VLCStyle.margin_xsmall
     property Item dragItem: null
-
-    readonly property bool highlighted: (mouseHoverHandler.hovered || visualFocus)
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
@@ -77,6 +75,8 @@ T.Control {
 
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
+
+    highlighted: (mouseHoverHandler.hovered || visualFocus)
 
     Accessible.role: Accessible.Cell
     Accessible.name: title

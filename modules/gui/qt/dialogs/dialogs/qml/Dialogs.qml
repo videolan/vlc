@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
@@ -179,7 +180,7 @@ Item {
                     Layout.leftMargin: VLCStyle.margin_xxsmall
                 }
 
-                Text {
+                T.Label {
                     id: messageText
 
                     Layout.maximumWidth: root.width * 0.5

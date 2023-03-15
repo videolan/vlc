@@ -222,7 +222,7 @@ FocusScope {
             }
 
             //use a raw control, we don't want platforms customisation
-            T.Control {
+            T.ToolBar {
                 id: localToolbar
 
                 width: parent.width
