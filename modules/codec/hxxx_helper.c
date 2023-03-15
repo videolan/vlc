@@ -890,6 +890,19 @@ hxxx_helper_get_current_profile_level(const struct hxxx_helper *hh,
     return VLC_EGENERIC;
 }
 
+int h264_helper_get_constraint_flag(const struct hxxx_helper *hh,
+                                    uint8_t *pi_constraints) {
+    
+    assert(hh->i_codec == VLC_CODEC_H264);
+    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
+    if (hsps)
+    {
+        *pi_constraints = hsps->h264_sps->i_constraint_set_flags;
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
 int
 hxxx_helper_get_chroma_chroma(const struct hxxx_helper *hh, uint8_t *pi_chroma_format,
                               uint8_t *pi_depth_luma, uint8_t *pi_depth_chroma)
