@@ -66,7 +66,7 @@ NSString *VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMedia
     size_t _initialAudioCount;
 }
 
-- (void)resetCachedMediaItemLists:(BOOL)sendNotification;
+- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
@@ -84,7 +84,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_ADDED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedMediaItemLists:YES];
+                [libraryModel resetCachedMediaItemListsWithNotification:YES];
             });
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
@@ -183,10 +183,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification
                                          object:nil];
-        
+
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
             const vlc_ml_query_params_t queryParameters = {};
-            
+
             // Preload video and audio count for gui
             self->_initialVideoCount = vlc_ml_count_video_media(self->_p_mediaLibrary, &queryParameters);
             self->_initialAudioCount = vlc_ml_count_audio_media(self->_p_mediaLibrary, &queryParameters);
@@ -216,9 +216,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedAudioMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfAudioMedia:YES];
+            [self resetCachedListOfAudioMediaWithNotification:YES completionHandler:nil];
         });
-        
+
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAudioCount;
     }
@@ -233,7 +233,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return queryParams;
 }
 
-- (void)resetCachedListOfAudioMedia:(BOOL)sendNotification
+- (void)resetCachedListOfAudioMediaWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
@@ -256,6 +256,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
             }
+
+            if (completionHandler) {
+                completionHandler();
+            }
         });
     });
 }
@@ -263,7 +267,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfAudioMedia
 {
     if (!_cachedAudioMedia) {
-        [self resetCachedListOfAudioMedia:YES];
+        [self resetCachedListOfAudioMediaWithNotification:YES completionHandler:nil];
     }
     return _cachedAudioMedia;
 }
@@ -377,16 +381,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if (!_cachedVideoMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"Fetching num video media");
-            [self resetCachedListOfVideoMedia:YES];
+            [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
         });
-        
+
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialVideoCount;
     }
     return _cachedVideoMedia.count;
 }
 
-- (void)resetCachedListOfVideoMedia:(BOOL)sendNotification
+- (void)resetCachedListOfVideoMediaWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParameters = [self queryParams];
@@ -408,6 +412,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
             }
+
+            if (completionHandler) {
+                completionHandler();
+            }
         });
     });
 }
@@ -416,13 +424,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedVideoMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfVideoMedia:YES];
+            [self resetCachedListOfVideoMediaWithNotification:YES completionHandler:nil];
         });
     }
     return _cachedVideoMedia;
 }
 
-- (void)resetCachedListOfRecentMedia:(BOOL)sendNotification
+- (void)resetCachedListOfRecentMediaWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParameters = { .i_nbResults = 20 };
@@ -446,6 +454,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
             }
+
+            if (completionHandler) {
+                completionHandler();
+            }
         });
     });
 }
@@ -454,7 +466,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedRecentMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfRecentMedia:YES];
+            [self resetCachedListOfRecentMediaWithNotification:YES completionHandler:nil];
         });
     }
     return _cachedRecentMedia.count;
@@ -464,17 +476,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedRecentMedia) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfRecentMedia:YES];
+            [self resetCachedListOfRecentMediaWithNotification:YES completionHandler:nil];
         });
     }
     return _cachedRecentMedia;
 }
 
-- (void)resetCachedMediaItemLists:(BOOL)sendNotification
+- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification
 {
-    [self resetCachedListOfRecentMedia:sendNotification];
-    [self resetCachedListOfAudioMedia:sendNotification];
-    [self resetCachedListOfVideoMedia:sendNotification];
+    [self resetCachedListOfRecentMediaWithNotification:sendNotification completionHandler:nil];
+    [self resetCachedListOfAudioMediaWithNotification:sendNotification completionHandler:nil];
+    [self resetCachedListOfVideoMediaWithNotification:sendNotification completionHandler:nil];
 }
 
 - (void)resetCachedListOfMonitoredFolders
@@ -618,7 +630,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemLists:NO];
+    [self resetCachedMediaItemListsWithNotification:NO];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
@@ -670,7 +682,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemLists:NO];
+    [self resetCachedMediaItemListsWithNotification:NO];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
