@@ -66,7 +66,7 @@ NSString *VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMedia
     size_t _initialAudioCount;
 }
 
-- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification;
+- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
@@ -84,7 +84,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_ADDED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
-                [libraryModel resetCachedMediaItemListsWithNotification:YES];
+                [libraryModel resetCachedMediaItemListsWithNotification:YES completionHandler:nil];
             });
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
@@ -482,11 +482,27 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedRecentMedia;
 }
 
-- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification
+- (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler
 {
-    [self resetCachedListOfRecentMediaWithNotification:sendNotification completionHandler:nil];
-    [self resetCachedListOfAudioMediaWithNotification:sendNotification completionHandler:nil];
-    [self resetCachedListOfVideoMediaWithNotification:sendNotification completionHandler:nil];
+    dispatch_group_t resetGroup = dispatch_group_create();
+
+    if (completionHandler) {
+        dispatch_group_notify(resetGroup, dispatch_get_main_queue(), ^{
+            completionHandler();
+        });
+    }
+
+    dispatch_group_enter(resetGroup);
+    [self resetCachedListOfRecentMediaWithNotification:sendNotification
+                                     completionHandler:^{ dispatch_group_leave(resetGroup); }];
+
+    dispatch_group_enter(resetGroup);
+    [self resetCachedListOfAudioMediaWithNotification:sendNotification
+                                    completionHandler:^{ dispatch_group_leave(resetGroup); }];
+
+    dispatch_group_enter(resetGroup);
+    [self resetCachedListOfVideoMediaWithNotification:sendNotification
+                                    completionHandler:^{ dispatch_group_leave(resetGroup); }];
 }
 
 - (void)resetCachedListOfMonitoredFolders
@@ -630,7 +646,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemListsWithNotification:NO];
+    [self resetCachedMediaItemListsWithNotification:NO completionHandler:nil];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
@@ -682,7 +698,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    [self resetCachedMediaItemListsWithNotification:NO];
+    [self resetCachedMediaItemListsWithNotification:NO completionHandler:nil];
 
     [self performActionOnMediaItemFromCache:itemId action:^(NSArray *itemArray, const NSUInteger index, NSError * const error) {
         if (error != nil) {
