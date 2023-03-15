@@ -309,14 +309,22 @@ static int OpenDecoder(vlc_object_t *p_this)
     switch (dec->fmt_in->i_codec)
     {
 #ifdef ENABLE_VP8_DECODER
-    case VLC_CODEC_WEBP:
     case VLC_CODEC_VP8:
+        if (dec->fmt_in->i_level) // contains alpha extradata
+            return VLC_ENOTSUP;
+        // fallthrough
+    case VLC_CODEC_WEBP:
+    case VLC_CODEC_VP8ALPHA_ES:
         iface = &vpx_codec_vp8_dx_algo;
         vp_version = 8;
         break;
 #endif
 #ifdef ENABLE_VP9_DECODER
     case VLC_CODEC_VP9:
+        if (dec->fmt_in->i_level) // contains alpha extradata
+            return VLC_ENOTSUP;
+        // fallthrough
+    case VLC_CODEC_VP9ALPHA_ES:
         iface = &vpx_codec_vp9_dx_algo;
         vp_version = 9;
         break;
@@ -404,14 +412,19 @@ static int OpenEncoder(vlc_object_t *p_this)
     switch (p_enc->fmt_out.i_codec)
     {
 #ifdef ENABLE_VP8_ENCODER
-    case VLC_CODEC_WEBP:
     case VLC_CODEC_VP8:
+        if (p_enc->fmt_out.i_level) // contains alpha extradata
+            return VLC_ENOTSUP;
+        // fallthrough
+    case VLC_CODEC_WEBP:
         iface = &vpx_codec_vp8_cx_algo;
         vp_version = 8;
         break;
 #endif
 #ifdef ENABLE_VP9_ENCODER
     case VLC_CODEC_VP9:
+        if (p_enc->fmt_out.i_level) // contains alpha extradata
+            return VLC_ENOTSUP;
         iface = &vpx_codec_vp9_cx_algo;
         vp_version = 9;
         break;
