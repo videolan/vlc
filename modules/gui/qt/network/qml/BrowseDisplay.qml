@@ -23,6 +23,7 @@ import QtQml 2.11
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.PageLoader {
@@ -75,7 +76,8 @@ Widgets.PageLoader {
 
     // Connections
     Connections {
-        target: (stackViewItem instanceof BrowseHomeDisplay) ? stackViewItem : null
+        target: (Helpers.isValidInstanceOf(stackViewItem, BrowseHomeDisplay)) ? stackViewItem
+                                                                              : null
 
         onSeeAll: {
             if (sd_source === -1)
