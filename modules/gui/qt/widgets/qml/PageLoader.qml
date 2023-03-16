@@ -42,6 +42,8 @@ FocusScope {
     property alias leftPadding: stackView.leftPadding
     property alias rightPadding: stackView.rightPadding
 
+    property alias stackViewItem: stackView.currentItem
+
     property alias stackView: stackView
 
     // Signals
