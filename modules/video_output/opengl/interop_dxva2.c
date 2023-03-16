@@ -192,7 +192,7 @@ GLConvAllocateTextures(const struct vlc_gl_interop *interop, uint32_t textures[]
 static void
 GLConvClose(vlc_object_t *obj)
 {
-    struct vlc_gl_interop *interop = (void *)obj;
+    struct vlc_gl_interop *interop = container_of(obj, struct vlc_gl_interop, obj);
     struct glpriv *priv = interop->priv;
 
     if (priv->gl_handle_d3d)
@@ -414,7 +414,7 @@ error:
 static int
 GLConvOpen(vlc_object_t *obj)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
+    struct vlc_gl_interop *interop = container_of(obj, struct vlc_gl_interop, obj);
 
     if (interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
