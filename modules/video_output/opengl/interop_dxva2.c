@@ -292,8 +292,11 @@ static int InitRangeProcessor(opengl_tex_converter_t *interop, IDirect3DDevice9E
     DXVAHD_VPCAPS *capsList = NULL;
     IDXVAHD_Device *hd_device = NULL;
 
-    HRESULT (WINAPI *CreateDevice)(IDirect3DDevice9Ex *,const DXVAHD_CONTENT_DESC *,DXVAHD_DEVICE_USAGE,PDXVAHDSW_Plugin,IDXVAHD_Device **);
-    CreateDevice = (void *)GetProcAddress(sys->processor.dll, "DXVAHD_CreateDevice");
+#ifdef __MINGW64_VERSION_MAJOR
+    typedef HRESULT (WINAPI* PDXVAHD_CreateDevice)(IDirect3DDevice9Ex *,const DXVAHD_CONTENT_DESC *,DXVAHD_DEVICE_USAGE,PDXVAHDSW_Plugin,IDXVAHD_Device **);
+#endif
+    PDXVAHD_CreateDevice CreateDevice;
+    CreateDevice = (PDXVAHD_CreateDevice)GetProcAddress(sys->processor.dll, "DXVAHD_CreateDevice");
     if (CreateDevice == NULL)
     {
         msg_Err(interop, "Can't create HD device (not Windows 7+)");
