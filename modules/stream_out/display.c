@@ -136,6 +136,7 @@ static void Del( sout_stream_t *p_stream, void *id )
     (void) p_stream;
 
     sout_stream_id_sys_t *id_sys = id;
+    vlc_input_decoder_Flush(id_sys->dec);
     vlc_input_decoder_Delete( id_sys->dec );
     sout_ClockDelete( id_sys->clock );
     free( id_sys );
