@@ -2216,31 +2216,15 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
 
     vlc_fifo_Lock( p_owner->p_fifo );
     p_owner->aborting = true;
-    p_owner->flushing = true;
     p_owner->b_waiting = false;
     vlc_fifo_Signal( p_owner->p_fifo );
 
     /* Make sure we aren't waiting/decoding anymore */
     vlc_cond_signal( &p_owner->wait_request );
-
-    /* The DecoderThread could be stuck in pf_decode(), waiting for a frame
-     * to be released to queue the block and return from there. In that case,
-     * it's not possible to close the decoder before the return of the callback.
-     * To fix this issue, prevent the decoder to queue picture in the vout by
-     * setting p_owner->aborting, and flush the vout from here to return the
-     * pictures to the decoder. This unblocks the DecoderThread, allowing the
-     * decoder module to later join all its worker threads (if any) and the
-     * decoder thread to terminate. */
-    if( p_dec->fmt_in->i_cat == VIDEO_ES && p_owner->p_vout != NULL
-     && p_owner->vout_started )
-    {
-        vout_FlushAll( p_owner->p_vout );
-    }
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     if( !vlc_input_decoder_IsSynchronous( p_owner ) )
         vlc_join( p_owner->thread, NULL );
-
     /* */
     if( p_owner->cc.b_supported )
     {
