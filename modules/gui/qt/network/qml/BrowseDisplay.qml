@@ -75,8 +75,7 @@ Widgets.PageLoader {
 
     // Connections
     Connections {
-        target: (stackView.currentItem instanceof BrowseHomeDisplay) ? stackView.currentItem
-                                                                     : null
+        target: (stackViewItem instanceof BrowseHomeDisplay) ? stackViewItem : null
 
         onSeeAll: {
             if (sd_source === -1)
@@ -84,17 +83,17 @@ Widgets.PageLoader {
             else
                 History.push(["mc", "network", "device", { title: title, sd_source: sd_source }])
 
-            stackView.currentItem.setCurrentItemFocus(reason)
+            stackViewItem.setCurrentItemFocus(reason)
         }
     }
 
     Connections {
-        target: stackView.currentItem
+        target: stackViewItem
 
         onBrowse: {
             History.push(["mc", "network", "browse", { tree: tree }])
 
-            stackView.currentItem.setCurrentItemFocus(reason)
+            stackViewItem.setCurrentItemFocus(reason)
         }
     }
 
@@ -158,7 +157,7 @@ Widgets.PageLoader {
             Navigation.cancelAction: function() {
                 History.previous()
 
-                stackView.currentItem.setCurrentItemFocus(Qt.BacktabFocusReason)
+                stackViewItem.setCurrentItemFocus(Qt.BacktabFocusReason)
             }
         }
     }
@@ -167,18 +166,18 @@ Widgets.PageLoader {
         id: componentBar
 
         NetworkAddressbar {
-            path: view.name === "browse" ? root.stackView.currentItem.providerModel.path : []
+            path: view.name === "browse" ? root.stackViewItem.providerModel.path : []
 
             onHomeButtonClicked: {
                 History.push(["mc", "network", "home"])
 
-                stackView.currentItem.setCurrentItemFocus(reason)
+                stackViewItem.setCurrentItemFocus(reason)
             }
 
             onBrowse: {
                 History.push(["mc", "network", "browse", { "tree": tree }])
 
-                stackView.currentItem.setCurrentItemFocus(reason)
+                stackViewItem.setCurrentItemFocus(reason)
             }
         }
     }
