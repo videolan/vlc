@@ -36,9 +36,16 @@ void NavigationAttached::defaultNavigationGeneric(QJSValue& jsCallback, QQuickIt
                                         Qt::FocusReason reason)
 {
     if (jsCallback.isCallable()) {
-        jsCallback.call();
+        const auto ret = jsCallback.call();
+
+        // if the function returns nothing or true, the action has been handled, stop the traversal
+        // if the function returns a false explictly, continue traversal
+        if (!ret.isBool() || ret.toBool())
+            return;
     }
-    else if (directionItem)
+
+
+    if (directionItem)
     {
         NavigationAttached* nextItem = qobject_cast<NavigationAttached*>(qmlAttachedPropertiesObject<NavigationAttached>(directionItem));
         if (directionItem->isVisible()
