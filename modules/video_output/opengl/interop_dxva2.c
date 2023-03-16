@@ -387,11 +387,12 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
 
     SetupProcessorInput(interop, &interop->fmt_in, src_format);
 
-    DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace;
-    colorspace.Usage = 0; // playback
-    colorspace.RGB_Range = true ? 0 : 1;
-    colorspace.YCbCr_xvYCC = true ? 1 : 0;
-    colorspace.YCbCr_Matrix = false ? 0 : 1;
+    DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace = {
+        .Usage = 0, // playback
+        .RGB_Range = true ? 0 : 1,
+        .YCbCr_xvYCC = true ? 1 : 0,
+        .YCbCr_Matrix = false ? 0 : 1,
+    };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE, sizeof(colorspace), &colorspace);
 
     return VLC_SUCCESS;

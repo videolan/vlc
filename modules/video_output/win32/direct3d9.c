@@ -1582,11 +1582,12 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
 
     SetupProcessorInput(vd, vd->source, d3dfmt);
 
-    DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace;
-    colorspace.Usage = 0; // playback
-    colorspace.RGB_Range = render_out->full_range ? 0 : 1;
-    colorspace.YCbCr_xvYCC = render_out->full_range ? 1 : 0;
-    colorspace.YCbCr_Matrix = render_out->colorspace == libvlc_video_colorspace_BT601 ? 0 : 1;
+    DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace = {
+        .Usage = 0, // playback
+        .RGB_Range = render_out->full_range ? 0 : 1,
+        .YCbCr_xvYCC = render_out->full_range ? 1 : 0,
+        .YCbCr_Matrix = render_out->colorspace == libvlc_video_colorspace_BT601 ? 0 : 1,
+    };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE, sizeof(colorspace), &colorspace);
 
     return VLC_SUCCESS;
