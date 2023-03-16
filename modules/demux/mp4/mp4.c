@@ -3433,12 +3433,14 @@ static bool FormatIsCompatible( const es_format_t *p_fmt1, const es_format_t *p_
     return es_format_IsSimilar( p_fmt1, p_fmt2 );
 }
 
-static int TrackUpdateFormat( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_chunk )
+static int TrackUpdateFormat( demux_t *p_demux, mp4_track_t *p_track,
+                              uint32_t i_previous_chunk )
 {
+    uint32_t i_chunk = p_track->i_chunk;
     /* now see if actual es is ok */
-    if( p_track->i_chunk >= p_track->i_chunk_count ||
-        (p_track->chunk[p_track->i_chunk].i_sample_description_index !=
-         p_track->chunk[i_chunk].i_sample_description_index ) )
+    if( i_previous_chunk != i_chunk &&
+        p_track->chunk[i_previous_chunk].i_sample_description_index !=
+        p_track->chunk[i_chunk].i_sample_description_index )
     {
         msg_Warn( p_demux, "recreate ES for track[Id 0x%x]",
                   p_track->i_track_ID );
@@ -3500,7 +3502,7 @@ static int TrackUpdateFormat( demux_t *p_demux, mp4_track_t *p_track, uint32_t i
 static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
                                  uint32_t i_chunk, uint32_t i_sample )
 {
-    if( TrackUpdateFormat( p_demux, p_track, i_chunk ) != VLC_SUCCESS )
+    if( TrackUpdateFormat( p_demux, p_track, p_track->i_chunk ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     p_track->i_chunk    = i_chunk;
@@ -4220,51 +4222,98 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     return i_pos;
 }
 
-static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_samples )
+
+static int MP4_TrackSetNextELST( mp4_track_t *tk )
 {
-    if ( UINT32_MAX - p_track->i_sample < i_samples )
-    {
-        p_track->i_sample = UINT32_MAX;
+    if( !tk->p_elst ||
+         tk->i_elst == UINT32_MAX - 1 ||
+         tk->i_elst + 1 >= tk->BOXDATA(p_elst)->i_entry_count )
         return VLC_EGENERIC;
+
+    tk->i_elst_time += tk->BOXDATA(p_elst)->entries[tk->i_elst++].i_segment_duration;
+
+    return VLC_SUCCESS;
+}
+
+static int MP4_TrackUpdateELST( mp4_track_t *tk, uint32_t i_movie_timescale,
+                                stime_t i_track_time, uint32_t i_track_sample )
+{
+    if( !tk->p_elst || tk->BOXDATA(p_elst)->i_entry_count == 0 )
+        return VLC_SUCCESS;
+
+    if( i_track_sample >= tk->i_sample_count )
+        return MP4_TrackSetNextELST( tk );
+
+    vlc_tick_t i_time = MP4_rescale_mtime( i_track_time, tk->i_timescale );
+    for(;;)
+    {
+        const MP4_Box_data_elst_entry_t *edit = &tk->BOXDATA(p_elst)->entries[tk->i_elst];
+        vlc_tick_t i_end = MP4_rescale_mtime( edit->i_media_time, tk->i_timescale ) +
+                           MP4_rescale_mtime( edit->i_segment_duration, i_movie_timescale );
+        if ( i_time < i_end || MP4_TrackSetNextELST( tk ) )
+            break;
     }
 
+    return VLC_SUCCESS;
+}
+
+static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_samples )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if ( UINT32_MAX - p_track->i_sample < i_samples )
+        i_samples = UINT32_MAX - p_track->i_sample; /* Ensure we won't overflow next add */
+
     p_track->i_sample += i_samples;
+    const uint32_t i_previous_chunk = p_track->i_chunk;
 
-    if( p_track->i_sample >= p_track->i_sample_count )
-        return VLC_EGENERIC;
-
-    /* Have we changed chunk ? */
-    if( p_track->i_sample >=
-            p_track->chunk[p_track->i_chunk].i_sample_first +
-            p_track->chunk[p_track->i_chunk].i_sample_count )
+    if( p_track->i_sample < p_track->i_sample_count )
     {
-        if( TrackGotoChunkSample( p_demux, p_track, p_track->i_chunk + 1,
-                                  p_track->i_sample ) )
+        /* Have we changed chunk ? */
+        while( p_track->i_sample >=
+               p_track->chunk[p_track->i_chunk].i_sample_first +
+               p_track->chunk[p_track->i_chunk].i_sample_count &&
+               p_track->i_chunk < p_track->i_chunk_count - 1 )
         {
-            msg_Warn( p_demux, "track[0x%x] will be disabled "
-                      "(cannot restart decoder)", p_track->i_track_ID );
-            MP4_TrackSelect( p_demux, p_track, false );
-            return VLC_EGENERIC;
+            p_track->i_chunk++;
+        }
+    }
+
+    if( p_track->p_elst ) /* Update */
+    {
+        uint32_t i_prev_elst = p_track->i_elst;
+        TrackUpdateSampleAndTimes( p_track );
+        MP4_TrackUpdateELST( p_track, p_sys->i_timescale, p_track->i_next_dts, p_track->i_sample);
+        if( p_track->i_elst != i_prev_elst )
+        {
+            msg_Dbg( p_demux, "changed elst %u -> %u", i_prev_elst, p_track->i_elst);
+            /* *** find good chunk *** */
+            uint32_t i_sample, i_chunk;
+            stime_t i_start = p_track->BOXDATA(p_elst)->entries[p_track->i_elst].i_media_time;
+            if( STTSToSampleChunk( p_track, i_start, &i_chunk, &i_sample ) != VLC_SUCCESS )
+            {
+                msg_Warn( p_demux, "track[Id 0x%x] will be disabled "
+                          "(seeking too far) chunk=%"PRIu32" sample=%"PRIu32,
+                          p_track->i_track_ID, i_chunk, i_sample );
+                return VLC_EGENERIC;
+            }
+            p_track->i_chunk = i_chunk;
+            p_track->i_sample = i_sample;
         }
     }
 
     TrackUpdateSampleAndTimes( p_track );
 
-    /* Have we changed elst */
-    if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count > 0 )
+    if( TrackUpdateFormat( p_demux, p_track, i_previous_chunk ) != VLC_SUCCESS )
     {
-        demux_sys_t *p_sys = p_demux->p_sys;
-        MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
-        uint64_t i_mvt = MP4_rescale_qtime( MP4_TrackGetDTSPTS( p_demux, p_track, NULL ),
-                                            p_sys->i_timescale );
-        if( p_track->i_elst < elst->i_entry_count &&
-            i_mvt >= p_track->i_elst_time +
-                     elst->entries[p_track->i_elst].i_segment_duration )
-        {
-            MP4_TrackSetELST( p_demux, p_track,
-                              MP4_TrackGetDTSPTS( p_demux, p_track, NULL ) );
-        }
+        msg_Warn( p_demux, "track[0x%x] will be disabled "
+                  "(cannot restart decoder)", p_track->i_track_ID );
+        MP4_TrackSelect( p_demux, p_track, false );
+        return VLC_EGENERIC;
     }
+
+    if( !p_track->b_selected || p_track->i_sample >= p_track->i_sample_count )
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -4287,8 +4336,9 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         {
             uint64_t i_dur = elst->entries[tk->i_elst].i_segment_duration;
 
-            if( tk->i_elst_time <= i_mvt
-             && i_mvt < (int64_t)(tk->i_elst_time + i_dur) )
+            if( elst->entries[tk->i_elst].i_media_time >=0 &&
+                tk->i_elst_time <= i_mvt &&
+                i_mvt < (int64_t)(tk->i_elst_time + i_dur) )
             {
                 break;
             }
