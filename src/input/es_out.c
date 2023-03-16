@@ -852,7 +852,10 @@ static void EsOutTerminate( es_out_t *out )
     foreach_es_then_es_slaves(es)
     {
         if (es->p_dec != NULL)
+        {
+            vlc_input_decoder_Flush(es->p_dec);
             vlc_input_decoder_Delete(es->p_dec);
+        }
 
         EsTerminate(es);
         EsRelease(es);
@@ -1059,6 +1062,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
             if( !p_es->p_dec_record )
                 continue;
 
+            vlc_input_decoder_Flush(p_es->p_dec_record);
             vlc_input_decoder_Delete( p_es->p_dec_record );
             p_es->p_dec_record = NULL;
         }
@@ -2622,6 +2626,7 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 
     assert( p_es->p_pgrm );
 
+    vlc_input_decoder_Flush(p_es->p_dec);
     vlc_input_decoder_Delete( p_es->p_dec );
     p_es->p_dec = NULL;
     if( p_es->p_pgrm->p_master_es_clock == p_es->p_clock )
@@ -2631,6 +2636,7 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 
     if( p_es->p_dec_record )
     {
+        vlc_input_decoder_Flush(p_es->p_dec_record);
         vlc_input_decoder_Delete( p_es->p_dec_record );
         p_es->p_dec_record = NULL;
     }
