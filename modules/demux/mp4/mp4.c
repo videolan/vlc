@@ -3525,6 +3525,8 @@ static void TrackUpdateSampleAndTimes( mp4_track_t *p_track )
 {
     const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
     uint32_t i_chunk_sample = p_track->i_sample - p_chunk->i_sample_first;
+    if( i_chunk_sample > p_chunk->i_sample_count && p_chunk->i_sample_count )
+        i_chunk_sample = p_chunk->i_sample_count - 1;
     p_track->i_next_dts = MP4_ChunkGetSampleDTS( p_chunk, i_chunk_sample );
     stime_t i_next_delta;
     if( !MP4_ChunkGetSampleCTSDelta( p_chunk, i_chunk_sample, &i_next_delta ) )
