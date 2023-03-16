@@ -80,6 +80,14 @@
     return self;
 }
 
+- (NSUInteger)indexOfMediaItemInCollection:(const NSUInteger)libraryId
+{
+    return [_collectionArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
+        return findMediaItem.libraryID == libraryId;
+    }];
+}
+
 - (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
     if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
@@ -95,8 +103,11 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self reloadDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
+
+    [self reloadDataForMediaItem:notificationMediaItem];
 }
 
 - (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
@@ -105,8 +116,11 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self deleteDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
+
+    [self deleteDataForMediaItem:notificationMediaItem];
 }
 
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
@@ -124,8 +138,11 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self reloadDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
+
+    [self reloadDataForMediaItem:notificationMediaItem];
 }
 
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
@@ -134,11 +151,14 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self deleteDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
+
+    [self deleteDataForMediaItem:notificationMediaItem];
 }
 
-- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
+- (void)reloadData
 {
     if(!_collectionView || !_groupDescriptor) {
         NSLog(@"Null collection view or video group descriptor");
@@ -155,32 +175,39 @@
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [modelDataInvocation getReturnValue:&self->_collectionArray];
-            completionHandler();
+            [self->_collectionView reloadData];
         });
     });
 }
 
-- (void)reloadData
+- (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    [self reloadDataWithCompletion:^{
-        [self->_collectionView reloadData];
-    }];
+    NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
+    if (mediaItemIndex == NSNotFound) {
+        return;
+    }
+
+    NSMutableArray * const mutableCollectionCopy = [self->_collectionArray mutableCopy];
+    [mutableCollectionCopy replaceObjectAtIndex:mediaItemIndex withObject:mediaItem];
+    self->_collectionArray = [mutableCollectionCopy copy];
+
+    NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
+    [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
 }
 
-- (void)reloadDataForIndex:(const NSUInteger)index
+- (void)deleteDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    [self reloadDataWithCompletion:^{
-        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    }];
-}
+    NSUInteger mediaItemIndex = [self indexOfMediaItemInCollection:mediaItem.libraryID];
+    if (mediaItemIndex == NSNotFound) {
+        return;
+    }
 
-- (void)deleteDataForIndex:(const NSUInteger)index
-{
-    [self reloadDataWithCompletion:^{
-        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    }];
+    NSMutableArray * const mutableCollectionCopy = [self->_collectionArray mutableCopy];
+    [mutableCollectionCopy removeObjectAtIndex:mediaItemIndex];
+    self->_collectionArray = [mutableCollectionCopy copy];
+
+    NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
+    [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
