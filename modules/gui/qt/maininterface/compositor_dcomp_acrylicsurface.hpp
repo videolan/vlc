@@ -187,6 +187,8 @@ private:
     bool createDesktopVisual();
     bool createBackHostVisual();
 
+    void updateTransparencyState();
+
     void sync();
     void updateVisual();
     void commitChanges();

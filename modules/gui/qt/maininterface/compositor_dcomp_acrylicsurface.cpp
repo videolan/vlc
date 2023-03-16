@@ -32,6 +32,15 @@ namespace
 
 bool isTransparencyEnabled()
 {
+    HIGHCONTRAST constrastInfo;
+    constrastInfo.cbSize = sizeof(HIGHCONTRAST);
+
+    bool ret = SystemParametersInfoA(SPI_GETHIGHCONTRAST, constrastInfo.cbSize, &constrastInfo, 0);
+
+    bool useHighContrast = ret && ((constrastInfo.dwFlags & HCF_HIGHCONTRASTON) == HCF_HIGHCONTRASTON);
+    if (useHighContrast)
+        return false;
+
     static const char *TRANSPARENCY_SETTING_PATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
     static const char *TRANSPARENCY_SETTING_KEY = "EnableTransparency";
 
@@ -128,14 +137,13 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &,
     {
         if (!lstrcmpW(LPCWSTR(msg->lParam), L"ImmersiveColorSet"))
         {
-            const auto transparencyEnabled = isTransparencyEnabled();
-            if (m_transparencyEnabled == transparencyEnabled)
-                break;
-
-            m_transparencyEnabled = transparencyEnabled;
-            m_mainCtx->setHasAcrylicSurface(m_transparencyEnabled);
-            setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
+            updateTransparencyState();
         }
+        break;
+    }
+    case WM_SYSCOLORCHANGE:
+    {
+        updateTransparencyState();
         break;
     }
     }
@@ -171,6 +179,17 @@ bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
     m_mainCtx->setHasAcrylicSurface(m_transparencyEnabled);
 
     return true;
+}
+
+void CompositorDCompositionAcrylicSurface::updateTransparencyState()
+{
+    const auto transparencyEnabled = isTransparencyEnabled();
+    if (m_transparencyEnabled == transparencyEnabled)
+        return;
+
+    m_transparencyEnabled = transparencyEnabled;
+    m_mainCtx->setHasAcrylicSurface(m_transparencyEnabled);
+    setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
 }
 
 bool CompositorDCompositionAcrylicSurface::loadFunctions()
