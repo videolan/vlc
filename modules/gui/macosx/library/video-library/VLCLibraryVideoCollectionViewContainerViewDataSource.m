@@ -145,15 +145,18 @@
         return;
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSAssert(self->_groupDescriptor.libraryModelDataMethodSignature, @"Group descriptor's library model data method signature cannot be nil");
+    NSAssert(self->_groupDescriptor.libraryModelDataMethodSignature, @"Group descriptor's library model data method signature cannot be nil");
 
-        NSInvocation * const modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
-        modelDataInvocation.selector = self->_groupDescriptor.libraryModelDataSelector;
+    NSInvocation * const modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
+    modelDataInvocation.selector = self->_groupDescriptor.libraryModelDataSelector;
+
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         [modelDataInvocation invokeWithTarget:self->_libraryModel];
-        [modelDataInvocation getReturnValue:&self->_collectionArray];
 
-        completionHandler();
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [modelDataInvocation getReturnValue:&self->_collectionArray];
+            completionHandler();
+        });
     });
 }
 
