@@ -82,6 +82,14 @@
     return self;
 }
 
+- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+{
+    return [array indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
+        return findMediaItem.libraryID == libraryId;
+    }];
+}
+
 - (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
@@ -101,8 +109,12 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self reloadDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
+
+    [self reloadDataForMediaItem:notificationMediaItem
+                    inVideoGroup:VLCLibraryVideoLibraryGroup];
 }
 
 - (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
@@ -113,8 +125,12 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self deleteDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
+
+    [self deleteDataForMediaItem:notificationMediaItem
+                    inVideoGroup:VLCLibraryVideoLibraryGroup];
 }
 
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
@@ -136,8 +152,12 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self reloadDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
+
+    [self reloadDataForMediaItem:notificationMediaItem
+                    inVideoGroup:VLCLibraryVideoRecentsGroup];
 }
 
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
@@ -148,11 +168,15 @@
         return;
     }
 
-    const NSUInteger modelIndex = [VLCLibraryModel modelIndexFromModelItemNotification:aNotification];
-    [self deleteDataForIndex:modelIndex];
+    NSParameterAssert(aNotification);
+    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
+
+    [self deleteDataForMediaItem:notificationMediaItem
+                    inVideoGroup:VLCLibraryVideoRecentsGroup];
 }
 
-- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
+- (void)reloadData
 {
     if(!_libraryModel) {
         return;
@@ -160,43 +184,84 @@
     
     [_collectionViewFlowLayout resetLayout];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self->_recentsArray = [self->_libraryModel listOfRecentMedia];
-        self->_libraryArray = [self->_libraryModel listOfVideoMedia];
-        completionHandler();
-    });
+    self->_recentsArray = [self.libraryModel listOfRecentMedia];
+    self->_libraryArray = [self.libraryModel listOfVideoMedia];
+    [self->_groupSelectionTableView reloadData];
 }
 
-- (void)reloadData
+- (void)changeDataForSpecificMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
+                          inVideoGroup:(VLCLibraryVideoGroup)group
+                        arrayOperation:(void(^)(const NSMutableArray*, const NSUInteger))arrayOperation
+                     completionHandler:(void(^)(const NSIndexSet*))completionHandler
 {
-    [self reloadDataWithCompletion:^{
-        // Don't regenerate the groups by index as these do not change according to the notification
-        // Stick to the selection table view
-        [self->_groupSelectionTableView reloadData];
-    }];
+    NSMutableArray *groupMutableCopyArray;
+    switch(group) {
+        case VLCLibraryVideoLibraryGroup:
+            groupMutableCopyArray = [_libraryArray mutableCopy];
+            break;
+        case VLCLibraryVideoRecentsGroup:
+            groupMutableCopyArray = [_recentsArray mutableCopy];
+            break;
+        default:
+            return;
+    }
+
+    NSUInteger mediaItemIndex = [self indexOfMediaItem:mediaItem.libraryID inArray:groupMutableCopyArray];
+    if (mediaItemIndex == NSNotFound) {
+        return;
+    }
+
+    arrayOperation(groupMutableCopyArray, mediaItemIndex);
+    switch(group) {
+        case VLCLibraryVideoLibraryGroup:
+            _libraryArray = [groupMutableCopyArray copy];
+            break;
+        case VLCLibraryVideoRecentsGroup:
+            _recentsArray = [groupMutableCopyArray copy];
+            break;
+        default:
+            return;
+    }
+
+    NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:mediaItemIndex];
+    completionHandler(rowIndexSet);
 }
 
-- (void)reloadDataForIndex:(NSUInteger const)index
+- (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
+                  inVideoGroup:(VLCLibraryVideoGroup)group
 {
-    [self reloadDataWithCompletion:^{
+    [self changeDataForSpecificMediaItem:mediaItem
+                            inVideoGroup:group
+                          arrayOperation:^(NSMutableArray * const mediaArray, const NSUInteger mediaItemIndex) {
+
+        [mediaArray replaceObjectAtIndex:mediaItemIndex withObject:mediaItem];
+
+    } completionHandler:^(NSIndexSet * const rowIndexSet) {
+
         // Don't regenerate the groups by index as these do not change according to the notification
         // Stick to the selection table view
-        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
-
         NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
         NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
+        [self->_groupSelectionTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
 
-        [self->_groupsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
     }];
 }
 
-- (void)deleteDataForIndex:(NSUInteger const)index
+- (void)deleteDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
+                  inVideoGroup:(VLCLibraryVideoGroup)group
 {
-    [self reloadDataWithCompletion:^{
+    [self changeDataForSpecificMediaItem:mediaItem
+                            inVideoGroup:group
+                          arrayOperation:^(NSMutableArray * const mediaArray, const NSUInteger mediaItemIndex) {
+
+        [mediaArray removeObjectAtIndex:mediaItemIndex];
+
+    } completionHandler:^(NSIndexSet * const rowIndexSet){
+
         // Don't regenerate the groups by index as these do not change according to the notification
         // Stick to the selection table view
-        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
-        [self->_groupsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+        [self->_groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+
     }];
 }
 
