@@ -66,6 +66,14 @@ NSString *VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMedia
     size_t _initialAudioCount;
 }
 
+@property (readwrite, atomic) NSArray *cachedAudioMedia;
+@property (readwrite, atomic) NSArray *cachedArtists;
+@property (readwrite, atomic) NSArray *cachedAlbums;
+@property (readwrite, atomic) NSArray *cachedGenres;
+@property (readwrite, atomic) NSArray *cachedVideoMedia;
+@property (readwrite, atomic) NSArray *cachedRecentMedia;
+@property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
+
 - (void)resetCachedMediaItemListsWithNotification:(BOOL)sendNotification completionHandler:(void(^)(void))completionHandler;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
@@ -242,7 +250,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedAudioMedia = [mutableArray copy];
+            self.cachedAudioMedia = [mutableArray copy];
 
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
@@ -285,7 +293,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_artist_list_release(p_artist_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedArtists = [mutableArray copy];
+            self.cachedArtists = [mutableArray copy];
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
         });
     });
@@ -319,7 +327,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_album_list_release(p_album_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedAlbums = [mutableArray copy];
+            self.cachedAlbums = [mutableArray copy];
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
         });
     });
@@ -353,7 +361,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_genre_list_release(p_genre_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedGenres = [mutableArray copy];
+            self.cachedGenres = [mutableArray copy];
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
         });
     });
@@ -395,7 +403,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedVideoMedia = [mutableArray copy];
+            self.cachedVideoMedia = [mutableArray copy];
 
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
@@ -435,7 +443,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedRecentMedia = [mutableArray copy];
+            self.cachedRecentMedia = [mutableArray copy];
 
             if (sendNotification) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
@@ -511,7 +519,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_folder_list_release(pp_entrypoints);
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_cachedListOfMonitoredFolders = [mutableArray copy];
+            self.cachedListOfMonitoredFolders = [mutableArray copy];
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelListOfMonitoredFoldersUpdated object:self];
         });
     });
@@ -586,26 +594,26 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // Recents can contain media items the other two do, so don't stop when we check recents.
         // At the same time, do not return an error if we have checked recents.
         BOOL recentsChecked = NO;
-        const NSUInteger recentsIndex = [self->_cachedRecentMedia indexOfObjectPassingTest:idCheckBlock];
+        const NSUInteger recentsIndex = [self.cachedRecentMedia indexOfObjectPassingTest:idCheckBlock];
         if (recentsIndex != NSNotFound) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                action(self->_cachedRecentMedia, recentsIndex, nil);
+                action(self.cachedRecentMedia, recentsIndex, nil);
             });
             recentsChecked = YES;
         }
 
-        const NSUInteger videoIndex = [self->_cachedVideoMedia indexOfObjectPassingTest:idCheckBlock];
+        const NSUInteger videoIndex = [self.cachedVideoMedia indexOfObjectPassingTest:idCheckBlock];
         if (videoIndex != NSNotFound) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                action(self->_cachedVideoMedia, videoIndex, nil);
+                action(self.cachedVideoMedia, videoIndex, nil);
             });
             return;
         }
 
-        const NSUInteger audioIndex = [self->_cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];
+        const NSUInteger audioIndex = [self.cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];
         if (audioIndex != NSNotFound) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                action(self->_cachedAudioMedia, audioIndex, nil);
+                action(self.cachedAudioMedia, audioIndex, nil);
             });
             return;
         }
@@ -644,7 +652,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             itemArray = [mutableItemArrayCopy copy];
 
             // Notify what happened
-            if (itemArray == self->_cachedRecentMedia) {
+            if (itemArray == self.cachedRecentMedia) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated
                                                                 object:mediaItem
                                                               userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
@@ -691,7 +699,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             // Notify what happened
             VLCMediaLibraryMediaItem * const mediaItem = [itemArray objectAtIndex:index];
 
-            if (itemArray == self->_cachedRecentMedia) {
+            if (itemArray == self.cachedRecentMedia) {
                 [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted
                                                                 object:mediaItem
                                                               userInfo:@{@"index": [NSNumber numberWithUnsignedLong:index]}];
