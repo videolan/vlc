@@ -188,12 +188,18 @@ bool ColorContext::setInheritedPalette(SystemPalette* palette)
     if (m_palette == palette)
         return false;
     if (m_palette)
+    {
         disconnect(m_palette, &SystemPalette::sourceChanged, this, &ColorContext::colorsChanged);
+        disconnect(m_palette, &SystemPalette::paletteChanged, this, &ColorContext::colorsChanged);
+    }
 
     m_palette = palette;
 
     if (m_palette)
+    {
         connect(m_palette, &SystemPalette::sourceChanged, this, &ColorContext::colorsChanged);
+        connect(m_palette, &SystemPalette::paletteChanged, this, &ColorContext::colorsChanged);
+    }
     else
         m_initialized = false;
 
