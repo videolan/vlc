@@ -165,10 +165,17 @@ static struct
         jint WRITE_NON_BLOCKING;
     } AudioTrack;
     struct {
+        jint USAGE_MEDIA;
+        jint CONTENT_TYPE_MOVIE;
+        jint CONTENT_TYPE_MUSIC;
+    } AudioAttributes;
+    struct {
         jclass clazz;
         jmethodID ctor;
         jmethodID build;
         jmethodID setLegacyStreamType;
+        jmethodID setUsage;
+        jmethodID setContentType;
     } AudioAttributes_Builder;
     struct {
         jint ENCODING_PCM_8BIT;
@@ -337,6 +344,17 @@ AudioTrack_InitJNI( vlc_object_t *p_aout)
                 "()Landroid/media/AudioAttributes;", true );
         GET_ID( GetMethodID, AudioAttributes_Builder.setLegacyStreamType, "setLegacyStreamType",
                 "(I)Landroid/media/AudioAttributes$Builder;", true );
+        GET_ID( GetMethodID, AudioAttributes_Builder.setUsage, "setUsage",
+                "(I)Landroid/media/AudioAttributes$Builder;", true );
+        GET_ID( GetMethodID, AudioAttributes_Builder.setContentType, "setContentType",
+                "(I)Landroid/media/AudioAttributes$Builder;", true );
+
+        /* AudioAttributes class init */
+        GET_CLASS( "android/media/AudioAttributes", true );
+        GET_CONST_INT( AudioAttributes.USAGE_MEDIA, "USAGE_MEDIA", true );
+        GET_CONST_INT( AudioAttributes.CONTENT_TYPE_MUSIC, "CONTENT_TYPE_MUSIC", true );
+        GET_CONST_INT( AudioAttributes.CONTENT_TYPE_MOVIE, "CONTENT_TYPE_MOVIE", true );
+
 
         /* AudioFormat_Builder class init */
         GET_CLASS( "android/media/AudioFormat$Builder", true );
@@ -615,6 +633,27 @@ AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
 #undef HAS_CHAN
 }
 
+struct role {
+    char vlc[16];
+};
+
+static const struct role video_roles[] = {
+    { "production" },
+    { "test" },
+    { "video" },
+};
+
+static int role_cmp(const void *r1, const void *entry) {
+    const struct role *role = entry;
+    return strcmp(r1, role->vlc);
+}
+
+static inline bool RoleHasVideoContent( char *role ) {
+    char *res = bsearch(role, video_roles, ARRAY_SIZE(video_roles), sizeof(*video_roles), role_cmp);
+
+    return res != NULL;
+}
+
 static jobject
 AudioTrack_New21( JNIEnv *env, aout_stream_t *stream, unsigned int i_rate,
                   int i_channel_config, int i_format, int i_size,
@@ -634,9 +673,24 @@ AudioTrack_New21( JNIEnv *env, aout_stream_t *stream, unsigned int i_rate,
     if( !p_aattr_builder )
         return NULL;
 
+    bool hasVideo = false;
+
+    char *vlc_role = var_InheritString(stream, "role");
+    if (vlc_role != NULL) {
+    hasVideo = RoleHasVideoContent(vlc_role);
+    free(vlc_role);
+    }
+
     ref = JNI_CALL_OBJECT( p_aattr_builder,
-                           jfields.AudioAttributes_Builder.setLegacyStreamType,
-                           jfields.AudioManager.STREAM_MUSIC );
+                         jfields.AudioAttributes_Builder.setUsage,
+                         jfields.AudioAttributes.USAGE_MEDIA );
+    (*env)->DeleteLocalRef( env, ref );
+
+    ref = JNI_CALL_OBJECT( p_aattr_builder,
+                         jfields.AudioAttributes_Builder.setContentType,
+                         hasVideo ?
+                         jfields.AudioAttributes.CONTENT_TYPE_MOVIE :
+                         jfields.AudioAttributes.CONTENT_TYPE_MUSIC );
     (*env)->DeleteLocalRef( env, ref );
 
     p_audio_attributes =
