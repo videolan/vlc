@@ -36,10 +36,12 @@
 
 @interface VLCLibraryVideoCollectionViewContainerViewDataSource ()
 {
-    NSArray *_collectionArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     VLCLibraryModel *_libraryModel;
 }
+
+@property (readwrite, atomic) NSArray *collectionArray;
+
 @end
 
 @implementation VLCLibraryVideoCollectionViewContainerViewDataSource
@@ -76,13 +78,14 @@
                                  object:nil];
 
         _libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
+        self.collectionArray = [NSArray array];
     }
     return self;
 }
 
 - (NSUInteger)indexOfMediaItemInCollection:(const NSUInteger)libraryId
 {
-    return [_collectionArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger idx, BOOL * const stop) {
+    return [self.collectionArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger idx, BOOL * const stop) {
         NSAssert(findMediaItem != nil, @"Collection should not contain nil media items");
         return findMediaItem.libraryID == libraryId;
     }];
@@ -165,16 +168,19 @@
         return;
     }
 
-    NSAssert(self->_groupDescriptor.libraryModelDataMethodSignature, @"Group descriptor's library model data method signature cannot be nil");
-
-    NSInvocation * const modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
-    modelDataInvocation.selector = self->_groupDescriptor.libraryModelDataSelector;
-
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-        [modelDataInvocation invokeWithTarget:self->_libraryModel];
+        switch(self->_groupDescriptor.group) {
+            case VLCLibraryVideoLibraryGroup:
+                self.collectionArray = self->_libraryModel.listOfVideoMedia;
+                break;
+            case VLCLibraryVideoRecentsGroup:
+                self.collectionArray = self->_libraryModel.listOfRecentMedia;
+                break;
+            default:
+                return;
+        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [modelDataInvocation getReturnValue:&self->_collectionArray];
             [self->_collectionView reloadData];
         });
     });
@@ -187,9 +193,9 @@
         return;
     }
 
-    NSMutableArray * const mutableCollectionCopy = [self->_collectionArray mutableCopy];
+    NSMutableArray * const mutableCollectionCopy = [self.collectionArray mutableCopy];
     [mutableCollectionCopy replaceObjectAtIndex:mediaItemIndex withObject:mediaItem];
-    self->_collectionArray = [mutableCollectionCopy copy];
+    self.collectionArray = [mutableCollectionCopy copy];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
@@ -202,9 +208,9 @@
         return;
     }
 
-    NSMutableArray * const mutableCollectionCopy = [self->_collectionArray mutableCopy];
+    NSMutableArray * const mutableCollectionCopy = [self.collectionArray mutableCopy];
     [mutableCollectionCopy removeObjectAtIndex:mediaItemIndex];
-    self->_collectionArray = [mutableCollectionCopy copy];
+    self.collectionArray = [mutableCollectionCopy copy];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
@@ -254,14 +260,14 @@
         return 0;
     }
 
-    return _collectionArray.count;
+    return self.collectionArray.count;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = _collectionArray[indexPath.item];
+    viewItem.representedItem = self.collectionArray[indexPath.item];
     return viewItem;
 }
 
@@ -280,7 +286,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        mediaItemSupplementaryDetailView.representedMediaItem = _collectionArray[indexPath.item];
+        mediaItemSupplementaryDetailView.representedMediaItem = self.collectionArray[indexPath.item];
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
         return mediaItemSupplementaryDetailView;
     }
@@ -291,7 +297,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
-    return _collectionArray[indexPath.item];
+    return self.collectionArray[indexPath.item];
 }
 
 @end
