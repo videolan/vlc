@@ -1159,7 +1159,7 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
                            const decoder_cc_desc_t *p_desc )
 {
     vlc_fifo_Lock(p_owner->p_fifo);
-    if (p_owner->flushing)
+    if (p_owner->flushing || p_owner->aborting)
     {
         vlc_fifo_Unlock(p_owner->p_fifo);
         vlc_frame_Release(p_cc);
@@ -1242,7 +1242,7 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         return VLC_EGENERIC;
     }
 
-    if (p_owner->flushing)
+    if (p_owner->flushing || p_owner->aborting)
     {
         picture_Release(p_picture);
         return VLC_SUCCESS;
@@ -1392,7 +1392,7 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         return VLC_EGENERIC;
     }
 
-    if (p_owner->flushing)
+    if (p_owner->flushing || p_owner->aborting)
     {
         block_Release(p_audio);
         return VLC_SUCCESS;
