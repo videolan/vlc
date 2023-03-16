@@ -183,9 +183,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         return;
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self reloadData];
-    });
+    [self reloadData];
 }
 
 - (void)libraryModelAudioItemUpdated:(NSNotification * const)aNotification
@@ -198,9 +196,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem * const)aNotification.object;
     NSAssert(mediaItem != nil, @"Audio item-related notification should carry valid media item");
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self reloadDataForMediaLibraryItem:mediaItem];
-    });
+    [self reloadDataForMediaLibraryItem:mediaItem];
 }
 
 - (void)libraryModelAudioItemDeleted:(NSNotification * const)aNotification
@@ -213,9 +209,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem * const)aNotification.object;
     NSAssert(mediaItem != nil, @"Audio item-related notification should carry valid media item");
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self deleteDataForMediaLibraryItem:mediaItem];
-    });
+    [self deleteDataForMediaLibraryItem:mediaItem];
 }
 
 - (void)retainSelectedMediaItem
@@ -446,7 +440,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     return VLCLibraryTitleSortDescriptorKey;
 }
 
-- (void)reloadViewsWithCompletion:(void(^)(void))completionHandler
+- (void)resetLayoutsForOperation:(void(^)(void))operation
 {
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_collectionView.collectionViewLayout;
     if (collectionViewFlowLayout) {
@@ -458,21 +452,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [gridModeListSelectionCollectionViewFlowLayout resetLayout];
     }
 
-    completionHandler();
+    operation();
     [self setupExistingSortForTableView:_songsTableView];
-}
-
-- (void)reloadDataWithCompletion:(void(^)(void))completionHandler
-{
-    [self retainSelectedMediaItem];
-    self->_displayedCollection = [self collectionToDisplay];
-    [self reloadViewsWithCompletion:completionHandler];
-    [self restoreSelectionState];
 }
 
 - (void)reloadData
 {
-    [self reloadDataWithCompletion:^{
+    [self retainSelectedMediaItem];
+    self->_displayedCollection = [self collectionToDisplay];
+    [self resetLayoutsForOperation:^{
         [self.collectionView reloadData];
         [self.gridModeListTableView reloadData];
         [self.gridModeListSelectionCollectionView reloadData];
@@ -480,6 +468,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [self.groupSelectionTableView reloadData];
         [self.songsTableView reloadData];
     }];
+    [self restoreSelectionState];
 }
 
 - (NSUInteger)indexForMediaLibraryItemWithId:(const int64_t)itemId
@@ -492,11 +481,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)reloadDataForMediaLibraryItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    [self reloadDataWithCompletion:^{
+    [self resetLayoutsForOperation:^{
         const NSUInteger index = [self indexForMediaLibraryItemWithId:mediaItem.libraryID];
         if (index == NSNotFound) {
             return;
         }
+
+        NSMutableArray * const mutableCollectionCopy = [self->_displayedCollection mutableCopy];
+        [mutableCollectionCopy replaceObjectAtIndex:index withObject:mediaItem];
+        self->_displayedCollection = [mutableCollectionCopy copy];
 
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
@@ -520,11 +513,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)deleteDataForMediaLibraryItem:(VLCMediaLibraryMediaItem * const)mediaItem
 {
-    [self reloadDataWithCompletion:^{
+    [self resetLayoutsForOperation:^{
         const NSUInteger index = [self indexForMediaLibraryItemWithId:mediaItem.libraryID];
         if (index == NSNotFound) {
             return;
         }
+
+        NSMutableArray * const mutableCollectionCopy = [self->_displayedCollection mutableCopy];
+        [mutableCollectionCopy removeObjectAtIndex:index];
+        self->_displayedCollection = [mutableCollectionCopy copy];
 
         NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
