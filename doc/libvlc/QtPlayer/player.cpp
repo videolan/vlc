@@ -17,6 +17,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QUrl>
 
 Mwindow::Mwindow() {
     vlcPlayer = NULL;
@@ -125,14 +126,14 @@ void Mwindow::initUI() {
 void Mwindow::openFile() {
 
     /* The basic file-select box */
-    QString fileOpen = QFileDialog::getOpenFileName(this, tr("Load a file"), "~");
+    QUrl url = QFileDialog::getOpenFileUrl(this, tr("Load a file"));
 
     /* Stop if something is playing */
     if (vlcPlayer && libvlc_media_player_is_playing(vlcPlayer))
         stop();
 
     /* Create a new Media */
-    libvlc_media_t *vlcMedia = libvlc_media_new_path(qtu(fileOpen));
+    libvlc_media_t *vlcMedia = libvlc_media_new_location(qtu(url.toString(QUrl::FullyEncoded)));
     if (!vlcMedia)
         return;
 
