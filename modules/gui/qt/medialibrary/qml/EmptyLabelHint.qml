@@ -25,6 +25,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 EmptyLabel {
+    id: root
     // Aliases
 
     property alias hint: labelHint.text
@@ -46,5 +47,7 @@ EmptyLabel {
         verticalAlignment: Text.AlignVCenter
 
         wrapMode: Text.WordWrap
+
+        color: root.colorContext.fg.secondary
     }
 }
