@@ -485,20 +485,6 @@ static void MP4_ChunkDestroy( mp4_chunk_t *ck )
         free( ck->p_sample_count_pts );
 }
 
-static const mp4_chunk_t * MP4_TrackChunkForSample( const mp4_track_t *p_track,
-                                                    uint32_t i_sample )
-{
-    if( i_sample >= p_track->i_sample_count )
-        return NULL;
-    for( uint32_t i=0; i<p_track->i_chunk_count; i++ )
-    {
-        if( i_sample >= p_track->chunk[i].i_sample_first &&
-            i_sample - p_track->chunk[i].i_sample_first < p_track->chunk[i].i_sample_count )
-            return &p_track->chunk[i];
-    }
-    return NULL;
-}
-
 static stime_t MP4_MapTrackTimeIntoTimeline( const mp4_track_t *p_track,
                                              uint32_t i_movie_timescale,
                                              stime_t i_time )
@@ -3519,28 +3505,38 @@ static void TrackUpdateStarttimes( mp4_track_t *p_track )
     p_track->i_start_delta = p_track->i_next_delta;
 
     /* Probe the 16 first B frames */
-    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
-    if( p_chunk->i_entries_pts )
+    uint32_t i_chunk = p_track->i_chunk;
+    if( !p_track->chunk[i_chunk].i_entries_pts )
+        return;
+
+    stime_t lowest = p_track->i_start_dts;
+    if( p_track->i_start_delta != UNKNOWN_DELTA )
+        lowest += p_track->i_start_delta;
+
+    for( uint32_t i=1; i<16; i++ )
     {
-        for( uint32_t i=1; i<16; i++ )
+        uint32_t i_nextsample = p_track->i_sample + i;
+        if( i_nextsample >= p_track->i_sample_count )
+            break;
+        const mp4_chunk_t *ck = NULL;
+        for( ; i_chunk < p_track->i_chunk_count; i_chunk++ )
         {
-            uint32_t i_nextsample = p_track->i_sample + i;
-            const mp4_chunk_t *ck = MP4_TrackChunkForSample( p_track, i_nextsample );
-            if(!ck)
+            ck = &p_track->chunk[i_chunk];
+            if( i_nextsample < ck->i_sample_first + ck->i_sample_count )
                 break;
-            stime_t pts;
-            stime_t dts = pts = MP4_ChunkGetSampleDTS( ck, i_nextsample - ck->i_sample_first );
-            stime_t delta = UNKNOWN_DELTA;
-            if( MP4_ChunkGetSampleCTSDelta( ck, i_nextsample - ck->i_sample_first, &delta ) )
-                pts += delta;
-            stime_t lowest = p_track->i_start_dts;
-            if( p_track->i_start_delta != UNKNOWN_DELTA )
-                lowest += p_track->i_start_delta;
-            if( pts < lowest )
-            {
-                p_track->i_start_dts = dts;
-                p_track->i_start_delta = delta;
-            }
+        }
+        if( !ck )
+            break;
+        assert(i_nextsample >= ck->i_sample_first);
+        stime_t pts;
+        stime_t dts = pts = MP4_ChunkGetSampleDTS( ck, i_nextsample - ck->i_sample_first );
+        stime_t delta = UNKNOWN_DELTA;
+        if( MP4_ChunkGetSampleCTSDelta( ck, i_nextsample - ck->i_sample_first, &delta ) )
+            pts += delta;
+        if( pts < lowest )
+        {
+            p_track->i_start_dts = dts;
+            p_track->i_start_delta = delta;
         }
     }
 }
