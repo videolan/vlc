@@ -54,7 +54,7 @@ char * json_dupstring(const json_value *node, const char *key)
 }
 
 static inline
-json_value * json_parse_document(vlc_object_t *p_obj, const char *psz_buffer)
+json_value * json_parse_document(vlc_object_t *p_obj, const char *psz_buffer, size_t i_buffer)
 {
     json_settings settings;
     char psz_error[128];
@@ -79,7 +79,7 @@ error:
 }
 
 static inline
-void * json_retrieve_document(vlc_object_t *p_obj, const char *psz_url)
+void * json_retrieve_document(vlc_object_t *p_obj, const char *psz_url, size_t *buf_size)
 {
     bool saved_no_interact = p_obj->no_interact;
     p_obj->no_interact = true;
@@ -95,29 +95,29 @@ void * json_retrieve_document(vlc_object_t *p_obj, const char *psz_url)
 
     /* read answer */
     char *p_buffer = NULL;
-    int i_ret = 0;
+    *buf_size = 0;
     for(;;)
     {
         int i_read = 65536;
 
-        if(i_ret >= INT_MAX - i_read)
+        if(*buf_size >= (SIZE_MAX - i_read - 1))
             break;
 
-        p_buffer = realloc_or_free(p_buffer, 1 + i_ret + i_read);
+        p_buffer = realloc_or_free(p_buffer, 1 + *buf_size + i_read);
         if(unlikely(p_buffer == NULL))
         {
             vlc_stream_Delete(p_stream);
             return NULL;
         }
 
-        i_read = vlc_stream_Read(p_stream, &p_buffer[i_ret], i_read);
+        i_read = vlc_stream_Read(p_stream, &p_buffer[*buf_size], i_read);
         if(i_read <= 0)
             break;
 
-        i_ret += i_read;
+        *buf_size += i_read;
     }
     vlc_stream_Delete(p_stream);
-    p_buffer[i_ret] = 0;
+    p_buffer[*buf_size++] = '\0';
 
     return p_buffer;
 }

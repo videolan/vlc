@@ -74,9 +74,10 @@ static void parse_recordings( vlc_object_t *p_obj, const json_value *node, acous
     }
 }
 
-static bool ParseJson( vlc_object_t *p_obj, const void *p_buffer, acoustid_results_t *p_results )
+static bool ParseJson( vlc_object_t *p_obj, const void *p_buffer, size_t i_buffer,
+                       acoustid_results_t *p_results )
 {
-    json_value *root = json_parse_document( p_obj, p_buffer );
+    json_value *root = json_parse_document( p_obj, p_buffer, i_buffer );
     if( !root )
         return false;
 
@@ -153,12 +154,13 @@ int acoustid_lookup_fingerprint( const acoustid_config_t *p_cfg, acoustid_finger
     }
 
     msg_Dbg( p_cfg->p_obj, "Querying AcoustID from %s", psz_url );
-    void *p_buffer = json_retrieve_document( p_cfg->p_obj, psz_url );
+    size_t i_buffer;
+    void *p_buffer = json_retrieve_document( p_cfg->p_obj, psz_url, &i_buffer );
     free( psz_url );
     if( !p_buffer )
         return VLC_EGENERIC;
 
-    if ( ParseJson( p_cfg->p_obj, p_buffer, & p_data->results ) )
+    if ( ParseJson( p_cfg->p_obj, p_buffer, i_buffer, & p_data->results ) )
         msg_Dbg( p_cfg->p_obj, "results count == %d", p_data->results.count );
     else
         msg_Dbg( p_cfg->p_obj, "No results" );
