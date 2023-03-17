@@ -624,8 +624,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_paused_at_eof = false;
 
     demux_t *p_demux = input_priv(p_input)->master->p_demux;
-    const bool b_can_demux = p_demux->pf_demux != NULL
-                          || p_demux->pf_readdir != NULL;
+    const bool b_can_demux = p_demux->ops != NULL ?
+        (p_demux->ops->demux.demux != NULL || p_demux->ops->demux.readdir != NULL) :
+        (p_demux->pf_demux != NULL || p_demux->pf_readdir != NULL);
 
     while( !input_Stopped( p_input ) && input_priv(p_input)->i_state != ERROR_S )
     {
@@ -2534,8 +2535,10 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, es_out_t *p_es_out,
 
     p_stream = stream_FilterAutoNew( p_stream );
 
-    if( p_stream->pf_read == NULL && p_stream->pf_block == NULL
-     && p_stream->pf_readdir == NULL )
+    if(( p_stream->ops != NULL && (p_stream->ops->stream.read == NULL &&
+                    p_stream->ops->stream.block == NULL && p_stream->ops->stream.readdir == NULL))
+                || ( p_stream->ops == NULL && (p_stream->pf_read == NULL && p_stream->pf_block == NULL &&
+                        p_stream->pf_readdir == NULL)) )
     {   /* Combined access/demux, no stream filtering */
         MRLSections( psz_anchor,
                      &p_source->i_title_start, &p_source->i_title_end,
@@ -2750,8 +2753,11 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
                        &in->b_can_pace_control ) )
         in->b_can_pace_control = false;
 
+    const bool b_can_demux = in->p_demux->ops != NULL ?
+        in->p_demux->ops->demux.demux != NULL : in->p_demux->pf_demux != NULL;
+
     /* Threaded and directory demuxers do not have pace control */
-    assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
+    assert( b_can_demux || !in->b_can_pace_control );
 
     if( !in->b_can_pace_control )
     {

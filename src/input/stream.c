@@ -202,7 +202,8 @@ char *vlc_stream_ReadLine( stream_t *s )
     stream_priv_t *priv = stream_priv(s);
 
     /* Let's fail quickly if this is a readdir access */
-    if( s->pf_read == NULL && s->pf_block == NULL )
+    if( (s->ops != NULL && s->ops->stream.read == NULL && s->ops->stream.block == NULL) ||
+            (s->ops == NULL && s->pf_read == NULL && s->pf_block == NULL) )
         return NULL;
 
     /* BOM detection */
@@ -439,7 +440,7 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
     if (vlc_killed())
         return 0;
 
-    if (s->pf_read != NULL)
+    if ((s->ops != NULL && s->ops->stream.read != NULL) || (s->ops == NULL && s->pf_read != NULL))
     {
         assert(priv->block == NULL);
         if (buf == NULL)
@@ -448,10 +449,10 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
                 return 0;
 
             char dummy[256];
-            ret = s->pf_read(s, dummy, len <= 256 ? len : 256);
+            ret = (s->ops != NULL ? s->ops->stream.read : s->pf_read)(s, dummy, len <= 256 ? len : 256);
         }
         else
-            ret = s->pf_read(s, buf, len);
+            ret = (s->ops != NULL ? s->ops->stream.read : s->pf_read)(s, buf, len);
         return ret;
     }
 
@@ -459,11 +460,11 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
     if (ret >= 0)
         return ret;
 
-    if (s->pf_block != NULL)
+    if ((s->ops != NULL && s->ops->stream.block != NULL) || (s->ops == NULL && s->pf_block != NULL))
     {
         bool eof = false;
 
-        priv->block = s->pf_block(s, &eof);
+        priv->block = (s->ops != NULL ? s->ops->stream.block : s->pf_block)(s, &eof);
         ret = vlc_stream_CopyBlock(&priv->block, buf, len);
         if (ret >= 0)
             return ret;
@@ -592,10 +593,10 @@ block_t *vlc_stream_ReadBlock(stream_t *s)
         block = priv->block;
         priv->block = NULL;
     }
-    else if (s->pf_block != NULL)
+    else if ((s->ops != NULL && s->ops->stream.block != NULL) || (s->ops == NULL && s->pf_block != NULL))
     {
         priv->eof = false;
-        block = s->pf_block(s, &priv->eof);
+        block = (s->ops != NULL ? s->ops->stream.block : s->pf_block)(s, &priv->eof);
     }
     else
     {
@@ -603,7 +604,7 @@ block_t *vlc_stream_ReadBlock(stream_t *s)
         if (unlikely(block == NULL))
             return NULL;
 
-        ssize_t ret = s->pf_read(s, block->p_buffer, block->i_buffer);
+        ssize_t ret = (s->ops != NULL ? s->ops->stream.read : s->pf_read)(s, block->p_buffer, block->i_buffer);
         if (ret > 0)
             block->i_buffer = ret;
         else
@@ -668,10 +669,15 @@ int vlc_stream_Seek(stream_t *s, uint64_t offset)
             return VLC_SUCCESS; /* Nothing to do! */
     }
 
-    if (s->pf_seek == NULL)
+    int ret;
+    if (s->ops == NULL && s->pf_seek != NULL) {
+        ret = s->pf_seek(s, offset);
+    } else if (s->ops != NULL && s->ops->stream.seek != NULL) {
+        ret = s->ops->stream.seek(s, offset);
+    } else {
         return VLC_EGENERIC;
+    }
 
-    int ret = s->pf_seek(s, offset);
     if (ret != VLC_SUCCESS)
         return ret;
 
@@ -919,6 +925,6 @@ block_t *vlc_stream_Block( stream_t *s, size_t size )
 
 int vlc_stream_ReadDir( stream_t *s, input_item_node_t *p_node )
 {
-    assert(s->pf_readdir != NULL);
-    return s->pf_readdir( s, p_node );
+    assert(s->pf_readdir != NULL || (s->ops != NULL && s->ops->stream.readdir != NULL));
+    return (s->ops != NULL ? s->ops->stream.readdir : s->pf_readdir)( s, p_node );
 }

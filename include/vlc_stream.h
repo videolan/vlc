@@ -60,6 +60,11 @@ struct vlc_stream_operations {
     union {
         struct {
             bool (*can_fastseek)(stream_t *);
+    
+            ssize_t (*read)(stream_t *, void *buf, size_t len);
+            block_t *(*block)(stream_t *, bool *restrict eof);
+            int (*readdir)(stream_t *, input_item_node_t *);
+            int (*seek)(stream_t *, uint64_t);
 
             int (*get_title)(stream_t *, unsigned *);
             int (*get_seekpoint)(stream_t *, unsigned *);
@@ -76,6 +81,9 @@ struct vlc_stream_operations {
         struct {
             bool (*can_record)(demux_t *);
             bool (*can_control_rate)(demux_t *);
+    
+            int (*demux)(demux_t *);
+            int (*readdir)(demux_t *, input_item_node_t *);
 
             bool (*has_unsupported_meta)(demux_t *);
 
@@ -149,6 +157,9 @@ struct stream_t
      *
      * Callback to read data from the stream into a caller-supplied buffer.
      *
+     * This is the legacy implementor, using \ref vlc_stream_operations
+     * should be prefered.
+     *
      * This may be NULL if the stream is actually a directory rather than a
      * byte stream, or if \ref stream_t.pf_block is non-NULL.
      *
@@ -170,6 +181,9 @@ struct stream_t
      * for buffers. In such case, this callback should be provided instead of
      * \ref stream_t.pf_read; otherwise, this should be NULL.
      *
+     * This is the legacy implementor, using \ref vlc_stream_operations
+     * should be prefered.
+     *
      * \param eof storage space for end-of-stream flag [OUT]
      * (*eof is always false when invoking pf_block(); pf_block() should set
      *  *eof to true if it detects the end of the stream)
@@ -185,6 +199,9 @@ struct stream_t
      * Callback to fill an item node from a directory
      * (see doc/browsing.txt for details).
      *
+     * This is the legacy implementor, using \ref vlc_stream_operations
+     * should be prefered.
+     *
      * NULL if the stream is not a directory.
      */
     int         (*pf_readdir)(stream_t *, input_item_node_t *);
@@ -195,6 +212,9 @@ struct stream_t
      * Seek.
      *
      * Callback to set the stream pointer (in bytes from start).
+     *
+     * This is the legacy implementor, using \ref vlc_stream_operations
+     * should be prefered.
      *
      * May be NULL if seeking is not supported.
      */

@@ -207,18 +207,24 @@ error:
     return NULL;
 }
 
+static int demux_ReadDir( stream_t *s, input_item_node_t *p_node )
+{
+    assert(s->pf_readdir != NULL || (s->ops != NULL && s->ops->demux.readdir != NULL));
+    return (s->ops != NULL ? s->ops->demux.readdir : s->pf_readdir)( s, p_node );
+}
+
 int demux_Demux(demux_t *demux)
 {
-    if (demux->pf_demux != NULL)
-        return demux->pf_demux(demux);
+    if (demux->pf_demux != NULL || (demux->ops != NULL && demux->ops->demux.demux != NULL))
+        return (demux->ops != NULL ? demux->ops->demux.demux : demux->pf_demux)(demux);
 
-    if (demux->pf_readdir != NULL && demux->p_input_item != NULL) {
+    if ((demux->pf_readdir != NULL || (demux->ops != NULL && demux->ops->demux.readdir != NULL)) && demux->p_input_item != NULL) {
         input_item_node_t *node = input_item_node_Create(demux->p_input_item);
 
         if (unlikely(node == NULL))
             return VLC_DEMUXER_EGENERIC;
 
-        if (vlc_stream_ReadDir(demux, node)) {
+        if (demux_ReadDir(demux, node)) {
              input_item_node_Delete(node);
              return VLC_DEMUXER_EGENERIC;
         }
