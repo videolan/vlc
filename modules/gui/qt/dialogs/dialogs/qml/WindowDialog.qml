@@ -40,6 +40,7 @@ Window {
 
     property alias contentComponent: loader.sourceComponent
     property alias standardButtons: buttonBox.standardButtons
+    property alias colorContext: layout.colorContext
 
     signal accepted()
     signal rejected(bool byButton)
@@ -62,6 +63,7 @@ Window {
     }
 
     ColumnLayout {
+        id: layout
         anchors.fill: parent
         anchors.margins: VLCStyle.margin_small
 
