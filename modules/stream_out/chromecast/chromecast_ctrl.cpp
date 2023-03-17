@@ -673,7 +673,7 @@ void intf_sys_t::processAuthMessage( const castchannel::CastMessage& msg )
 
 void intf_sys_t::processHeartBeatMessage( const castchannel::CastMessage& msg )
 {
-    json_value *p_data = json_parse(msg.payload_utf8().c_str());
+    json_value *p_data = json_parse(msg.payload_utf8().c_str(), msg.payload_utf8().length());
     std::string type((*p_data)["type"]);
 
     if (type == "PING")
@@ -696,7 +696,7 @@ void intf_sys_t::processHeartBeatMessage( const castchannel::CastMessage& msg )
 
 bool intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
 {
-    json_value *p_data = json_parse(msg.payload_utf8().c_str());
+    json_value *p_data = json_parse(msg.payload_utf8().c_str(), msg.payload_utf8().length());
     std::string type((*p_data)["type"]);
 
     bool ret = true;
@@ -800,7 +800,7 @@ bool intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
 
 void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
 {
-    json_value *p_data = json_parse(msg.payload_utf8().c_str());
+    json_value *p_data = json_parse(msg.payload_utf8().c_str(), msg.payload_utf8().length());
     std::string type((*p_data)["type"]);
     int64_t requestId = (json_int_t) (*p_data)["requestId"];
 
@@ -947,7 +947,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
 
 void intf_sys_t::processConnectionMessage( const castchannel::CastMessage& msg )
 {
-    json_value *p_data = json_parse(msg.payload_utf8().c_str());
+    json_value *p_data = json_parse(msg.payload_utf8().c_str(), msg.payload_utf8().length());
     std::string type((*p_data)["type"]);
     json_value_free(p_data);
 

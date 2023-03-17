@@ -59,7 +59,7 @@ json_value * json_parse_document(vlc_object_t *p_obj, const char *psz_buffer, si
     json_settings settings;
     char psz_error[128];
     memset (&settings, 0, sizeof (json_settings));
-    json_value *root = json_parse_ex(&settings, psz_buffer, psz_error);
+    json_value *root = json_parse_ex(&settings, psz_buffer, i_buffer, psz_error);
     if (root == NULL)
     {
         msg_Warn(p_obj, "Can't parse json data: %s", psz_error);
