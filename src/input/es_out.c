@@ -719,8 +719,6 @@ static void EsOutUpdateDelayJitter(es_out_t *out)
 
 static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 {
-    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-
     assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES);
 
     es->delay = delay;
