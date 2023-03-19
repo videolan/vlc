@@ -54,7 +54,7 @@ extern NSString * const VLCLibraryAlbumSortDescriptorKey;
 extern NSString * const VLCLibraryPlayCountSortDescriptorKey;
 extern NSString * const VLCLibraryYearSortDescriptorKey;
 
-@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) VLCLibraryAudioGroupDataSource *audioGroupDataSource;

@@ -34,6 +34,7 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+#import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
@@ -50,6 +51,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSArray<NSString *> *_placeholderLabelStrings;
 
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
+    VLCLibraryAudioTableViewDelegate *_audioLibraryTableViewDelegate;
 }
 @end
 
@@ -66,6 +68,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self setupAudioDataSource];
 
         _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+        _audioLibraryTableViewDelegate = [[VLCLibraryAudioTableViewDelegate alloc] init];
 
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
@@ -152,7 +155,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupAudioTableViews
 {
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
-    _audioCollectionSelectionTableView.delegate = _audioDataSource;
+    _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _audioGroupDataSource;
@@ -162,13 +165,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 
     _audioSongTableView.dataSource = _audioDataSource;
-    _audioSongTableView.delegate = _audioDataSource;
+    _audioSongTableView.delegate = _audioLibraryTableViewDelegate;
 }
 
 - (void)setupGridModeSplitView
 {
     _audioLibraryGridModeSplitViewListTableView.dataSource = _audioDataSource;
-    _audioLibraryGridModeSplitViewListTableView.delegate = _audioDataSource;
+    _audioLibraryGridModeSplitViewListTableView.delegate = _audioLibraryTableViewDelegate;
 
     _audioLibraryGridModeSplitViewListSelectionCollectionView.dataSource = _audioGroupDataSource;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioLibraryCollectionViewDelegate;

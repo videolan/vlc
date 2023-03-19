@@ -495,73 +495,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     return [self displayAllArtistsGenresTableEntry] ? numItems + 1 : numItems;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView
-   viewForTableColumn:(NSTableColumn *)tableColumn
-                  row:(NSInteger)row
-{
-    // The table view for songs in the list view mode of the audio library is different from the other audio groupings
-    // and we use a vanilla NSTableView created in the VLCLibraryWindow XIB for it
-    if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"] &&
-        _currentParentType == VLC_ML_PARENT_UNKNOWN) {
-        const NSString * const columnIdentifier = tableColumn.identifier;
-        const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row forTableView:tableView];
-
-        if (!mediaItem) {
-            return nil;
-        }
-
-        const VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:mediaItem.albumID];
-        const VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:mediaItem.genreID];
-
-        NSString *cellText = @"";
-        NSString *cellIdentifier = @"";
-
-        if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewSongPlayingColumnIdentifier]) {
-            VLCLibrarySongsTableViewSongPlayingTableCellView *cellView = (VLCLibrarySongsTableViewSongPlayingTableCellView*)[tableView makeViewWithIdentifier:@"VLCLibrarySongsTableViewSongPlayingTableCellViewIdentifier" owner:self];
-            NSAssert(cellView, @"Unexpectedly received null cellview");
-            cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)mediaItem;
-            return cellView;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewTitleColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
-            cellText = mediaItem.title;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewDurationColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewDurationTableCellViewIdentifier";
-            cellText = mediaItem.durationString;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewArtistColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewArtistTableCellViewIdentifier";
-            cellText = album.artistName.length == 0 ? @"" : album.artistName;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewAlbumColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewAlbumTableCellViewIdentifier";
-            cellText = album.title.length == 0 ? @"" : album.title;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewGenreColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewGenreTableCellViewIdentifier";
-            cellText = genre.name.length == 0 ? @"" : genre.name;
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewPlayCountColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewPlayCountTableCellViewIdentifier";
-            cellText = [@(mediaItem.playCount) stringValue];
-        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewYearColumnIdentifier]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewYearTableCellViewIdentifier";
-            cellText = [@(mediaItem.year) stringValue];
-        } else {
-            NSAssert(true, @"Received unknown column identifier %@", columnIdentifier);
-        }
-
-        NSTableCellView *cellView = [tableView makeViewWithIdentifier:cellIdentifier owner:self];
-        cellView.textField.stringValue = cellText;
-        return cellView;
-    }
-
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    [cellView setRepresentedItem:[self libraryItemAtRow:row forTableView:tableView]];
-    return cellView;
-}
-
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
@@ -583,7 +516,9 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row
 {
-    if (tableView != _groupSelectionTableView && tableView != _gridModeListTableView) {
+    NSParameterAssert(tableView);
+    
+    if (tableView != _collectionSelectionTableView && tableView != _groupSelectionTableView && tableView != _gridModeListTableView) {
         return;
     }
 
@@ -592,36 +527,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     const NSInteger selectedRow = tableView.selectedRow;
-
     const BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
     const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
-
-    if (libraryItemIndex < 0 && showingAllItemsEntry) {
-        _audioGroupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
-    } else {
-        id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
-
-        if (_currentParentType == VLC_ML_PARENT_ALBUM) {
-            _audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
-        } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
-            _audioGroupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
-        } else { // FIXME: we have nothing to show here
-            _audioGroupDataSource.representedListOfAlbums = nil;
-        }
-    }
-
-    [self.groupSelectionTableView reloadData];
-    [self.gridModeListSelectionCollectionView reloadData];
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    NSParameterAssert(notification);
-    NSTableView *tableView = (NSTableView *)notification.object;
-    NSAssert(tableView, @"Must be a valid table view");
-    NSInteger selectedRow = tableView.selectedRow;
-    BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
-    NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
     if (libraryItemIndex < 0 && showingAllItemsEntry) {
         _audioGroupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
