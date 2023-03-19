@@ -50,21 +50,21 @@
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"
 
-static NSString *VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewTitleColumnIdentifier = @"VLCLibrarySongsTableViewTitleColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewDurationColumnIdentifier = @"VLCLibrarySongsTableViewDurationColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewArtistColumnIdentifier = @"VLCLibrarySongsTableViewArtistColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewAlbumColumnIdentifier = @"VLCLibrarySongsTableViewAlbumColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewGenreColumnIdentifier = @"VLCLibrarySongsTableViewGenreColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewPlayCountColumnIdentifier = @"VLCLibrarySongsTableViewPlayCountColumnIdentifier";
-static NSString *VLCLibrarySongsTableViewYearColumnIdentifier = @"VLCLibrarySongsTableViewYearColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewTitleColumnIdentifier = @"VLCLibrarySongsTableViewTitleColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewDurationColumnIdentifier = @"VLCLibrarySongsTableViewDurationColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewArtistColumnIdentifier = @"VLCLibrarySongsTableViewArtistColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewAlbumColumnIdentifier = @"VLCLibrarySongsTableViewAlbumColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewGenreColumnIdentifier = @"VLCLibrarySongsTableViewGenreColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewPlayCountColumnIdentifier = @"VLCLibrarySongsTableViewPlayCountColumnIdentifier";
+NSString * const VLCLibrarySongsTableViewYearColumnIdentifier = @"VLCLibrarySongsTableViewYearColumnIdentifier";
 
-static NSString *VLCLibraryTitleSortDescriptorKey = @"VLCLibraryTitleSortDescriptorKey";
-static NSString *VLCLibraryDurationSortDescriptorKey = @"VLCLibraryDurationSortDescriptorKey";
-static NSString *VLCLibraryArtistSortDescriptorKey = @"VLCLibraryArtistSortDescriptorKey";
-static NSString *VLCLibraryAlbumSortDescriptorKey = @"VLCLibraryAlbumSortDescriptorKey";
-static NSString *VLCLibraryPlayCountSortDescriptorKey = @"VLCLibraryPlayCountSortDescriptorKey";
-static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescriptorKey";
+NSString * const VLCLibraryTitleSortDescriptorKey = @"VLCLibraryTitleSortDescriptorKey";
+NSString * const VLCLibraryDurationSortDescriptorKey = @"VLCLibraryDurationSortDescriptorKey";
+NSString * const VLCLibraryArtistSortDescriptorKey = @"VLCLibraryArtistSortDescriptorKey";
+NSString * const VLCLibraryAlbumSortDescriptorKey = @"VLCLibraryAlbumSortDescriptorKey";
+NSString * const VLCLibraryPlayCountSortDescriptorKey = @"VLCLibraryPlayCountSortDescriptorKey";
+NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescriptorKey";
 // TODO: Add sorting by genre
 
 @interface VLCLibraryAudioDataSource ()

@@ -38,6 +38,22 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
     VLCAudioLibraryGenresSegment
 };
 
+extern NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewTitleColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewDurationColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewArtistColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewAlbumColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewGenreColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewPlayCountColumnIdentifier;
+extern NSString * const VLCLibrarySongsTableViewYearColumnIdentifier;
+
+extern NSString * const VLCLibraryTitleSortDescriptorKey;
+extern NSString * const VLCLibraryDurationSortDescriptorKey;
+extern NSString * const VLCLibraryArtistSortDescriptorKey;
+extern NSString * const VLCLibraryAlbumSortDescriptorKey;
+extern NSString * const VLCLibraryPlayCountSortDescriptorKey;
+extern NSString * const VLCLibraryYearSortDescriptorKey;
+
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
