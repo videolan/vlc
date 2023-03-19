@@ -69,7 +69,10 @@ extern NSString * const VLCLibraryYearSortDescriptorKey;
 
 - (void)setup;
 - (void)setupCollectionView:(NSCollectionView *)collectionView;
+
 - (void)reloadData;
+- (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row;
+
 
 @end
 

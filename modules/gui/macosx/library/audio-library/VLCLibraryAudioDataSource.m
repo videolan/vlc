@@ -581,6 +581,39 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     return _displayedCollection[row];
 }
 
+- (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row
+{
+    if (tableView != _groupSelectionTableView && tableView != _gridModeListTableView) {
+        return;
+    }
+
+    if (tableView.selectedRow != row) {
+        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+    }
+
+    const NSInteger selectedRow = tableView.selectedRow;
+
+    const BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
+    const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
+
+    if (libraryItemIndex < 0 && showingAllItemsEntry) {
+        _audioGroupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
+    } else {
+        id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
+
+        if (_currentParentType == VLC_ML_PARENT_ALBUM) {
+            _audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
+        } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+            _audioGroupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
+        } else { // FIXME: we have nothing to show here
+            _audioGroupDataSource.representedListOfAlbums = nil;
+        }
+    }
+
+    [self.groupSelectionTableView reloadData];
+    [self.gridModeListSelectionCollectionView reloadData];
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     NSParameterAssert(notification);
