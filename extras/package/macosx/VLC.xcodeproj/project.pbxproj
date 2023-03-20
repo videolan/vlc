@@ -105,6 +105,7 @@
 		53B447F9293BB47B00857588 /* VLCLibraryVideoTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447F3293BB47A00857588 /* VLCLibraryVideoTableViewDataSource.m */; };
 		53B447FA293BB47B00857588 /* VLCLibraryVideoGroupDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447F4293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.m */; };
 		53ED472329C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */; };
+		53ED472629C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472529C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m */; };
 		53F0E92D299B002300491D49 /* VLCInputNodePathControlItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F0E92C299B002300491D49 /* VLCInputNodePathControlItem.m */; };
 		53F0E930299B17DF00491D49 /* VLCInputNodePathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F0E92F299B17DF00491D49 /* VLCInputNodePathControl.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
@@ -310,6 +311,8 @@
 		53B447F5293BB47B00857588 /* VLCLibraryVideoCollectionViewsStackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoCollectionViewsStackViewController.h; sourceTree = "<group>"; };
 		53ED472129C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioTableViewDelegate.h; sourceTree = "<group>"; };
 		53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioTableViewDelegate.m; sourceTree = "<group>"; };
+		53ED472429C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioGroupTableViewDelegate.h; sourceTree = "<group>"; };
+		53ED472529C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioGroupTableViewDelegate.m; sourceTree = "<group>"; };
 		53F0E92B299B002300491D49 /* VLCInputNodePathControlItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCInputNodePathControlItem.h; sourceTree = "<group>"; };
 		53F0E92C299B002300491D49 /* VLCInputNodePathControlItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCInputNodePathControlItem.m; sourceTree = "<group>"; };
 		53F0E92E299B17DF00491D49 /* VLCInputNodePathControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCInputNodePathControl.h; sourceTree = "<group>"; };
@@ -1326,6 +1329,8 @@
 				7DE2F0432282C84A0040DD0A /* VLCLibraryAudioDataSource.m */,
 				53903D3829576ED500D0B308 /* VLCLibraryAudioGroupDataSource.h */,
 				53903D3929576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m */,
+				53ED472429C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.h */,
+				53ED472529C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m */,
 				53ED472129C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.h */,
 				53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */,
 				536283E8291146BC00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.h */,
@@ -1937,6 +1942,7 @@
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
 				5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */,
 				1C3113981E508C6900D4DD76 /* VLCAudioEffectsWindowController.m in Sources */,
+				53ED472629C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m in Sources */,
 				536283F9291146BC00640C15 /* VLCLibraryCollectionViewFlowLayout.m in Sources */,
 				6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */,
 				7D445D8E2203375100263D34 /* VLCPlaylistMenuController.m in Sources */,
