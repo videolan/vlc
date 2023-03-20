@@ -79,7 +79,7 @@ Item {
         drag.maximumX: root.dragXMax
         drag.maximumY: root.dragYMax
 
-        onWheel: wheel.accept()
+        onWheel: wheel.accepted = true
 
         Rectangle {
             color: "#10000000"
