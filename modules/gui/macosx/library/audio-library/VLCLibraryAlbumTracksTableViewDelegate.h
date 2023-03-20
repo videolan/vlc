@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAlbumTracksTableViewDelegate : NSObject
+@interface VLCLibraryAlbumTracksTableViewDelegate : NSObject <NSTableViewDelegate>
 
 @end
 

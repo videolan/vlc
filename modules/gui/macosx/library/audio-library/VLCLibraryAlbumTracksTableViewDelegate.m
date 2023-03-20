@@ -22,6 +22,31 @@
 
 #import "VLCLibraryAlbumTracksTableViewDelegate.h"
 
+#import "library/VLCLibraryTableView.h"
+
+#import "library/audio-library/VLCLibrarySongTableCellView.h"
+
 @implementation VLCLibraryAlbumTracksTableViewDelegate
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        return nil;
+    }
+
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    VLCLibrarySongTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibrarySongCellIdentifier owner:self];
+
+    if (cellView == nil) {
+        cellView = [VLCLibrarySongTableCellView fromNibWithOwner:self];
+        cellView.identifier = VLCAudioLibrarySongCellIdentifier;
+    }
+
+    cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)[vlcDataSource libraryItemAtRow:row
+                                                                                   forTableView:tableView];
+    return cellView;
+}
 
 @end
