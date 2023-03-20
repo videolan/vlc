@@ -1420,10 +1420,11 @@ static void SetupProcessorInput(vout_display_t *vd, const video_format_t *fmt, c
     DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA frame_format = { DXVAHD_FRAME_FORMAT_PROGRESSIVE };
     IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_FRAME_FORMAT, sizeof(frame_format), &frame_format );
 
-    DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA colorspace = { 0 };
-    colorspace.RGB_Range = fmt->color_range == COLOR_RANGE_FULL ? 0 : 1;
-    colorspace.YCbCr_xvYCC = fmt->color_range == COLOR_RANGE_FULL ? 1 : 0;
-    colorspace.YCbCr_Matrix = fmt->space == COLOR_SPACE_BT601 ? 0 : 1;
+    DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA colorspace = {
+        .RGB_Range = fmt->color_range == COLOR_RANGE_FULL ? 0 : 1,
+        .YCbCr_xvYCC = fmt->color_range == COLOR_RANGE_FULL ? 1 : 0,
+        .YCbCr_Matrix = fmt->space == COLOR_SPACE_BT601 ? 0 : 1,
+    };
     IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE, sizeof(colorspace), &colorspace );
 
     DXVAHD_STREAM_STATE_SOURCE_RECT_DATA srcRect;
