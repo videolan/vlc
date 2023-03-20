@@ -110,6 +110,7 @@ typedef struct
     uint64_t     i_cumulated_duration; /* Same as above, but not from probing, (movie time scale) */
     uint32_t     i_timescale;          /* movie time scale */
     vlc_tick_t   i_nztime;             /* time position of the presentation (CLOCK_FREQ timescale) */
+    vlc_tick_t   i_max_pts_offset;
     unsigned int i_tracks;       /* number of tracks */
     mp4_track_t  *track;         /* array of track */
     float        f_fps;          /* number of frame per seconds */
@@ -595,6 +596,13 @@ static vlc_tick_t MP4_TrackGetDTSPTS( demux_t *p_demux, const mp4_track_t *p_tra
             *pi_nzpts = INVALID_PTS;
         }
         else *pi_nzpts = i_dts;
+    }
+
+    if( p_track->i_pts_offset )
+    {
+        if( pi_nzpts && *pi_nzpts != INVALID_PTS )
+            *pi_nzpts += p_track->i_pts_offset;
+        i_dts += p_track->i_pts_offset;
     }
 
     return i_dts;
@@ -1300,6 +1308,22 @@ static int Open( vlc_object_t * p_this )
             msg_Dbg( p_demux, "ignoring track[Id 0x%x] %d refs %x",
                      p_track->i_track_ID, p_track->b_ok, p_track->i_use_flags );
         }
+
+        if( p_track->b_ok && p_track->i_cts_shift ) /* PTS shift handling pass 1 */
+        {
+            p_track->i_pts_offset = MP4_rescale_mtime( p_track->i_cts_shift,
+                                                       p_track->i_timescale );
+            if( p_track->i_pts_offset > p_sys->i_max_pts_offset )
+                p_sys->i_max_pts_offset = p_track->i_pts_offset;
+        }
+    }
+
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ ) /* PTS shift handling pass 2 */
+    {
+        mp4_track_t *p_track = &p_sys->track[i];
+        if( !p_track->b_ok )
+            continue;
+        p_track->i_pts_offset = p_sys->i_max_pts_offset - p_track->i_pts_offset;
     }
 
     p_mvex = MP4_BoxGet( p_sys->p_moov, "mvex" );
@@ -2216,7 +2240,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            *va_arg( args, vlc_tick_t * ) = p_sys->i_nztime;
+            *va_arg( args, vlc_tick_t * ) = (p_sys->i_max_pts_offset < p_sys->i_nztime)
+                                          ? p_sys->i_nztime - p_sys->i_max_pts_offset : 0;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
@@ -2889,6 +2914,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     i_cts_shift = -ctts->pi_sample_offset[i];
             }
         }
+        p_demux_track->i_cts_shift = i_cts_shift;
 
         /* Create pts-dts table per chunk */
         uint32_t i_index = 0;

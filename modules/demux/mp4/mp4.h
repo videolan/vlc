@@ -135,6 +135,8 @@ typedef struct
     uint32_t         i_next_delta;
     stime_t          i_start_dts;
     stime_t          i_next_dts;
+    int64_t          i_cts_shift;
+    vlc_tick_t       i_pts_offset;
     /* give the next sample to read, i_chunk is to find quickly where
       the sample is located */
     uint32_t         i_sample;       /* next sample to read */
