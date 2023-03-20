@@ -167,7 +167,7 @@ typedef struct
 /*****************************************************************************
  * Declaration of local function
  *****************************************************************************/
-static void MP4_TrackSetup( demux_t *, mp4_track_t *, MP4_Box_t  *, bool, bool );
+static void MP4_TrackSetup( demux_t *, mp4_track_t *, const MP4_Box_t  *, bool, bool );
 static void MP4_TrackInit( mp4_track_t *, const MP4_Box_t * );
 static void MP4_TrackClean( es_out_t *, mp4_track_t * );
 
@@ -1258,7 +1258,7 @@ static int Open( vlc_object_t * p_this )
     /* now process each track and extract all useful information */
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
+        const MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
         MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
         if( p_sys->track[i].b_ok && ! MP4_isMetadata(&p_sys->track[i]) )
@@ -3562,7 +3562,7 @@ static void TrackUpdateSampleAndTimes( mp4_track_t *p_track )
  * If it succeed b_ok is set to 1 else to 0
  ****************************************************************************/
 static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
-                             MP4_Box_t *p_box_trak,
+                             const MP4_Box_t *p_box_trak,
                              bool b_create_es, bool b_force_enable )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
