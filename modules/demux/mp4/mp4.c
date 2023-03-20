@@ -2216,7 +2216,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            *va_arg( args, vlc_tick_t * ) = p_sys->i_timescale > 0 ? p_sys->i_nztime : 0;
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_nztime;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
