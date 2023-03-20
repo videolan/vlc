@@ -107,7 +107,9 @@
 
 - (void)layout {
     NSRect bounds = [self convertRectToBacking:self.bounds];
-    dispatch_sync(_eventQueue, ^{
+    // dispatch the event async to prevent potential deadlock 
+    // with video output's RenderPicture's display lock
+    dispatch_async(_eventQueue, ^{
         if (_wnd == NULL)
             return;
         vlc_window_ReportSize(_wnd, bounds.size.width, bounds.size.height);

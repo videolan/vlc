@@ -20,6 +20,17 @@ vlc_modules += {
     'dependencies' : [foundation_dep, corefoundation_dep, corevideo_dep, darwingl_dep],
 }
 
+vlc_modules += {
+    'name' : 'samplebufferdisplay',
+    'sources' : files(
+        'VLCSampleBufferDisplay.m',
+        '../../codec/vt_utils.c',
+        '../../codec/vt_utils.h'
+    ),
+    'objc_args' : ['-fobjc-arc'],
+    'dependencies' : [avfoundation_dep, avkit_dep, cocoa_dep, coremedia_dep, quartz_dep],
+}
+
 if have_ios or have_tvos
     vlc_modules += {
         'name' : 'caeagl',

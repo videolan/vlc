@@ -90,6 +90,7 @@ if host_system == 'darwin'
     coreaudio_dep = dependency('CoreAudio', required: true)
     coreimage_dep = dependency('CoreImage', required: true)
     coregraphics_dep = dependency('CoreGraphics', required: true)
+    avkit_dep = dependency('AVKit', required: true)
 endif
 
 # macOS specific dependencies
