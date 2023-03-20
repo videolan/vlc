@@ -397,9 +397,9 @@ static int InitRangeProcessor(opengl_tex_converter_t *interop, IDirect3DDevice9E
 
     DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace = {
         .Usage = 0, // playback
-        .RGB_Range = true ? 0 : 1,
-        .YCbCr_xvYCC = true ? 1 : 0,
-        .YCbCr_Matrix = false ? 0 : 1,
+        .RGB_Range = /* full range */true ? 0 : 1,
+        .YCbCr_xvYCC = /* full range */true ? 1 : 0,
+        .YCbCr_Matrix = /* BT601 colorspace */ false ? 0 : 1,
     };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE, sizeof(colorspace), &colorspace);
 
