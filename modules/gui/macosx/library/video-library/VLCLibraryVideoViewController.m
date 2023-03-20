@@ -33,11 +33,18 @@
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 
 #import "main/VLCMain.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
+
+@interface VLCLibraryVideoViewController ()
+{
+    VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
+}
+@end
 
 @implementation VLCLibraryVideoViewController
 
@@ -46,8 +53,11 @@
     self = [super init];
 
     if(self) {
+        _videoLibraryTableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
+
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableViewDataSource];
+        [self setupTableViews];
         [self setupGridViewController];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
@@ -89,8 +99,17 @@
     _libraryVideoTableViewDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+}
 
-    [_libraryVideoTableViewDataSource setup];
+- (void)setupTableViews
+{
+    _videoLibraryGroupsTableView.dataSource = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupsTableView.target = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+
+    _videoLibraryGroupSelectionTableView.dataSource = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupSelectionTableView.target = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
 }
 
 - (void)setupGridViewController

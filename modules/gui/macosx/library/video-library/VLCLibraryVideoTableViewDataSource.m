@@ -84,22 +84,6 @@
     });
 }
 
-- (void)setup
-{
-    [self setupTableViews];
-}
-
-- (void)setupTableViews
-{
-    _groupsTableView.dataSource = self;
-    _groupsTableView.delegate = self;
-    _groupsTableView.target = self;
-    
-    _groupSelectionTableView.dataSource = self;
-    _groupSelectionTableView.delegate = self;
-    _groupSelectionTableView.target = self;
-}
-
 #pragma mark - table view data source and delegation
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -119,41 +103,6 @@
     }
     
     return 0;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:@"VLCVideoLibraryTableViewCellIdentifier" owner:self];
-    
-    if (!cellView) {
-        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
-        cellView.identifier = @"VLCVideoLibraryTableViewCellIdentifier";
-    }
-    
-    if (tableView == _groupsTableView) {
-        cellView.representedVideoLibrarySection = row;
-    } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
-            case VLCLibraryVideoRecentsGroup:
-                cellView.representedItem = _recentsArray[row];
-                break;
-            case VLCLibraryVideoLibraryGroup:
-                cellView.representedItem = _libraryArray[row];
-                break;
-            default:
-                NSAssert(1, @"Reached unreachable case for video library section");
-                break;
-        }
-    }
-    
-    return cellView;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    if(notification.object == _groupsTableView) {
-        [_groupSelectionTableView reloadData];
-    }
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
