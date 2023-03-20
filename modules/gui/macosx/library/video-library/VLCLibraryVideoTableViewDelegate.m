@@ -61,4 +61,28 @@
     return cellView;
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    NSTableView *tableView = (NSTableView *)notification.object;
+    NSAssert(tableView, @"Must be a valid table view");
+    NSInteger selectedRow = tableView.selectedRow;
+
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        return;
+    }
+
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoTableViewDataSource class]]) {
+        VLCLibraryVideoTableViewDataSource * const videoTableViewDataSource = (VLCLibraryVideoTableViewDataSource *)vlcDataSource;
+        NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
+
+        if (tableView == videoTableViewDataSource.groupsTableView) {
+            [videoTableViewDataSource.groupSelectionTableView reloadData];
+        }
+    }
+}
+
 @end
