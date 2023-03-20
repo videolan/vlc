@@ -1,0 +1,62 @@
+From d4249c712991ab191f05968470b34587cc716a53 Mon Sep 17 00:00:00 2001
+From: LIU Hao <lh_mouse@126.com>
+Date: Sat, 18 Mar 2023 14:59:38 +0800
+Subject: [PATCH 1/2] headers: Update to Wine master and regenerate H from IDL
+ (edited)
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+
+edited:
+* only kept the dxvahd.h changes
+---
+ mingw-w64-headers/include/dxvahd.h | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/mingw-w64-headers/include/dxvahd.h b/mingw-w64-headers/include/dxvahd.h
+index 71b027863..aaff9400c 100644
+--- a/mingw-w64-headers/include/dxvahd.h
++++ b/mingw-w64-headers/include/dxvahd.h
+@@ -251,10 +251,16 @@ typedef struct _DXVAHD_BLT_STATE_CONSTRICTION_DATA {
+     SIZE Size;
+ } DXVAHD_BLT_STATE_CONSTRICTION_DATA;
+ typedef struct _DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA {
+-    UINT Usage : 1;
+-    UINT RGB_Range : 1;
+-    UINT YCbCr_Matrix : 1;
+-    UINT YCbCr_xvYCC : 1;
++    __C89_NAMELESS union {
++        __C89_NAMELESS struct {
++            UINT Usage : 1;
++            UINT RGB_Range : 1;
++            UINT YCbCr_Matrix : 1;
++            UINT YCbCr_xvYCC : 1;
++            UINT Reserved : 28;
++        } __C89_NAMELESSSTRUCTNAME;
++        UINT Value;
++    } __C89_NAMELESSUNIONNAME;
+ } DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA;
+ typedef struct _DXVAHD_BLT_STATE_PRIVATE_DATA {
+     GUID Guid;
+@@ -332,10 +338,15 @@ typedef struct _DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA {
+     DXVAHD_FRAME_FORMAT FrameFormat;
+ } DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA;
+ typedef struct _DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA {
+-    UINT Type : 1;
+-    UINT RGB_Range : 1;
+-    UINT YCbCr_Matrix : 1;
+-    UINT YCbCr_xvYCC : 1;
++    __C89_NAMELESS union {
++        __C89_NAMELESS struct {
++            UINT Type : 1;
++            UINT RGB_Range : 1;
++            UINT YCbCr_Matrix : 1;
++            UINT YCbCr_xvYCC : 1;
++        } __C89_NAMELESSSTRUCTNAME;
++        UINT Value;
++    } __C89_NAMELESSUNIONNAME;
+ } DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA;
+ typedef struct _DXVAHD_STREAM_STATE_LUMA_KEY_DATA {
+     WINBOOL Enable;
+-- 
+2.37.3.windows.1
+

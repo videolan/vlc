@@ -17,7 +17,7 @@ endif # !HAVE_WINSTORE
 PKGS += dxva dxvahd
 
 ifeq ($(call mingw_at_least, 8), true)
-PKGS_FOUND += d3d9 dxvahd
+PKGS_FOUND += d3d9
 endif # MINGW 8
 ifeq ($(call mingw_at_least, 9), true)
 ifdef HAVE_WINSTORE
@@ -30,6 +30,9 @@ endif # MINGW 10
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dcomp
 endif
+ifeq ($(call mingw_at_least, 11), true)
+PKGS_FOUND += dxvahd
+endif # MINGW 11
 endif # !HAVE_VISUALSTUDIO
 
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
@@ -53,6 +56,8 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
+	$(APPLY) $(SRC)/mingw64/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
+	$(APPLY) $(SRC)/mingw64/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
 	$(MOVE)
 
 .mingw64: mingw64
