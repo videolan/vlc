@@ -45,36 +45,10 @@
     return 0;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCLibraryAlbumTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryAlbumTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[self libraryItemAtRow:row forTableView:tableView];
-    return cellView;
-}
-
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
     return _representedListOfAlbums[row];
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
-{
-    VLCLibraryAlbumTableCellView *cellView = (VLCLibraryAlbumTableCellView *)[self tableView:tableView viewForTableColumn:[[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier] row:row];
-    return cellView == nil ? -1 : cellView.height;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
-{
-    // We use this with nested table views, since the table view cell is the VLCLibraryAlbumTableCellView.
-    // We don't want to select the outer cell, only the inner cells in the album view's table.
-    return NO;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView

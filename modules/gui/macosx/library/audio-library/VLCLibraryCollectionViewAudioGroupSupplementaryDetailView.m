@@ -26,6 +26,7 @@
 #import "extensions/NSFont+VLCAdditions.h"
 
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
 
 NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
@@ -33,6 +34,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 @interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView () 
 {
     VLCLibraryAudioGroupDataSource *_audioGroupAlbumsDataSource;
+    VLCLibraryAudioGroupTableViewDelegate *_audioGroupAlbumsTableViewDelegate;
 }
 
 @end
@@ -42,8 +44,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 - (void)awakeFromNib
 {
     _audioGroupAlbumsDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
+    _audioGroupAlbumsTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
+
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
-    _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsDataSource;
+    _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsTableViewDelegate;
     
     _audioGroupNameTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
 }

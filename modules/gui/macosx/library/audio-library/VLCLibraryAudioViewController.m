@@ -34,6 +34,7 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
@@ -52,6 +53,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
     VLCLibraryAudioTableViewDelegate *_audioLibraryTableViewDelegate;
+    VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
 }
 @end
 
@@ -69,6 +71,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
         _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
         _audioLibraryTableViewDelegate = [[VLCLibraryAudioTableViewDelegate alloc] init];
+        _audioGroupLibraryTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
 
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
@@ -158,7 +161,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
     _audioGroupSelectionTableView.dataSource = _audioGroupDataSource;
-    _audioGroupSelectionTableView.delegate = _audioGroupDataSource;
+    _audioGroupSelectionTableView.delegate = _audioGroupLibraryTableViewDelegate;
 
     if(@available(macOS 11.0, *)) {
         _audioGroupSelectionTableView.style = NSTableViewStyleFullWidth;
