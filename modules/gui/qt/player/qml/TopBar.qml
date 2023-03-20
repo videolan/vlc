@@ -177,10 +177,7 @@ FocusScope{
     Loader {
         id: tapNDrag
 
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-
+        anchors.fill: parent
         active: root.showCSD
         source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
     }
