@@ -22,6 +22,43 @@
 
 #import "VLCLibraryVideoTableViewDelegate.h"
 
+#import "VLCLibraryVideoTableViewDataSource.h"
+
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
+
 @implementation VLCLibraryVideoTableViewDelegate
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        return nil;
+    }
+
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:@"VLCVideoLibraryTableViewCellIdentifier" owner:self];
+
+    if (!cellView) {
+        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
+        cellView.identifier = @"VLCVideoLibraryTableViewCellIdentifier";
+    }
+
+    const id<VLCMediaLibraryItemProtocol> mediaItem = [vlcDataSource libraryItemAtRow:row forTableView:tableView];
+    if (mediaItem != nil) {
+        cellView.representedItem = mediaItem;
+    } else if ([vlcDataSource isKindOfClass:[VLCLibraryVideoTableViewDataSource class]]) {
+        VLCLibraryVideoTableViewDataSource * const videoTableViewDataSource = (VLCLibraryVideoTableViewDataSource *)vlcDataSource;
+        NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
+
+        if (tableView == groupsTableView) {
+            cellView.representedVideoLibrarySection = row;
+        }
+    }
+
+    return cellView;
+}
 
 @end
