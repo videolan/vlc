@@ -457,6 +457,8 @@ void MLListCache::asyncCountAndLoad()
                     emit endInsertRows();
                     emit localSizeChanged(m_cachedData->totalCount);
                 }
+                else
+                    emit localSizeChanged(0);
             }
 
             m_countTask = 0;
