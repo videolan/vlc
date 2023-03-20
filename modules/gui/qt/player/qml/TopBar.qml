@@ -392,6 +392,7 @@ FocusScope{
         Widgets.IconControlButton {
             id: menuSelector
 
+            anchors.verticalCenter: parent.verticalCenter
             visible: !root.showToolbar
             enabled: visible
             focus: visible
@@ -424,6 +425,7 @@ FocusScope{
         Widgets.IconControlButton {
             id: playlistButton
 
+            anchors.verticalCenter: parent.verticalCenter
             objectName: ControlListModel.PLAYLIST_BUTTON
             size: VLCStyle.icon_banner
             iconText: VLCIcons.playlist
