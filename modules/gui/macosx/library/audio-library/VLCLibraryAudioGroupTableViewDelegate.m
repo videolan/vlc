@@ -22,6 +22,11 @@
 
 #import "VLCLibraryAudioGroupTableViewDelegate.h"
 
+#import "VLCLibraryAlbumTableCellView.h"
+#import "VLCLibraryAudioDataSource.h"
+
+#import "library/VLCLibraryTableCellView.h"
+
 @implementation VLCLibraryAudioGroupTableViewDelegate
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
@@ -30,4 +35,25 @@
     // We don't want to select the outer cell, only the inner cells in the album view's table.
     return NO;
 }
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        return nil;
+    }
+
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    VLCLibraryAlbumTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
+
+    if (cellView == nil) {
+        cellView = [VLCLibraryAlbumTableCellView fromNibWithOwner:self];
+        cellView.identifier = VLCAudioLibraryCellIdentifier;
+    }
+
+    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[vlcDataSource libraryItemAtRow:row forTableView:tableView];
+    return cellView;
+}
+
 @end
