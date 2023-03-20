@@ -1,0 +1,25 @@
+From d12847294d570acc97790c7a02fb44a73850f347 Mon Sep 17 00:00:00 2001
+From: LIU Hao <lh_mouse@126.com>
+Date: Sat, 18 Mar 2023 17:19:02 +0800
+Subject: [PATCH 2/2] headers/dxvahd: Regenerate H from IDL
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/dxvahd.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mingw-w64-headers/include/dxvahd.h b/mingw-w64-headers/include/dxvahd.h
+index aaff9400c..6bcd753dd 100644
+--- a/mingw-w64-headers/include/dxvahd.h
++++ b/mingw-w64-headers/include/dxvahd.h
+@@ -344,6 +344,7 @@ typedef struct _DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA {
+             UINT RGB_Range : 1;
+             UINT YCbCr_Matrix : 1;
+             UINT YCbCr_xvYCC : 1;
++            UINT Reserved : 28;
+         } __C89_NAMELESSSTRUCTNAME;
+         UINT Value;
+     } __C89_NAMELESSUNIONNAME;
+-- 
+2.37.3.windows.1
+

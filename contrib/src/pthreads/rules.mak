@@ -11,12 +11,12 @@ PKGS += pthreads
 ifndef HAVE_VISUALSTUDIO
 PKGS += dxva dxvahd
 PKGS_ALL += dxva dxvahd
-ifeq ($(call mingw_at_least, 8), true)
-PKGS_FOUND += dxvahd
-endif # MINGW 8
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
+ifeq ($(call mingw_at_least, 11), true)
+PKGS_FOUND += dxvahd
+endif # MINGW 11
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += pthreads
 endif
@@ -35,6 +35,8 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 # pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	$(UNPACK)
+	$(APPLY) $(SRC)/pthreads/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
+	$(APPLY) $(SRC)/pthreads/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
 	$(MOVE)
 
 .pthreads: pthreads
