@@ -122,6 +122,22 @@ FocusScope {
 
     // Settings
 
+    contentWidth: {
+        var size = _effectiveCellWidth * nbItemPerRow - horizontalSpacing
+
+        return leftMargin + size + rightMargin
+    }
+
+    contentHeight: {
+        var size = getItemPos(_count - 1)[1] + rowHeight + _expandItemVerticalSpace
+
+        // NOTE: topMargin and headerHeight are included in root.getItemPos.
+        if (footerItem)
+            return size + footerItem.height + bottomMargin
+        else
+            return size + bottomMargin
+    }
+
     Accessible.role: Accessible.Table
 
     activeFocusOnTab: true
@@ -776,15 +792,6 @@ FocusScope {
 
             // Place the delegates after the expandItem
             _setupIndexes(forceRelayout, [topGridEndId, lastId], root._expandItemVerticalSpace)
-
-            // update contentWidth and contentHeight
-            var gridContentWidth = root._effectiveCellWidth * root.nbItemPerRow - root.horizontalSpacing
-            contentWidth = root.leftMargin + gridContentWidth + root.rightMargin
-
-            var gridContentHeight = root.getItemPos(root._count - 1)[1] + root.rowHeight + root._expandItemVerticalSpace
-            contentHeight = gridContentHeight
-                    + (footerItemLoader.item ? footerItemLoader.item.height : 0)
-                    + root.bottomMargin // topMargin and headerHeight is included in root.getItemPos
         }
 
         Connections {
