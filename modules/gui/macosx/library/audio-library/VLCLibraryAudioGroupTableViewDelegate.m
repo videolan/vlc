@@ -24,4 +24,10 @@
 
 @implementation VLCLibraryAudioGroupTableViewDelegate
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
+{
+    // We use this with nested table views, since the table view cell is the VLCLibraryAlbumTableCellView.
+    // We don't want to select the outer cell, only the inner cells in the album view's table.
+    return NO;
+}
 @end
