@@ -35,6 +35,7 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 
 NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
@@ -43,6 +44,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 @interface VLCLibraryCollectionViewAlbumSupplementaryDetailView () 
 {
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
+    VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryController *_libraryController;
 }
 
@@ -59,8 +61,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 - (void)awakeFromNib
 {
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
+    _tracksTableViewDelegate = [[VLCLibraryAlbumTracksTableViewDelegate alloc] init];
+
     _albumTracksTableView.dataSource = _tracksDataSource;
-    _albumTracksTableView.delegate = _tracksDataSource;
+    _albumTracksTableView.delegate = _tracksTableViewDelegate;
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
     
     _albumTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];

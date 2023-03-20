@@ -39,6 +39,7 @@
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
@@ -48,6 +49,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 {
     VLCLibraryController *_libraryController;
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
+    VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryTableView *_tracksTableView;
     NSTableColumn *_column;
 }
@@ -141,8 +143,9 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     _tracksTableView.backgroundColor = [NSColor clearColor];
 
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
+    _tracksTableViewDelegate = [[VLCLibraryAlbumTracksTableViewDelegate alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;
-    _tracksTableView.delegate = _tracksDataSource;
+    _tracksTableView.delegate = _tracksTableViewDelegate;
     _tracksTableView.doubleAction = @selector(tracksTableViewDoubleClickAction:);
     _tracksTableView.target = self;
 
