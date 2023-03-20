@@ -394,9 +394,9 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
 
     DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace = {
         .Usage = 0, // playback
-        .RGB_Range = true ? 0 : 1,
-        .YCbCr_xvYCC = true ? 1 : 0,
-        .YCbCr_Matrix = false ? 0 : 1,
+        .RGB_Range = /* full range */true ? 0 : 1,
+        .YCbCr_xvYCC = /* full range */true ? 1 : 0,
+        .YCbCr_Matrix = /* BT601 colorspace */ false ? 0 : 1,
     };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE, sizeof(colorspace), &colorspace);
 
