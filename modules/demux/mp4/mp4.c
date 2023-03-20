@@ -1258,13 +1258,14 @@ static int Open( vlc_object_t * p_this )
     /* now process each track and extract all useful information */
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        const MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
-        MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
+        const MP4_Box_t *p_trakbox = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
+        MP4_TrackSetup( p_demux, &p_sys->track[i], p_trakbox, true, !b_enabled_es );
+        mp4_track_t *p_track = &p_sys->track[i];
 
-        if( p_sys->track[i].b_ok && ! MP4_isMetadata(&p_sys->track[i]) )
+        if( p_track->b_ok && ! MP4_isMetadata(p_track) )
         {
             const char *psz_cat;
-            switch( p_sys->track[i].fmt.i_cat )
+            switch( p_track->fmt.i_cat )
             {
                 case( VIDEO_ES ):
                     psz_cat = "video";
@@ -1282,22 +1283,22 @@ static int Open( vlc_object_t * p_this )
             }
 
             msg_Dbg( p_demux, "adding track[Id 0x%x] %s (%s) language %s",
-                     p_sys->track[i].i_track_ID, psz_cat,
-                     p_sys->track[i].b_enable ? "enable":"disable",
-                     p_sys->track[i].fmt.psz_language ?
-                     p_sys->track[i].fmt.psz_language : "undef" );
+                     p_track->i_track_ID, psz_cat,
+                     p_track->b_enable ? "enable":"disable",
+                     p_track->fmt.psz_language ?
+                     p_track->fmt.psz_language : "undef" );
         }
-        else if( p_sys->track[i].b_ok && (p_sys->track[i].i_use_flags & USEAS_CHAPTERS) )
+        else if( p_track->b_ok && (p_track->i_use_flags & USEAS_CHAPTERS) )
         {
             msg_Dbg( p_demux, "using track[Id 0x%x] for chapter language %s",
-                     p_sys->track[i].i_track_ID,
-                     p_sys->track[i].fmt.psz_language ?
-                     p_sys->track[i].fmt.psz_language : "undef" );
+                     p_track->i_track_ID,
+                     p_track->fmt.psz_language ?
+                     p_track->fmt.psz_language : "undef" );
         }
         else
         {
             msg_Dbg( p_demux, "ignoring track[Id 0x%x] %d refs %x",
-                     p_sys->track[i].i_track_ID, p_sys->track[i].b_ok, p_sys->track[i].i_use_flags );
+                     p_track->i_track_ID, p_track->b_ok, p_track->i_use_flags );
         }
     }
 
