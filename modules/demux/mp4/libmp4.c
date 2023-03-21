@@ -3437,7 +3437,6 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     stream_t *p_stream_memory;
     z_stream z_data;
     uint8_t *p_data;
-    int i_result;
 #endif
 
     if( !( p_box->data.p_cmov = calloc(1, sizeof( MP4_Box_data_cmov_t ) ) ) )
@@ -3498,8 +3497,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     /* uncompress */
-    i_result = inflate( &z_data, Z_NO_FLUSH );
-    if( i_result != Z_OK && i_result != Z_STREAM_END )
+    if( inflate( &z_data, Z_FINISH ) != Z_STREAM_END )
     {
         msg_Err( p_stream, "read box: \"cmov\" error while uncompressing" );
         free( p_data );
