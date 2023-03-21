@@ -133,6 +133,13 @@ GLConvUpdate(const struct vlc_gl_interop *interop, uint32_t textures[],
                     (const char*)&dstDesc.Format, dstDesc.Format, hr);
             return VLC_EGENERIC;
         }
+
+        hr = IDirect3DDevice9Ex_PresentEx(d3d9_decoder->d3ddev.devex, NULL, NULL, NULL, NULL, D3DPRESENT_INTERVAL_IMMEDIATE);
+        if (FAILED(hr))
+        {
+            msg_Warn(interop->gl, "IDirect3DDevice9_Present failed. (0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
     }
     else
     {
