@@ -3419,8 +3419,6 @@ static int MP4_ReadBox_cmvd( stream_t *p_stream, MP4_Box_t *p_box )
     /* now copy compressed data */
     memcpy( p_box->data.p_cmvd->p_data, p_peek,i_read);
 
-    p_box->data.p_cmvd->b_compressed = 1;
-
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"cmvd\" compressed data size %d",
                       p_box->data.p_cmvd->i_compressed_size );
@@ -3498,7 +3496,6 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Warn( p_stream, "read box: \"cmov\" uncompressing data size "
                   "mismatch" );
     }
-    p_cmvd->data.p_cmvd->i_uncompressed_size = z_data.total_out;
 
     /* close zlib */
     if( inflateEnd( &z_data ) != Z_OK )
@@ -3507,17 +3504,11 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
                   "data (ignored)" );
     }
 
-    free( p_cmvd->data.p_cmvd->p_data );
-    p_cmvd->data.p_cmvd->p_data = p_data;
-    p_cmvd->data.p_cmvd->b_compressed = 0;
-
     msg_Dbg( p_stream, "read box: \"cmov\" box successfully uncompressed" );
 
     /* now create a memory stream */
-    p_stream_memory =
-        vlc_stream_MemoryNew( VLC_OBJECT(p_stream),
-                              p_cmvd->data.p_cmvd->p_data,
-                              p_cmvd->data.p_cmvd->i_uncompressed_size, true );
+    p_stream_memory = vlc_stream_MemoryNew( VLC_OBJECT(p_stream),
+                                            p_data, z_data.total_out, false );
 
     /* and read uncompressd moov */
     MP4_Box_t *p_moov =  MP4_ReadBox( p_stream_memory, NULL );

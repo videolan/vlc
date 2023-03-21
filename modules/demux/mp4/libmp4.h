@@ -1077,8 +1077,6 @@ typedef struct MP4_Box_data_cmvd_s
 {
     uint32_t i_uncompressed_size;
     uint32_t i_compressed_size;
-
-    int     b_compressed; /* Set to 1 if compressed data, 0 if uncompressed */
     uint8_t *p_data;
 
 } MP4_Box_data_cmvd_t;
