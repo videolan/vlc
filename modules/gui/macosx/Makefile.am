@@ -122,6 +122,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableView.h \
 	gui/macosx/library/VLCLibraryTableView.m \
+	gui/macosx/library/VLCLibraryTableViewDelegate.h \
+	gui/macosx/library/VLCLibraryTableViewDelegate.m \
 	gui/macosx/library/VLCLibraryTableCellView.h \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryTableCellViewProtocol.h \
