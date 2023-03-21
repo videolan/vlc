@@ -3447,7 +3447,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
           p_box->p_father->i_type != ATOM_foov ) )
     {
         msg_Warn( p_stream, "Read box: \"cmov\" box alone" );
-        return 1;
+        return 0;
     }
 
     if( !MP4_ReadBoxContainer( p_stream, p_box ) )
