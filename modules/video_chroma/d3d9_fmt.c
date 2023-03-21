@@ -28,6 +28,9 @@
 #include "d3d9_fmt.h"
 
 #include "../codec/avcodec/va_surface.h"
+#include "copy.h"
+
+#include <vlc_picture_pool.h>
 
 picture_sys_t *ActivePictureSys(picture_t *p_pic)
 {
@@ -254,4 +257,117 @@ int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
 error:
     D3D9_Destroy( hd3d );
     return VLC_EGENERIC;
+}
+
+
+static void DestroyPicture(picture_t *picture)
+{
+    ReleasePictureSys(picture->p_sys);
+
+    free(picture->p_sys);
+    free(picture);
+}
+
+int Direct3D9LockSurface(picture_t *picture)
+{
+    /* Lock the surface to get a valid pointer to the picture buffer */
+    D3DLOCKED_RECT d3drect;
+    HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
+    if (FAILED(hr)) {
+        return VLC_EGENERIC;
+    }
+
+    return picture_UpdatePlanes(picture, d3drect.pBits, d3drect.Pitch);
+}
+
+void Direct3D9UnlockSurface(picture_t *picture)
+{
+    /* Unlock the Surface */
+    HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
+    if (FAILED(hr)) {
+        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
+    }
+}
+
+/* */
+picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
+    d3d9_device_t *p_d3d9_dev, const d3d9_format_t *default_d3dfmt, const video_format_t *fmt, unsigned count)
+{
+    picture_pool_t*   pool = NULL;
+    picture_t**       pictures = NULL;
+    unsigned          picture_count = 0;
+
+    pictures = calloc(count, sizeof(*pictures));
+    if (!pictures)
+        goto error;
+
+    D3DFORMAT format;
+    switch (fmt->i_chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        format = MAKEFOURCC('P','0','1','0');
+        break;
+    case VLC_CODEC_D3D9_OPAQUE:
+        format = MAKEFOURCC('N','V','1','2');
+        break;
+    default:
+        if (!default_d3dfmt)
+            goto error;
+        format = default_d3dfmt->format;
+        break;
+    }
+
+    for (picture_count = 0; picture_count < count; ++picture_count)
+    {
+        picture_sys_t *picsys = malloc(sizeof(*picsys));
+        if (unlikely(picsys == NULL))
+            goto error;
+        memset(picsys, 0, sizeof(*picsys));
+
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3d9_dev->dev,
+                                                          fmt->i_width,
+                                                          fmt->i_height,
+                                                          format,
+                                                          D3DPOOL_DEFAULT,
+                                                          &picsys->surface,
+                                                          NULL);
+        if (FAILED(hr)) {
+           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           free(picsys);
+           goto error;
+        }
+
+        picture_resource_t resource = {
+            .p_sys = picsys,
+            .pf_destroy = DestroyPicture,
+        };
+
+        picture_t *picture = picture_NewFromResource(fmt, &resource);
+        if (unlikely(picture == NULL)) {
+            free(picsys);
+            goto error;
+        }
+
+        pictures[picture_count] = picture;
+    }
+
+    picture_pool_configuration_t pool_cfg;
+    memset(&pool_cfg, 0, sizeof(pool_cfg));
+    pool_cfg.picture_count = count;
+    pool_cfg.picture       = pictures;
+    if( !is_d3d9_opaque( fmt->i_chroma ) )
+    {
+        pool_cfg.lock = Direct3D9LockSurface;
+        pool_cfg.unlock = Direct3D9UnlockSurface;
+    }
+
+    pool = picture_pool_NewExtended( &pool_cfg );
+
+error:
+    if (pool == NULL && pictures) {
+        for (unsigned i=0;i<picture_count; ++i)
+            DestroyPicture(pictures[i]);
+    }
+    free(pictures);
+    return pool;
 }

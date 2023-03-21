@@ -67,6 +67,16 @@ typedef struct
     D3DCAPS9                caps;
 } d3d9_device_t;
 
+typedef struct
+{
+    const char   *name;
+    D3DFORMAT    format;    /* D3D format */
+    vlc_fourcc_t fourcc;    /* VLC fourcc */
+    uint32_t     rmask;
+    uint32_t     gmask;
+    uint32_t     bmask;
+} d3d9_format_t;
+
 #include "../codec/avcodec/va_surface.h"
 
 picture_sys_t *ActivePictureSys(picture_t *p_pic);
@@ -87,6 +97,18 @@ static inline void ReleasePictureSys(picture_sys_t *p_sys)
     FreeLibrary(p_sys->dxva2_dll);
 }
 
+static inline bool is_d3d9_opaque(vlc_fourcc_t chroma)
+{
+    switch (chroma)
+    {
+    case VLC_CODEC_D3D9_OPAQUE:
+    case VLC_CODEC_D3D9_OPAQUE_10B:
+        return true;
+    default:
+        return false;
+    }
+}
+
 HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, HWND,
                           const video_format_t *, d3d9_device_t *out);
 #define D3D9_CreateDevice(a,b,c,d,e) D3D9_CreateDevice( VLC_OBJECT(a), b, c, d, e )
@@ -98,5 +120,22 @@ int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
 void D3D9_Destroy(d3d9_handle_t *);
 
 int D3D9_FillPresentationParameters(d3d9_handle_t *, const video_format_t *, d3d9_device_t *);
+
+/**
+ * It locks the surface associated to the picture and get the surface
+ * descriptor which amongst other things has the pointer to the picture
+ * data and its pitch.
+ */
+int Direct3D9LockSurface(picture_t *picture);
+
+/**
+ * It unlocks the surface associated to the picture.
+ */
+void Direct3D9UnlockSurface(picture_t *picture);
+
+struct picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *, d3d9_device_t *,
+     const d3d9_format_t *, const video_format_t *, unsigned);
+
+
 
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */

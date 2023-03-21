@@ -126,16 +126,6 @@ static const vlc_fourcc_t d3d_subpicture_chromas[] = {
     0
 };
 
-typedef struct
-{
-    const char   *name;
-    D3DFORMAT    format;    /* D3D format */
-    vlc_fourcc_t fourcc;    /* VLC fourcc */
-    uint32_t     rmask;
-    uint32_t     gmask;
-    uint32_t     bmask;
-} d3d9_format_t;
-
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
@@ -188,9 +178,6 @@ static const d3d9_format_t *FindBufferFormat(vout_display_t *, D3DFORMAT);
 
 static int  Open(vlc_object_t *);
 
-static picture_pool_t *Direct3D9CreatePicturePool  (vlc_object_t *, d3d9_device_t *,
-     const d3d9_format_t *, const video_format_t *, unsigned);
-
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
@@ -230,18 +217,6 @@ static void Direct3D9RenderScene(vout_display_t *vd, d3d_region_t *, int, d3d_re
 
 /* */
 static int DesktopCallback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
-
-static bool is_d3d9_opaque(vlc_fourcc_t chroma)
-{
-    switch (chroma)
-    {
-    case VLC_CODEC_D3D9_OPAQUE:
-    case VLC_CODEC_D3D9_OPAQUE_10B:
-        return true;
-    default:
-        return false;
-    }
-}
 
 static HINSTANCE Direct3D9LoadShaderLibrary(void)
 {
@@ -402,126 +377,6 @@ static void Close(vlc_object_t *object)
     Direct3D9Destroy(vd->sys);
 
     free(vd->sys);
-}
-
-static void DestroyPicture(picture_t *picture)
-{
-    ReleasePictureSys(picture->p_sys);
-
-    free(picture->p_sys);
-    free(picture);
-}
-
-/**
- * It locks the surface associated to the picture and get the surface
- * descriptor which amongst other things has the pointer to the picture
- * data and its pitch.
- */
-static int Direct3D9LockSurface(picture_t *picture)
-{
-    /* Lock the surface to get a valid pointer to the picture buffer */
-    D3DLOCKED_RECT d3drect;
-    HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
-    if (FAILED(hr)) {
-        return VLC_EGENERIC;
-    }
-
-    CommonUpdatePicture(picture, NULL, d3drect.pBits, d3drect.Pitch);
-    return VLC_SUCCESS;
-}
-/**
- * It unlocks the surface associated to the picture.
- */
-static void Direct3D9UnlockSurface(picture_t *picture)
-{
-    /* Unlock the Surface */
-    HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
-    if (FAILED(hr)) {
-        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
-    }
-}
-
-/* */
-static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
-    d3d9_device_t *p_d3d9_dev, const d3d9_format_t *default_d3dfmt, const video_format_t *fmt, unsigned count)
-{
-    picture_pool_t*   pool = NULL;
-    picture_t**       pictures = NULL;
-    unsigned          picture_count = 0;
-
-    pictures = calloc(count, sizeof(*pictures));
-    if (!pictures)
-        goto error;
-
-    D3DFORMAT format;
-    switch (fmt->i_chroma)
-    {
-    case VLC_CODEC_D3D9_OPAQUE_10B:
-        format = MAKEFOURCC('P','0','1','0');
-        break;
-    case VLC_CODEC_D3D9_OPAQUE:
-        format = MAKEFOURCC('N','V','1','2');
-        break;
-    default:
-        if (!default_d3dfmt)
-            goto error;
-        format = default_d3dfmt->format;
-        break;
-    }
-
-    for (picture_count = 0; picture_count < count; ++picture_count)
-    {
-        picture_sys_t *picsys = malloc(sizeof(*picsys));
-        if (unlikely(picsys == NULL))
-            goto error;
-        memset(picsys, 0, sizeof(*picsys));
-
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3d9_dev->dev,
-                                                          fmt->i_width,
-                                                          fmt->i_height,
-                                                          format,
-                                                          D3DPOOL_DEFAULT,
-                                                          &picsys->surface,
-                                                          NULL);
-        if (FAILED(hr)) {
-           msg_Err(o, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
-           free(picsys);
-           goto error;
-        }
-
-        picture_resource_t resource = {
-            .p_sys = picsys,
-            .pf_destroy = DestroyPicture,
-        };
-
-        picture_t *picture = picture_NewFromResource(fmt, &resource);
-        if (unlikely(picture == NULL)) {
-            free(picsys);
-            goto error;
-        }
-
-        pictures[picture_count] = picture;
-    }
-
-    picture_pool_configuration_t pool_cfg;
-    memset(&pool_cfg, 0, sizeof(pool_cfg));
-    pool_cfg.picture_count = count;
-    pool_cfg.picture       = pictures;
-    if( !is_d3d9_opaque( fmt->i_chroma ) )
-    {
-        pool_cfg.lock = Direct3D9LockSurface;
-        pool_cfg.unlock = Direct3D9UnlockSurface;
-    }
-
-    pool = picture_pool_NewExtended( &pool_cfg );
-
-error:
-    if (pool == NULL && pictures) {
-        for (unsigned i=0;i<picture_count; ++i)
-            DestroyPicture(pictures[i]);
-    }
-    free(pictures);
-    return pool;
 }
 
 static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
