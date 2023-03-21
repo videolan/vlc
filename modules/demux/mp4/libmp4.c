@@ -3442,14 +3442,6 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     z_stream z_data;
     uint8_t *p_data;
 
-    if( !p_box->p_father ||
-        ( p_box->p_father->i_type != ATOM_moov &&
-          p_box->p_father->i_type != ATOM_foov ) )
-    {
-        msg_Warn( p_stream, "Read box: \"cmov\" box alone" );
-        return 0;
-    }
-
     if( !( p_box->data.p_cmov = calloc(1, sizeof( MP4_Box_data_cmov_t ) ) ) )
         return 0;
 
@@ -4934,7 +4926,6 @@ static const struct
 {
     /* Containers */
     { ATOM_moov,    MP4_ReadBoxContainer,     0 },
-    { ATOM_foov,    MP4_ReadBoxContainer,     0 },
     { ATOM_trak,    MP4_ReadBoxContainer,     ATOM_moov },
     { ATOM_trak,    MP4_ReadBoxContainer,     ATOM_foov },
     { ATOM_mdia,    MP4_ReadBoxContainer,     ATOM_trak },
@@ -4966,10 +4957,16 @@ static const struct
     { ATOM_mvex,    MP4_ReadBoxContainer,     ATOM_moov },
     { ATOM_mvex,    MP4_ReadBoxContainer,     ATOM_ftyp },
 
+    /* Quicktime compression */
+    { ATOM_foov,    MP4_ReadBoxContainer,     0 },
+    { ATOM_cmov,    MP4_ReadBox_cmov,         ATOM_foov },
+    { ATOM_cmov,    MP4_ReadBox_cmov,         ATOM_moov },
+    { ATOM_dcom,    MP4_ReadBox_dcom,         ATOM_cmov },
+    { ATOM_cmvd,    MP4_ReadBox_cmvd,         ATOM_cmov },
+
     /* specific box */
     { ATOM_ftyp,    MP4_ReadBox_ftyp,         0 },
     { ATOM_styp,    MP4_ReadBox_ftyp,         0 },
-    { ATOM_cmov,    MP4_ReadBox_cmov,         0 },
     { ATOM_mvhd,    MP4_ReadBox_mvhd,         ATOM_moov },
     { ATOM_mvhd,    MP4_ReadBox_mvhd,         ATOM_foov },
     { ATOM_tkhd,    MP4_ReadBox_tkhd,         ATOM_trak },
@@ -5003,9 +5000,7 @@ static const struct
     { ATOM_esds,    MP4_ReadBox_esds,         ATOM_mp4a },
     { ATOM_esds,    MP4_ReadBox_esds,         ATOM_mp4v },
     { ATOM_esds,    MP4_ReadBox_esds,         ATOM_mp4s },
-    { ATOM_dcom,    MP4_ReadBox_dcom,         0 },
     { ATOM_dfLa,    MP4_ReadBox_Binary,       ATOM_fLaC },
-    { ATOM_cmvd,    MP4_ReadBox_cmvd,         0 },
     { ATOM_av1C,    MP4_ReadBox_av1C,         ATOM_av01 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc1 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
