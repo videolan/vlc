@@ -5476,23 +5476,19 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
             goto error;
     }
 
-    MP4_Box_t *p_moov;
     MP4_Box_t *p_cmov;
-
     /* check if there is a cmov, if so replace
       compressed moov by  uncompressed one */
-    if( ( ( p_moov = MP4_BoxGet( p_vroot, "moov" ) ) &&
-          ( p_cmov = MP4_BoxGet( p_vroot, "moov/cmov" ) ) ) ||
-        ( ( p_moov = MP4_BoxGet( p_vroot, "foov" ) ) &&
-          ( p_cmov = MP4_BoxGet( p_vroot, "foov/cmov" ) ) ) )
+    if( ( p_cmov = MP4_BoxGet( p_vroot, "moov/cmov" ) ) ||
+        ( p_cmov = MP4_BoxGet( p_vroot, "foov/cmov" ) ) )
     {
-        /* rename the compressed moov as a box to skip */
-        p_moov->i_type = ATOM_skip;
-
+        MP4_Box_t *p_moov = MP4_BoxExtract( &p_vroot->p_first, p_cmov->p_father->i_type );
         /* get uncompressed p_moov */
         MP4_Box_t *p_umoov = MP4_BoxExtract( &p_cmov->p_first, ATOM_moov );
         /* make p_root father of this new moov */
         MP4_BoxAddChild( p_vroot, p_umoov );
+        /* Release old moov and compressed info */
+        MP4_BoxFree( p_moov );
     }
 
     return p_vroot;
