@@ -281,6 +281,7 @@ MP4_Box_t * MP4_BoxExtract( MP4_Box_t **pp_chain, uint32_t i_type )
         {
             *pp_chain = p_box->p_next;
             p_box->p_next = NULL;
+            p_box->p_father = NULL;
             return p_box;
         }
         pp_chain = &p_box->p_next;
