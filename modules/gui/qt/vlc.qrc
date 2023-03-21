@@ -82,6 +82,8 @@
         <file alias="VanillaObject.qml">util/qml/VanillaObject.qml</file>
         <file alias="NativeMenu.qml">util/qml/NativeMenu.qml</file>
         <file alias="MLContextMenu.qml">util/qml/MLContextMenu.qml</file>
+        <file alias="ListViewRev15.qml">util/qml/ListViewRev15.qml</file>
+        <file alias="ListViewRev11.qml">util/qml/ListViewRev11.qml</file>
     </qresource>
     <qresource prefix="/sd">
         <file alias="capture-card.svg">pixmaps/sd/capture-card.svg</file>
