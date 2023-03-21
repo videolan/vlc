@@ -342,6 +342,15 @@ void MainUI::registerQMLTypes()
         qmlRegisterType(QUrl("qrc:///util/TouchScreenTapHandlerRev11.qml"), uri, versionMajor, versionMinor, "TouchScreenTapHandlerCompat");
 #endif
 
+        qmlRegisterType(QUrl(QStringLiteral(
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+                            "qrc:///util/ListViewRev15.qml"
+#else
+                            "qrc:///util/ListViewRev11.qml"
+#endif
+                            )),
+                        uri, versionMajor, versionMinor, "ListViewCompat");
+
         qmlProtectModule(uri, versionMajor);
     }
 
