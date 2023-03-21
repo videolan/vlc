@@ -3509,6 +3509,11 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     /* now create a memory stream */
     p_stream_memory = vlc_stream_MemoryNew( VLC_OBJECT(p_stream),
                                             p_data, z_data.total_out, false );
+    if( !p_stream_memory )
+    {
+        free( p_data );
+        return 0;
+    }
 
     /* and read uncompressd moov */
     MP4_Box_t *p_moov =  MP4_ReadBox( p_stream_memory, NULL );
