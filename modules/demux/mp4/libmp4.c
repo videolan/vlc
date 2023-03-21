@@ -3488,6 +3488,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     if( inflate( &z_data, Z_FINISH ) != Z_STREAM_END )
     {
         msg_Err( p_stream, "read box: \"cmov\" error while uncompressing" );
+        inflateEnd( &z_data );
         free( p_data );
         return 0;
     }
