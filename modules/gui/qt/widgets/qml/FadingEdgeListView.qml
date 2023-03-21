@@ -22,7 +22,7 @@ import org.videolan.compat 0.1
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 
-ListView {
+ListViewCompat {
     id: root
 
     // backgroundColor is only needed for sub-pixel
