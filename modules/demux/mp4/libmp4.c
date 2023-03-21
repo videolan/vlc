@@ -3430,17 +3430,17 @@ static int MP4_ReadBox_cmvd( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
 {
+#ifndef HAVE_ZLIB
+    msg_Dbg( p_stream, "read box: \"cmov\" zlib unsupported" );
+    return 0;
+#else
+
     MP4_Box_t *p_dcom;
     MP4_Box_t *p_cmvd;
 
-#ifdef HAVE_ZLIB
     stream_t *p_stream_memory;
     z_stream z_data;
     uint8_t *p_data;
-#endif
-
-    if( !( p_box->data.p_cmov = calloc(1, sizeof( MP4_Box_data_cmov_t ) ) ) )
-        return 0;
 
     if( !p_box->p_father ||
         ( p_box->p_father->i_type != ATOM_moov &&
@@ -3449,6 +3449,9 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Warn( p_stream, "Read box: \"cmov\" box alone" );
         return 0;
     }
+
+    if( !( p_box->data.p_cmov = calloc(1, sizeof( MP4_Box_data_cmov_t ) ) ) )
+        return 0;
 
     if( !MP4_ReadBoxContainer( p_stream, p_box ) )
     {
@@ -3470,11 +3473,6 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
     }
 
-#ifndef HAVE_ZLIB
-    msg_Dbg( p_stream, "read box: \"cmov\" zlib unsupported" );
-    return 0;
-
-#else
     /* decompress data */
     /* allocate a new buffer */
     if( !( p_data = malloc( p_cmvd->data.p_cmvd->i_uncompressed_size ) ) )
