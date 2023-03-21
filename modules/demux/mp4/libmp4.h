@@ -1083,12 +1083,6 @@ typedef struct MP4_Box_data_cmvd_s
 
 } MP4_Box_data_cmvd_t;
 
-typedef struct MP4_Box_data_cmov_s
-{
-    struct MP4_Box_s *p_moov; /* uncompressed moov */
-
-} MP4_Box_data_cmov_t;
-
 typedef struct
 {
     uint32_t i_type;
@@ -1819,7 +1813,6 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_dcom_t *p_dcom;
     MP4_Box_data_cmvd_t *p_cmvd;
-    MP4_Box_data_cmov_t *p_cmov;
 
     MP4_Box_data_moviehintinformation_rtp_t *p_moviehintinformation_rtp;
 

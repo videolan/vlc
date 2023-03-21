@@ -3443,9 +3443,6 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     z_stream z_data;
     uint8_t *p_data;
 
-    if( !( p_box->data.p_cmov = calloc(1, sizeof( MP4_Box_data_cmov_t ) ) ) )
-        return 0;
-
     if( !MP4_ReadBoxContainer( p_stream, p_box ) )
     {
         return 0;
@@ -3522,15 +3519,18 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
                               p_cmvd->data.p_cmvd->i_uncompressed_size, true );
 
     /* and read uncompressd moov */
-    p_box->data.p_cmov->p_moov = MP4_ReadBox( p_stream_memory, NULL );
+    MP4_Box_t *p_moov =  MP4_ReadBox( p_stream_memory, NULL );
 
     vlc_stream_Delete( p_stream_memory );
+
+    if( p_moov )
+        MP4_BoxAddChild( p_box, p_moov );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"cmov\" compressed movie header completed");
 #endif
 
-    return p_box->data.p_cmov->p_moov ? 1 : 0;
+    return p_moov ? 1 : 0;
 #endif /* HAVE_ZLIB */
 }
 
@@ -5498,15 +5498,9 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         p_moov->i_type = ATOM_skip;
 
         /* get uncompressed p_moov */
-        p_moov = p_cmov->data.p_cmov->p_moov;
-        p_cmov->data.p_cmov->p_moov = NULL;
-
+        MP4_Box_t *p_umoov = MP4_BoxExtract( &p_cmov->p_first, ATOM_moov );
         /* make p_root father of this new moov */
-        p_moov->p_father = p_vroot;
-
-        /* insert this new moov box as first child of p_root */
-        p_moov->p_next = p_vroot->p_first;
-        p_vroot->p_first = p_moov;
+        MP4_BoxAddChild( p_vroot, p_umoov );
     }
 
     return p_vroot;
