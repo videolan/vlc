@@ -41,8 +41,8 @@
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 
-NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
-NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
+NSString * const VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 @interface VLCLibraryAlbumTableCellView ()
