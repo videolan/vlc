@@ -53,10 +53,6 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
 - (void)awakeFromNib
 {
-    if(@available(macOS 10.14, *)) {
-        self.playInstantlyButton.contentTintColor = [NSColor VLCAccentColor];
-    }
-
     self.playInstantlyButton.target = self;
     self.playInstantlyButton.action = @selector(playInstantly:);
 
