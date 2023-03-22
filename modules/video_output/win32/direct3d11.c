@@ -535,6 +535,48 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
 }
 #endif
 
+static int UpdateSamplers(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    D3D11_SAMPLER_DESC sampDesc;
+    memset(&sampDesc, 0, sizeof(sampDesc));
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    d3d11_device_lock(&sys->d3d_dev);
+
+    ID3D11SamplerState *d3dsampState[2];
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[0]);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+        d3d11_device_unlock(&sys->d3d_dev);
+        return VLC_EGENERIC;
+    }
+
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[1]);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+        ID3D11SamplerState_Release(d3dsampState[0]);
+        d3d11_device_unlock(&sys->d3d_dev);
+        return VLC_EGENERIC;
+    }
+
+    ID3D11DeviceContext_PSSetSamplers(sys->d3d_dev.d3dcontext, 0, 2, d3dsampState);
+    ID3D11SamplerState_Release(d3dsampState[0]);
+    ID3D11SamplerState_Release(d3dsampState[1]);
+
+    d3d11_device_unlock(&sys->d3d_dev);
+    return VLC_SUCCESS;
+}
+
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1768,34 +1810,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     UpdatePicQuadPosition(vd);
 
-    D3D11_SAMPLER_DESC sampDesc;
-    memset(&sampDesc, 0, sizeof(sampDesc));
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-    ID3D11SamplerState *d3dsampState[2];
-    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[0]);
-    if (FAILED(hr)) {
-      msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-      return VLC_EGENERIC;
-    }
-
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[1]);
-    if (FAILED(hr)) {
-      msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-      ID3D11SamplerState_Release(d3dsampState[0]);
-      return VLC_EGENERIC;
-    }
-
-    ID3D11DeviceContext_PSSetSamplers(sys->d3d_dev.d3dcontext, 0, 2, d3dsampState);
-    ID3D11SamplerState_Release(d3dsampState[0]);
-    ID3D11SamplerState_Release(d3dsampState[1]);
+    UpdateSamplers(vd);
 
     msg_Dbg(vd, "Direct3D11 resources created");
     return VLC_SUCCESS;
