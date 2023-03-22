@@ -29,6 +29,15 @@
 
 @implementation VLCLibraryAudioGroupTableViewDelegate
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.cellViewIdentifier = VLCAudioLibraryCellIdentifier;
+    }
+    return self;
+}
+
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
 {
     // We use this with nested table views, since the table view cell is the VLCLibraryAlbumTableCellView.
@@ -43,26 +52,6 @@
                                                                           viewForTableColumn:column
                                                                                          row:row];
     return cellView == nil ? -1 : cellView.height;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        return nil;
-    }
-
-    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
-
-    VLCLibraryAlbumTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryAlbumTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[vlcDataSource libraryItemAtRow:row forTableView:tableView];
-    return cellView;
 }
 
 @end
