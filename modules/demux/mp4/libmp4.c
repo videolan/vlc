@@ -3308,6 +3308,9 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET1BYTE( i_version );
     MP4_GET3BYTES( dummy ); VLC_UNUSED(dummy);
 
+    if( i_version > 1 )
+        MP4_READBOX_EXIT( 0 );
+
     MP4_GET4BYTES( count );
     if( count == 0 )
         MP4_READBOX_EXIT( 1 );
