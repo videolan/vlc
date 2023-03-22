@@ -259,6 +259,11 @@ void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
         item->help = qfut( help );
     else
         item->help.clear();
+    const char *help_html = module_get_help_html( mod );
+    if( help_html )
+        item->help_html = qfut( help_html );
+    else
+        item->help_html.clear();
 
     item->setText( 0, item->name );
     //item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
@@ -453,7 +458,7 @@ bool PrefsTreeItem::contains( const QString &text, Qt::CaseSensitivity cs )
 
     if ( name.contains( text, cs )
          || (!is_core && head.contains( text, cs ))
-         || help.contains( text, cs )
+         || (!help_html.isEmpty() ? help_html.contains( text, cs ) : help.contains( text, cs ))
        )
     {
         return true;
@@ -566,8 +571,19 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     title_line->setFrameShape(QFrame::HLine);
     title_line->setFrameShadow(QFrame::Sunken);
 
-    QLabel *helpLabel = new QLabel( node->help, this );
+    QLabel *helpLabel = new QLabel( this );
     helpLabel->setWordWrap( true );
+    if( node->help_html.isEmpty() )
+    {
+        helpLabel->setText( node->help );
+        helpLabel->setTextFormat( Qt::PlainText );
+    }
+    else
+    {
+        helpLabel->setText( node->help_html );
+        helpLabel->setTextFormat( Qt::RichText );
+        helpLabel->setOpenExternalLinks( true );
+    }
 
     global_layout->addWidget( titleLabel );
     global_layout->addWidget( title_line );

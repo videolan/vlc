@@ -77,6 +77,7 @@ public:
     AdvPrefsPanel *panel;
     QString name;
     QString help;
+    QString help_html;
     enum vlc_config_cat cat_id;
     enum vlc_config_subcat subcat_id;
     module_t *p_module;
