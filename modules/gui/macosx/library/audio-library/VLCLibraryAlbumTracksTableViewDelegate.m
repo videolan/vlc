@@ -28,25 +28,14 @@
 
 @implementation VLCLibraryAlbumTracksTableViewDelegate
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (instancetype)init
 {
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        return nil;
+    self = [super init];
+    if (self) {
+        self.cellViewIdentifier = VLCAudioLibrarySongCellIdentifier;
     }
-
-    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
-
-    VLCLibrarySongTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibrarySongCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibrarySongTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCAudioLibrarySongCellIdentifier;
-    }
-
-    cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)[vlcDataSource libraryItemAtRow:row
-                                                                                   forTableView:tableView];
-    return cellView;
+    return self;
 }
+
 
 @end
