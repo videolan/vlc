@@ -257,13 +257,9 @@ void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
     const char *help = module_get_help( mod );
     if( help )
         item->help = qfut( help );
-    else
-        item->help.clear();
     const char *help_html = module_get_help_html( mod );
     if( help_html )
         item->help_html = qfut( help_html );
-    else
-        item->help_html.clear();
 
     item->setText( 0, item->name );
     //item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
@@ -451,9 +447,7 @@ bool PrefsTreeItem::contains( const QString &text, Qt::CaseSensitivity cs )
     /* check the node itself (its name/longname/helptext) */
 
     QString head;
-    if( is_core )
-        head.clear();
-    else
+    if( !is_core )
         head = QString( qfut( module_GetLongName( p_module ) ) );
 
     if ( name.contains( text, cs )
