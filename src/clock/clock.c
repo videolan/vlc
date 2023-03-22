@@ -327,6 +327,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 /* System and stream ts should be incrementing */
                 if (stream_diff < 0)
                 {
+                    vlc_warning(main_clock->logger, "avstats: [CLOCK][RESET] ts=%" PRId64
+                                " system_diff=%"PRId64 " stream_diff=%" PRId64,
+                                vlc_tick_now(), system_diff, stream_diff);
+
                     vlc_warning(main_clock->logger, "resetting master clock: "
                                 "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
                                 system_diff, stream_diff);
@@ -338,6 +342,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 else if (instant_coeff > 1.0 + COEFF_THRESHOLD
                       || instant_coeff < 1.0 - COEFF_THRESHOLD)
                 {
+                    vlc_warning(main_clock->logger, "avstats: [CLOCK][RESET] ts=%" PRId64
+                                " system_diff=%"PRId64 " stream_diff=%" PRId64,
+                                vlc_tick_now(), system_diff, stream_diff);
+
                     vlc_warning(main_clock->logger, "resetting master clock: "
                                 "coefficient too unstable: %f", instant_coeff);
                     /* Reset and continue (calculate the offset from the
