@@ -42,6 +42,7 @@
 #import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistItem.h"
@@ -584,18 +585,9 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
-    NSPasteboardItem * const pboardItem = [[NSPasteboardItem alloc] init];
-
     const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
-    NSMutableArray * const encodedLibraryItemsArray = [NSMutableArray array];
 
-    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
-        [encodedLibraryItemsArray addObject:mediaItem];
-    }];
-
-    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
-    [pboardItem setData:data forType:VLCMediaLibraryMediaItemUTI];
-    return pboardItem;
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 #pragma mark - table view double click actions
