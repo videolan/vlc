@@ -32,6 +32,16 @@
 
 @implementation VLCLibraryAudioTableViewDelegate
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.cellViewIdentifier = VLCAudioLibraryCellIdentifier;
+        self.cellViewClass = [VLCLibraryTableCellView class];
+    }
+    return self;
+}
+
 - (NSView *)tableView:(NSTableView *)tableView
    viewForTableColumn:(NSTableColumn *)tableColumn
                   row:(NSInteger)row

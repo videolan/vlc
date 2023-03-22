@@ -35,6 +35,7 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = @"VLCVideoLibraryTableViewCellIdentifier";
+        self.cellViewClass = [VLCLibraryTableCellView class];
     }
     return self;
 }

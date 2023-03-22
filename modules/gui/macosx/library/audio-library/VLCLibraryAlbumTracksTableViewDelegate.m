@@ -22,8 +22,6 @@
 
 #import "VLCLibraryAlbumTracksTableViewDelegate.h"
 
-#import "library/VLCLibraryTableView.h"
-
 #import "library/audio-library/VLCLibrarySongTableCellView.h"
 
 @implementation VLCLibraryAlbumTracksTableViewDelegate
@@ -33,6 +31,7 @@
     self = [super init];
     if (self) {
         self.cellViewIdentifier = VLCAudioLibrarySongCellIdentifier;
+        self.cellViewClass = [VLCLibrarySongTableCellView class];
     }
     return self;
 }

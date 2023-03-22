@@ -25,6 +25,7 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableCellViewProtocol.h"
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryDataTypes.h"
 
 @implementation VLCLibraryTableViewDelegate
 
@@ -37,15 +38,14 @@
     NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
     NSAssert(vlcDataSource != nil, @"Should be a valid data source");
 
-    NSView * const cellView = [tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
-    if (![cellView conformsToProtocol:@protocol(VLCLibraryTableCellViewProtocol)]) {
-        return nil;
+    NSView<VLCLibraryTableCellViewProtocol> * cellView = (NSView<VLCLibraryTableCellViewProtocol> *)[tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
+
+    if (cellView == nil && [self.cellViewClass respondsToSelector:@selector(fromNibWithOwner:)]) {
+        cellView = [self.cellViewClass fromNibWithOwner:self];
+        cellView.identifier = self.cellViewIdentifier;
     }
 
-    NSView<VLCLibraryTableCellViewProtocol> * const libraryCellView = (NSView<VLCLibraryTableCellViewProtocol> *)cellView;
-
-    libraryCellView.representedItem = [vlcDataSource libraryItemAtRow:row
-                                                         forTableView:tableView];
+    [cellView setRepresentedItem:[vlcDataSource libraryItemAtRow:row forTableView:tableView]];
     return cellView;
 }
 
