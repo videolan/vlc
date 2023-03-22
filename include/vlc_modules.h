@@ -220,6 +220,14 @@ VLC_API const char *module_get_name(const module_t *m, bool longname) VLC_USED;
 VLC_API const char *module_get_help(const module_t *m) VLC_USED;
 
 /**
+ * Gets the help HTML for a module.
+ *
+ * \param m the module
+ * \return the help HTML
+ */
+VLC_API const char *module_get_help_html(const module_t *m) VLC_USED;
+
+/**
  * Gets the capability string of a module.
  *
  * \param m the module

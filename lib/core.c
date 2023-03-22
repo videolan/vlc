@@ -187,10 +187,12 @@ static libvlc_module_description_t *module_description_list_get(
         const char* shortname = module_GetShortName( p_module );
         const char* longname = module_GetLongName( p_module );
         const char* help = module_get_help( p_module );
+        const char* help_html = module_get_help_html( p_module );
         p_actual->psz_name = name ? strdup( name ) : NULL;
         p_actual->psz_shortname = shortname ? strdup( shortname ) : NULL;
         p_actual->psz_longname = longname ? strdup( longname ) : NULL;
         p_actual->psz_help = help ? strdup( help ) : NULL;
+        p_actual->psz_help_html = help_html ? strdup( help_html ) : NULL;
 
         p_actual->p_next = NULL;
         if ( p_previous )
@@ -214,6 +216,7 @@ void libvlc_module_description_list_release( libvlc_module_description_t *p_list
         free( p_actual->psz_shortname );
         free( p_actual->psz_longname );
         free( p_actual->psz_help );
+        free( p_actual->psz_help_html );
         p_before = p_actual;
         p_actual = p_before->p_next;
         free( p_before );

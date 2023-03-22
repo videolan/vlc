@@ -48,6 +48,7 @@ enum vlc_module_properties
     VLC_MODULE_DESCRIPTION,
     VLC_MODULE_HELP,
     VLC_MODULE_TEXTDOMAIN,
+    VLC_MODULE_HELP_HTML,
     /* Insert new VLC_MODULE_* here */
 
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
@@ -354,6 +355,10 @@ VLC_METADATA_EXPORTS
 
 #define set_help( help ) \
     if (vlc_module_set (VLC_MODULE_HELP, VLC_CHECKED_TYPE(const char *, help))) \
+        goto error;
+
+#define set_help_html( help_html ) \
+    if (vlc_module_set (VLC_MODULE_HELP_HTML, VLC_CHECKED_TYPE(const char *, help_html))) \
         goto error;
 
 #define set_capability( cap, score ) \

@@ -302,6 +302,7 @@ static int vlc_cache_load_module(vlc_plugin_t *plugin, block_t *file)
     LOAD_STRING(module->psz_shortname);
     LOAD_STRING(module->psz_longname);
     LOAD_STRING(module->psz_help);
+    LOAD_STRING(module->psz_help_html);
 
     LOAD_IMMEDIATE(module->i_shortcuts);
     if (module->i_shortcuts > MODULE_SHORTCUT_MAX)
@@ -582,6 +583,7 @@ static int CacheSaveModule(FILE *file, const module_t *module)
     SAVE_STRING(module->psz_shortname);
     SAVE_STRING(module->psz_longname);
     SAVE_STRING(module->psz_help);
+    SAVE_STRING(module->psz_help_html);
     SAVE_IMMEDIATE(module->i_shortcuts);
 
     for (size_t j = 0; j < module->i_shortcuts; j++)

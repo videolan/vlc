@@ -69,6 +69,11 @@ const char *module_get_help( const module_t *m )
     return m->psz_help;
 }
 
+const char *module_get_help_html( const module_t *m )
+{
+    return m->psz_help_html;
+}
+
 const char *module_get_capability (const module_t *m)
 {
     return (m->psz_capability != NULL) ? m->psz_capability : "none";

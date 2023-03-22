@@ -46,6 +46,7 @@ static void test_moduledescriptionlist (libvlc_module_description_t *list)
         assert (strlen (module->psz_shortname) );
         assert (module->psz_longname == NULL || strlen (module->psz_longname));
         assert (module->psz_help == NULL || strlen (module->psz_help));
+        assert (module->psz_help_html == NULL || strlen (module->psz_help_html));
         module = module->p_next;
     }    
 

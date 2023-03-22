@@ -29,6 +29,7 @@ Core:
      - Flat, new random implementation
      - Can't browse anymore (cf. mediatree)
  * Add support for dual subtitles selection (via the player)
+ * Support of HTML help (via the vlc_plugin.h:set_help_html macro)
 
 Audio output:
  * ALSA: HDMI passthrough support.

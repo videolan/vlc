@@ -86,7 +86,9 @@ struct module_t
      */
     const char *psz_shortname;                              /**< Module name */
     const char *psz_longname;                   /**< Module descriptive name */
-    const char *psz_help;        /**< Long help string for "special" modules */
+    const char *psz_help;        /**< Long help plain string for "special" modules */
+    const char *psz_help_html;   /**< Long help HTML string, shown instead of the plain help where it makes sense to render HTML.
+                                      Supports only a limited HTML4 subset, see https://doc.qt.io/qt-6/richtext-html-subset.html */
 
     const char *psz_capability;                              /**< Capability */
     int      i_score;                          /**< Score for the capability */

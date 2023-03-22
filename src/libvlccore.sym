@@ -263,6 +263,7 @@ module_config_get
 module_find
 module_get_capability
 module_get_help
+module_get_help_html
 module_get_name
 module_get_object
 module_get_score

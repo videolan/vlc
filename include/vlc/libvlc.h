@@ -498,6 +498,7 @@ typedef struct libvlc_module_description_t
     char *psz_shortname;
     char *psz_longname;
     char *psz_help;
+    char *psz_help_html;
     struct libvlc_module_description_t *p_next;
 } libvlc_module_description_t;
 
