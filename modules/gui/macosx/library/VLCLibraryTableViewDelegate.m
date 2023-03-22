@@ -22,6 +22,13 @@
 
 #import "VLCLibraryTableViewDelegate.h"
 
+#import "library/VLCLibraryTableCellView.h"
+
 @implementation VLCLibraryTableViewDelegate
+
+- (Class)cellViewType
+{
+    return [VLCLibraryTableCellView class];
+}
 
 @end
