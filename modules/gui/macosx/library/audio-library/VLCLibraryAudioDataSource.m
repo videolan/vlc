@@ -582,6 +582,22 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     return VLC_ML_SORTING_DEFAULT;
 }
 
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    NSPasteboardItem * const pboardItem = [[NSPasteboardItem alloc] init];
+
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+    NSMutableArray * const encodedLibraryItemsArray = [NSMutableArray array];
+
+    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
+        [encodedLibraryItemsArray addObject:mediaItem];
+    }];
+
+    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
+    [pboardItem setData:data forType:VLCMediaLibraryMediaItemUTI];
+    return pboardItem;
+}
+
 #pragma mark - table view double click actions
 
 - (void)groubSelectionDoubleClickAction:(id)sender

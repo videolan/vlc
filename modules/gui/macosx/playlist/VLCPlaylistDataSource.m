@@ -133,6 +133,10 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     /* check whether the receive data is a library item from the left-hand side */
     NSData *data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemPasteboardType];
     if (!data) {
+        data = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemUTI];
+    }
+
+    if (!data) {
         /* it's not, so check if it is a file handle from the Finder */
         id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
         if (propertyList == nil) {
