@@ -986,9 +986,6 @@ typedef struct MP4_Box_data_stdp_s
 
 typedef struct MP4_Box_data_elst_s
 {
-    uint8_t  i_version;
-    uint32_t i_flags;
-
     uint32_t i_entry_count;
 
     uint64_t *i_segment_duration; /* movie timescale */

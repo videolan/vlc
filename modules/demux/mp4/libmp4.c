@@ -3303,13 +3303,16 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_READBOX_ENTER( MP4_Box_data_elst_t, MP4_FreeBox_elst );
 
-    MP4_GETVERSIONFLAGS( p_box->data.p_elst );
-    MP4_GET4BYTES( count );
+    uint8_t i_version;
+    uint32_t dummy;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( dummy ); VLC_UNUSED(dummy);
 
+    MP4_GET4BYTES( count );
     if( count == 0 )
         MP4_READBOX_EXIT( 1 );
 
-    uint32_t i_entries_max = i_read / ((p_box->data.p_elst->i_version == 1) ? 20 : 12);
+    uint32_t i_entries_max = i_read / ((i_version == 1) ? 20 : 12);
     if( count > i_entries_max )
         count = i_entries_max;
 
@@ -3334,7 +3337,7 @@ static int MP4_ReadBox_elst( stream_t *p_stream, MP4_Box_t *p_box )
         uint64_t segment_duration;
         int64_t media_time;
 
-        if( p_box->data.p_elst->i_version == 1 )
+        if( i_version == 1 )
         {
             union { int64_t s; uint64_t u; } u;
 
