@@ -101,15 +101,7 @@
         return cellView;
     }
 
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:vlcDataSource];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryTableCellView fromNibWithOwner:vlcDataSource];
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    [cellView setRepresentedItem:libraryItem];
-    return cellView;
+    return [super tableView:tableView viewForTableColumn:tableColumn row:row];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification

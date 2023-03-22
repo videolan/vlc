@@ -22,9 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryTableViewDelegate.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioTableViewDelegate : NSObject <NSTableViewDelegate>
+@interface VLCLibraryAudioTableViewDelegate : VLCLibraryTableViewDelegate
 
 @end
 
