@@ -33,21 +33,23 @@ FocusScope {
     // Properties
 
     readonly property real minimumWidth: {
-        var minimumWidth = 0
         var count = repeater.count
+
+        if (count === 0)
+            return 0
+
+        var size = 0
 
         for (var i = 0; i < count; ++i) {
             var item = repeater.itemAt(i)
 
-            if (item.minimumWidth !== undefined)
-                minimumWidth += item.minimumWidth
+            if (item.minimumWidth === undefined)
+                size += item.implicitWidth
             else
-                minimumWidth += item.implicitWidth
+                size += item.minimumWidth
         }
 
-        minimumWidth += ((count - 1) * playerControlLayout.spacing)
-
-        return minimumWidth
+        return size + ((count - 1) * playerControlLayout.spacing)
     }
 
     property bool rightAligned: false
