@@ -503,6 +503,9 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "late_flush");
 
+        msg_Info(aout, "avstats: [RENDER][AUDIO][FLUSH] ts=%" PRId64 " drift=%" PRId64,
+                 vlc_tick_now(), drift);
+
         if (!stream->sync.discontinuity)
             msg_Warn (aout, "playback way too late (%"PRId64"): "
                       "flushing buffers", drift);
@@ -524,6 +527,8 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
         {
             if (tracer != NULL)
                 vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_silence");
+            msg_Info(aout, "avstats: [RENDER][AUDIO][SILENCE] ts=%" PRId64 " drift=%" PRId64,
+                     vlc_tick_now(), drift);
 
             msg_Warn (aout, "playback way too early (%"PRId64"): "
                       "playing silence", drift);
