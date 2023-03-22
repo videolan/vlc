@@ -25,7 +25,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *VLCMediaLibraryMediaItemPasteboardType;
+extern NSString * const VLCMediaLibraryMediaItemPasteboardType;
+extern NSString * const VLCMediaLibraryMediaItemUTI;
 
 @class VLCMediaLibraryMediaItem;
 @class VLCMediaLibraryAlbum;

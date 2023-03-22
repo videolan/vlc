@@ -50,7 +50,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (void)prepareForUse
 {
-    [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, VLCPlaylistItemPasteboardType, NSFilenamesPboardType]];
+    [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, VLCMediaLibraryMediaItemUTI, VLCPlaylistItemPasteboardType, NSFilenamesPboardType]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView

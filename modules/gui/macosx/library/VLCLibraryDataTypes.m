@@ -29,7 +29,8 @@
 
 #import <vlc_url.h>
 
-NSString *VLCMediaLibraryMediaItemPasteboardType = @"VLCMediaLibraryMediaItemPasteboardType";
+NSString * const VLCMediaLibraryMediaItemPasteboardType = @"VLCMediaLibraryMediaItemPasteboardType";
+NSString * const VLCMediaLibraryMediaItemUTI = @"org.videolan.vlc.VLCMediaLibraryMediaItem";
 
 const CGFloat VLCMediaLibrary4KWidth = 3840.;
 const CGFloat VLCMediaLibrary4KHeight = 2160.;
