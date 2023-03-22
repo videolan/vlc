@@ -1004,7 +1004,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (sys->log_level >= 4)
             render_start = mdate();
         if (sys->renderFence == UINT64_MAX)
-            sys->renderFence;
+            sys->renderFence = 0;
         else
             sys->renderFence++;
 
