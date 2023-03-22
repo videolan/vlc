@@ -258,6 +258,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
     if (unlikely(aout == NULL))
         return NULL;
 
+    msg_Info(aout, "avstats: [RENDER][AUDIO][NEW] ts=%" PRId64,
+             vlc_tick_now());
+
     aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_init (&owner->lock);
@@ -775,6 +778,9 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
     {
         filter_fmt->i_format = fmt->i_format = formats[i];
         owner->main_stream = stream;
+        msg_Info(aout, "avstats: [RENDER][AUDIO][START] ts=%" PRId64,
+                 vlc_tick_now());
+
         ret = aout->start(aout, fmt);
         if (ret != 0)
             owner->main_stream = NULL;
