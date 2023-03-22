@@ -325,7 +325,7 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 double instant_coeff = system_diff / (double) stream_diff * rate;
 
                 /* System and stream ts should be incrementing */
-                if (system_diff < 0 || stream_diff < 0)
+                if (stream_diff < 0)
                 {
                     vlc_warning(main_clock->logger, "resetting master clock: "
                                 "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
@@ -344,8 +344,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                      * current point) */
                     vlc_clock_context_reset(context);
                 }
-                else
+                else if (system_diff > 0)
                 {
+                    /* If system_diff < 0, we're still evaluating the input
+                     * speed and the value is not correct yet. */
                     AvgUpdate(&context->coeff_avg, instant_coeff);
                     context->coeff = AvgGet(&context->coeff_avg);
                 }
