@@ -22,12 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryTableCellViewProtocol.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCTrackingView;
 @class VLCMediaLibraryMediaItem;
 
-@interface VLCLibrarySongTableCellView : NSTableCellView
+@interface VLCLibrarySongTableCellView : NSTableCellView<VLCLibraryTableCellViewProtocol>
 
 extern NSString *VLCAudioLibrarySongCellIdentifier;
 

@@ -235,6 +235,14 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     [_tracksTableView reloadData];
 }
 
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)libraryItem;
+    if (album != nil) {
+        [self setRepresentedAlbum:album];
+    }
+}
+
 - (void)tracksTableViewDoubleClickAction:(id)sender
 {
     if (!_libraryController) {

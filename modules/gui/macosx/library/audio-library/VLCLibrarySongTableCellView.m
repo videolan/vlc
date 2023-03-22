@@ -98,4 +98,12 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
 }
 
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)libraryItem;
+    if (mediaItem != nil) {
+        [self setRepresentedMediaItem:mediaItem];
+    }
+}
+
 @end

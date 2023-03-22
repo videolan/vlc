@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryTableCellViewProtocol.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
@@ -29,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol VLCMediaLibraryItemProtocol;
 @class VLCInputItem;
 
-@interface VLCLibraryTableCellView : NSTableCellView
+@interface VLCLibraryTableCellView : NSTableCellView<VLCLibraryTableCellViewProtocol>
 
 + (instancetype)fromNibWithOwner:(id)owner;
 
