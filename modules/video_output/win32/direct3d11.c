@@ -69,6 +69,14 @@ static void Close(vlc_object_t *);
 #define HW_BLENDING_LONGTEXT N_(\
     "Try to use hardware acceleration for subtitle/OSD blending.")
 
+#define UPSCALE_MODE_TEXT N_("Video Upscaling Mode")
+#define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
+
+static const char *const ppsz_upscale_mode[] = {
+    "linear", "point" };
+static const char *const ppsz_upscale_mode_text[] = {
+    N_("Linear Sampler"), N_("Point Sampler") };
+
 vlc_module_begin ()
     set_shortname("Direct3D11")
     set_description(N_("Direct3D11 video output"))
@@ -83,10 +91,19 @@ vlc_module_begin ()
     add_integer("winrt-swapchain",     0x0, NULL, NULL, true) /* IDXGISwapChain1*     */
         change_volatile()
 
+    add_string("d3d11-upscale-mode", "linear", UPSCALE_MODE_TEXT, UPSCALE_MODE_LONGTEXT, false)
+        change_string_list(ppsz_upscale_mode, ppsz_upscale_mode_text)
+
     set_capability("vout display", 300)
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
 vlc_module_end ()
+
+enum d3d11_upscale
+{
+    upscale_LinearSampler,
+    upscale_PointSampler,
+};
 
 struct vout_display_sys_t
 {
@@ -130,6 +147,9 @@ struct vout_display_sys_t
     const d3d_format_t       *d3dregion_format;
     int                      d3dregion_count;
     picture_t                **d3dregions;
+
+    // upscaling
+    enum d3d11_upscale       upscaleMode;
 };
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
@@ -551,7 +571,10 @@ static int UpdateSamplers(vout_display_t *vd)
     d3d11_device_lock(&sys->d3d_dev);
 
     ID3D11SamplerState *d3dsampState[2];
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+    if (sys->upscaleMode == upscale_PointSampler)
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    else
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
     hr = ID3D11Device_CreateSamplerState(sys->d3d_dev.d3ddevice, &sampDesc, &d3dsampState[0]);
     if (FAILED(hr)) {
         msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
@@ -1431,6 +1454,18 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         if (err != VLC_SUCCESS)
             return err;
     }
+
+    char *psz_upscale = var_InheritString(vd, "d3d11-upscale-mode");
+    if (strcmp("linear", psz_upscale) == 0)
+        sys->upscaleMode = upscale_LinearSampler;
+    else if (strcmp("point", psz_upscale) == 0)
+        sys->upscaleMode = upscale_PointSampler;
+    else
+    {
+        msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
+        sys->upscaleMode = upscale_LinearSampler;
+    }
+    free(psz_upscale);
 
     video_format_Copy(&sys->pool_fmt, &fmt);
 
