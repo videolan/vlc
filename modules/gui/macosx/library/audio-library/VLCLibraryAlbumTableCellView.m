@@ -42,7 +42,9 @@
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 
 NSString * const VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+NSString * const VLCLibraryAlbumTableCellTableViewIdentifier = @"VLCLibraryAlbumTableCellTableViewIdentifier";
 NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
+
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 @interface VLCLibraryAlbumTableCellView ()
@@ -130,6 +132,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 - (void)setupTracksTableView
 {
     _tracksTableView = [[VLCLibraryTableView alloc] initWithFrame:NSZeroRect];
+    _tracksTableView.identifier = VLCLibraryAlbumTableCellTableViewIdentifier;
     _column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
     _column.width = [self expectedTableViewWidth];
     _column.maxWidth = MAXFLOAT;
@@ -163,6 +166,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextField);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(handleTableViewSelectionIsChanging:)
+                               name:NSTableViewSelectionIsChangingNotification
+                             object:nil];
 }
 
 - (void)prepareForReuse
@@ -254,6 +263,19 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     NSInteger clickedRow = _tracksTableView.clickedRow;
     if (clickedRow < trackCount) {
         [_libraryController appendItemToPlaylist:tracks[_tracksTableView.clickedRow] playImmediately:YES];
+    }
+}
+
+- (void)handleTableViewSelectionIsChanging:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    NSTableView * const tableView = notification.object;
+    NSAssert(tableView, @"Table view selection changing notification should carry valid table view");
+
+    if (tableView != _tracksTableView &&
+        tableView.identifier == VLCLibraryAlbumTableCellTableViewIdentifier) {
+
+        [_tracksTableView deselectAll:self];
     }
 }
 
