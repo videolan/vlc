@@ -544,9 +544,7 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
  **************************************************************************/
 void libvlc_media_list_player_retain(libvlc_media_list_player_t * p_mlp)
 {
-    if (!p_mlp)
-        return;
-
+    assert(p_mlp);
     vlc_atomic_rc_inc(&p_mlp->rc);
 }
 
