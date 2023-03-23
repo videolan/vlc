@@ -292,12 +292,6 @@ static void send_parsed_changed( libvlc_media_t *p_md,
     event.type = libvlc_MediaParsedChanged;
     event.u.media_parsed_changed.new_status = new_status;
     libvlc_event_send( &p_md->event_manager, &event );
-
-    libvlc_media_list_t *p_subitems = p_md->p_subitems;
-    /* notify the media list */
-    libvlc_media_list_lock( p_subitems );
-    libvlc_media_list_internal_end_reached( p_subitems );
-    libvlc_media_list_unlock( p_subitems );
 }
 
 /**

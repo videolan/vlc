@@ -172,12 +172,10 @@ enum libvlc_event_e {
     libvlc_MediaListItemDeleted = 0x202,
 
     /**
-     * A \link #libvlc_media_list_t media list\endlink has reached the
-     * end.
-     * All \link #libvlc_media_t items\endlink were either added (in
-     * case of a \ref libvlc_media_discoverer_t) or parsed (preparser).
+     * Removed: libvlc_MediaListEndReached = 0x204
+     * Use libvlc_MediaParsedChanged to known when a media_list
+     * attached to a media has been parsed
      */
-    libvlc_MediaListEndReached = 0x204,
 
     /**
      * Playback of a \link #libvlc_media_list_player_t media list

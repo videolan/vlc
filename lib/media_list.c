@@ -85,17 +85,6 @@ notify_item_deletion( libvlc_media_list_t * p_mlist,
     libvlc_event_send( &p_mlist->event_manager, &event );
 }
 
-/* LibVLC internal */
-void libvlc_media_list_internal_end_reached( libvlc_media_list_t * p_mlist )
-{
-    libvlc_event_t event;
-
-    event.type = libvlc_MediaListEndReached;
-
-    /* Send the event */
-    libvlc_event_send( &p_mlist->event_manager, &event );
-}
-
 /**************************************************************************
  *       static mlist_is_writable (private)
  **************************************************************************/
