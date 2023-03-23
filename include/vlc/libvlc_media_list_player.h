@@ -78,8 +78,9 @@ LIBVLC_API void
  * libvlc_media_list_player_release() to decrement reference count.
  *
  * \param p_mlp media player list object
+ * \return the same object
  */
-LIBVLC_API void
+LIBVLC_API libvlc_media_list_player_t *
     libvlc_media_list_player_retain( libvlc_media_list_player_t *p_mlp );
 
 /**

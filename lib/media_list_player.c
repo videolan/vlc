@@ -542,10 +542,11 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
 /**************************************************************************
  *        retain (Public)
  **************************************************************************/
-void libvlc_media_list_player_retain(libvlc_media_list_player_t * p_mlp)
+libvlc_media_list_player_t *libvlc_media_list_player_retain(libvlc_media_list_player_t * p_mlp)
 {
     assert(p_mlp);
     vlc_atomic_rc_inc(&p_mlp->rc);
+    return p_mlp;
 }
 
 /**************************************************************************
