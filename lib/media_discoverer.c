@@ -168,11 +168,6 @@ libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
 LIBVLC_API void
 libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 {
-    libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
-    libvlc_media_list_lock( p_mlist );
-    libvlc_media_list_internal_end_reached( p_mlist );
-    libvlc_media_list_unlock( p_mlist );
-
     vlc_sd_Destroy( p_mdis->p_sd );
     p_mdis->p_sd = NULL;
 }
