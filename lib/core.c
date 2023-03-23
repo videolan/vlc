@@ -82,11 +82,12 @@ error:
     return NULL;
 }
 
-void libvlc_retain( libvlc_instance_t *p_instance )
+libvlc_instance_t *libvlc_retain( libvlc_instance_t *p_instance )
 {
     assert( p_instance != NULL );
 
     vlc_atomic_rc_inc( &p_instance->ref_count );
+    return p_instance;
 }
 
 void libvlc_release( libvlc_instance_t *p_instance )
