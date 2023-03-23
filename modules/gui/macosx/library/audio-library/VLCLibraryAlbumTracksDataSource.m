@@ -22,7 +22,9 @@
 
 #import "VLCLibraryAlbumTracksDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/audio-library/VLCLibrarySongTableCellView.h"
 
 const CGFloat VLCLibraryTracksRowHeight = 40.;
 
@@ -47,6 +49,13 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
     }
 
     return 0;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
