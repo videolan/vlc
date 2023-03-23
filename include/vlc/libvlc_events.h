@@ -164,28 +164,20 @@ enum libvlc_event_e {
      * \link #libvlc_media_list_t media list\endlink.
      */
     libvlc_MediaListItemAdded=0x200,
-    /**
-     * A \link #libvlc_media_t media item\endlink is about to get
-     * added to a \link #libvlc_media_list_t media list\endlink.
-     */
-    libvlc_MediaListWillAddItem,
+
     /**
      * A \link #libvlc_media_t media item\endlink was deleted from
      * a \link #libvlc_media_list_t media list\endlink.
      */
-    libvlc_MediaListItemDeleted,
-    /**
-     * A \link #libvlc_media_t media item\endlink is about to get
-     * deleted from a \link #libvlc_media_list_t media list\endlink.
-     */
-    libvlc_MediaListWillDeleteItem,
+    libvlc_MediaListItemDeleted = 0x202,
+
     /**
      * A \link #libvlc_media_list_t media list\endlink has reached the
      * end.
      * All \link #libvlc_media_t items\endlink were either added (in
      * case of a \ref libvlc_media_discoverer_t) or parsed (preparser).
      */
-    libvlc_MediaListEndReached,
+    libvlc_MediaListEndReached = 0x204,
 
     /**
      * Playback of a \link #libvlc_media_list_player_t media list
@@ -325,17 +317,7 @@ typedef struct libvlc_event_t
         {
             libvlc_media_t * item;
             int index;
-        } media_list_will_add_item;
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
         } media_list_item_deleted;
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
-        } media_list_will_delete_item;
 
         /* media list player */
         struct
