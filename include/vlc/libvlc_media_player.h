@@ -191,8 +191,9 @@ LIBVLC_API void libvlc_media_player_release( libvlc_media_player_t *p_mi );
  * libvlc_media_player_release() to decrement reference count.
  *
  * \param p_mi media player object
+ * \return the same object
  */
-LIBVLC_API void libvlc_media_player_retain( libvlc_media_player_t *p_mi );
+LIBVLC_API libvlc_media_player_t *libvlc_media_player_retain( libvlc_media_player_t *p_mi );
 
 /**
  * Set the media that will be used by the media_player. If any,

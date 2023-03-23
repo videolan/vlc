@@ -871,10 +871,11 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
  *
  * Caller must hold the lock.
  **************************************************************************/
-void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
+libvlc_media_player_t *libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
     assert( p_mi );
     vlc_atomic_rc_inc( &p_mi->rc );
+    return p_mi;
 }
 
 /**************************************************************************
