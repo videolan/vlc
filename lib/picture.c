@@ -135,9 +135,10 @@ static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* att
     return pic;
 }
 
-void libvlc_picture_retain( libvlc_picture_t* pic )
+libvlc_picture_t *libvlc_picture_retain( libvlc_picture_t* pic )
 {
     vlc_atomic_rc_inc( &pic->rc );
+    return pic;
 }
 
 void libvlc_picture_release( libvlc_picture_t* pic )
