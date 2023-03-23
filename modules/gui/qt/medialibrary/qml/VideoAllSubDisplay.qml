@@ -89,9 +89,11 @@ VideoAll {
 
     function setCurrentItemFocus(reason) {
         if (headerItem && headerItem.focus)
-            headerItem.forceActiveFocus(reason)
+            headerItem.forceActiveFocus(reason) // continue watching section
+        else if (currentItem.setCurrentItemFocus)
+            currentItem.setCurrentItemFocus(reason) // grid or list view
         else
-            currentItem.setCurrentItemFocus(reason)
+            currentItem.forceActiveFocus(reason) // empty label
     }
 
     // VideoAll events reimplementation
