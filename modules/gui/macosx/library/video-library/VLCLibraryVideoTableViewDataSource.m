@@ -33,7 +33,9 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/CompatibilityFixes.h"
+
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 
 @interface VLCLibraryVideoTableViewDataSource ()
 {
@@ -103,6 +105,13 @@
     }
     
     return 0;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
