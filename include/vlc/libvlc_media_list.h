@@ -56,8 +56,9 @@ LIBVLC_API void
  * Retain reference to a media list
  *
  * \param p_ml a media list created with libvlc_media_list_new()
+ * \return the same object
  */
-LIBVLC_API void
+LIBVLC_API libvlc_media_list_t *
     libvlc_media_list_retain( libvlc_media_list_t *p_ml );
 
 /**

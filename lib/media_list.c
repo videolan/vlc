@@ -203,9 +203,10 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
  *
  * Increase an object refcount.
  **************************************************************************/
-void libvlc_media_list_retain( libvlc_media_list_t * p_mlist )
+libvlc_media_list_t *libvlc_media_list_retain( libvlc_media_list_t * p_mlist )
 {
     vlc_atomic_rc_inc( &p_mlist->rc );
+    return p_mlist;
 }
 
 /**************************************************************************
