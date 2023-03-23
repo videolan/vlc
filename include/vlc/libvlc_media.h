@@ -413,8 +413,9 @@ LIBVLC_API void libvlc_media_add_option_flag(
  * media descriptor object.
  *
  * \param p_md the media descriptor
+ * \return the same object
  */
-LIBVLC_API void libvlc_media_retain( libvlc_media_t *p_md );
+LIBVLC_API libvlc_media_t *libvlc_media_retain( libvlc_media_t *p_md );
 
 /**
  * Decrement the reference count of a media descriptor object. If the

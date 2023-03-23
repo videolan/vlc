@@ -641,10 +641,11 @@ void libvlc_media_release( libvlc_media_t *p_md )
 }
 
 // Retain a media descriptor object
-void libvlc_media_retain( libvlc_media_t *p_md )
+libvlc_media_t *libvlc_media_retain( libvlc_media_t *p_md )
 {
     assert (p_md);
     vlc_atomic_rc_inc( &p_md->rc );
+    return p_md;
 }
 
 // Duplicate a media descriptor object
