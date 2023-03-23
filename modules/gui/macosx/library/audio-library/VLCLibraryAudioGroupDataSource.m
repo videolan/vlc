@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAudioGroupDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
+
 #import "main/VLCMain.h"
 
 #import "library/VLCLibraryDataTypes.h"
@@ -89,6 +91,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     return nil;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
+
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
