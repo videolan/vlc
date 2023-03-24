@@ -1,15 +1,15 @@
---- ./build/make/configure.sh.original  2020-08-10 15:46:20.000000000 +0200
-+++ ./build/make/configure.sh   2020-08-10 15:54:53.000000000 +0200
-@@ -996,7 +996,7 @@ EOF
+--- libvpx-1.13.0/build/make/configure.sh	2023-02-07 20:33:51.000000000 -0500
++++ libvpx-1.13.0-new/build/make/configure.sh	2023-03-24 11:41:25.477967730 -0400
+@@ -1119,7 +1119,7 @@
  
-         darwin*)
+         darwin)
            if ! enabled external_build; then
 -            XCRUN_FIND="xcrun --sdk iphoneos --find"
 +            XCRUN_FIND="xcrun --find"
              CXX="$(${XCRUN_FIND} clang++)"
              CC="$(${XCRUN_FIND} clang)"
              AR="$(${XCRUN_FIND} ar)"
-@@ -1015,7 +1015,7 @@ EOF
+@@ -1138,7 +1138,7 @@
              add_cflags -arch ${tgt_isa}
              add_ldflags -arch ${tgt_isa}
  

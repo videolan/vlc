@@ -1,11 +1,12 @@
-diff --git a/build/make/configure.sh b/build/make/configure.sh
-index 581042e38..5b282d666 100644
---- a/build/make/configure.sh
-+++ b/build/make/configure.sh
-@@ -861,100 +861,6 @@ process_common_toolchain() {
-   # PIC is probably what we want when building shared libs
-   enabled shared && soft_enable pic
+--- libvpx-1.13.0/build/make/configure.sh	2023-02-07 20:33:51.000000000 -0500
++++ libvpx-1.13.0-new/build/make/configure.sh	2023-03-24 11:22:57.841614048 -0400
+@@ -858,103 +858,6 @@
+       ;;
+   esac
  
+-  # PIC is probably what we want when building shared libs
+-  enabled shared && soft_enable pic
+-
 -  # Minimum iOS version for all target platforms (darwin and iphonesimulator).
 -  # Shared library framework builds are only possible on iOS 8 and later.
 -  if enabled shared; then
@@ -85,7 +86,7 @@ index 581042e38..5b282d666 100644
 -      add_cflags  "-mmacosx-version-min=10.15"
 -      add_ldflags "-mmacosx-version-min=10.15"
 -      ;;
--    *-darwin2[0-1]-*)
+-    *-darwin2[0-2]-*)
 -      add_cflags  "-arch ${toolchain%%-*}"
 -      add_ldflags "-arch ${toolchain%%-*}"
 -      ;;
@@ -103,7 +104,7 @@ index 581042e38..5b282d666 100644
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1143,12 +1049,6 @@ EOF
+@@ -1143,12 +1046,6 @@
                add_cflags -isysroot ${alt_libc}
              fi
  
