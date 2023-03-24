@@ -101,6 +101,8 @@ HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet
     HLSRepresentation *rep = new (std::nothrow) HLSRepresentation(adaptSet);
     if(rep)
     {
+        rep->addAttribute(new TimescaleAttr(Timescale(1000000)));
+
         if(uriAttr)
         {
             std::string uri;
@@ -154,7 +156,6 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     HLSRepresentation *rep  = createRepresentation(adaptSet, tag);
     if(rep)
     {
-        rep->addAttribute(new TimescaleAttr(Timescale(1000000)));
         parseSegments(p_obj, rep, tagslist);
         adaptSet->addRepresentation(rep);
     }
