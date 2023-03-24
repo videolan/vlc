@@ -101,7 +101,7 @@ HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet
     HLSRepresentation *rep = new (std::nothrow) HLSRepresentation(adaptSet);
     if(rep)
     {
-        rep->addAttribute(new TimescaleAttr(Timescale(1000000)));
+        rep->addAttribute(new TimescaleAttr(Timescale(CLOCK_FREQ)));
 
         if(uriAttr)
         {
