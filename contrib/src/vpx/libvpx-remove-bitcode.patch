@@ -1,8 +1,6 @@
-diff --git a/build/make/configure.sh b/build/make/configure.sh
-index d05d0fa12..0ebf74039 100644
---- a/build/make/configure.sh
-+++ b/build/make/configure.sh
-@@ -1129,12 +1129,6 @@ EOF
+--- libvpx-1.13.0/build/make/configure.sh	2023-02-07 20:33:51.000000000 -0500
++++ libvpx-1.13.0-new/build/make/configure.sh	2023-03-24 11:19:11.230089669 -0400
+@@ -1166,12 +1166,6 @@
                  fi
                  ;;
              esac
@@ -13,5 +11,5 @@ index d05d0fa12..0ebf74039 100644
 -              check_add_ldflags -fembed-bitcode
 -            fi
            fi
-
-           asm_conversion_cmd="${source_path}/build/make/ads2gas_apple.pl"
+ 
+           asm_conversion_cmd="${source_path_mk}/build/make/ads2gas_apple.pl"
