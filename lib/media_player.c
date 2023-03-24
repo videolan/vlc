@@ -2431,17 +2431,18 @@ static void player_timer_on_update(const struct vlc_player_timer_point *point,
 
     const libvlc_media_player_time_point_t libpoint = PLAYER_TIME_CORE_TO_LIB(point);
 
-    p_mi->timer.on_update(&libpoint, p_mi->timer.cbs_data);
+    p_mi->timer.cbs->on_update(p_mi->timer.cbs_data, &libpoint);
 }
 
 static void player_timer_on_paused(vlc_tick_t system_date, void *data)
 {
     libvlc_media_player_t *p_mi = data;
 
-    if (p_mi->timer.on_paused == NULL)
+    if (p_mi->timer.cbs->on_paused == NULL)
         return;
 
-    p_mi->timer.on_paused(US_FROM_VLC_TICK(system_date), p_mi->timer.cbs_data);
+    p_mi->timer.cbs->on_paused(p_mi->timer.cbs_data,
+                               US_FROM_VLC_TICK(system_date));
 }
 
 static void player_timer_on_seek(const struct vlc_player_timer_point *point,
@@ -2449,18 +2450,18 @@ static void player_timer_on_seek(const struct vlc_player_timer_point *point,
 {
     libvlc_media_player_t *p_mi = data;
 
-    if (p_mi->timer.on_seek == NULL)
+    if (p_mi->timer.cbs->on_seek == NULL)
         return;
 
     if (point != NULL)
     {
         const libvlc_media_player_time_point_t libpoint = PLAYER_TIME_CORE_TO_LIB(point);
-        p_mi->timer.on_seek(&libpoint, p_mi->timer.cbs_data);
+        p_mi->timer.cbs->on_seek(p_mi->timer.cbs_data, &libpoint);
         p_mi->timer.seeking = true;
     }
     else
     {
-        p_mi->timer.on_seek(NULL, p_mi->timer.cbs_data);
+        p_mi->timer.cbs->on_seek(p_mi->timer.cbs_data, NULL);
         p_mi->timer.seeking = false;
     }
 }
@@ -2468,12 +2469,13 @@ static void player_timer_on_seek(const struct vlc_player_timer_point *point,
 int
 libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
                                int64_t min_period_us,
-                               libvlc_media_player_watch_time_on_update on_update,
-                               libvlc_media_player_watch_time_on_paused on_paused,
-                               libvlc_media_player_watch_time_on_seek on_seek,
+                               const struct libvlc_media_player_watch_time_cbs *cbs,
                                void *cbs_data)
 {
-    assert(on_update != NULL);
+    assert(cbs != NULL && cbs->on_update != NULL);
+
+    /* No different versions to handle for now */
+    assert(cbs->version <= 0);
 
     static const struct vlc_player_timer_cbs player_timer_cbs = {
         .on_update = player_timer_on_update,
@@ -2492,9 +2494,7 @@ libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
         return -1;
     }
 
-    p_mi->timer.on_update = on_update;
-    p_mi->timer.on_paused = on_paused;
-    p_mi->timer.on_seek = on_seek;
+    p_mi->timer.cbs = cbs;
     p_mi->timer.cbs_data = cbs_data;
     p_mi->timer.seeking = false;
 

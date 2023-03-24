@@ -50,9 +50,7 @@ struct libvlc_media_player_t
 
     struct {
         vlc_player_timer_id *id;
-        libvlc_media_player_watch_time_on_update on_update;
-        libvlc_media_player_watch_time_on_paused on_paused;
-        libvlc_media_player_watch_time_on_seek on_seek;
+        const struct libvlc_media_player_watch_time_cbs *cbs;
         void *cbs_data;
         bool seeking;
     } timer;

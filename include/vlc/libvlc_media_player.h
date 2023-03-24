@@ -3119,60 +3119,76 @@ typedef struct libvlc_media_player_time_point_t
 } libvlc_media_player_time_point_t;
 
 /**
- * Callback prototype that notify when the player state or time changed.
- *
- * Get notified when the time is updated by the input or output source. The
- * input source is the 'demux' or the 'access_demux'. The output source are
- * audio and video outputs: an update is received each time a video frame is
- * displayed or an audio sample is written. The delay between each updates may
- * depend on the input and source type (it can be every 5ms, 30ms, 1s or
- * 10s...). Users of this timer may need to update the position at a higher
- * frequency from their own mainloop via
- * libvlc_media_player_time_point_interpolate().
- *
- * \warning It is forbidden to call any Media Player functions from here.
- *
- * \param value always valid, the time corresponding to the state
- * \param data opaque pointer set by libvlc_media_player_watch_time()
+ * struct defining callbacks for libvlc_media_player_watch_time()
  */
-typedef void (*libvlc_media_player_watch_time_on_update)(
-        const libvlc_media_player_time_point_t *value, void *data);
+struct libvlc_media_player_watch_time_cbs {
+    /** 
+     * Version of struct libvlc_media_player_watch_time_cbs
+     */
+    uint32_t version;
 
-/**
- * Callback prototype that notify when the timer is paused.
- *
- * This event is sent when the player is paused or stopping. The player
- * user should stop its "interpolate" timer.
- *
- * \note libvlc_media_player_watch_time_on_update() can be called when paused
- * for those 2 reasons:
- * - playback is resumed (libvlc_media_player_time_point_t.system_date is valid)
- * - a track, likely video (next-frame) is outputted when paused
- *   (libvlc_media_player_time_point_t.system_date = INT64_MAX)
- *
- * \warning It is forbidden to call any Media Player functions from here.
- *
- * \param system_date_us system date, in us, of this event, only valid (> 0)
- * when paused. It can be used to interpolate the last updated point to this
- * date in order to get the last paused ts/position.
- * \param data opaque pointer set by libvlc_media_player_watch_time()
- */
-typedef void (*libvlc_media_player_watch_time_on_paused)(
-        int64_t system_date_us, void *data);
+    /**
+     * Callback prototype that notify when the player state or time changed.
+     *
+     * Get notified when the time is updated by the input or output source. The
+     * input source is the 'demux' or the 'access_demux'. The output source are
+     * audio and video outputs: an update is received each time a video frame is
+     * displayed or an audio sample is written. The delay between each updates may
+     * depend on the input and source type (it can be every 5ms, 30ms, 1s or
+     * 10s...). Users of this timer may need to update the position at a higher
+     * frequency from their own mainloop via
+     * libvlc_media_player_time_point_interpolate().
+     *
+     * \note Mandatory (can't be NULL),
+     * available since version 0
+     *
+     * \warning It is forbidden to call any Media Player functions from here.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_watch_time()
+     * \param value always valid, the time corresponding to the state
+     */
+    void (*on_update)(void *opaque,
+                      const libvlc_media_player_time_point_t *value);
 
-/**
- * Callback prototype that notify when the player is seeking or finished
- * seeking
- *
- * \warning It is forbidden to call any Media Player functions from here.
- *
- * \note It is not possible to receive points via on_update() while seeking.
- *
- * \param value point of the seek request or NULL when seeking is finished
- * \param data opaque pointer set by libvlc_media_player_watch_time()
- */
-typedef void (*libvlc_media_player_watch_time_on_seek)(
-        const libvlc_media_player_time_point_t *value, void *data);
+    /**
+     * Callback prototype that notify when the timer is paused.
+     *
+     * This event is sent when the player is paused or stopping. The player
+     * user should stop its "interpolate" timer.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     * \note libvlc_media_player_watch_time_on_update() can be called when
+     * paused for those 2 reasons:
+     * - playback is resumed (libvlc_media_player_time_point_t.system_date is
+     *   valid)
+     * - a track, likely video (next-frame) is outputted when paused
+     *   (libvlc_media_player_time_point_t.system_date = INT64_MAX)
+     *
+     * \warning It is forbidden to call any Media Player functions from here.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_watch_time()
+     * \param system_date_us system date, in us, of this event, only valid (>
+     * 0) when paused. It can be used to interpolate the last updated point to
+     * this date in order to get the last paused ts/position.
+     */
+    void (*on_paused)(void *opaque, int64_t system_date_us);
+
+    /**
+     * Callback prototype that notify when the player is seeking or finished
+     * seeking.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \warning It is forbidden to call any Media Player functions from here.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_watch_time()
+     * \param value point of the seek request or NULL when seeking is finished.
+     */
+    void (*on_seek)(void *opaque,
+                    const libvlc_media_player_time_point_t *value);
+};
 
 /**
  * Watch for times updates
@@ -3185,20 +3201,18 @@ typedef void (*libvlc_media_player_watch_time_on_seek)(
  * \param min_period_us corresponds to the minimum period, in us, between each
  * updates, use it to avoid flood from too many source updates, set it to 0 to
  * receive all updates.
- * \param on_update callback to listen to update events (must not be NULL)
- * \param on_paused callback to listen to paused events (can be NULL)
- * \param on_seek callback to listen to seek events (can be NULL)
- * \param cbs_data opaque pointer used by the callbacks
+ * \param cbs callback to listen to events (can't be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until
+ * libvlc_media_player_unwatch_time() is called.
+ * \param cbs_opaque opaque pointer used by the callbacks
  * \return 0 on success, -1 on error (allocation error, or if already watching)
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API int
 libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
                                int64_t min_period_us,
-                               libvlc_media_player_watch_time_on_update on_update,
-                               libvlc_media_player_watch_time_on_paused on_paused,
-                               libvlc_media_player_watch_time_on_seek on_seek,
-                               void *cbs_data);
+                               const struct libvlc_media_player_watch_time_cbs *cbs,
+                               void *cbs_opaque);
 
 /**
  * Unwatch time updates
