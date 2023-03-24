@@ -36,9 +36,7 @@
 typedef struct
 {
     void *opaque;
-    libvlc_media_read_cb read_cb;
-    libvlc_media_seek_cb seek_cb;
-    libvlc_media_close_cb close_cb;
+    const struct libvlc_media_open_cbs *cbs;
     uint64_t size;
 } access_sys_t;
 
@@ -50,7 +48,7 @@ static ssize_t Read(stream_t *access, void *buf, size_t len)
     static_assert(PTRDIFF_MAX == SSIZE_MAX,
                   "libvlc_media_read_cb type mismatch");
 
-    ptrdiff_t val = sys->read_cb(sys->opaque, buf, len);
+    ptrdiff_t val = sys->cbs->read(sys->opaque, buf, len);
 
     if (val < 0) {
         msg_Err(access, "read error");
@@ -64,9 +62,9 @@ static int Seek(stream_t *access, uint64_t offset)
 {
     access_sys_t *sys = access->p_sys;
 
-    assert(sys->seek_cb != NULL);
+    assert(sys->cbs->seek != NULL);
 
-    if (sys->seek_cb(sys->opaque, offset) != 0)
+    if (sys->cbs->seek(sys->opaque, offset) != 0)
         return VLC_EGENERIC;
    return VLC_SUCCESS;
 }
@@ -78,7 +76,7 @@ static int Control(stream_t *access, int query, va_list args)
     switch (query)
     {
         case STREAM_CAN_SEEK:
-            *va_arg(args, bool *) = sys->seek_cb != NULL;
+            *va_arg(args, bool *) = sys->cbs->seek != NULL;
             break;
 
         case STREAM_CAN_FASTSEEK:
@@ -87,7 +85,7 @@ static int Control(stream_t *access, int query, va_list args)
 
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
-            *va_arg(args, bool *) = sys->seek_cb != NULL;
+            *va_arg(args, bool *) = sys->cbs->seek != NULL;
             break;
 
         case STREAM_GET_SIZE:
@@ -110,13 +108,6 @@ static int Control(stream_t *access, int query, va_list args)
     return VLC_SUCCESS;
 }
 
-static int open_cb_default(void *opaque, void **datap, uint64_t *sizep)
-{
-    *datap = opaque;
-    (void) sizep;
-    return 0;
-}
-
 static int Open(vlc_object_t *object)
 {
     stream_t *access = (stream_t *)object;
@@ -125,30 +116,25 @@ static int Open(vlc_object_t *object)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    libvlc_media_open_cb open_cb;
     void *opaque;
-
     opaque = var_InheritAddress(access, "imem-data");
-    open_cb = var_InheritAddress(access, "imem-open");
+    sys->cbs = var_InheritAddress(access, "imem-cbs");
     sys->opaque = NULL;
-    sys->read_cb = var_InheritAddress(access, "imem-read");
-    sys->seek_cb = var_InheritAddress(access, "imem-seek");
-    sys->close_cb = var_InheritAddress(access, "imem-close");
     sys->size = UINT64_MAX;
 
-    if (open_cb == NULL)
-        open_cb = open_cb_default;
-    if (sys->read_cb == NULL)
+    if (sys->cbs->read == NULL)
         return VLC_EGENERIC;
 
-    if (open_cb(opaque, &sys->opaque, &sys->size)) {
+    if (sys->cbs->open == NULL)
+        sys->opaque = opaque;
+    else if (sys->cbs->open(opaque, &sys->opaque, &sys->size)) {
         msg_Err(access, "open error");
         return VLC_EGENERIC;
     }
 
     access->pf_read = Read;
     access->pf_block = NULL;
-    access->pf_seek = (sys->seek_cb != NULL) ? Seek : NULL;
+    access->pf_seek = (sys->cbs->seek != NULL) ? Seek : NULL;
     access->pf_control = Control;
 
     access->p_sys = sys;
@@ -160,8 +146,8 @@ static void Close(vlc_object_t *object)
     stream_t *access = (stream_t *)object;
     access_sys_t *sys = access->p_sys;
 
-    if (sys->close_cb != NULL)
-        sys->close_cb(sys->opaque);
+    if (sys->cbs->close != NULL)
+        sys->cbs->close(sys->opaque);
 }
 
 vlc_module_begin()

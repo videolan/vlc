@@ -431,22 +431,21 @@ libvlc_media_t *libvlc_media_new_fd(int fd)
 }
 
 // Create a media with custom callbacks to read the data from
-libvlc_media_t *libvlc_media_new_callbacks(libvlc_media_open_cb open_cb,
-                                           libvlc_media_read_cb read_cb,
-                                           libvlc_media_seek_cb seek_cb,
-                                           libvlc_media_close_cb close_cb,
-                                           void *opaque)
+libvlc_media_t *libvlc_media_new_callbacks(const struct libvlc_media_open_cbs *cbs,
+                                           void *cbs_opaque)
 {
+    assert(cbs != NULL && cbs->read != NULL);
+
+    /* No different versions to handle for now */
+    assert(cbs->version <= 0);
+
     libvlc_media_t *m = libvlc_media_new_location("imem://");
     if (unlikely(m == NULL))
         return NULL;
 
-    assert(read_cb != NULL);
-    input_item_AddOpaque(m->p_input_item, "imem-data", opaque);
-    input_item_AddOpaque(m->p_input_item, "imem-open", open_cb);
-    input_item_AddOpaque(m->p_input_item, "imem-read", read_cb);
-    input_item_AddOpaque(m->p_input_item, "imem-seek", seek_cb);
-    input_item_AddOpaque(m->p_input_item, "imem-close", close_cb);
+    input_item_AddOpaque(m->p_input_item, "imem-data", cbs_opaque);
+    input_item_AddOpaque(m->p_input_item, "imem-cbs", (void *) cbs);
+
     return m;
 }
 

@@ -216,60 +216,81 @@ typedef struct libvlc_media_slave_t
 #define libvlc_media_filestat_size 1
 
 /**
- * Callback prototype to open a custom bitstream input media.
- *
- * The same media item can be opened multiple times. Each time, this callback
- * is invoked. It should allocate and initialize any instance-specific
- * resources, then store them in *datap. The instance resources can be freed
- * in the @ref libvlc_media_close_cb callback.
- *
- * \param opaque private pointer as passed to libvlc_media_new_callbacks()
- * \param datap storage space for a private data pointer [OUT]
- * \param sizep byte length of the bitstream or UINT64_MAX if unknown [OUT]
- *
- * \note For convenience, *datap is initially NULL and *sizep is initially 0.
- *
- * \return 0 on success, non-zero on error. In case of failure, the other
- * callbacks will not be invoked and any value stored in *datap and *sizep is
- * discarded.
+ * struct defining callbacks for libvlc_media_new_callbacks()
  */
-typedef int (*libvlc_media_open_cb)(void *opaque, void **datap,
-                                    uint64_t *sizep);
+struct libvlc_media_open_cbs
+{
+    /** 
+     * Version of struct libvlc_media_open_cbs
+     */
+    uint32_t version;
 
-/**
- * Callback prototype to read data from a custom bitstream input media.
- *
- * \param opaque private pointer as set by the @ref libvlc_media_open_cb
- *               callback
- * \param buf start address of the buffer to read data into
- * \param len bytes length of the buffer
- *
- * \return strictly positive number of bytes read, 0 on end-of-stream,
- *         or -1 on non-recoverable error
- *
- * \note If no data is immediately available, then the callback should sleep.
- * \warning The application is responsible for avoiding deadlock situations.
- */
-typedef ptrdiff_t (*libvlc_media_read_cb)(void *opaque, unsigned char *buf,
-                                         size_t len);
+    /**
+     * Callback prototype to open a custom bitstream input media.
+     *
+     * The same media item can be opened multiple times. Each time, this callback
+     * is invoked. It should allocate and initialize any instance-specific
+     * resources, then store them in *datap. The instance resources can be freed
+     * in the @ref close callback.
+     *
+     * \param cbs_opaque private pointer as passed to libvlc_media_new_callbacks()
+     * \param datap storage space for a private data pointer [OUT]
+     * \param sizep byte length of the bitstream or UINT64_MAX if unknown [OUT]
+     *
+     * \note For convenience, *datap is initially NULL and *sizep is initially 0.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \note If NULL, the opaque pointer will be passed to read_cb,
+     * seek_cb and close_cb, and the stream size will be treated as unknown.
+     *
+     * \return 0 on success, non-zero on error. In case of failure, the other
+     * callbacks will not be invoked and any value stored in *datap and *sizep is
+     * discarded.
+     */
+    int (*open)(void *cbs_opaque, void **datap, uint64_t *sizep);
 
-/**
- * Callback prototype to seek a custom bitstream input media.
- *
- * \param opaque private pointer as set by the @ref libvlc_media_open_cb
- *               callback
- * \param offset absolute byte offset to seek to
- * \return 0 on success, -1 on error.
- */
-typedef int (*libvlc_media_seek_cb)(void *opaque, uint64_t offset);
+    /**
+     * Callback prototype to read data from a custom bitstream input media.
+     *
+     * \param data private pointer as set by the @ref open callback
+     * \param buf start address of the buffer to read data into
+     * \param len bytes length of the buffer
+     *
+     * \note Mandatory (can't be NULL),
+     * available since version 0
+     *
+     * \return strictly positive number of bytes read, 0 on end-of-stream,
+     *         or -1 on non-recoverable error
+     *
+     * \note If no data is immediately available, then the callback should sleep.
+     * \warning The application is responsible for avoiding deadlock situations.
+     */
+    ptrdiff_t (*read)(void *data, unsigned char *buf, size_t len);
 
-/**
- * Callback prototype to close a custom bitstream input media.
- *
- * \param opaque private pointer as set by the @ref libvlc_media_open_cb
- *               callback
- */
-typedef void (*libvlc_media_close_cb)(void *opaque);
+    /**
+     * Callback prototype to seek a custom bitstream input media.
+     *
+     * \note Optional (can be NULL if seeking is not supported),
+     * available since version 0
+     *
+     * \param data private pointer as set by the @ref open callback
+     * \param offset absolute byte offset to seek to
+     * \return 0 on success, -1 on error.
+     */
+    int (*seek)(void *data, uint64_t offset);
+
+    /**
+     * Callback prototype to close a custom bitstream input media.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param data private pointer as set by the @ref open callback
+     */
+    void (*close)(void *data);
+};
 
 /**
  * Create a media with a certain given media resource location,
@@ -325,16 +346,12 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_fd(int fd);
 /**
  * Create a media with custom callbacks to read the data from.
  *
- * \param open_cb callback to open the custom bitstream input media
- * \param read_cb callback to read data (must not be NULL)
- * \param seek_cb callback to seek, or NULL if seeking is not supported
- * \param close_cb callback to close the media, or NULL if unnecessary
- * \param opaque data pointer for the open callback
+ * \param cbs callback to setup the media (can't be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until all
+ * player instances that were supplied this media item are stopped.
+ * \param cbs_opaque opaque pointer for the open callback
  *
  * \return the newly created media or NULL on error
- *
- * \note If open_cb is NULL, the opaque pointer will be passed to read_cb,
- * seek_cb and close_cb, and the stream size will be treated as unknown.
  *
  * \note The callbacks may be called asynchronously (from another thread).
  * A single stream instance need not be reentrant. However the open_cb needs to
@@ -343,16 +360,15 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_fd(int fd);
  * \warning The callbacks may be used until all or any player instances
  * that were supplied the media item are stopped.
  *
+ * \warning The function prototype changed between LibVLC 3.0.0 and LibVLC 4.0.0
+ *
  * \see libvlc_media_release
  *
- * \version LibVLC 3.0.0 and later.
+ * \version LibVLC 3.0.0 and later
  */
-LIBVLC_API libvlc_media_t *libvlc_media_new_callbacks(
-                                   libvlc_media_open_cb open_cb,
-                                   libvlc_media_read_cb read_cb,
-                                   libvlc_media_seek_cb seek_cb,
-                                   libvlc_media_close_cb close_cb,
-                                   void *opaque );
+LIBVLC_API libvlc_media_t *
+libvlc_media_new_callbacks(const struct libvlc_media_open_cbs *cbs,
+                           void *cbs_opaque);
 
 /**
  * Create a media as an empty node with a given name.
