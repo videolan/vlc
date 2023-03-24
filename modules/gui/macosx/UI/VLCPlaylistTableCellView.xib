@@ -14,7 +14,7 @@
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
                     <rect key="frame" x="142" y="32" width="37" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="ZPw-XO-XD1">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="ZPw-XO-XD1">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -22,7 +22,7 @@
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
                     <rect key="frame" x="142" y="46" width="37" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="aCe-ia-0Ww">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="aCe-ia-0Ww">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -57,7 +57,7 @@
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPv-k2-6XS">
                     <rect key="frame" x="142" y="18" width="37" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="jZ4-pa-K3T">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="jZ4-pa-K3T">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
