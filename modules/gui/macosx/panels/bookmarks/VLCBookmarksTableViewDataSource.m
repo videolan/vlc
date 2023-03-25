@@ -22,6 +22,40 @@
 
 #import "VLCBookmarksTableViewDataSource.h"
 
+#import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
+
+#import "main/VLCMain.h"
+
+#import <vlc_media_library.h>
+
+@interface VLCBookmarksTableViewDataSource ()
+{
+    vlc_ml_bookmark_list_t *_bookmarks;
+    vlc_medialibrary_t *_mediaLibrary;
+}
+@end
+
 @implementation VLCBookmarksTableViewDataSource
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _mediaLibrary = vlc_ml_instance_get(getIntf());
+    }
+    return self;
+}
+
+- (void)setLibraryItemId:(const int64_t)libraryItemId
+{
+    if (libraryItemId == _libraryItemId) {
+        return;
+    }
+
+    _libraryItemId = libraryItemId;
+    _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, libraryItemId);
+}
 
 @end
