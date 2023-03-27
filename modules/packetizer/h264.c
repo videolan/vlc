@@ -164,6 +164,17 @@ static const uint8_t p_h264_startcode[3] = { 0x00, 0x00, 0x01 };
 /*****************************************************************************
  * Helpers
  *****************************************************************************/
+static void LastAppendXPSCopy( const block_t *p_block, block_t ***ppp_last )
+{
+    if( !p_block )
+        return;
+    block_t *p_dup = block_Alloc( p_block->i_buffer );
+    if( p_dup )
+    {
+        memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
+        block_ChainLastAppend( ppp_last, p_dup );
+    }
+}
 
 static void StoreSPS( decoder_sys_t *p_sys, uint8_t i_id,
                       block_t *p_block, h264_sequence_parameter_set_t *p_sps )
@@ -881,18 +892,13 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         for( int i = 0; i <= H264_SPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_sps); i++ )
         {
-            if( p_sys->sps[i].p_block )
-                block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->sps[i].p_block ) );
+            LastAppendXPSCopy( p_sys->sps[i].p_block, &pp_xpsnal_tail );
             /* 7.4.1.2.3,  shall be the next NAL unit after a sequence parameter set NAL unit
              * having the same value of seq_parameter_set_id */
-            if( p_sys->spsext[i].p_block )
-                block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->spsext[i].p_block ) );
+            LastAppendXPSCopy( p_sys->spsext[i].p_block, &pp_xpsnal_tail );
         }
         for( int i = 0; i < H264_PPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_pps); i++ )
-        {
-            if( p_sys->pps[i].p_block )
-                block_ChainLastAppend( &pp_xpsnal_tail, block_Duplicate( p_sys->pps[i].p_block ) );
-        }
+            LastAppendXPSCopy( p_sys->pps[i].p_block, &pp_xpsnal_tail );
     }
 
     /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
