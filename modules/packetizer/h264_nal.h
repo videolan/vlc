@@ -89,6 +89,8 @@ typedef struct h264_sequence_parameter_set_t h264_sequence_parameter_set_t;
 typedef struct h264_picture_parameter_set_t h264_picture_parameter_set_t;
 typedef struct h264_sequence_parameter_set_extension_t h264_sequence_parameter_set_extension_t;
 
+bool h264_get_xps_id(const uint8_t *p_nalbuf, size_t i_nalbuf, uint8_t *pi_id);
+
 h264_sequence_parameter_set_t * h264_decode_sps( const uint8_t *, size_t, bool );
 h264_picture_parameter_set_t *  h264_decode_pps( const uint8_t *, size_t, bool );
 h264_sequence_parameter_set_extension_t * h264_decode_sps_extension( const uint8_t *, size_t, bool );

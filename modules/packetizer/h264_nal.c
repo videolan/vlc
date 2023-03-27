@@ -740,6 +740,41 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
     return bo.b;
 }
 
+bool h264_get_xps_id( const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id )
+{
+    if( i_buf < 2 )
+        return false;
+
+    /* No need to lookup convert from emulation for that data */
+    uint8_t i_max, i_offset;
+    switch( h264_getNALType(p_buf) )
+    {
+        case H264_NAL_SPS:
+            i_offset = 1 + 3 /* profile constraint level */;
+            i_max = H264_SPS_ID_MAX;
+            break;
+        case H264_NAL_PPS:
+            i_offset = 1;
+            i_max = H264_PPS_ID_MAX;
+            break;
+        case H264_NAL_SPS_EXT:
+            i_offset = 1;
+            i_max = H264_SPSEXT_ID_MAX;
+            break;
+        default:
+            return false;
+    }
+
+    if( i_buf <= i_offset )
+        return false;
+
+    bs_t bs;
+    bs_init( &bs, &p_buf[i_offset], i_buf - i_offset );
+    *pi_id = bs_read_ue( &bs );
+
+    return !bs_error( &bs ) && *pi_id <= i_max;
+}
+
 static const h264_level_limits_t * h264_get_level_limits( const h264_sequence_parameter_set_t *p_sps )
 {
     uint16_t i_level_number = p_sps->i_level;
