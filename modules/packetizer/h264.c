@@ -152,9 +152,8 @@ static block_t * PacketizeDrain( void *p_private );
 static block_t *ParseNALBlock( decoder_t *, bool *pb_ts_used, block_t * );
 
 static block_t *OutputPicture( decoder_t *p_dec );
-static void PutSPS( decoder_t *p_dec, block_t *p_frag );
-static void PutPPS( decoder_t *p_dec, block_t *p_frag );
-static void PutSPSEXT( decoder_t *p_dec, block_t *p_frag );
+static void ReleaseXPS( decoder_sys_t *p_sys );
+static bool PutXPS( decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag );
 static bool ParseSliceHeader( decoder_t *p_dec, const block_t *p_frag, h264_slice_t *p_slice );
 static bool ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
@@ -175,39 +174,6 @@ static void LastAppendXPSCopy( const block_t *p_block, block_t ***ppp_last )
         memcpy( &p_dup->p_buffer[4], p_block->p_buffer, p_block->i_buffer );
         block_ChainLastAppend( ppp_last, p_dup );
     }
-}
-
-static void StoreSPS( decoder_sys_t *p_sys, uint8_t i_id,
-                      block_t *p_block, h264_sequence_parameter_set_t *p_sps )
-{
-    if( p_sys->sps[i_id].p_block )
-        block_Release( p_sys->sps[i_id].p_block );
-    if( p_sys->sps[i_id].p_sps )
-        h264_release_sps( p_sys->sps[i_id].p_sps );
-    if( p_sys->sps[i_id].p_sps == p_sys->p_active_sps )
-        p_sys->p_active_sps = NULL;
-    p_sys->sps[i_id].p_block = p_block;
-    p_sys->sps[i_id].p_sps = p_sps;
-}
-
-static void StorePPS( decoder_sys_t *p_sys, uint8_t i_id,
-                      block_t *p_block, h264_picture_parameter_set_t *p_pps )
-{
-    if( p_sys->pps[i_id].p_block )
-        block_Release( p_sys->pps[i_id].p_block );
-    if( p_sys->pps[i_id].p_pps )
-        h264_release_pps( p_sys->pps[i_id].p_pps );
-    if( p_sys->pps[i_id].p_pps == p_sys->p_active_pps )
-        p_sys->p_active_pps = NULL;
-    p_sys->pps[i_id].p_block = p_block;
-    p_sys->pps[i_id].p_pps = p_pps;
-}
-
-static void StoreSPSEXT( decoder_sys_t *p_sys, uint8_t i_id, block_t *p_block )
-{
-    if( p_sys->spsext[i_id].p_block )
-        block_Release( p_sys->spsext[i_id].p_block );
-    p_sys->spsext[i_id].p_block = p_block;
 }
 
 static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t *p_sps,
@@ -497,15 +463,9 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i;
 
     DropStoredNAL( p_sys );
-    for( i = 0; i <= H264_SPS_ID_MAX; i++ )
-        StoreSPS( p_sys, i, NULL, NULL );
-    for( i = 0; i <= H264_PPS_ID_MAX; i++ )
-        StorePPS( p_sys, i, NULL, NULL );
-    for( i = 0; i <= H264_SPSEXT_ID_MAX; i++ )
-        StoreSPSEXT( p_sys, i, NULL );
+    ReleaseXPS( p_sys );
 
     packetizer_Clean( &p_sys->packetizer );
 
@@ -726,15 +686,9 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
 
             /* Stored for insert on keyframes */
             if( i_nal_type == H264_NAL_SPS )
-            {
-                PutSPS( p_dec, p_frag );
-                p_sys->b_new_sps = true;
-            }
+                p_sys->b_new_sps |= PutXPS( p_dec, i_nal_type, p_frag );
             else
-            {
-                PutPPS( p_dec, p_frag );
-                p_sys->b_new_pps = true;
-            }
+                p_sys->b_new_pps |= PutXPS( p_dec, i_nal_type, p_frag );
         break;
 
         case H264_NAL_SEI:
@@ -746,7 +700,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         break;
 
         case H264_NAL_SPS_EXT:
-            PutSPSEXT( p_dec, p_frag );
+            PutXPS( p_dec, i_nal_type, p_frag );
             if( p_sys->b_slice )
                 p_pic = OutputPicture( p_dec );
             break;
@@ -1103,101 +1057,123 @@ static int CmpXPS( const block_t *p_ref, const block_t *p_nal )
            memcmp( p_ref->p_buffer, p_nal->p_buffer, p_nal->i_buffer );
 }
 
-static void PutSPS( decoder_t *p_dec, block_t *p_frag )
+#define wrap_h264_xps_decode(funcname ) \
+    static void *funcname ## _wrapper ( const uint8_t *a, size_t b, bool c ) \
+    { return funcname(a,b,c); }
+
+wrap_h264_xps_decode(h264_decode_sps)
+wrap_h264_xps_decode(h264_decode_pps)
+
+#define wrap_h264_xps_release(funcname, typecast) \
+    static void funcname ## _wrapper ( void *a ) { funcname((typecast *)a); }
+
+wrap_h264_xps_release(h264_release_sps, h264_sequence_parameter_set_t)
+wrap_h264_xps_release(h264_release_pps, h264_picture_parameter_set_t)
+
+static void ReleaseXPS( decoder_sys_t *p_sys )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( !hxxx_strip_AnnexB_startcode( (const uint8_t **)&p_frag->p_buffer, &p_frag->i_buffer ) )
+    for( int i = 0; i <= H264_SPS_ID_MAX; i++ )
     {
-        block_Release( p_frag );
-        return;
+        if( !p_sys->sps[i].p_block )
+            continue;
+        block_Release( p_sys->sps[i].p_block );
+        h264_release_sps( p_sys->sps[i].p_sps );
     }
-
-    h264_sequence_parameter_set_t *p_sps =
-            h264_decode_sps( p_frag->p_buffer, p_frag->i_buffer, true );
-    if( !p_sps )
+    for( int i = 0; i <= H264_PPS_ID_MAX; i++ )
     {
-        msg_Warn( p_dec, "invalid SPS" );
-        block_Release( p_frag );
-        return;
+        if( !p_sys->pps[i].p_block )
+            continue;
+        block_Release( p_sys->pps[i].p_block );
+        h264_release_pps( p_sys->pps[i].p_pps );
     }
-
-    if( !CmpXPS( p_sys->sps[p_sps->i_id].p_block, p_frag ) )
+    for( int i = 0; i <= H264_SPSEXT_ID_MAX; i++ )
     {
-        h264_release_sps( p_sps );
-        block_Release( p_frag );
-        return;
+        if( p_sys->spsext[i].p_block )
+            block_Release( p_sys->spsext[i].p_block );
     }
-
-    /* We have a new SPS */
-    msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", p_sps->i_id );
-    StoreSPS( p_sys, p_sps->i_id, p_frag, p_sps );
+    p_sys->p_active_sps = NULL;
+    p_sys->p_active_pps = NULL;
 }
 
-static void PutPPS( decoder_t *p_dec, block_t *p_frag )
+static bool PutXPS( decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !hxxx_strip_AnnexB_startcode( (const uint8_t **)&p_frag->p_buffer, &p_frag->i_buffer ) )
+    uint8_t i_id;
+    if( !hxxx_strip_AnnexB_startcode( (const uint8_t **)&p_frag->p_buffer,
+                                      &p_frag->i_buffer ) ||
+        !h264_get_xps_id( p_frag->p_buffer, p_frag->i_buffer, &i_id ) )
     {
         block_Release( p_frag );
-        return;
+        return false;
     }
 
-    h264_picture_parameter_set_t *p_pps =
-            h264_decode_pps( p_frag->p_buffer, p_frag->i_buffer, true );
-    if( !p_pps )
+    const char * rgsz_types[3] = {"SPS", "PPS", "SPSEXT"};
+    const char *psz_type;
+    block_t **pp_block_dst;
+    /* all depend on pp_xps_dst */
+    void **pp_xps_dst = NULL;
+    const void **pp_active; /* optional */
+    void * (* pf_decode_xps)(const uint8_t *, size_t, bool);
+    void   (* pf_release_xps)(void *);
+
+    switch( i_nal_type )
     {
-        msg_Warn( p_dec, "invalid PPS" );
-        block_Release( p_frag );
-        return;
+        case H264_NAL_SPS:
+            psz_type = rgsz_types[0];
+            pp_active = (const void **) &p_sys->p_active_sps;
+            pp_block_dst = &p_sys->sps[i_id].p_block;
+            pp_xps_dst = (void **) &p_sys->sps[i_id].p_sps;
+            pf_decode_xps = h264_decode_sps_wrapper;
+            pf_release_xps = h264_release_sps_wrapper;
+            break;
+        case H264_NAL_PPS:
+            psz_type = rgsz_types[1];
+            pp_active = (const void **) &p_sys->p_active_pps;
+            pp_block_dst = &p_sys->pps[i_id].p_block;
+            pp_xps_dst = (void **) &p_sys->pps[i_id].p_pps;
+            pf_decode_xps = h264_decode_pps_wrapper;
+            pf_release_xps = h264_release_pps_wrapper;
+            break;
+        case H264_NAL_SPS_EXT:
+            psz_type = rgsz_types[2];
+            pp_block_dst = &p_sys->spsext[i_id].p_block;
+            break;
+        default:
+            block_Release( p_frag );
+            return false;
     }
 
-    if( !CmpXPS( p_sys->pps[p_pps->i_id].p_block, p_frag ) )
+    if( !CmpXPS( *pp_block_dst, p_frag ) )
     {
-        h264_release_pps( p_pps );
         block_Release( p_frag );
-        return;
+        return false;
     }
 
-    /* We have a new PPS */
-    msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", p_pps->i_id, p_pps->i_sps_id );
-    StorePPS( p_sys, p_pps->i_id, p_frag, p_pps );
-}
+    msg_Dbg( p_dec, "found NAL_%s (id=%" PRIu8 ")", psz_type, i_id );
 
-static void PutSPSEXT( decoder_t *p_dec, block_t *p_frag )
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( !hxxx_strip_AnnexB_startcode( (const uint8_t **)&p_frag->p_buffer, &p_frag->i_buffer ) )
+    if( pp_xps_dst != NULL )
     {
-        block_Release( p_frag );
-        return;
+        void *p_xps = pf_decode_xps( p_frag->p_buffer, p_frag->i_buffer, true );
+        if( !p_xps )
+        {
+            block_Release( p_frag );
+            return false;
+        }
+        if( *pp_xps_dst )
+        {
+            if( pp_active && *pp_active == *pp_xps_dst )
+                *pp_active = NULL;
+            pf_release_xps( *pp_xps_dst );
+        }
+        *pp_xps_dst = p_xps;
     }
 
-    h264_sequence_parameter_set_extension_t *p_spsext =
-            h264_decode_sps_extension( p_frag->p_buffer, p_frag->i_buffer, true );
-    if( !p_spsext )
-    {
-        msg_Warn( p_dec, "invalid SPSEXT" );
-        block_Release( p_frag );
-        return;
-    }
+    if( *pp_block_dst )
+        block_Release( *pp_block_dst );
+    *pp_block_dst = p_frag;
 
-    if( !CmpXPS( p_sys->spsext[p_spsext->i_sps_id].p_block, p_frag ) )
-    {
-        h264_release_sps_extension( p_spsext );
-        block_Release( p_frag );
-        return;
-    }
-
-    /* We have a new SPSEXT */
-    msg_Dbg( p_dec, "found NAL_SPSEXT (sps_id=%d)", p_spsext->i_sps_id );
-
-    StoreSPSEXT( p_sys, p_spsext->i_sps_id, p_frag );
-
-    /* we don't need a decoded one */
-    h264_release_sps_extension( p_spsext );
+    return true;
 }
 
 static void GetSPSPPS( uint8_t i_pps_id, void *priv,
