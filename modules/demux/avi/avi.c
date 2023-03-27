@@ -145,8 +145,8 @@ typedef struct
     bool            b_activated;
     bool            b_eof;
 
-    unsigned int    i_rate;
-    unsigned int    i_scale;
+    unsigned int    i_rate; /* for audio & video */
+    unsigned int    i_scale;/* for audio & video */
     unsigned int    i_samplesize;
 
     struct bitmapinfoheader_properties bihprops;
@@ -484,11 +484,6 @@ static int Open( vlc_object_t * p_this )
         tk->i_samplesize = p_strh->i_samplesize;
         msg_Dbg( p_demux, "stream[%u] rate:%u scale:%u samplesize:%u",
                 i, tk->i_rate, tk->i_scale, tk->i_samplesize );
-        if( !tk->i_scale || !tk->i_rate || !(tk->i_rate * CLOCK_FREQ / tk->i_scale) )
-        {
-            free( tk );
-            continue;
-        }
 
         switch( p_strh->i_type )
         {
@@ -693,6 +688,16 @@ static int Open( vlc_object_t * p_this )
                 free( tk );
                 continue;
         }
+
+        if( tk->fmt.i_cat != SPU_ES &&
+           (!tk->i_scale || !tk->i_rate || !(tk->i_rate * CLOCK_FREQ / tk->i_scale)) )
+        {
+            msg_Warn( p_demux, "stream[%u] has invalid timescale", i );
+            es_format_Clean(&tk->fmt);
+            free( tk );
+            continue;
+        }
+
         tk->fmt.i_id = i;
         if( p_strn && p_strn->p_str )
             tk->fmt.psz_description = FromACP( p_strn->p_str );
