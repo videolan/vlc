@@ -119,6 +119,8 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     m_videoFullScreen = fs;
     if( fs )
     {
+        m_lastWinGeometry = m_window->geometry();
+
         int numscreen = var_InheritInteger( m_intf, "qt-fullscreen-screennumber" );
 
         auto screenList = QApplication::screens();
@@ -135,7 +137,6 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
             /* To be sure window is on proper-screen in xinerama */
             if( !screenres.contains( m_window->position() ) )
             {
-                m_lastWinGeometry = m_window->geometry();
                 m_window->setPosition(screenres.x(), screenres.y() );
             }
         }
