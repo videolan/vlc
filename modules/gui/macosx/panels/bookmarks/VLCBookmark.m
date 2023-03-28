@@ -22,6 +22,20 @@
 
 #import "VLCBookmark.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCBookmark
+
++ (instancetype)bookmarkWithVlcBookmark:(vlc_ml_bookmark_t)vlcBookmark
+{
+    VLCBookmark * const bookmark = [[VLCBookmark alloc] init];
+    
+    bookmark->_mediaLibraryItemId = vlcBookmark.i_media_id;
+    bookmark.bookmarkTime = vlcBookmark.i_time;
+    bookmark.bookmarkName = toNSStr(vlcBookmark.psz_name);
+    bookmark.bookmarkDescription = toNSStr(vlcBookmark.psz_description);
+
+    return bookmark;
+}
 
 @end

@@ -22,14 +22,19 @@
 
 #import <Foundation/Foundation.h>
 
+#import <vlc_media_library.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCBookmark : NSObject
+
++ (instancetype)bookmarkWithVlcBookmark:(vlc_ml_bookmark_t)vlcBookmark;
 
 @property (readonly) int64_t mediaLibraryItemId;
 @property (readwrite, assign) int64_t bookmarkTime;
 @property (readwrite) NSString *bookmarkName;
 @property (readwrite) NSString *bookmarkDescription;
+
 
 @end
 
