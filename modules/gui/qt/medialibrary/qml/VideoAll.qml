@@ -54,6 +54,10 @@ MainInterface.MainViewLoader {
 
     property alias dragItem: dragItem
 
+    // function(model) -> [strings....]
+    // used to get grid labels per model item
+    property var gridLabels: getLabel
+
     list: list
     grid: grid
     emptyLabel: emptylabel
@@ -179,7 +183,7 @@ MainInterface.MainViewLoader {
                           &&
                           gridView.expandIndex !== gridItem.index) ? 0.7 : 1
 
-                labels: root.onLabelGrid(model)
+               labels: root.gridLabels(model)
 
                 // FIXME: Sometimes MLBaseModel::getDataAt returns {} so we use 'isNew === true'.
                 showNewIndicator: (model.isNew === true)

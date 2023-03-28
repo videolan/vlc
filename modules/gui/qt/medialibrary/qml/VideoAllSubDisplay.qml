@@ -55,6 +55,8 @@ VideoAll {
 
     contextMenu: Util.MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
 
+    gridLabels: !!_meta ? _meta.gridLabels : root.getLabel
+
     // Functions
 
     function _updateMetaModel(groupping) {
@@ -102,7 +104,6 @@ VideoAll {
 
     function onDoubleClick(object) { _meta.onDoubleClick(object) }
 
-    function onLabelGrid(object) { return _meta.onLabelGrid(object) }
     function onLabelList(object) { return _meta.onLabelList(object) }
 
     function isInfoExpandPanelAvailable(modelIndexData) {
@@ -126,6 +127,8 @@ VideoAll {
 
             property var model: MLVideoModel { ml: MediaLib }
 
+            property var gridLabels: root.getLabel
+
             function onAction(indexes) {
                 MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
                 g_mainDisplay.showPlayer()
@@ -133,7 +136,6 @@ VideoAll {
 
             function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
 
-            function onLabelGrid(object) { return root.getLabel(object) }
             function onLabelList(object) { return root.getLabel(object) }
 
             function isInfoExpandPanelAvailable(modelIndexData) { return true }
@@ -147,6 +149,10 @@ VideoAll {
             id: metaGroup
 
             property var model: MLVideoGroupsModel { ml: MediaLib }
+
+            property var gridLabels: function (model) {
+                return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
+            }
 
             function onAction(indexes) {
                 var index = indexes[0]
@@ -173,9 +179,7 @@ VideoAll {
                 root.showList(object, Qt.MouseFocusReason)
             }
 
-            function onLabelGrid(object) {
-                return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
-            }
+
 
             function onLabelList(object) {
                 return root.getLabelGroup(object, I18n.qtr("%1"))
@@ -195,6 +199,10 @@ VideoAll {
 
             property var model: MLVideoFoldersModel { ml: MediaLib }
 
+            property var gridLabels: function (model) {
+                return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
+            }
+
             function onAction(indexes) {
                 var index = indexes[0]
 
@@ -203,10 +211,6 @@ VideoAll {
 
             function onDoubleClick(object) {
                 root.showList(object, Qt.MouseFocusReason)
-            }
-
-            function onLabelGrid(object) {
-                return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
             }
 
             function onLabelList(object) {
