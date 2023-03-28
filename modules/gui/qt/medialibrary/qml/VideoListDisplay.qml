@@ -37,6 +37,8 @@ MainInterface.MainTableView {
     // NOTE: This is useful for groups because our main criteria is 'name' instead of 'title'.
     property string mainCriteria: "title"
 
+    property alias coverLabels: tableColumns.titlecoverLabels
+
     //---------------------------------------------------------------------------------------------
     // Private
 
@@ -162,8 +164,6 @@ MainInterface.MainTableView {
         titleCover_width: VLCStyle.listAlbumCover_width
         titleCover_radius: VLCStyle.listAlbumCover_radius
 
-        function titlecoverLabels(model) {
-            return listView_id.onLabels(model);
-        }
+        titlecoverLabels: listView_id.onLabels
     }
 }

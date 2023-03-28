@@ -57,6 +57,7 @@ MainInterface.MainViewLoader {
     // function(model) -> [strings....]
     // used to get grid labels per model item
     property var gridLabels: getLabel
+    property var listLabels: getLabel
 
     list: list
     grid: grid
@@ -270,6 +271,8 @@ MainInterface.MainViewLoader {
             onContextMenuButtonClicked: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
             onRightClick: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+
+            coverLabels: root.listLabels
 
             // Functions
 

@@ -41,10 +41,9 @@ Item {
     property int titleCover_height: VLCStyle.trackListAlbumCover_heigth
     property int titleCover_radius: VLCStyle.trackListAlbumCover_radius
 
-    // Functions
-
-    function titlecoverLabels(model) {
-        // implement this function to show labels in title Cover
+    // function (model) -> [string...]
+    // implement this function to show labels in title Cover
+    property var titlecoverLabels: function(model) {
         return []
     }
 

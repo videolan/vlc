@@ -57,6 +57,8 @@ VideoAll {
 
     gridLabels: !!_meta ? _meta.gridLabels : root.getLabel
 
+    listLabels: !!_meta ? _meta.listLabels : root.getLabel
+
     // Functions
 
     function _updateMetaModel(groupping) {
@@ -104,8 +106,6 @@ VideoAll {
 
     function onDoubleClick(object) { _meta.onDoubleClick(object) }
 
-    function onLabelList(object) { return _meta.onLabelList(object) }
-
     function isInfoExpandPanelAvailable(modelIndexData) {
         return _meta.isInfoExpandPanelAvailable(modelIndexData)
     }
@@ -129,14 +129,14 @@ VideoAll {
 
             property var gridLabels: root.getLabel
 
+            property var listLabels: root.getLabel
+
             function onAction(indexes) {
                 MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
                 g_mainDisplay.showPlayer()
             }
 
             function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
-
-            function onLabelList(object) { return root.getLabel(object) }
 
             function isInfoExpandPanelAvailable(modelIndexData) { return true }
         }
@@ -152,6 +152,10 @@ VideoAll {
 
             property var gridLabels: function (model) {
                 return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
+            }
+
+            property var listLabels: function (model) {
+                return root.getLabelGroup(model, I18n.qtr("%1"))
             }
 
             function onAction(indexes) {
@@ -179,12 +183,6 @@ VideoAll {
                 root.showList(object, Qt.MouseFocusReason)
             }
 
-
-
-            function onLabelList(object) {
-                return root.getLabelGroup(object, I18n.qtr("%1"))
-            }
-
             function isInfoExpandPanelAvailable(modelIndexData) {
                 return modelIndexData.isVideo
             }
@@ -203,6 +201,10 @@ VideoAll {
                 return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
             }
 
+            property var listLabels: function (model) {
+                return root.getLabelGroup(model, I18n.qtr("%1"))
+            }
+
             function onAction(indexes) {
                 var index = indexes[0]
 
@@ -211,10 +213,6 @@ VideoAll {
 
             function onDoubleClick(object) {
                 root.showList(object, Qt.MouseFocusReason)
-            }
-
-            function onLabelList(object) {
-                return root.getLabelGroup(object, I18n.qtr("%1"))
             }
 
             function isInfoExpandPanelAvailable(modelIndexData) {
