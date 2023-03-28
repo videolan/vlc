@@ -240,6 +240,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/panels/VLCVideoEffectsWindowController.m \
 	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDataSource.h \
 	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDataSource.m \
+	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDelegate.h \
+	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDelegate.m \
 	gui/macosx/panels/dialogs/VLCCoreDialogProvider.h \
 	gui/macosx/panels/dialogs/VLCCoreDialogProvider.m \
 	gui/macosx/panels/dialogs/VLCCustomCropArWindowController.h \
