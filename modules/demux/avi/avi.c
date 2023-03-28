@@ -607,6 +607,8 @@ static int Open( vlc_object_t * p_this )
                 {
                    msg_Dbg( p_demux, "stream[%u] subtitles", i );
                    es_format_Init( &tk->fmt, SPU_ES, p_vids->p_bih->biCompression );
+                   tk->fmt.subs.spu.i_original_frame_width = p_vids->p_bih->biWidth;
+                   tk->fmt.subs.spu.i_original_frame_height = p_vids->p_bih->biHeight;
                    break;
                 }
 
