@@ -22,6 +22,8 @@
 
 #import "VLCBookmarksTableViewDataSource.h"
 
+#import "VLCBookmark.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
@@ -65,6 +67,13 @@
     }
 
     return _bookmarks->i_nb_items;
+}
+
+- (VLCBookmark *)bookmarkForRow:(NSInteger)row
+{
+    NSParameterAssert(row >= 0 || row < _bookmarks->i_nb_items);
+    vlc_ml_bookmark_t bookmark = _bookmarks->p_items[row];
+    return [[VLCBookmark alloc] initWithVlcBookmark:bookmark];
 }
 
 @end

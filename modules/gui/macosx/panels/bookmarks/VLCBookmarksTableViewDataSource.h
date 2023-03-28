@@ -24,9 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCBookmark;
+
 @interface VLCBookmarksTableViewDataSource : NSObject<NSTableViewDataSource>
 
 @property (nonatomic, readwrite, assign) int64_t libraryItemId;
+
+- (VLCBookmark *)bookmarkForRow:(NSInteger)row;
 
 @end
 
