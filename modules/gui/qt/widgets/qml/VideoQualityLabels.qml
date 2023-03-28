@@ -22,7 +22,16 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 Row {
-    property alias labels: repeater.model
+    id: root
+
+    property var labels
+
+    onLabelsChanged: {
+        // try to reuse items, texts are assigned with Binding
+        // extra items are hidden, Row should take care of them
+        if (repeater.count < labels.length)
+            repeater.model = labels.length
+    }
 
     spacing: VLCStyle.margin_xxsmall
 
@@ -42,7 +51,9 @@ Row {
             leftPadding: VLCStyle.margin_xxxsmall
             rightPadding: VLCStyle.margin_xxxsmall
 
-            text: modelData
+            visible: index < root.labels.length
+            text: index >= root.labels.length ? "" :  root.labels[index]
+
             font.pixelSize: VLCStyle.fontSize_normal
 
             color: theme.fg.primary
