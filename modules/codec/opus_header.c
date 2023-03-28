@@ -78,7 +78,7 @@ static int write_uint32(Packet *p, uint32_t val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
-    SetDWBE(&p->data[p->pos], val);
+    SetDWLE(&p->data[p->pos], val);
     p->pos += 4;
     return 1;
 }
@@ -87,7 +87,7 @@ static int write_uint16(Packet *p, uint16_t val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
-    SetWBE(&p->data[p->pos], val);
+    SetWLE(&p->data[p->pos], val);
     p->pos += 2;
     return 1;
 }
@@ -105,7 +105,7 @@ static int read_uint32(ROPacket *p, uint32_t *val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
-    *val = GetDWBE(&p->data[p->pos]);
+    *val = GetDWLE(&p->data[p->pos]);
     p->pos += 4;
     return 1;
 }
@@ -114,7 +114,7 @@ static int read_uint16(ROPacket *p, uint16_t *val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
-    *val = GetWBE(&p->data[p->pos]);
+    *val = GetWLE(&p->data[p->pos]);
     p->pos += 2;
     return 1;
 }
