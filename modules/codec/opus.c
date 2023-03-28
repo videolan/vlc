@@ -428,7 +428,9 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         msg_Err( p_dec, "cannot read Opus header" );
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_dec, "Opus audio with %d channels", p_header->channels);
+
+    msg_Dbg( p_dec, "Opus audio with %d channels, %d samples preskip, %d samplerate",
+             p_header->channels, p_header->preskip, p_header->input_sample_rate );
 
     if((p_header->channels>2 && p_header->channel_mapping==0) ||
         (p_header->channels>8 && p_header->channel_mapping==1) ||
