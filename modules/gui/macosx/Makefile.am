@@ -238,6 +238,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/panels/VLCTrackSynchronizationWindowController.m \
 	gui/macosx/panels/VLCVideoEffectsWindowController.h \
 	gui/macosx/panels/VLCVideoEffectsWindowController.m \
+	gui/macosx/panels/bookmarks/VLCBookmark.h \
+	gui/macosx/panels/bookmarks/VLCBookmark.m \
 	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDataSource.h \
 	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDataSource.m \
 	gui/macosx/panels/bookmarks/VLCBookmarksTableViewDelegate.h \

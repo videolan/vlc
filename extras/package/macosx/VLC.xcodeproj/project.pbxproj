@@ -80,6 +80,7 @@
 		5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */; };
 		533B5D2C29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */; };
 		534E73E229D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */; };
+		534E73E529D2FF07009982DE /* VLCBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E73E429D2FF07009982DE /* VLCBookmark.m */; };
 		534E8E3A29A06325009503F8 /* VLCMainVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E8E3929A06325009503F8 /* VLCMainVideoViewController.m */; };
 		5352B37329DF29BF0011CE03 /* VLCMainVideoViewControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5352B37229DF29BF0011CE03 /* VLCMainVideoViewControlsBar.m */; };
 		5352B37629E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 5352B37529E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.m */; };
@@ -266,6 +267,8 @@
 		533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksTableViewDataSource.m; sourceTree = "<group>"; };
 		534E73E029D2EDB1009982DE /* VLCBookmarksTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmarksTableViewDelegate.h; sourceTree = "<group>"; };
 		534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksTableViewDelegate.m; sourceTree = "<group>"; };
+		534E73E329D2FF07009982DE /* VLCBookmark.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmark.h; sourceTree = "<group>"; };
+		534E73E429D2FF07009982DE /* VLCBookmark.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmark.m; sourceTree = "<group>"; };
 		534E8E3729A04F95009503F8 /* VLCMainVideoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMainVideoView.xib; sourceTree = "<group>"; };
 		534E8E3829A06325009503F8 /* VLCMainVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainVideoViewController.h; sourceTree = "<group>"; };
 		534E8E3929A06325009503F8 /* VLCMainVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainVideoViewController.m; sourceTree = "<group>"; };
@@ -1401,6 +1404,8 @@
 		533B5D2929CF94AB003DE887 /* bookmarks */ = {
 			isa = PBXGroup;
 			children = (
+				534E73E329D2FF07009982DE /* VLCBookmark.h */,
+				534E73E429D2FF07009982DE /* VLCBookmark.m */,
 				533B5D2A29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.h */,
 				533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */,
 				534E73E029D2EDB1009982DE /* VLCBookmarksTableViewDelegate.h */,
@@ -2041,6 +2046,7 @@
 				7D460B0C229EB4C700097948 /* VLCDragDropView.m in Sources */,
 				7D445D872202574B00263D34 /* VLCPlaylistModel.m in Sources */,
 				7D2554C222C8A39300F2D9C2 /* VLCMediaSourceDataSource.m in Sources */,
+				534E73E529D2FF07009982DE /* VLCBookmark.m in Sources */,
 				7DE2F0442282C84A0040DD0A /* VLCLibraryAudioDataSource.m in Sources */,
 				7D0F640C2202163E00FDB91F /* VLCPlaylistDataSource.m in Sources */,
 				1C3113AD1E508C6900D4DD76 /* VLCExtensionsManager.m in Sources */,
