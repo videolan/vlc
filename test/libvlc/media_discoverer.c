@@ -23,28 +23,27 @@
 #include <string.h>
 
 static void
-ml_item_event(const struct libvlc_event_t *p_ev, const char *psz_event)
+ml_item_event(libvlc_media_t *media, const char *psz_event)
 {
-    char *psz_mrl = libvlc_media_get_mrl(p_ev->u.media_list_item_added.item);
+    char *psz_mrl = libvlc_media_get_mrl(media);
     assert(psz_mrl);
 
-    test_log("item %s(%d): '%s'\n", psz_event,
-             p_ev->u.media_list_item_added.index, psz_mrl);
+    test_log("item %s: '%s'\n", psz_event, psz_mrl);
     free(psz_mrl);
 }
 
 static void
-ml_item_added(const struct libvlc_event_t *p_ev, void *p_data)
+ml_item_added(void *opaque, libvlc_media_t *parent, libvlc_media_t *media)
 {
-    (void) p_data;
-    ml_item_event(p_ev, "added");
+    (void) opaque; (void) parent;
+    ml_item_event(media, "added");
 }
 
 static void
-ml_item_deleted(const struct libvlc_event_t *p_ev, void *p_data)
+ml_item_removed(void *opaque, libvlc_media_t *media)
 {
-    (void) p_data;
-    ml_item_event(p_ev, "deleted");
+    (void) opaque;
+    ml_item_event(media, "removed");
 }
 
 static void
@@ -52,23 +51,16 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name, bool b_wait)
 {
     test_log("creating and starting discoverer %s\n", psz_name);
 
+    static const struct libvlc_media_discoverer_cbs cbs = {
+        .version = 0,
+        .on_media_added = ml_item_added,
+        .on_media_removed = ml_item_removed,
+    };
+
+
     libvlc_media_discoverer_t *p_md =
-        libvlc_media_discoverer_new(p_vlc, psz_name);
+        libvlc_media_discoverer_new(p_vlc, psz_name, &cbs, NULL);
     assert(p_md != NULL);
-
-    libvlc_media_list_t *p_ml = libvlc_media_discoverer_media_list(p_md);
-    assert(p_ml != NULL);
-
-    libvlc_event_manager_t *p_evm = libvlc_media_list_event_manager(p_ml);
-    assert(p_evm);
-
-    int i_ret;
-    i_ret = libvlc_event_attach(p_evm, libvlc_MediaListItemAdded,
-                                ml_item_added, NULL);
-    assert(i_ret == 0);
-    i_ret = libvlc_event_attach(p_evm, libvlc_MediaListItemDeleted,
-                                ml_item_deleted, NULL);
-    assert(i_ret == 0);
 
     if (libvlc_media_discoverer_start(p_md) == -1)
     {
@@ -85,12 +77,6 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name, bool b_wait)
         libvlc_media_discoverer_stop(p_md);
     }
 
-    libvlc_event_detach(p_evm, libvlc_MediaListItemAdded,
-                        ml_item_added, NULL);
-    libvlc_event_detach(p_evm, libvlc_MediaListItemDeleted,
-                        ml_item_deleted, NULL);
-
-    libvlc_media_list_release(p_ml);
     libvlc_media_discoverer_release(p_md);
 }
 

@@ -31,7 +31,6 @@
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_list.h>
 #include <vlc/libvlc_media_discoverer.h>
-#include <vlc/libvlc_events.h>
 
 #include <vlc_services_discovery.h>
 
@@ -44,6 +43,8 @@ struct libvlc_media_discoverer_t
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
+    const struct libvlc_media_discoverer_cbs *cbs;
+    void *                   cbs_opaque;
     char                     name[];
 };
 
@@ -59,17 +60,21 @@ static void services_discovery_item_added( services_discovery_t *sd,
                                            input_item_t *parent,
                                            input_item_t *p_item )
 {
-    libvlc_media_t * p_md;
     libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
     libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
 
-    p_md = libvlc_media_new_from_input_item( p_item );
+    libvlc_media_t *p_md = libvlc_media_new_from_input_item( p_item );
+    if (p_md == NULL)
+        return;
 
-    (void) parent; /* Flatten items list for now. TODO: tree support. */
+    libvlc_media_t *parent_media = parent != NULL ? parent->libvlc_owner : NULL;
 
     libvlc_media_list_lock( p_mlist );
     libvlc_media_list_internal_add_media( p_mlist, p_md );
     libvlc_media_list_unlock( p_mlist );
+
+    if( p_mdis->cbs != NULL && p_mdis->cbs->on_media_added != NULL )
+        p_mdis->cbs->on_media_added( p_mdis->cbs_opaque, parent_media, p_md );
 
     libvlc_media_release( p_md );
 }
@@ -84,21 +89,25 @@ static void services_discovery_item_removed( services_discovery_t *sd,
     libvlc_media_t * p_md;
     libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
 
-    int i, count = libvlc_media_list_count( p_mdis->p_mlist );
     libvlc_media_list_lock( p_mdis->p_mlist );
-    for( i = 0; i < count; i++ )
+    int count = libvlc_media_list_count( p_mdis->p_mlist );
+    for( int i = 0; i < count; i++ )
     {
         p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i );
         assert(p_md != NULL);
-        if( p_md->p_input_item == p_item )
+        if( p_md == p_item->libvlc_owner )
         {
             libvlc_media_list_internal_remove_index( p_mdis->p_mlist, i );
+            libvlc_media_list_unlock( p_mdis->p_mlist );
+
+            if( p_mdis->cbs != NULL && p_mdis->cbs->on_media_removed != NULL )
+                p_mdis->cbs->on_media_removed( p_mdis->cbs_opaque, p_md );
             libvlc_media_release( p_md );
-            break;
+            return;
         }
         libvlc_media_release( p_md );
     }
-    libvlc_media_list_unlock( p_mdis->p_mlist );
+    vlc_assert_unreachable();
 }
 
 /*
@@ -109,8 +118,13 @@ static void services_discovery_item_removed( services_discovery_t *sd,
  *       new (Public)
  **************************************************************************/
 libvlc_media_discoverer_t *
-libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
+libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name,
+                             const struct libvlc_media_discoverer_cbs *cbs,
+                             void *cbs_opaque )
 {
+    /* No different versions to handle for now */
+    assert(cbs == NULL || cbs->version <= 0);
+
     /* podcast SD is a hack and only works with custom playlist callbacks. */
     if( !strncasecmp( psz_name, "podcast", 7 ) )
         return NULL;
@@ -128,6 +142,8 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
     p_mdis->p_mlist = libvlc_media_list_new();
     p_mdis->p_mlist->b_read_only = true;
     p_mdis->p_sd = NULL;
+    p_mdis->cbs = cbs;
+    p_mdis->cbs_opaque = cbs_opaque;
 
     libvlc_retain( p_inst );
     strcpy( p_mdis->name, psz_name );
