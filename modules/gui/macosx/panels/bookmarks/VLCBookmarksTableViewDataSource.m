@@ -58,4 +58,13 @@
     _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, libraryItemId);
 }
 
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (_bookmarks == NULL) {
+        return 0;
+    }
+
+    return _bookmarks->i_nb_items;
+}
+
 @end
