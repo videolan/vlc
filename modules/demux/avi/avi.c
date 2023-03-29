@@ -603,7 +603,7 @@ static int Open( vlc_object_t * p_this )
 
             case( AVIFOURCC_vids ):
             {
-                if( p_vids->p_bih->biCompression == VLC_FOURCC( 'D', 'X', 'S', 'B' ) )
+                if( p_vids->p_bih->biCompression == FOURCC_DXSB )
                 {
                    msg_Dbg( p_demux, "stream[%u] subtitles", i );
                    es_format_Init( &tk->fmt, SPU_ES, p_vids->p_bih->biCompression );
@@ -626,7 +626,7 @@ static int Open( vlc_object_t * p_this )
                     !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
                 {
                     tk->fmt.i_codec           =
-                    tk->fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
+                    tk->fmt.i_original_fourcc = FOURCC_XVID;
                 }
 
                 if( IsQNAPCodec( p_vids->p_bih->biCompression ) )

@@ -364,6 +364,10 @@ int     AVI_ChunkFetchIndexes( stream_t *, avi_chunk_t *p_riff );
 
 /* *** codex stuff ***  */
 
+/* DivX */
+#define FOURCC_DXSB         VLC_FOURCC('D','X','S','B') /* xsub */
+#define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
+
 /* DV */
 #define FOURCC_dvsd         VLC_FOURCC('d','v','s','d')
 #define FOURCC_dvhd         VLC_FOURCC('d','v','h','d')
