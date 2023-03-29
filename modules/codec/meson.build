@@ -632,6 +632,7 @@ if host_system == 'windows'
         dependencies: [
             cc.find_library('dxguid'),
             cc.find_library('wbemuuid'),
+            cc.find_library('uuid'),
         ]
     )
     d3d9_common_lib = static_library('d3d9_common',
