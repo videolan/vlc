@@ -338,13 +338,11 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
     ComPtr<IMFMediaType> input_media_type;
 
     /* Search a suitable input type for the MFT. */
-    int input_type_index = 0;
-    bool found = false;
-    for (int i = 0; !found; ++i)
+    for (int i = 0;; ++i)
     {
-        hr = p_sys->mft->GetInputAvailableType(stream_id, i, &input_media_type);
+        hr = p_sys->mft->GetInputAvailableType(stream_id, i, input_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
-            break;
+            goto error;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
         {
             /* The output type must be set before setting the input type for this MFT. */
@@ -360,18 +358,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
 
         if (subtype == mSubtype)
             break;
-
-        if (found)
-            input_type_index = i;
-
-        input_media_type.Reset();
     }
-    if (!found)
-        goto error;
-
-    hr = p_sys->mft->GetInputAvailableType(stream_id, input_type_index, &input_media_type);
-    if (FAILED(hr))
-        goto error;
 
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {

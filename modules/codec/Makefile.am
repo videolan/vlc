@@ -611,7 +611,7 @@ endif
 libmft_plugin_la_SOURCES = codec/mft.cpp
 libmft_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la
+libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la
 codec_LTLIBRARIES += libmft_plugin.la
 if HAVE_WINSTORE
 libmft_plugin_la_LIBADD += -ld3d11
