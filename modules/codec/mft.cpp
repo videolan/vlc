@@ -1527,10 +1527,9 @@ static int FindMFT(decoder_t *p_dec)
     if (activate_objects_count == 0)
         return VLC_EGENERIC;
 
-    void *pv;
     for (UINT32 i = 0; i < activate_objects_count; ++i)
     {
-        hr = activate_objects[i]->ActivateObject(__uuidof(p_sys->mft.Get()), &pv);
+        hr = activate_objects[i]->ActivateObject(IID_PPV_ARGS(p_sys->mft.ReleaseAndGetAddressOf()));
         activate_objects[i]->Release();
         if (FAILED(hr))
             continue;
