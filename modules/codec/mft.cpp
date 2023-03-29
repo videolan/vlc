@@ -372,8 +372,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
         UINT64 frame_ratio_num = p_dec->fmt_in->video.i_frame_rate;
         UINT64 frame_ratio_dem = p_dec->fmt_in->video.i_frame_rate_base;
         if(frame_ratio_num && frame_ratio_dem) {
-            UINT64 frame_rate = (frame_ratio_num << 32) | frame_ratio_dem;
-            hr = input_media_type->SetUINT64(MF_MT_FRAME_RATE, frame_rate);
+            hr = MFSetAttributeRatio(input_media_type.Get(), MF_MT_FRAME_RATE, frame_ratio_num, frame_ratio_dem);
             if(FAILED(hr))
                 goto error;
         }
