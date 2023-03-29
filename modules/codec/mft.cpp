@@ -440,7 +440,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)\n", hr);
+    msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
     return VLC_EGENERIC;
 }
 
@@ -515,7 +515,10 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 
     hr = p_sys->mft->SetOutputType(stream_id, output_media_type.Get(), 0);
     if (FAILED(hr))
+    {
+        msg_Err(p_dec, "Failed to set the output. (hr=0x%lX)", hr);
         goto error;
+    }
 
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
@@ -738,7 +741,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)\n", hr);
+    msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)", hr);
     block_ChainRelease(p_xps_blocks);
     return VLC_EGENERIC;
 }
@@ -1599,7 +1602,7 @@ static int Open(vlc_object_t *p_this)
 
     if (FindMFT(p_dec))
     {
-        msg_Err(p_dec, "Could not find suitable MFT decoder");
+        msg_Err(p_dec, "Could not find suitable MFT decoder for %4.4s", (char*)&p_dec->fmt_in->i_codec);
         goto error;
     }
 
