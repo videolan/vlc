@@ -456,13 +456,22 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
      * preference thus we will use the first one unless YV12/I420 is
      * available for video or float32 for audio.
      */
+    GUID subtype;
     int output_type_index = -1;
-    bool found = false;
-    for (int i = 0; !found; ++i)
+    for (int i = 0; output_type_index == -1; ++i)
     {
-        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, &output_media_type);
+        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, output_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
+        {
+            /*
+            * It's not an error if we don't find the output type we were
+            * looking for, in this case we use the first available type.
+            */
+            /* No output format found we prefer, just pick the first one preferred
+            * by the MFT */
+            output_type_index = 0;
             break;
+        }
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
         {
             /* The input type must be set before setting the output type for this MFT. */
@@ -471,7 +480,6 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         else if (FAILED(hr))
             goto error;
 
-        GUID subtype;
         hr = output_media_type->GetGUID(MF_MT_SUBTYPE, &subtype);
         if (FAILED(hr))
             goto error;
@@ -480,11 +488,11 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         {
             if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12
              || subtype == MFVideoFormat_I420 || subtype == MFVideoFormat_IYUV)
-                found = true;
+                output_type_index = i;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
             else if(output_type_index < 0 && GUIDToFormat(d3d_format_table, subtype) > 0)
-                    output_type_index = i;
+                output_type_index = i;
         }
         else
         {
@@ -493,33 +501,19 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
             if (FAILED(hr))
                 continue;
             if (bits_per_sample == 32 && subtype == MFAudioFormat_Float)
-                found = true;
+                output_type_index = i;
         }
-
-        if (found)
-            output_type_index = i;
-
-        output_media_type.Reset();
     }
-    /*
-     * It's not an error if we don't find the output type we were
-     * looking for, in this case we use the first available type.
-     */
-    if(output_type_index < 0)
-        /* No output format found we prefer, just pick the first one preferred
-         * by the MFT */
-        output_type_index = 0;
 
-    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, &output_media_type);
+    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.ReleaseAndGetAddressOf());
+    if (FAILED(hr))
+        goto error;
+
+    hr = output_media_type->GetGUID(MF_MT_SUBTYPE, &subtype);
     if (FAILED(hr))
         goto error;
 
     hr = p_sys->mft->SetOutputType(stream_id, output_media_type.Get(), 0);
-    if (FAILED(hr))
-        goto error;
-
-    GUID subtype;
-    hr = output_media_type->GetGUID(MF_MT_SUBTYPE, &subtype);
     if (FAILED(hr))
         goto error;
 
