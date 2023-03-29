@@ -478,7 +478,8 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
-            if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12 || subtype == MFVideoFormat_I420)
+            if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12
+             || subtype == MFVideoFormat_I420 || subtype == MFVideoFormat_IYUV)
                 found = true;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
@@ -532,6 +533,8 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
             /* D3D formats are upside down */
             p_dec->fmt_out.video.orientation = ORIENT_BOTTOM_LEFT;
         } else {
+            if (subtype == MFVideoFormat_IYUV)
+                subtype = MFVideoFormat_I420;
             fcc = vlc_fourcc_GetCodec(p_dec->fmt_in->i_cat, subtype.Data1);
         }
 
