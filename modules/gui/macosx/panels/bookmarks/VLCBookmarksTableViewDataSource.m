@@ -26,9 +26,13 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 
 #import "main/VLCMain.h"
+
+#import "playlist/VLCPlayerController.h"
+#import "playlist/VLCPlaylistController.h"
 
 #import <vlc_media_library.h>
 
@@ -36,6 +40,7 @@
 {
     vlc_ml_bookmark_list_t *_bookmarks;
     vlc_medialibrary_t *_mediaLibrary;
+    VLCPlayerController *_playerController;
 }
 @end
 
@@ -45,9 +50,26 @@
 {
     self = [super init];
     if (self) {
+        _playerController = VLCMain.sharedInstance.playlistController.playerController;
         _mediaLibrary = vlc_ml_instance_get(getIntf());
+
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(currentMediaItemChanged:)
+                                                   name:VLCPlayerCurrentMediaItemChanged
+                                                 object:nil];
     }
     return self;
+}
+
+- (void)currentMediaItemChanged:(NSNotification * const)notification
+{
+    VLCMediaLibraryMediaItem * const currentMediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
+    if (currentMediaItem == nil) {
+        return;
+    }
+
+    const int64_t currentMediaItemId = currentMediaItem.libraryID;
+    [self setLibraryItemId:currentMediaItemId];
 }
 
 - (void)setLibraryItemId:(const int64_t)libraryItemId
