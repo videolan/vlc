@@ -442,7 +442,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in SetInputType()");
+    msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)\n", hr);
     return VLC_EGENERIC;
 }
 
