@@ -121,8 +121,8 @@ typedef struct
 
 typedef struct
 {
-    uint32_t     i_flags;
     uint64_t     i_pos;
+    uint32_t     i_flags;
     uint32_t     i_length;
     uint64_t     i_lengthtotal;
 
