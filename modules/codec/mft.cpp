@@ -364,8 +364,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
     {
         UINT64 width = p_dec->fmt_in->video.i_width;
         UINT64 height = p_dec->fmt_in->video.i_height;
-        UINT64 frame_size = (width << 32) | height;
-        hr = input_media_type->SetUINT64(MF_MT_FRAME_SIZE, frame_size);
+        hr = MFSetAttributeSize(input_media_type.Get(), MF_MT_FRAME_SIZE, width, height);
         if (FAILED(hr))
             goto error;
 
