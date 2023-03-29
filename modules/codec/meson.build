@@ -644,6 +644,24 @@ if host_system == 'windows'
         pic: true,
         install: false
     )
+
+    mft_link_with = [ cc.find_library('mfplat'), d3d11_common_lib ]
+    if get_option('winstore_app')
+        mft_link_with += [ cc.find_library('d3d11') ]
+    endif
+    vlc_modules += {
+        'name' : 'mft',
+        'sources' : files(
+                'mft.cpp',
+                'hxxx_helper.c',
+                '../packetizer/hxxx_nal.c',
+                '../packetizer/hxxx_sei.c',
+                '../packetizer/h264_slice.c',
+                '../packetizer/h264_nal.c',
+                '../packetizer/hevc_nal.c'
+            ),
+        'link_with' : mft_link_with
+    }
 endif
 
 # OpenMAX IL codec
