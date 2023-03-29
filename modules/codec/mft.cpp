@@ -84,11 +84,6 @@ public:
         assert(!streamStarted);
     }
 
-    const GUID* major_type = nullptr;
-    const GUID* subtype = nullptr;
-    /* Container for a dynamically constructed subtype */
-    GUID custom_subtype;
-
     // Direct3D
     vlc_video_context  *vctx_out = nullptr;
     const d3d_format_t *cfg = nullptr;
@@ -256,7 +251,7 @@ enum
 typedef struct
 {
     vlc_fourcc_t fourcc;
-    const GUID   *guid;
+    const GUID   guid;
 } pair_format_guid;
 
 DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_AV1, FCC('AV01'));
@@ -267,17 +262,17 @@ DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_AV1, FCC('AV01'));
  */
 static const pair_format_guid video_format_table[] =
 {
-    { VLC_CODEC_H264, &MFVideoFormat_H264 },
-    { VLC_CODEC_MPGV, &MFVideoFormat_MPEG2 },
-    { VLC_CODEC_MP2V, &MFVideoFormat_MPEG2 },
-    { VLC_CODEC_MP1V, &MFVideoFormat_MPG1 },
-    { VLC_CODEC_MJPG, &MFVideoFormat_MJPG },
-    { VLC_CODEC_WMV1, &MFVideoFormat_WMV1 },
-    { VLC_CODEC_WMV2, &MFVideoFormat_WMV2 },
-    { VLC_CODEC_WMV3, &MFVideoFormat_WMV3 },
-    { VLC_CODEC_VC1,  &MFVideoFormat_WVC1 },
-    { VLC_CODEC_AV1,  &vlc_MFVideoFormat_AV1 },
-    { 0, NULL }
+    { VLC_CODEC_H264, MFVideoFormat_H264 },
+    { VLC_CODEC_MPGV, MFVideoFormat_MPEG2 },
+    { VLC_CODEC_MP2V, MFVideoFormat_MPEG2 },
+    { VLC_CODEC_MP1V, MFVideoFormat_MPG1 },
+    { VLC_CODEC_MJPG, MFVideoFormat_MJPG },
+    { VLC_CODEC_WMV1, MFVideoFormat_WMV1 },
+    { VLC_CODEC_WMV2, MFVideoFormat_WMV2 },
+    { VLC_CODEC_WMV3, MFVideoFormat_WMV3 },
+    { VLC_CODEC_VC1,  MFVideoFormat_WVC1 },
+    { VLC_CODEC_AV1,  vlc_MFVideoFormat_AV1 },
+    { 0, GUID_NULL }
 };
 
 // 8-bit luminance only
@@ -293,11 +288,11 @@ DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_L8, 50);
  * Table to map MF Transform raw 3D3 output formats to native VLC FourCC
  */
 static const pair_format_guid d3d_format_table[] = {
-    { VLC_CODEC_RGB32, &MFVideoFormat_RGB32  },
-    { VLC_CODEC_RGB24, &MFVideoFormat_RGB24  },
-    { VLC_CODEC_RGBA,  &MFVideoFormat_ARGB32 },
-    { VLC_CODEC_GREY,  &vlc_MFVideoFormat_L8 },
-    { 0, NULL }
+    { VLC_CODEC_RGB32, MFVideoFormat_RGB32  },
+    { VLC_CODEC_RGB24, MFVideoFormat_RGB24  },
+    { VLC_CODEC_RGBA,  MFVideoFormat_ARGB32 },
+    { VLC_CODEC_GREY,  vlc_MFVideoFormat_L8 },
+    { 0, GUID_NULL }
 };
 
 /*
@@ -306,34 +301,34 @@ static const pair_format_guid d3d_format_table[] = {
  */
 static const pair_format_guid audio_format_table[] =
 {
-    { VLC_CODEC_MPGA, &MFAudioFormat_MPEG      },
-    { VLC_CODEC_MP3,  &MFAudioFormat_MP3       },
-    { VLC_CODEC_DTS,  &MFAudioFormat_DTS       },
-    { VLC_CODEC_MP4A, &MFAudioFormat_AAC       },
-    { VLC_CODEC_WMA2, &MFAudioFormat_WMAudioV8 },
-    { VLC_CODEC_A52,  &MFAudioFormat_Dolby_AC3 },
-    { 0, NULL }
+    { VLC_CODEC_MPGA, MFAudioFormat_MPEG      },
+    { VLC_CODEC_MP3,  MFAudioFormat_MP3       },
+    { VLC_CODEC_DTS,  MFAudioFormat_DTS       },
+    { VLC_CODEC_MP4A, MFAudioFormat_AAC       },
+    { VLC_CODEC_WMA2, MFAudioFormat_WMAudioV8 },
+    { VLC_CODEC_A52,  MFAudioFormat_Dolby_AC3 },
+    { 0, GUID_NULL }
 };
 
-static const GUID *FormatToGUID(const pair_format_guid table[], vlc_fourcc_t fourcc)
+static const GUID & FormatToGUID(const pair_format_guid table[], vlc_fourcc_t fourcc)
 {
     for (int i = 0; table[i].fourcc; ++i)
         if (table[i].fourcc == fourcc)
             return table[i].guid;
 
-    return NULL;
+    return GUID_NULL;
 }
 
 static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & guid)
 {
     for (int i = 0; table[i].fourcc; ++i)
-        if (IsEqualGUID(*table[i].guid, guid))
+        if (table[i].guid == guid)
             return table[i].fourcc;
 
     return 0;
 }
 
-static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> & result)
+static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype, ComPtr<IMFMediaType> & result)
 {
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
@@ -363,8 +358,8 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
         if (FAILED(hr))
             goto error;
 
-        if (IsEqualGUID(subtype, *p_sys->subtype))
-            found = true;
+        if (subtype == mSubtype)
+            break;
 
         if (found)
             input_type_index = i;
@@ -399,7 +394,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
     }
     else
     {
-        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, p_sys->subtype->Data1);
+        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, mSubtype.Data1);
         if (FAILED(hr))
             goto error;
         if (p_dec->fmt_in->audio.i_rate)
@@ -498,7 +493,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
-            if (IsEqualGUID(subtype, MFVideoFormat_NV12) || IsEqualGUID(subtype, MFVideoFormat_YV12) || IsEqualGUID(subtype, MFVideoFormat_I420))
+            if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12 || subtype == MFVideoFormat_I420)
                 found = true;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
@@ -511,7 +506,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
             hr = output_media_type->GetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, &bits_per_sample);
             if (FAILED(hr))
                 continue;
-            if (bits_per_sample == 32 && IsEqualGUID(subtype, MFAudioFormat_Float))
+            if (bits_per_sample == 32 && subtype == MFAudioFormat_Float)
                 found = true;
         }
 
@@ -1336,7 +1331,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
     return VLC_SUCCESS;
 }
 
-static int InitializeMFT(decoder_t *p_dec)
+static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 {
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
@@ -1389,7 +1384,7 @@ static int InitializeMFT(decoder_t *p_dec)
     else if (FAILED(hr))
         goto error;
 
-    if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type))
+    if (SetInputType(p_dec, p_sys->input_stream_id, mSubtype, p_sys->input_type))
         goto error;
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
@@ -1430,7 +1425,7 @@ static int InitializeMFT(decoder_t *p_dec)
      * SetInputType, try again after setting the output type.
      */
     if (p_sys->input_type.Get() == nullptr)
-        if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type) || p_sys->input_type.Get() == nullptr)
+        if (SetInputType(p_dec, p_sys->input_stream_id, mSubtype, p_sys->input_type) || p_sys->input_type.Get() == nullptr)
             goto error;
 
     /* This event is required for asynchronous MFTs, optional otherwise. */
@@ -1511,31 +1506,30 @@ static int FindMFT(decoder_t *p_dec)
 
     /* Try to create a MFT using MFTEnumEx. */
     GUID category;
+    MFT_REGISTER_TYPE_INFO input_type;
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         category = MFT_CATEGORY_VIDEO_DECODER;
-        p_sys->major_type = &MFMediaType_Video;
-        p_sys->subtype = FormatToGUID(video_format_table, p_dec->fmt_in->i_codec);
-        if(!p_sys->subtype) {
+        input_type.guidMajorType = MFMediaType_Video;
+        input_type.guidSubtype = FormatToGUID(video_format_table, p_dec->fmt_in->i_codec);
+        if(input_type.guidSubtype == GUID_NULL) {
             /* Codec is not well known. Construct a MF transform subtype from the fourcc */
-            p_sys->custom_subtype = MFVideoFormat_Base;
-            p_sys->custom_subtype.Data1 = p_dec->fmt_in->i_codec;
-            p_sys->subtype = &p_sys->custom_subtype;
+            input_type.guidSubtype = MFVideoFormat_Base;
+            input_type.guidSubtype.Data1 = p_dec->fmt_in->i_codec;
         }
     }
     else
     {
         category = MFT_CATEGORY_AUDIO_DECODER;
-        p_sys->major_type = &MFMediaType_Audio;
-        p_sys->subtype = FormatToGUID(audio_format_table, p_dec->fmt_in->i_codec);
+        input_type.guidMajorType = MFMediaType_Audio;
+        input_type.guidSubtype  = FormatToGUID(audio_format_table, p_dec->fmt_in->i_codec);
     }
-    if (!p_sys->subtype)
+    if (input_type.guidSubtype == GUID_NULL)
         return VLC_EGENERIC;
 
     UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
                  | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
                  | MFT_ENUM_FLAG_HARDWARE;
-    MFT_REGISTER_TYPE_INFO input_type = { *p_sys->major_type, *p_sys->subtype };
     IMFActivate **activate_objects = NULL;
     UINT32 activate_objects_count = 0;
     hr = MFTEnumEx(category, flags, &input_type, NULL, &activate_objects, &activate_objects_count);
@@ -1553,9 +1547,8 @@ static int FindMFT(decoder_t *p_dec)
         activate_objects[i]->Release();
         if (FAILED(hr))
             continue;
-        p_sys->mft = static_cast<IMFTransform *>(pv);
 
-        if (InitializeMFT(p_dec) == VLC_SUCCESS)
+        if (InitializeMFT(p_dec, input_type.guidSubtype) == VLC_SUCCESS)
         {
             for (++i; i < activate_objects_count; ++i)
                 activate_objects[i]->Release();
