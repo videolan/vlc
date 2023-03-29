@@ -35,13 +35,19 @@
 
 #import "VLCBookmarksWindowController.h"
 
+#import "bookmarks/VLCBookmarksTableViewDataSource.h"
+#import "bookmarks/VLCBookmarksTableViewDelegate.h"
+
 #import "extensions/NSString+Helpers.h"
+
 #import "main/CompatibilityFixes.h"
+
 #import "windows/video/VLCVideoOutputProvider.h"
 
 @interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
-    //input_thread_t *p_old_input;
+    VLCBookmarksTableViewDataSource *_tableViewDataSource;
+    VLCBookmarksTableViewDelegate *_tableViewDelegate;
 }
 @end
 
@@ -55,16 +61,16 @@
 {
     self = [super initWithWindowNibName:@"Bookmarks"];
     if (self) {
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateCocoaWindowLevel:) name:VLCWindowShouldUpdateLevel object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(updateCocoaWindowLevel:)
+                                                   name:VLCWindowShouldUpdateLevel
+                                                 object:nil];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    //if (p_old_input)
-    //    input_Release(p_old_input);
-
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
@@ -72,8 +78,11 @@
 {
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    _dataTable.dataSource = self;
-    _dataTable.delegate = self;
+    _tableViewDataSource = [[VLCBookmarksTableViewDataSource alloc] init];
+    _tableViewDelegate = [[VLCBookmarksTableViewDelegate alloc] init];
+
+    _dataTable.dataSource = _tableViewDataSource;
+    _dataTable.delegate = _tableViewDelegate;
     _dataTable.action = @selector(goToBookmark:);
     _dataTable.target = self;
 
