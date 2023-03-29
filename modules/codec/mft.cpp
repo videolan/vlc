@@ -528,7 +528,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         vlc_fourcc_t fcc = GUIDToFormat(d3d_format_table, subtype);
         if(fcc) {
             /* D3D formats are upside down */
-            p_dec->fmt_out.video.orientation = ORIENT_BOTTOM_LEFT;
+            p_dec->fmt_out.video.orientation = ORIENT_VFLIPPED;
         } else {
             if (subtype == MFVideoFormat_IYUV)
                 subtype = MFVideoFormat_I420;
