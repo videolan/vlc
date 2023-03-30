@@ -536,6 +536,31 @@ decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
 }
 
 static void
+decoder_on_new_audio_sk_stats(vlc_input_decoder_t *decoder,
+                              unsigned overrun, unsigned underun,
+                              void *userdata)
+{
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    struct input_stats *stats = input_priv(p_sys->p_input)->stats;
+    if (!stats)
+        return;
+
+    atomic_fetch_add_explicit(&stats->audio_overrun, overrun,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->audio_underrun, underun,
+                              memory_order_relaxed);
+}
+
+
+static void
 decoder_on_new_audio_latency(vlc_input_decoder_t *decoder, vlc_tick_t latency,
                              void *userdata)
 {
@@ -619,6 +644,7 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_new_video_stats = decoder_on_new_video_stats,
     .on_new_video_sk_stats = decoder_on_new_video_sk_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
+    .on_new_audio_sk_stats = decoder_on_new_audio_sk_stats,
     .on_new_decoder_stats = decoder_on_new_decoder_stats,
     .on_new_audio_latency = decoder_on_new_audio_latency,
     .get_attachments = decoder_get_attachments,

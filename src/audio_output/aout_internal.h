@@ -147,6 +147,8 @@ struct vlc_aout_stats
 {
     unsigned lost;
     unsigned played;
+    unsigned overrun;
+    unsigned underrun;
     vlc_tick_t latency;
 };
 

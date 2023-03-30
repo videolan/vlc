@@ -80,6 +80,8 @@ struct input_stats *input_stats_Create(void)
     atomic_init(&stats->audio_renderer_out_cnt, 0);
 
     atomic_init(&stats->audio_latency, 0);
+    atomic_init(&stats->audio_overrun, 0);
+    atomic_init(&stats->audio_underrun, 0);
 
     return stats;
 }
@@ -137,6 +139,8 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
     st->audio_renderer_out_cnt = atomic_load_explicit(&stats->audio_renderer_out_cnt, memory_order_relaxed);
 
     st->audio_latency = atomic_load_explicit(&stats->audio_latency, memory_order_relaxed);
+    st->audio_overrun = atomic_load_explicit(&stats->audio_overrun, memory_order_relaxed);
+    st->audio_underrun = atomic_load_explicit(&stats->audio_underrun, memory_order_relaxed);
 }
 
 /** Update a counter element with new values

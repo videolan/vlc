@@ -99,6 +99,8 @@ struct vlc_aout_stream
 
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
+    atomic_uint buffers_underrun;
+    atomic_uint buffers_overrun;
     _Atomic vlc_tick_t latency;
     vlc_tick_t last_latency;
     void (*on_new_latency_cb)(vlc_tick_t tick, void *data);
@@ -285,6 +287,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     atomic_init (&stream->buffers_lost, 0);
     atomic_init (&stream->buffers_played, 0);
     atomic_init (&stream->latency, 0);
+    atomic_init (&stream->buffers_overrun, 0);
+    atomic_init (&stream->buffers_underrun, 0);
     atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
 
     atomic_init(&stream->drained, false);
@@ -506,6 +510,8 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
         msg_Info(aout, "avstats: [RENDER][AUDIO][FLUSH] ts=%" PRId64 " drift=%" PRId64,
                  vlc_tick_now(), drift);
 
+
+        atomic_fetch_add_explicit(&stream->buffers_underrun, 1, memory_order_relaxed);
         if (!stream->sync.discontinuity)
             msg_Warn (aout, "playback way too late (%"PRId64"): "
                       "flushing buffers", drift);
@@ -530,6 +536,7 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
             msg_Info(aout, "avstats: [RENDER][AUDIO][SILENCE] ts=%" PRId64 " drift=%" PRId64,
                      vlc_tick_now(), drift);
 
+            atomic_fetch_add_explicit(&stream->buffers_overrun, 1, memory_order_relaxed);
             msg_Warn (aout, "playback way too early (%"PRId64"): "
                       "playing silence", drift);
         }
@@ -860,6 +867,10 @@ void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream,
     stats->played = atomic_exchange_explicit(&stream->buffers_played, 0,
                                        memory_order_relaxed);
     stats->latency = atomic_load_explicit(&stream->latency, memory_order_relaxed);
+    stats->underrun = atomic_exchange_explicit(&stream->buffers_underrun, 0,
+                                               memory_order_relaxed);
+    stats->overrun = atomic_exchange_explicit(&stream->buffers_overrun, 0,
+                                              memory_order_relaxed);
 }
 
 void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_t date)

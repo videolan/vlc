@@ -1518,6 +1518,8 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
     vlc_fifo_Unlock(p_owner->p_fifo);
 
     decoder_Notify(p_owner, on_new_audio_stats, 1, stats.lost, stats.played, stats.latency);
+    decoder_Notify(p_owner, on_new_audio_sk_stats,
+                   stats.overrun, stats.underrun);
 }
 
 static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_subpic )

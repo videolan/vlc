@@ -783,6 +783,9 @@ struct input_stats {
     atomic_uintmax_t video_renderer_out_cnt;
     atomic_uintmax_t audio_renderer_out_cnt;
     _Atomic vlc_tick_t audio_latency;
+
+    atomic_uintmax_t audio_overrun;
+    atomic_uintmax_t audio_underrun;
 };
 
 struct input_stats *input_stats_Create(void);

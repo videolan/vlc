@@ -47,6 +47,10 @@ struct vlc_input_decoder_callbacks {
                                void *userdata);
     void (*on_new_audio_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
                                unsigned lost, unsigned played, vlc_tick_t latency, void *userdata);
+    void (*on_new_audio_sk_stats)(vlc_input_decoder_t *decoder,
+                                  unsigned overrun, unsigned underrun,
+                                  void *userdata);
+
     void (*on_new_decoder_stats)(vlc_input_decoder_t *decoder,
                                  enum es_format_category_e cat,
                                  uintmax_t cnt_in, uintmax_t cnt_out,

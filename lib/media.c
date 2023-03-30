@@ -762,6 +762,8 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
     p_stats->video_renderer_out_cnt = p_itm_stats->video_renderer_out_cnt;
     p_stats->audio_renderer_out_cnt = p_itm_stats->audio_renderer_out_cnt;
     p_stats->audio_latency = p_itm_stats->audio_latency;
+    p_stats->audio_overrun = p_itm_stats->audio_overrun;
+    p_stats->audio_underrun = p_itm_stats->audio_underrun;
 
     vlc_mutex_unlock( &item->lock );
     return true;

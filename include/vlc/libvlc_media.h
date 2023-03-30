@@ -135,6 +135,9 @@ typedef struct libvlc_media_stats_t
     uint64_t video_renderer_out_cnt;
     uint64_t audio_renderer_out_cnt;
     libvlc_time_t audio_latency;
+
+    uint64_t audio_overrun;
+    uint64_t audio_underrun;
 } libvlc_media_stats_t;
 
 /**

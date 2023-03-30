@@ -557,6 +557,9 @@ struct input_stats_t
     uintmax_t audio_renderer_out_cnt;
     vlc_tick_t audio_latency;
 
+    uintmax_t audio_underrun;
+    uintmax_t audio_overrun;
+
 };
 
 /**
