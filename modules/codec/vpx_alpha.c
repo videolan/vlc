@@ -17,6 +17,8 @@
 #include <vlc_atomic.h>
 #include <vlc_picture_pool.h>
 
+#include "alpha_combine.h"
+
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
@@ -202,6 +204,44 @@ static int FormatUpdate( decoder_t *dec, vlc_video_context *vctx )
                 p_sys->pf_combine = CombinePicturesCPU;
             }
             break;
+#ifdef _WIN32
+        case VLC_CODEC_D3D11_OPAQUE:
+            if (dec == &p_sys->alpha->dec)
+            {
+                switch (p_sys->opaque->dec.fmt_out.video.i_chroma)
+                {
+                    case VLC_CODEC_D3D11_OPAQUE:
+                        res = SetupD3D11(bdec, vctx, &p_sys->vctx);
+                        if (res == VLC_SUCCESS)
+                        {
+                            p_sys->pf_combine = CombineD3D11;
+                            vctx = p_sys->vctx;
+                        }
+                        break;
+                    default:
+                        msg_Err(dec, "unsupported opaque D3D11 combination %4.4s", (char*)&p_sys->opaque->dec.fmt_out.video.i_chroma);
+                        res = VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                switch (p_sys->alpha->dec.fmt_out.video.i_chroma)
+                {
+                    case VLC_CODEC_D3D11_OPAQUE:
+                        res = SetupD3D11(bdec, vctx, &p_sys->vctx);
+                        if (res == VLC_SUCCESS)
+                        {
+                            p_sys->pf_combine = CombineD3D11;
+                            vctx = p_sys->vctx;
+                        }
+                        break;
+                    default:
+                        msg_Err(dec, "unsupported opaque D3D11 combination %4.4s", (char*)&p_sys->alpha->dec.fmt_out.video.i_chroma);
+                        res = VLC_EGENERIC;
+                }
+            }
+            break;
+#endif // _WIN32
         default:
             msg_Err(dec, "unsupported decoder output %4.4s", (char*)&dec->fmt_out.video.i_chroma);
             res = VLC_EGENERIC;

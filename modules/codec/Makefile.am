@@ -568,7 +568,14 @@ libvpx_plugin_la_LIBADD = $(VPX_LIBS)
 EXTRA_LTLIBRARIES += libvpx_plugin.la
 codec_LTLIBRARIES += $(LTLIBvpx)
 
-libvpx_alpha_plugin_la_SOURCES = codec/vpx_alpha.c
+libvpx_alpha_plugin_la_SOURCES = codec/vpx_alpha.c codec/alpha_combine.h
+if HAVE_WIN32
+libvpx_alpha_plugin_la_SOURCES += codec/alpha_d3d11.cpp
+libvpx_alpha_plugin_la_LIBADD = $(LIBCOM) libd3d11_common.la
+if HAVE_WINSTORE
+libvpx_alpha_plugin_la_LIBADD += -ld3d11
+endif
+endif
 codec_LTLIBRARIES += libvpx_alpha_plugin.la
 
 libaom_plugin_la_SOURCES = codec/aom.c \
