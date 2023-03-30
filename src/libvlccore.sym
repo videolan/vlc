@@ -1026,3 +1026,8 @@ vlc_executor_WaitIdle
 vlc_input_attachment_Release
 vlc_input_attachment_New
 vlc_input_attachment_Hold
+vlc_preparser_New
+vlc_preparser_Push
+vlc_preparser_Cancel
+vlc_preparser_Delete
+vlc_preparser_Deactivate

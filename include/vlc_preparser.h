@@ -49,7 +49,7 @@ typedef struct vlc_preparser_t vlc_preparser_t;
  * @param obj the parent object
  * @return a valid preparser object or NULL in case of error
  */
-vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj );
+VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj );
 
 /**
  * This function enqueues the provided item to be preparsed or fetched.
@@ -71,11 +71,11 @@ vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj );
  * otherwise
  * If this returns an error, the on_preparse_ended will *not* be invoked
  */
-int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
-                        input_item_meta_request_option_t option,
-                        const struct vlc_metadata_cbs *cbs,
-                        void *cbs_userdata,
-                        int timeout, void *id );
+VLC_API int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
+                                input_item_meta_request_option_t option,
+                                const struct vlc_metadata_cbs *cbs,
+                                void *cbs_userdata,
+                                int timeout, void *id );
 
 /**
  * This function cancel all preparsing requests for a given id
@@ -83,7 +83,7 @@ int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
  * @param preparser the preparser object
  * @param id unique id given to vlc_preparser_Push()
  */
-void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id );
+VLC_API void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id );
 
 /**
  * This function destroys the preparser object and thread.
@@ -91,7 +91,7 @@ void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id );
  * @param preparser the preparser object
  * All pending input items will be released.
  */
-void vlc_preparser_Delete( vlc_preparser_t *preparser );
+VLC_API void vlc_preparser_Delete( vlc_preparser_t *preparser );
 
 /**
  * This function deactivates the preparser
@@ -101,8 +101,9 @@ void vlc_preparser_Delete( vlc_preparser_t *preparser );
  *
  * @param preparser the preparser object
  */
-void vlc_preparser_Deactivate( vlc_preparser_t *preparser );
+VLC_API void vlc_preparser_Deactivate( vlc_preparser_t *preparser );
 
 /** @} vlc_preparser */
 
 #endif
+
