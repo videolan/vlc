@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _INPUT_PREPARSER_H
-#define _INPUT_PREPARSER_H 1
+#ifndef VLC_PREPARSER_H
+#define VLC_PREPARSER_H 1
 
 #include <vlc_input_item.h>
 /**
@@ -83,4 +83,3 @@ void vlc_preparser_Delete( vlc_preparser_t * );
 void vlc_preparser_Deactivate( vlc_preparser_t * );
 
 #endif
-

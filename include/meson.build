@@ -85,6 +85,7 @@ install_headers(
     'vlc_playlist.h',
     'vlc_playlist_export.h',
     'vlc_plugin.h',
+    'vlc_preparser.h',
     'vlc_probe.h',
     'vlc_rand.h',
     'vlc_renderer_discovery.h',

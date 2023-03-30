@@ -25,10 +25,10 @@
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 #include <vlc_executor.h>
+#include <vlc_preparser.h>
 
 #include "input/input_interface.h"
 #include "input/input_internal.h"
-#include "preparser.h"
 #include "fetcher.h"
 
 struct vlc_preparser_t

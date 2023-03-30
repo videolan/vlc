@@ -36,11 +36,11 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_preparser.h>
 #include "../lib/libvlc_internal.h"
 
 #include "modules/modules.h"
 #include "config/configuration.h"
-#include "preparser/preparser.h"
 #include "media_source/media_source.h"
 
 #include <stdio.h>                                              /* sprintf() */
