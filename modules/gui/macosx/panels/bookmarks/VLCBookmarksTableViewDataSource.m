@@ -140,6 +140,12 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     const int64_t bookmarkTime = MS_FROM_VLC_TICK(currentTime);
     vlc_ml_media_add_bookmark(_mediaLibrary, _libraryItemId, bookmarkTime);
     _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, _libraryItemId);
+
+    vlc_ml_media_update_bookmark(_mediaLibrary,
+                                 _libraryItemId,
+                                 bookmarkTime,
+                                 [_NS("New bookmark") UTF8String],
+                                 [_NS("Description of new bookmark.") UTF8String]);
 }
 
 @end
