@@ -56,6 +56,7 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     if (self) {
         _playerController = VLCMain.sharedInstance.playlistController.playerController;
         _mediaLibrary = vlc_ml_instance_get(getIntf());
+        [self updateLibraryItemId];
 
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(currentMediaItemChanged:)
@@ -65,15 +66,23 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     return self;
 }
 
-- (void)currentMediaItemChanged:(NSNotification * const)notification
+- (void)updateLibraryItemId
 {
     VLCMediaLibraryMediaItem * const currentMediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
     if (currentMediaItem == nil) {
+        _libraryItemId = -1;
+        [self updateBookmarks];
         return;
     }
 
     const int64_t currentMediaItemId = currentMediaItem.libraryID;
     [self setLibraryItemId:currentMediaItemId];
+    [self updateBookmarks];
+}
+
+- (void)currentMediaItemChanged:(NSNotification * const)notification
+{
+    [self updateLibraryItemId];
 }
 
 - (void)setLibraryItemId:(const int64_t)libraryItemId
