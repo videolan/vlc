@@ -346,40 +346,6 @@ clear:
     return 0;
 }
 
-- (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn: (NSTableColumn *)theTableColumn row: (NSInteger)row
-{
-#if 0
-    /* return the corresponding data as NSString */
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
-    id ret = @"";
-
-    if (!p_input)
-        return @"";
-    else if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS)
-        ret = @"";
-    else if (row >= i_bookmarks)
-        ret = @"";
-    else {
-        NSString * identifier = [theTableColumn identifier];
-        if ([identifier isEqualToString: @"description"])
-            ret = toNSStr(pp_bookmarks[row]->psz_name);
-		else if ([identifier isEqualToString: @"time_offset"]) {
-            ret = [self timeStringForBookmark:pp_bookmarks[row]];
-        }
-
-        // Clear the bookmark list
-        for (int i = 0; i < i_bookmarks; i++)
-            vlc_seekpoint_Delete(pp_bookmarks[i]);
-        free(pp_bookmarks);
-    }
-    input_Release(p_input);
-    return ret;
-#endif
-    return @"";
-}
-
 /*****************************************************************************
  * delegate methods
  *****************************************************************************/
