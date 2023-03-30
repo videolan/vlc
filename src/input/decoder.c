@@ -1508,19 +1508,16 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
     vlc_fifo_Lock(p_owner->p_fifo);
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
-    unsigned played = 0;
-    unsigned aout_lost = 0;
-    vlc_tick_t latency;
+    struct vlc_aout_stats stats;
     if( p_owner->p_astream != NULL )
-    {
-        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played, &latency );
-    }
+        vlc_aout_stream_GetResetStats(p_owner->p_astream, &stats);
+
     if (success != VLC_SUCCESS)
-        aout_lost++;
+        stats.lost++;
 
     vlc_fifo_Unlock(p_owner->p_fifo);
 
-    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played, latency);
+    decoder_Notify(p_owner, on_new_audio_stats, 1, stats.lost, stats.played, stats.latency);
 }
 
 static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_subpic )

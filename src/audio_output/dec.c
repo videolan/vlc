@@ -852,14 +852,14 @@ drop:
     return ret;
 }
 
-void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *restrict lost,
-                           unsigned *restrict played, vlc_tick_t *restrict latency)
+void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream,
+                                   struct vlc_aout_stats *stats)
 {
-    *lost = atomic_exchange_explicit(&stream->buffers_lost, 0,
+    stats->lost = atomic_exchange_explicit(&stream->buffers_lost, 0,
                                      memory_order_relaxed);
-    *played = atomic_exchange_explicit(&stream->buffers_played, 0,
+    stats->played = atomic_exchange_explicit(&stream->buffers_played, 0,
                                        memory_order_relaxed);
-    *latency = atomic_load_explicit(&stream->latency, memory_order_relaxed);
+    stats->latency = atomic_load_explicit(&stream->latency, memory_order_relaxed);
 }
 
 void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_t date)

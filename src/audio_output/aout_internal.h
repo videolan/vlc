@@ -143,11 +143,18 @@ struct vlc_aout_stream_cfg
     void *cb_data;
 };
 
+struct vlc_aout_stats
+{
+    unsigned lost;
+    unsigned played;
+    vlc_tick_t latency;
+};
+
 vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
                                      const struct vlc_aout_stream_cfg *cfg);
 void vlc_aout_stream_Delete(vlc_aout_stream *);
 int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block);
-void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *, unsigned *, vlc_tick_t *);
+void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, struct vlc_aout_stats *stats);
 void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool b_paused, vlc_tick_t i_date);
 void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate);
 void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay);
