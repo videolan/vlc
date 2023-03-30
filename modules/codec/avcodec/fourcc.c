@@ -251,6 +251,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_CLLC, AV_CODEC_ID_CLLC },
     { VLC_CODEC_MSS2, AV_CODEC_ID_MSS2 },
     { VLC_CODEC_VP9, AV_CODEC_ID_VP9 },
+    { VLC_CODEC_VP9ALPHA_ES, AV_CODEC_ID_VP9 },
 #if LIBAVCODEC_VERSION_CHECK( 57, 83, 101 )
     { VLC_CODEC_AV1, AV_CODEC_ID_AV1 },
 #endif
