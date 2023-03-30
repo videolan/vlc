@@ -254,7 +254,19 @@ typedef struct
     const GUID   guid;
 } pair_format_guid;
 
-DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_AV1, FCC('AV01'));
+#if defined(__MINGW64_VERSION_MAJOR)
+# if __MINGW64_VERSION_MAJOR < 10
+// 8-bit luminance only
+// Older versions of mingw-w64 lack this GUID, but it was added in mingw-w64
+// git on 2021-07-11 (during __MINGW64_VERSION_MAJOR 10). Use a local
+// redefinition of this GUID with a custom prefix, to let the same code build
+// with both older and newer versions of mingw-w64 (and earlier git snapshots
+// with __MINGW64_VERSION_MAJOR == 10).
+DEFINE_MEDIATYPE_GUID (MFVideoFormat_L8, 50); // D3DFMT_L8
+
+DEFINE_MEDIATYPE_GUID (MFVideoFormat_AV1, FCC('AV01'));
+# endif  // __MINGW64_VERSION_MAJOR >= 0
+#endif // __MINGW64_VERSION_MAJOR
 
 /*
  * We need this table since the FOURCC used for GUID is not the same
@@ -271,18 +283,9 @@ static const pair_format_guid video_format_table[] =
     { VLC_CODEC_WMV2, MFVideoFormat_WMV2 },
     { VLC_CODEC_WMV3, MFVideoFormat_WMV3 },
     { VLC_CODEC_VC1,  MFVideoFormat_WVC1 },
-    { VLC_CODEC_AV1,  vlc_MFVideoFormat_AV1 },
+    { VLC_CODEC_AV1,  MFVideoFormat_AV1 },
     { 0, GUID_NULL }
 };
-
-// 8-bit luminance only
-
-// Older versions of mingw-w64 lack this GUID, but it was added in mingw-w64
-// git on 2021-07-11 (during __MINGW64_VERSION_MAJOR 10). Use a local
-// redefinition of this GUID with a custom prefix, to let the same code build
-// with both older and newer versions of mingw-w64 (and earlier git snapshots
-// with __MINGW64_VERSION_MAJOR == 10).
-DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_L8, 50);
 
 /*
  * Table to map MF Transform raw 3D3 output formats to native VLC FourCC
@@ -291,7 +294,7 @@ static const pair_format_guid d3d_format_table[] = {
     { VLC_CODEC_RGB32, MFVideoFormat_RGB32  },
     { VLC_CODEC_RGB24, MFVideoFormat_RGB24  },
     { VLC_CODEC_RGBA,  MFVideoFormat_ARGB32 },
-    { VLC_CODEC_GREY,  vlc_MFVideoFormat_L8 },
+    { VLC_CODEC_GREY,  MFVideoFormat_L8 },
     { 0, GUID_NULL }
 };
 
