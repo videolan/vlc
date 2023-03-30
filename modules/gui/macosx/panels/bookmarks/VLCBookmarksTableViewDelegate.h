@@ -24,8 +24,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const VLCBookmarksTableViewCellIdentifier;
-
 @interface VLCBookmarksTableViewDelegate : NSObject <NSTableViewDelegate>
 
 @end

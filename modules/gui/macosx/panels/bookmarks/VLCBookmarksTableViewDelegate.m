@@ -28,27 +28,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
-NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCellIdentifier";
-
 @implementation VLCBookmarksTableViewDelegate
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCBookmarksTableViewDataSource * const vlcDataSource = (VLCBookmarksTableViewDataSource *)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
 
-    VLCBookmark * const bookmark = [vlcDataSource bookmarkForRow:row];
-    NSString * const identifier = [tableColumn identifier];
-
-    if ([identifier isEqualToString:@"name"]) {
-        return bookmark.bookmarkName;
-    } else if ([identifier isEqualToString:@"description"]) {
-        return bookmark.bookmarkDescription;
-    } else if ([identifier isEqualToString:@"time_offset"]) {
-        return [NSString stringWithTime:bookmark.bookmarkTime / 1000];
-    }
-
-    return @"";
-}
 
 @end

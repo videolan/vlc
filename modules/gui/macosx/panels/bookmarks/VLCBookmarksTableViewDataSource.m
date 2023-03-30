@@ -24,6 +24,8 @@
 
 #import "VLCBookmark.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
@@ -35,6 +37,8 @@
 #import "playlist/VLCPlaylistController.h"
 
 #import <vlc_media_library.h>
+
+NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCellIdentifier";
 
 @interface VLCBookmarksTableViewDataSource ()
 {
@@ -96,6 +100,25 @@
     NSParameterAssert(row >= 0 || row < _bookmarks->i_nb_items);
     vlc_ml_bookmark_t bookmark = _bookmarks->p_items[row];
     return [[VLCBookmark alloc] initWithVlcBookmark:bookmark];
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCBookmarksTableViewDataSource * const vlcDataSource = (VLCBookmarksTableViewDataSource *)tableView.dataSource;
+    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+
+    VLCBookmark * const bookmark = [vlcDataSource bookmarkForRow:row];
+    NSString * const identifier = [tableColumn identifier];
+
+    if ([identifier isEqualToString:@"name"]) {
+        return bookmark.bookmarkName;
+    } else if ([identifier isEqualToString:@"description"]) {
+        return bookmark.bookmarkDescription;
+    } else if ([identifier isEqualToString:@"time_offset"]) {
+        return [NSString stringWithTime:bookmark.bookmarkTime / 1000];
+    }
+
+    return @"";
 }
 
 @end
