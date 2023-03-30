@@ -509,6 +509,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
 
+    d3d11_device_lock(sys->d3d_dev);
     void *pv;
     hr = ID3D11Device_QueryInterface( sys->d3d_dev->d3ddevice, &IID_ID3D10Multithread, &pv);
     if (SUCCEEDED(hr)) {
@@ -525,6 +526,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         isXboxHardware(sys->d3d_dev))
     {
         msg_Warn(va, "%dx%d resolution not supported by your hardware", fmt->i_width, fmt->i_height);
+        d3d11_device_unlock(sys->d3d_dev);
         return VLC_EGENERIC;
     }
 #endif
@@ -554,6 +556,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &p_texture );
     if (FAILED(hr)) {
         msg_Err(va, "CreateTexture2D %zu failed. (hr=0x%lX)", surface_count, hr);
+        d3d11_device_unlock(sys->d3d_dev);
         return VLC_EGENERIC;
     }
 
@@ -568,6 +571,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         if (FAILED(hr)) {
             msg_Err(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%lX)", surface_idx, hr);
             ID3D11Texture2D_Release(p_texture);
+            d3d11_device_unlock(sys->d3d_dev);
             return VLC_EGENERIC;
         }
 
@@ -593,6 +597,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
     if (FAILED(hr)) {
         msg_Err(va, "GetVideoDecoderConfigCount failed. (hr=0x%lX)", hr);
+        d3d11_device_unlock(sys->d3d_dev);
         return VLC_EGENERIC;
     }
 
@@ -602,6 +607,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         hr = ID3D11VideoDevice_GetVideoDecoderConfig( sys->d3ddec, &decoderDesc, i, &cfg_list[i] );
         if (FAILED(hr)) {
             msg_Err(va, "GetVideoDecoderConfig failed. (hr=0x%lX)", hr);
+            d3d11_device_unlock(sys->d3d_dev);
             return VLC_EGENERIC;
         }
     }
@@ -635,6 +641,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     }
     if (cfg_score <= 0) {
         msg_Err(va, "Failed to find a supported decoder configuration");
+        d3d11_device_unlock(sys->d3d_dev);
         return VLC_EGENERIC;
     }
 
@@ -644,8 +651,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     if (FAILED(hr)) {
         msg_Err(va, "ID3D11VideoDevice_CreateVideoDecoder failed. (hr=0x%lX)", hr);
         sys->hw.decoder = NULL;
+        d3d11_device_unlock(sys->d3d_dev);
         return VLC_EGENERIC;
     }
+    d3d11_device_unlock(sys->d3d_dev);
     sys->hw.decoder = decoder;
 
     msg_Dbg(va, "DxCreateDecoderSurfaces succeed");
