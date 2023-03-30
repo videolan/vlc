@@ -130,4 +130,16 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     return @"";
 }
 
+- (void)addBookmark
+{
+    if (_libraryItemId == 0) {
+        return;
+    }
+
+    const vlc_tick_t currentTime = _playerController.time;
+    const int64_t bookmarkTime = MS_FROM_VLC_TICK(currentTime);
+    vlc_ml_media_add_bookmark(_mediaLibrary, _libraryItemId, bookmarkTime);
+    _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, _libraryItemId);
+}
+
 @end

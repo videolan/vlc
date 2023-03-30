@@ -128,24 +128,8 @@
 
 - (IBAction)add:(id)sender
 {
-#if 0
-    /* add item to list */
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (!p_input)
-        return;
-
-    seekpoint_t bookmark;
-
-    if (!input_Control(p_input, INPUT_GET_BOOKMARK, &bookmark)) {
-        bookmark.psz_name = (char *)_("Untitled");
-        input_Control(p_input, INPUT_ADD_BOOKMARK, &bookmark);
-    }
-
-    input_Release(p_input);
-
+    [_tableViewDataSource addBookmark];
     [_dataTable reloadData];
-#endif
 }
 
 - (IBAction)clear:(id)sender
