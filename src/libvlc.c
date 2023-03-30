@@ -230,7 +230,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Meta data handling
      */
-    priv->parser = input_preparser_New(VLC_OBJECT(p_libvlc));
+    priv->parser = vlc_preparser_New(VLC_OBJECT(p_libvlc));
     if( !priv->parser )
         goto error;
 
@@ -343,7 +343,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
     if (priv->parser != NULL)
-        input_preparser_Deactivate(priv->parser);
+        vlc_preparser_Deactivate(priv->parser);
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -376,7 +376,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     if (priv->parser != NULL)
-        input_preparser_Delete(priv->parser);
+        vlc_preparser_Delete(priv->parser);
 
     if (priv->main_playlist)
         vlc_playlist_Delete(priv->main_playlist);
@@ -452,7 +452,7 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
 
 int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                         input_item_meta_request_option_t i_options,
-                        const input_preparser_callbacks_t *cbs,
+                        const struct vlc_metadata_cbs *cbs,
                         void *cbs_userdata,
                         int timeout, void *id)
 {
@@ -461,7 +461,7 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    return input_preparser_Push( priv->parser, item, i_options, cbs,
+    return vlc_preparser_Push( priv->parser, item, i_options, cbs,
                                  cbs_userdata, timeout, id );
 }
 
@@ -472,7 +472,7 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
  */
 int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                            input_item_meta_request_option_t i_options,
-                           const input_preparser_callbacks_t *cbs,
+                           const struct vlc_metadata_cbs *cbs,
                            void *cbs_userdata,
                            int timeout, void *id)
 {
@@ -503,5 +503,5 @@ void libvlc_MetadataCancel(libvlc_int_t *libvlc, void *id)
     if (unlikely(priv->parser == NULL))
         return;
 
-    input_preparser_Cancel(priv->parser, id);
+    vlc_preparser_Cancel(priv->parser, id);
 }

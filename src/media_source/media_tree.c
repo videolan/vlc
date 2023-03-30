@@ -334,7 +334,7 @@ vlc_media_tree_Remove(vlc_media_tree_t *tree, input_item_t *media)
     return true;
 }
 
-static const input_preparser_callbacks_t input_preparser_callbacks = {
+static const struct vlc_metadata_cbs preparser_callbacks = {
     .on_subtree_added = media_subtree_changed,
     .on_preparse_ended = media_subtree_preparse_ended
 };
@@ -348,12 +348,12 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
     VLC_UNUSED(libvlc);
     VLC_UNUSED(media);
     VLC_UNUSED(id);
-    VLC_UNUSED(input_preparser_callbacks);
+    VLC_UNUSED(preparser_callbacks);
 #else
     media->i_preparse_depth = 1;
     vlc_MetadataRequest(libvlc, media, META_REQUEST_OPTION_SCOPE_ANY |
                         META_REQUEST_OPTION_DO_INTERACT,
-                        &input_preparser_callbacks, tree, 0, id);
+                        &preparser_callbacks, tree, 0, id);
 #endif
 }
 

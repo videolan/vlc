@@ -820,7 +820,7 @@ libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
     return 1;
 }
 
-static const input_preparser_callbacks_t input_preparser_callbacks = {
+static const struct vlc_metadata_cbs preparser_callbacks = {
     .on_preparse_ended = input_item_preparse_ended,
     .on_subtree_added = input_item_subtree_added,
 };
@@ -867,7 +867,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
 
     ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
-                                 &input_preparser_callbacks, media,
+                                 &preparser_callbacks, media,
                                  timeout, media);
     if (ret != VLC_SUCCESS)
     {

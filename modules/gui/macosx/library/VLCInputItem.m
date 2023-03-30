@@ -81,7 +81,7 @@ static void cb_preparse_ended(input_item_t *p_item, enum input_item_preparse_sta
     });
 }
 
-static const struct input_preparser_callbacks_t preparseCallbacks = {
+static const struct vlc_metadata_cbs preparseCallbacks = {
     cb_preparse_ended,
     cb_subtree_added,
 };

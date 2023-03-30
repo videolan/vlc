@@ -106,7 +106,7 @@ on_preparse_ended(input_item_t *media,
     vlc_playlist_Unlock(playlist);
 }
 
-static const input_preparser_callbacks_t input_preparser_callbacks = {
+static const struct vlc_metadata_cbs preparser_callbacks = {
     .on_preparse_ended = on_preparse_ended,
     .on_subtree_added = on_subtree_added,
 };
@@ -117,13 +117,13 @@ vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input)
 #ifdef TEST_PLAYLIST
     VLC_UNUSED(playlist);
     VLC_UNUSED(input);
-    VLC_UNUSED(input_preparser_callbacks);
+    VLC_UNUSED(preparser_callbacks);
 #else
     /* vlc_MetadataRequest is not exported */
     vlc_MetadataRequest(playlist->libvlc, input,
                         META_REQUEST_OPTION_SCOPE_LOCAL |
                         META_REQUEST_OPTION_FETCH_LOCAL,
-                        &input_preparser_callbacks, playlist, -1, NULL);
+                        &preparser_callbacks, playlist, -1, NULL);
 #endif
 }
 

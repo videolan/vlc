@@ -32,12 +32,12 @@
  * an asynchronous way.
  * It will also issue art fetching requests.
  */
-typedef struct input_preparser_t input_preparser_t;
+typedef struct vlc_preparser_t vlc_preparser_t;
 
 /**
  * This function creates the preparser object and thread.
  */
-input_preparser_t *input_preparser_New( vlc_object_t * );
+vlc_preparser_t *vlc_preparser_New( vlc_object_t * );
 
 /**
  * This function enqueues the provided item to be preparsed.
@@ -49,30 +49,30 @@ input_preparser_t *input_preparser_New( vlc_object_t * );
  * "preparse-timeout" option will be used as a timeout. If 0, it will wait
  * indefinitely. If > 0, the timeout will be used (in milliseconds).
  * @param id unique id provided by the caller. This is can be used to cancel
- * the request with input_preparser_Cancel()
+ * the request with vlc_preparser_Cancel()
  * @returns VLC_SUCCESS if the item was scheduled for preparsing, an error code
  * otherwise
  * If this returns an error, the on_preparse_ended will *not* be invoked
  */
-int input_preparser_Push( input_preparser_t *, input_item_t *,
-                           input_item_meta_request_option_t,
-                           const input_preparser_callbacks_t *cbs,
-                           void *cbs_userdata,
-                           int timeout, void *id );
+int vlc_preparser_Push( vlc_preparser_t *, input_item_t *,
+                        input_item_meta_request_option_t,
+                        const struct vlc_metadata_cbs *cbs,
+                        void *cbs_userdata,
+                        int timeout, void *id );
 
 /**
  * This function cancel all preparsing requests for a given id
  *
- * @param id unique id given to input_preparser_Push()
+ * @param id unique id given to vlc_preparser_Push()
  */
-void input_preparser_Cancel( input_preparser_t *, void *id );
+void vlc_preparser_Cancel( vlc_preparser_t *, void *id );
 
 /**
  * This function destroys the preparser object and thread.
  *
  * All pending input items will be released.
  */
-void input_preparser_Delete( input_preparser_t * );
+void vlc_preparser_Delete( vlc_preparser_t * );
 
 /**
  * This function deactivates the preparser
@@ -80,7 +80,7 @@ void input_preparser_Delete( input_preparser_t * );
  * All pending requests will be removed, and it will block until the currently
  * running entity has finished (if any).
  */
-void input_preparser_Deactivate( input_preparser_t * );
+void vlc_preparser_Deactivate( vlc_preparser_t * );
 
 #endif
 
