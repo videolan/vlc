@@ -1024,15 +1024,14 @@ static int Demux_Seekable( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     unsigned int i_track_count = 0;
-    unsigned int i_track;
     /* cannot be more than 100 stream (dcXX or wbXX) */
     avi_track_toread_t toread[100];
 
 
     /* detect new selected/unselected streams */
-    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+    for( unsigned int i = 0; i < p_sys->i_track; i++ )
     {
-        avi_track_t *tk = p_sys->track[i_track];
+        avi_track_t *tk = p_sys->track[i];
         bool  b = false;
 
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
@@ -1046,7 +1045,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             if( p_sys->b_seekable)
             {
-                AVI_TrackSeek( p_demux, i_track, p_sys->i_time );
+                AVI_TrackSeek( p_demux, i, p_sys->i_time );
             }
             tk->b_activated = true;
         }
@@ -1078,29 +1077,29 @@ static int Demux_Seekable( demux_t *p_demux )
     p_sys->i_time += p_sys->i_read_increment;
 
     /* init toread */
-    for( i_track = 0; i_track < p_sys->i_track; i_track++ )
+    for( unsigned i = 0; i < p_sys->i_track; i++ )
     {
-        avi_track_t *tk = p_sys->track[i_track];
+        avi_track_t *tk = p_sys->track[i];
 
-        toread[i_track].b_ok = tk->b_activated && !tk->b_eof;
+        toread[i].b_ok = tk->b_activated && !tk->b_eof;
         if( tk->i_idxposc < tk->idx.i_size )
         {
-            toread[i_track].i_posf = tk->idx.p_entry[tk->i_idxposc].i_pos;
+            toread[i].i_posf = tk->idx.p_entry[tk->i_idxposc].i_pos;
            if( tk->i_idxposb > 0 )
            {
-                toread[i_track].i_posf += 8 + tk->i_idxposb;
+                toread[i].i_posf += 8 + tk->i_idxposb;
            }
         }
         else
         {
-            toread[i_track].i_posf = -1;
+            toread[i].i_posf = -1;
         }
 
         vlc_tick_t i_dpts = p_sys->i_time - AVI_GetPTS( tk );
 
         if( tk->i_samplesize )
         {
-            toread[i_track].i_toread = AVI_PTSToByte( tk, i_dpts );
+            toread[i].i_toread = AVI_PTSToByte( tk, i_dpts );
         }
         else if ( i_dpts > VLC_TICK_FROM_SEC(-2) ) /* don't send a too early dts (low fps video) */
         {
@@ -1111,26 +1110,26 @@ static int Demux_Seekable( demux_t *p_demux )
                  * That does not even work when reading amount < scale / rate */
                 i_chunks_count++;
             }
-            toread[i_track].i_toread = i_chunks_count;
+            toread[i].i_toread = i_chunks_count;
         }
         else
-            toread[i_track].i_toread = -1;
+            toread[i].i_toread = -1;
     }
 
     for( ;; )
     {
-        avi_track_t     *tk;
-        bool       b_done;
+        bool b_done = true;
         block_t         *p_frame;
-        int64_t i_pos;
-        unsigned int i;
+        int64_t i_pos = -1;
+        unsigned int i_track = 0;
 
         /* search for first chunk to be read */
-        for( i = 0, b_done = true, i_pos = -1; i < p_sys->i_track; i++ )
+        for( unsigned i = 0; i < p_sys->i_track; i++ )
         {
+            avi_track_t *tk = p_sys->track[i];
             if( !toread[i].b_ok ||
                 ( p_sys->b_fastseekable && p_sys->b_interleaved &&
-                  AVI_GetDPTS( p_sys->track[i], toread[i].i_toread ) <= -p_sys->i_read_increment ) )
+                  AVI_GetDPTS( tk, toread[i].i_toread ) <= -p_sys->i_read_increment ) )
             {
                 continue;
             }
@@ -1152,7 +1151,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( b_done )
         {
-            for( i = 0; i < p_sys->i_track; i++ )
+            for( unsigned i = 0; i < p_sys->i_track; i++ )
             {
                 if( toread[i].b_ok && toread[i].i_toread >= 0 )
                     return VLC_DEMUXER_SUCCESS;
@@ -1210,7 +1209,7 @@ static int Demux_Seekable( demux_t *p_demux )
                 else
                 {
                     i_track = avi_pk.i_stream;
-                    tk = p_sys->track[i_track];
+                    avi_track_t *tk = p_sys->track[i_track];
 
                     /* add this chunk to the index */
                     avi_entry_t index;
@@ -1248,7 +1247,7 @@ static int Demux_Seekable( demux_t *p_demux )
         }
 
         /* Set the track to use */
-        tk = p_sys->track[i_track];
+        avi_track_t *tk = p_sys->track[i_track];
 
         size_t i_size;
         unsigned i_ck_remaining_bytes = tk->idx.p_entry[tk->i_idxposc].i_length -
