@@ -31,6 +31,7 @@ extern NSString * const VLCBookmarksTableViewCellIdentifier;
 @interface VLCBookmarksTableViewDataSource : NSObject<NSTableViewDataSource>
 
 @property (nonatomic, readwrite, assign) int64_t libraryItemId;
+@property (readonly) NSArray<VLCBookmark *> *bookmarks;
 
 - (void)addBookmark;
 - (VLCBookmark *)bookmarkForRow:(NSInteger)row;

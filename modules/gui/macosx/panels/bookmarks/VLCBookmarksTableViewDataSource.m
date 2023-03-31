@@ -42,7 +42,6 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
 
 @interface VLCBookmarksTableViewDataSource ()
 {
-    vlc_ml_bookmark_list_t *_bookmarks;
     vlc_medialibrary_t *_mediaLibrary;
     VLCPlayerController *_playerController;
 }
@@ -80,6 +79,32 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     [self updateBookmarks];
 }
 
+- (void)updateBookmarks
+{
+    if (_libraryItemId <= 0) {
+        _bookmarks = [NSArray array];
+        return;
+    }
+
+    vlc_ml_bookmark_list_t * const vlcBookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, _libraryItemId);
+
+    if (vlcBookmarks == NULL) {
+        _bookmarks = [NSArray array];
+        return;
+    }
+
+    NSMutableArray<VLCBookmark *> * const tempBookmarks = [NSMutableArray arrayWithCapacity:vlcBookmarks->i_nb_items];
+
+    for (int i = 0; i < vlcBookmarks->i_nb_items; i++) {
+        vlc_ml_bookmark_t vlcBookmark = vlcBookmarks->p_items[i];
+        VLCBookmark * const bookmark = [VLCBookmark bookmarkWithVlcBookmark:vlcBookmark];
+        [tempBookmarks addObject:bookmark];
+    }
+
+    _bookmarks = [tempBookmarks copy];
+    vlc_ml_bookmark_list_release(vlcBookmarks);
+}
+
 - (void)currentMediaItemChanged:(NSNotification * const)notification
 {
     [self updateLibraryItemId];
@@ -92,31 +117,33 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     }
 
     _libraryItemId = libraryItemId;
-    _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, libraryItemId);
+    [self updateBookmarks];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (_bookmarks == NULL) {
+    if (_bookmarks == nil) {
         return 0;
     }
 
-    return _bookmarks->i_nb_items;
+    return _bookmarks.count;
 }
 
 - (VLCBookmark *)bookmarkForRow:(NSInteger)row
 {
-    NSParameterAssert(row >= 0 || row < _bookmarks->i_nb_items);
-    vlc_ml_bookmark_t bookmark = _bookmarks->p_items[row];
-    return [[VLCBookmark alloc] initWithVlcBookmark:bookmark];
+    NSParameterAssert(row >= 0 || row < _bookmarks.count);
+    return [_bookmarks objectAtIndex:row];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCBookmarksTableViewDataSource * const vlcDataSource = (VLCBookmarksTableViewDataSource *)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+    if (_bookmarks == nil || _bookmarks.count == 0) {
+        return @"";
+    }
 
-    VLCBookmark * const bookmark = [vlcDataSource bookmarkForRow:row];
+    VLCBookmark * const bookmark = [self bookmarkForRow:row];
+    NSAssert(bookmark != nil, @"Should be a valid bookmark");
+
     NSString * const identifier = [tableColumn identifier];
 
     if ([identifier isEqualToString:@"name"]) {
@@ -132,20 +159,20 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
 
 - (void)addBookmark
 {
-    if (_libraryItemId == 0) {
+    if (_libraryItemId <= 0) {
         return;
     }
 
     const vlc_tick_t currentTime = _playerController.time;
     const int64_t bookmarkTime = MS_FROM_VLC_TICK(currentTime);
     vlc_ml_media_add_bookmark(_mediaLibrary, _libraryItemId, bookmarkTime);
-    _bookmarks = vlc_ml_list_media_bookmarks(_mediaLibrary, nil, _libraryItemId);
-
     vlc_ml_media_update_bookmark(_mediaLibrary,
                                  _libraryItemId,
                                  bookmarkTime,
                                  [_NS("New bookmark") UTF8String],
                                  [_NS("Description of new bookmark.") UTF8String]);
+
+    [self updateBookmarks];
 }
 
 @end
