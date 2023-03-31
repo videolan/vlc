@@ -243,7 +243,6 @@ libvlc_Quit
 libvlc_SetExitHandler
 libvlc_MetadataRequest
 libvlc_MetadataCancel
-libvlc_ArtRequest
 vlc_UrlParse
 vlc_UrlParseFixup
 vlc_UrlClean

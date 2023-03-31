@@ -503,19 +503,11 @@ typedef struct input_preparser_callbacks_t {
     void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
 } input_preparser_callbacks_t;
 
-typedef struct input_fetcher_callbacks_t {
-    void (*on_art_fetch_ended)(input_item_t *, bool fetched, void *userdata);
-} input_fetcher_callbacks_t;
-
 VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,
                                     input_item_meta_request_option_t,
                                     const input_preparser_callbacks_t *cbs,
                                     void *cbs_userdata,
                                     int, void * );
-VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,
-                              input_item_meta_request_option_t,
-                              const input_fetcher_callbacks_t *cbs,
-                              void *cbs_userdata );
 VLC_API void libvlc_MetadataCancel( libvlc_int_t *, void * );
 
 /******************

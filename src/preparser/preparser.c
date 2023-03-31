@@ -376,15 +376,6 @@ int input_preparser_Push( input_preparser_t *preparser,
     return VLC_SUCCESS;
 }
 
-void input_preparser_fetcher_Push( input_preparser_t *preparser,
-    input_item_t *item, input_item_meta_request_option_t options,
-    const input_fetcher_callbacks_t *cbs, void *cbs_userdata )
-{
-    if( preparser->fetcher )
-        input_fetcher_Push( preparser->fetcher, item, options,
-                            cbs, cbs_userdata );
-}
-
 void input_preparser_Cancel( input_preparser_t *preparser, void *id )
 {
     vlc_mutex_lock(&preparser->lock);

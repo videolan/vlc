@@ -491,26 +491,6 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
 }
 
 /**
- * Requests retrieving/downloading art for an input item.
- * The retrieval is performed asynchronously.
- */
-int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item,
-                      input_item_meta_request_option_t i_options,
-                      const input_fetcher_callbacks_t *cbs,
-                      void *cbs_userdata)
-{
-    libvlc_priv_t *priv = libvlc_priv(libvlc);
-    assert(i_options & META_REQUEST_OPTION_FETCH_ANY);
-
-    if (unlikely(priv->parser == NULL))
-        return VLC_ENOMEM;
-
-    input_preparser_fetcher_Push(priv->parser, item, i_options,
-                                 cbs, cbs_userdata);
-    return VLC_SUCCESS;
-}
-
-/**
  * Cancels extraction of the meta data for an input item.
  *
  * This does nothing if the input item is already processed or if it was not

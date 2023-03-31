@@ -34,6 +34,10 @@
  */
 typedef struct input_fetcher_t input_fetcher_t;
 
+typedef struct input_fetcher_callbacks_t {
+    void (*on_art_fetch_ended)(input_item_t *, bool fetched, void *userdata);
+} input_fetcher_callbacks_t;
+
 /**
  * This function creates the fetcher object and thread.
  */
