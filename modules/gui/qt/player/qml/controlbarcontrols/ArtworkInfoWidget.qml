@@ -33,6 +33,12 @@ AbstractButton {
     readonly property real minimumWidth: coverRect.implicitWidth +
                                          + (leftPadding + rightPadding)
 
+    readonly property int preferredWidth: minimumWidth + contentItem.spacing * 2
+                                          +
+                                          Math.max(titleLabel.implicitWidth,
+                                                   artistLabel.implicitWidth,
+                                                   progressIndicator.implicitWidth)
+
     property bool _keyPressed: false
 
     text: I18n.qtr("Open player")
