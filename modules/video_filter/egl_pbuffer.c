@@ -434,12 +434,16 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
     gl->ops = &gl_ops;
     gl->offscreen_vflip = true;
 
-    vlc_gl_MakeCurrent(gl);
+    eglMakeCurrent(sys->display, sys->surface, sys->surface,
+                   sys->context);
+
+
     int ret = vlc_gl_api_Init(&sys->api, gl);
     if (ret != VLC_SUCCESS)
     {
         msg_Err(gl, "Failed to initialize gl_api");
-        vlc_gl_ReleaseCurrent(gl);
+        eglMakeCurrent(sys->display, sys->surface, sys->surface,
+                       EGL_NO_CONTEXT);
         goto error2;
     }
 
@@ -471,8 +475,8 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
 
     sys->current_flip = BUFFER_COUNT - 1;
     BindDrawFramebuffer(sys);
-
-    vlc_gl_ReleaseCurrent(gl);
+    eglMakeCurrent(sys->display, sys->surface, sys->surface,
+                   EGL_NO_CONTEXT);
 
     return VLC_SUCCESS;
 
