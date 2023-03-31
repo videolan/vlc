@@ -1126,7 +1126,7 @@ PlayerController::PlayerController( qt_intf_t *_p_intf )
     connect( &d_ptr->m_position_timer, &QTimer::timeout, this, &PlayerController::updatePositionFromTimer );
     connect( &d_ptr->m_time_timer, &QTimer::timeout, this, &PlayerController::updateTimeFromTimer );
 
-    input_fetcher_cbs.on_art_fetch_ended = onArtFetchEnded_callback;
+    input_preparser_cbs.on_art_fetch_ended = onArtFetchEnded_callback;
 }
 
 PlayerController::~PlayerController()
@@ -1850,10 +1850,10 @@ void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
             if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
-        libvlc_ArtRequest( vlc_object_instance(d->p_intf), p_item,
-                           (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
-                                      : META_REQUEST_OPTION_FETCH_LOCAL,
-                           &input_fetcher_cbs, this );
+        libvlc_MetadataRequest( vlc_object_instance(d->p_intf), p_item,
+                                (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
+                                           : META_REQUEST_OPTION_FETCH_LOCAL,
+                                &input_preparser_cbs, this, 0, NULL );
     }
 }
 
