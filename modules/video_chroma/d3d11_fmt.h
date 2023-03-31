@@ -206,7 +206,10 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *);
 
 picture_t *D3D11_AllocPicture(vlc_object_t *,
                               const video_format_t *, vlc_video_context *,
-                              bool, const d3d_format_t *);
+                              bool shared, const d3d_format_t *);
+int D3D11_PictureFill(vlc_object_t *,
+                      picture_t *, vlc_video_context *,
+                      bool shared, const d3d_format_t *);
 
 void D3D11_PictureAttach(picture_t *, ID3D11Texture2D *textures, const d3d_format_t *cfg);
 

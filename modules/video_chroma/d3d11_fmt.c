@@ -983,32 +983,24 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *ctx)
     return &pic_ctx->s;
 }
 
-picture_t *D3D11_AllocPicture(vlc_object_t *obj,
-                              const video_format_t *fmt, vlc_video_context *vctx_out,
-                              bool shared, const d3d_format_t *cfg)
+int D3D11_PictureFill(vlc_object_t *obj, picture_t *pic,
+                      vlc_video_context *vctx_out,
+                      bool shared, const d3d_format_t *cfg)
 {
     if (unlikely(cfg == NULL))
-        return NULL;
+        return VLC_EINVAL;
 
     struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx == NULL))
-        return NULL;
+        return VLC_ENOMEM;
     pic_ctx->picsys.sharedHandle = INVALID_HANDLE_VALUE;
-
-    picture_t *pic = picture_NewFromFormat( fmt );
-    if (unlikely(pic == NULL))
-    {
-        free(pic_ctx);
-        return NULL;
-    }
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vctx_out);
     if (AllocateTextures(obj, &dev_sys->d3d_dev, cfg,
-                         fmt, shared, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
+                         &pic->format, shared, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
     {
-        picture_Release(pic);
         free(pic_ctx);
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     D3D11_AllocateResourceView(vlc_object_logger(obj), dev_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
@@ -1035,5 +1027,22 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
         vlc_video_context_Hold(vctx_out),
     };
     pic->context = &pic_ctx->s;
+    return VLC_SUCCESS;
+}
+
+picture_t *D3D11_AllocPicture(vlc_object_t *obj,
+                              const video_format_t *fmt, vlc_video_context *vctx_out,
+                              bool shared, const d3d_format_t *cfg)
+{
+    picture_t *pic = picture_NewFromFormat( fmt );
+    if (unlikely(pic == NULL))
+        return NULL;
+
+    if (D3D11_PictureFill(obj, pic, vctx_out, shared, cfg) != VLC_SUCCESS)
+    {
+        picture_Release(pic);
+        return NULL;
+    }
+
     return pic;
 }
