@@ -168,6 +168,7 @@ DrawBlend(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     vt->DrawArrays(GL_TRIANGLES, 0, 3);
 
     vt->Disable(GL_BLEND);
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
@@ -206,6 +207,7 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLES, 0, 3);
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
@@ -265,6 +267,7 @@ DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
