@@ -839,7 +839,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 
     libvlc_int_t *libvlc = inst->p_libvlc_int;
     input_item_t *item = media->p_input_item;
-    input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
+    input_item_meta_request_option_t parse_scope = 0;
     int ret;
     unsigned int ref = atomic_load_explicit(&media->worker_count,
                                             memory_order_relaxed);
@@ -853,6 +853,8 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
                                                   memory_order_relaxed,
                                                   memory_order_relaxed));
 
+    if (parse_flag & libvlc_media_parse_local)
+        parse_scope |= META_REQUEST_OPTION_SCOPE_LOCAL;
     if (parse_flag & libvlc_media_parse_network)
         parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
     if (parse_flag & libvlc_media_fetch_local)
