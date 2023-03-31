@@ -84,6 +84,11 @@ static int MakeCurrent (vlc_gl_t *gl)
         return VLC_EGENERIC;
 
     sys->current = true;
+
+    const opengl_vtable_t *vt = &sys->api.vt;
+    vt->BindBuffer(GL_PIXEL_PACK_BUFFER, sys->pixelbuffers[sys->current_flip]);
+    vt->BindFramebuffer(GL_FRAMEBUFFER, sys->framebuffers[sys->current_flip]);
+
     return VLC_SUCCESS;
 }
 
