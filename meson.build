@@ -173,6 +173,8 @@ intl_dep = dependency('intl', required: get_option('nls'))
 if intl_dep.found()
     cdata.set('HAVE_GETTEXT', 1)
     cdata.set('ENABLE_NLS', 1)
+
+    subdir('po')
 endif
 
 # Domain name i18n support via GNU libidn
