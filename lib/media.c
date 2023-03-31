@@ -864,7 +864,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
     if (parse_flag & libvlc_media_do_interact)
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
     if (parse_flag & libvlc_media_no_skip)
-        parse_scope |= META_REQUEST_OPTION_NO_SKIP;
+        parse_scope |= META_REQUEST_OPTION_SCOPE_FORCED;
 
     ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
                                  &input_preparser_callbacks, media,

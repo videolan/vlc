@@ -323,7 +323,7 @@ int input_preparser_Push( input_preparser_t *preparser,
         item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
 
-    if (!(i_options & META_REQUEST_OPTION_NO_SKIP))
+    if (!(i_options & META_REQUEST_OPTION_SCOPE_FORCED))
     {
         switch( i_type )
         {
