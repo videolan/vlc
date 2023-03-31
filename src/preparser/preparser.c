@@ -240,10 +240,14 @@ RunnableRun(void *userdata)
     vlc_tick_t deadline = task->timeout ? vlc_tick_now() + task->timeout
                                         : VLC_TICK_INVALID;
 
-    if (atomic_load(&task->interrupted))
-        goto end;
+    if (task->options & (META_REQUEST_OPTION_SCOPE_ANY|
+                         META_REQUEST_OPTION_SCOPE_FORCED))
+    {
+        if (atomic_load(&task->interrupted))
+            goto end;
 
-    Parse(task, deadline);
+        Parse(task, deadline);
+    }
 
     if (atomic_load(&task->interrupted))
         goto end;
@@ -335,9 +339,16 @@ int input_preparser_Push( input_preparser_t *preparser,
                     break;
                 /* fallthrough */
             default:
-                if (cbs && cbs->on_preparse_ended)
-                    cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
-                return VLC_SUCCESS;
+                if( ( i_options & META_REQUEST_OPTION_FETCH_ANY ) == 0 )
+                {
+                    /* Nothing to do (no preparse and not fetch), notify it */
+                    if (cbs && cbs->on_preparse_ended)
+                        cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED,
+                                               cbs_userdata);
+                    return VLC_SUCCESS;
+                }
+                /* Continue without parsing (but fetching) */
+                i_options &= ~META_REQUEST_OPTION_SCOPE_ANY;
         }
     }
 
