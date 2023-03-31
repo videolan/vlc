@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preparser.h
  *****************************************************************************
- * Copyright (C) 1999-2008 VLC authors and VideoLAN
+ * Copyright (C) 1999-2023 VLC authors and VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -25,6 +25,15 @@
 #define VLC_PREPARSER_H 1
 
 #include <vlc_input_item.h>
+
+/**
+ * @defgroup vlc_preparser Preparser
+ * @ingroup input
+ * @{
+ * @file
+ * VLC Preparser API
+ */
+
 /**
  * Preparser opaque structure.
  *
@@ -36,15 +45,23 @@ typedef struct vlc_preparser_t vlc_preparser_t;
 
 /**
  * This function creates the preparser object and thread.
+ *
+ * @param obj the parent object
+ * @return a valid preparser object or NULL in case of error
  */
-vlc_preparser_t *vlc_preparser_New( vlc_object_t * );
+vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj );
 
 /**
- * This function enqueues the provided item to be preparsed.
+ * This function enqueues the provided item to be preparsed or fetched.
  *
  * The input item is retained until the preparsing is done or until the
  * preparser object is deleted.
  *
+ * @param preparser the preparser object
+ * @param item a valid item to preparse
+ * @param option preparse flag, cf @ref input_item_meta_request_option_t
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
  * @param timeout maximum time allowed to preparse the item. If -1, the default
  * "preparse-timeout" option will be used as a timeout. If 0, it will wait
  * indefinitely. If > 0, the timeout will be used (in milliseconds).
@@ -54,8 +71,8 @@ vlc_preparser_t *vlc_preparser_New( vlc_object_t * );
  * otherwise
  * If this returns an error, the on_preparse_ended will *not* be invoked
  */
-int vlc_preparser_Push( vlc_preparser_t *, input_item_t *,
-                        input_item_meta_request_option_t,
+int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
+                        input_item_meta_request_option_t option,
                         const struct vlc_metadata_cbs *cbs,
                         void *cbs_userdata,
                         int timeout, void *id );
@@ -63,23 +80,29 @@ int vlc_preparser_Push( vlc_preparser_t *, input_item_t *,
 /**
  * This function cancel all preparsing requests for a given id
  *
+ * @param preparser the preparser object
  * @param id unique id given to vlc_preparser_Push()
  */
-void vlc_preparser_Cancel( vlc_preparser_t *, void *id );
+void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id );
 
 /**
  * This function destroys the preparser object and thread.
  *
+ * @param preparser the preparser object
  * All pending input items will be released.
  */
-void vlc_preparser_Delete( vlc_preparser_t * );
+void vlc_preparser_Delete( vlc_preparser_t *preparser );
 
 /**
  * This function deactivates the preparser
  *
  * All pending requests will be removed, and it will block until the currently
  * running entity has finished (if any).
+ *
+ * @param preparser the preparser object
  */
-void vlc_preparser_Deactivate( vlc_preparser_t * );
+void vlc_preparser_Deactivate( vlc_preparser_t *preparser );
+
+/** @} vlc_preparser */
 
 #endif
