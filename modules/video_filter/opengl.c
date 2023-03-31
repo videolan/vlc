@@ -191,7 +191,7 @@ static int Open( vlc_object_t *obj )
 
     if (sys->gl == NULL)
     {
-        msg_Err(obj, "Failed to create opengl context\n");
+        msg_Err(obj, "Failed to create opengl context");
         goto gl_create_failure;
     }
 
