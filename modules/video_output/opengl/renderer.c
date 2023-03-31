@@ -712,6 +712,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     const opengl_vtable_t *vt = renderer->vt;
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
+    GL_ASSERT_NOERROR(vt);
 
     vt->UseProgram(renderer->program_id);
 
@@ -751,6 +752,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                          renderer->var.ZoomMatrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
