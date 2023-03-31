@@ -317,36 +317,6 @@ clear:
 }
 
 /*****************************************************************************
- * data source methods
- *****************************************************************************/
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)theDataTable
-{
-#if 0
-    /* return the number of bookmarks */
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
-
-    if (!p_input)
-        return 0;
-
-    int returnValue = input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks);
-    input_Release(p_input);
-
-    if (returnValue != VLC_SUCCESS)
-        return 0;
-
-    for (int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete(pp_bookmarks[i]);
-    free(pp_bookmarks);
-
-    return i_bookmarks;
-#endif
-    return 0;
-}
-
-/*****************************************************************************
  * delegate methods
  *****************************************************************************/
 
