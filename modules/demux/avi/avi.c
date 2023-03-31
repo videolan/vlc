@@ -850,7 +850,7 @@ error:
  *****************************************************************************/
 
 static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
-                            uint32_t i_header, uint32_t i_size )
+                            uint32_t i_header, uint32_t i_osize )
 {
     /* skip header */
     if( i_header )
@@ -862,7 +862,7 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     }
 
     /* read size padded on word boundary */
-    i_size = __EVEN(i_size);
+    uint32_t i_size = __EVEN(i_osize);
 
     if( i_size == 0 )
         return block_Alloc(0); /* vlc_stream_Block can't read/alloc 0 sized */
@@ -870,6 +870,9 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     block_t *p_frame = vlc_stream_Block( p_demux->s, i_size );
     if ( !p_frame )
         return p_frame;
+
+    if( i_osize == i_size - 1 )
+        p_frame->i_buffer--;
 
     if( tk->bihprops.i_stride > INT32_MAX - 3 )
     {
