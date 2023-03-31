@@ -27,7 +27,10 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
-#ifdef ID3D11VideoContext_VideoProcessorBlt
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     ID3D11VideoDevice              *d3dviddev;
@@ -46,6 +49,9 @@ void D3D11_ReleaseProcessor(d3d11_processor_t *);
 
 HRESULT D3D11_Assert_ProcessorInput(vlc_object_t *, d3d11_processor_t *, picture_sys_d3d11_t *);
 #define D3D11_Assert_ProcessorInput(a,b,c) D3D11_Assert_ProcessorInput(VLC_OBJECT(a),b,c)
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* VLC_D3D11_PROCESSOR_H */
