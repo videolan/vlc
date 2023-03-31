@@ -59,6 +59,7 @@ struct task
     vlc_sem_t fetch_ended;
     atomic_int preparse_status;
     atomic_bool interrupted;
+    bool art_fetched;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
 
@@ -86,6 +87,7 @@ TaskNew(input_preparser_t *preparser, input_item_t *item,
     task->userdata = userdata;
     task->id = id;
     task->timeout = timeout;
+    task->art_fetched = false;
 
     input_item_Hold(item);
 
@@ -127,7 +129,15 @@ PreparserRemoveTask(input_preparser_t *preparser, struct task *task)
 static void
 NotifyPreparseEnded(struct task *task)
 {
-    if (task->cbs && task->cbs->on_preparse_ended) {
+    if (task->cbs == NULL)
+        return;
+
+    if (task->options & META_REQUEST_OPTION_FETCH_ANY
+     && task->cbs->on_art_fetch_ended)
+        task->cbs->on_art_fetch_ended(task->item, task->art_fetched,
+                                      task->userdata);
+
+    if (task->cbs->on_preparse_ended) {
         int status = atomic_load_explicit(&task->preparse_status,
                                           memory_order_relaxed);
         task->cbs->on_preparse_ended(task->item, status, task->userdata);
@@ -172,6 +182,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     VLC_UNUSED(fetched);
 
     struct task *task = userdata;
+    task->art_fetched = fetched;
 
     vlc_sem_post(&task->fetch_ended);
 }

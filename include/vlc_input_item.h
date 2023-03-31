@@ -499,6 +499,7 @@ enum input_item_preparse_status
 
 typedef struct input_preparser_callbacks_t {
     void (*on_preparse_ended)(input_item_t *, enum input_item_preparse_status status, void *userdata);
+    void (*on_art_fetch_ended)(input_item_t *, bool fetched, void *userdata);
     void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
 } input_preparser_callbacks_t;
 
