@@ -857,14 +857,14 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         parse_scope |= META_REQUEST_OPTION_SCOPE_LOCAL;
     if (parse_flag & libvlc_media_parse_network)
         parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+    if (parse_flag & libvlc_media_parse_forced)
+        parse_scope |= META_REQUEST_OPTION_SCOPE_FORCED;
     if (parse_flag & libvlc_media_fetch_local)
         parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
     if (parse_flag & libvlc_media_fetch_network)
         parse_scope |= META_REQUEST_OPTION_FETCH_NETWORK;
     if (parse_flag & libvlc_media_do_interact)
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-    if (parse_flag & libvlc_media_no_skip)
-        parse_scope |= META_REQUEST_OPTION_SCOPE_FORCED;
 
     ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
                                  &input_preparser_callbacks, media,
