@@ -77,12 +77,12 @@ public:
             // Copy the mask
             QPainter painter(&ret);
             painter.setCompositionMode(QPainter::CompositionMode_Source);
-            const auto radius = effectiveBlurRadius();
+            const auto radius = m_blurRadius;
             painter.drawImage(radius + m_xOffset, radius + m_yOffset, mask);
         }
 
         // Blur the mask
-        qt_blurImage(ret, effectiveBlurRadius(), false);
+        qt_blurImage(ret, m_blurRadius, false);
 
         return ret;
     }
@@ -90,8 +90,8 @@ public:
     constexpr QSize boundingSize(const QSize& size) const
     {
         // Size of bounding rectangle of the effect
-        const qreal radius = 2 * effectiveBlurRadius();
-        return size + QSize(qAbs(m_xOffset) + radius, qAbs(m_yOffset) + radius);
+        const qreal diameter = m_blurRadius * 2;
+        return size + QSize(qAbs(m_xOffset) + diameter, qAbs(m_yOffset) + diameter);
     }
 
 protected:
@@ -99,13 +99,6 @@ protected:
     QColor m_color {63, 63, 63, 180};
     qreal m_xOffset = 0.0;
     qreal m_yOffset = 0.0;
-
-private:
-    constexpr qreal effectiveBlurRadius() const
-    {
-        // Translated blur radius for the Qt blur algorithm
-        return 2.5 * (m_blurRadius + 1);
-    }
 };
 
 class RoundedRectDropShadowEffect : public RectDropShadowEffect
