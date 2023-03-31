@@ -109,6 +109,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
