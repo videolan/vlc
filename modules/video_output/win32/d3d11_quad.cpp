@@ -370,3 +370,59 @@ void d3d11_quad_t::UpdateViewport(const RECT *rect, const d3d_format_t *display)
         vlc_assert_unreachable();
     }
 }
+
+#ifdef HAVE_D3D11_4_H
+HRESULT D3D11_InitFence(d3d11_device_t & d3d_dev, d3d11_gpu_fence & fence)
+{
+    HRESULT hr;
+    ComPtr<ID3D11Device5> d3ddev5;
+    hr = d3d_dev.d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3ddev5));
+    if (FAILED(hr))
+        goto error;
+    hr = d3ddev5->CreateFence(fence.renderFence, D3D11_FENCE_FLAG_NONE, IID_GRAPHICS_PPV_ARGS(&fence.d3dRenderFence));
+    if (FAILED(hr))
+        goto error;
+    hr = d3d_dev.d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(&fence.d3dcontext4));
+    if (FAILED(hr))
+        goto error;
+    fence.renderFinished = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    if (unlikely(fence.renderFinished == nullptr))
+        goto error;
+    return S_OK;
+error:
+    fence.d3dRenderFence.Reset();
+    fence.d3dcontext4.Reset();
+    CloseHandle(fence.renderFinished);
+    return hr;
+}
+
+void D3D11_ReleaseFence(d3d11_gpu_fence & fence)
+{
+    if (fence.d3dcontext4.Get())
+    {
+        fence.d3dRenderFence.Reset();
+        fence.d3dcontext4.Reset();
+        CloseHandle(fence.renderFinished);
+        fence.renderFinished = nullptr;
+    }
+}
+
+int D3D11_WaitFence(d3d11_gpu_fence & fence)
+{
+    if (fence.d3dcontext4.Get())
+    {
+        if (fence.renderFence == UINT64_MAX)
+            fence.renderFence = 0;
+        else
+            fence.renderFence++;
+
+        ResetEvent(fence.renderFinished);
+        fence.d3dRenderFence->SetEventOnCompletion(fence.renderFence, fence.renderFinished);
+        fence.d3dcontext4->Signal(fence.d3dRenderFence.Get(), fence.renderFence);
+
+        WaitForSingleObject(fence.renderFinished, INFINITE);
+        return VLC_SUCCESS;
+    }
+    return VLC_ENOTSUP;
+}
+#endif // HAVE_D3D11_4_H

@@ -40,9 +40,6 @@
 #include <new>
 
 #include "../../video_chroma/d3d11_fmt.h"
-#ifdef HAVE_D3D11_4_H
-#include <d3d11_4.h>
-#endif
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
@@ -92,10 +89,7 @@ typedef struct vout_display_sys_t
     d3d11_quad_t             picQuad;
 
 #ifdef HAVE_D3D11_4_H
-    ComPtr<ID3D11Fence>      d3dRenderFence;
-    ComPtr<ID3D11DeviceContext4> d3dcontext4;
-    UINT64                   renderFence = 0;
-    HANDLE                   renderFinished = NULL;
+    d3d11_gpu_fence          fence;
 #endif
 
     picture_sys_d3d11_t      stagingSys;
@@ -628,23 +622,15 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     }
 
 #ifdef HAVE_D3D11_4_H
-    if (sys->d3dcontext4.Get())
+    if (sys->log_level >= 4)
     {
-        vlc_tick_t render_start;
-        if (sys->log_level >= 4)
-            render_start = vlc_tick_now();
-        if (sys->renderFence == UINT64_MAX)
-            sys->renderFence = 0;
-        else
-            sys->renderFence++;
-
-        ResetEvent(sys->renderFinished);
-        sys->d3dRenderFence->SetEventOnCompletion(sys->renderFence, sys->renderFinished);
-        sys->d3dcontext4->Signal(sys->d3dRenderFence.Get(), sys->renderFence);
-
-        WaitForSingleObject(sys->renderFinished, INFINITE);
-        if (sys->log_level >= 4)
-            msg_Dbg(vd, "waited %" PRId64 " ms for the render fence", MS_FROM_VLC_TICK(vlc_tick_now() - render_start));
+        vlc_tick_t render_start = vlc_tick_now();
+        D3D11_WaitFence(sys->fence);
+        msg_Dbg(vd, "waited %" PRId64 " ms for the render fence", MS_FROM_VLC_TICK(vlc_tick_now() - render_start));
+    }
+    else
+    {
+        D3D11_WaitFence(sys->fence);
     }
 #endif
 }
@@ -1073,39 +1059,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     return UpdateStaging(vd, fmt);
 }
 
-#ifdef HAVE_D3D11_4_H
-static HRESULT InitRenderFence(vout_display_sys_t *sys)
-{
-    HRESULT hr;
-    ComPtr<ID3D11Device5> d3ddev5;
-    hr = sys->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3ddev5));
-    if (FAILED(hr))
-        goto error;
-    hr = d3ddev5->CreateFence(sys->renderFence, D3D11_FENCE_FLAG_NONE, IID_GRAPHICS_PPV_ARGS(&sys->d3dRenderFence));
-    if (FAILED(hr))
-        goto error;
-    hr = sys->d3d_dev->d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(&sys->d3dcontext4));
-    if (FAILED(hr))
-        goto error;
-    sys->renderFinished = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (unlikely(sys->renderFinished == NULL))
-        goto error;
-    return S_OK;
-error:
-    sys->d3dRenderFence.Reset();
-    sys->d3dcontext4.Reset();
-    CloseHandle(sys->renderFinished);
-    return hr;
-}
-#endif // HAVE_D3D11_4_H
-
 static int Direct3D11CreateGenericResources(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     HRESULT hr;
 
 #ifdef HAVE_D3D11_4_H
-    hr = InitRenderFence(sys);
+    hr = D3D11_InitFence(*sys->d3d_dev, sys->fence);
     if (SUCCEEDED(hr))
     {
         msg_Dbg(vd, "using GPU render fence");
@@ -1223,13 +1183,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
 #ifdef HAVE_D3D11_4_H
-    if (sys->d3dcontext4.Get())
-    {
-        sys->d3dRenderFence.Reset();
-        sys->d3dcontext4.Reset();
-        CloseHandle(sys->renderFinished);
-        sys->renderFinished = NULL;
-    }
+    D3D11_ReleaseFence(sys->fence);
 #endif
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");

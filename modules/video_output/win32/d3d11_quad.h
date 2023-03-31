@@ -25,11 +25,29 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_shaders.h"
+#ifdef HAVE_D3D11_4_H
+# include <d3d11_4.h>
+#endif
 
 #define PS_CONST_LUMI_BOUNDS 0
 #define VS_CONST_VIEWPOINT   1
 
 typedef bool (*d3d11_select_plane_t)(void *opaque, size_t plane_index, ID3D11RenderTargetView **);
+
+#ifdef HAVE_D3D11_4_H
+struct d3d11_gpu_fence
+{
+    Microsoft::WRL::ComPtr<ID3D11Fence>          d3dRenderFence;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext4> d3dcontext4;
+    UINT64                                       renderFence = 0;
+    HANDLE                                       renderFinished = nullptr;
+};
+
+HRESULT D3D11_InitFence(d3d11_device_t &, d3d11_gpu_fence &);
+int D3D11_WaitFence(d3d11_gpu_fence &);
+void D3D11_ReleaseFence(d3d11_gpu_fence &);
+#endif
+
 
 void D3D11_RenderQuad(d3d11_device_t *, d3d11_quad_t *, d3d11_vertex_shader_t *,
                       ID3D11ShaderResourceView *resourceViews[DXGI_MAX_SHADER_VIEW],
