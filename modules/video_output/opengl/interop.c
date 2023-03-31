@@ -74,6 +74,7 @@ vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
+    GL_ASSERT_NOERROR(&priv->gl);
 
     if (interop->ops->allocate_textures != NULL)
     {
