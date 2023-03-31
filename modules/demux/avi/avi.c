@@ -168,6 +168,17 @@ typedef struct
     unsigned int    i_blockno;
     unsigned int    i_blocksize;
 
+    struct
+    {
+        bool b_ok;
+
+        int64_t i_toread;
+
+        int64_t i_posf; /* where we will read :
+                       if i_idxposb == 0 : beginning of chunk (+8 to access data)
+                       else : point on data directly */
+    } demuxctx;
+
 } avi_track_t;
 
 typedef struct
@@ -1008,25 +1019,11 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-typedef struct
-{
-    bool b_ok;
-
-    int64_t i_toread;
-
-    int64_t i_posf; /* where we will read :
-                   if i_idxposb == 0 : beginning of chunk (+8 to access data)
-                   else : point on data directly */
-} avi_track_toread_t;
-
 static int Demux_Seekable( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     unsigned int i_track_count = 0;
-    /* cannot be more than 100 stream (dcXX or wbXX) */
-    avi_track_toread_t toread[100];
-
 
     /* detect new selected/unselected streams */
     for( unsigned int i = 0; i < p_sys->i_track; i++ )
@@ -1081,25 +1078,25 @@ static int Demux_Seekable( demux_t *p_demux )
     {
         avi_track_t *tk = p_sys->track[i];
 
-        toread[i].b_ok = tk->b_activated && !tk->b_eof;
+        tk->demuxctx.b_ok = tk->b_activated && !tk->b_eof;
         if( tk->i_idxposc < tk->idx.i_size )
         {
-            toread[i].i_posf = tk->idx.p_entry[tk->i_idxposc].i_pos;
+            tk->demuxctx.i_posf = tk->idx.p_entry[tk->i_idxposc].i_pos;
            if( tk->i_idxposb > 0 )
            {
-                toread[i].i_posf += 8 + tk->i_idxposb;
+                tk->demuxctx.i_posf += 8 + tk->i_idxposb;
            }
         }
         else
         {
-            toread[i].i_posf = -1;
+            tk->demuxctx.i_posf = -1;
         }
 
         vlc_tick_t i_dpts = p_sys->i_time - AVI_GetPTS( tk );
 
         if( tk->i_samplesize )
         {
-            toread[i].i_toread = AVI_PTSToByte( tk, i_dpts );
+            tk->demuxctx.i_toread = AVI_PTSToByte( tk, i_dpts );
         }
         else if ( i_dpts > VLC_TICK_FROM_SEC(-2) ) /* don't send a too early dts (low fps video) */
         {
@@ -1110,10 +1107,10 @@ static int Demux_Seekable( demux_t *p_demux )
                  * That does not even work when reading amount < scale / rate */
                 i_chunks_count++;
             }
-            toread[i].i_toread = i_chunks_count;
+            tk->demuxctx.i_toread = i_chunks_count;
         }
         else
-            toread[i].i_toread = -1;
+            tk->demuxctx.i_toread = -1;
     }
 
     for( ;; )
@@ -1127,23 +1124,23 @@ static int Demux_Seekable( demux_t *p_demux )
         for( unsigned i = 0; i < p_sys->i_track; i++ )
         {
             avi_track_t *tk = p_sys->track[i];
-            if( !toread[i].b_ok ||
+            if( !tk->demuxctx.b_ok ||
                 ( p_sys->b_fastseekable && p_sys->b_interleaved &&
-                  AVI_GetDPTS( tk, toread[i].i_toread ) <= -p_sys->i_read_increment ) )
+                  AVI_GetDPTS( tk, tk->demuxctx.i_toread ) <= -p_sys->i_read_increment ) )
             {
                 continue;
             }
 
-            if( toread[i].i_toread > 0 )
+            if( tk->demuxctx.i_toread > 0 )
             {
                 b_done = false; /* not yet finished */
 
-                if( toread[i].i_posf > 0 )
+                if( tk->demuxctx.i_posf > 0 )
                 {
-                    if( i_pos == -1 || i_pos > toread[i].i_posf )
+                    if( i_pos == -1 || i_pos > tk->demuxctx.i_posf )
                     {
                         i_track = i;
-                        i_pos = toread[i].i_posf;
+                        i_pos = tk->demuxctx.i_posf;
                     }
                 }
             }
@@ -1153,7 +1150,8 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             for( unsigned i = 0; i < p_sys->i_track; i++ )
             {
-                if( toread[i].b_ok && toread[i].i_toread >= 0 )
+                const avi_track_t *tk = p_sys->track[i];
+                if( tk->demuxctx.b_ok && tk->demuxctx.i_toread >= 0 )
                     return VLC_DEMUXER_SUCCESS;
             }
             msg_Warn( p_demux, "all tracks have failed, exiting..." );
@@ -1221,7 +1219,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
                     /* do we will read this data ? */
                     if( i_indexid >= 0 &&
-                        AVI_GetDPTS( tk, toread[i_track].i_toread ) > -p_sys->i_read_increment )
+                        AVI_GetDPTS( tk, tk->demuxctx.i_toread ) > -p_sys->i_read_increment )
                     {
                         tk->i_idxposc = (unsigned int) i_indexid;
                         tk->i_idxposb = 0;
@@ -1259,7 +1257,7 @@ static int Demux_Seekable( demux_t *p_demux )
             int64_t i_toread;
 
             /* remaining bytes to read inside the current read increment */
-            if( ( i_toread = toread[i_track].i_toread ) <= 0 )
+            if( ( i_toread = tk->demuxctx.i_toread ) <= 0 )
             {
                 if( tk->i_samplesize > 1 )
                 {
@@ -1287,7 +1285,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             msg_Warn( p_demux, "failed reading data" );
             tk->b_eof = false;
-            toread[i_track].b_ok = false;
+            tk->demuxctx.b_ok = false;
             continue;
         }
 
@@ -1304,7 +1302,7 @@ static int Demux_Seekable( demux_t *p_demux )
         /* advance chunk/byte pointers */
         if( tk->i_samplesize )
         {
-            toread[i_track].i_toread -= i_size;
+            tk->demuxctx.i_toread -= i_size;
             tk->i_idxposb += i_size;
             if( tk->i_idxposb >=
                     tk->idx.p_entry[tk->i_idxposc].i_length )
@@ -1321,23 +1319,23 @@ static int Demux_Seekable( demux_t *p_demux )
             {
                 tk->i_blockno += tk->i_blocksize > 0 ? ( i_size + tk->i_blocksize - 1 ) / tk->i_blocksize : 1;
             }
-            toread[i_track].i_toread--;
+            tk->demuxctx.i_toread--;
         }
 
         /* check new chunk and set new read pos */
         if( tk->i_idxposc < tk->idx.i_size)
         {
-            toread[i_track].i_posf =
+            tk->demuxctx.i_posf =
                 tk->idx.p_entry[tk->i_idxposc].i_pos;
             if( tk->i_idxposb > 0 )
             {
-                toread[i_track].i_posf += 8 + tk->i_idxposb;
+                tk->demuxctx.i_posf += 8 + tk->i_idxposb;
             }
 
         }
         else /* all chunks read for this track */
         {
-            toread[i_track].i_posf = -1;
+            tk->demuxctx.i_posf = -1;
         }
 
         AVI_SendFrame( p_demux, tk, p_frame );
