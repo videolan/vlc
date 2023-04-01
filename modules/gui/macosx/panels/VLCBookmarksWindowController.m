@@ -276,21 +276,10 @@ clear:
 
 - (IBAction)remove:(id)sender
 {
-#if 0
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (!p_input)
-        return;
-
-    int i_focused = (int)[_dataTable selectedRow];
-
-    if (i_focused >= 0)
-        input_Control(p_input, INPUT_DEL_BOOKMARK, i_focused);
-
-    input_Release(p_input);
-
+    const NSInteger selectedRow = [_dataTable selectedRow];
+    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
+    [_tableViewDataSource removeBookmark:bookmark];
     [_dataTable reloadData];
-#endif
 }
 
 - (NSString *)timeStringForBookmark:(seekpoint_t *)bookmark

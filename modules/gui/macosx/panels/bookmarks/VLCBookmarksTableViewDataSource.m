@@ -175,6 +175,21 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     [self updateBookmarks];
 }
 
+- (void)removeBookmarkWithTime:(const int64_t)bookmarkTime
+{
+    if (_libraryItemId <= 0) {
+        return;
+    }
+
+    vlc_ml_media_remove_bookmark(_mediaLibrary, _libraryItemId, bookmarkTime);
+    [self updateBookmarks];
+}
+
+- (void)removeBookmark:(VLCBookmark *)bookmark
+{
+    [self removeBookmarkWithTime:bookmark.bookmarkTime];
+}
+
 - (void)clearBookmarks
 {
     if (_libraryItemId <= 0) {
