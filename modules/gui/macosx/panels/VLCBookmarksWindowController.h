@@ -33,27 +33,12 @@
 @property (readwrite, weak) IBOutlet NSButton *removeButton;
 @property (readwrite, weak) IBOutlet NSTableView *dataTable;
 
-/* edit window */
-@property (readwrite) IBOutlet NSWindow *editBookmarksWindow;
-@property (readwrite, weak) IBOutlet NSButton *editOKButton;
-@property (readwrite, weak) IBOutlet NSButton *editCancelButton;
-@property (readwrite, weak) IBOutlet NSTextField *editNameLabel;
-@property (readwrite, weak) IBOutlet NSTextField *editDescriptionLabel;
-@property (readwrite, weak) IBOutlet NSTextField *editTimeLabel;
-@property (readwrite, weak) IBOutlet NSTextField *editNameTextField;
-@property (readwrite, weak) IBOutlet NSTextField *editDescriptionTextField;
-@property (readwrite, weak) IBOutlet NSTextField *editTimeTextField;
-
 - (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)add:(id)sender;
 - (IBAction)clear:(id)sender;
-- (IBAction)edit:(id)sender;
 - (IBAction)remove:(id)sender;
 - (IBAction)goToBookmark:(id)sender;
-
-- (IBAction)edit_cancel:(id)sender;
-- (IBAction)edit_ok:(id)sender;
 
 - (void)toggleRowDependentButtonsEnabled:(BOOL)enabled;
 

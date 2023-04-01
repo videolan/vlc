@@ -54,7 +54,6 @@
 {
     VLCBookmarksTableViewDataSource *_tableViewDataSource;
     VLCBookmarksTableViewDelegate *_tableViewDelegate;
-    VLCInputItem *_oldInputItem;
 }
 @end
 
@@ -97,19 +96,11 @@
     [self.window setTitle: _NS("Bookmarks")];
     [_addButton setTitle: _NS("Add")];
     [_clearButton setTitle: _NS("Clear")];
-    [_editButton setTitle: _NS("Edit")];
     [_removeButton setTitle: _NS("Remove")];
     [[[_dataTable tableColumnWithIdentifier:@"description"] headerCell]
      setStringValue: _NS("Description")];
     [[[_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
      setStringValue: _NS("Time")];
-
-    /* edit window */
-    [_editOKButton setTitle: _NS("OK")];
-    [_editCancelButton setTitle: _NS("Cancel")];
-    [_editNameLabel setStringValue: _NS("Name")];
-    [_editDescriptionLabel setStringValue: _NS("Description")];
-    [_editTimeLabel setStringValue: _NS("Time")];
 }
 
 - (void)updateCocoaWindowLevel:(NSNotification *)aNotification
@@ -145,91 +136,6 @@
     [_tableViewDataSource clearBookmarks];
     [_dataTable reloadData];
 }
-
-- (IBAction)edit:(id)sender
-{
-    VLCInputItem * const currentlyPlayingInputItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
-    if (currentlyPlayingInputItem == nil) {
-        return;
-    }
-
-    const NSInteger selectedRow = [_dataTable selectedRow];
-    if (selectedRow < 0) {
-        return;
-    }
-
-    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
-
-    [_editNameTextField setStringValue:bookmark.bookmarkName];
-    [_editDescriptionTextField setStringValue:bookmark.bookmarkDescription];
-    [_editTimeTextField setStringValue:[NSString stringWithTime:bookmark.bookmarkTime / 1000]];
-
-    [self.window beginSheet:_editBookmarksWindow completionHandler:nil];
-
-    _oldInputItem = currentlyPlayingInputItem;
-}
-
-- (IBAction)edit_cancel:(id)sender
-{
-    /* close sheet */
-    [NSApp endSheet:_editBookmarksWindow];
-    [_editBookmarksWindow close];
-}
-
-- (IBAction)edit_ok:(id)sender
-{
-    VLCInputItem * const currentlyPlayingInputItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
-    if (currentlyPlayingInputItem == nil) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSCriticalAlertStyle];
-        [alert setMessageText:_NS("No input")];
-        [alert setInformativeText:_NS("No input found. A stream must be playing or paused for bookmarks to work.")];
-        [alert beginSheetModalForWindow:self.window
-                      completionHandler:nil];
-        return;
-    }
-
-    if (_oldInputItem.vlcInputItem != currentlyPlayingInputItem.vlcInputItem) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSCriticalAlertStyle];
-        [alert setMessageText:_NS("Input has changed")];
-        [alert setInformativeText:_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input.")];
-        [alert beginSheetModalForWindow:self.window
-                      completionHandler:nil];
-        return;
-    }
-
-    const NSInteger selectedRow = [_dataTable selectedRow];
-    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
-    VLCBookmark * const originalBookmark = [bookmark copy];
-
-    NSArray * const components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
-    const NSUInteger componentCount = [components count];
-    NSLog(@"%@", components);
-
-    if (componentCount == 1) {
-        bookmark.bookmarkTime = ([[components firstObject] longLongValue]) * 1000;
-    } else if (componentCount == 2) {
-        bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 60 +
-                                 [[components objectAtIndex:1] longLongValue]) * 1000;
-    } else if (componentCount == 3) {
-        bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 3600 +
-                                 [[components objectAtIndex:1] longLongValue] * 60 +
-                                 [[components objectAtIndex:2] longLongValue]) * 1000;
-    } else {
-        msg_Err(getIntf(), "Invalid string format for time");
-    }
-
-    bookmark.bookmarkName = _editNameTextField.stringValue;
-    bookmark.bookmarkDescription = _editDescriptionTextField.stringValue;
-
-    [_tableViewDataSource editBookmark:bookmark originalBookmark:originalBookmark];
-    [_dataTable reloadData];
-
-    [NSApp endSheet: _editBookmarksWindow];
-    [_editBookmarksWindow close];
-}
-
 
 - (IBAction)goToBookmark:(id)sender
 {
@@ -302,7 +208,6 @@
 
 - (void)toggleRowDependentButtonsEnabled:(BOOL)enabled
 {
-    _editButton.enabled = enabled;
     _removeButton.enabled = enabled;
 }
 
