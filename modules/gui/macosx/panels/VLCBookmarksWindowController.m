@@ -35,12 +35,16 @@
 
 #import "VLCBookmarksWindowController.h"
 
+#import "bookmarks/VLCBookmark.h"
 #import "bookmarks/VLCBookmarksTableViewDataSource.h"
 #import "bookmarks/VLCBookmarksTableViewDelegate.h"
 
 #import "extensions/NSString+Helpers.h"
 
 #import "main/CompatibilityFixes.h"
+
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 #import "windows/video/VLCVideoOutputProvider.h"
 
@@ -262,16 +266,12 @@ clear:
 
 - (IBAction)goToBookmark:(id)sender
 {
-#if 0
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
+    const NSInteger selectedRow = [_dataTable selectedRow];
+    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
+    vlc_tick_t bookmarkTime = VLC_TICK_FROM_MS(bookmark.bookmarkTime);
 
-    if (!p_input)
-        return;
-
-    input_Control(p_input, INPUT_SET_BOOKMARK, [_dataTable selectedRow]);
-
-    input_Release(p_input);
-#endif
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    [playerController setTimeFast:bookmarkTime];
 }
 
 - (IBAction)remove:(id)sender
