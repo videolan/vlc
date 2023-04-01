@@ -111,15 +111,24 @@ vlc_frame_t *vlc_frame_Alloc (size_t size)
                    "VLC_FRAME_PADDING must be a multiple of VLC_FRAME_ALIGN");
 
     /* 2 * VLC_FRAME_PADDING: pre + post padding */
-    const size_t capacity = VLC_FRAME_ALIGN + (2 * VLC_FRAME_PADDING) + size;
-    unsigned char *buf = malloc(capacity);
+    size_t capacity = (2 * VLC_FRAME_PADDING) + size;
+    unsigned char *buf;
+#ifdef HAVE_ALIGNED_ALLOC
+    capacity += (-size) % VLC_FRAME_ALIGN;
+    buf = aligned_alloc(VLC_FRAME_ALIGN, capacity);
+#else
+    capacity += VLC_FRAME_ALIGN;
+    buf = malloc(capacity);
+#endif
     if (unlikely(buf == NULL))
         return NULL;
 
     vlc_frame_t *f = vlc_frame_heap_Alloc(buf, capacity);
     if (likely(f != NULL)) {
+#ifndef HAVE_ALIGNED_ALLOC
         /* Alignment */
         buf += (-(uintptr_t)(void *)buf) % (uintptr_t)VLC_FRAME_ALIGN;
+#endif
         /* Header reserve */
         buf += VLC_FRAME_PADDING;
         f->p_buffer = buf;
