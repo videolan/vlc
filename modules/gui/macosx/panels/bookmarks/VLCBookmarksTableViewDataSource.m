@@ -57,16 +57,31 @@ NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset"
 {
     self = [super init];
     if (self) {
-        _playerController = VLCMain.sharedInstance.playlistController.playerController;
-        _mediaLibrary = vlc_ml_instance_get(getIntf());
-        [self updateLibraryItemId];
-
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(currentMediaItemChanged:)
-                                                   name:VLCPlayerCurrentMediaItemChanged
-                                                 object:nil];
+        [self setup];
     }
     return self;
+}
+
+- (instancetype)initWithTableView:(NSTableView *)tableView
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+        _tableView = tableView;
+    }
+    return self;
+}
+
+- (void)setup
+{
+    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _mediaLibrary = vlc_ml_instance_get(getIntf());
+    [self updateLibraryItemId];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(currentMediaItemChanged:)
+                                               name:VLCPlayerCurrentMediaItemChanged
+                                             object:nil];
 }
 
 - (void)updateLibraryItemId
@@ -87,6 +102,7 @@ NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset"
 {
     if (_libraryItemId <= 0) {
         _bookmarks = [NSArray array];
+        [_tableView reloadData];
         return;
     }
 
@@ -94,6 +110,7 @@ NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset"
 
     if (vlcBookmarks == NULL) {
         _bookmarks = [NSArray array];
+        [_tableView reloadData];
         return;
     }
 
@@ -107,6 +124,8 @@ NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset"
 
     _bookmarks = [tempBookmarks copy];
     vlc_ml_bookmark_list_release(vlcBookmarks);
+
+    [_tableView reloadData];
 }
 
 - (void)currentMediaItemChanged:(NSNotification * const)notification

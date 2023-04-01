@@ -36,6 +36,9 @@ extern NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier;
 
 @property (nonatomic, readwrite, assign) int64_t libraryItemId;
 @property (readonly) NSArray<VLCBookmark *> *bookmarks;
+@property (readwrite) NSTableView *tableView;
+
+- (instancetype)initWithTableView:(NSTableView *)tableView;
 
 - (void)addBookmark;
 - (void)editBookmark:(VLCBookmark *)editedBookmark originalBookmark:(VLCBookmark *)originalBookmark;

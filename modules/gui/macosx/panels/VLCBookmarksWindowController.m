@@ -84,7 +84,7 @@
 {
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    _tableViewDataSource = [[VLCBookmarksTableViewDataSource alloc] init];
+    _tableViewDataSource = [[VLCBookmarksTableViewDataSource alloc] initWithTableView:_dataTable];
     _tableViewDelegate = [[VLCBookmarksTableViewDelegate alloc] initWithBookmarksWindowController:self];
 
     _dataTable.dataSource = _tableViewDataSource;
@@ -130,13 +130,11 @@
 - (IBAction)add:(id)sender
 {
     [_tableViewDataSource addBookmark];
-    [_dataTable reloadData];
 }
 
 - (IBAction)clear:(id)sender
 {
     [_tableViewDataSource clearBookmarks];
-    [_dataTable reloadData];
 }
 
 - (IBAction)goToBookmark:(id)sender
@@ -154,7 +152,6 @@
     const NSInteger selectedRow = [_dataTable selectedRow];
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
     [_tableViewDataSource removeBookmark:bookmark];
-    [_dataTable reloadData];
 }
 
 /* Called when the user hits CMD + C or copy is clicked in the edit menu
