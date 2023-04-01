@@ -38,8 +38,10 @@
 @property (readwrite, weak) IBOutlet NSButton *editOKButton;
 @property (readwrite, weak) IBOutlet NSButton *editCancelButton;
 @property (readwrite, weak) IBOutlet NSTextField *editNameLabel;
+@property (readwrite, weak) IBOutlet NSTextField *editDescriptionLabel;
 @property (readwrite, weak) IBOutlet NSTextField *editTimeLabel;
 @property (readwrite, weak) IBOutlet NSTextField *editNameTextField;
+@property (readwrite, weak) IBOutlet NSTextField *editDescriptionTextField;
 @property (readwrite, weak) IBOutlet NSTextField *editTimeTextField;
 
 - (IBAction)toggleWindow:(id)sender;

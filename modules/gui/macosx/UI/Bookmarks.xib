@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,6 +14,8 @@
                 <outlet property="editBookmarksWindow" destination="133" id="170"/>
                 <outlet property="editButton" destination="90" id="167"/>
                 <outlet property="editCancelButton" destination="143" id="171"/>
+                <outlet property="editDescriptionLabel" destination="mLX-It-aCO" id="cb2-dI-ycm"/>
+                <outlet property="editDescriptionTextField" destination="Iqd-Ep-T5U" id="RNT-yM-A8U"/>
                 <outlet property="editNameLabel" destination="145" id="175"/>
                 <outlet property="editNameTextField" destination="135" id="173"/>
                 <outlet property="editOKButton" destination="141" id="172"/>
@@ -29,59 +31,59 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="340" y="330" width="566" height="263"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="85">
                 <rect key="frame" x="0.0" y="0.0" width="566" height="263"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88">
-                        <rect key="frame" x="20" y="224" width="59" height="19"/>
+                        <rect key="frame" x="20" y="224" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                         </buttonCell>
                         <connections>
                             <action selector="add:" target="-2" id="177"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
-                        <rect key="frame" x="20" y="199" width="59" height="19"/>
+                        <rect key="frame" x="20" y="199" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                         </buttonCell>
                         <connections>
                             <action selector="edit:" target="-2" id="179"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
-                        <rect key="frame" x="20" y="174" width="59" height="19"/>
+                        <rect key="frame" x="20" y="174" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                         </buttonCell>
                         <connections>
                             <action selector="remove:" target="-2" id="183"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
-                        <rect key="frame" x="20" y="149" width="59" height="19"/>
+                        <rect key="frame" x="20" y="149" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                         </buttonCell>
                         <connections>
                             <action selector="clear:" target="-2" id="178"/>
                         </connections>
                     </button>
                     <scrollView horizontalCompressionResistancePriority="749" borderType="line" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="107">
-                        <rect key="frame" x="87" y="20" width="459" height="232"/>
+                        <rect key="frame" x="90" y="20" width="456" height="232"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="KmY-DA-2er">
-                            <rect key="frame" x="1" y="1" width="457" height="230"/>
+                            <rect key="frame" x="1" y="1" width="454" height="230"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" autosaveName="bookmarks-table" headerView="111" id="110" customClass="VLCHUDTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="457" height="207"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="533" height="207"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -132,16 +134,16 @@
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="Y3p-2z-GZy"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="vLK-mg-OaO"/>
                         </constraints>
-                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="109">
-                            <rect key="frame" x="1" y="259" width="148" height="16"/>
+                        <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="109">
+                            <rect key="frame" x="1" y="215" width="454" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="108">
                             <rect key="frame" x="378" y="18" width="15" height="242"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <tableHeaderView key="headerView" id="111">
-                            <rect key="frame" x="0.0" y="0.0" width="457" height="23"/>
+                        <tableHeaderView key="headerView" wantsLayer="YES" id="111">
+                            <rect key="frame" x="0.0" y="0.0" width="533" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -170,36 +172,47 @@
         <window title="Bookmark inspector" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="133" userLabel="EditBookmarks" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="340" y="401" width="298" height="125"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
+            <rect key="contentRect" x="340" y="401" width="322" height="156"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" id="134">
-                <rect key="frame" x="0.0" y="0.0" width="298" height="125"/>
+                <rect key="frame" x="0.0" y="0.0" width="325" height="151"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="135">
-                        <rect key="frame" x="74" y="84" width="204" height="21"/>
+                        <rect key="frame" x="101" y="110" width="204" height="21"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="204" id="bLc-El-nRp"/>
                         </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="136">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Bookmark name" id="136">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iqd-Ep-T5U">
+                        <rect key="frame" x="101" y="79" width="204" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="204" id="p7l-0c-3A3"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Bookmark description" id="HwY-r7-hfv">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="137">
-                        <rect key="frame" x="74" y="53" width="204" height="21"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="138">
+                        <rect key="frame" x="101" y="48" width="204" height="21"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="-- : --" id="138">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="141">
-                        <rect key="frame" x="246" y="18" width="32" height="19"/>
+                        <rect key="frame" x="273" y="19" width="32" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
@@ -209,10 +222,10 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="143">
-                        <rect key="frame" x="185" y="18" width="53" height="19"/>
+                        <rect key="frame" x="209" y="19" width="56" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -222,15 +235,23 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
-                        <rect key="frame" x="25" y="87" width="44" height="16"/>
+                        <rect key="frame" x="52" y="113" width="44" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mLX-It-aCO">
+                        <rect key="frame" x="18" y="82" width="78" height="16"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description:" id="hVb-pK-7n8">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147">
-                        <rect key="frame" x="31" y="56" width="38" height="16"/>
+                        <rect key="frame" x="58" y="51" width="38" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -239,19 +260,25 @@ Gw
                     </textField>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="141" secondAttribute="bottom" constant="19" id="0Ll-rf-AZ3"/>
+                    <constraint firstAttribute="bottom" secondItem="141" secondAttribute="bottom" constant="20" id="0Ll-rf-AZ3"/>
                     <constraint firstAttribute="trailing" secondItem="141" secondAttribute="trailing" constant="20" id="51H-Gl-Wm6"/>
+                    <constraint firstAttribute="trailing" secondItem="Iqd-Ep-T5U" secondAttribute="trailing" constant="20" id="Hpg-ZM-xUL"/>
                     <constraint firstItem="137" firstAttribute="trailing" secondItem="135" secondAttribute="trailing" id="Ibp-wb-N3K"/>
+                    <constraint firstItem="mLX-It-aCO" firstAttribute="centerY" secondItem="Iqd-Ep-T5U" secondAttribute="centerY" id="Iye-zy-6cC"/>
                     <constraint firstItem="137" firstAttribute="width" secondItem="135" secondAttribute="width" id="KDT-cT-78n"/>
                     <constraint firstItem="145" firstAttribute="centerY" secondItem="135" secondAttribute="centerY" id="N5h-2o-PKj"/>
                     <constraint firstItem="135" firstAttribute="leading" secondItem="145" secondAttribute="trailing" constant="7" id="Ozi-Tq-KpZ"/>
-                    <constraint firstItem="137" firstAttribute="top" secondItem="135" secondAttribute="bottom" constant="10" id="SLF-If-gXP"/>
+                    <constraint firstItem="137" firstAttribute="top" secondItem="Iqd-Ep-T5U" secondAttribute="bottom" constant="10" id="SLF-If-gXP"/>
                     <constraint firstItem="135" firstAttribute="top" secondItem="134" secondAttribute="top" constant="20" id="T08-hy-5Zj"/>
                     <constraint firstItem="141" firstAttribute="leading" secondItem="143" secondAttribute="trailing" constant="8" id="TrP-09-F93"/>
                     <constraint firstItem="147" firstAttribute="centerY" secondItem="137" secondAttribute="centerY" id="aQe-Z4-wmD"/>
+                    <constraint firstItem="mLX-It-aCO" firstAttribute="leading" secondItem="134" secondAttribute="leading" constant="20" id="dx5-b3-UpJ"/>
                     <constraint firstItem="137" firstAttribute="leading" secondItem="147" secondAttribute="trailing" constant="7" id="juq-Oe-r8e"/>
                     <constraint firstAttribute="trailing" secondItem="135" secondAttribute="trailing" constant="20" id="mS1-KH-zaF"/>
+                    <constraint firstItem="Iqd-Ep-T5U" firstAttribute="top" secondItem="135" secondAttribute="bottom" constant="10" id="piK-dc-U0m"/>
                     <constraint firstItem="143" firstAttribute="centerY" secondItem="141" secondAttribute="centerY" id="qXj-mZ-5ck"/>
+                    <constraint firstItem="141" firstAttribute="top" secondItem="137" secondAttribute="bottom" constant="10" id="wuM-hr-Luw"/>
+                    <constraint firstItem="Iqd-Ep-T5U" firstAttribute="leading" secondItem="mLX-It-aCO" secondAttribute="trailing" constant="7" id="xQ6-Pc-NZk"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="141" y="149"/>

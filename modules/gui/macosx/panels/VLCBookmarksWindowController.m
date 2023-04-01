@@ -108,6 +108,7 @@
     [_editOKButton setTitle: _NS("OK")];
     [_editCancelButton setTitle: _NS("Cancel")];
     [_editNameLabel setStringValue: _NS("Name")];
+    [_editDescriptionLabel setStringValue: _NS("Description")];
     [_editTimeLabel setStringValue: _NS("Time")];
 }
 
@@ -160,6 +161,7 @@
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
 
     [_editNameTextField setStringValue:bookmark.bookmarkName];
+    [_editDescriptionTextField setStringValue:bookmark.bookmarkDescription];
     [_editTimeTextField setStringValue:[NSString stringWithTime:bookmark.bookmarkTime / 1000]];
 
     [self.window beginSheet:_editBookmarksWindow completionHandler:nil];
@@ -219,6 +221,7 @@
     }
 
     bookmark.bookmarkName = _editNameTextField.stringValue;
+    bookmark.bookmarkDescription = _editDescriptionTextField.stringValue;
 
     [_tableViewDataSource editBookmark:bookmark originalBookmark:originalBookmark];
     [_dataTable reloadData];
