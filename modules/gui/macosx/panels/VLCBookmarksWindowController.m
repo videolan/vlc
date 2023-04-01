@@ -134,19 +134,8 @@
 
 - (IBAction)clear:(id)sender
 {
-#if 0
-    /* clear table */
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (!p_input)
-        return;
-
-    input_Control(p_input, INPUT_CLEAR_BOOKMARKS);
-
-    input_Release(p_input);
-
+    [_tableViewDataSource clearBookmarks];
     [_dataTable reloadData];
-#endif
 }
 
 - (IBAction)edit:(id)sender
