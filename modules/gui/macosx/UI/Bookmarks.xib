@@ -11,16 +11,6 @@
                 <outlet property="addButton" destination="88" id="163"/>
                 <outlet property="clearButton" destination="94" id="165"/>
                 <outlet property="dataTable" destination="110" id="166"/>
-                <outlet property="editBookmarksWindow" destination="133" id="170"/>
-                <outlet property="editButton" destination="90" id="167"/>
-                <outlet property="editCancelButton" destination="143" id="171"/>
-                <outlet property="editDescriptionLabel" destination="mLX-It-aCO" id="cb2-dI-ycm"/>
-                <outlet property="editDescriptionTextField" destination="Iqd-Ep-T5U" id="RNT-yM-A8U"/>
-                <outlet property="editNameLabel" destination="145" id="175"/>
-                <outlet property="editNameTextField" destination="135" id="173"/>
-                <outlet property="editOKButton" destination="141" id="172"/>
-                <outlet property="editTimeLabel" destination="147" id="176"/>
-                <outlet property="editTimeTextField" destination="137" id="174"/>
                 <outlet property="removeButton" destination="92" id="169"/>
                 <outlet property="window" destination="84" id="184"/>
             </connections>
@@ -46,18 +36,8 @@
                             <action selector="add:" target="-2" id="177"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
-                        <rect key="frame" x="20" y="199" width="62" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Edit" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="91">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="edit:" target="-2" id="179"/>
-                        </connections>
-                    </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
-                        <rect key="frame" x="20" y="174" width="62" height="19"/>
+                        <rect key="frame" x="20" y="199" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
@@ -67,7 +47,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
-                        <rect key="frame" x="20" y="149" width="62" height="19"/>
+                        <rect key="frame" x="20" y="174" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
@@ -149,139 +129,22 @@
                     </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="107" firstAttribute="leading" secondItem="90" secondAttribute="trailing" constant="8" id="9X9-yE-SIP"/>
-                    <constraint firstItem="92" firstAttribute="top" secondItem="90" secondAttribute="bottom" constant="7" id="A88-z3-fCb"/>
                     <constraint firstAttribute="bottom" secondItem="107" secondAttribute="bottom" constant="20" id="BRp-2T-87k"/>
                     <constraint firstItem="94" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="FOs-iP-fF8"/>
                     <constraint firstAttribute="trailing" secondItem="107" secondAttribute="trailing" constant="20" id="G5G-Zl-egd"/>
-                    <constraint firstItem="90" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="IQa-1D-B9p"/>
                     <constraint firstItem="107" firstAttribute="leading" secondItem="88" secondAttribute="trailing" constant="8" id="Ltc-GA-VMt"/>
+                    <constraint firstItem="92" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="7" id="Lxo-UF-Nea"/>
                     <constraint firstItem="107" firstAttribute="leading" secondItem="94" secondAttribute="trailing" constant="8" id="N3T-ZA-ej2"/>
                     <constraint firstItem="88" firstAttribute="top" secondItem="85" secondAttribute="top" constant="20" id="WP1-gk-lha"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="94" secondAttribute="bottom" constant="20" id="eNd-Mr-tyL"/>
                     <constraint firstItem="92" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="epp-d9-CZ3"/>
                     <constraint firstItem="94" firstAttribute="top" secondItem="92" secondAttribute="bottom" constant="7" id="hSm-2D-FnN"/>
                     <constraint firstItem="107" firstAttribute="leading" secondItem="92" secondAttribute="trailing" constant="8" id="nMK-MO-8IJ"/>
-                    <constraint firstItem="90" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="7" id="qG7-2g-FtJ"/>
                     <constraint firstItem="88" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="uNA-di-0LF"/>
                     <constraint firstItem="107" firstAttribute="top" secondItem="85" secondAttribute="top" constant="11" id="xmY-ER-h97"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="261" y="295.5"/>
-        </window>
-        <window title="Bookmark inspector" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="133" userLabel="EditBookmarks" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="340" y="401" width="322" height="156"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
-            <view key="contentView" id="134">
-                <rect key="frame" x="0.0" y="0.0" width="325" height="151"/>
-                <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="135">
-                        <rect key="frame" x="101" y="110" width="204" height="21"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="204" id="bLc-El-nRp"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Bookmark name" id="136">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iqd-Ep-T5U">
-                        <rect key="frame" x="101" y="79" width="204" height="21"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="204" id="p7l-0c-3A3"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Bookmark description" id="HwY-r7-hfv">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="137">
-                        <rect key="frame" x="101" y="48" width="204" height="21"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="-- : --" id="138">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="141">
-                        <rect key="frame" x="273" y="19" width="32" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="OK" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="142">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="edit_ok:" target="-2" id="181"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="143">
-                        <rect key="frame" x="209" y="19" width="56" height="19"/>
-                        <buttonCell key="cell" type="roundRect" title="Cancel" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="144">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
-                            <string key="keyEquivalent" base64-UTF8="YES">
-Gw
-</string>
-                        </buttonCell>
-                        <connections>
-                            <action selector="edit_cancel:" target="-2" id="180"/>
-                        </connections>
-                    </button>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="145">
-                        <rect key="frame" x="52" y="113" width="44" height="16"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Name:" id="146">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mLX-It-aCO">
-                        <rect key="frame" x="18" y="82" width="78" height="16"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description:" id="hVb-pK-7n8">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="147">
-                        <rect key="frame" x="58" y="51" width="38" height="16"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Time:" id="148">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                </subviews>
-                <constraints>
-                    <constraint firstAttribute="bottom" secondItem="141" secondAttribute="bottom" constant="20" id="0Ll-rf-AZ3"/>
-                    <constraint firstAttribute="trailing" secondItem="141" secondAttribute="trailing" constant="20" id="51H-Gl-Wm6"/>
-                    <constraint firstAttribute="trailing" secondItem="Iqd-Ep-T5U" secondAttribute="trailing" constant="20" id="Hpg-ZM-xUL"/>
-                    <constraint firstItem="137" firstAttribute="trailing" secondItem="135" secondAttribute="trailing" id="Ibp-wb-N3K"/>
-                    <constraint firstItem="mLX-It-aCO" firstAttribute="centerY" secondItem="Iqd-Ep-T5U" secondAttribute="centerY" id="Iye-zy-6cC"/>
-                    <constraint firstItem="137" firstAttribute="width" secondItem="135" secondAttribute="width" id="KDT-cT-78n"/>
-                    <constraint firstItem="145" firstAttribute="centerY" secondItem="135" secondAttribute="centerY" id="N5h-2o-PKj"/>
-                    <constraint firstItem="135" firstAttribute="leading" secondItem="145" secondAttribute="trailing" constant="7" id="Ozi-Tq-KpZ"/>
-                    <constraint firstItem="137" firstAttribute="top" secondItem="Iqd-Ep-T5U" secondAttribute="bottom" constant="10" id="SLF-If-gXP"/>
-                    <constraint firstItem="135" firstAttribute="top" secondItem="134" secondAttribute="top" constant="20" id="T08-hy-5Zj"/>
-                    <constraint firstItem="141" firstAttribute="leading" secondItem="143" secondAttribute="trailing" constant="8" id="TrP-09-F93"/>
-                    <constraint firstItem="147" firstAttribute="centerY" secondItem="137" secondAttribute="centerY" id="aQe-Z4-wmD"/>
-                    <constraint firstItem="mLX-It-aCO" firstAttribute="leading" secondItem="134" secondAttribute="leading" constant="20" id="dx5-b3-UpJ"/>
-                    <constraint firstItem="137" firstAttribute="leading" secondItem="147" secondAttribute="trailing" constant="7" id="juq-Oe-r8e"/>
-                    <constraint firstAttribute="trailing" secondItem="135" secondAttribute="trailing" constant="20" id="mS1-KH-zaF"/>
-                    <constraint firstItem="Iqd-Ep-T5U" firstAttribute="top" secondItem="135" secondAttribute="bottom" constant="10" id="piK-dc-U0m"/>
-                    <constraint firstItem="143" firstAttribute="centerY" secondItem="141" secondAttribute="centerY" id="qXj-mZ-5ck"/>
-                    <constraint firstItem="141" firstAttribute="top" secondItem="137" secondAttribute="bottom" constant="10" id="wuM-hr-Luw"/>
-                    <constraint firstItem="Iqd-Ep-T5U" firstAttribute="leading" secondItem="mLX-It-aCO" secondAttribute="trailing" constant="7" id="xQ6-Pc-NZk"/>
-                </constraints>
-            </view>
-            <point key="canvasLocation" x="180" y="57"/>
         </window>
     </objects>
 </document>
