@@ -175,6 +175,26 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     [self updateBookmarks];
 }
 
+- (void)editBookmark:(VLCBookmark *)bookmark originalBookmark:(VLCBookmark *)originalBookmark
+{
+    if (_libraryItemId <= 0) {
+        return;
+    }
+
+    if (originalBookmark.bookmarkTime != bookmark.bookmarkTime) {
+        [self removeBookmark:originalBookmark];
+        vlc_ml_media_add_bookmark(_mediaLibrary, _libraryItemId, bookmark.bookmarkTime);
+    }
+
+    vlc_ml_media_update_bookmark(_mediaLibrary,
+                                 _libraryItemId,
+                                 bookmark.bookmarkTime,
+                                 bookmark.bookmarkName.UTF8String,
+                                 bookmark.bookmarkDescription.UTF8String);
+
+    [self updateBookmarks];
+}
+
 - (void)removeBookmarkWithTime:(const int64_t)bookmarkTime
 {
     if (_libraryItemId <= 0) {

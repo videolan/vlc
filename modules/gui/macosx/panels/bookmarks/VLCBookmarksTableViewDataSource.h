@@ -34,6 +34,7 @@ extern NSString * const VLCBookmarksTableViewCellIdentifier;
 @property (readonly) NSArray<VLCBookmark *> *bookmarks;
 
 - (void)addBookmark;
+- (void)editBookmark:(VLCBookmark *)editedBookmark originalBookmark:(VLCBookmark *)originalBookmark;
 - (void)removeBookmarkWithTime:(const int64_t)bookmarkTime;
 - (void)removeBookmark:(VLCBookmark *)bookmark;
 - (void)clearBookmarks;
