@@ -521,8 +521,8 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         vlc_frame_Release (frame);
         frame = NULL;
         errno = EIO;
-        goto done;
     }
+done:
 #else // !_WIN32
     for (size_t i = 0; i < length;)
     {
@@ -536,7 +536,6 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         i += len;
     }
 #endif // !_WIN32
-done:
     vlc_cleanup_pop ();
     return frame;
 }
