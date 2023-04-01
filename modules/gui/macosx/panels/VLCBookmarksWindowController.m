@@ -50,7 +50,7 @@
 
 #import "windows/video/VLCVideoOutputProvider.h"
 
-@interface VLCBookmarksWindowController() <NSTableViewDataSource, NSTableViewDelegate>
+@interface VLCBookmarksWindowController()
 {
     VLCBookmarksTableViewDataSource *_tableViewDataSource;
     VLCBookmarksTableViewDelegate *_tableViewDelegate;
