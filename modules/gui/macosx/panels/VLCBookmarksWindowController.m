@@ -41,6 +41,8 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCInputItem.h"
+
 #import "main/CompatibilityFixes.h"
 
 #import "playlist/VLCPlaylistController.h"
@@ -174,14 +176,8 @@
 
 - (IBAction)edit_ok:(id)sender
 {
-#if 0
-    /* save field contents and close sheet */
-     seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
-    NSInteger i;
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-
-    if (!p_input) {
+    VLCInputItem * const currentlyPlayingInputItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
+    if (currentlyPlayingInputItem == nil) {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setAlertStyle:NSCriticalAlertStyle];
         [alert setMessageText:_NS("No input")];
@@ -190,58 +186,45 @@
                       completionHandler:nil];
         return;
     }
-    if (p_old_input != p_input) {
+
+    if (_oldInputItem.vlcInputItem != currentlyPlayingInputItem.vlcInputItem) {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setAlertStyle:NSCriticalAlertStyle];
         [alert setMessageText:_NS("Input has changed")];
         [alert setInformativeText:_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input.")];
         [alert beginSheetModalForWindow:self.window
                       completionHandler:nil];
-        input_Release(p_input);
         return;
     }
 
-    if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        input_Release(p_input);
-        return;
-    }
+    const NSInteger selectedRow = [_dataTable selectedRow];
+    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
+    VLCBookmark * const originalBookmark = [bookmark copy];
 
-    i = [_dataTable selectedRow];
+    NSArray * const components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
+    const NSUInteger componentCount = [components count];
+    NSLog(@"%@", components);
 
-    free(pp_bookmarks[i]->psz_name);
-
-    pp_bookmarks[i]->psz_name = strdup([[_editNameTextField stringValue] UTF8String]);
-
-    NSArray * components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
-    NSUInteger componentCount = [components count];
-    if (componentCount == 1)
-        pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] floatValue]);
-    else if (componentCount == 2)
-        pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] longLongValue] * 60 + [[components objectAtIndex:1] longLongValue]);
-    else if (componentCount == 3)
-        pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] floatValue]);
-    else {
+    if (componentCount == 1) {
+        bookmark.bookmarkTime = ([[components firstObject] longLongValue]) * 1000;
+    } else if (componentCount == 2) {
+        bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 60 +
+                                 [[components objectAtIndex:1] longLongValue]) * 1000;
+    } else if (componentCount == 3) {
+        bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 3600 +
+                                 [[components objectAtIndex:1] longLongValue] * 60 +
+                                 [[components objectAtIndex:2] longLongValue]) * 1000;
+    } else {
         msg_Err(getIntf(), "Invalid string format for time");
-        goto clear;
     }
 
-    if (input_Control(p_input, INPUT_CHANGE_BOOKMARK, pp_bookmarks[i], i) != VLC_SUCCESS) {
-        msg_Warn(getIntf(), "Unable to change the bookmark");
-        goto clear;
-    }
+    bookmark.bookmarkName = _editNameTextField.stringValue;
 
+    [_tableViewDataSource editBookmark:bookmark originalBookmark:originalBookmark];
     [_dataTable reloadData];
-    input_Release(p_input);
 
     [NSApp endSheet: _editBookmarksWindow];
     [_editBookmarksWindow close];
-
-clear:
-    // Clear the bookmark list
-    for (int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete(pp_bookmarks[i]);
-    free(pp_bookmarks);
-#endif
 }
 
 
