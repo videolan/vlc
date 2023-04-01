@@ -108,7 +108,8 @@ static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* att
     libvlc_picture_t *pic = malloc( sizeof( *pic ) );
     if ( unlikely( pic == NULL ) )
         return NULL;
-    pic->converted = malloc( sizeof( *pic->converted ) );
+    pic->converted = block_New(&block_cbs, attachment->p_data,
+                               attachment->i_data);
     if ( unlikely( pic->converted == NULL ) )
     {
         free(pic);
@@ -117,8 +118,6 @@ static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* att
     vlc_atomic_rc_init( &pic->rc );
     pic->attachment = vlc_input_attachment_Hold( attachment );
     pic->time = VLC_TICK_INVALID;
-    block_Init( pic->converted, &block_cbs, attachment->p_data,
-                attachment->i_data);
     video_format_Init( &pic->fmt, fcc );
     switch ( fcc )
     {
