@@ -27,7 +27,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88">
-                        <rect key="frame" x="20" y="224" width="62" height="19"/>
+                        <rect key="frame" x="10" y="234" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Add" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="89">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
@@ -37,7 +37,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="92">
-                        <rect key="frame" x="20" y="199" width="62" height="19"/>
+                        <rect key="frame" x="10" y="211" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Remove" bezelStyle="roundedRect" alignment="center" enabled="NO" borderStyle="border" inset="2" id="93">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
@@ -47,7 +47,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94">
-                        <rect key="frame" x="20" y="174" width="62" height="19"/>
+                        <rect key="frame" x="10" y="188" width="62" height="19"/>
                         <buttonCell key="cell" type="roundRect" title="Clear" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="95">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
@@ -57,13 +57,13 @@
                         </connections>
                     </button>
                     <scrollView horizontalCompressionResistancePriority="749" borderType="line" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="107">
-                        <rect key="frame" x="90" y="20" width="456" height="232"/>
+                        <rect key="frame" x="82" y="10" width="474" height="243"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="KmY-DA-2er">
-                            <rect key="frame" x="1" y="1" width="454" height="230"/>
+                            <rect key="frame" x="1" y="1" width="472" height="241"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" autosaveName="bookmarks-table" headerView="111" id="110" customClass="VLCHUDTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="454" height="207"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="472" height="218"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
@@ -93,7 +93,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="time_offset" editable="NO" width="52" minWidth="30" maxWidth="1000" id="113">
+                                        <tableColumn identifier="time_offset" editable="NO" width="71" minWidth="30" maxWidth="1000" id="113">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Time">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -115,7 +115,7 @@
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="vLK-mg-OaO"/>
                         </constraints>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="109">
-                            <rect key="frame" x="1" y="215" width="454" height="16"/>
+                            <rect key="frame" x="1" y="226" width="472" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="108">
@@ -123,25 +123,25 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" wantsLayer="YES" id="111">
-                            <rect key="frame" x="0.0" y="0.0" width="454" height="23"/>
+                            <rect key="frame" x="0.0" y="0.0" width="472" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="107" secondAttribute="bottom" constant="20" id="BRp-2T-87k"/>
-                    <constraint firstItem="94" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="FOs-iP-fF8"/>
-                    <constraint firstAttribute="trailing" secondItem="107" secondAttribute="trailing" constant="20" id="G5G-Zl-egd"/>
-                    <constraint firstItem="107" firstAttribute="leading" secondItem="88" secondAttribute="trailing" constant="8" id="Ltc-GA-VMt"/>
-                    <constraint firstItem="92" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="7" id="Lxo-UF-Nea"/>
-                    <constraint firstItem="107" firstAttribute="leading" secondItem="94" secondAttribute="trailing" constant="8" id="N3T-ZA-ej2"/>
-                    <constraint firstItem="88" firstAttribute="top" secondItem="85" secondAttribute="top" constant="20" id="WP1-gk-lha"/>
+                    <constraint firstAttribute="bottom" secondItem="107" secondAttribute="bottom" constant="10" id="BRp-2T-87k"/>
+                    <constraint firstItem="94" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="10" id="FOs-iP-fF8"/>
+                    <constraint firstAttribute="trailing" secondItem="107" secondAttribute="trailing" constant="10" id="G5G-Zl-egd"/>
+                    <constraint firstItem="107" firstAttribute="leading" secondItem="88" secondAttribute="trailing" constant="10" id="Ltc-GA-VMt"/>
+                    <constraint firstItem="92" firstAttribute="top" secondItem="88" secondAttribute="bottom" constant="5" id="Lxo-UF-Nea"/>
+                    <constraint firstItem="107" firstAttribute="leading" secondItem="94" secondAttribute="trailing" constant="10" id="N3T-ZA-ej2"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="94" secondAttribute="bottom" constant="20" id="eNd-Mr-tyL"/>
-                    <constraint firstItem="92" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="epp-d9-CZ3"/>
-                    <constraint firstItem="94" firstAttribute="top" secondItem="92" secondAttribute="bottom" constant="7" id="hSm-2D-FnN"/>
-                    <constraint firstItem="107" firstAttribute="leading" secondItem="92" secondAttribute="trailing" constant="8" id="nMK-MO-8IJ"/>
-                    <constraint firstItem="88" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="20" id="uNA-di-0LF"/>
-                    <constraint firstItem="107" firstAttribute="top" secondItem="85" secondAttribute="top" constant="11" id="xmY-ER-h97"/>
+                    <constraint firstItem="92" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="10" id="epp-d9-CZ3"/>
+                    <constraint firstItem="88" firstAttribute="top" secondItem="107" secondAttribute="top" id="fkG-Sm-DPC"/>
+                    <constraint firstItem="94" firstAttribute="top" secondItem="92" secondAttribute="bottom" constant="5" id="hSm-2D-FnN"/>
+                    <constraint firstItem="107" firstAttribute="leading" secondItem="92" secondAttribute="trailing" constant="10" id="nMK-MO-8IJ"/>
+                    <constraint firstItem="88" firstAttribute="leading" secondItem="85" secondAttribute="leading" constant="10" id="uNA-di-0LF"/>
+                    <constraint firstItem="107" firstAttribute="top" secondItem="85" secondAttribute="top" constant="10" id="xmY-ER-h97"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="261" y="295.5"/>
