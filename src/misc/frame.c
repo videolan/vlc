@@ -91,18 +91,6 @@ vlc_frame_t *vlc_frame_Init(vlc_frame_t *restrict f, const struct vlc_frame_call
     return f;
 }
 
-static void vlc_frame_generic_Release (vlc_frame_t *frame)
-{
-    /* That is always true for frames allocated with vlc_frame_Alloc(). */
-    assert (frame->p_start == (unsigned char *)(frame + 1));
-    free (frame);
-}
-
-static const struct vlc_frame_callbacks vlc_frame_generic_cbs =
-{
-    vlc_frame_generic_Release,
-};
-
 /** Initial memory alignment of data frame.
  * @note This must be a multiple of sizeof(void*) and a power of two.
  * libavcodec AVX optimizations require at least 32-bytes. */
@@ -119,22 +107,25 @@ vlc_frame_t *vlc_frame_Alloc (size_t size)
         return NULL;
     }
 
-    /* 2 * VLC_FRAME_PADDING: pre + post padding */
-    const size_t alloc = sizeof (vlc_frame_t) + VLC_FRAME_ALIGN + (2 * VLC_FRAME_PADDING)
-                       + size;
-    if (unlikely(alloc <= size))
-        return NULL;
-
-    vlc_frame_t *f = malloc (alloc);
-    if (unlikely(f == NULL))
-        return NULL;
-
-    vlc_frame_Init(f, &vlc_frame_generic_cbs, f + 1, alloc - sizeof (*f));
     static_assert ((VLC_FRAME_PADDING % VLC_FRAME_ALIGN) == 0,
                    "VLC_FRAME_PADDING must be a multiple of VLC_FRAME_ALIGN");
-    f->p_buffer += VLC_FRAME_PADDING + VLC_FRAME_ALIGN - 1;
-    f->p_buffer = (void *)(((uintptr_t)f->p_buffer) & ~(VLC_FRAME_ALIGN - 1));
-    f->i_buffer = size;
+
+    /* 2 * VLC_FRAME_PADDING: pre + post padding */
+    const size_t capacity = VLC_FRAME_ALIGN + (2 * VLC_FRAME_PADDING) + size;
+    unsigned char *buf = malloc(capacity);
+    if (unlikely(buf == NULL))
+        return NULL;
+
+    vlc_frame_t *f = vlc_frame_heap_Alloc(buf, capacity);
+    if (likely(f != NULL)) {
+        /* Alignment */
+        buf += (-(uintptr_t)(void *)buf) % (uintptr_t)VLC_FRAME_ALIGN;
+        /* Header reserve */
+        buf += VLC_FRAME_PADDING;
+        f->p_buffer = buf;
+        f->i_buffer = size;
+    }
+
     return f;
 }
 
