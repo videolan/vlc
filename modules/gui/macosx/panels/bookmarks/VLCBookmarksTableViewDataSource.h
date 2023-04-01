@@ -37,6 +37,8 @@ extern NSString * const VLCBookmarksTableViewCellIdentifier;
 - (void)removeBookmarkWithTime:(const int64_t)bookmarkTime;
 - (void)removeBookmark:(VLCBookmark *)bookmark;
 - (void)clearBookmarks;
+
+- (void)updateBookmarks;
 - (VLCBookmark *)bookmarkForRow:(NSInteger)row;
 
 @end
