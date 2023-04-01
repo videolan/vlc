@@ -200,10 +200,11 @@ static gboolean autoplug_query_cb( GstElement *p_bin, GstPad *p_pad,
         switch( GST_QUERY_TYPE ( p_query ) ){
         case GST_QUERY_CAPS:
             return gst_vlc_video_sink_query_caps( p_query );
-        case GST_QUERY_ALLOCATION:
+        case GST_QUERY_ALLOCATION: {
             GstBaseSink *p_bsink = GST_BASE_SINK_CAST( p_sys->p_decode_out );
             GstBaseSinkClass *p_bclass = GST_BASE_SINK_GET_CLASS( p_bsink );
             return p_bclass->propose_allocation( p_bsink, p_query );
+        }
         default:
             return FALSE;
         }
