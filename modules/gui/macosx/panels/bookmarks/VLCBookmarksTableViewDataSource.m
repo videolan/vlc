@@ -40,6 +40,10 @@
 
 NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCellIdentifier";
 
+NSString * const VLCBookmarksTableViewNameTableColumnIdentifier = @"name";
+NSString * const VLCBookmarksTableViewDescriptionTableColumnIdentifier = @"description";
+NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset";
+
 @interface VLCBookmarksTableViewDataSource ()
 {
     vlc_medialibrary_t *_mediaLibrary;
@@ -146,11 +150,11 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
 
     NSString * const identifier = [tableColumn identifier];
 
-    if ([identifier isEqualToString:@"name"]) {
+    if ([identifier isEqualToString:VLCBookmarksTableViewNameTableColumnIdentifier]) {
         return bookmark.bookmarkName;
-    } else if ([identifier isEqualToString:@"description"]) {
+    } else if ([identifier isEqualToString:VLCBookmarksTableViewDescriptionTableColumnIdentifier]) {
         return bookmark.bookmarkDescription;
-    } else if ([identifier isEqualToString:@"time_offset"]) {
+    } else if ([identifier isEqualToString:VLCBookmarksTableViewTimeTableColumnIdentifier]) {
         return [NSString stringWithTime:bookmark.bookmarkTime / 1000];
     }
 
@@ -167,13 +171,13 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
 
     NSString * const columnIdentifier = tableColumn.identifier;
 
-    if ([columnIdentifier isEqualToString:@"name"]) {
+    if ([columnIdentifier isEqualToString:VLCBookmarksTableViewNameTableColumnIdentifier]) {
         NSString * const newName = (NSString *)object;
         bookmark.bookmarkName = newName;
-    } else if ([columnIdentifier isEqualToString:@"description"]) {
+    } else if ([columnIdentifier isEqualToString:VLCBookmarksTableViewDescriptionTableColumnIdentifier]) {
         NSString * const newDescription = (NSString *)object;
         bookmark.bookmarkDescription = newDescription;
-    } else if ([columnIdentifier isEqualToString:@"time_offset"]) {
+    } else if ([columnIdentifier isEqualToString:VLCBookmarksTableViewTimeTableColumnIdentifier]) {
         NSString * const timeString = (NSString *)object;
         NSArray * const components = [object componentsSeparatedByString:@":"];
         const NSUInteger componentCount = [components count];
