@@ -97,6 +97,8 @@
     [_addButton setTitle: _NS("Add")];
     [_clearButton setTitle: _NS("Clear")];
     [_removeButton setTitle: _NS("Remove")];
+    [[[_dataTable tableColumnWithIdentifier:@"name"] headerCell]
+     setStringValue: _NS("Name")];
     [[[_dataTable tableColumnWithIdentifier:@"description"] headerCell]
      setStringValue: _NS("Description")];
     [[[_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
