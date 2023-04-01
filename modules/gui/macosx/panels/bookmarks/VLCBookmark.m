@@ -38,4 +38,16 @@
     return bookmark;
 }
 
+- (nonnull id)copyWithZone:(nullable NSZone *)zone
+{
+    VLCBookmark * const bookmarkCopy = [[VLCBookmark alloc] init];
+
+    bookmarkCopy->_mediaLibraryItemId = self.mediaLibraryItemId;
+    bookmarkCopy.bookmarkTime = self.bookmarkTime;
+    bookmarkCopy.bookmarkName = self.bookmarkName;
+    bookmarkCopy.bookmarkDescription = self.bookmarkDescription;
+
+    return bookmarkCopy;
+}
+
 @end

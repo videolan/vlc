@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCBookmark : NSObject
+@interface VLCBookmark : NSObject<NSCopying>
 
 + (instancetype)bookmarkWithVlcBookmark:(vlc_ml_bookmark_t)vlcBookmark;
 
