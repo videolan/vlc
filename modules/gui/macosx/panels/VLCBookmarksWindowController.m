@@ -246,55 +246,34 @@
     [_dataTable reloadData];
 }
 
-- (NSString *)timeStringForBookmark:(seekpoint_t *)bookmark
-{
-    assert(bookmark != NULL);
-
-    vlc_tick_t total = bookmark->i_time_offset;
-    uint64_t hour = ( total / VLC_TICK_FROM_SEC(3600) );
-    uint64_t min = ( total % VLC_TICK_FROM_SEC(3600) ) / VLC_TICK_FROM_SEC(60);
-    float    sec = secf_from_vlc_tick( total % VLC_TICK_FROM_SEC(60) );
-
-    return [NSString stringWithFormat:@"%02llu:%02llu:%06.3f", hour, min, sec];
-}
-
 /* Called when the user hits CMD + C or copy is clicked in the edit menu
  */
-- (void) copy:(id)sender {
-#if 0
-    NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
-    NSIndexSet *selectionIndices = [_dataTable selectedRowIndexes];
-
-
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    int i_bookmarks;
-    seekpoint_t **pp_bookmarks;
-
-    if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS)
+- (void)copy:(id)sender
+{
+    NSArray<VLCBookmark *> * const bookmarks = _tableViewDataSource.bookmarks;
+    if (bookmarks == nil || bookmarks.count == 0) {
         return;
+    }
 
-    [pasteBoard clearContents];
+    NSPasteboard * const pasteBoard = [NSPasteboard generalPasteboard];
+    NSIndexSet * const selectionIndices = [_dataTable selectedRowIndexes];
     NSUInteger index = [selectionIndices firstIndex];
 
-    while(index != NSNotFound) {
+    while (index != NSNotFound) {
         /* Get values */
-        if (index >= i_bookmarks)
+        if (index >= bookmarks.count) {
             break;
-        NSString *name = toNSStr(pp_bookmarks[index]->psz_name);
-        NSString *time = [self timeStringForBookmark:pp_bookmarks[index]];
+        }
 
-        NSString *message = [NSString stringWithFormat:@"%@ - %@", name, time];
+        VLCBookmark * const bookmark = bookmarks[index];
+        NSString * const name = bookmark.bookmarkName;
+        NSString * const time = [NSString stringWithTime:bookmark.bookmarkTime / 1000];
+        NSString * const message = [NSString stringWithFormat:@"%@ - %@", name, time];
         [pasteBoard writeObjects:@[message]];
 
         /* Get next index */
         index = [selectionIndices indexGreaterThanIndex:index];
     }
-
-    // Clear the bookmark list
-    for (int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete(pp_bookmarks[i]);
-    free(pp_bookmarks);
-#endif
 }
 
 #pragma mark -
