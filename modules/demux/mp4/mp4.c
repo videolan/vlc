@@ -1854,7 +1854,8 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, bool b_accurate )
         }
     }
 
-    msg_Dbg( p_demux, "seeking with %"PRId64 "ms %s to %ld", MS_FROM_VLC_TICK(i_date - i_start),
+    msg_Dbg( p_demux, "seeking with %"PRId64 "ms %s to %"PRId64,
+             MS_FROM_VLC_TICK(i_date - i_start),
             !b_accurate ? "alignment" : "preroll (use input-fast-seek to avoid)", i_date );
 
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
