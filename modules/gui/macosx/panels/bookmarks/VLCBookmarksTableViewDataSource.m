@@ -44,10 +44,31 @@ NSString * const VLCBookmarksTableViewNameTableColumnIdentifier = @"name";
 NSString * const VLCBookmarksTableViewDescriptionTableColumnIdentifier = @"description";
 NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset";
 
+static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event)
+{
+    switch (p_event->i_type)
+    {
+        case VLC_ML_EVENT_BOOKMARKS_ADDED:
+        case VLC_ML_EVENT_BOOKMARKS_DELETED:
+        case VLC_ML_EVENT_BOOKMARKS_UPDATED:
+        {
+            // Need to reload data on main queue
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCBookmarksTableViewDataSource *dataSource = (__bridge VLCBookmarksTableViewDataSource *)p_data;
+                [dataSource updateBookmarks];
+            });
+        }
+        break;
+        default:
+            break;
+    }
+}
+
 @interface VLCBookmarksTableViewDataSource ()
 {
     vlc_medialibrary_t *_mediaLibrary;
     VLCPlayerController *_playerController;
+    vlc_ml_event_callback_t *_eventCallback;
 }
 @end
 
@@ -82,6 +103,10 @@ NSString * const VLCBookmarksTableViewTimeTableColumnIdentifier = @"time_offset"
                                            selector:@selector(currentMediaItemChanged:)
                                                name:VLCPlayerCurrentMediaItemChanged
                                              object:nil];
+
+    _eventCallback = vlc_ml_event_register_callback(_mediaLibrary,
+                                                    bookmarksLibraryCallback,
+                                                    (__bridge void *)self);
 }
 
 - (void)updateLibraryItemId
