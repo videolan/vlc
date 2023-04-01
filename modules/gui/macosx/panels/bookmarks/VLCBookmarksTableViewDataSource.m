@@ -157,6 +157,45 @@ NSString * const VLCBookmarksTableViewCellIdentifier = @"VLCBookmarksTableViewCe
     return @"";
 }
 
+- (void)tableView:(NSTableView *)tableView
+   setObjectValue:(id)object
+   forTableColumn:(NSTableColumn *)tableColumn
+              row:(NSInteger)row;
+{
+    VLCBookmark * const bookmark = [self bookmarkForRow:row];
+    VLCBookmark * const originalBookmark = [bookmark copy];
+
+    NSString * const columnIdentifier = tableColumn.identifier;
+
+    if ([columnIdentifier isEqualToString:@"name"]) {
+        NSString * const newName = (NSString *)object;
+        bookmark.bookmarkName = newName;
+    } else if ([columnIdentifier isEqualToString:@"description"]) {
+        NSString * const newDescription = (NSString *)object;
+        bookmark.bookmarkDescription = newDescription;
+    } else if ([columnIdentifier isEqualToString:@"time_offset"]) {
+        NSString * const timeString = (NSString *)object;
+        NSArray * const components = [object componentsSeparatedByString:@":"];
+        const NSUInteger componentCount = [components count];
+
+        if (componentCount == 1) {
+            bookmark.bookmarkTime = ([[components firstObject] longLongValue]) * 1000;
+        } else if (componentCount == 2) {
+            bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 60 +
+                                     [[components objectAtIndex:1] longLongValue]) * 1000;
+        } else if (componentCount == 3) {
+            bookmark.bookmarkTime = ([[components firstObject] longLongValue] * 3600 +
+                                     [[components objectAtIndex:1] longLongValue] * 60 +
+                                     [[components objectAtIndex:2] longLongValue]) * 1000;
+        } else {
+            msg_Err(getIntf(), "Cannot set bookmark time as invalid string format for time was received");
+        }
+    }
+
+    [self editBookmark:bookmark originalBookmark:originalBookmark];
+    [tableView reloadData];
+}
+
 - (void)addBookmark
 {
     if (_libraryItemId <= 0) {
