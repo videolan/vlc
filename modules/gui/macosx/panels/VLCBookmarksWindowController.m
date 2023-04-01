@@ -52,6 +52,7 @@
 {
     VLCBookmarksTableViewDataSource *_tableViewDataSource;
     VLCBookmarksTableViewDelegate *_tableViewDelegate;
+    VLCInputItem *_oldInputItem;
 }
 @end
 
@@ -144,44 +145,24 @@
 
 - (IBAction)edit:(id)sender
 {
-#if 0
-    /* put values to the sheet's fields and show sheet */
-    /* we take the values from the core and not the table, because we cannot
-     * really trust it */
-    input_thread_t * p_input = pl_CurrentInput(getIntf());
-    seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
-    int row = (int)[_dataTable selectedRow];
-
-    if (!p_input)
-        return;
-
-    if (row < 0) {
-        input_Release(p_input);
+    VLCInputItem * const currentlyPlayingInputItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
+    if (currentlyPlayingInputItem == nil) {
         return;
     }
 
-    if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
-        input_Release(p_input);
+    const NSInteger selectedRow = [_dataTable selectedRow];
+    if (selectedRow < 0) {
         return;
     }
 
-    [_editNameTextField setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
-    [_editTimeTextField setStringValue:[self timeStringForBookmark:pp_bookmarks[row]]];
+    VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
 
-    /* Just keep the pointer value to check if it
-     * changes. Note, we don't need to keep a reference to the object.
-     * so release it now. */
-    p_old_input = p_input;
-    input_Release(p_input);
+    [_editNameTextField setStringValue:bookmark.bookmarkName];
+    [_editTimeTextField setStringValue:[NSString stringWithTime:bookmark.bookmarkTime / 1000]];
 
     [self.window beginSheet:_editBookmarksWindow completionHandler:nil];
 
-    // Clear the bookmark list
-    for (int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete(pp_bookmarks[i]);
-    free(pp_bookmarks);
-#endif
+    _oldInputItem = currentlyPlayingInputItem;
 }
 
 - (IBAction)edit_cancel:(id)sender
