@@ -271,14 +271,10 @@ static const struct vlc_frame_callbacks vlc_frame_heap_cbs =
 
 vlc_frame_t *vlc_frame_heap_Alloc (void *addr, size_t length)
 {
-    vlc_frame_t *frame = malloc (sizeof (*frame));
-    if (frame == NULL)
-    {
-        free (addr);
-        return NULL;
-    }
-
-    return vlc_frame_Init(frame, &vlc_frame_heap_cbs, addr, length);
+    vlc_frame_t *frame = vlc_frame_New(&vlc_frame_heap_cbs, addr, length);
+    if (unlikely(frame == NULL))
+        free(addr);
+    return frame;
 }
 
 #ifdef HAVE_MMAP
@@ -303,18 +299,14 @@ vlc_frame_t *vlc_frame_mmap_Alloc (void *addr, size_t length)
     long page_mask = sysconf(_SC_PAGESIZE) - 1;
     size_t left = ((uintptr_t)addr) & page_mask;
     size_t right = (-length) & page_mask;
-
-    vlc_frame_t *frame = malloc (sizeof (*frame));
-    if (frame == NULL)
-    {
-        munmap (addr, length);
-        return NULL;
-    }
-
-    vlc_frame_Init(frame, &vlc_frame_mmap_cbs,
-               ((char *)addr) - left, left + length + right);
-    frame->p_buffer = addr;
-    frame->i_buffer = length;
+    vlc_frame_t *frame = vlc_frame_New(&vlc_frame_mmap_cbs,
+                                       ((char *)addr) - left,
+                                       left + length + right);
+    if (likely(frame != NULL)) {
+        frame->p_buffer = addr;
+        frame->i_buffer = length;
+    } else
+        munmap(addr, length);
     return frame;
 }
 #else
@@ -377,14 +369,11 @@ static const struct vlc_frame_callbacks vlc_frame_shm_cbs =
 
 vlc_frame_t *vlc_frame_shm_Alloc (void *addr, size_t length)
 {
-    vlc_frame_t *frame = malloc (sizeof (*frame));
+    vlc_frame_t *frame = vlc_frame_New(&vlc_frame_shm_cbs, (uint8_t *)addr,
+                                       length);
     if (unlikely(frame == NULL))
-    {
-        shmdt (addr);
-        return NULL;
-    }
-
-    return vlc_frame_Init(frame, &vlc_frame_shm_cbs, (uint8_t *)addr, length);
+        shmdt(addr);
+    return frame;
 }
 #else
 vlc_frame_t *vlc_frame_shm_Alloc (void *addr, size_t length)
