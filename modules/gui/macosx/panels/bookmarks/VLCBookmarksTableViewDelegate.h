@@ -24,7 +24,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCBookmarksWindowController;
+
 @interface VLCBookmarksTableViewDelegate : NSObject <NSTableViewDelegate>
+
+- (instancetype)initWithBookmarksWindowController:(VLCBookmarksWindowController *)controller;
 
 @end
 

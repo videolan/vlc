@@ -79,7 +79,7 @@
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     _tableViewDataSource = [[VLCBookmarksTableViewDataSource alloc] init];
-    _tableViewDelegate = [[VLCBookmarksTableViewDelegate alloc] init];
+    _tableViewDelegate = [[VLCBookmarksTableViewDelegate alloc] initWithBookmarksWindowController:self];
 
     _dataTable.dataSource = _tableViewDataSource;
     _dataTable.delegate = _tableViewDelegate;
@@ -305,24 +305,6 @@ clear:
     return [NSString stringWithFormat:@"%02llu:%02llu:%06.3f", hour, min, sec];
 }
 
-/*****************************************************************************
- * delegate methods
- *****************************************************************************/
-
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
-{
-    /* check whether a row is selected and en-/disable the edit/remove buttons */
-    if ([_dataTable selectedRow] == -1) {
-        /* no row is selected */
-        [_editButton setEnabled: NO];
-        [_removeButton setEnabled: NO];
-    } else {
-        /* a row is selected */
-        [_editButton setEnabled: YES];
-        [_removeButton setEnabled: YES];
-    }
-}
-
 /* Called when the user hits CMD + C or copy is clicked in the edit menu
  */
 - (void) copy:(id)sender {
@@ -381,6 +363,12 @@ clear:
      * even if we don’t implement the action
      */
     return YES;
+}
+
+- (void)toggleRowDependentButtonsEnabled:(BOOL)enabled
+{
+    _editButton.enabled = enabled;
+    _removeButton.enabled = enabled;
 }
 
 @end

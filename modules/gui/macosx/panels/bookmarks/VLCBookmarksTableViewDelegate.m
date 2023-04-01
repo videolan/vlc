@@ -28,8 +28,33 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "panels/VLCBookmarksWindowController.h"
+
+@interface VLCBookmarksTableViewDelegate ()
+{
+    VLCBookmarksWindowController* _parentController;
+}
+@end
+
 @implementation VLCBookmarksTableViewDelegate
 
+- (instancetype)initWithBookmarksWindowController:(VLCBookmarksWindowController *)controller
+{
+    self = [super init];
+    if (self) {
+        _parentController = controller;
+    }
+    return self;
+}
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    NSTableView * const tableView = notification.object;
+    NSParameterAssert(tableView);
+
+    const BOOL enableRowDependentBookmarkWindowButtons = tableView.selectedRow >= 0;
+    [_parentController toggleRowDependentButtonsEnabled:enableRowDependentBookmarkWindowButtons];
+}
 
 @end

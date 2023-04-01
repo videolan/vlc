@@ -53,4 +53,6 @@
 - (IBAction)edit_cancel:(id)sender;
 - (IBAction)edit_ok:(id)sender;
 
+- (void)toggleRowDependentButtonsEnabled:(BOOL)enabled;
+
 @end
