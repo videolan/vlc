@@ -72,6 +72,16 @@ void vlc_frame_CopyProperties(vlc_frame_t *restrict dst, const vlc_frame_t *src)
     dst->i_length  = src->i_length;
 }
 
+vlc_frame_t *vlc_frame_New(const struct vlc_frame_callbacks *cbs,
+                           void *buf, size_t size)
+{
+    vlc_frame_t *f = malloc(sizeof (*f));
+    if (unlikely(f == NULL))
+        return NULL;
+
+    return vlc_frame_Init(f, cbs, buf, size);
+}
+
 vlc_frame_t *vlc_frame_Init(vlc_frame_t *restrict f, const struct vlc_frame_callbacks *cbs,
                             void *buf, size_t size)
 {

@@ -79,6 +79,7 @@
 #define vlc_block_callbacks vlc_frame_callbacks
 
 #define block_Init vlc_frame_Init
+#define block_New vlc_frame_New
 #define block_Alloc vlc_frame_Alloc
 #define block_TryRealloc vlc_frame_TryRealloc
 #define block_Realloc vlc_frame_Realloc

@@ -53,6 +53,7 @@ vlc_frame_GetAncillary
 vlc_frame_heap_Alloc
 vlc_frame_Init
 vlc_frame_mmap_Alloc
+vlc_frame_New
 vlc_frame_shm_Alloc
 vlc_frame_Realloc
 vlc_frame_Release
