@@ -651,6 +651,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     QLabel *helpLabel = new QLabel( help, this );
     helpLabel->setWordWrap( true );
+    helpLabel->setOpenExternalLinks( true );
 
     global_layout->addWidget( titleLabel );
     global_layout->addWidget( title_line );
