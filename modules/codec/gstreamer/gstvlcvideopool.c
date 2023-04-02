@@ -32,7 +32,7 @@ static void gst_vlc_video_pool_finalize( GObject *p_object );
 
 #define gst_vlc_video_pool_parent_class parent_class
 G_DEFINE_TYPE (GstVlcVideoPool, gst_vlc_video_pool,
-    GST_TYPE_BUFFER_POOL);
+    GST_TYPE_BUFFER_POOL)
 
 static const gchar** gst_vlc_video_pool_get_options (GstBufferPool *p_pool)
 {

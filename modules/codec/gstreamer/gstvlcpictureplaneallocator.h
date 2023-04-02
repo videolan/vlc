@@ -61,7 +61,7 @@ struct _GstVlcPicturePlane
 struct _GstVlcPicturePlaneAllocator
 {
     GstAllocator parent;
-    picture_t pic_info;;
+    picture_t pic_info;
 
     decoder_t *p_dec;
 };

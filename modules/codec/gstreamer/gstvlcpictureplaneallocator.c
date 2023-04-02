@@ -34,7 +34,7 @@ vlc_fourcc_t GetGstVLCFourcc( const char* );
 
 #define gst_vlc_picture_plane_allocator_parent_class parent_class
 G_DEFINE_TYPE (GstVlcPicturePlaneAllocator, gst_vlc_picture_plane_allocator, \
-        GST_TYPE_ALLOCATOR);
+        GST_TYPE_ALLOCATOR)
 
 static void gst_vlc_picture_plane_allocator_finalize( GObject *p_object );
 static GstMemory* gst_vlc_picture_plane_allocator_dummy_alloc(

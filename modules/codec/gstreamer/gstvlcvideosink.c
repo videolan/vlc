@@ -71,7 +71,7 @@ static void gst_vlc_video_sink_get_property( GObject *p_object, guint prop_id,
 static void gst_vlc_video_sink_finalize( GObject *p_obj );
 
 #define gst_vlc_video_sink_parent_class parent_class
-G_DEFINE_TYPE( GstVlcVideoSink, gst_vlc_video_sink, GST_TYPE_BASE_SINK );
+G_DEFINE_TYPE( GstVlcVideoSink, gst_vlc_video_sink, GST_TYPE_BASE_SINK )
 
 static void gst_vlc_video_sink_class_init( GstVlcVideoSinkClass *p_klass )
 {
