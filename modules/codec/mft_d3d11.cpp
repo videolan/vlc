@@ -120,7 +120,7 @@ HRESULT MFHW_d3d11::SetupVideoContext(vlc_logger *logger, ComPtr<IMFDXGIBuffer> 
 
     D3D11_TEXTURE2D_DESC desc;
     d3d11Res->GetDesc(&desc);
-    vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
+    vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format, DXGI_FORMAT_UNKNOWN );
     if (unlikely(vctx_out == NULL))
     {
         vlc_error(logger, "failed to create a video context");

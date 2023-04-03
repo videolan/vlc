@@ -188,7 +188,7 @@ static picture_t *AllocPicture( filter_t *p_filter )
 {
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
-    const d3d_format_t *cfg = D3D11_RenderFormat(vctx_sys->format, DXGI_FORMAT_UNKNOWN ,true);
+    const d3d_format_t *cfg = D3D11_RenderFormat(vctx_sys->format, vctx_sys->secondary ,true);
     if (unlikely(cfg == NULL))
         return NULL;
 

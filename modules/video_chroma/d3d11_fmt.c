@@ -957,7 +957,7 @@ const struct vlc_video_context_operations d3d11_vctx_ops = {
     NULL,
 };
 
-vlc_video_context *D3D11CreateVideoContext(vlc_decoder_device *dec_dev, DXGI_FORMAT vctx_fmt)
+vlc_video_context *D3D11CreateVideoContext(vlc_decoder_device *dec_dev, DXGI_FORMAT vctx_fmt, DXGI_FORMAT alpha)
 {
     vlc_video_context *vctx = vlc_video_context_Create( dec_dev, VLC_VIDEO_CONTEXT_D3D11VA,
                                           sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
@@ -966,6 +966,7 @@ vlc_video_context *D3D11CreateVideoContext(vlc_decoder_device *dec_dev, DXGI_FOR
 
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(vctx);
     priv->format = vctx_fmt;
+    priv->secondary = alpha;
     return vctx;
 }
 

@@ -897,7 +897,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
     if (vtcx_sys != NULL &&
         D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
-        sys->picQuad.generic.textureFormat = D3D11_RenderFormat(vtcx_sys->format, DXGI_FORMAT_UNKNOWN ,true);
+        sys->picQuad.generic.textureFormat = D3D11_RenderFormat(vtcx_sys->format, vtcx_sys->secondary ,true);
     }
 
     // look for the requested pixel format first

@@ -255,7 +255,7 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
         goto error;
     }
 
-    p_data->vctx = D3D11CreateVideoContext(dec_dev, p_data->output_format->formatTexture);
+    p_data->vctx = D3D11CreateVideoContext(dec_dev, p_data->output_format->formatTexture, p_data->output_format->alphaTexture);
     vlc_decoder_device_Release(dec_dev);
     dec_dev = nullptr;
     if (unlikely(p_data->vctx == nullptr))

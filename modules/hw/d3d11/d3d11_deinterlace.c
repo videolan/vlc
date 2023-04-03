@@ -254,7 +254,7 @@ int D3D11OpenDeinterlace(filter_t *filter)
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
     sys->d3d_dev = &dev_sys->d3d_dev;
 
-    sys->output_format = D3D11_RenderFormat(vctx_sys->format, DXGI_FORMAT_UNKNOWN ,true);
+    sys->output_format = D3D11_RenderFormat(vctx_sys->format, vctx_sys->secondary ,true);
     if (unlikely(sys->output_format == NULL))
         goto error;
 

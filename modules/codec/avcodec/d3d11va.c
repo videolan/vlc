@@ -292,7 +292,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, con
                 sys->d3d_dev->adapterDesc.VendorId, DxgiVendorStr(sys->d3d_dev->adapterDesc.VendorId),
                 sys->d3d_dev->adapterDesc.DeviceId, sys->d3d_dev->adapterDesc.Revision);
 
-    sys->vctx = D3D11CreateVideoContext(dec_device, sys->render_fmt->formatTexture);
+    sys->vctx = D3D11CreateVideoContext(dec_device, sys->render_fmt->formatTexture, sys->render_fmt->alphaTexture);
     if (sys->vctx == NULL)
     {
         msg_Dbg(va, "no video context");

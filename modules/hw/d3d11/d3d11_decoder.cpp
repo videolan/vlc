@@ -124,7 +124,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     if (unlikely(p_sys->vctx == nullptr))
     {
         p_sys->vctx =
-            D3D11CreateVideoContext(p_sys->dec_dev, p_sys->output_format->formatTexture);
+            D3D11CreateVideoContext(p_sys->dec_dev, p_sys->output_format->formatTexture, p_sys->output_format->alphaTexture);
         if (!p_sys->vctx)
         {
             block_Release( p_block );
@@ -277,7 +277,7 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
         }
 
         p_sys->vctx =
-            D3D11CreateVideoContext(p_sys->dec_dev, p_sys->output_format->formatTexture);
+            D3D11CreateVideoContext(p_sys->dec_dev, p_sys->output_format->formatTexture, p_sys->output_format->alphaTexture);
         if (!p_sys->vctx)
         {
             vlc_decoder_device_Release(dec_dev);
