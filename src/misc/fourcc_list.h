@@ -1262,6 +1262,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_D3D11_OPAQUE_BGRA, "BGRA D3D11 opaque"),
         A("DAGR"),
 
+    B(VLC_CODEC_D3D11_OPAQUE_ALPHA, "4:2:0 D3D11 opaque with alpha"),
+        A("DA11"),
+
     B(VLC_CODEC_NVDEC_OPAQUE, "4:2:0 NVDEC opaque"),
         A("NVD8"),
 

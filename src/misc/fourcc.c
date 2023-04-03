@@ -818,6 +818,9 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_D3D11_OPAQUE_RGBA,     FAKE_FMT() },
     { VLC_CODEC_D3D11_OPAQUE_BGRA,     FAKE_FMT() },
 
+    { { VLC_CODEC_D3D11_OPAQUE_ALPHA },
+                                       FAKE_FMT() },
+
     { VLC_CODEC_NVDEC_OPAQUE_16B,      FAKE_FMT() },
     { VLC_CODEC_NVDEC_OPAQUE_10B,      FAKE_FMT() },
     { VLC_CODEC_NVDEC_OPAQUE,          FAKE_FMT() },
