@@ -245,13 +245,7 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
     DXGI_OUTDUPL_DESC outDesc;
     p_data->duplication->GetDesc(&outDesc);
 
-    for (p_data->output_format = DxgiGetRenderFormatList();
-         p_data->output_format->name != nullptr; ++p_data->output_format)
-    {
-        if (p_data->output_format->formatTexture == outDesc.ModeDesc.Format &&
-            is_d3d11_opaque(p_data->output_format->fourcc))
-            break;
-    }
+    p_data->output_format = D3D11_RenderFormat(outDesc.ModeDesc.Format ,true);
     if (unlikely(!p_data->output_format->name))
     {
         msg_Err(p_demux, "Unknown texture format %d", outDesc.ModeDesc.Format);

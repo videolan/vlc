@@ -925,16 +925,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                             p_dec->fmt_out.video.i_width = desc.Width;
                             p_dec->fmt_out.video.i_height = desc.Height;
 
-                            for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
-                                    output_format->name != NULL; ++output_format)
-                            {
-                                if (output_format->formatTexture == desc.Format &&
-                                    is_d3d11_opaque(output_format->fourcc))
-                                {
-                                    p_sys->cfg = output_format;
-                                    break;
-                                }
-                            }
+                            p_sys->cfg = D3D11_RenderFormat(desc.Format ,true);
 
                             p_dec->fmt_out.i_codec = p_sys->cfg->fourcc;
                             p_dec->fmt_out.video.i_chroma = p_sys->cfg->fourcc;

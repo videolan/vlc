@@ -112,13 +112,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         D3D11_TEXTURE2D_DESC outDesc;
         src_sys->texture[0]->GetDesc(&outDesc);
 
-        for (p_sys->output_format = DxgiGetRenderFormatList();
-            p_sys->output_format->name != nullptr; ++p_sys->output_format)
-        {
-            if (p_sys->output_format->formatTexture == outDesc.Format &&
-                is_d3d11_opaque(p_sys->output_format->fourcc))
-                break;
-        }
+        p_sys->output_format = D3D11_RenderFormat(outDesc.Format ,true);
         if (unlikely(!p_sys->output_format->name))
         {
             msg_Err(p_dec, "Unknown texture format %d", outDesc.Format);

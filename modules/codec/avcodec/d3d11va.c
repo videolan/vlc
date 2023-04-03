@@ -369,20 +369,6 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
-static const d3d_format_t *D3D11_FindDXGIFormat(DXGI_FORMAT dxgi)
-{
-    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
-         output_format->name != NULL; ++output_format)
-    {
-        if (output_format->formatTexture == dxgi &&
-                is_d3d11_opaque(output_format->fourcc))
-        {
-            return output_format;
-        }
-    }
-    return NULL;
-}
-
 static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -427,8 +413,8 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     }
 
     if (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_NV12)
-        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_NV12);
-    processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_420_OPAQUE);
+        processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_NV12 ,true);
+    processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_420_OPAQUE ,true);
     processorInput[idx++] = NULL;
 
     /* */
