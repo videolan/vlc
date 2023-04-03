@@ -247,6 +247,7 @@ RunnableRun(void *userdata)
     vlc_thread_set_name("vlc-run-prepars");
 
     struct task *task = userdata;
+    vlc_preparser_t *preparser = task->preparser;
 
     vlc_tick_t deadline = task->timeout ? vlc_tick_now() + task->timeout
                                         : VLC_TICK_INVALID;
@@ -255,10 +256,15 @@ RunnableRun(void *userdata)
                          META_REQUEST_OPTION_SCOPE_FORCED))
     {
         if (atomic_load(&task->interrupted))
+        {
+            PreparserRemoveTask(preparser, task);
             goto end;
+        }
 
         Parse(task, deadline);
     }
+
+    PreparserRemoveTask(preparser, task);
 
     if (atomic_load(&task->interrupted))
         goto end;
@@ -272,8 +278,6 @@ RunnableRun(void *userdata)
 
 end:
     NotifyPreparseEnded(task);
-    vlc_preparser_t *preparser = task->preparser;
-    PreparserRemoveTask(preparser, task);
     TaskDelete(task);
 }
 
