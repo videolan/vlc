@@ -418,8 +418,8 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     }
 
     if (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_NV12)
-        processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_NV12 ,true);
-    processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_420_OPAQUE ,true);
+        processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_NV12, DXGI_FORMAT_UNKNOWN ,true);
+    processorInput[idx++] = D3D11_RenderFormat(DXGI_FORMAT_420_OPAQUE, DXGI_FORMAT_UNKNOWN ,true);
     processorInput[idx++] = NULL;
 
     /* */

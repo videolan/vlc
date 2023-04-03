@@ -623,7 +623,7 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sy
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
-    const d3d_format_t *cfg = D3D11_RenderFormat(vctx_sys->format ,false);
+    const d3d_format_t *cfg = D3D11_RenderFormat(vctx_sys->format, DXGI_FORMAT_UNKNOWN ,false);
     if (unlikely(cfg == NULL))
         return NULL;
 

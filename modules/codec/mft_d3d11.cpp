@@ -129,7 +129,7 @@ HRESULT MFHW_d3d11::SetupVideoContext(vlc_logger *logger, ComPtr<IMFDXGIBuffer> 
     fmt_out.video.i_width = desc.Width;
     fmt_out.video.i_height = desc.Height;
 
-    cfg = D3D11_RenderFormat(desc.Format ,true);
+    cfg = D3D11_RenderFormat(desc.Format, DXGI_FORMAT_UNKNOWN, true);
 
     fmt_out.i_codec = cfg->fourcc;
     fmt_out.video.i_chroma = cfg->fourcc;

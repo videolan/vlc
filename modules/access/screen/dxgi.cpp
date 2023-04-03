@@ -248,7 +248,7 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
     DXGI_OUTDUPL_DESC outDesc;
     p_data->duplication->GetDesc(&outDesc);
 
-    p_data->output_format = D3D11_RenderFormat(outDesc.ModeDesc.Format ,true);
+    p_data->output_format = D3D11_RenderFormat(outDesc.ModeDesc.Format, DXGI_FORMAT_UNKNOWN ,true);
     if (unlikely(!p_data->output_format))
     {
         msg_Err(p_demux, "Unknown texture format %d", outDesc.ModeDesc.Format);

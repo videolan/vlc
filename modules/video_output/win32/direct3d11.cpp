@@ -215,7 +215,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 
     display_info_t new_display = { };
 
-    new_display.pixelFormat = D3D11_RenderFormat((DXGI_FORMAT)out.dxgi_format, false);
+    new_display.pixelFormat = D3D11_RenderFormat((DXGI_FORMAT)out.dxgi_format, DXGI_FORMAT_UNKNOWN, false);
     if (unlikely(new_display.pixelFormat == NULL))
     {
         msg_Err(vd, "Could not find the output format.");
@@ -897,7 +897,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
     if (vtcx_sys != NULL &&
         D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
-        sys->picQuad.generic.textureFormat = D3D11_RenderFormat(vtcx_sys->format ,true);
+        sys->picQuad.generic.textureFormat = D3D11_RenderFormat(vtcx_sys->format, DXGI_FORMAT_UNKNOWN ,true);
     }
 
     // look for the requested pixel format first
