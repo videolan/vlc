@@ -396,9 +396,7 @@ void *aligned_alloc(size_t, size_t);
 } /* extern "C" */
 #endif
 
-#if defined (_WIN32) && defined(__MINGW32__)
-#define aligned_free(ptr)  __mingw_aligned_free(ptr)
-#elif defined (_WIN32) && defined(_MSC_VER)
+#if defined (_WIN32)
 #define aligned_free(ptr)  _aligned_free(ptr)
 #else
 #define aligned_free(ptr)  free(ptr)

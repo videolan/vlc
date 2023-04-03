@@ -56,9 +56,7 @@ void *aligned_alloc(size_t align, size_t size)
 
 #elif defined(HAVE_MEMALIGN)
     return memalign(align, size);
-#elif defined (_WIN32) && defined(__MINGW32__)
-    return __mingw_aligned_malloc(size, align);
-#elif defined (_WIN32) && defined(_MSC_VER)
+#elif defined (_WIN32)
     return _aligned_malloc(size, align);
 #else
     /* align must be valid/supported */
