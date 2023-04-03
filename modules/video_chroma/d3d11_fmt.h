@@ -151,6 +151,21 @@ void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys);
 
 void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys);
 
+static inline const d3d_format_t *D3D11_RenderFormat(DXGI_FORMAT opaque, bool gpu_based)
+{
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
+            output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == opaque &&
+            is_d3d11_opaque(output_format->fourcc) == gpu_based)
+        {
+            return output_format;
+        }
+    }
+    return NULL;
+}
+
+
 /* map texture planes to resource views */
 int D3D11_AllocateResourceView(struct vlc_logger *obj, ID3D11Device *d3ddevice,
                              const d3d_format_t *format,
