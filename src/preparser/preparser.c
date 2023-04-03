@@ -56,7 +56,6 @@ struct task
     input_item_parser_id_t *parser;
 
     vlc_sem_t preparse_ended;
-    vlc_sem_t fetch_ended;
     atomic_int preparse_status;
     atomic_bool interrupted;
     bool art_fetched;
@@ -93,7 +92,6 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item,
 
     task->parser = NULL;
     vlc_sem_init(&task->preparse_ended, 0);
-    vlc_sem_init(&task->fetch_ended, 0);
     atomic_init(&task->preparse_status, ITEM_PREPARSE_SKIPPED);
     atomic_init(&task->interrupted, false);
 
@@ -184,7 +182,11 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     struct task *task = userdata;
     task->art_fetched = fetched;
 
-    vlc_sem_post(&task->fetch_ended);
+    if (!atomic_load(&task->interrupted))
+        input_item_SetPreparsed(task->item, true);
+
+    NotifyPreparseEnded(task);
+    TaskDelete(task);
 }
 
 static const input_fetcher_callbacks_t input_fetcher_callbacks = {
@@ -223,22 +225,16 @@ Parse(struct task *task, vlc_tick_t deadline)
     input_item_parser_id_Release(task->parser);
 }
 
-static void
+static int
 Fetch(struct task *task)
 {
     input_fetcher_t *fetcher = task->preparser->fetcher;
     if (!fetcher || !(task->options & META_REQUEST_OPTION_FETCH_ANY))
-        return;
+        return VLC_ENOENT;
 
-    int ret =
-        input_fetcher_Push(fetcher, task->item,
-                           task->options & META_REQUEST_OPTION_FETCH_ANY,
-                           &input_fetcher_callbacks, task);
-    if (ret != VLC_SUCCESS)
-        return;
-
-    /* Wait until the end of fetching (fetching is not interruptible) */
-    vlc_sem_wait(&task->fetch_ended);
+    return input_fetcher_Push(fetcher, task->item,
+                              task->options & META_REQUEST_OPTION_FETCH_ANY,
+                              &input_fetcher_callbacks, task);
 }
 
 static void
@@ -269,12 +265,13 @@ RunnableRun(void *userdata)
     if (atomic_load(&task->interrupted))
         goto end;
 
-    Fetch(task);
+    int ret = Fetch(task);
 
-    if (atomic_load(&task->interrupted))
-        goto end;
+    if (ret == VLC_SUCCESS)
+        return; /* Remove the task and notify from the fetcher callback */
 
-    input_item_SetPreparsed(task->item, true);
+    if (!atomic_load(&task->interrupted))
+        input_item_SetPreparsed(task->item, true);
 
 end:
     NotifyPreparseEnded(task);
