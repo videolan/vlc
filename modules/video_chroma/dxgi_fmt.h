@@ -46,6 +46,7 @@ typedef struct
 {
     const char   *name;
     DXGI_FORMAT  formatTexture;
+    DXGI_FORMAT  alphaTexture;
     vlc_fourcc_t fourcc;
     uint8_t      bitsPerChannel;
     uint8_t      widthDenominator;
