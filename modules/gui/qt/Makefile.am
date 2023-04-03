@@ -687,10 +687,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/record.svg \
 	gui/qt/pixmaps/icons/remove.svg \
 	gui/qt/pixmaps/icons/renderer.svg \
-	gui/qt/pixmaps/icons/repeat_all.svg \
-	gui/qt/pixmaps/icons/repeat_one.svg \
+	gui/qt/pixmaps/icons/ic_fluent_arrow_repeat_all.svg \
+	gui/qt/pixmaps/icons/ic_fluent_arrow_repeat_1.svg \
 	gui/qt/pixmaps/icons/search.svg \
-	gui/qt/pixmaps/icons/shuffle_on.svg \
+	gui/qt/pixmaps/icons/ic_fluent_arrow_shuffle.svg \
 	gui/qt/pixmaps/icons/skip_back.svg \
 	gui/qt/pixmaps/icons/skip_for.svg \
 	gui/qt/pixmaps/icons/slower.svg \

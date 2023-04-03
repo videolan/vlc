@@ -62,7 +62,7 @@ QtObject {
     readonly property string repeat_all : "\ue02e"
     readonly property string repeat_one : "\ue02f"
     readonly property string search : "\ue030"
-    readonly property string shuffle_on : "\ue031"
+    readonly property string shuffle : "\ue031"
     readonly property string skip_back : "\ue032"
     readonly property string skip_for : "\ue033"
     readonly property string slower : "\ue034"

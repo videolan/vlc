@@ -104,7 +104,7 @@ Widgets.OverlayMenu {
         id: shuffleAction
         text: I18n.qtr("Shuffle Playlist")
         onTriggered: MainPlaylistController.shuffle()
-        readonly property string fontIcon: VLCIcons.shuffle_on
+        readonly property string fontIcon: VLCIcons.shuffle
     }
 
     Action {
