@@ -38,9 +38,10 @@
 
 #include "access.h"
 #include "filter.h"
-#include "vlc_dshow.h"
 
 #include <initguid.h>
+
+#include <wmcodecdsp.h>
 
 #include <new>
 

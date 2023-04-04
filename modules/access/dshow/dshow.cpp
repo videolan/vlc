@@ -45,10 +45,11 @@
 #include <vlc_charset.h>     /* FromWide */
 
 #include <initguid.h>
-#include "vlc_dshow.h"
 
 #include "access.h"
 #include "filter.h"
+
+#include <wmcodecdsp.h>
 
 #include "../src/win32/mta_holder.h"
 

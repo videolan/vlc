@@ -33,7 +33,6 @@
 #include <assert.h>
 
 #include "access.h"
-#include "vlc_dshow.h"
 
 namespace dshow {
 
