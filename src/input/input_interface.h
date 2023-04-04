@@ -29,7 +29,7 @@
 /**********************************************************************
  * Item metadata
  **********************************************************************/
-void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
+void input_item_SetPreparsed( input_item_t *p_i );
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found );
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_epg, bool );

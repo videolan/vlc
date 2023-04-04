@@ -180,7 +180,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     struct task *task = userdata;
 
     if (!atomic_load(&task->interrupted))
-        input_item_SetPreparsed(task->item, true);
+        input_item_SetPreparsed(task->item);
 
     NotifyPreparseEnded(task, fetched);
     TaskDelete(task);
@@ -268,7 +268,7 @@ RunnableRun(void *userdata)
         return; /* Remove the task and notify from the fetcher callback */
 
     if (!atomic_load(&task->interrupted))
-        input_item_SetPreparsed(task->item, true);
+        input_item_SetPreparsed(task->item);
 
 end:
     NotifyPreparseEnded(task, false);

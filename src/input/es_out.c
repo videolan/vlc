@@ -1929,7 +1929,7 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta
     }
     free( psz_alloc );
 
-    input_item_SetPreparsed( p_item, true );
+    input_item_SetPreparsed( p_item );
 
     input_SendEventMeta( p_input );
     /* TODO handle sout meta ? */

@@ -65,18 +65,14 @@ void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
             .u.input_item_error_when_reading_changed.new_value = b_error } );
     }
 }
-void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
+void input_item_SetPreparsed( input_item_t *p_i )
 {
     bool b_send_event = false;
 
     vlc_mutex_lock( &p_i->lock );
 
     int status = vlc_meta_GetStatus(p_i->p_meta);
-    int new_status;
-    if( b_preparsed )
-        new_status = status | ITEM_PREPARSED;
-    else
-        new_status = status & ~ITEM_PREPARSED;
+    int new_status = status | ITEM_PREPARSED;
     if( status != new_status )
     {
         vlc_meta_SetStatus(p_i->p_meta, new_status);
