@@ -135,8 +135,6 @@ FocusScope {
     Row {
         anchors.fill: parent
 
-        anchors.leftMargin: root.leftPadding
-
         visible: artistModel.count > 0
 
         Widgets.KeyNavigableListView {
@@ -179,13 +177,15 @@ FocusScope {
                 text: I18n.qtr("Artists")
                 font.pixelSize: VLCStyle.fontSize_large
                 color: artistList.colorContext.fg.primary
-                leftPadding: VLCStyle.margin_normal
+                leftPadding: root.leftPadding + VLCStyle.margin_normal
                 bottomPadding: VLCStyle.margin_small
                 topPadding: VLCStyle.margin_xlarge
             }
 
             delegate: MusicArtistDelegate {
                 width: artistList.width
+
+                leftPadding: root.leftPadding
 
                 isCurrent: ListView.isCurrentItem
 
