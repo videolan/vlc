@@ -74,6 +74,7 @@ enum vlc_qt_theme_color_name {
     VQTC_NAME_ACCENT,
     VQTC_NAME_SHADOW,
     VQTC_NAME_SEPARATOR,
+    VQTC_NAME_INDICATOR,
     VQTC_NAME_COUNT
 };
 

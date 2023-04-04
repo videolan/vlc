@@ -561,6 +561,9 @@ void SystemPalette::makeLightPalette()
 
         setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
         setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::black, 0.6));
+
+        setColor(CS, C::Decoration, C::Indicator, C::Normal, QColor("#9e9e9e")); //FIXME not a predef
+
     }
 
     //Accent Buttons
@@ -755,6 +758,8 @@ void SystemPalette::makeDarkPalette()
 
         setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
         setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::white, 0.6));
+
+        setColor(CS, C::Decoration, C::Indicator, C::Normal, QColor("#666666"));  //FIXME not a predef
     }
 
     //Accent Buttons

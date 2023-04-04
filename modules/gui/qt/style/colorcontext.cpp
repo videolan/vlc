@@ -402,6 +402,11 @@ QColor ColorContext::separator() const
     return getColor(Decoration, Separator);
 }
 
+QColor ColorContext::indicator() const
+{
+    return getColor(Decoration, Indicator);
+}
+
 QColor ColorContext::shadow() const
 {
     return getColor(Decoration, Shadow);

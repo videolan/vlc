@@ -117,6 +117,7 @@ public:
         Accent = VQTC_NAME_ACCENT,
         Shadow = VQTC_NAME_SHADOW,
         Separator = VQTC_NAME_SEPARATOR,
+        Indicator = VQTC_NAME_INDICATOR
     };
 
     Q_PROPERTY(SystemPalette* palette READ palette WRITE setPalette NOTIFY paletteChanged FINAL)
@@ -139,6 +140,7 @@ public:
     Q_PROPERTY(QColor visualFocus READ visualFocus NOTIFY colorsChanged FINAL)
     Q_PROPERTY(QColor border READ border NOTIFY colorsChanged FINAL)
     Q_PROPERTY(QColor separator READ separator NOTIFY colorsChanged FINAL)
+    Q_PROPERTY(QColor indicator READ indicator NOTIFY colorsChanged FINAL)
     Q_PROPERTY(QColor shadow READ shadow NOTIFY colorsChanged FINAL)
     Q_PROPERTY(QColor accent READ accent NOTIFY colorsChanged FINAL)
 
@@ -160,6 +162,7 @@ public:
     QColor visualFocus() const;
     QColor border() const;
     QColor separator() const;
+    QColor indicator() const;
     QColor shadow() const;
     QColor accent() const;
 

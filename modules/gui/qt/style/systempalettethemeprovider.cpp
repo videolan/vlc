@@ -327,6 +327,13 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_HIGHLIGHT, VQTC_STATE_FOCUSED, hightlightHover);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_HIGHLIGHT, VQTC_STATE_HOVERED, hightlightHover);
         setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_HIGHLIGHT, VQTC_STATE_NORMAL, textOnHightlight);
+
+
+        const auto bg = palette.color(QPalette::AlternateBase);
+        const auto indicator = sys->m_isDark ? bg.lighter() : bg.darker();
+        setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_INDICATOR
+                   , VQTC_STATE_NORMAL, indicator);
+
     }
 
     //Badge

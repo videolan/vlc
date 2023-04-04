@@ -359,6 +359,9 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setGtkColorSetFg(obj, CS, VQTC_NAME_PRIMARY, ITEM_SELECTOR);
         setGtkColorSetBorder(obj, CS, ITEM_SELECTOR);
         setGtkColorSetHighlight(obj, CS, ITEM_SELECTOR);
+
+        const auto separator = GetSeparatorColor(" GtkListBoxRow#separator.horizontal");
+        setGtkColor(obj, CS, VQTC_SECTION_DECORATION,  VQTC_NAME_INDICATOR, VQTC_STATE_NORMAL, separator);
     }
 
 #define COMBOBOX_SELECTOR VIEW_SELECTOR " GtkComboBoxText#combobox #box.linked #entry.combo"

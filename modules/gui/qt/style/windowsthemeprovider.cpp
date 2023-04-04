@@ -171,6 +171,8 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
             setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, COLOR_BTNTEXT);
             setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_FOCUSED, COLOR_HIGHLIGHT);
             setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_HOVERED, COLOR_HIGHLIGHT);
+
+            setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_INDICATOR, VQTC_STATE_NORMAL, COLOR_HIGHLIGHT);
         }
 
         //set colors on all buttons
