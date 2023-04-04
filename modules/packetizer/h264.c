@@ -244,29 +244,18 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
 
         if( p_dec->fmt_out.i_extra == 0 && p_pps )
         {
-            const block_t *p_spsblock = p_sys->sps[p_sps->i_id].p_block;
-            const block_t *p_ppsblock = p_sys->pps[p_pps->i_id].p_block;
-            const block_t *p_spsextblock = p_sys->spsext[p_sps->i_id].p_block;
-
-            if( p_spsblock && p_ppsblock )
+            block_t *p_xpsblocks = GatherSets( p_sys, true, true );
+            if( p_xpsblocks )
             {
-                size_t i_alloc = p_ppsblock->i_buffer + p_spsblock->i_buffer;
-                if( p_spsextblock )
-                    i_alloc += p_spsextblock->i_buffer;
-                p_dec->fmt_out.p_extra = malloc( i_alloc );
+                size_t i_total;
+                block_ChainProperties( p_xpsblocks, NULL, &i_total, NULL );
+                p_dec->fmt_out.p_extra = malloc( i_total );
                 if( p_dec->fmt_out.p_extra )
                 {
-                    uint8_t*p_buf = p_dec->fmt_out.p_extra;
-                    p_dec->fmt_out.i_extra = i_alloc;
-                    memcpy( p_buf, p_spsblock->p_buffer, p_spsblock->i_buffer );
-                    p_buf += p_spsblock->i_buffer;
-                    if( p_spsextblock )
-                    {
-                        memcpy( p_buf, p_spsextblock->p_buffer, p_spsextblock->i_buffer );
-                        p_buf += p_spsextblock->i_buffer;
-                    }
-                    memcpy( p_buf, p_ppsblock->p_buffer, p_ppsblock->i_buffer );
+                    p_dec->fmt_out.i_extra = i_total;
+                    block_ChainExtract( p_xpsblocks, p_dec->fmt_out.p_extra, i_total );
                 }
+                block_ChainRelease( p_xpsblocks );
             }
         }
     }
