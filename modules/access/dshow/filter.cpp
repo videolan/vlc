@@ -31,11 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 
-#ifndef _MSC_VER
-    /* Work-around a bug in w32api-2.5 */
-#   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE
-#endif
-
 #include "access.h"
 #include "filter.h"
 
