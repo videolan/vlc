@@ -176,6 +176,22 @@ static void LastAppendXPSCopy( const block_t *p_block, block_t ***ppp_last )
     }
 }
 
+static block_t * GatherSets( decoder_sys_t *p_sys, bool b_need_sps, bool b_need_pps )
+{
+    block_t *p_xpsnal = NULL;
+    block_t **pp_xpsnal_tail = &p_xpsnal;
+    for( int i = 0; i <= H264_SPS_ID_MAX && b_need_sps; i++ )
+    {
+        LastAppendXPSCopy( p_sys->sps[i].p_block, &pp_xpsnal_tail );
+        /* 7.4.1.2.3,  shall be the next NAL unit after a sequence parameter set NAL unit
+         * having the same value of seq_parameter_set_id */
+        LastAppendXPSCopy( p_sys->spsext[i].p_block, &pp_xpsnal_tail );
+    }
+    for( int i = 0; i < H264_PPS_ID_MAX && b_need_pps; i++ )
+        LastAppendXPSCopy( p_sys->pps[i].p_block, &pp_xpsnal_tail );
+    return p_xpsnal;
+}
+
 static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t *p_sps,
                                             const h264_picture_parameter_set_t *p_pps )
 {
@@ -841,20 +857,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
     /* Gather PPS/SPS if required */
-    block_t *p_xpsnal = NULL;
-    block_t **pp_xpsnal_tail = &p_xpsnal;
-    if( b_need_sps_pps || p_sys->b_new_sps || p_sys->b_new_pps )
-    {
-        for( int i = 0; i <= H264_SPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_sps); i++ )
-        {
-            LastAppendXPSCopy( p_sys->sps[i].p_block, &pp_xpsnal_tail );
-            /* 7.4.1.2.3,  shall be the next NAL unit after a sequence parameter set NAL unit
-             * having the same value of seq_parameter_set_id */
-            LastAppendXPSCopy( p_sys->spsext[i].p_block, &pp_xpsnal_tail );
-        }
-        for( int i = 0; i < H264_PPS_ID_MAX && (b_need_sps_pps || p_sys->b_new_pps); i++ )
-            LastAppendXPSCopy( p_sys->pps[i].p_block, &pp_xpsnal_tail );
-    }
+    block_t *p_xpsnal = GatherSets( p_sys, b_need_sps_pps|p_sys->b_new_sps,
+                                           b_need_sps_pps|p_sys->b_new_pps );
 
     /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
     if( p_sys->leading.p_head &&
