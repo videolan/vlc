@@ -108,7 +108,7 @@ typedef unsigned short mode_t;
 
 /* C++11 says there's no need to define __STDC_*_MACROS when including
  * inttypes.h and stdint.h. */
-#if defined (__cplusplus) && (defined(__MINGW32__) || defined(__UCLIBC__))
+#if defined (__cplusplus) && defined(__UCLIBC__)
 # ifndef __STDC_FORMAT_MACROS
 #  define __STDC_FORMAT_MACROS 1
 # endif
