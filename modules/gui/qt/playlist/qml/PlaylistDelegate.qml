@@ -198,7 +198,6 @@ T.ItemDelegate {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                 text: (model.artist ? model.artist : I18n.qtr("Unknown Artist"))
                 color: theme.fg.primary
                 verticalAlignment: Text.AlignBottom
