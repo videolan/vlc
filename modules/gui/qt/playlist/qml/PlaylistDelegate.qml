@@ -115,8 +115,8 @@ T.ItemDelegate {
         Item {
             id: artworkItem
 
-            Layout.preferredHeight: VLCStyle.icon_normal
-            Layout.preferredWidth: VLCStyle.icon_normal
+            Layout.preferredHeight: VLCStyle.icon_playlistArt
+            Layout.preferredWidth: VLCStyle.icon_playlistArt
             Layout.alignment: Qt.AlignVCenter
 
             Accessible.role: Accessible.Graphic

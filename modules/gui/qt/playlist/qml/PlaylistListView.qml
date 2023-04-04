@@ -238,7 +238,8 @@ Control {
             spacing: VLCStyle.margin_large
 
             Widgets.IconLabel {
-                Layout.preferredWidth: VLCStyle.icon_playlistHeader
+                // playlist cover column
+                Layout.preferredWidth: VLCStyle.icon_playlistArt
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
