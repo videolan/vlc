@@ -44,9 +44,9 @@ T.ItemDelegate {
 
     // Settings
 
-    topPadding: VLCStyle.margin_xxsmall
+    topPadding: VLCStyle.playlistDelegate_verticalPadding
 
-    bottomPadding: VLCStyle.margin_xxsmall
+    bottomPadding: VLCStyle.playlistDelegate_verticalPadding
 
     leftPadding: VLCStyle.margin_normal
 
@@ -178,7 +178,7 @@ T.ItemDelegate {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.leftMargin: VLCStyle.margin_large
-            spacing: 0
+            spacing: VLCStyle.margin_xsmall
 
             Widgets.ListLabel {
                 id: textInfo
