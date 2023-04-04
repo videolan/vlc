@@ -254,11 +254,13 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
         sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
         sample = sampleTexture( normalSampler, In.uv );\n\
+    float srcAlpha = saturate(sample.a  * Opacity);\n\
+    sample.a = 1.0;\n\
     float3 rgb = max(mul(sample, Colorspace),0);\n\
     rgb = sourceToLinear(rgb);\n\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
-    return float4(rgb, saturate(sample.a * Opacity));\n\
+    return float4(rgb, srcAlpha);\n\
 }\n\
 ";
 
