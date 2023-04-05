@@ -189,11 +189,11 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 }
 
 /**************************************************************************
- * release (Public)
+ * destroy (Public)
  **************************************************************************/
 
 void
-libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
+libvlc_media_discoverer_destroy( libvlc_media_discoverer_t * p_mdis )
 {
     if( p_mdis->p_sd != NULL )
         libvlc_media_discoverer_stop( p_mdis );

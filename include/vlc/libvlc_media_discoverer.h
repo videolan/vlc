@@ -118,7 +118,7 @@ struct libvlc_media_discoverer_cbs {
  * a list of the discoverer names available in this libVLC instance
  * \param cbs callback to listen to events (can be NULL). The pointed
  * struct must be kept alive (and not modified) by the caller until the
- * returned object is released with libvlc_media_discoverer_release().
+ * returned object is destroyed with libvlc_media_discoverer_destroy().
  * \param cbs_opaque opaque pointer used by the callbacks
  * \return media discover object or NULL in case of error
  * \version LibVLC 3.0.0 or later
@@ -160,9 +160,10 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis );
  * the object will be released.
  *
  * \param p_mdis media service discover object
+ * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API void
-libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
+libvlc_media_discoverer_destroy( libvlc_media_discoverer_t * p_mdis );
 
 /**
  * Query if media service discover object is running.
