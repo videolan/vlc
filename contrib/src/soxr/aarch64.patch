@@ -1,0 +1,21 @@
+diff --git a/cmake/Modules/FindSIMD32.cmake b/cmake/Modules/FindSIMD32.cmake
+index 9e4237358f..580e9ca87b 100644
+--- a/cmake/Modules/FindSIMD32.cmake	
++++ b/cmake/Modules/FindSIMD32.cmake	
+@@ -24,6 +24,16 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+       return !vgetq_lane_u32(vceqq_f32(a,b),0);
+     }
+   ")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
++  set (TRIAL_C_FLAGS
++    " ")
++  set (TEST_C_SOURCE "
++    #include <arm_neon.h>
++    int main(int c, char * * v) {
++      float32x4_t a = vdupq_n_f32((float)c), b = vdupq_n_f32((float)!!v);
++      return !vgetq_lane_u32(vceqq_f32(a,b),0);
++    }
++  ")
+ else ()
+   if (WIN32) # Safety for when mixed lib/app compilers (but performance hit)
+     set (GCC_WIN32_SIMD32_OPTS "-mincoming-stack-boundary=2")
