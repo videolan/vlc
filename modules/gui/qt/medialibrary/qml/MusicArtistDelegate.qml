@@ -116,7 +116,7 @@ T.ItemDelegate {
         onDoubleClicked: itemDoubleClicked(mouse)
 
         Widgets.CurrentIndicator {
-            height: parent.height - (margin * 2)
+            length: parent.height - (margin * 2)
 
             margin: VLCStyle.dp(4, VLCStyle.scale)
 

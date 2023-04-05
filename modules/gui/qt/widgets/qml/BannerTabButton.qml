@@ -130,7 +130,7 @@ T.TabButton {
         }
 
         Widgets.CurrentIndicator {
-            width: tabRow.width
+            length: tabRow.width
 
             orientation: Qt.Horizontal
 

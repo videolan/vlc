@@ -23,6 +23,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 Rectangle {
+    id: root
 
     property int orientation: Qt.Vertical
     property int margin: VLCStyle.margin_xxxsmall
@@ -31,37 +32,33 @@ Rectangle {
         id: theme
     }
 
-    color: theme.accent
-    width: orientation === Qt.Vertical ? VLCStyle.heightBar_xxxsmall : parent.width
-    height: orientation === Qt.Horizontal ? VLCStyle.heightBar_xxxsmall : parent.height
+    property Item source: parent
 
-    onOrientationChanged: {
-        if (orientation == Qt.Vertical) {
-            anchors.horizontalCenter = undefined
-            anchors.verticalCenter = Qt.binding(function () {
-                return parent.verticalCenter
-            })
-            anchors.left = Qt.binding(function () {
-                return parent.left
-            })
-            anchors.right = undefined
-            anchors.leftMargin = Qt.binding(function () {
-                return margin
-            })
-            anchors.bottomMargin = 0
-        } else {
-            anchors.top = undefined
-            anchors.bottom = Qt.binding(function () {
-                return parent.bottom
-            })
-            anchors.horizontalCenter = Qt.binding(function () {
-                return parent.horizontalCenter
-            })
-            anchors.verticalCenter = undefined
-            anchors.leftMargin = 0
-            anchors.bottomMargin = Qt.binding(function () {
-                return margin
-            })
+    property int length: 0
+
+    property var _position: [
+        {
+            // for orientation == Qt.Vertical
+            "width" : VLCStyle.heightBar_xxxsmall,
+            "height": root.length,
+            "x": margin,
+            "y": !!source ? (source.height - root.length) / 2 : 0
+        },
+        {
+            // for orientation == Qt.Horizontal
+            "width": root.length,
+            "height": VLCStyle.heightBar_xxxsmall,
+            "x": !!source ? (source.width - root.length) / 2 : 0,
+            "y": !!source ? source.height - margin : 0,
         }
-    }
+    ]
+
+    property var _currentPosition: (orientation === Qt.Vertical) ? _position[0] : _position[1]
+
+    color: theme.accent
+
+    x: _currentPosition.x
+    y: _currentPosition.y
+    width: _currentPosition.width
+    height: _currentPosition.height
 }
