@@ -53,10 +53,10 @@ if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').e
 
     if have_wayland
         wayland_scanner = find_program(
-            wayland_scanner_dep.get_pkgconfig_variable('wayland_scanner'),
+            wayland_scanner_dep.get_variable(pkgconfig: 'wayland_scanner'),
             native: true
         )
-        wayland_protocols_dir = wayland_protocols_dep.get_pkgconfig_variable('pkgdatadir')
+        wayland_protocols_dir = wayland_protocols_dep.get_variable(pkgconfig: 'pkgdatadir')
     endif
 else
     have_wayland = false
