@@ -38,6 +38,7 @@
 #include <vlc_codec.h>
 #include <vlc_input.h>
 #include <vlc_dialog.h>
+#include <vlc_stream.h>
 
 #include <ass/ass.h>
 
@@ -122,6 +123,7 @@ typedef struct
 
 static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height );
 static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img );
+static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track * );
 
 //#define DEBUG_REGION
 
@@ -279,6 +281,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     ass_process_codec_private( p_track, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra );
+    OldEngineClunkyRollInfoPatch( p_dec, p_track );
 
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
@@ -771,3 +774,61 @@ static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img )
 #endif
 }
 
+/* Patch [Script Info] aiming old and custom rendering engine
+ * See #27771 */
+static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track *p_track )
+{
+    if( !p_dec->fmt_in->i_extra )
+        return;
+
+    stream_t *p_memstream = vlc_stream_MemoryNew( p_dec, p_dec->fmt_in->p_extra,
+                                                  p_dec->fmt_in->i_extra, true );
+    char *s = vlc_stream_ReadLine( p_memstream );
+    unsigned playres[2] = {0, 0};
+    bool b_hotfix = false;
+    if( s && !strncmp( s, "[Script Info]", 13 ) )
+    {
+        free( s );
+        for( ;; )
+        {
+            s = vlc_stream_ReadLine( p_memstream );
+            if( !s || *s == '[' /* Next section */ )
+            {
+                break;
+            }
+            else if( !strncmp( s, "PlayResX: ", 10 ) ||
+                     !strncmp( s, "PlayResY: ", 10 ) )
+            {
+                playres['Y' - s[7]] = atoi( &s[9] );
+            }
+            else if( !strncmp( s, "Original Script: ", 17 ) )
+            {
+                b_hotfix = !!strstr( s, "[http://www.crunchyroll.com/user/" );
+                if( !b_hotfix )
+                    break;
+            }
+            else if( !strncmp( s, "LayoutRes", 9 ) ||
+                     !strncmp( s, "ScaledBorderAndShadow:", 22  ) )
+            {
+                /* They can still have fixed their mess in the future. Tell me, Marty. */
+                b_hotfix = false;
+                break;
+            }
+        }
+    }
+    free( s );
+    vlc_stream_Delete( p_memstream );
+    if( b_hotfix && playres[0] && playres[1] )
+    {
+	msg_Dbg( p_dec,"patching script info for custom rendering engine "
+                       "(built against libass 0x%X)", LIBASS_VERSION );
+        /* Only modify struct _before_ any ass_process_chunk calls
+           (see ass_types.h documentation for when modifications are allowed) */
+        p_track->ScaledBorderAndShadow = 1;
+        p_track->YCbCrMatrix = YCBCR_NONE;
+#if LIBASS_VERSION >= 0x01600020
+        p_track->LayoutResX = playres[0];
+        p_track->LayoutResY = playres[1];
+#endif
+    }
+}
