@@ -93,6 +93,7 @@
 #define VLC_CODEC_TRUEMOTION2     VLC_FOURCC('T','M','2','0')
 #define VLC_CODEC_QTRLE           VLC_FOURCC('r','l','e',' ')
 #define VLC_CODEC_QDRAW           VLC_FOURCC('q','d','r','w')
+#define VLC_CODEC_QOI             VLC_FOURCC('q','o','i','f')
 #define VLC_CODEC_QPEG            VLC_FOURCC('Q','P','E','G')
 #define VLC_CODEC_ULTI            VLC_FOURCC('U','L','T','I')
 #define VLC_CODEC_VIXL            VLC_FOURCC('V','I','X','L')

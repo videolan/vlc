@@ -625,6 +625,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_QDRAW, "Apple QuickDraw Video"),
         A("qdrw"),
 
+    B(VLC_CODEC_QOI, "Quite OK Image Format"),
+        A("qoif"),
+
     B(VLC_CODEC_QPEG, "QPEG Video"),
         A("QPEG"),
         A("Q1.0"),
