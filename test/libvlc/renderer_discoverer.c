@@ -71,7 +71,7 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
         libvlc_renderer_discoverer_stop(p_rd);
     }
 
-    libvlc_renderer_discoverer_release(p_rd);
+    libvlc_renderer_discoverer_destroy(p_rd);
 }
 
 int

@@ -181,7 +181,7 @@ struct libvlc_renderer_discoverer_cbs
  * get a list of the discoverer names available in this libVLC instance
  * \param cbs callback to listen to events (can't be NULL). The pointed
  * struct must be kept alive (and not modified) by the caller until the
- * returned object is released with libvlc_renderer_discoverer_release().
+ * returned object is destroyed with libvlc_renderer_discoverer_destroy().
  * \param cbs_opaque opaque pointer used by the callbacks
  * \return media discover object or NULL in case of error
  */
@@ -194,18 +194,18 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
 /**
  * Release a renderer discoverer object
  *
- * \version LibVLC 3.0.0 or later
+ * \version LibVLC 4.0.0 or later
  *
  * \param p_rd renderer discoverer object
  */
 LIBVLC_API void
-libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_rd );
+libvlc_renderer_discoverer_destroy( libvlc_renderer_discoverer_t *p_rd );
 
 /**
  * Start renderer discovery
  *
  * To stop it, call libvlc_renderer_discoverer_stop() or
- * libvlc_renderer_discoverer_release() directly.
+ * libvlc_renderer_discoverer_destroy() directly.
  *
  * \see libvlc_renderer_discoverer_stop()
  *

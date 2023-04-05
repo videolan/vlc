@@ -151,7 +151,7 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
 }
 
 void
-libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_lrd )
+libvlc_renderer_discoverer_destroy( libvlc_renderer_discoverer_t *p_lrd )
 {
     libvlc_renderer_discoverer_stop( p_lrd );
     free( p_lrd );
