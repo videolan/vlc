@@ -35,9 +35,11 @@
 
 struct libvlc_renderer_discoverer_t
 {
-    libvlc_event_manager_t  event_manager;
     vlc_object_t *          p_object;
     vlc_renderer_discovery_t *p_rd;
+
+    const struct libvlc_renderer_discoverer_cbs *cbs;
+    void *cbs_opaque;
 
     int                     i_items;
     vlc_renderer_item_t **  pp_items;
@@ -63,12 +65,8 @@ static void renderer_discovery_item_added( vlc_renderer_discovery_t *rd,
 
     TAB_APPEND( p_lrd->i_items, p_lrd->pp_items, p_item );
 
-    libvlc_event_t event = {
-        .type = libvlc_RendererDiscovererItemAdded,
-        .u.renderer_discoverer_item_added.item =
-            (libvlc_renderer_item_t*) p_item,
-    };
-    libvlc_event_send( &p_lrd->event_manager, &event );
+    p_lrd->cbs->on_item_added( p_lrd->cbs_opaque,
+                               (libvlc_renderer_item_t*) p_item );
 }
 
 static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
@@ -81,12 +79,9 @@ static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
     assert( i_idx != -1 );
     TAB_ERASE( p_lrd->i_items, p_lrd->pp_items, i_idx );
 
-    libvlc_event_t event = {
-        .type = libvlc_RendererDiscovererItemDeleted,
-        .u.renderer_discoverer_item_deleted.item =
-            (libvlc_renderer_item_t*) p_item,
-    };
-    libvlc_event_send( &p_lrd->event_manager, &event );
+    if( p_lrd->cbs->on_item_removed != NULL )
+        p_lrd->cbs->on_item_removed( p_lrd->cbs_opaque,
+                                     (libvlc_renderer_item_t*) p_item );
 
     vlc_renderer_item_release( p_item );
 }
@@ -130,8 +125,15 @@ libvlc_renderer_item_flags( const libvlc_renderer_item_t *p_item )
 
 libvlc_renderer_discoverer_t *
 libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
-                                const char *psz_name )
+                                const char *psz_name,
+                                const struct libvlc_renderer_discoverer_cbs *cbs,
+                                void *cbs_opaque )
 {
+    assert( cbs != NULL && cbs->on_item_added != NULL );
+
+    /* No different versions to handle for now */
+    assert(cbs->version <= 0);
+
     size_t len = strlen( psz_name ) + 1;
     libvlc_renderer_discoverer_t *p_lrd = malloc( sizeof(*p_lrd) + len );
 
@@ -142,7 +144,8 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
     memcpy( p_lrd->name, psz_name, len );
     TAB_INIT( p_lrd->i_items, p_lrd->pp_items );
     p_lrd->p_rd = NULL;
-    libvlc_event_manager_init( &p_lrd->event_manager, p_lrd );
+    p_lrd->cbs = cbs;
+    p_lrd->cbs_opaque = cbs_opaque;
 
     return p_lrd;
 }
@@ -151,7 +154,6 @@ void
 libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_lrd )
 {
     libvlc_renderer_discoverer_stop( p_lrd );
-    libvlc_event_manager_destroy( &p_lrd->event_manager );
     free( p_lrd );
 }
 
@@ -183,12 +185,6 @@ libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_lrd )
     for( int i = 0; i < p_lrd->i_items; ++i )
         vlc_renderer_item_release( p_lrd->pp_items[i] );
     TAB_CLEAN( p_lrd->i_items, p_lrd->pp_items );
-}
-
-libvlc_event_manager_t *
-libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_lrd )
-{
-    return &p_lrd->event_manager;
 }
 
 void

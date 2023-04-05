@@ -56,21 +56,18 @@ typedef struct libvlc_rd_description_t
 /**
  * Renderer item
  *
- * This struct is passed by a @ref libvlc_event_t when a new renderer is added
- * or deleted.
+ * This struct is passed by a @ref libvlc_renderer_discoverer_cbs when a new
+ * renderer is added or deleted.
  *
- * An item is valid until the @ref libvlc_RendererDiscovererItemDeleted event
- * is called with the same pointer.
- *
- * \see libvlc_renderer_discoverer_event_manager()
+ * An item is valid until the @ref libvlc_renderer_discoverer_cbs::on_item_removed
+ * callback is called with the same pointer.
  */
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
-
 
 /**
  * Hold a renderer item, i.e. creates a new reference
  *
- * This functions need to called from the libvlc_RendererDiscovererItemAdded
+ * This functions need to called from the libvlc_renderer_discoverer_cbs::on_item_added
  * callback if the libvlc user wants to use this item after. (for display or
  * for passing it to the mediaplayer for example).
  *
@@ -134,27 +131,65 @@ LIBVLC_API int
 libvlc_renderer_item_flags(const libvlc_renderer_item_t *p_item);
 
 /**
+ * struct defining callbacks for libvlc_renderer_discoverer_new()
+ */
+struct libvlc_renderer_discoverer_cbs
+{
+    /**
+     * Version of struct libvlc_renderer_discoverer_cbs
+     */
+    uint32_t version;
+
+    /**
+     * Callback prototype that notify when the discoverer added an item
+     *
+     * \note Mandatory (can't be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_renderer_discoverer_new()
+     * \param item the new added item
+     */
+    void (*on_item_added)(void *opaque, libvlc_renderer_item_t *item);
+
+    /**
+     * Callback prototype that notify when the discoverer removed an item
+     *
+     * \note Optional (can be NULL).
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_renderer_discoverer_new()
+     * \param item the removed item
+     */
+    void (*on_item_removed)(void *opaque, libvlc_renderer_item_t *item);
+};
+
+/**
  * Create a renderer discoverer object by name
  *
- * After this object is created, you should attach to events in order to be
- * notified of the discoverer events.
+ * After this object is created, items addition and removal will be
+ * notified through the provided callbacks.
  *
  * You need to call libvlc_renderer_discoverer_start() in order to start the
  * discovery.
  *
- * \see libvlc_renderer_discoverer_event_manager()
  * \see libvlc_renderer_discoverer_start()
  *
- * \version LibVLC 3.0.0 or later
+ * \version LibVLC 4.0.0 or later
  *
  * \param p_inst libvlc instance
  * \param psz_name service name; use libvlc_renderer_discoverer_list_get() to
  * get a list of the discoverer names available in this libVLC instance
+ * \param cbs callback to listen to events (can't be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until the
+ * returned object is released with libvlc_renderer_discoverer_release().
+ * \param cbs_opaque opaque pointer used by the callbacks
  * \return media discover object or NULL in case of error
  */
 LIBVLC_API libvlc_renderer_discoverer_t *
 libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
-                                const char *psz_name );
+                                const char *psz_name,
+                                const struct libvlc_renderer_discoverer_cbs *cbs,
+                                void *cbs_opaque );
 
 /**
  * Release a renderer discoverer object
@@ -193,26 +228,6 @@ libvlc_renderer_discoverer_start( libvlc_renderer_discoverer_t *p_rd );
  */
 LIBVLC_API void
 libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_rd );
-
-/**
- * Get the event manager of the renderer discoverer
- *
- * The possible events to attach are @ref libvlc_RendererDiscovererItemAdded
- * and @ref libvlc_RendererDiscovererItemDeleted.
- *
- * The @ref libvlc_renderer_item_t struct passed to event callbacks is owned by
- * VLC, users should take care of holding/releasing this struct for their
- * internal usage.
- *
- * \see libvlc_event_t.u.renderer_discoverer_item_added.item
- * \see libvlc_event_t.u.renderer_discoverer_item_deleted.item
- *
- * \version LibVLC 3.0.0 or later
- *
- * \return a valid event manager (can't fail)
- */
-LIBVLC_API libvlc_event_manager_t *
-libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_rd );
 
 /**
  * Get media discoverer services

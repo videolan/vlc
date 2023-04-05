@@ -197,20 +197,6 @@ enum libvlc_event_e {
     libvlc_MediaListPlayerStopped,
 
     /**
-     * A new \link #libvlc_renderer_item_t renderer item\endlink was found by a
-     * \link #libvlc_renderer_discoverer_t renderer discoverer\endlink.
-     * The renderer item is valid until deleted.
-     */
-    libvlc_RendererDiscovererItemAdded=0x502,
-
-    /**
-     * A previously discovered \link #libvlc_renderer_item_t renderer item\endlink
-     * was deleted by a \link #libvlc_renderer_discoverer_t renderer discoverer\endlink.
-     * The renderer item is no longer valid.
-     */
-    libvlc_RendererDiscovererItemDeleted,
-
-    /**
      * The current media set into the \ref libvlc_media_player_t is stopping.
      *
      * This event can be used to notify when the media callbacks, initialized
@@ -394,15 +380,6 @@ typedef struct libvlc_event_t
             /** Only valid when recording ends (recording == false) */
             const char *recorded_file_path;
         } media_player_record_changed;
-
-        struct
-        {
-            libvlc_renderer_item_t *item;
-        } renderer_discoverer_item_added;
-        struct
-        {
-            libvlc_renderer_item_t *item;
-        } renderer_discoverer_item_deleted;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 

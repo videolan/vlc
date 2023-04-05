@@ -31,17 +31,17 @@ item_event(const libvlc_renderer_item_t *p_item, const char *psz_event)
 }
 
 static void
-renderer_discoverer_item_added(const struct libvlc_event_t *p_ev, void *p_data)
+renderer_discoverer_item_added(void *opaque, libvlc_renderer_item_t *p_item)
 {
-    (void) p_data;
-    item_event(p_ev->u.renderer_discoverer_item_added.item, "added");
+    (void) opaque;
+    item_event(p_item, "added");
 }
 
 static void
-renderer_discoverer_item_deleted(const struct libvlc_event_t *p_ev, void *p_data)
+renderer_discoverer_item_removed(void *opaque, libvlc_renderer_item_t *p_item)
 {
-    (void) p_data;
-    item_event(p_ev->u.renderer_discoverer_item_deleted.item, "deleted");
+    (void) opaque;
+    item_event(p_item, "deleted");
 }
 
 static void
@@ -49,20 +49,16 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
 {
     test_log("creating and starting discoverer %s\n", psz_name);
 
+    static const struct libvlc_renderer_discoverer_cbs cbs = {
+        .version = 0,
+        .on_item_added = renderer_discoverer_item_added,
+        .on_item_removed = renderer_discoverer_item_removed,
+    };
+
     libvlc_renderer_discoverer_t *p_rd =
-        libvlc_renderer_discoverer_new(p_vlc, psz_name);
+        libvlc_renderer_discoverer_new(p_vlc, psz_name,
+                                       &cbs, NULL);
     assert(p_rd != NULL);
-
-    libvlc_event_manager_t *p_evm = libvlc_renderer_discoverer_event_manager(p_rd);
-    assert(p_evm);
-
-    int i_ret;
-    i_ret = libvlc_event_attach(p_evm, libvlc_RendererDiscovererItemAdded,
-                                renderer_discoverer_item_added, NULL);
-    assert(i_ret == 0);
-    i_ret = libvlc_event_attach(p_evm, libvlc_RendererDiscovererItemDeleted,
-                                renderer_discoverer_item_deleted, NULL);
-    assert(i_ret == 0);
 
     if (libvlc_renderer_discoverer_start(p_rd) == -1)
     {
