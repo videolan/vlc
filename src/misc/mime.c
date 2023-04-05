@@ -51,6 +51,7 @@ static const struct
     { ".jpg",   "image/jpeg" },
     { ".jpeg",  "image/jpeg" },
     { ".png",   "image/png" },
+    { ".qoi",   "image/qoi" },
     { ".pct",   "image/x-pict" },
     /* same as modules/mux/mpjpeg.c here: */
     { ".mpjpeg","multipart/x-mixed-replace; boundary=7b3cc56e5f51db803f790dad720ed50a" },
