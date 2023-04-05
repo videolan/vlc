@@ -645,9 +645,9 @@ if host_system == 'windows'
         install: false
     )
 
-    mft_link_with = [ cc.find_library('mfplat'), d3d11_common_lib ]
+    mft_deps = [ cc.find_library('mfplat') ]
     if get_option('winstore_app')
-        mft_link_with += [ cc.find_library('d3d11') ]
+        mft_deps += [ cc.find_library('d3d11') ]
     endif
     vlc_modules += {
         'name' : 'mft',
@@ -660,7 +660,8 @@ if host_system == 'windows'
                 '../packetizer/h264_nal.c',
                 '../packetizer/hevc_nal.c'
             ),
-        'link_with' : mft_link_with
+        'link_with' : [ d3d11_common_lib ],
+        'dependencies' : mft_deps
     }
 endif
 
