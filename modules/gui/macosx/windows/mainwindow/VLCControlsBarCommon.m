@@ -170,6 +170,7 @@
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
         self.fullscreenButtonWidthConstraint.constant = 0;
+        self.fullscreenButton.hidden = YES;
     }
 
     self.backwardButton.accessibilityTitle = _NS("Previous");
