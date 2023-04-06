@@ -28,9 +28,10 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="3" userLabel="Main Video View Controls Bar" customClass="VLCControlsBarCommon">
+        <customObject id="3" userLabel="Main Video View Controls Bar" customClass="VLCMainVideoViewControlsBar">
             <connections>
                 <outlet property="backwardButton" destination="V9d-hX-iyg" id="ZFn-jn-7OB"/>
+                <outlet property="bookmarksButton" destination="4tZ-52-1q9" id="dAN-YB-YZ5"/>
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
@@ -133,6 +134,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="openBookmarks:" target="3" id="o6m-9M-L4U"/>
+                                                        </connections>
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
                                                         <rect key="frame" x="111" y="-1" width="32" height="33"/>

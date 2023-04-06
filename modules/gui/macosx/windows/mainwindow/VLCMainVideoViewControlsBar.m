@@ -22,6 +22,23 @@
 
 #import "VLCMainVideoViewControlsBar.h"
 
+#import "extensions/NSString+Helpers.h"
+#import "main/VLCMain.h"
+#import "panels/VLCBookmarksWindowController.h"
+
 @implementation VLCMainVideoViewControlsBar
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+
+    _bookmarksButton.toolTip = _NS("Bookmarks");
+    _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
+}
+
+- (IBAction)openBookmarks:(id)sender
+{
+    [VLCMain.sharedInstance.bookmarks toggleWindow:sender];
+}
 
 @end
