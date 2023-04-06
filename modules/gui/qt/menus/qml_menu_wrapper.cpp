@@ -49,8 +49,11 @@ namespace
         if (arrowsize <= 0)
             arrowsize = 32;
 
+        qreal dpr = widget ? widget->devicePixelRatioF() : 1.0;
         headerOption.rect = QRect(0, 0, arrowsize, arrowsize);
-        QPixmap arrow(arrowsize, arrowsize);
+
+        QPixmap arrow(arrowsize * dpr, arrowsize * dpr);
+        arrow.setDevicePixelRatio(dpr);
         arrow.fill(Qt::transparent);
 
         {
