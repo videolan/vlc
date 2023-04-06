@@ -39,6 +39,12 @@
 # include "config.h"
 #endif
 
+// For dynamic use of DXVA-HD
+#if _WIN32_WINNT < 0x0601 // _WIN32_WINNT_WIN7
+# undef _WIN32_WINNT
+# define _WIN32_WINNT _WIN32_WINNT_WIN7
+#endif
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
