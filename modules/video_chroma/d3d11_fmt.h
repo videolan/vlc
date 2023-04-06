@@ -28,6 +28,15 @@
 
 #include "dxgi_fmt.h"
 
+#ifdef __cplusplus
+extern "C" {
+
+#ifndef IID_GRAPHICS_PPV_ARGS
+#define IID_GRAPHICS_PPV_ARGS(ppType) IID_PPV_ARGS(ppType)
+#endif
+
+#endif
+
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
 /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
@@ -162,5 +171,9 @@ static inline void d3d11_device_unlock(d3d11_device_t *d3d_dev)
     if( d3d_dev->context_mutex  != INVALID_HANDLE_VALUE )
         ReleaseMutex( d3d_dev->context_mutex );
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include-guard */
