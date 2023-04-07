@@ -68,6 +68,14 @@
                             inView:((NSView *)sender).superview];
 }
 
+- (IBAction)openAudioMenu:(id)sender
+{
+    NSMenu *menu = VLCMain.sharedInstance.mainMenu.audioMenu;
+    [menu popUpMenuPositioningItem:nil
+                        atLocation:_audioTracksButton.frame.origin
+                            inView:((NSView *)sender).superview];
+}
+
 - (void)updateItemDependentButtons:(id)sender
 {
     [self updateSubtitleButtonVisibility];

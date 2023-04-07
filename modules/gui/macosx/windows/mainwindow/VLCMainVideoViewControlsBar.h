@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (IBAction)openBookmarks:(id)sender;
 - (IBAction)openSubtitlesMenu:(id)sender;
+- (IBAction)openAudioMenu:(id)sender;
 
 @end
 
