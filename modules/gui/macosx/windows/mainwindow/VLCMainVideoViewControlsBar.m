@@ -56,7 +56,7 @@
 
 - (IBAction)openSubtitlesMenu:(id)sender
 {
-    NSMenu *menu = VLCMain.sharedInstance.mainMenu.subtitlesMenu;
+    NSMenu * const menu = VLCMain.sharedInstance.mainMenu.subtitlesMenu;
     [menu popUpMenuPositioningItem:nil
                         atLocation:_subtitlesButton.frame.origin
                             inView:((NSView *)sender).superview];
@@ -64,7 +64,7 @@
 
 - (IBAction)openAudioMenu:(id)sender
 {
-    NSMenu *menu = VLCMain.sharedInstance.mainMenu.audioMenu;
+    NSMenu * const menu = VLCMain.sharedInstance.mainMenu.audioMenu;
     [menu popUpMenuPositioningItem:nil
                         atLocation:_audioButton.frame.origin
                             inView:((NSView *)sender).superview];
