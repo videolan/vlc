@@ -91,6 +91,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
+    video_format_t           pool_fmt;
 
     int                      log_level;
 
@@ -377,7 +378,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
     if (sys->picQuad.formatInfo->formatTexture == DXGI_FORMAT_UNKNOWN)
-        sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
+        sys->sys.pool = picture_pool_NewFromFormat( &sys->pool_fmt, pool_size );
     else
     {
         ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
@@ -387,7 +388,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             /* only provide enough for the filters, we can still do direct rendering */
             slices = __MIN(slices, 6);
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &surface_fmt, slices, textures))
+        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &sys->pool_fmt, slices, textures))
             goto error;
 
         pictures = calloc(pool_size, sizeof(*pictures));
@@ -419,7 +420,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
                 .pf_destroy = DestroyDisplayPoolPicture,
             };
 
-            picture = picture_NewFromResource(&surface_fmt, &resource);
+            picture = picture_NewFromResource(&sys->pool_fmt, &resource);
             if (unlikely(picture == NULL)) {
                 free(picsys);
                 msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
@@ -432,7 +433,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
 
 #ifdef HAVE_ID3D11VIDEODECODER
-        if (is_d3d11_opaque(surface_fmt.i_chroma) && !sys->legacy_shader)
+        if (is_d3d11_opaque(sys->pool_fmt.i_chroma) && !sys->legacy_shader)
 #endif
         {
             sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
@@ -450,7 +451,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             .picture       = pictures,
             .picture_count = pool_size,
         };
-        if (vd->info.is_slow && !is_d3d11_opaque(surface_fmt.i_chroma)) {
+        if (vd->info.is_slow && !is_d3d11_opaque(sys->pool_fmt.i_chroma)) {
             pool_cfg.lock          = Direct3D11MapPoolTexture;
             //pool_cfg.unlock        = Direct3D11UnmapPoolTexture;
         }
@@ -473,7 +474,7 @@ error:
         sys->sys.pool = picture_pool_NewExtended( &pool_cfg );
     } else {
         msg_Dbg(vd, "D3D11 pool succeed with %d surfaces (%dx%d) context 0x%p",
-                pool_size, surface_fmt.i_width, surface_fmt.i_height, sys->d3d_dev.d3dcontext);
+                pool_size, sys->pool_fmt.i_width, sys->pool_fmt.i_height, sys->d3d_dev.d3dcontext);
     }
     return sys->sys.pool;
 }
@@ -1431,6 +1432,24 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
             return err;
     }
 
+    video_format_Copy(&sys->pool_fmt, &fmt);
+
+    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
+            BogusZeroCopy(vd);
+
+    if (!sys->legacy_shader && is_d3d11_opaque(sys->pool_fmt.i_chroma))
+    {
+        sys->pool_fmt.i_width  = (sys->pool_fmt.i_width  + 0x7F) & ~0x7F;
+        sys->pool_fmt.i_height = (sys->pool_fmt.i_height + 0x7F) & ~0x7F;
+    }
+    else
+    if ( sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    {
+        sys->pool_fmt.i_width  = (sys->pool_fmt.i_width  + 0x01) & ~0x01;
+        sys->pool_fmt.i_height = (sys->pool_fmt.i_height + 0x01) & ~0x01;
+    }
+
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
         return VLC_EGENERIC;
@@ -1585,9 +1604,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
 
-    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
-            BogusZeroCopy(vd);
-
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
                                   sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->b_color_range_full,
@@ -1600,18 +1616,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     sys->picQuad.i_width  = fmt->i_width;
     sys->picQuad.i_height = fmt->i_height;
-    if (!sys->legacy_shader && is_d3d11_opaque(fmt->i_chroma))
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
-    }
-    else
-    if ( sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
-    }
 
     UpdateRects(vd, NULL, true);
 
@@ -1823,6 +1827,7 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
     if (sys->sys.pool)
         picture_pool_Release(sys->sys.pool);
     sys->sys.pool = NULL;
+    video_format_Clean(&sys->pool_fmt);
 }
 
 static void Direct3D11DestroyResources(vout_display_t *vd)
