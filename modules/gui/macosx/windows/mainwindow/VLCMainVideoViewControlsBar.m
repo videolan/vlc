@@ -41,6 +41,12 @@
 
     _bookmarksButton.toolTip = _NS("Bookmarks");
     _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
+
+    _subtitlesButton.toolTip = _NS("Subtitle settings");
+    _subtitlesButton.accessibilityLabel = _subtitlesButton.toolTip;
+
+    _audioButton.toolTip = _NS("Audio settings");
+    _audioButton.accessibilityLabel = _audioButton.toolTip;
 }
 
 - (IBAction)openBookmarks:(id)sender
