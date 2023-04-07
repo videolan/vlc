@@ -266,6 +266,8 @@ static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
         return MC_API_ERROR;
     }
 
+    if (p_args->video.b_low_latency)
+        syms.AMediaFormat.setInt32(p_sys->p_format, "low-latency", 1);
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
     syms.AMediaFormat.setString(p_sys->p_format, "mime", api->psz_mime);
     /* No limits for input size */

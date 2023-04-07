@@ -99,6 +99,7 @@ union mc_api_args
         int i_angle;
         bool b_tunneled_playback;
         bool b_adaptive_playback;
+        bool b_low_latency;
     } video;
     struct
     {

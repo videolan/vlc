@@ -470,6 +470,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         if (p_sys->b_adaptive)
             msg_Dbg(p_dec, "mediacodec configured for adaptative playback");
         args.video.b_adaptive_playback = p_sys->b_adaptive;
+        args.video.b_low_latency = var_InheritBool(p_dec, "low-delay");
     }
     else
     {
