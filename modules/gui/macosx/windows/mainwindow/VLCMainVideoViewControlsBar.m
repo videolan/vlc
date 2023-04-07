@@ -40,13 +40,28 @@
     _bookmarksButton.toolTip = _NS("Bookmarks");
     _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
 
-    [self updateSubtitleButtonVisibility];
-    [self updateAudioTracksButtonVisibility];
+    [self updateItemDependentButtons:self];
+
+    NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateItemDependentButtons:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateItemDependentButtons:)
+                               name:VLCPlayerTrackListChanged
+                             object:nil];
 }
 
 - (IBAction)openBookmarks:(id)sender
 {
     [VLCMain.sharedInstance.bookmarks toggleWindow:sender];
+}
+
+- (void)updateItemDependentButtons:(id)sender
+{
+    [self updateSubtitleButtonVisibility];
+    [self updateAudioTracksButtonVisibility];
 }
 
 - (void)updateSubtitleButtonVisibility
