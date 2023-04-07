@@ -23,8 +23,13 @@
 #import "VLCMainVideoViewControlsBar.h"
 
 #import "extensions/NSString+Helpers.h"
+
 #import "main/VLCMain.h"
+
 #import "panels/VLCBookmarksWindowController.h"
+
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 @implementation VLCMainVideoViewControlsBar
 
@@ -34,11 +39,19 @@
 
     _bookmarksButton.toolTip = _NS("Bookmarks");
     _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
+
+    [self updateSubtitleButtonVisibility];
 }
 
 - (IBAction)openBookmarks:(id)sender
 {
     [VLCMain.sharedInstance.bookmarks toggleWindow:sender];
+}
+
+- (void)updateSubtitleButtonVisibility
+{
+     NSArray * const subtitleTracks = VLCMain.sharedInstance.playlistController.playerController.subtitleTracks;
+    _subtitlesButton.hidden = subtitleTracks.count == 0;
 }
 
 @end
