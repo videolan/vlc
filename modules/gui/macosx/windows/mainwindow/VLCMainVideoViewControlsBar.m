@@ -41,18 +41,6 @@
 
     _bookmarksButton.toolTip = _NS("Bookmarks");
     _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
-
-    [self updateItemDependentButtons:self];
-
-    NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateItemDependentButtons:)
-                               name:VLCPlayerCurrentMediaItemChanged
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateItemDependentButtons:)
-                               name:VLCPlayerTrackListChanged
-                             object:nil];
 }
 
 - (IBAction)openBookmarks:(id)sender
@@ -72,26 +60,8 @@
 {
     NSMenu *menu = VLCMain.sharedInstance.mainMenu.audioMenu;
     [menu popUpMenuPositioningItem:nil
-                        atLocation:_audioTracksButton.frame.origin
+                        atLocation:_audioButton.frame.origin
                             inView:((NSView *)sender).superview];
-}
-
-- (void)updateItemDependentButtons:(id)sender
-{
-    [self updateSubtitleButtonVisibility];
-    [self updateAudioTracksButtonVisibility];
-}
-
-- (void)updateSubtitleButtonVisibility
-{
-     NSArray * const subtitleTracks = VLCMain.sharedInstance.playlistController.playerController.subtitleTracks;
-    _subtitlesButton.hidden = subtitleTracks.count == 0;
-}
-
-- (void)updateAudioTracksButtonVisibility
-{
-    NSArray * const audioTracks = VLCMain.sharedInstance.playlistController.playerController.audioTracks;
-   _audioTracksButton.hidden = audioTracks.count == 0;
 }
 
 @end

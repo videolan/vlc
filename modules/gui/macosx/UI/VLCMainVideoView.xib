@@ -30,7 +30,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="3" userLabel="Main Video View Controls Bar" customClass="VLCMainVideoViewControlsBar">
             <connections>
-                <outlet property="audioTracksButton" destination="cja-ZG-8LF" id="h5Z-AR-iHx"/>
+                <outlet property="audioButton" destination="cja-ZG-8LF" id="96C-CC-iV7"/>
                 <outlet property="backwardButton" destination="V9d-hX-iyg" id="ZFn-jn-7OB"/>
                 <outlet property="bookmarksButton" destination="4tZ-52-1q9" id="dAN-YB-YZ5"/>
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
