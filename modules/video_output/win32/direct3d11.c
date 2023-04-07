@@ -935,14 +935,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     {
         picture_sys_t *p_sys = ActivePictureSys(picture);
 
+        D3D11_TEXTURE2D_DESC srcDesc;
+        ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
+
         if (is_d3d11_opaque(picture->format.i_chroma))
             d3d11_device_lock( &sys->d3d_dev );
 
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
-            D3D11_TEXTURE2D_DESC srcDesc,texDesc;
+            D3D11_TEXTURE2D_DESC texDesc;
             if (!is_d3d11_opaque(picture->format.i_chroma))
                 Direct3D11UnmapPoolTexture(picture);
-            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
             ID3D11Texture2D_GetDesc(sys->stagingSys.texture[0], &texDesc);
             D3D11_BOX box = {
                 .top = 0,
@@ -959,21 +961,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         }
         else
         {
-            D3D11_TEXTURE2D_DESC texDesc;
-            ID3D11Texture2D_GetDesc(p_sys->texture[0], &texDesc);
-            if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+            if (srcDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
             {
                 /* for performance reason we don't want to allocate this during
                  * display, do it preferrably when creating the texture */
                 assert(p_sys->resourceView[0]!=NULL);
             }
-            if ( sys->picQuad.i_height != texDesc.Height ||
-                 sys->picQuad.i_width != texDesc.Width )
+            if ( sys->picQuad.i_height != srcDesc.Height ||
+                 sys->picQuad.i_width != srcDesc.Width )
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.i_height = texDesc.Height;
-                sys->picQuad.i_width = texDesc.Width;
+                sys->picQuad.i_height = srcDesc.Height;
+                sys->picQuad.i_width = srcDesc.Width;
 
                 UpdateRects(vd, NULL, true);
                 UpdateSize(vd);
