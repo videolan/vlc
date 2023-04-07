@@ -41,6 +41,7 @@
     _bookmarksButton.accessibilityLabel = _bookmarksButton.toolTip;
 
     [self updateSubtitleButtonVisibility];
+    [self updateAudioTracksButtonVisibility];
 }
 
 - (IBAction)openBookmarks:(id)sender
@@ -52,6 +53,12 @@
 {
      NSArray * const subtitleTracks = VLCMain.sharedInstance.playlistController.playerController.subtitleTracks;
     _subtitlesButton.hidden = subtitleTracks.count == 0;
+}
+
+- (void)updateAudioTracksButtonVisibility
+{
+    NSArray * const audioTracks = VLCMain.sharedInstance.playlistController.playerController.audioTracks;
+   _audioTracksButton.hidden = audioTracks.count == 0;
 }
 
 @end

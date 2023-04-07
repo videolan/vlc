@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, strong) IBOutlet NSButton *bookmarksButton;
 @property (readwrite, strong) IBOutlet NSButton *subtitlesButton;
+@property (readwrite, strong) IBOutlet NSButton *audioTracksButton;
 
 - (IBAction)openBookmarks:(id)sender;
 
