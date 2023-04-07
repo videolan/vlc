@@ -26,6 +26,8 @@
 
 #import "main/VLCMain.h"
 
+#import "menus/VLCMainMenu.h"
+
 #import "panels/VLCBookmarksWindowController.h"
 
 #import "playlist/VLCPlaylistController.h"
@@ -56,6 +58,14 @@
 - (IBAction)openBookmarks:(id)sender
 {
     [VLCMain.sharedInstance.bookmarks toggleWindow:sender];
+}
+
+- (IBAction)openSubtitlesMenu:(id)sender
+{
+    NSMenu *menu = VLCMain.sharedInstance.mainMenu.subtitlesMenu;
+    [menu popUpMenuPositioningItem:nil
+                        atLocation:_subtitlesButton.frame.origin
+                            inView:((NSView *)sender).superview];
 }
 
 - (void)updateItemDependentButtons:(id)sender

@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSButton *audioTracksButton;
 
 - (IBAction)openBookmarks:(id)sender;
+- (IBAction)openSubtitlesMenu:(id)sender;
 
 @end
 
