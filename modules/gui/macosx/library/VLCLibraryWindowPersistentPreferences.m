@@ -54,53 +54,80 @@ NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryV
     [standardUserDefaults setInteger:viewMode forKey:fullKey];
 }
 
+- (VLCLibraryViewMode)videoLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryVideoLibraryViewModePreferenceKey];
+}
 
 - (void)setVideoLibraryViewMode:(VLCLibraryViewMode)videoLibraryViewMode
 {
-    _videoLibraryViewMode = videoLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryVideoLibraryViewModePreferenceKey
                                               value:videoLibraryViewMode];
 }
 
+- (VLCLibraryViewMode)albumLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryAlbumLibraryViewModePreferenceKey];
+}
+
 - (void)setAlbumLibraryViewMode:(VLCLibraryViewMode)albumLibraryViewMode
 {
-    _albumLibraryViewMode = albumLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryAlbumLibraryViewModePreferenceKey
                                               value:albumLibraryViewMode];
 
 }
 
+- (VLCLibraryViewMode)genreLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryGenreLibraryViewModePreferenceKey];
+}
+
 - (void)setGenreLibraryViewMode:(VLCLibraryViewMode)genreLibraryViewMode
 {
-    _genreLibraryViewMode = genreLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryGenreLibraryViewModePreferenceKey
                                               value:genreLibraryViewMode];
 }
 
+- (VLCLibraryViewMode)songsLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibrarySongsLibraryViewModePreferenceKey];
+}
+
 - (void)setSongsLibraryViewMode:(VLCLibraryViewMode)songsLibraryViewMode
 {
-    _songsLibraryViewMode = songsLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibrarySongsLibraryViewModePreferenceKey
                                               value:songsLibraryViewMode];
 }
 
+- (VLCLibraryViewMode)artistLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryArtistLibraryViewModePreferenceKey];
+}
+
 - (void)setArtistLibraryViewMode:(VLCLibraryViewMode)artistLibraryViewMode
 {
-    _artistLibraryViewMode = artistLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryArtistLibraryViewModePreferenceKey
                                               value:artistLibraryViewMode];
 }
 
+- (VLCLibraryViewMode)browseLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryBrowseLibraryViewModePreferenceKey];
+}
+
 - (void)setBrowseLibraryViewMode:(VLCLibraryViewMode)browseLibraryViewMode
 {
-    _browseLibraryViewMode = browseLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryBrowseLibraryViewModePreferenceKey
                                               value:browseLibraryViewMode];
 }
 
+- (VLCLibraryViewMode)streamLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey];
+}
+
 - (void)setStreamLibraryViewMode:(VLCLibraryViewMode)streamLibraryViewMode
 {
-    _streamLibraryViewMode = streamLibraryViewMode;
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey
                                               value:streamLibraryViewMode];
 }
