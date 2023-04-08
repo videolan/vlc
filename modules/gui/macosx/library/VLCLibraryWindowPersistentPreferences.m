@@ -24,6 +24,14 @@
 
 NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
 
+NSString * const VLCLibraryVideoLibraryViewModePreferenceKey = @"VideoLibraryViewMode";
+NSString * const VLCLibraryAlbumLibraryViewModePreferenceKey = @"AlbumLibraryViewMode";
+NSString * const VLCLibraryGenreLibraryViewModePreferenceKey = @"GenreLibraryViewMode";
+NSString * const VLCLibrarySongsLibraryViewModePreferenceKey = @"SongsLibraryViewMode";
+NSString * const VLCLibraryArtistLibraryViewModePreferenceKey = @"ArtistLibraryViewMode";
+NSString * const VLCLibraryBrowseLibraryViewModePreferenceKey = @"BrowseLibraryViewMode";
+NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryViewMode";
+
 @implementation VLCLibraryWindowPersistentPreferences
 
 - (NSString * const)fullLibraryWindowKey:(NSString *)partialKey
@@ -44,6 +52,57 @@ NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
     NSUserDefaults * const standardUserDefaults = NSUserDefaults.standardUserDefaults;
     NSString * const fullKey = [self fullLibraryWindowKey:key];
     [standardUserDefaults setInteger:viewMode forKey:fullKey];
+}
+
+
+- (void)setVideoLibraryViewMode:(VLCLibraryViewMode)videoLibraryViewMode
+{
+    _videoLibraryViewMode = videoLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryVideoLibraryViewModePreferenceKey
+                                              value:videoLibraryViewMode];
+}
+
+- (void)setAlbumLibraryViewMode:(VLCLibraryViewMode)albumLibraryViewMode
+{
+    _albumLibraryViewMode = albumLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryAlbumLibraryViewModePreferenceKey
+                                              value:albumLibraryViewMode];
+
+}
+
+- (void)setGenreLibraryViewMode:(VLCLibraryViewMode)genreLibraryViewMode
+{
+    _genreLibraryViewMode = genreLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryGenreLibraryViewModePreferenceKey
+                                              value:genreLibraryViewMode];
+}
+
+- (void)setSongsLibraryViewMode:(VLCLibraryViewMode)songsLibraryViewMode
+{
+    _songsLibraryViewMode = songsLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibrarySongsLibraryViewModePreferenceKey
+                                              value:songsLibraryViewMode];
+}
+
+- (void)setArtistLibraryViewMode:(VLCLibraryViewMode)artistLibraryViewMode
+{
+    _artistLibraryViewMode = artistLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryArtistLibraryViewModePreferenceKey
+                                              value:artistLibraryViewMode];
+}
+
+- (void)setBrowseLibraryViewMode:(VLCLibraryViewMode)browseLibraryViewMode
+{
+    _browseLibraryViewMode = browseLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryBrowseLibraryViewModePreferenceKey
+                                              value:browseLibraryViewMode];
+}
+
+- (void)setStreamLibraryViewMode:(VLCLibraryViewMode)streamLibraryViewMode
+{
+    _streamLibraryViewMode = streamLibraryViewMode;
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey
+                                              value:streamLibraryViewMode];
 }
 
 @end
