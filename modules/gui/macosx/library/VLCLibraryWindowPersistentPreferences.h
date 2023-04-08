@@ -24,6 +24,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, VLCLibraryViewMode) {
+    VLCLibraryListViewMode,
+    VLCLibraryGridViewMode
+};
+
 @interface VLCLibraryWindowPersistentPreferences : NSObject
 
 @end
