@@ -48,7 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readonly) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
 @property (readonly) NSSegmentedControl *audioSegmentedControl;
-@property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readonly) NSSegmentedControl *segmentedTitleControl;
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;

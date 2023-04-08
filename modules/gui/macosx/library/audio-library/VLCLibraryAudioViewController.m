@@ -30,6 +30,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
@@ -116,7 +117,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
 
     _audioSegmentedControl = libraryWindow.audioSegmentedControl;
-    _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
     _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
@@ -355,7 +355,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)updatePresentedView
 {
-    _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+    const VLCAudioLibrarySegment audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+    _audioDataSource.audioLibrarySegment = audioLibrarySegment;
 
     if (_audioDataSource.libraryModel.listOfAudioMedia.count == 0) {
         [self presentPlaceholderAudioView];
@@ -363,10 +364,32 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
-        if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryListViewModeSegment) {
+        VLCLibraryViewModeSegment viewModeSegment = VLCLibraryGridViewModeSegment; // default value
+        VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+        switch (audioLibrarySegment) {
+            case VLCAudioLibraryArtistsSegment:
+                viewModeSegment = libraryWindowPrefs.artistLibraryViewMode;
+                break;
+            case VLCAudioLibraryGenresSegment:
+                viewModeSegment = libraryWindowPrefs.genreLibraryViewMode;
+                break;
+            case VLCAudioLibrarySongsSegment:
+                viewModeSegment = libraryWindowPrefs.songsLibraryViewMode;
+                break;
+            case VLCAudioLibraryAlbumsSegment:
+                viewModeSegment = libraryWindowPrefs.albumLibraryViewMode;
+                break;
+            default:
+                break;
+        }
+
+        if (viewModeSegment == VLCLibraryListViewModeSegment) {
             [self presentAudioTableView];
-        } else if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment) {
+        } else if (viewModeSegment == VLCLibraryGridViewModeSegment) {
             [self presentAudioGridModeView];
+        } else {
+            NSAssert(false, @"View mode must be grid or list mode");
         }
     }
 }
