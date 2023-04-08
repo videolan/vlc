@@ -21,7 +21,9 @@
  *****************************************************************************/
 
 #import "VLCLibraryWindow.h"
-#include "VLCLibraryDataTypes.h"
+
+#import "VLCLibraryDataTypes.h"
+
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
@@ -40,6 +42,7 @@
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
@@ -47,6 +50,7 @@
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioViewController.h"
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
@@ -375,10 +379,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)setViewForSelectedSegment
 {
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
-    _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
-    VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
-    switch (selectedLibrarySegment) {
+    switch (_currentSelectedSegment) {
         case VLCLibraryVideoSegment:
             [self showVideoLibrary];
             break;
@@ -387,7 +389,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
             break;
         case VLCLibraryBrowseSegment:
         case VLCLibraryStreamsSegment:
-            [self showMediaSourceLibraryWithSegment:selectedLibrarySegment];
+            [self showMediaSourceLibraryWithSegment:_currentSelectedSegment];
             break;
         default:
             break;
@@ -396,9 +398,48 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)segmentedControlAction:(id)sender
 {
-    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment && 
-        _gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
+    if (_gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
         return;
+    }
+
+    _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
+
+    const VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
+    VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+    switch (selectedLibrarySegment) {
+        case VLCLibraryVideoSegment:
+            preferences.videoLibraryViewMode = _currentSelectedViewModeSegment;
+            break;
+        case VLCLibraryMusicSegment:
+        {
+            const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
+            switch (selectedAudioSegment) {
+                case VLCAudioLibraryArtistsSegment:
+                    preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
+                    break;
+                case VLCAudioLibraryGenresSegment:
+                    preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
+                    break;
+                case VLCAudioLibraryAlbumsSegment:
+                    preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
+                    break;
+                case VLCAudioLibrarySongsSegment:
+                    preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case VLCLibraryBrowseSegment:
+            preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
+            break;
+        case VLCLibraryStreamsSegment:
+            preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
+            break;
+        default:
+            break;
     }
 
     [self setViewForSelectedSegment];
