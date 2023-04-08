@@ -375,6 +375,49 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 #pragma mark - misc. user interactions
 
+- (void)updateGridVsListViewModeSegmentedControl
+{
+    const VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
+    VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+    switch (selectedLibrarySegment) {
+        case VLCLibraryVideoSegment:
+            _currentSelectedViewModeSegment = preferences.videoLibraryViewMode;
+            break;
+        case VLCLibraryMusicSegment:
+        {
+            const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
+            switch (selectedAudioSegment) {
+                case VLCAudioLibraryArtistsSegment:
+                    _currentSelectedViewModeSegment = preferences.artistLibraryViewMode;
+                    break;
+                case VLCAudioLibraryGenresSegment:
+                    _currentSelectedViewModeSegment = preferences.genreLibraryViewMode;
+                    break;
+                case VLCAudioLibraryAlbumsSegment:
+                    _currentSelectedViewModeSegment = preferences.albumLibraryViewMode;
+                    break;
+                case VLCAudioLibrarySongsSegment:
+                    _currentSelectedViewModeSegment = preferences.songsLibraryViewMode;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case VLCLibraryBrowseSegment:
+            _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
+            break;
+        case VLCLibraryStreamsSegment:
+            _currentSelectedViewModeSegment = preferences.streamLibraryViewMode;
+            break;
+        default:
+            break;
+    }
+
+    _gridVsListSegmentedControl.selectedSegment = _currentSelectedViewModeSegment;
+}
+
 - (void)setViewForSelectedSegment
 {
     switch (_currentSelectedSegment) {
@@ -403,6 +446,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
     [self setViewForSelectedSegment];
+    [self updateGridVsListViewModeSegmentedControl];
 }
 
 - (IBAction)gridVsListSegmentedControlAction:(id)sender

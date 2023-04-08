@@ -147,6 +147,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)togglePlaylist;
 - (void)hideControlsBar;
 - (void)showControlsBar;
+- (void)updateGridVsListViewModeSegmentedControl;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;

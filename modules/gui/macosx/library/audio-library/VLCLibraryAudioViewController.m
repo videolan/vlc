@@ -391,6 +391,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         } else {
             NSAssert(false, @"View mode must be grid or list mode");
         }
+
+        [VLCMain.sharedInstance.libraryWindow updateGridVsListViewModeSegmentedControl];
     }
 }
 
