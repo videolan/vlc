@@ -541,9 +541,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setLibrarySearchToolbarItemVisible:YES];
     _optionBarView.hidden = YES;
 
-    _gridVsListSegmentedControl.target = self;
-    _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
-
     [_libraryVideoViewController presentVideoView];
 }
 
@@ -553,9 +550,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     _optionBarView.hidden = NO;
-
-    _gridVsListSegmentedControl.target = self;
-    _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 
     [_libraryAudioViewController presentAudioView];
 }
