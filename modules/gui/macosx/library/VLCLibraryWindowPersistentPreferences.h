@@ -22,23 +22,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#import "VLCLibraryWindow.h"
 
-typedef NS_ENUM(NSUInteger, VLCLibraryViewMode) {
-    VLCLibraryGridViewMode = 0, // NSUserDefaults integerForKey defaults to 0
-    VLCLibraryListViewMode      // when no value found for key, so this is
-                                // effectively our default.
-};
+NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowPersistentPreferences : NSObject
 
-@property (readwrite, nonatomic) VLCLibraryViewMode videoLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode albumLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode genreLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode songsLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode artistLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode browseLibraryViewMode;
-@property (readwrite, nonatomic) VLCLibraryViewMode streamLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment videoLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment albumLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment genreLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment songsLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment artistLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment browseLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment streamLibraryViewMode;
 
 @end
 

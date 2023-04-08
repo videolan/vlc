@@ -363,9 +363,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
-        if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryListViewModeSegment) {
             [self presentAudioTableView];
-        } else if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+        } else if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment) {
             [self presentAudioGridModeView];
         }
     }

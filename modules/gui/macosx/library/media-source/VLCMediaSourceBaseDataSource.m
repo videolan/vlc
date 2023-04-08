@@ -116,7 +116,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 {
     self.gridVsListSegmentedControl.action = @selector(setGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
-    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment;
+    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment;
 
     [self setCurrentViewMode];
 }
@@ -479,7 +479,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)setGridOrListMode:(id)sender
 {
-    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment;
+    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment;
     _childDataSource.gridViewMode = _gridViewMode;
 
     [self setCurrentViewMode];

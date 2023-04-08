@@ -208,7 +208,7 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+    if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment) {
         _videoLibrarySplitView.hidden = YES;
         _videoLibraryCollectionViewsStackViewScrollView.hidden = NO;
         [_libraryVideoCollectionViewsStackViewController reloadData];

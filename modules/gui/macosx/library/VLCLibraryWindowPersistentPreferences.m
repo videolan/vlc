@@ -47,86 +47,86 @@ NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryV
 }
 
 - (void)setLibraryWindowViewModePreferenceWithKey:(NSString *)key
-                                            value:(VLCLibraryViewMode)viewMode
+                                            value:(VLCLibraryViewModeSegment)viewMode
 {
     NSUserDefaults * const standardUserDefaults = NSUserDefaults.standardUserDefaults;
     NSString * const fullKey = [self fullLibraryWindowKey:key];
     [standardUserDefaults setInteger:viewMode forKey:fullKey];
 }
 
-- (VLCLibraryViewMode)videoLibraryViewMode
+- (VLCLibraryViewModeSegment)videoLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryVideoLibraryViewModePreferenceKey];
 }
 
-- (void)setVideoLibraryViewMode:(VLCLibraryViewMode)videoLibraryViewMode
+- (void)setVideoLibraryViewMode:(VLCLibraryViewModeSegment)videoLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryVideoLibraryViewModePreferenceKey
                                               value:videoLibraryViewMode];
 }
 
-- (VLCLibraryViewMode)albumLibraryViewMode
+- (VLCLibraryViewModeSegment)albumLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryAlbumLibraryViewModePreferenceKey];
 }
 
-- (void)setAlbumLibraryViewMode:(VLCLibraryViewMode)albumLibraryViewMode
+- (void)setAlbumLibraryViewMode:(VLCLibraryViewModeSegment)albumLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryAlbumLibraryViewModePreferenceKey
                                               value:albumLibraryViewMode];
 
 }
 
-- (VLCLibraryViewMode)genreLibraryViewMode
+- (VLCLibraryViewModeSegment)genreLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryGenreLibraryViewModePreferenceKey];
 }
 
-- (void)setGenreLibraryViewMode:(VLCLibraryViewMode)genreLibraryViewMode
+- (void)setGenreLibraryViewMode:(VLCLibraryViewModeSegment)genreLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryGenreLibraryViewModePreferenceKey
                                               value:genreLibraryViewMode];
 }
 
-- (VLCLibraryViewMode)songsLibraryViewMode
+- (VLCLibraryViewModeSegment)songsLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibrarySongsLibraryViewModePreferenceKey];
 }
 
-- (void)setSongsLibraryViewMode:(VLCLibraryViewMode)songsLibraryViewMode
+- (void)setSongsLibraryViewMode:(VLCLibraryViewModeSegment)songsLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibrarySongsLibraryViewModePreferenceKey
                                               value:songsLibraryViewMode];
 }
 
-- (VLCLibraryViewMode)artistLibraryViewMode
+- (VLCLibraryViewModeSegment)artistLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryArtistLibraryViewModePreferenceKey];
 }
 
-- (void)setArtistLibraryViewMode:(VLCLibraryViewMode)artistLibraryViewMode
+- (void)setArtistLibraryViewMode:(VLCLibraryViewModeSegment)artistLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryArtistLibraryViewModePreferenceKey
                                               value:artistLibraryViewMode];
 }
 
-- (VLCLibraryViewMode)browseLibraryViewMode
+- (VLCLibraryViewModeSegment)browseLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryBrowseLibraryViewModePreferenceKey];
 }
 
-- (void)setBrowseLibraryViewMode:(VLCLibraryViewMode)browseLibraryViewMode
+- (void)setBrowseLibraryViewMode:(VLCLibraryViewModeSegment)browseLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryBrowseLibraryViewModePreferenceKey
                                               value:browseLibraryViewMode];
 }
 
-- (VLCLibraryViewMode)streamLibraryViewMode
+- (VLCLibraryViewModeSegment)streamLibraryViewMode
 {
     return [self libraryViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey];
 }
 
-- (void)setStreamLibraryViewMode:(VLCLibraryViewMode)streamLibraryViewMode
+- (void)setStreamLibraryViewMode:(VLCLibraryViewModeSegment)streamLibraryViewMode
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey
                                               value:streamLibraryViewMode];
