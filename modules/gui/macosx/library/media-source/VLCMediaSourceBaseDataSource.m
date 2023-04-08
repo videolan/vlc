@@ -115,7 +115,19 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)reloadViews
 {
-    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
+    VLCLibraryViewModeSegment viewModeSegment = VLCLibraryGridViewModeSegment;
+    VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+    switch (_mediaSourceMode) {
+        case VLCMediaSourceModeLAN:
+            viewModeSegment = libraryWindowPrefs.browseLibraryViewMode;
+            break;
+        case VLCMediaSourceModeInternet:
+            viewModeSegment = libraryWindowPrefs.streamLibraryViewMode;
+            break;
+        default:
+            break;
+    }
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         self.collectionViewScrollView.hidden = NO;
