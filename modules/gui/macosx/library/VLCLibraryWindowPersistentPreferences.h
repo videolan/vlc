@@ -25,8 +25,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, VLCLibraryViewMode) {
-    VLCLibraryListViewMode,
-    VLCLibraryGridViewMode
+    VLCLibraryGridViewMode = 0, // NSUserDefaults integerForKey defaults to 0
+    VLCLibraryListViewMode      // when no value found for key, so this is
+                                // effectively our default.
 };
 
 @interface VLCLibraryWindowPersistentPreferences : NSObject
