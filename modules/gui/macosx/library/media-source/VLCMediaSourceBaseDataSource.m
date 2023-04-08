@@ -38,6 +38,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "main/VLCMain.h"
 
@@ -114,11 +115,19 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)reloadViews
 {
-    self.gridVsListSegmentedControl.action = @selector(setGridOrListMode:);
-    self.gridVsListSegmentedControl.target = self;
-    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment;
+    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
 
-    [self setCurrentViewMode];
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        self.collectionViewScrollView.hidden = NO;
+        self.tableView.hidden = YES;
+        [self.collectionView reloadData];
+    } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
+        self.collectionViewScrollView.hidden = YES;
+        self.tableView.hidden = NO;
+        [self.tableView reloadData];
+    } else {
+        NSAssert(false, @"View mode must be grid or list mode");
+    }
 }
 
 - (void)loadMediaSources
@@ -462,27 +471,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
         _childDataSource.nodeToDisplay = matchingItem.inputNode;
         [_pathControl clearPathControlItemsAheadOf:selectedItem];
     }
-}
-
-- (void)setCurrentViewMode
-{
-    if (_gridViewMode) {
-        self.collectionViewScrollView.hidden = NO;
-        self.tableView.hidden = YES;
-        [self.collectionView reloadData];
-    } else {
-        self.collectionViewScrollView.hidden = YES;
-        self.tableView.hidden = NO;
-        [self.tableView reloadData];
-    }
-}
-
-- (void)setGridOrListMode:(id)sender
-{
-    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment;
-    _childDataSource.gridViewMode = _gridViewMode;
-
-    [self setCurrentViewMode];
 }
 
 #pragma mark - VLCMediaSource Delegation

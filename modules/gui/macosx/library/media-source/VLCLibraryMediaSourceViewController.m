@@ -68,7 +68,6 @@
     _baseDataSource.collectionViewScrollView = _collectionViewScrollView;
     _baseDataSource.homeButton = _homeButton;
     _baseDataSource.pathControl = _pathControl;
-    _baseDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
     _baseDataSource.tableView = _tableView;
     [_baseDataSource setupViews];
 }

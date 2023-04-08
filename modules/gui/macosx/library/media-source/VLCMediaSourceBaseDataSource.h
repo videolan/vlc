@@ -41,7 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSCollectionView *collectionView;
 @property (readwrite) NSScrollView *collectionViewScrollView;
 @property (readwrite) NSTableView *tableView;
-@property (readwrite) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) VLCInputNodePathControl *pathControl;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
@@ -51,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadViews;
 - (void)homeButtonAction:(id)sender;
 - (void)pathControlAction:(id)sender;
-- (void)setGridOrListMode:(id)sender;
 
 @end
 

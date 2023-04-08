@@ -40,7 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) NSTableView *tableView;
 @property (readwrite) VLCInputNodePathControl *pathControl;
-@property (readwrite) BOOL gridViewMode;
 
 - (void)setupViews;
 - (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
