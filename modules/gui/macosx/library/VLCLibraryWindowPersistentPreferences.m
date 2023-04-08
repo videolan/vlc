@@ -22,6 +22,16 @@
 
 #import "VLCLibraryWindowPersistentPreferences.h"
 
+NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
+
 @implementation VLCLibraryWindowPersistentPreferences
+
+- (void)setLibraryWindowViewModePreferenceWithKey:(NSString *)key
+                                            value:(VLCLibraryViewMode)viewMode
+{
+    NSUserDefaults * const standardUserDefaults = NSUserDefaults.standardUserDefaults;
+    NSString * const fullKey = [NSString stringWithFormat:@"%@.%@", VLCLibraryWindowPreferencePrefix, key];
+    [standardUserDefaults setInteger:viewMode forKey:fullKey];
+}
 
 @end
