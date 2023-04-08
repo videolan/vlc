@@ -68,11 +68,9 @@
     VLCLibraryWindow *libraryWindow = [VLCMain sharedInstance].libraryWindow;
 
     NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
-    NSInteger rememberedSelectedLibraryViewModeSegment = [state decodeIntegerForKey:@"macosx-library-view-mode-selected-segment"];
     NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
 
     [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
-    [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
     [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
     [libraryWindow segmentedControlAction:self];

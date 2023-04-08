@@ -272,7 +272,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super encodeRestorableStateWithCoder:coder];
     [coder encodeInteger:_segmentedTitleControl.selectedSegment forKey:@"macosx-library-selected-segment"];
-    [coder encodeInteger:_gridVsListSegmentedControl.selectedSegment forKey:@"macosx-library-view-mode-selected-segment"];
     [coder encodeInteger:_audioSegmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
 }
 
@@ -394,6 +393,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         default:
             break;
     }
+
+    [self invalidateRestorableState];
 }
 
 - (IBAction)segmentedControlAction:(id)sender
@@ -443,7 +444,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [self setViewForSelectedSegment];
-    [self invalidateRestorableState];
 }
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
