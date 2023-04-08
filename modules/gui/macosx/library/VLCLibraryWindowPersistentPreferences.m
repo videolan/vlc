@@ -26,11 +26,16 @@ NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
 
 @implementation VLCLibraryWindowPersistentPreferences
 
+- (NSString * const)fullLibraryWindowKey:(NSString *)partialKey
+{
+    return [NSString stringWithFormat:@"%@.%@", VLCLibraryWindowPreferencePrefix, partialKey];
+}
+
 - (void)setLibraryWindowViewModePreferenceWithKey:(NSString *)key
                                             value:(VLCLibraryViewMode)viewMode
 {
     NSUserDefaults * const standardUserDefaults = NSUserDefaults.standardUserDefaults;
-    NSString * const fullKey = [NSString stringWithFormat:@"%@.%@", VLCLibraryWindowPreferencePrefix, key];
+    NSString * const fullKey = [self fullLibraryWindowKey:key];
     [standardUserDefaults setInteger:viewMode forKey:fullKey];
 }
 
