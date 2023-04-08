@@ -32,6 +32,14 @@ typedef NS_ENUM(NSUInteger, VLCLibraryViewMode) {
 
 @interface VLCLibraryWindowPersistentPreferences : NSObject
 
+@property (readwrite, nonatomic) VLCLibraryViewMode videoLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode albumLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode genreLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode songsLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode artistLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode browseLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewMode streamLibraryViewMode;
+
 @end
 
 NS_ASSUME_NONNULL_END
