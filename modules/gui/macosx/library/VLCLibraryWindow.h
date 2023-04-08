@@ -45,9 +45,11 @@ typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
     VLCLibraryStreamsSegment
 };
 
-typedef NS_ENUM(NSUInteger, VLCLibraryViewModeSegment) {
-    VLCLibraryGridViewModeSegment = 0,
-    VLCLibraryListViewModeSegment
+typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
+    VLCLibrarySmallestSentinelViewModeSegment = -1,
+    VLCLibraryGridViewModeSegment,
+    VLCLibraryListViewModeSegment,
+    VLCLibraryLargestSentinelViewModeSegment
 };
 
 @interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification>
