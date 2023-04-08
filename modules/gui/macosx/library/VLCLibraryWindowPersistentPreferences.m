@@ -34,6 +34,18 @@ NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryV
 
 @implementation VLCLibraryWindowPersistentPreferences
 
+static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
+
++ (VLCLibraryWindowPersistentPreferences *)sharedInstance
+{
+    static dispatch_once_t pred;
+    dispatch_once(&pred, ^{
+        sharedInstance = [[VLCLibraryWindowPersistentPreferences alloc] init];
+    });
+
+    return sharedInstance;
+}
+
 - (NSString * const)fullLibraryWindowKey:(NSString *)partialKey
 {
     return [NSString stringWithFormat:@"%@.%@", VLCLibraryWindowPreferencePrefix, partialKey];
