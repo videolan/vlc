@@ -28,6 +28,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -90,7 +91,6 @@
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
 
-    _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
     _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
@@ -208,14 +208,18 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    if (self.gridVsListSegmentedControl.selectedSegment == VLCLibraryGridViewModeSegment) {
+    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
+
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         _videoLibrarySplitView.hidden = YES;
         _videoLibraryCollectionViewsStackViewScrollView.hidden = NO;
         [_libraryVideoCollectionViewsStackViewController reloadData];
-    } else {
+    } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         _videoLibrarySplitView.hidden = NO;
         _videoLibraryCollectionViewsStackViewScrollView.hidden = YES;
         [_libraryVideoTableViewDataSource reloadData];
+    } else {
+        NSAssert(false, @"View mode must be grid or list mode");
     }
 }
 
