@@ -135,6 +135,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
+	gui/macosx/library/VLCLibraryWindowPersistentPreferences.h \
+	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.h \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h \
