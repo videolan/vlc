@@ -377,8 +377,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)setViewForSelectedSegment
 {
-    _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
-
     switch (_currentSelectedSegment) {
         case VLCLibraryVideoSegment:
             [self showVideoLibrary];
@@ -397,7 +395,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self invalidateRestorableState];
 }
 
-- (IBAction)segmentedControlAction:(id)sender
+- (IBAction)segmentedTitleControlAction:(id)sender
+{
+    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment) {
+        return;
+    }
+
+    _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
+    [self setViewForSelectedSegment];
+}
+
+- (IBAction)gridVsListSegmentedControlAction:(id)sender
 {
     if (_gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
         return;
@@ -649,7 +657,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (IBAction)goToBrowseSection:(id)sender
 {
     [_segmentedTitleControl setSelected:YES forSegment:2];
-    [self segmentedControlAction:_segmentedTitleControl];
+    [self segmentedTitleControlAction:_segmentedTitleControl];
 }
 
 #pragma mark - split view delegation

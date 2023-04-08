@@ -73,7 +73,7 @@
     [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
     [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
-    [libraryWindow segmentedControlAction:self];
+    [libraryWindow segmentedTitleControlAction:self];
     if (rememberedSelectedLibrarySegment == VLCLibraryMusicSegment) {
         [libraryWindow.libraryAudioViewController segmentedControlAction:self];
     }

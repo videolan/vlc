@@ -670,6 +670,9 @@
                                 <action selector="segmentedControlAction:" target="QvC-M9-y7g" id="seg-Me-t1n"/>
                             </connections>
                         </segmentedControl>
+                        <connections>
+                            <action selector="segmentedTitleControlAction:" target="QvC-M9-y7g" id="YUg-2w-bwP"/>
+                        </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
                     <toolbarItem implicitItemIdentifier="85037E27-D263-490C-B4B2-0EFE5B5837AA" label="Library View Type" paletteLabel="Library View Type" sizingBehavior="auto" id="kBa-MC-Mdq">
@@ -685,6 +688,9 @@
                                 </segments>
                             </segmentedCell>
                         </segmentedControl>
+                        <connections>
+                            <action selector="gridVsListSegmentedControlAction:" target="QvC-M9-y7g" id="HMA-eG-oej"/>
+                        </connections>
                     </toolbarItem>
                     <searchToolbarItem implicitItemIdentifier="A132890F-6B3D-4523-A71B-B00F095057C4" label="Search" paletteLabel="Search" visibilityPriority="1001" id="dv4-Il-y8X">
                         <nil key="toolTip"/>

@@ -157,7 +157,9 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)showAndHidePlaylist:(id)sender;
 - (IBAction)backwardsNavigationAction:(id)sender;
 - (IBAction)forwardsNavigationAction:(id)sender;
-- (IBAction)segmentedControlAction:(id)sender;
+- (IBAction)segmentedTitleControlAction:(id)sender;
+- (IBAction)gridVsListSegmentedControlAction:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END
