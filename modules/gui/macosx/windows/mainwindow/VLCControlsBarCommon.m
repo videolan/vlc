@@ -342,8 +342,7 @@
         return;
     }
 
-    _songNameTextField.stringValue = inputItem.name;
-    _artistNameTextField.stringValue = inputItem.artist;
+    _playingItemDisplayField.stringValue = inputItem.name;
 
     NSURL *artworkURL = inputItem.artworkURL;
 

@@ -37,7 +37,7 @@
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
                 <outlet property="playButton" destination="PCC-8a-sVF" id="ddT-ZM-Jhz"/>
-                <outlet property="songNameTextField" destination="lEW-MN-FFU" id="btX-L9-7TO"/>
+                <outlet property="playingItemDisplayField" destination="lEW-MN-FFU" id="hKa-df-8UB"/>
                 <outlet property="subtitlesButton" destination="YTl-LZ-WDe" id="893-XB-eDY"/>
                 <outlet property="timeField" destination="3ri-8b-8mw" id="f0i-Gh-R8V"/>
                 <outlet property="timeSlider" destination="qNZ-Fh-W8i" id="Fkk-fj-s5Q"/>

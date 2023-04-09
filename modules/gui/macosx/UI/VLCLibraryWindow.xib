@@ -812,9 +812,9 @@
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
                 <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
+                <outlet property="playingItemDisplayField" destination="d0e-29-yNq" id="QUe-1S-TQO"/>
                 <outlet property="repeatButton" destination="t4r-bt-Jxm" id="U7s-Tb-Ado"/>
                 <outlet property="shuffleButton" destination="SYG-jf-oHJ" id="b4m-v0-sC9"/>
-                <outlet property="songNameTextField" destination="d0e-29-yNq" id="JTI-XG-miC"/>
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
                 <outlet property="trailingTimeField" destination="oGd-mG-cFw" id="geo-iq-0th"/>
