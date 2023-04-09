@@ -192,6 +192,31 @@
     [self.volumeUpButton setEnabled: !b_muted];
 }
 
+- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification;
+{
+    [super updateCurrentItemDisplayControls:aNotification];
+
+    VLCInputItem * const inputItem = _playerController.currentMedia;
+    if (!inputItem) {
+        return;
+    }
+
+    NSFont * const boldSystemFont = [NSFont boldSystemFontOfSize:12.];
+    NSDictionary<NSString *, id> * const boldAttribute = @{NSFontAttributeName: boldSystemFont};
+
+    NSMutableAttributedString * const displayString = [[NSMutableAttributedString alloc] initWithString:inputItem.name attributes:boldAttribute];
+
+    if (inputItem.artist.length != 0) {
+        NSAttributedString * const separator = [[NSAttributedString alloc] initWithString:@" · " attributes:boldAttribute];
+        [displayString appendAttributedString:separator];
+
+        NSAttributedString * const artistString = [[NSAttributedString alloc] initWithString:inputItem.artist];
+        [displayString appendAttributedString:artistString];
+    }
+
+    self.playingItemDisplayField.attributedStringValue = displayString;
+}
+
 - (void)updateMuteVolumeButtonImage
 {
     self.muteVolumeButton.image = imageFromRes(@"VLCVolumeOffTemplate");
