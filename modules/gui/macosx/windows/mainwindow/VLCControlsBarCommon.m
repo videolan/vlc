@@ -26,6 +26,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlaylistItem.h"
+#import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
 
@@ -423,7 +425,20 @@
 
 - (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification
 {
-    VLCInputItem * const inputItem = _playerController.currentMedia;
+    // If we use the playlist's currentPlayingItem we will get the same item we had before.
+    // Let's instead grab the playlist item from the playlist model, as we know this is
+    // updated before the VLCPlaylistCurrentItemChanged notification is sent out
+    const size_t currentPlaylistIndex = _playlistController.currentPlaylistIndex;
+    if (currentPlaylistIndex < 0) {
+        return;
+    }
+
+    VLCPlaylistItem * const currentPlayingItem = [_playlistController.playlistModel playlistItemAtIndex:currentPlaylistIndex];
+    if (!currentPlayingItem) {
+        return;
+    }
+
+    VLCInputItem * const inputItem = currentPlayingItem.inputItem;
     if (!inputItem) {
         return;
     }
