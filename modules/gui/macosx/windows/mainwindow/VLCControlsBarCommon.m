@@ -92,7 +92,12 @@
                                name:VLCPlayerStateChanged
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged
+                           selector:@selector(updatePlaybackControls:)
+                               name:VLCPlaylistCurrentItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateCurrentItemDisplayControls:)
+                               name:VLCPlaylistCurrentItemChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(fullscreenStateUpdated:)
@@ -342,16 +347,6 @@
         return;
     }
 
-    _playingItemDisplayField.stringValue = inputItem.name;
-
-    NSURL *artworkURL = inputItem.artworkURL;
-
-    if (artworkURL) {
-        [_artworkImageView setImageURL:inputItem.artworkURL placeholderImage:[NSImage imageNamed:@"noart"]];
-    } else {
-        _artworkImageView.image = [NSImage imageNamed:@"noart"];
-    }
-
     [self.timeSlider setHidden:NO];
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:_playerController.position];
@@ -424,6 +419,24 @@
 
     [self.forwardButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
     [self.backwardButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
+}
+
+- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification
+{
+    VLCInputItem * const inputItem = _playerController.currentMedia;
+    if (!inputItem) {
+        return;
+    }
+
+    _playingItemDisplayField.stringValue = inputItem.name;
+
+    NSURL * const artworkURL = inputItem.artworkURL;
+
+    if (artworkURL) {
+        [_artworkImageView setImageURL:inputItem.artworkURL placeholderImage:[NSImage imageNamed:@"noart"]];
+    } else {
+        _artworkImageView.image = [NSImage imageNamed:@"noart"];
+    }
 }
 
 - (void)setPause

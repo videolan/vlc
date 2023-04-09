@@ -78,5 +78,6 @@
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 - (void)updateVolumeSlider:(NSNotification *)aNotification;
 - (void)updateMuteVolumeButton:(NSNotification *)aNotification;
+- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification;
 
 @end
