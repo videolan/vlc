@@ -67,7 +67,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
                                selector:@selector(inputItemChanged:)
-                                   name:VLCPlaylistCurrentItemChanged
+                                   name:VLCPlayerCurrentMediaItemChanged
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(playbackStatusUpdated:)
@@ -91,15 +91,16 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
 - (void)inputItemChanged:(NSNotification *)aNotification
 {
-    VLCMain *mainInstance = [VLCMain sharedInstance];
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+
     // Cancel pending resume dialogs
     [_resumeDialogController cancel];
 
     // object is hold here and released then it is dead
-    _currentInput = [[mainInstance playlistController] currentlyPlayingInputItem];
+    _currentInput = playerController.currentMedia;
     if (_currentInput) {
-        VLCPlaylistController *playlistController = aNotification.object;
-        [self continuePlaybackWhereYouLeftOff:_currentInput player:playlistController.playerController];
+        [self continuePlaybackWhereYouLeftOff:_currentInput
+                                       player:playerController];
     }
 }
 
