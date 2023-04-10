@@ -349,7 +349,7 @@ FocusScope {
 
                             Text {
                                 text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
-                                visible: root.model.sortCriteria === modelData.criteria
+                                visible: root.model.sortCriteria === modelData.model.criteria
                                 font.pixelSize: VLCStyle.fontSize_normal
                                 color: root.colorContext.accent
 
@@ -362,8 +362,8 @@ FocusScope {
                                 }
                             }
                             onClicked: {
-                                if (root.model.sortCriteria !== modelData.criteria)
-                                    root.model.sortCriteria = modelData.criteria
+                                if (root.model.sortCriteria !== modelData.model.criteria)
+                                    root.model.sortCriteria = modelData.model.criteria
                                 else
                                     root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
                             }
