@@ -85,8 +85,8 @@
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     if (_mainMenuInstance) {
         [notificationCenter addObserver:self
-                               selector:@selector(currentPlaylistItemChanged:)
-                                   name:VLCPlaylistCurrentItemChanged
+                               selector:@selector(currentPlayingItemChanged:)
+                                   name:VLCPlayerCurrentMediaItemChanged
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(updateStatistics:)
@@ -216,10 +216,10 @@
     [_lostAudioBuffersTextField setIntValue: 0];
 }
 
-- (void)currentPlaylistItemChanged:(NSNotification *)aNotification
+- (void)currentPlayingItemChanged:(NSNotification *)aNotification
 {
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
-    VLCInputItem *currentMediaItem = playlistController.currentlyPlayingInputItem;
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    VLCInputItem * const currentMediaItem = playerController.currentMedia;
     [self setRepresentedInputItem:currentMediaItem];
 }
 
