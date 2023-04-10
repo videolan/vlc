@@ -36,7 +36,7 @@ extern NSString *VLCPlaybackOrderChanged;
 extern NSString *VLCPlaybackRepeatChanged;
 extern NSString *VLCPlaybackHasPreviousChanged;
 extern NSString *VLCPlaybackHasNextChanged;
-extern NSString *VLCPlaylistCurrentItemChanged;
+extern NSString *VLCPlaylistCurrentItemIndexChanged;
 extern NSString *VLCPlaylistItemsAdded;
 extern NSString *VLCPlaylistItemsRemoved;
 
@@ -77,7 +77,6 @@ extern NSString *VLCPlaylistItemsRemoved;
  * input of the currently playing item
  @return returns the input item for the currently playing playlist item
  @note the receiver is responsible for releasing the input item
- @note Subscribe to the VLCPlaylistCurrentItemChanged notification to be notified about changes
  */
 @property (readonly, nullable) VLCInputItem *currentlyPlayingInputItem;
 
