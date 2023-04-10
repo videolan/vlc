@@ -71,7 +71,7 @@
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(updatePlaybackControls:)
-                               name:VLCPlaylistCurrentItemChanged
+                               name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(playbackStateChanged:)
@@ -198,20 +198,7 @@
 {
     [super updateCurrentItemDisplayControls:aNotification];
 
-    // If we use the playlist's currentPlayingItem we will get the same item we had before.
-    // Let's instead grab the playlist item from the playlist model, as we know this is
-    // updated before the VLCPlaylistCurrentItemChanged notification is sent out
-    const size_t currentPlaylistIndex = _playlistController.currentPlaylistIndex;
-    if (currentPlaylistIndex < 0) {
-        return;
-    }
-
-    VLCPlaylistItem * const currentPlayingItem = [_playlistController.playlistModel playlistItemAtIndex:currentPlaylistIndex];
-    if (!currentPlayingItem) {
-        return;
-    }
-
-    VLCInputItem * const inputItem = currentPlayingItem.inputItem;
+    VLCInputItem * const inputItem = _playerController.currentMedia;
     if (!inputItem) {
         return;
     }
