@@ -35,7 +35,7 @@
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(playStateOrItemChanged:)
-                               name:VLCPlaylistCurrentItemChanged
+                               name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(playStateOrItemChanged:)

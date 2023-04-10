@@ -94,10 +94,6 @@
                                name:VLCPlayerStateChanged
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updatePlaybackControls:)
-                               name:VLCPlayerCurrentMediaItemChanged
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(updateCurrentItemDisplayControls:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];

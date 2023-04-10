@@ -220,7 +220,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(mediaItemChanged:)
-                               name:VLCPlaylistCurrentItemChanged
+                               name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(voutListChanged:)
