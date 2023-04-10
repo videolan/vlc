@@ -44,6 +44,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
+#import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistModel.h"
@@ -113,45 +114,27 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                    name:VLCLibraryModelGenreListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(playlistItemChanged:)
-                                   name:VLCPlaylistCurrentItemChanged
+                               selector:@selector(currentlyPlayingItemChanged:)
+                                   name:VLCPlayerCurrentMediaItemChanged
                                  object:nil];
     }
 
     return self;
 }
 
-- (void)playlistItemChanged:(NSNotification *)aNotification
+- (void)currentlyPlayingItemChanged:(NSNotification *)aNotification
 {
-    NSParameterAssert(aNotification);
-    VLCPlaylistController *playlistController = (VLCPlaylistController *)aNotification.object;
-    NSAssert(playlistController, @"Should receive valid playlist controller from notification");
-    VLCPlaylistModel *playlistModel = playlistController.playlistModel;
-    NSAssert(playlistModel, @"Should receive valid playlist model");
-
-    // If we use the playlist's currentPlayingItem we will get the same item we had before.
-    // Let's instead grab the playlist item from the playlist model, as we know this is
-    // updated before the VLCPlaylistCurrentItemChanged notification is sent out
-    size_t currentPlaylistIndex = playlistController.currentPlaylistIndex;
-    if (currentPlaylistIndex < 0) {
-        return;
-    }
-
-    VLCPlaylistItem *currentPlayingItem = [playlistModel playlistItemAtIndex:currentPlaylistIndex];
-    if (!currentPlayingItem) {
-        return;
-    }
-
-    VLCInputItem *currentInputItem = currentPlayingItem.inputItem;
-    if (!currentPlayingItem) {
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    VLCInputItem * const currentInputItem = playerController.currentMedia;
+    if (!currentInputItem) {
         return;
     }
 
     if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
-        NSString *currentItemMrl = currentInputItem.MRL;
+        NSString * const currentItemMrl = currentInputItem.MRL;
 
-        NSUInteger itemIndexInDisplayedCollection = [self->_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
-            VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)element;
+        const NSUInteger itemIndexInDisplayedCollection = [self->_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+            VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)element;
             return [mediaItem.inputItem.MRL isEqualToString:currentItemMrl];
         }];
 
