@@ -54,6 +54,11 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         // TODO refine which GPU can do it
         canProcess = true;
     }
+    else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL)
+    {
+        // TODO refine which GPU and drivers can do it
+        canProcess = true;
+    }
 
     if (!canProcess)
     {
@@ -277,6 +282,68 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
 
             if (FAILED(hr)) {
                 msg_Err(vd, "Failed to set the NVIDIA video process stream extension. (hr=0x%lX)", hr);
+                d3d11_device_unlock(d3d_dev);
+                goto done_super;
+            }
+        }
+        else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL)
+        {
+            constexpr GUID GUID_INTEL_VPE_INTERFACE{ 0xedd1d4b9, 0x8659, 0x4cbc, {0xa4, 0xd6, 0x98, 0x31, 0xa2, 0x16, 0x3a, 0xc3}};
+
+            constexpr UINT kIntelVpeFnVersion = 0x01;
+            constexpr UINT kIntelVpeFnMode    = 0x20;
+            constexpr UINT kIntelVpeFnScaling = 0x37;
+
+            // values for kIntelVpeFnVersion
+            constexpr UINT kIntelVpeVersion3 = 0x0003;
+
+            // values for kIntelVpeFnMode
+            constexpr UINT kIntelVpeModeNone    = 0x0;
+            constexpr UINT kIntelVpeModePreproc = 0x1;
+
+            // values for kIntelVpeFnScaling
+            constexpr UINT kIntelVpeScalingDefault         = 0x0;
+            constexpr UINT kIntelVpeScalingSuperResolution = 0x2;
+
+            UINT param;
+            struct {
+                UINT function;
+                void *param;
+            } ext = {
+                0,
+                &param,
+            };
+
+            ext.function = kIntelVpeFnVersion;
+            param = kIntelVpeVersion3;
+            hr = scaleProc->d3dvidctx->VideoProcessorSetOutputExtension(
+                scaleProc->processor.Get(),
+                &GUID_INTEL_VPE_INTERFACE, sizeof(ext), &ext);
+
+            if (FAILED(hr)) {
+                msg_Err(vd, "Failed to set the Intel VPE version. (hr=0x%lX)", hr);
+                d3d11_device_unlock(d3d_dev);
+                goto done_super;
+            }
+
+            ext.function = kIntelVpeFnMode;
+            param = upscale ? kIntelVpeModePreproc : kIntelVpeModeNone;
+            hr = scaleProc->d3dvidctx->VideoProcessorSetOutputExtension(
+                scaleProc->processor.Get(),
+                &GUID_INTEL_VPE_INTERFACE, sizeof(ext), &ext);
+            if (FAILED(hr)) {
+                msg_Err(vd, "Failed to set the Intel VPE mode. (hr=0x%lX)", hr);
+                d3d11_device_unlock(d3d_dev);
+                goto done_super;
+            }
+
+            ext.function = kIntelVpeFnScaling;
+            param = upscale ? kIntelVpeScalingSuperResolution : kIntelVpeScalingDefault;
+            hr = scaleProc->d3dvidctx->VideoProcessorSetOutputExtension(
+                scaleProc->processor.Get(),
+                &GUID_INTEL_VPE_INTERFACE, sizeof(ext), &ext);
+            if (FAILED(hr)) {
+                msg_Err(vd, "Failed to set the Intel VPE scaling type. (hr=0x%lX)", hr);
                 d3d11_device_unlock(d3d_dev);
                 goto done_super;
             }
