@@ -534,9 +534,11 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
 
+        D3D11_TEXTURE2D_DESC srcDesc;
+        p_sys->texture[KNOWN_DXGI_INDEX]->GetDesc(&srcDesc);
+
         if (sys->legacy_shader) {
-            D3D11_TEXTURE2D_DESC srcDesc,texDesc;
-            p_sys->texture[KNOWN_DXGI_INDEX]->GetDesc(&srcDesc);
+            D3D11_TEXTURE2D_DESC texDesc;
             sys->stagingSys.texture[0]->GetDesc(&texDesc);
             D3D11_BOX box;
             box.top = 0;
@@ -552,21 +554,19 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         }
         else
         {
-            D3D11_TEXTURE2D_DESC texDesc;
-            p_sys->texture[0]->GetDesc(&texDesc);
-            if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+            if (srcDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
             {
                 /* for performance reason we don't want to allocate this during
                  * display, do it preferably when creating the texture */
                 assert(p_sys->renderSrc[0]!=NULL);
             }
-            if ( sys->picQuad.generic.i_height != texDesc.Height ||
-                 sys->picQuad.generic.i_width  != texDesc.Width )
+            if ( sys->picQuad.generic.i_height != srcDesc.Height ||
+                 sys->picQuad.generic.i_width  != srcDesc.Width )
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.generic.i_height = texDesc.Height;
-                sys->picQuad.generic.i_width  = texDesc.Width;
+                sys->picQuad.generic.i_height = srcDesc.Height;
+                sys->picQuad.generic.i_width  = srcDesc.Width;
 
                 CommonPlacePicture(vd, &sys->area);
                 UpdateSize(vd);
