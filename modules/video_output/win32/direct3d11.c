@@ -120,6 +120,7 @@ struct vout_display_sys_t
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
+    video_format_t           quad_fmt;
 
 #ifdef HAVE_D3D11_4_H
     ID3D11Fence              *d3dRenderFence;
@@ -371,14 +372,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if (vd->info.is_slow)
         pool_size = 1;
 
-    video_format_t surface_fmt = vd->fmt;
-    surface_fmt.i_width  = sys->picQuad.i_width;
-    surface_fmt.i_height = sys->picQuad.i_height;
-
-    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
+    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &sys->quad_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
                    vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->flatVSShader : sys->projectionVSShader,
                    sys->pVertexLayout,
-                   surface_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
+                   sys->quad_fmt.projection_mode, vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
     }
@@ -996,8 +993,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.i_height = srcDesc.Height;
-                sys->picQuad.i_width = srcDesc.Width;
+                sys->quad_fmt.i_width = srcDesc.Width;
+                sys->quad_fmt.i_height = srcDesc.Height;
+                sys->picQuad.i_width = sys->quad_fmt.i_width;
+                sys->picQuad.i_height = sys->quad_fmt.i_height;
 
                 UpdateRects(vd, NULL, true);
                 UpdateSize(vd);
@@ -1467,6 +1466,9 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     }
     free(psz_upscale);
 
+    video_format_Init(&sys->quad_fmt, vd->source.i_chroma);
+    video_format_Copy(&sys->quad_fmt, &vd->source);
+
     video_format_Copy(&sys->pool_fmt, &fmt);
 
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
@@ -1876,6 +1878,8 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     sys->d3dregion_count = 0;
 
     ReleasePictureSys(&sys->stagingSys);
+
+    video_format_Clean(&sys->quad_fmt);
 
     if (sys->pVertexLayout)
     {
