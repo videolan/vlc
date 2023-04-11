@@ -66,9 +66,9 @@ static void Close(vout_display_t *);
 #define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
 
 static const char *const ppsz_upscale_mode[] = {
-    "linear", "point", "processor" };
+    "linear", "point", "processor", "super" };
 static const char *const ppsz_upscale_mode_text[] = {
-    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor") };
+    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor"), N_("Super Resolution") };
 
 vlc_module_begin ()
     set_shortname("Direct3D11")
@@ -90,6 +90,7 @@ enum d3d11_upscale
     upscale_LinearSampler,
     upscale_PointSampler,
     upscale_VideoProcessor,
+    upscale_SuperResolution,
 };
 
 typedef struct vout_display_sys_t
@@ -208,7 +209,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    if (sys->upscaleMode == upscale_VideoProcessor)
+    if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
                              vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
@@ -480,7 +481,7 @@ static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
-    if (sys->upscaleMode == upscale_VideoProcessor)
+    if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
                              vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
@@ -787,17 +788,19 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
 static void InitScaleProcessor(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    if (sys->upscaleMode != upscale_VideoProcessor)
+    if (sys->upscaleMode != upscale_VideoProcessor && sys->upscaleMode != upscale_SuperResolution)
         return;
 
-    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), sys->d3d_dev, sys->picQuad.quad_fmt.i_chroma);
+    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), sys->d3d_dev, sys->picQuad.quad_fmt.i_chroma,
+                                          sys->upscaleMode == upscale_SuperResolution);
     if (sys->scaleProc == NULL)
     {
         msg_Dbg(vd, "forcing linear sampler");
         sys->upscaleMode = upscale_LinearSampler;
     }
 
-    msg_Dbg(vd, "Using Video Processor scaler");
+    msg_Dbg(vd, "Using %s scaler", sys->upscaleMode != upscale_SuperResolution ?
+            "Video Processor": "Super Resolution");
 }
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
@@ -857,6 +860,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         sys->upscaleMode = upscale_PointSampler;
     else if (strcmp("processor", psz_upscale) == 0)
         sys->upscaleMode = upscale_VideoProcessor;
+    else if (strcmp("super", psz_upscale) == 0)
+        sys->upscaleMode = upscale_SuperResolution;
     else
     {
         msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);

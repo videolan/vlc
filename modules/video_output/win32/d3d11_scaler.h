@@ -20,7 +20,7 @@ extern "C" {
 
 struct d3d11_scaler;
 
-struct d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *, d3d11_device_t*, vlc_fourcc_t i_chroma);
+struct d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *, d3d11_device_t*, vlc_fourcc_t i_chroma, bool super_res);
 void D3D11_UpscalerDestroy(struct d3d11_scaler *);
 int D3D11_UpscalerUpdate(vlc_object_t *, struct d3d11_scaler *, d3d11_device_t*,
                          const video_format_t *, video_format_t *,

@@ -25,6 +25,8 @@ struct d3d11_scaler
     bool                            usable = false;
     const d3d_format_t              *d3d_fmt = nullptr;
     vout_display_place_t            place = {};
+    bool                            super_res = false;
+    bool                            upscaling = false;
     UINT                            Width  = 0;
     UINT                            Height = 0;
     ComPtr<ID3D11VideoDevice>               d3dviddev;
@@ -41,8 +43,24 @@ static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_devi
     return FindD3D11Format( vd, d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
 }
 
-d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma)
+d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma,
+                                   bool super_res)
 {
+    bool canProcess = !super_res;
+    // NVIDIA 530+ driver
+    if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA &&
+        (d3d_dev->WDDM.revision * 10000 + d3d_dev->WDDM.build) > 153000)
+    {
+        // TODO refine which GPU can do it
+        canProcess = true;
+    }
+
+    if (!canProcess)
+    {
+        msg_Err(vd, "Super Resolution filter not supported");
+        return nullptr;
+    }
+
     const d3d_format_t *fmt = GetDirectRenderingFormat(vd, d3d_dev, i_chroma);
     if (fmt == nullptr || fmt->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
@@ -70,6 +88,7 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
     }
 
     scaleProc->d3d_fmt = fmt;
+    scaleProc->super_res = super_res;
     return scaleProc;
 error:
     delete scaleProc;
@@ -98,6 +117,7 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc{ };
     D3D11_VIDEO_COLOR black{};
     black.RGBA.A = 1.f;
+    bool upscale = false;
 
     vout_display_place_t place{};
     auto display = *cfg;
@@ -229,7 +249,46 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     scaleProc->d3dvidctx->VideoProcessorSetOutputBackgroundColor(scaleProc->processor.Get(),
                                                                  0, &black);
 
+    if (scaleProc->super_res)
+    {
+        // only use super resolution when source is smaller than display
+        upscale = fmt->i_visible_width < place.width
+               || fmt->i_visible_height < place.height;
+
+        if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA)
+        {
+            constexpr GUID kNvidiaPPEInterfaceGUID{ 0xd43ce1b3, 0x1f4b, 0x48ac, {0xba, 0xee, 0xc3, 0xc2, 0x53, 0x75, 0xe6, 0xf7} };
+            constexpr UINT kStreamExtensionVersionV1 = 0x1;
+            constexpr UINT kStreamExtensionMethodRTXVSR = 0x2;
+            struct {
+                UINT version;
+                UINT method;
+                UINT enable;
+            } stream_extension_info = {
+                kStreamExtensionVersionV1,
+                kStreamExtensionMethodRTXVSR,
+                upscale ? 1u : 0u,
+            };
+
+            hr = scaleProc->d3dvidctx->VideoProcessorSetStreamExtension(
+                scaleProc->processor.Get(),
+                0, &kNvidiaPPEInterfaceGUID, sizeof(stream_extension_info),
+                &stream_extension_info);
+
+            if (FAILED(hr)) {
+                msg_Err(vd, "Failed to set the NVIDIA video process stream extension. (hr=0x%lX)", hr);
+                d3d11_device_unlock(d3d_dev);
+                goto done_super;
+            }
+        }
+    }
     d3d11_device_unlock(d3d_dev);
+
+    if (scaleProc->upscaling != upscale)
+    {
+        msg_Dbg(vd, "turning VSR %s", upscale ? "ON" : "OFF");
+        scaleProc->upscaling = upscale;
+    }
 
     scaleProc->usable = true;
     return VLC_SUCCESS;
