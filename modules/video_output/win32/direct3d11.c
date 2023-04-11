@@ -55,6 +55,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
+#include "d3d11_scaler.h"
 
 #include "common.h"
 
@@ -73,9 +74,9 @@ static void Close(vlc_object_t *);
 #define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
 
 static const char *const ppsz_upscale_mode[] = {
-    "linear", "point" };
+    "linear", "point", "processor" };
 static const char *const ppsz_upscale_mode_text[] = {
-    N_("Linear Sampler"), N_("Point Sampler") };
+    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor") };
 
 vlc_module_begin ()
     set_shortname("Direct3D11")
@@ -103,6 +104,7 @@ enum d3d11_upscale
 {
     upscale_LinearSampler,
     upscale_PointSampler,
+    upscale_VideoProcessor,
 };
 
 struct vout_display_sys_t
@@ -151,6 +153,7 @@ struct vout_display_sys_t
 
     // upscaling
     enum d3d11_upscale       upscaleMode;
+    struct d3d11_scaler      *scaleProc;
 };
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
@@ -603,12 +606,23 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
     UINT window_width, window_height;
-    if (sys->sys.pf_GetWindowSize != GetWinRTSize
+    bool proc_upscale = sys->upscaleMode == upscale_VideoProcessor;
+    if ((sys->sys.pf_GetWindowSize != GetWinRTSize && !proc_upscale)
     || !sys->sys.pf_GetWindowSize(&sys->sys, &window_width, &window_height))
     {
         window_width  = RECTWidth(sys->sys.rect_dest_clipped);
         window_height = RECTHeight(sys->sys.rect_dest_clipped);
     }
+
+    if (proc_upscale)
+    {
+        vout_display_cfg_t cfg = *vd->cfg;
+        cfg.display.width = window_width;
+        cfg.display.height = window_height;
+        D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, &sys->d3d_dev,
+                             &sys->pool_fmt, &sys->quad_fmt, &cfg);
+    }
+
     D3D11_TEXTURE2D_DESC dsc = { 0 };
 
     if (sys->d3drenderTargetView) {
@@ -872,6 +886,29 @@ static int Control(vout_display_t *vd, int query, va_list args)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
+    if (sys->upscaleMode == upscale_VideoProcessor)
+        switch (query) {
+        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+        case VOUT_DISPLAY_CHANGE_ZOOM:
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            {
+                // update the source cropping
+                UINT window_width, window_height;
+                if (!sys->sys.pf_GetWindowSize(&sys->sys, &window_width, &window_height))
+                {
+                    window_width  = RECTWidth(sys->sys.rect_dest_clipped);
+                    window_height = RECTHeight(sys->sys.rect_dest_clipped);
+                }
+                vout_display_cfg_t cfg = *vd->cfg;
+                cfg.display.width = window_width;
+                cfg.display.height = window_height;
+                D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, &sys->d3d_dev, &vd->source,
+                                     &sys->quad_fmt, &cfg);
+            }
+            break;
+        }
+
     int res = CommonControl( vd, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
@@ -908,6 +945,30 @@ static void Manage(vout_display_t *vd)
         !RectEquals(&before_dest, &sys->sys.rect_dest))
     {
         UpdateSize(vd);
+    }
+}
+
+static void CallUpdateRects(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+    {
+        D3D11_UpscalerGetSize(sys->scaleProc, &sys->quad_fmt.i_width, &sys->quad_fmt.i_height);
+
+        sys->quad_fmt.i_x_offset       = 0;
+        sys->quad_fmt.i_y_offset       = 0;
+        sys->quad_fmt.i_visible_width  = sys->quad_fmt.i_width;
+        sys->quad_fmt.i_visible_height = sys->quad_fmt.i_height;
+
+        sys->picQuad.i_width = sys->quad_fmt.i_width;
+        sys->picQuad.i_height = sys->quad_fmt.i_height;
+
+        UpdateRects(vd, NULL, true);
+        UpdateSize(vd);
+    }
+    else
+    {
+        UpdateRects(vd, NULL, true);
     }
 }
 
@@ -962,6 +1023,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (is_d3d11_opaque(picture->format.i_chroma))
             d3d11_device_lock( &sys->d3d_dev );
 
+        if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        {
+            if (D3D11_UpscalerScale(VLC_OBJECT(vd), sys->scaleProc, p_sys) != VLC_SUCCESS)
+                return;
+            uint32_t witdh, height;
+            D3D11_UpscalerGetSize(sys->scaleProc, &witdh, &height);
+            srcDesc.Width  = witdh;
+            srcDesc.Height = height;
+        }
+
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC texDesc;
             if (!is_d3d11_opaque(picture->format.i_chroma))
@@ -998,7 +1069,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 sys->picQuad.i_width = sys->quad_fmt.i_width;
                 sys->picQuad.i_height = sys->quad_fmt.i_height;
 
-                UpdateRects(vd, NULL, true);
+                CallUpdateRects(vd);
                 UpdateSize(vd);
             }
         }
@@ -1046,7 +1117,14 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     /* Render the quad */
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
         D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, sys->stagingSys.resourceView, sys->d3drenderTargetView);
-    else {
+    else if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+    {
+        ID3D11ShaderResourceView *SRV[D3D11_MAX_SHADER_VIEW];
+        D3D11_UpscalerGetSRV(sys->scaleProc, SRV);
+        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, SRV, sys->d3drenderTargetView);
+    }
+    else
+    {
         picture_sys_t *p_sys = ActivePictureSys(picture);
         D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, p_sys->resourceView, sys->d3drenderTargetView);
     }
@@ -1372,6 +1450,19 @@ static bool BogusZeroCopy(const vout_display_t *vd)
     }
 }
 
+static void InitScaleProcessor(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (sys->upscaleMode != upscale_VideoProcessor)
+        return;
+
+    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), &sys->d3d_dev, sys->quad_fmt.i_chroma);
+    if (sys->scaleProc == NULL)
+        sys->upscaleMode = upscale_LinearSampler;
+
+    msg_Dbg(vd, "Using Video Processor scaler");
+}
+
 static int Direct3D11Open(vout_display_t *vd, bool external_device)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1459,6 +1550,8 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         sys->upscaleMode = upscale_LinearSampler;
     else if (strcmp("point", psz_upscale) == 0)
         sys->upscaleMode = upscale_PointSampler;
+    else if (strcmp("processor", psz_upscale) == 0)
+        sys->upscaleMode = upscale_VideoProcessor;
     else
     {
         msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
@@ -1468,10 +1561,14 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 
     video_format_Init(&sys->quad_fmt, vd->source.i_chroma);
     video_format_Copy(&sys->quad_fmt, &vd->source);
+    if (sys->upscaleMode == upscale_VideoProcessor)
+        sys->sys.src_fmt = &sys->quad_fmt;
+    InitScaleProcessor(vd);
 
     video_format_Copy(&sys->pool_fmt, &fmt);
 
-    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
+    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 ||
+            (sys->scaleProc == NULL && !CanUseTextureArray(vd)) ||
             BogusZeroCopy(vd);
 
     if (!sys->legacy_shader && is_d3d11_opaque(sys->pool_fmt.i_chroma))
@@ -1654,7 +1751,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->picQuad.i_width  = fmt->i_width;
     sys->picQuad.i_height = fmt->i_height;
 
-    UpdateRects(vd, NULL, true);
+    CallUpdateRects(vd);
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
@@ -1783,13 +1880,13 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, NULL, true);
-
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
+
+    CallUpdateRects(vd);
 
     if (sys->d3dregion_format != NULL)
     {
@@ -1879,6 +1976,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     ReleasePictureSys(&sys->stagingSys);
 
+    if (sys->scaleProc != NULL)
+    {
+        D3D11_UpscalerDestroy(sys->scaleProc);
+        sys->scaleProc = NULL;
+    }
     video_format_Clean(&sys->quad_fmt);
 
     if (sys->pVertexLayout)
@@ -2071,12 +2173,18 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
-        quad->cropViewport.Width =  (FLOAT) r->fmt.i_visible_width  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
-        quad->cropViewport.Height = (FLOAT) r->fmt.i_visible_height * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+        vout_display_cfg_t place_cfg = *vd->cfg;
+        place_cfg.display.width  = RECTWidth(sys->sys.rect_dest_clipped);
+        place_cfg.display.height = RECTHeight(sys->sys.rect_dest_clipped);
+        vout_display_place_t place;
+        vout_display_PlacePicture(&place, &vd->source, &place_cfg, false);
+
+        quad->cropViewport.Width =  (FLOAT) r->fmt.i_visible_width  * place.width  / subpicture->i_original_picture_width;
+        quad->cropViewport.Height = (FLOAT) r->fmt.i_visible_height * place.height / subpicture->i_original_picture_height;
         quad->cropViewport.MinDepth = 0.0f;
         quad->cropViewport.MaxDepth = 1.0f;
-        quad->cropViewport.TopLeftX = sys->sys.rect_dest.left + (FLOAT) r->i_x * RECTWidth(sys->sys.rect_dest) / subpicture->i_original_picture_width;
-        quad->cropViewport.TopLeftY = sys->sys.rect_dest.top  + (FLOAT) r->i_y * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+        quad->cropViewport.TopLeftX = place.x + (FLOAT) r->i_x * place.width  / subpicture->i_original_picture_width;
+        quad->cropViewport.TopLeftY = place.y + (FLOAT) r->i_y * place.height / subpicture->i_original_picture_height;
 
         D3D11_UpdateQuadOpacity(vd, &sys->d3d_dev, quad, r->i_alpha / 255.0f );
     }
