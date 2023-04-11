@@ -58,10 +58,6 @@ typedef struct vout_display_sys_win32_t
     /* */
     HWND                 hvideownd;        /* Handle of the video sub-window */
     HWND                 hparent;             /* Handle of the parent window */
-
-# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    HINSTANCE     dxgidebug_dll;
-# endif
 } vout_display_sys_win32_t;
 
 

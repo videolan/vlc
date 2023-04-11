@@ -55,9 +55,6 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
         return VLC_EGENERIC;
 
     /* */
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-#endif
     sys->hvideownd = NULL;
     sys->hparent   = NULL;
 
