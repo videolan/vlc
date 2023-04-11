@@ -272,10 +272,10 @@ static void UpdateSize(vout_display_t *vd)
     sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
 
     RECT source_rect;
-    source_rect.left   = vd->source->i_x_offset;
-    source_rect.right  = vd->source->i_x_offset + vd->source->i_visible_width;
-    source_rect.top    = vd->source->i_y_offset;
-    source_rect.bottom = vd->source->i_y_offset + vd->source->i_visible_height;
+    source_rect.left   = sys->picQuad.quad_fmt.i_x_offset;
+    source_rect.right  = sys->picQuad.quad_fmt.i_x_offset + sys->picQuad.quad_fmt.i_visible_width;
+    source_rect.top    = sys->picQuad.quad_fmt.i_y_offset;
+    source_rect.bottom = sys->picQuad.quad_fmt.i_y_offset + sys->picQuad.quad_fmt.i_visible_height;
     d3d11_device_lock( sys->d3d_dev );
 
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
@@ -588,8 +588,10 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.generic.i_height = srcDesc.Height;
-                sys->picQuad.generic.i_width  = srcDesc.Width;
+                sys->picQuad.quad_fmt.i_width  = srcDesc.Width;
+                sys->picQuad.quad_fmt.i_height = srcDesc.Height;
+                sys->picQuad.generic.i_width  = sys->picQuad.quad_fmt.i_width;
+                sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
 
                 CommonPlacePicture(vd, &sys->area);
                 UpdateSize(vd);
@@ -773,15 +775,19 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         }
     }
 
+    video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
+    if (!is_d3d11_opaque(fmt.i_chroma))
+        sys->picQuad.quad_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
+
     /* adjust the decoder sizes to have proper padding */
-    sys->picQuad.generic.i_width  = fmt.i_width;
-    sys->picQuad.generic.i_height = fmt.i_height;
     if ( sys->picQuad.generic.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuad.generic.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
-        sys->picQuad.generic.i_width  = (sys->picQuad.generic.i_width  + 0x01) & ~0x01;
-        sys->picQuad.generic.i_height = (sys->picQuad.generic.i_height + 0x01) & ~0x01;
+        sys->picQuad.quad_fmt.i_width  = (sys->picQuad.quad_fmt.i_width  + 0x01) & ~0x01;
+        sys->picQuad.quad_fmt.i_height = (sys->picQuad.quad_fmt.i_height + 0x01) & ~0x01;
     }
+    sys->picQuad.generic.i_width  = sys->picQuad.quad_fmt.i_width;
+    sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
 
     char *psz_upscale = var_InheritString(vd, "d3d11-upscale-mode");
     if (strcmp("linear", psz_upscale) == 0)
@@ -1043,13 +1049,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    if (D3D11_AllocateQuad(vd, sys->d3d_dev, vd->source->projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    if (D3D11_AllocateQuad(vd, sys->d3d_dev, sys->picQuad.quad_fmt.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not allocate quad buffers.");
        return VLC_EGENERIC;
     }
 
-    if (D3D11_SetupQuad( vd, sys->d3d_dev, vd->source, &sys->picQuad, &sys->display) != VLC_SUCCESS)
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, &sys->picQuad.quad_fmt, &sys->picQuad, &sys->display) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not Create the main quad picture.");
         return VLC_EGENERIC;
@@ -1061,7 +1067,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     source_rect.top    = fmt->i_y_offset;
     source_rect.bottom = fmt->i_y_offset + fmt->i_visible_height;
     if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
-                                  video_format_GetTransform(vd->source->orientation, sys->display.orientation)))
+                                  video_format_GetTransform(sys->picQuad.quad_fmt.orientation, sys->display.orientation)))
     {
         msg_Err(vd, "Could not set quad picture position.");
         return VLC_EGENERIC;
