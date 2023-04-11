@@ -41,10 +41,11 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(display_win32_area_t *area)
+void CommonInit(display_win32_area_t *area, const video_format_t *src_fmt)
 {
     ZeroMemory(&area->place, sizeof(area->place));
     area->place_changed = false;
+    area->src_fmt = src_fmt;
 }
 
 #ifndef VLC_WINSTORE_APP
@@ -90,7 +91,7 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
 {
     /* Update the window position and size */
     vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, vd->source, &vd->cfg->display);
+    vout_display_PlacePicture(&area->place, area->src_fmt, &vd->cfg->display);
 
     /* Signal the change in size/position */
     if (!vout_display_PlaceEquals(&before_place, &area->place))
@@ -99,9 +100,9 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
 
 #ifndef NDEBUG
         msg_Dbg(vd, "UpdateRects source offset: %i,%i visible: %ix%i decoded: %ix%i",
-            vd->source->i_x_offset, vd->source->i_y_offset,
-            vd->source->i_visible_width, vd->source->i_visible_height,
-            vd->source->i_width, vd->source->i_height);
+            area->src_fmt->i_x_offset, area->src_fmt->i_y_offset,
+            area->src_fmt->i_visible_width, area->src_fmt->i_visible_height,
+            area->src_fmt->i_width, area->src_fmt->i_height);
         msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
             area->place.x, area->place.y, area->place.width, area->place.height);
 #endif

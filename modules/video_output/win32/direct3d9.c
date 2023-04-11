@@ -1783,7 +1783,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area);
+    CommonInit(&sys->area, vd->source);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );

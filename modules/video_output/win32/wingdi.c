@@ -123,7 +123,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area);
+    CommonInit(&sys->area, vd->source);
     if (CommonWindowInit(vd, &sys->area, false))
         goto error;
     CommonPlacePicture(vd, &sys->area);

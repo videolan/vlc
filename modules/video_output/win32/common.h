@@ -38,6 +38,8 @@ typedef struct display_win32_area_t
     vout_display_place_t  place;
     bool                  place_changed;
     struct event_thread_t *event; // only use if sys.event is not NULL
+
+    const video_format_t  *src_fmt;
 } display_win32_area_t;
 
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
@@ -56,7 +58,7 @@ void CommonControl(vout_display_t *, display_win32_area_t *, int );
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 
-void CommonInit(display_win32_area_t *);
+void CommonInit(display_win32_area_t *, const video_format_t *);
 
 void* HookWindowsSensors(vout_display_t*, HWND);
 void UnhookWindowsSensors(void*);
