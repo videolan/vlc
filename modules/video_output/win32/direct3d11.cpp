@@ -43,6 +43,7 @@
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
+#include "d3d11_scaler.h"
 #ifndef VLC_WINSTORE_APP
 #include "d3d11_swapchain.h"
 #endif
@@ -65,9 +66,9 @@ static void Close(vout_display_t *);
 #define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
 
 static const char *const ppsz_upscale_mode[] = {
-    "linear", "point" };
+    "linear", "point", "processor" };
 static const char *const ppsz_upscale_mode_text[] = {
-    N_("Linear Sampler"), N_("Point Sampler") };
+    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor") };
 
 vlc_module_begin ()
     set_shortname("Direct3D11")
@@ -88,6 +89,7 @@ enum d3d11_upscale
 {
     upscale_LinearSampler,
     upscale_PointSampler,
+    upscale_VideoProcessor,
 };
 
 typedef struct vout_display_sys_t
@@ -136,6 +138,7 @@ typedef struct vout_display_sys_t
 
     // upscaling
     enum d3d11_upscale       upscaleMode;
+    d3d11_scaler             *scaleProc;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
@@ -203,6 +206,12 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     {
         msg_Err(vd, "Failed to set format %dx%d %d bits on output", cfg.width, cfg.height, cfg.bitdepth);
         return VLC_EGENERIC;
+    }
+
+    if (sys->upscaleMode == upscale_VideoProcessor)
+    {
+        D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
+                             vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
     }
 
     display_info_t new_display = { };
@@ -470,6 +479,26 @@ static void Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+
+    if (sys->upscaleMode == upscale_VideoProcessor)
+    {
+        D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
+                             vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
+
+        if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        {
+            D3D11_UpscalerGetSize(sys->scaleProc, &sys->picQuad.quad_fmt.i_width, &sys->picQuad.quad_fmt.i_height);
+
+            sys->picQuad.quad_fmt.i_x_offset       = 0;
+            sys->picQuad.quad_fmt.i_y_offset       = 0;
+            sys->picQuad.quad_fmt.i_visible_width  = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.quad_fmt.i_visible_height = sys->picQuad.quad_fmt.i_height;
+
+            sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
+        }
+    }
+
     CommonControl( vd, &sys->area, query );
 
     if ( sys->area.place_changed )
@@ -560,7 +589,17 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         D3D11_TEXTURE2D_DESC srcDesc;
         p_sys->texture[KNOWN_DXGI_INDEX]->GetDesc(&srcDesc);
 
-        if (sys->legacy_shader) {
+        if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        {
+            if (D3D11_UpscalerScale(VLC_OBJECT(vd), sys->scaleProc, p_sys) != VLC_SUCCESS)
+                return;
+            uint32_t witdh, height;
+            D3D11_UpscalerGetSize(sys->scaleProc, &witdh, &height);
+            srcDesc.Width  = witdh;
+            srcDesc.Height = height;
+        }
+        else if (sys->legacy_shader)
+        {
             D3D11_TEXTURE2D_DESC texDesc;
             sys->stagingSys.texture[0]->GetDesc(&texDesc);
             D3D11_BOX box;
@@ -615,7 +654,13 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
     /* Render the quad */
     ID3D11ShaderResourceView **renderSrc;
-    if (sys->legacy_shader)
+    ID3D11ShaderResourceView *SRV[DXGI_MAX_SHADER_VIEW];
+    if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+    {
+        D3D11_UpscalerGetSRV(sys->scaleProc, SRV);
+        renderSrc = SRV;
+    }
+    else if (sys->legacy_shader)
         renderSrc = sys->stagingSys.renderSrc;
     else {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
@@ -739,6 +784,22 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, DXGI_CHROMA_CPU, supportFlags );
 }
 
+static void InitScaleProcessor(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    if (sys->upscaleMode != upscale_VideoProcessor)
+        return;
+
+    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), sys->d3d_dev, sys->picQuad.quad_fmt.i_chroma);
+    if (sys->scaleProc == NULL)
+    {
+        msg_Dbg(vd, "forcing linear sampler");
+        sys->upscaleMode = upscale_LinearSampler;
+    }
+
+    msg_Dbg(vd, "Using Video Processor scaler");
+}
+
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
@@ -794,12 +855,16 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         sys->upscaleMode = upscale_LinearSampler;
     else if (strcmp("point", psz_upscale) == 0)
         sys->upscaleMode = upscale_PointSampler;
+    else if (strcmp("processor", psz_upscale) == 0)
+        sys->upscaleMode = upscale_VideoProcessor;
     else
     {
         msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
         sys->upscaleMode = upscale_LinearSampler;
     }
     free(psz_upscale);
+
+    InitScaleProcessor(vd);
 
     CommonPlacePicture(vd, &sys->area);
 
@@ -1028,7 +1093,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     HRESULT hr;
 
-    sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
+    sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 ||
+            (sys->scaleProc == nullptr && !CanUseTextureArray(vd)) ||
             BogusZeroCopy(vd) || !is_d3d11_opaque(fmt->i_chroma);
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
@@ -1200,6 +1266,12 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 static void Direct3D11DestroyResources(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+
+    if (sys->scaleProc != nullptr)
+    {
+        D3D11_UpscalerDestroy(sys->scaleProc);
+        sys->scaleProc = nullptr;
+    }
 
     sys->picQuad.Reset();
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);

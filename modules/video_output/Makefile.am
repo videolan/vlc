@@ -186,6 +186,7 @@ endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.cpp \
  video_output/win32/d3d11_quad.cpp video_output/win32/d3d11_quad.h \
+ video_output/win32/d3d11_scaler.cpp video_output/win32/d3d11_scaler.h \
  video_output/win32/d3d11_shaders.cpp video_output/win32/d3d11_shaders.h \
  video_output/win32/d3d_shaders.c video_output/win32/d3d_shaders.h \
  video_output/win32/d3d_dynamic_shader.c video_output/win32/d3d_dynamic_shader.h \
