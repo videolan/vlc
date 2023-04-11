@@ -36,7 +36,6 @@ typedef struct {
 } event_cfg_t;
 
 typedef struct {
-    vlc_window_t *parent_window;
     HWND hvideownd;
 } event_hwnd_t;
 

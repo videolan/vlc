@@ -204,7 +204,6 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     msg_Dbg( p_event->obj, "Vout EventThread running" );
 
     /* */
-    p_hwnd->parent_window = p_event->parent_window;
     p_hwnd->hvideownd     = p_event->hvideownd;
     return VLC_SUCCESS;
 }
