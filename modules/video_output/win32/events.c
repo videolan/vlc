@@ -171,7 +171,7 @@ void EventThreadDestroy( event_thread_t *p_event )
     free( p_event );
 }
 
-int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event_cfg_t *p_cfg )
+int EventThreadStart( event_thread_t *p_event, HWND *p_hwnd, const event_cfg_t *p_cfg )
 {
     p_event->is_projected = p_cfg->is_projected;
     p_event->window_area.left   = 0;
@@ -204,7 +204,7 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     msg_Dbg( p_event->obj, "Vout EventThread running" );
 
     /* */
-    p_hwnd->hvideownd     = p_event->hvideownd;
+    *p_hwnd = p_event->hvideownd;
     return VLC_SUCCESS;
 }
 

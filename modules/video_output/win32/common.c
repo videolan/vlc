@@ -69,11 +69,8 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     cfg.height = vd->cfg->display.height;
     cfg.is_projected = projection_gestures;
 
-    event_hwnd_t hwnd;
-    if (EventThreadStart(sys->event, &hwnd, &cfg))
+    if (EventThreadStart(sys->event, &sys->hvideownd, &cfg))
         return VLC_EGENERIC;
-
-    sys->hvideownd     = hwnd.hvideownd;
 
     CommonPlacePicture(vd, area);
 
