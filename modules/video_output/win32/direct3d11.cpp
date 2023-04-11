@@ -61,6 +61,14 @@ static void Close(vout_display_t *);
 #define HW_BLENDING_LONGTEXT N_(\
     "Try to use hardware acceleration for subtitle/OSD blending.")
 
+#define UPSCALE_MODE_TEXT N_("Video Upscaling Mode")
+#define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
+
+static const char *const ppsz_upscale_mode[] = {
+    "linear", "point" };
+static const char *const ppsz_upscale_mode_text[] = {
+    N_("Linear Sampler"), N_("Point Sampler") };
+
 vlc_module_begin ()
     set_shortname("Direct3D11")
     set_description(N_("Direct3D11 video output"))
@@ -69,9 +77,18 @@ vlc_module_begin ()
 
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)
 
+    add_string("d3d11-upscale-mode", "linear", UPSCALE_MODE_TEXT, UPSCALE_MODE_LONGTEXT)
+        change_string_list(ppsz_upscale_mode, ppsz_upscale_mode_text)
+
     add_shortcut("direct3d11")
     set_callback_display(Open, 300)
 vlc_module_end ()
+
+enum d3d11_upscale
+{
+    upscale_LinearSampler,
+    upscale_PointSampler,
+};
 
 typedef struct vout_display_sys_t
 {
@@ -116,6 +133,9 @@ typedef struct vout_display_sys_t
     libvlc_video_makeCurrent_cb              startEndRenderingCb;
     libvlc_video_frameMetadata_cb            sendMetadataCb;
     libvlc_video_output_select_plane_cb      selectPlaneCb;
+
+    // upscaling
+    enum d3d11_upscale       upscaleMode;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
@@ -763,6 +783,18 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         sys->picQuad.generic.i_height = (sys->picQuad.generic.i_height + 0x01) & ~0x01;
     }
 
+    char *psz_upscale = var_InheritString(vd, "d3d11-upscale-mode");
+    if (strcmp("linear", psz_upscale) == 0)
+        sys->upscaleMode = upscale_LinearSampler;
+    else if (strcmp("point", psz_upscale) == 0)
+        sys->upscaleMode = upscale_PointSampler;
+    else
+    {
+        msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
+        sys->upscaleMode = upscale_LinearSampler;
+    }
+    free(psz_upscale);
+
     CommonPlacePicture(vd, &sys->area);
 
     err = UpdateDisplayFormat(vd, &fmt);
@@ -1003,7 +1035,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         msg_Err(vd, "Failed to compile the pixel shader. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
-    hr = D3D11_SetQuadPixelShader(VLC_OBJECT(vd), sys->d3d_dev, false,
+    hr = D3D11_SetQuadPixelShader(VLC_OBJECT(vd), sys->d3d_dev, sys->upscaleMode != upscale_LinearSampler,
                                   &sys->picQuad, pPSBlob);
     if (FAILED(hr))
     {
