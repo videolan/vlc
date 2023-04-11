@@ -119,6 +119,8 @@ int CommonInit(vout_display_t *vd)
     cfg.width  = vd->cfg->display.width;
     cfg.height = vd->cfg->display.height;
 
+    sys->src_fmt = &vd->source;
+
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
         return VLC_EGENERIC;
@@ -161,7 +163,7 @@ void UpdateRects(vout_display_t *vd,
     bool is_forced)
 {
     vout_display_sys_t *sys = vd->sys;
-    const video_format_t *source = &vd->source;
+    const video_format_t *source = sys->src_fmt;
 #define rect_src sys->rect_src
 #define rect_src_clipped sys->rect_src_clipped
 #define rect_dest sys->rect_dest

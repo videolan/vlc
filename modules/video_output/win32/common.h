@@ -67,6 +67,7 @@ typedef struct vout_display_sys_win32_t
     RECT         rect_src_clipped;
     RECT         rect_dest;
     RECT         rect_dest_clipped;
+    const video_format_t *src_fmt;
 
     picture_pool_t *pool;
 
