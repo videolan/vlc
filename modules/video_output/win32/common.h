@@ -57,7 +57,6 @@ typedef struct vout_display_sys_win32_t
 
     /* */
     HWND                 hvideownd;        /* Handle of the video sub-window */
-    HWND                 hparent;             /* Handle of the parent window */
 } vout_display_sys_win32_t;
 
 

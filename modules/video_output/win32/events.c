@@ -205,7 +205,6 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
 
     /* */
     p_hwnd->parent_window = p_event->parent_window;
-    p_hwnd->hparent       = p_event->hparent;
     p_hwnd->hvideownd     = p_event->hvideownd;
     return VLC_SUCCESS;
 }
@@ -376,4 +375,14 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     UnregisterClass( p_event->class_video, hInstance );
 
     CloseGestures( p_event->p_gesture);
+}
+
+void EventThreadUpdateSize( event_thread_t *p_event )
+{
+    RECT clientRect;
+    GetClientRect(p_event->hparent, &clientRect);
+
+    SetWindowPos(p_event->hvideownd, 0, 0, 0,
+                    RECTWidth(clientRect),
+                    RECTHeight(clientRect), SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
 }

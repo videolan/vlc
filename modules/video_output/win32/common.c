@@ -56,7 +56,6 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
 
     /* */
     sys->hvideownd = NULL;
-    sys->hparent   = NULL;
 
     /* */
     sys->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
@@ -74,7 +73,6 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     if (EventThreadStart(sys->event, &hwnd, &cfg))
         return VLC_EGENERIC;
 
-    sys->hparent       = hwnd.hparent;
     sys->hvideownd     = hwnd.hvideownd;
 
     CommonPlacePicture(vd, area);
@@ -131,12 +129,7 @@ void CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_
         // Update dimensions
         if (sys->event != NULL)
         {
-            RECT clientRect;
-            GetClientRect(sys->hparent, &clientRect);
-
-            SetWindowPos(sys->hvideownd, 0, 0, 0,
-                         RECTWidth(clientRect),
-                         RECTHeight(clientRect), SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
+            EventThreadUpdateSize(sys->event);
         }
 #endif /* !VLC_WINSTORE_APP */
         // fallthrough
