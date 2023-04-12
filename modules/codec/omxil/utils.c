@@ -37,6 +37,7 @@
 #include "qcom.h"
 #include "../../video_chroma/copy.h"
 #include "../../packetizer/h264_nal.h"
+#include "../../packetizer/hevc_nal.h"
 
 /*****************************************************************************
  * Events utility functions
@@ -1230,6 +1231,13 @@ static const struct omx_to_profile_idc avc_omx_to_profile_idc[] =
     { OMX_VIDEO_AVCProfileHigh444,   PROFILE_H264_HIGH_444 },
 };
 
+static const struct omx_to_profile_idc hevc_omx_to_profile_idc[] =
+{
+    { 0x1 /* OMX_VIDEO_HEVCProfileMain */, VLC_HEVC_PROFILE_MAIN },
+    { 0x2 /* OMX_VIDEO_HEVCProfileMain10 */, VLC_HEVC_PROFILE_MAIN_10 },
+    { 0x1000 /* OMX_VIDEO_HEVCProfileMain10HDR10 */, VLC_HEVC_PROFILE_MAIN_10 },
+};
+
 int convert_omx_to_profile_idc(vlc_fourcc_t codec, int profile_type)
 {
     const struct omx_to_profile_idc *omx_to_profile_idc = NULL;
@@ -1239,6 +1247,10 @@ int convert_omx_to_profile_idc(vlc_fourcc_t codec, int profile_type)
         case VLC_CODEC_H264:
             omx_to_profile_idc = avc_omx_to_profile_idc;
             array_length = ARRAY_SIZE(avc_omx_to_profile_idc);
+            break;
+        case VLC_CODEC_HEVC:
+            omx_to_profile_idc = hevc_omx_to_profile_idc;
+            array_length = ARRAY_SIZE(hevc_omx_to_profile_idc);
             break;
         default:
             return 0;
