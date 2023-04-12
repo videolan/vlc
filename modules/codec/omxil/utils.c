@@ -1213,11 +1213,13 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
     }
 }
 
-static const struct
+struct omx_to_profile_idc
 {
-    OMX_VIDEO_AVCPROFILETYPE omx_profile;
-    size_t                   profile_idc;
-} omx_to_profile_idc[] =
+    int                      omx_profile;
+    int                      profile_idc;
+};
+
+static const struct omx_to_profile_idc avc_omx_to_profile_idc[] =
 {
     { OMX_VIDEO_AVCProfileBaseline,  PROFILE_H264_BASELINE },
     { OMX_VIDEO_AVCProfileMain,      PROFILE_H264_MAIN },
@@ -1228,9 +1230,20 @@ static const struct
     { OMX_VIDEO_AVCProfileHigh444,   PROFILE_H264_HIGH_444 },
 };
 
-size_t convert_omx_to_profile_idc(OMX_VIDEO_AVCPROFILETYPE profile_type)
+int convert_omx_to_profile_idc(vlc_fourcc_t codec, int profile_type)
 {
-    size_t array_length = sizeof(omx_to_profile_idc)/sizeof(omx_to_profile_idc[0]);
+    const struct omx_to_profile_idc *omx_to_profile_idc = NULL;
+    size_t array_length;
+    switch (codec)
+    {
+        case VLC_CODEC_H264:
+            omx_to_profile_idc = avc_omx_to_profile_idc;
+            array_length = ARRAY_SIZE(avc_omx_to_profile_idc);
+            break;
+        default:
+            return 0;
+    }
+
     for (size_t i = 0; i < array_length; ++i) {
         if (omx_to_profile_idc[i].omx_profile == profile_type)
             return omx_to_profile_idc[i].profile_idc;

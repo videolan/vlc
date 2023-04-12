@@ -450,7 +450,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
 
                         int codec_profile = 0;
                         if (strcmp(psz_mime, "video/avc") == 0)
-                            codec_profile = convert_omx_to_profile_idc(omx_profile);
+                            codec_profile = convert_omx_to_profile_idc(VLC_CODEC_H264, omx_profile);
                         else if (strcmp(psz_mime, "video/hevc") == 0)
                         {
                             switch (omx_profile)
