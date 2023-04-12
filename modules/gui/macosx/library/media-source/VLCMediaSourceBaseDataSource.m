@@ -106,8 +106,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.pathControl.action = @selector(pathControlAction:);
     self.pathControl.target = self;
 
-    _homeButton.hidden = YES;
-    _pathControl.hidden = YES;
+    [self togglePathControlVisibility:NO];
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -419,8 +418,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     [self setChildDataSource:newChildDataSource];
     [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
 
-    _homeButton.hidden = NO;
-    _pathControl.hidden = NO;
+    [self togglePathControlVisibility:YES];
 }
 
 - (void)setChildDataSource:(VLCMediaSourceDataSource *)childDataSource
@@ -455,6 +453,12 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 #pragma mark - user interaction with generic buttons
 
+- (void)togglePathControlVisibility:(BOOL)visible
+{
+    _homeButton.hidden = !visible;
+    _pathControl.hidden = !visible;
+}
+
 - (void)returnHome
 {
     self.collectionView.dataSource = self;
@@ -467,9 +471,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     [self reloadData];
 
-    _homeButton.hidden = YES;
-    _pathControl.hidden = YES;
-    
+    [self togglePathControlVisibility:NO];
 }
 
 - (void)homeButtonAction:(id)sender
