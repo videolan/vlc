@@ -298,6 +298,26 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
         return;
     }
 
+    auto it = m_inputItemQuery.find(variantList);
+
+    if (it == m_inputItemQuery.end())
+    {
+        it = m_inputItemQuery.insert(variantList, {callback});
+    }
+    else
+    {
+        // be patient
+
+        for (const auto& it2 : it.value())
+        {
+            if (callback.strictlyEquals(it2))
+                return;
+        }
+
+        it.value().push_back(callback); // FIXME: Use an ordered set
+        return;
+    }
+
     runOnMLThread<Ctx>(this,
     //ML thread
     [mlIdList](vlc_medialibrary_t* ml, Ctx& ctx){
@@ -326,7 +346,7 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
         }
     },
     //UI thread
-    [this, callback](quint64, Ctx& ctx) mutable
+    [this, it](quint64, Ctx& ctx) mutable
     {
         auto jsEngine = qjsEngine(this);
         if (!jsEngine)
@@ -341,7 +361,12 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
             i++;
         }
 
-        callback.call({jsArray});
+        for (auto cb : qAsConst(it.value())) // TODO: Qt 6 use const reference
+        {
+            cb.call({jsArray});
+        }
+
+        m_inputItemQuery.erase(it);
     });
 }
 

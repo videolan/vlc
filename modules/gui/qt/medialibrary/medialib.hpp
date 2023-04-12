@@ -218,6 +218,8 @@ private:
     quint64 m_taskId = 1;
     QMap<quint64, RunOnMLThreadBaseRunner*> m_runningTasks;
     QMultiMap<const QObject*, quint64> m_objectTasks;
+
+    QMap<QVariantList, QVector<QJSValue>> m_inputItemQuery;
 };
 
 class RunOnMLThreadBaseRunner : public QObject, public QRunnable
