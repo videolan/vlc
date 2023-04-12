@@ -232,6 +232,9 @@ FocusScope {
 
                     item.width = Qt.binding(function() { return loader.width } )
 
+                    if (item.maximumHeight !== undefined)
+                        item.maximumHeight = Qt.binding(function() { return rowLayout.height })
+
                     item.visible = Qt.binding(function() { return loader.visible })
 
                     if (item.requestLockUnlockAutoHide) {
