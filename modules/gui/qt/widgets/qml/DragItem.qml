@@ -60,6 +60,8 @@ Item {
     // string => role
     property string titleRole: "title"
 
+    readonly property var inputItems: _inputItems
+
     function coversXPos(index) {
         return VLCStyle.margin_small + (coverSize / 3) * index;
     }
@@ -81,6 +83,8 @@ Item {
 
         if (!dragItem._active)
             return
+
+        Qt.callLater(dragItem.getSelectedInputItem, dragItem.setInputItems)
 
         var covers = []
         var titleList = []
@@ -107,6 +111,16 @@ Item {
         _title = titleList.join(",") + (indexes.length > _maxCovers ? "..." : "")
     }
 
+    function setInputItems(inputItems) {
+        if (!Array.isArray(inputItems) || inputItems.length === 0) {
+            console.warn("can't convert items to input items");
+            dragItem._inputItems = null
+            return
+        }
+
+        dragItem._inputItems = inputItems
+    }
+
     //---------------------------------------------------------------------------------------------
     // Private
 
@@ -117,6 +131,8 @@ Item {
     readonly property int _indexesSize: !!indexes ? indexes.length : 0
 
     readonly property int _displayedCoversCount: Math.min(_indexesSize, _maxCovers + 1)
+
+    property var _inputItems
 
     property var _data: []
 
@@ -131,6 +147,9 @@ Item {
         // TODO: Rework D&D positioning
         if (!Drag.active)
             x = y = -1
+
+        if (!Drag.active)
+            dragItem._inputItems = undefined
     }
 
     //---------------------------------------------------------------------------------------------

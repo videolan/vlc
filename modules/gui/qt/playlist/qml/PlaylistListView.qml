@@ -102,13 +102,17 @@ Control {
 
         // NOTE: Dropping medialibrary content into the queue.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            item.getSelectedInputItem(function(inputItems) {
-                if (!Array.isArray(inputItems) || inputItems.length === 0) {
-                    console.warn("can't convert items to input items");
-                    return
-                }
-                mainPlaylistController.insert(index, inputItems, false)
-            })
+            if (item.inputItems) {
+                mainPlaylistController.insert(index, item.inputItems, false)
+            } else {
+                item.getSelectedInputItem(function(inputItems) {
+                    if (!Array.isArray(inputItems) || inputItems.length === 0) {
+                        console.warn("can't convert items to input items");
+                        return
+                    }
+                    mainPlaylistController.insert(index, inputItems, false)
+                })
+            }
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
         } else if (drop.hasUrls) {
