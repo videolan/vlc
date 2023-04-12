@@ -28,11 +28,14 @@ import "qrc:///util/Helpers.js" as Helpers
 T.Control {
     id: playBtn
 
-    implicitHeight: VLCStyle.icon_medium
     implicitWidth: implicitHeight
+
+    implicitHeight: Math.min(VLCStyle.icon_medium, maximumHeight)
 
     scale: (_keyOkPressed || (mouseArea.pressed && cursorInside)) ? 0.95
                                                                   : 1.00
+
+    property int maximumHeight: VLCStyle.icon_medium
 
     property bool paintOnly: false
 
