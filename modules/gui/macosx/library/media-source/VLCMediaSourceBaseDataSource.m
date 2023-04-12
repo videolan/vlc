@@ -106,6 +106,9 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.pathControl.action = @selector(pathControlAction:);
     self.pathControl.target = self;
 
+    _homeButton.hidden = YES;
+    _pathControl.hidden = YES;
+
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.hidden = YES;
@@ -415,6 +418,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     
     [self setChildDataSource:newChildDataSource];
     [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
+
+    _homeButton.hidden = NO;
+    _pathControl.hidden = NO;
 }
 
 - (void)setChildDataSource:(VLCMediaSourceDataSource *)childDataSource
@@ -460,6 +466,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
     [self.pathControl clearInputNodePathControlItems];
 
     [self reloadData];
+
+    _homeButton.hidden = YES;
+    _pathControl.hidden = YES;
+    
 }
 
 - (void)homeButtonAction:(id)sender
