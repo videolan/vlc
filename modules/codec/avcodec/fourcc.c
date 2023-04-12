@@ -122,6 +122,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_VIXL, AV_CODEC_ID_VIXL },
     { VLC_CODEC_QPEG, AV_CODEC_ID_QPEG },
     { VLC_CODEC_PNG, AV_CODEC_ID_PNG },
+    { VLC_CODEC_PNM, AV_CODEC_ID_PPM },
     { VLC_CODEC_PPM, AV_CODEC_ID_PPM },
     /* AV_CODEC_ID_PBM */
     { VLC_CODEC_PGM, AV_CODEC_ID_PGM },
