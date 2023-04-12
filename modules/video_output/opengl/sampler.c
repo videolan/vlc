@@ -790,10 +790,13 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 #if !defined(USE_OPENGL_ES2)
                 const opengl_vtable_t *vt = priv->vt;
                 /* fetch framebuffer depth (we are already bound to the default one). */
-                if (vt->GetFramebufferAttachmentParameteriv != NULL)
+                if (priv->gl->api_type == VLC_OPENGL &&
+                    vt->GetFramebufferAttachmentParameteriv != NULL)
+                {
                     vt->GetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK_LEFT,
                                                             GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
                                                             &fb_depth);
+                }
 #endif
                 if (fb_depth <= 0)
                     fb_depth = 8;
