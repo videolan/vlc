@@ -24,7 +24,6 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-
 AbstractButton {
     id: artworkInfoItem
 
@@ -33,11 +32,15 @@ AbstractButton {
     readonly property real minimumWidth: coverRect.implicitWidth +
                                          + (leftPadding + rightPadding)
 
+    property int maximumHeight: _preferredHeight
+
     readonly property int preferredWidth: minimumWidth + contentItem.spacing * 2
                                           +
                                           Math.max(titleLabel.implicitWidth,
                                                    artistLabel.implicitWidth,
                                                    progressIndicator.implicitWidth)
+
+    property int _preferredHeight: VLCStyle.dp(60, VLCStyle.scale)
 
     property bool _keyPressed: false
 
@@ -91,8 +94,10 @@ AbstractButton {
         Rectangle {
             id: coverRect
 
-            implicitHeight: VLCStyle.dp(60, VLCStyle.scale)
             implicitWidth: implicitHeight
+
+            implicitHeight: Math.min(artworkInfoItem._preferredHeight,
+                                     artworkInfoItem.maximumHeight)
 
             color: theme.bg.primary
 
@@ -178,6 +183,8 @@ AbstractButton {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                visible: (infoColumn.height >= artworkInfoItem._preferredHeight)
 
                 text: {
                     if (paintOnly)
