@@ -104,7 +104,12 @@ FocusScope {
 
                     loaderRight.width = Math.round(size * (implicitRight / total))
 
-                    var contentWidth = loaderRight.item.contentWidth
+                    item = loaderRight.item
+
+                    if (item === null)
+                        return
+
+                    var contentWidth = item.contentWidth
 
                     // NOTE: We assign the remaining width based on the contentWidth.
                     if (contentWidth)
@@ -114,7 +119,12 @@ FocusScope {
                 } else {
                     loaderLeft.width = Math.round(size * (implicitLeft / total))
 
-                    var contentWidth = loaderLeft.item.contentWidth
+                    item = loaderLeft.item
+
+                    if (item === null)
+                        return
+
+                    var contentWidth = item.contentWidth
 
                     // NOTE: We assign the remaining width based on the contentWidth.
                     if (contentWidth)
