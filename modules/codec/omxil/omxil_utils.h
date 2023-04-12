@@ -285,5 +285,3 @@ unsigned int GetAudioParamSize(OMX_INDEXTYPE index);
  * H264 specific code
  *****************************************************************************/
 size_t convert_omx_to_profile_idc(OMX_VIDEO_AVCPROFILETYPE profile_type);
-
-size_t convert_omx_to_level_idc(OMX_VIDEO_AVCLEVELTYPE level_type);
