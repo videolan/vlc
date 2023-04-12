@@ -31,6 +31,7 @@
 
 #include "filter_priv.h"
 #include "importer_priv.h"
+#include "gl_util.h"
 
 /* The filter chain contains the sequential list of filters.
  *
@@ -139,6 +140,11 @@ struct vlc_gl_filters {
         vlc_video_dovi_metadata_t dovi_rpu;
         int has_dovi;
     } pic;
+
+    struct vlc_gl_extension_vt extension_vt;
+
+    bool can_blit;
+    GLenum draw_framebuffer_target;
 };
 
 struct vlc_gl_filters *
@@ -164,6 +170,21 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     memset(&filters->viewport, 0, sizeof(filters->viewport));
     filters->pic.pts = VLC_TICK_INVALID;
     filters->pic.has_dovi = 0;
+
+    vlc_gl_LoadExtensionFunctions(filters->gl, &filters->extension_vt);
+
+    /* MSAA requires glBlitFramebuffer to resolve the samples, which is
+     * available starting with OpenGL ES 3 or OpenGL 3, and only available as an
+     * extension otherwise (ANGLE, NV). */
+    filters->can_blit = vlc_gl_GetVersionMajor(&filters->extension_vt) >= 3;
+
+    /* GL_DRAW_FRAMEBUFFER doesn't exist when OpenGL or OpenGL ES is < 3, and
+     * some needed extensions are not found, resulting in GL_INVALID_ENUM */
+    filters->draw_framebuffer_target = GL_DRAW_FRAMEBUFFER;
+    if (!filters->can_blit)
+        filters->draw_framebuffer_target = GL_FRAMEBUFFER;
+
+
 
     return filters;
 }
@@ -306,7 +327,7 @@ vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
     {
         /* Compute the highest msaa_level among the filter and its subfilters */
         unsigned msaa_level = 0;
-        if (filters->api->supports_multisample)
+        if (filters->can_blit && filters->api->supports_multisample)
         {
             msaa_level = priv->filter.config.msaa_level;
             vlc_list_foreach(subfilter_priv, &priv->blend_subfilters, node)
@@ -350,12 +371,13 @@ vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
          * one */
         bool has_out = !is_last;
         int ret = vlc_gl_filter_InitFramebuffers(filter, has_out);
+        GL_ASSERT_NOERROR(vt);
         if (ret != VLC_SUCCESS)
             return ret;
     }
 
     /* Restore bindings */
-    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+    vt->BindFramebuffer(filters->draw_framebuffer_target, draw_framebuffer);
     vt->BindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
     return VLC_SUCCESS;
@@ -446,7 +468,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 
                 /* Select the output texture associated to this plane */
                 GLuint draw_fb = priv->framebuffers_out[i];
-                vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+                vt->BindFramebuffer(filters->draw_framebuffer_target, draw_fb);
 
                 assert(!vlc_list_is_last(&priv->node, &filters->list));
                 vt->Viewport(0, 0, priv->tex_widths[i], priv->tex_heights[i]);
@@ -467,7 +489,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 draw_fb = priv->tex_count > 0 ? priv->framebuffers_out[0]
                                               : draw_framebuffer;
 
-            vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+            vt->BindFramebuffer(filters->draw_framebuffer_target, draw_fb);
 
             if (vlc_list_is_last(&priv->node, &filters->list))
             {
@@ -489,7 +511,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
             {
                 /* Reset the draw buffer, in case it has been changed from a
                  * filter draw() callback */
-                vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+                vt->BindFramebuffer(filters->draw_framebuffer_target, draw_fb);
 
                 struct vlc_gl_filter *subfilter = &subfilter_priv->filter;
                 ret = subfilter->ops->draw(subfilter, NULL, &meta);
@@ -497,7 +519,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                     return ret;
             }
 
-            if (filter->config.msaa_level)
+            if (filters->can_blit && filter->config.msaa_level)
             {
                 /* Never resolve multisampling to the default framebuffer */
                 assert(priv->tex_count == 1);
