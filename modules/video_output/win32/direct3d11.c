@@ -192,11 +192,9 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
-static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
+static bool GetWinRTSize(const vout_display_sys_win32_t *p_sys, UINT *w, UINT *h)
 {
     const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
-    out->left   = 0;
-    out->top    = 0;
     uint32_t i_width;
     uint32_t i_height;
     UINT dataSize = sizeof(i_width);
@@ -209,8 +207,8 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
     if (FAILED(hr)) {
         return false;
     }
-    out->right  = i_width;
-    out->bottom = i_height;
+    *w = i_width;
+    *h = i_height;
     return true;
 }
 
@@ -235,7 +233,7 @@ static int OpenCoreW(vout_display_t *vd)
     IDXGISwapChain_AddRef     (sys->dxgiswapChain);
     ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
 
-    sys->sys.pf_GetRect = GetRect;
+    sys->sys.pf_GetWindowSize = GetWinRTSize;
 
     return VLC_SUCCESS;
 }
@@ -583,11 +581,13 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     HRESULT hr;
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
-    RECT rect;
-    if (sys->sys.pf_GetRect != GetRect || !sys->sys.pf_GetRect(&sys->sys, &rect))
-        rect = sys->sys.rect_dest_clipped;
-    uint32_t i_width = RECTWidth(rect);
-    uint32_t i_height = RECTHeight(rect);
+    UINT window_width, window_height;
+    if (sys->sys.pf_GetWindowSize != GetWinRTSize
+    || !sys->sys.pf_GetWindowSize(&sys->sys, &window_width, &window_height))
+    {
+        window_width  = RECTWidth(sys->sys.rect_dest_clipped);
+        window_height = RECTHeight(sys->sys.rect_dest_clipped);
+    }
     D3D11_TEXTURE2D_DESC dsc = { 0 };
 
     if (sys->d3drenderTargetView) {
@@ -600,7 +600,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         }
     }
 
-    if (dsc.Width == i_width && dsc.Height == i_height)
+    if (dsc.Width == window_width && dsc.Height == window_height)
         return S_OK; /* nothing changed */
 
     if (sys->d3drenderTargetView) {
@@ -613,7 +613,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     }
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
-    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
+    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, window_width, window_height,
         DXGI_FORMAT_UNKNOWN, 0);
     if (FAILED(hr)) {
        msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
@@ -639,8 +639,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     deptTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     deptTexDesc.CPUAccessFlags = 0;
     deptTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    deptTexDesc.Width = i_width;
-    deptTexDesc.Height = i_height;
+    deptTexDesc.Width = window_width;
+    deptTexDesc.Height = window_height;
     deptTexDesc.MipLevels = 1;
     deptTexDesc.MiscFlags = 0;
     deptTexDesc.SampleDesc.Count = 1;

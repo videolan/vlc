@@ -79,7 +79,7 @@ typedef struct vout_display_sys_win32_t
     int  i_align_dest_boundary;
     int  i_align_dest_size;
 
-    bool (*pf_GetRect)(const struct vout_display_sys_win32_t *p_sys, RECT *out);
+    bool (*pf_GetWindowSize)(const struct vout_display_sys_win32_t *p_sys, UINT *w, UINT *h);
     unsigned int (*pf_GetPictureWidth) (const vout_display_t *);
     unsigned int (*pf_GetPictureHeight)(const vout_display_t *);
 } vout_display_sys_win32_t;

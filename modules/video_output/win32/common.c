@@ -55,9 +55,14 @@ static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 #if !VLC_WINSTORE_APP
 static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
-static bool GetRect(const vout_display_sys_t *sys, RECT *out)
+static bool GetWindowSize(const vout_display_sys_t *sys, UINT *w, UINT *h)
 {
-    return GetClientRect(sys->hwnd, out);
+    RECT out;
+    if (!GetClientRect(sys->hwnd, &out))
+        return false;
+    *w = out.right;  // out.left is zero
+    *h = out.bottom; // out.top is zero
+    return true;
 }
 #endif
 
@@ -87,7 +92,7 @@ int CommonInit(vout_display_t *vd)
     sys->pf_GetPictureWidth  = GetPictureWidth;
     sys->pf_GetPictureHeight = GetPictureHeight;
 #if !VLC_WINSTORE_APP
-    sys->pf_GetRect = GetRect;
+    sys->pf_GetWindowSize = GetWindowSize;
     SetRectEmpty(&sys->rect_display);
     SetRectEmpty(&sys->rect_parent);
 
@@ -162,7 +167,6 @@ void UpdateRects(vout_display_t *vd,
 #define rect_dest sys->rect_dest
 #define rect_dest_clipped sys->rect_dest_clipped
 
-    RECT  rect;
     POINT point;
 
     /* */
@@ -170,7 +174,8 @@ void UpdateRects(vout_display_t *vd,
         cfg = vd->cfg;
 
     /* Retrieve the window size */
-    if (!sys->pf_GetRect(sys, &rect))
+    UINT window_width, window_height;
+    if (!sys->pf_GetWindowSize(sys, &window_width, &window_height))
         return;
 
     /* Retrieve the window position */
@@ -186,27 +191,31 @@ void UpdateRects(vout_display_t *vd,
     if (unlikely(!sys->event)) // external rendering
     {
         has_moved = false;
-        is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
-            rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
-        sys->rect_display = rect;
+        is_resized =
+            window_width  != (UINT)(sys->rect_display.right - sys->rect_display.left) ||
+            window_height != (UINT)(sys->rect_display.bottom - sys->rect_display.top);
+        sys->rect_display.left = 0;
+        sys->rect_display.top = 0;
+        sys->rect_display.right = window_width;
+        sys->rect_display.bottom = window_height;
     }
 #if !VLC_WINSTORE_APP
     else
     {
         EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
             point.x, point.y,
-            rect.right, rect.bottom);
+            window_width, window_height);
     }
 #endif
     if (is_resized)
-        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
+        vout_display_SendEventDisplaySize(vd, window_width, window_height);
     if (!is_forced && !has_moved && !is_resized)
         return;
 
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = *cfg;
-    place_cfg.display.width = rect.right;
-    place_cfg.display.height = rect.bottom;
+    place_cfg.display.width = window_width;
+    place_cfg.display.height = window_height;
 
 #if (defined(MODULE_NAME_IS_glwin32))
     /* Reverse vertical alignment as the GL tex are Y inverted */
