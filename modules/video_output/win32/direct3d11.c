@@ -74,9 +74,9 @@ static void Close(vlc_object_t *);
 #define UPSCALE_MODE_LONGTEXT N_("Select the upscaling mode for video.")
 
 static const char *const ppsz_upscale_mode[] = {
-    "linear", "point", "processor" };
+    "linear", "point", "processor", "super" };
 static const char *const ppsz_upscale_mode_text[] = {
-    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor") };
+    N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor"), N_("Super Resolution") };
 
 vlc_module_begin ()
     set_shortname("Direct3D11")
@@ -105,6 +105,7 @@ enum d3d11_upscale
     upscale_LinearSampler,
     upscale_PointSampler,
     upscale_VideoProcessor,
+    upscale_SuperResolution,
 };
 
 struct vout_display_sys_t
@@ -606,7 +607,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
     UINT window_width, window_height;
-    bool proc_upscale = sys->upscaleMode == upscale_VideoProcessor;
+    bool proc_upscale = sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution;
     if ((sys->sys.pf_GetWindowSize != GetWinRTSize && !proc_upscale)
     || !sys->sys.pf_GetWindowSize(&sys->sys, &window_width, &window_height))
     {
@@ -886,7 +887,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
-    if (sys->upscaleMode == upscale_VideoProcessor)
+    if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
         switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -1453,14 +1454,16 @@ static bool BogusZeroCopy(const vout_display_t *vd)
 static void InitScaleProcessor(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    if (sys->upscaleMode != upscale_VideoProcessor)
+    if (sys->upscaleMode != upscale_VideoProcessor && sys->upscaleMode != upscale_SuperResolution)
         return;
 
-    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), &sys->d3d_dev, sys->quad_fmt.i_chroma);
+    sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), &sys->d3d_dev, sys->quad_fmt.i_chroma,
+                                          sys->upscaleMode == upscale_SuperResolution);
     if (sys->scaleProc == NULL)
         sys->upscaleMode = upscale_LinearSampler;
 
-    msg_Dbg(vd, "Using Video Processor scaler");
+    msg_Dbg(vd, "Using %s scaler", sys->upscaleMode != upscale_SuperResolution ?
+            "Video Processor": "Super Resolution");
 }
 
 static int Direct3D11Open(vout_display_t *vd, bool external_device)
@@ -1552,6 +1555,8 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         sys->upscaleMode = upscale_PointSampler;
     else if (strcmp("processor", psz_upscale) == 0)
         sys->upscaleMode = upscale_VideoProcessor;
+    else if (strcmp("super", psz_upscale) == 0)
+        sys->upscaleMode = upscale_SuperResolution;
     else
     {
         msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
@@ -1561,7 +1566,7 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 
     video_format_Init(&sys->quad_fmt, vd->source.i_chroma);
     video_format_Copy(&sys->quad_fmt, &vd->source);
-    if (sys->upscaleMode == upscale_VideoProcessor)
+    if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
         sys->sys.src_fmt = &sys->quad_fmt;
     InitScaleProcessor(vd);
 
