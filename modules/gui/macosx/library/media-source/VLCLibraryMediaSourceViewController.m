@@ -58,6 +58,8 @@
     _tableViewScrollView = libraryWindow.mediaSourceTableViewScrollView;
     _homeButton = libraryWindow.mediaSourceHomeButton;
     _pathControl = libraryWindow.mediaSourcePathControl;
+    _pathControlBottomTableViewScrollViewConstraint = libraryWindow.mediaSourcePathControlTableViewScrollViewBottomConstraint;
+    _pathControlBottomCollectionViewScrollViewConstraint = libraryWindow.mediaSourcePathControlCollectionViewScrollViewBottomConstraint;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
 }
 
@@ -68,6 +70,8 @@
     _baseDataSource.collectionViewScrollView = _collectionViewScrollView;
     _baseDataSource.homeButton = _homeButton;
     _baseDataSource.pathControl = _pathControl;
+    _baseDataSource.pathControlBottomTableViewScrollViewConstraint = _pathControlBottomTableViewScrollViewConstraint;
+    _baseDataSource.pathControlBottomCollectionViewScrollViewConstraint = _pathControlBottomCollectionViewScrollViewConstraint;
     _baseDataSource.tableView = _tableView;
     [_baseDataSource setupViews];
 }

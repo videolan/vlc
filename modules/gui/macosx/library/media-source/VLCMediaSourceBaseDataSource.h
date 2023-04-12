@@ -43,6 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSTableView *tableView;
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) VLCInputNodePathControl *pathControl;
+@property (readwrite) NSLayoutConstraint *pathControlBottomTableViewScrollViewConstraint;
+@property (readwrite) NSLayoutConstraint *pathControlBottomCollectionViewScrollViewConstraint;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 
