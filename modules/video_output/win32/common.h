@@ -32,13 +32,12 @@ extern "C" {
  * event_thread_t: event thread
  *****************************************************************************/
 
-typedef struct event_thread_t event_thread_t;
-
 typedef struct display_win32_area_t
 {
     /* Coordinates of dest images (used when blitting to display) */
     vout_display_place_t  place;
     bool                  place_changed;
+    struct event_thread_t *event; // only use if sys.event is not NULL
 } display_win32_area_t;
 
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
@@ -48,12 +47,12 @@ typedef struct display_win32_area_t
  * Prototypes from common.c
  *****************************************************************************/
 #ifndef VLC_WINSTORE_APP
-int  CommonWindowInit(vout_display_t *, display_win32_area_t *, event_thread_t **,
+int  CommonWindowInit(vout_display_t *, display_win32_area_t *,
                       bool projection_gestures);
-void CommonWindowClean(event_thread_t *);
+void CommonWindowClean(display_win32_area_t *);
+HWND CommonVideoHWND(const display_win32_area_t *);
 #endif /* !VLC_WINSTORE_APP */
-void CommonControl(vout_display_t *, display_win32_area_t *, event_thread_t *, int );
-HWND CommonVideoHWND(const event_thread_t *);
+void CommonControl(vout_display_t *, display_win32_area_t *, int );
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 

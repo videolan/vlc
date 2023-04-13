@@ -49,14 +49,14 @@ void CommonInit(display_win32_area_t *area)
 #ifndef VLC_WINSTORE_APP
 /* */
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
-                     event_thread_t **sys, bool projection_gestures)
+                     bool projection_gestures)
 {
     if (unlikely(vd->cfg->window == NULL))
         return VLC_EGENERIC;
 
     /* */
-    *sys = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
-    if (!*sys)
+    area->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
+    if (!area->event)
         return VLC_EGENERIC;
 
     /* */
@@ -66,7 +66,7 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     cfg.height = vd->cfg->display.height;
     cfg.is_projected = projection_gestures;
 
-    if (EventThreadStart(*sys, &cfg))
+    if (EventThreadStart(area->event, &cfg))
         return VLC_EGENERIC;
 
     CommonPlacePicture(vd, area);
@@ -74,9 +74,9 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     return VLC_SUCCESS;
 }
 
-HWND CommonVideoHWND(const event_thread_t *sys)
+HWND CommonVideoHWND(const display_win32_area_t *area)
 {
-    return EventThreadVideoHWND(sys);
+    return EventThreadVideoHWND(area->event);
 }
 #endif /* !VLC_WINSTORE_APP */
 
@@ -111,24 +111,24 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
 
 #ifndef VLC_WINSTORE_APP
 /* */
-void CommonWindowClean(event_thread_t *sys)
+void CommonWindowClean(display_win32_area_t *sys)
 {
-    if (sys) {
-        EventThreadStop(sys);
-        EventThreadDestroy(sys);
+    if (sys->event) {
+        EventThreadStop(sys->event);
+        EventThreadDestroy(sys->event);
     }
 }
 #endif /* !VLC_WINSTORE_APP */
 
-void CommonControl(vout_display_t *vd, display_win32_area_t *area, event_thread_t *sys, int query)
+void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
 #ifndef VLC_WINSTORE_APP
         // Update dimensions
-        if (sys != NULL)
+        if (area->event != NULL)
         {
-            EventThreadUpdateSize(sys);
+            EventThreadUpdateSize(area->event);
         }
 #endif /* !VLC_WINSTORE_APP */
         // fallthrough
