@@ -55,9 +55,6 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
         return VLC_EGENERIC;
 
     /* */
-    sys->hvideownd = NULL;
-
-    /* */
     sys->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
     if (!sys->event)
         return VLC_EGENERIC;
@@ -69,12 +66,17 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     cfg.height = vd->cfg->display.height;
     cfg.is_projected = projection_gestures;
 
-    if (EventThreadStart(sys->event, &sys->hvideownd, &cfg))
+    if (EventThreadStart(sys->event, &cfg))
         return VLC_EGENERIC;
 
     CommonPlacePicture(vd, area);
 
     return VLC_SUCCESS;
+}
+
+HWND CommonVideoHWND(const vout_display_sys_win32_t *sys)
+{
+    return EventThreadVideoHWND(sys->event);
 }
 #endif /* !VLC_WINSTORE_APP */
 

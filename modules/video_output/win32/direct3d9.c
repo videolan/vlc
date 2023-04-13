@@ -1139,7 +1139,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         RECT rect;
         UINT width, height;
 
-        GetClientRect(p_sys->sys.hvideownd, &rect);
+        GetClientRect(CommonVideoHWND(&sys->sys), &rect);
         width  = RECTWidth(rect);
         height = RECTHeight(rect);
 
@@ -1263,9 +1263,9 @@ static void Swap(vout_display_t *vd)
 
     HRESULT hr;
     if (sys->d3d9_device->hd3d.use_ex) {
-        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, sys->sys.hvideownd, NULL, 0);
+        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, CommonVideoHWND(&sys->sys), NULL, 0);
     } else {
-        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, sys->sys.hvideownd, NULL);
+        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, CommonVideoHWND(&sys->sys), NULL);
     }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%lX", hr);

@@ -160,7 +160,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    HDC hdc = GetDC(sys->sys.hvideownd);
+    HDC hdc = GetDC(CommonVideoHWND(&sys->sys));
 
     if (sys->area.place_changed)
     {
@@ -196,7 +196,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
                SRCCOPY);
     }
 
-    ReleaseDC(sys->sys.hvideownd, hdc);
+    ReleaseDC(CommonVideoHWND(&sys->sys), hdc);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -206,7 +206,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
     /* */
-    HDC window_dc = GetDC(sys->sys.hvideownd);
+    HDC window_dc = GetDC(CommonVideoHWND(&sys->sys));
 
     /* */
     sys->i_depth = GetDeviceCaps(window_dc, PLANES) *
@@ -279,7 +279,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     sys->off_dc = CreateCompatibleDC(window_dc);
 
     SelectObject(sys->off_dc, sys->off_bitmap);
-    ReleaseDC(sys->sys.hvideownd, window_dc);
+    ReleaseDC(CommonVideoHWND(&sys->sys), window_dc);
 
     return VLC_SUCCESS;
 }

@@ -54,9 +54,6 @@ typedef struct vout_display_sys_win32_t
 {
     /* */
     event_thread_t *event;
-
-    /* */
-    HWND                 hvideownd;        /* Handle of the video sub-window */
 } vout_display_sys_win32_t;
 
 
@@ -69,6 +66,7 @@ int  CommonWindowInit(vout_display_t *, display_win32_area_t *, vout_display_sys
 void CommonWindowClean(vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
 void CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int );
+HWND CommonVideoHWND(const vout_display_sys_win32_t *);
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 

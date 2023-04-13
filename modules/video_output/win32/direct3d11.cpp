@@ -387,7 +387,7 @@ static int Open(vout_display_t *vd,
                                                       vd->cfg->window->handle.dcomp_visual, sys->d3d_dev);
         else
 #endif
-            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
+            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->sys), sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
         sys->updateOutputCb      = D3D11_LocalSwapchainUpdateOutput;
@@ -398,8 +398,8 @@ static int Open(vout_display_t *vd,
     }
 
 #ifndef VLC_WINSTORE_APP
-    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
-        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
+    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && CommonVideoHWND(&sys->sys))
+        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->sys));
 #endif // !VLC_WINSTORE_APP
 
     if (Direct3D11Open(vd, fmtp, context)) {

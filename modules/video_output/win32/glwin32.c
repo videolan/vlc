@@ -101,7 +101,7 @@ static vlc_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
         return NULL;
 
     wnd->type = VLC_WINDOW_TYPE_HWND;
-    wnd->handle.hwnd = sys->sys.hvideownd;
+    wnd->handle.hwnd = CommonVideoHWND(&sys->sys);
     wnd->ops = &embedVideoWindow_Ops;
     return wnd;
 }
@@ -138,7 +138,7 @@ static int Open(vout_display_t *vd,
         goto error;
 
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
-        sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
+        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->sys));
 
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 
