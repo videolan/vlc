@@ -40,6 +40,7 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0016-Replace-custom-type-traits-with-std-one-s.patch
 	$(APPLY) $(SRC)/qt/0017-Rename-QtPrivate-is_-un-signed-to-QtPrivate-Is-Un-si.patch
 	$(APPLY) $(SRC)/qt/0018-Remove-qtypetraits.h-s-contents-altogether.patch
+	$(APPLY) $(SRC)/qt/0019-QFileSystemEngine-only-define-FILE_ID_INFO-for-build.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	$(MOVE)
 

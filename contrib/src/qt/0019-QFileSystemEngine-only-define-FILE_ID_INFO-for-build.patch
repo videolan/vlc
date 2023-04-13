@@ -1,0 +1,36 @@
+From fc4a82f9ba5dd31405b0615ed967c215277cf15e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4_qt@ycbcr.xyz>
+Date: Thu, 13 Apr 2023 06:13:36 +0200
+Subject: [PATCH 19/19] QFileSystemEngine: only define FILE_ID_INFO for builds
+ before Win8
+
+Otherwise it redefines a known structure and gives error with gcc 12.
+
+A similar change was done in 4879bc91d421714508fb54d095d9b0104d62d842 but
+it was assuming the minimum build was Vista (not our case).
+
+Change-Id: I6befe6e348f36e01415cdc2817be98b07be23efb
+---
+ src/corelib/io/qfilesystemengine_win.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/corelib/io/qfilesystemengine_win.cpp b/src/corelib/io/qfilesystemengine_win.cpp
+index 257bd4a50e..cf5092fec1 100644
+--- a/src/corelib/io/qfilesystemengine_win.cpp
++++ b/src/corelib/io/qfilesystemengine_win.cpp
+@@ -625,10 +625,12 @@ typedef struct _FILE_ID_128 {
+ } FILE_ID_128, *PFILE_ID_128;
+ #    endif // !(Q_CC_MINGW && FILE_SUPPORTS_INTEGRITY_STREAMS)
+ 
++#    if _WIN32_WINNT < 0x0602 //  Windows 8 onwards
+ typedef struct _FILE_ID_INFO {
+     ULONGLONG VolumeSerialNumber;
+     FILE_ID_128 FileId;
+ } FILE_ID_INFO, *PFILE_ID_INFO;
++#    endif
+ #  endif // if defined (Q_CC_MINGW) || (defined(Q_CC_MSVC) && (_MSC_VER < 1700 || WINVER <= 0x0601))
+ 
+ // File ID for Windows up to version 7.
+-- 
+2.37.3.windows.1
+
