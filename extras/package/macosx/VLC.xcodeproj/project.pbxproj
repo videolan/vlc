@@ -100,6 +100,7 @@
 		538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 538A7ED929A63EE40068AD4F /* VLCFullVideoViewWindow.m */; };
 		53903D3A29576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53903D3929576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m */; };
 		539BA79F298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 539BA79E298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m */; };
+		539F114B29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 539F114A29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m */; };
 		53B447CA2939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */; };
 		53B447F6293BB47B00857588 /* VLCLibraryVideoCollectionViewContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */; };
 		53B447F7293BB47B00857588 /* VLCLibraryVideoCollectionViewContainerViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447ED293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerViewDataSource.m */; };
@@ -307,6 +308,8 @@
 		53903D3929576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioGroupDataSource.m; sourceTree = "<group>"; };
 		539BA79D298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAspectRatioRetainingVideoWindow.h; sourceTree = "<group>"; };
 		539BA79E298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAspectRatioRetainingVideoWindow.m; sourceTree = "<group>"; };
+		539F114929E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryTwoPaneSplitViewDelegate.h; sourceTree = "<group>"; };
+		539F114A29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryTwoPaneSplitViewDelegate.m; sourceTree = "<group>"; };
 		53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySongsTableViewSongPlayingTableCellView.h; sourceTree = "<group>"; };
 		53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySongsTableViewSongPlayingTableCellView.m; sourceTree = "<group>"; };
 		53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewContainerView.m; sourceTree = "<group>"; };
@@ -1208,6 +1211,8 @@
 				536283DE291146BC00640C15 /* VLCLibraryTableView.m */,
 				53ED473429CA4F3400795DB1 /* VLCLibraryTableViewDelegate.h */,
 				53ED473529CA4F3400795DB1 /* VLCLibraryTableViewDelegate.m */,
+				539F114929E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.h */,
+				539F114A29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m */,
 				7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */,
 				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
 				5362550B293FD639005D64FA /* VLCLibraryWindowController.h */,
@@ -2031,6 +2036,7 @@
 				6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */,
 				7D445D842202524D00263D34 /* VLCPlaylistItem.m in Sources */,
 				1C3113CF1E508C6900D4DD76 /* prefs_widgets.m in Sources */,
+				539F114B29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m in Sources */,
 				7D0F63FF2201F63400FDB91F /* VLCPlaylistTableCellView.m in Sources */,
 				1C3113D11E508C6900D4DD76 /* prefs.m in Sources */,
 				1C3113D31E508C6900D4DD76 /* VLCResumeDialogController.m in Sources */,

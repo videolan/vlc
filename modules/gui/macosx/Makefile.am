@@ -129,6 +129,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellView.h \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryTableCellViewProtocol.h \
+	gui/macosx/library/VLCLibraryTwoPaneSplitViewDelegate.h \
+	gui/macosx/library/VLCLibraryTwoPaneSplitViewDelegate.m \
 	gui/macosx/library/VLCLibraryUIUnits.h \
 	gui/macosx/library/VLCLibraryUIUnits.m \
 	gui/macosx/library/VLCLibraryWindow.h \
