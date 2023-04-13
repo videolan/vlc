@@ -1236,11 +1236,11 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
             yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_601_4;
             break;
         case COLOR_SPACE_BT2020:
-            yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_2020;
+            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_2020;
             break;
         case COLOR_SPACE_BT709:
         default:
-            yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_709_2;
+            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_709_2;
             break;
     }
     CFDictionarySetValue(decoderConfiguration, kCVImageBufferYCbCrMatrixKey,
