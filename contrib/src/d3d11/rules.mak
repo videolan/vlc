@@ -6,6 +6,7 @@ else
 #ugly way to get the default location of standard idl files
 IDL_INCLUDES = -I/`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
 endif
+IDL_INCLUDES += -Ipthreads/mingw-w64-headers/include
 
 D3D11_COMMIT_ID := a0cd5afeb60be3be0860e9a203314c10485bb9b8
 D3D11_1_COMMIT_ID := aa6ab47929a9cac6897f38e630ce0bb88458e288
@@ -40,6 +41,7 @@ DST_DXGI16_H = $(PREFIX)/include/dxgi1_6.h
 ifdef HAVE_WIN32
 PKGS += d3d11
 endif
+DEPS_d3d11 = pthreads $(DEPS_pthreads)
 
 $(TARBALLS)/d3d11.idl:
 	$(call download_pkg,$(D3D11_IDL_URL),d3d11)
