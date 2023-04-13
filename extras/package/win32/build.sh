@@ -245,9 +245,9 @@ if [ ! -z "$BUILD_UCRT" ]; then
     # the values are not passed to the makefiles/configures
     export LDFLAGS
     export CPPFLAGS
-# else
-#     # The current minimum for VLC is Windows 7 and to use the regular msvcrt
-#     CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -D__MSVCRT_VERSION__=0x700"
+else
+    # The current minimum for VLC 3.0 is Windows XP SP1 and to use the regular msvcrt
+    CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0502 -DWINVER=0x502 -D__MSVCRT_VERSION__=0x700"
 fi
 CFLAGS="$CPPFLAGS $CFLAGS"
 CXXFLAGS="$CPPFLAGS $CXXFLAGS"
