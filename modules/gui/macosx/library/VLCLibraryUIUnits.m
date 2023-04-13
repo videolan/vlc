@@ -98,6 +98,7 @@
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
 {
     static uint numItemsInRow = 5;
+    static uint minItemsInRow = 2;
 
     NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                            withLayout:collectionViewLayout
@@ -111,7 +112,7 @@
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
     }
-    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth]) {
+    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth] && numItemsInRow > minItemsInRow) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
