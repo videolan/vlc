@@ -298,6 +298,7 @@ QtObject {
 
     // Player control layout
     readonly property int controlLayoutHeight: dp(64, scale)
+    readonly property int controlLayoutHeightPinned: dp(32, scale)
 
     readonly property var dp: MainCtx.dp
 
