@@ -302,6 +302,7 @@ static const staticentry_t p_list_video[] = {
         E("X263", "Xirlink H263"),
         /* Zygo (partial) */
         E("ZyGo", "ITU H263+"),
+        A("HAVI"),
 
     /* H263i */
     B(VLC_CODEC_H263I, "I263.I"),
