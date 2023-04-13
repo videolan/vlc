@@ -63,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (const CGFloat)controlsFadeAnimationDuration;
 
++ (const CGFloat)librarySplitViewMainViewMinimumWidth;
+
 @end
 
 NS_ASSUME_NONNULL_END

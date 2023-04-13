@@ -171,4 +171,9 @@
     return 0.4f;
 }
 
++ (const CGFloat)librarySplitViewMainViewMinimumWidth
+{
+    return 400.;
+}
+
 @end
