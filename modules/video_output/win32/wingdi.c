@@ -59,7 +59,7 @@ vlc_module_end ()
  *****************************************************************************/
 typedef struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;
+    event_thread_t           *sys;
     display_win32_area_t     area;
 
     int  i_depth;
@@ -99,7 +99,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    CommonControl(vd, &sys->area, &sys->sys, query);
+    CommonControl(vd, &sys->area, sys->sys, query);
     return VLC_SUCCESS;
 }
 
@@ -150,9 +150,9 @@ static void Close(vout_display_t *vd)
 
     Clean(vd);
 
-    CommonWindowClean(&sys->sys);
+    CommonWindowClean(sys->sys);
 
-    free(vd->sys);
+    free(sys);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -160,7 +160,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    HDC hdc = GetDC(CommonVideoHWND(&sys->sys));
+    HDC hdc = GetDC(CommonVideoHWND(sys->sys));
 
     if (sys->area.place_changed)
     {
@@ -196,7 +196,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
                SRCCOPY);
     }
 
-    ReleaseDC(CommonVideoHWND(&sys->sys), hdc);
+    ReleaseDC(CommonVideoHWND(sys->sys), hdc);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -206,7 +206,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
     /* */
-    HDC window_dc = GetDC(CommonVideoHWND(&sys->sys));
+    HDC window_dc = GetDC(CommonVideoHWND(sys->sys));
 
     /* */
     sys->i_depth = GetDeviceCaps(window_dc, PLANES) *
@@ -279,7 +279,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     sys->off_dc = CreateCompatibleDC(window_dc);
 
     SelectObject(sys->off_dc, sys->off_bitmap);
-    ReleaseDC(CommonVideoHWND(&sys->sys), window_dc);
+    ReleaseDC(CommonVideoHWND(sys->sys), window_dc);
 
     return VLC_SUCCESS;
 }

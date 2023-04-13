@@ -73,7 +73,7 @@ vlc_module_end ()
 
 typedef struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
+    event_thread_t           *sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
 
     int                      log_level;
@@ -387,7 +387,7 @@ static int Open(vout_display_t *vd,
                                                       vd->cfg->window->handle.dcomp_visual, sys->d3d_dev);
         else
 #endif
-            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->sys), sys->d3d_dev);
+            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(sys->sys), sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
         sys->updateOutputCb      = D3D11_LocalSwapchainUpdateOutput;
@@ -398,8 +398,8 @@ static int Open(vout_display_t *vd,
     }
 
 #ifndef VLC_WINSTORE_APP
-    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && CommonVideoHWND(&sys->sys))
-        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->sys));
+    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && CommonVideoHWND(sys->sys))
+        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(sys->sys));
 #endif // !VLC_WINSTORE_APP
 
     if (Direct3D11Open(vd, fmtp, context)) {
@@ -439,7 +439,7 @@ static void Close(vout_display_t *vd)
     D3D_ReleaseShaderCompiler(sys->shaders);
 #ifndef VLC_WINSTORE_APP
     UnhookWindowsSensors(sys->p_sensors);
-    CommonWindowClean(&sys->sys);
+    CommonWindowClean(sys->sys);
 #endif
     Direct3D11Close(vd);
     delete sys;
@@ -447,7 +447,7 @@ static void Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    CommonControl( vd, &sys->area, &sys->sys, query );
+    CommonControl( vd, &sys->area, sys->sys, query );
 
     if ( sys->area.place_changed )
     {

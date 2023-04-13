@@ -62,7 +62,7 @@ vlc_module_end()
  *****************************************************************************/
 typedef struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;
+    event_thread_t           *sys;
     display_win32_area_t     area;
 
     vlc_gl_t              *gl;
@@ -84,7 +84,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    CommonControl(vd, &sys->area, &sys->sys, query);
+    CommonControl(vd, &sys->area, sys->sys, query);
     return VLC_SUCCESS;
 }
 
@@ -101,7 +101,7 @@ static vlc_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
         return NULL;
 
     wnd->type = VLC_WINDOW_TYPE_HWND;
-    wnd->handle.hwnd = CommonVideoHWND(&sys->sys);
+    wnd->handle.hwnd = CommonVideoHWND(sys->sys);
     wnd->ops = &embedVideoWindow_Ops;
     return wnd;
 }
@@ -138,7 +138,7 @@ static int Open(vout_display_t *vd,
         goto error;
 
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
-        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->sys));
+        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(sys->sys));
 
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 
@@ -201,7 +201,7 @@ static void Close(vout_display_t *vd)
     }
 
     UnhookWindowsSensors(sys->p_sensors);
-    CommonWindowClean(&sys->sys);
+    CommonWindowClean(sys->sys);
 
     free(sys);
 }

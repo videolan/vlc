@@ -45,28 +45,15 @@ typedef struct display_win32_area_t
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
 
 /*****************************************************************************
- * vout_sys_t: video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the module specific properties of an output thread.
- *****************************************************************************/
-typedef struct vout_display_sys_win32_t
-{
-    /* */
-    event_thread_t *event;
-} vout_display_sys_win32_t;
-
-
-/*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
 #ifndef VLC_WINSTORE_APP
-int  CommonWindowInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *,
+int  CommonWindowInit(vout_display_t *, display_win32_area_t *, event_thread_t **,
                       bool projection_gestures);
-void CommonWindowClean(vout_display_sys_win32_t *);
+void CommonWindowClean(event_thread_t *);
 #endif /* !VLC_WINSTORE_APP */
-void CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int );
-HWND CommonVideoHWND(const vout_display_sys_win32_t *);
+void CommonControl(vout_display_t *, display_win32_area_t *, event_thread_t *, int );
+HWND CommonVideoHWND(const event_thread_t *);
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 

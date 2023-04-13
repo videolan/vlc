@@ -131,7 +131,7 @@ typedef struct
 
 typedef struct vout_display_sys_t
 {
-    vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
+    event_thread_t           *sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
@@ -1139,7 +1139,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         RECT rect;
         UINT width, height;
 
-        GetClientRect(CommonVideoHWND(&sys->sys), &rect);
+        GetClientRect(CommonVideoHWND(sys->sys), &rect);
         width  = RECTWidth(rect);
         height = RECTHeight(rect);
 
@@ -1263,9 +1263,9 @@ static void Swap(vout_display_t *vd)
 
     HRESULT hr;
     if (sys->d3d9_device->hd3d.use_ex) {
-        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, CommonVideoHWND(&sys->sys), NULL, 0);
+        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, CommonVideoHWND(sys->sys), NULL, 0);
     } else {
-        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, CommonVideoHWND(&sys->sys), NULL);
+        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, CommonVideoHWND(sys->sys), NULL);
     }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%lX", hr);
@@ -1688,7 +1688,7 @@ static void Direct3D9Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    CommonControl(vd, &sys->area, &sys->sys, query);
+    CommonControl(vd, &sys->area, sys->sys, query);
     return VLC_SUCCESS;
 }
 
@@ -1872,7 +1872,7 @@ static int Open(vout_display_t *vd,
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonWindowClean(&sys->sys);
+    CommonWindowClean(sys->sys);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1887,7 +1887,7 @@ static void Close(vout_display_t *vd)
 
     Direct3D9Close(vd);
 
-    CommonWindowClean(&sys->sys);
+    CommonWindowClean(sys->sys);
 
     Direct3D9Destroy(sys);
 
