@@ -29,6 +29,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
@@ -55,6 +56,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
     VLCLibraryAudioTableViewDelegate *_audioLibraryTableViewDelegate;
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
+    VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
 }
 @end
 
@@ -73,6 +75,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
         _audioLibraryTableViewDelegate = [[VLCLibraryAudioTableViewDelegate alloc] init];
         _audioGroupLibraryTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
+        _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
@@ -161,6 +164,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)setupAudioTableViews
 {
+    _audioLibrarySplitView.delegate = _splitViewDelegate;
+    
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
@@ -177,6 +182,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)setupGridModeSplitView
 {
+    _audioLibraryGridModeSplitView.delegate = _splitViewDelegate;
+
     _audioLibraryGridModeSplitViewListTableView.dataSource = _audioDataSource;
     _audioLibraryGridModeSplitViewListTableView.delegate = _audioLibraryTableViewDelegate;
 
