@@ -29,7 +29,7 @@
 
 #include <vlc_es.h>
 
-#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
+#if defined(HAVE_DCOMP_H)
 # include <dcomp.h>
 #endif
 
@@ -76,7 +76,6 @@ struct dxgi_swapchain
     const dxgi_color_space *colorspace = nullptr;
 
     swapchain_surface_type  swapchainSurfaceType;
-#ifndef VLC_WINSTORE_APP
     union {
         HWND                hwnd;
 #if defined(HAVE_DCOMP_H)
@@ -86,7 +85,6 @@ struct dxgi_swapchain
         } dcomp;
 #endif // HAVE_DCOMP_H
     } swapchainSurface;
-#endif /* !VLC_WINSTORE_APP */
 
     ComPtr<IDXGISwapChain1> dxgiswapChain;   /* DXGI 1.2 swap chain */
     ComPtr<IDXGISwapChain4> dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
@@ -243,7 +241,6 @@ done:
                              color_spaces[best].color == (video_color_space_t) cfg->colorspace;
 }
 
-#ifndef VLC_WINSTORE_APP
 static void FillSwapChainDesc(dxgi_swapchain *display, UINT width, UINT height, DXGI_SWAP_CHAIN_DESC1 *out)
 {
     ZeroMemory(out, sizeof(*out));
@@ -358,8 +355,6 @@ static void DXGI_CreateSwapchainDComp(dxgi_swapchain *display,
 }
 #endif /* HAVE_DCOMP_H */
 
-#endif /* !VLC_WINSTORE_APP */
-
 void DXGI_LocalSwapchainSwap( dxgi_swapchain *display )
 {
     DXGI_PRESENT_PARAMETERS presentParams = { };
@@ -408,17 +403,13 @@ dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
         return NULL;
 
     display->obj = o;
-#ifndef VLC_WINSTORE_APP
     display->swapchainSurfaceType = SWAPCHAIN_SURFACE_HWND;
     display->swapchainSurface.hwnd = hwnd;
-#else // VLC_WINSTORE_APP
-    VLC_UNUSED(hwnd);
-#endif // VLC_WINSTORE_APP
 
     return display;
 }
 
-#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
+#if defined(HAVE_DCOMP_H)
 dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual)
 {
     dxgi_swapchain *display = new (std::nothrow) dxgi_swapchain();
@@ -457,7 +448,6 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
     UINT width = cfg->width ? cfg->width : 8;
     UINT height = cfg->height ? cfg->height : 8;
 
-#ifndef VLC_WINSTORE_APP
     if (display->dxgiswapChain.Get() && display->pixelFormat != newPixelFormat)
     {
         // the pixel format changed, we need a new swapchain
@@ -479,7 +469,6 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                                      width, height);
 
     }
-#endif /* !VLC_WINSTORE_APP */
     if ( !display->dxgiswapChain.Get() )
         return false;
 
