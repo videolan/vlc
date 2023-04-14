@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -44,6 +45,7 @@
 @interface VLCLibraryVideoViewController ()
 {
     VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
+    VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
 }
 @end
 
@@ -55,6 +57,7 @@
 
     if(self) {
         _videoLibraryTableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
+        _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableViewDataSource];
@@ -99,6 +102,7 @@
 
 - (void)setupTableViewDataSource
 {
+    _videoLibrarySplitView.delegate = _splitViewDelegate;
     _libraryVideoTableViewDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
     _libraryVideoTableViewDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
