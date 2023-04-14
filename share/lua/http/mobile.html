@@ -63,11 +63,11 @@
 					return false;
 				});
                 $('#buttonRewd').click(function(){
-                    sendCommand({'command': 'seek', 'val': '-30S'});
+                    sendCommand({'command': 'seek', 'val': '-' + seek_sec.toString() + 'S'});
                     return false;
                 });
                 $('#buttonFwrd').click(function(){
-                    sendCommand({'command': 'seek', 'val': '+30S'});
+                    sendCommand({'command': 'seek', 'val': '+' + seek_sec.toString() + 'S'});
                     return false;
                 });
 			})

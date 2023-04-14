@@ -2,6 +2,7 @@ var currentArt = null;
 var current_que = 'main';
 var current_playlist_id = -1;
 var previous_playlist_id = -1;
+var seek_sec = 0;
 
 function updateArt(url) {
     $('#albumArt').fadeOut(500, function () {
@@ -79,6 +80,8 @@ function updateStatus() {
                     updatePlayList();
                     previous_playlist_id = current_playlist_id;
                 }
+
+                seek_sec = parseInt($('seek_sec', data).text());
 
                 if (pollStatus) {
                     setTimeout(updateStatus, 1000);

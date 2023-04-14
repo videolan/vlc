@@ -470,6 +470,7 @@ getstatus = function (includecategories)
     s.apiversion=3
     s.version=vlc.misc.version()
     s.volume=vlc.volume.get()
+    s.seek_sec = vlc.config.get("short-jump-size")
 
     if input then
         s.time=math.floor(vlc.var.get(input,"time") / 1000000)
