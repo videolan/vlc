@@ -22,6 +22,28 @@
 
 #import "VLCLibraryTwoPaneSplitViewDelegate.h"
 
+#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
+
+#import "main/VLCMain.h"
+
 @implementation VLCLibraryTwoPaneSplitViewDelegate
+
+- (CGFloat)splitView:(NSSplitView *)splitView
+constrainMaxCoordinate:(CGFloat)proposedMinimumPosition
+         ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex != 0) {
+        return proposedMinimumPosition;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    const CGFloat libraryWindowWidth = libraryWindow.frame.size.width;
+
+    NSNumber * const leftPaneIndex = [NSNumber numberWithLong:0];
+    NSNumber * const leftPaneMaxWidth = [NSNumber numberWithDouble:libraryWindowWidth - [VLCLibraryUIUnits librarySplitViewMainViewMinimumWidth]];
+
+    return leftPaneMaxWidth.floatValue;
+}
 
 @end
