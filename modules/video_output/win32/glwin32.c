@@ -135,6 +135,7 @@ static int Open(vout_display_t *vd,
     if (CommonWindowInit(vd, &sys->area,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
+    CommonPlacePicture(vd, &sys->area);
 
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->area));

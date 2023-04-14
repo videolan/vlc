@@ -126,6 +126,7 @@ static int Open(vout_display_t *vd,
     CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area, false))
         goto error;
+    CommonPlacePicture(vd, &sys->area);
 
     /* */
     if (Init(vd, fmtp))

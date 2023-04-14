@@ -70,8 +70,6 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     if (EventThreadStart(area->event, &cfg))
         return VLC_EGENERIC;
 
-    CommonPlacePicture(vd, area);
-
     return VLC_SUCCESS;
 }
 

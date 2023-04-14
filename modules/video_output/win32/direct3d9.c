@@ -1802,6 +1802,8 @@ static int Open(vout_display_t *vd,
         sys->startEndRenderingCb = NULL;
     }
 
+    CommonPlacePicture(vd, &sys->area);
+
     sys->dec_device = context ? vlc_video_context_HoldDevice(context) : NULL;
     sys->d3d9_device = GetD3D9OpaqueDevice(sys->dec_device);
     if ( sys->d3d9_device == NULL )
@@ -1829,9 +1831,6 @@ static int Open(vout_display_t *vd,
                 sys->d3d9_device->d3ddev.caps.MaxTextureHeight);
         goto error;
     }
-
-    if (sys->swapCb == LocalSwapchainSwap)
-        CommonPlacePicture(vd, &sys->area);
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
     if (!sys->hxdll)
