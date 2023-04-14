@@ -28,10 +28,12 @@
 #include "dxgi_swapchain.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
+#ifndef VLC_WINSTORE_APP
 void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND, d3d11_device_t *d3d_dev);
-#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
+#if defined(HAVE_DCOMP_H)
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev);
-#endif
+#endif // HAVE_DCOMP_H
+#endif // !VLC_WINSTORE_APP
 
 void D3D11_LocalSwapchainCleanupDevice( void *opaque );
 bool D3D11_LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out );

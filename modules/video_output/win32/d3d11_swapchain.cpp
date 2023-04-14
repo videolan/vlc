@@ -177,6 +177,7 @@ bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *out )
     return true;
 }
 
+#ifndef VLC_WINSTORE_APP
 void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d_dev)
 {
     d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
@@ -193,7 +194,7 @@ void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_dev
     return display;
 }
 
-#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
+#if defined(HAVE_DCOMP_H)
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev)
 {
     d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
@@ -209,4 +210,5 @@ void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, 
 
     return display;
 }
-#endif
+#endif // HAVE_DCOMP_H
+#endif // !VLC_WINSTORE_APP

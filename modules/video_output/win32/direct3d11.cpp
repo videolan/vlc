@@ -367,7 +367,10 @@ static int Open(vout_display_t *vd,
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
-#ifndef VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
+        msg_Err(vd, "UWP apps needs to set an external rendering target");
+        goto error;
+#else // !VLC_WINSTORE_APP
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area,
@@ -375,17 +378,15 @@ static int Open(vout_display_t *vd,
                 goto error;
         }
 
-#endif /* !VLC_WINSTORE_APP */
-
         /* use our internal swapchain callbacks */
-#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
+#if defined(HAVE_DCOMP_H)
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_DCOMP)
             sys->outside_opaque =
                 D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
                                                       vd->cfg->window->display.dcomp_device,
                                                       vd->cfg->window->handle.dcomp_visual, sys->d3d_dev);
         else
-#endif
+#endif //HAVE_DCOMP_H
             sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->area), sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
@@ -394,6 +395,7 @@ static int Open(vout_display_t *vd,
         sys->startEndRenderingCb = D3D11_LocalSwapchainStartEndRendering;
         sys->sendMetadataCb      = D3D11_LocalSwapchainSetMetadata;
         sys->selectPlaneCb       = D3D11_LocalSwapchainSelectPlane;
+#endif // !VLC_WINSTORE_APP
     }
 
 #ifndef VLC_WINSTORE_APP
