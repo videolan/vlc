@@ -32,7 +32,6 @@
 
 struct libvlc_media_list_t
 {
-    libvlc_event_manager_t      event_manager;
     vlc_mutex_t                 object_lock;
     vlc_atomic_rc_t             rc;
     libvlc_media_t * p_md; /* The media from which the

@@ -181,16 +181,6 @@ LIBVLC_API void
 LIBVLC_API void
     libvlc_media_list_unlock( libvlc_media_list_t *p_ml );
 
-/**
- * Get libvlc_event_manager from this media list instance.
- * The p_event_manager is immutable, so you don't have to hold the lock
- *
- * \param p_ml a media list instance
- * \return libvlc_event_manager
- */
-LIBVLC_API libvlc_event_manager_t *
-    libvlc_media_list_event_manager( libvlc_media_list_t *p_ml );
-
 /** @} media_list */
 
 # ifdef __cplusplus

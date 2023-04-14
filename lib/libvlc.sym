@@ -82,7 +82,6 @@ libvlc_media_tracklist_count
 libvlc_media_tracklist_delete
 libvlc_media_list_add_media
 libvlc_media_list_count
-libvlc_media_list_event_manager
 libvlc_media_list_index_of_item
 libvlc_media_list_insert_media
 libvlc_media_list_is_readonly

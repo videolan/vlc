@@ -160,24 +160,6 @@ enum libvlc_event_e {
     libvlc_MediaPlayerRecordChanged,
 
     /**
-     * A \link #libvlc_media_t media item\endlink was added to a
-     * \link #libvlc_media_list_t media list\endlink.
-     */
-    libvlc_MediaListItemAdded=0x200,
-
-    /**
-     * A \link #libvlc_media_t media item\endlink was deleted from
-     * a \link #libvlc_media_list_t media list\endlink.
-     */
-    libvlc_MediaListItemDeleted = 0x202,
-
-    /**
-     * Removed: libvlc_MediaListEndReached = 0x204
-     * Use libvlc_MediaParsedChanged to known when a media_list
-     * attached to a media has been parsed
-     */
-
-    /**
      * Playback of a \link #libvlc_media_list_player_t media list
      * player\endlink has started.
      */
