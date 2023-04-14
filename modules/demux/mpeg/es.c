@@ -71,7 +71,7 @@ vlc_module_begin ()
 
     add_submodule()
     set_description( N_("MPEG-4 video" ) )
-    set_capability( "demux", 5 )
+    set_capability( "demux", 7 )
     set_callbacks( OpenVideo, Close )
     add_float( "es-fps", 25, FPS_TEXT, FPS_LONGTEXT )
 

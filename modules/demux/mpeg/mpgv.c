@@ -42,7 +42,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MPEG-I/II video demuxer" ) )
-    set_capability( "demux", 5 )
+    set_capability( "demux", 7 )
     set_callbacks( Open, Close )
     add_shortcut( "mpgv" )
 vlc_module_end ()

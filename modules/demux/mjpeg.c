@@ -49,7 +49,7 @@ static int  Open ( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( "MJPEG")
     set_description( N_("M-JPEG camera demuxer") )
-    set_capability( "demux", 5 )
+    set_capability( "demux", 7 )
     set_callback( Open )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_float( "mjpeg-fps", 0.0, FPS_TEXT, FPS_LONGTEXT )
