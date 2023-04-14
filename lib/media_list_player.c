@@ -115,12 +115,6 @@ static inline void assert_locked(libvlc_media_list_player_t * p_mlp)
     (void) p_mlp;
 }
 
-static inline libvlc_event_manager_t * mlist_em(libvlc_media_list_player_t * p_mlp)
-{
-    assert_locked(p_mlp);
-    return libvlc_media_list_event_manager(p_mlp->p_mlist);
-}
-
 static inline libvlc_event_manager_t * mplayer_em(libvlc_media_list_player_t * p_mlp)
 {
     return libvlc_media_player_event_manager(p_mlp->p_mi);
@@ -370,38 +364,6 @@ media_player_reached_end(const libvlc_event_t * p_event, void * p_user_data)
 }
 
 /**************************************************************************
- *       playlist_item_deleted (private) (Event Callback)
- **************************************************************************/
-static void
-mlist_item_deleted(const libvlc_event_t * p_event, void * p_user_data)
-{
-    // Nothing to do. For now.
-    (void)p_event; (void)p_user_data;
-}
-
-
-/**************************************************************************
- * install_playlist_observer (private)
- **************************************************************************/
-static void
-install_playlist_observer(libvlc_media_list_player_t * p_mlp)
-{
-    assert_locked(p_mlp);
-    libvlc_event_attach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp);
-}
-
-/**************************************************************************
- * uninstall_playlist_observer (private)
- **************************************************************************/
-static void
-uninstall_playlist_observer(libvlc_media_list_player_t * p_mlp)
-{
-    assert_locked(p_mlp);
-    if (!p_mlp->p_mlist) return;
-    libvlc_event_detach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp);
-}
-
-/**************************************************************************
  * install_media_player_observer (private)
  **************************************************************************/
 static void
@@ -536,10 +498,7 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     libvlc_media_player_release(p_mlp->p_mi);
 
     if (p_mlp->p_mlist)
-    {
-        uninstall_playlist_observer(p_mlp);
         libvlc_media_list_release(p_mlp->p_mlist);
-    }
 
     unlock(p_mlp);
 
@@ -608,14 +567,9 @@ void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp,
 
     lock(p_mlp);
     if (p_mlp->p_mlist)
-    {
-        uninstall_playlist_observer(p_mlp);
         libvlc_media_list_release(p_mlp->p_mlist);
-    }
     libvlc_media_list_retain(p_mlist);
     p_mlp->p_mlist = p_mlist;
-
-    install_playlist_observer(p_mlp);
 
     unlock(p_mlp);
 }
