@@ -3,7 +3,7 @@
 #
 
 # Direct3D11 video output
-d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_shaders.cpp', 'd3d_shaders.c', 'd3d_dynamic_shader.c', 'd3d11_swapchain.cpp', 'dxgi_swapchain.cpp', 'common.c')
+d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_shaders.cpp', 'd3d_shaders.c', 'd3d_dynamic_shader.c', 'dxgi_swapchain.cpp', 'common.c')
 d3d11_link_with = [ d3d11_common_lib ]
 d3d11_deps = []
 if get_option('winstore_app')
@@ -12,7 +12,7 @@ if get_option('winstore_app')
         cc.find_library('d3dcompiler_47')
     ]
 else
-    d3d11_sources += files('events.c', 'sensors.cpp', 'win32touch.c')
+    d3d11_sources += files('d3d11_swapchain.cpp', 'events.c', 'sensors.cpp', 'win32touch.c')
     d3d11_link_with += [ chroma_copy_lib ]
 endif
 

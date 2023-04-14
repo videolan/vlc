@@ -43,7 +43,9 @@
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
+#ifndef VLC_WINSTORE_APP
 #include "d3d11_swapchain.h"
+#endif
 
 #include "common.h"
 #include "../../video_chroma/copy.h"
@@ -743,8 +745,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         }
         if (err != VLC_SUCCESS)
         {
+#ifndef VLC_WINSTORE_APP
             if ( sys->swapCb == D3D11_LocalSwapchainSwap )
                 D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+#endif // !VLC_WINSTORE_APP
             return err;
         }
     }
@@ -769,8 +773,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
+#ifndef VLC_WINSTORE_APP
         if ( sys->swapCb == D3D11_LocalSwapchainSwap )
             D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+#endif // !VLC_WINSTORE_APP
         return VLC_EGENERIC;
     }
 
@@ -903,8 +909,10 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
+#ifndef VLC_WINSTORE_APP
     if ( sys->swapCb == D3D11_LocalSwapchainSwap )
         D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+#endif // !VLC_WINSTORE_APP
 
     if (sys->d3d_dev && sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
         D3D11_ReleaseDevice( sys->local_d3d_dev );

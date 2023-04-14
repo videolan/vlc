@@ -33,7 +33,6 @@ void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND, d3d11_device_t 
 #if defined(HAVE_DCOMP_H)
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev);
 #endif // HAVE_DCOMP_H
-#endif // !VLC_WINSTORE_APP
 
 void D3D11_LocalSwapchainCleanupDevice( void *opaque );
 bool D3D11_LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out );
@@ -41,5 +40,6 @@ bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter );
 bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *output );
 void D3D11_LocalSwapchainSwap( void *opaque );
 void D3D11_LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t, const void * );
+#endif // !VLC_WINSTORE_APP
 
 #endif /* VLC_D3D11_SWAPCHAIN_H */
