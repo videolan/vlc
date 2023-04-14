@@ -43,6 +43,7 @@
 
 void CommonInit(display_win32_area_t *area)
 {
+    ZeroMemory(&area->place, sizeof(area->place));
     area->place_changed = false;
 }
 
