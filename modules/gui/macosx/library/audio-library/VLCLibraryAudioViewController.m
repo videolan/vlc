@@ -77,6 +77,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _audioGroupLibraryTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
+        [self setupAudioPlaceholderView];
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
