@@ -294,14 +294,14 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentPlaceholderAudioView
 {
-    for (NSLayoutConstraint *constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint *constraint in _audioPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in _audioPlaceholderImageViewSizeConstraints) {
         constraint.active = YES;
     }
 
-    NSInteger selectedLibrarySegment = _audioSegmentedControl.selectedSegment;
+    const NSInteger selectedLibrarySegment = _audioSegmentedControl.selectedSegment;
 
     if(selectedLibrarySegment < _placeholderImageNames.count && selectedLibrarySegment >= 0) {
         _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]];
@@ -313,7 +313,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     _libraryTargetView.subviews = @[_emptyLibraryView];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
+    NSDictionary * const dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
