@@ -45,7 +45,10 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
 {
     self.internalAlbum = representedAlbum;
-    self.tracks = [self.representedAlbum tracksAsMediaItems];
+
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        self.tracks = [self.representedAlbum tracksAsMediaItems];
+    });
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
