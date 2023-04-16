@@ -29,9 +29,9 @@
 const CGFloat VLCLibraryTracksRowHeight = 40.;
 
 @interface VLCLibraryAlbumTracksDataSource ()
-{
-    NSArray *_tracks;
-}
+
+@property (readwrite, atomic) NSArray<VLCMediaLibraryMediaItem*> *tracks;
+
 @end
 
 @implementation VLCLibraryAlbumTracksDataSource
@@ -39,7 +39,7 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
 {
     _representedAlbum = representedAlbum;
-    _tracks = [_representedAlbum tracksAsMediaItems];
+    self.tracks = [_representedAlbum tracksAsMediaItems];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -61,7 +61,7 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    return _tracks[row];
+    return self.tracks[row];
 }
 
 @end
