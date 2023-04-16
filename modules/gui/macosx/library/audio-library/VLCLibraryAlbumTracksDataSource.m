@@ -31,21 +31,27 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 @interface VLCLibraryAlbumTracksDataSource ()
 
 @property (readwrite, atomic) NSArray<VLCMediaLibraryMediaItem*> *tracks;
+@property (readwrite, atomic) VLCMediaLibraryAlbum *internalAlbum;
 
 @end
 
 @implementation VLCLibraryAlbumTracksDataSource
 
+- (VLCMediaLibraryAlbum*)representedAlbum
+{
+    return self.internalAlbum;
+}
+
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
 {
-    _representedAlbum = representedAlbum;
-    self.tracks = [_representedAlbum tracksAsMediaItems];
+    self.internalAlbum = representedAlbum;
+    self.tracks = [self.representedAlbum tracksAsMediaItems];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (_representedAlbum != nil) {
-        return _representedAlbum.numberOfTracks;
+    if (self.representedAlbum != nil) {
+        return self.representedAlbum.numberOfTracks;
     }
 
     return 0;
