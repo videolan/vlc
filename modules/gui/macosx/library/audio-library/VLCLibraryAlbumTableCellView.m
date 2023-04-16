@@ -240,8 +240,13 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     self.representedImageView.image = _representedAlbum.smallArtworkImage;
 
+    __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{
-        [self->_tracksTableView reloadData];
+        __strong typeof(self) strongSelf = weakSelf;
+
+        if (strongSelf) {
+            [strongSelf->_tracksTableView reloadData];
+        }
     }];
 }
 
