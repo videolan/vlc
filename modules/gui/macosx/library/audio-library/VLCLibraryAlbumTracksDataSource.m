@@ -44,10 +44,22 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
 {
-    self.internalAlbum = representedAlbum;
+    [self setRepresentedAlbum:representedAlbum withCompletion:nil];
+}
+
+- (void)setRepresentedAlbum:(id)album
+             withCompletion:(nullable void (^)(void))completionHandler
+{
+    self.internalAlbum = album;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         self.tracks = [self.representedAlbum tracksAsMediaItems];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completionHandler != nil) {
+                completionHandler();
+            }
+        });
     });
 }
 

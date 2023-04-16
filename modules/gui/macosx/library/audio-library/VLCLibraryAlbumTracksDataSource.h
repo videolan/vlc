@@ -34,6 +34,9 @@ extern const CGFloat VLCLibraryTracksRowHeight;
 
 @property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
 
+- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum*)album
+             withCompletion:(nullable void(^)(void))completionHandler;
+
 @end
 
 NS_ASSUME_NONNULL_END
