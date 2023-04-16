@@ -443,17 +443,20 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)reloadData
 {
-    [self retainSelectedMediaItem];
-    self->_displayedCollection = [self collectionToDisplay];
-    [self resetLayoutsForOperation:^{
-        [self.collectionView reloadData];
-        [self.gridModeListTableView reloadData];
-        [self.gridModeListSelectionCollectionView reloadData];
-        [self.collectionSelectionTableView reloadData];
-        [self.groupSelectionTableView reloadData];
-        [self.songsTableView reloadData];
-    }];
-    [self restoreSelectionState];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self retainSelectedMediaItem];
+        self.displayedCollection = [self collectionToDisplay];
+
+        [self resetLayoutsForOperation:^{
+            [self.collectionView reloadData];
+            [self.gridModeListTableView reloadData];
+            [self.gridModeListSelectionCollectionView reloadData];
+            [self.collectionSelectionTableView reloadData];
+            [self.groupSelectionTableView reloadData];
+            [self.songsTableView reloadData];
+        }];
+        [self restoreSelectionState];
+    });
 }
 
 - (NSUInteger)indexForMediaLibraryItemWithId:(const int64_t)itemId
