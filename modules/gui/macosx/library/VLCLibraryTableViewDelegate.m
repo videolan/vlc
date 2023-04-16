@@ -45,7 +45,12 @@
         cellView.identifier = self.cellViewIdentifier;
     }
 
-    [cellView setRepresentedItem:[vlcDataSource libraryItemAtRow:row forTableView:tableView]];
+    NSObject<VLCMediaLibraryItemProtocol> * const libraryItem = [vlcDataSource libraryItemAtRow:row forTableView:tableView];
+    if (libraryItem == nil) {
+        return nil;
+    }
+
+    [cellView setRepresentedItem:libraryItem];
     return cellView;
 }
 
