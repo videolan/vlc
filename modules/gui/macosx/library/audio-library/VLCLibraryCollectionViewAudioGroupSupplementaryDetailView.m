@@ -66,9 +66,14 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
     }
 
     _audioGroupNameTextField.stringValue = _representedAudioGroup.displayString;
-    _audioGroupAlbumsDataSource.representedListOfAlbums = _representedAudioGroup.albums;
 
-    [_audioGroupAlbumsTableView reloadData];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        self->_audioGroupAlbumsDataSource.representedListOfAlbums = self->_representedAudioGroup.albums;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_audioGroupAlbumsTableView reloadData];
+        });
+    });
 }
 
 @end
