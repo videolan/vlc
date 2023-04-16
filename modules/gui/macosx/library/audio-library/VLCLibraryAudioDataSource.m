@@ -604,22 +604,26 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     const BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
     const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
-    if (libraryItemIndex < 0 && showingAllItemsEntry) {
-        _audioGroupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
-    } else {
-        id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[libraryItemIndex];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        if (libraryItemIndex < 0 && showingAllItemsEntry) {
+            self->_audioGroupDataSource.representedListOfAlbums = self->_libraryModel.listOfAlbums;
+        } else {
+            id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[libraryItemIndex];
 
-        if (_currentParentType == VLC_ML_PARENT_ALBUM) {
-            _audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
-        } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
-            _audioGroupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
-        } else { // FIXME: we have nothing to show here
-            _audioGroupDataSource.representedListOfAlbums = nil;
+            if (self->_currentParentType == VLC_ML_PARENT_ALBUM) {
+                self->_audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
+            } else if(self->_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+                self->_audioGroupDataSource.representedListOfAlbums = [self->_libraryModel listAlbumsOfParentType:self->_currentParentType forID:libraryItem.libraryID];
+            } else { // FIXME: we have nothing to show here
+                self->_audioGroupDataSource.representedListOfAlbums = nil;
+            }
         }
-    }
 
-    [self.groupSelectionTableView reloadData];
-    [self.gridModeListSelectionCollectionView reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.groupSelectionTableView reloadData];
+            [self.gridModeListSelectionCollectionView reloadData];
+        });
+    });
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
