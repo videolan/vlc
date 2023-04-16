@@ -94,9 +94,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumDetailsTextField.stringValue = _representedAlbum.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
     _albumArtworkImageView.image = _representedAlbum.smallArtworkImage;
-    _tracksDataSource.representedAlbum = _representedAlbum;
-
-    [_albumTracksTableView reloadData];
+    [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{
+        [self->_albumTracksTableView reloadData];
+    }];
 }
 
 - (IBAction)playAction:(id)sender

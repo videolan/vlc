@@ -240,8 +240,9 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     self.representedImageView.image = _representedAlbum.smallArtworkImage;
 
-    _tracksDataSource.representedAlbum = _representedAlbum;
-    [_tracksTableView reloadData];
+    [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{
+        [self->_tracksTableView reloadData];
+    }];
 }
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
