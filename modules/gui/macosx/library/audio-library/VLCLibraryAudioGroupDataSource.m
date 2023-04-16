@@ -40,8 +40,8 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (_representedListOfAlbums != nil) {
-        return _representedListOfAlbums.count;
+    if (self.representedListOfAlbums != nil) {
+        return self.representedListOfAlbums.count;
     }
 
     return 0;
@@ -50,13 +50,13 @@
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    return _representedListOfAlbums[row];
+    return self.representedListOfAlbums[row];
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    return _representedListOfAlbums.count;
+    return self.representedListOfAlbums.count;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
@@ -68,7 +68,7 @@
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = _representedListOfAlbums[indexPath.item];
+    viewItem.representedItem = self.representedListOfAlbums[indexPath.item];
     return viewItem;
 }
 
@@ -80,7 +80,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        VLCMediaLibraryAlbum *album = _representedListOfAlbums[indexPath.item];
+        VLCMediaLibraryAlbum * const album = self.representedListOfAlbums[indexPath.item];
         albumSupplementaryDetailView.representedAlbum = album;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
         albumSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
@@ -103,7 +103,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
-    return _representedListOfAlbums[indexPath.item];
+    return self.representedListOfAlbums[indexPath.item];
 }
 
 @end

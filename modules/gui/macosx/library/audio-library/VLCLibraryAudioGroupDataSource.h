@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAudioGroupDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
-@property (readwrite, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
+@property (readwrite, atomic, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
 @end
 
