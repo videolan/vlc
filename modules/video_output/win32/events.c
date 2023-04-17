@@ -63,7 +63,7 @@ struct event_thread_t
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
 
-    RECT window_area;
+    unsigned init_width, init_height;
 
     /* */
     vlc_window_t *parent_window;
@@ -174,10 +174,8 @@ void EventThreadDestroy( event_thread_t *p_event )
 int EventThreadStart( event_thread_t *p_event, const event_cfg_t *p_cfg )
 {
     p_event->is_projected = p_cfg->is_projected;
-    p_event->window_area.left   = 0;
-    p_event->window_area.top    = 0;
-    p_event->window_area.right  = p_cfg->width;
-    p_event->window_area.bottom = p_cfg->height;
+    p_event->init_width  = p_cfg->width;
+    p_event->init_height = p_cfg->height;
 
     p_event->b_ready = false;
     atomic_store( &p_event->b_done, false);
@@ -333,8 +331,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
                     i_style,                                 /* window style */
                     CW_USEDEFAULT,                   /* default X coordinate */
                     CW_USEDEFAULT,                   /* default Y coordinate */
-                    RECTWidth(p_event->window_area),         /* window width */
-                    RECTHeight(p_event->window_area),       /* window height */
+                    p_event->init_width,                     /* window width */
+                    p_event->init_height,                   /* window height */
                     p_event->hparent,                       /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
