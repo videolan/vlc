@@ -369,6 +369,11 @@ struct win32_gesture_sys_t *InitGestures( HWND hwnd, bool b_isProjected )
             &config,
             sizeof( GESTURECONFIG )
             );
+    if (result == 0)
+    {
+        free(p_gesture);
+        return NULL;
+    }
     if (b_isProjected)
         p_gesture->DecodeGestureImpl = DecodeGestureProjection;
     else
