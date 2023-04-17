@@ -31,7 +31,32 @@
 
 #include <assert.h>
 
-static bool DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi )
+enum {
+    GESTURE_ACTION_UNDEFINED = 0,
+    GESTURE_ACTION_VOLUME,
+    GESTURE_ACTION_JUMP,
+    GESTURE_ACTION_BRIGHTNESS
+};
+
+
+struct win32_gesture_sys_t
+{
+    DWORD       i_type;                 /* Gesture ID */
+    int         i_action;               /* GESTURE_ACTION */
+
+    int         i_beginx;               /* Start X position */
+    int         i_beginy;               /* Start Y position */
+    int         i_lasty;                /* Last known Y position for PAN */
+    double      f_lastzoom;             /* Last zoom factor */
+
+    ULONGLONG   i_ullArguments;         /* Base values to compare between 2 zoom gestures */
+    bool        b_2fingers;             /* Did we detect 2 fingers? */
+
+    bool (*DecodeGestureImpl)( vlc_object_t *, struct win32_gesture_sys_t *, const GESTUREINFO* );
+};
+
+
+static bool DecodeGestureAction( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi )
 {
     bool bHandled = false; /* Needed to release the handle */
     switch ( p_gi->dwID )
@@ -166,7 +191,7 @@ static bool DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_ge
 }
 
 
-static bool DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi )
+static bool DecodeGestureProjection( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi )
 {
     //vout_display_t *vd = (vout_display_t *)p_this;
 
@@ -280,7 +305,7 @@ static bool DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
     return bHandled;
 }
 
-bool DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
+bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
                     LPARAM lParam )
 {
     if( !p_gesture )
@@ -312,7 +337,7 @@ bool DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
     return false;
 }
 
-BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProjected )
+BOOL InitGestures( HWND hwnd, struct win32_gesture_sys_t **pp_gesture, bool b_isProjected )
 {
     BOOL result = FALSE;
     GESTURECONFIG config = { 0, 0, 0 };
@@ -333,7 +358,7 @@ BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProject
         config.dwBlock = GC_PAN_WITH_INERTIA;
     }
 
-    win32_gesture_sys_t *p_gesture = malloc( sizeof(win32_gesture_sys_t) );
+    struct win32_gesture_sys_t *p_gesture = malloc( sizeof(*p_gesture) );
     if( !p_gesture )
     {
         *pp_gesture = NULL;
@@ -362,7 +387,7 @@ BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProject
     return result;
 }
 
-void CloseGestures( win32_gesture_sys_t *p_gesture )
+void CloseGestures( struct win32_gesture_sys_t *p_gesture )
 {
     free( p_gesture );
 }

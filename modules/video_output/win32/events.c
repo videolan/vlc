@@ -67,7 +67,7 @@ struct event_thread_t
 #endif
 
     /* Gestures */
-    win32_gesture_sys_t *p_gesture;
+    struct win32_gesture_sys_t *p_gesture;
 
     unsigned init_width, init_height;
 
