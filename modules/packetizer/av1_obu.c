@@ -554,6 +554,11 @@ bool AV1_get_frame_rate(const av1_OBU_sequence_header_t *p_seq,
     return true;
 }
 
+bool AV1_get_super_res(const av1_OBU_sequence_header_t *p_seq)
+{
+    return p_seq->enable_superres;
+}
+
 bool AV1_get_colorimetry(const av1_OBU_sequence_header_t *p_seq,
                          video_color_primaries_t *p_primaries,
                          video_transfer_func_t *p_transfer,

@@ -167,6 +167,7 @@ bool AV1_get_colorimetry( const av1_OBU_sequence_header_t *,
                           video_color_primaries_t *, video_transfer_func_t *,
                           video_color_space_t *, video_color_range_t *);
 bool AV1_get_frame_rate(const av1_OBU_sequence_header_t *, unsigned *, unsigned *);
+bool AV1_get_super_res(const av1_OBU_sequence_header_t *);
 vlc_fourcc_t AV1_get_chroma(const av1_OBU_sequence_header_t *);
 
 bool AV1_sequence_header_equal(const av1_OBU_sequence_header_t *,const av1_OBU_sequence_header_t *);
