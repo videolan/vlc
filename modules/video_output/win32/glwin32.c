@@ -38,6 +38,7 @@
 #include "../opengl/vout_helper.h"
 
 #include "common.h"
+#include "sensors.h"
 
 /*****************************************************************************
  * Module descriptor

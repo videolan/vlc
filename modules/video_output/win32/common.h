@@ -59,9 +59,6 @@ void CommonControl(vout_display_t *, display_win32_area_t *, int );
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 
 void CommonInit(display_win32_area_t *, const video_format_t *);
-
-void* HookWindowsSensors(vout_display_t*, HWND);
-void UnhookWindowsSensors(void*);
 # ifdef __cplusplus
 }
 # endif

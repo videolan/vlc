@@ -26,7 +26,7 @@
 #endif
 
 #include "events.h"
-#include "common.h"
+#include "sensors.h"
 
 #include <initguid.h>
 #include <wrl/client.h>

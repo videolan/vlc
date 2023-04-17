@@ -49,6 +49,7 @@
 #endif
 
 #include "common.h"
+#include "sensors.h"
 #include "../../video_chroma/copy.h"
 
 using Microsoft::WRL::ComPtr;
