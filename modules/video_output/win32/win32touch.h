@@ -45,10 +45,9 @@ struct win32_gesture_sys_t;
 
 struct win32_gesture_sys_t *InitGestures( HWND hwnd, bool b_isProjected );
 
-bool DecodeGesture( vlc_object_t *p_intf, struct win32_gesture_sys_t *p_gesture,
-                    LPARAM lParam );
+bool DecodeGesture( vlc_object_t *, struct win32_gesture_sys_t *, HGESTUREINFO );
 
-void CloseGestures( struct win32_gesture_sys_t *p_gesture );
+void CloseGestures( struct win32_gesture_sys_t * );
 
 #ifdef __cplusplus
 }

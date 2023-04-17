@@ -306,7 +306,7 @@ static bool DecodeGestureProjection( vlc_object_t *p_this, struct win32_gesture_
 }
 
 bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
-                    LPARAM lParam )
+                    HGESTUREINFO hGestureInfo )
 {
     if( !p_gesture )
         return false;
@@ -315,7 +315,7 @@ bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
     ZeroMemory( &gi, sizeof( GESTUREINFO ) );
     gi.cbSize = sizeof( GESTUREINFO );
 
-    BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
+    BOOL bResult  = GetGestureInfo(hGestureInfo, &gi);
     bool bHandled = false; /* Needed to release the handle */
 
     if( bResult )
@@ -331,7 +331,7 @@ bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
     {
         /* Close the Handle, if we handled the gesture, a contrario
          * from the doc example */
-        CloseGestureInfoHandle((HGESTUREINFO)lParam);
+        CloseGestureInfoHandle(hGestureInfo);
         return true;
     }
     return false;

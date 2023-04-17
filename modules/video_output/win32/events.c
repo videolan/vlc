@@ -139,7 +139,7 @@ static LRESULT CALLBACK VideoEventProc( HWND hwnd, UINT message,
         return 0;
 
     case WM_GESTURE:
-        if (DecodeGesture( p_event->obj, p_event->p_gesture, lParam ))
+        if (DecodeGesture( p_event->obj, p_event->p_gesture, (HGESTUREINFO)lParam ))
             return 0;
         return DefWindowProc(hwnd, message, wParam, lParam);
 
