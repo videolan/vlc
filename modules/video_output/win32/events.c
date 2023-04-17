@@ -82,8 +82,8 @@ struct event_thread_t
  * Local Prototypes        *
  ***************************/
 /* Window Creation */
-static int  Win32VoutCreateWindow( event_thread_t * );
-static void Win32VoutCloseWindow ( event_thread_t * );
+static int  Win32VoutCreateWindow( struct event_thread_t * );
+static void Win32VoutCloseWindow ( struct event_thread_t * );
 
 /*****************************************************************************
  * EventThread: Create video window & handle its messages
@@ -97,7 +97,7 @@ static void *EventThread( void *p_this )
 {
     vlc_thread_set_name("vlc-vout-hwnd");
 
-    event_thread_t *p_event = (event_thread_t *)p_this;
+    struct event_thread_t *p_event = p_this;
     MSG msg;
     int canc = vlc_savecancel ();
 
@@ -144,7 +144,7 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window,
+struct event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window,
                                    const struct vout_display_placement *display,
                                    const vout_display_owner_t *owner )
 {
@@ -158,7 +158,7 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_windo
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
     msg_Dbg( obj, "creating Vout EventThread" );
-    event_thread_t *p_event = malloc( sizeof(*p_event) );
+    struct event_thread_t *p_event = malloc( sizeof(*p_event) );
     if( !p_event )
         return NULL;
 
@@ -212,12 +212,12 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_windo
     return p_event;
 }
 
-HWND EventThreadVideoHWND( const event_thread_t *p_event )
+HWND EventThreadVideoHWND( const struct event_thread_t *p_event )
 {
     return p_event->hvideownd;
 }
 
-void EventThreadDestroy( event_thread_t *p_event )
+void EventThreadDestroy( struct event_thread_t *p_event )
 {
     if ( p_event == NULL )
         return;
@@ -256,7 +256,7 @@ static LRESULT CALLBACK VideoEventProc( HWND hwnd, UINT message,
     LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
     if( p_user_data == 0 ) /* messages before WM_CREATE */
         return DefWindowProc(hwnd, message, wParam, lParam);
-    event_thread_t *p_event = (event_thread_t *)p_user_data;
+    struct event_thread_t *p_event = (struct event_thread_t *)p_user_data;
 
     switch( message )
     {
@@ -300,7 +300,7 @@ static LRESULT CALLBACK VideoEventProc( HWND hwnd, UINT message,
  * the video will be displayed. This window will also allow us to capture the
  * events.
  *****************************************************************************/
-static int Win32VoutCreateWindow( event_thread_t *p_event )
+static int Win32VoutCreateWindow( struct event_thread_t *p_event )
 {
     HINSTANCE  hInstance;
     WNDCLASS   wc;                            /* window class components */
@@ -383,7 +383,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
  *****************************************************************************
  * This function returns all resources allocated by Win32VoutCreateWindow.
  *****************************************************************************/
-static void Win32VoutCloseWindow( event_thread_t *p_event )
+static void Win32VoutCloseWindow( struct event_thread_t *p_event )
 {
     msg_Dbg( p_event->obj, "Win32VoutCloseWindow" );
 
@@ -395,7 +395,7 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     CloseGestures( p_event->p_gesture);
 }
 
-void EventThreadUpdateSize( event_thread_t *p_event )
+void EventThreadUpdateSize( struct event_thread_t *p_event )
 {
     RECT clientRect;
     GetClientRect(p_event->hparent, &clientRect);
