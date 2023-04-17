@@ -24,6 +24,8 @@
 # include <config.h>
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_threads.h>
@@ -99,7 +101,7 @@ static int human(uint64_t *i)
 {
     if (i == 0)
         return 0;
-    unsigned exp = (63 - clz(*i)) / 10;
+    unsigned exp = (stdc_bit_width(*i) - 1) / 10;
     exp = (exp < ARRAY_SIZE(binary_prefixes)) ? exp : ARRAY_SIZE(binary_prefixes);
     *i >>= (10 * exp);
     return exp;
