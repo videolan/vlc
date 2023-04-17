@@ -78,140 +78,6 @@ struct event_thread_t
     HWND hvideownd;
 };
 
-/***************************
- * Local Prototypes        *
- ***************************/
-/* Window Creation */
-static int  Win32VoutCreateWindow( struct event_thread_t * );
-static void Win32VoutCloseWindow ( struct event_thread_t * );
-
-/*****************************************************************************
- * EventThread: Create video window & handle its messages
- *****************************************************************************
- * This function creates a video window and then enters an infinite loop
- * that handles the messages sent to that window.
- * The main goal of this thread is to isolate the Win32 PeekMessage function
- * because this one can block for a long time.
- *****************************************************************************/
-static void *EventThread( void *p_this )
-{
-    vlc_thread_set_name("vlc-vout-hwnd");
-
-    struct event_thread_t *p_event = p_this;
-    MSG msg;
-    int canc = vlc_savecancel ();
-
-
-    vlc_mutex_lock( &p_event->lock );
-    /* Create a window for the video */
-    /* Creating a window under Windows also initializes the thread's event
-     * message queue */
-    if( Win32VoutCreateWindow( p_event ) )
-        p_event->b_error = true;
-
-    p_event->b_ready = true;
-    vlc_cond_signal( &p_event->wait );
-
-    const bool b_error = p_event->b_error;
-    vlc_mutex_unlock( &p_event->lock );
-
-    if( b_error )
-    {
-        vlc_restorecancel( canc );
-        return NULL;
-    }
-
-    /* Main loop */
-    /* GetMessage will sleep if there's no message in the queue */
-    for( ;; )
-    {
-        if( !GetMessage( &msg, 0, 0, 0 ) || atomic_load( &p_event->b_done ) )
-        {
-            break;
-        }
-
-        /* Messages we don't handle directly are dispatched to the
-         * window procedure */
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-
-    } /* End Main loop */
-
-    msg_Dbg( p_event->obj, "Win32 Vout EventThread terminating" );
-
-    Win32VoutCloseWindow( p_event );
-    vlc_restorecancel(canc);
-    return NULL;
-}
-
-struct event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window,
-                                   const struct vout_display_placement *display,
-                                   const vout_display_owner_t *owner )
-{
-    if (parent_window->type != VLC_WINDOW_TYPE_HWND)
-        return NULL;
-     /* Create the Vout EventThread, this thread is created by us to isolate
-     * the Win32 PeekMessage function calls. We want to do this because
-     * Windows can stay blocked inside this call for a long time, and when
-     * this happens it thus blocks vlc's video_output thread.
-     * Vout EventThread will take care of the creation of the video
-     * window (because PeekMessage has to be called from the same thread which
-     * created the window). */
-    msg_Dbg( obj, "creating Vout EventThread" );
-    struct event_thread_t *p_event = malloc( sizeof(*p_event) );
-    if( !p_event )
-        return NULL;
-
-    p_event->obj = obj;
-    vlc_mutex_init( &p_event->lock );
-    vlc_cond_init( &p_event->wait );
-    atomic_init( &p_event->b_done, false );
-    p_event->b_ready = false;
-    p_event->b_error = false;
-
-    p_event->parent_window = parent_window;
-
-    _snwprintf( p_event->class_video, ARRAY_SIZE(p_event->class_video),
-                TEXT("VLC video output %p"), (void *)p_event );
-
-#ifdef HAVE_WIN32_SENSORS
-    p_event->init_move = owner;
-    p_event->p_sensors = NULL;
-#else
-    VLC_UNUSED(owner);
-#endif
-    p_event->init_width  = display->width;
-    p_event->init_height = display->height;
-
-    if( vlc_clone( &p_event->thread, EventThread, p_event ) )
-    {
-        msg_Err( obj, "cannot create Vout EventThread" );
-        free(p_event);
-        return NULL;
-    }
-
-    vlc_mutex_lock( &p_event->lock );
-    while( !p_event->b_ready )
-        vlc_cond_wait( &p_event->wait, &p_event->lock );
-    const bool b_error = p_event->b_error;
-    vlc_mutex_unlock( &p_event->lock );
-
-    if( b_error )
-    {
-        vlc_join( p_event->thread, NULL );
-        free(p_event);
-        return NULL;
-    }
-
-#ifdef HAVE_WIN32_SENSORS
-    if (owner != NULL)
-        p_event->p_sensors = HookWindowsSensors(vlc_object_logger(obj), owner, p_event->hvideownd);
-#endif
-    msg_Dbg( obj, "Vout EventThread running" );
-
-    return p_event;
-}
-
 HWND EventThreadVideoHWND( const struct event_thread_t *p_event )
 {
     return p_event->hvideownd;
@@ -393,6 +259,133 @@ static void Win32VoutCloseWindow( struct event_thread_t *p_event )
     UnregisterClass( p_event->class_video, hInstance );
 
     CloseGestures( p_event->p_gesture);
+}
+
+/*****************************************************************************
+ * EventThread: Create video window & handle its messages
+ *****************************************************************************
+ * This function creates a video window and then enters an infinite loop
+ * that handles the messages sent to that window.
+ * The main goal of this thread is to isolate the Win32 PeekMessage function
+ * because this one can block for a long time.
+ *****************************************************************************/
+static void *EventThread( void *p_this )
+{
+    vlc_thread_set_name("vlc-vout-hwnd");
+
+    struct event_thread_t *p_event = p_this;
+    MSG msg;
+    int canc = vlc_savecancel ();
+
+
+    vlc_mutex_lock( &p_event->lock );
+    /* Create a window for the video */
+    /* Creating a window under Windows also initializes the thread's event
+     * message queue */
+    if( Win32VoutCreateWindow( p_event ) )
+        p_event->b_error = true;
+
+    p_event->b_ready = true;
+    vlc_cond_signal( &p_event->wait );
+
+    const bool b_error = p_event->b_error;
+    vlc_mutex_unlock( &p_event->lock );
+
+    if( b_error )
+    {
+        vlc_restorecancel( canc );
+        return NULL;
+    }
+
+    /* Main loop */
+    /* GetMessage will sleep if there's no message in the queue */
+    for( ;; )
+    {
+        if( !GetMessage( &msg, 0, 0, 0 ) || atomic_load( &p_event->b_done ) )
+        {
+            break;
+        }
+
+        /* Messages we don't handle directly are dispatched to the
+         * window procedure */
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+
+    } /* End Main loop */
+
+    msg_Dbg( p_event->obj, "Win32 Vout EventThread terminating" );
+
+    Win32VoutCloseWindow( p_event );
+    vlc_restorecancel(canc);
+    return NULL;
+}
+
+struct event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window,
+                                   const struct vout_display_placement *display,
+                                   const vout_display_owner_t *owner )
+{
+    if (parent_window->type != VLC_WINDOW_TYPE_HWND)
+        return NULL;
+     /* Create the Vout EventThread, this thread is created by us to isolate
+     * the Win32 PeekMessage function calls. We want to do this because
+     * Windows can stay blocked inside this call for a long time, and when
+     * this happens it thus blocks vlc's video_output thread.
+     * Vout EventThread will take care of the creation of the video
+     * window (because PeekMessage has to be called from the same thread which
+     * created the window). */
+    msg_Dbg( obj, "creating Vout EventThread" );
+    struct event_thread_t *p_event = malloc( sizeof(*p_event) );
+    if( !p_event )
+        return NULL;
+
+    p_event->obj = obj;
+    vlc_mutex_init( &p_event->lock );
+    vlc_cond_init( &p_event->wait );
+    atomic_init( &p_event->b_done, false );
+    p_event->b_ready = false;
+    p_event->b_error = false;
+
+    p_event->parent_window = parent_window;
+
+    _snwprintf( p_event->class_video, ARRAY_SIZE(p_event->class_video),
+                TEXT("VLC video output %p"), (void *)p_event );
+
+#ifdef HAVE_WIN32_SENSORS
+    p_event->init_move = owner;
+    p_event->p_sensors = NULL;
+#else
+    VLC_UNUSED(owner);
+#endif
+    p_event->init_width  = display->width;
+    p_event->init_height = display->height;
+
+    if( vlc_clone( &p_event->thread, EventThread, p_event ) )
+    {
+        msg_Err( obj, "cannot create Vout EventThread" );
+        free(p_event);
+        return NULL;
+    }
+
+    vlc_mutex_lock( &p_event->lock );
+    while( !p_event->b_ready )
+        vlc_cond_wait( &p_event->wait, &p_event->lock );
+    const bool b_error = p_event->b_error;
+    vlc_mutex_unlock( &p_event->lock );
+
+    if( b_error )
+    {
+        vlc_join( p_event->thread, NULL );
+        free(p_event);
+        return NULL;
+    }
+
+#ifdef HAVE_WIN32_SENSORS
+    if (owner != NULL)
+        p_event->p_sensors = HookWindowsSensors(vlc_object_logger(obj), owner, p_event->hvideownd);
+#endif
+    msg_Dbg( obj, "Vout EventThread running" );
+
+    return p_event;
 }
 
 void EventThreadUpdateSize( struct event_thread_t *p_event )
