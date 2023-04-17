@@ -598,31 +598,7 @@ VLC_USED static inline int vlc_##basename##suffix(type x) \
 { \
     return __builtin_##basename##suffix(x); \
 }
-
-VLC_INT_FUNC(clz)
 #else
-VLC_USED static inline int vlc_clzll(unsigned long long x)
-{
-    int i = sizeof (x) * 8;
-
-    while (x)
-    {
-        x >>= 1;
-        i--;
-    }
-    return i;
-}
-
-VLC_USED static inline int vlc_clzl(unsigned long x)
-{
-    return vlc_clzll(x) - ((sizeof (long long) - sizeof (long)) * 8);
-}
-
-VLC_USED static inline int vlc_clz(unsigned x)
-{
-    return vlc_clzll(x) - ((sizeof (long long) - sizeof (int)) * 8);
-}
-
 VLC_USED static inline int vlc_ctz_generic(unsigned long long x)
 {
     unsigned i = sizeof (x) * 8;
@@ -677,26 +653,6 @@ VLC_INT_FUNC(popcount)
           signed long:      func##l(x), \
         unsigned long long: func##ll(x), \
           signed long long: func##ll(x))
-
-/**
- * Count leading zeroes
- *
- * This function counts the number of consecutive zero (clear) bits
- * down from the highest order bit in an unsigned integer.
- *
- * \param x a non-zero integer
- * \note This macro assumes that CHAR_BIT equals 8.
- * \warning By definition, the result depends on the (width of the) type of x.
- * \return The number of leading zero bits in x.
- */
-# define clz(x) \
-    _Generic((x), \
-        unsigned char: (vlc_clz(x) - (sizeof (unsigned) - 1) * 8), \
-        unsigned short: (vlc_clz(x) \
-        - (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
-        unsigned: vlc_clz(x), \
-        unsigned long: vlc_clzl(x), \
-        unsigned long long: vlc_clzll(x))
 
 /**
  * Count trailing zeroes
