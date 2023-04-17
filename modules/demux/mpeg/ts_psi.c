@@ -20,6 +20,7 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
 #include <vlc_common.h>
 
 #ifndef _DVBPSI_DVBPSI_H_
@@ -1063,15 +1064,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_stream_t *p_pes,
     }
 }
 
-static int vlc_ceil_log2( const unsigned int val )
-{
-    int n = 31 - clz(val);
-    if ((1U << n) != val)
-        n++;
-
-    return n;
-}
-
 static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt)
 {
     OpusHeader h;
@@ -1083,8 +1075,8 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
 
     uint8_t mapping;
     int csc;
-    int channels = 0;
-    int stream_count = 0;
+    unsigned int channels = 0;
+    unsigned int stream_count = 0;
     int ccc = p[1]; // channel_config_code
     if (ccc <= 8) {
         channels = ccc;
@@ -1120,21 +1112,21 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
             bs_init(&s, &p[4], len - 4);
             stream_count = 1;
             if (channels) {
-                int bits = vlc_ceil_log2(channels);
+                int bits = stdc_bit_width(channels - 1);
                 if (s.i_left < bits)
                     goto explicit_config_too_short;
                 stream_count = bs_read(&s, bits) + 1;
-                bits = vlc_ceil_log2(stream_count + 1);
+                bits = stdc_bit_width(stream_count);
                 if (s.i_left < bits)
                     goto explicit_config_too_short;
                 csc = bs_read(&s, bits);
             }
-            int channel_bits = vlc_ceil_log2(stream_count + csc + 1);
+            int channel_bits = stdc_bit_width(stream_count + csc);
             if (s.i_left < channels * channel_bits)
                 goto explicit_config_too_short;
 
             unsigned char silence = (1U << (stream_count + csc + 1)) - 1;
-            for (int i = 0; i < channels; i++) {
+            for (unsigned int i = 0; i < channels; i++) {
                 unsigned char m = bs_read(&s, channel_bits);
                 if (m == silence)
                     m = 0xff;
