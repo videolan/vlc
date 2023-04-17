@@ -56,7 +56,7 @@ struct event_thread_t
     vlc_thread_t thread;
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
-    bool         b_ready;
+    bool         b_ready; // the thread was started
     atomic_bool  b_done;
     bool         b_error;
 
@@ -219,9 +219,9 @@ HWND EventThreadVideoHWND( const event_thread_t *p_event )
     return p_event->hvideownd;
 }
 
-void EventThreadStop( event_thread_t *p_event )
+void EventThreadDestroy( event_thread_t *p_event )
 {
-    if( !p_event->b_ready )
+    if ( p_event == NULL )
         return;
 
     atomic_store( &p_event->b_done, true );
@@ -232,16 +232,12 @@ void EventThreadStop( event_thread_t *p_event )
         PostMessage( p_event->hvideownd, WM_NULL, 0, 0);
 
     vlc_join( p_event->thread, NULL );
-    p_event->b_ready = false;
 
 #ifdef HAVE_WIN32_SENSORS
     if (p_event->p_sensors)
         UnhookWindowsSensors(p_event->p_sensors);
 #endif
-}
 
-void EventThreadDestroy( event_thread_t *p_event )
-{
     free( p_event );
 }
 

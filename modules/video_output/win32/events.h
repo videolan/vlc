@@ -34,5 +34,4 @@ event_thread_t *EventThreadCreate( vlc_object_t *, vlc_window_t *,
                                    const vout_display_owner_t * );
 void            EventThreadDestroy( event_thread_t * );
 HWND            EventThreadVideoHWND( const event_thread_t * );
-void            EventThreadStop( event_thread_t * );
 void            EventThreadUpdateSize( event_thread_t * );
