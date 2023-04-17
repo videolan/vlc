@@ -290,7 +290,7 @@ bool DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
     ZeroMemory( &gi, sizeof( GESTUREINFO ) );
     gi.cbSize = sizeof( GESTUREINFO );
 
-    BOOL bResult  = p_gesture->OurGetGestureInfo((HGESTUREINFO)lParam, &gi);
+    BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
     bool bHandled = false; /* Needed to release the handle */
 
     if( bResult )
@@ -306,7 +306,7 @@ bool DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
     {
         /* Close the Handle, if we handled the gesture, a contrario
          * from the doc example */
-        p_gesture->OurCloseGestureInfoHandle((HGESTUREINFO)lParam);
+        CloseGestureInfoHandle((HGESTUREINFO)lParam);
         return true;
     }
     return false;
@@ -340,31 +340,13 @@ BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProject
         return FALSE;
     }
 
-    HINSTANCE h_user32_dll = LoadLibrary(TEXT("user32.dll"));
-    if( !h_user32_dll )
-    {
-        *pp_gesture = NULL;
-        free( p_gesture );
-        return FALSE;
-    }
-
-    BOOL (WINAPI *OurSetGestureConfig) (HWND, DWORD, UINT, PGESTURECONFIG, UINT);
-    OurSetGestureConfig = (void *)GetProcAddress(h_user32_dll, "SetGestureConfig");
-
-    p_gesture->OurCloseGestureInfoHandle =
-        (void *)GetProcAddress(h_user32_dll, "CloseGestureInfoHandle" );
-    p_gesture->OurGetGestureInfo =
-        (void *)GetProcAddress(h_user32_dll, "GetGestureInfo");
-    if( OurSetGestureConfig )
-    {
-        result = OurSetGestureConfig(
-                hwnd,
-                0,
-                1,
-                &config,
-                sizeof( GESTURECONFIG )
-                );
-    }
+    result = SetGestureConfig(
+            hwnd,
+            0,
+            1,
+            &config,
+            sizeof( GESTURECONFIG )
+            );
     if (b_isProjected)
         p_gesture->DecodeGestureImpl = DecodeGestureProjection;
     else
@@ -375,7 +357,6 @@ BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProject
     p_gesture->i_action   = GESTURE_ACTION_UNDEFINED;
     p_gesture->i_beginx   = p_gesture->i_beginy = -1;
     p_gesture->i_lasty    = -1;
-    p_gesture->huser_dll  = h_user32_dll;
 
     *pp_gesture = p_gesture;
     return result;
@@ -383,7 +364,5 @@ BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProject
 
 void CloseGestures( win32_gesture_sys_t *p_gesture )
 {
-    if (p_gesture && p_gesture->huser_dll )
-        FreeLibrary( p_gesture->huser_dll );
     free( p_gesture );
 }

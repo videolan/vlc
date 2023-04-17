@@ -16,6 +16,9 @@ else
     d3d11_sources += files('d3d11_swapchain.cpp', 'dxgi_swapchain.cpp', 'events.c', 'sensors.cpp', 'win32touch.c')
     d3d11_link_with += [ chroma_copy_lib ]
     d3d11_cargs += '-DHAVE_WIN32_SENSORS'
+    d3d11_deps += [
+        cc.find_library('user32')
+    ]
 endif
 
 vlc_modules += {
@@ -31,7 +34,10 @@ if have_win_desktop
     vlc_modules += {
         'name' : 'direct3d9',
         'sources' : files('direct3d9.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
-        'link_with' : [ d3d9_common_lib, chroma_copy_lib ]
+        'link_with' : [ d3d9_common_lib, chroma_copy_lib ],
+        'dependencies' : [
+            cc.find_library('user32')
+        ]
     }
 
     # GDI video output
@@ -39,6 +45,9 @@ if have_win_desktop
         'name' : 'wingdi',
         'sources' : files('wingdi.c', 'common.c', 'events.c', 'win32touch.c'),
         'link_with' : [ chroma_copy_lib ]
+        'dependencies' : [
+            cc.find_library('user32')
+        ]
     }
 
     opengl32_lib = cc.find_library('opengl32', required: false)
@@ -51,7 +60,9 @@ if have_win_desktop
                 opengl_vout_commonsources
             ],
             'c_args' : [ contrib_inc_args, '-DHAVE_WIN32_SENSORS' ],
-            'dependencies' : [ gl_common_dep, opengl32_lib ]
+            'dependencies' : [ gl_common_dep, opengl32_lib,
+                cc.find_library('user32')
+            ]
         }
 
         # WGL

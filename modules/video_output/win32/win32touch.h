@@ -62,10 +62,6 @@ typedef struct win32_gesture_sys_t {
     bool        b_2fingers;             /* Did we detect 2 fingers? */
 
     bool (*DecodeGestureImpl)( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
-
-    HINSTANCE   huser_dll;              /* user32.dll */
-    BOOL (WINAPI * OurCloseGestureInfoHandle)(HGESTUREINFO hGestureInfo);
-    BOOL (WINAPI * OurGetGestureInfo)(HGESTUREINFO hGestureInfo, PGESTUREINFO pGestureInfo);
 } win32_gesture_sys_t;
 
 

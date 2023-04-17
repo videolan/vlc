@@ -168,7 +168,7 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/builtin_shaders.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 $(LIBCOM) -luuid
+libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 -luser32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 libglinterop_dxva2_plugin_la_SOURCES = video_output/opengl/interop_dxva2.c \
@@ -202,7 +202,7 @@ libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/dxgi_swapchain.cpp video_output/win32/dxgi_swapchain.h \
  video_output/win32/sensors.cpp \
  video_output/win32/win32touch.c video_output/win32/win32touch.h
-libdirect3d11_plugin_la_LIBADD += -lgdi32
+libdirect3d11_plugin_la_LIBADD += -lgdi32 -luser32
 else
 libdirect3d11_plugin_la_LIBADD += -ld3d11
 libdirect3d11_plugin_la_LIBADD += -ld3dcompiler_47
@@ -221,7 +221,7 @@ libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_WIN32_SENSORS
 libglwin32_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libwgl_plugin_la_SOURCES = video_output/win32/wgl.c
 
-libglwin32_plugin_la_LIBADD = libchroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid libvlc_opengl.la
+libglwin32_plugin_la_LIBADD = libchroma_copy.la -lopengl32 -lgdi32 -luser32 $(LIBCOM) -luuid libvlc_opengl.la
 libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 libvlc_opengl.la
 
 libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
@@ -239,7 +239,7 @@ libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
-libwingdi_plugin_la_LIBADD = libchroma_copy.la -lgdi32 $(LIBCOM) -luuid
+libwingdi_plugin_la_LIBADD = libchroma_copy.la -lgdi32 -luser32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwingdi_plugin.la
 endif
