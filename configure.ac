@@ -980,6 +980,10 @@ dnl
 dnl Check for headers
 dnl
 
+AC_CHECK_HEADER([stdbit.h],, [
+  CPPFLAGS="${CPPFLAGS} -I\$(top_srcdir)/compat/stdbit"
+])
+
 dnl  POSIX
 AC_CHECK_HEADERS([arpa/inet.h poll.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h wordexp.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
