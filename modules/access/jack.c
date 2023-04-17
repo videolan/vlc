@@ -37,6 +37,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -450,7 +452,7 @@ static block_t *GrabJack( demux_t *p_demux )
     }
 
     /* Find the previous power of 2 */
-    i_read = 1 << ((sizeof(i_read)*8 - 1) - vlc_clz(i_read - 1));
+    i_read = stdc_bit_floor(i_read);
 
     p_block = block_Alloc( i_read );
 
