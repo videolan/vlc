@@ -62,13 +62,7 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
         return VLC_EGENERIC;
 
     /* */
-    event_cfg_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.width  = vd->cfg->display.width;
-    cfg.height = vd->cfg->display.height;
-    cfg.is_projected = projection_gestures;
-
-    if (EventThreadStart(area->event, &cfg))
+    if (EventThreadStart(area->event, &vd->cfg->display, projection_gestures))
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
