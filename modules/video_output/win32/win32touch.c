@@ -337,7 +337,7 @@ bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
     return false;
 }
 
-BOOL InitGestures( HWND hwnd, struct win32_gesture_sys_t **pp_gesture, bool b_isProjected )
+struct win32_gesture_sys_t *InitGestures( HWND hwnd, bool b_isProjected )
 {
     BOOL result = FALSE;
     GESTURECONFIG config = { 0, 0, 0 };
@@ -359,11 +359,8 @@ BOOL InitGestures( HWND hwnd, struct win32_gesture_sys_t **pp_gesture, bool b_is
     }
 
     struct win32_gesture_sys_t *p_gesture = malloc( sizeof(*p_gesture) );
-    if( !p_gesture )
-    {
-        *pp_gesture = NULL;
-        return FALSE;
-    }
+    if( unlikely(!p_gesture) )
+        return NULL;
 
     result = SetGestureConfig(
             hwnd,
@@ -383,8 +380,7 @@ BOOL InitGestures( HWND hwnd, struct win32_gesture_sys_t **pp_gesture, bool b_is
     p_gesture->i_beginx   = p_gesture->i_beginy = -1;
     p_gesture->i_lasty    = -1;
 
-    *pp_gesture = p_gesture;
-    return result;
+    return p_gesture;
 }
 
 void CloseGestures( struct win32_gesture_sys_t *p_gesture )

@@ -235,10 +235,10 @@ static int Win32VoutCreateWindow( struct event_thread_t *p_event )
 
 #ifdef HAVE_WIN32_SENSORS
     if (p_event->init_move != NULL)
-        InitGestures( p_event->hvideownd, &p_event->p_gesture, true );
+        p_event->p_gesture = InitGestures( p_event->hvideownd, true );
     else
 #endif
-        InitGestures( p_event->hvideownd, &p_event->p_gesture, false );
+        p_event->p_gesture = InitGestures( p_event->hvideownd, false );
 
     /* Now display the window */
     ShowWindow( p_event->hvideownd, SW_SHOWNOACTIVATE );

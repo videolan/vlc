@@ -43,7 +43,7 @@ extern "C" {
 
 struct win32_gesture_sys_t;
 
-BOOL InitGestures( HWND hwnd, struct win32_gesture_sys_t **p_gesture, bool b_isProjected );
+struct win32_gesture_sys_t *InitGestures( HWND hwnd, bool b_isProjected );
 
 bool DecodeGesture( vlc_object_t *p_intf, struct win32_gesture_sys_t *p_gesture,
                     LPARAM lParam );
