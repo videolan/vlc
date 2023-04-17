@@ -129,10 +129,10 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
 
     video_format_t *v = &dec->fmt_out.video;
 
-    v->i_visible_width  = img->p.w;
-    v->i_visible_height = img->p.h;
-    v->i_width  = (img->p.w + 0x7F) & ~0x7F;
-    v->i_height = (img->p.h + 0x7F) & ~0x7F;
+    v->i_visible_width  = img->seq_hdr->max_width;
+    v->i_visible_height = img->seq_hdr->max_height;
+    v->i_width  = (img->seq_hdr->max_width + 0x7F) & ~0x7F;
+    v->i_height = (img->seq_hdr->max_height + 0x7F) & ~0x7F;
 
     if( !v->i_sar_num || !v->i_sar_den )
     {
