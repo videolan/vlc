@@ -163,8 +163,8 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
 
     video_format_t *v = &dec->fmt_out.video;
 
-    v->i_visible_width  = img->p.w;
-    v->i_visible_height = img->p.h;
+    v->i_visible_width  = img->seq_hdr->max_width;
+    v->i_visible_height = img->seq_hdr->max_height;
 
     UpdateDecoderOutput(dec, img->seq_hdr);
 
@@ -199,8 +199,8 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     v->multiview_mode = dec->fmt_in->video.multiview_mode;
     v->pose = dec->fmt_in->video.pose;
     dec->fmt_out.i_codec = FindVlcChroma(img);
-    v->i_width  = (img->p.w + 0x7F) & ~0x7F;
-    v->i_height = (img->p.h + 0x7F) & ~0x7F;
+    v->i_width  = (img->seq_hdr->max_width + 0x7F) & ~0x7F;
+    v->i_height = (img->seq_hdr->max_height + 0x7F) & ~0x7F;
     v->i_chroma = dec->fmt_out.i_codec;
 
     if (decoder_UpdateVideoFormat(dec) == 0)
