@@ -24,6 +24,7 @@
 # include <config.h>
 #endif
 #include <assert.h>
+#include <stdbit.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -276,7 +277,7 @@ static const unsigned short pic_types[8] = {
     BLOCK_FLAG_TYPE_I /* actually DC */, 0, 0, 0
 };
 
-#define EXTRACT(x,mask) (((x) & (mask)) >> vlc_ctz(mask))
+#define EXTRACT(x,mask) (((x) & (mask)) >> stdc_trailing_zeros(mask))
 
 static void rtp_mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
                            const struct vlc_rtp_pktinfo *restrict info)
