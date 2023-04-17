@@ -31,42 +31,6 @@
 
 #include <assert.h>
 
-static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
-static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
-
-LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
-                       HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
-{
-    if( !p_gesture )
-        return DefWindowProc( hWnd, message, wParam, lParam );
-
-    GESTUREINFO gi;
-    ZeroMemory( &gi, sizeof( GESTUREINFO ) );
-    gi.cbSize = sizeof( GESTUREINFO );
-
-    BOOL bResult  = p_gesture->OurGetGestureInfo((HGESTUREINFO)lParam, &gi);
-    BOOL bHandled = FALSE; /* Needed to release the handle */
-
-    if( bResult )
-        bHandled = p_gesture->DecodeGestureImpl(p_this, p_gesture, &gi);
-    else
-    {
-        DWORD dwErr = GetLastError();
-        if( dwErr > 0 )
-            msg_Err( p_this, "Could not retrieve a valid GESTUREINFO structure" );
-    }
-
-    if( bHandled )
-    {
-        /* Close the Handle, if we handled the gesture, a contrario
-         * from the doc example */
-        p_gesture->OurCloseGestureInfoHandle((HGESTUREINFO)lParam);
-        return 0;
-    }
-    else
-        return DefWindowProc( hWnd, message, wParam, lParam );
-}
-
 static BOOL DecodeGestureAction( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi )
 {
     BOOL bHandled = FALSE; /* Needed to release the handle */
@@ -314,6 +278,38 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
             break;
     }
     return bHandled;
+}
+
+LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
+                       HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+    if( !p_gesture )
+        return DefWindowProc( hWnd, message, wParam, lParam );
+
+    GESTUREINFO gi;
+    ZeroMemory( &gi, sizeof( GESTUREINFO ) );
+    gi.cbSize = sizeof( GESTUREINFO );
+
+    BOOL bResult  = p_gesture->OurGetGestureInfo((HGESTUREINFO)lParam, &gi);
+    BOOL bHandled = FALSE; /* Needed to release the handle */
+
+    if( bResult )
+        bHandled = p_gesture->DecodeGestureImpl(p_this, p_gesture, &gi);
+    else
+    {
+        DWORD dwErr = GetLastError();
+        if( dwErr > 0 )
+            msg_Err( p_this, "Could not retrieve a valid GESTUREINFO structure" );
+    }
+
+    if( bHandled )
+    {
+        /* Close the Handle, if we handled the gesture, a contrario
+         * from the doc example */
+        p_gesture->OurCloseGestureInfoHandle((HGESTUREINFO)lParam);
+        return 0;
+    }
+    return DefWindowProc( hWnd, message, wParam, lParam );
 }
 
 BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProjected )
