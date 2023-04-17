@@ -315,11 +315,16 @@ bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
     ZeroMemory( &gi, sizeof( GESTUREINFO ) );
     gi.cbSize = sizeof( GESTUREINFO );
 
-    BOOL bResult  = GetGestureInfo(hGestureInfo, &gi);
-    bool bHandled = false; /* Needed to release the handle */
-
-    if( bResult )
-        bHandled = p_gesture->DecodeGestureImpl(p_this, p_gesture, &gi);
+    if( GetGestureInfo(hGestureInfo, &gi) )
+    {
+        if( p_gesture->DecodeGestureImpl(p_this, p_gesture, &gi) )
+        {
+            /* Close the Handle, if we handled the gesture, a contrario
+             * from the doc example */
+            CloseGestureInfoHandle(hGestureInfo);
+            return true;
+        }
+    }
     else
     {
         DWORD dwErr = GetLastError();
@@ -327,13 +332,6 @@ bool DecodeGesture( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture,
             msg_Err( p_this, "Could not retrieve a valid GESTUREINFO structure" );
     }
 
-    if( bHandled )
-    {
-        /* Close the Handle, if we handled the gesture, a contrario
-         * from the doc example */
-        CloseGestureInfoHandle(hGestureInfo);
-        return true;
-    }
     return false;
 }
 
