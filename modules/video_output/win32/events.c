@@ -41,6 +41,9 @@
 
 #include "events.h"
 #include "common.h"
+#ifdef HAVE_WIN32_SENSORS
+#include "sensors.h"
+#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -57,8 +60,11 @@ struct event_thread_t
     atomic_bool  b_done;
     bool         b_error;
 
-    /* */
-    bool is_projected;
+#ifdef HAVE_WIN32_SENSORS
+    /* Sensors */
+    const vout_display_owner_t *init_move;
+    void *p_sensors;
+#endif
 
     /* Gestures */
     win32_gesture_sys_t *p_gesture;
@@ -171,9 +177,15 @@ void EventThreadDestroy( event_thread_t *p_event )
     free( p_event );
 }
 
-int EventThreadStart( event_thread_t *p_event, const struct vout_display_placement *display, bool is_projected )
+int EventThreadStart( event_thread_t *p_event, const struct vout_display_placement *display,
+                      const vout_display_owner_t *owner )
 {
-    p_event->is_projected = is_projected;
+#ifdef HAVE_WIN32_SENSORS
+    p_event->init_move = owner;
+    p_event->p_sensors = NULL;
+#else
+    VLC_UNUSED(owner);
+#endif
     p_event->init_width  = display->width;
     p_event->init_height = display->height;
 
@@ -199,6 +211,11 @@ int EventThreadStart( event_thread_t *p_event, const struct vout_display_placeme
         p_event->b_ready = false;
         return VLC_EGENERIC;
     }
+
+#ifdef HAVE_WIN32_SENSORS
+    if (owner != NULL)
+        p_event->p_sensors = HookWindowsSensors(vlc_object_logger(p_event->obj), owner, p_event->hvideownd);
+#endif
     msg_Dbg( p_event->obj, "Vout EventThread running" );
 
     return VLC_SUCCESS;
@@ -223,6 +240,11 @@ void EventThreadStop( event_thread_t *p_event )
 
     vlc_join( p_event->thread, NULL );
     p_event->b_ready = false;
+
+#ifdef HAVE_WIN32_SENSORS
+    if (p_event->p_sensors)
+        UnhookWindowsSensors(p_event->p_sensors);
+#endif
 }
 
 
@@ -352,7 +374,12 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         SetWindowLong( p_event->hparent, GWL_STYLE,
                        parent_style | WS_CLIPCHILDREN );
 
-    InitGestures( p_event->hvideownd, &p_event->p_gesture, p_event->is_projected );
+#ifdef HAVE_WIN32_SENSORS
+    if (p_event->init_move != NULL)
+        InitGestures( p_event->hvideownd, &p_event->p_gesture, true );
+    else
+#endif
+        InitGestures( p_event->hvideownd, &p_event->p_gesture, false );
 
     /* Now display the window */
     ShowWindow( p_event->hvideownd, SW_SHOWNOACTIVATE );

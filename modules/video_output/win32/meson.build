@@ -5,6 +5,7 @@
 # Direct3D11 video output
 d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_scaler.cpp', 'd3d11_shaders.cpp', 'd3d_shaders.c', 'd3d_dynamic_shader.c', 'common.c')
 d3d11_link_with = [ d3d11_common_lib ]
+d3d11_cargs = []
 d3d11_deps = []
 if get_option('winstore_app')
     d3d11_deps += [
@@ -14,12 +15,14 @@ if get_option('winstore_app')
 else
     d3d11_sources += files('d3d11_swapchain.cpp', 'dxgi_swapchain.cpp', 'events.c', 'sensors.cpp', 'win32touch.c')
     d3d11_link_with += [ chroma_copy_lib ]
+    d3d11_cargs += '-DHAVE_WIN32_SENSORS'
 endif
 
 vlc_modules += {
     'name' : 'direct3d11',
     'sources' : d3d11_sources,
     'link_with' : d3d11_link_with,
+    'c_args' : d3d11_cargs,
     'dependencies' : d3d11_deps
 }
 
@@ -47,7 +50,7 @@ if have_win_desktop
                 files('glwin32.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
                 opengl_vout_commonsources
             ],
-            'c_args' : [ contrib_inc_args ],
+            'c_args' : [ contrib_inc_args, '-DHAVE_WIN32_SENSORS' ],
             'dependencies' : [ gl_common_dep, opengl32_lib ]
         }
 

@@ -49,7 +49,6 @@
 #endif
 
 #include "common.h"
-#include "sensors.h"
 #include "../../video_chroma/copy.h"
 
 using Microsoft::WRL::ComPtr;
@@ -99,9 +98,6 @@ typedef struct vout_display_sys_t
     display_win32_area_t     area;
 
     int                      log_level;
-
-    /* Sensors */
-    void *p_sensors = NULL;
 
     display_info_t           display = {};
 
@@ -431,11 +427,6 @@ static int Open(vout_display_t *vd,
 #endif // !VLC_WINSTORE_APP
     }
 
-#ifndef VLC_WINSTORE_APP
-    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && CommonVideoHWND(&sys->area))
-        sys->p_sensors = HookWindowsSensors(vlc_object_logger(vd), &vd->owner, CommonVideoHWND(&sys->area));
-#endif // !VLC_WINSTORE_APP
-
     if (Direct3D11Open(vd, fmtp, context)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
@@ -472,7 +463,6 @@ static void Close(vout_display_t *vd)
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     D3D_ReleaseShaderCompiler(sys->shaders);
 #ifndef VLC_WINSTORE_APP
-    UnhookWindowsSensors(sys->p_sensors);
     CommonWindowClean(&sys->area);
 #endif
     Direct3D11Close(vd);

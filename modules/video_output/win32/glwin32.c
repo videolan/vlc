@@ -38,7 +38,6 @@
 #include "../opengl/vout_helper.h"
 
 #include "common.h"
-#include "sensors.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -67,9 +66,6 @@ typedef struct vout_display_sys_t
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
-
-    /* Sensors */
-    void *p_sensors;
 } vout_display_sys_t;
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
@@ -138,9 +134,6 @@ static int Open(vout_display_t *vd,
         goto error;
     CommonPlacePicture(vd, &sys->area);
 
-    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
-        sys->p_sensors = HookWindowsSensors(vlc_object_logger(vd), &vd->owner, CommonVideoHWND(&sys->area));
-
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 
     vout_display_cfg_t embed_cfg = *vd->cfg;
@@ -201,7 +194,6 @@ static void Close(vout_display_t *vd)
         vlc_object_delete(surface);
     }
 
-    UnhookWindowsSensors(sys->p_sensors);
     CommonWindowClean(&sys->area);
 
     free(sys);

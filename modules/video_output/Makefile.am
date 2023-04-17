@@ -193,7 +193,9 @@ libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.cpp \
  video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
+libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if !HAVE_WINSTORE
+libdirect3d11_plugin_la_CPPFLAGS += -DHAVE_WIN32_SENSORS
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \
  video_output/win32/d3d11_swapchain.cpp video_output/win32/d3d11_swapchain.h \
@@ -215,6 +217,7 @@ libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
+libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_WIN32_SENSORS
 libglwin32_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libwgl_plugin_la_SOURCES = video_output/win32/wgl.c
 
