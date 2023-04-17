@@ -57,13 +57,10 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
         return VLC_EGENERIC;
 
     /* */
-    area->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
+    area->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window,
+                                    &vd->cfg->display,
+                                    projection_gestures ? &vd->owner : NULL);
     if (!area->event)
-        return VLC_EGENERIC;
-
-    /* */
-    if (EventThreadStart(area->event, &vd->cfg->display,
-                         projection_gestures ? &vd->owner : NULL))
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;

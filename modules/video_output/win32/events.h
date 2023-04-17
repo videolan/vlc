@@ -29,10 +29,10 @@
  */
 typedef struct event_thread_t event_thread_t;
 
-event_thread_t *EventThreadCreate( vlc_object_t *, vlc_window_t *);
+event_thread_t *EventThreadCreate( vlc_object_t *, vlc_window_t *,
+                                   const struct vout_display_placement *,
+                                   const vout_display_owner_t * );
 void            EventThreadDestroy( event_thread_t * );
-int             EventThreadStart( event_thread_t *, const struct vout_display_placement *,
-                                  const vout_display_owner_t * );
 HWND            EventThreadVideoHWND( const event_thread_t * );
 void            EventThreadStop( event_thread_t * );
 void            EventThreadUpdateSize( event_thread_t * );

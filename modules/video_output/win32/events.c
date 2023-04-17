@@ -144,7 +144,9 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window)
+event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window,
+                                   const struct vout_display_placement *display,
+                                   const vout_display_owner_t *owner )
 {
     if (parent_window->type != VLC_WINDOW_TYPE_HWND)
         return NULL;
@@ -169,17 +171,7 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_windo
 
     _snwprintf( p_event->class_video, ARRAY_SIZE(p_event->class_video),
                 TEXT("VLC video output %p"), (void *)p_event );
-    return p_event;
-}
 
-void EventThreadDestroy( event_thread_t *p_event )
-{
-    free( p_event );
-}
-
-int EventThreadStart( event_thread_t *p_event, const struct vout_display_placement *display,
-                      const vout_display_owner_t *owner )
-{
 #ifdef HAVE_WIN32_SENSORS
     p_event->init_move = owner;
     p_event->p_sensors = NULL;
@@ -195,8 +187,9 @@ int EventThreadStart( event_thread_t *p_event, const struct vout_display_placeme
 
     if( vlc_clone( &p_event->thread, EventThread, p_event ) )
     {
-        msg_Err( p_event->obj, "cannot create Vout EventThread" );
-        return VLC_EGENERIC;
+        msg_Err( obj, "cannot create Vout EventThread" );
+        free(p_event);
+        return NULL;
     }
 
     vlc_mutex_lock( &p_event->lock );
@@ -208,17 +201,17 @@ int EventThreadStart( event_thread_t *p_event, const struct vout_display_placeme
     if( b_error )
     {
         vlc_join( p_event->thread, NULL );
-        p_event->b_ready = false;
-        return VLC_EGENERIC;
+        free(p_event);
+        return NULL;
     }
 
 #ifdef HAVE_WIN32_SENSORS
     if (owner != NULL)
-        p_event->p_sensors = HookWindowsSensors(vlc_object_logger(p_event->obj), owner, p_event->hvideownd);
+        p_event->p_sensors = HookWindowsSensors(vlc_object_logger(obj), owner, p_event->hvideownd);
 #endif
-    msg_Dbg( p_event->obj, "Vout EventThread running" );
+    msg_Dbg( obj, "Vout EventThread running" );
 
-    return VLC_SUCCESS;
+    return p_event;
 }
 
 HWND EventThreadVideoHWND( const event_thread_t *p_event )
@@ -247,6 +240,10 @@ void EventThreadStop( event_thread_t *p_event )
 #endif
 }
 
+void EventThreadDestroy( event_thread_t *p_event )
+{
+    free( p_event );
+}
 
 /***********************************
  * Local functions implementations *
