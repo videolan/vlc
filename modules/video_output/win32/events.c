@@ -57,8 +57,8 @@ struct event_thread_t
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_ready; // the thread was started
-    atomic_bool  b_done;
     bool         b_error;
+    atomic_bool  b_done;
 
 #ifdef HAVE_WIN32_SENSORS
     /* Sensors */
@@ -166,6 +166,8 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_windo
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
     atomic_init( &p_event->b_done, false );
+    p_event->b_ready = false;
+    p_event->b_error = false;
 
     p_event->parent_window = parent_window;
 
@@ -180,10 +182,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_windo
 #endif
     p_event->init_width  = display->width;
     p_event->init_height = display->height;
-
-    p_event->b_ready = false;
-    atomic_store( &p_event->b_done, false);
-    p_event->b_error = false;
 
     if( vlc_clone( &p_event->thread, EventThread, p_event ) )
     {
