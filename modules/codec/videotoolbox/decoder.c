@@ -37,6 +37,7 @@
 #import "../../packetizer/h264_slice.h"
 #import "../../packetizer/hxxx_nal.h"
 #import "../../packetizer/hxxx_sei.h"
+#import "../../packetizer/iso_color_tables.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
@@ -1176,6 +1177,147 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
     vlc_assert_unreachable();
 }
 
+static CFStringRef 
+MapYCbCrMatrixFromFormat(video_color_space_t color_space)
+{
+    switch (color_space) {
+    case COLOR_SPACE_BT601:
+        return kCVImageBufferYCbCrMatrix_ITU_R_601_4;
+    case COLOR_SPACE_BT2020:
+        if (__builtin_available(macOS 10.11, iOS 9, *))
+            return kCVImageBufferYCbCrMatrix_ITU_R_2020;
+        break;
+    case COLOR_SPACE_BT709:
+        return kCVImageBufferYCbCrMatrix_ITU_R_709_2;
+    case COLOR_SPACE_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_mc mc_cicp = 
+                vlc_coeffs_to_iso_23001_8_mc(color_space);
+            return CVYCbCrMatrixGetStringForIntegerCodePoint(mc_cicp);
+        }
+    }
+    return NULL;
+}
+
+static CFStringRef 
+MapColorPrimariesFromFormat(video_color_primaries_t color_primaries)
+{
+    switch (color_primaries) {
+    case COLOR_PRIMARIES_BT2020:
+        return kCVImageBufferColorPrimaries_ITU_R_2020;
+    case COLOR_PRIMARIES_BT709:
+        return kCVImageBufferColorPrimaries_ITU_R_709_2;
+    case COLOR_PRIMARIES_SMTPE_170:
+        return kCVImageBufferColorPrimaries_SMPTE_C;
+    case COLOR_PRIMARIES_EBU_3213:
+        return kCVImageBufferColorPrimaries_EBU_3213;
+    case COLOR_PRIMARIES_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_cp cp_cicp = 
+                vlc_primaries_to_iso_23001_8_cp(color_primaries);
+            return CVColorPrimariesGetStringForIntegerCodePoint(cp_cicp);
+        }
+    }
+    return NULL;
+}
+
+static CFStringRef 
+MapTransferFuncFromFormat(video_transfer_func_t transfer_func)
+{
+    switch (transfer_func) {
+    case TRANSFER_FUNC_SMPTE_ST2084:
+        if (__builtin_available(macOS 10.13, iOS 11, *))
+            return kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
+        break;
+    case TRANSFER_FUNC_BT709:
+    /* note: as stated by CVImageBuffer.h, 
+       kCVImageBufferTransferFunction_ITU_R_709_2 is equivalent to
+       kCVImageBufferTransferFunction_ITU_R_2020 and preferred
+    */
+        return kCVImageBufferTransferFunction_ITU_R_709_2;
+    case TRANSFER_FUNC_SMPTE_240:
+        return kCVImageBufferTransferFunction_SMPTE_240M_1995;
+    case TRANSFER_FUNC_HLG:
+        if (__builtin_available(macOS 10.13, iOS 11, *))
+            return kCVImageBufferTransferFunction_ITU_R_2100_HLG;
+        break;
+    case TRANSFER_FUNC_LINEAR:
+        if (__builtin_available(macOS 10.14, iOS 12, *))
+            return kCVImageBufferTransferFunction_Linear;
+        break;
+    case TRANSFER_FUNC_SRGB:
+        return kCVImageBufferTransferFunction_UseGamma;
+    case TRANSFER_FUNC_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_tc tc_cicp =
+                vlc_xfer_to_iso_23001_8_tc(transfer_func);
+            return CVTransferFunctionGetStringForIntegerCodePoint(tc_cicp);
+        }
+    }
+    return NULL;
+}
+
+static void 
+SetDecoderColorProperties(CFMutableDictionaryRef decoderConfiguration, 
+                          const video_format_t *video_fmt)
+{
+    /** 
+     VideoToolbox decoder doesn't attach all color properties to image buffers.
+     Current display modules handle tonemap without them.
+     Attaching additional color properties to image buffers is mandatory for
+     native image buffer display on macOS in order to have proper colors
+     tonemap when AVFoundation APIs are used to render them and prevent
+     flickering while using multiple displays with different colorsync profiles.
+    */
+    
+    CFStringRef color_matrix = 
+        MapYCbCrMatrixFromFormat(video_fmt->space);
+    if (color_matrix) {
+        CFDictionarySetValue(
+            decoderConfiguration,
+            kCVImageBufferYCbCrMatrixKey,
+            color_matrix);
+    }
+
+    CFStringRef color_primaries = 
+        MapColorPrimariesFromFormat(video_fmt->primaries);
+    if (color_primaries) {
+        CFDictionarySetValue(
+            decoderConfiguration, 
+            kCVImageBufferColorPrimariesKey, 
+            color_primaries
+        );
+    }
+
+    CFStringRef color_transfer_func = 
+        MapTransferFuncFromFormat(video_fmt->transfer);
+    if (color_transfer_func) {
+        CFDictionarySetValue(
+            decoderConfiguration, 
+            kCVImageBufferTransferFunctionKey, 
+            color_transfer_func
+        );
+    }
+
+    Float32 gamma = 0;
+    if (video_fmt->transfer == TRANSFER_FUNC_SRGB)
+        gamma = 2.2;
+
+    if (gamma != 0) {
+        cfdict_set_int32(
+            decoderConfiguration,
+            kCVImageBufferGammaLevelKey,
+            gamma
+        );
+    }
+}
+
 static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
                                                              unsigned i_sar_num,
                                                              unsigned i_sar_den)
@@ -1226,25 +1368,9 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
         CFRelease(pixelaspectratio);
     }
 
-    /* Setup YUV->RGB matrix since VT can output BGRA directly. Don't setup
-     * transfer and primaries since the transformation is done via the GL
-     * fragment shader. */
-    CFStringRef yuvmatrix;
-    switch (p_dec->fmt_out.video.space)
-    {
-        case COLOR_SPACE_BT601:
-            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_601_4;
-            break;
-        case COLOR_SPACE_BT2020:
-            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_2020;
-            break;
-        case COLOR_SPACE_BT709:
-        default:
-            yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_709_2;
-            break;
-    }
-    CFDictionarySetValue(decoderConfiguration, kCVImageBufferYCbCrMatrixKey,
-                         yuvmatrix);
+    video_format_AdjustColorSpace(&p_dec->fmt_out.video);
+
+    SetDecoderColorProperties(decoderConfiguration, &p_dec->fmt_out.video);
 
 #if TARGET_OS_OSX
     /* enable HW accelerated playback, since this is optional on OS X
