@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
 #include <vlc_common.h>
 #include <vlc_charset.h>
 
@@ -93,7 +94,7 @@ static bool ReadWin32( HANDLE *hConsoleIn, unsigned char *p_buffer, int *pi_size
                     (*pi_size)--;
                     nbBytes++;
                 }
-                assert( clz( (unsigned char)~(p_buffer[*pi_size]) ) == nbBytes + 1 );
+                assert( stdc_leading_ones( p_buffer[*pi_size] ) == nbBytes + 1 );
                 // The first utf8 byte will be overridden by a \0
             }
             else
