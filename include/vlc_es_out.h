@@ -25,6 +25,8 @@
 
 #include <assert.h>
 
+#include <vlc_es.h>
+
 /**
  * \defgroup es_out ES output
  * \ingroup input
@@ -182,24 +184,101 @@ static inline void es_out_Delete( es_out_t *p_out )
     p_out->cbs->destroy( p_out );
 }
 
+/* PCR handling, DTS/PTS will be automatically computed using those PCR
+ * XXX: SET_PCR(_GROUP) are in charge of the pace control. They will wait
+ * to slow down the demuxer so that it reads at the right speed.
+ * XXX: if you want PREROLL just call ES_OUT_SET_NEXT_DISPLAY_TIME and send
+ * as you would normally do.
+ */
 static inline int es_out_SetPCR( es_out_t *out, vlc_tick_t pcr )
 {
     return es_out_Control( out, ES_OUT_SET_PCR, pcr );
 }
 
-static inline int es_out_ControlSetMeta( es_out_t *out, const vlc_meta_t *p_meta )
+/* Reset the PCR */
+VLC_USED static inline int es_out_ResetPCR( es_out_t *out )
 {
-    return es_out_Control( out, ES_OUT_SET_META, p_meta );
+    return es_out_Control( out, ES_OUT_RESET_PCR );
 }
 
-static inline int es_out_ControlGetPcrSystem( es_out_t *out, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
+/* Set or change the selected ES in its category (audio/video/spu) */
+VLC_USED static inline int es_out_SetES( es_out_t *out, es_out_id_t *id )
+{
+    return es_out_Control( out, ES_OUT_SET_ES, id );
+}
+
+/* Unset selected ES */
+VLC_USED static inline int es_out_UnsetES( es_out_t *out, es_out_id_t *id )
+{
+    return es_out_Control( out, ES_OUT_UNSET_ES, id );
+}
+
+/* Restart the selected ES */
+VLC_USED static inline int es_out_RestartES( es_out_t *out, es_out_id_t *id )
+{
+    return es_out_Control( out, ES_OUT_RESTART_ES, id );
+}
+
+/* Set or change the default ES */
+VLC_USED static inline int es_out_SetESDefault( es_out_t *out, es_out_id_t *id )
+{
+    return es_out_Control( out, ES_OUT_SET_ES_DEFAULT, id );
+}
+
+/* Force (un)selection of the ES (bypass current mode) */
+VLC_USED static inline int es_out_SetESState( es_out_t *out, es_out_id_t *id, bool state )
+{
+    return es_out_Control( out, ES_OUT_SET_ES_STATE, id, state );
+}
+
+/* This will update the fmt, drain and restart the decoder (if any).
+ * The new fmt must have the same i_cat and i_id. */
+VLC_USED static inline int es_out_SetESFmt( es_out_t *out, es_format_t *fmt )
+{
+    return es_out_Control( out, ES_OUT_SET_ES_FMT, fmt );
+}
+
+/* Sets ES selection policy when in auto mode */
+VLC_USED static inline int es_out_SetESCatPolicy( es_out_t *out, enum es_format_category_e cat, enum es_out_policy_e policy )
+{
+    return es_out_Control( out, ES_OUT_SET_ES_CAT_POLICY, cat, policy );
+}
+
+/* Get the selected state of the ES */
+VLC_USED static inline bool es_out_GetESState( es_out_t *out, es_out_id_t *id)
+{
+    bool state = false;
+    
+    es_out_Control( out, ES_OUT_GET_ES_STATE, id, &state );
+    return state;
+}
+
+/* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed) */
+VLC_USED static inline int es_out_SetNextDisplayTime( es_out_t *out, vlc_tick_t ndt )
+{
+    return es_out_Control( out, ES_OUT_SET_NEXT_DISPLAY_TIME, ndt );
+}
+
+/* Set global meta data (The vlc_meta_t is not modified nor released) */
+VLC_USED static inline int es_out_SetMeta( es_out_t *out, const vlc_meta_t *meta )
+{
+    return es_out_Control( out, ES_OUT_SET_META, meta );
+}
+#define es_out_ControlSetMeta es_out_SetMeta
+
+/* Get the PCR system clock manipulation for external clock synchronization */
+VLC_USED static inline int es_out_GetPcrSystem( es_out_t *out, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
 {
     return es_out_Control( out, ES_OUT_GET_PCR_SYSTEM, pi_system, pi_delay );
 }
-static inline int es_out_ControlModifyPcrSystem( es_out_t *out, bool b_absolute, vlc_tick_t i_system )
+#define es_out_ControlGetPcrSystem es_out_GetPcrSystem
+
+/* Modify the PCR system clock manipulation for external clock synchronization */
+VLC_USED static inline int es_out_ModifyPcrSystem( es_out_t *out, bool b_absolute, vlc_tick_t i_system )
 {
     return es_out_Control( out, ES_OUT_MODIFY_PCR_SYSTEM, b_absolute, i_system );
 }
+#define es_out_ControlModifyPcrSystem es_out_ModifyPcrSystem
 
 /**
  * @}
