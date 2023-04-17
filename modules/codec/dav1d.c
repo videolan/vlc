@@ -160,6 +160,7 @@ static void UpdateDecoderOutput(decoder_t *dec, const Dav1dSequenceHeader *seq_h
 static int NewPicture(Dav1dPicture *img, void *cookie)
 {
     decoder_t *dec = cookie;
+    decoder_sys_t *p_sys = dec->p_sys;
 
     video_format_t *v = &dec->fmt_out.video;
 
@@ -202,6 +203,11 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     v->i_width  = (img->seq_hdr->max_width + 0x7F) & ~0x7F;
     v->i_height = (img->seq_hdr->max_height + 0x7F) & ~0x7F;
     v->i_chroma = dec->fmt_out.i_codec;
+
+    dec->i_extra_picture_buffers = p_sys->s.max_frame_delay;
+    if (img->seq_hdr->super_res)
+        // dav1d seems to buffer more pictures when using super resolution
+        dec->i_extra_picture_buffers += p_sys->s.max_frame_delay > 1 ? 2 : 1;
 
     if (decoder_UpdateVideoFormat(dec) == 0)
     {
