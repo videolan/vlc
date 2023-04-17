@@ -24,6 +24,8 @@
 # include <config.h>
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_plugin.h>
@@ -915,7 +917,7 @@ static inline dtv_delivery_t GetSingleDelivery( dtv_delivery_t d )
     if( d == 0 )
         return DTV_DELIVERY_NONE;
     else
-        return 1 << ctz( d );
+        return 1 << stdc_trailing_zeros(d);
 }
 
 /** Determines which delivery system to use. */
