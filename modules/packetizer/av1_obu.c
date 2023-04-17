@@ -328,8 +328,8 @@ av1_OBU_sequence_header_t *
 
     p_seq->seq_profile = bs_read(&bs, 3);
     p_seq->still_picture = bs_read1(&bs);
-    const obu_u1_t reduced_still_picture_header = bs_read1(&bs);
-    if(reduced_still_picture_header)
+    p_seq->reduced_still_picture_header = bs_read1(&bs);
+    if(p_seq->reduced_still_picture_header)
     {
         p_seq->operating_points[0].seq_level_idx = bs_read(&bs, 5);
     }
@@ -373,7 +373,7 @@ av1_OBU_sequence_header_t *
     const obu_u4_t frame_height_bits_minus_1 = bs_read(&bs, 4);
     p_seq->max_frame_width_minus_1 = bs_read(&bs, 1 + frame_width_bits_minus_1);
     p_seq->max_frame_height_minus_1 = bs_read(&bs, 1 + frame_height_bits_minus_1);
-    if(!reduced_still_picture_header)
+    if(!p_seq->reduced_still_picture_header)
     {
         p_seq->frame_id_numbers_present_flag = bs_read1(&bs);
         if(p_seq->frame_id_numbers_present_flag)
@@ -385,7 +385,7 @@ av1_OBU_sequence_header_t *
     p_seq->use_128x128_superblock = bs_read1(&bs);
     p_seq->enable_filter_intra = bs_read1(&bs);
     p_seq->enable_intra_edge_filter = bs_read1(&bs);
-    if(!reduced_still_picture_header)
+    if(!p_seq->reduced_still_picture_header)
     {
         p_seq->enable_interintra_compound = bs_read1(&bs);
         p_seq->enable_masked_compound = bs_read1(&bs);
