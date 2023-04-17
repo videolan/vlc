@@ -139,7 +139,7 @@ static int Open(vout_display_t *vd,
     CommonPlacePicture(vd, &sys->area);
 
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
-        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->area));
+        sys->p_sensors = HookWindowsSensors(vlc_object_logger(vd), &vd->owner, CommonVideoHWND(&sys->area));
 
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 

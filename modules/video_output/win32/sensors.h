@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-void* HookWindowsSensors(vout_display_t*, HWND);
+void* HookWindowsSensors(struct vlc_logger *, const vout_display_owner_t *, HWND);
 void UnhookWindowsSensors(void*);
 
 # ifdef __cplusplus

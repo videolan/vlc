@@ -433,7 +433,7 @@ static int Open(vout_display_t *vd,
 
 #ifndef VLC_WINSTORE_APP
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && CommonVideoHWND(&sys->area))
-        sys->p_sensors = HookWindowsSensors(vd, CommonVideoHWND(&sys->area));
+        sys->p_sensors = HookWindowsSensors(vlc_object_logger(vd), &vd->owner, CommonVideoHWND(&sys->area));
 #endif // !VLC_WINSTORE_APP
 
     if (Direct3D11Open(vd, fmtp, context)) {

@@ -41,8 +41,8 @@ using Microsoft::WRL::ComPtr;
 class SensorReceiver : public ISensorEvents
 {
 public:
-    SensorReceiver(vout_display_t *vd, const vlc_viewpoint_t & init_viewpoint)
-        :vd(vd)
+    SensorReceiver(const vout_display_owner_t *o, const vlc_viewpoint_t & init_viewpoint)
+        :owner(*o)
         ,current_pos(init_viewpoint)
     {}
 
@@ -128,7 +128,8 @@ public:
             old_pos.roll  - current_pos.roll,
             0.0f
         };
-        vout_display_SendEventViewpointMoved(vd, &vp);
+        if (owner.viewpoint_moved)
+            owner.viewpoint_moved(owner.sys, &vp);
         return S_OK;
     }
 
@@ -147,12 +148,12 @@ public:
     }
 
 private:
-    vout_display_t *const vd;
+    vout_display_owner_t owner;
     vlc_viewpoint_t current_pos;
     long m_cRef;
 };
 
-void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
+void *HookWindowsSensors(vlc_logger *vd, const vout_display_owner_t *move, HWND hwnd)
 {
     ComPtr<ISensorManager> pSensorManager;
     HRESULT hr = CoCreateInstance( __uuidof(SensorManager),
@@ -165,13 +166,13 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
     hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, &pInclinometers);
     if (FAILED(hr))
     {
-        msg_Dbg(vd, "inclinometer not found. (hr=0x%lX)", hr);
+        vlc_debug(vd, "inclinometer not found. (hr=0x%lX)", hr);
         return NULL;
     }
 
     ULONG count;
     pInclinometers->GetCount(&count);
-    msg_Dbg(vd, "Found %lu inclinometer", count);
+    vlc_debug(vd, "Found %lu inclinometer", count);
     for (ULONG i=0; i<count; ++i)
     {
         ComPtr<ISensor> pSensor;
@@ -213,7 +214,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
             PropVariantClear(&pvRot);
         }
 
-        SensorReceiver *received = new(std::nothrow) SensorReceiver(vd, start_viewpoint);
+        SensorReceiver *received = new(std::nothrow) SensorReceiver(move, start_viewpoint);
         if (received)
         {
             pSensor->SetEventSink(received);
