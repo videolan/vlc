@@ -21,6 +21,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
 #include "hxxx_ep3b.h"
@@ -1116,14 +1118,6 @@ void hevc_get_dpb_values( const hevc_sequence_parameter_set_t *p_sps, uint8_t *m
     */
 }
 
-static inline uint8_t vlc_ceil_log2( uint32_t val )
-{
-    uint8_t n = 31 - clz(val);
-    if (((unsigned)1 << n) != val)
-        n++;
-    return n;
-}
-
 static bool hevc_get_picture_CtbsYsize( const hevc_sequence_parameter_set_t *p_sps, unsigned *p_w, unsigned *p_h )
 {
     const unsigned int MinCbLog2SizeY = p_sps->log2_min_luma_coding_block_size_minus3 + 3;
@@ -1261,7 +1255,7 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
         if( !hevc_get_picture_CtbsYsize( p_sps, &w, &h ) )
             return false;
 
-        (void) bs_read( p_bs, vlc_ceil_log2( w * h ) ); /* slice_segment_address */
+        (void) bs_read( p_bs, stdc_bit_width( w * h - 1 ) ); /* slice_segment_address */
     }
 
     if( !p_sl->dependent_slice_segment_flag )
