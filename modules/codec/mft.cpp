@@ -1289,6 +1289,12 @@ static void DestroyMFT(decoder_t *p_dec);
 
 static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 {
+    if (!(d3d_dev->d3ddevice->GetCreationFlags() & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+    {
+        msg_Warn(p_dec, "the provided D3D11 device doesn't support decoding");
+        return VLC_EGENERIC;
+    }
+
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
     hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, &p_sys->dxgi_manager);
@@ -1381,13 +1387,14 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
                     hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
                     if (SUCCEEDED(hr) && can_d3d11)
                     {
-                        SetD3D11(p_dec, &devsys11->d3d_dev);
-
-                        IMFAttributes *outputAttr = NULL;
-                        hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
-                        if (SUCCEEDED(hr))
+                        if (SetD3D11(p_dec, &devsys11->d3d_dev) == VLC_SUCCESS)
                         {
-                            hr = outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE);
+                            IMFAttributes *outputAttr = NULL;
+                            hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
+                            if (SUCCEEDED(hr))
+                            {
+                                hr = outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE);
+                            }
                         }
                     }
                 }
