@@ -33,6 +33,7 @@
 #include "sub_renderer.h"
 
 #include <assert.h>
+#include <stdbit.h>
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_es.h>
@@ -253,8 +254,8 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
             if (!sr->api->supports_npot) {
-                glr->width  = vlc_align_pot(glr->width);
-                glr->height = vlc_align_pot(glr->height);
+                glr->width  = stdc_bit_ceil((unsigned)glr->width);
+                glr->height = stdc_bit_ceil((unsigned)glr->height);
                 glr->tex_width  = (float) r->fmt.i_visible_width  / glr->width;
                 glr->tex_height = (float) r->fmt.i_visible_height / glr->height;
             } else {

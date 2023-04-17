@@ -50,13 +50,6 @@ static const float MATRIX2x3_IDENTITY[2*3] = {
     0, 0,
 };
 
-/** Return the smallest larger or equal power of 2 */
-static inline unsigned vlc_align_pot(unsigned x)
-{
-    unsigned align = 1 << (8 * sizeof (unsigned) - vlc_clz(x));
-    return ((align >> 1) == x) ? x : align;
-}
-
 /**
  * Build an OpenGL program
  *
