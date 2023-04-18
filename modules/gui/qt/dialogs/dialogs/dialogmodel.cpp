@@ -22,7 +22,7 @@
 
 // VLC includes
 #include <vlc_dialog.h>
-#include <qt.hpp>
+#include "qt.hpp"
 
 #include "maininterface/mainctx.hpp"
 

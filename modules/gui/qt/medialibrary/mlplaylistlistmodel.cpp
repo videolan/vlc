@@ -24,7 +24,7 @@
 
 // VLC includes
 #include <vlc_media_library.h>
-#include <qt.hpp>
+#include "qt.hpp"
 
 #include "util/vlctick.hpp"
 
