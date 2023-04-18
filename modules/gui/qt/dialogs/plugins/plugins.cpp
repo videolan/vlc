@@ -36,6 +36,7 @@
 #include <cassert>
 
 #include <vlc_modules.h>
+#include <vlc_extensions.h>
 
 #include <QTreeWidget>
 #include <QStringList>
