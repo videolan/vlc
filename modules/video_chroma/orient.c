@@ -27,6 +27,7 @@
 #   include "config.h"
 #endif
 #include <limits.h>
+#include <stdbit.h>
 
 #include <vlc_common.h>
 #include <vlc_cpu.h>
@@ -312,7 +313,7 @@ static int Open(filter_t *filter)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    int order = vlc_ctz(chroma->pixel_size);
+    int order = stdc_trailing_zeros(chroma->pixel_size);
 
     sys->transform = transform;
     sys->plane = descriptions[transform];
