@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -110,7 +112,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_chan_mode = p_sys->first.i_chan_mode;
     p_dec->fmt_out.audio.i_physical_channels = p_sys->first.i_physical_channels;
     p_dec->fmt_out.audio.i_channels =
-        vlc_popcount( p_dec->fmt_out.audio.i_physical_channels );
+        stdc_count_ones( p_dec->fmt_out.audio.i_physical_channels );
 
     p_dec->fmt_out.i_bitrate = p_sys->first.i_bitrate;
 
