@@ -28,6 +28,7 @@
 #define COBJMACROS
 
 #include <assert.h>
+#include <stdbit.h>
 #include <stdlib.h>
 
 #define _DECL_DLLMAIN
@@ -169,7 +170,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     if (wfe->dwChannelMask & SPEAKER_LOW_FREQUENCY)
         fmt->i_physical_channels |= AOUT_CHAN_LFE;
 
-    assert(vlc_popcount(wfe->dwChannelMask) == wf->nChannels);
+    assert(stdc_count_ones(wfe->dwChannelMask) == wf->nChannels);
 
     if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM))
     {
