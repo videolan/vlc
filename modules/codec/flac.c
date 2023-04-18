@@ -32,6 +32,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -337,7 +339,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                 {
                     char *endptr = (char *) &comment->entry[34] + comment->length;
                     const uint32_t i_wfxmask = strtoul( (char *) &comment->entry[34], &endptr, 16 );
-                    const unsigned i_wfxchannels = vlc_popcount( i_wfxmask );
+                    const unsigned i_wfxchannels = stdc_count_ones( i_wfxmask );
                     if( i_wfxchannels > 0 && i_wfxchannels <= AOUT_CHAN_MAX )
                     {
                         /* Create the vlc bitmap from wfx channels */
@@ -353,7 +355,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
                             }
                         }
                         /* Check if we have the 1 to 1 mapping */
-                        if( (unsigned) vlc_popcount(i_vlcmask) != i_wfxchannels )
+                        if( stdc_count_ones(i_vlcmask) != i_wfxchannels )
                         {
                             msg_Warn( p_dec, "Unsupported channel mask %x", i_wfxmask );
                             return;
