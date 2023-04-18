@@ -23,9 +23,7 @@
 #include "config.h"
 #endif
 
-#include <vlc_media_library.h>
 #include <vlc_media_source.h>
-#include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
 #include <memory>
