@@ -280,11 +280,11 @@ static BOOL DecodeGestureProjection( vlc_object_t *p_this, win32_gesture_sys_t *
     return bHandled;
 }
 
-LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
-                       HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+bool DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
+                    LPARAM lParam )
 {
     if( !p_gesture )
-        return DefWindowProc( hWnd, message, wParam, lParam );
+        return false;
 
     GESTUREINFO gi;
     ZeroMemory( &gi, sizeof( GESTUREINFO ) );
@@ -307,9 +307,9 @@ LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
         /* Close the Handle, if we handled the gesture, a contrario
          * from the doc example */
         p_gesture->OurCloseGestureInfoHandle((HGESTUREINFO)lParam);
-        return 0;
+        return true;
     }
-    return DefWindowProc( hWnd, message, wParam, lParam );
+    return false;
 }
 
 BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **pp_gesture, bool b_isProjected )

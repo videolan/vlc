@@ -71,8 +71,8 @@ typedef struct win32_gesture_sys_t {
 
 BOOL InitGestures( HWND hwnd, win32_gesture_sys_t **p_gesture, bool b_isProjected );
 
-LRESULT DecodeGesture( vlc_object_t *p_intf, win32_gesture_sys_t *p_gesture,
-        HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+bool DecodeGesture( vlc_object_t *p_intf, win32_gesture_sys_t *p_gesture,
+                    LPARAM lParam );
 
 void CloseGestures( win32_gesture_sys_t *p_gesture );
 
