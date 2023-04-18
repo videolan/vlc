@@ -24,6 +24,7 @@
 #include "extensions_manager.hpp" // for isUnloading()
 
 #include <vlc_dialog.h>
+#include <vlc_extensions.h>
 
 #include <QGridLayout>
 #include <QPushButton>

@@ -27,8 +27,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_extensions.h>
-
 #include "qt.hpp"
 #include <player/player_controller.hpp>
 #include "util/singleton.hpp"
@@ -39,6 +37,10 @@ class QMenu;
 class QSignalMapper;
 
 class ExtensionsDialogProvider;
+
+extern "C" {
+    struct extensions_manager_t;
+};
 
 class ExtensionsManager : public QObject, public Singleton<ExtensionsManager>
 {
