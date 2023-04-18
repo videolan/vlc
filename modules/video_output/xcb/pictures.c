@@ -24,6 +24,7 @@
 # include <config.h>
 #endif
 
+#include <stdbit.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
@@ -66,16 +67,16 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             /* TODO: 30 bits HDR RGB */
             case 32:
             case 24:
-                if (vlc_popcount(vt->red_mask) == 8
-                 && vlc_popcount(vt->green_mask) == 8
-                 && vlc_popcount(vt->red_mask) == 8)
+                if (stdc_count_ones(vt->red_mask) == 8
+                 && stdc_count_ones(vt->green_mask) == 8
+                 && stdc_count_ones(vt->red_mask) == 8)
                     break; /* 32-bits ARGB or 24-bits RGB */
                 return false;
             case 16:
             case 15:
-                if (vlc_popcount(vt->red_mask) == 5
-                 && vlc_popcount(vt->green_mask) == (depth - 10)
-                 && vlc_popcount(vt->red_mask) == 5)
+                if (stdc_count_ones(vt->red_mask) == 5
+                 && stdc_count_ones(vt->green_mask) == (depth - 10u)
+                 && stdc_count_ones(vt->red_mask) == 5)
                     break; /* 16-bits or 15-bits RGB */
                 return false;
             case 8:
