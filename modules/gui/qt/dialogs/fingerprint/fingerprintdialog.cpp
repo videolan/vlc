@@ -25,6 +25,8 @@
 
 #include "dialogs/fingerprint/chromaprint.hpp"
 
+#include <vlc_fingerprinter.h>
+
 #include <QLabel>
 #include <QListWidgetItem>
 

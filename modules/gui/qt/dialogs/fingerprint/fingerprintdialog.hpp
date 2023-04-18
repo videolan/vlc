@@ -27,7 +27,10 @@
 #include "qt.hpp"
 
 #include <QDialog>
-#include <vlc_fingerprinter.h>
+
+extern "C" {
+    typedef struct fingerprint_request_t fingerprint_request_t;
+};
 
 namespace Ui {
 class FingerprintDialog;

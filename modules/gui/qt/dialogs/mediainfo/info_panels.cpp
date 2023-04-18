@@ -36,6 +36,7 @@
 #include <cassert>
 #include <vlc_url.h>
 #include <vlc_meta.h>
+#include <vlc_input_item.h>
 
 #include <QTreeWidget>
 #include <QTableWidget>

@@ -26,8 +26,12 @@
 
 #include <QObject>
 #include <QString>
-#include <vlc_fingerprinter.h>
 #include "qt.hpp"
+
+extern "C" {
+    typedef struct fingerprint_request_t fingerprint_request_t;
+    typedef struct fingerprinter_thread_t fingerprinter_thread_t;
+};
 
 class Chromaprint : public QObject
 {

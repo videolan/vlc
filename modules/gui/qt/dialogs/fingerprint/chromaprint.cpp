@@ -24,6 +24,7 @@
 
 #include "chromaprint.hpp"
 #include <vlc_modules.h>
+#include <vlc_fingerprinter.h>
 
 Chromaprint::Chromaprint( qt_intf_t *_p_intf ) : p_intf( _p_intf )
 {
