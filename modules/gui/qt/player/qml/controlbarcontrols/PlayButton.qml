@@ -196,7 +196,8 @@ T.Control {
         color: cursorInside ? theme.accent
                             : "black"  //foreground is always black
 
-        font.pixelSize: VLCStyle.icon_play
+        font.pixelSize: Math.round(parent.height / 1.7)
+
         font.family: VLCIcons.fontFamily
 
         verticalAlignment: Text.AlignVCenter
