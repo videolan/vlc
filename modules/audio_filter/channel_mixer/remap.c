@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_configuration.h>
 #include <vlc_plugin.h>
@@ -317,7 +319,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     i_output_physical = CanonicaliseChannels( i_output_physical );
 
-    unsigned i_channels = vlc_popcount(i_output_physical);
+    unsigned i_channels = stdc_count_ones(i_output_physical);
 
     /* condense out_channels */
     uint8_t out_ch_sorted[ AOUT_CHAN_MAX ];
