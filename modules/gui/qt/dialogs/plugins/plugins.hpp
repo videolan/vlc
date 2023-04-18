@@ -26,8 +26,6 @@
 #include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
-#include <vlc_addons.h>
-
 #include <QStringList>
 #include <QTreeWidgetItem>
 #include <QPushButton>
