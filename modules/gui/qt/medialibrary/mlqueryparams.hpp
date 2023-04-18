@@ -24,7 +24,7 @@
 #endif
 
 #include <QByteArray>
-#include "vlc_media_library.h"
+#include <vlc_media_library.h>
 
 /**
  * C++ owned version of vlc_ml_query_params_t, so that it can be moved or

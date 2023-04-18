@@ -22,7 +22,7 @@
 #include <QMutex>
 #include <QRunnable>
 #include "qt.hpp"
-#include "vlc_window.h"
+#include <vlc_window.h>
 
 class MainCtx;
 

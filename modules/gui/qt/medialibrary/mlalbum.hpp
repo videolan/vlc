@@ -21,13 +21,13 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "vlc_common.h"
+#include <vlc_common.h>
 
 #include <QObject>
 #include <QString>
 #include <QList>
 #include <memory>
-#include "vlc_media_library.h"
+#include <vlc_media_library.h>
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 #include "util/vlctick.hpp"

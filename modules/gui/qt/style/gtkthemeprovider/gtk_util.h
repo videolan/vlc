@@ -35,7 +35,7 @@
 #include "gtk_compat.h"
 #include "scoped_gobject.h"
 
-#include "vlc_picture.h"
+#include <vlc_picture.h>
 
 namespace gtk {
 

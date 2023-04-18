@@ -25,7 +25,7 @@
 #include "config.h"
 #endif
 
-#include "vlc_media_library.h"
+#include <vlc_media_library.h>
 #include <QString>
 
 // Forward declarations

@@ -22,12 +22,12 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "vlc_common.h"
+#include <vlc_common.h>
 
 
 #include <memory>
 #include <QAbstractListModel>
-#include "vlc_media_library.h"
+#include <vlc_media_library.h>
 #include "mlqmltypes.hpp"
 #include "medialib.hpp"
 #include <memory>

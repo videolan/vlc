@@ -22,8 +22,8 @@
 
 #include "playlist_controller.hpp"
 #include "playlist_controller_p.hpp"
-#include "vlc_player.h"
-#include "vlc_url.h"
+#include <vlc_player.h>
+#include <vlc_url.h>
 #include "util/qmlinputitem.hpp"
 #include <algorithm>
 #include <QVariant>

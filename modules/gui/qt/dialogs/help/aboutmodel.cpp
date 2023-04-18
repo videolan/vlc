@@ -21,7 +21,7 @@
 
 #include "aboutmodel.hpp"
 
-#include "vlc_about.h"
+#include <vlc_about.h>
 
 
 AboutModel::AboutModel(QObject *parent) : QObject(parent)

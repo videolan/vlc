@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 #include "mllistcache.hpp"
-#include "vlc_diffutil.h"
+#include <vlc_diffutil.h>
 
 namespace {
 

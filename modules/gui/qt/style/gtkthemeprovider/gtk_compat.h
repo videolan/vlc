@@ -24,8 +24,8 @@
 # include "config.h"
 #endif
 
-#include "vlc_common.h"
-#include "vlc_picture.h"
+#include <vlc_common.h>
+#include <vlc_picture.h>
 
 #include <algorithm>
 
