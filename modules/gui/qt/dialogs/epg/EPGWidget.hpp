@@ -25,7 +25,6 @@
 
 #include "qt.hpp"
 
-#include <vlc_epg.h>
 #include <vlc_input_item.h>
 
 #include <QWidget>

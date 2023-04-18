@@ -27,8 +27,6 @@
 
 #include "EPGProgram.hpp"
 
-#include <vlc_epg.h>
-
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QHash>
