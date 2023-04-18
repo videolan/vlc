@@ -58,7 +58,7 @@ FocusScope {
 
     // Settings
 
-    implicitHeight: VLCStyle.maxControlbarControlHeight
+    implicitHeight: VLCStyle.controlLayoutHeight
 
     // Events
 

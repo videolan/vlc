@@ -296,8 +296,8 @@ QtObject {
     // New indicator
     readonly property url newIndicator: "qrc:///misc/new_indicator.svg";
 
-    // Player controlbar
-    readonly property int maxControlbarControlHeight: dp(64, scale)
+    // Player control layout
+    readonly property int controlLayoutHeight: dp(64, scale)
 
     readonly property var dp: MainCtx.dp
 

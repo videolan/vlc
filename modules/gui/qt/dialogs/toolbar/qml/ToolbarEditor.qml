@@ -87,7 +87,7 @@ Item {
         Rectangle{
             id: parentRectangle
 
-            Layout.preferredHeight: VLCStyle.maxControlbarControlHeight * 1.5
+            Layout.preferredHeight: VLCStyle.controlLayoutHeight * 1.5
             Layout.fillWidth: true
 
             color: theme.bg.primary
