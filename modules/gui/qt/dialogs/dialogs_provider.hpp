@@ -41,6 +41,8 @@
 #include <QObject>
 #include <QStringList>
 
+#include <vlc_es.h>
+
 #define TITLE_EXTENSIONS_MEDIA qtr( "Media Files" )
 #define TITLE_EXTENSIONS_VIDEO qtr( "Video Files" )
 #define TITLE_EXTENSIONS_AUDIO qtr( "Audio Files" )

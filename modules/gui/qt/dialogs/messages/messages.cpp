@@ -40,6 +40,7 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
+#include <vlc_input_item.h>
 
 
 #include "dialogs/messages/messages.hpp"

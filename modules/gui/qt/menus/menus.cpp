@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_intf_strings.h>
 #include <vlc_aout.h>                             /* audio_output_t */
-#include <vlc_player.h>
+#include <vlc_interface.h>
 
 #include "menus.hpp"
 

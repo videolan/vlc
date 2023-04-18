@@ -29,7 +29,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_player.h>
 
 #include <qconfig.h>
 
@@ -67,6 +66,7 @@ extern "C" {
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 typedef struct vlc_playlist vlc_playlist_t;
 typedef struct intf_thread_t intf_thread_t;
+typedef struct vlc_player_t vlc_player_t;
 }
 
 namespace vlc {
@@ -122,16 +122,8 @@ struct qt_intf_t
  * destroyed.
  */
 struct vlc_player_locker {
-    vlc_player_locker( vlc_player_t* p_player )
-        : p_player( p_player )
-    {
-        vlc_player_Lock( p_player );
-    }
-
-    ~vlc_player_locker()
-    {
-        vlc_player_Unlock( p_player );
-    }
+    vlc_player_locker( vlc_player_t* );
+    ~vlc_player_locker();
 
     private:
         vlc_player_t* p_player;

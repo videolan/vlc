@@ -1,5 +1,7 @@
 #include "renderer_manager.hpp"
 
+#include <vlc_player.h>
+
 #include <QApplication>
 
 const QEvent::Type RendererManagerEvent::AddedEvent =
