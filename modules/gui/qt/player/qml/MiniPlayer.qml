@@ -81,10 +81,21 @@ T.Pane {
 
     contentItem: ControlBar {
         focus: true
-        textPosition: ControlBar.TimeTextPosition.Hide
-        sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
-        bookmarksHeight: VLCStyle.icon_xsmall * 0.7
+
+        // NOTE: When controls are pinned we keep the same slider in both views. Otherwise we make
+        //       it more compact to fit the modern design.
+
+        textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
+                                                 : ControlBar.TimeTextPosition.Hide
+
+        sliderHeight: (MainCtx.pinVideoControls) ? VLCStyle.heightBar_xxsmall
+                                                 : VLCStyle.dp(3, VLCStyle.scale)
+
+        bookmarksHeight: (MainCtx.pinVideoControls) ? VLCStyle.controlBarBookmarksHeight
+                                                    : VLCStyle.icon_xsmall * 0.7
+
         identifier: PlayerControlbarModel.Miniplayer
+
         Navigation.parentItem: root
 
         Keys.onPressed: {
