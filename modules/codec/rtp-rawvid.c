@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdbit.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -847,7 +848,7 @@ static int Open(vlc_object_t *obj)
     unsigned int bpmp = depth * spmp;
 
     /* pixel group size equals LCM(depth * spmp, 8) bits */
-    sys->pgroup = bpmp >> ((bpmp % 8) ? vlc_ctz(bpmp) : 3);
+    sys->pgroup = bpmp >> ((bpmp % 8) ? stdc_trailing_zeros(bpmp) : 3);
     sys->half_height_uv = half_height_uv;
     sys->decode_line = format->line_cb;
     sys->pic = NULL;
