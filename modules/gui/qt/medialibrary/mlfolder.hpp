@@ -23,7 +23,8 @@
 
 // MediaLibrary includes
 #include "mlqmltypes.hpp"
-#include "util/vlctick.hpp"
+
+class VLCTick;
 
 class MLFolder : public MLItem
 {

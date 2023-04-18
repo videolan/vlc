@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "mlalbumtrackmodel.hpp"
+#include "util/vlctick.hpp"
 
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},

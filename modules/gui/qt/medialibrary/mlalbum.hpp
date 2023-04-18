@@ -24,7 +24,8 @@
 #include <memory>
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
-#include "util/vlctick.hpp"
+
+class VLCTick;
 
 class MLAlbum : public QObject, public MLItem
 {

@@ -29,9 +29,10 @@
 
 #include <vlc_media_library.h>
 #include "mlqmltypes.hpp"
-#include "util/vlctick.hpp"
 
 #include <functional>
+
+class VLCTick;
 
 class VideoDescription
 {

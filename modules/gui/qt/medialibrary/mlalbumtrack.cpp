@@ -19,6 +19,7 @@
 #include <cassert>
 #include "mlalbumtrack.hpp"
 #include "mlhelper.hpp"
+#include "util/vlctick.hpp"
 
 MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data, QObject *_parent )
     : QObject( _parent )

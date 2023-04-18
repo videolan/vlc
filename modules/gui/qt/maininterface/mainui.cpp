@@ -46,6 +46,7 @@
 #include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
 #include "util/csdbuttonmodel.hpp"
+#include "util/vlctick.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"

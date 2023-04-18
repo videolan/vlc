@@ -20,6 +20,8 @@
 
 #include "mlgroup.hpp"
 
+#include "util/vlctick.hpp"
+
 // VLC includes
 #include "qt.hpp"
 

@@ -22,6 +22,7 @@
 
 #include <vlc_thumbnailer.h>
 #include "mlhelper.hpp"
+#include "util/vlctick.hpp"
 
 VideoDescription::VideoDescription(const QString &codec, const QString &language, const unsigned int fps)
     : m_codec(codec)
@@ -135,7 +136,7 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
     else if ( maxWidth >= 1440 && maxHeight >= 1080 )
         m_resolution = "HD";
     else if ( maxWidth >= 720 && maxHeight >= 1280 )
-        m_resolution = "720p";  
+        m_resolution = "720p";
 }
 
 bool MLVideo::isNew() const

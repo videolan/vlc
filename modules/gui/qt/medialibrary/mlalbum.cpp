@@ -18,6 +18,8 @@
 #include <cassert>
 #include "mlalbum.hpp"
 
+#include "util/vlctick.hpp"
+
 MLAlbum::MLAlbum(const vlc_ml_album_t *_data, QObject *_parent)
     : QObject( _parent )
     , MLItem        ( MLItemId( _data->i_id, VLC_ML_PARENT_ALBUM ) )

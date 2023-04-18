@@ -26,6 +26,7 @@
 #include "gototime.hpp"
 
 #include "player/player_controller.hpp"
+#include "util/vlctick.hpp"
 
 #include <QLabel>
 #include <QTimeEdit>

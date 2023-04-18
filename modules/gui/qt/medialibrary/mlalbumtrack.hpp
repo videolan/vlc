@@ -24,7 +24,8 @@
 
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
-#include "util/vlctick.hpp"
+
+class VLCTick;
 
 extern "C" {
     struct vlc_medialibrary_t;

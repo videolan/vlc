@@ -29,6 +29,7 @@
 
 // Util includes
 #include "util/covergenerator.hpp"
+#include "util/vlctick.hpp"
 
 // MediaLibrary includes
 #include "mlcustomcover.hpp"

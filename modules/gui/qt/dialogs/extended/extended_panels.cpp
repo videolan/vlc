@@ -52,6 +52,7 @@
 #include "util/qt_dirs.hpp"
 #include "widgets/native/customwidgets.hpp"
 #include "dialogs/dialogs_provider.hpp"
+#include "util/vlctick.hpp"
 
 #include "../../../../audio_filter/equalizer_presets.h"
 #include <vlc_modules.h>

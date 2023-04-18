@@ -26,6 +26,8 @@
 #include <vlc_media_library.h>
 #include <qt.hpp>
 
+#include "util/vlctick.hpp"
+
 // MediaLibrary includes
 #include "mlhelper.hpp"
 #include "mlcustomcover.hpp"

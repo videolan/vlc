@@ -18,6 +18,7 @@
 
 #include "mlvideomodel.hpp"
 #include "mlhelper.hpp"
+#include "util/vlctick.hpp"
 
 template<typename T>
 QVariantList getVariantList(const QList<T> & desc)

@@ -26,7 +26,8 @@
 // MediaLibrary includes
 // NOTE: We need that header for VideoDescription and AudioDescription.
 #include "mlvideo.hpp"
-#include "util/vlctick.hpp"
+
+class VLCTick;
 
 // Qt includes
 #include <QUrl>

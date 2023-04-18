@@ -20,6 +20,8 @@
 
 #include "mlfolder.hpp"
 
+#include "util/vlctick.hpp"
+
 // Ctor / dtor
 
 MLFolder::MLFolder(const vlc_ml_folder_t * data)

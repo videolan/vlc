@@ -24,6 +24,7 @@
 
 // Util includes
 #include "util/qmlinputitem.hpp"
+#include "util/vlctick.hpp"
 
 // MediaLibrary includes
 #include "mlhelper.hpp"
