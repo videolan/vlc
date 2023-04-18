@@ -18,6 +18,12 @@
 
 #include "playlist_common.hpp"
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#include <vlc_playlist.h>
+
+
 
 PlaylistPtr::PlaylistPtr()
     : m_playlist(nullptr)
@@ -38,3 +44,13 @@ PlaylistPtr&PlaylistPtr::operator=(const PlaylistPtr& ptr)
     return *this;
 }
 
+PlaylistLocker::PlaylistLocker(vlc_playlist_t* playlist)
+    : m_playlist(playlist)
+{
+    vlc_playlist_Lock(m_playlist);
+}
+
+PlaylistLocker::~PlaylistLocker()
+{
+    vlc_playlist_Unlock(m_playlist);
+}

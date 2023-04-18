@@ -18,12 +18,11 @@
 #ifndef PLAYLIST_COMMON_HPP
 #define PLAYLIST_COMMON_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <QObject>
-#include <vlc_playlist.h>
+
+extern "C" {
+    typedef struct vlc_playlist vlc_playlist_t;
+}
 
 // QObject wrapper to carry playlist ptr through QML
 class PlaylistPtr
@@ -41,17 +40,11 @@ public:
 class PlaylistLocker
 {
 public:
-    inline PlaylistLocker(vlc_playlist_t* playlist)
-        : m_playlist(playlist)
-    {
-        vlc_playlist_Lock(m_playlist);
-    }
+    PlaylistLocker(vlc_playlist_t* playlist);
 
-    inline  ~PlaylistLocker()
-    {
-        vlc_playlist_Unlock(m_playlist);
-    }
+    ~PlaylistLocker();
 
+private:
     vlc_playlist_t* m_playlist;
 };
 
