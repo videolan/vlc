@@ -24,7 +24,6 @@
 
 #include <vlc_common.h>
 #include <vlc_cxx_helpers.hpp>
-#include <vlc_input_item.h>
 #include <vlc_playlist.h>
 #include <QExplicitlySharedDataPointer>
 #include <QUrl>

@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "playlist_item.hpp"
+#include <vlc_input_item.h>
 
 //namespace vlc {
 //namespace playlist {
