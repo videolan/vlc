@@ -35,7 +35,7 @@
 
 #include <QBitmap>
 
-#include <assert.h>
+#include <cassert>
 
 #include <QWindow>
 #include <qpa/qplatformnativeinterface.h>

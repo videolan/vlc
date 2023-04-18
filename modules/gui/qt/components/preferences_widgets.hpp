@@ -31,7 +31,7 @@
 #endif
 
 #include "qt.hpp"
-#include <assert.h>
+#include <cassert>
 
 #include <QWidget>
 

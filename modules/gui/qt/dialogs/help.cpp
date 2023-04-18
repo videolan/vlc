@@ -44,7 +44,7 @@
 #include <QDate>
 #include <QPushButton>
 
-#include <assert.h>
+#include <cassert>
 
 HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 

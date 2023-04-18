@@ -33,7 +33,7 @@
 
 #include <QString>
 
-#include <assert.h>
+#include <cassert>
 
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
            : QWizard( parent )

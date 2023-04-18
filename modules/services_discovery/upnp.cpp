@@ -36,7 +36,7 @@
 #include <vlc_services_discovery.h>
 #include <vlc_charset.h>
 
-#include <assert.h>
+#include <cassert>
 #include <limits.h>
 #include <algorithm>
 #include <set>

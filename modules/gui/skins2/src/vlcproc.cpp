@@ -56,7 +56,7 @@
 #include "../utils/var_string.hpp"
 #include <sstream>
 
-#include <assert.h>
+#include <cassert>
 
 VlcProc *VlcProc::instance( intf_thread_t *pIntf )
 {

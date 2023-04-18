@@ -38,7 +38,7 @@
 
 #include "sorting.h"
 
-#include <assert.h>
+#include <cassert>
 #include <QFont>
 #include <QAction>
 #include <QStack>

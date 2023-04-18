@@ -48,7 +48,7 @@
 #include <QScreen>
 #include <QtAlgorithms>
 #include <QDir>
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 #define ICON_HEIGHT 48

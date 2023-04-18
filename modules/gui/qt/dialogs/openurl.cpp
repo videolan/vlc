@@ -37,7 +37,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include <assert.h>
+#include <cassert>
 
 OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
                               bool _bClipboard ) :

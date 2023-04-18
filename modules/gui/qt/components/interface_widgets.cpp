@@ -70,7 +70,7 @@ static inline int qrand() {
 #endif
 
 #include <math.h>
-#include <assert.h>
+#include <cassert>
 
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>

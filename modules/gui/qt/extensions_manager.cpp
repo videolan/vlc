@@ -26,7 +26,7 @@
 #include "dialogs/extensions.hpp"
 
 #include <vlc_modules.h>
-#include "assert.h"
+#include <cassert>
 
 #include <QMenu>
 #include <QAction>

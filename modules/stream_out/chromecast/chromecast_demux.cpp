@@ -34,7 +34,7 @@
 
 #include "chromecast_common.h"
 
-#include <assert.h>
+#include <cassert>
 #include <new>
 
 static void on_paused_changed_cb(void *data, bool paused);

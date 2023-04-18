@@ -27,7 +27,7 @@
 #include "qt.hpp"
 #include <vlc_extensions.h>
 
-#include "assert.h"
+#include <cassert>
 
 #include <QDialog>
 class QObject;
