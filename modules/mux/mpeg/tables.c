@@ -21,6 +21,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_es.h>
@@ -559,7 +561,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             }
             else if(vlc_popcount(p_stream->fmt->audio.i_frame_length) == 1)
             {
-                i_ver = ctz( p_stream->fmt->audio.i_frame_length >> 8 );
+                i_ver = stdc_trailing_zeros( p_stream->fmt->audio.i_frame_length >> 8 );
                 if(i_ver == 0 || i_ver > 3)
                    i_ver = 1;
                 i_ver += '0';
