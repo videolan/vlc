@@ -25,7 +25,6 @@
 #include <memory>
 
 #include <vlc_common.h>
-#include <vlc_interface.h> /* intf_thread_t */
 
 #include <windows.h>
 
