@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <stdbit.h>
+
 #include "mp4.h"
 #include "avci.h"
 #include "../xiph.h"
@@ -1216,7 +1218,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
              * as vlc can't enumerate channels for compressed content */
             if( i_bps )
             {
-                p_fmt->audio.i_channels = vlc_popcount(i_vlc_mapping);
+                p_fmt->audio.i_channels = stdc_count_ones(i_vlc_mapping);
                 p_fmt->audio.i_physical_channels = i_vlc_mapping;
             }
         }
