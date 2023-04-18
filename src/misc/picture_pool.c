@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdatomic.h>
+#include <stdbit.h>
 #include <stdlib.h>
 
 #include <vlc_common.h>
@@ -165,7 +166,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         return NULL;
     }
 
-    int i = ctz(pool->available);
+    int i = stdc_trailing_zeros(pool->available);
     pool->available &= ~(1ULL << i);
     vlc_mutex_unlock(&pool->lock);
 
@@ -180,7 +181,7 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     while (pool->available == 0)
         vlc_cond_wait(&pool->wait, &pool->lock);
 
-    int i = ctz(pool->available);
+    int i = stdc_trailing_zeros(pool->available);
     pool->available &= ~(1ULL << i);
     vlc_mutex_unlock(&pool->lock);
 
