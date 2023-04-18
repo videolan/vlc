@@ -27,6 +27,7 @@
 #ifndef VLC_A52_H_
 #define VLC_A52_H_
 
+#include <stdbit.h>
 #include <vlc_bits.h>
 
 /**
@@ -198,7 +199,7 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
     if( bs->i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
 
-    p_header->i_channels = vlc_popcount(p_header->i_channels_conf);
+    p_header->i_channels = stdc_count_ones(p_header->i_channels_conf);
 
     const unsigned i_rate_shift = VLC_CLIP(bs->i_bsid, 8, 11) - 8;
     p_header->i_bitrate = (pi_frmsizcod_bitrates[bs->i_frmsizcod >> 1] * 1000)
@@ -359,7 +360,7 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
         p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
     if( bs->i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
-    p_header->i_channels = vlc_popcount( p_header->i_channels_conf );
+    p_header->i_channels = stdc_count_ones( p_header->i_channels_conf );
     p_header->i_bitrate = 8 * p_header->i_size * p_header->i_rate
                         / (p_header->i_blocks_per_sync_frame * 256);
     p_header->i_samples = p_header->i_blocks_per_sync_frame * 256;
