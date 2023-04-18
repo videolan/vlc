@@ -61,7 +61,7 @@ typedef struct win32_gesture_sys_t {
     ULONGLONG   i_ullArguments;         /* Base values to compare between 2 zoom gestures */
     bool        b_2fingers;             /* Did we detect 2 fingers? */
 
-    BOOL (*DecodeGestureImpl)( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
+    bool (*DecodeGestureImpl)( vlc_object_t *p_this, struct win32_gesture_sys_t *p_gesture, const GESTUREINFO* p_gi );
 
     HINSTANCE   huser_dll;              /* user32.dll */
     BOOL (WINAPI * OurCloseGestureInfoHandle)(HGESTUREINFO hGestureInfo);
