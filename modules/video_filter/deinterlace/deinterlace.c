@@ -33,6 +33,7 @@
 #endif
 
 #include <assert.h>
+#include <stdbit.h>
 #include <stdint.h>
 
 #include <vlc_common.h>
@@ -568,7 +569,7 @@ notsupp:
 #endif
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);
-        p_sys->pf_merge = funcs.merges[vlc_ctz(pixel_size)];
+        p_sys->pf_merge = funcs.merges[stdc_trailing_zeros(pixel_size)];
 #if defined(__i386__) || defined(__x86_64__)
         p_sys->pf_end_merge = NULL;
 #endif
