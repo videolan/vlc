@@ -34,6 +34,7 @@
 #endif
 
 #include <assert.h>
+#include <stdbit.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -562,7 +563,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         b_reorder = aout_CheckChannelReorder( pi_faad_channels_positions, NULL,
             p_dec->fmt_out.audio.i_physical_channels, pi_neworder_table );
 
-        p_dec->fmt_out.audio.i_channels = vlc_popcount(p_dec->fmt_out.audio.i_physical_channels);
+        p_dec->fmt_out.audio.i_channels = stdc_count_ones(p_dec->fmt_out.audio.i_physical_channels);
 
         if( !decoder_UpdateAudioFormat( p_dec ) && p_dec->fmt_out.audio.i_channels > 0 )
             p_out = decoder_NewAudioBuffer( p_dec, frame.samples / p_dec->fmt_out.audio.i_channels );
@@ -577,7 +578,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             if ( p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_BITMAP )
             {
                 /* Don't kill speakers if some weird mapping does not gets 1:1 */
-                if( vlc_popcount(p_dec->fmt_out.audio.i_physical_channels) != frame.channels )
+                if( stdc_count_ones(p_dec->fmt_out.audio.i_physical_channels) != frame.channels )
                     memset( p_out->p_buffer, 0, p_out->i_buffer );
             }
 
