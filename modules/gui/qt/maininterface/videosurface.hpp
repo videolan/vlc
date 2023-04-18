@@ -22,7 +22,10 @@
 #include <QMutex>
 #include <QRunnable>
 #include "qt.hpp"
-#include <vlc_window.h>
+
+extern "C" {
+    typedef struct vlc_window vlc_window_t;
+}
 
 class MainCtx;
 

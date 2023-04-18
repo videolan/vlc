@@ -36,6 +36,8 @@
 #  include "compositor_x11.hpp"
 #endif
 
+#include <vlc_window.h>
+
 using namespace vlc;
 
 template<typename T>

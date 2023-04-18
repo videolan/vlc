@@ -18,6 +18,11 @@
 #include <QX11Info>
 #include <QScreen>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#include <vlc_window.h>
+
 #include "compositor_x11.hpp"
 #include "compositor_x11_renderwindow.hpp"
 #include "compositor_x11_uisurface.hpp"

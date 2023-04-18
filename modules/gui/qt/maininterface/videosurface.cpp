@@ -20,6 +20,7 @@
 #include "widgets/native/customwidgets.hpp" //for qtEventToVLCKey
 #include <QSGRectangleNode>
 #include <QThreadPool>
+#include <vlc_window.h>
 
 WindowResizer::WindowResizer(vlc_window_t* window):
     m_requestedWidth(0),
