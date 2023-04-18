@@ -25,7 +25,6 @@
 
 #include "mlbasemodel.hpp"
 
-#include <vlc_media_library.h>
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 

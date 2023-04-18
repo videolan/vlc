@@ -19,19 +19,17 @@
 #ifndef MLARTIST_HPP
 #define MLARTIST_HPP
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <vlc_common.h>
-
 #include <QObject>
 #include <QString>
 #include <memory>
-#include <vlc_media_library.h>
 
 #include "mlalbum.hpp"
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
+
+extern "C" {
+    typedef struct vlc_ml_artist_t vlc_ml_artist_t;
+};
 
 class MLArtist : public QObject, public MLItem
 {

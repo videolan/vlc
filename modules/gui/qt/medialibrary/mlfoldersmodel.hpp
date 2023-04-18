@@ -31,7 +31,12 @@
 #include "mlhelper.hpp"
 
 #include <maininterface/mainctx.hpp>
-#include <vlc_media_library.h>
+
+extern "C" {
+    struct vlc_medialibrary_t;
+    typedef struct vlc_ml_folder_t vlc_ml_folder_t;
+    typedef struct vlc_ml_event_t vlc_ml_event_t;
+};
 
 class MLFoldersBaseModel : public QAbstractListModel
 {
