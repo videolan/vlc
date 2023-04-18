@@ -19,6 +19,8 @@
 #include "mainctx_win32.hpp"
 #include "mainui.hpp"
 
+#include <vlc_window.h>
+
 #define D3D11_NO_HELPERS  // avoid tons of warnings
 #include <d3d11.h>
 

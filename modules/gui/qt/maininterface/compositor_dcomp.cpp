@@ -26,6 +26,8 @@
 
 #include <comdef.h>
 
+#include <vlc_window.h>
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QQuickWidget>

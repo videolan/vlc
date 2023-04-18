@@ -27,10 +27,14 @@
 #include <QObject>
 
 #include <vlc_common.h>
-#include <vlc_window.h>
 
 #include "qt.hpp"
 
+
+extern "C" {
+    typedef struct vlc_window vlc_window_t;
+    typedef struct vlc_window_cfg vlc_window_cfg_t;
+}
 
 class MainCtx;
 class VideoWindowHandler;
