@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdbit.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -599,7 +600,7 @@ static int Volume(struct cli_client *cl, const char *const *args, size_t count,
                        "AOUT_VOLUME_DEFAULT must be a power of two.");
 
         if (*end == '\0' && ul > 1 && ul <= AOUT_VOLUME_MAX)
-            volume = ldexpf(ul, -ctz(AOUT_VOLUME_DEFAULT));
+            volume = ldexpf(ul, -stdc_trailing_zeros((unsigned)AOUT_VOLUME_DEFAULT));
         else
             volume = atof(args[1]);
 
