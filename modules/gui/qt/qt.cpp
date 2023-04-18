@@ -73,6 +73,7 @@ extern "C" char **environ;
 #include <QVector>
 #include "playlist/playlist_item.hpp"
 
+#include <vlc_interface.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
 #include <vlc_player.h>

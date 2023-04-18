@@ -57,6 +57,7 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include <vlc_player.h>
+#include <vlc_interface.h>
 
 static bool filterIsPresent( const QString &filters, const QString &filter )
 {

@@ -21,7 +21,6 @@
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
-#include <vlc_interface.h>
 
 struct VLCObjectHolder
 {

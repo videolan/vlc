@@ -64,6 +64,8 @@
 #include <QFileInfo>
 #endif
 
+#include <vlc_interface.h>
+
 #define VLC_REFERENCE_SCALE_FACTOR 96.
 
 using  namespace vlc::playlist;

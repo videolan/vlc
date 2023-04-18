@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+#include <vlc_interface.h>
 #include <vlc_intf_strings.h>
 
 #include "qt.hpp"
