@@ -33,7 +33,7 @@
 
 #include <QString>
 
-#include <assert.h>
+#include <cassert>
 #include <QWindow>
 
 SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inputChain )

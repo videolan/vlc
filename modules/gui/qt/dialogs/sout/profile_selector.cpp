@@ -38,7 +38,7 @@
 #include <QListWidgetItem>
 #include <QFontMetrics>
 
-#include <assert.h>
+#include <cassert>
 #include <vlc_modules.h>
 
 #define CATPROP2NAME( val ) QString("valueholder_%1").arg( val )

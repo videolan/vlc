@@ -37,7 +37,7 @@
 #include <QBitmap>
 #include <QTimer>
 
-#include <assert.h>
+#include <cassert>
 
 #include <QWindow>
 #include QPNI_HEADER

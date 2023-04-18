@@ -28,7 +28,7 @@
 #include "../utils/position.hpp"
 #include "../utils/var_bool.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 
 CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,

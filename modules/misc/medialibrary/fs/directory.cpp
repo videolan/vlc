@@ -35,7 +35,7 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <medialibrary/filesystem/Errors.h>
 #include <sys/stat.h>
 #include <system_error>

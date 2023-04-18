@@ -37,7 +37,7 @@
 #include <QSignalMapper>
 #include <QThreadPool>
 
-#include <assert.h>
+#include <cassert>
 
 #define POSITION_MIN_UPDATE_INTERVAL VLC_TICK_FROM_MS(15)
 

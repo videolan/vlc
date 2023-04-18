@@ -57,7 +57,7 @@
 #include "../utils/var_string.hpp"
 #include <sstream>
 
-#include <assert.h>
+#include <cassert>
 
 void on_playlist_items_reset( vlc_playlist_t *playlist,
                               vlc_playlist_item_t *const items[],

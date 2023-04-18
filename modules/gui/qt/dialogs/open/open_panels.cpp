@@ -29,7 +29,7 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 
 #include "qt.hpp"
 #include "maininterface/mainctx.hpp"

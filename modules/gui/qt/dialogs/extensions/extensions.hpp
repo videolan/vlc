@@ -27,7 +27,7 @@
 #include <vlc_extensions.h>
 #include "util/singleton.hpp"
 
-#include "assert.h"
+#include <cassert>
 
 #include <QDialog>
 class QObject;

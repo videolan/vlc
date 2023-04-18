@@ -33,7 +33,7 @@
 #include "dialogs/fingerprint/fingerprintdialog.hpp"
 #include "dialogs/fingerprint/chromaprint.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <vlc_url.h>
 #include <vlc_meta.h>
 

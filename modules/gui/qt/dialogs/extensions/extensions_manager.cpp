@@ -27,7 +27,7 @@
 #include <vlc_modules.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
-#include "assert.h"
+#include <cassert>
 
 #include <QMenu>
 #include <QAction>

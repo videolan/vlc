@@ -37,7 +37,7 @@
 #include "dialogs/preferences/preferences_widgets.hpp"
 
 #include <vlc_modules.h>
-#include <assert.h>
+#include <cassert>
 
 #define ITEM_HEIGHT 25
 

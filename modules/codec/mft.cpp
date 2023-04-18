@@ -28,7 +28,7 @@
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
-#include <assert.h>
+#include <cassert>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

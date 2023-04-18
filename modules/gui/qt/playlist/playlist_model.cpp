@@ -23,7 +23,7 @@
 #include "playlist_model.hpp"
 #include "playlist_model_p.hpp"
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include "util/qmlinputitem.hpp"
 
 namespace vlc {

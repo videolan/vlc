@@ -39,7 +39,7 @@
 #include <QUrl>
 
 #include <math.h>
-#include <assert.h>
+#include <cassert>
 
 #include <vlc_player.h>
 

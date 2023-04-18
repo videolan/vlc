@@ -40,7 +40,7 @@
 #include <vlc_services_discovery.h>
 #include <vlc_renderer_discovery.h>
 
-#include <assert.h>
+#include <cassert>
 #include <limits.h>
 #include <algorithm>
 #include <set>

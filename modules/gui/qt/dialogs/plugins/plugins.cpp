@@ -33,7 +33,7 @@
 #include "widgets/native/animators.hpp"
 #include "util/imagehelper.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 #include <vlc_modules.h>
 

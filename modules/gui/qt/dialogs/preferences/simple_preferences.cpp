@@ -62,7 +62,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
-#include <assert.h>
+#include <cassert>
 #include <math.h>
 
 #define ICON_HEIGHT 48
