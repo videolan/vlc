@@ -32,6 +32,8 @@
 #include <QRegExp>
 #include <QMenu>
 
+#include <vlc_url.h>
+
 #ifndef NDEBUG
 # define DEBUG_QT 1
 #endif

@@ -28,7 +28,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_url.h>
 
 #include "widgets/native/qvlcframe.hpp"
 #include "dialogs/open/open_panels.hpp"

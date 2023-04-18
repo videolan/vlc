@@ -41,6 +41,7 @@
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 #ifdef _WIN32
   #include <vlc_charset.h> /* FromWide for Win32 */
 #endif

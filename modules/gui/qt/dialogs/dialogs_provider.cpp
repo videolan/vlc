@@ -58,6 +58,8 @@
 #include "dialogs/playlists/playlists.hpp"
 #include "dialogs/firstrun/firstrunwizard.hpp"
 
+#include <vlc_url.h>
+
 #include <QEvent>
 #include <QApplication>
 #include <QSignalMapper>
