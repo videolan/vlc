@@ -26,6 +26,7 @@
 # include <config.h>
 #endif
 #include <assert.h>
+#include <stdbit.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -274,7 +275,7 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 
     if (desc->channel_count < ARRAY_SIZE(channel_masks)) {
         sys->channel_mask = channel_masks[desc->channel_count];
-        assert(vlc_popcount(sys->channel_mask) == sys->channel_count);
+        assert(stdc_count_ones(sys->channel_mask) == sys->channel_count);
 
         /* Octet-unaligned formats cannot readily be reordered, especially in
          * foreign endianness. The decoder will take care of that. */
