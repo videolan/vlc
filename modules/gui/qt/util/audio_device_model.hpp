@@ -21,13 +21,13 @@
 
 #include <QAbstractListModel>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "qt.hpp"
-#include <vlc_aout.h>
-#include <vlc_player.h>
+
+extern "C" {
+    typedef struct vlc_player_aout_listener_id vlc_player_aout_listener_id;
+    typedef struct audio_output audio_output_t;
+    typedef struct vlc_player_t vlc_player_t;
+}
 
 class AudioDeviceModel : public QAbstractListModel
 {

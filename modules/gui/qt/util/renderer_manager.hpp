@@ -1,15 +1,8 @@
 #ifndef RENDERER_MANAGER_HPP
 #define RENDERER_MANAGER_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "qt.hpp"
 #include "util/singleton.hpp"
-
-#include <vlc_common.h>
-#include <vlc_renderer_discovery.h>
 
 #include <QObject>
 #include <QEvent>
@@ -17,21 +10,18 @@
 #include <QVector>
 #include <QHash>
 
+extern "C" {
+    typedef struct vlc_renderer_item_t vlc_renderer_item_t;
+}
+
 class RendererManagerEvent : public QEvent
 {
 public:
     static const QEvent::Type AddedEvent;
     static const QEvent::Type RemovedEvent;
 
-    RendererManagerEvent( QEvent::Type type, vlc_renderer_item_t *p_item_ )
-        : QEvent( type ), p_item( p_item_ )
-    {
-        vlc_renderer_item_hold( p_item );
-    }
-    virtual ~RendererManagerEvent()
-    {
-        vlc_renderer_item_release( p_item );
-    }
+    RendererManagerEvent( QEvent::Type type, vlc_renderer_item_t *p_item_ );
+    virtual ~RendererManagerEvent();
 
     vlc_renderer_item_t * getItem() const { return p_item; }
 

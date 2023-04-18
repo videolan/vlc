@@ -17,6 +17,8 @@
  *****************************************************************************/
 
 #include "audio_device_model.hpp"
+#include <vlc_player.h>
+#include <vlc_aout.h>
 
 extern "C" {
 

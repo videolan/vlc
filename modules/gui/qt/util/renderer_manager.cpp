@@ -4,10 +4,30 @@
 
 #include <QApplication>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_renderer_discovery.h>
+#include <vlc_player.h>
+
 const QEvent::Type RendererManagerEvent::AddedEvent =
         (QEvent::Type)QEvent::registerEventType();
 const QEvent::Type RendererManagerEvent::RemovedEvent =
         (QEvent::Type)QEvent::registerEventType();
+
+RendererManagerEvent::RendererManagerEvent(Type type, vlc_renderer_item_t* p_item_)
+    : QEvent( type ), p_item( p_item_ )
+{
+    vlc_renderer_item_hold( p_item );
+}
+
+RendererManagerEvent::~RendererManagerEvent()
+{
+    vlc_renderer_item_release( p_item );
+}
+
 
 RendererManager::RendererManager( qt_intf_t *p_intf_ ) :
     p_intf( p_intf_ ), p_selected_item( NULL )
