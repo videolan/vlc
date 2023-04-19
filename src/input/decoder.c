@@ -1716,7 +1716,7 @@ static void *DecoderThread( void *p_data )
     /* The decoder's main loop */
     vlc_fifo_Lock( p_owner->p_fifo );
 
-    while( !p_owner->aborting )
+    while( !p_owner->aborting || p_owner->flushing )
     {
         if( p_owner->flushing )
         {   /* Flush before/regardless of pause. We do not want to resume just
