@@ -26,6 +26,8 @@
 #ifndef VLC_CPU_H
 # define VLC_CPU_H 1
 
+#include <vlc_threads.h>
+
 /**
  * Retrieves CPU capability flags.
  */
