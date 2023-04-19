@@ -25,6 +25,9 @@
 
 #include <stdarg.h>
 
+#include <vlc_common.h>
+#include <vlc_threads.h>
+
 /**
  * \defgroup traces Tracing
  * \ingroup os
@@ -175,7 +178,7 @@ static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char 
 {
     if (now != VLC_TICK_MAX && now != VLC_TICK_INVALID)
     {
-        vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), VLC_TRACE("type", type), 
+        vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), VLC_TRACE("type", type),
                                VLC_TRACE("id", id), VLC_TRACE("pts", pts),
                                VLC_TRACE("render_ts", now), VLC_TRACE_END);
         vlc_tracer_TraceWithTs(tracer, now, VLC_TRACE("type", type),
