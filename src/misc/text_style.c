@@ -244,7 +244,8 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
 
     if( psz_hex != psz_value ||
         (*psz_hex >= '0' && *psz_hex <= '9') ||
-        (*psz_hex >= 'A' && *psz_hex <= 'F') )
+        (*psz_hex >= 'A' && *psz_hex <= 'F') ||
+        (*psz_hex >= 'a' && *psz_hex <= 'f') )
     {
         uint32_t i_value = strtol( psz_hex, &psz_end, 16 );
         if( *psz_end == 0 || isspace( *psz_end ) )
