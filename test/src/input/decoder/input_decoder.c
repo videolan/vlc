@@ -96,8 +96,8 @@ static int DecoderDecode(decoder_t *dec, block_t *block)
 static void DecoderFlush(decoder_t *dec)
 {
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
-    assert(scenario->decoder_flush != NULL);
-    return scenario->decoder_flush(dec);
+    if (scenario->decoder_flush != NULL)
+        scenario->decoder_flush(dec);
 }
 
 static void CloseDecoder(vlc_object_t *obj)
