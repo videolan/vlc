@@ -54,6 +54,25 @@ snapshot_was_taken( vlc_object_t *p_this, char const *psz_cmd,
 
 static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
 
+static libvlc_state_t
+libvlc_state_from_player(enum vlc_player_state state)
+{
+    switch (state) {
+        case VLC_PLAYER_STATE_STOPPED:
+            return libvlc_Stopped;
+        case VLC_PLAYER_STATE_STOPPING:
+            return libvlc_Stopping;
+        case VLC_PLAYER_STATE_STARTED:
+            return libvlc_Opening;
+        case VLC_PLAYER_STATE_PLAYING:
+            return libvlc_Playing;
+        case VLC_PLAYER_STATE_PAUSED:
+            return libvlc_Paused;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 // player callbacks
 
 static void
@@ -1897,19 +1916,7 @@ libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
 
     if (error != VLC_PLAYER_ERROR_NONE)
         return libvlc_Error;
-    switch (state) {
-        case VLC_PLAYER_STATE_STOPPED:
-            return libvlc_Stopped;
-        case VLC_PLAYER_STATE_STOPPING:
-            return libvlc_Stopping;
-        case VLC_PLAYER_STATE_STARTED:
-            return libvlc_Opening;
-        case VLC_PLAYER_STATE_PLAYING:
-            return libvlc_Playing;
-        case VLC_PLAYER_STATE_PAUSED:
-            return libvlc_Paused;
-    }
-    vlc_assert_unreachable();
+    return libvlc_state_from_player(state);
 }
 
 bool libvlc_media_player_is_seekable(libvlc_media_player_t *p_mi)
