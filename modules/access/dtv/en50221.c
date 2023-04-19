@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_tick.h>
+#include <vlc_threads.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 

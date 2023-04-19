@@ -35,6 +35,7 @@
 # include "../xcb/vlc_xkb.h"
 #endif
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_window.h>
 #include <vlc_mouse.h>
 #include <vlc_fs.h>
