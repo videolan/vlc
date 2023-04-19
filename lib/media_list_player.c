@@ -42,6 +42,7 @@
 #include "libvlc_internal.h"
 
 #include "media_internal.h" // Abuse, could and should be removed
+#include "media_player_internal.h"
 #include "media_list_path.h"
 
 //#define DEBUG_MEDIA_LIST_PLAYER
@@ -63,8 +64,6 @@ struct libvlc_media_list_player_t
     libvlc_event_manager_t      event_manager;
     int                         seek_offset;
     bool                        dead;
-    /* Protect access to this structure. */
-    vlc_mutex_t                 object_lock;
     /* Protect access to this structure and from callback execution. */
     vlc_mutex_t                 mp_callback_lock;
     vlc_cond_t                  seek_pending;
@@ -97,7 +96,7 @@ static void stop(libvlc_media_list_player_t * p_mlp);
 static inline void lock(libvlc_media_list_player_t * p_mlp)
 {
     // Obtain an access to this structure
-    vlc_mutex_lock(&p_mlp->object_lock);
+    vlc_player_Lock(p_mlp->p_mi->player);
 
     // Make sure no callback will occurs at the same time
     vlc_mutex_lock(&p_mlp->mp_callback_lock);
@@ -106,7 +105,7 @@ static inline void lock(libvlc_media_list_player_t * p_mlp)
 static inline void unlock(libvlc_media_list_player_t * p_mlp)
 {
     vlc_mutex_unlock(&p_mlp->mp_callback_lock);
-    vlc_mutex_unlock(&p_mlp->object_lock);
+    vlc_player_Unlock(p_mlp->p_mi->player);
 }
 
 static inline void assert_locked(libvlc_media_list_player_t * p_mlp)
@@ -450,7 +449,6 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
     vlc_atomic_rc_init(&p_mlp->rc);
     p_mlp->seek_offset = 0;
     p_mlp->dead = false;
-    vlc_mutex_init(&p_mlp->object_lock);
     vlc_mutex_init(&p_mlp->mp_callback_lock);
     vlc_cond_init(&p_mlp->seek_pending);
     libvlc_event_manager_init(&p_mlp->event_manager, p_mlp);
