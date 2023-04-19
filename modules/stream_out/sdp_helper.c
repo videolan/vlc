@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 #include <vlc_charset.h>
 #include <vlc_network.h>
 #include <vlc_memstream.h>
