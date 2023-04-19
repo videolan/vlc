@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 struct vlc_timer
 {
