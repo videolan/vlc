@@ -206,6 +206,7 @@ endif
 #
 
 check_c_headers = [
+    ['stdbit.h'],
     ['arpa/inet.h'],
     ['threads.h'],
     ['netinet/tcp.h'],
@@ -264,6 +265,9 @@ foreach header : check_cpp_headers
     endif
 endforeach
 
+if not cdata.has('HAVE_STDBIT_H')
+    vlc_include_dirs += include_directories('compat/stdbit')
+endif
 
 #
 # Darwin specific checks
