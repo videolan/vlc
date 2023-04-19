@@ -22,6 +22,7 @@
 #ifndef VLC_MKV_DISPATCHER_HPP_
 #define VLC_MKV_DISPATCHER_HPP_
 
+#include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
 // ----------------------------------------------------------------------------

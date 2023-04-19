@@ -31,6 +31,7 @@
 #include "BytesRange.hpp"
 #include "ConnectionParams.hpp"
 #include "../ID.hpp"
+#include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
 typedef struct vlc_frame_t block_t;

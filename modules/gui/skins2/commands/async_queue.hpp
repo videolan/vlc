@@ -30,6 +30,7 @@
 #include <string>
 #include <memory>
 
+#include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
 class OSTimer;

@@ -26,6 +26,7 @@
 #include "Streams.hpp"
 #include <vector>
 
+#include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
 namespace adaptive

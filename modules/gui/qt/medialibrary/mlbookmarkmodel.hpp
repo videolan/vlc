@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_input_item.h>
 #include <vlc_player.h>
 #include <vlc_cxx_helpers.hpp>
