@@ -84,9 +84,6 @@ typedef enum libvlc_state_t
 {
     libvlc_NothingSpecial=0,
     libvlc_Opening,
-    libvlc_Buffering, /* XXX: Deprecated value. Check the
-                       * libvlc_MediaPlayerBuffering event to know the
-                       * buffering state of a libvlc_media_player */
     libvlc_Playing,
     libvlc_Paused,
     libvlc_Stopped,
