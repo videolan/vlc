@@ -478,10 +478,7 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
 
     const char *psz_hex = (*psz_value == '#') ? psz_value + 1 : psz_value;
 
-    if( psz_hex != psz_value ||
-        (*psz_hex >= '0' && *psz_hex <= '9') ||
-        (*psz_hex >= 'A' && *psz_hex <= 'F') ||
-        (*psz_hex >= 'a' && *psz_hex <= 'f') )
+    if( psz_hex != psz_value || isxdigit(*psz_hex) )
     {
         uint32_t i_value = (uint32_t)strtoul( psz_hex, &psz_end, 16 );
         if( *psz_end == 0 || isspace( *psz_end ) )
