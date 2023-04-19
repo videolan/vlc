@@ -153,9 +153,7 @@ Slider {
         onPositionChanged: fsm.playerUpdatePosition(Player.position)
     }
 
-    Component.onCompleted:  {
-        fsm.playerUpdatePosition(Player.position)
-    }
+    Component.onCompleted: value = Player.position
 
     implicitHeight: control.barHeight
     height: implicitHeight
