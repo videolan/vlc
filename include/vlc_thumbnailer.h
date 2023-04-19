@@ -24,6 +24,7 @@
 #define VLC_THUMBNAILER_H
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 
 typedef struct vlc_thumbnailer_t vlc_thumbnailer_t;
 typedef struct vlc_thumbnailer_request_t vlc_thumbnailer_request_t;

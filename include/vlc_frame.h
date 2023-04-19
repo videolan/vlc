@@ -23,6 +23,8 @@
 #ifndef VLC_FRAME_H
 #define VLC_FRAME_H 1
 
+#include <vlc_tick.h>
+
 struct vlc_ancillary;
 typedef uint32_t vlc_ancillary_id;
 

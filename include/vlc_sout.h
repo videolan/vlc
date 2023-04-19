@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <vlc_es.h>
 #include <vlc_clock.h>
+#include <vlc_tick.h>
 
 #ifdef __cplusplus
 extern "C" {

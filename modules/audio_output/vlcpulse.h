@@ -22,6 +22,9 @@
 
 #ifndef VLCPULSE_H
 # define VLCPULSE_H 1
+
+#include <vlc_tick.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif

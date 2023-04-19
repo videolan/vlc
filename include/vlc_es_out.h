@@ -27,6 +27,8 @@
 
 #include <vlc_es.h>
 
+#include <vlc_tick.h>
+
 /**
  * \defgroup es_out ES output
  * \ingroup input
@@ -248,7 +250,7 @@ VLC_USED static inline int es_out_SetESCatPolicy( es_out_t *out, enum es_format_
 VLC_USED static inline bool es_out_GetESState( es_out_t *out, es_out_id_t *id)
 {
     bool state = false;
-    
+
     es_out_Control( out, ES_OUT_GET_ES_STATE, id, &state );
     return state;
 }

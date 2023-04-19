@@ -32,6 +32,8 @@
 #include <stdatomic.h>
 #endif
 
+#include <vlc_tick.h>
+
 /**
  * \ingroup os
  * \defgroup thread Threads and synchronization primitives
