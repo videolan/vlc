@@ -33,7 +33,7 @@
 #include <d3dcompiler.h>
 #include <comdef.h>
 
-#include "compositor_common.hpp""
+#include "compositor_common.hpp"
 #include "compositor_accessibility.hpp"
 
 namespace vlc {
