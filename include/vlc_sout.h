@@ -27,13 +27,13 @@
 #ifndef VLC_SOUT_H_
 #define VLC_SOUT_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <sys/types.h>
 #include <vlc_es.h>
 #include <vlc_clock.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * \defgroup sout Stream output
