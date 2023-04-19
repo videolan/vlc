@@ -3514,7 +3514,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
 
     case ES_OUT_SET_NEXT_DISPLAY_TIME:
     {
-        const int64_t i_date = va_arg( args, int64_t );
+        const vlc_tick_t i_date = va_arg( args, vlc_tick_t );
 
         if( i_date < 0 )
             return VLC_EGENERIC;

@@ -74,7 +74,7 @@ enum es_out_query_e
     ES_OUT_SET_ES_FMT,         /* arg1= es_out_id_t* arg2=es_format_t* res=can fail */
 
     /* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed */
-    ES_OUT_SET_NEXT_DISPLAY_TIME,       /* arg1=int64_t i_pts(microsecond) */
+    ES_OUT_SET_NEXT_DISPLAY_TIME,       /* arg1=vlc_tick_t i_pts(microsecond) */
     /* Set meta data for group (dynamic) (The vlc_meta_t is not modified nor released) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=const vlc_meta_t */
     /* Set epg for group (dynamic) (The vlc_epg_t is not modified nor released) */

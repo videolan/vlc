@@ -1553,8 +1553,8 @@ static int CmdInitControl( ts_cmd_control_t *p_cmd, input_source_t *in,
         break;
 
     case ES_OUT_SET_PCR:                /* arg1=vlc_tick_t i_pcr(microsecond!) (using default group 0)*/
-    case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
-        p_cmd->u.i_i64 = va_arg( args, int64_t );
+    case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=vlc_tick_t i_pts(microsecond) */
+        p_cmd->u.i_i64 = va_arg( args, vlc_tick_t );
         break;
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=vlc_tick_t i_pcr(microsecond!)*/
@@ -1689,7 +1689,7 @@ static int CmdExecuteControl( es_out_t *p_tsout, ts_cmd_control_t *p_cmd )
         return es_out_in_Control( p_sys->p_out, in, i_query, p_cmd->u.i_int );
 
     case ES_OUT_SET_PCR:                /* arg1=vlc_tick_t i_pcr(microsecond!) (using default group 0)*/
-    case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
+    case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=vlc_tick_t i_pts(microsecond) */
         return es_out_in_Control( p_sys->p_out, in, i_query, p_cmd->u.i_i64 );
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=vlc_tick_t i_pcr(microsecond!)*/
