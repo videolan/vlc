@@ -423,7 +423,6 @@ gen_vlc_static_module_list()
     done
 
     printf "\
-#include \"config.h\"\\n\
 #include <vlc_common.h>\\n\
 #include <vlc_plugin.h>\\n\
 %b\\n\
