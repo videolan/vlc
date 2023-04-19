@@ -982,7 +982,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                (int64_t)(TO_SCALE( vlc_tick_from_sec( i_length * f ))) );
+                                vlc_tick_from_sec( i_length * f ) );
                 return VLC_SUCCESS;
             }
         }
