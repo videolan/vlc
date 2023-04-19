@@ -368,7 +368,7 @@ void MetaPanel::fingerprintUpdate( input_item_t *p_item )
 }
 
 /**
- * Second Panel - Shows the extra metadata in a tree, non editable.
+ * Second Panel - Shows the extra metadata in a table, non editable.
  **/
 ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
 {
@@ -380,11 +380,12 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent ) : QWidget( parent )
      layout->addWidget( topLabel, 0, 0 );
 
      extraMeta = new QTableWidget( this );
-     extraMeta->setAlternatingRowColors( true );
-     extraMeta->setColumnCount( 2 );
-     extraMeta->horizontalHeader()->hide();
      extraMeta->verticalHeader()->hide();
+     extraMeta->setAlternatingRowColors( true );
 
+     extraMeta->setColumnCount( 2 );
+     extraMeta->setHorizontalHeaderLabels({ qtr( "Property" ),
+                                            qtr( "Value" ) });
      extraMeta->horizontalHeader()->setStretchLastSection(true);
      extraMeta->resizeRowsToContents();
 
