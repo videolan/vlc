@@ -33,6 +33,8 @@
 
 #include <memory>
 
+#include <vlc_threads.h>
+
 namespace mkv {
 
 class virtual_segment_c;

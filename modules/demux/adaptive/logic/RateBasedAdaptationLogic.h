@@ -27,6 +27,7 @@
 
 #include "AbstractAdaptationLogic.h"
 #include "../tools/MovingAverage.hpp"
+#include <vlc_threads.h>
 
 namespace adaptive
 {

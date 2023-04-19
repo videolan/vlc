@@ -21,6 +21,7 @@
 #define KEYRING_H
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 #include <map>
 #include <list>

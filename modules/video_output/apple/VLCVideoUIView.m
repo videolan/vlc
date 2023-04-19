@@ -63,6 +63,7 @@
 #endif
 
 #import <vlc_common.h>
+#import <vlc_threads.h>
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>
 #import <vlc_mouse.h>

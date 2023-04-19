@@ -30,6 +30,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 #include <OMX_Core.h>
 #include <OMX_Component.h>

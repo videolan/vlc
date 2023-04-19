@@ -26,6 +26,7 @@
 
 #include "cmd_generic.hpp"
 #include "../src/vlcproc.hpp"
+#include <vlc_threads.h>
 
 
 class CmdCallback : public CmdGeneric

@@ -25,6 +25,8 @@
 #include "../tools/MovingAverage.hpp"
 #include <map>
 
+#include <vlc_threads.h>
+
 namespace adaptive
 {
     namespace logic

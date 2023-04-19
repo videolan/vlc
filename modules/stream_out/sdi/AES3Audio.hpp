@@ -21,6 +21,7 @@
 #define AES3AUDIO_HPP
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_block.h>
 #include <vlc_block_helper.h>
 #include <vlc_es.h>

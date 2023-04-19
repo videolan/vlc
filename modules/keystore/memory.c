@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_keystore.h>
 #include <vlc_strings.h>

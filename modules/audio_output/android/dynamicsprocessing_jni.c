@@ -25,6 +25,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_fourcc.h>
 
 #include <jni.h>

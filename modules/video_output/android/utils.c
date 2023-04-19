@@ -27,6 +27,7 @@
 
 #include "utils.h"
 #include "env.h"
+#include <vlc_threads.h>
 
 #include <dlfcn.h>
 #include <jni.h>

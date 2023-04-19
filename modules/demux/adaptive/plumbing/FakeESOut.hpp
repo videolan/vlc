@@ -23,6 +23,7 @@
 #include <vlc_common.h>
 #include <list>
 #include "../Time.hpp"
+#include <vlc_threads.h>
 
 namespace adaptive
 {

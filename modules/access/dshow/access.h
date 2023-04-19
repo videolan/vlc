@@ -29,6 +29,8 @@
 
 #include <vector>
 
+#include <vlc_threads.h>
+
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 

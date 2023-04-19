@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_modules.h>
 #include <vlc_fourcc.h>
 #include "../video_output/android/env.h"

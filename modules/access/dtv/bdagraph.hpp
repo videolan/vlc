@@ -38,6 +38,8 @@
 #include "bdadefs.h"
 #include <stdexcept>
 
+#include <vlc_threads.h>
+
 #include <wrl/client.h>
 
 

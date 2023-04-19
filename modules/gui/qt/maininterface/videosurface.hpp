@@ -23,6 +23,8 @@
 #include <QRunnable>
 #include "qt.hpp"
 
+#include <vlc_threads.h>
+
 extern "C" {
     typedef struct vlc_window vlc_window_t;
 }

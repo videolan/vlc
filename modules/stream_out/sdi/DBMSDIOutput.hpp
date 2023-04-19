@@ -24,6 +24,7 @@
 #include "SDIOutput.hpp"
 
 #include <vlc_es.h>
+#include <vlc_threads.h>
 #include "../../access/vlc_decklink.h"
 
 namespace sdi_sout

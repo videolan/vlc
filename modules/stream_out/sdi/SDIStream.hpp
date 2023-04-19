@@ -21,6 +21,7 @@
 #define SDISTREAM_HPP
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_filter.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>
