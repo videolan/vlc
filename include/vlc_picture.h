@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <vlc_atomic.h>
+#include <vlc_es.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,8 +43,6 @@ typedef uint32_t vlc_ancillary_id;
  * \file
  * This file defines picture structures and functions in vlc
  */
-
-#include <vlc_es.h>
 
 /** Description of a planar graphic field */
 typedef struct plane_t
