@@ -454,11 +454,18 @@ void swab (const void *, void *, ssize_t);
 
 /* Socket stuff */
 #ifndef HAVE_INET_PTON
+# ifdef __cplusplus
+}
+# endif
 # ifndef _WIN32
 #  include <sys/socket.h>
 #else
 typedef int socklen_t;
 # endif
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 int inet_pton(int, const char *, void *);
 const char *inet_ntop(int, const void *, char *, socklen_t);
 #endif
@@ -491,7 +498,13 @@ int poll (struct pollfd *, unsigned, int);
 #endif
 
 #ifndef HAVE_IF_NAMEINDEX
+# ifdef __cplusplus
+}
+# endif
 #include <errno.h>
+# ifdef __cplusplus
+extern "C" {
+# endif
 # ifndef HAVE_STRUCT_IF_NAMEINDEX
 struct if_nameindex
 {
@@ -529,7 +542,13 @@ struct msghdr
 };
 
 # ifndef HAVE_IF_NAMETOINDEX
+#  ifdef __cplusplus
+}
+#  endif
 #  include <stdlib.h> /* a define may change from the real atoi declaration */
+#  ifdef __cplusplus
+extern "C" {
+#  endif
 static inline int if_nametoindex(const char *name)
 {
     return atoi(name);
@@ -746,7 +765,13 @@ char *realpath(const char * restrict pathname, char * restrict resolved_path);
 #ifdef __APPLE__
 # define fdatasync fsync
 
+# ifdef __cplusplus
+}
+# endif
 # include <time.h>
+# ifdef __cplusplus
+extern "C" {
+# endif
 # ifndef TIMER_ABSTIME
 #  define TIMER_ABSTIME 0x01
 # endif
@@ -766,7 +791,13 @@ int clock_getres(clockid_t clock_id, struct timespec *tp);
 
 #ifndef _WIN32
 # ifndef HAVE_CLOCK_NANOSLEEP
+#  ifdef __cplusplus
+}
+#  endif
 # include <time.h>
+#  ifdef __cplusplus
+extern "C" {
+#  endif
 int clock_nanosleep(clockid_t clock_id, int flags,
         const struct timespec *rqtp, struct timespec *rmtp);
 # endif
