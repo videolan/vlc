@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
 #include <vlc_spawn.h>
