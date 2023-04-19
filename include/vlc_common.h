@@ -557,7 +557,6 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 #   include <os2.h>
 #endif
 
-#include "vlc_tick.h"
 #include "vlc_threads.h"
 
 /**
