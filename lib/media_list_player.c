@@ -527,26 +527,6 @@ libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp)
 }
 
 /**************************************************************************
- *        set_media_player (Public)
- **************************************************************************/
-void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_mlp, libvlc_media_player_t * p_mi)
-{
-    libvlc_media_player_t *p_oldmi;
-
-    assert(p_mi != NULL);
-    libvlc_media_player_retain(p_mi);
-
-    lock(p_mlp);
-    uninstall_media_player_observer(p_mlp);
-    p_oldmi = p_mlp->p_mi;
-    p_mlp->p_mi = p_mi;
-    install_media_player_observer(p_mlp);
-    unlock(p_mlp);
-
-    libvlc_media_player_release(p_oldmi);
-}
-
-/**************************************************************************
  *        get_media_player (Public)
  **************************************************************************/
 libvlc_media_player_t * libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp)

@@ -101,17 +101,6 @@ LIBVLC_API libvlc_event_manager_t *
     libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp);
 
 /**
- * Replace media player in media_list_player with this instance.
- *
- * \param p_mlp media list player instance
- * \param p_mi media player instance
- */
-LIBVLC_API void
-    libvlc_media_list_player_set_media_player(
-                                     libvlc_media_list_player_t * p_mlp,
-                                     libvlc_media_player_t * p_mi );
-
-/**
  * Get media player of the media_list_player instance.
  *
  * \param p_mlp media list player instance
