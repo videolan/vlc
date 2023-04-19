@@ -131,7 +131,7 @@ int main( int argc, char *argv[] ) {
 
     //setup vlc
     vlc_inst = libvlc_new(0, NULL);
-    media_player = libvlc_media_player_new(vlc_inst);
+    media_player = libvlc_media_player_new(vlc_inst, NULL, NULL);
     g_signal_connect(G_OBJECT(player_widget), "realize", G_CALLBACK(player_widget_on_realize), NULL);
 
     gtk_widget_show_all(window);

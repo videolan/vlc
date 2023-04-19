@@ -24,6 +24,11 @@
 #include "media_player.h"
 #include <vlc_common.h>
 
+static const struct libvlc_media_player_cbs recording_cbs = {
+    .version = 0,
+    .on_recording_changed = mp_on_recording_changed,
+};
+
 static void test_media_player_record(const char** argv, int argc)
 {
     test_log ("Testing record\n");
@@ -41,18 +46,12 @@ static void test_media_player_record(const char** argv, int argc)
     assert (vlc != NULL);
     libvlc_media_t *md = libvlc_media_new_location(file);
     assert (md != NULL);
-    libvlc_media_player_t *mp = libvlc_media_player_new (vlc);
+    struct mp_event_ctx ctx;
+    mp_event_ctx_init(&ctx);
+    libvlc_media_player_t *mp = libvlc_media_player_new (vlc, &recording_cbs, &ctx);
     assert (mp != NULL);
     libvlc_media_player_set_media (mp, md);
     libvlc_media_release (md);
-
-    libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
-    struct mp_event_ctx ctx;
-    mp_event_ctx_init(&ctx);
-
-    int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerRecordChanged, mp_event_ctx_on_event, &ctx);
-    assert(!res);
 
     libvlc_media_player_play (mp);
 
@@ -63,27 +62,31 @@ static void test_media_player_record(const char** argv, int argc)
 
     /* Enabling */
     {
-        const struct libvlc_event_t *ev = mp_event_ctx_wait_event(&ctx);
-        assert(ev->u.media_player_record_changed.recording);
-        mp_event_ctx_release(&ctx);
+        struct mp_event *ev = mp_event_ctx_wait_event(&ctx);
+        assert(ev->type == EVENT_TYPE_RECORDING_CHANGED);
+        assert(ev->recording_changed.recording);
+        mp_event_delete(ev);
     }
 
     /* Disabling */
     {
         libvlc_media_player_record(mp, false, path);
-        const struct libvlc_event_t *ev = mp_event_ctx_wait_event(&ctx);
-        assert(!ev->u.media_player_record_changed.recording);
-        assert(ev->u.media_player_record_changed.recorded_file_path != NULL);
-        filepath = strdup(ev->u.media_player_record_changed.recorded_file_path);
+        struct mp_event *ev = mp_event_ctx_wait_event(&ctx);
+        assert(ev->type == EVENT_TYPE_RECORDING_CHANGED);
+        assert(!ev->recording_changed.recording);
+        assert(ev->recording_changed.file_path != NULL);
+
+        filepath = strdup(ev->recording_changed.file_path);
         assert(filepath != NULL);
-        mp_event_ctx_release(&ctx);
+
+        mp_event_delete(ev);
     }
 
     libvlc_media_player_stop_async (mp);
     libvlc_media_player_release (mp);
     libvlc_release (vlc);
 
-    res = unlink(filepath);
+    unlink(filepath);
     /** TODO:
      * We should check assert(res == 0);, but the record is currently
      * creating a stream output pipeline instance for recording with

@@ -392,7 +392,9 @@ internal_player_subitems_changed(vlc_player_t *player, input_item_t *media,
  *         new (Public)
  **************************************************************************/
 libvlc_media_list_player_t *
-libvlc_media_list_player_new(libvlc_instance_t * p_instance)
+libvlc_media_list_player_new(libvlc_instance_t * p_instance,
+                             const struct libvlc_media_player_cbs *cbs,
+                             void *cbs_opaque)
 {
     libvlc_media_list_player_t * p_mlp;
     p_mlp = calloc( 1, sizeof(libvlc_media_list_player_t) );
@@ -407,7 +409,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
     libvlc_event_manager_init(&p_mlp->event_manager, p_mlp);
 
     /* Create the underlying media_player */
-    p_mlp->p_mi = libvlc_media_player_new(p_instance);
+    p_mlp->p_mi = libvlc_media_player_new(p_instance, cbs, cbs_opaque);
     if( p_mlp->p_mi == NULL )
         goto error;
 

@@ -24,7 +24,7 @@
 #define LIBVLC_MEDIA_LIST_PLAYER_H 1
 
 #include <vlc/libvlc.h>
-#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_media_player.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -63,11 +63,17 @@ typedef enum libvlc_playback_mode_t
  * Create new media_list_player.
  *
  * \param p_instance libvlc instance
+ * \param cbs callback to listen to events (can be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until
+ * the returned media list player is released.
+ * \param cbs_opaque opaque pointer used by the callbacks
  * \return media list player instance or NULL on error
  *         (it must be released by libvlc_media_list_player_release())
  */
 LIBVLC_API libvlc_media_list_player_t *
-    libvlc_media_list_player_new( libvlc_instance_t * p_instance );
+    libvlc_media_list_player_new( libvlc_instance_t * p_instance,
+                                  const struct libvlc_media_player_cbs *cbs,
+                                  void *cbs_opaque );
 
 /**
  * Release a media_list_player after use

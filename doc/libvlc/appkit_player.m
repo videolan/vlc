@@ -77,7 +77,7 @@
     instance = libvlc_new(ARRAY_SIZE(vlc_args), vlc_args);
     NSAssert(instance != NULL, @"Failed to allocate libvlc instance");
 
-    player = libvlc_media_player_new(instance);
+    player = libvlc_media_player_new(instance, NULL, NULL);
     NSAssert(player != NULL, @"Failed to allocate player instance");
 
     NSArray *args = [[NSProcessInfo processInfo] arguments];

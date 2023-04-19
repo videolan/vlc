@@ -316,13 +316,6 @@ static struct
     { "file.ts", libvlc_media_type_file },
 };
 
-static void subitem_parse_ended(const libvlc_event_t *event, void *user_data)
-{
-    (void)event;
-    vlc_sem_t *sem = user_data;
-    vlc_sem_post (sem);
-}
-
 static void check_subitems(libvlc_media_t *m, bool *subitems_found)
 {
 #ifdef _WIN32
@@ -366,12 +359,18 @@ static void check_subitems(libvlc_media_t *m, bool *subitems_found)
 #undef FILE_SEPARATOR
 }
 
-static void subitem_added(const libvlc_event_t *event, void *user_data)
+static void on_media_parsed(void *opaque, libvlc_media_t *media)
 {
-    bool *subitems_found = user_data;
-    libvlc_media_t *m = event->u.media_subitem_added.new_child;
+    (void) media;
+    vlc_sem_t *sem = opaque;
+    vlc_sem_post(sem);
+}
 
-    check_subitems(m, subitems_found);
+static void on_media_subitems_changed(void *opaque, libvlc_media_t *media)
+{
+    (void) media;
+    vlc_sem_t *sem = opaque;
+    vlc_sem_post(sem);
 }
 
 static void test_media_subitems_media(libvlc_instance_t *vlc,
@@ -387,18 +386,24 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
 
     if (play)
     {
-        libvlc_event_manager_t *em = libvlc_media_event_manager (media);
-        libvlc_event_attach (em, libvlc_MediaSubItemAdded, subitem_added, subitems_found);
-
         /* XXX: libvlc_media_parse won't work with fd, since it
          * won't be preparsed because fd:// is an unknown type, so play the
          * file to force parsing. */
-        libvlc_event_attach (em, libvlc_MediaSubItemTreeAdded, subitem_parse_ended, &sem);
 
-        libvlc_media_player_t *mp = libvlc_media_player_new_from_media(vlc, media);
+        static const struct libvlc_media_player_cbs cbs = {
+            .version = 0,
+            .on_media_parsed = on_media_parsed,
+            .on_media_subitems_changed = on_media_subitems_changed,
+        };
+
+        libvlc_media_player_t *mp =
+            libvlc_media_player_new_from_media(vlc, media, &cbs, &sem);
         assert (mp);
         assert (libvlc_media_player_play (mp) != -1);
-        vlc_sem_wait (&sem);
+
+        vlc_sem_wait(&sem);
+        vlc_sem_wait(&sem);
+
         libvlc_media_player_release (mp);
     }
     else
@@ -425,20 +430,19 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
         assert(task != NULL);
 
         vlc_sem_wait (&sem);
-
-        libvlc_media_list_t *subitems = libvlc_media_subitems(media);
-        assert(subitems != NULL);
-        for (int i = 0; i < libvlc_media_list_count(subitems); ++i)
-        {
-            libvlc_media_t *child = libvlc_media_list_item_at_index(subitems, i);
-            assert(child != NULL);
-            check_subitems(child, subitems_found);
-            libvlc_media_release(child);
-        }
-        libvlc_media_list_release(subitems);
-
         libvlc_parser_destroy(parser);
     }
+
+    libvlc_media_list_t *subitems = libvlc_media_subitems(media);
+    assert(subitems != NULL);
+    for (int i = 0; i < libvlc_media_list_count(subitems); ++i)
+    {
+        libvlc_media_t *child = libvlc_media_list_item_at_index(subitems, i);
+        assert(child != NULL);
+        check_subitems(child, subitems_found);
+        libvlc_media_release(child);
+    }
+    libvlc_media_list_release(subitems);
 
     if (!b_items_expected)
         return;

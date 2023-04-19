@@ -124,10 +124,10 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     md = libvlc_media_new_location(file);
     assert(md);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     libvlc_media_list_add_media (ml, md);
@@ -189,10 +189,10 @@ static void test_media_list_player_previous(const char** argv, int argc)
     md = libvlc_media_new_location(file);
     assert(md);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     libvlc_media_list_add_media (ml, md);
@@ -248,10 +248,10 @@ static void test_media_list_player_next(const char** argv, int argc)
     md = libvlc_media_new_location(file);
     assert(md);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     libvlc_media_list_add_media (ml, md);
@@ -307,10 +307,10 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
     md = libvlc_media_new_location(file);
     assert(md);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     libvlc_media_list_add_media( ml, md);
@@ -347,10 +347,10 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
     md = libvlc_media_new_location(file);
     assert(md);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     for (unsigned i = 0; i < 5; i++)
@@ -418,22 +418,22 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     md5 = libvlc_media_new_location(file);
     assert(md5);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new ();
     assert (ml != NULL);
 
-    ml2 = libvlc_media_list_new (vlc);
+    ml2 = libvlc_media_list_new ();
     assert (ml2 != NULL);
 
-    ml3 = libvlc_media_list_new (vlc);
+    ml3 = libvlc_media_list_new ();
     assert (ml3 != NULL);
 
-    ml4 = libvlc_media_list_new (vlc);
+    ml4 = libvlc_media_list_new ();
     assert (ml4 != NULL);
 
-    ml5 = libvlc_media_list_new (vlc);
+    ml5 = libvlc_media_list_new ();
     assert (ml5 != NULL);
 
-    ml6 = libvlc_media_list_new (vlc);
+    ml6 = libvlc_media_list_new ();
     assert (ml6 != NULL);
 
     media_list_add_file_path(ml2, file);
@@ -466,7 +466,7 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     libvlc_media_list_add_media (ml, md2);
     libvlc_media_list_add_media (ml, md3);
 
-    mlp = libvlc_media_list_player_new (vlc);
+    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
     assert(mlp);
 
     libvlc_media_list_player_set_media_list (mlp, ml);

@@ -19,7 +19,7 @@ static void test_equalizer (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (NULL != vlc);
 
-    mp = libvlc_media_player_new (vlc);
+    mp = libvlc_media_player_new (vlc, NULL, NULL);
     assert (NULL != mp);
 
     // presets

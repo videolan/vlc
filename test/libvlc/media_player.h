@@ -24,50 +24,216 @@
 #ifndef TEST_MEDIA_PLAYER_H
 #define TEST_MEDIA_PLAYER_H
 
+#include <vlc_list.h>
+
+struct mp_event
+{
+    struct vlc_list node;
+    enum {
+        EVENT_TYPE_STATE,
+        EVENT_TYPE_TRACK_LIST,
+        EVENT_TYPE_TRACK_SELECTION,
+        EVENT_TYPE_PROGRAM_LIST,
+        EVENT_TYPE_PROGRAM_SELECTION,
+        EVENT_TYPE_RECORDING_CHANGED,
+    } type;
+    union {
+        libvlc_state_t state;
+        struct {
+            libvlc_list_action_t action;
+            libvlc_track_type_t type;
+            char *id;
+        } track_list;
+        struct {
+            libvlc_track_type_t type;
+            char *unselected_id;
+            char *selected_id;
+        } track_selection;
+        struct {
+            libvlc_list_action_t action;
+            int group_id;
+        } program_list;
+        struct {
+            int unselected_group_id;
+            int selected_group_id;
+        } program_selection;
+        struct {
+            bool recording;
+            char *file_path;
+        } recording_changed;
+    };
+};
+
 struct mp_event_ctx
 {
-    vlc_sem_t sem_ev;
-    vlc_sem_t sem_done;
-    const struct libvlc_event_t *ev;
+    vlc_mutex_t lock;
+    vlc_cond_t wait;
+
+    struct vlc_list events;
 };
+
+static inline void mp_event_delete(struct mp_event *ev)
+{
+    switch (ev->type)
+    {
+        case EVENT_TYPE_TRACK_LIST:
+            free(ev->track_list.id);
+            break;
+        case EVENT_TYPE_TRACK_SELECTION:
+            free(ev->track_selection.unselected_id);
+            free(ev->track_selection.selected_id);
+            break;
+        case EVENT_TYPE_RECORDING_CHANGED:
+            free(ev->recording_changed.file_path);
+        default: break;
+    }
+    free(ev);
+}
 
 static inline void mp_event_ctx_init(struct mp_event_ctx *ctx)
 {
-    vlc_sem_init(&ctx->sem_ev, 0);
-    vlc_sem_init(&ctx->sem_done, 0);
-    ctx->ev = NULL;
+    vlc_mutex_init(&ctx->lock);
+    vlc_cond_init(&ctx->wait);
+    vlc_list_init(&ctx->events);
 }
 
-static inline const struct libvlc_event_t *mp_event_ctx_wait_event(struct mp_event_ctx *ctx)
+static inline void mp_event_ctx_destroy(struct mp_event_ctx *ctx)
 {
-    vlc_sem_wait(&ctx->sem_ev);
-    assert(ctx->ev != NULL);
-    return ctx->ev;
+    struct mp_event *ev;
+    vlc_list_foreach(ev, &ctx->events, node)
+        mp_event_delete(ev);
 }
 
-static inline void mp_event_ctx_release(struct mp_event_ctx *ctx)
+static inline struct mp_event *mp_event_ctx_wait_event(struct mp_event_ctx *ctx)
 {
-    assert(ctx->ev != NULL);
-    ctx->ev = NULL;
-    vlc_sem_post(&ctx->sem_done);
+    vlc_mutex_lock(&ctx->lock);
+    struct mp_event *event;
+
+    while ((event = vlc_list_first_entry_or_null(&ctx->events, struct mp_event,
+                                                 node)) == NULL)
+        vlc_cond_wait(&ctx->wait, &ctx->lock);
+
+    vlc_list_remove(&event->node);
+    vlc_mutex_unlock(&ctx->lock);
+
+    return event;
 }
 
-static inline void mp_event_ctx_wait(struct mp_event_ctx *ctx)
+static inline void mp_event_ctx_push_event(struct mp_event_ctx *ctx,
+                                           const struct mp_event *ev)
 {
-    mp_event_ctx_wait_event(ctx);
-    mp_event_ctx_release(ctx);
+    struct mp_event *dup = malloc(sizeof *dup);
+    assert(dup != NULL);
+    *dup = *ev;
+
+    vlc_mutex_lock(&ctx->lock);
+    vlc_list_append(&dup->node, &ctx->events);
+    vlc_cond_signal(&ctx->wait);
+    vlc_mutex_unlock(&ctx->lock);
 }
 
-static inline void mp_event_ctx_on_event(const struct libvlc_event_t *event, void *data)
+static inline void mp_event_ctx_wait_state(struct mp_event_ctx *ctx,
+                                           libvlc_state_t state)
 {
-    struct mp_event_ctx *ctx = data;
+    for (;;)
+    {
+        struct mp_event *ev = mp_event_ctx_wait_event(ctx);
+        if (ev->type == EVENT_TYPE_STATE && ev->state == state)
+        {
+            mp_event_delete(ev);
+            break;
+        }
+        else
+            mp_event_delete(ev);
+    }
+}
 
-    assert(ctx->ev == NULL);
-    ctx->ev = event;
+static inline void mp_on_state_changed(void *opaque, libvlc_state_t state)
+{
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_STATE,
+        .state = state,
+    });
+}
 
-    vlc_sem_post(&ctx->sem_ev);
-    vlc_sem_wait(&ctx->sem_done);
-    assert(ctx->ev == NULL);
+static inline void mp_on_track_list_changed(void *opaque, libvlc_list_action_t action,
+                                            libvlc_track_type_t type, const char *id)
+{
+    char *id_dup = strdup(id);
+    assert(id_dup);
+
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_TRACK_LIST,
+        .track_list.action = action,
+        .track_list.type = type,
+        .track_list.id = id_dup,
+    });
+}
+
+static inline void mp_on_track_selection_changed(void *opaque, libvlc_track_type_t type,
+                                                 const char *unselected_id,
+                                                 const char *selected_id)
+{
+    char *unselected_id_dup = NULL;
+    if (unselected_id != NULL)
+    {
+        unselected_id_dup = strdup(unselected_id);
+        assert(unselected_id_dup);
+    }
+    char *selected_id_dup = NULL;
+    if (selected_id != NULL)
+    {
+        selected_id_dup = strdup(selected_id);
+        assert(selected_id_dup);
+    }
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_TRACK_SELECTION,
+        .track_selection.type = type,
+        .track_selection.unselected_id = unselected_id_dup,
+        .track_selection.selected_id = selected_id_dup,
+    });
+}
+
+static inline void mp_on_program_list_changed(void *opaque,
+                                              libvlc_list_action_t action,
+                                              int group_id)
+{
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_PROGRAM_LIST,
+        .program_list.action = action,
+        .program_list.group_id = group_id,
+    });
+}
+
+static inline void mp_on_program_selection_changed(void *opaque,
+                                                   int unselected_group_id,
+                                                   int selected_group_id)
+{
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_PROGRAM_SELECTION,
+        .program_selection.unselected_group_id = unselected_group_id,
+        .program_selection.selected_group_id = selected_group_id,
+    });
+}
+
+static inline void mp_on_recording_changed(void *opaque, bool recording,
+                                           const char *file_path)
+{
+
+    char *file_path_dup;
+    if (file_path != NULL)
+    {
+        file_path_dup = strdup(file_path);
+        assert(file_path_dup != NULL);
+    }
+    else
+        file_path_dup = NULL;
+
+    mp_event_ctx_push_event(opaque, &(struct mp_event) {
+        .type = EVENT_TYPE_RECORDING_CHANGED,
+        .recording_changed.recording = recording,
+        .recording_changed.file_path = file_path_dup,
+    });
 }
 
 #endif /* TEST_MEDIA_PLAYER_H */

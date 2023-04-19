@@ -182,6 +182,29 @@ typedef enum libvlc_abloop_t {
 } libvlc_abloop_t;
 
 /**
+ * Enumeration of player capabilities
+ */
+typedef enum libvlc_capability_t {
+    /** player can seek */
+    libvlc_capability_seek        = 0x01,
+    /** player can pause */
+    libvlc_capability_pause       = 0x02,
+    /** player can change rate */
+    libvlc_capability_change_rate = 0x04,
+    /** player can seek back */
+    libvlc_capability_rewind      = 0x08,
+} libvlc_capability_t;
+
+/**
+ * Enumeration of player track/program list actions
+ */
+typedef enum libvlc_list_action_t {
+    libvlc_list_action_added,
+    libvlc_list_action_removed,
+    libvlc_list_action_updated,
+} libvlc_list_action_t;
+
+/**
  * Opaque equalizer handle.
  *
  * Equalizer settings can be applied to a media player.
@@ -189,14 +212,353 @@ typedef enum libvlc_abloop_t {
 typedef struct libvlc_equalizer_t libvlc_equalizer_t;
 
 /**
+ * struct defining callbacks for libvlc_media_player_new()
+ */
+struct libvlc_media_player_cbs
+{
+    /**
+     * Version of struct libvlc_media_player_cbs
+     */
+    uint32_t version;
+
+    /**
+     * Callback prototype that notify when the player changed media
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media new played media
+     */
+    void (*on_media_changed)( void *opaque, libvlc_media_t *media );
+
+    /**
+     * Callback prototype that notify when the player will stop the current
+     * media.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * This can be called from the PLAYING state, before the
+     * player requests the next media, or from the STOPPING state, ie.
+     * when the player is stopping.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media stopping media
+     */
+    void (*on_media_stopping)( void *opaque, libvlc_media_t *media );
+
+    /**
+     * Callback prototype that notify when the player state changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param state new player state
+     */
+    void (*on_state_changed)( void *opaque, libvlc_state_t state );
+
+    /**
+     * Callback prototype that notify when the player buffering changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * This event is always called with the 0 and 1 values before a playback
+     * (in case of success). Values in between depends on the media type.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param buffering buffering in the range [0:1]
+     */
+    void (*on_buffering_changed)( void *opaque, float buffering );
+
+    /**
+     * Callback prototype that notify when the player capabilities changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param old_caps old player capabilities
+     * \param new_caps new player capabilities
+     */
+    void (*on_capabilities_changed)( void *opaque, libvlc_capability_t old_caps,
+                                     libvlc_capability_t new_caps );
+
+    /**
+     * Callback prototype that notify when the player position changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param time a valid time or 0
+     * \param pos a valid position
+     */
+    void (*on_position_changed)( void *opaque, libvlc_time_t time, double pos );
+
+    /**
+     * Callback prototype that notify when the player length changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * May be called when the media is opening or during playback.
+     * A started and playing media doesn't have necessarily a valid length.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param length a valid length or 0
+     */
+    void (*on_length_changed)( void *opaque, libvlc_time_t length );
+
+    /**
+     * Callback prototype that notify when the player added, removed or updated
+     * a track
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param action added, removed or updated
+     * \param type type of the track
+     * \param id valid track id, call libvlc_media_player_get_track_from_id()
+     * to get the track description.
+     */
+    void (*on_track_list_changed)( void *opaque, libvlc_list_action_t action,
+                                   libvlc_track_type_t type, const char *id );
+
+    /**
+     * Callback prototype that notify when a track is selected or unselected
+     * by the player
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param type type of tracks being unselected or selected
+     * \param unselected_id valid track id or NULL (when nothing is unselected)
+     * \param selected_id valid track id or NULL (when nothing is selected),
+     * call libvlc_media_player_get_track_from_id() to get the track description.
+     */
+    void (*on_track_selection_changed)( void *opaque, libvlc_track_type_t type,
+                                        const char *unselected_id,
+                                        const char *selected_id );
+
+    /**
+     * Callback prototype that notify when the player added, removed or updated
+     * a program
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param action added, removed or updated
+     * \param group_id valid group id, call
+     * libvlc_media_player_get_program_from_id() to get the program description.
+     */
+    void (*on_program_list_changed)( void *opaque, libvlc_list_action_t action,
+                                     int group_id );
+
+    /**
+     * Callback prototype that notify when a program is selected or unselected
+     * by the player
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param unselected_group_id valid group id
+     * \param selected_group_id valid group id, call
+     * libvlc_media_player_get_program_from_id() to get the program description.
+     */
+    void (*on_program_selection_changed)( void *opaque, int unselected_group_id,
+                                          int selected_group_id );
+
+    /**
+     * Callback prototype that notify when the player changed titles
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * Call libvlc_media_player_get_full_title_descriptions() to get the
+     * description of new titles.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     */
+    void (*on_titles_changed)( void *opaque );
+
+    /**
+     * Callback prototype that notify when the player selected a new title
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param title description of the new selected title, valid only from this
+     * callback, do not release
+     * \param idx index of the new title
+     */
+    void (*on_title_selection_changed)( void *opaque,
+                                        const libvlc_title_description_t *title,
+                                        unsigned idx );
+
+    /**
+     * Callback prototype that notify when the player selected a new chapter
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param title_idx index of the title
+     * \param chapter_idx index of the new selected chapter
+     */
+    void (*on_chapter_selection_changed)( void *opaque,
+                                          unsigned title_idx, unsigned chapter_idx );
+
+    /**
+     * Callback prototype that notify when the player recording state changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param recording true if recording is enabled
+     * \param file_path file path of the recording, only valid when the
+     * recording ends (recording == false)
+     */
+    void (*on_recording_changed)( void *opaque, bool recording,
+                                  const char *file_path );
+
+    /**
+     * Callback prototype that notify when the player took a screenshot
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param file_path file path of the screenshot
+     */
+    void (*on_screenshot_taken)( void *opaque, const char *file_path );
+
+    /**
+     * Callback prototype that notify when the player parsed the current media
+     *
+     * Called once per media, this won't be called if the media has already
+     * been parsed by the parser, use on_media_meta_changed() to get notified
+     * when media meta is updated.
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media media being played/parsed
+     */
+    void (*on_media_parsed)( void *opaque, libvlc_media_t *media );
+
+    /**
+     * Callback prototype that notify when metadata were update by the player
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media media being played/parsed, call libvlc_media_get_meta() to
+     * get new metadata
+     */
+    void (*on_media_meta_changed)( void *opaque, libvlc_media_t *media );
+
+    /**
+     * Callback prototype that notify when the player added new subitems to the
+     * current media
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media media being played/parsed, call libvlc_media_subitems() to
+     * get sub items
+     */
+    void (*on_media_subitems_changed)( void *opaque, libvlc_media_t *media );
+
+
+    /**
+     * Callback prototype that notify when a new player vout is added or removed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param vout_count number of active vouts
+     */
+    void (*on_vout_changed)( void *opaque, unsigned vout_count );
+
+    /**
+     * Callback prototype that notify when the player is corked/uncorked
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * The player can be corked when the audio output loose focus or when a
+     * renderer was paused from the outside.
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param corked true if the player is corked. In that case, the user
+     * should pause the player and release all external resource needed by the
+     * player
+     */
+    void (*on_cork_changed)( void *opaque, bool corked );
+
+    /**
+     * Callback prototype that notify when the audio volume has changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param new_volume volume in the range [0;2.f]
+     */
+    void (*on_audio_volume_changed)( void *opaque, float volume );
+
+    /**
+     * Callback prototype that notify when the audio mute state has changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param muted true if muted
+     */
+    void (*on_audio_mute_changed)( void *opaque, bool muted );
+
+    /**
+     * Callback prototype that notify when the audio device state has changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param device the device name
+     */
+    void (*on_audio_device_changed)( void *opaque, const char *device );
+};
+
+/**
  * Create an empty Media Player object
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Player
  *        should be created.
+ * \param cbs callback to listen to events (can be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until
+ * the returned media player is released.
+ * \param cbs_opaque opaque pointer used by the callbacks
  * \return a new media player object, or NULL on error.
  * It must be released by libvlc_media_player_release().
  */
-LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p_libvlc_instance );
+LIBVLC_API libvlc_media_player_t *
+libvlc_media_player_new( libvlc_instance_t *p_libvlc_instance,
+                         const struct libvlc_media_player_cbs *cbs,
+                         void *cbs_opaque );
 
 /**
  * Create a Media Player object from a Media
@@ -204,10 +566,17 @@ LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p
  * \param inst LibVLC instance to create a media player with
  * \param p_md the media. Afterwards the p_md can be safely
  *        destroyed.
+ * \param cbs callback to listen to events (can be NULL). The pointed
+ * struct must be kept alive (and not modified) by the caller until
+ * the returned media player is released.
+ * \param cbs_opaque opaque pointer used by the callbacks
  * \return a new media player object, or NULL on error.
  * It must be released by libvlc_media_player_release().
  */
-LIBVLC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_instance_t *inst, libvlc_media_t *p_md );
+LIBVLC_API libvlc_media_player_t *
+libvlc_media_player_new_from_media( libvlc_instance_t *inst, libvlc_media_t *p_md,
+                                    const struct libvlc_media_player_cbs *cbs,
+                                    void *cbs_opaque );
 
 /**
  * Release a media_player after use
@@ -237,9 +606,9 @@ LIBVLC_API libvlc_media_player_t *libvlc_media_player_retain( libvlc_media_playe
  * \note The function will open the media, without starting it, allowing the
  * user to send controls (like seek requests) before Starting the player.
  *
- * \note The user should listen to the libvlc_MediaPlayerMediaChanged event, to
- * know when the new media is actually used by the player (or to known that the
- * older media is no longer used).
+ * \note The user should listen to the libvlc_media_player_cbs.on_media_changed
+ * callback, to know when the new media is actually used by the player
+ * (or to know that the older media is no longer used).
  *
  * \param p_mi the Media Player
  * \param p_md the Media. Afterwards the p_md can be safely
@@ -254,7 +623,7 @@ LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
  * \warning Calling this function just after libvlc_media_player_set_media()
  * will return the media that was just set, but this media might not be
  * currently used internally by the player. To detect such case, the user
- * should listen to the libvlc_MediaPlayerMediaChanged event.
+ * should listen to the libvlc_media_player_cbs.on_media_changed callback.
  *
  * \param p_mi the Media Player
  * \return the media associated with p_mi, or NULL if no
@@ -288,13 +657,6 @@ LIBVLC_API void libvlc_media_player_set_next_media( libvlc_media_player_t *p_mi,
  */
 LIBVLC_API libvlc_media_t * libvlc_media_player_get_next_media( libvlc_media_player_t *p_mi );
 
-/**
- * Get the Event Manager from which the media player send event.
- *
- * \param p_mi the Media Player
- * \return the event manager associated with p_mi
- */
-LIBVLC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_media_player_t *p_mi );
 
 /**
  * is_playing
@@ -334,8 +696,8 @@ LIBVLC_API void libvlc_media_player_pause ( libvlc_media_player_t *p_mi );
  * Stop asynchronously
  *
  * \note This function is asynchronous. In case of success, the user should
- * wait for the libvlc_MediaPlayerStopped event to know when the stop is
- * finished.
+ * wait for the libvlc_media_player_cbs.on_state_changed callback to report the
+ * libvlc_Stopped state to know when the stop is finished.
  *
  * \param p_mi the Media Player
  * \return 0 if the player is being stopped, -1 otherwise (no-op)
@@ -1496,7 +1858,7 @@ LIBVLC_API int libvlc_media_player_get_chapter_count_for_title(
  * \param p_mi the Media Player
  * \param i_title title number to play
  */
-LIBVLC_API void libvlc_media_player_set_title( libvlc_media_player_t *p_mi, int i_title );
+LIBVLC_API void libvlc_media_player_set_title( libvlc_media_player_t *p_mi, unsigned i_title );
 
 /**
  * Get movie title
@@ -1875,8 +2237,8 @@ libvlc_player_programlist_delete( libvlc_player_programlist_t *list );
 /**
  * Select program with a given program id.
  *
- * \note program ids are sent via the libvlc_MediaPlayerProgramAdded event or
- * can be fetch via libvlc_media_player_get_programlist()
+ * \note program ids are sent via the libvlc_media_player_cbs.on_program_list_changed
+ * callback or can be fetched via libvlc_media_player_get_programlist()
  *
  * \version LibVLC 4.0.0 or later
  *
@@ -3097,8 +3459,8 @@ LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *p_mi,
 /**
  * Start/stop recording
  *
- * \note The user should listen to the libvlc_MediaPlayerRecordChanged event,
- * to monitor the recording state.
+ * \note The user should listen to the libvlc_media_player_cbs.on_recording_changed
+ * callback, to monitor the recording state.
  *
  * \version LibVLC 4.0.0 and later.
  *

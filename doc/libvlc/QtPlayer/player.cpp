@@ -138,7 +138,7 @@ void Mwindow::openFile() {
         return;
 
     /* Create a new libvlc player */
-    vlcPlayer = libvlc_media_player_new_from_media (vlcInstance, vlcMedia);
+    vlcPlayer = libvlc_media_player_new_from_media (vlcInstance, vlcMedia, NULL, NULL);
 
     /* Release the media */
     libvlc_media_release(vlcMedia);
