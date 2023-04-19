@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>

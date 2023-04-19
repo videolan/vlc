@@ -37,6 +37,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_fs.h> /* vlc_pipe */
 #include <vlc_network.h> /* vlc_accept */
 

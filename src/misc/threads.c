@@ -28,6 +28,7 @@
 #include <stdatomic.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_atomic.h>
 #include "libvlc.h"
 
