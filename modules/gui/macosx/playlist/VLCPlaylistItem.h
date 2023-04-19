@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <vlc_playlist.h>
+#import <vlc_tick.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

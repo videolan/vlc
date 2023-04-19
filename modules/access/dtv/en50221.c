@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 
@@ -1265,11 +1266,11 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
         CAPMTFirst( p_cam, i_session_id, p_info );
         return;
     }
- 
+
 #ifdef CAPMT_WAIT
     vlc_tick_sleep( VLC_TICK_FROM_MS(CAPMT_WAIT) );
 #endif
- 
+
     msg_Dbg( p_cam->obj, "adding CAPMT for SID %d on session %d",
              p_info->i_program_number, i_session_id );
 

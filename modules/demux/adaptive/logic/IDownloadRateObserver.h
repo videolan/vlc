@@ -26,6 +26,7 @@
 #define IDOWNLOADRATEOBSERVER_H_
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 
 namespace adaptive
 {

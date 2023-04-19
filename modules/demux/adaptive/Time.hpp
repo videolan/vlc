@@ -21,6 +21,7 @@
 #define TIME_HPP
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 #include <list>
 
 namespace adaptive

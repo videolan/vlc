@@ -26,6 +26,8 @@
  * Definitions of structures and functions used by this plugin
  *****************************************************************************/
 
+#include <vlc_tick.h>
+
 //#define OGG_DEMUX_DEBUG 1
 #ifdef OGG_DEMUX_DEBUG
   #define DemuxDebug(code) code

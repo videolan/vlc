@@ -20,6 +20,8 @@
 #ifndef WEBVTT_H
 #define WEBVTT_H
 
+#include <vlc_tick.h>
+
 int  webvtt_OpenDecoder   ( vlc_object_t * );
 void webvtt_CloseDecoder  ( vlc_object_t * );
 

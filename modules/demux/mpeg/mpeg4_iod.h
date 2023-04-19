@@ -20,6 +20,8 @@
 #ifndef VLC_MPEG4_IOD_H
 #define VLC_MPEG4_IOD_H
 
+#include <vlc_tick.h>
+
 #define ES_DESCRIPTOR_COUNT 255
 typedef enum
 {

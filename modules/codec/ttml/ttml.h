@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_tick.h>
+
 int tt_OpenDemux( vlc_object_t* p_this );
 void tt_CloseDemux( vlc_object_t* p_demux );
 

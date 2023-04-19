@@ -21,6 +21,7 @@
 #define CONVERSIONS_HPP
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 #include <string>
 #include <sstream>
 

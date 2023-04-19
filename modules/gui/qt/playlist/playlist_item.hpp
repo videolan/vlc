@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_playlist.h>
 #include <QExplicitlySharedDataPointer>

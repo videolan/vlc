@@ -21,6 +21,7 @@
 #define BUFFERINGLOGIC_HPP
 
 #include <vlc_common.h>
+#include <vlc_tick.h>
 
 #include "../tools/Properties.hpp"
 
