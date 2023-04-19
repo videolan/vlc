@@ -39,6 +39,7 @@
 
 #include <vlc_stream.h>
 #include <vlc_rand.h>
+#include <vlc_threads.h>
 
 #include "../../misc/webservices/json.h"
 

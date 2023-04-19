@@ -33,6 +33,7 @@
 # include <sys/uio.h>
 #endif
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_block.h>
 #include <vlc_interrupt.h>
 #include <vlc_tls.h>

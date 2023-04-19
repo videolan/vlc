@@ -27,6 +27,7 @@
 #include <vlc_modules.h>
 #include <vlc_meta.h>
 #include <vlc_block.h>
+#include <vlc_threads.h>
 
 #include <sstream>
 

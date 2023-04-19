@@ -46,6 +46,7 @@ typedef xcb_atom_t Atom;
 #include <X11/Xatom.h> /* XA_WM_NAME */
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 #include <vlc_window.h>

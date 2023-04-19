@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>            /* aout_FormatNbChannels, AOUT_FMTS_SIMILAR */
 #include <vlc_vout.h>              /* vout_*Picture, aout_filter_..tVout */

@@ -27,6 +27,7 @@
 #include "coreaudio_common.h"
 
 #include <vlc_plugin.h>
+#include <vlc_threads.h>
 #include <vlc_dialog.h>                      // vlc_dialog_display_error
 #include <vlc_charset.h>                     // FromCFString
 
@@ -1261,7 +1262,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
                 if (ret != VLC_SUCCESS)
                     continue;
 
-                /* 
+                /*
                  * Only the first found format id is accepted. In case of
                  * another id later on, we still use the already saved one.
                  * This can happen if the user plugs in a spdif cable while a

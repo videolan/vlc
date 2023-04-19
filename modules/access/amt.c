@@ -50,6 +50,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
@@ -437,7 +438,7 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_access, "Parsed AMT URL port %d",url.i_port);
         i_bind_port = url.i_port;
     }
-    
+
     msg_Dbg( p_access, "Opening multicast: %s:%d local=%s:%d", url.psz_host, i_server_port, url.psz_path, i_bind_port );
 
     /* Initialize hints prior to call to vlc_getaddrinfo with either IP address or FQDN */

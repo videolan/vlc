@@ -28,6 +28,7 @@
 #include <alsa/asoundlib.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_demux.h>
 #include <vlc_aout.h>
 #include <vlc_plugin.h>

@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_block.h>
 #include <vlc_fs.h>
 #include <vlc_demux.h>

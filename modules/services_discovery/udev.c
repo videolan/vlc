@@ -33,6 +33,7 @@
 #include <libudev.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
 #ifdef HAVE_ALSA

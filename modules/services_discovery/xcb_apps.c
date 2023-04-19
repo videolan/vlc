@@ -28,6 +28,7 @@
 typedef xcb_atom_t Atom;
 #include <X11/Xatom.h> /* XA_WINDOW */
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_services_discovery.h>
 #include <vlc_dialog.h>
 #include <vlc_charset.h>

@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_tls.h>
 #include <vlc_url.h>
 #include "message.h"
