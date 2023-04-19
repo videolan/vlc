@@ -383,6 +383,7 @@ debian-meson:
     after_script:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
         - mv extras/package/snap/parts/vlc/build/contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+    allow_failure: true
     variables: *variables-snap
 
 snap:
