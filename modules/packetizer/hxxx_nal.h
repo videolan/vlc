@@ -20,6 +20,8 @@
 #ifndef HXXX_NAL_H
 #define HXXX_NAL_H
 
+#include <stdbit.h>
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include "startcode_helper.h"
@@ -67,7 +69,7 @@ static inline void hxxx_iterator_init( hxxx_iterator_ctx_t *p_ctx, const uint8_t
 {
     p_ctx->p_head = p_data;
     p_ctx->p_tail = p_data + i_data;
-    if( vlc_popcount(i_nal_length_size) == 1 && i_nal_length_size <= 4 )
+    if( stdc_has_single_bit(i_nal_length_size) && i_nal_length_size <= 4 )
         p_ctx->i_nal_length_size = i_nal_length_size;
     else
         p_ctx->i_nal_length_size = 0;
