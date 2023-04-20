@@ -1,0 +1,24 @@
+From d551a3c42bb3799e88e778ea7f3d0402a46efbff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kacper=20Michaj=C5=82ow?= <kasper93@gmail.com>
+Date: Thu, 19 Jan 2023 21:15:16 +0100
+Subject: [PATCH] vulkan: add missing array termination
+
+---
+ src/vulkan/context.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/vulkan/context.c b/src/vulkan/context.c
+index 9fa80c2f..d93283e0 100644
+--- a/src/vulkan/context.c
++++ b/src/vulkan/context.c
+@@ -195,6 +195,7 @@ static const struct vk_ext vk_device_extensions[] = {
+         .name = VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME,
+         .funs = (struct vk_fun[]) {
+             PL_VK_DEV_FUN(AcquireFullScreenExclusiveModeEXT),
++            {0}
+         },
+ #endif
+     },
+-- 
+2.37.3.windows.1
+

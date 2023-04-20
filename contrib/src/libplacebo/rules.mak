@@ -39,6 +39,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
 	$(APPLY) $(SRC)/libplacebo/0001-vulkan-meson-add-the-clang-gcc-C-runtime.patch
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-overriding-python3-path.patch
+	$(APPLY) $(SRC)/libplacebo/0001-vulkan-add-missing-array-termination.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson .python-venv
