@@ -215,11 +215,12 @@ private:
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 {
 public:
-    CSDWin32EventHandler(const bool useClientSideDecoration, QWindow *window, CSDButtonModel *buttonmodel, QObject *parent)
+    CSDWin32EventHandler(MainCtx* mainctx, QWindow *window, QObject *parent)
         : QObject {parent}
-        , m_useClientSideDecoration {useClientSideDecoration}
+        , m_mainctx(mainctx)
+        , m_useClientSideDecoration {mainctx->useClientSideDecoration()}
         , m_window {window}
-        , m_buttonmodel {buttonmodel}
+        , m_buttonmodel {mainctx->csdButtonModel()}
     {
         QApplication::instance()->installNativeEventFilter(this);
         updateCSDSettings();
@@ -325,7 +326,10 @@ public:
             // Map the point to client coordinates.
             ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
-            const QPoint qtPoint {point.x, point.y};
+            //getIntfScaleFactor uses logicalDotsPerInch, here we want the actual window DPR
+            double scaleFactor = m_mainctx->getIntfUserScaleFactor() * m_window->devicePixelRatio();
+            //divide by scale factor as buttons coordinates will be in dpr
+            const QPoint qtPoint {static_cast<int>(point.x / scaleFactor), static_cast<int>(point.y / scaleFactor)};
             auto button = overlappingButton(qtPoint);
             if (!button)
                 return false;
@@ -515,6 +519,7 @@ private:
         }
     }
 
+    MainCtx* m_mainctx = nullptr;
     bool m_useClientSideDecoration;
     QWindow *m_window;
     CSDButtonModel *m_buttonmodel;
@@ -787,8 +792,7 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
     : InterfaceWindowHandler(_p_intf, mainCtx, window, widget, parent)
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx->useClientSideDecoration(),
-                                                       window, mainCtx->csdButtonModel(), window))
+    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx, window, window))
 #endif
 
 {
