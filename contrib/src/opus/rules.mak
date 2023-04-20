@@ -1,8 +1,8 @@
 # opus
 
-OPUS_VERSION := 1.3.1
+OPUS_VERSION := 1.4
 
-OPUS_URL := https://archive.mozilla.org/pub/opus/opus-$(OPUS_VERSION).tar.gz
+OPUS_URL := $(XIPH)/opus/opus-$(OPUS_VERSION).tar.gz
 
 PKGS += opus
 ifeq ($(call need_pkg,"opus >= 0.9.14"),)
@@ -16,7 +16,6 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
-	$(APPLY) $(SRC)/opus/0001-CMake-set-the-pkg-config-version-to-the-library-vers.patch
 	$(APPLY) $(SRC)/opus/0002-CMake-set-the-pkg-config-string-as-with-autoconf-mes.patch
 	# fix missing included file in packaged source
 	cd $(UNPACK_DIR) && sed -e 's,include(opus_buildtype,#include(opus_buildtype,' -i.orig CMakeLists.txt
@@ -26,6 +25,15 @@ OPUS_CONF=
 ifndef HAVE_FPU
 OPUS_CONF += -DOPUS_FIXED_POINT=ON
 endif
+
+# rtcd is not working on win64-arm64
+ifdef HAVE_WIN64
+ifeq ($(ARCH),aarch64)
+OPUS_CONF += -DOPUS_MAY_HAVE_NEON=OFF -DOPUS_PRESUME_NEON=ON
+endif
+endif
+
+
 
 .opus: opus toolchain.cmake
 	$(CMAKECLEAN)
