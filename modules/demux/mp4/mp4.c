@@ -3530,7 +3530,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
     }
 
-    if( !p_track->b_enable )
+    if( !p_track->b_enable || p_track->b_chapters_source )
         p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
 
     if( TrackCreateES( p_demux,
