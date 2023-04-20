@@ -326,6 +326,12 @@ public:
             // Map the point to client coordinates.
             ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
+            // excluse resize handle area
+            if ((m_window->windowState() != Qt::WindowFullScreen)
+                && (point.y < resizeBorderHeight(m_window)
+                    || point.x > (m_window->width() * m_window->devicePixelRatio() - resizeBorderWidth(m_window))))
+                return false;
+
             //getIntfScaleFactor uses logicalDotsPerInch, here we want the actual window DPR
             double scaleFactor = m_mainctx->getIntfUserScaleFactor() * m_window->devicePixelRatio();
             //divide by scale factor as buttons coordinates will be in dpr
