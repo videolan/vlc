@@ -253,6 +253,13 @@ public:
 
         switch ( msg->message )
         {
+        case WM_SHOWWINDOW:
+        {
+            // on window show, update client frame in case DWM settings were updated
+            if (msg->wParam) updateClientFrame();
+            return false;
+        }
+
         case WM_NCCALCSIZE:
         {
             /* This is used to remove the decoration instead of using FramelessWindowHint because
@@ -408,6 +415,26 @@ public:
     }
 
 private:
+    void updateClientFrame()
+    {
+        auto hwnd = (HWND)m_window->winId();
+
+        MARGINS margin {};
+
+        // set top client area to 1 pixel tall in case of user decorations
+        // with winapi magic, this add rounded corners and shadows to the window
+        //
+        // warning1: if you set margin.cyTopHeight to 1
+        // that somehow breaks snaplayouts menu with WS_CAPTION style ^_____^
+        //
+        // warning2: if you set negative margin, the window will start painting
+        // default CSD button underneath the qml layer, you won't be able to see
+        // it but those will capture all your CSD events.
+        margin.cxLeftWidth = (m_useClientSideDecoration ? 1 : 0);
+
+        DwmExtendFrameIntoClientArea(hwnd, &margin);
+    }
+
     void updateCSDSettings()
     {
         HWND winId = WinId(m_window);
@@ -430,12 +457,9 @@ private:
             SetWindowLong (winId, GWL_STYLE, style);
         }
 
-        // add back shadows
-        // with positive margins, snap layouts menu (windows 11) won't appear
-        const int margin = (m_useClientSideDecoration ? - 1 : 0);
-        const MARGINS m {margin, margin, margin, margin};
-        DwmExtendFrameIntoClientArea(winId, &m);
+        updateClientFrame();
 
+        // trigger window update, this applies changes done in updateClientFrame
         SetWindowPos(winId, NULL, 0, 0, 0, 0,
             SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOCOPYBITS |
             SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOREPOSITION |
