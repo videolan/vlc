@@ -8,13 +8,13 @@ Subject: [PATCH 2/2] CMake: set the pkg-config string as with autoconf/meson
  1 file changed, 8 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 902cb835..0abb677c 100644
+index 9d824cdc..216ed4b1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -317,6 +317,14 @@ if(OPUS_INSTALL_PKG_CONFIG_MODULE)
+@@ -533,6 +533,14 @@ if(OPUS_INSTALL_PKG_CONFIG_MODULE)
    set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
    set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-   set(VERSION ${PROJECT_VERSION})
+   set(VERSION ${PACKAGE_VERSION})
 +  if(OPUS_FIXED_POINT)
 +    set(PC_BUILD "fixed-point")
 +  else()
@@ -26,6 +26,3 @@ index 902cb835..0abb677c 100644
    if(HAVE_LIBM)
      set(LIBM "-lm")
    endif()
--- 
-2.37.3.windows.1
-
