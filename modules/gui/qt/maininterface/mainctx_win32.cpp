@@ -394,6 +394,22 @@ public:
         case WM_NCLBUTTONDOWN:
         {
 
+            // manually trigger button here, UI will never get click
+            // signal because we have captured the mouse in non client area
+            switch ( msg->wParam )
+            {
+            case HTCLOSE:
+                trigger(CSDButton::Close);
+                break;
+            case HTMINBUTTON:
+                trigger(CSDButton::Minimize);
+                break;
+            case HTMAXBUTTON:
+                trigger(CSDButton::MaximizeRestore);
+                break;
+            }
+
+
             // required for win7 compositor, otherwise this
             // paints default min/max/close buttons
             return true;
@@ -472,6 +488,18 @@ private:
         for (auto button : m_buttonmodel->windowCSDButtons()) {
             if (button->type() == type) {
                 button->setShowHovered(true);
+                return ;
+            }
+        }
+
+        vlc_assert_unreachable();
+    }
+
+    void trigger(CSDButton::ButtonType type)
+    {
+        for (auto button : m_buttonmodel->windowCSDButtons()) {
+            if (button->type() == type) {
+                button->click();
                 return ;
             }
         }
