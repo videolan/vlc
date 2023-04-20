@@ -588,7 +588,7 @@ PrepareAudioFormat(aout_stream_t *stream, audio_sample_format_t *fmt)
         sys->cfg.low_latency = true;
     }
     else
-        sys->cfg.low_latency = false;
+        sys->cfg.low_latency = var_InheritBool(stream, "low-delay");
 
     sys->fmt = *fmt;
 }
