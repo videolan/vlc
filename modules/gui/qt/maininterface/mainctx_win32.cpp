@@ -215,12 +215,11 @@ private:
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 {
 public:
-    CSDWin32EventHandler(const bool useClientSideDecoration, const bool isWin7Compositor, QWindow *window, CSDButtonModel *buttonmodel, QObject *parent)
+    CSDWin32EventHandler(const bool useClientSideDecoration, QWindow *window, CSDButtonModel *buttonmodel, QObject *parent)
         : QObject {parent}
         , m_useClientSideDecoration {useClientSideDecoration}
         , m_window {window}
         , m_buttonmodel {buttonmodel}
-        , m_isWin7Compositor {isWin7Compositor}
     {
         QApplication::instance()->installNativeEventFilter(this);
         updateCSDSettings();
@@ -392,6 +391,14 @@ public:
             break;
         }
 
+        case WM_NCLBUTTONDOWN:
+        {
+
+            // required for win7 compositor, otherwise this
+            // paints default min/max/close buttons
+            return true;
+        }
+
         case WM_NCMOUSELEAVE:
         case WM_MOUSELEAVE:
         {
@@ -441,22 +448,6 @@ private:
         if ( !winId )
             return;
 
-        if (m_isWin7Compositor)
-        {
-            // special case for win7 compositor
-            // removing CSD borders with win7 compositor works with Qt::FramelessWindowHint
-            // but with that the shadows don't work, so manually remove WS_CAPTION style
-            DWORD style = m_nonCSDGwlStyle == 0 ? GetWindowLong(winId, GWL_STYLE) : m_nonCSDGwlStyle;
-            if (m_nonCSDGwlStyle == 0)
-                m_nonCSDGwlStyle = style;
-            if (m_useClientSideDecoration)
-            {
-                style &= ~WS_CAPTION;
-                style |= (WS_MAXIMIZEBOX | WS_THICKFRAME);
-            }
-            SetWindowLong (winId, GWL_STYLE, style);
-        }
-
         updateClientFrame();
 
         // trigger window update, this applies changes done in updateClientFrame
@@ -496,12 +487,10 @@ private:
         }
     }
 
-    DWORD m_nonCSDGwlStyle = 0;
     bool m_useClientSideDecoration;
     QWindow *m_window;
     CSDButtonModel *m_buttonmodel;
     bool m_trackingMouse = false;
-    const bool m_isWin7Compositor;
 };
 
 }
@@ -771,7 +760,6 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx->useClientSideDecoration(),
-                                                       _p_intf->p_compositor->type() == vlc::Compositor::Win7Compositor,
                                                        window, mainCtx->csdButtonModel(), window))
 #endif
 
