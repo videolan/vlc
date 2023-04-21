@@ -520,15 +520,15 @@ static int OpenDecoder(vlc_object_t *p_this)
             dav1d_version(), p_sys->s.n_threads);
 
     dec->i_extra_picture_buffers = p_sys->s.max_frame_delay;
-    if (super_res)
-        // dav1d seems to buffer more pictures when using super resolution
-        dec->i_extra_picture_buffers += p_sys->s.max_frame_delay > 1 ? 2 : 1;
 #else
     msg_Dbg(p_this, "Using dav1d version %s with %d/%d frame/tile threads",
             dav1d_version(), p_sys->s.n_frame_threads, p_sys->s.n_tile_threads);
 
     dec->i_extra_picture_buffers = (p_sys->s.n_frame_threads - 1);
 #endif
+    if (super_res)
+        // dav1d seems to buffer more pictures when using super resolution
+        dec->i_extra_picture_buffers += dec->i_extra_picture_buffers > 1 ? 2 : 1;
     dec->fmt_out.video.i_width  = (dec->fmt_out.video.i_width + 0x7F) & ~0x7F;
     dec->fmt_out.video.i_height = (dec->fmt_out.video.i_height + 0x7F) & ~0x7F;
 
