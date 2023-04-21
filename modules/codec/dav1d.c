@@ -204,10 +204,14 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     v->i_height = (img->seq_hdr->max_height + 0x7F) & ~0x7F;
     v->i_chroma = dec->fmt_out.i_codec;
 
+#if DAV1D_API_VERSION_MAJOR >= 6
     dec->i_extra_picture_buffers = p_sys->s.max_frame_delay;
+#else
+    dec->i_extra_picture_buffers = (p_sys->s.n_frame_threads - 1);
+#endif
     if (img->seq_hdr->super_res)
         // dav1d seems to buffer more pictures when using super resolution
-        dec->i_extra_picture_buffers += p_sys->s.max_frame_delay > 1 ? 2 : 1;
+        dec->i_extra_picture_buffers += dec->i_extra_picture_buffers > 1 ? 2 : 1;
 
     if (decoder_UpdateVideoFormat(dec) == 0)
     {
