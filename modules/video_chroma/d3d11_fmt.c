@@ -384,7 +384,7 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
     if (unlikely(d3d11ctx == NULL))
     {
         msg_Err(obj, "missing external ID3D11DeviceContext");
-        return S_FALSE;
+        return E_FAIL;
     }
 
     HRESULT hr;
