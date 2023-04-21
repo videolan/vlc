@@ -484,7 +484,7 @@ static MMAL_STATUS_T conv_set_output(filter_t * const p_filter, converter_sys_t 
         // Override default format width/height if we have a pic we need to match
         if ((status = pic_to_format(sys->output->format, pic)) != MMAL_SUCCESS)
         {
-            msg_Err(p_filter, "Bad format desc: %4.4s, pic=%p, bits=%d", (const char*)&pic->format.i_chroma, pic, pic->format.i_bits_per_pixel);
+            msg_Err(p_filter, "Bad format desc: %4.4s, pic=%p, bits=%d", (const char*)&pic->format.i_chroma, (void*)pic, pic->format.i_bits_per_pixel);
             return status;
         }
     }

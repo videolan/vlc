@@ -148,7 +148,7 @@ static int Open(vlc_window_t *wnd)
         for (/*n = 0*/; used[n]; n++)
             if (used[n] == val)
             {
-                msg_Warn (wnd, "HWND 0x%p is busy", val);
+                msg_Warn (wnd, "HWND 0x%p is busy", (void*)val);
                 vlc_mutex_unlock (&serializer);
                 return VLC_EGENERIC;
             }

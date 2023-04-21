@@ -724,7 +724,7 @@ static picture_t *VideoExport_Filter(filter_t *filter, picture_t *src)
 
     if (unlikely(src->context == NULL))
     {
-        msg_Err(filter, "corrupt VDPAU video surface %p", src);
+        msg_Err(filter, "corrupt VDPAU video surface %p", (void*)src);
         picture_Release(src);
         return NULL;
     }

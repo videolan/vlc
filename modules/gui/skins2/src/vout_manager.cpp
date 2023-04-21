@@ -225,7 +225,7 @@ void VoutManager::releaseWnd( vlc_window_t* pWnd )
         if( it->pWnd == pWnd )
         {
             msg_Dbg( getIntf(), "vout released vout=%p, VideoCtrl=%p",
-                             (void *)pWnd, it->pCtrlVideo );
+                             (void *)pWnd, (void *)it->pCtrlVideo );
 
             // if a video control was being used, detach from it
             if( it->pCtrlVideo )

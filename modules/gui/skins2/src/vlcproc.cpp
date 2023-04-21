@@ -589,7 +589,7 @@ void VlcProc::on_loop_changed( vlc_value_t newVal )
 void VlcProc::on_current_media_changed( vlc_value_t newVal )
 {
     input_item_t* pItem = static_cast<input_item_t*>(newVal.p_address);
-    msg_Dbg(getIntf(),"current media changed %p", pItem );
+    msg_Dbg(getIntf(),"current media changed %p", static_cast<void*>(pItem) );
     if( pItem )
     {
         // Update short name (as defined by --input-title-format)
