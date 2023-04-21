@@ -27,8 +27,13 @@ import "qrc:///style/"
 Item {
     id: spacer
     enabled: false
-    implicitWidth: VLCStyle.icon_toolbar
+
+    // NOTE: We already have spacing between components in the ControlLayout so this should be set
+    //       to zero, except in the customize panel.
+    implicitWidth: (paintOnly) ? VLCStyle.icon_toolbar : 0
+
     implicitHeight: VLCStyle.icon_toolbar
+
     property alias spacetextExt: spacetext
     property bool paintOnly: false
 
