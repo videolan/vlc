@@ -562,7 +562,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             int64_t i_location = 0;
 
             if( p_sys->i_tracks > 0 &&
-                sscanf( line, "timestamp: %02d:%02d:%02d:%03d, filepos: %"SCNx64,
+                sscanf( line, "timestamp: %02d:%02d:%02d:%03d, filepos: %"SCNi64,
                         &h, &m, &s, &ms, &loc ) == 5  )
             {
                 vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
