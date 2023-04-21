@@ -41,12 +41,7 @@ public:
     inline void callAsync(Fun&& fun)
     {
         Q_Q(PlaylistListModel);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
         QMetaObject::invokeMethod(q, std::forward<Fun>(fun), Qt::QueuedConnection, nullptr);
-#else
-        QObject src;
-        QObject::connect(&src, &QObject::destroyed, q, std::forward<Fun>(fun), Qt::QueuedConnection);
-#endif
     }
 
     void onItemsReset(const QVector<PlaylistItem>& items);
