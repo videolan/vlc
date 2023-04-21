@@ -423,7 +423,7 @@ gen_vlc_static_module_list()
     done
 
     printf "\
-#include <vlc_common.h>\\n\
+#include <stddef.h>\\n\
 #include <vlc_plugin.h>\\n\
 %b\\n\
 const vlc_plugin_cb vlc_static_modules[] = {\\n
