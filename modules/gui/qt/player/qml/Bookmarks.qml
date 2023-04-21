@@ -97,10 +97,12 @@ Item {
             ml: MediaLib
         }
 
-        Widgets.IconToolButton {
+        Widgets.RoundButton {
             id: bookmarkButton
 
             size: control.barHeight
+
+            backgroundColor: bookmarkButton.colorContext.fg.primary
 
             x: control.width * model.position - width/2
             focusPolicy: Qt.NoFocus
@@ -113,11 +115,6 @@ Item {
                     control.bookmarkPosition = x + width/2
                 }
                 control.bookmarkHovered = bookmarkButton.hovered
-            }
-
-            background: Rectangle {
-                radius: parent.width * 0.5
-                color: bookmarkButton.colorContext.fg.primary
             }
         }
     }
