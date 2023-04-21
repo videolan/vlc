@@ -500,7 +500,7 @@ static int ExecuteSave( vlm_t *p_vlm, const char *psz_file, vlm_message_t **pp_s
     if( psz_save == NULL )
         goto error;
     if( fputs( psz_save, f ) == EOF )
-        goto error;;
+        goto error;
     if( fclose( f ) )
     {
         f = NULL;

@@ -48,7 +48,7 @@ private:
     void render();
 
     QBackingStore* m_backingStore = nullptr;
-    bool m_initialized = false;;
+    bool m_initialized = false;
 };
 
 

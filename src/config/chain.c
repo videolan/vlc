@@ -484,6 +484,6 @@ char *config_StringEscape( const char *str )
             *dst++ = '\\';
         *dst++ = *p;
     }
-    *dst = '\0';;
+    *dst = '\0';
     return ret;
 }

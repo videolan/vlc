@@ -193,7 +193,7 @@ static void test_media_list_player_previous(const char** argv, int argc)
     assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc);
-    assert(mlp);;
+    assert(mlp);
 
     libvlc_media_list_add_media (ml, md);
 

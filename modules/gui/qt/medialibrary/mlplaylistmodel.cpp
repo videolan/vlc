@@ -458,7 +458,7 @@ void MLPlaylistModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, c
 
 std::vector<std::pair<int, int>> MLPlaylistModel::getSortedRowsRanges(const QModelIndexList & indexes, bool asc) const
 {
-    assert (indexes.size() > 0);;
+    assert (indexes.size() > 0);
 
     QList<int> rows;
     for (const QModelIndex & index : indexes)

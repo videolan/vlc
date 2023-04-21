@@ -253,7 +253,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (sys->i_depth > 8) {
         ((DWORD*)bi->bmiColors)[0] = fmt->i_rmask;
         ((DWORD*)bi->bmiColors)[1] = fmt->i_gmask;
-        ((DWORD*)bi->bmiColors)[2] = fmt->i_bmask;;
+        ((DWORD*)bi->bmiColors)[2] = fmt->i_bmask;
     }
 
     BITMAPINFOHEADER *bih = &sys->bitmapinfo.bmiHeader;

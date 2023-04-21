@@ -339,7 +339,7 @@ error:      wordfree(&we);
 
         if (pp != NULL)
         {
-            const struct command *c = *pp;;
+            const struct command *c = *pp;
 
             ret = c->handler.callback(cl, args, count, c->data);
         }

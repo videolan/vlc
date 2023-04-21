@@ -205,7 +205,7 @@ static int Open( vlc_object_t * p_this )
 
     es_format_Init( &p_sys->fmt_video, VIDEO_ES, VLC_CODEC_DV );
     p_sys->fmt_video.video.i_width = 720;
-    p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;;
+    p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;
     p_sys->fmt_video.video.i_visible_width = p_sys->fmt_video.video.i_width;
     p_sys->fmt_video.video.i_visible_height = p_sys->fmt_video.video.i_height;
 

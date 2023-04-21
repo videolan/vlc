@@ -802,7 +802,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         run_desc_t *p_run = p_paragraph->p_runs + i;
         unsigned int i_glyph_count;
         const hb_glyph_info_t *p_infos =
-                hb_buffer_get_glyph_infos( p_run->p_buffer, &i_glyph_count );;
+                hb_buffer_get_glyph_infos( p_run->p_buffer, &i_glyph_count );
         const hb_glyph_position_t *p_positions =
                 hb_buffer_get_glyph_positions( p_run->p_buffer, &i_glyph_count );
         for( unsigned int j = 0; j < i_glyph_count; ++j )

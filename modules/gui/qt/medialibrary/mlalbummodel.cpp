@@ -89,7 +89,7 @@ void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
         case VLC_ML_EVENT_GENRE_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_GENRE &&
                  event.deletion.i_entity_id == m_parent.id )
-                    emit resetRequested();;
+                    emit resetRequested();
             return;
         default:
             break;

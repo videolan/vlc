@@ -305,7 +305,7 @@ LRESULT CALLBACK Win32Loop::processEvent( HWND hwnd, UINT msg,
         default:
             break;
     }
-    return DefWindowProc( hwnd, msg, wParam, lParam );;
+    return DefWindowProc( hwnd, msg, wParam, lParam );
 }
 
 

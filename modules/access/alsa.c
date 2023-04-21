@@ -258,7 +258,7 @@ static int Control (demux_t *demux, int query, va_list ap)
         case DEMUX_CAN_CONTROL_RATE:
         case DEMUX_CAN_SEEK:
             *va_arg (ap, bool *) = false;
-            break;;
+            break;
 
         default:
             return VLC_EGENERIC;

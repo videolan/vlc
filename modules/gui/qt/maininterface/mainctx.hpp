@@ -271,7 +271,7 @@ public:
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
-    void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);;
+    void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);
 
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); };
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); };

@@ -329,7 +329,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (vpx_codec_dec_init(&sys->ctx, iface, &deccfg, 0) != VPX_CODEC_OK) {
         VPX_ERR(p_this, &sys->ctx, "Failed to initialize decoder");
         free(sys);
-        return VLC_EGENERIC;;
+        return VLC_EGENERIC;
     }
 
     dec->pf_decode = Decode;

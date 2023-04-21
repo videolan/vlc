@@ -80,9 +80,9 @@ static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
 
     if (xiph_SplitHeaders(packet_size, packet, &packet_count,
                                 i_extra, p_extra))
-        return VLC_EGENERIC;;
+        return VLC_EGENERIC;
     if (packet_count < 3)
-        return VLC_EGENERIC;;
+        return VLC_EGENERIC;
 
     if (theora_pixel_fmt != NULL)
     {

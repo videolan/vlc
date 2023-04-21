@@ -1551,7 +1551,7 @@ static scan_session_t *scan_session_New( scan_t *p_scan, const scan_tuner_config
     p_session->p_pathandle = NULL;
     p_session->p_sdthandle = NULL;
     p_session->p_nithandle = NULL;
-    return p_session;;
+    return p_session;
 }
 
 static void scan_session_Delete( scan_session_t *p_session )

@@ -329,7 +329,7 @@ namespace
 
             assert(provider->imageType() == QQmlImageProviderBase::ImageResponse);
 
-            const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);;
+            const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);
 
             if (provider->imageType() == QQmlImageProviderBase::ImageResponse)
             {

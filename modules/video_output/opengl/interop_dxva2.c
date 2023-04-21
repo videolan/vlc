@@ -248,7 +248,7 @@ static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_form
         .right  = interop->fmt_in.i_x_offset + interop->fmt_in.i_visible_width,
         .top    = interop->fmt_in.i_y_offset,
         .bottom = interop->fmt_in.i_y_offset + interop->fmt_in.i_visible_height,
-    };;
+    };
     IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
 
     DXVAHD_BLT_STATE_TARGET_RECT_DATA dstRect;

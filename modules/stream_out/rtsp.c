@@ -945,7 +945,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     bool found = false;
                     for (int i = 0; i < ses->trackc; i++)
                     {
-                        rtsp_strack_t *tr = ses->trackv + i;;
+                        rtsp_strack_t *tr = ses->trackv + i;
                         if (tr->id == id)
                         {
                             if (tr->setup_fd == -1)

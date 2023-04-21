@@ -1029,7 +1029,7 @@ static const struct cli_handler cmds[] =
 
 void *RegisterPlayer(intf_thread_t *intf)
 {
-    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);;
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
     struct player_cli *pc = malloc(sizeof (*pc));
 
@@ -1069,7 +1069,7 @@ error:
 
 void DeregisterPlayer(intf_thread_t *intf, void *data)
 {
-    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);;
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
     struct player_cli *pc = data;
 

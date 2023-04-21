@@ -216,7 +216,7 @@ bool CompositorDCompositionUISurface::init()
     HR(d3dDevice.As(&m_qtd3dDevice1));
 
     m_uiOffscreenSurface = new QOffscreenSurface();
-    m_uiOffscreenSurface->setFormat(format);;
+    m_uiOffscreenSurface->setFormat(format);
     m_uiOffscreenSurface->create();
 
     m_uiRenderControl = new CompositorDCompositionRenderControl(m_renderWindow);
@@ -793,7 +793,7 @@ QQuickWindow* CompositorDCompositionUISurface::getOffscreenWindow() const {
 
 void CompositorDCompositionUISurface::handleScreenChange()
 {
-    m_uiWindow->setGeometry(0, 0, m_renderWindow->width(), m_renderWindow->height());;
+    m_uiWindow->setGeometry(0, 0, m_renderWindow->width(), m_renderWindow->height());
     requestUpdate();
 }
 

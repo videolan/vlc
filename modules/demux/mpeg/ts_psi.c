@@ -357,7 +357,7 @@ static void ParsePMTPrivateRegistrations( demux_t *p_demux, const dvbpsi_descrip
 static dvbpsi_descriptor_t *PMTEsFindDescriptor( const dvbpsi_pmt_es_t *p_es,
                                                  int i_tag )
 {
-    dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;;
+    dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
     while( p_dr && ( p_dr->i_tag != i_tag ) )
         p_dr = p_dr->p_next;
     return p_dr;

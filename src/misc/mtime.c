@@ -151,6 +151,6 @@ struct timespec *vlc_tick_to_timespec(struct timespec *restrict ts,
     lldiv_t d = lldiv(tick, CLOCK_FREQ);
 
     ts->tv_sec = d.quot;
-    ts->tv_nsec = NS_FROM_VLC_TICK(d.rem);;
+    ts->tv_nsec = NS_FROM_VLC_TICK(d.rem);
     return ts;
 }

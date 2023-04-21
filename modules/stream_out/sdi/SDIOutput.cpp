@@ -45,7 +45,7 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     video.tenbits = var_InheritBool(p_stream, CFG_PREFIX "tenbits");
     video.nosignal_delay = var_InheritInteger(p_stream, CFG_PREFIX "nosignal-delay");
     video.pic_nosignal = NULL;
-    audio.i_channels = var_InheritInteger(p_stream, CFG_PREFIX "channels");;
+    audio.i_channels = var_InheritInteger(p_stream, CFG_PREFIX "channels");
     audio.b_configured = false;
     ancillary.afd = var_InheritInteger(p_stream, CFG_PREFIX "afd");
     ancillary.ar = var_InheritInteger(p_stream, CFG_PREFIX "ar");

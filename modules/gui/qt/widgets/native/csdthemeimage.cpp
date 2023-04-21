@@ -29,7 +29,7 @@ void CSDThemeImage::updateContent()
 
 QSGNode* CSDThemeImage::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData*)
 {
-    QSGImageNode *imageNode = nullptr;;
+    QSGImageNode *imageNode = nullptr;
     auto w = window();
     if (!m_theme || m_bannerHeight <= 0)
     {

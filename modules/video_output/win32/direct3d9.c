@@ -1434,7 +1434,7 @@ static void SetupProcessorInput(vout_display_t *vd, const video_format_t *fmt, c
         .right  = vd->source->i_x_offset + vd->source->i_visible_width,
         .top    = vd->source->i_y_offset,
         .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
-    };;
+    };
     IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
 
     DXVAHD_BLT_STATE_TARGET_RECT_DATA dstRect;

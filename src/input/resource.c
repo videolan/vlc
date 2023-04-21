@@ -567,7 +567,7 @@ void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***pp
         goto exit;
 
     *ppp_vout = pp_vout;
-    *pi_vout = count;;
+    *pi_vout = count;
 
     count = 0;
     vlc_list_foreach( vout_rsc, &p_resource->vout_rscs, node )

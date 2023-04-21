@@ -1895,7 +1895,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 p_tk->fmt.audio.i_channels   = GetWLE( &p_wf->nChannels );
                 p_tk->fmt.audio.i_rate = GetDWLE( &p_wf->nSamplesPerSec );
                 p_tk->fmt.i_bitrate    = GetDWLE( &p_wf->nAvgBytesPerSec ) * 8;
-                p_tk->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );;
+                p_tk->fmt.audio.i_blockalign = GetWLE( &p_wf->nBlockAlign );
                 p_tk->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
 
                 p_tk->fmt.i_extra            = GetWLE( &p_wf->cbSize );
