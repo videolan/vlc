@@ -9,14 +9,14 @@ TARBALLS := $(TOOLS)
 # common rules
 #
 
-ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
+ifeq ($(shell command -v curl >/dev/null 2>&1 || echo FAIL),)
 download = curl -f -L -- "$(1)" > "$@.tmp" && touch $@.tmp && mv $@.tmp $@
-else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v wget >/dev/null 2>&1 || echo FAIL),)
 download = rm -f $@.tmp && \
 	wget --passive -c -p -O $@.tmp "$(1)" && \
 	touch $@.tmp && \
 	mv $@.tmp $@
-else ifeq ($(which fetch >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v fetch >/dev/null 2>&1 || echo FAIL),)
 download = rm -f $@.tmp && \
 	fetch -p -o $@.tmp "$(1)" && \
 	touch $@.tmp && \
@@ -25,11 +25,11 @@ else
 download = $(error Neither curl nor wget found!)
 endif
 
-ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
+ifeq ($(shell command -v sha512sum >/dev/null 2>&1 || echo FAIL),)
 SHA512SUM = sha512sum --check
-else ifeq ($(shell shasum --version >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v shasum >/dev/null 2>&1 || echo FAIL),)
 SHA512SUM = shasum -a 512 --check
-else ifeq ($(shell openssl version >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v openssl >/dev/null 2>&1 || echo FAIL),)
 SHA512SUM = openssl dgst -sha512
 else
 SHA512SUM = $(error SHA-512 checksumming not found!)
