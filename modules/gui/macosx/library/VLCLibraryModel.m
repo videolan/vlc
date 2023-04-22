@@ -43,6 +43,7 @@ NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecen
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
 NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
+NSString * const VLCLibraryModelAlbumUpdated = @"VLCLibraryModelAlbumUpdated";
 
 @interface VLCLibraryModel ()
 {
@@ -66,6 +67,7 @@ NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecen
     size_t _initialAudioCount;
 
     dispatch_queue_t _mediaItemCacheModificationQueue;
+    dispatch_queue_t _albumCacheModificationQueue;
 }
 
 @property (readwrite, atomic) NSArray *cachedAudioMedia;
@@ -84,6 +86,7 @@ NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecen
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 
 @end
 
@@ -122,7 +125,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel resetCachedListOfArtists];
             break;
         case VLC_ML_EVENT_ALBUM_ADDED:
+            [libraryModel resetCachedListOfAlbums];
+            break;
         case VLC_ML_EVENT_ALBUM_UPDATED:
+            [libraryModel handleAlbumUpdateEvent:p_event];
+            break;
         case VLC_ML_EVENT_ALBUM_DELETED:
             [libraryModel resetCachedListOfAlbums];
             break;
@@ -165,7 +172,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _p_mediaLibrary = library;
         _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
 
+        // Serial queues make avoiding concurrent modification of the caches easy, while avoiding
+        // locking other queues
         _mediaItemCacheModificationQueue = dispatch_queue_create("mediaItemCacheModificationQueue", 0);
+        _albumCacheModificationQueue = dispatch_queue_create("albumCacheModificationQueue", 0);
 
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [_defaultNotificationCenter addObserver:self
@@ -649,6 +659,40 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 break;
         }
     }];
+}
+
+- (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+
+    VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:itemId];
+    if (album == nil) {
+        NSLog(@"Could not find a library album with this ID. Can't handle update.");
+        return;
+    }
+
+    dispatch_async(_albumCacheModificationQueue, ^{
+        const NSUInteger albumIndex = [self->_cachedAlbums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum * const album, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(album != nil, @"Cache list should not contain nil media items");
+            return album.libraryID == itemId;
+        }];
+
+        if (albumIndex == NSNotFound) {
+            NSLog(@"Did not find album with id %lli in album cache.", itemId);
+            return;
+        }
+
+        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableAlbumCache = [self->_cachedAlbums mutableCopy];
+            [mutableAlbumCache replaceObjectAtIndex:albumIndex withObject:album];
+            self->_cachedAlbums = [mutableAlbumCache copy];
+
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumUpdated object:album];
+        });
+    });
 }
 
 @end
