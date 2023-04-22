@@ -11,6 +11,11 @@ description: |
   NOTE. This snap contains an untested daily build of VLC
 confinement: strict
 compression: lzo
+plugs:
+  dot-config-aacs:
+    interface: personal-files
+    read:
+    - $HOME/.config/aacs
 
 apps:
   vlc:
@@ -37,6 +42,7 @@ apps:
       - audio-record
       - jack1
       - avahi-control
+      - dot-config-aacs
     slots:
       - mpris
 
