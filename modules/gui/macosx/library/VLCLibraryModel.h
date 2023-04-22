@@ -51,6 +51,7 @@ extern NSString * const VLCLibraryModelAudioMediaItemUpdated;
 extern NSString * const VLCLibraryModelVideoMediaItemUpdated;
 extern NSString * const VLCLibraryModelRecentsMediaItemUpdated;
 extern NSString * const VLCLibraryModelAlbumUpdated;
+extern NSString * const VLCLibraryModelArtistUpdated;
 
 @interface VLCLibraryModel : NSObject
 
