@@ -4,7 +4,7 @@
  * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * Authors: Samuel Bassaly <shkshk90 # gmail -dot- com>
- *          Claudio Cambra <claudio.cambra@gmail.com>
+ *          Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,6 +75,27 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     if(@available(macOS 10.12.2, *)) {
         _playAlbumButton.bezelColor = [NSColor VLCAccentColor];
     }
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(handleAlbumUpdated:)
+                               name:VLCLibraryModelAlbumUpdated
+                             object:nil];
+}
+
+- (void)handleAlbumUpdated:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    if (_representedAlbum == nil) {
+        return;
+    }
+
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)notification.object;
+    if (album == nil || _representedAlbum.libraryID != album.libraryID) {
+        return;
+    }
+
+    [self setRepresentedAlbum:album];
 }
 
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
