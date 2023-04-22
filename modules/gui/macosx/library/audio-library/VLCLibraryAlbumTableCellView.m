@@ -34,6 +34,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -127,6 +128,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     self.artistNameTextField.textColor = [NSColor VLCAccentColor];
 
     [self prepareForReuse];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(handleAlbumUpdated:)
+                               name:VLCLibraryModelAlbumUpdated
+                             object:nil];
 }
 
 - (void)setupTracksTableView
@@ -188,6 +195,21 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     _tracksDataSource.representedAlbum = nil;
     [_tracksTableView reloadData];
+}
+
+- (void)handleAlbumUpdated:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    if (_representedAlbum == nil) {
+        return;
+    }
+
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)notification.object;
+    if (album == nil || _representedAlbum.libraryID != album.libraryID) {
+        return;
+    }
+
+    [self setRepresentedAlbum:album];
 }
 
 - (void)setFrameSize:(NSSize)size
