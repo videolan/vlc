@@ -26,23 +26,23 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "extensions/NSString+Helpers.h"
 
-NSString *VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
-NSString *VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
-NSString *VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
-NSString *VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
-NSString *VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
+NSString * const VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
+NSString * const VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
+NSString * const VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
+NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
+NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
-NSString *VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMediaListReset";
-NSString *VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
-NSString *VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
+NSString * const VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMediaListReset";
+NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
+NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
 
-NSString *VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
-NSString *VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
-NSString *VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
+NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
+NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
+NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
 
-NSString *VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
-NSString *VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
-NSString *VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
+NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
+NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
+NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
 
 @interface VLCLibraryModel ()
 {

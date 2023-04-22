@@ -32,23 +32,23 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCMediaLibraryGenre;
 @class VLCMediaLibraryEntryPoint;
 
-extern NSString *VLCLibraryModelArtistListUpdated;
-extern NSString *VLCLibraryModelAlbumListUpdated;
-extern NSString *VLCLibraryModelGenreListUpdated;
-extern NSString *VLCLibraryModelListOfMonitoredFoldersUpdated;
-extern NSString *VLCLibraryModelMediaItemThumbnailGenerated;
+extern NSString * const VLCLibraryModelArtistListUpdated;
+extern NSString * const VLCLibraryModelAlbumListUpdated;
+extern NSString * const VLCLibraryModelGenreListUpdated;
+extern NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated;
+extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 
-extern NSString *VLCLibraryModelAudioMediaListReset;
-extern NSString *VLCLibraryModelVideoMediaListReset;
-extern NSString *VLCLibraryModelRecentsMediaListReset;
+extern NSString * const VLCLibraryModelAudioMediaListReset;
+extern NSString * const VLCLibraryModelVideoMediaListReset;
+extern NSString * const VLCLibraryModelRecentsMediaListReset;
 
-extern NSString *VLCLibraryModelAudioMediaItemDeleted;
-extern NSString *VLCLibraryModelVideoMediaItemDeleted;
-extern NSString *VLCLibraryModelRecentsMediaItemDeleted;
+extern NSString * const VLCLibraryModelAudioMediaItemDeleted;
+extern NSString * const VLCLibraryModelVideoMediaItemDeleted;
+extern NSString * const VLCLibraryModelRecentsMediaItemDeleted;
 
-extern NSString *VLCLibraryModelAudioMediaItemUpdated;
-extern NSString *VLCLibraryModelVideoMediaItemUpdated;
-extern NSString *VLCLibraryModelRecentsMediaItemUpdated;
+extern NSString * const VLCLibraryModelAudioMediaItemUpdated;
+extern NSString * const VLCLibraryModelVideoMediaItemUpdated;
+extern NSString * const VLCLibraryModelRecentsMediaItemUpdated;
 
 @interface VLCLibraryModel : NSObject
 
