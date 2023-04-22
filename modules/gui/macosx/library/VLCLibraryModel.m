@@ -39,6 +39,7 @@ NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecents
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
 NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
+NSString * const VLCLibraryModelAlbumDeleted = @"VLCLibraryModelAlbumDeleted";
 
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
@@ -85,6 +86,7 @@ NSString * const VLCLibraryModelAlbumUpdated = @"VLCLibraryModelAlbumUpdated";
 - (void)resetCachedListOfMonitoredFolders;
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 
@@ -131,7 +133,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleAlbumUpdateEvent:p_event];
             break;
         case VLC_ML_EVENT_ALBUM_DELETED:
-            [libraryModel resetCachedListOfAlbums];
+            [libraryModel handleAlbumDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_GENRE_ADDED:
         case VLC_ML_EVENT_GENRE_UPDATED:
@@ -661,6 +663,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }];
 }
 
+- (NSInteger)indexForAlbumInCache:(int64_t)albumLibraryId
+{
+    return [_cachedAlbums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum * const album, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(album != nil, @"Cache list should not contain nil media items");
+        return album.libraryID == albumLibraryId;
+    }];
+}
+
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -674,11 +684,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_albumCacheModificationQueue, ^{
-        const NSUInteger albumIndex = [self->_cachedAlbums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum * const album, const NSUInteger idx, BOOL * const stop) {
-            NSAssert(album != nil, @"Cache list should not contain nil media items");
-            return album.libraryID == itemId;
-        }];
-
+        const NSUInteger albumIndex = [self indexForAlbumInCache:itemId];
         if (albumIndex == NSNotFound) {
             NSLog(@"Did not find album with id %lli in album cache.", itemId);
             return;
@@ -691,6 +697,32 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_cachedAlbums = [mutableAlbumCache copy];
 
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumUpdated object:album];
+        });
+    });
+}
+
+- (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+    NSLog(@"Deleting %lli", itemId);
+
+    dispatch_async(_albumCacheModificationQueue, ^{
+        const NSUInteger albumIndex = [self indexForAlbumInCache:itemId];
+        if (albumIndex == NSNotFound) {
+            NSLog(@"Did not find album with id %lli in album cache.", itemId);
+            return;
+        }
+
+        VLCMediaLibraryAlbum * const album = self->_cachedAlbums[albumIndex];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableAlbumCache = [self->_cachedAlbums mutableCopy];
+            [mutableAlbumCache removeObjectAtIndex:albumIndex];
+            self->_cachedAlbums = [mutableAlbumCache copy];
+
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumDeleted object:album];
         });
     });
 }
