@@ -89,26 +89,22 @@ NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecen
 
 static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
+    VLCLibraryModel * const libraryModel = (__bridge VLCLibraryModel *)p_data;
+    if (libraryModel == nil) {
+        return;
+    }
+
     switch(p_event->i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel resetCachedMediaItemLists];
             break;
-        }
         case VLC_ML_EVENT_MEDIA_UPDATED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel handleMediaItemUpdateEvent:p_event];
             break;
-        }
         case VLC_ML_EVENT_MEDIA_DELETED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel handleMediaItemDeletionEvent:p_event];
             break;
-        }
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             if (p_event->media_thumbnail_generated.b_success) {
                 VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:(struct vlc_ml_media_t *)p_event->media_thumbnail_generated.p_media];
@@ -116,7 +112,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                     return;
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
                     [libraryModel mediaItemThumbnailGenerated:mediaItem];
                 });
             }
@@ -124,35 +119,23 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_ARTIST_ADDED:
         case VLC_ML_EVENT_ARTIST_UPDATED:
         case VLC_ML_EVENT_ARTIST_DELETED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel resetCachedListOfArtists];
             break;
-        }
         case VLC_ML_EVENT_ALBUM_ADDED:
         case VLC_ML_EVENT_ALBUM_UPDATED:
         case VLC_ML_EVENT_ALBUM_DELETED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel resetCachedListOfAlbums];
             break;
-        }
         case VLC_ML_EVENT_GENRE_ADDED:
         case VLC_ML_EVENT_GENRE_UPDATED:
         case VLC_ML_EVENT_GENRE_DELETED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel resetCachedListOfGenres];
             break;
-        }
         case VLC_ML_EVENT_FOLDER_ADDED:
         case VLC_ML_EVENT_FOLDER_UPDATED:
         case VLC_ML_EVENT_FOLDER_DELETED:
-        {
-            VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
             [libraryModel resetCachedListOfMonitoredFolders];
             break;
-        }
         default:
             break;
     }
