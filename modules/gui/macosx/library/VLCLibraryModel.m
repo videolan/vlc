@@ -716,6 +716,40 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
+- (void)deleteAudioGroupItemWithId:(const int64_t)itemId
+                           inCache:(NSArray * const)cache
+                       usingSetter:(const SEL)setterSelector
+                        usingQueue:(const dispatch_queue_t)queue
+              withNotificationName:(const NSNotificationName)notificationName
+{
+    NSParameterAssert([self respondsToSelector:setterSelector]);
+
+    dispatch_async(queue, ^{
+        const NSUInteger audioGroupIndex = [self indexForAudioGroupInCache:cache
+                                                                withItemId:itemId];
+        if (audioGroupIndex == NSNotFound) {
+            NSLog(@"Did not find audio group item with id %lli in cache.", itemId);
+            return;
+        }
+
+        const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = cache[audioGroupIndex];
+
+        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
+            [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
+            NSArray * const immutableCopy = [mutableAudioGroupCache copy];
+
+            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
+            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
+            cacheSetterFunction(self, setterSelector, immutableCopy);
+
+            [self->_defaultNotificationCenter postNotificationName:notificationName
+                                                            object:audioGroupItem];
+        });
+    });
+}
+
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -742,24 +776,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     const int64_t itemId = p_event->modification.i_entity_id;
     NSLog(@"Deleting %lli", itemId);
 
-    dispatch_async(_albumCacheModificationQueue, ^{
-        const NSUInteger albumIndex = [self indexForAudioGroupInCache:self->_cachedAlbums
-                                                           withItemId:itemId];
-        if (albumIndex == NSNotFound) {
-            NSLog(@"Did not find album with id %lli in album cache.", itemId);
-            return;
-        }
-
-        VLCMediaLibraryAlbum * const album = self->_cachedAlbums[albumIndex];
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableAlbumCache = [self->_cachedAlbums mutableCopy];
-            [mutableAlbumCache removeObjectAtIndex:albumIndex];
-            self->_cachedAlbums = [mutableAlbumCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumDeleted object:album];
-        });
-    });
+    [self deleteAudioGroupItemWithId:itemId
+                             inCache:_cachedAlbums
+                         usingSetter:@selector(setCachedAlbums:)
+                          usingQueue:_albumCacheModificationQueue
+                withNotificationName:VLCLibraryModelAlbumDeleted];
 }
 
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event
@@ -788,24 +809,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     const int64_t itemId = p_event->modification.i_entity_id;
     NSLog(@"Deleting %lli", itemId);
 
-    dispatch_async(_artistCacheModificationQueue, ^{
-        const NSUInteger artistIndex = [self indexForAudioGroupInCache:self->_cachedArtists
-                                                            withItemId:itemId];
-        if (artistIndex == NSNotFound) {
-            NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
-            return;
-        }
-
-        VLCMediaLibraryArtist * const artist = self->_cachedArtists[artistIndex];
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableArtistCache = [self->_cachedArtists mutableCopy];
-            [mutableArtistCache removeObjectAtIndex:artistIndex];
-            self->_cachedArtists = [mutableArtistCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistDeleted object:artist];
-        });
-    });
+    [self deleteAudioGroupItemWithId:itemId
+                             inCache:_cachedArtists
+                         usingSetter:@selector(setCachedArtists:)
+                          usingQueue:_artistCacheModificationQueue
+                withNotificationName:VLCLibraryModelArtistDeleted];
 }
 
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event
@@ -834,24 +842,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     const int64_t itemId = p_event->modification.i_entity_id;
     NSLog(@"Deleting %lli", itemId);
 
-    dispatch_async(_genreCacheModificationQueue, ^{
-        const NSUInteger genreIndex = [self indexForAudioGroupInCache:self->_cachedGenres
-                                                           withItemId:itemId];
-        if (genreIndex == NSNotFound) {
-            NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
-            return;
-        }
-
-        VLCMediaLibraryGenre * const genre = self->_cachedArtists[genreIndex];
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableGenreCache = [self->_cachedGenres mutableCopy];
-            [mutableGenreCache removeObjectAtIndex:genreIndex];
-            self->_cachedGenres = [mutableGenreCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreDeleted object:genre];
-        });
-    });
+    [self deleteAudioGroupItemWithId:itemId
+                             inCache:_cachedGenres
+                         usingSetter:@selector(setCachedGenres:)
+                          usingQueue:_genreCacheModificationQueue
+                withNotificationName:VLCLibraryModelGenreDeleted];
 }
 
 @end
