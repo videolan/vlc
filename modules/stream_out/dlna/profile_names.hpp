@@ -123,7 +123,7 @@ public:
     dlna_profile_t()
         : video_codec(VLC_CODEC_UNKNOWN)
         , audio_codec(VLC_CODEC_UNKNOWN)
-        {};
+        {}
 
     dlna_profile_t(std::string profile, std::string mux, std::string mime,
             vlc_fourcc_t video, vlc_fourcc_t audio)
@@ -133,7 +133,7 @@ public:
         , media(DLNA_CLASS_AV)
         , video_codec(video)
         , audio_codec(audio)
-        {};
+        {}
 
     dlna_profile_t(std::string profile, std::string mux, std::string mime,
             dlna_media_class_t media, vlc_fourcc_t video, vlc_fourcc_t audio)
@@ -143,7 +143,7 @@ public:
         , media(media)
         , video_codec(video)
         , audio_codec(audio)
-        {};
+        {}
 };
 
 const dlna_profile_t default_audio_profile = {

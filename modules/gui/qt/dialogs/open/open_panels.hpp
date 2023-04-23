@@ -70,7 +70,7 @@ public:
         p_intf = _p_intf;
         context = CONTEXT_INTERACTIVE;
     }
-    virtual ~OpenPanel() {};
+    virtual ~OpenPanel() {}
     virtual void clear() = 0;
     virtual void onFocus() {}
     virtual void onAccept() {}

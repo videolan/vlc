@@ -202,7 +202,7 @@ public:
     inline qt_intf_t* getIntf() const { return p_intf; }
     inline PlaylistPtr getMainPlaylist() const { return PlaylistPtr(p_intf->p_playlist); }
     inline vlc::playlist::PlaylistControllerModel* getMainPlaylistController() const { return p_intf->p_mainPlaylistController; }
-    bool smoothScroll() const { return m_smoothScroll; };
+    bool smoothScroll() const { return m_smoothScroll; }
 
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu.get(); }
@@ -265,22 +265,22 @@ public:
     inline QScreen* screen() const { return intfMainWindow()->screen(); }
     inline bool getUseGlobalShortcuts() const { return m_useGlobalShortcuts; }
     void setUseGlobalShortcuts(bool useGlobalShortcuts );
-    inline int maxVolume() const { return m_maxVolume; };
+    inline int maxVolume() const { return m_maxVolume; }
 
-    inline float safeArea() const { return m_safeArea; };
+    inline float safeArea() const { return m_safeArea; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
     void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);
 
-    Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); };
-    Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); };
+    Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
+    Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); }
 
-    Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersion() { return QT_VERSION; };
+    Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersion() { return QT_VERSION; }
     Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersionCheck(unsigned char major,
                                                                         unsigned char minor,
                                                                         unsigned char patch)
-                                                                       { return QT_VERSION_CHECK(major, minor, patch); };
+                                                                       { return QT_VERSION_CHECK(major, minor, patch); }
 
     /**
      * @brief ask for the application to terminate

@@ -46,13 +46,13 @@ public:
         SOURCE_TYPE,
         SOURCE_ARTWORK
     };
-    Q_ENUM(Role);
+    Q_ENUM(Role)
 
     enum ItemType {
         TYPE_DUMMY = -1, // provided for UI for entry "Add a service"
         TYPE_SOURCE = 0
     };
-    Q_ENUM(ItemType);
+    Q_ENUM(ItemType)
 
     NetworkSourcesModel( QObject* parent = nullptr );
 

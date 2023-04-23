@@ -1433,7 +1433,7 @@ static void x264_log( void *data, int i_level, const char *psz, va_list args)
     }
 
     msg_GenericVa( p_enc, i_level, psz, args );
-};
+}
 
 /****************************************************************************
  * Encode:

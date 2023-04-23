@@ -73,8 +73,8 @@ class QVLCFrame : public QWidget
 {
 public:
     QVLCFrame( qt_intf_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
-    {};
-    virtual ~QVLCFrame()   {};
+    {}
+    virtual ~QVLCFrame()   {}
 
     void toggleVisible()
     {
@@ -111,7 +111,7 @@ class QVLCDialog : public QDialog
 {
 public:
     QVLCDialog(QWindow *parent, qt_intf_t *_p_intf );
-    virtual ~QVLCDialog() {};
+    virtual ~QVLCDialog() {}
     void toggleVisible()
     {
         if( isVisible() ) hide();

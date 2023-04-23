@@ -196,7 +196,7 @@ static int Open( vlc_object_t *p_this )
         {
             ops.filter_audio = DoWork;
             ops.close = Close;
-        };
+        }
     } filter_ops;
 
     p_filter->ops = &filter_ops.ops;

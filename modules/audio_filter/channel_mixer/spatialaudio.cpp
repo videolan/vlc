@@ -318,7 +318,7 @@ static const struct FilterOperationInitializer {
         ops.flush = Flush;
         ops.change_viewpoint = ChangeViewpoint;
         ops.close = Close;
-    };
+    }
 } filter_ops;
 
 static int OpenBinauralizer(vlc_object_t *p_this)

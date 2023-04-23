@@ -52,7 +52,7 @@ public:
         URL_URL,
         URL_LAST_PLAYED_DATE
     };
-    Q_ENUM(Roles);
+    Q_ENUM(Roles)
 
     explicit MLUrlModel(QObject *parent = nullptr);
 

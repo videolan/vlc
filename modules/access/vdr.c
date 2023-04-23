@@ -103,7 +103,7 @@ vlc_module_end ()
 /* minimum chapter size in seconds */
 #define MIN_CHAPTER_SIZE 5
 
-TYPEDEF_ARRAY( uint64_t, size_array_t );
+TYPEDEF_ARRAY( uint64_t, size_array_t )
 
 typedef struct
 {

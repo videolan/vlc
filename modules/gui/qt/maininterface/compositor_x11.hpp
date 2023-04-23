@@ -47,7 +47,7 @@ public:
 
     bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)  override;
 
-    inline Type type() const override { return X11Compositor; };
+    inline Type type() const override { return X11Compositor; }
 
     QWindow* interfaceMainWindow() const override;
 

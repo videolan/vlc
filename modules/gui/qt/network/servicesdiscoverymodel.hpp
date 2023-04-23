@@ -62,7 +62,7 @@ public:
         SERVICE_STATE,
         SERVICE_ARTWORK
     };
-    Q_ENUM(Role);
+    Q_ENUM(Role)
 
     explicit ServicesDiscoveryModel(QObject* parent = nullptr);
     ~ServicesDiscoveryModel() override;

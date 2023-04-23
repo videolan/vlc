@@ -43,7 +43,7 @@ public:
         TypeCount
     };
 
-    Q_ENUM(ButtonType);
+    Q_ENUM(ButtonType)
 
     CSDButton(ButtonType type, QObject *parent);
 

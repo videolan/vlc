@@ -43,7 +43,7 @@ public:
         ColorScheme scheme;
     };
 
-    Q_ENUM(ColorScheme);
+    Q_ENUM(ColorScheme)
 
     explicit ColorSchemeModel(QObject* parent = nullptr);
 

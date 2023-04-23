@@ -685,7 +685,7 @@ static const struct FilterOperationInitializer {
     {
         ops.blend_video = DoBlend;
         ops.close       = Close;
-    };
+    }
 } filter_ops;
 
 static int Open(filter_t *filter)

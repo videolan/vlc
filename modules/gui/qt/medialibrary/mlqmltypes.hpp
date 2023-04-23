@@ -70,7 +70,7 @@ public:
     MLItem(MLItemId id) : m_id(id) {}
     virtual ~MLItem() = default;
 
-    MLItemId getId() const { return m_id; };
+    MLItemId getId() const { return m_id; }
 
 private:
     MLItemId m_id;

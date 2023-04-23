@@ -89,7 +89,7 @@ private:
         QMetaMethod increaseMethod;
         QMetaMethod decreaseMethod;
         QQuickItem* item = nullptr;
-        bool valid() const { return item != nullptr; };
+        bool valid() const { return item != nullptr; }
     } m_scrollBarV, m_scrollBarH;
 
     void adjustScrollBar(ScrollBar& scrollBar);

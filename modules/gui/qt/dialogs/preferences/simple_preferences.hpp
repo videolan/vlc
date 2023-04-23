@@ -78,7 +78,7 @@ class SPrefsCatList : public QWidget
     Q_OBJECT
 public:
     SPrefsCatList( qt_intf_t *, QWidget * );
-    virtual ~SPrefsCatList() {};
+    virtual ~SPrefsCatList() {}
 private:
     qt_intf_t *p_intf;
 signals:

@@ -74,7 +74,7 @@ class QVLCDebugLevelSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    QVLCDebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
+    QVLCDebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { }
 protected:
     QString textFromValue( int ) const override;
     /* QVLCDebugLevelSpinBox is read-only */

@@ -74,11 +74,11 @@ public:
     inline UString* getString() {return (UString*)m_cString.get(); }
     inline void setString( UStringPtr val ) { m_cString = val; }
 
-    inline bool isReadonly() { return m_readonly; };
-    inline bool isSelected() { return m_selected; };
-    inline bool isPlaying() { return m_playing; };
-    inline bool isExpanded() { return m_expanded; };
-    inline bool isFlat() { return m_flat; };
+    inline bool isReadonly() { return m_readonly; }
+    inline bool isSelected() { return m_selected; }
+    inline bool isPlaying() { return m_playing; }
+    inline bool isExpanded() { return m_expanded; }
+    inline bool isFlat() { return m_flat; }
 
     inline void setSelected( bool val ) { m_selected = val; }
     inline void setPlaying( bool val ) { m_playing = val; }
