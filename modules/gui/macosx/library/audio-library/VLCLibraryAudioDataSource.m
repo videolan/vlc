@@ -134,6 +134,14 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                selector:@selector(libraryModelGenresReset:)
                                    name:VLCLibraryModelGenreListUpdated
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelGenresUpdated:)
+                                   name:VLCLibraryModelGenreUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelGenresDeleted:)
+                                   name:VLCLibraryModelGenreDeleted
+                                 object:nil];
 
         [notificationCenter addObserver:self
                                selector:@selector(currentlyPlayingItemChanged:)
@@ -267,6 +275,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [self libraryModelAudioItemUpdated:aNotification];
 }
 
+- (void)libraryModelGenreUpdated:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_GENRE) {
+        return;
+    }
+
+    [self libraryModelAudioItemUpdated:aNotification];
+}
+
 - (void)libraryModelAudioItemDeleted:(NSNotification * const)aNotification
 {
     NSParameterAssert(aNotification);
@@ -278,6 +295,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
     const id <VLCMediaLibraryItemProtocol> item = (id<VLCMediaLibraryItemProtocol>)aNotification.object;
     [self deleteDataForMediaLibraryItem:item];
+}
+
+- (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+        return;
+    }
+
+    [self libraryModelAudioItemDeleted:aNotification];
 }
 
 - (void)libraryModelArtistDeleted:(NSNotification * const)aNotification
@@ -298,13 +324,13 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [self libraryModelAudioItemDeleted:aNotification];
 }
 
-- (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
+- (void)libraryModelGenreDeleted:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+    if (_currentParentType != VLC_ML_PARENT_GENRE) {
         return;
     }
 
-    [self libraryModelAudioItemDeleted:aNotification];
+    [self libraryModelAudioMediaItemDeleted:aNotification];
 }
 
 - (void)retainSelectedMediaItem
