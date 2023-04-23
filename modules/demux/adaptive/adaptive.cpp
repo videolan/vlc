@@ -134,14 +134,14 @@ vlc_module_begin ()
         add_integer( "adaptive-maxheight", 0,
                      ADAPT_HEIGHT_TEXT, nullptr )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT )
-        add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT );
+        add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT )
         add_integer( "adaptive-livedelay",
                      MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_LIVE_BUFFERING),
-                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT );
+                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT )
         add_integer( "adaptive-maxbuffer",
                      MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_MAX_BUFFERING),
-                     ADAPT_MAXBUFFER_TEXT, nullptr );
-        add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT );
+                     ADAPT_MAXBUFFER_TEXT, nullptr )
+        add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT )
             change_integer_list(rgi_latency, ppsz_latency)
         set_callbacks( Open, Close )
 vlc_module_end ()

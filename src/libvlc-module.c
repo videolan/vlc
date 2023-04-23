@@ -1866,11 +1866,11 @@ vlc_module_begin ()
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT )
         change_safe ()
 
-    add_bool( "save-recentplay", true, SAVE_RECENTPLAY, NULL );
+    add_bool( "save-recentplay", true, SAVE_RECENTPLAY, NULL )
 
     add_integer( "restore-playback-pos", VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
                  RESTORE_PLAYBACK_POS_TEXT, RESTORE_PLAYBACK_POS_LONGTEXT )
-        change_integer_list( pi_restore_playback_values, ppsz_restore_playback_desc );
+        change_integer_list( pi_restore_playback_values, ppsz_restore_playback_desc )
 
     add_bool( "restore-playback-states", false,
                  RESTORE_PLAYBACK_STATE_TEXT, RESTORE_PLAYBACK_STATE_LONGTEXT )
@@ -1986,7 +1986,7 @@ vlc_module_begin ()
     add_integer( "input-timeshift-granularity", -1, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT )
 
-    add_string( "input-title-format", "$Z", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT );
+    add_string( "input-title-format", "$Z", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT )
 
 /* Decoder options */
     add_category_hint(N_("Input access and codecs"), CODEC_CAT_LONGTEXT)

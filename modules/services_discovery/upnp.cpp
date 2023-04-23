@@ -136,11 +136,11 @@ VLC_RD_PROBE_HELPER( "upnp_renderer", N_("UPnP Renderer Discovery") )
  * Module descriptor
  */
 vlc_module_begin()
-    set_shortname( "UPnP" );
-    set_description( N_( "Universal Plug'n'Play" ) );
-    set_subcategory( SUBCAT_PLAYLIST_SD );
-    set_capability( "services_discovery", 0 );
-    set_callbacks( SD::OpenSD, SD::CloseSD );
+    set_shortname( "UPnP" )
+    set_description( N_( "Universal Plug'n'Play" ) )
+    set_subcategory( SUBCAT_PLAYLIST_SD )
+    set_capability( "services_discovery", 0 )
+    set_callbacks( SD::OpenSD, SD::CloseSD )
 
     add_string( "satip-channelist", "auto", SATIP_CHANNEL_LIST,
                 nullptr )

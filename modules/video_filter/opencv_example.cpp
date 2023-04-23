@@ -84,7 +84,7 @@ vlc_module_begin ()
 
     add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml",
                           N_("Haar cascade filename"),
-                          N_("Name of XML file containing Haar cascade description"));
+                          N_("Name of XML file containing Haar cascade description"))
 vlc_module_end ()
 
 /*****************************************************************************

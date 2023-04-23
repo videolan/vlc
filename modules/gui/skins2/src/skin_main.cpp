@@ -498,17 +498,17 @@ vlc_module_begin ()
         change_private ()
 #ifdef _WIN32
     add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
-              SKINS2_SYSTRAY_LONG );
+              SKINS2_SYSTRAY_LONG )
     add_bool( "skins2-taskbar", true, SKINS2_TASKBAR,
-              nullptr );
+              nullptr )
 #endif
     add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
-              SKINS2_TRANSPARENCY_LONG );
+              SKINS2_TRANSPARENCY_LONG )
 
     add_bool( "skinned-playlist", true, SKINS2_PLAYLIST,
-              nullptr );
+              nullptr )
     add_bool( "skinned-video", true, SKINS2_VIDEO,
-              SKINS2_VIDEO_LONG );
+              SKINS2_VIDEO_LONG )
     set_shortname( N_("Skins"))
     set_description( N_("Skinnable Interface") )
     set_capability( "interface", 30 )

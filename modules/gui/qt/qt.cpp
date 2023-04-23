@@ -289,7 +289,7 @@ vlc_module_begin ()
     add_shortcut("qt")
 
     add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
-              nullptr );
+              nullptr )
 
     add_bool( "qt-system-tray", true, SYSTRAY_TEXT, SYSTRAY_LONGTEXT)
 
@@ -378,7 +378,7 @@ vlc_module_begin ()
         change_private ()
 
     add_integer( "qt-fullscreen-screennumber", -1, FULLSCREEN_NUMBER_TEXT,
-               FULLSCREEN_NUMBER_LONGTEXT );
+               FULLSCREEN_NUMBER_LONGTEXT )
 
     add_bool( "qt-autoload-extensions", true,
               QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT )

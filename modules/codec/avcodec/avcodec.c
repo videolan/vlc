@@ -121,7 +121,7 @@ vlc_module_begin ()
     add_integer( "avcodec-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT )
     add_string( "avcodec-codec", NULL, CODEC_TEXT, CODEC_LONGTEXT )
     add_obsolete_string( "avcodec-hw" ) /* removed since 4.0.0 */
-    add_integer( "avcodec-threads", 0, THREADS_TEXT, THREADS_LONGTEXT );
+    add_integer( "avcodec-threads", 0, THREADS_TEXT, THREADS_LONGTEXT )
     add_string( "avcodec-options", NULL, AV_OPTIONS_TEXT, AV_OPTIONS_LONGTEXT )
 
 

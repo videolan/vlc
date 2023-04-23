@@ -77,7 +77,7 @@ vlc_module_begin ()
     set_description( N_("Video cropping filter") )
     set_callback_video_filter( OpenFilter )
 
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     set_section( N_("Crop"), NULL )
         add_integer_with_range( CFG_PREFIX "croptop", 0, 0, INT_MAX,

@@ -58,22 +58,22 @@ static void Close( vlc_object_t * );
 # define FOURCC_DEFAULT "s16l"
 #endif
 
-vlc_module_begin();
-    set_shortname( "Raw Audio" );
-    set_description( N_("Raw audio demuxer") );
-    set_capability( "demux", 0 );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_callbacks( Open, Close );
-    add_shortcut( "rawaud" );
+vlc_module_begin()
+    set_shortname( "Raw Audio" )
+    set_description( N_("Raw audio demuxer") )
+    set_capability( "demux", 0 )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_callbacks( Open, Close )
+    add_shortcut( "rawaud" )
     add_integer_with_range( "rawaud-channels", 2, 1, 32, CHANNELS_TEXT, CHANNELS_LONGTEXT )
         change_safe()
     add_integer_with_range( "rawaud-samplerate", 48000, 1, 384000, SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT )
         change_safe()
     add_string( "rawaud-fourcc", FOURCC_DEFAULT,
-                FOURCC_TEXT, FOURCC_LONGTEXT );
+                FOURCC_TEXT, FOURCC_LONGTEXT )
         change_safe()
-    add_string( "rawaud-lang", "eng", LANG_TEXT, LANG_LONGTEXT);
-vlc_module_end();
+    add_string( "rawaud-lang", "eng", LANG_TEXT, LANG_LONGTEXT)
+vlc_module_end()
 
 /*****************************************************************************
  * Definitions of structures used by this plugin

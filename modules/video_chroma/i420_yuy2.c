@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_callback_video_converter( Activate, 250 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
 #elif defined (PLUGIN_ALTIVEC)
-    set_description( N_("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_description( N_("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_callback_video_converter( Activate, 250 )
 # define vlc_CPU_capable() vlc_CPU_ALTIVEC()
 #endif

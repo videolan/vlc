@@ -461,12 +461,12 @@ VLC_METADATA_EXPORTS
 #ifndef VLC_DYNAMIC_PLUGIN
 #define add_module_cat(name, subcategory, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
-    change_integer_range (subcategory /* gruik */, 0);
+    change_integer_range (subcategory /* gruik */, 0)
 
 #define add_module_list_cat(name, subcategory, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
                      value) \
-    change_integer_range (subcategory /* gruik */, 0);
+    change_integer_range (subcategory /* gruik */, 0)
 #endif
 
 #define add_integer( name, value, text, longtext ) \

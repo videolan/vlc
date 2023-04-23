@@ -60,12 +60,12 @@ static void CloseEncoder  ( encoder_t * );
 
 static block_t *EncodeFrame  ( encoder_t *, block_t * );
 
-vlc_module_begin();
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_description( N_("MP3 fixed point audio encoder") );
-    set_capability( "audio encoder", 50 );
-    set_callback( OpenEncoder );
-vlc_module_end();
+vlc_module_begin()
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_description( N_("MP3 fixed point audio encoder") )
+    set_capability( "audio encoder", 50 )
+    set_callback( OpenEncoder )
+vlc_module_end()
 
 static atomic_bool busy = ATOMIC_VAR_INIT(false);
 

@@ -110,7 +110,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_ACODEC)
     add_integer(ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
              AOT_LONGTEXT)
-    change_integer_list(pi_aot_values, ppsz_aot_descriptions);
+    change_integer_list(pi_aot_values, ppsz_aot_descriptions)
     add_bool(ENC_CFG_PREFIX "sbr", false, SIDEBAND_TEXT,
               SIDEBAND_LONGTEXT)
     add_integer(ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT,

@@ -308,8 +308,8 @@ vlc_module_begin()
     add_shortcut( "stats" )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( OutputOpen, Close )
-    add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT );
-    add_string( SOUT_CFG_PREFIX "prefix", "stats", PREFIX_TEXT, NULL );
+    add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "prefix", "stats", PREFIX_TEXT, NULL )
     add_submodule()
     set_capability( "sout filter", 0 )
     add_shortcut( "stats" )

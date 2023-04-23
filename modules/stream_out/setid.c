@@ -73,10 +73,10 @@ vlc_module_begin()
     set_shortname( N_("Set Lang"))
     set_description( N_("Change the language of an elementary stream"))
     set_capability( "sout filter", 50 )
-    add_shortcut( "setlang" );
+    add_shortcut( "setlang" )
     set_callbacks( OpenLang, Close )
     add_integer( SOUT_CFG_PREFIX_LANG "id", 0, ID_TEXT, ID_LONGTEXT )
-    add_string( SOUT_CFG_PREFIX_LANG "lang", "eng", LANG_TEXT, LANG_LONGTEXT );
+    add_string( SOUT_CFG_PREFIX_LANG "lang", "eng", LANG_TEXT, LANG_LONGTEXT )
 
 vlc_module_end()
 

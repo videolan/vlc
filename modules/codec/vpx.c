@@ -81,7 +81,7 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-vpx-"
     add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_BEST_QUALITY, QUALITY_MODE_TEXT,
                  QUALITY_MODE_LONGTEXT )
-        change_integer_list( quality_values, quality_desc );
+        change_integer_list( quality_values, quality_desc )
 #endif
 vlc_module_end ()
 

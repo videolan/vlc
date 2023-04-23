@@ -379,23 +379,23 @@ vlc_module_begin ()
 
     add_float( ENC_CFG_PREFIX ENC_QUALITY, -1.,
                ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT )
-    change_float_range(-1., 10.);
+    change_float_range(-1., 10.)
 
     add_float( ENC_CFG_PREFIX ENC_NOISE_THRESHOLD, -1.,
                ENC_NOISE_THRESHOLD_TEXT, ENC_NOISE_THRESHOLD_LONGTEXT )
-    change_float_range(-1., 100.);
+    change_float_range(-1., 100.)
 
     add_integer( ENC_CFG_PREFIX ENC_BITRATE, -1,
                  ENC_BITRATE_TEXT, ENC_BITRATE_LONGTEXT )
-    change_integer_range(-1, INT_MAX);
+    change_integer_range(-1, INT_MAX)
 
     add_integer( ENC_CFG_PREFIX ENC_MAX_BITRATE, -1,
                  ENC_MAX_BITRATE_TEXT, ENC_MAX_BITRATE_LONGTEXT )
-    change_integer_range(-1, INT_MAX);
+    change_integer_range(-1, INT_MAX)
 
     add_integer( ENC_CFG_PREFIX ENC_MIN_BITRATE, -1,
                  ENC_MIN_BITRATE_TEXT, ENC_MIN_BITRATE_LONGTEXT )
-    change_integer_range(-1, INT_MAX);
+    change_integer_range(-1, INT_MAX)
 
     add_string( ENC_CFG_PREFIX ENC_GOP_STRUCTURE, NULL,
                  ENC_GOP_STRUCTURE_TEXT, ENC_GOP_STRUCTURE_LONGTEXT )
@@ -403,7 +403,7 @@ vlc_module_begin ()
 
     add_integer( ENC_CFG_PREFIX ENC_AU_DISTANCE, -1,
                  ENC_AU_DISTANCE_TEXT, ENC_AU_DISTANCE_LONGTEXT )
-    change_integer_range(-1, INT_MAX);
+    change_integer_range(-1, INT_MAX)
 
     add_string( ENC_CFG_PREFIX ENC_CHROMAFMT, "420",
                 ENC_CHROMAFMT_TEXT, ENC_CHROMAFMT_LONGTEXT )
@@ -431,27 +431,27 @@ vlc_module_begin ()
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_COMBINED, -1,
               ENC_ME_COMBINED_TEXT, ENC_ME_COMBINED_LONGTEXT )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_HIERARCHICAL, -1,
                  ENC_ME_HIERARCHICAL_TEXT, NULL )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_DOWNSAMPLE_LEVELS, -1,
                  ENC_ME_DOWNSAMPLE_LEVELS_TEXT, ENC_ME_DOWNSAMPLE_LEVELS_LONGTEXT )
-    change_integer_range(-1, 8 );
+    change_integer_range(-1, 8 )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_GLOBAL_MOTION, -1,
                  ENC_ME_GLOBAL_MOTION_TEXT, NULL )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_ME_PHASECORR, -1,
                  ENC_ME_PHASECORR_TEXT, NULL )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     add_string( ENC_CFG_PREFIX ENC_DWTINTRA, NULL,
                 ENC_DWTINTRA_TEXT, NULL )
@@ -463,12 +463,12 @@ vlc_module_begin ()
 
     add_integer( ENC_CFG_PREFIX ENC_DWTDEPTH, -1,
                  ENC_DWTDEPTH_TEXT, ENC_DWTDEPTH_LONGTEXT )
-    change_integer_range(-1, SCHRO_LIMIT_ENCODER_TRANSFORM_DEPTH );
+    change_integer_range(-1, SCHRO_LIMIT_ENCODER_TRANSFORM_DEPTH )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_MULTIQUANT, -1,
                  ENC_MULTIQUANT_TEXT, ENC_MULTIQUANT_LONGTEXT )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_SCBLK_SIZE, NULL,
@@ -481,12 +481,12 @@ vlc_module_begin ()
 
     add_float( ENC_CFG_PREFIX ENC_PREFILTER_STRENGTH, -1.,
                  ENC_PREFILTER_STRENGTH_TEXT, ENC_PREFILTER_STRENGTH_LONGTEXT )
-    change_float_range(-1., 100.0);
+    change_float_range(-1., 100.0)
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_SCD, -1,
                  ENC_SCD_TEXT, NULL )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_PWT, NULL,
@@ -496,22 +496,22 @@ vlc_module_begin ()
     /* advanced option only */
     add_float( ENC_CFG_PREFIX ENC_PDIST, -1,
                ENC_PDIST_TEXT, ENC_PDIST_LONGTEXT )
-    change_float_range(-1., 100.);
+    change_float_range(-1., 100.)
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_NOAC, -1,
               ENC_NOAC_TEXT, ENC_NOAC_LONGTEXT )
-    change_integer_range(-1, 1 );
+    change_integer_range(-1, 1 )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_HSLICES, -1,
                  ENC_HSLICES_TEXT, ENC_HSLICES_LONGTEXT )
-    change_integer_range(-1, INT_MAX );
+    change_integer_range(-1, INT_MAX )
 
     /* advanced option only */
     add_integer( ENC_CFG_PREFIX ENC_VSLICES, -1,
                  ENC_VSLICES_TEXT, ENC_VSLICES_LONGTEXT )
-    change_integer_range(-1, INT_MAX );
+    change_integer_range(-1, INT_MAX )
 
     /* advanced option only */
     add_string( ENC_CFG_PREFIX ENC_FORCE_PROFILE, NULL,

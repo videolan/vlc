@@ -2403,7 +2403,7 @@ vlc_module_begin()
     set_callbacks(OpenDecoder, CloseDecoder)
 
     add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC)
-    add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG);
+    add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG)
         change_string_list(chroma_list_values, chroma_list_names)
 
     /* Deprecated options */

@@ -338,8 +338,8 @@ typedef int (*vlc_rtp_parser_cb)(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 #define set_rtp_parser_callback(cb) \
     { \
         vlc_rtp_parser_cb cb__ = (cb); (void) cb__; \
-        set_callback(cb); \
-        set_capability("rtp parser", 0); \
+        set_callback(cb) \
+        set_capability("rtp parser", 0) \
     }
 
 int vlc_rtp_pt_instantiate(vlc_object_t *obj, struct vlc_rtp_pt *restrict pt,

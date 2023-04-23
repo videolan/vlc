@@ -172,7 +172,7 @@ vlc_module_begin()
 
         set_section(N_("Video output"), 0)
         add_integer("macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT)
-        add_float_with_range("macosx-opaqueness", 1, 0, 1, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT);
+        add_float_with_range("macosx-opaqueness", 1, 0, 1, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT)
         add_bool("macosx-black", false, BLACK_TEXT, BLACK_LONGTEXT)
 vlc_module_end()
 

@@ -54,7 +54,7 @@ vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
     { \
         vlc_gl_filter_open_fn *fn = open; \
         (void) fn; \
-        set_callback(fn); \
+        set_callback(fn) \
     }
 
 struct vlc_gl_filter_ops {

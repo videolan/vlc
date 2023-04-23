@@ -80,7 +80,7 @@ vlc_module_begin ()
                ENC_QUALITY_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT )
-        change_integer_list( pi_stereo_values, ppsz_stereo_descriptions );
+        change_integer_list( pi_stereo_values, ppsz_stereo_descriptions )
     add_bool( ENC_CFG_PREFIX "vbr", false, ENC_VBR_TEXT,
               ENC_VBR_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "psy", 3, ENC_PSY_TEXT,

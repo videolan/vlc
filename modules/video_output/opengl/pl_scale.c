@@ -377,7 +377,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("opengl filter", 0)
     set_callback(Open)
-    add_shortcut("pl_scale");
+    add_shortcut("pl_scale")
 
 #define UPSCALER_TEXT "OpenGL upscaler"
 #define UPSCALER_LONGTEXT "Upscaler filter to apply during rendering"

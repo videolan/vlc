@@ -620,7 +620,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("opengl filter", 0)
     set_callback_opengl_filter(Open)
-    add_shortcut("mock");
+    add_shortcut("mock")
     add_float(MOCK_CFG_PREFIX "angle", 0.f, NULL, NULL) /* in degrees */
         change_volatile()
     add_float(MOCK_CFG_PREFIX "speed", 0.f, NULL, NULL) /* in rotations per minute */

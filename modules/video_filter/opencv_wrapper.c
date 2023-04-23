@@ -76,15 +76,15 @@ vlc_module_begin ()
                           N_("Amount by which to scale the picture before sending it to the internal OpenCV filter") )
     add_string( "opencv-chroma", "input",
                           N_("OpenCV filter chroma"),
-                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"));
+                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"))
         change_string_list( chroma_list, chroma_list_text )
     add_string( "opencv-output", "input",
                           N_("Wrapper filter output"),
-                          N_("Determines what (if any) video is displayed by the wrapper filter"));
+                          N_("Determines what (if any) video is displayed by the wrapper filter"))
         change_string_list( output_list, output_list_text )
     add_string( "opencv-filter-name", "none",
                           N_("OpenCV internal filter name"),
-                          N_("Name of internal OpenCV plugin filter to use"));
+                          N_("Name of internal OpenCV plugin filter to use"))
 vlc_module_end ()
 
 

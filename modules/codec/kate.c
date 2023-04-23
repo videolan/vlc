@@ -279,31 +279,31 @@ vlc_module_begin ()
                           TIGER_QUALITY_DEFAULT, 0.0f, 1.0f,
                           TIGER_QUALITY_TEXT, TIGER_QUALITY_LONGTEXT )
 
-    set_section( N_("Tiger rendering defaults"), NULL );
+    set_section( N_("Tiger rendering defaults"), NULL )
     add_string( "kate-tiger-default-font-desc", TIGER_DEFAULT_FONT_DESC_DEFAULT,
-                TIGER_DEFAULT_FONT_DESC_TEXT, TIGER_DEFAULT_FONT_DESC_LONGTEXT);
+                TIGER_DEFAULT_FONT_DESC_TEXT, TIGER_DEFAULT_FONT_DESC_LONGTEXT)
     add_integer_with_range( "kate-tiger-default-font-effect",
                             TIGER_DEFAULT_FONT_EFFECT_DEFAULT,
                             0, ARRAY_SIZE(pi_font_effects),
                             TIGER_DEFAULT_FONT_EFFECT_TEXT, TIGER_DEFAULT_FONT_EFFECT_LONGTEXT )
-    change_integer_list( pi_font_effects, ppsz_font_effect_names );
+    change_integer_list( pi_font_effects, ppsz_font_effect_names )
     add_float_with_range( "kate-tiger-default-font-effect-strength",
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_DEFAULT, 0.0f, 1.0f,
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_TEXT, TIGER_DEFAULT_FONT_EFFECT_STRENGTH_LONGTEXT )
     add_integer_with_range( "kate-tiger-default-font-color",
                             TIGER_DEFAULT_FONT_COLOR_DEFAULT, 0, 0x00ffffff,
-                            TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT);
-    change_integer_list( pi_color_values, ppsz_color_descriptions );
+                            TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT)
+    change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer_with_range( "kate-tiger-default-font-alpha",
                             TIGER_DEFAULT_FONT_ALPHA_DEFAULT, 0, 255,
-                            TIGER_DEFAULT_FONT_ALPHA_TEXT, TIGER_DEFAULT_FONT_ALPHA_LONGTEXT);
+                            TIGER_DEFAULT_FONT_ALPHA_TEXT, TIGER_DEFAULT_FONT_ALPHA_LONGTEXT)
     add_integer_with_range( "kate-tiger-default-background-color",
                             TIGER_DEFAULT_BACKGROUND_COLOR_DEFAULT, 0, 0x00ffffff,
-                            TIGER_DEFAULT_BACKGROUND_COLOR_TEXT, TIGER_DEFAULT_BACKGROUND_COLOR_LONGTEXT);
-    change_integer_list( pi_color_values, ppsz_color_descriptions );
+                            TIGER_DEFAULT_BACKGROUND_COLOR_TEXT, TIGER_DEFAULT_BACKGROUND_COLOR_LONGTEXT)
+    change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer_with_range( "kate-tiger-default-background-alpha",
                             TIGER_DEFAULT_BACKGROUND_ALPHA_DEFAULT, 0, 255,
-                            TIGER_DEFAULT_BACKGROUND_ALPHA_TEXT, TIGER_DEFAULT_BACKGROUND_ALPHA_LONGTEXT);
+                            TIGER_DEFAULT_BACKGROUND_ALPHA_TEXT, TIGER_DEFAULT_BACKGROUND_ALPHA_LONGTEXT)
 #endif
 
 #ifdef ENABLE_PACKETIZER
