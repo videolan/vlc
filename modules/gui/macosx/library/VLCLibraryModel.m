@@ -55,13 +55,6 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     vlc_medialibrary_t *_p_mediaLibrary;
     vlc_ml_event_callback_t *_p_eventCallback;
 
-    NSArray *_cachedAudioMedia;
-    NSArray *_cachedArtists;
-    NSArray *_cachedAlbums;
-    NSArray *_cachedGenres;
-    NSArray *_cachedVideoMedia;
-    NSArray *_cachedRecentMedia;
-    NSArray *_cachedListOfMonitoredFolders;
     NSNotificationCenter *_defaultNotificationCenter;
 
     enum vlc_ml_sorting_criteria_t _sortCriteria;
@@ -690,6 +683,39 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }];
 }
 
+- (void)updateAudioGroupItem:(const id<VLCMediaLibraryAudioGroupProtocol>)audioGroupItem
+                     inCache:(NSArray * const)cache
+                 usingSetter:(const SEL)setterSelector
+                  usingQueue:(const dispatch_queue_t)queue
+        withNotificationName:(const NSNotificationName)notificationName
+{
+    NSParameterAssert([self respondsToSelector:setterSelector]);
+    const int64_t itemId = audioGroupItem.libraryID;
+
+    dispatch_async(queue, ^{
+        const NSUInteger audioGroupIndex = [self indexForAudioGroupInCache:cache
+                                                                withItemId:itemId];
+        if (audioGroupIndex == NSNotFound) {
+            NSLog(@"Did not find audio group item with id %lli in cache.", itemId);
+            return;
+        }
+
+        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
+            [mutableAudioGroupCache replaceObjectAtIndex:audioGroupIndex withObject:audioGroupItem];
+            NSArray * const immutableCopy = [mutableAudioGroupCache copy];
+
+            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
+            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
+            cacheSetterFunction(self, setterSelector, immutableCopy);
+
+            [self->_defaultNotificationCenter postNotificationName:notificationName
+                                                            object:audioGroupItem];
+        });
+    });
+}
+
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -702,23 +728,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    dispatch_async(_albumCacheModificationQueue, ^{
-        const NSUInteger albumIndex = [self indexForAudioGroupInCache:self->_cachedAlbums
-                                                           withItemId:itemId];
-        if (albumIndex == NSNotFound) {
-            NSLog(@"Did not find album with id %lli in album cache.", itemId);
-            return;
-        }
-
-        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableAlbumCache = [self->_cachedAlbums mutableCopy];
-            [mutableAlbumCache replaceObjectAtIndex:albumIndex withObject:album];
-            self->_cachedAlbums = [mutableAlbumCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumUpdated object:album];
-        });
-    });
+    [self updateAudioGroupItem:album
+                       inCache:_cachedAlbums
+                   usingSetter:@selector(setCachedAlbums:)
+                    usingQueue:_albumCacheModificationQueue
+          withNotificationName:VLCLibraryModelAlbumUpdated];
 }
 
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event
@@ -760,23 +774,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    dispatch_async(_artistCacheModificationQueue, ^{
-        const NSUInteger artistIndex = [self indexForAudioGroupInCache:self->_cachedArtists
-                                                            withItemId:itemId];
-        if (artistIndex == NSNotFound) {
-            NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
-            return;
-        }
-
-        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableArtistCache = [self->_cachedArtists mutableCopy];
-            [mutableArtistCache replaceObjectAtIndex:artistIndex withObject:artist];
-            self->_cachedArtists = [mutableArtistCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistUpdated object:artist];
-        });
-    });
+    [self updateAudioGroupItem:artist
+                       inCache:_cachedArtists
+                   usingSetter:@selector(setCachedArtists:)
+                    usingQueue:_artistCacheModificationQueue
+          withNotificationName:VLCLibraryModelArtistUpdated];
 }
 
 - (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event
@@ -818,24 +820,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    dispatch_async(_genreCacheModificationQueue, ^{
-        const NSUInteger genreIndex = [self indexForAudioGroupInCache:self->_cachedGenres
-                                                           withItemId:itemId];
-
-        if (genreIndex == NSNotFound) {
-            NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
-            return;
-        }
-
-        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSMutableArray * const mutableGenreCache = [self->_cachedGenres mutableCopy];
-            [mutableGenreCache replaceObjectAtIndex:genreIndex withObject:genre];
-            self->_cachedGenres = [mutableGenreCache copy];
-
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreUpdated object:genre];
-        });
-    });
+    [self updateAudioGroupItem:genre
+                       inCache:_cachedGenres
+                   usingSetter:@selector(setCachedGenres:)
+                    usingQueue:_genreCacheModificationQueue
+          withNotificationName:VLCLibraryModelGenreUpdated];
 }
 
 - (void)handleGenreDeletionEvent:(const vlc_ml_event_t * const)p_event
