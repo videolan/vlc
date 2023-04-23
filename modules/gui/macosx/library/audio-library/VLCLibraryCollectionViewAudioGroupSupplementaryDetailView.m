@@ -62,6 +62,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
                            selector:@selector(handleAudioGroupUpdated:)
                                name:VLCLibraryModelArtistUpdated
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(handleAudioGroupUpdated:)
+                               name:VLCLibraryModelGenreUpdated
+                             object:nil];
 }
 
 - (void)handleAudioGroupUpdated:(NSNotification *)notification
