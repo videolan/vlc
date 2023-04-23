@@ -55,25 +55,24 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
-                           selector:@selector(handleAlbumUpdated:)
+                           selector:@selector(handleAudioGroupUpdated:)
                                name:VLCLibraryModelAlbumUpdated
                              object:nil];
 }
 
-- (void)handleAlbumUpdated:(NSNotification *)notification
+- (void)handleAudioGroupUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    VLCMediaLibraryAlbum * const representedAlbum = (VLCMediaLibraryAlbum *)_representedAudioGroup;
-    if (representedAlbum == nil) {
+    
+    if (_representedAudioGroup == nil ||
+        notification.object == nil ||
+        ![notification.object conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
+
         return;
     }
 
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)notification.object;
-    if (album == nil || representedAlbum.libraryID != album.libraryID) {
-        return;
-    }
-
-    [self setRepresentedAudioGroup:album];
+    const id<VLCMediaLibraryAudioGroupProtocol> audioGroup = (id<VLCMediaLibraryAudioGroupProtocol>)notification.object;
+    [self setRepresentedAudioGroup:audioGroup];
 }
 
 - (void)setRepresentedAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedAudioGroup
