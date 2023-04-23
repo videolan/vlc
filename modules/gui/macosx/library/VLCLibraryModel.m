@@ -41,6 +41,7 @@ NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMe
 NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
 NSString * const VLCLibraryModelAlbumDeleted = @"VLCLibraryModelAlbumDeleted";
 NSString * const VLCLibraryModelArtistDeleted = @"VLCLibraryModelArtistDeleted";
+NSString * const VLCLibraryModelGenreDeleted = @"VLCLibraryModelGenreDeleted";
 
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
@@ -93,6 +94,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleGenreDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event;
@@ -154,7 +156,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleGenreUpdateEvent:p_event];
             break;
         case VLC_ML_EVENT_GENRE_DELETED:
-            [libraryModel resetCachedListOfGenres];
+            [libraryModel handleGenreDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_FOLDER_ADDED:
         case VLC_ML_EVENT_FOLDER_UPDATED:
@@ -808,6 +810,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
+- (NSInteger)indexForGenreInCache:(int64_t)genreLibraryId
+{
+    return [_cachedGenres indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGenre * const genre, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(genre != nil, @"Cache list should not contain nil genres");
+        return genre.libraryID == genreLibraryId;
+    }];
+}
+
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -821,10 +831,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_genreCacheModificationQueue, ^{
-        const NSUInteger genreIndex = [self->_cachedGenres indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGenre * const genre, const NSUInteger idx, BOOL * const stop) {
-            NSAssert(genre != nil, @"Cache list should not contain nil media items");
-            return genre.libraryID == itemId;
-        }];;
+        const NSUInteger genreIndex = [self indexForGenreInCache:itemId];
 
         if (genreIndex == NSNotFound) {
             NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
@@ -838,6 +845,32 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_cachedGenres = [mutableGenreCache copy];
 
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreUpdated object:genre];
+        });
+    });
+}
+
+- (void)handleGenreDeletionEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+    NSLog(@"Deleting %lli", itemId);
+
+    dispatch_async(_genreCacheModificationQueue, ^{
+        const NSUInteger genreIndex = [self indexForGenreInCache:itemId];
+        if (genreIndex == NSNotFound) {
+            NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
+            return;
+        }
+
+        VLCMediaLibraryGenre * const genre = self->_cachedArtists[genreIndex];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableGenreCache = [self->_cachedGenres mutableCopy];
+            [mutableGenreCache removeObjectAtIndex:genreIndex];
+            self->_cachedGenres = [mutableGenreCache copy];
+
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreDeleted object:genre];
         });
     });
 }

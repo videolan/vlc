@@ -47,6 +47,7 @@ extern NSString * const VLCLibraryModelVideoMediaItemDeleted;
 extern NSString * const VLCLibraryModelRecentsMediaItemDeleted;
 extern NSString * const VLCLibraryModelAlbumDeleted;
 extern NSString * const VLCLibraryModelArtistDeleted;
+extern NSString * const VLCLibraryModelGenreDeleted;
 
 extern NSString * const VLCLibraryModelAudioMediaItemUpdated;
 extern NSString * const VLCLibraryModelVideoMediaItemUpdated;
