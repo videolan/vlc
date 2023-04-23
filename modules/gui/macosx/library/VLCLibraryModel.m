@@ -40,6 +40,7 @@ NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMe
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
 NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
 NSString * const VLCLibraryModelAlbumDeleted = @"VLCLibraryModelAlbumDeleted";
+NSString * const VLCLibraryModelArtistDeleted = @"VLCLibraryModelArtistDeleted";
 
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
@@ -89,6 +90,7 @@ NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event;
@@ -131,7 +133,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleArtistUpdateEvent:p_event];
             break;
         case VLC_ML_EVENT_ARTIST_DELETED:
-            [libraryModel resetCachedListOfArtists];
+            [libraryModel handleArtistDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_ALBUM_ADDED:
             [libraryModel resetCachedListOfAlbums];
@@ -735,6 +737,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
+- (NSInteger)indexForArtistInCache:(int64_t)artistLibraryId
+{
+    return [_cachedArtists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryArtist * const artist, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(artist != nil, @"Cache list should not contain nil artists");
+        return artist.libraryID == artistLibraryId;
+    }];
+}
+
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -748,10 +758,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_artistCacheModificationQueue, ^{
-        const NSUInteger artistIndex = [self->_cachedArtists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryArtist * const artist, const NSUInteger idx, BOOL * const stop) {
-            NSAssert(artist != nil, @"Cache list should not contain nil artists");
-            return artist.libraryID == itemId;
-        }];
+        const NSUInteger artistIndex = [self indexForArtistInCache:itemId];
         if (artistIndex == NSNotFound) {
             NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
             return;
@@ -764,6 +771,32 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_cachedArtists = [mutableArtistCache copy];
 
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistUpdated object:artist];
+        });
+    });
+}
+
+- (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+    NSLog(@"Deleting %lli", itemId);
+
+    dispatch_async(_artistCacheModificationQueue, ^{
+        const NSUInteger artistIndex = [self indexForArtistInCache:itemId];
+        if (artistIndex == NSNotFound) {
+            NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
+            return;
+        }
+
+        VLCMediaLibraryArtist * const artist = self->_cachedArtists[artistIndex];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableArtistCache = [self->_cachedArtists mutableCopy];
+            [mutableArtistCache removeObjectAtIndex:artistIndex];
+            self->_cachedArtists = [mutableArtistCache copy];
+
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistDeleted object:artist];
         });
     });
 }
