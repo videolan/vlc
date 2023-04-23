@@ -682,11 +682,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }];
 }
 
-- (NSInteger)indexForAlbumInCache:(int64_t)albumLibraryId
+- (NSInteger)indexForAudioGroupInCache:(NSArray * const)cache withItemId:(const int64_t)itemId
 {
-    return [_cachedAlbums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum * const album, const NSUInteger idx, BOOL * const stop) {
-        NSAssert(album != nil, @"Cache list should not contain nil media items");
-        return album.libraryID == albumLibraryId;
+    return [cache indexOfObjectPassingTest:^BOOL(id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(audioGroupItem != nil, @"Cache list should not contain nil audio group items");
+        return audioGroupItem.libraryID == itemId;
     }];
 }
 
@@ -703,7 +703,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_albumCacheModificationQueue, ^{
-        const NSUInteger albumIndex = [self indexForAlbumInCache:itemId];
+        const NSUInteger albumIndex = [self indexForAudioGroupInCache:self->_cachedAlbums
+                                                           withItemId:itemId];
         if (albumIndex == NSNotFound) {
             NSLog(@"Did not find album with id %lli in album cache.", itemId);
             return;
@@ -728,7 +729,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSLog(@"Deleting %lli", itemId);
 
     dispatch_async(_albumCacheModificationQueue, ^{
-        const NSUInteger albumIndex = [self indexForAlbumInCache:itemId];
+        const NSUInteger albumIndex = [self indexForAudioGroupInCache:self->_cachedAlbums
+                                                           withItemId:itemId];
         if (albumIndex == NSNotFound) {
             NSLog(@"Did not find album with id %lli in album cache.", itemId);
             return;
@@ -746,14 +748,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
-- (NSInteger)indexForArtistInCache:(int64_t)artistLibraryId
-{
-    return [_cachedArtists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryArtist * const artist, const NSUInteger idx, BOOL * const stop) {
-        NSAssert(artist != nil, @"Cache list should not contain nil artists");
-        return artist.libraryID == artistLibraryId;
-    }];
-}
-
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -767,7 +761,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_artistCacheModificationQueue, ^{
-        const NSUInteger artistIndex = [self indexForArtistInCache:itemId];
+        const NSUInteger artistIndex = [self indexForAudioGroupInCache:self->_cachedArtists
+                                                            withItemId:itemId];
         if (artistIndex == NSNotFound) {
             NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
             return;
@@ -792,7 +787,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSLog(@"Deleting %lli", itemId);
 
     dispatch_async(_artistCacheModificationQueue, ^{
-        const NSUInteger artistIndex = [self indexForArtistInCache:itemId];
+        const NSUInteger artistIndex = [self indexForAudioGroupInCache:self->_cachedArtists
+                                                            withItemId:itemId];
         if (artistIndex == NSNotFound) {
             NSLog(@"Did not find artist with id %lli in artist cache.", itemId);
             return;
@@ -810,14 +806,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
-- (NSInteger)indexForGenreInCache:(int64_t)genreLibraryId
-{
-    return [_cachedGenres indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGenre * const genre, const NSUInteger idx, BOOL * const stop) {
-        NSAssert(genre != nil, @"Cache list should not contain nil genres");
-        return genre.libraryID == genreLibraryId;
-    }];
-}
-
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event
 {
     NSParameterAssert(p_event != NULL);
@@ -831,7 +819,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_async(_genreCacheModificationQueue, ^{
-        const NSUInteger genreIndex = [self indexForGenreInCache:itemId];
+        const NSUInteger genreIndex = [self indexForAudioGroupInCache:self->_cachedGenres
+                                                           withItemId:itemId];
 
         if (genreIndex == NSNotFound) {
             NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
@@ -857,7 +846,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSLog(@"Deleting %lli", itemId);
 
     dispatch_async(_genreCacheModificationQueue, ^{
-        const NSUInteger genreIndex = [self indexForGenreInCache:itemId];
+        const NSUInteger genreIndex = [self indexForAudioGroupInCache:self->_cachedGenres
+                                                           withItemId:itemId];
         if (genreIndex == NSNotFound) {
             NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
             return;
