@@ -47,6 +47,7 @@ NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMe
 NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
 NSString * const VLCLibraryModelAlbumUpdated = @"VLCLibraryModelAlbumUpdated";
 NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
+NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 
 @interface VLCLibraryModel ()
 {
@@ -72,6 +73,7 @@ NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
     dispatch_queue_t _mediaItemCacheModificationQueue;
     dispatch_queue_t _albumCacheModificationQueue;
     dispatch_queue_t _artistCacheModificationQueue;
+    dispatch_queue_t _genreCacheModificationQueue;
 }
 
 @property (readwrite, atomic) NSArray *cachedAudioMedia;
@@ -94,6 +96,7 @@ NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event;
 
 @end
 
@@ -145,7 +148,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleAlbumDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_GENRE_ADDED:
+            [libraryModel resetCachedListOfGenres];
+            break;
         case VLC_ML_EVENT_GENRE_UPDATED:
+            [libraryModel handleGenreUpdateEvent:p_event];
+            break;
         case VLC_ML_EVENT_GENRE_DELETED:
             [libraryModel resetCachedListOfGenres];
             break;
@@ -187,7 +194,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // locking other queues
         _mediaItemCacheModificationQueue = dispatch_queue_create("mediaItemCacheModificationQueue", 0);
         _albumCacheModificationQueue = dispatch_queue_create("albumCacheModificationQueue", 0);
-        _artistCacheModificationQueue = dispatch_queue_create("artistCacheModificationQueue", 0);
+        _artistCacheModificationQueue = dispatch_queue_create("genreCacheModificationQueue", 0);
 
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
         [_defaultNotificationCenter addObserver:self
@@ -797,6 +804,40 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_cachedArtists = [mutableArtistCache copy];
 
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistDeleted object:artist];
+        });
+    });
+}
+
+- (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+
+    VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:itemId];
+    if (genre == nil) {
+        NSLog(@"Could not find a library genre with this ID. Can't handle update.");
+        return;
+    }
+
+    dispatch_async(_genreCacheModificationQueue, ^{
+        const NSUInteger genreIndex = [self->_cachedGenres indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGenre * const genre, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(genre != nil, @"Cache list should not contain nil media items");
+            return genre.libraryID == itemId;
+        }];;
+
+        if (genreIndex == NSNotFound) {
+            NSLog(@"Did not find genre with id %lli in genre cache.", itemId);
+            return;
+        }
+
+        // Block calling queue while we modify the cache, preventing dangerous concurrent modification
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableGenreCache = [self->_cachedGenres mutableCopy];
+            [mutableGenreCache replaceObjectAtIndex:genreIndex withObject:genre];
+            self->_cachedGenres = [mutableGenreCache copy];
+
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreUpdated object:genre];
         });
     });
 }
