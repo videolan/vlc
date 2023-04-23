@@ -89,30 +89,30 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 {
     self = [super init];
     if(self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelAudioMediaItemsReset:)
                                    name:VLCLibraryModelAudioMediaListReset
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAudioItemUpdated:)
+                               selector:@selector(libraryModelAudioMediaItemUpdated:)
                                    name:VLCLibraryModelAudioMediaItemUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAudioItemDeleted:)
+                               selector:@selector(libraryModelAudioMediaItemDeleted:)
                                    name:VLCLibraryModelAudioMediaItemDeleted
                                  object:nil];
 
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelArtistsReset:)
                                    name:VLCLibraryModelArtistListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelAlbumsReset:)
                                    name:VLCLibraryModelAlbumListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
+                               selector:@selector(libraryModelGenresReset:)
                                    name:VLCLibraryModelGenreListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
@@ -162,13 +162,49 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 }
 
-- (void)libraryModelUpdated:(NSNotification * const)aNotification
+- (void)libraryModelReset:(NSNotification * const)aNotification
 {
     if(_libraryModel == nil) {
         return;
     }
 
     [self reloadData];
+}
+
+- (void)libraryModelAudioMediaItemsReset:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+        return;
+    }
+
+    [self libraryModelReset:aNotification];
+}
+
+- (void)libraryModelArtistsReset:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_ARTIST) {
+        return;
+    }
+
+    [self libraryModelReset:aNotification];
+}
+
+- (void)libraryModelAlbumsReset:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_ALBUM) {
+        return;
+    }
+
+    [self libraryModelReset:aNotification];
+}
+
+- (void)libraryModelGenresReset:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_GENRE) {
+        return;
+    }
+
+    [self libraryModelReset:aNotification];
 }
 
 - (void)libraryModelAudioItemUpdated:(NSNotification * const)aNotification
@@ -184,6 +220,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [self reloadDataForMediaLibraryItem:item];
 }
 
+- (void)libraryModelAudioMediaItemUpdated:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+        return;
+    }
+
+    [self libraryModelAudioItemUpdated:aNotification];
+}
+
 - (void)libraryModelAudioItemDeleted:(NSNotification * const)aNotification
 {
     NSParameterAssert(aNotification);
@@ -195,6 +240,15 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
     const id <VLCMediaLibraryItemProtocol> item = (id<VLCMediaLibraryItemProtocol>)aNotification.object;
     [self deleteDataForMediaLibraryItem:item];
+}
+
+- (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
+{
+    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+        return;
+    }
+
+    [self libraryModelAudioItemDeleted:aNotification];
 }
 
 - (void)retainSelectedMediaItem
