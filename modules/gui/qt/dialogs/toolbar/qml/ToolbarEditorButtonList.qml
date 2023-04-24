@@ -52,8 +52,11 @@ GridView {
         colorSet: ColorContext.View
     }
 
-    MouseEventFilter {
-        target: root
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+
+        preventStealing: true
     }
 
     Util.FlickableScrollHandler { }
