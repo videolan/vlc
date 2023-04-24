@@ -98,10 +98,6 @@ ListView {
         colorSet: ColorContext.View
     }
     
-    MouseEventFilter {
-        target: playerBtnDND
-    }
-
     Util.FlickableScrollHandler {
         fallbackScroll: true
         enabled: true
@@ -110,7 +106,8 @@ ListView {
     MouseArea {
         anchors.fill: parent
 
-        acceptedButtons: Qt.NoButton
+        preventStealing: true
+
         z: -1
 
         cursorShape: root.dragActive ? Qt.DragMoveCursor : Qt.ArrowCursor
