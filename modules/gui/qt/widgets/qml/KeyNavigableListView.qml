@@ -266,27 +266,6 @@ FadingEdgeListView {
         }
     }
 
-
-    MouseEventFilter {
-        target: root
-
-        onMouseButtonPress: {
-            if (buttons & (Qt.LeftButton | Qt.RightButton)) {
-                Helpers.enforceFocus(root, Qt.MouseFocusReason)
-
-                if (!(modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
-                    root.deselectAll()
-                }
-            }
-        }
-
-        onMouseButtonRelease: {
-            if (button & Qt.RightButton) {
-                root.showContextMenu(globalPos)
-            }
-        }
-    }
-
     Util.ViewDragAutoScrollHandler {
         id: dragAutoScrollHandler
 
@@ -301,6 +280,32 @@ FadingEdgeListView {
         onFocusChanged: {
             if (!headerItem.focus) {
                 currentItem.focus = true
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+
+        z: -1
+
+        preventStealing: true
+
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onPressed: {
+            Helpers.enforceFocus(root, Qt.MouseFocusReason)
+
+            if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
+                root.deselectAll()
+            }
+
+            mouse.accepted = true
+        }
+
+        onReleased: {
+            if (mouse.button & Qt.RightButton) {
+                root.showContextMenu(mapToGlobal(mouse.x, mouse.y))
             }
         }
     }
