@@ -1,0 +1,36 @@
+From 07d1fa08b618585c7c019b7a24a221c8161cbbb5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tim-Philipp=20M=C3=BCller?= <tim@centricular.com>
+Date: Thu, 20 Apr 2023 19:06:13 +0100
+Subject: [PATCH] meson: fix build on arm64
+
+Would fail like:
+
+Checking if "compiler supports ARMv7/AArch64 NEON intrinsics" : links: NO
+Checking if "compiler supports ARMv7/AArch64 NEON intrinsics with -mfpu=neon" : links: YES
+Checking if "compiler supports AArch64 NEON intrinsics" : links: NO
+Checking if "compiler supports AArch64 NEON intrinsics with -mfpu=neon" : links: NO
+Message: Compiler does not support AArch64 NEON intrinsics
+../silk/meson.build:28:45: ERROR: Unknown variable "have_arm_intrinsics_or_asm".
+
+since commit 08088411259056f63774befb2d00951fdd5c46ba.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index ed66d380..9f28de33 100644
+--- a/meson.build
++++ b/meson.build
+@@ -574,8 +574,8 @@ foreach l : lines
+ endforeach
+ 
+ subdir('include')
+-subdir('silk')
+ subdir('celt')
++subdir('silk')
+ subdir('src')
+ 
+ configure_file(output: 'config.h', configuration: opus_conf)
+-- 
+GitLab
+

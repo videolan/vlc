@@ -16,28 +16,16 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
-	$(APPLY) $(SRC)/opus/0002-CMake-set-the-pkg-config-string-as-with-autoconf-mes.patch
-	# fix missing included file in packaged source
-	cd $(UNPACK_DIR) && sed -e 's,include(opus_buildtype,#include(opus_buildtype,' -i.orig CMakeLists.txt
+	$(APPLY) $(SRC)/opus/0001-meson-arm64.patch
 	$(MOVE)
 
-OPUS_CONF=
+OPUS_CONF=  -D extra-programs=disabled -D tests=disabled -D docs=disabled
 ifndef HAVE_FPU
-OPUS_CONF += -DOPUS_FIXED_POINT=ON
+OPUS_CONF += -D fixed-point=true
 endif
 
-# rtcd is not working on win64-arm64
-ifdef HAVE_WIN64
-ifeq ($(ARCH),aarch64)
-OPUS_CONF += -DOPUS_MAY_HAVE_NEON=OFF -DOPUS_PRESUME_NEON=ON
-endif
-endif
-
-
-
-.opus: opus toolchain.cmake
-	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(OPUS_CONF)
-	+$(CMAKEBUILD)
-	$(CMAKEINSTALL)
+.opus: opus crossfile.meson
+	$(MESONCLEAN)
+	$(HOSTVARS_MESON) $(MESON) $(OPUS_CONF)
+	+$(MESONBUILD)
 	touch $@
