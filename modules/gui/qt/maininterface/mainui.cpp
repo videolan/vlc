@@ -40,7 +40,6 @@
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 #include "util/qmlinputitem.hpp"
-#include "util/mouse_event_filter.hpp"
 #include "util/flickable_scroll_handler.hpp"
 #include "util/hover_handler_rev11.hpp"
 #include "util/color_svg_image_provider.hpp"
@@ -287,7 +286,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
 
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
-        qmlRegisterType<MouseEventFilter>( uri, versionMajor, versionMinor, "MouseEventFilter" );
         qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
 
         qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");

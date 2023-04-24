@@ -325,8 +325,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/vlctick.cpp \
 	gui/qt/util/vlctick.hpp \
 	gui/qt/util/qmlinputitem.hpp \
-	gui/qt/util/mouse_event_filter.cpp \
-	gui/qt/util/mouse_event_filter.hpp \
 	gui/qt/util/effects_image_provider.cpp \
 	gui/qt/util/effects_image_provider.hpp \
 	gui/qt/util/qsgroundedrectangularimagenode.cpp \
@@ -505,7 +503,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/keyhelper.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/item_key_event_filter.moc.cpp \
-	gui/qt/util/mouse_event_filter.moc.cpp \
 	gui/qt/util/effects_image_provider.moc.cpp \
 	gui/qt/util/flickable_scroll_handler.moc.cpp \
 	gui/qt/util/hover_handler_rev11.moc.cpp \
