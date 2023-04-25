@@ -175,8 +175,6 @@ static int  Direct3D11CreateFormatResources (vout_display_t *, const video_forma
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
-static void Direct3D11DestroyPool(vout_display_t *);
-
 static void DestroyDisplayPoolPicture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
