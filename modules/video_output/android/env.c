@@ -26,6 +26,7 @@
 #endif
 
 #include "utils.h"
+#include "env.h"
 #include <dlfcn.h>
 #include <jni.h>
 #include <pthread.h>
