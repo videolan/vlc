@@ -601,6 +601,11 @@ option('rist',
     value: 'auto',
     description: 'librist support for access and access_output')
 
+option('libgcrypt',
+    type: 'feature',
+    value: 'auto',
+    description: 'libgcrypt support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
@@ -636,7 +641,6 @@ option('rist',
 # TODO: Missing lirc
 # TODO: Missing projectm
 # TODO: Missing vsxu
-# TODO: Missing libgcrypt
 # TODO: Missing kwallet
 # TODO: Missing osx_notifications
 # TODO: Missing dsm

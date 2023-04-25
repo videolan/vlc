@@ -447,3 +447,6 @@ if librist_dep.found()
         'dependencies' : [socket_libs, librist_dep]
     }
 endif
+
+# RTP
+subdir('rtp')
