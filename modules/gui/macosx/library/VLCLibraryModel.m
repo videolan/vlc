@@ -643,7 +643,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
-    NSLog(@"Deleting %lli", itemId);
 
     [self performActionOnMediaItemInCache:itemId action:^(NSMutableArray * const cachedMediaArray, const NSUInteger cachedMediaIndex, NSMutableArray * const recentMediaArray, const NSUInteger recentMediaIndex) {
 
@@ -774,7 +773,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
-    NSLog(@"Deleting %lli", itemId);
 
     [self deleteAudioGroupItemWithId:itemId
                              inCache:_cachedAlbums
@@ -807,7 +805,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
-    NSLog(@"Deleting %lli", itemId);
 
     [self deleteAudioGroupItemWithId:itemId
                              inCache:_cachedArtists
@@ -840,7 +837,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
-    NSLog(@"Deleting %lli", itemId);
 
     [self deleteAudioGroupItemWithId:itemId
                              inCache:_cachedGenres
