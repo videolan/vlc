@@ -62,6 +62,8 @@ static const char* const quality_desc[] = {
     N_("Good"), N_("Realtime"), N_("Best"),
 };
 #endif
+#define THREADS_TEXT N_( "Threads" )
+#define THREADS_LONGTEXT N_( "Number of threads used for decoding, 0 meaning auto" )
 
 /*****************************************************************************
  * Module descriptor
@@ -72,6 +74,7 @@ vlc_module_begin ()
     set_description(N_("WebM video decoder"))
     set_capability("video decoder", 60)
     set_callbacks(OpenDecoder, CloseDecoder)
+    add_integer( "vpx-threads", 0, THREADS_TEXT, THREADS_LONGTEXT );
     set_subcategory(SUBCAT_INPUT_VCODEC)
 #ifdef ENABLE_SOUT
     add_submodule()
@@ -327,8 +330,9 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_ENOMEM;
     dec->p_sys = sys;
 
+    int i_thread_count = var_InheritInteger(p_this, "vpx-threads");
     struct vpx_codec_dec_cfg deccfg = {
-        .threads = __MIN(vlc_GetCPUCount(), 16)
+        .threads = i_thread_count ? i_thread_count : __MIN(vlc_GetCPUCount(), 16)
     };
 
     msg_Dbg(p_this, "VP%d: using libvpx version %s (build options %s)",
