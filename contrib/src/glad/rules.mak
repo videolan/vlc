@@ -1,4 +1,4 @@
-GLAD_VERSION := 2.0.1
+GLAD_VERSION := 2.0.4
 GLAD_URL := $(GITHUB)/Dav1dde/glad/archive/refs/tags/v$(GLAD_VERSION).tar.gz
 
 DEPS_glad = jinja $(DEPS_jinja)
