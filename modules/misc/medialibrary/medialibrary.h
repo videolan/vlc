@@ -36,6 +36,7 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include <cstdarg>
+#include <type_traits>
 
 struct vlc_event_t;
 struct vlc_object_t;
