@@ -285,6 +285,8 @@ VLC_API void vlc_obj_free(vlc_object_t *obj, void *ptr);
 #ifdef __cplusplus
 } /* extern "C" */
 
+# include <type_traits>
+
 #undef vlc_object_create
 
 template <typename O> VLC_MALLOC VLC_USED
