@@ -26,6 +26,8 @@
 # include <X11/Xlib.h>
 # include <X11/Xlibint.h>
 
+#include <vlc_threads.h>
+
 static inline bool vlc_xlib_init (vlc_object_t *obj)
 {
     if (!var_InheritBool (obj, "xlib"))
