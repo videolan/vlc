@@ -85,6 +85,7 @@ struct demux_sys_t
     mp4_track_t  *track;         /* array of track */
     float        f_fps;          /* number of frame per seconds */
 
+    bool         b_quicktime;
     bool         b_fragmented;   /* fMP4 */
     bool         b_seekable;
     bool         b_fastseekable;
@@ -766,6 +767,7 @@ static int Open( vlc_object_t * p_this )
                 break;
             case MAJOR_qt__:
                 msg_Dbg( p_demux, "Apple QuickTime media" );
+                p_sys->b_quicktime = true;
                 break;
             case MAJOR_isml:
                 msg_Dbg( p_demux, "PIFF (= isml = fMP4) media" );
@@ -3465,10 +3467,9 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
 
         for( i = 0; i < p_chap->i_entry_count; i++ )
         {
-            if( p_track->i_track_ID == p_chap->i_track_ID[i] &&
-                p_track->fmt.i_cat == UNKNOWN_ES )
+            if( p_track->i_track_ID == p_chap->i_track_ID[i] )
             {
-                p_track->b_chapters_source = true;
+                p_track->b_chapters_source = !p_sys->b_quicktime;
                 p_track->b_enable = false;
                 break;
             }
