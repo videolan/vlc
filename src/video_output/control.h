@@ -24,6 +24,7 @@
 #define LIBVLC_VOUT_INTERNAL_CONTROL_H
 
 #include <vlc_viewpoint.h>
+#include <vlc_threads.h>
 
 /* */
 typedef struct {

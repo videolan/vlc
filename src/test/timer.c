@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #undef vlc_tick_sleep
 
 const char vlc_module_name[] = "test_timer";

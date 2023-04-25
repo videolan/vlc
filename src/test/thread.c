@@ -29,6 +29,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 static int thread_data_magic = 0x1234;
 static int thread_return_magic = 0x4321;

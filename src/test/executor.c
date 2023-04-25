@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_executor.h>
 #include <vlc_tick.h>
 

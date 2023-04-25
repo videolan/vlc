@@ -33,6 +33,7 @@
 #include <vlc_messages.h>
 #include <vlc_strings.h>
 #include <vlc_http.h>
+#include <vlc_threads.h>
 
 typedef struct http_cookie_t
 {

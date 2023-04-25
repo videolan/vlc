@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 /*
  * POSIX timers are essentially unusable from a library: there provide no safe
