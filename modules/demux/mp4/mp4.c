@@ -115,6 +115,7 @@ typedef struct
     mp4_track_t  *track;         /* array of track */
     float        f_fps;          /* number of frame per seconds */
 
+    bool         b_quicktime;
     bool         b_fragmented;   /* fMP4 */
     bool         b_seekable;
     bool         b_fastseekable;
@@ -1035,6 +1036,7 @@ static int Open( vlc_object_t * p_this )
                 break;
             case BRAND_qt__:
                 msg_Dbg( p_demux, "Apple QuickTime media" );
+                p_sys->b_quicktime = true;
                 break;
             case BRAND_isml:
                 msg_Dbg( p_demux, "PIFF (= isml = fMP4) media" );
@@ -2541,8 +2543,7 @@ static void LoadChapter( demux_t  *p_demux )
         for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         {
             mp4_track_t *tk = &p_sys->track[i];
-            if(tk->b_ok && (tk->i_use_flags & USEAS_CHAPTERS) &&
-               tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_TX3G)
+            if ( tk->b_ok && (tk->i_use_flags & USEAS_CHAPTERS) && tk->fmt.i_cat == SPU_ES )
             {
                 LoadChapterApple( p_demux, tk );
                 break;
@@ -3785,8 +3786,7 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_sample = 0;
 
     /* Disable chapter only track */
-    if( p_track->fmt.i_cat == UNKNOWN_ES &&
-       (p_track->i_use_flags & USEAS_CHAPTERS) )
+    if( (p_track->i_use_flags & USEAS_CHAPTERS) && !p_sys->b_quicktime )
         p_track->b_enable = false;
 
     const MP4_Box_t *p_tsel;
