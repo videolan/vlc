@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.12
 import QtQuick.Templates 2.12 as T
 
@@ -24,9 +25,33 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 
-
 T.Control {
-    id: playBtn
+    id: root
+
+    // Properties
+
+    property int maximumHeight: VLCStyle.icon_medium
+
+    property bool paintOnly: false
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+
+        colorSet: ColorContext.ToolButton
+
+        enabled: root.enabled || root.paintOnly
+        focused: root.activeFocus
+        hovered: root.cursorInside
+        pressed: mouseArea.containsPress
+    }
+
+    property bool _keyOkPressed: false
+
+    // Aliases
+
+    property alias cursorInside: mouseArea.cursorInside
+
+    // Settings
 
     implicitWidth: implicitHeight
 
@@ -34,14 +59,6 @@ T.Control {
 
     scale: (_keyOkPressed || (mouseArea.pressed && cursorInside)) ? 0.95
                                                                   : 1.00
-
-    property int maximumHeight: VLCStyle.icon_medium
-
-    property bool paintOnly: false
-
-    property bool _keyOkPressed: false
-
-    property alias cursorInside: mouseArea.cursorInside
 
     Accessible.role: Accessible.Button
     Accessible.name: I18n.qtr("Play/Pause")
@@ -51,94 +68,7 @@ T.Control {
     Accessible.onPressAction: mainPlaylistController.togglePlayPause()
     Accessible.onToggleAction: mainPlaylistController.togglePlayPause()
 
-    Keys.onPressed: {
-        if (KeyHelper.matchOk(event) ) {
-            if (!event.isAutoRepeat) {
-                _keyOkPressed = true
-                keyHoldTimer.restart()
-            }
-            event.accepted = true
-        }
-        Navigation.defaultKeyAction(event)
-    }
-
-    Keys.onReleased: {
-        if (KeyHelper.matchOk(event)) {
-            if (!event.isAutoRepeat) {
-                _keyOkPressed = false
-                keyHoldTimer.stop()
-                if (Player.playingState !== Player.PLAYING_STATE_STOPPED)
-                    mainPlaylistController.togglePlayPause()
-            }
-            event.accepted = true
-        }
-    }
-
-    function _pressAndHoldAction() {
-        _keyOkPressed = false
-        mainPlaylistController.stop()
-    }
-
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.ToolButton
-
-        enabled: playBtn.enabled || playBtn.paintOnly
-        focused: playBtn.activeFocus
-        hovered: playBtn.cursorInside
-        pressed: mouseArea.containsPress
-    }
-
-    Timer {
-        id: keyHoldTimer
-
-        interval: mouseArea.pressAndHoldInterval
-        repeat: false
-
-        Component.onCompleted: {
-            triggered.connect(_pressAndHoldAction)
-        }
-    }
-
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-
-        hoverEnabled: true
-
-        readonly property bool cursorInside: {
-            if (!containsMouse)
-                return false
-
-            var center = (width / 2)
-            if (Helpers.pointInRadius( center - mouseX,
-                                       center - mouseY,
-                                       center )) {
-                return true
-            } else {
-                return false
-            }
-        }
-
-        onPressed: {
-            if (!cursorInside) {
-                mouse.accepted = false
-                return
-            }
-
-            playBtn.forceActiveFocus(Qt.MouseFocusReason)
-        }
-
-        onClicked: {
-            mainPlaylistController.togglePlayPause()
-            mouse.accepted = true
-        }
-
-        onPressAndHold: {
-            _pressAndHoldAction()
-            mouse.accepted = true
-        }
-    }
+    // States
 
     states: [
         State {
@@ -178,6 +108,91 @@ T.Control {
             properties: "opacity"
             easing.type: Easing.InOutSine
             duration: VLCStyle.duration_veryShort
+        }
+    }
+
+    // Keys
+
+    Keys.onPressed: {
+        if (KeyHelper.matchOk(event) ) {
+            if (!event.isAutoRepeat) {
+                _keyOkPressed = true
+                keyHoldTimer.restart()
+            }
+            event.accepted = true
+        }
+        Navigation.defaultKeyAction(event)
+    }
+
+    Keys.onReleased: {
+        if (KeyHelper.matchOk(event)) {
+            if (!event.isAutoRepeat) {
+                _keyOkPressed = false
+                keyHoldTimer.stop()
+                if (Player.playingState !== Player.PLAYING_STATE_STOPPED)
+                    mainPlaylistController.togglePlayPause()
+            }
+            event.accepted = true
+        }
+    }
+
+    // Functions
+
+    function _pressAndHoldAction() {
+        _keyOkPressed = false
+        mainPlaylistController.stop()
+    }
+
+    // Children
+
+    Timer {
+        id: keyHoldTimer
+
+        interval: mouseArea.pressAndHoldInterval
+        repeat: false
+
+        Component.onCompleted: {
+            triggered.connect(_pressAndHoldAction)
+        }
+    }
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+
+        hoverEnabled: true
+
+        readonly property bool cursorInside: {
+            if (!containsMouse)
+                return false
+
+            var center = (width / 2)
+            if (Helpers.pointInRadius( center - mouseX,
+                                       center - mouseY,
+                                       center )) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        onPressed: {
+            if (!cursorInside) {
+                mouse.accepted = false
+                return
+            }
+
+            root.forceActiveFocus(Qt.MouseFocusReason)
+        }
+
+        onClicked: {
+            mainPlaylistController.togglePlayPause()
+            mouse.accepted = true
+        }
+
+        onPressAndHold: {
+            _pressAndHoldAction()
+            mouse.accepted = true
         }
     }
 
