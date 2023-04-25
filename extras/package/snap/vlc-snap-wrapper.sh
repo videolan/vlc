@@ -34,4 +34,9 @@ export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
 # set QML2 import path for Qt UI
 export QML2_IMPORT_PATH="$QML2_IMPORT_PATH:$SNAP/usr/lib/x86_64-linux-gnu/qt5/qml/"
 
+# Link the aacs directory from $HOME #28017
+if [ ! -L "$HOME/.config/aacs" ]; then
+    ln -s $SNAP_REAL_HOME/.config/aacs $HOME/.config/aacs
+fi
+
 exec $SNAP/usr/bin/vlc --config=$SNAP_USER_COMMON/vlcrc "$@"
