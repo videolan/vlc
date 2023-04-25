@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
@@ -25,7 +26,9 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 AbstractButton {
-    id: artworkInfoItem
+    id: root
+
+    // Properties
 
     property bool paintOnly: false
 
@@ -40,13 +43,28 @@ AbstractButton {
                                                    artistLabel.implicitWidth,
                                                    progressIndicator.implicitWidth)
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+
+        colorSet: ColorContext.ToolButton
+
+        focused: root.visualFocus
+        hovered: root.hovered
+    }
+
     property int _preferredHeight: VLCStyle.dp(60, VLCStyle.scale)
 
     property bool _keyPressed: false
 
+    // Settings
+
     text: I18n.qtr("Open player")
 
     padding: VLCStyle.focus_border
+
+    Accessible.onPressAction: root.clicked()
+
+    // Keys
 
     Keys.onPressed: {
         if (KeyHelper.matchOk(event)) {
@@ -71,22 +89,17 @@ AbstractButton {
         }
     }
 
+    // Events
+
     onClicked: g_mainDisplay.showPlayer()
-
-    Accessible.onPressAction: artworkInfoItem.clicked()
-
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.ToolButton
-        focused: artworkInfoItem.visualFocus
-        hovered: artworkInfoItem.hovered
-    }
 
     background: Widgets.AnimatedBackground {
         active: visualFocus
         animate: theme.initialized
         activeBorderColor: theme.visualFocus
     }
+
+    // Children
 
     contentItem: RowLayout {
         spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
@@ -96,8 +109,7 @@ AbstractButton {
 
             implicitWidth: implicitHeight
 
-            implicitHeight: Math.min(artworkInfoItem._preferredHeight,
-                                     artworkInfoItem.maximumHeight)
+            implicitHeight: Math.min(root._preferredHeight, root.maximumHeight)
 
             color: theme.bg.primary
 
@@ -133,7 +145,7 @@ AbstractButton {
                 Accessible.name: I18n.qtr("Cover")
 
                 ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
-                                 && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
+                                 && (root.hovered || root.visualFocus)
                 ToolTip.delay: VLCStyle.delayToolTipAppear
                 ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
                                                     .arg(artistLabel.text)
@@ -184,7 +196,7 @@ AbstractButton {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                visible: (infoColumn.height >= artworkInfoItem._preferredHeight)
+                visible: (infoColumn.height >= root._preferredHeight)
 
                 text: {
                     if (paintOnly)
