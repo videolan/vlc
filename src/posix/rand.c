@@ -36,6 +36,7 @@
 #include <vlc_fs.h>
 
 #include <vlc_hash.h>
+#include <vlc_tick.h>
 
 /*
  * Pseudo-random number generator using a HMAC-MD5 in counter mode.
