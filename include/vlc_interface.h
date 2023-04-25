@@ -25,6 +25,8 @@
 #ifndef VLC_INTF_H_
 #define VLC_INTF_H_
 
+#include <vlc_threads.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif

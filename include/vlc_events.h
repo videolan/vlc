@@ -26,6 +26,7 @@
 
 #include <vlc_arrays.h>
 #include <vlc_meta.h>
+#include <vlc_threads.h>
 
 /**
  * \file

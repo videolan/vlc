@@ -22,6 +22,7 @@
 #define VLC_ADDONS_H 1
 
 #include <vlc_arrays.h>
+#include <vlc_threads.h>
 
 # ifdef __cplusplus
 extern "C" {

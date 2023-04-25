@@ -31,6 +31,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <vlc_common.h>
+#include <vlc_threads.h>
 
 /**
  * Opaque type for queue entry.

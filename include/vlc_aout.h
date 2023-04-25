@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <vlc_list.h>
 #include <vlc_es.h>
+#include <vlc_threads.h>
 
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
