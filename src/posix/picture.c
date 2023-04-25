@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
