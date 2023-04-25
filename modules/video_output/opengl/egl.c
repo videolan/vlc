@@ -30,6 +30,7 @@
 #include <EGL/eglext.h>
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_opengl.h>
 #include <vlc_window.h>
