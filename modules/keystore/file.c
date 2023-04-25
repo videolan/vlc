@@ -30,6 +30,7 @@
 #ifdef HAVE_FCNTL
 #include <fcntl.h>
 #endif
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
