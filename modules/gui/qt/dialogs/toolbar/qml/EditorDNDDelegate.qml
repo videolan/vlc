@@ -58,6 +58,8 @@ Control {
 
         drag.target: loader
 
+        drag.smoothed: false
+
         hoverEnabled: true
 
         drag.onActiveChanged: {
@@ -75,15 +77,10 @@ Control {
             }
         }
 
-        onPositionChanged: {
-            if (drag.active) {
-                // FIXME: There must be a better way of this
-                const pos = mapToItem(loader.parent, mouseX, mouseY)
-                // y should be set first, because the automatic scroll is
-                // triggered by change on X
-                loader.y = pos.y
-                loader.x = pos.x
-            }
+        onPressed: {
+            const pos = mapToItem(loader.parent, mouseX, mouseY)
+            loader.y = pos.y
+            loader.x = pos.x
         }
     }
 
