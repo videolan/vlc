@@ -26,7 +26,6 @@
 #endif
 
 #include "dialogs/preferences/preferences.hpp"
-#include "widgets/native/qvlcframe.hpp"
 #include "dialogs/errors/errors.hpp"
 
 #include "expert_view.hpp"
