@@ -1,6 +1,6 @@
 # libplacebo
 
-PLACEBO_VERSION := 5.229.1
+PLACEBO_VERSION := 5.264.1
 PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
 PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
@@ -9,7 +9,8 @@ PLACEBOCONF := -Dpython-path=$(PYTHON_VENV)/bin/python3 \
 	-Dglslang=enabled \
 	-Dshaderc=disabled \
 	-Ddemos=false \
-	-Dtests=false
+	-Dtests=false \
+	-Dfind_lib_path=$(PREFIX)/lib
 
 DEPS_libplacebo = glad $(DEPS_glad) jinja $(DEPS_jinja) glslang $(DEPS_glslang) vulkan-headers $(DEPS_vulkan-headers)
 ifndef HAVE_WINSTORE
@@ -39,7 +40,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
 	$(APPLY) $(SRC)/libplacebo/0001-vulkan-meson-add-the-clang-gcc-C-runtime.patch
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-overriding-python3-path.patch
-	$(APPLY) $(SRC)/libplacebo/0001-vulkan-add-missing-array-termination.patch
+	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-forcing-the-path-to-look-for-libraries.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson .python-venv
