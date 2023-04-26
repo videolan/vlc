@@ -65,32 +65,10 @@ Control {
     }
 
     function isDropAcceptable(drop, index) {
-        if (drop.hasUrls)
-            return true // external drop (i.e. from filesystem)
-
-        if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) {
-            // internal drop (inter-view or intra-playlist)
-            const selection = drop.source.selection
-            if (!!selection) {
-                const length = selection.length
-                const firstIndex = selection[0]
-                const lastIndex = selection[length - 1]
-                let consecutive = true
-                if (length > 1) {
-                    for (let i = 0; i < length - 1; ++i) {
-                        if (selection[i + 1] - selection[i] !== 1) {
-                            consecutive = false
-                            break
-                        }
-                    }
-                }
-                return !consecutive || (index > lastIndex + 1 || index < firstIndex)
-            } else {
-                return true
-            }
-        }
-
-        return false
+        if (drop.source === dragItem)
+            return Helpers.itemsMovable(drop.source.indexes, index)
+        else
+            return true
     }
 
     function acceptDrop(index, drop) {
@@ -163,13 +141,8 @@ Control {
 
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
-        property var selection: null // make this indexes alias?
-
-        indexes: selection
-
         onRequestData: {
-            selection = root.model.getSelection()
-            indexes = selection
+            indexes = root.model.getSelection()
             setData(identifier, indexes.map(function (index) {
                 const item = root.model.itemAt(index)
                 return {
