@@ -266,8 +266,8 @@ T.ItemDelegate {
 
         onPressed: {
             const pos = mapToItem(dragItem.parent, mouseX, mouseY)
-            dragItem.x = pos.x + VLCStyle.dp(15)
-            dragItem.y = pos.y
+            dragItem.x = pos.x + VLCStyle.dragDelta
+            dragItem.y = pos.y + VLCStyle.dragDelta
         }
 
         drag.target: dragItem
