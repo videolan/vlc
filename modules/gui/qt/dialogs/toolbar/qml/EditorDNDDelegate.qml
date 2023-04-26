@@ -79,8 +79,8 @@ Control {
 
         onPressed: {
             const pos = mapToItem(loader.parent, mouseX, mouseY)
-            loader.y = pos.y
-            loader.x = pos.x
+            loader.y = pos.y + VLCStyle.dragDelta
+            loader.x = pos.x + VLCStyle.dragDelta
         }
     }
 
