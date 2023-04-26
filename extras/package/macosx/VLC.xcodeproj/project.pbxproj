@@ -310,6 +310,7 @@
 		539BA79E298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAspectRatioRetainingVideoWindow.m; sourceTree = "<group>"; };
 		539F114929E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryTwoPaneSplitViewDelegate.h; sourceTree = "<group>"; };
 		539F114A29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryTwoPaneSplitViewDelegate.m; sourceTree = "<group>"; };
+		539F116A29F9756000F13460 /* VLCMainVideoViewAudioMediaDecorativeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMainVideoViewAudioMediaDecorativeView.xib; sourceTree = "<group>"; };
 		53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySongsTableViewSongPlayingTableCellView.h; sourceTree = "<group>"; };
 		53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySongsTableViewSongPlayingTableCellView.m; sourceTree = "<group>"; };
 		53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewContainerView.m; sourceTree = "<group>"; };
@@ -1797,6 +1798,7 @@
 				7DFFF8FE23682CE400C8B0C9 /* VLCDetachedAudioWindow.xib */,
 				6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */,
 				6B82240B1E4D2A9000833BE1 /* VLCInformationWindow.xib */,
+				539F116A29F9756000F13460 /* VLCMainVideoViewAudioMediaDecorativeView.xib */,
 				7DE82E7A228437AA002D341A /* VLCLibraryAlbumTableCellView.xib */,
 				536283FD2911476A00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib */,
 				536283FB2911476A00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib */,
