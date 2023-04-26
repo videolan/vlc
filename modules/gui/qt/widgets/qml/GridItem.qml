@@ -188,6 +188,8 @@ T.ItemDelegate {
 
         drag.axis: Drag.XAndYAxis
 
+        drag.smoothed: false
+
         onClicked: {
             if (mouse.button === Qt.RightButton)
                 contextMenuButtonClicked(picture, root.mapToGlobal(mouse.x,mouse.y));
@@ -201,14 +203,12 @@ T.ItemDelegate {
                 root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
         }
 
-        onPressed: _modifiersOnLastPress = mouse.modifiers
+        onPressed: {
+            _modifiersOnLastPress = mouse.modifiers
 
-        onPositionChanged: {
-            if (drag.active) {
-                const pos = drag.target.parent.mapFromItem(root, mouseX, mouseY)
-                drag.target.x = pos.x + VLCStyle.dragDelta
-                drag.target.y = pos.y + VLCStyle.dragDelta
-            }
+            const pos = drag.target.parent.mapFromItem(root, mouseX, mouseY)
+            drag.target.x = pos.x + VLCStyle.dragDelta
+            drag.target.y = pos.y + VLCStyle.dragDelta
         }
 
         drag.onActiveChanged: {
