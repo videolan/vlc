@@ -142,7 +142,6 @@ Control {
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
         onRequestData: {
-            indexes = root.model.getSelection()
             setData(identifier, indexes.map(function (index) {
                 const item = root.model.itemAt(index)
                 return {

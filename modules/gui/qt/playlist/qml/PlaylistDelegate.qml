@@ -280,6 +280,8 @@ T.ItemDelegate {
                     /* the dragged item is not in the selection, replace the selection */
                     root.model.setSelection([index])
                 }
+
+                dragItem.indexes = root.model.getSelection()
                 dragItem.Drag.active = true
             } else {
                 dragItem.Drag.drop()
