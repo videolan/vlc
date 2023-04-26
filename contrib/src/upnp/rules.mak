@@ -1,5 +1,5 @@
 # UPNP
-UPNP_VERSION := 1.14.15
+UPNP_VERSION := 1.14.16
 UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
