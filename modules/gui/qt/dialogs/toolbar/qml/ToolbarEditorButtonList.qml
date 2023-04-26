@@ -135,6 +135,8 @@ GridView {
 
         drag.target: buttonDragItem
 
+        drag.smoothed: false
+
         readonly property int mIndex: PlayerControlbarControls.controlList[model.index].id
 
         drag.onActiveChanged: {
@@ -155,16 +157,10 @@ GridView {
             }
         }
 
-        onPositionChanged: {
-            if (drag.active) {
-                // FIXME: There must be a better way of this
-
-                const pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
-                // y should be set first, because the automatic scroll is
-                // triggered by change on X
-                buttonDragItem.y = pos.y
-                buttonDragItem.x = pos.x
-            }
+        onPressed: {
+            const pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
+            buttonDragItem.y = pos.y
+            buttonDragItem.x = pos.x
         }
 
         Rectangle {
