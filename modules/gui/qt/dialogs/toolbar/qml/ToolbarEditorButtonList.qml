@@ -159,8 +159,8 @@ GridView {
 
         onPressed: {
             const pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
-            buttonDragItem.y = pos.y
-            buttonDragItem.x = pos.x
+            buttonDragItem.y = pos.y + VLCStyle.dragDelta
+            buttonDragItem.x = pos.x + VLCStyle.dragDelta
         }
 
         Rectangle {
