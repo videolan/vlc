@@ -1,12 +1,10 @@
-#include "renderer_manager.hpp"
-
-#include <vlc_player.h>
-
-#include <QApplication>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include "renderer_manager.hpp"
+
+#include <QApplication>
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>
