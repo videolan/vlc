@@ -69,3 +69,27 @@ function alignUp(a, b) {
 function alignDown(a, b) {
     return Math.floor(a / b) * b
 }
+
+function isSortedIntegerArrayConsecutive(array) {
+    const length = array.length
+
+    if (length <= 1)
+        return true
+
+    const first = array[0]
+    const last = array[length - 1]
+
+    if (length === 2)
+        return Math.abs(first - last) === 1
+
+    const sum1 = array.reduce((i, j) => i + j)
+    const sum2 = length * (first + last) / 2
+
+    return (sum1 === sum2)
+}
+
+function itemsMovable(sortedItemIndexes, targetIndex) {
+    return !isSortedIntegerArrayConsecutive(sortedItemIndexes) ||
+            (targetIndex > (sortedItemIndexes[sortedItemIndexes.length - 1] + 1) ||
+             targetIndex < sortedItemIndexes[0])
+}
