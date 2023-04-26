@@ -78,6 +78,7 @@ T.ItemDelegate {
         hoverEnabled: true
 
         drag.axis: Drag.XAndYAxis
+        drag.smoothed: false
 
         drag.target: Widgets.DragItem {
             indexes: [index]
@@ -102,9 +103,7 @@ T.ItemDelegate {
             dragItem.Drag.active = drag.active;
         }
 
-        onPositionChanged: {
-            if (drag.active == false) return;
-
+        onPressed: {
             const pos = drag.target.parent.mapFromItem(root, mouseX, mouseY);
 
             drag.target.x = pos.x + VLCStyle.dragDelta;
