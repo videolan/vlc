@@ -125,9 +125,18 @@ T.Control {
 
             drag.axis: Drag.XAndYAxis
 
+            drag.smoothed: false
+
             // Events
 
-            onPressed: _modifiersOnLastPress = mouse.modifiers
+            onPressed: {
+                _modifiersOnLastPress = mouse.modifiers
+
+                const pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
+
+                drag.target.x = pos.x + VLCStyle.dragDelta;
+                drag.target.y = pos.y + VLCStyle.dragDelta;
+            }
 
             onClicked: {
                 if ((mouse.button === Qt.LeftButton) || !delegate.selected) {
@@ -136,16 +145,6 @@ T.Control {
 
                 if (mouse.button === Qt.RightButton)
                     delegate.rightClick(delegate, delegate.rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
-            }
-
-            onPositionChanged: {
-                if (drag.active == false)
-                    return;
-
-                const pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
-
-                drag.target.x = pos.x + VLCStyle.dragDelta;
-                drag.target.y = pos.y + VLCStyle.dragDelta;
             }
 
             onDoubleClicked: {
