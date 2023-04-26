@@ -292,7 +292,7 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
 
     for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
     {
-        AdaptationSet *adaptationSet = new AdaptationSet(period);
+        AdaptationSet *adaptationSet = new (std::nothrow) AdaptationSet(period);
         if(!adaptationSet)
             continue;
 
