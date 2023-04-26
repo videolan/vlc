@@ -264,7 +264,15 @@ T.ItemDelegate {
                 mainPlaylistController.goTo(index, true)
         }
 
+        onPressed: {
+            const pos = mapToItem(dragItem.parent, mouseX, mouseY)
+            dragItem.x = pos.x + VLCStyle.dp(15)
+            dragItem.y = pos.y
+        }
+
         drag.target: dragItem
+
+        drag.smoothed: false
 
         drag.onActiveChanged: {
             if (drag.active) {
@@ -272,33 +280,15 @@ T.ItemDelegate {
                     /* the dragged item is not in the selection, replace the selection */
                     root.model.setSelection([index])
                 }
-
-                if (contains(mapFromItem(dragItem.parent, dragItem.x, dragItem.y))) {
-                    // Force trigger entered signal in drop areas
-                    // so that containsDrag work properly
-                    dragItem.x = -1
-                    dragItem.y = -1
-                }
-
-                dragItem.Drag.active = drag.active
-            }
-            else {
+                dragItem.Drag.active = true
+            } else {
                 dragItem.Drag.drop()
-            }
-        }
-
-        onPositionChanged: {
-            if (drag.active) {
-                // FIXME: Override dragItem's position
-                const pos = mapToItem(dragItem.parent, mouseX, mouseY)
-                dragItem.x = pos.x + VLCStyle.dp(15)
-                dragItem.y = pos.y
             }
         }
 
         TapHandler {
             acceptedDevices: PointerDevice.TouchScreen
-
+            
             onTapped: {
                 if (root.mode === PlaylistListView.Mode.Normal) {
                     mainPlaylistController.goTo(index, true)
