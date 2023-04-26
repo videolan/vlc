@@ -143,11 +143,6 @@ Item {
     property int _currentRequest: 0
 
     Drag.onActiveChanged: {
-        // FIXME: This should not be ideally necessary
-        // TODO: Rework D&D positioning
-        if (!Drag.active)
-            x = y = -1
-
         if (!Drag.active)
             dragItem._inputItems = undefined
     }
