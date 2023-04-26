@@ -128,7 +128,7 @@ static const char *const ts_standards_list_text[] =
                         "requires \"Set PID to ID of ES\" to be enabled." )
 
 #define PID_TEXT N_("Set PID to ID of ES")
-#define PID_LONGTEXT N_("Sets PID to the ID if the incoming ES. This is for " \
+#define PID_LONGTEXT N_("Sets PID to the ID of the incoming ES. This is for " \
   "use with --ts-es-id-pid, and allows having the same PIDs in the input " \
   "and output streams.")
 
