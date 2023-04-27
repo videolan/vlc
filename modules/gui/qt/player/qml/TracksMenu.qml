@@ -35,7 +35,6 @@ T.Popup {
     // Settings
 
     height: VLCStyle.dp(296, VLCStyle.scale)
-    width: rootPlayer.width
 
     // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
@@ -134,10 +133,10 @@ T.Popup {
                 onCurrentItemChanged: {
                     if (currentItem instanceof TracksPage)
                         root.width = Qt.binding(function () {
-                            return Math.min(currentItem.preferredWidth, rootPlayer.width)
+                            return Math.min(currentItem.preferredWidth, root.parent.width)
                         })
                     else
-                        root.width = Qt.binding(function () { return rootPlayer.width })
+                        root.width = Qt.binding(function () { return root.parent.width })
                 }
             }
 
