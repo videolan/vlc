@@ -67,7 +67,6 @@ extern "C" char **environ;
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
-#include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "maininterface/compositor.hpp"
 
 #include <QVector>
@@ -449,6 +448,14 @@ enum CleanupReason {
     CLEANUP_INTF_CLOSED
 };
 
+static inline void triggerQuit()
+{
+    QMetaObject::invokeMethod(qApp, []() {
+            qApp->closeAllWindows();
+            qApp->quit();
+        }, Qt::QueuedConnection);
+}
+
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
@@ -461,7 +468,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 #include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
 static void Abort( void *obj )
 {
-    QVLCApp::triggerQuit();
+    triggerQuit();
 }
 #endif
 
@@ -553,7 +560,8 @@ static void CloseInternal( qt_intf_t *p_intf )
 {
     /* And quit */
     msg_Dbg( p_intf, "requesting exit..." );
-    QVLCApp::triggerQuit();
+
+    triggerQuit();
 
     msg_Dbg( p_intf, "waiting for UI thread..." );
 #ifndef Q_OS_MAC
@@ -710,7 +718,8 @@ static void *Thread( void *obj )
     QQuickWindow::setDefaultAlphaBuffer(true);
 
     /* Start the QApplication here */
-    QVLCApp app( argc, argv );
+    QApplication app( argc, argv );
+    app.setProperty("initialStyle", app.style()->objectName());
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,1)
     //suppress deprecation warnings about QML 'Connections' syntax

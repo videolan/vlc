@@ -30,7 +30,6 @@
 #include "preferences_widgets.hpp"
 #include "maininterface/mainctx.hpp"
 #include "util/color_scheme_model.hpp"
-#include "util/qvlcapp.hpp"
 #include "util/proxycolumnmodel.hpp"
 #include "medialibrary/mlrecentsmodel.hpp"
 
@@ -1315,7 +1314,7 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 void SPrefsPanel::changeStyle()
 {
     QApplication::setStyle( getQStyleKey( qobject_cast<QComboBox *>( optionWidgets["styleCB"] )
-                                          , p_intf->p_app->defaultStyle() ) );
+                                        , p_intf->p_app->property("initialStyle").toString() ) );
 
     /* force refresh on all widgets */
     QWidgetList widgets = QApplication::allWidgets();

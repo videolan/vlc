@@ -900,7 +900,6 @@ modules/gui/qt/util/imagehelper.cpp
 modules/gui/qt/util/imagehelper.hpp
 modules/gui/qt/util/qt_dirs.cpp
 modules/gui/qt/util/qt_dirs.hpp
-modules/gui/qt/util/qvlcapp.hpp
 modules/gui/qt/util/registry.cpp
 modules/gui/qt/util/registry.hpp
 modules/gui/qt/util/singleton.hpp

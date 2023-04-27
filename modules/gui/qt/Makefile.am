@@ -308,7 +308,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/hover_handler_rev11.cpp \
 	gui/qt/util/hover_handler_rev11.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
-	gui/qt/util/qvlcapp.hpp \
 	gui/qt/util/proxycolumnmodel.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
 	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
@@ -506,7 +505,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/effects_image_provider.moc.cpp \
 	gui/qt/util/flickable_scroll_handler.moc.cpp \
 	gui/qt/util/hover_handler_rev11.moc.cpp \
-	gui/qt/util/qvlcapp.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/sortfilterproxymodel.moc.cpp \
