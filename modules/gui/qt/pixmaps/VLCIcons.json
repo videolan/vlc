@@ -65,7 +65,7 @@
         {"key":"topbar_discover", "path": "./icons/topbar_discover.svg"},
         {"key":"topbar_music", "path": "./icons/topbar_music.svg"},
         {"key":"topbar_network", "path": "./icons/topbar_network.svg"},
-        {"key":"topbar_sort", "path": "./icons/topbar_sort.svg"},
+        {"key":"topbar_sort", "path": "./icons/ic_fluent_arrow_sort.svg"},
         {"key":"topbar_video", "path": "./icons/topbar_video.svg"},
         {"key":"tv", "path": "./icons/tv.svg"},
         {"key":"tvtelx", "path": "./icons/tvtelx.svg"},

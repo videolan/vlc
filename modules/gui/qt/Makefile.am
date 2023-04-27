@@ -704,7 +704,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/topbar_filter.svg \
 	gui/qt/pixmaps/icons/topbar_music.svg \
 	gui/qt/pixmaps/icons/topbar_network.svg \
-	gui/qt/pixmaps/icons/topbar_sort.svg \
+	gui/qt/pixmaps/icons/ic_fluent_arrow_sort.svg \
 	gui/qt/pixmaps/icons/topbar_video.svg \
 	gui/qt/pixmaps/icons/tv.svg \
 	gui/qt/pixmaps/icons/tvtelx.svg \
