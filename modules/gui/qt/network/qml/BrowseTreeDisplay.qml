@@ -26,7 +26,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-FocusScope {
+MainInterface.MainViewLoader {
     id: root
 
     // Properties
@@ -39,8 +39,9 @@ FocusScope {
 
     readonly property bool isViewMultiView: true
 
-    //the index to "go to" when the view is loaded
-    property var initialIndex: 0
+     // 'parsingPending' property is not available with NetworkDevicesModel
+    readonly property bool parsing: Helpers.get(providerModel, "parsingPending", false)
+
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name"},
         { text: I18n.qtr("Url"), criteria: "mrl" },
@@ -48,20 +49,33 @@ FocusScope {
         { text: I18n.qtr("File modified"), criteria: "fileModified" }
     ]
 
-    // Aliases
-
-    property alias leftPadding: view.leftPadding
-    property alias rightPadding: view.rightPadding
-
-    property alias model: filterModel
-
-    property alias _currentView: view.currentItem
+    // fixme remove this
+    property Item _currentView: currentItem
 
     signal browse(var tree, int reason)
 
     Navigation.cancelAction: function() {
         History.previous()
     }
+
+    model: SortFilterProxyModel {
+        id: filterModel
+
+        sourceModel: providerModel
+        searchRole: "name"
+    }
+
+    // override the default currentComponent assignment from MainViewLoader
+    // because we need to not show empty label when model is parsing
+    currentComponent: {
+        if (filterModel.count == 0 && !root.parsing)
+            return emptyLabelComponent
+        else if (MainCtx.gridView)
+            return gridComponent
+        else
+            return tableComponent
+    }
+
 
     onTreeChanged: providerModel.tree = tree
 
@@ -73,21 +87,18 @@ FocusScope {
         providerModel.addAndPlay(filterModel.mapIndexToSource(index))
     }
 
-    function setCurrentItemFocus(reason) {
-        _currentView.setCurrentItemFocus(reason);
-    }
-
-    Util.SelectableDelegateModel{
-        id: selectionModel
-
-        model: filterModel
-    }
-
-    SortFilterProxyModel {
-        id: filterModel
-
-        sourceModel: providerModel
-        searchRole: "name"
+    function _actionAtIndex(index) {
+        if ( selectionModel.selectedIndexes.length > 1 ) {
+            playSelected()
+        } else {
+            var data = filterModel.getDataAt(index)
+            if (data.type === NetworkMediaModel.TYPE_DIRECTORY
+                    || data.type === NetworkMediaModel.TYPE_NODE)  {
+                browse(data.tree, Qt.TabFocusReason)
+            } else {
+                playAt(index)
+            }
+        }
     }
 
     Widgets.DragItem {
@@ -125,30 +136,13 @@ FocusScope {
         }
     }
 
-    function resetFocus() {
-        var initialIndex = root.initialIndex
-        if (initialIndex >= filterModel.count)
-            initialIndex = 0
-        selectionModel.select(filterModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (_currentView) {
-            _currentView.currentIndex = initialIndex
-            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
-        }
-    }
 
+    Widgets.BusyIndicatorExt {
+        id: busyIndicator
 
-    function _actionAtIndex(index) {
-        if ( selectionModel.selectedIndexes.length > 1 ) {
-            playSelected()
-        } else {
-            var data = filterModel.getDataAt(index)
-            if (data.type === NetworkMediaModel.TYPE_DIRECTORY
-                    || data.type === NetworkMediaModel.TYPE_NODE)  {
-                browse(data.tree, Qt.TabFocusReason)
-            } else {
-                playAt(index)
-            }
-        }
+        runningDelayed: root.parsing
+        anchors.centerIn: parent
+        z: 1
     }
 
     Component{
@@ -163,7 +157,7 @@ FocusScope {
             headerDelegate: FocusScope {
                 id: headerId
 
-                width: view.width
+                width: root.width
                 height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_normal
 
                 Navigation.navigable: btn.visible
@@ -309,8 +303,6 @@ FocusScope {
             }]
 
             dragItem: networkDragItem
-            height: view.height
-            width: view.width
 
             model: filterModel
 
@@ -328,7 +320,7 @@ FocusScope {
             header: FocusScope {
                 id: head
 
-                width: view.width
+                width: root.width
                 height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
 
                 Navigation.navigable: btn.visible
@@ -377,28 +369,16 @@ FocusScope {
         }
     }
 
-    Widgets.StackViewExt {
-        id: view
+    Component {
+        id: emptyLabelComponent
 
-        anchors.fill: parent
+        Widgets.EmptyLabelHint {
+            // FIXME: find better cover
+            cover: VLCStyle.noArtVideoCover
+            coverWidth : VLCStyle.dp(182, VLCStyle.scale)
+            coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 
-        focus: true
-        initialItem: MainCtx.gridView ? gridComponent : tableComponent
-
-        Connections {
-            target: MainCtx
-            onGridViewChanged: {
-                if (MainCtx.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(tableComponent)
-            }
-        }
-
-        Widgets.BusyIndicatorExt {
-            runningDelayed: Helpers.get(providerModel, "parsingPending", false) // 'parsingPending' property is not available with NetworkDevicesModel
-            anchors.centerIn: parent
-            z: 1
+            text: I18n.qtr("Nothing to see here, go back.")
         }
     }
 }
