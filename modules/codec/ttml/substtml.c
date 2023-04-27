@@ -1155,12 +1155,15 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
 }
 
 static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
-                                          const uint8_t *p_data, size_t i_data )
+                                          const uint8_t *p_data, size_t i_data,
+                                          unsigned int i_visible_width, unsigned int i_visible_height )
 {
     if( i_data < 16 )
         return NULL;
     video_format_t fmt_out;
     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
+    fmt_out.i_visible_width = i_visible_width;
+    fmt_out.i_visible_height = i_visible_height;
     es_format_t es_in;
     es_format_Init( &es_in, VIDEO_ES, VLC_CODEC_PNG );
     es_in.video.i_chroma = es_in.i_codec;
@@ -1198,7 +1201,9 @@ static void TTMLRegionsToSpuBitmapRegions( decoder_t *p_dec, subpicture_t *p_spu
                         p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
     {
         picture_t *p_pic = picture_CreateFromPNG( p_dec, p_region->bgbitmap.p_bytes,
-                                                         p_region->bgbitmap.i_bytes );
+                                                         p_region->bgbitmap.i_bytes,
+                                                         p_region->updt.extent.x,
+                                                         p_region->updt.extent.y );
         if( p_pic )
         {
             ttml_image_updater_region_t *r = TTML_ImageUpdaterRegionNew( p_pic );
