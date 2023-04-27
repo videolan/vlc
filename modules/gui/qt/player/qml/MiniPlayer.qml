@@ -29,6 +29,8 @@ import "qrc:///style/"
 T.Pane {
     id: root
 
+    readonly property alias sliderY: controlBar.sliderY
+
     height: 0
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
@@ -82,6 +84,8 @@ T.Pane {
     }
 
     contentItem: ControlBar {
+        id: controlBar
+
         focus: true
 
         // NOTE: When controls are pinned we keep the same slider in both views. Otherwise we make
