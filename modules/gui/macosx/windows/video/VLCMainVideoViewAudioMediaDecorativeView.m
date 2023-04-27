@@ -22,12 +22,15 @@
 
 #import "VLCMainVideoViewAudioMediaDecorativeView.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 @implementation VLCMainVideoViewAudioMediaDecorativeView
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCMainVideoViewAudioMediaDecorativeView*)[NSView fromNibNamed:@"VLCMainVideoViewAudioMediaDecorativeView"
+                                                                 withClass:[VLCMainVideoViewAudioMediaDecorativeView class]
+                                                                 withOwner:owner];
 }
 
 @end

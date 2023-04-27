@@ -6,14 +6,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner">
-            <connections>
-                <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
-            </connections>
-        </customObject>
+        <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView id="WRu-Ic-lQK">
+        <customView id="WRu-Ic-lQK" customClass="VLCMainVideoViewAudioMediaDecorativeView">
             <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
