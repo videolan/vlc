@@ -283,7 +283,7 @@ MainInterface.MainViewLoader {
     Component {
         id: emptylabel
 
-        EmptyLabelButton {
+        Widgets.EmptyLabelButton {
             coverWidth : VLCStyle.dp(182, VLCStyle.scale)
             coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 

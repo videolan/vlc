@@ -72,7 +72,7 @@ FocusScope {
         displayMarginEnd: g_mainDisplay.displayMargin
     }
 
-    EmptyLabelButton {
+    Widgets.EmptyLabelButton {
         anchors.fill: parent
         visible: tracklistdisplay_id.model.isReady && (tracklistdisplay_id.model.count <= 0)
         focus: visible

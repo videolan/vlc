@@ -767,6 +767,8 @@ modules/gui/qt/maininterface/qml/BannerSources.qml
 modules/gui/qt/maininterface/qml/MainDisplay.qml
 modules/gui/qt/maininterface/qml/MainInterface.qml
 modules/gui/qt/maininterface/qml/NoMedialibHome.qml
+modules/gui/qt/widgets/qml/EmptyLabelButton.qml
+modules/gui/qt/widgets/qml/EmptyLabel.qml
 modules/gui/qt/medialibrary/mlbookmarkmodel.cpp
 modules/gui/qt/medialibrary/mlbookmarkmodel.hpp
 modules/gui/qt/medialibrary/mlfolder.cpp
@@ -787,7 +789,6 @@ modules/gui/qt/medialibrary/mlvideogroupsmodel.cpp
 modules/gui/qt/medialibrary/mlvideogroupsmodel.hpp
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
-modules/gui/qt/medialibrary/qml/EmptyLabelButton.qml
 modules/gui/qt/medialibrary/qml/MediaGroupDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml

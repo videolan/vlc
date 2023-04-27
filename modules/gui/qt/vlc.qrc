@@ -153,6 +153,9 @@
         <file alias="MainViewLoader.qml">maininterface/qml/MainViewLoader.qml</file>
     </qresource>
     <qresource prefix="/widgets">
+        <file alias="EmptyLabel.qml">widgets/qml/EmptyLabel.qml</file>
+        <file alias="EmptyLabelButton.qml">widgets/qml/EmptyLabelButton.qml</file>
+        <file alias="EmptyLabelHint.qml">widgets/qml/EmptyLabelHint.qml</file>
         <file alias="ActionButtonOverlay.qml">widgets/qml/ActionButtonOverlay.qml</file>
         <file alias="ActionButtonPrimary.qml">widgets/qml/ActionButtonPrimary.qml</file>
         <file alias="BannerCone.qml">widgets/qml/BannerCone.qml</file>
@@ -242,9 +245,6 @@
         <file alias="ServicesSources.qml">network/qml/ServicesSources.qml</file>
     </qresource>
     <qresource prefix="/medialibrary">
-        <file alias="EmptyLabel.qml">medialibrary/qml/EmptyLabel.qml</file>
-        <file alias="EmptyLabelButton.qml">medialibrary/qml/EmptyLabelButton.qml</file>
-        <file alias="EmptyLabelHint.qml">medialibrary/qml/EmptyLabelHint.qml</file>
         <file alias="MediaGroupDisplay.qml">medialibrary/qml/MediaGroupDisplay.qml</file>
         <file alias="MusicAlbums.qml">medialibrary/qml/MusicAlbums.qml</file>
         <file alias="MusicDisplay.qml">medialibrary/qml/MusicDisplay.qml</file>

@@ -356,7 +356,7 @@ MainInterface.MainViewLoader {
     Component {
         id: emptyLabel
 
-        EmptyLabelHint {
+        Widgets.EmptyLabelHint {
             visible: (model.count === 0)
 
             focus: true

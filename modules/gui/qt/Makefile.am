@@ -847,9 +847,6 @@ libqt_plugin_la_QML = \
 	gui/qt/maininterface/qml/NoMedialibHome.qml \
 	gui/qt/medialibrary/qml/ArtistTopBanner.qml \
 	gui/qt/medialibrary/qml/AudioGridItem.qml \
-	gui/qt/medialibrary/qml/EmptyLabel.qml \
-	gui/qt/medialibrary/qml/EmptyLabelButton.qml \
-	gui/qt/medialibrary/qml/EmptyLabelHint.qml \
 	gui/qt/medialibrary/qml/MediaGroupDisplay.qml \
 	gui/qt/medialibrary/qml/MusicAlbums.qml \
 	gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml \
@@ -1006,6 +1003,9 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/DragItem.qml \
 	gui/qt/widgets/qml/DrawerExt.qml \
 	gui/qt/widgets/qml/ExpandGridView.qml \
+	gui/qt/widgets/qml/EmptyLabel.qml \
+	gui/qt/widgets/qml/EmptyLabelButton.qml \
+	gui/qt/widgets/qml/EmptyLabelHint.qml \
 	gui/qt/widgets/qml/GridItem.qml \
 	gui/qt/widgets/qml/HorizontalResizeHandle.qml \
 	gui/qt/widgets/qml/IconLabel.qml \

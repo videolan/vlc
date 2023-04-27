@@ -194,7 +194,7 @@ FocusScope {
         Keys.onDeletePressed: onDelete()
     }
 
-    EmptyLabelButton {
+    Widgets.EmptyLabelButton {
         anchors.fill: parent
 
         visible: model.isReady && (model.count <= 0)
