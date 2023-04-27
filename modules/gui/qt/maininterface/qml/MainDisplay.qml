@@ -50,6 +50,15 @@ FocusScope {
     property int displayMargin: (loaderProgress.active) ? miniPlayer.height + loaderProgress.height
                                                         : miniPlayer.height
 
+    readonly property int positionSliderY: {
+        var size = miniPlayer.y + miniPlayer.sliderY
+
+        if (MainCtx.pinVideoControls)
+            return size - VLCStyle.margin_xxxsmall
+        else
+            return size
+    }
+
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
