@@ -309,6 +309,15 @@ clean:
     ogg_stream_clear( &os );
 }
 
+static void update_page_type( logical_stream_t *p_stream, int64_t i_granule )
+{
+    if( i_granule == 0 )
+        p_stream->page_type = OGGPAGE_HEADER;
+    else if( p_stream->page_type == OGGPAGE_HEADER )
+        p_stream->page_type = OGGPAGE_FIRST;
+    else
+        p_stream->page_type = OGGPAGE_OTHER;
+}
 
 static int64_t find_first_page_granule( demux_t *p_demux,
                                 int64_t i_pos1, int64_t i_pos2,
@@ -402,6 +411,7 @@ static int64_t find_first_page_granule( demux_t *p_demux,
 
         if ( ogg_page_granulepos( &p_sys->current_page ) <= 0 )
         {
+            update_page_type( p_stream, ogg_page_granulepos(( &p_sys->current_page )) );
             /* A negative granulepos means that the packet continues on the
              * next page => read the next page */
             p_sys->i_input_position += i_result;
@@ -436,6 +446,8 @@ static bool OggSeekToPacket( demux_t *p_demux, logical_stream_t *p_stream,
         return false;
     p_sys->b_page_waiting = true;
     int i=0;
+
+    update_page_type( p_stream, ogg_page_granulepos( &p_sys->current_page ) );
 
     int64_t itarget_frame = Ogg_GetKeyframeGranule( p_stream, i_granulepos );
     int64_t iframe = Ogg_GetKeyframeGranule( p_stream, ogg_page_granulepos( &p_sys->current_page ) );

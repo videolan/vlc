@@ -83,13 +83,18 @@ typedef struct logical_stream_s
     /* Misc */
     bool b_initializing;
     bool b_finished;
-    bool b_reinit;
     bool b_oggds;
     int i_granule_shift;
     int i_next_block_flags;
 
     /* Opus has a starting offset in the headers. */
     int i_pre_skip;
+    enum
+    {
+        OGGPAGE_HEADER,
+        OGGPAGE_FIRST,
+        OGGPAGE_OTHER,
+    } page_type;
 
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
     int8_t i_first_frame_index;

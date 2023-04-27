@@ -530,6 +530,17 @@ static int Demux( demux_t * p_demux )
             }
         }
 
+
+        if( ogg_page_granulepos( &p_sys->current_page  ) == 0 && !p_stream->b_oggds )
+            p_stream->page_type = OGGPAGE_HEADER;
+        else if( p_stream->page_type == OGGPAGE_HEADER )
+            p_stream->page_type = OGGPAGE_FIRST;
+        else
+            p_stream->page_type = OGGPAGE_OTHER;
+
+        if( p_stream->page_type == OGGPAGE_FIRST && p_stream->fmt.i_codec == VLC_CODEC_OPUS )
+            p_stream->i_skip_frames = p_stream->i_pre_skip;
+
         /* clear the finished flag if pages after eos (ex: after a seek) */
         if ( ! ogg_page_eos( &p_sys->current_page ) && p_sys->p_skelstream != p_stream )
             p_stream->b_finished = false;
@@ -576,15 +587,6 @@ static int Demux( demux_t * p_demux )
                 p_stream->i_data_start = vlc_stream_Tell( p_demux->s );
             }
 
-            if( p_stream->b_reinit )
-            {
-                p_stream->b_reinit = false;
-                if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
-                {
-                    p_stream->i_skip_frames = p_stream->i_pre_skip;
-                }
-            }
-
             Ogg_DecodePacket( p_demux, p_stream, &oggpacket, ogg_page_eos( &p_sys->current_page ) );
         }
 
@@ -629,8 +631,18 @@ static void Ogg_ResetStream( logical_stream_t *p_stream )
         p_stream->special.vorbis.i_prev_blocksize = 0;
     }
 #endif
+    if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
+    {
+
+        /* For Opus, trash the first 80 ms of decoded output as
+               well, to avoid blowing out speakers if we get unlucky.
+               Opus predicts content from prior frames, which can go
+               badly if we seek right where the stream goes from very
+               quiet to very loud. It will converge after a bit. */
+        if( p_stream->i_skip_frames < p_stream->i_pre_skip )
+            p_stream->i_skip_frames = __MAX( 80*48, p_stream->i_pre_skip );
+    }
     /* we'll trash all the data until we find the next pcr */
-    p_stream->b_reinit = true;
     p_stream->i_pcr = VLC_TICK_INVALID;
     p_stream->i_next_block_flags = 0;
     p_stream->b_interpolation_failed = false;
@@ -1603,6 +1615,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 p_stream->i_serial_no = ogg_page_serialno( &p_ogg->current_page );
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
+                if( ogg_page_granulepos( &p_ogg->current_page ) == 0 && !p_stream->b_oggds )
+                    p_stream->page_type = OGGPAGE_HEADER;
+                else
+                    p_stream->page_type = OGGPAGE_OTHER;
+
                 TAB_APPEND( p_ogg->i_streams, p_ogg->pp_stream, p_stream );
 
                 /* Extract the initial header from the first page and verify
@@ -2207,7 +2224,6 @@ static void Ogg_CreateES( demux_t *p_demux, bool stable_id )
 
                 p_stream->p_es = p_old_stream->p_es;
                 p_stream->b_finished = false;
-                p_stream->b_reinit = false;
                 p_stream->b_initializing = false;
                 p_stream->i_pre_skip = 0;
                 es_format_Clean( &p_stream->fmt_old );
@@ -2282,7 +2298,6 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
             p_ogg->i_bitrate += p_stream->fmt.i_bitrate;
 
         p_stream->i_pcr = VLC_TICK_INVALID;
-        p_stream->b_reinit = false;
     }
 
     /* get total frame count for video stream; we will need this for seeking */
@@ -2354,6 +2369,7 @@ static void Ogg_LogicalStreamInit( logical_stream_t *p_stream )
     es_format_Init( &p_stream->fmt_old, UNKNOWN_ES, 0 );
     p_stream->i_pcr = VLC_TICK_INVALID;
     p_stream->i_first_frame_index = 1;
+    p_stream->page_type = OGGPAGE_OTHER;
     date_Set( &p_stream->dts, VLC_TICK_INVALID );
     p_stream->b_initializing = true;
     p_stream->b_contiguous = true; /* default */
@@ -2933,12 +2949,6 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
                 break;
         }
     }
-    /* For Opus, trash the first 80 ms of decoded output as
-           well, to avoid blowing out speakers if we get unlucky.
-           Opus predicts content from prior frames, which can go
-           badly if we seek right where the stream goes from very
-           quiet to very loud. It will converge after a bit. */
-    p_stream->i_pre_skip = __MAX( 80*48, p_stream->i_pre_skip );
 }
 
 static bool Ogg_ReadFlacStreamInfo( demux_t *p_demux, logical_stream_t *p_stream,
