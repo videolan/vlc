@@ -1946,11 +1946,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
 
             int i_pid = PIDGet( p_pkt );
             ts_pid_t *p_pid = GetPID(p_sys, i_pid);
-            if( i_pid != 0x1FFF && p_pid->type == TYPE_STREAM &&
-                ts_stream_Find_es( p_pid->u.p_stream, p_pmt ) &&
-               (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
-               (p_pkt->p_buffer[3] & 0xD0) == 0x10    /* Has payload but is not encrypted */
-            )
+            if( i_pid != 0x1FFF )
             {
                 unsigned i_skip = 4;
                 if ( p_pkt->p_buffer[3] & 0x20 ) // adaptation field
@@ -1963,7 +1959,11 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
                     }
                 }
 
-                if( i_pcr == -1 )
+                if( i_pcr == -1 && p_pid->type == TYPE_STREAM &&
+                    ts_stream_Find_es( p_pid->u.p_stream, p_pmt ) &&
+                   (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
+                   (p_pkt->p_buffer[3] & 0xD0) == 0x10    /* Has payload but is not encrypted */
+                )
                 {
                     vlc_tick_t i_dts = -1;
                     vlc_tick_t i_pts = -1;
