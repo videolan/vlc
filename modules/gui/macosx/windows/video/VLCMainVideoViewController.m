@@ -55,6 +55,49 @@
     return self;
 }
 
+- (void)setupAudioDecorativeView
+{
+    _audioDecorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self];
+    _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1.
+                                      constant:0.
+        ],
+    ]];
+
+    [self.view addSubview:_audioDecorativeView positioned:NSWindowAbove relativeTo:_voutView];
+    _audioDecorativeView.hidden = YES;
+}
+
 - (void)viewDidLoad
 {
     _autohideControls = YES;
@@ -87,6 +130,9 @@
 
     _returnButtonBottomConstraint.active = NO;
     _playlistButtonBottomConstraint.active = NO;
+
+    [self setupAudioDecorativeView];
+}
 }
 
 - (BOOL)mouseOnControls
