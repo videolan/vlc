@@ -733,9 +733,6 @@ static void *Thread( void *obj )
      * necessary for  RTL locales */
     app.setLayoutDirection(QLocale().textDirection());
 
-    p_intf->p_app = &app;
-
-
     /* All the settings are in the .conf/.ini style */
 #ifdef _WIN32
     char *cConfigDir = config_GetUserDir( VLC_CONFIG_DIR );

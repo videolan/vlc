@@ -95,7 +95,6 @@ struct qt_intf_t
 
     vlc_thread_t thread;
 
-    class QApplication *p_app;          /* Main Qt Application */
     class MainCtx *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
     class QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
 
