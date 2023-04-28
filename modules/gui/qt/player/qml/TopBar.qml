@@ -423,7 +423,7 @@ FocusScope{
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
 
-            iconText: VLCIcons.menu
+            iconText: VLCIcons.more
             text: I18n.qtr("Menu")
 
             Navigation.parentItem: root

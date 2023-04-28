@@ -46,7 +46,7 @@ QtObject {
     readonly property string home : "\ue01e"
     readonly property string info : "\ue01f"
     readonly property string list : "\ue020"
-    readonly property string menu : "\ue021"
+    readonly property string more : "\ue021"
     readonly property string next : "\ue022"
     readonly property string pause : "\ue023"
     readonly property string play : "\ue024"

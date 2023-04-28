@@ -479,7 +479,7 @@ FocusScope {
 
                                 visible: !MainCtx.hasToolbarMenu
                                 size: VLCStyle.icon_banner
-                                iconText: VLCIcons.menu
+                                iconText: VLCIcons.more
                                 text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height

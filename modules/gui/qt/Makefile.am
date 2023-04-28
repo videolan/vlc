@@ -671,7 +671,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/home.svg \
 	gui/qt/pixmaps/icons/info.svg \
 	gui/qt/pixmaps/icons/ic_fluent_apps_list.svg \
-	gui/qt/pixmaps/icons/menu.svg \
+	gui/qt/pixmaps/icons/ic_fluent_more_vertical.svg \
 	gui/qt/pixmaps/icons/multiselect.svg \
 	gui/qt/pixmaps/icons/next.svg \
 	gui/qt/pixmaps/icons/pause.svg \
@@ -689,7 +689,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/renderer.svg \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_repeat_all.svg \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_repeat_1.svg \
-	gui/qt/pixmaps/icons/search.svg \
+	gui/qt/pixmaps/icons/ic_fluent_search.svg \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_shuffle.svg \
 	gui/qt/pixmaps/icons/skip_back.svg \
 	gui/qt/pixmaps/icons/skip_for.svg \
