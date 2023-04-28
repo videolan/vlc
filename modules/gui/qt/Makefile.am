@@ -700,12 +700,12 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/stream.svg \
 	gui/qt/pixmaps/icons/sync.svg \
 	gui/qt/pixmaps/icons/time.svg \
-	gui/qt/pixmaps/icons/topbar_discover.svg \
+	gui/qt/pixmaps/icons/ic_fluent_globe.svg \
 	gui/qt/pixmaps/icons/topbar_filter.svg \
-	gui/qt/pixmaps/icons/topbar_music.svg \
-	gui/qt/pixmaps/icons/topbar_network.svg \
+	gui/qt/pixmaps/icons/ic_fluent_music_note_2.svg \
+	gui/qt/pixmaps/icons/ic_fluent_wifi_1.svg \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_sort.svg \
-	gui/qt/pixmaps/icons/topbar_video.svg \
+	gui/qt/pixmaps/icons/ic_fluent_filmstrip.svg \
 	gui/qt/pixmaps/icons/tv.svg \
 	gui/qt/pixmaps/icons/tvtelx.svg \
 	gui/qt/pixmaps/icons/visualization.svg \
