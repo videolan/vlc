@@ -666,11 +666,11 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/faster.svg \
 	gui/qt/pixmaps/icons/frame-by-frame.svg \
 	gui/qt/pixmaps/icons/fullscreen.svg \
-	gui/qt/pixmaps/icons/grid.svg \
+	gui/qt/pixmaps/icons/ic_fluent_grid.svg \
 	gui/qt/pixmaps/icons/history.svg \
 	gui/qt/pixmaps/icons/home.svg \
 	gui/qt/pixmaps/icons/info.svg \
-	gui/qt/pixmaps/icons/list.svg \
+	gui/qt/pixmaps/icons/ic_fluent_apps_list.svg \
 	gui/qt/pixmaps/icons/menu.svg \
 	gui/qt/pixmaps/icons/multiselect.svg \
 	gui/qt/pixmaps/icons/next.svg \
