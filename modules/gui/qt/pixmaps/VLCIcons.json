@@ -43,7 +43,7 @@
         {"key":"play_filled", "path": "./icons/ic_fluent_play_filled.svg"},
         {"key":"play", "path": "./icons/ic_fluent_play.svg"},
         {"key":"play_reverse", "path": "./icons/play_reverse.svg"},
-        {"key":"playlist", "path": "./icons/playlist.svg"},
+        {"key":"playlist", "path": "./icons/ic_playlist.svg"},
         {"key":"playlist_clear", "path": "./icons/ic_playlist_clear.svg"},
         {"key":"previous", "path": "./icons/ic_fluent_previous.svg"},
         {"key":"profile_new", "path": "./icons/profile_new.svg"},

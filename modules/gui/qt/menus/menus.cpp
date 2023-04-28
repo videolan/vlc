@@ -312,7 +312,7 @@ void VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
 
     action = menu->addAction(
 #ifndef __APPLE__
-            QIcon( ":/menu/playlist.svg" ),
+            QIcon( ":/menu/ic_playlist.svg" ),
 #endif
             qtr( "Play&list" ));
     action->setShortcut(QString( "Ctrl+L" ));

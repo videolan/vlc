@@ -677,7 +677,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/ic_pause_filled.svg \
 	gui/qt/pixmaps/icons/pip.svg \
 	gui/qt/pixmaps/icons/ic_playlist_clear.svg \
-	gui/qt/pixmaps/icons/playlist.svg \
+	gui/qt/pixmaps/icons/ic_playlist.svg \
 	gui/qt/pixmaps/icons/ic_fluent_play.svg \
 	gui/qt/pixmaps/icons/play_reverse.svg \
 	gui/qt/pixmaps/icons/ic_fluent_play_filled.svg \
@@ -735,7 +735,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/movie.svg \
 	gui/qt/pixmaps/menu/music.svg \
 	gui/qt/pixmaps/menu/network.svg \
-	gui/qt/pixmaps/menu/playlist.svg \
+	gui/qt/pixmaps/menu/ic_playlist.svg \
 	gui/qt/pixmaps/menu/ic_fluent_next.svg \
 	gui/qt/pixmaps/menu/ic_pause_filled.svg \
 	gui/qt/pixmaps/menu/ic_fluent_play_filled.svg \
