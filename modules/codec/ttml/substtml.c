@@ -1154,16 +1154,36 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
     }
 }
 
+static void setWidth( video_format_t* fmt, int flags, float extent_x )
+{
+    if ( !( flags & UPDT_REGION_EXTENT_X_IS_RATIO ) && extent_x > 0 )
+    {
+        fmt->i_width = extent_x;
+        fmt->i_visible_width = extent_x;
+    }
+}
+
+static void setHeight( video_format_t* fmt, int flags, float extent_y )
+{
+    if ( !( flags & UPDT_REGION_EXTENT_Y_IS_RATIO ) && extent_y > 0 )
+    {
+        fmt->i_height = extent_y;
+        fmt->i_visible_height = extent_y;
+    }
+}
+
 static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
                                           const uint8_t *p_data, size_t i_data,
-                                          unsigned int i_visible_width, unsigned int i_visible_height )
+                                          int flags, float extent_x, float extent_y )
 {
     if( i_data < 16 )
         return NULL;
+        
     video_format_t fmt_out;
     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
-    fmt_out.i_visible_width = i_visible_width;
-    fmt_out.i_visible_height = i_visible_height;
+    setWidth( &fmt_out, flags, extent_x);
+    setHeight(&fmt_out, flags, extent_y);
+    
     es_format_t es_in;
     es_format_Init( &es_in, VIDEO_ES, VLC_CODEC_PNG );
     es_in.video.i_chroma = es_in.i_codec;
@@ -1202,6 +1222,7 @@ static void TTMLRegionsToSpuBitmapRegions( decoder_t *p_dec, subpicture_t *p_spu
     {
         picture_t *p_pic = picture_CreateFromPNG( p_dec, p_region->bgbitmap.p_bytes,
                                                          p_region->bgbitmap.i_bytes,
+                                                         p_region->updt.flags,
                                                          p_region->updt.extent.x,
                                                          p_region->updt.extent.y );
         if( p_pic )
