@@ -22,6 +22,7 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryUIUnits.h"
 
@@ -32,6 +33,7 @@
 
 #import "views/VLCBottomBarView.h"
 
+#import "windows/video/VLCMainVideoViewAudioMediaDecorativeView.h"
 #import "windows/video/VLCMainVideoViewOverlayView.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
@@ -52,6 +54,15 @@
 - (instancetype)init
 {
     self = [super initWithNibName:@"VLCMainVideoView" bundle:nil];
+    if (self) {
+        _isFadingIn = NO;
+
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+        [notificationCenter addObserver:self
+                               selector:@selector(playerCurrentMediaItemChanged:)
+                                   name:VLCPlayerCurrentMediaItemChanged
+                                 object:nil];
+    }
     return self;
 }
 
@@ -133,6 +144,16 @@
 
     [self setupAudioDecorativeView];
 }
+
+- (void)playerCurrentMediaItemChanged:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCPlayerController * const controller = notification.object;
+    NSAssert(controller != nil, @"Player current media item changed notification should carry a valid player controller");
+
+    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
+
+    _audioDecorativeView.hidden = mediaItem == nil || mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
 }
 
 - (BOOL)mouseOnControls
