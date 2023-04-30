@@ -17,6 +17,8 @@ apps:
     desktop: usr/share/applications/vlc.desktop
     command: bin/desktop-launch $SNAP/bin/vlc-snap-wrapper.sh
     common-id: org.videolan.vlc
+    environment:
+      DISABLE_WAYLAND: '1'
     plugs:
       - unity7
       - network
