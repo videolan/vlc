@@ -237,6 +237,8 @@ FocusScope {
 
                             text: Helpers.get(root.model, "title", I18n.qtr("Unknown title"))
 
+                            color: theme.fg.primary
+
                             Layout.fillWidth: true
                         }
 
@@ -253,6 +255,8 @@ FocusScope {
 
                     Widgets.CaptionLabel {
                         id: expand_infos_subtitle_id
+
+                        color: theme.fg.secondary
 
                         width: parent.width
                         text: I18n.qtr("%1 - %2 - %3 - %4")
