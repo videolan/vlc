@@ -786,7 +786,20 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)setHasActiveVideo:(BOOL)hasActiveVideo
 {
     [super setHasActiveVideo:hasActiveVideo];
-    hasActiveVideo ? [self enableVideoPlaybackAppearance] : [self disableVideoPlaybackAppearance];
+    if (hasActiveVideo) {
+        [self enableVideoPlaybackAppearance];
+    } else if (!self.videoViewController.view.hidden) {
+        // If we are switching to audio media then keep the active main video view open
+        NSURL * const currentMediaUrl = _playlistController.playerController.URLOfCurrentMediaItem;
+        VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
+        const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+
+        if (!decorativeViewVisible) {
+            [self disableVideoPlaybackAppearance];
+        }
+    } else {
+        [self disableVideoPlaybackAppearance];
+    }
 }
 
 - (void)playerStateChanged:(NSNotification *)notification
@@ -794,10 +807,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (_playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self hideControlsBar];
         return;
-    }
-
-    if(_playlistController.playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
-        [self reopenVideoView];
     }
 
     if (self.videoViewController.view.isHidden) {
