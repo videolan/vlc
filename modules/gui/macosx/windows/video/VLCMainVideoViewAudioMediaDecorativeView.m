@@ -33,4 +33,10 @@
                                                                  withOwner:owner];
 }
 
+- (void)setCoverArt:(NSImage *)coverArtImage
+{
+    _backgroundCoverArtView.image = coverArtImage;
+    _foregroundCoverArtView.image = coverArtImage;
+}
+
 @end
