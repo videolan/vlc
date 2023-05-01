@@ -94,6 +94,7 @@ Widgets.PageLoader {
                 topPadding: VLCStyle.margin_large
                 bottomPadding: VLCStyle.margin_normal
                 width: root.width
+                color: colorContext.fg.primary
             }
 
             onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
