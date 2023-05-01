@@ -13,14 +13,13 @@
             <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <box boxType="custom" borderType="none" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="IjI-8w-fnX">
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cDv-dn-65H">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
-                    <view key="contentView" id="jw4-Zc-Axj">
-                        <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    </view>
-                    <color key="fillColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
-                </box>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="noart" id="3lz-lJ-nIL"/>
+                </imageView>
+                <visualEffectView blendingMode="withinWindow" material="HUDWindow" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="D1e-fS-bwO">
+                    <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                </visualEffectView>
                 <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="40P-sL-Mzq">
                     <rect key="frame" x="232" y="112" width="256" height="256"/>
                     <constraints>
@@ -28,17 +27,21 @@
                         <constraint firstAttribute="width" secondItem="40P-sL-Mzq" secondAttribute="height" multiplier="1:1" id="dje-mE-ZfL"/>
                     </constraints>
                     <shadow key="shadow" blurRadius="20">
-                        <color key="color" name="VLCAccentColor"/>
+                        <color key="color" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </shadow>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="noart" id="m7g-tH-8dl"/>
                 </imageView>
             </subviews>
             <constraints>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="4Ib-c0-egD"/>
-                <constraint firstItem="IjI-8w-fnX" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="S2f-YA-quS"/>
-                <constraint firstAttribute="bottom" secondItem="IjI-8w-fnX" secondAttribute="bottom" id="UWq-yk-vmv"/>
-                <constraint firstItem="IjI-8w-fnX" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="ZC0-v1-aQ2"/>
-                <constraint firstAttribute="trailing" secondItem="IjI-8w-fnX" secondAttribute="trailing" id="wNq-aQ-zyN"/>
+                <constraint firstAttribute="trailing" secondItem="D1e-fS-bwO" secondAttribute="trailing" id="J68-x2-cY5"/>
+                <constraint firstItem="D1e-fS-bwO" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="KBI-Gr-tTT"/>
+                <constraint firstAttribute="bottom" secondItem="cDv-dn-65H" secondAttribute="bottom" id="Sv1-Hf-eCe"/>
+                <constraint firstItem="cDv-dn-65H" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="bZL-GN-AAt"/>
+                <constraint firstItem="cDv-dn-65H" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="dvc-kq-jk8"/>
+                <constraint firstItem="D1e-fS-bwO" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="eDP-U6-Qt6"/>
+                <constraint firstAttribute="bottom" secondItem="D1e-fS-bwO" secondAttribute="bottom" id="toU-5j-lin"/>
+                <constraint firstAttribute="trailing" secondItem="cDv-dn-65H" secondAttribute="trailing" id="vEl-zP-vj9"/>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="centerY" secondItem="WRu-Ic-lQK" secondAttribute="centerY" id="yFl-gc-ITT"/>
             </constraints>
             <point key="canvasLocation" x="66" y="-232"/>
@@ -46,8 +49,5 @@
     </objects>
     <resources>
         <image name="noart" width="128" height="128"/>
-        <namedColor name="VLCAccentColor">
-            <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
     </resources>
 </document>
