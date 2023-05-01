@@ -44,6 +44,11 @@
                 <constraint firstAttribute="trailing" secondItem="cDv-dn-65H" secondAttribute="trailing" id="vEl-zP-vj9"/>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="centerY" secondItem="WRu-Ic-lQK" secondAttribute="centerY" id="yFl-gc-ITT"/>
             </constraints>
+            <connections>
+                <outlet property="backgroundCoverArtView" destination="cDv-dn-65H" id="bw2-8i-Xg6"/>
+                <outlet property="backgroundVisualEffectView" destination="D1e-fS-bwO" id="Jkh-ep-Wyn"/>
+                <outlet property="foregroundCoverArtView" destination="40P-sL-Mzq" id="nVl-ga-BoM"/>
+            </connections>
             <point key="canvasLocation" x="66" y="-232"/>
         </customView>
     </objects>
