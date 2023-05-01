@@ -808,16 +808,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 // This handles reopening the video view when the user has closed it.
 - (void)reopenVideoView
 {
-    if(!self.hasActiveVideo) {
-        return;
-    }
-
-    VLCMediaLibraryMediaItem *mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playlistController.playerController.URLOfCurrentMediaItem];
-
-    if(mediaItem == nil || mediaItem.mediaType != VLC_ML_MEDIA_TYPE_VIDEO) {
-        return;
-    }
-
     [self enableVideoPlaybackAppearance];
 }
 
