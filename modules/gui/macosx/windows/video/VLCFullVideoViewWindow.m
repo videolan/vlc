@@ -107,7 +107,8 @@
     if (self.videoViewController.mouseOnControls ||
         !_autohideTitlebar ||
         self.isInNativeFullscreen ||
-        self.videoViewController.view.hidden) {
+        self.videoViewController.view.hidden ||
+        !self.videoViewController.autohideControls) {
 
         [self showTitleBar];
         return;
