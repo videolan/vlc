@@ -67,6 +67,7 @@ extern "C" char **environ;
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
+#include "util/dismiss_popup_event_filter.hpp"
 #include "maininterface/compositor.hpp"
 
 #include <QVector>
@@ -822,14 +823,18 @@ static void *Thread( void *obj )
         /* Check window type from the Qt platform back-end */
         bool known_type = true;
 
-        QString platform = app.platformName();
-        if( platform == qfu("xcb") )
+        const QString& platform = app.platformName();
+        if( platform == QLatin1String("xcb") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_XID;
-        else if( platform == qfu("wayland") || platform == qfu("wayland-egl") )
+        else if( platform == QLatin1String("wayland") || platform == QLatin1String("wayland-egl") ) {
             p_intf->voutWindowType = VLC_WINDOW_TYPE_WAYLAND;
-        else if( platform == qfu("windows") )
+
+            // Workaround for popup widgets not closing on mouse press on wayland:
+            app.installEventFilter(new DismissPopupEventFilter(&app));
+        }
+        else if( platform == QLatin1String("windows") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_HWND;
-        else if( platform == qfu("cocoa" ) )
+        else if( platform == QLatin1String("cocoa") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_NSOBJECT;
         else
         {
