@@ -153,7 +153,14 @@
 
     VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
 
-    _audioDecorativeView.hidden = mediaItem == nil || mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+    const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+    _audioDecorativeView.hidden = !decorativeViewVisible;
+
+    if (decorativeViewVisible) {
+        [self setAutohideControls:NO];
+    } else {
+        [self setAutohideControls:YES];
+    }
 }
 
 - (BOOL)mouseOnControls
