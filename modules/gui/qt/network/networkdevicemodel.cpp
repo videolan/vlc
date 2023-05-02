@@ -52,7 +52,7 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
         case NETWORK_TREE:
             return QVariant::fromValue( NetworkTreeItem(MediaTreePtr{ item.mediaSource->tree }, item.inputItem.get()) );
         case NETWORK_ARTWORK:
-            return item.artworkUrl;
+            return item.artwork;
         default:
             return {};
     }
@@ -458,13 +458,13 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
         item.inputItem = InputItemPtr(inputItem);
 
         char * artwork = input_item_GetArtworkURL(inputItem.get());
-
         if (artwork)
         {
-            item.artworkUrl = QUrl::fromEncoded(artwork);
+            item.artwork = QString::fromUtf8(artwork);
 
             free(artwork);
         }
+
 
         insertItem(it, std::move(item));
     }

@@ -180,7 +180,7 @@ struct NetworkDeviceItem
     NetworkDeviceModel::ItemType type;
     NetworkDeviceModel::MediaSourcePtr mediaSource;
     NetworkDeviceModel::InputItemPtr inputItem;
-    QUrl artworkUrl;
+    QString artwork;
 };
 
 #endif // MLNETWORKDEVICEMODEL_HPP
