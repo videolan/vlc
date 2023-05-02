@@ -284,7 +284,7 @@ vlc_ml_sorting_criteria_t MLPlaylistListModel::roleToCriteria(int role) const /*
 
 std::unique_ptr<MLBaseModel::BaseLoader> MLPlaylistListModel::createLoader() const /* override */
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<Loader>(*this, m_playlistType);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -400,18 +400,48 @@ void MLPlaylistListModel::setCoverPrefix(const QString & prefix)
     emit coverPrefixChanged();
 }
 
+MLPlaylistListModel::PlaylistType MLPlaylistListModel::playlistType() const
+{
+    return m_playlistType;
+}
+
+void MLPlaylistListModel::setPlaylistType(PlaylistType playlistType)
+{
+    if (m_playlistType == playlistType)
+        return;
+    m_playlistType = playlistType;
+    resetCache();
+    emit playlistTypeChanged();
+}
+
 //=================================================================================================
 // Loader
 //=================================================================================================
 
-MLPlaylistListModel::Loader::Loader(const MLPlaylistListModel & model)
-    : MLBaseModel::BaseLoader(model) {}
+static inline vlc_ml_playlist_type_t qmlToMLPlaylistType(MLPlaylistListModel::PlaylistType type)
+{
+    switch(type) {
+    case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_ALL:
+        return VLC_ML_PLAYLIST_TYPE_ALL;
+    case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_AUDIO:
+        return VLC_ML_PLAYLIST_TYPE_AUDIO;
+    case MLPlaylistListModel::PlaylistType::PLAYLIST_TYPE_VIDEO:
+        return VLC_ML_PLAYLIST_TYPE_VIDEO;
+    default:
+        vlc_assert_unreachable();
+    }
+}
+
+MLPlaylistListModel::Loader::Loader(const MLPlaylistListModel & model, PlaylistType playlistType)
+    : MLBaseModel::BaseLoader(model)
+    , m_playlistType(playlistType)
+{}
 
 size_t MLPlaylistListModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     vlc_ml_query_params_t params = getParams().toCQueryParams();
-
-    return vlc_ml_count_playlists(ml, &params);
+    vlc_ml_playlist_type_t mlPlaylistType = qmlToMLPlaylistType(m_playlistType);
+    return vlc_ml_count_playlists(ml, &params, mlPlaylistType);
 }
 
 std::vector<std::unique_ptr<MLItem>>
@@ -419,7 +449,9 @@ MLPlaylistListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t c
 {
     vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
 
-    ml_unique_ptr<vlc_ml_playlist_list_t> list(vlc_ml_list_playlists(ml, &params));
+    vlc_ml_playlist_type_t mlPlaylistType = qmlToMLPlaylistType(m_playlistType);
+
+    ml_unique_ptr<vlc_ml_playlist_list_t> list(vlc_ml_list_playlists(ml, &params, mlPlaylistType));
 
     if (list == nullptr)
         return {};

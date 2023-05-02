@@ -30,13 +30,6 @@ class MLPlaylistListModel : public MLBaseModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QSize coverSize READ coverSize WRITE setCoverSize NOTIFY coverSizeChanged FINAL)
-
-    Q_PROPERTY(QString coverDefault READ coverDefault WRITE setCoverDefault
-               NOTIFY coverDefaultChanged FINAL)
-
-    Q_PROPERTY(QString coverPrefix READ coverPrefix WRITE setCoverPrefix NOTIFY coverPrefixChanged FINAL)
-
 public:
     enum Roles
     {
@@ -46,6 +39,24 @@ public:
         PLAYLIST_DURATION,
         PLAYLIST_COUNT
     };
+
+    enum PlaylistType {
+        PLAYLIST_TYPE_ALL,
+        PLAYLIST_TYPE_AUDIO,
+        PLAYLIST_TYPE_VIDEO,
+    };
+    Q_ENUM(PlaylistType)
+
+public:
+
+    Q_PROPERTY(QSize coverSize READ coverSize WRITE setCoverSize NOTIFY coverSizeChanged FINAL)
+
+    Q_PROPERTY(QString coverDefault READ coverDefault WRITE setCoverDefault
+                   NOTIFY coverDefaultChanged FINAL)
+
+    Q_PROPERTY(QString coverPrefix READ coverPrefix WRITE setCoverPrefix NOTIFY coverPrefixChanged FINAL)
+
+    Q_PROPERTY(PlaylistType playlistType READ playlistType WRITE setPlaylistType NOTIFY playlistTypeChanged FINAL)
 
 public:
     explicit MLPlaylistListModel(QObject * parent = nullptr);
@@ -85,6 +96,7 @@ signals:
     void coverSizeChanged   ();
     void coverDefaultChanged();
     void coverPrefixChanged ();
+    void playlistTypeChanged();
 
 public: // Properties
     QSize coverSize() const;
@@ -96,10 +108,14 @@ public: // Properties
     QString coverPrefix() const;
     void    setCoverPrefix(const QString & prefix);
 
+    PlaylistType playlistType() const;
+    void setPlaylistType(PlaylistType type);
+
 private: // Variables
     QSize   m_coverSize;
     QString m_coverDefault;
     QString m_coverPrefix;
+    PlaylistType m_playlistType = PLAYLIST_TYPE_ALL;
 
     bool m_transactionPending = false;
     bool m_resetAfterTransaction = false;
@@ -107,13 +123,15 @@ private: // Variables
 private:
     struct Loader : public MLBaseModel::BaseLoader
     {
-        Loader(const MLPlaylistListModel & model);
+        Loader(const MLPlaylistListModel & model, PlaylistType playlistType);
 
         size_t count(vlc_medialibrary_t* ml) const override;
 
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override;
 
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;
+
+        PlaylistType m_playlistType;
     };
 };
 
