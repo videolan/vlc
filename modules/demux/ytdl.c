@@ -31,6 +31,7 @@
 
 #include "json/json.h"
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_demux.h>
 #include <vlc_stream.h>
 #include <vlc_fs.h>

@@ -40,6 +40,7 @@
 #include "../src/generic_window.hpp"
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_xlib.h>
 
 X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),

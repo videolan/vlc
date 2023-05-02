@@ -31,6 +31,7 @@
 #include <cassert>
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
