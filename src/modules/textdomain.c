@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include "modules/modules.h"
 
 #ifdef ENABLE_NLS
