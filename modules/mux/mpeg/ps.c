@@ -32,6 +32,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
@@ -123,7 +124,7 @@ typedef struct
     int i_system_header;
     vlc_tick_t i_dts_delay;
     int i_rate_bound; /* units of 50 bytes/second */
- 
+
     int64_t i_instant_bitrate;
     int64_t i_instant_size;
     vlc_tick_t i_instant_dts;
@@ -260,7 +261,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ps_stream_t *p_stream;
- 
+
 
     msg_Dbg( p_mux, "adding input codec=%4.4s",
              (char*)&p_input->p_fmt->i_codec );

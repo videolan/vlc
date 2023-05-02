@@ -32,6 +32,7 @@
 #include <sstream>
 #include <iomanip>
 
+#include <vlc_configuration.h>
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_dialog.h>
 #include <vlc_rand.h>

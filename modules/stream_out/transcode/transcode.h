@@ -1,3 +1,4 @@
+#include <vlc_configuration.h>
 #include <vlc_picture_fifo.h>
 #include <vlc_filter.h>
 #include <vlc_codec.h>

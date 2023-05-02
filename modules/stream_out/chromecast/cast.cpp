@@ -32,6 +32,7 @@
 
 #include "../renderer_common.hpp"
 #include "chromecast.h"
+#include <vlc_configuration.h>
 #include <vlc_dialog.h>
 
 #include <vlc_sout.h>

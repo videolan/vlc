@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_modules.h>

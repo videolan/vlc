@@ -34,6 +34,7 @@
 #include <math.h>
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_aout.h>
 #include <vlc_sout.h>
 #include <vlc_codec.h>

@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_interface.h>
 #include <vlc_fs.h>
 
