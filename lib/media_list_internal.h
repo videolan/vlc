@@ -32,6 +32,7 @@
 #include <vlc/libvlc_media.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 
 struct libvlc_media_list_t
 {

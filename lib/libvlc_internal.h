@@ -36,6 +36,7 @@
 #include <vlc_atomic.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_threads.h>
 
 /* Note well: this header is included from LibVLC core.
