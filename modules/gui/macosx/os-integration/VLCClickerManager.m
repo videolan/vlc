@@ -30,6 +30,8 @@
 #import "playlist/VLCPlayerController.h"
 #import "os-integration/VLCSystemVolume.h"
 
+#import <vlc_configuration.h>
+
 @interface VLCClickerManager()
 {
     VLCPlaylistController *_playlistController;

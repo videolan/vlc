@@ -70,6 +70,7 @@
 #import "windows/VLCOpenInputMetadata.h"
 
 #import <vlc_common.h>
+#import <vlc_configuration.h>
 #import <vlc_url.h>
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
@@ -81,7 +82,7 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
     CGFloat _lastPlaylistWidthBeforeCollaps;
-    
+
     NSInteger _currentSelectedSegment;
     NSInteger _currentSelectedViewModeSegment;
 }
@@ -141,7 +142,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     self.toolbar.allowsUserCustomization = NO;
-    
+
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
 
@@ -196,7 +197,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                             forKeyPath:@"effectiveAppearance"
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];
-        
+
         _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
     }
 
@@ -842,9 +843,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     for (NSView *subview in _libraryTargetView.subviews) {
         [subview removeFromSuperview];
     }
-    
+
     NSLog(@"Presenting video view in main library window.");
-    
+
     NSView *videoView = self.videoViewController.view;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;

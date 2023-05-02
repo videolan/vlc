@@ -26,6 +26,7 @@
 
 #include <unistd.h> /* execl() */
 
+#import <vlc_configuration.h>
 #import <vlc_interface.h>
 
 #import "extensions/NSString+Helpers.h"

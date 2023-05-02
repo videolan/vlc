@@ -31,6 +31,8 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
+#import <vlc_configuration.h>
+
 static const int64_t SecInMillisecs = 1000;
 static const int64_t MinInMillisecs = SecInMillisecs * 60;
 static const int64_t MinimumDuration = 3 * MinInMillisecs;

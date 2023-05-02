@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <vlc_configuration.h>
 #include <vlc_fs.h>
 
 

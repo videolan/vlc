@@ -31,6 +31,7 @@
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_updateLabel
 #endif
 
+#import <vlc_configuration.h>
 #import <vlc_actions.h>
 #import <vlc_interface.h>
 #import <vlc_dialog.h>

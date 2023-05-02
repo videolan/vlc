@@ -22,6 +22,7 @@
 
 #import "VLCPlayerController.h"
 
+#import <vlc_configuration.h>
 #import <vlc_url.h>
 
 #import "extensions/NSString+Helpers.h"
@@ -608,7 +609,7 @@ static int BossCallback(vlc_object_t *p_this,
         _playerVoutListenerID = vlc_player_vout_AddListener(_p_player,
                                                             &player_vout_callbacks,
                                                             (__bridge void *)self);
-        
+
         _volume = VLCVolumeDefault;
 
         libvlc_int_t *libvlc = vlc_object_instance(getIntf());

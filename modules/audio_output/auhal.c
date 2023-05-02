@@ -26,6 +26,7 @@
 
 #include "coreaudio_common.h"
 
+#include <vlc_configuration.h>
 #include <vlc_plugin.h>
 #include <vlc_threads.h>
 #include <vlc_dialog.h>                      // vlc_dialog_display_error

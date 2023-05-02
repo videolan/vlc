@@ -40,6 +40,8 @@
 #import "views/VLCLinearProgressIndicator.h"
 #import "views/VLCTrackingView.h"
 
+#import <vlc_configuration.h>
+
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 const CGFloat VLCLibraryCollectionViewItemMinimalDisplayedProgress = 0.05;
 const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
@@ -218,7 +220,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     if (updatedMediaItem == nil || _representedItem == nil || ![_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         return;
     }
-    
+
     VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
     if(mediaItem && updatedMediaItem.libraryID == mediaItem.libraryID) {
         [self updateRepresentation];

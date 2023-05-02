@@ -30,6 +30,8 @@
 #import "library/VLCInputItem.h"
 #import "views/VLCWrappableTextField.h"
 
+#import <vlc_configuration.h>
+
 @interface VLCResumeDialogController()
 {
     int _currentResumeTimeout;

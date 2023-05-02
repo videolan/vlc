@@ -33,6 +33,8 @@
 
 #import "views/VLCImageView.h"
 
+#import <vlc_configuration.h>
+
 @interface VLCPlaylistTableCellView ()
 {
     NSFont *_displayedFont;

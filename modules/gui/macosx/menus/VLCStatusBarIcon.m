@@ -30,6 +30,8 @@
 #import "library/VLCInputItem.h"
 #import "windows/VLCDetachedAudioWindow.h"
 
+#import <vlc_configuration.h>
+
 @interface VLCStatusBarIcon ()
 {
     NSMenuItem *_vlcStatusBarMenuItem;
@@ -103,7 +105,7 @@
     // Set our selves up as delegate, to receive menuNeedsUpdate messages, so
     // we can update our menu as needed/before it's drawn
     [_vlcStatusBarIconMenu setDelegate:self];
-    
+
     // Register notifications
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self

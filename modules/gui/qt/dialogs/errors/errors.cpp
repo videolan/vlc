@@ -33,6 +33,8 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
+#include <vlc_configuration.h>
+
 ErrorsDialog::ErrorsDialog( qt_intf_t *_p_intf )
              : QVLCDialog( nullptr, _p_intf )
 {

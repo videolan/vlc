@@ -23,6 +23,7 @@
 
 #include "theme.hpp"
 #include "top_window.hpp"
+#include <vlc_configuration.h>
 #include <sstream>
 
 

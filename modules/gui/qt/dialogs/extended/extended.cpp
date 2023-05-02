@@ -36,6 +36,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QWindow>
+#include <vlc_configuration.h>
 #include <vlc_modules.h>
 
 ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )

@@ -30,6 +30,8 @@
 #import "VLCApplication.h"
 #import "extensions/NSString+Helpers.h"
 
+#import <vlc_configuration.h>
+
 /*****************************************************************************
  * VLCApplication implementation
  *****************************************************************************/

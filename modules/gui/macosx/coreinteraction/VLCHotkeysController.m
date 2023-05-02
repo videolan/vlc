@@ -29,6 +29,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
+#import <vlc_configuration.h>
 #import <vlc_actions.h>
 #import <vlc_plugin.h>
 #import <vlc_modules.h>

@@ -59,6 +59,7 @@
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 
+#import <vlc_configuration.h>
 #import <vlc_interface.h>
 
 #ifdef HAVE_SPARKLE
@@ -1868,7 +1869,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
         const int menuItemOffset = 14;
         const int menuItemOffsetWithActiveState = 24;
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             if (menu == self->_controlsMenu) {
                 BOOL controlsMenuHasActiveState = NO;

@@ -39,6 +39,8 @@
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCVoutView.h"
 
+#import <vlc_configuration.h>
+
 const CGFloat VLCVideoWindowCommonMinimalHeight = 70.;
 NSString *VLCVideoWindowShouldShowFullscreenController = @"VLCVideoWindowShouldShowFullscreenController";
 NSString *VLCVideoWindowDidEnterFullscreen = @"VLCVideoWindowDidEnterFullscreen";

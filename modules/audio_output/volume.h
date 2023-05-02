@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_aout.h>
 
 #define add_sw_gain() \

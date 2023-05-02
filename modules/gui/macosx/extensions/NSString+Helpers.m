@@ -27,6 +27,7 @@
 
 #import "NSString+Helpers.h"
 
+#import <vlc_configuration.h>
 #import <vlc_strings.h>
 #import <vlc_actions.h>
 

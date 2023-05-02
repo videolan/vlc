@@ -29,6 +29,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
 
+#import <vlc_configuration.h>
+
 @interface VLCOutput()
 {
     NSString *_transcode;

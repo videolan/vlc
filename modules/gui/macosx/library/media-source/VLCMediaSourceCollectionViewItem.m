@@ -40,6 +40,8 @@
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 
+#import <vlc_configuration.h>
+
 NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @interface VLCMediaSourceCollectionViewItem()

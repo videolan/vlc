@@ -44,6 +44,7 @@
 #import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVoutView.h"
 
+#include <vlc_configuration.h>
 #include <vlc_vout_display.h>
 
 NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
@@ -236,7 +237,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 
     VLCVideoWindowCommon *newVideoWindow = [[VLCVideoWindowCommon alloc] initWithContentRect:window_rect styleMask:mask backing:NSBackingStoreBuffered defer:YES];
     newVideoWindow.delegate = newVideoWindow;
-    newVideoWindow.releasedWhenClosed = NO;            
+    newVideoWindow.releasedWhenClosed = NO;
 
     newVideoWindow.backgroundColor = [NSColor blackColor];
     newVideoWindow.canBecomeKeyWindow = !asVideoWallpaper;
@@ -329,12 +330,12 @@ int WindowOpen(vlc_window_t *p_wnd)
     if ((videoWallpaper || !windowDecorations) && !isNativeFullscreen) {
         return [self borderlessVideoWindowAsVideoWallpaper:videoWallpaper withWindowDecorations:windowDecorations];
     }
-    
+
     BOOL isEmbedded = var_InheritBool(getIntf(), "embedded-video") && !b_mainWindowHasVideo;
     if (isEmbedded) {
         return [self setupMainLibraryVideoWindow];
     }
-    
+
     return [self setupDetachedVideoWindow];
 }
 
@@ -369,7 +370,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     BOOL isEmbedded = [videoWindow isKindOfClass:[VLCLibraryWindow class]];
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
-    
+
     // set (only!) window origin if specified
     if (!isEmbedded) {
         if ([videoWindow isKindOfClass:[VLCAspectRatioRetainingVideoWindow class]]) {
@@ -392,7 +393,7 @@ int WindowOpen(vlc_window_t *p_wnd)
                          withVlcWindow:(vlc_window_t *)p_wnd
 {
     VLCVoutView *voutView = videoWindow.videoViewController.voutView;
-    
+
     [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
     [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
     [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
@@ -410,7 +411,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     char *psz_splitter = var_GetString(voutView.voutThread, "video-splitter");
     BOOL b_have_splitter = psz_splitter != NULL && strcmp(psz_splitter, "none");
     free(psz_splitter);
-    
+
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
 
