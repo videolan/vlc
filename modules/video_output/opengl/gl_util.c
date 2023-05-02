@@ -27,6 +27,7 @@
 
 #include <vlc_filter.h>
 #include <vlc_modules.h>
+#include <vlc_configuration.h>
 
 static void
 LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
