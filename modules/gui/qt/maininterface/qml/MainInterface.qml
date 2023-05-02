@@ -38,13 +38,13 @@ Item {
     property alias g_root: root
 
     BindingCompat {
-        target: VLCStyle.self
+        target: VLCStyle
         property: "appWidth"
         value: root.width
     }
 
     BindingCompat {
-        target: VLCStyle.self
+        target: VLCStyle
         property: "appHeight"
         value: root.height
     }

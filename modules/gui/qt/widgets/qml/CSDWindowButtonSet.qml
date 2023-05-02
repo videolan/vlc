@@ -90,7 +90,7 @@ Row {
             onHeightChanged: Qt.callLater(updateRect)
 
             Connections {
-                target: VLCStyle.self
+                target: VLCStyle
 
                 // handle window resize
                 onAppWidthChanged: Qt.callLater(updateRect)

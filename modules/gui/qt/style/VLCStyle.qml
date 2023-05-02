@@ -33,8 +33,6 @@ QtObject {
     readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: dp(20, scale); }
     readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: dp(24, scale); }
 
-    property alias self: vlc_style
-
     readonly property SystemPalette palette:  SystemPalette {
         objectName: "themePalette"
         source: MainCtx.colorScheme.scheme
