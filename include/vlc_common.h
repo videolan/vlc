@@ -992,8 +992,6 @@ static inline bool mul_overflow(unsigned long long a, unsigned long long b,
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-#include <vlc_arrays.h>
-
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. */
 
