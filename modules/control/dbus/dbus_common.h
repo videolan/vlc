@@ -29,6 +29,7 @@
 #define VLC_DBUS_DBUS_COMMON_H_
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_interface.h>
 #include <vlc_player.h>
 #include <vlc_playlist.h>

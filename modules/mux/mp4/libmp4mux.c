@@ -31,6 +31,7 @@
 #include "../../packetizer/hxxx_nal.h"
 #include "../../packetizer/iso_color_tables.h"
 
+#include <vlc_arrays.h>
 #include <vlc_es.h>
 #include <vlc_iso_lang.h>
 #include <vlc_bits.h>
