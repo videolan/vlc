@@ -25,6 +25,7 @@
 
 #include <stdatomic.h>
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <assert.h>
 #include <stdarg.h>
