@@ -29,6 +29,7 @@
 #include <ctype.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_url.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>

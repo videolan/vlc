@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <vlc_common.h>
 
+#include <vlc_arrays.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include <vlc_aout.h>

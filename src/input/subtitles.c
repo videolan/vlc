@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
 

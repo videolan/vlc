@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_epg.h>
 
 static void vlc_epg_event_Clean(vlc_epg_event_t *p_event)
