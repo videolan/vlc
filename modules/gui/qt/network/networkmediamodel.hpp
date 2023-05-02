@@ -211,7 +211,7 @@ private:
         ItemType type;
         bool canBeIndexed;
         NetworkTreeItem tree;
-        QUrl artworkUrl;
+        QString artwork;
         qint64 fileSize;
         QDateTime fileModified;
     };

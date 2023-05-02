@@ -70,7 +70,7 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
         case NETWORK_TREE:
             return QVariant::fromValue( item.tree );
         case NETWORK_ARTWORK:
-            return item.artworkUrl;
+            return item.artwork;
         case NETWORK_FILE_SIZE:
             return item.fileSize;
         case NETWORK_FILE_MODIFIED:
@@ -579,7 +579,7 @@ void NetworkMediaModel::refreshMediaList( MediaTreePtr tree,
 
         if (str)
         {
-            item.artworkUrl = QUrl::fromEncoded(str);
+            item.artwork = QString::fromUtf8(str);
             free(str);
         }
 
