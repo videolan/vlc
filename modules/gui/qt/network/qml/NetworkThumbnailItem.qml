@@ -101,7 +101,14 @@ Row {
         width: artwork.width
         height: artwork.height
 
-        Widgets.ListCoverShadow { anchors.fill: parent }
+        Widgets.ListCoverShadow {
+            // clip shadows to only the painted area of cover
+            x: (artwork.x + artwork.width - artwork.paintedWidth) / 2
+            y: (artwork.y + artwork.height - artwork.paintedHeight) / 2
+            width: artwork.paintedWidth
+            height: artwork.paintedHeight
+
+        }
 
         NetworkCustomCover {
             id: artwork
@@ -109,7 +116,11 @@ Row {
             width: VLCStyle.listAlbumCover_width
             height: VLCStyle.listAlbumCover_height
 
-            //radius: VLCStyle.listAlbumCover_radius
+            // artworks can have anysize, we try to fit it using PreserveAspectFit
+            // in the provided size and place it in the center of itemCover
+            fillMode: Image.PreserveAspectFit
+            horizontalAlignment: Image.AlignHCenter
+            verticalAlignment: Image.AlignVCenter
 
             networkModel: rowModel
 
