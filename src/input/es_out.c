@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 
 #include <vlc_arrays.h>
 #include <vlc_es_out.h>

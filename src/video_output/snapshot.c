@@ -31,6 +31,7 @@
 #include <time.h>
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_block.h>

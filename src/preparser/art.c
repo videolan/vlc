@@ -29,6 +29,7 @@
 #include <errno.h>
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_input_item.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
