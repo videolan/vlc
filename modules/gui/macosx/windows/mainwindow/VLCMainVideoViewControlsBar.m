@@ -24,6 +24,8 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryDataTypes.h"
+
 #import "main/VLCMain.h"
 
 #import "menus/VLCMainMenu.h"
@@ -32,6 +34,15 @@
 
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+
+#import "views/VLCWrappableTextField.h"
+
+@interface VLCMainVideoViewControlsBar ()
+{
+    VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
+}
+@end
 
 @implementation VLCMainVideoViewControlsBar
 
@@ -47,6 +58,28 @@
 
     _audioButton.toolTip = _NS("Audio settings");
     _audioButton.accessibilityLabel = _audioButton.toolTip;
+
+    _playlistController = VLCMain.sharedInstance.playlistController;
+    _playerController = _playlistController.playerController;
+
+    NSNotificationCenter * const notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateDetailLabel:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+}
+
+- (void)updateDetailLabel:(NSNotification *)notification
+{
+    
+    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
+    if (!mediaItem) {
+        return;
+    }
+
+    _detailLabel.hidden = [mediaItem.detailString isEqualToString:@""] ||
+                          [mediaItem.detailString isEqualToString:mediaItem.durationString];
+    _detailLabel.stringValue = mediaItem.detailString;
 }
 
 - (IBAction)openBookmarks:(id)sender
