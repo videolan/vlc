@@ -3848,9 +3848,12 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     if( !p_track->b_enable || (p_track->i_use_flags & USEAS_CHAPTERS) )
         p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
 
+    if( !p_sys->b_quicktime || (p_track->i_use_flags & USEAS_CHAPTERS) == 0 )
+        b_create_es &= !MP4_isMetadata( p_track );
+
     if( TrackCreateES( p_demux,
                        p_track, p_track->i_chunk,
-                      (MP4_isMetadata( p_track ) || !b_create_es) ? NULL : &p_track->p_es ) )
+                       !b_create_es ? NULL : &p_track->p_es ) )
     {
         msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
                  p_track->i_track_ID );
