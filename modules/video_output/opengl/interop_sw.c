@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <vlc_opengl.h>
 #include <vlc_opengl_interop.h>

@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_es.h>
 #include <vlc_subpicture.h>
 

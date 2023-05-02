@@ -21,6 +21,7 @@
 #define JSON_HELPER_H
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_stream.h>
 
 #include <limits.h>

@@ -32,6 +32,7 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
@@ -42,6 +43,7 @@
 #include <vlc_meta.h>
 #include <vlc_codecs.h>
 #include <vlc_charset.h>
+#include <vlc_arrays.h>
 
 #include "libavi.h"
 #include "../rawdv.h"
