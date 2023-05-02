@@ -21,6 +21,7 @@
 #define VLC_TIMESTAMPS_FILTER_H
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_es_out.h>
 
 #include "moving_avg.h"

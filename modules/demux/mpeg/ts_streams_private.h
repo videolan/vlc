@@ -26,6 +26,7 @@ typedef struct ts_sections_processor_t ts_sections_processor_t;
 #include "timestamps.h"
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_es.h>
 
 struct ts_pat_t
