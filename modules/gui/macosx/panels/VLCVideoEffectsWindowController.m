@@ -32,6 +32,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import <vlc_configuration.h>
 
 #define getWidgetBoolValue(w)   ((vlc_value_t){ .b_bool = [w state] })
 #define getWidgetIntValue(w)    ((vlc_value_t){ .i_int = [w intValue] })

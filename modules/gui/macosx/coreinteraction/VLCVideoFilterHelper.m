@@ -22,6 +22,7 @@
 
 #import "VLCVideoFilterHelper.h"
 
+#import <vlc_configuration.h>
 #import <vlc_modules.h>
 #import <vlc_charset.h>
 
