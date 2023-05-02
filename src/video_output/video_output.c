@@ -35,6 +35,7 @@
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
+#include <vlc_configuration.h>
 
 #include <math.h>
 #include <stdlib.h>                                                /* free() */
