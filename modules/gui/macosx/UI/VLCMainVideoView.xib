@@ -33,6 +33,7 @@
                 <outlet property="audioButton" destination="cja-ZG-8LF" id="96C-CC-iV7"/>
                 <outlet property="backwardButton" destination="V9d-hX-iyg" id="ZFn-jn-7OB"/>
                 <outlet property="bookmarksButton" destination="4tZ-52-1q9" id="dAN-YB-YZ5"/>
+                <outlet property="detailLabel" destination="5ii-yU-6Zp" id="ves-8e-T8E"/>
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
@@ -67,7 +68,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
-                                <rect key="frame" x="0.0" y="0.0" width="720" height="107"/>
+                                <rect key="frame" x="0.0" y="0.0" width="720" height="132"/>
                                 <subviews>
                                     <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f4v-2z-dQ1" customClass="VLCTimeField">
                                         <rect key="frame" x="623" y="20" width="79" height="14"/>
@@ -80,13 +81,21 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="San-L7-ZvB">
-                                        <rect key="frame" x="20" y="59" width="390" height="28"/>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="San-L7-ZvB">
+                                        <rect key="frame" x="20" y="59" width="390" height="53"/>
                                         <subviews>
                                             <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="lEW-MN-FFU" customClass="VLCWrappableTextField">
-                                                <rect key="frame" x="-2" y="0.0" width="394" height="28"/>
+                                                <rect key="frame" x="-2" y="25" width="394" height="28"/>
                                                 <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Nothing Playing" usesSingleLineMode="YES" id="8l0-zS-fOa">
                                                     <font key="font" metaFont="systemBold" size="24"/>
+                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5ii-yU-6Zp" customClass="VLCWrappableTextField">
+                                                <rect key="frame" x="-2" y="0.0" width="145" height="21"/>
+                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" placeholderString="No details to show" usesSingleLineMode="YES" id="k9I-DK-CEe">
+                                                    <font key="font" textStyle="title2" name=".SFNS-Regular"/>
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -98,8 +107,10 @@
                                         </constraints>
                                         <visibilityPriorities>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
