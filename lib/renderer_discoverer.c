@@ -28,6 +28,7 @@
 #include <vlc/libvlc_renderer_discoverer.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 
 #include "libvlc_internal.h"
 #include "renderer_discoverer_internal.h"
