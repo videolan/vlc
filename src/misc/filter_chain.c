@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_filter.h>
+#include <vlc_configuration.h>
 #include <vlc_modules.h>
 #include <vlc_mouse.h>
 #include <vlc_spu.h>
