@@ -296,6 +296,10 @@ QtObject {
     // New indicator
     readonly property url newIndicator: "qrc:///misc/new_indicator.svg";
 
+    // ControlBar
+
+    readonly property int controlBarBookmarksHeight: icon_xsmall * 0.9
+
     // Player control layout
     readonly property int controlLayoutHeight: dp(64, scale)
     readonly property int controlLayoutHeightPinned: dp(32, scale)

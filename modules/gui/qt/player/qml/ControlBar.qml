@@ -42,7 +42,7 @@ Control {
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
-    property real bookmarksHeight: VLCStyle.icon_xsmall * 0.9
+    property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
 
     signal requestLockUnlockAutoHide(bool lock)
 
