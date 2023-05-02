@@ -25,6 +25,7 @@
 #define VLC_VLM_H 1
 
 #include <vlc_input.h>
+#include <vlc_arrays.h>
 
 /**
  * \defgroup server VLM
