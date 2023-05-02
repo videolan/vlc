@@ -174,8 +174,6 @@ static inline void *realloc_or_free( void *p, size_t sz )
         _ARRAY_ALLOC(array, (int)((array).i_alloc * 1.5) )                    \
 }
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 /* API */
 #define DECL_ARRAY(type) struct {                                           \
     int i_alloc;                                                            \
