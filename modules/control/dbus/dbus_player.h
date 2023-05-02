@@ -27,6 +27,7 @@
 #define VLC_DBUS_DBUS_PLAYER_H_
 
 #include <vlc_interface.h>
+#include <vlc_arrays.h>
 #include "dbus_common.h"
 
 #define DBUS_MPRIS_PLAYER_INTERFACE    "org.mpris.MediaPlayer2.Player"

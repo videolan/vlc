@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include "../lru.h"
+#include <vlc_arrays.h>
 
 struct vlc_font_select_t
 {

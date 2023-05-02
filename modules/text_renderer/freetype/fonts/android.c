@@ -34,6 +34,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_filter.h>                                      /* filter_sys_t */
 
 # include <vlc_xml.h>

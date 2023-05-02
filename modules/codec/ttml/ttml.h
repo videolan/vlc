@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include <vlc_tick.h>
+#include <vlc_arrays.h>
 
 int tt_OpenDemux( vlc_object_t* p_this );
 void tt_CloseDemux( vlc_object_t* p_demux );

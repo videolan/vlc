@@ -20,6 +20,8 @@
 #ifndef VLC_TS_H
 #define VLC_TS_H
 
+#include <vlc_arrays.h>
+
 #ifdef HAVE_ARIBB24
     typedef struct arib_instance_t arib_instance_t;
 #endif

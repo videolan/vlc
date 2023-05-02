@@ -32,7 +32,7 @@
 #ifndef PLATFORM_FONTS_H
 #define PLATFORM_FONTS_H
 
-/** \defgroup freetype_fonts Freetype Fonts management 
+/** \defgroup freetype_fonts Freetype Fonts management
  * \ingroup freetype
  * Freetype text rendering cross platform
  * @{
@@ -54,6 +54,8 @@
 #endif
 
 #include "freetype.h"
+
+#include <vlc_arrays.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -27,6 +27,7 @@
 #define VLC_DBUS_DBUS_TRACKLIST_H_
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_interface.h>
 #include "dbus_common.h"
 
