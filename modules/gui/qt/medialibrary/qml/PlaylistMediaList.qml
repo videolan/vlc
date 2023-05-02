@@ -95,6 +95,9 @@ MainInterface.MainViewLoader {
     model: MLPlaylistListModel {
         ml: MediaLib
 
+        playlistType: isMusic ? MLPlaylistListModel.PLAYLIST_TYPE_AUDIO
+                              : MLPlaylistListModel.PLAYLIST_TYPE_VIDEO
+
         coverSize: (isMusic) ? Qt.size(512, 512)
                              : Qt.size(1024, 640)
 
