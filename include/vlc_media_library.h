@@ -89,6 +89,13 @@ typedef enum vlc_ml_history_type_t
     VLC_ML_HISTORY_TYPE_NETWORK,
 } vlc_ml_history_type_t;
 
+typedef enum vlc_ml_playlist_type_t
+{
+    VLC_ML_PLAYLIST_TYPE_ALL,
+    VLC_ML_PLAYLIST_TYPE_AUDIO,
+    VLC_ML_PLAYLIST_TYPE_VIDEO,
+} vlc_ml_playlist_type_t;
+
 typedef struct vlc_ml_thumbnail_t
 {
     char* psz_mrl;
@@ -1738,20 +1745,20 @@ static inline size_t vlc_ml_count_group_media( vlc_medialibrary_t* p_ml, const v
 
 //-------------------------------------------------------------------------------------------------
 
-static inline vlc_ml_playlist_list_t* vlc_ml_list_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+static inline vlc_ml_playlist_list_t* vlc_ml_list_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, vlc_ml_playlist_type_t playlist_type )
 {
     vlc_assert( p_ml != NULL );
     vlc_ml_playlist_list_t* res;
-    if ( vlc_ml_list( p_ml, VLC_ML_LIST_PLAYLISTS, params, &res ) != VLC_SUCCESS )
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_PLAYLISTS, params, (int) playlist_type, &res ) != VLC_SUCCESS )
         return NULL;
     return res;
 }
 
-static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, vlc_ml_playlist_type_t playlist_type)
 {
     vlc_assert( p_ml != NULL );
     size_t count;
-    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_PLAYLISTS, params, &count ) != VLC_SUCCESS )
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_PLAYLISTS, params, (int) playlist_type, &count ) != VLC_SUCCESS )
         return 0;
     return count;
 }

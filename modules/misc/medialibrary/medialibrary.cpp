@@ -1990,11 +1990,28 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
         case VLC_ML_LIST_PLAYLISTS:
         case VLC_ML_COUNT_PLAYLISTS:
         {
+            auto vlcPlaylistType = static_cast<vlc_ml_playlist_type_t>(va_arg( args, int ));
+            medialibrary::PlaylistType mlPlaylistType;
+            switch (vlcPlaylistType)
+            {
+            case VLC_ML_PLAYLIST_TYPE_ALL:
+                mlPlaylistType = medialibrary::PlaylistType::All;
+                break;
+            case VLC_ML_PLAYLIST_TYPE_VIDEO:
+                mlPlaylistType = medialibrary::PlaylistType::VideoOnly;
+                break;
+            case VLC_ML_PLAYLIST_TYPE_AUDIO:
+                mlPlaylistType = medialibrary::PlaylistType::AudioOnly;
+                break;
+            default:
+                    vlc_assert_unreachable();
+            }
+
             medialibrary::Query<medialibrary::IPlaylist> query;
             if ( pattern != nullptr )
                 query = m_ml->searchPlaylists( pattern, paramsPtr );
             else
-                query = m_ml->playlists( medialibrary::PlaylistType::All, paramsPtr );
+                query = m_ml->playlists( mlPlaylistType, paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             switch ( listQuery )
