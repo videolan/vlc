@@ -24,31 +24,26 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.ScaledImage {
-    id: custom_cover
+Item {
+    id: root
 
     property var networkModel
     property color bgColor
     property color color1
     property color accent
 
-    sourceSize: Qt.size(width, height)
-    source: {
-        if (networkModel === null)
-            return ""
 
-        if (!!networkModel.artwork && networkModel.artwork.length > 0)
-            return networkModel.artwork
+    // Image properties
+    property int fillMode: Image.Stretch
+    property int horizontalAlignment: Image.AlignHCenter
+    property int verticalAlignment: Image.AlignVCenter
 
-        var img = SVGColorImage.colorize(_baseUri(networkModel.type))
-            .color1(custom_cover.color1)
-            .accent(custom_cover.accent)
+    readonly property var paintedWidth: _image.paintedWidth
+    readonly property var paintedHeight: _image.paintedHeight
 
-        if (bgColor !== undefined)
-            img.background(custom_cover.bgColor)
+    // currently shown image
+    property var _image: typeImage.visible ? typeImage : artwork
 
-        return img.uri()
-    }
 
     function _baseUri(type) {
         switch (type) {
@@ -64,6 +59,58 @@ Widgets.ScaledImage {
             return "qrc:///sd/file.svg"
         default:
             return "qrc:///sd/directory.svg"
+        }
+    }
+
+
+    Widgets.ScaledImage {
+        // failsafe cover, we show this while loading artwork or if loading fails
+
+        id: typeImage
+
+        anchors.fill: parent
+
+        visible: !artwork.visible
+
+        sourceSize: Qt.size(width, height)
+
+        fillMode: root.fillMode
+        horizontalAlignment: root.horizontalAlignment
+        verticalAlignment: root.verticalAlignment
+
+        source: {
+            if (!networkModel || !visible)
+                return ""
+
+            var img = SVGColorImage.colorize(_baseUri(networkModel.type))
+                .color1(root.color1)
+                .accent(root.accent)
+
+            if (bgColor !== undefined)
+                img.background(root.bgColor)
+
+            return img.uri()
+        }
+    }
+
+    Widgets.ScaledImage {
+        id: artwork
+
+        anchors.fill: parent
+
+        visible: status === Image.Ready
+
+        sourceSize: Qt.size(width, height)
+
+        fillMode: root.fillMode
+        horizontalAlignment: root.horizontalAlignment
+        verticalAlignment: root.verticalAlignment
+
+        source: {
+            if (!!networkModel && !!networkModel.artwork && networkModel.artwork.length > 0)
+                return networkModel.artwork
+
+            return ""
         }
     }
 }
