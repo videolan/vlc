@@ -27,6 +27,7 @@
 #include <stdarg.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_dialog.h>
 #include <vlc_interrupt.h>
 #include <vlc_extensions.h>

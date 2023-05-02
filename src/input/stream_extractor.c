@@ -26,6 +26,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
 #include <vlc_modules.h>

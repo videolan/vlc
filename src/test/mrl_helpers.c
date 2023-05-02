@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include "../input/mrl_helpers.h"
 
 #define MAX_RESULT 10
