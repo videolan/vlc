@@ -31,6 +31,7 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>

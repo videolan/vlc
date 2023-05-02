@@ -28,6 +28,7 @@
  *****************************************************************************/
 #include "mp4.h"
 
+#include <vlc_arrays.h>
 #include <vlc_demux.h>
 #include <vlc_charset.h>                           /* EnsureUTF8 */
 #include <vlc_input.h>

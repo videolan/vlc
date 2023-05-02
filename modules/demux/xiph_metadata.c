@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_arrays.h>

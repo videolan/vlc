@@ -49,6 +49,7 @@ http://service.real.com/help/library/guides/realone/IntroGuide/HTML/htmfiles/ram
 #include <ctype.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_access.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>

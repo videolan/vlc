@@ -55,6 +55,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #include <errno.h>
 
 #include <vlc_common.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_input.h>
