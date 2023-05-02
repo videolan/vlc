@@ -21,6 +21,8 @@
 #ifndef LIBVLC_CONFIGURATION_H
 # define LIBVLC_CONFIGURATION_H 1
 
+#include <vlc_configuration.h>
+
 /* Internal configuration prototypes and structures */
 
 struct vlc_plugin_t;
