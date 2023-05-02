@@ -36,6 +36,7 @@
 
 /* VLC core API headers */
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 
