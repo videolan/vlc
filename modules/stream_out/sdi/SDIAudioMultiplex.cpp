@@ -22,6 +22,7 @@
 #endif
 
 #include "SDIAudioMultiplex.hpp"
+#include <vlc_configuration.h>
 #include <vlc_es.h>
 #include <limits>
 #include <cstring>
