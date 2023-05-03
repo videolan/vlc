@@ -27,6 +27,15 @@ import "qrc:///player/" as Player
 Widgets.IconControlButton {
     id: root
 
+    // Proprerties
+
+    readonly property var _parentItem: {
+        if ((typeof rootPlayer !== 'undefined') && (rootPlayer !== null))
+            return rootPlayer
+        else
+            return g_mainDisplay
+    }
+
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
@@ -48,15 +57,15 @@ Widgets.IconControlButton {
     Loader {
         id: menuLoader
 
-        active: (typeof rootPlayer !== 'undefined') && (rootPlayer !== null)
-
         sourceComponent: Player.TracksMenu {
             id: menu
 
-            parent: rootPlayer
+            parent: root._parentItem
+
+            width: parent.width
 
             x: 0
-            y: (rootPlayer.positionSliderY - height)
+            y: (parent.positionSliderY - height)
             z: 1
 
             focus: true
@@ -65,15 +74,17 @@ Widgets.IconControlButton {
 
             onOpened: {
                 root.requestLockUnlockAutoHide(true)
-                if (!!rootPlayer)
-                    rootPlayer.applyMenu(menu)
+
+                if (typeof parent.applyMenu === "function")
+                    parent.applyMenu(menu)
             }
 
             onClosed: {
                 root.requestLockUnlockAutoHide(false)
                 root.forceActiveFocus()
-                if (!!rootPlayer)
-                    rootPlayer.applyMenu(null)
+
+                if (typeof parent.applyMenu === "function")
+                    parent.applyMenu(null)
             }
         }
     }
