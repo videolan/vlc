@@ -59,8 +59,19 @@ T.Popup {
     T.Overlay.modal: null
 
     background: Rectangle {
-        opacity: 0.8
-        color: popupTheme.bg.primary
+        // NOTE: The opacity should be stronger on a light background for readability.
+        color: (popupTheme.palette.isDark)
+               ? VLCStyle.setColorAlpha(popupTheme.bg.primary, 0.8)
+               : VLCStyle.setColorAlpha(popupTheme.bg.primary, 0.96)
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height: VLCStyle.margin_xxxsmall
+
+            color: popupTheme.border
+        }
     }
 
     contentItem: StackView {
