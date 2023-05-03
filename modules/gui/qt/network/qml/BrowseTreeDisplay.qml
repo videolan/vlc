@@ -111,7 +111,10 @@ MainInterface.MainViewLoader {
         defaultText:  I18n.qtr("Unknown Share")
 
         coverProvider: function(index, data) {
-            return {artwork: data.artwork, cover: custom_cover, type: data.type}
+            // this is used to provide context to NetworkCustomCover
+            // indexData is networkModel (model data) for this index
+            // cover is our custom cover that will be loaded insted of default DragItem cover
+            return {"indexData": data, "cover": custom_cover}
         }
 
         onRequestData: {
@@ -129,9 +132,18 @@ MainInterface.MainViewLoader {
             id: custom_cover
 
             NetworkCustomCover {
-                networkModel: model
-                width: networkDragItem.coverSize / 2
-                height: networkDragItem.coverSize / 2
+                networkModel: model.indexData
+
+                width: networkDragItem.coverSize
+                height: networkDragItem.coverSize
+
+                // we can not change the size of cover and shodows from here,
+                // so for best visual use scale image to fit
+                fillMode: Image.PreserveAspectCrop
+
+                bgColor: networkDragItem.colorContext.bg.secondary
+                color1: networkDragItem.colorContext.fg.primary
+                accent: networkDragItem.colorContext.accent
             }
         }
     }
