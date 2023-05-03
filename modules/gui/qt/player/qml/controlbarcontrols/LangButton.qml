@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.12
 
 import org.videolan.vlc 0.1
@@ -23,17 +24,26 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///player/" as Player
 
-
 Widgets.IconControlButton {
-    id: langBtn
-    iconText: VLCIcons.audiosub
+    id: root
 
-    enabled: menuLoader.status === Loader.Ready
-    onClicked: menuLoader.item.open()
+    // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    // Settings
+
+    iconText: VLCIcons.audiosub
+
+    enabled: menuLoader.status === Loader.Ready
+
     text: I18n.qtr("Languages and tracks")
+
+    // Events
+
+    onClicked: menuLoader.item.open()
+
+    // Children
 
     Loader {
         id: menuLoader
@@ -44,22 +54,24 @@ Widgets.IconControlButton {
             id: menu
 
             parent: rootPlayer
-            focus: true
+
             x: 0
             y: (rootPlayer.positionSliderY - height)
             z: 1
 
-            colorContext.palette: langBtn.colorContext.palette
+            focus: true
+
+            colorContext.palette: root.colorContext.palette
 
             onOpened: {
-                langBtn.requestLockUnlockAutoHide(true)
+                root.requestLockUnlockAutoHide(true)
                 if (!!rootPlayer)
                     rootPlayer.applyMenu(menu)
             }
 
             onClosed: {
-                langBtn.requestLockUnlockAutoHide(false)
-                langBtn.forceActiveFocus()
+                root.requestLockUnlockAutoHide(false)
+                root.forceActiveFocus()
                 if (!!rootPlayer)
                     rootPlayer.applyMenu(null)
             }
