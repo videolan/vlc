@@ -45,6 +45,7 @@
 #include <QSplitter>
 #include <QShortcut>
 
+#include <vlc_configuration.h>
 #include <vlc_modules.h>
 
 PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )

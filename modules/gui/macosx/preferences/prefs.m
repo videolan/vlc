@@ -51,6 +51,7 @@
 #import <string.h>
 
 #import <vlc_common.h>
+#import <vlc_configuration.h>
 #import <vlc_actions.h>
 #import <vlc_config_cat.h>
 #import <vlc_modules.h>
