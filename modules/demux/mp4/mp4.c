@@ -183,6 +183,7 @@ static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, vlc_tick_t );
+static void TrackUpdateSampleAndTimes( mp4_track_t *p_track );
 
 static void     MP4_UpdateSeekpoint( demux_t *, vlc_tick_t );
 
@@ -2483,6 +2484,7 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
         if( tk->i_sample >= tk->chunk[tk->i_chunk].i_sample_first +
                             tk->chunk[tk->i_chunk].i_sample_count )
             tk->i_chunk++;
+        TrackUpdateSampleAndTimes( tk );
 
         vlc_tick_t i_pts;
         MP4_TrackGetDTSPTS( p_demux, tk, &i_pts );
