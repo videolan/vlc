@@ -190,6 +190,13 @@ Item {
 
     on_ActiveChanged: {
         if (_active) {
+
+            // reset any data from previous drags before requesting new data,
+            // so that we don't show invalid data while data is being requested
+            _title = ""
+            _covers = []
+            _data = []
+
             dragItem._currentRequest += 1
             dragItem.requestData(dragItem._currentRequest)
 
