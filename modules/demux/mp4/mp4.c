@@ -2485,6 +2485,9 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
         uint32_t i_nb_samples = 0;
         const uint32_t i_size = MP4_TrackGetReadSize( tk, &i_nb_samples );
 
+        if( i_nb_samples > 1 )
+            break; /* should not happen */
+
         if( i_size > 0 && !vlc_stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
         {
             char p_buffer[256];
