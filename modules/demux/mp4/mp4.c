@@ -2480,6 +2480,10 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
 
     for( tk->i_sample = 0; tk->i_sample < tk->i_sample_count; tk->i_sample++ )
     {
+        if( tk->i_sample >= tk->chunk[tk->i_chunk].i_sample_first +
+                            tk->chunk[tk->i_chunk].i_sample_count )
+            tk->i_chunk++;
+
         vlc_tick_t i_pts;
         MP4_TrackGetDTSPTS( p_demux, tk, &i_pts );
         uint32_t i_nb_samples = 0;
@@ -2520,9 +2524,6 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
                 TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
             }
         }
-        if( tk->i_sample+1 >= tk->chunk[tk->i_chunk].i_sample_first +
-                              tk->chunk[tk->i_chunk].i_sample_count )
-            tk->i_chunk++;
     }
 }
 static void LoadChapter( demux_t  *p_demux )
