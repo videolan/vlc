@@ -83,6 +83,7 @@ static void cb_preparse_ended(input_item_t *p_item, enum input_item_preparse_sta
 
 static const struct vlc_metadata_cbs preparseCallbacks = {
     cb_preparse_ended,
+    NULL,
     cb_subtree_added,
 };
 
@@ -625,7 +626,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     if (self.isStream) {
         return;
     }
-    
+
     NSURL *pathUrl = [NSURL URLWithString:self.path];
     if (pathUrl == nil) {
         return;
@@ -660,7 +661,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     self = [super init];
     if (self && p_inputNode != NULL) {
         _vlcInputItemNode = p_inputNode;
-        
+
         if (_vlcInputItemNode->p_item) {
             _inputItem = [[VLCInputItem alloc] initWithInputItem:_vlcInputItemNode->p_item];
         }
