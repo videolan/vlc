@@ -183,9 +183,9 @@ vlcSetLibVLCEnvironment() {
     echo "Setting libVLC flags"
 
     # Enable debug symbols by default
-    export CFLAGS="-g -arch $ACTUAL_HOST_ARCH"
-    export CXXFLAGS="-g -arch $ACTUAL_HOST_ARCH"
-    export OBJCFLAGS="-g -arch $ACTUAL_HOST_ARCH"
+    export CFLAGS="-g -arch $ACTUAL_HOST_ARCH -Werror=incompatible-function-pointer-types"
+    export CXXFLAGS="-g -arch $ACTUAL_HOST_ARCH -Werror=incompatible-function-pointer-types"
+    export OBJCFLAGS="-g -arch $ACTUAL_HOST_ARCH -Werror=incompatible-function-pointer-types"
     export LDFLAGS="-arch $ACTUAL_HOST_ARCH"
 }
 
