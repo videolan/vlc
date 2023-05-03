@@ -152,16 +152,14 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc{};
         processorDesc.InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE;
         processorDesc.InputFrameRate = {
-            .Numerator   = fmt->i_frame_rate,
-            .Denominator = fmt->i_frame_rate_base,
+            fmt->i_frame_rate, fmt->i_frame_rate_base,
         };
         processorDesc.InputWidth   = fmt->i_width;
         processorDesc.InputHeight  = fmt->i_height;
         processorDesc.OutputWidth  = out_width;
         processorDesc.OutputHeight = out_height;
         processorDesc.OutputFrameRate = {
-            .Numerator   = fmt->i_frame_rate,
-            .Denominator = fmt->i_frame_rate_base,
+            fmt->i_frame_rate, fmt->i_frame_rate_base,
         };
         processorDesc.Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL;
         hr = scaleProc->d3dviddev->CreateVideoProcessorEnumerator(&processorDesc, &scaleProc->enumerator);
