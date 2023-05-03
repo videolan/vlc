@@ -44,7 +44,7 @@ if have_win_desktop
     vlc_modules += {
         'name' : 'wingdi',
         'sources' : files('wingdi.c', 'common.c', 'events.c', 'win32touch.c'),
-        'link_with' : [ chroma_copy_lib ]
+        'link_with' : [ chroma_copy_lib ],
         'dependencies' : [
             cc.find_library('user32')
         ]
