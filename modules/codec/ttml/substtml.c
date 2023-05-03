@@ -1154,22 +1154,47 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
     }
 }
 
-static void setWidth( video_format_t* fmt, int flags, float extent_x )
+static bool isValidPixelsExtent( int flags, float extent_x, float extent_y )
 {
-    if ( !( flags & UPDT_REGION_EXTENT_X_IS_RATIO ) && extent_x > 0 )
-    {
-        fmt->i_width = extent_x;
-        fmt->i_visible_width = extent_x;
-    }
+    return !( flags & UPDT_REGION_EXTENT_X_IS_RATIO ) && !( flags & UPDT_REGION_EXTENT_Y_IS_RATIO )
+        && extent_x > 0 && extent_y > 0;
 }
 
-static void setHeight( video_format_t* fmt, int flags, float extent_y )
+static bool isValidPercentsExtent( int flags, float extent_x, float extent_y )
 {
-    if ( !( flags & UPDT_REGION_EXTENT_Y_IS_RATIO ) && extent_y > 0 )
-    {
-        fmt->i_height = extent_y;
-        fmt->i_visible_height = extent_y;
-    }
+    return ( flags & UPDT_REGION_EXTENT_X_IS_RATIO ) && ( flags & UPDT_REGION_EXTENT_Y_IS_RATIO )
+        && extent_x > 0 && extent_y > 0;
+}
+
+static void setPixelsWidthAndHeight( video_format_t* fmt, float extent_x, float extent_y )
+{
+    fmt->i_width = extent_x;
+    fmt->i_visible_width = extent_x;
+
+    fmt->i_height = extent_y;
+    fmt->i_visible_height = extent_y;
+}
+
+static void setPercentsWidthAndHeight( video_format_t* fmt, float extent_x, float extent_y )
+{
+    fmt->i_width = extent_x * fmt->i_width;
+    fmt->i_visible_width = fmt->i_width;
+
+    fmt->i_height = extent_y * fmt->i_height;
+    fmt->i_visible_height = fmt->i_height;
+}
+
+static picture_t * rescalePicture( image_handler_t *p_image, picture_t *p_picture, float extent_x, float extent_y )
+{
+    video_format_t fmt_out;
+    video_format_Copy( &fmt_out, &p_picture->format );
+    setPercentsWidthAndHeight( &fmt_out, extent_x, extent_y );
+
+    picture_t *p_scaled_picture = image_Convert( p_image, p_picture,  &p_picture->format, &fmt_out );
+
+    video_format_Clean( &fmt_out );
+
+    return p_scaled_picture;
 }
 
 static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
@@ -1181,8 +1206,11 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
         
     video_format_t fmt_out;
     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
-    setWidth( &fmt_out, flags, extent_x);
-    setHeight(&fmt_out, flags, extent_y);
+    
+    if ( isValidPixelsExtent( flags, extent_x, extent_y ) )
+    {
+        setPixelsWidthAndHeight( &fmt_out, extent_x, extent_y );
+    }
     
     es_format_t es_in;
     es_format_Init( &es_in, VIDEO_ES, VLC_CODEC_PNG );
@@ -1202,6 +1230,18 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
     if( p_image )
     {
         p_pic = image_Read( p_image, p_block, &es_in, &fmt_out );
+        
+        if ( p_pic && isValidPercentsExtent( flags, extent_x, extent_y ) )
+        {
+            picture_t *p_scaled_pic = rescalePicture( p_image, p_pic, extent_x, extent_y );
+
+            if ( p_scaled_pic )
+            {
+                picture_Release( p_pic );
+                p_pic = p_scaled_pic;
+            }
+        }
+        
         image_HandlerDelete( p_image );
     }
     else block_Release( p_block );
