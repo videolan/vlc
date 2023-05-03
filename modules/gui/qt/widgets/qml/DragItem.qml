@@ -351,18 +351,18 @@ Item {
 
         ScrollingText {
             label: titleLabel
-            forceScroll: true
-            height: titleLabel.height
+            height: VLCStyle.fontHeight_large
             width: parent.width
+
             clip: scrolling
+            forceScroll: dragItem.visible
+            hoverScroll: false
 
             T.Label {
                 id: titleLabel
 
                 text: dragItem._title
                 visible: text && text !== ""
-                width: parent.width
-                elide: Text.ElideNone
                 font.pixelSize: VLCStyle.fontSize_large
                 color: theme.fg.primary
             }
