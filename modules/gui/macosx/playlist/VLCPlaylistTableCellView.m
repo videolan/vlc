@@ -68,13 +68,10 @@
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
 {
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        NSImage *image = [VLCLibraryImageCache thumbnailForPlaylistItem:item];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.audioArtworkImageView.image = image;
-            self.mediaImageView.image = image;
-        });
-    });
+    [VLCLibraryImageCache thumbnailForPlaylistItem:item withCompletion:^(NSImage * const thumbnail) {
+        self.audioArtworkImageView.image = thumbnail;
+        self.mediaImageView.image = thumbnail;
+    }];
 
     NSString *artist = item.artistName;
     if (artist && artist.length > 0) {
