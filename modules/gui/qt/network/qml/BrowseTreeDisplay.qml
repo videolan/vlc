@@ -154,48 +154,18 @@ MainInterface.MainViewLoader {
             selectionDelegateModel: selectionModel
             model: filterModel
 
-            headerDelegate: FocusScope {
-                id: headerId
+            headerDelegate: BrowseTreeHeader {
+                providerModel: root.providerModel
 
-                width: root.width
-                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_normal
+                // align header content with grid content
+                leftPadding: gridView.rowX
 
-                Navigation.navigable: btn.visible
+                width: gridView.width
+
                 Navigation.parentItem: root
-                Navigation.downAction: function() {
+                Navigation.downAction: function () {
                     focus = false
                     gridView.forceActiveFocus(Qt.TabFocusReason)
-                }
-
-                RowLayout {
-                    id: layout
-
-                    anchors.fill: parent
-                    anchors.topMargin: VLCStyle.margin_large
-                    anchors.bottomMargin: VLCStyle.margin_normal
-                    anchors.rightMargin: VLCStyle.margin_small
-
-                    Widgets.SubtitleLabel {
-                        text: providerModel.name
-                        leftPadding: gridView.rowX
-                        color: gridView.colorContext.fg.primary
-
-                        Layout.fillWidth: true
-                    }
-
-                    Widgets.ButtonExt {
-                        id: btn
-
-                        focus: true
-                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                        text:  providerModel.indexed ?  I18n.qtr("Remove from medialibrary") : I18n.qtr("Add to medialibrary")
-                        visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
-                        onClicked: providerModel.indexed = !providerModel.indexed
-
-                        Layout.preferredWidth: implicitWidth
-
-                        Navigation.parentItem: headerId
-                    }
                 }
             }
 
