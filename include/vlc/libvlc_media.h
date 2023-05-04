@@ -420,8 +420,6 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
  * at least once before calling this function.
  * If the media has not yet been parsed this will return NULL.
  *
- * \see libvlc_MediaMetaChanged
- *
  * \param p_md the media descriptor
  * \param e_meta the meta to read
  * \return the media's meta
@@ -524,16 +522,6 @@ LIBVLC_API bool libvlc_media_get_stats(libvlc_media_t *p_md,
  */
 LIBVLC_API VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t *)
 libvlc_media_subitems( libvlc_media_t *p_md );
-
-/**
- * Get event manager from media descriptor object.
- * NOTE: this function doesn't increment reference counting.
- *
- * \param p_md a media descriptor object
- * \return event manager object
- */
-LIBVLC_API libvlc_event_manager_t *
-    libvlc_media_event_manager( libvlc_media_t *p_md );
 
 /**
  * Get duration (in ms) of media descriptor object item.

@@ -32,7 +32,6 @@
 #include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_list.h> // For the subitems, here for convenience
-#include <vlc/libvlc_events.h>
 
 #include <vlc_common.h>
 #include <vlc_meta.h>
@@ -108,7 +107,6 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
 {
     libvlc_media_t * p_md_child;
     libvlc_media_list_t *p_subitems;
-    libvlc_event_t event;
 
     p_md_child = libvlc_media_new_from_input_item( item );
 
@@ -118,12 +116,6 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
     libvlc_media_list_internal_add_media( p_subitems, p_md_child );
     libvlc_media_list_unlock( p_subitems );
 
-    /* Construct the event */
-    event.type = libvlc_MediaSubItemAdded;
-    event.u.media_subitem_added.new_child = p_md_child;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
     return p_md_child;
 }
 
@@ -217,14 +209,6 @@ error:
 void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *node)
 {
     input_item_add_subnode( p_md, node );
-
-    /* Construct the event */
-    libvlc_event_t event;
-    event.type = libvlc_MediaSubItemTreeAdded;
-    event.u.media_subitemtree_added.item = p_md;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
 }
 
 /**
@@ -265,8 +249,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
     p_md->p_input_item->libvlc_owner = p_md;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
     p_md->req = NULL;
-
-    libvlc_event_manager_init( &p_md->event_manager, p_md );
 
     input_item_Hold( p_md->p_input_item );
 
@@ -388,7 +370,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     input_item_Release( p_md->p_input_item );
 
-    libvlc_event_manager_destroy( &p_md->event_manager );
     free( p_md );
 }
 
@@ -537,15 +518,6 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
 
     vlc_mutex_unlock( &item->lock );
     return true;
-}
-
-// Get event manager from a media descriptor object
-libvlc_event_manager_t *
-libvlc_media_event_manager( libvlc_media_t * p_md )
-{
-    assert( p_md );
-
-    return &p_md->event_manager;
 }
 
 // Get duration of media object (in ms)

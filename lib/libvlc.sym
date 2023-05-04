@@ -64,7 +64,6 @@ libvlc_media_discoverer_list_release
 libvlc_media_discoverer_start
 libvlc_media_discoverer_stop
 libvlc_media_duplicate
-libvlc_media_event_manager
 libvlc_media_get_codec_description
 libvlc_media_get_duration
 libvlc_media_get_filestat

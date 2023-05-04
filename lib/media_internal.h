@@ -42,8 +42,6 @@ typedef enum libvlc_media_parsed_status_t
 
 struct libvlc_media_t
 {
-    libvlc_event_manager_t event_manager;
-
     input_item_t      *p_input_item;
     vlc_atomic_rc_t    rc;
 
