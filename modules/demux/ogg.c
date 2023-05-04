@@ -807,8 +807,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             acc = va_arg( args, int );
             if ( p_sys->i_length <= 0 || !b /* || ! STREAM_CAN_FASTSEEK */ )
             {
-                Ogg_PreparePostSeek( p_sys );
-                return Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );
+                int ret = Oggseek_BlindSeektoPosition( p_demux, p_stream, f, b );
+                if( ret == VLC_SUCCESS )
+                    Ogg_PreparePostSeek( p_sys );
+                return ret;
             }
 
             assert( p_sys->i_length > 0 );
@@ -816,9 +818,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             vlc_tick_t i_preroll = Ogg_GetDecoderPreroll( p_stream );
             if( i_preroll > i64 )
                 i_preroll = i64;
-            Ogg_PreparePostSeek( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 - i_preroll ) >= 0 )
             {
+                Ogg_PreparePostSeek( p_sys );
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                     VLC_TICK_0 + i64 );
