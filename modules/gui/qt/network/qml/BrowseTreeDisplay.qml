@@ -66,9 +66,9 @@ MainInterface.MainViewLoader {
     }
 
     // override the default currentComponent assignment from MainViewLoader
-    // because we need to not show empty label when model is parsing
+    // because we need to show empty label when model is parsing
     currentComponent: {
-        if (filterModel.count == 0 && !root.parsing)
+        if (filterModel.count == 0 || root.parsing)
             return emptyLabelComponent
         else if (MainCtx.gridView)
             return gridComponent
@@ -134,15 +134,6 @@ MainInterface.MainViewLoader {
                 height: networkDragItem.coverSize / 2
             }
         }
-    }
-
-
-    Widgets.BusyIndicatorExt {
-        id: busyIndicator
-
-        runningDelayed: root.parsing
-        anchors.centerIn: parent
-        z: 1
     }
 
     Component{
@@ -312,7 +303,7 @@ MainInterface.MainViewLoader {
         FocusScope {
             id: focusScope
 
-            Navigation.navigable: layout.Navigation.navigable || emptyLabel.button.enabled
+            Navigation.navigable: layout.Navigation.navigable || (emptyLabel.visible && emptyLabel.button.enabled)
 
             // used by MainDisplay to transfer focus
             function setCurrentItemFocus(reason) {
@@ -346,6 +337,8 @@ MainInterface.MainViewLoader {
                 Widgets.EmptyLabelButton {
                     id: emptyLabel
 
+                    visible: !root.parsing
+
                     // FIXME: find better cover
                     cover: VLCStyle.noArtVideoCover
                     coverWidth : VLCStyle.dp(182, VLCStyle.scale)
@@ -375,6 +368,21 @@ MainInterface.MainViewLoader {
                             header.forceActiveFocus(Qt.TabFocusReason)
                         else
                             return false // fallthrough default action
+                    }
+                }
+
+                Item {
+                    visible: root.parsing
+
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Widgets.BusyIndicatorExt {
+                        id: busyIndicator
+
+                        runningDelayed: root.parsing
+                        anchors.centerIn: parent
+                        z: 1
                     }
                 }
             }
