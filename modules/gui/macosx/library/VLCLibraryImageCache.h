@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSImage *)thumbnailForPlaylistItem:(VLCPlaylistItem*)playlistItem;
 + (void)thumbnailForInputItem:(VLCInputItem *)inputItem
                withCompletion:(void(^)(const NSImage *))completionHandler;
++ (void)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem
+                  withCompletion:(void(^)(const NSImage *))completionHandler;
 
 @end
 

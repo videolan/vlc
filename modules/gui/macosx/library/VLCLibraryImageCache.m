@@ -161,4 +161,10 @@ float kVLCDefaultThumbnailPosition = .15;
     });
 }
 
++ (void)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem
+               withCompletion:(void(^)(const NSImage *))completionHandler
+{
+    [self thumbnailForInputItem:playlistItem.inputItem withCompletion:completionHandler];
+}
+
 @end
