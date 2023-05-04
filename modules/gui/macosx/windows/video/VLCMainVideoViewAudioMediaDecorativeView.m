@@ -54,13 +54,9 @@
     VLCPlayerController * const controller = notification.object;
     NSAssert(controller != nil, @"Player current media item changed notification should carry a valid player controller");
 
-    VLCInputItem * const currentInputItem = controller.currentMedia;
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        NSImage * const image = [VLCLibraryImageCache thumbnailForInputItem:currentInputItem];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setCoverArt:image];
-        });
-    });
+    [VLCLibraryImageCache thumbnailForInputItem:controller.currentMedia withCompletion:^(NSImage * const thumbnail) {
+        [self setCoverArt:thumbnail];
+    }];
 }
 
 - (void)setCoverArt:(NSImage *)coverArtImage

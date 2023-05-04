@@ -149,12 +149,10 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     _mediaTitleTextField.stringValue = _representedInputItem.name;
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        NSImage *image = [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self->_mediaImageView.image = image;
-        });
-    });
+    [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem withCompletion:^(NSImage * const thumbnail) {
+        self->_mediaImageView.image = thumbnail;
+    }];
+
 
     switch (_representedInputItem.inputType) {
         case ITEM_TYPE_STREAM:
