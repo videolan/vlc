@@ -10,6 +10,6 @@ if taglib_dep.found()
     vlc_modules += {
         'name' : 'taglib',
         'sources' : files('taglib.cpp', '../demux/xiph_metadata.c'),
-        'dependencies' : [taglib_dep, z_lib]
+        'dependencies' : [taglib_dep, z_dep]
     }
 endif

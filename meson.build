@@ -131,7 +131,7 @@ subdir('buildsystem/simd_checks')
 #
 
 # zlib library
-z_lib = cc.find_library('z', required: false)
+z_dep = dependency('zlib', required: false)
 
 # Math library
 m_lib = cc.find_library('m', required: false)

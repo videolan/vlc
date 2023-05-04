@@ -9,7 +9,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'sap',
     'sources' : files('sap.c', '../access/rtp/sdp.c'),
-    'dependencies' : [socket_libs, z_lib]
+    'dependencies' : [socket_libs, z_dep]
 }
 
 # Zeroconf services discovery

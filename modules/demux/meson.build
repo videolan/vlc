@@ -278,7 +278,7 @@ if libebml_dep.found() and libmatroska_dep.found()
             'mp4/libmp4.c',
             '../packetizer/dts_header.c',
         ),
-        'dependencies' : [libebml_dep, libmatroska_dep, z_lib]
+        'dependencies' : [libebml_dep, libmatroska_dep, z_dep]
     }
 endif
 
@@ -295,7 +295,7 @@ vlc_modules += {
         'asf/asfpacket.c',
         'mp4/attachments.c',
     ),
-    'dependencies' : [m_lib, z_lib]
+    'dependencies' : [m_lib, z_dep]
 }
 
 
@@ -575,7 +575,7 @@ vlc_modules += {
 
     ),
     'include_directories' : include_directories('adaptive', './'),
-    'dependencies' : [socket_libs, m_lib, z_lib],
+    'dependencies' : [socket_libs, m_lib, z_dep],
     'link_with' : vlc_http_lib,
     # TODO: Add optional GCRYPT dependency!
 }

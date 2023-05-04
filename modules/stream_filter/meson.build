@@ -16,11 +16,11 @@ if host_system != 'windows' and not have_tvos
   }
 endif
 
-if z_lib.found()
+if z_dep.found()
   vlc_modules += {
       'name' : 'inflate',
       'sources' : files('inflate.c'),
-      'dependencies' : [z_lib]
+      'dependencies' : [z_dep]
   }
 endif
 
