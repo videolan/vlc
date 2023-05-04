@@ -150,6 +150,17 @@ float kVLCDefaultThumbnailPosition = .15;
     return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem];
 }
 
++ (void)thumbnailForLibraryItem:(VLCAbstractMediaLibraryItem *)libraryItem
+               withCompletion:(void(^)(const NSImage *))completionHandler
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        NSImage * const image = [VLCLibraryImageCache thumbnailForLibraryItem:libraryItem];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(image);
+        });
+    });
+}
+
 + (void)thumbnailForInputItem:(VLCInputItem *)inputItem
                withCompletion:(void(^)(const NSImage *))completionHandler
 {
