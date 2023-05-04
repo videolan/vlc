@@ -65,9 +65,6 @@ FocusScope {
 
     Component.onCompleted: {
         loadView()
-        if (MainCtx.mediaLibraryAvailable && !MainCtx.hasFirstrun)
-            // asynchronous call
-            MainCtx.mediaLibrary.reload()
     }
 
     function loadView() {

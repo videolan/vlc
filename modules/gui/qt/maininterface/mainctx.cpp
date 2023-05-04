@@ -199,6 +199,10 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
             THEDP->firstRunDialog();
         }, Qt::QueuedConnection);
     }
+    else if (m_medialib)
+    {
+        QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
+    }
 }
 
 MainCtx::~MainCtx()
