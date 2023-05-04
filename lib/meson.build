@@ -6,7 +6,6 @@ libvlc_sources = [
     'log.c',
     'video.c',
     'audio.c',
-    'event.c',
     'media.c',
     'media_track.c',
     'media_player.c',

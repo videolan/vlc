@@ -28,7 +28,6 @@
 #include <vlc/libvlc_dialog.h>
 #include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
-#include <vlc/libvlc_events.h>
 
 #include <vlc_atomic.h>
 #include <vlc_common.h>
@@ -112,13 +111,6 @@ struct libvlc_instance_t
     } dialog;
 };
 
-struct libvlc_event_manager_t
-{
-    void * p_obj;
-    vlc_array_t listeners;
-    vlc_mutex_t lock;
-};
-
 /***************************************************************************
  * Other internal functions
  ***************************************************************************/
@@ -126,14 +118,6 @@ struct libvlc_event_manager_t
 /* Thread context */
 void libvlc_threads_init (void);
 void libvlc_threads_deinit (void);
-
-/* Events */
-void libvlc_event_manager_init(libvlc_event_manager_t *, void *);
-void libvlc_event_manager_destroy(libvlc_event_manager_t *);
-
-void libvlc_event_send(
-        libvlc_event_manager_t * p_em,
-        libvlc_event_t * p_event );
 
 static inline libvlc_time_t libvlc_time_from_vlc_tick(vlc_tick_t time)
 {

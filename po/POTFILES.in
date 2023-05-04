@@ -133,7 +133,6 @@ src/win32/thread.c
 
 lib/audio.c
 lib/core.c
-lib/event.c
 lib/libvlc_internal.h
 lib/log.c
 lib/media.c

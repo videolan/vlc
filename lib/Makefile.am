@@ -10,7 +10,6 @@ CLEANFILES = $(BUILT_SOURCES) $(pkgconfig_DATA)
 pkginclude_HEADERS = \
 	../include/vlc/libvlc.h \
 	../include/vlc/libvlc_dialog.h \
-	../include/vlc/libvlc_events.h \
 	../include/vlc/libvlc_media.h \
 	../include/vlc/libvlc_media_discoverer.h \
 	../include/vlc/libvlc_media_list.h \
@@ -40,7 +39,6 @@ libvlc_la_SOURCES = \
 	log.c \
 	video.c \
 	audio.c \
-	event.c \
 	media.c \
 	media_track.c \
 	media_player.c \
