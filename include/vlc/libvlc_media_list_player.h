@@ -98,15 +98,6 @@ LIBVLC_API libvlc_media_list_player_t *
     libvlc_media_list_player_retain( libvlc_media_list_player_t *p_mlp );
 
 /**
- * Return the event manager of this media_list_player.
- *
- * \param p_mlp media list player instance
- * \return the event manager
- */
-LIBVLC_API libvlc_event_manager_t *
-    libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp);
-
-/**
  * Get media player of the media_list_player instance.
  *
  * \param p_mlp media list player instance

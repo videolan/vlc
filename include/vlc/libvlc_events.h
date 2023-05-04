@@ -100,25 +100,6 @@ enum libvlc_event_e {
      * wish to use them
      */
     libvlc_MediaAttachedThumbnailsFound,
-
-    /**
-     * Playback of a \link #libvlc_media_list_player_t media list
-     * player\endlink has started.
-     */
-    libvlc_MediaListPlayerPlayed=0x400,
-
-    /**
-     * The current \link #libvlc_media_t item\endlink of a
-     * \link #libvlc_media_list_player_t media list player\endlink
-     * has changed to a different item.
-     */
-    libvlc_MediaListPlayerNextItemSet,
-
-    /**
-     * Playback of a \link #libvlc_media_list_player_t media list
-     * player\endlink has stopped.
-     */
-    libvlc_MediaListPlayerStopped,
 };
 
 /**
@@ -175,12 +156,6 @@ typedef struct libvlc_event_t
             libvlc_media_t * item;
             int index;
         } media_list_item_deleted;
-
-        /* media list player */
-        struct
-        {
-            libvlc_media_t * item;
-        } media_list_player_next_item_set;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 
