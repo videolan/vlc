@@ -287,48 +287,15 @@ MainInterface.MainViewLoader {
 
             rowHeight: VLCStyle.tableCoverRow_height
 
-            header: FocusScope {
-                id: head
+            header: BrowseTreeHeader {
+                providerModel: root.providerModel
 
-                width: root.width
-                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
+                width: tableView.width
 
-                Navigation.navigable: btn.visible
                 Navigation.parentItem: root
-
-                RowLayout {
-                    id: layout
-
-                    anchors.fill: parent
-                    anchors.topMargin: VLCStyle.margin_large
-                    anchors.bottomMargin: VLCStyle.margin_small
-                    anchors.rightMargin: VLCStyle.margin_small
-
-                    Widgets.SubtitleLabel {
-                        text: providerModel.name
-                        leftPadding: VLCStyle.margin_large
-                        color: tableView.colorContext.fg.primary
-
-                        Layout.fillWidth: true
-                    }
-
-                    Widgets.ButtonExt {
-                        id: btn
-
-                        focus: true
-                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                        text:  providerModel.indexed ?  I18n.qtr("Remove from medialibrary") : I18n.qtr("Add to medialibrary")
-                        visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
-                        onClicked: providerModel.indexed = !providerModel.indexed
-
-                        Navigation.parentItem: root
-                        Navigation.downAction: function() {
-                            head.focus = false
-                            tableView.forceActiveFocus(Qt.TabFocusReason)
-                        }
-
-                        Layout.preferredWidth: implicitWidth
-                    }
+                Navigation.downAction: function () {
+                    focus = false
+                    tableView.forceActiveFocus(Qt.TabFocusReason)
                 }
             }
 
