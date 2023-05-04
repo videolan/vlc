@@ -81,19 +81,24 @@ float kVLCDefaultThumbnailPosition = .15;
 - (NSImage *)smallThumbnailForLibraryItem:(VLCAbstractMediaLibraryItem*)libraryItem
 {
     NSImage *image;
-    NSString *artworkMRL = libraryItem.smallArtworkMRL;
+    NSString * const artworkMRL = libraryItem.smallArtworkMRL;
+
     if (libraryItem.smallArtworkGenerated) {
         image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artworkMRL]];
     } else if ([libraryItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        VLCMediaLibraryMediaItem* mediaItem = (VLCMediaLibraryMediaItem*)libraryItem;
+        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem*)libraryItem;
         
         if (mediaItem.mediaType != VLC_ML_MEDIA_TYPE_AUDIO) {
             [self generateThumbnailForMediaItem:mediaItem.libraryID];
         }
     }
+
     if (image) {
         [_imageCache setObject:image forKey:artworkMRL];
+    } else { // If nothing so far worked, then fall back on default image
+        image = [NSImage imageNamed:@"noart.png"];
     }
+
     return image;
 }
 
@@ -127,8 +132,8 @@ float kVLCDefaultThumbnailPosition = .15;
 - (NSImage *)generateImageForInputItem:(VLCInputItem *)inputItem
 {
     NSImage *image;
-    NSURL *artworkURL = inputItem.artworkURL;
-    NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+    NSURL * const artworkURL = inputItem.artworkURL;
+    const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
 
     if (artworkURL) {
         image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
@@ -140,6 +145,8 @@ float kVLCDefaultThumbnailPosition = .15;
 
     if (image) {
         [_imageCache setObject:image forKey:inputItem.MRL];
+    } else { // If nothing so far worked, then fall back on default image
+        image = [NSImage imageNamed:@"noart.png"];
     }
 
     return image;
