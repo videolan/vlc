@@ -25,6 +25,8 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 EmptyLabel {
+    id: root
+
     // Properties
 
     property bool _keyPressed: false
