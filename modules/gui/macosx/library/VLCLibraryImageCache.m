@@ -150,4 +150,15 @@ float kVLCDefaultThumbnailPosition = .15;
     return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem];
 }
 
++ (void)thumbnailForInputItem:(VLCInputItem *)inputItem
+               withCompletion:(void(^)(const NSImage *))completionHandler
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        NSImage * const image = [VLCLibraryImageCache thumbnailForInputItem:inputItem];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(image);
+        });
+    });
+}
+
 @end
