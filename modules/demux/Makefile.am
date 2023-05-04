@@ -191,6 +191,7 @@ libmkv_plugin_la_SOURCES = \
 	demux/mkv/chapters.hpp demux/mkv/chapters.cpp \
 	demux/mkv/chapter_command.hpp demux/mkv/chapter_command.cpp \
 	demux/mkv/stream_io_callback.hpp demux/mkv/stream_io_callback.cpp \
+	demux/mkv/vlc_colors.c demux/mkv/vlc_colors.h \
 	demux/vobsub.h \
 	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
         demux/av1_unpack.h codec/webvtt/helpers.h \

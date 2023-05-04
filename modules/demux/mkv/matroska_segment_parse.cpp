@@ -36,7 +36,7 @@ extern "C" {
 #include "../mp4/libmp4.h"
 }
 
-#include "../../packetizer/iso_color_tables.h"
+#include "vlc_colors.h"
 
 #include <vlc_codecs.h>
 #include <stdexcept>
@@ -785,7 +785,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoColourTransferCharacter, transfer )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer( static_cast<uint8>(transfer) );
+            vars.tk->fmt.video.transfer = iso_23001_transfer_to_vlc( static_cast<uint8>(transfer) );
             const char *name = nullptr;
             switch( static_cast<uint8>(transfer) )
             {
@@ -827,7 +827,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoColourPrimaries, primaries )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.primaries = iso_23001_8_cp_to_vlc_primaries( static_cast<uint8>(primaries) );
+            vars.tk->fmt.video.primaries = iso_23001_primaries_to_vlc( static_cast<uint8>(primaries) );
             const char *name = nullptr;
             switch( static_cast<uint8>(primaries) )
             {
@@ -859,7 +859,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoColourMatrix, matrix )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.space = iso_23001_8_mc_to_vlc_coeffs( static_cast<uint8>(matrix) );
+            vars.tk->fmt.video.space = iso_23001_matrix_coeffs_to_vlc( static_cast<uint8>(matrix) );
             const char *name = nullptr;
             switch( static_cast<uint8>(matrix) )
             {
