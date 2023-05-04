@@ -885,6 +885,7 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/BrowseDisplay.qml \
 	gui/qt/network/qml/BrowseHomeDisplay.qml \
 	gui/qt/network/qml/BrowseTreeDisplay.qml \
+	gui/qt/network/qml/BrowseTreeHeader.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
 	gui/qt/network/qml/NetworkAddressbar.qml \

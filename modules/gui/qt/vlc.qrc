@@ -234,6 +234,7 @@
         <file alias="BrowseDisplay.qml">network/qml/BrowseDisplay.qml</file>
         <file alias="BrowseHomeDisplay.qml">network/qml/BrowseHomeDisplay.qml</file>
         <file alias="BrowseTreeDisplay.qml">network/qml/BrowseTreeDisplay.qml</file>
+        <file alias="BrowseTreeHeader.qml">network/qml/BrowseTreeHeader.qml</file>
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
         <file alias="NetworkCustomCover.qml">network/qml/NetworkCustomCover.qml</file>
