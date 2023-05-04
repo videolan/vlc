@@ -23,20 +23,24 @@
 
 #import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
-#import "main/VLCMain.h"
-#import "library/VLCLibraryController.h"
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryMenuController.h"
-#import "views/VLCImageView.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryMenuController.h"
+
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+
+#import "main/VLCMain.h"
+
+#import "views/VLCImageView.h"
 
 NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
@@ -114,7 +118,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTitleTextField.stringValue = _representedAlbum.displayString;
     _albumDetailsTextField.stringValue = _representedAlbum.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
-    _albumArtworkImageView.image = _representedAlbum.smallArtworkImage;
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {
+        self->_albumArtworkImageView.image = thumbnail;
+    }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{

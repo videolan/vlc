@@ -76,7 +76,9 @@
     self.playInstantlyButton.action = @selector(playMediaItemInstantly:);
     self.playInstantlyButton.target = self;
 
-    self.representedImageView.image = representedItem.smallArtworkImage;
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+        self.representedImageView.image = thumbnail;
+    }];
 
     if(representedItem.detailString.length > 0) {
         self.primaryTitleTextField.hidden = NO;

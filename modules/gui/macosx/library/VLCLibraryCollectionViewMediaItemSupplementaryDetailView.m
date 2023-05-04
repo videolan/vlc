@@ -22,17 +22,21 @@
 
 #import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
-#import "main/VLCMain.h"
-#import "library/VLCInputItem.h"
-#import "library/VLCLibraryController.h"
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryMenuController.h"
-#import "views/VLCImageView.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
+
+#import "main/VLCMain.h"
+
+#import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryMenuController.h"
+
+#import "views/VLCImageView.h"
 
 NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
@@ -93,7 +97,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
     _mediaItemFileNameTextField.stringValue = _representedMediaItem.inputItem.name;
     _mediaItemPathTextField.stringValue = _representedMediaItem.inputItem.decodedMRL;
-    _mediaItemArtworkImageView.image = _representedMediaItem.smallArtworkImage;
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedMediaItem withCompletion:^(NSImage * const thumbnail) {
+        self->_mediaItemArtworkImageView.image = thumbnail;
+    }];
 }
 
 - (IBAction)playAction:(id)sender

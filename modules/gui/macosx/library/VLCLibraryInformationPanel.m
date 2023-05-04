@@ -21,9 +21,12 @@
 *****************************************************************************/
 
 #import "VLCLibraryInformationPanel.h"
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCInputItem.h"
+
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
+#import "library/VLCInputItem.h"
 
 @interface VLCLibraryInformationPanel ()
 {
@@ -47,9 +50,9 @@
 
 - (void)updateRepresentation
 {
-    NSMutableString *textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
+    NSMutableString * const textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
 
-    NSString *itemDetailsString;
+    NSString * itemDetailsString;
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
     } else {
@@ -57,13 +60,16 @@
     }
     [textContent appendString:itemDetailsString];
     
-    NSString *fileDetailsString = [self fileDetailsStringForLibraryItem:_representedItem];
+    NSString * const fileDetailsString = [self fileDetailsStringForLibraryItem:_representedItem];
     [textContent appendString:fileDetailsString];
     
     _textField.attributedStringValue = [[NSAttributedString alloc] initWithString:textContent];
     _textField.font = [NSFont systemFontOfSize:13.];
     _textField.textColor = [NSColor whiteColor];
-    _imageView.image = _representedItem.smallArtworkImage;
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+        self->_imageView.image = thumbnail;
+    }];
     self.window.title = _representedItem.displayString;
 }
 

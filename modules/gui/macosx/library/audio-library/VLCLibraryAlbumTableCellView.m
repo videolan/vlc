@@ -34,6 +34,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
@@ -260,7 +261,9 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.summaryTextField.stringValue = _representedAlbum.durationString;
     }
 
-    self.representedImageView.image = _representedAlbum.smallArtworkImage;
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {
+        self.representedImageView.image = thumbnail;
+    }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{

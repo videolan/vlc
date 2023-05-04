@@ -22,22 +22,23 @@
 
 #import "VLCLibraryCollectionViewItem.h"
 
-#import "main/VLCMain.h"
-
-#import "library/VLCLibraryController.h"
-#import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryMenuController.h"
-#import "library/VLCLibraryUIUnits.h"
-
-#import "views/VLCImageView.h"
-#import "views/VLCLinearProgressIndicator.h"
-#import "views/VLCTrackingView.h"
-
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
+
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryUIUnits.h"
+
+#import "main/VLCMain.h"
+
+#import "views/VLCImageView.h"
+#import "views/VLCLinearProgressIndicator.h"
+#import "views/VLCTrackingView.h"
 
 NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 const CGFloat VLCLibraryCollectionViewItemMinimalDisplayedProgress = 0.05;
@@ -233,14 +234,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
     _mediaTitleTextField.stringValue = _representedItem.displayString;
     _secondaryInfoTextField.stringValue = _representedItem.detailString;
-    _mediaImageView.image = _representedItem.smallArtworkImage;
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+        self->_mediaImageView.image = thumbnail;
+    }];
 
     // TODO: Add handling for the other types
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
+        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
 
         if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
-            VLCMediaLibraryTrack *videoTrack = mediaItem.firstVideoTrack;
+            VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
                                       andHeight:videoTrack.videoHeight];
             _videoImageViewAspectRatioConstraint.active = YES;
@@ -248,7 +252,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             _videoImageViewAspectRatioConstraint.active = NO;
         }
 
-        CGFloat position = mediaItem.progress;
+        const CGFloat position = mediaItem.progress;
         if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
             _progressIndicator.progress = position;
             _progressIndicator.hidden = NO;
