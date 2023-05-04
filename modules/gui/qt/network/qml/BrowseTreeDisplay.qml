@@ -309,13 +309,76 @@ MainInterface.MainViewLoader {
     Component {
         id: emptyLabelComponent
 
-        Widgets.EmptyLabelHint {
-            // FIXME: find better cover
-            cover: VLCStyle.noArtVideoCover
-            coverWidth : VLCStyle.dp(182, VLCStyle.scale)
-            coverHeight: VLCStyle.dp(114, VLCStyle.scale)
+        FocusScope {
+            id: focusScope
 
-            text: I18n.qtr("Nothing to see here, go back.")
+            Navigation.navigable: layout.Navigation.navigable || emptyLabel.button.enabled
+
+            // used by MainDisplay to transfer focus
+            function setCurrentItemFocus(reason) {
+                if (!focusScope.Navigation.navigable)
+                    return
+
+                if (header.Navigation.navigable)
+                    header.forceActiveFocus(reason)
+                else
+                    emptyLabel.forceActiveFocus(reason)
+            }
+
+            ColumnLayout {
+                id: layout
+
+                anchors.fill: parent
+
+                BrowseTreeHeader {
+                    id: header
+
+                    focus: true
+
+                    providerModel: root.providerModel
+
+                    Layout.fillWidth: true
+
+                    Navigation.parentItem: root
+                    Navigation.downItem: emptyLabel
+                }
+
+                Widgets.EmptyLabelButton {
+                    id: emptyLabel
+
+                    // FIXME: find better cover
+                    cover: VLCStyle.noArtVideoCover
+                    coverWidth : VLCStyle.dp(182, VLCStyle.scale)
+                    coverHeight: VLCStyle.dp(114, VLCStyle.scale)
+
+                    text: I18n.qtr("Nothing to see here, go back.")
+
+                    button.iconTxt: VLCIcons.back
+                    button.text: I18n.qtr("Back")
+                    button.enabled: !History.previousEmpty
+                    button.width: button.implicitWidth
+
+                    function onNavigate() {
+                        History.previous()
+                    }
+
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    Navigation.parentItem: root
+                    Navigation.upAction: function () {
+                        // FIXME: for some reason default navigation flow doesn't work
+                        // i.e setting Navigtaion.upItem doesn't fallthrough to parent's
+                        // action if Navigtaion.upItem.Navigtaion.navigble is false
+
+                        if (header.Navigation.navigable)
+                            header.forceActiveFocus(Qt.TabFocusReason)
+                        else
+                            return false // fallthrough default action
+                    }
+                }
+            }
         }
+
     }
 }
