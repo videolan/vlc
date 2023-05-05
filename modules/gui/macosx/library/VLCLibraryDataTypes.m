@@ -264,16 +264,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @end
 
 @implementation VLCAbstractMediaLibraryItem
-
-- (NSImage *)smallArtworkImage
-{
-    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
-    if (!image) {
-        image = [NSImage imageNamed:@"noart.png"];
-    }
-    return image;
-}
-
 @end
 
 @implementation VLCAbstractMediaLibraryAudioGroup
@@ -1127,7 +1117,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize firstMediaItem = _firstMediaItem;
 @synthesize libraryID = _libraryId;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkImage = _smallArtworkImage;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
 

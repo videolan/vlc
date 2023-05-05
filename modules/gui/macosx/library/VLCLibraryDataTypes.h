@@ -112,7 +112,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly) int64_t libraryID;
 @property (readonly) BOOL smallArtworkGenerated;
-@property (readonly) NSImage *smallArtworkImage;
 @property (readonly) NSString *smallArtworkMRL;
 @property (readonly) NSString *displayString;
 @property (readonly) NSString *detailString;
@@ -140,7 +139,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly) int64_t libraryID;
 @property (readonly) BOOL smallArtworkGenerated;
-@property (readonly) NSImage *smallArtworkImage;
 @property (readonly, strong, atomic) NSString *smallArtworkMRL;
 
 @end
