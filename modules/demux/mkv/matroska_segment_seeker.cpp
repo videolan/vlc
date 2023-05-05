@@ -323,6 +323,11 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, vlc_tick_t target_pts,
         if( contains_all_of_t() ( tpoints, priority_tracks ) )
             return tpoints;
 
+        // Avoid busyloop, don't iterate on the same seekpoint
+        if( needle_pts == start.pts - 1 )
+            // we found the same needle twice, stop looking
+            return tpoints;
+
         needle_pts = start.pts - 1;
     }
 
