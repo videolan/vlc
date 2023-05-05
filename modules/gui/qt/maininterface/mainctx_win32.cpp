@@ -159,8 +159,8 @@ public:
         EnableMenuItem(hmenu, SC_MAXIMIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize) ? MFS_ENABLED : MFS_DISABLED)));
         EnableMenuItem(hmenu, SC_CLOSE, (MF_BYCOMMAND | MFS_ENABLED));
 
-        // map pos to screen points
-        const auto screenPoints = m_window->mapToGlobal(windowpos);
+        // map pos to screen points and convert according to device DPR, required on HI-DPI displays
+        const auto screenPoints = m_window->mapToGlobal(windowpos) * m_window->devicePixelRatio();
 
         const auto alignment = (QGuiApplication::isRightToLeft() ? TPM_RIGHTALIGN : TPM_LEFTALIGN);
 
