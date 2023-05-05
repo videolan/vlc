@@ -87,7 +87,7 @@ class SystemMenuButton : public CSDButton
 public:
     SystemMenuButton(QObject *parent = nullptr) : CSDButton {SystemMenuButton::SystemMenu, parent} {}
 
-    virtual void showSystemMenu(const QPoint &windowpos) = 0;
+    Q_INVOKABLE virtual void showSystemMenu(const QPoint &windowpos) = 0;
 
 signals:
     void systemMenuVisibilityChanged(bool visible);
