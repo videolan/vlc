@@ -24,14 +24,28 @@ import org.videolan.vlc 0.1
 
 Item {
     TapHandler {
-        onDoubleTapped: {
-            
-                if ((MainCtx.intfMainWindow.visibility & Window.Maximized) !== 0) {
-                    MainCtx.requestInterfaceNormal()
-                } else {
-                    MainCtx.requestInterfaceMaximized()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onSingleTapped: {
+            if (eventPoint.event.button & Qt.RightButton) {
+                var systemButton = MainCtx.csdButtonModel.systemMenuButton
+                if (systemButton) {
+                    systemButton.showSystemMenu(eventPoint.position)
                 }
-            
+            }
+        }
+
+        onDoubleTapped: {
+            if (!(eventPoint.event.button & Qt.LeftButton))
+                return
+
+            // handle left button click
+            if ((MainCtx.intfMainWindow.visibility & Window.Maximized) !== 0) {
+                MainCtx.requestInterfaceNormal()
+            } else {
+                MainCtx.requestInterfaceMaximized()
+            }
+
         }
         gesturePolicy: TapHandler.DragThreshold
     }
