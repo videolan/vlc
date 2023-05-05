@@ -139,7 +139,7 @@ public:
         connect(this, &CSDButton::doubleClicked, this, &WinSystemMenuButton::handleDoubleClick);
     }
 
-    void showSystemMenu() override
+    void showSystemMenu(const QPoint &windowpos) override
     {
         HWND hwnd = (HWND)m_window->winId();
         HMENU hmenu = ::GetSystemMenu(hwnd, FALSE);
@@ -159,10 +159,8 @@ public:
         EnableMenuItem(hmenu, SC_MAXIMIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize) ? MFS_ENABLED : MFS_DISABLED)));
         EnableMenuItem(hmenu, SC_CLOSE, (MF_BYCOMMAND | MFS_ENABLED));
 
-        // calculate screen point 'margin' down from system menu button's rect
-        const QPoint margin {0, 4};
-        const auto bottomLeft = rect().bottomLeft();
-        const auto screenPoints = m_window->mapToGlobal(bottomLeft) + margin;
+        // map pos to screen points
+        const auto screenPoints = m_window->mapToGlobal(windowpos);
 
         const auto alignment = (QGuiApplication::isRightToLeft() ? TPM_RIGHTALIGN : TPM_LEFTALIGN);
 
@@ -199,7 +197,9 @@ private:
             if (!m_triggerSystemMenu)
                 return;
 
-            showSystemMenu();
+            // show system menu 'margin' below the rect
+            constexpr QPoint margin {0, 4};
+            showSystemMenu(rect().bottomLeft() + margin);
         });
     }
 
