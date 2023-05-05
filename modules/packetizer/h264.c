@@ -1109,9 +1109,9 @@ static bool PutXPS( decoder_t *p_dec, uint8_t i_nal_type, block_t *p_frag )
     block_t **pp_block_dst;
     /* all depend on pp_xps_dst */
     void **pp_xps_dst = NULL;
-    const void **pp_active; /* optional */
-    void * (* pf_decode_xps)(const uint8_t *, size_t, bool);
-    void   (* pf_release_xps)(void *);
+    const void **pp_active = NULL; /* optional */
+    void * (* pf_decode_xps)(const uint8_t *, size_t, bool) = NULL;
+    void   (* pf_release_xps)(void *) = NULL;
 
     switch( i_nal_type )
     {
