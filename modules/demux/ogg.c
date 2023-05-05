@@ -183,6 +183,13 @@ static bool Ogg_VorbisValidBlocksize( long );
 static void Ogg_DecodeVorbisHeader( logical_stream_t *, ogg_packet *, int );
 #endif
 
+static vlc_tick_t Ogg_GetDecoderPreroll( logical_stream_t *p_stream )
+{
+    if( p_stream->fmt.i_codec == VLC_CODEC_OPUS )
+        return vlc_tick_from_samples( 80 * 48, 48000 );
+    return 0;
+}
+
 static void fill_channels_info(audio_format_t *audio)
 {
     static const int pi_channels_map[9] =
@@ -726,7 +733,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
-            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TICK_0 + i64, b ) != -1 )
+            vlc_tick_t i_preroll = Ogg_GetDecoderPreroll( p_stream );
+            if( i_preroll > i64 )
+                i_preroll = i64;
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TICK_0 + i64 - i_preroll, b ) != -1 )
             {
                 Ogg_PreparePostSeek( p_sys );
                 if( acc )
@@ -803,8 +813,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             assert( p_sys->i_length > 0 );
             i64 = f * p_sys->i_length;
+            vlc_tick_t i_preroll = Ogg_GetDecoderPreroll( p_stream );
+            if( i_preroll > i64 )
+                i_preroll = i64;
             Ogg_PreparePostSeek( p_sys );
-            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 ) >= 0 )
+            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 - i_preroll ) >= 0 )
             {
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
