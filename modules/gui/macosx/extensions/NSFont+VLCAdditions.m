@@ -29,6 +29,16 @@
     return [NSFont systemFontOfSize:24. weight:NSFontWeightBold];
 }
 
++ (instancetype)VLCLibrarySubsectionHeaderFont
+{
+    return [NSFont systemFontOfSize:18. weight:NSFontWeightSemibold];
+}
+
++ (instancetype)VLCLibrarySubsectionSubheaderFont
+{
+    return [NSFont systemFontOfSize:16. weight:NSFontWeightMedium];
+}
+
 + (instancetype)VLClibraryHighlightCellTitleFont
 {
     return [NSFont systemFontOfSize:21.];
