@@ -30,12 +30,17 @@
     self = [super init];
 
     if(self) {
-        _scrollParentX = NO;
-        _scrollParentY = NO;
-        _scrollSelf = YES;
+        [self setup];
     }
 
     return self;
+}
+
+- (void)setup
+{
+    _scrollParentX = NO;
+    _scrollParentY = NO;
+    _scrollSelf = YES;
 }
 
 - (void)scrollWheel:(NSEvent *)event
