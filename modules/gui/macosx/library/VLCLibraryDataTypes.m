@@ -325,6 +325,10 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
 
         _name = toNSStr(p_artist->psz_name);
+        if ([_name isEqualToString:@""]) {
+            _name = _NS("Unknown Artist");
+        }
+
         _shortBiography = toNSStr(p_artist->psz_shortbio);
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
@@ -411,6 +415,10 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
 
         _title = toNSStr(p_album->psz_title);
+        if ([_title isEqualToString:@""]) {
+            _title = _NS("Unknown Album");
+        }
+
         _summary = toNSStr(p_album->psz_summary);
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
@@ -473,6 +481,10 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
 
         _name = toNSStr(p_genre->psz_name);
+        if ([_name isEqualToString:@""]) {
+            _name = _NS("Unknown Genre");
+        }
+
         _numberOfTracks = p_genre->i_nb_tracks;
     }
     return self;
@@ -650,8 +662,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _playCount = p_mediaItem->i_playcount;
         _lastPlayedDate = p_mediaItem->i_last_played_date;
         _progress = p_mediaItem->f_progress;
-        _title = toNSStr(p_mediaItem->psz_title);
         _favorited = p_mediaItem->b_is_favorite;
+
+        _title = toNSStr(p_mediaItem->psz_title);
+        if ([_title isEqualToString:@""]) {
+            _title = _NS("Unknown Media Item");
+        }
 
         switch (p_mediaItem->i_subtype) {
             case VLC_ML_MEDIA_SUBTYPE_MOVIE:
