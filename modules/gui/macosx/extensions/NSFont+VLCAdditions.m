@@ -39,21 +39,6 @@
     return [NSFont systemFontOfSize:16. weight:NSFontWeightMedium];
 }
 
-+ (instancetype)VLClibraryHighlightCellTitleFont
-{
-    return [NSFont systemFontOfSize:21.];
-}
-
-+ (instancetype)VLClibraryHighlightCellSubtitleFont
-{
-    return [NSFont systemFontOfSize:13.];
-}
-
-+ (instancetype)VLClibraryHighlightCellHighlightLabelFont
-{
-    return [NSFont systemFontOfSize:11.];
-}
-
 + (instancetype)VLClibraryCellAnnotationFont
 {
     return [NSFont systemFontOfSize:15.];

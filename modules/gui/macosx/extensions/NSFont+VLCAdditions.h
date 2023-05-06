@@ -29,9 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibrarySectionHeaderFont;
 + (instancetype)VLCLibrarySubsectionHeaderFont;
 + (instancetype)VLCLibrarySubsectionSubheaderFont;
-+ (instancetype)VLClibraryHighlightCellTitleFont;
-+ (instancetype)VLClibraryHighlightCellSubtitleFont;
-+ (instancetype)VLClibraryHighlightCellHighlightLabelFont;
 + (instancetype)VLClibraryCellAnnotationFont;
 + (instancetype)VLCplaylistLabelFont;
 + (instancetype)VLCplaylistSelectedItemLabelFont;

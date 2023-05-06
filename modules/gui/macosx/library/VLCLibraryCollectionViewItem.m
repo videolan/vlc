@@ -128,7 +128,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
     self.unplayedIndicatorTextField.stringValue = _NS("NEW");
-    self.unplayedIndicatorTextField.font = [NSFont VLClibraryHighlightCellHighlightLabelFont];
+    self.unplayedIndicatorTextField.font = [NSFont VLClibraryCellAnnotationFont];
     self.highlightBox.borderColor = [NSColor VLCAccentColor];
     self.unplayedIndicatorTextField.textColor = [NSColor VLCAccentColor];
 
