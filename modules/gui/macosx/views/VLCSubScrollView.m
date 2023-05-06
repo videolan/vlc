@@ -36,6 +36,11 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+    [self setup];
+}
+
 - (void)setup
 {
     _scrollParentX = NO;
