@@ -74,12 +74,12 @@
 
 + (const CGFloat)dynamicCollectionViewItemMinimumWidth
 {
-    return 180;
+    return 150;
 }
 
 + (const CGFloat)dynamicCollectionViewItemMaximumWidth
 {
-    return 280;
+    return 200;
 }
 
 + (const CGFloat)collectionViewItemSpacing
