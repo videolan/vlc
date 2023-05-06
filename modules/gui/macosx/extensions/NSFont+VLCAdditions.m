@@ -39,9 +39,4 @@
     return [NSFont systemFontOfSize:16. weight:NSFontWeightMedium];
 }
 
-+ (instancetype)VLClibraryCellAnnotationFont
-{
-    return [NSFont systemFontOfSize:15.];
-}
-
 @end

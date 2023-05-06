@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibrarySectionHeaderFont;
 + (instancetype)VLCLibrarySubsectionHeaderFont;
 + (instancetype)VLCLibrarySubsectionSubheaderFont;
-+ (instancetype)VLClibraryCellAnnotationFont;
 
 @end
 

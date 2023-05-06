@@ -124,11 +124,11 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.secondaryInfoTextField.textColor = [NSColor VLClibrarySubtitleColor];
-    self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
+    self.annotationTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
     self.unplayedIndicatorTextField.stringValue = _NS("NEW");
-    self.unplayedIndicatorTextField.font = [NSFont VLClibraryCellAnnotationFont];
+    self.unplayedIndicatorTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
     self.highlightBox.borderColor = [NSColor VLCAccentColor];
     self.unplayedIndicatorTextField.textColor = [NSColor VLCAccentColor];
 

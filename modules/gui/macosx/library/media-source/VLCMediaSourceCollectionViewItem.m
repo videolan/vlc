@@ -61,7 +61,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 - (void)awakeFromNib
 {
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
-    self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
+    self.annotationTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
 
