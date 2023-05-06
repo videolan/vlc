@@ -25,6 +25,7 @@
 @interface VLCTrackingView ()
 {
     NSTrackingArea *_trackingArea;
+    BOOL _mouseIn;
 }
 @end
 
@@ -32,6 +33,8 @@
 
 - (void)handleMouseExit
 {
+    _mouseIn = NO;
+
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:1.0];
         [self.viewToShow setAlphaValue:.0];
@@ -55,6 +58,8 @@
 
 - (void)handleMouseEnter
 {
+    _mouseIn = YES;
+
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:.0];
         [self.viewToHide setHidden:NO];
