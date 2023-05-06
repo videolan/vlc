@@ -51,7 +51,6 @@
 #include <QLineEdit>
 #include <QStackedLayout>
 #include <QCompleter>
-#include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
 #include <QMimeData>
@@ -88,21 +87,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 
     setAcceptDrops( true );
 
-    /* Set Filters for file selection */
-/*    QString fileTypes = "";
-    ADD_FILTER_MEDIA( fileTypes );
-    ADD_FILTER_VIDEO( fileTypes );
-    ADD_FILTER_AUDIO( fileTypes );
-    ADD_FILTER_PLAYLIST( fileTypes );
-    ADD_FILTER_ALL( fileTypes );
-    fileTypes.replace( QString(";*"), QString(" *")); */
-
-
-/*    lineFileEdit = ui.fileEdit;
-    //TODO later: fill the fileCompleteList with previous items played.
-    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
-    fileCompleter->setModel( new QDirModel( fileCompleter ) );
-    lineFileEdit->setCompleter( fileCompleter );*/
     if( var_InheritBool( p_intf, "qt-embedded-open" ) )
     {
         ui.tempWidget->hide();
