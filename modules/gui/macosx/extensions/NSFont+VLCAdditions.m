@@ -31,47 +31,47 @@
 
 + (instancetype)VLClibraryHighlightCellTitleFont
 {
-    return [NSFont systemFontOfSize:21. weight:NSFontWeightMedium];
+    return [NSFont systemFontOfSize:21.];
 }
 
 + (instancetype)VLClibraryHighlightCellSubtitleFont
 {
-    return [NSFont systemFontOfSize:13. weight:NSFontWeightSemibold];
+    return [NSFont systemFontOfSize:13.];
 }
 
 + (instancetype)VLClibraryHighlightCellHighlightLabelFont
 {
-    return [NSFont systemFontOfSize:11. weight:NSFontWeightBold];
+    return [NSFont systemFontOfSize:11.];
 }
 
 + (instancetype)VLClibraryLargeCellTitleFont
 {
-    return [NSFont systemFontOfSize:17. weight:NSFontWeightMedium];
+    return [NSFont systemFontOfSize:17.];
 }
 
 + (instancetype)VLClibraryLargeCellSubtitleFont
 {
-    return [NSFont systemFontOfSize:13. weight:NSFontWeightSemibold];
+    return [NSFont systemFontOfSize:13.];
 }
 
 + (instancetype)VLClibrarySmallCellTitleFont
 {
-    return [NSFont systemFontOfSize:13. weight:NSFontWeightMedium];
+    return [NSFont systemFontOfSize:13.];
 }
 
 + (instancetype)VLClibrarySmallCellSubtitleFont
 {
-    return [NSFont systemFontOfSize:10. weight:NSFontWeightSemibold];
+    return [NSFont systemFontOfSize:10.];
 }
 
 + (instancetype)VLClibraryCellAnnotationFont
 {
-    return [NSFont systemFontOfSize:15. weight:NSFontWeightBold];
+    return [NSFont systemFontOfSize:15.];
 }
 
 + (instancetype)VLCplaylistLabelFont
 {
-    return [NSFont systemFontOfSize:13. weight:NSFontWeightRegular];
+    return [NSFont systemFontOfSize:13.];
 }
 
 + (instancetype)VLCplaylistSelectedItemLabelFont
