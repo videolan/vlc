@@ -23,8 +23,13 @@
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
+
+#import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+
+#import <vlc_configuration.h>
 
 NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentifier";
 
@@ -40,12 +45,29 @@ NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentif
     
     _mediaImageView.cropsImagesToRoundedCorners = YES;
     _mediaImageView.contentGravity = VLCImageViewContentGravityCenter;
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(updateFontBasedOnSetting:)
+                               name:VLCConfigurationChangedNotification
+                             object:nil];
+
+    [self updateFontBasedOnSetting:nil];
 }
 
 - (void)prepareForReuse
 {
     [super prepareForReuse];
     self.mediaImageView.image = nil;
+}
+
+- (void)updateFontBasedOnSetting:(NSNotification *)aNotification
+{
+    if (config_GetInt("macosx-large-text")) {
+        self.titleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
+    } else {
+        self.titleTextField.font = [NSFont VLClibrarySmallCellTitleFont];
+    }
 }
 
 @end
