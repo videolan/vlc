@@ -30,7 +30,7 @@
 
 @implementation VLCTrackingView
 
-- (void)mouseExited:(NSEvent *)event
+- (void)handleMouseExit
 {
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:1.0];
@@ -51,6 +51,11 @@
         self.viewToHide.hidden = YES;
         self.viewToShow.hidden = NO;
     }
+}
+
+- (void)mouseExited:(NSEvent *)event
+{
+    [self handleMouseExit];
 }
 
 - (void)mouseEntered:(NSEvent *)event
