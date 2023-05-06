@@ -121,8 +121,8 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 - (void)awakeFromNib
 {
     [self setupTracksTableView];
-    self.albumNameTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    self.artistNameTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
+    self.albumNameTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
+    self.artistNameTextField.font = [NSFont VLCLibrarySubsectionSubheaderFont];
     self.yearTextField.font = [NSFont VLClibrarySmallCellTitleFont];
     self.summaryTextField.font = [NSFont VLClibrarySmallCellTitleFont];
     self.trackingView.viewToHide = self.playInstantlyButton;
