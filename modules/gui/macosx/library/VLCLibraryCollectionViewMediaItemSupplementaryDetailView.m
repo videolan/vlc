@@ -52,8 +52,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (void)awakeFromNib
 {
-    _mediaItemTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
-    _mediaItemDetailTextField.font = [NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
+    _mediaItemTitleTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
+    _mediaItemDetailTextField.font = [NSFont VLCLibrarySubsectionSubheaderFont];
     _mediaItemDetailTextField.textColor = [NSColor VLCAccentColor];
 
     if(@available(macOS 10.12.2, *)) {

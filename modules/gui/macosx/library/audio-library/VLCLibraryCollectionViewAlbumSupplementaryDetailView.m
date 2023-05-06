@@ -71,8 +71,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTracksTableView.delegate = _tracksTableViewDelegate;
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
     
-    _albumTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
-    _albumDetailsTextField.font = [NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
+    _albumTitleTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
+    _albumDetailsTextField.font = [NSFont VLCLibrarySubsectionSubheaderFont];
 
     _albumDetailsTextField.textColor = [NSColor VLCAccentColor];
 
