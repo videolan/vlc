@@ -72,15 +72,15 @@
                     <color key="borderColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </box>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
-                    <rect key="frame" x="-2" y="23" width="52" height="24"/>
+                    <rect key="frame" x="-2" y="31" width="37" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" usesSingleLineMode="YES" id="7Hy-o3-LvX">
-                        <font key="font" metaFont="system" size="20"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="u2r-zy-XEW">
-                    <rect key="frame" x="180" y="2" width="34" height="16"/>
+                    <rect key="frame" x="180" y="11" width="34" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="NEW" id="NeT-5U-eZn">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -102,9 +102,9 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">
-                    <rect key="frame" x="-2" y="0.0" width="42" height="19"/>
+                    <rect key="frame" x="-2" y="11" width="37" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="LSS-jh-llZ">
-                        <font key="font" metaFont="system" size="15"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

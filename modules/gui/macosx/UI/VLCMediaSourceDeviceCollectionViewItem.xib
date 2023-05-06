@@ -14,20 +14,20 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="214" height="246"/>
+        <customView misplaced="YES" id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="214" height="238"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jJ3-BQ-y8F">
-                    <rect key="frame" x="-2" y="0.0" width="56" height="24"/>
+                    <rect key="frame" x="-2" y="0.0" width="37" height="16"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="Utm-F6-CKx">
-                        <font key="font" metaFont="systemBold" size="20"/>
+                        <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="rko-Nc-j4c" customClass="VLCImageView">
-                    <rect key="frame" x="0.0" y="32" width="214" height="214"/>
+                    <rect key="frame" x="0.0" y="24" width="214" height="214"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="rko-Nc-j4c" secondAttribute="height" multiplier="1:1" id="tGe-gB-9im"/>
                     </constraints>
