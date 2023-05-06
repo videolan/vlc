@@ -153,18 +153,12 @@
     self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
     [self updateMuteVolumeButtonImage];
 
-    NSColor *timeFieldTextColor = [NSColor controlTextColor];
-
-    [self.timeField setTextColor: timeFieldTextColor];
-    [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.timeField setNeedsDisplay:YES];
     [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
     self.trailingTimeField.isTimeRemaining = NO;
     self.timeField.accessibilityLabel = _NS("Playback time");
 
     self.trailingTimeField.isTimeRemaining = !self.timeField.isTimeRemaining;
-    [self.trailingTimeField setTextColor: timeFieldTextColor];
-    [self.trailingTimeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.trailingTimeField setNeedsDisplay:YES];
     [self.trailingTimeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
     self.trailingTimeField.isTimeRemaining = YES;
