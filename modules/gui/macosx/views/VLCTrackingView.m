@@ -53,12 +53,7 @@
     }
 }
 
-- (void)mouseExited:(NSEvent *)event
-{
-    [self handleMouseExit];
-}
-
-- (void)mouseEntered:(NSEvent *)event
+- (void)handleMouseEnter
 {
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:.0];
@@ -78,6 +73,16 @@
         self.viewToHide.hidden = NO;
         self.viewToShow.hidden = YES;
     }
+}
+
+- (void)mouseExited:(NSEvent *)event
+{
+    [self handleMouseExit];
+}
+
+- (void)mouseEntered:(NSEvent *)event
+{
+    [self handleMouseEnter];
 }
 
 - (void)updateTrackingAreas
