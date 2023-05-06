@@ -54,26 +54,6 @@
     return [NSFont systemFontOfSize:11.];
 }
 
-+ (instancetype)VLClibraryLargeCellTitleFont
-{
-    return [NSFont systemFontOfSize:17.];
-}
-
-+ (instancetype)VLClibraryLargeCellSubtitleFont
-{
-    return [NSFont systemFontOfSize:13.];
-}
-
-+ (instancetype)VLClibrarySmallCellTitleFont
-{
-    return [NSFont systemFontOfSize:13.];
-}
-
-+ (instancetype)VLClibrarySmallCellSubtitleFont
-{
-    return [NSFont systemFontOfSize:10.];
-}
-
 + (instancetype)VLClibraryCellAnnotationFont
 {
     return [NSFont systemFontOfSize:15.];

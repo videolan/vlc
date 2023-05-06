@@ -51,9 +51,6 @@
 
 - (void)awakeFromNib
 {
-    self.singlePrimaryTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    self.primaryTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    self.secondaryTitleTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
     [self prepareForReuse];
 }
 

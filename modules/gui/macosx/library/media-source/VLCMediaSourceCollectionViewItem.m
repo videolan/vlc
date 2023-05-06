@@ -50,19 +50,6 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @implementation VLCMediaSourceCollectionViewItem
 
-- (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-        [notificationCenter addObserver:self
-                               selector:@selector(updateFontBasedOnSetting:)
-                                   name:VLCConfigurationChangedNotification
-                                 object:nil];
-    }
-    return self;
-}
-
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -86,7 +73,6 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     [self updateColoredAppearance:self.view.effectiveAppearance];
-    [self updateFontBasedOnSetting:nil];
     [self prepareForReuse];
 }
 
@@ -112,15 +98,6 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     self.mediaTitleTextField.textColor = isDark ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
-}
-
-- (void)updateFontBasedOnSetting:(NSNotification *)aNotification
-{
-    if (config_GetInt("macosx-large-text")) {
-        self.mediaTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    } else {
-        self.mediaTitleTextField.font = [NSFont VLClibrarySmallCellTitleFont];
-    }
 }
 
 #pragma mark - view representation

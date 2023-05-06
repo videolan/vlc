@@ -98,10 +98,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
                                selector:@selector(mediaItemThumbnailGenerated:)
                                    name:VLCLibraryModelMediaItemThumbnailGenerated
                                  object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(updateFontBasedOnSetting:)
-                                   name:VLCConfigurationChangedNotification
-                                 object:nil];
     }
     return self;
 }
@@ -144,7 +140,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     [self updateColoredAppearance:self.view.effectiveAppearance];
-    [self updateFontBasedOnSetting:nil];
     [self prepareForReuse];
 }
 
@@ -170,17 +165,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     self.mediaTitleTextField.textColor = isDark ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
-}
-
-- (void)updateFontBasedOnSetting:(NSNotification *)aNotification
-{
-    if (config_GetInt("macosx-large-text")) {
-        self.mediaTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-        self.secondaryInfoTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
-    } else {
-        self.mediaTitleTextField.font = [NSFont VLClibrarySmallCellTitleFont];
-        self.secondaryInfoTextField.font = [NSFont VLClibrarySmallCellSubtitleFont];
-    }
 }
 
 #pragma mark - view representation
