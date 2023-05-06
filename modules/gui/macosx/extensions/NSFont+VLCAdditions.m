@@ -31,12 +31,12 @@
 
 + (instancetype)VLCLibrarySubsectionHeaderFont
 {
-    return [NSFont systemFontOfSize:18. weight:NSFontWeightSemibold];
+    return [NSFont systemFontOfSize:17. weight:NSFontWeightSemibold];
 }
 
 + (instancetype)VLCLibrarySubsectionSubheaderFont
 {
-    return [NSFont systemFontOfSize:16. weight:NSFontWeightMedium];
+    return [NSFont systemFontOfSize:15. weight:NSFontWeightMedium];
 }
 
 @end
