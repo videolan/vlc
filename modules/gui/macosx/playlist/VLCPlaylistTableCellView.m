@@ -35,23 +35,7 @@
 
 #import <vlc_configuration.h>
 
-@interface VLCPlaylistTableCellView ()
-{
-    NSFont *_displayedFont;
-    NSFont *_displayedBoldFont;
-}
-@end
-
 @implementation VLCPlaylistTableCellView
-
-- (void)awakeFromNib
-{
-    [self updateFontsBasedOnSetting:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateFontsBasedOnSetting:)
-                                                 name:VLCConfigurationChangedNotification
-                                               object:nil];
-}
 
 - (void)dealloc
 {
@@ -61,11 +45,13 @@
 - (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
 {
     _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
-    NSFont *displayedFont = _representsCurrentPlaylistItem ? _displayedBoldFont : _displayedFont;
+
+    NSFont * const displayedFont = _representsCurrentPlaylistItem ?
+        [NSFont boldSystemFontOfSize:NSFont.systemFontSize] :
+        [NSFont systemFontOfSize:NSFont.systemFontSize];
+
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
-    self.artistTextField.font = _displayedFont;
-    self.durationTextField.font = _displayedFont;
 }
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
@@ -100,19 +86,6 @@
     self.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
 
     _representedPlaylistItem = item;
-}
-
-- (void)updateFontsBasedOnSetting:(NSNotification *)aNotification
-{
-    BOOL largeText = config_GetInt("macosx-large-text");
-    if (largeText) {
-        _displayedFont = [NSFont VLCplaylistLabelFont];
-        _displayedBoldFont = [NSFont VLCplaylistSelectedItemLabelFont];
-    } else {
-        _displayedFont = [NSFont VLCsmallPlaylistLabelFont];
-        _displayedBoldFont = [NSFont VLCsmallPlaylistSelectedItemLabelFont];
-    }
-    [self setRepresentsCurrentPlaylistItem:_representsCurrentPlaylistItem];
 }
 
 @end

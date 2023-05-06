@@ -180,10 +180,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCPlaybackRepeatChanged
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updateViewCellDimensionsBasedOnSetting:)
-                               name:VLCConfigurationChangedNotification
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
@@ -212,7 +208,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
-    _playlistCounterTextField.font = [NSFont VLCplaylistSelectedItemLabelFont];
+    _playlistCounterTextField.font = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];
     _playlistCounterTextField.textColor = [NSColor VLClibraryAnnotationColor];
     _playlistCounterTextField.hidden = YES;
 
@@ -226,7 +222,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _playlistTableView.dataSource = _playlistDataSource;
     _playlistTableView.delegate = _playlistDataSource;
-    [self updateViewCellDimensionsBasedOnSetting:nil];
+    _playlistTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     [_playlistTableView reloadData];
 
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
@@ -311,13 +307,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
         self.dragDropImageBackgroundBox.hidden = YES;
     }
-}
-
-- (void)updateViewCellDimensionsBasedOnSetting:(NSNotification *)aNotification
-{
-    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ?
-        [VLCLibraryUIUnits largeTableViewRowHeight] :
-        [VLCLibraryUIUnits mediumTableViewRowHeight];
 }
 
 #pragma mark - playmode state display and interaction
