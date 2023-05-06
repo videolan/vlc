@@ -33,8 +33,6 @@
 
 #import "main/VLCMain.h"
 
-#import "main/VLCMain.h"
-
 #import "playlist/VLCPlaylistController.h"
 
 #import "views/VLCImageView.h"
