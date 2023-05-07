@@ -643,7 +643,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     }
 
     [self setupButton:_intf_statusIconCheckbox forBoolValue: "macosx-statusicon"];
-    [self setupButton:_intf_largeFontInListsCheckbox forBoolValue: "macosx-large-text"];
 
     [self setupButton:_video_nativeFullscreenCheckbox forBoolValue: "macosx-nativefullscreenmode"];
     [self setupButton:_video_embeddedCheckbox forBoolValue: "embedded-video"];
@@ -973,7 +972,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt("metadata-network-access", [_intf_artCheckbox state]);
 
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
-        config_PutInt("macosx-large-text", [_intf_largeFontInListsCheckbox state]);
 
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 
