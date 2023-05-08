@@ -76,16 +76,21 @@
 
 -(id)initWithFrame:(NSRect)frameRect
 {
-    if (self = [super initWithFrame:frameRect]) {
-        [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-        i_lastScrollWheelDirection = 0;
-        f_cumulated_magnification = 0.0;
-        VLCMain *mainInstance = [VLCMain sharedInstance];
-        _playerController = [[mainInstance playlistController] playerController];
-        _hotkeysController = [[VLCHotkeysController alloc] init];
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
     }
-
     return self;
+}
+
+- (void)setup
+{
+    [self registerForDraggedTypes:@[NSFilenamesPboardType]];
+    i_lastScrollWheelDirection = 0;
+    f_cumulated_magnification = 0.0;
+
+    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _hotkeysController = [[VLCHotkeysController alloc] init];
 }
 
 - (void)drawRect:(NSRect)rect
