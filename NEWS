@@ -1,26 +1,49 @@
 Changes between 3.0.18 and 3.0.19:
 ----------------------------------
 
+Core:
+ * Fix next-frame freezing in most scenarios
+
 Demux:
- * Fix some FLAC VBR files playback regression
- * Fix black screen on poorly edited MP4 files on Android Mediacodec
+ * Fix FLAC playback quality regression with variable frame size
+ * Support RIFF INFO tags for Wav files
  * Fix AVI files with flipped RAW video planes
  * Fix duration on short and small Ogg/Opus files
  * Fix some HLS/TS streams with ID3 prefix
  * Fix for GoPro MAX spatial metadata
+ * Improve ffmpeg muxed MP4 chapters handling
+ * Fix some HLS playlist refresh drift
+
+Decoders:
+ * Multiple fixes on AAC handling
+ * Activate hardware decoding of AV1 on Windows (DxVA)
+ * Improve AV1 HDR support with software decoding
+ * Fix some AV1 GBRP streams
+ * Fix AV1 super-resolution streams
+ * Fix black screen on poorly edited MP4 files on Android Mediacodec
+ * Fix rawvid video in NV12
+
+Video Output:
+ * Super Resolution scaling with nVidia and Intel GPUs
+ * Direct3D9 fix for cropping
+ * Multiple fixes for hardware decoding on D3D11 and OpenGL interop
 
 Contribs:
  * Update of fluidlite, fixing some MIDI rendering on Windows
  * Update of zlib to 1.2.13 (CVE-2022-37434)
+ * Update of FFmpeg, vpx, ebml
 
 Misc:
  * Fix some rendering issues on Linux with the fullscreen controller
- * Fix some MPRIS inconsistencies that broke some OS widgets on Linux
+ * Fix GOOM visualization
  * Fixes for Youtube playback
- * Fix some crashes on macOS when switching application
+ * Fix some MPRIS inconsistencies that broke some OS widgets on Linux
+ * Implement MPRIS TrackList signals
+ * Fix opening files in read-only mode
  * Fix password search using the Kwallet backend
+ * Fix some crashes on macOS when switching application
  * Fix 5.1/7.1 output on macOS and tvOS
- * Multiple fixes on AAC handling
+ * Improve muxing timestamps in a few formats (reset to 0)
 
 
 Changes between 3.0.18-rc2 and 3.0.18:
