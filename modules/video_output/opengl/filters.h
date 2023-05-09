@@ -27,12 +27,12 @@
 #include <vlc_opengl.h>
 #include <vlc_tick.h>
 
-#include "filter.h"
 #include "gl_api.h"
 #include "interop.h"
 #include "sampler.h"
 
 struct vlc_gl_filters;
+struct vlc_gl_filter;
 
 /**
  * Create a new OpenGL filter chain
