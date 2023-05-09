@@ -163,6 +163,10 @@ static const struct
     {VLC_CODEC_RGBA64, AV_PIX_FMT_RGBA64LE, 0, 0, 0 },
 #endif /* !WORDS_BIGENDIAN */
 
+#ifdef AV_PIX_FMT_X2BGR10
+    {VLC_CODEC_RGBA10, AV_PIX_FMT_X2BGR10, 0, 0, 0 },
+#endif
+
     {VLC_CODEC_RGBA, AV_PIX_FMT_RGBA, 0, 0, 0 },
     {VLC_CODEC_ARGB, AV_PIX_FMT_ARGB, 0, 0, 0 },
     {VLC_CODEC_BGRA, AV_PIX_FMT_BGRA, 0, 0, 0 },
