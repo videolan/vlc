@@ -62,7 +62,5 @@ Window {
         anchors.fill: parent
 
         colorContext.palette: VLCStyle.palette
-
-        readonly property PlaylistListView g_root: playlistView
     }
 }
