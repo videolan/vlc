@@ -91,6 +91,23 @@ static const vlc_fourcc_t pi_allowed_chromas_yuv10[] = {
     0
 };
 
+static const vlc_fourcc_t pi_allowed_chromas_yuv444[] = {
+    VLC_CODEC_RGBA,
+    VLC_CODEC_BGRA,
+    VLC_CODEC_I422,
+    VLC_CODEC_I420,
+    0
+};
+
+static const vlc_fourcc_t pi_allowed_chromas_yuv444_10[] = {
+    VLC_CODEC_RGBA10,
+    VLC_CODEC_RGBA64,
+    ALLOWED_CHROMAS_YUV10,
+    VLC_CODEC_I422,
+    VLC_CODEC_I420,
+    0
+};
+
 static const vlc_fourcc_t *get_allowed_chromas( filter_t *p_filter )
 {
     switch (p_filter->fmt_out.video.i_chroma)
@@ -103,6 +120,12 @@ static const vlc_fourcc_t *get_allowed_chromas( filter_t *p_filter )
         case VLC_CODEC_D3D11_OPAQUE_10B:
         case VLC_CODEC_VAAPI_420_10BPP:
             return pi_allowed_chromas_yuv10;
+        case VLC_CODEC_I444:
+            return pi_allowed_chromas_yuv444;
+        case VLC_CODEC_I444_10L:
+        case VLC_CODEC_I444_12L:
+        case VLC_CODEC_I444_16L:
+            return pi_allowed_chromas_yuv444_10;
         default:
             return pi_allowed_chromas_yuv;
     }
