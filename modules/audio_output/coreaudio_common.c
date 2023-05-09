@@ -759,6 +759,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         }
         else
         {
+            aout_FormatPrepare(fmt);
             ret = MapInputLayout(p_aout, fmt, &inlayout_buf, &inlayout_size);
             if (ret != VLC_SUCCESS)
                 return ret;
