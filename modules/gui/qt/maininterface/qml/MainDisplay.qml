@@ -34,7 +34,7 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///dialogs/" as DG
 
 FocusScope {
-    id: root
+    id: g_mainDisplay
 
     //name and properties of the tab to be initially loaded
     property var view: ({
@@ -54,10 +54,6 @@ FocusScope {
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
 
-    // Aliases
-
-    property alias g_mainDisplay: root
-
     onViewChanged: {
         _oldViewProperties[view.name] = view.properties
         loadView()
@@ -68,7 +64,7 @@ FocusScope {
     }
 
     function loadView() {
-        var found = stackView.loadView(root.pageModel, root.view.name, root.view.properties)
+        var found = stackView.loadView(g_mainDisplay.pageModel, g_mainDisplay.view.name, g_mainDisplay.view.properties)
 
         var item = stackView.currentItem
 
@@ -106,7 +102,7 @@ FocusScope {
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
             return e.listed
         }).findIndex(function (e) {
-            return e.name === root.view.name
+            return e.name === g_mainDisplay.view.name
         })
 
         if (item.pageModel !== undefined)
@@ -190,7 +186,7 @@ FocusScope {
 
 
     function showPlayer() {
-        root._inhibitMiniPlayer = true
+        g_mainDisplay._inhibitMiniPlayer = true
         History.push(["player"])
     }
 
@@ -221,7 +217,7 @@ FocusScope {
         id: medialibId
         anchors.fill: parent
 
-        Navigation.parentItem: root
+        Navigation.parentItem: g_mainDisplay
 
         Rectangle {
             id: parentRectangle
@@ -269,12 +265,12 @@ FocusScope {
                     Layout.maximumHeight: height
                     Layout.fillWidth: true
 
-                    model: root.tabModel
+                    model: g_mainDisplay.tabModel
 
                     plListView: playlist
 
                     onItemClicked: {
-                        var name = root.tabModel.get(index).name
+                        var name = g_mainDisplay.tabModel.get(index).name
                         selectedIndex = index
                         if (_oldViewProperties[name] === undefined)
                             History.push(["mc", name])
@@ -304,7 +300,7 @@ FocusScope {
                             left: parent.left
                             bottom: parent.bottom
 
-                            bottomMargin: root.displayMargin
+                            bottomMargin: g_mainDisplay.displayMargin
 
                             right: (playlistColumn.visible && !VLCStyle.isScreenSmall)
                                    ? playlistColumn.left
@@ -347,12 +343,12 @@ FocusScope {
                         focus: false
 
                         implicitWidth: VLCStyle.isScreenSmall
-                                       ? root.width * 0.8
-                                       : Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                       ? g_mainDisplay.width * 0.8
+                                       : Helpers.clamp(g_mainDisplay.width / resizeHandle.widthFactor,
                                                        playlist.minimumWidth,
-                                                       root.width / 2)
+                                                       g_mainDisplay.width / 2)
                         width: 0
-                        height: parent.height - root.displayMargin
+                        height: parent.height - g_mainDisplay.displayMargin
 
                         visible: false
 
@@ -408,7 +404,7 @@ FocusScope {
                             rightPadding: VLCStyle.applicationHorizontalMargin
 
                             bottomPadding: topPadding + Math.max(VLCStyle.applicationVerticalMargin
-                                                                 - root.displayMargin, 0)
+                                                                 - g_mainDisplay.displayMargin, 0)
 
                             Navigation.parentItem: medialibId
                             Navigation.upItem: sourcesBanner
@@ -436,7 +432,7 @@ FocusScope {
 
                                 atRight: false
                                 targetWidth: playlistColumn.width
-                                sourceWidth: root.width
+                                sourceWidth: g_mainDisplay.width
 
                                 onWidthFactorChanged: {
                                     if (!_inhibitMainInterfaceUpdate)
@@ -500,17 +496,17 @@ FocusScope {
             width: VLCStyle.dp(320, VLCStyle.scale)
             height: VLCStyle.dp(180, VLCStyle.scale)
             z: 2
-            visible: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
-            enabled: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
+            visible: !g_mainDisplay._inhibitMiniPlayer && g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+            enabled: !g_mainDisplay._inhibitMiniPlayer && g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
 
             dragXMin: 0
-            dragXMax: root.width - playerPip.width
+            dragXMax: g_mainDisplay.width - playerPip.width
             dragYMin: sourcesBanner.y + sourcesBanner.height
             dragYMax: miniPlayer.y - playerPip.height
 
             //keep the player visible on resize
             Connections {
-                target: root
+                target: g_mainDisplay
                 onWidthChanged: {
                     if (playerPip.x > playerPip.dragXMax)
                         playerPip.x = playerPip.dragXMax
@@ -524,7 +520,7 @@ FocusScope {
 
         DG.Dialogs {
             z: 10
-            bgContent: root
+            bgContent: g_mainDisplay
 
             anchors {
                 bottom: miniPlayer.visible ? miniPlayer.top : parent.bottom
@@ -537,7 +533,7 @@ FocusScope {
             id: miniPlayer
 
             BindingCompat on state {
-                when: root._inhibitMiniPlayer && !miniPlayer.visible
+                when: g_mainDisplay._inhibitMiniPlayer && !miniPlayer.visible
                 value: ""
             }
 
