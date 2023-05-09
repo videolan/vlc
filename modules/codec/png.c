@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_rand.h>
+#include <vlc_ancillary.h>
 #include <png.h>
 
 /* PNG_SYS_COMMON_MEMBERS:

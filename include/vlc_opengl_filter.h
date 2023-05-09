@@ -25,7 +25,7 @@
 #define VLC_OPENGL_FILTER_H
 
 #include <vlc_tick.h>
-#include <vlc_es.h>
+#include <vlc_ancillary.h>
 
 struct vlc_gl_filter;
 struct vlc_gl_picture;

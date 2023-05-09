@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_charset.h>
+#include <vlc_ancillary.h>
 
 #include <jpeglib.h>
 #include <setjmp.h>

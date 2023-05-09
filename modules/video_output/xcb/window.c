@@ -50,7 +50,7 @@ typedef xcb_atom_t Atom;
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 #include <vlc_window.h>
-#include <vlc_es.h>
+#include <vlc_ancillary.h>
 
 typedef struct
 {

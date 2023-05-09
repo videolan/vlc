@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_ancillary.h>
 
 /*****************************************************************************
  * decoder_sys_t : raw video decoder descriptor

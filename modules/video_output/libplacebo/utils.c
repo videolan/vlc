@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
-#include <vlc_ancillary.h>
 #include "utils.h"
 
 static void Log(void *priv, enum pl_log_level level, const char *msg)

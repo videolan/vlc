@@ -34,12 +34,12 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_charset.h>
-#include <vlc_es.h>
 #include <vlc_frame.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
 #include <vlc_mouse.h>
 #include <vlc_actions.h>
+#include <vlc_ancillary.h>
 
 #include <shellapi.h>                                         /* ExtractIcon */
 #include "../wasync_resize_compressor.h"

@@ -23,6 +23,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture.h>
+#include <vlc_ancillary.h>
 
 #include <libplacebo/colorspace.h>
 #include <libplacebo/shaders/colorspace.h>

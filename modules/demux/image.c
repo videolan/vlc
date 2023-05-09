@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_image.h>
+#include <vlc_ancillary.h>
 #include "mxpeg_helper.h"
 
 /*****************************************************************************
