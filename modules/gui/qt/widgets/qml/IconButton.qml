@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQuick 2.11
-import QtQuick.Controls 2.4
-import QtQuick.Templates 2.4 as T
+import QtQuick 2.12
+import QtQuick.Controls 2.12
+import QtQuick.Templates 2.12 as T
 
 import org.videolan.vlc 0.1
 

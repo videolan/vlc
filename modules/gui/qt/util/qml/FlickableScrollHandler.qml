@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 import QtQml 2.11
-import QtQml.Models 2.11
+import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1 as VLC
 

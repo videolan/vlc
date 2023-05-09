@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 pragma Singleton
-import QtQuick 2.11
+import QtQuick 2.12
 
 import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
