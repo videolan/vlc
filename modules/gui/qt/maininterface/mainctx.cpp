@@ -866,7 +866,7 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
     // one that is set
 #ifndef NDEBUG
     QQmlComponent component(engine);
-    component.setData(QByteArrayLiteral("import QtQuick 2.11; import QtQuick.Controls 2.4; Item { }"), {});
+    component.setData(QByteArrayLiteral("import QtQuick 2.12; import QtQuick.Controls 2.12; Item { }"), {});
     QObject* const obj = component.create();
     assert(obj);
     // Consider disabling setting of custom attached
