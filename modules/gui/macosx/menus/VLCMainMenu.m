@@ -754,6 +754,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         _videoMenu.autoenablesItems = NO;
     }
 
+    _snapshot.enabled = activeVideo;
     [self setVideoSubmenusEnabled:activeVideo];
 }
 
