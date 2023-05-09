@@ -118,6 +118,4 @@ vlc_ancillary_GetData(const struct vlc_ancillary *ancillary);
 
 /** @} */
 
-/** @} */
-
 #endif /* VLC_ANCILLARY_H */
