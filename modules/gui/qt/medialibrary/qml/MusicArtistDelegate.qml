@@ -94,7 +94,7 @@ T.ItemDelegate {
         }
 
         drag.onActiveChanged: {
-            var dragItem = drag.target;
+            const dragItem = drag.target;
 
             if (drag.active == false)
                 dragItem.Drag.drop();
@@ -105,7 +105,7 @@ T.ItemDelegate {
         onPositionChanged: {
             if (drag.active == false) return;
 
-            var pos = drag.target.parent.mapFromItem(root, mouseX, mouseY);
+            const pos = drag.target.parent.mapFromItem(root, mouseX, mouseY);
 
             drag.target.x = pos.x + VLCStyle.dragDelta;
             drag.target.y = pos.y + VLCStyle.dragDelta;

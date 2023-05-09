@@ -83,8 +83,8 @@ T.Switch {
         if (_update === false)
             return
 
-        var from = handle.x
-        var to
+        const from = handle.x
+        let to
 
         if (checked)
             to = handle.drag.maximumX
@@ -99,8 +99,8 @@ T.Switch {
     // Private
 
     function _applyX(x) {
-        var from = handle.x
-        var to
+        const from = handle.x
+        let to
 
         _update = false
 

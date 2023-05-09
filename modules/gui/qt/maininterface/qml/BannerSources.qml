@@ -237,7 +237,7 @@ FocusScope {
                         // sometimes when view changes, one of the "focusable" object will become disabled
                         // but because of focus chainning, FocusScope still tries to force active focus on the object
                         // but that will fail, manually assign focus in such cases
-                        var focusable = [localContextGroup, localMenuGroup, playlistGroup]
+                        const focusable = [localContextGroup, localMenuGroup, playlistGroup]
                         if (!focusable.some(function (obj) { return obj.activeFocus; })) {
                             // no object has focus
                             localToolbar.nextItemInFocusChain(true).forceActiveFocus()
@@ -325,12 +325,12 @@ FocusScope {
                         Connections {
                             target: root
                             onExtraLocalActionsChanged : {
-                                for (var i = 0; i < localContextModel.countExtra; i++) {
+                                for (let i = 0; i < localContextModel.countExtra; i++) {
                                     localContextModel.remove(localContextModel.count - localContextModel.countExtra, localContextModel.countExtra)
                                 }
 
                                 if (root.extraLocalActions && root.extraLocalActions instanceof ObjectModel) {
-                                    for (i = 0; i < root.extraLocalActions.count; i++)
+                                    for (let i = 0; i < root.extraLocalActions.count; i++)
                                         localContextModel.append(root.extraLocalActions.get(i))
                                     localContextModel.countExtra = root.extraLocalActions.count
                                 } else {

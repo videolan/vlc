@@ -47,12 +47,11 @@ Widgets.GridItem {
         if (model.artwork && model.artwork.toString() !== "") {
             return model.artwork
         }
-
         return ""
     }
 
     fallbackImage: {
-        var f = function(type) {
+        const f = function(type) {
             switch (type) {
             case NetworkMediaModel.TYPE_DISC:
                 return "qrc://sd/disc.svg"

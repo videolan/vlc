@@ -60,9 +60,9 @@ FocusScope {
     readonly property int contentRightMargin: extraMargin + rightMargin
 
     readonly property real usedRowSpace: {
-        var size = leftMargin + rightMargin
+        let size = leftMargin + rightMargin
 
-        for (var i in sortModel)
+        for (let i in sortModel)
             size += VLCStyle.colWidth(sortModel[i].size)
 
         return size + Math.max(VLCStyle.column_spacing * (sortModel.length - 1), 0)
@@ -174,7 +174,7 @@ FocusScope {
     }
 
     function getItemY(index) {
-        var size = index * rowHeight + topMargin
+        let size = index * rowHeight + topMargin
 
         if (tableHeaderItem)
             size += tableHeaderItem.height
@@ -230,7 +230,7 @@ FocusScope {
             // updating availableRowWidth is expensive because of property bindings in sortModel
             // and availableRowWidth is dependent on root.width which can update in a burst
             // so try to maintain a minimum time gap between subsequent availableRowWidth updates
-            var sinceLastUpdate = Date.now() - root._availabeRowWidthLastUpdateTime
+            const sinceLastUpdate = Date.now() - root._availabeRowWidthLastUpdateTime
             if ((root.availableRowWidth === 0) || (sinceLastUpdate > 128 && !availableRowWidthUpdater.running)) {
                 _update()
             } else if (!availableRowWidthUpdater.running) {

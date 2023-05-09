@@ -78,7 +78,7 @@ Control {
         onPositionChanged: {
             if (drag.active) {
                 // FIXME: There must be a better way of this
-                var pos = mapToItem(loader.parent, mouseX, mouseY)
+                const pos = mapToItem(loader.parent, mouseX, mouseY)
                 // y should be set first, because the automatic scroll is
                 // triggered by change on X
                 loader.y = pos.y
@@ -100,7 +100,7 @@ Control {
         }
 
         onDropped: {
-            var destIndex = parent.DelegateModel.itemsIndex
+            let destIndex = parent.DelegateModel.itemsIndex
 
             if((drag.source.dndView === dndView)
                     && (drag.source.DelegateModel.itemsIndex < destIndex))

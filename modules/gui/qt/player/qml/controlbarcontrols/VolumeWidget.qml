@@ -31,7 +31,7 @@ T.Pane {
     property bool paintOnly: false
 
     readonly property color sliderColor: {
-        var theme = volControl.colorContext
+        const theme = volControl.colorContext
         return (volControl.position > _fullvolpos) ? theme.fg.negative : theme.fg.primary
     }
 
@@ -155,7 +155,7 @@ T.Pane {
             function _adjustPlayerVolume() {
                 Player.muted = false
 
-                var value = volControl.value
+                let value = volControl.value
 
                 // NOTE: We are clamping the value to make it easier to restore the default volume.
                 if (_shiftPressed === false) {
@@ -268,7 +268,7 @@ T.Pane {
                 onPositionChanged: if (mouse.buttons & Qt.RightButton) adjustVolume(mouse)
 
                 onWheel: {
-                    var delta = 0, fineControl = false
+                    let delta = 0, fineControl = false
 
                     if ((Math.abs(wheel.pixelDelta.x) % 120 > 0) || (Math.abs(wheel.pixelDelta.y) % 120 > 0)) {
                         if (Math.abs(wheel.pixelDelta.x) > Math.abs(wheel.pixelDelta.y))
@@ -294,7 +294,7 @@ T.Pane {
                         // Degrees to steps for standard mouse
                         delta = delta / 8 / 15
 
-                        var steps = Math.ceil(Math.abs(delta))
+                        const steps = Math.ceil(Math.abs(delta))
 
                         Player.muted = false
 
@@ -310,7 +310,7 @@ T.Pane {
                 function adjustVolume(mouse) {
                     mouse.accepted = true
 
-                    var pos = mouse.x * root._maxvolpos / width
+                    const pos = mouse.x * root._maxvolpos / width
 
                     if (pos < 0.25)
                         volControl.value = 0

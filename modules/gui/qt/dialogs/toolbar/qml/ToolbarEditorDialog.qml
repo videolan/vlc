@@ -102,7 +102,7 @@ WindowDialog {
                     }
 
                     displayText: {
-                        var text
+                        let text
 
                         if (!!MainCtx.controlbarProfileModel.currentModel)
                             text = MainCtx.controlbarProfileModel.currentModel.name
@@ -133,7 +133,7 @@ WindowDialog {
                     iconText: VLCIcons.profile_new
 
                     onClicked: {
-                        var npDialog = DialogsProvider.getTextDialog(null,
+                        const npDialog = DialogsProvider.getTextDialog(null,
                                                                      I18n.qtr("Profile Name"),
                                                                      I18n.qtr("Please enter the new profile name:"),
                                                                      I18n.qtr("Profile %1").arg(comboBox.count + 1))

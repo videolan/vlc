@@ -166,7 +166,7 @@ T.Control {
             if (!containsMouse)
                 return false
 
-            var center = (width / 2)
+            const center = (width / 2)
             if (Helpers.pointInRadius( center - mouseX,
                                        center - mouseY,
                                        center )) {
@@ -198,7 +198,7 @@ T.Control {
 
     contentItem: T.Label {
         text: {
-            var state = Player.playingState
+            const state = Player.playingState
 
             if (!paintOnly
                     && state !== Player.PLAYING_STATE_PAUSED

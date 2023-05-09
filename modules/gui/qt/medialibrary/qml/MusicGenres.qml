@@ -68,8 +68,8 @@ MainInterface.MainViewLoader {
         if (selectionModel.selectedIndexes.length > 1) {
             MediaLib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
         } else if (selectionModel.selectedIndexes.length === 1) {
-            var sel = selectionModel.selectedIndexes[0]
-            var model = genreModel.getDataAt(sel)
+            const sel = selectionModel.selectedIndexes[0]
+            const model = genreModel.getDataAt(sel)
             showAlbumView(model.id, model.name, Qt.TabFocusReason)
         }
     }
@@ -91,7 +91,7 @@ MainInterface.MainViewLoader {
      */
     onActiveFocusChanged: {
         if (activeFocus && genreModel.count > 0 && !selectionModel.hasSelection) {
-            var initialIndex = 0
+            let initialIndex = 0
             if (currentIndex !== -1)
                 initialIndex = currentIndex
 

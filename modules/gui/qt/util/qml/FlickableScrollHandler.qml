@@ -32,11 +32,11 @@ VLC.FlickableScrollHandler {
         if (!enabled) {
             // QTBUG-56075
             // Note that this workaround is not effective when enabled dynamically changes
-            var qtVersion = VLC.MainCtx.qtVersion()
+            const qtVersion = VLC.MainCtx.qtVersion()
             if ((qtVersion >= VLC.MainCtx.qtVersionCheck(6, 0, 0) && qtVersion < VLC.MainCtx.qtVersionCheck(6, 2, 0)) ||
                 (qtVersion < VLC.MainCtx.qtVersionCheck(5, 15, 8))) {
                 handler.enabled = true
-                var smoothScroll = Qt.binding(function() { return VLC.MainCtx.smoothScroll })
+                const smoothScroll = Qt.binding(function() { return VLC.MainCtx.smoothScroll })
                 handler.handleOnlyPixelDelta = smoothScroll
                 _behaviorAdjuster.when = smoothScroll
                 _behaviorAdjuster.model.append( {property: "flickDeceleration", value: 3500} )

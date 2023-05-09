@@ -34,9 +34,9 @@ Row {
     property color hoverColor: VLCStyle.setColorAlpha(theme.bg.primary, 0.5)
 
     readonly property bool hovered: {
-        var h = false
-        for (var i = 0; i < repeater.count; ++i) {
-            var button = repeater.itemAt(i)
+        let h = false
+        for (let i = 0; i < repeater.count; ++i) {
+            const button = repeater.itemAt(i)
             h = h || button.hovered || button.showHovered
         }
 
@@ -98,8 +98,8 @@ Row {
             }
 
             function updateRect() {
-                var point = mapToItem(null, 0, 0)
-                var rect = Qt.rect(point.x, point.y, width, height)
+                const point = mapToItem(null, 0, 0)
+                const rect = Qt.rect(point.x, point.y, width, height)
 
                 modelData.rect = rect
             }

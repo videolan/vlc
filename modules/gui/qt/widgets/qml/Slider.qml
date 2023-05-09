@@ -71,9 +71,9 @@ T.Slider {
     function positionAt(x) {
         // taken from qt sources QQuickSlider.cpp
         // TODO: support vertical slider
-        var hw = control.handle.width
-        var offset = control.leftPadding + hw / 2
-        var extend = control.availableWidth - hw
+        const hw = control.handle.width
+        const offset = control.leftPadding + hw / 2
+        const extend = control.availableWidth - hw
         return (x - offset) / extend
     }
 
@@ -155,7 +155,7 @@ T.Slider {
        text: {
            if (!visible) return ""
 
-           var v = control.valueAt(control.positionAt(pos.x))
+           const v = control.valueAt(control.positionAt(pos.x))
            return control.toolTipTextProvider(v)
        }
 

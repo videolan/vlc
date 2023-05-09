@@ -28,7 +28,7 @@ Item {
 
         onSingleTapped: {
             if (eventPoint.event.button & Qt.RightButton) {
-                var systemButton = MainCtx.csdButtonModel.systemMenuButton
+                const systemButton = MainCtx.csdButtonModel.systemMenuButton
                 if (systemButton) {
                     systemButton.showSystemMenu(eventPoint.position)
                 }

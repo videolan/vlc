@@ -71,10 +71,10 @@ FocusScope {
         if (item.activeFocus === false)
             return
 
-        var minY
-        var maxY
+        let minY
+        let maxY
 
-        var index = item.currentIndex
+        const index = item.currentIndex
 
         // NOTE: We want to include the header when we're on the first row.
         if ((MainCtx.gridView && index < item.nbItemPerRow) || index < 1) {
@@ -258,15 +258,14 @@ FocusScope {
     }
 
     function resetFocus() {
-        var widgetlist = [foldersSection, deviceSection, lanSection]
-        var i;
-        for (i in widgetlist) {
+        const widgetlist = [foldersSection, deviceSection, lanSection]
+        for (let i in widgetlist) {
             if (widgetlist[i].activeFocus && widgetlist[i].visible)
                 return
         }
 
-        var found  = false;
-        for (i in widgetlist) {
+        let found  = false;
+        for (let i in widgetlist) {
             if (widgetlist[i].visible && !found) {
                 widgetlist[i].focus = true
                 found = true

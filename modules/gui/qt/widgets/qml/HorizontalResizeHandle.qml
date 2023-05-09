@@ -52,8 +52,8 @@ MouseArea {
     }
 
     onPositionChanged: {
-        var f = atRight ? -1 : 1
-        var delta = mouseX - _previousX
+        const f = atRight ? -1 : 1
+        const delta = mouseX - _previousX
 
         root.widthFactor = root.sourceWidth / (root.targetWidth + (delta * - f))
     }

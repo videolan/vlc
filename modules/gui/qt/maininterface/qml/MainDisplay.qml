@@ -64,9 +64,9 @@ FocusScope {
     }
 
     function loadView() {
-        var found = stackView.loadView(g_mainDisplay.pageModel, g_mainDisplay.view.name, g_mainDisplay.view.properties)
+        const found = stackView.loadView(g_mainDisplay.pageModel, g_mainDisplay.view.name, g_mainDisplay.view.properties)
 
-        var item = stackView.currentItem
+        const item = stackView.currentItem
 
         item.Navigation.parentItem = medialibId
         item.Navigation.upItem = sourcesBanner
@@ -239,7 +239,7 @@ FocusScope {
                 tint: frostedTheme.bg.secondary
 
                 effectRect: {
-                    var _height = 0
+                    let _height = 0
                     if (loaderProgress.active && loaderProgress.item.visible)
                         _height += loaderProgress.item.height
                     if (miniPlayer.visible)
@@ -270,7 +270,7 @@ FocusScope {
                     plListView: playlist
 
                     onItemClicked: {
-                        var name = g_mainDisplay.tabModel.get(index).name
+                        const name = g_mainDisplay.tabModel.get(index).name
                         selectedIndex = index
                         if (_oldViewProperties[name] === undefined)
                             History.push(["mc", name])

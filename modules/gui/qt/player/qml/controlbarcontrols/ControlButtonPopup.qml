@@ -57,7 +57,7 @@ Widgets.IconControlButton {
             return
         }
 
-        var parent = Navigation.parentItem;
+        const parent = Navigation.parentItem;
 
         if (parent)
             parent.Navigation.defaultNavigationUp()
@@ -82,15 +82,15 @@ Widgets.IconControlButton {
 
     // NOTE: coordinates are based on the popup parent view.
     function _updatePosition() {
-        var parent = popup.parent
+        const parent = popup.parent
 
-        var position = parent.mapFromItem(root, x, y)
+        const position = parent.mapFromItem(root, x, y)
 
-        var popupX = Math.round(position.x - ((popup.width - width) / 2))
+        const popupX = Math.round(position.x - ((popup.width - width) / 2))
 
-        var minimum = VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
+        const minimum = VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
 
-        var maximum = parent.width - popup.width - minimum
+        const maximum = parent.width - popup.width - minimum
 
         popup.x = Helpers.clamp(popupX, minimum, maximum)
 

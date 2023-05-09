@@ -86,15 +86,15 @@ Item {
 
         Qt.callLater(dragItem.getSelectedInputItem, dragItem.setInputItems)
 
-        var covers = []
-        var titleList = []
+        const covers = []
+        const titleList = []
 
-        for (var i in indexes) {
+        for (let i in indexes) {
             if (covers.length === _maxCovers)
                 break
 
-            var cover = _getCover(indexes[i], data[i])
-            var itemTitle = _getTitle(indexes[i], data[i])
+            const cover = _getCover(indexes[i], data[i])
+            const itemTitle = _getTitle(indexes[i], data[i])
             if (!cover || !itemTitle) continue
 
             covers.push(cover)

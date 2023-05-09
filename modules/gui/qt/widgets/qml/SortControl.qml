@@ -86,7 +86,7 @@ FocusScope {
         target: (_menu) ? _menu : null
 
         onSelected: {
-            var selectedSortKey = root.model[index][root.criteriaRole]
+            const selectedSortKey = root.model[index][root.criteriaRole]
 
             if (root.sortKey !== selectedSortKey) {
                 root.sortSelected(selectedSortKey)
@@ -101,9 +101,9 @@ FocusScope {
     // Functions
 
     function show() {
-        var model = root.model.map(function(modelData) {
-            var checked = modelData[root.criteriaRole] === sortKey
-            var order = checked ? root.sortOrder : undefined
+        const model = root.model.map(function(modelData) {
+            const checked = modelData[root.criteriaRole] === sortKey
+            const order = checked ? root.sortOrder : undefined
             return {
                 "text": modelData[root.textRole],
                 "checked": checked,
@@ -111,7 +111,7 @@ FocusScope {
             }
         })
 
-        var point
+        let point
 
         if (root.popupAbove)
             point = root.mapToGlobal(0, - VLCStyle.margin_xxsmall)

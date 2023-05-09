@@ -151,9 +151,9 @@ MainInterface.MainTableView {
             return
         }
 
-        var item = drop.source;
+        const item = drop.source;
 
-        var destinationIndex = before ? index : (index + 1)
+        const destinationIndex = before ? index : (index + 1)
 
         // NOTE: Move implementation.
         if (dragItem === item) {

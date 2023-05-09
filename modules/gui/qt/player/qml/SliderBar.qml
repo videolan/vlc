@@ -106,7 +106,7 @@ Slider {
             position = Helpers.clamp(position, 0., 1.)
             control.value = position
             if (!forcePrecise) {
-                var chapter = Player.chapters.getClosestChapterFromPos(position, threshold)
+                const chapter = Player.chapters.getClosestChapterFromPos(position, threshold)
                 if (chapter !== -1) {
                     Player.chapters.selectChapter(chapter)
                     return

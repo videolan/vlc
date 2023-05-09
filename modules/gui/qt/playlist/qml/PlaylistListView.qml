@@ -70,14 +70,14 @@ Control {
 
         if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) {
             // internal drop (inter-view or intra-playlist)
-            var selection = drop.source.selection
+            const selection = drop.source.selection
             if (!!selection) {
-                var length = selection.length
-                var firstIndex = selection[0]
-                var lastIndex = selection[length - 1]
-                var consecutive = true
+                const length = selection.length
+                const firstIndex = selection[0]
+                const lastIndex = selection[length - 1]
+                let consecutive = true
                 if (length > 1) {
-                    for (var i = 0; i < length - 1; ++i) {
+                    for (let i = 0; i < length - 1; ++i) {
                         if (selection[i + 1] - selection[i] !== 1) {
                             consecutive = false
                             break
@@ -94,7 +94,7 @@ Control {
     }
 
     function acceptDrop(index, drop) {
-        var item = drop.source;
+        const item = drop.source;
 
         // NOTE: Move implementation.
         if (dragItem == item) {
@@ -116,9 +116,9 @@ Control {
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
         } else if (drop.hasUrls) {
-            var urlList = [];
+            const urlList = [];
 
-            for (var url in drop.urls)
+            for (let url in drop.urls)
                 urlList.push(drop.urls[url]);
 
             mainPlaylistController.insert(index, urlList, false);
@@ -171,7 +171,7 @@ Control {
             selection = root.model.getSelection()
             indexes = selection
             setData(identifier, indexes.map(function (index) {
-                var item = root.model.itemAt(index)
+                const item = root.model.itemAt(index)
                 return {
                     "title": item.title,
                     "cover": (!!item.artwork && item.artwork.toString() !== "") ? item.artwork : VLCStyle.noArtAlbumCover
@@ -485,11 +485,11 @@ Control {
                 if (root.mode === PlaylistListView.Mode.Select) {
                     console.log("update selection select")
                 } else if (root.mode === PlaylistListView.Mode.Move) {
-                    var selectedIndexes = root.model.getSelection()
+                    const selectedIndexes = root.model.getSelection()
                     if (selectedIndexes.length === 0)
                         return
                     /* always move relative to the first item of the selection */
-                    var target = selectedIndexes[0];
+                    let target = selectedIndexes[0];
                     if (newIndex > oldIndex) {
                         /* move down */
                         target++
@@ -549,7 +549,7 @@ Control {
             }
 
             function onDelete() {
-                var selection = root.model.getSelection()
+                const selection = root.model.getSelection()
                 if (selection.length === 0)
                     return
                 root.model.removeItems(selection)

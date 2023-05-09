@@ -123,13 +123,13 @@ FocusScope {
     // Settings
 
     contentWidth: {
-        var size = _effectiveCellWidth * nbItemPerRow - horizontalSpacing
+        const size = _effectiveCellWidth * nbItemPerRow - horizontalSpacing
 
         return leftMargin + size + rightMargin
     }
 
     contentHeight: {
-        var size = getItemPos(_count - 1)[1] + rowHeight + _expandItemVerticalSpace
+        const size = getItemPos(_count - 1)[1] + rowHeight + _expandItemVerticalSpace
 
         // NOTE: topMargin and headerHeight are included in root.getItemPos.
         if (footerItem)
@@ -172,7 +172,7 @@ FocusScope {
     // Keys
 
     Keys.onPressed: {
-        var newIndex = -1
+        let newIndex = -1
         if (KeyHelper.matchRight(event)) {
             if ((currentIndex + 1) % nbItemPerRow !== 0) {//are we not at the end of line
                 newIndex = Math.min(_count - 1, currentIndex + 1)
@@ -182,7 +182,7 @@ FocusScope {
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (KeyHelper.matchDown(event)) {
-            var lastIndex = _count - 1
+            const lastIndex = _count - 1
             // we are not on the last line
             if (Math.floor(currentIndex / nbItemPerRow)
                 !==
@@ -211,7 +211,7 @@ FocusScope {
         if (newIndex !== -1 && newIndex !== currentIndex) {
             event.accepted = true;
 
-            var oldIndex = currentIndex;
+            const oldIndex = currentIndex;
             currentIndex = newIndex;
             selectionDelegateModel.updateSelection(event.modifiers, oldIndex, newIndex)
 
@@ -246,9 +246,9 @@ FocusScope {
     Connections {
         target: model
         onDataChanged: {
-            var iMin = topLeft.row
-            var iMax = bottomRight.row + 1 // [] => [)
-            var f_l = _currentRange
+            const iMin = topLeft.row
+            const iMax = bottomRight.row + 1 // [] => [)
+            const f_l = _currentRange
             if (iMin < f_l[1] && f_l[0] < iMax) {
                 _refreshData(iMin, iMax)
             }
@@ -265,24 +265,23 @@ FocusScope {
         target: selectionDelegateModel
 
         onSelectionChanged: {
-            var i
-            for (i = 0; i < selected.length; ++i) {
+            for (let i = 0; i < selected.length; ++i) {
                 _updateSelectedRange(selected[i].topLeft, selected[i].bottomRight, true)
             }
 
-            for (i = 0; i < deselected.length; ++i) {
+            for (let i = 0; i < deselected.length; ++i) {
                 _updateSelectedRange(deselected[i].topLeft, deselected[i].bottomRight, false)
             }
         }
 
         function _updateSelectedRange(topLeft, bottomRight, select) {
-            var iMin = topLeft.row
-            var iMax = bottomRight.row + 1 // [] => [)
+            let iMin = topLeft.row
+            let iMax = bottomRight.row + 1 // [] => [)
             if (iMin < root._currentRange[1] && root._currentRange[0] < iMax) {
                 iMin = Math.max(iMin, root._currentRange[0])
                 iMax = Math.min(iMax, root._currentRange[1])
-                for (var j = iMin; j < iMax; j++) {
-                    var item = root._getItem(j)
+                for (let j = iMin; j < iMax; j++) {
+                    const item = root._getItem(j)
                     console.assert(item)
                     item.selected = select
                 }
@@ -356,17 +355,17 @@ FocusScope {
     }
 
     function getItemRowCol(id) {
-        var rowId = Math.floor(id / nbItemPerRow)
-        var colId = id % nbItemPerRow
+        const rowId = Math.floor(id / nbItemPerRow)
+        const colId = id % nbItemPerRow
         return [colId, rowId]
     }
 
     function getItemPos(id) {
-        var rowCol = getItemRowCol(id);
+        const rowCol = getItemRowCol(id);
 
-        var x = rowCol[0] * _effectiveCellWidth + contentLeftMargin;
+        const x = rowCol[0] * _effectiveCellWidth + contentLeftMargin;
 
-        var y = rowCol[1] * rowHeight + headerHeight + topMargin;
+        const y = rowCol[1] * rowHeight + headerHeight + topMargin;
 
         // NOTE: Position needs to be integer based if we want to avoid visual artifacts like
         //       wrong alignments or blurry texture rendering.
@@ -381,13 +380,13 @@ FocusScope {
             index < 0 || index >= _count)
             return
 
-        var itemTopY = getItemPos(index)[1]
-        var itemBottomY = itemTopY + rowHeight
+        const itemTopY = getItemPos(index)[1]
+        const itemBottomY = itemTopY + rowHeight
 
-        var viewTopY = flickable.contentY
-        var viewBottomY = viewTopY + flickable.height
+        const viewTopY = flickable.contentY
+        const viewBottomY = viewTopY + flickable.height
 
-        var newContentY
+        let newContentY
 
         if (itemTopY < viewTopY)
              //item above view
@@ -443,57 +442,57 @@ FocusScope {
     }
 
     function _calculateCurrentRange() {
-        var myContentY = flickable.contentY
-        var contentYWithoutExpand = myContentY
-        var heightWithoutExpand = flickable.height + displayMarginEnd
+        const myContentY = flickable.contentY
+        let contentYWithoutExpand = myContentY
+        let heightWithoutExpand = flickable.height + displayMarginEnd
 
         if (expandIndex !== -1) {
-            var expandItemY = getItemPos(flickable.getExpandItemGridId())[1]
+            const expandItemY = getItemPos(flickable.getExpandItemGridId())[1]
 
             if (myContentY >= expandItemY && myContentY < expandItemY + _expandItemVerticalSpace)
                 contentYWithoutExpand = expandItemY
             if (myContentY >= expandItemY + _expandItemVerticalSpace)
                 contentYWithoutExpand = myContentY - _expandItemVerticalSpace
 
-            var expandYStart = Math.max(myContentY, expandItemY)
-            var expandYEnd = Math.min(myContentY + height, expandItemY + _expandItemVerticalSpace)
-            var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
+            const expandYStart = Math.max(myContentY, expandItemY)
+            const expandYEnd = Math.min(myContentY + height, expandItemY + _expandItemVerticalSpace)
+            const expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
             heightWithoutExpand -= expandDisplayedHeight
         }
 
-        var onlyGridContentY = contentYWithoutExpand - headerHeight - topMargin
-        var rowId = Math.floor(onlyGridContentY / rowHeight)
-        var firstId = Math.max(rowId * nbItemPerRow, 0)
+        const onlyGridContentY = contentYWithoutExpand - headerHeight - topMargin
+        const firstRowId = Math.floor(onlyGridContentY / rowHeight)
+        const firstId = Math.max(firstRowId * nbItemPerRow, 0)
 
-        rowId = Math.ceil((onlyGridContentY + heightWithoutExpand) / rowHeight)
-        var lastId = Math.min(rowId * nbItemPerRow, _count)
+        const lastRowId = Math.ceil((onlyGridContentY + heightWithoutExpand) / rowHeight)
+        const lastId = Math.min(lastRowId * nbItemPerRow, _count)
 
         return [firstId, lastId]
     }
 
     function _getItem(id) {
-        var i = id - _currentRange[0]
+        const i = id - _currentRange[0]
         return _idChildrenList[i]
     }
 
     function _setItem(id, item) {
-        var i = id - _currentRange[0]
+        const i = id - _currentRange[0]
         _idChildrenList[i] = item
     }
 
     function _containsItem(id) {
-        var i = id - _currentRange[0]
-        var childrenList = _idChildrenList
+        const i = id - _currentRange[0]
+        const childrenList = _idChildrenList
         return i >= 0 && i < childrenList.length && typeof childrenList[i] !== "undefined"
     }
 
     function _indexToZ(id) {
-        var rowCol = getItemRowCol(id)
+        const rowCol = getItemRowCol(id)
         return rowCol[0] % 2 + 2 * (rowCol[1] % 2)
     }
 
     function _repositionItem(id, x, y) {
-        var item = _getItem(id)
+        const item = _getItem(id)
         console.assert(item !== undefined, "wrong child: " + id)
 
         //theses properties are always defined in Item
@@ -506,7 +505,7 @@ FocusScope {
     }
 
     function _recycleItem(id, x, y) {
-        var item = _unusedItemList.pop()
+        const item = _unusedItemList.pop()
         console.assert(item !== undefined, "incorrect _recycleItem call, id" + id + " ununsedItemList size" + _unusedItemList.length)
 
         item.index = id
@@ -523,7 +522,7 @@ FocusScope {
     }
 
     function _createItem(id, x, y) {
-        var item = delegate.createObject( flickable.contentItem, {
+        const item = delegate.createObject( flickable.contentItem, {
                         selected: selectionDelegateModel.isSelected(model.index(id, 0)),
                         index: id,
                         model: model.getDataAt(id),
@@ -540,9 +539,9 @@ FocusScope {
     }
 
     function _setupChild(id, ydelta) {
-        var pos = getItemPos(id)
+        const pos = getItemPos(id)
 
-        var item;
+        let item;
 
         if (_containsItem(id))
             item = _repositionItem(id, pos[0], pos[1] + ydelta)
@@ -559,14 +558,14 @@ FocusScope {
     }
 
     function _refreshData( iMin, iMax ) {
-        var f_l = _currentRange
+        const f_l = _currentRange
         if (!iMin || iMin < f_l[0])
             iMin = f_l[0]
         if (!iMax || iMax > f_l[1])
             iMax= f_l[1]
 
-        for (var id  = iMin; id < iMax; id++) {
-            var item = _getItem(id)
+        for (let id  = iMin; id < iMax; id++) {
+            const item = _getItem(id)
             item.model = model.getDataAt(id)
         }
 
@@ -703,19 +702,17 @@ FocusScope {
         onContentYChanged: { Qt.callLater(flickable.layout, false) }
 
         function getExpandItemGridId() {
-            var ret
             if (root.expandIndex !== -1) {
-                var rowCol = root.getItemRowCol(root.expandIndex)
-                var rowId = rowCol[1] + 1
-                ret = rowId * root.nbItemPerRow
+                const rowCol = root.getItemRowCol(root.expandIndex)
+                const rowId = rowCol[1] + 1
+                return rowId * root.nbItemPerRow
             } else {
-                ret = root._count
+                return root._count
             }
-            return ret
         }
 
         function _setupIndexes(force, range, yDelta) {
-            for (var i = range[0]; i < range[1]; i++) {
+            for (let i = range[0]; i < range[1]; i++) {
                 if (!force && root._containsItem(i))
                     continue
                 _setupChild(i, yDelta)
@@ -737,18 +734,17 @@ FocusScope {
                 return
             }
 
-            var overlapped = _overlappedInterval([first, last], root._currentRange)
+            const overlapped = _overlappedInterval([first, last], root._currentRange)
 
-            var i
-            var newList = new Array(last - first)
+            const newList = new Array(last - first)
 
-            for (i = overlapped[0]; i < overlapped[1]; ++i) {
+            for (let i = overlapped[0]; i < overlapped[1]; ++i) {
                 newList[i - first] = root._getItem(i)
                 root._setItem(i, undefined)
             }
 
-            for (i = root._currentRange[0]; i < root._currentRange[1]; ++i) {
-                var item = root._getItem(i)
+            for (let i = root._currentRange[0]; i < root._currentRange[1]; ++i) {
+                const item = root._getItem(i)
                 if (typeof item !== "undefined") {
                     item.visible = false
                     root._unusedItemList.push(item)
@@ -768,14 +764,14 @@ FocusScope {
 
             root.rowX = getItemPos(0)[0]
 
-            var expandItemGridId = getExpandItemGridId()
+            const expandItemGridId = getExpandItemGridId()
 
-            var f_l = _calculateCurrentRange()
-            var nbItems = f_l[1] - f_l[0]
-            var firstId = f_l[0]
-            var lastId = f_l[1]
+            const f_l = _calculateCurrentRange()
+            const nbItems = f_l[1] - f_l[0]
+            const firstId = f_l[0]
+            const lastId = f_l[1]
 
-            var topGridEndId = Math.max(Math.min(expandItemGridId, lastId), firstId)
+            const topGridEndId = Math.max(Math.min(expandItemGridId, lastId), firstId)
 
             if (!forceRelayout && root._currentRange[0] === firstId && root._currentRange[1] === lastId)
                 return;
@@ -786,7 +782,7 @@ FocusScope {
             _setupIndexes(forceRelayout, [firstId, topGridEndId], 0)
 
             if (root.expandIndex !== -1) {
-                var expandItemPos = root.getItemPos(expandItemGridId)
+                const expandItemPos = root.getItemPos(expandItemGridId)
                 expandItem.y = expandItemPos[1]
                 if (!expandItemLoader.visible)
                     expandItemLoader.visible = true
@@ -820,7 +816,7 @@ FocusScope {
             if (root.expandIndex === -1)
                 return
 
-            var expandItemHeight = expandItem.implicitHeight + root.verticalSpacing
+            const expandItemHeight = expandItem.implicitHeight + root.verticalSpacing
 
             // Expand animation
 
@@ -832,8 +828,8 @@ FocusScope {
             animateExpandItem.start()
 
             // Sliding animation
-            var currentItemYPos = root.getItemPos(root.expandIndex)[1]
-            currentItemYPos += root.rowHeight / 2
+            const currentItemYPos = root.getItemPos(root.expandIndex)[1]
+                                    + root.rowHeight / 2
             animateFlickableContentY(currentItemYPos)
         }
 

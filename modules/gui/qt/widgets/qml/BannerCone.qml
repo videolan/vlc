@@ -69,7 +69,7 @@ Image {
     }
 
     function updateRect() {
-        var rect = root.mapToItem(null, 0, 0, width, height)
+        const rect = root.mapToItem(null, 0, 0, width, height)
 
         if (button)
             button.rect = rect

@@ -117,7 +117,7 @@ Widgets.PageLoader {
 
             property Component addressBar: NetworkAddressbar {
                 path: {
-                    var _path = providerModel.path
+                    const _path = providerModel.path
                     _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
                     return _path
                 }

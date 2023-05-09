@@ -68,7 +68,7 @@ Item {
                     implicitWidth: VLCStyle.button_width_large
 
                     text: {
-                        var text = modelData.name
+                        const text = modelData.name
 
                         if (!!MainCtx.controlbarProfileModel.currentModel &&
                                 MainCtx.controlbarProfileModel.currentModel.getModel(identifier).dirty)
@@ -180,8 +180,8 @@ Item {
                             Layout.fillHeight: true
                             Layout.fillWidth: {
                                 if (count === 0) {
-                                    for (var i = 0; i < repeater.count; ++i) {
-                                        var item = repeater.itemAt(i)
+                                    for (let i = 0; i < repeater.count; ++i) {
+                                        const item = repeater.itemAt(i)
                                         if (!!item && item.count > 0)
                                             return false
                                     }

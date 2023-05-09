@@ -142,7 +142,7 @@ T.Control {
                 if (drag.active == false)
                     return;
 
-                var pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
+                const pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
 
                 drag.target.x = pos.x + VLCStyle.dragDelta;
                 drag.target.y = pos.y + VLCStyle.dragDelta;
@@ -239,7 +239,7 @@ T.Control {
                     if (!delegate.selected)
                         delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
 
-                    var pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
+                    const pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
                     delegate.contextMenuButtonClicked(this, delegate.rowModel, pos)
                 }
 

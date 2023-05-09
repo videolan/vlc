@@ -155,7 +155,7 @@ FocusScope {
     // Events
 
     function onAction(index) {
-        var indexes = modelSelect.selectedIndexes
+        const indexes = modelSelect.selectedIndexes
 
         if (indexes.length > 1) {
             model.addAndPlay(modelFilter.mapIndexesToSource(indexes))
@@ -163,9 +163,9 @@ FocusScope {
             return
         }
 
-        var data = modelFilter.getDataAt(index)
+        const data = modelFilter.getDataAt(index)
 
-        var type = data.type
+        const type = data.type
 
         if (type === NetworkMediaModel.TYPE_DIRECTORY || type === NetworkMediaModel.TYPE_NODE)
             browse(data.tree, Qt.TabFocusReason)
@@ -182,7 +182,7 @@ FocusScope {
     }
 
     function onDoubleClicked(model, index) {
-        var type = model.type
+        const type = model.type
 
         if (type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
             browse(model.tree, Qt.MouseFocusReason)
@@ -391,7 +391,7 @@ FocusScope {
                             if (itemText.rowModel === null)
                                 return ""
 
-                            var text = itemText.rowModel[itemText.colModel.criteria]
+                            const text = itemText.rowModel[itemText.colModel.criteria]
 
                             if (text.toString() === "vlc://nop")
                                 return ""

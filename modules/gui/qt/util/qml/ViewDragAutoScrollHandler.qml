@@ -67,11 +67,11 @@ QtObject {
             if (!root.dragItem.visible || !root.view.visible)
                 return ViewDragAutoScrollHandler.Direction.None
 
-            var pos = root.view.mapFromItem(root.dragItem.parent,
+            const pos = root.view.mapFromItem(root.dragItem.parent,
                                             root.dragItem.x,
                                             root.dragItem.y)
 
-            var size, mark, atBeginning, atEnd
+            let size, mark, atBeginning, atEnd
             if (root.orientation === Qt.Vertical) {
                 size = root.view.height
                 mark = pos.y
@@ -115,7 +115,7 @@ QtObject {
                 if (_scrollBar)
                     _scrollBar.active = false // TODO: Use Binding Qt >=5.14
             } else if (!running) {
-                var _to
+                let _to
 
                 if (direction === ViewDragAutoScrollHandler.Direction.Backward) {
                     _to = 0

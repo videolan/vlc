@@ -82,7 +82,7 @@ Item {
             if (!networkModel || !visible)
                 return ""
 
-            var img = SVGColorImage.colorize(_baseUri(networkModel.type))
+            const img = SVGColorImage.colorize(_baseUri(networkModel.type))
                 .color1(root.color1)
                 .accent(root.accent)
 

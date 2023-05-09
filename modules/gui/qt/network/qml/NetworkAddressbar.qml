@@ -46,14 +46,14 @@ T.Control {
     onActiveFocusChanged: if (activeFocus) contentItem.forceActiveFocus(focusReason)
 
     function createContentModel() {
-        var contentModel = []
-        var menuModel = []
+        const contentModel = []
+        const menuModel = []
         if (path.length < 1)
             return
-        var leftWidth = control.availableWidth
-        var i = path.length
+        let leftWidth = control.availableWidth
+        let i = path.length
         while (--i >= 0) {
-            var textWidth = fontMetrics.advanceWidth(path[i].display)
+            const textWidth = fontMetrics.advanceWidth(path[i].display)
                     + (i !== path.length - 1 ? iconMetrics.advanceWidth(
                                                     VLCIcons.breadcrumb_sep) : 0) + VLCStyle.margin_xsmall * 4
 
@@ -206,11 +206,11 @@ T.Control {
         id: popup
 
         function show() {
-            var model = control._menuModel.map(function (modelData) {
+            const model = control._menuModel.map(function (modelData) {
                 return modelData.display
             })
 
-            var point = control.mapToGlobal(0, menuButton.height + VLCStyle.margin_xxsmall)
+            const point = control.mapToGlobal(0, menuButton.height + VLCStyle.margin_xxsmall)
 
             popup.popup(point, model)
         }

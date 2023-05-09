@@ -68,17 +68,17 @@ Row {
         if (colModel === null || rowModel === null)
             return ""
 
-        var criterias = colModel.subCriterias
+        const criterias = colModel.subCriterias
 
         if (criterias === undefined || criterias.length === 0)
             return ""
 
-        var string = ""
+        let string = ""
 
-        for (var i = 0; i < criterias.length; i++) {
-            var criteria = criterias[i]
+        for (let i = 0; i < criterias.length; i++) {
+            const criteria = criterias[i]
 
-            var value = rowModel[criteria]
+            const value = rowModel[criteria]
 
             if (value.toString() === "vlc://nop")
                 continue

@@ -74,7 +74,7 @@ ColumnLayout {
         // NOTE: We want a rounded 1.xx value.
         value = Math.round(value * 100) / 100
 
-        for (var i = 0; i < _model.length; i++) {
+        for (let i = 0; i < _model.length; i++) {
             if (Helpers.compareFloat(_model[i].value, value) === false)
                 continue
 
@@ -120,8 +120,8 @@ ColumnLayout {
         value = sliderToSpeed(value)
 
         if (_shiftPressed === false) {
-            for (var i = 0; i < _values.length; i++) {
-                var clamp = _values[i]
+            for (let i = 0; i < _values.length; i++) {
+                const clamp = _values[i]
 
                 if (_testClamp(value, clamp)) {
                     value = clamp
@@ -305,10 +305,10 @@ ColumnLayout {
             Navigation.leftItem: slider
 
             Component.onCompleted: {
-                for (var i = 0; i < _model.length; i++) {
-                    var item = _model[i]
+                for (let i = 0; i < _model.length; i++) {
+                    const item = _model[i]
 
-                    var title = item.title
+                    const title = item.title
 
                     if (title)
                         model.append({ "title": title })

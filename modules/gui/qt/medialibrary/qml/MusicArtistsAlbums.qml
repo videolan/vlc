@@ -72,7 +72,7 @@ FocusScope {
         if (artistModel.count === 0) {
             return
         }
-        var initialIndex = root.initialIndex
+        let initialIndex = root.initialIndex
         if (initialIndex >= artistModel.count)
             initialIndex = 0
         if (initialIndex !== artistList.currentIndex) {
@@ -102,7 +102,7 @@ FocusScope {
 
         onCountChanged: {
             if (artistModel.count > 0 && !selectionModel.hasSelection) {
-                var initialIndex = root.initialIndex
+                let initialIndex = root.initialIndex
                 if (initialIndex >= artistModel.count)
                     initialIndex = 0
                 artistList.currentIndex = initialIndex

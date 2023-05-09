@@ -76,7 +76,7 @@ FocusScope {
     // Functions
 
     function _updateLayout() {
-        var item = loaderCenter.item
+        let item = loaderCenter.item
 
         // NOTE: Sometimes this gets called before the item is loaded.
         if (item === null)
@@ -92,12 +92,12 @@ FocusScope {
 
         } else if (loaderRight.item.count) {
 
-            var implicitLeft = loaderLeft.implicitWidth
-            var implicitRight = loaderRight.implicitWidth
+            const implicitLeft = loaderLeft.implicitWidth
+            const implicitRight = loaderRight.implicitWidth
 
-            var total = implicitLeft + implicitRight
+            const total = implicitLeft + implicitRight
 
-            var size = total + _minimumSpacing
+            let size = total + _minimumSpacing
 
             if (size > width) {
                 size = width - _minimumSpacing
@@ -112,7 +112,7 @@ FocusScope {
                     if (item === null)
                         return
 
-                    var contentWidth = item.contentWidth
+                    const contentWidth = item.contentWidth
 
                     // NOTE: We assign the remaining width based on the contentWidth.
                     if (contentWidth)
@@ -127,7 +127,7 @@ FocusScope {
                     if (item === null)
                         return
 
-                    var contentWidth = item.contentWidth
+                    const contentWidth = item.contentWidth
 
                     // NOTE: We assign the remaining width based on the contentWidth.
                     if (contentWidth)

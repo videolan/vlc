@@ -86,7 +86,7 @@ Item {
 
         onMenuClosed: _menuIndex = -1
         onNavigateMenu: {
-            var i =  (root._menuIndex + root.toolbarModel.length + direction) % root.toolbarModel.length
+            const i =  (root._menuIndex + root.toolbarModel.length + direction) % root.toolbarModel.length
             root.openMenu(menubarLayout.visibleChildren[i], root.toolbarModel[i], i)
         }
 

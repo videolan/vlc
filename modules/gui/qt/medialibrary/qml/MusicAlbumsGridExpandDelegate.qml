@@ -44,7 +44,7 @@ FocusScope {
     implicitWidth: layout.implicitWidth
 
     implicitHeight: {
-        var verticalMargins = layout.anchors.topMargin + layout.anchors.bottomMargin
+        const verticalMargins = layout.anchors.topMargin + layout.anchors.bottomMargin
         if (tracks.contentHeight < artAndControl.height)
             return artAndControl.height + verticalMargins
         return Math.min(tracks.contentHeight
@@ -63,7 +63,7 @@ FocusScope {
     }
 
     function _getStringTrack() {
-        var count = Helpers.get(model, "nb_tracks", 0);
+        const count = Helpers.get(model, "nb_tracks", 0);
 
         if (count < 2)
             return I18n.qtr("%1 track").arg(count);

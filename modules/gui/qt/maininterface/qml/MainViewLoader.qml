@@ -118,7 +118,7 @@ Widgets.StackViewExt {
     function resetFocus() {
         if (!model || model.count === 0) return
 
-        var initialIndex = root.initialIndex
+        let initialIndex = root.initialIndex
         if (initialIndex >= model.count)
             initialIndex = 0
 

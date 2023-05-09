@@ -159,7 +159,7 @@ GridView {
             if (drag.active) {
                 // FIXME: There must be a better way of this
 
-                var pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
+                const pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
                 // y should be set first, because the automatic scroll is
                 // triggered by change on X
                 buttonDragItem.y = pos.y

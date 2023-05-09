@@ -72,8 +72,8 @@ FocusScope{
 
     function _layoutLine(c1, c2, offset)
     {
-        var c1Height = c1 !== undefined ? c1.implicitHeight : 0
-        var c2Height = c2 !== undefined ? c2.implicitHeight : 0
+        let c1Height = c1 !== undefined ? c1.implicitHeight : 0
+        let c2Height = c2 !== undefined ? c2.implicitHeight : 0
 
         if (c2 === csdDecorations) {
             //csdDecorations.implicitHeight gets overwritten when the height is set,
@@ -81,7 +81,7 @@ FocusScope{
             c2Height = VLCStyle.icon_normal
         }
 
-        var lineHeight = Math.max(c1Height, c2Height)
+        const lineHeight = Math.max(c1Height, c2Height)
 
         if (c1) {
             c1.height = lineHeight
@@ -98,13 +98,13 @@ FocusScope{
     //FIXME: if CSD will be weirdly placed if application safe-area are used,
     //nota that if you need a safe area (kiosk mode), you probably don't need CSD
     function _layout() {
-        var offset = root.topMargin
+        let offset = root.topMargin
 
         if (root.pinControls && !root.showToolbar && root.showCSD) {
             //place everything on one line
             //csdDecorations.implicitHeight gets overwritten when the height is set,
             //VLCStyle.icon_normal is its initial value
-            var lineHeight = Math.max(logoOrResume.implicitHeight, playlistGroup.implicitHeight, VLCStyle.icon_normal)
+            const lineHeight = Math.max(logoOrResume.implicitHeight, playlistGroup.implicitHeight, VLCStyle.icon_normal)
 
             centerTitleText.y = 0
             centerTitleText.height = lineHeight
@@ -124,9 +124,9 @@ FocusScope{
         } else {
             playlistGroup.extraRightMargin = 0
 
-            var left = undefined
-            var right = undefined
-            var logoPlaced = false
+            let left = undefined
+            let right = undefined
+            let logoPlaced = false
 
             if (root.showToolbar) {
                 left = menubar
@@ -156,8 +156,8 @@ FocusScope{
 
             right = playlistGroup
 
-            var secondLineOffset = offset
-            var secondLineHeight = root._layoutLine(left, right, offset)
+            const secondLineOffset = offset
+            const secondLineHeight = root._layoutLine(left, right, offset)
 
             offset += secondLineHeight
 

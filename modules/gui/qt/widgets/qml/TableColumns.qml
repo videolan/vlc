@@ -51,19 +51,19 @@ Item {
         if (colModel === null || rowModel === null)
             return ""
 
-        var criterias = colModel.subCriterias
+        const criterias = colModel.subCriterias
 
         if (criterias === undefined || criterias.length === 0)
             return ""
 
-        var string = ""
+        let string = ""
 
-        for (var i = 0; i < criterias.length; i++) {
+        for (let i = 0; i < criterias.length; i++) {
             if (i) string += " • "
 
-            var criteria = criterias[i]
+            const criteria = criterias[i]
 
-            var value = rowModel[criteria]
+            const value = rowModel[criteria]
 
             // NOTE: We can't use 'instanceof' because VLCTick is uncreatable.
             if (value.toString().indexOf("VLCTick(") === 0) {
@@ -110,7 +110,7 @@ Item {
                 anchors.fill: parent
 
                 source: {
-                    var cover = null
+                    let cover = null
                     if (!!titleDel.rowModel) {
                         cover = titleDel.rowModel[root.criteriaCover]
                     }

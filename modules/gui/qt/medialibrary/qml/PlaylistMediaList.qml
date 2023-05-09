@@ -110,13 +110,13 @@ MainInterface.MainViewLoader {
         if (root.selectionModel.selectedIndexes.length > 1) {
             MediaLib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes));
         } else if (root.selectionModel.selectedIndexes.length === 1) {
-            var index = selectionModel.selectedIndexes[0];
+            const index = selectionModel.selectedIndexes[0];
             showList(model.getDataAt(index), Qt.TabFocusReason);
         }
     }
 
     function _getCount(model) {
-        var count = model.count;
+        const count = model.count;
 
         if (count < 100)
             return count;

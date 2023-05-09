@@ -57,8 +57,8 @@ T.Control {
 
         // Next item
         if (focusReason === Qt.TabFocusReason) {
-            for (var i = 0; i < count; i++) {
-                var item = repeater.itemAt(i);
+            for (let i = 0; i < count; i++) {
+                const item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
                     item.forceActiveFocus(Qt.TabFocusReason);
@@ -69,8 +69,8 @@ T.Control {
         }
         // Previous item
         else if (focusReason === Qt.BacktabFocusReason) {
-            for (var i = count -1; i >= 0; i--) {
-                var item = repeater.itemAt(i);
+            for (let i = count -1; i >= 0; i--) {
+                const item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
                     item.forceActiveFocus(Qt.BacktabFocusReason);
@@ -81,10 +81,10 @@ T.Control {
         }
         // NOTE: We make sure that one item has the focus.
         else {
-            var itemFocus = undefined;
+            let itemFocus = undefined;
 
-            for (var i = 0 ; i < count; i++) {
-                var item = repeater.itemAt(i);
+            for (let i = 0 ; i < count; i++) {
+                const item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
                     // NOTE: We already have a focused item, so we keep it this way.
@@ -112,7 +112,7 @@ T.Control {
     function _applyFocus() {
         if (indexFocus < 0 || indexFocus >= count) return false;
 
-        var item = repeater.itemAt(indexFocus);
+        const item = repeater.itemAt(indexFocus);
 
         if (item.visible && item.enabled) {
             item.forceActiveFocus(focusReason);
@@ -124,7 +124,7 @@ T.Control {
     }
 
     function _hasFocus() {
-        for (var i = 0 ; i < count; i++) {
+        for (let i = 0 ; i < count; i++) {
             if (repeater.itemAt(i).activeFocus)
                 return true;
         }
@@ -156,7 +156,7 @@ T.Control {
                 item.Navigation.parentItem = root;
 
                 item.Navigation.leftAction = function() {
-                    var i = index;
+                    let i = index;
 
                     do {
                         i--;
@@ -171,7 +171,7 @@ T.Control {
                 };
 
                 item.Navigation.rightAction = function() {
-                    var i = index;
+                    let i = index;
 
                     do {
                         i++;

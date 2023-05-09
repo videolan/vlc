@@ -74,7 +74,7 @@ ListViewCompat {
         if (transitionsRunning || !delegateItem)
             return null
 
-        var margin = 0 // -root.displayMarginBeginning
+        let margin = 0 // -root.displayMarginBeginning
         if (orientation === Qt.Vertical) {
             // if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
             //    margin += headerItem.height
@@ -92,7 +92,7 @@ ListViewCompat {
         if (transitionsRunning || !delegateItem)
             return null
 
-        var margin = 0 // -root.displayMarginEnd
+        let margin = 0 // -root.displayMarginEnd
         if (orientation === Qt.Vertical) {
             // if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
             //    margin += footerItem.height

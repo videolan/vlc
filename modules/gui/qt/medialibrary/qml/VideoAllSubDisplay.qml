@@ -77,7 +77,7 @@ VideoAll {
     function getLabelGroup(model, string) {
         if (!model) return ""
 
-        var count = model.count
+        const count = model.count
 
         if (count === 1) {
             return getLabel(model)
@@ -159,9 +159,9 @@ VideoAll {
             }
 
             function onAction(indexes) {
-                var index = indexes[0]
+                const index = indexes[0]
 
-                var object = model.getDataAt(index);
+                const object = model.getDataAt(index);
 
                 if (object.isVideo) {
                     MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
@@ -206,7 +206,7 @@ VideoAll {
             }
 
             function onAction(indexes) {
-                var index = indexes[0]
+                const index = indexes[0]
 
                 root.showList(model.getDataAt(index), Qt.TabFocusReason)
             }

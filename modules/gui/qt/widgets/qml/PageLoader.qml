@@ -84,7 +84,7 @@ FocusScope {
             console.error("pageModel is not defined")
             return
         }
-        var found = stackView.loadView(root.pageModel, view.name, view.properties)
+        const found = stackView.loadView(root.pageModel, view.name, view.properties)
         if (!found) {
             console.error("failed to load", JSON.stringify(History.current))
             return

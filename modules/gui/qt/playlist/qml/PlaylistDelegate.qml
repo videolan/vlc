@@ -75,10 +75,10 @@ T.ItemDelegate {
     // Functions
 
     function moveSelected() {
-        var selectedIndexes = root.model.getSelection()
+        const selectedIndexes = root.model.getSelection()
         if (selectedIndexes.length === 0)
             return
-        var preTarget = index
+        let preTarget = index
         /* move to _above_ the clicked item if move up, but
          * _below_ the clicked item if move down */
         if (preTarget > selectedIndexes[0])
@@ -293,7 +293,7 @@ T.ItemDelegate {
         onPositionChanged: {
             if (drag.active) {
                 // FIXME: Override dragItem's position
-                var pos = mapToItem(dragItem.parent, mouseX, mouseY)
+                const pos = mapToItem(dragItem.parent, mouseX, mouseY)
                 dragItem.x = pos.x + VLCStyle.dp(15)
                 dragItem.y = pos.y
             }

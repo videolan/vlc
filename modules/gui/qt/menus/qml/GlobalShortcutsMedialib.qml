@@ -40,7 +40,7 @@ Item {
                     if (index < recentModel.count)
                     {
 
-                        var trackId = recentModel.data(recentModel.index(index, 0), MLRecentModel.RECENT_MEDIA_ID)
+                        const trackId = recentModel.data(recentModel.index(index, 0), MLRecentModel.RECENT_MEDIA_ID)
                         if (!!trackId)
                             MediaLib.addAndPlay([trackId])
                     }

@@ -101,7 +101,7 @@ Item {
     ]
 
     function loadCurrentHistoryView() {
-        var current = History.current
+        const current = History.current
         if ( !current || !current.name  || !current.properties ) {
             console.warn("unable to load requested view, undefined")
             return
@@ -116,7 +116,7 @@ Item {
 
     function setInitialView() {
         //set the initial view
-        var loadPlayer = !mainPlaylistController.empty;
+        const loadPlayer = !mainPlaylistController.empty;
 
         if (MainCtx.mediaLibraryAvailable)
             History.push(["mc", "video"], loadPlayer ? History.Stay : History.Go)
@@ -138,10 +138,10 @@ Item {
     DropArea {
         anchors.fill: parent
         onDropped: {
-            var urls = []
+            let urls = []
             if (drop.hasUrls) {
 
-                for (var i = 0; i < drop.urls.length; i++)
+                for (let i = 0; i < drop.urls.length; i++)
                     urls.push(drop.urls[i])
 
             } else if (drop.hasText) {
@@ -206,7 +206,7 @@ Item {
 
     Loader {
         active: {
-            var windowVisibility = MainCtx.intfMainWindow.visibility
+            const windowVisibility = MainCtx.intfMainWindow.visibility
             return MainCtx.clientSideDecoration
                     && (windowVisibility !== Window.Maximized)
                     && (windowVisibility !== Window.FullScreen)

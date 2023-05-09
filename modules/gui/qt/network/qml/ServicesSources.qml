@@ -91,7 +91,7 @@ MainInterface.MainGridView {
     }
 
     onActionAtIndex: {
-        var itemData = sourcesFilterModel.getDataAt(index);
+        const itemData = sourcesFilterModel.getDataAt(index);
 
         if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
             History.push(["mc", "discover", "services", "services_manage"]);

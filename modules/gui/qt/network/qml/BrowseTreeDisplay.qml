@@ -91,7 +91,7 @@ MainInterface.MainViewLoader {
         if ( selectionModel.selectedIndexes.length > 1 ) {
             playSelected()
         } else {
-            var data = filterModel.getDataAt(index)
+            const data = filterModel.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
                 browse(data.tree, Qt.TabFocusReason)

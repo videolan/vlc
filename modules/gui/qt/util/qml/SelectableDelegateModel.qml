@@ -24,12 +24,12 @@ ItemSelectionModel {
     property int shiftIndex: -1
 
     function _addRange(from, to) {
-        for (var i = from; i <= to; i++) {
+        for (let i = from; i <= to; i++) {
             select(model.index(i, 0), ItemSelectionModel.Select)
         }
     }
     function _delRange(from, to) {
-        for (var i = from; i <= to; i++) {
+        for (let i = from; i <= to; i++) {
             select(model.index(i, 0), ItemSelectionModel.Deselect)
         }
     }

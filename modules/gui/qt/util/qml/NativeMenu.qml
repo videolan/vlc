@@ -68,12 +68,12 @@ VanillaObject {
         _pendingData = true
         _dataList = null
 
-        var requestID = ++_currentRequest
+        const requestID = ++_currentRequest
         requestData(requestID, _indexes)
 
-        var textStrings = []
+        const textStrings = []
         _effectiveActions = []
-        for (var i in actions) {
+        for (let i in actions) {
             if (!actions[i].hasOwnProperty("visible")
                     || (typeof actions[i].visible === "boolean" && actions[i].visible)
                     || (typeof actions[i].visible === "function" && actions[i].visible(_options, _indexes))) {
@@ -97,7 +97,7 @@ VanillaObject {
     }
 
     function _executeAction(index) {
-        var action = root._effectiveActions[index]
+        const action = root._effectiveActions[index]
         action.action(_dataList, _options, _indexes)
     }
 

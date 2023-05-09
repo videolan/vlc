@@ -151,7 +151,7 @@ ListView {
             }
 
             onDropped: {
-                var destIndex = playerBtnDND.count
+                let destIndex = playerBtnDND.count
 
                 if (drag.source.dndView === playerBtnDND)
                     --destIndex

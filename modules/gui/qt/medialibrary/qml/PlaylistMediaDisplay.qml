@@ -73,7 +73,7 @@ FocusScope {
     function resetFocus() {
         if (model.count === 0) return
 
-        var initialIndex = root.initialIndex
+        let initialIndex = root.initialIndex
 
         if (initialIndex >= model.count)
             initialIndex = 0
@@ -87,7 +87,7 @@ FocusScope {
 
     function onDelete()
     {
-        var indexes = modelSelect.selectedIndexes;
+        const indexes = modelSelect.selectedIndexes;
 
         if (indexes.length === 0)
             return;

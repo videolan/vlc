@@ -59,9 +59,9 @@ FocusScope {
         if (count === 0)
             return 0
 
-        var size = 0
+        let size = 0
 
-        for (var i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i) {
             size += repeater.itemAt(i).preferredWidth
         }
 
@@ -75,8 +75,8 @@ FocusScope {
     implicitHeight: rowLayout.implicitHeight
 
     Navigation.navigable: {
-        for (var i = 0; i < repeater.count; ++i) {
-            var item = repeater.itemAt(i).item
+        for (let i = 0; i < repeater.count; ++i) {
+            const item = repeater.itemAt(i).item
 
             if (item && item.focus) {
                 return true
@@ -103,16 +103,16 @@ FocusScope {
     }
 
     function _updateContentWidth() {
-        var size = 0
+        let size = 0
 
-        for (var i = 0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
 
-            var item = repeater.itemAt(i)
+            const item = repeater.itemAt(i)
 
             if (item === null || item.isActive === false)
                 continue
 
-            var width = item.width
+            const width = item.width
 
             if (width)
                 size += width + spacing
@@ -267,11 +267,11 @@ FocusScope {
                 function applyNavigation() {
                     if (item == null) return
 
-                    var itemLeft  = repeater.itemAt(index - 1)
-                    var itemRight = repeater.itemAt(index + 1)
+                    const itemLeft  = repeater.itemAt(index - 1)
+                    const itemRight = repeater.itemAt(index + 1)
 
                     if (itemLeft) {
-                        var componentLeft = itemLeft.item
+                        const componentLeft = itemLeft.item
 
                         if (componentLeft)
                         {
@@ -282,7 +282,7 @@ FocusScope {
                     }
 
                     if (itemRight) {
-                        var componentRight = itemRight.item
+                        const componentRight = itemRight.item
 
                         if (componentRight)
                         {
@@ -296,11 +296,11 @@ FocusScope {
                 function removeNavigation() {
                     if (item == null) return
 
-                    var itemLeft = repeater.itemAt(index - 1)
+                    const itemLeft = repeater.itemAt(index - 1)
 
                     // NOTE: The current item was removed from the repeater so we test against the
                     //       same index.
-                    var itemRight = repeater.itemAt(index)
+                    const itemRight = repeater.itemAt(index)
 
                     if (itemLeft) {
                         if (itemRight) {
@@ -324,16 +324,16 @@ FocusScope {
                     if (_index === undefined)
                         _index = index
 
-                    for (var i = 1; i <= Math.max(_index, repeater.count - (_index + 1)); ++i) {
+                    for (let i = 1; i <= Math.max(_index, repeater.count - (_index + 1)); ++i) {
                          if (i <= _index) {
-                             var leftItem = repeater.itemAt(_index - i)
+                             const leftItem = repeater.itemAt(_index - i)
 
                              if (_focusIfFocusable(leftItem))
                                  return
                          }
 
                          if (_index + i <= repeater.count - 1) {
-                             var rightItem = repeater.itemAt(_index + i)
+                             const rightItem = repeater.itemAt(_index + i)
 
                              if (_focusIfFocusable(rightItem))
                                  return

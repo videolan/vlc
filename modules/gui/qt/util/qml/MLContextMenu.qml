@@ -128,7 +128,7 @@ NativeMenu {
         if (indexes.length !== 1)
             return false
 
-        var isFavorite = model.getDataAt(indexes[0]).isFavorite
+        const isFavorite = model.getDataAt(indexes[0]).isFavorite
 
         // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
         return (isFavorite === false)
@@ -138,7 +138,7 @@ NativeMenu {
         if (indexes.length !== 1)
             return false
 
-        var isFavorite = model.getDataAt(indexes[0]).isFavorite
+        const isFavorite = model.getDataAt(indexes[0]).isFavorite
 
         // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
         return (isFavorite === true)
@@ -148,7 +148,7 @@ NativeMenu {
         if (indexes.length !== 1)
             return false
 
-        var isNew = model.getDataAt(indexes[0]).isNew
+        const isNew = model.getDataAt(indexes[0]).isNew
 
         // NOTE: Strictly comparing 'isNew' given it might be undefined.
         return (isNew === true)
@@ -158,26 +158,26 @@ NativeMenu {
         if (indexes.length !== 1)
             return false
 
-        var isNew = model.getDataAt(indexes[0]).isNew
+        const isNew = model.getDataAt(indexes[0]).isNew
 
         // NOTE: Strictly comparing 'isNew' given it might be undefined.
         return (isNew === false)
     }
 
     function _signalShowInformation(dataList, options) {
-        var index = Helpers.get(options, "information", null)
+        const index = Helpers.get(options, "information", null)
         console.assert(Helpers.isInteger(index))
         showMediaInformation(index)
     }
 
     function _playerOptions(options, extraOptions) {
-        var playerOpts = Helpers.get(options, "player-options", [])
+        const playerOpts = Helpers.get(options, "player-options", [])
         return playerOpts.concat(extraOptions)
     }
 
     function _mlIDList(dataList) {
-        var idList = []
-        for (var i in dataList) {
+        const idList = []
+        for (let i in dataList) {
             idList.push(dataList[i][idDataRole])
         }
 

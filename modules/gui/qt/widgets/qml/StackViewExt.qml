@@ -81,7 +81,7 @@ StackView {
             if (Object.keys(viewProperties).length === 0 && root.currentItem.hasOwnProperty("loadDefaultView") ) {
                 root.currentItem.loadDefaultView()
             } else {
-                for ( var viewProp in viewProperties ) {
+                for ( let viewProp in viewProperties ) {
                     if ( root.currentItem.hasOwnProperty(viewProp) ) {
                         root.currentItem[viewProp] = viewProperties[viewProp]
                     }
@@ -90,10 +90,10 @@ StackView {
             return true
         }
 
-        var found = false
-        for (var tab = 0; tab < viewModel.length; tab++ )
+        let found = false
+        for (let tab = 0; tab < viewModel.length; tab++ )
         {
-            var model = viewModel[tab]
+            const model = viewModel[tab]
             if (model.name === view) {
                 if (model.guard !== undefined && typeof model.guard === "function" && !model.guard(viewProperties)) {
                     continue //we're not allowed to load this page
@@ -101,7 +101,7 @@ StackView {
 
                 //we can't use push(url, properties) as Qt interprets viewProperties
                 //as a second component to load
-                var component = undefined
+                let component = undefined
                 if (model.component) {
                     component = model.component
                 } else if ( model.url ) {

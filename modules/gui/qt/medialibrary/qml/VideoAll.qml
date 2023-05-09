@@ -200,7 +200,7 @@ MainInterface.MainViewLoader {
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
 
-                    var options = {}
+                    const options = {}
                     if (root.isInfoExpandPanelAvailable(model))
                         options["information"] = index
 

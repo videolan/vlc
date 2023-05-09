@@ -71,15 +71,15 @@ QtObject {
     ]
 
     function control(id) {
-        var control = controlList.find( function(control) { return ( control.id === id ) } )
+        const entry = controlList.find( function(e) { return ( e.id === id ) } )
 
-        if (control === undefined) {
+        if (entry === undefined) {
             console.log("control delegate id " + id +  " doesn't exist")
             return { source: controlPath + "Fallback.qml" }
         }
         
-        control.source = controlPath + control.file
+        entry.source = controlPath + entry.file
 
-        return control
+        return entry
     }
 }

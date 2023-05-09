@@ -33,7 +33,7 @@ DragItem {
 
     function getSelectedInputItem(cb) {
         console.assert(mlIDRole)
-        var inputIdList = root.indexesData.map(function(obj){
+        const inputIdList = root.indexesData.map(function(obj){
             return obj[root.mlIDRole]
         })
         MediaLib.mlInputItem(inputIdList, cb)

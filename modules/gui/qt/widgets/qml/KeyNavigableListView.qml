@@ -157,7 +157,7 @@ FadingEdgeListView {
     }
 
     Keys.onPressed: {
-        var newIndex = -1
+        let newIndex = -1
 
         if (orientation === ListView.Vertical)
         {
@@ -202,7 +202,7 @@ FadingEdgeListView {
             _keyPressed = true
         }
 
-        var oldIndex = currentIndex
+        const oldIndex = currentIndex
         if (newIndex >= 0 && newIndex < count && newIndex !== oldIndex) {
             event.accepted = true;
 

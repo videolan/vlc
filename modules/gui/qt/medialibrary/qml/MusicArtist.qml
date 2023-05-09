@@ -200,8 +200,8 @@ FocusScope {
     onInitialIndexChanged: resetFocus()
     onActiveFocusChanged: {
         if (activeFocus && albumModel.count > 0 && !albumSelectionModel.hasSelection) {
-            var initialIndex = 0
-            var albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
+            let initialIndex = 0
+            const albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
             if (albumsListView.currentIndex !== -1)
                 initialIndex = albumsListView.currentIndex
             albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
@@ -221,11 +221,11 @@ FocusScope {
         if (albumModel.count === 0) {
             return
         }
-        var initialIndex = root.initialIndex
+        let initialIndex = root.initialIndex
         if (initialIndex >= albumModel.count)
             initialIndex = 0
         albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        var albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
+        const albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
             albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
