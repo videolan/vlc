@@ -262,8 +262,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GL_ASSERT_NOERROR(vt);
     return vgl;
 
-delete_sub_renderer:
-    vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
 delete_sub_interop:
     vlc_gl_interop_Delete(vgl->sub_interop);
 delete_filters:
