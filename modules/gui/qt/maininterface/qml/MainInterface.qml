@@ -30,23 +30,21 @@ import "qrc:///style/"
 import "qrc:///playlist/" as PL
 
 Item {
-    id: root
+    id: g_mainInterface
 
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
-    property alias g_root: root
-
     BindingCompat {
         target: VLCStyle
         property: "appWidth"
-        value: root.width
+        value: g_mainInterface.width
     }
 
     BindingCompat {
         target: VLCStyle
         property: "appHeight"
-        value: root.height
+        value: g_mainInterface.height
     }
 
     Window.onWindowChanged: {
@@ -91,8 +89,8 @@ Item {
         playlistPtr: MainCtx.mainPlaylist
 
         onPlaylistInitialized: {
-            root._playlistReady = true
-            if (root._interfaceReady)
+            g_mainInterface._playlistReady = true
+            if (g_mainInterface._interfaceReady)
                 setInitialView()
         }
     }
@@ -108,7 +106,7 @@ Item {
             console.warn("unable to load requested view, undefined")
             return
         }
-        stackView.loadView(root.pageModel, current.name, current.properties)
+        stackView.loadView(g_mainInterface.pageModel, current.name, current.properties)
     }
 
     Connections {
@@ -131,8 +129,8 @@ Item {
 
 
     Component.onCompleted: {
-        root._interfaceReady = true;
-        if (root._playlistReady)
+        g_mainInterface._interfaceReady = true;
+        if (g_mainInterface._playlistReady)
             setInitialView()
     }
 

@@ -27,8 +27,8 @@ Item {
     property int csdSize: MainCtx.csdBorderSize
 
     //private
-    readonly property int _edgeVtHeight: g_root.height - root.csdSize * 2
-    readonly property int _edgeHzWidth: g_root.width - root.csdSize * 2
+    readonly property int _edgeVtHeight: g_mainInterface.height - root.csdSize * 2
+    readonly property int _edgeHzWidth: g_mainInterface.width - root.csdSize * 2
 
     Repeater {
         model: [
@@ -51,7 +51,7 @@ Item {
             },
             {
                 edge: Qt.RightEdge,
-                x: g_root.width - root.csdSize,
+                x: g_mainInterface.width - root.csdSize,
                 y: root.csdSize,
                 width: root.csdSize,
                 height: root._edgeVtHeight,
@@ -60,7 +60,7 @@ Item {
             {
                 edge: Qt.BottomEdge,
                 x: root.csdSize,
-                y: g_root.height - root.csdSize,
+                y: g_mainInterface.height - root.csdSize,
                 width: root._edgeHzWidth,
                 height: root.csdSize,
                 cursor: Qt.SizeVerCursor,
@@ -77,14 +77,14 @@ Item {
             {
                 edge: Qt.BottomEdge | Qt.LeftEdge,
                 x: 0,
-                y: g_root.height - root.csdSize,
+                y: g_mainInterface.height - root.csdSize,
                 width: root.csdSize,
                 height: root.csdSize,
                 cursor: Qt.SizeBDiagCursor,
             },
             {
                 edge: Qt.TopEdge | Qt.RightEdge,
-                x: g_root.width - root.csdSize,
+                x: g_mainInterface.width - root.csdSize,
                 y: 0,
                 width: root.csdSize,
                 height: root.csdSize,
@@ -92,8 +92,8 @@ Item {
             },
             {
                 edge: Qt.BottomEdge | Qt.RightEdge,
-                x: g_root.width - root.csdSize,
-                y: g_root.height - root.csdSize,
+                x: g_mainInterface.width - root.csdSize,
+                y: g_mainInterface.height - root.csdSize,
                 width: root.csdSize,
                 height: root.csdSize,
                 cursor: Qt.SizeFDiagCursor,

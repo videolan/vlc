@@ -102,7 +102,7 @@ Widgets.IconControlButton {
     Popup {
         id: popup
 
-        parent: (root._isCurrentViewPlayer) ? rootPlayer : g_root
+        parent: (root._isCurrentViewPlayer) ? rootPlayer : g_mainInterface
 
         padding: VLCStyle.margin_small
 
