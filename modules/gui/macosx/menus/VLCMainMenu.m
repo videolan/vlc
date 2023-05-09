@@ -641,7 +641,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else {
         [_postprocessing setEnabled:NO];
         [self setAudioSubMenusEnabled:NO];
-        [self setVideoSubmenusEnabled:NO];
+        [self setVideoMenuActiveVideo:NO];
         [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
     }
@@ -710,8 +710,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     [self refreshVoutDeviceMenu:nil];
 
-    BOOL activeVideoPlayback = _playerController.activeVideoPlayback;
-    [self setVideoSubmenusEnabled:activeVideoPlayback];
+    const BOOL activeVideoPlayback = _playerController.activeVideoPlayback;
+    [self setVideoMenuActiveVideo:activeVideoPlayback];
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)notification
@@ -746,6 +746,15 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [_visual setEnabled: enabled];
     [_channels setEnabled: enabled];
+}
+
+- (void)setVideoMenuActiveVideo:(BOOL)activeVideo
+{
+    if (_videoMenu.autoenablesItems) {
+        _videoMenu.autoenablesItems = NO;
+    }
+
+    [self setVideoSubmenusEnabled:activeVideo];
 }
 
 - (void)setVideoSubmenusEnabled:(BOOL)enabled
@@ -1522,7 +1531,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             break;
 
         case VLC_PLAYER_STATE_STOPPED:
-            [self setVideoSubmenusEnabled:NO];
+            [self setVideoMenuActiveVideo:NO];
             [self setAudioSubMenusEnabled:NO];
 
         default:
