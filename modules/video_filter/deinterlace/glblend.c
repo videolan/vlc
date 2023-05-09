@@ -27,9 +27,9 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
 #include <vlc_filter.h>
 
-#include "video_output/opengl/filter.h"
 #include "video_output/opengl/gl_api.h"
 #include "video_output/opengl/gl_common.h"
 #include "video_output/opengl/gl_util.h"

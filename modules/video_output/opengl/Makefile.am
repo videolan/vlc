@@ -1,6 +1,5 @@
 OPENGL_COMMONSOURCES = \
        video_output/opengl/filter.c \
-       video_output/opengl/filter.h \
        video_output/opengl/filter_priv.h \
        video_output/opengl/filters.c \
        video_output/opengl/filters.h \

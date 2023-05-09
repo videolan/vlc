@@ -31,13 +31,13 @@
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
+#include <vlc_opengl_filter.h>
 
 #include <libplacebo/log.h>
 #include <libplacebo/gpu.h>
 #include <libplacebo/opengl.h>
 #include <libplacebo/renderer.h>
 
-#include "video_output/opengl/filter.h"
 #include "video_output/opengl/gl_api.h"
 #include "video_output/opengl/gl_common.h"
 #include "video_output/opengl/gl_scale.h"

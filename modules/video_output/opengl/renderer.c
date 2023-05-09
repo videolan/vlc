@@ -36,8 +36,8 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include <vlc_picture.h>
+#include <vlc_opengl_filter.h>
 
-#include "filter.h"
 #include "gl_util.h"
 #include "vout_helper.h"
 #include "sampler.h"

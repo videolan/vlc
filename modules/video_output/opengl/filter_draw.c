@@ -28,8 +28,8 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
 
-#include "filter.h"
 #include "gl_api.h"
 #include "gl_common.h"
 #include "gl_util.h"
