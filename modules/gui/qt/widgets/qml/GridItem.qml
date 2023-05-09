@@ -220,7 +220,9 @@ T.ItemDelegate {
             root.dragItem.Drag.active = drag.active
         }
 
-        TouchScreenTapHandlerCompat {
+        TapHandler {
+            acceptedDevices: PointerDevice.TouchScreen
+
             onTapped: {
                 root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
                 root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
@@ -231,8 +233,9 @@ T.ItemDelegate {
             }
         }
 
-        MouseHoverHandlerCompat {
+        HoverHandler {
             id: mouseHoverHandler
+            acceptedDevices: PointerDevice.Mouse
         }
 
         ColumnLayout {
@@ -344,8 +347,9 @@ T.ItemDelegate {
                 ToolTip.text: subtitleTxt.text
                 ToolTip.visible: subtitleTxtMouseHandler.hovered
 
-                MouseHoverHandlerCompat {
+                HoverHandler {
                     id: subtitleTxtMouseHandler
+                    acceptedDevices: PointerDevice.Mouse
                 }
             }
         }

@@ -305,8 +305,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/item_key_event_filter.hpp \
 	gui/qt/util/flickable_scroll_handler.cpp \
 	gui/qt/util/flickable_scroll_handler.hpp \
-	gui/qt/util/hover_handler_rev11.cpp \
-	gui/qt/util/hover_handler_rev11.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/proxycolumnmodel.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
@@ -504,7 +502,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/item_key_event_filter.moc.cpp \
 	gui/qt/util/effects_image_provider.moc.cpp \
 	gui/qt/util/flickable_scroll_handler.moc.cpp \
-	gui/qt/util/hover_handler_rev11.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/sortfilterproxymodel.moc.cpp \
@@ -982,9 +979,6 @@ libqt_plugin_la_QML = \
 	gui/qt/util/qml/ViewDragAutoScrollHandler.qml \
 	gui/qt/util/qml/BindingRev8.qml \
 	gui/qt/util/qml/BindingRev14.qml \
-	gui/qt/util/qml/MouseHoverHandlerRev12.qml \
-	gui/qt/util/qml/TouchScreenTapHandlerRev11.qml \
-	gui/qt/util/qml/TouchScreenTapHandlerRev12.qml \
 	gui/qt/util/qml/VanillaObject.qml \
 	gui/qt/util/qml/NativeMenu.qml \
 	gui/qt/util/qml/MLContextMenu.qml \

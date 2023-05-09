@@ -165,7 +165,9 @@ T.Control {
                 delegate.dragItem.Drag.active = drag.active
             }
 
-            TouchScreenTapHandlerCompat {
+            TapHandler {
+                acceptedDevices: PointerDevice.TouchScreen
+
                 onTapped: {
                     delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
                     delegate.itemDoubleClicked(delegate._index, delegate.rowModel)

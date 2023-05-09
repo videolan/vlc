@@ -299,7 +299,9 @@ T.ItemDelegate {
             }
         }
 
-        TouchScreenTapHandlerCompat {
+        TapHandler {
+            acceptedDevices: PointerDevice.TouchScreen
+
             onTapped: {
                 if (root.mode === PlaylistListView.Mode.Normal) {
                     mainPlaylistController.goTo(index, true)
