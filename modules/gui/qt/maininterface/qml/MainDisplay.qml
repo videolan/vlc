@@ -555,7 +555,7 @@ FocusScope {
             z: 3
 
             horizontalPadding: VLCStyle.applicationHorizontalMargin
-            bottomPadding: VLCStyle.applicationVerticalMargin
+            bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
 
             background.visible: !parentRectangle.layer.enabled
 
