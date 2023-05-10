@@ -26,25 +26,26 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-T.Pane {
+ControlBar {
     id: root
 
-    readonly property alias sliderY: controlBar.sliderY
-
     height: 0
-
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding)
 
     visible: false
 
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
                                                                   : "expanded"
 
-    //redundant with child ControlBar
-    Accessible.ignored: true
+    textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
+                                             : ControlBar.TimeTextPosition.Hide
+
+    sliderHeight: (MainCtx.pinVideoControls) ? VLCStyle.heightBar_xxsmall
+                                             : VLCStyle.dp(3, VLCStyle.scale)
+
+    bookmarksHeight: (MainCtx.pinVideoControls) ? VLCStyle.controlBarBookmarksHeight
+                                                : VLCStyle.icon_xsmall * 0.7
+
+    identifier: PlayerControlbarModel.Miniplayer
 
     states: State {
         name: "expanded"
@@ -67,11 +68,6 @@ T.Pane {
         }
     }
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
-    }
-
     // this MouseArea prevents mouse events to be sent below miniplayer
     MouseArea {
         anchors.fill: parent
@@ -80,36 +76,6 @@ T.Pane {
     }
 
     background: Rectangle {
-        color: theme.bg.primary
-    }
-
-    contentItem: ControlBar {
-        id: controlBar
-
-        focus: true
-
-        // NOTE: When controls are pinned we keep the same slider in both views. Otherwise we make
-        //       it more compact to fit the modern design.
-
-        textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
-                                                 : ControlBar.TimeTextPosition.Hide
-
-        sliderHeight: (MainCtx.pinVideoControls) ? VLCStyle.heightBar_xxsmall
-                                                 : VLCStyle.dp(3, VLCStyle.scale)
-
-        bookmarksHeight: (MainCtx.pinVideoControls) ? VLCStyle.controlBarBookmarksHeight
-                                                    : VLCStyle.icon_xsmall * 0.7
-
-        identifier: PlayerControlbarModel.Miniplayer
-
-        Navigation.parentItem: root
-
-        Keys.onPressed: {
-            Navigation.defaultKeyAction(event)
-
-            if (!event.accepted) {
-                MainCtx.sendHotkey(event.key, event.modifiers)
-            }
-        }
+        color: colorContext.bg.primary
     }
 }
