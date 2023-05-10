@@ -149,9 +149,10 @@ Widgets.IconControlButton {
 
             radius: VLCStyle.dp(8, VLCStyle.scale)
 
-            opacity: 0.85
-
-            color: popupTheme.bg.primary
+            // NOTE: The opacity should be stronger on a light background for readability.
+            color: (popupTheme.palette.isDark)
+                   ? VLCStyle.setColorAlpha(popupTheme.bg.primary, 0.8)
+                   : VLCStyle.setColorAlpha(popupTheme.bg.primary, 0.96)
         }
     }
 }
