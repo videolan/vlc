@@ -634,7 +634,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create( mp, "vout-cb-opaque", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-setup", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-cleanup", VLC_VAR_ADDRESS );
-    var_Create( mp, "vout-cb-resize-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vout-cb-window-cb", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-update-output", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-swap", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-get-proc-address", VLC_VAR_ADDRESS );
@@ -1062,7 +1062,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        libvlc_video_engine_t engine,
                                        libvlc_video_output_setup_cb setup_cb,
                                        libvlc_video_output_cleanup_cb cleanup_cb,
-                                       libvlc_video_output_set_resize_cb resize_cb,
+                                       libvlc_video_output_set_window_cb set_window_cb,
                                        libvlc_video_update_output_cb update_output_cb,
                                        libvlc_video_swap_cb swap_cb,
                                        libvlc_video_makeCurrent_cb makeCurrent_cb,
@@ -1108,7 +1108,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
     var_SetAddress( mp, "vout-cb-cleanup", cleanup_cb );
-    var_SetAddress( mp, "vout-cb-resize-cb", resize_cb );
+    var_SetAddress( mp, "vout-cb-window-cb", set_window_cb );
     var_SetAddress( mp, "vout-cb-update-output", update_output_cb );
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-get-proc-address", getProcAddress_cb );

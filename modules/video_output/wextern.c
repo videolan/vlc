@@ -48,7 +48,7 @@ vlc_module_end()
 
 typedef struct {
     void                                   *opaque;
-    libvlc_video_output_set_resize_cb      setResizeCb;
+    libvlc_video_output_set_window_cb       setWindowCb;
 } wextern_t;
 
 static void WindowResize(void *opaque, unsigned width, unsigned height)
@@ -57,13 +57,34 @@ static void WindowResize(void *opaque, unsigned width, unsigned height)
     vlc_window_ReportSize(window, width, height);
 }
 
+static void WindowMouseMoved(void *opaque, int x, int y)
+{
+    vlc_window_t *window = opaque;
+    vlc_window_ReportMouseMoved(window, x, y);
+}
+
+static void WindowMousePress(void *opaque, libvlc_video_output_mouse_button_t button)
+{
+    vlc_window_t *window = opaque;
+    vlc_window_ReportMousePressed(window, button);
+}
+
+static void WindowMouseRelease(void *opaque, libvlc_video_output_mouse_button_t button)
+{
+    vlc_window_t *window = opaque;
+    vlc_window_ReportMouseReleased(window, button);
+}
+
 static int Enable(struct vlc_window *wnd, const vlc_window_cfg_t *wcfg)
 {
     wextern_t *sys = wnd->sys;
 
-    if ( sys->setResizeCb != NULL )
+    if ( sys->setWindowCb != NULL )
         /* bypass the size handling as the window doesn't handle the size */
-        sys->setResizeCb( sys->opaque, WindowResize, wnd );
+        sys->setWindowCb( sys->opaque,
+            WindowResize,
+            WindowMouseMoved, WindowMousePress, WindowMouseRelease,
+            wnd );
 
     (void) wcfg;
     return VLC_SUCCESS;
@@ -73,8 +94,8 @@ static void Disable(struct vlc_window *wnd)
 {
     wextern_t *sys = wnd->sys;
 
-    if ( sys->setResizeCb != NULL )
-        sys->setResizeCb( sys->opaque, NULL, NULL );
+    if ( sys->setWindowCb != NULL )
+        sys->setWindowCb( sys->opaque, NULL, NULL, NULL, NULL, NULL );
 }
 
 static const struct vlc_window_operations ops = {
@@ -89,11 +110,13 @@ static int Open(vlc_window_t *wnd)
     wextern_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof(*sys));
     if (unlikely(sys==NULL))
         return VLC_ENOMEM;
+
     sys->opaque          = var_InheritAddress( wnd, "vout-cb-opaque" );
-    sys->setResizeCb     = var_InheritAddress( wnd, "vout-cb-resize-cb" );
+    sys->setWindowCb     = var_InheritAddress( wnd, "vout-cb-window-cb" );
 
     wnd->sys = sys;
     wnd->type = VLC_WINDOW_TYPE_DUMMY;
     wnd->ops = &ops;
+    wnd->info.has_double_click = false;
     return VLC_SUCCESS;
 }

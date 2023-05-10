@@ -717,32 +717,92 @@ typedef enum libvlc_video_engine_t {
 
 
 /** Callback type that can be called to request a render size changes.
- * 
- * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_resize_cb.
- * 
- * \param report_opaque parameter passed to \ref libvlc_video_output_set_resize_cb. [IN]
+ *
+ * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_window_cb.
+ *
+ * \param report_opaque parameter passed to \ref libvlc_video_output_set_window_cb. [IN]
  * \param width new rendering width requested. [IN]
  * \param height new rendering height requested. [IN]
  */
 typedef void( *libvlc_video_output_resize_cb )( void *report_opaque, unsigned width, unsigned height );
 
 
+/**
+ * Enumeration of the different mouse buttons that can be reported for user interaction
+ * can be passed to \ref libvlc_video_output_mouse_press_cb and \ref libvlc_video_output_mouse_release_cb.
+ */
+typedef enum libvlc_video_output_mouse_button_t {
+    libvlc_video_output_mouse_button_left = 0,
+    libvlc_video_output_mouse_button_middle = 1,
+    libvlc_video_output_mouse_button_right = 2
+} libvlc_video_output_mouse_button_t;
+
+
+/** Callback type that can be called to notify the mouse position when hovering the render surface.
+ *
+ * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_window_cb.
+ *
+ * The position (0,0) denotes the top left corner, bottom right corner position
+ * is (width,height) as reported by \ref libvlc_video_output_resize_cb.
+ *
+ * \param report_opaque parameter passed to \ref libvlc_video_output_set_window_cb. [IN]
+ * \param x horizontal mouse positon in \ref libvlc_video_output_resize_cb coordinates. [IN]
+ * \param y vertical mouse positon in \ref libvlc_video_output_resize_cb coordinates. [IN]
+ */
+typedef void (*libvlc_video_output_mouse_move_cb)(void *opaque, int x, int y);
+
+/** Callback type that can be called to notify when a mouse button is pressed in the rendering surface.
+ *
+ * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_window_cb.
+ *
+ * The button event will be reported at the last position provided by \ref libvlc_video_output_mouse_move_cb
+ *
+ * \param report_opaque parameter passed to \ref libvlc_video_output_set_window_cb. [IN]
+ * \param button represent the button pressed, see \ref libvlc_video_output_mouse_button_t for available buttons. [IN]
+ */
+typedef void (*libvlc_video_output_mouse_press_cb)(void *opaque, libvlc_video_output_mouse_button_t button);
+
+/** Callback type that can be called to notify when a mouse button is released in the rendering surface.
+ *
+ * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_window_cb.
+ *
+ * The button event will be reported at the last position provided by \ref libvlc_video_output_mouse_move_cb.
+ *
+ * \param report_opaque parameter passed to \ref libvlc_video_output_set_window_cb. [IN]
+ * \param button represent the button released, see \ref libvlc_video_output_mouse_button_t for available buttons. [IN]
+ */
+typedef void (*libvlc_video_output_mouse_release_cb)(void *opaque, libvlc_video_output_mouse_button_t button);
+
 /** Set the callback to call when the host app resizes the rendering area.
  *
  * This allows text rendering and aspect ratio to be handled properly when the host
- * rendering size changes.
+ * rendering size changes and to provide mouse.
  *
  * It may be called before the \ref libvlc_video_output_setup_cb callback.
+ *
+ * \warning These callbacks cannot be called concurently, the caller is responsible for serialization
  *
  * \param[in] opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb()
  * \param[in] report_size_change callback which must be called when the host size changes.
  *            The callback is valid until another call to \ref libvlc_video_output_set_resize_cb
  *            is done. This may be called from any thread.
+ * \param[in] report_mouse_move callback which must be called when the mouse position change on the video surface.
+ *            The coordinates are relative to the size reported through the report_size_change.
+ *            This may be called from any thread.
+ * \param[in] report_mouse_pressed callback which must be called when a mouse button is pressed on the video surface,
+ *            The position of the event is the last position reported by the report_mouse_move callback. This may be
+ *            called from any thread.
+ * \param[in] report_mouse_released callback which must be called when a mouse button is released on the video surface,
+ *            The position of the event is the last position reported by the report_mouse_move callback. This may be
+ *            called from any thread.
  * \param[in] report_opaque private pointer to pass to the \ref report_size_change callback.
  */
-typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
-                                                    libvlc_video_output_resize_cb report_size_change,
-                                                    void *report_opaque );
+typedef void( *libvlc_video_output_set_window_cb )( void *opaque,
+                                            libvlc_video_output_resize_cb report_size_change,
+                                            libvlc_video_output_mouse_move_cb report_mouse_move,
+                                            libvlc_video_output_mouse_press_cb report_mouse_pressed,
+                                            libvlc_video_output_mouse_release_cb report_mouse_released,
+                                            void *report_opaque );
 
 /** Tell the host the rendering for the given plane is about to start
  *
@@ -801,7 +861,7 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_output_setup_cb setup_cb,
                                         libvlc_video_output_cleanup_cb cleanup_cb,
-                                        libvlc_video_output_set_resize_cb resize_cb,
+                                        libvlc_video_output_set_window_cb window_cb,
                                         libvlc_video_update_output_cb update_output_cb,
                                         libvlc_video_swap_cb swap_cb,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
