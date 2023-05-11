@@ -58,6 +58,11 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
     self.trackingView.viewToHide = self.playInstantlyButton;
     self.trackingView.viewToShow = self.trackNumberTextField;
+
+    if (@available(macOS 10.14, *)) {
+        self.playInstantlyButton.contentTintColor = [NSColor VLCAccentColor];
+    }
+
     [self prepareForReuse];
 }
 
