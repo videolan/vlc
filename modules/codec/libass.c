@@ -814,6 +814,7 @@ static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track *p_track )
                 b_hotfix = false;
                 break;
             }
+            free( s );
         }
     }
     free( s );
