@@ -58,7 +58,7 @@
     frame.size.width = 0.;
     _foregroundView = [[NSView alloc] initWithFrame:frame];
     _foregroundView.wantsLayer = YES;
-    _foregroundView.layer.backgroundColor = [NSColor VLClibraryProgressIndicatorForegroundColor].CGColor;
+    _foregroundView.layer.backgroundColor = [NSColor VLCAccentColor].CGColor;
     _foregroundView.autoresizingMask = NSViewWidthSizable;
     _foregroundView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_foregroundView];
