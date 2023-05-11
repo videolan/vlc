@@ -24,7 +24,11 @@ endif
 ifdef HAVE_WINSTORE
 UPNP_CONF += --disable-ipv6 --enable-unspecified_server
 else
+ifdef HAVE_IOS
+UPNP_CONF += --disable-ipv6 --disable-reuseaddr
+else
 UPNP_CONF += --enable-ipv6
+endif
 endif
 ifndef WITH_OPTIMIZATION
 UPNP_CONF += --enable-debug
@@ -49,6 +53,9 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/upnp/revert-ifaddrs.patch
 endif
 	$(APPLY) $(SRC)/upnp/miniserver.patch
+ifdef HAVE_IOS
+	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
+endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

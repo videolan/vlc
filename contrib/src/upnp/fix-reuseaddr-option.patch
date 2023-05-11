@@ -1,0 +1,51 @@
+diff -ru upnp/upnp/src/ssdp/ssdp_server.c upnp-fixed/upnp/src/ssdp/ssdp_server.c
+--- upnp/upnp/src/ssdp/ssdp_server.c	2022-08-03 16:05:12
++++ upnp-fixed/upnp/src/ssdp/ssdp_server.c	2023-05-11 12:13:42
+@@ -928,6 +928,7 @@
+ 
+ 		return UPNP_E_OUTOF_SOCKET;
+ 	}
++#ifdef UPNP_MINISERVER_REUSEADDR
+ 	onOff = 1;
+ 	ret = setsockopt(*ssdpSock,
+ 		SOL_SOCKET,
+@@ -945,6 +946,7 @@
+ 		ret = UPNP_E_SOCKET_ERROR;
+ 		goto error_handler;
+ 	}
++#endif
+ 	#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+ 	onOff = 1;
+ 	ret = setsockopt(*ssdpSock,
+@@ -1133,6 +1135,7 @@
+ 		return UPNP_E_OUTOF_SOCKET;
+ 	}
+ 	onOff = 1;
++#ifdef UPNP_MINISERVER_REUSEADDR
+ 	ret = setsockopt(*ssdpSock,
+ 		SOL_SOCKET,
+ 		SO_REUSEADDR,
+@@ -1149,6 +1152,7 @@
+ 		ret = UPNP_E_SOCKET_ERROR;
+ 		goto error_handler;
+ 	}
++#endif
+ 		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+ 	onOff = 1;
+ 	ret = setsockopt(*ssdpSock,
+@@ -1313,6 +1317,7 @@
+ 		return UPNP_E_OUTOF_SOCKET;
+ 	}
+ 	onOff = 1;
++#ifdef UPNP_MINISERVER_REUSEADDR
+ 	ret = setsockopt(*ssdpSock,
+ 		SOL_SOCKET,
+ 		SO_REUSEADDR,
+@@ -1329,6 +1334,7 @@
+ 		ret = UPNP_E_SOCKET_ERROR;
+ 		goto error_handler;
+ 	}
++#endif
+ 		#if (defined(BSD) && !defined(__GNU__)) || defined(__APPLE__)
+ 	onOff = 1;
+ 	ret = setsockopt(*ssdpSock,
