@@ -44,6 +44,8 @@ Rectangle {
     property alias source: image.source
     property bool isImageReady: image.status == RoundImage.Ready
 
+    property alias fallbackImageSource: fallbackImage.source
+
     property alias imageOverlay: overlay.sourceComponent
 
     property alias playCoverVisible: playCoverLoader.visible
@@ -69,6 +71,16 @@ Rectangle {
         anchors.fill: parent
 
         radius: root.radius
+    }
+
+    RoundImage {
+        id: fallbackImage
+
+        anchors.fill: parent
+
+        radius: root.radius
+
+        visible: !root.isImageReady
     }
 
     Loader {
