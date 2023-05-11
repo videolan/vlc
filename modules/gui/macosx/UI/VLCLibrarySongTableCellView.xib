@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -35,15 +36,16 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NFZ-x0-t5c">
-                    <rect key="frame" x="10" y="7" width="12.5" height="36"/>
+                    <rect key="frame" x="10" y="17" width="16" height="16"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="32" id="bai-RH-huE"/>
+                        <constraint firstAttribute="width" secondItem="NFZ-x0-t5c" secondAttribute="height" multiplier="1:1" id="Hv5-J8-wdk"/>
+                        <constraint firstAttribute="height" constant="16" id="bai-RH-huE"/>
                     </constraints>
-                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="play.fill" catalog="system" imagePosition="only" alignment="left" imageScaling="proportionallyDown" inset="2" id="5MR-Gt-X4p">
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="VLCPlayTemplate" imagePosition="only" alignment="left" imageScaling="proportionallyDown" inset="2" id="5MR-Gt-X4p">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
-                    <color key="contentTintColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="contentTintColor" name="VLCAccentColor"/>
                 </button>
                 <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="XNL-fH-9bU">
                     <rect key="frame" x="334" y="17" width="56" height="16"/>
@@ -81,6 +83,9 @@
         </customView>
     </objects>
     <resources>
-        <image name="play.fill" catalog="system" width="12" height="13"/>
+        <image name="VLCPlayTemplate" width="128" height="128"/>
+        <namedColor name="VLCAccentColor">
+            <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>
