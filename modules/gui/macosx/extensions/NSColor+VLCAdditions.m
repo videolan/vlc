@@ -78,11 +78,6 @@
     return [NSColor colorWithRed:37./255. green:41./255. blue:44./255. alpha:.8];
 }
 
-+ (instancetype)VLClibraryProgressIndicatorForegroundColor
-{
-    return [NSColor colorWithRed:246./255. green:127./255. blue:0. alpha:1.];
-}
-
 + (instancetype)VLClibraryItemBorderLightColor
 {
     return [NSColor colorWithRed:0.89 green:0.89 blue:0.91 alpha:1.];

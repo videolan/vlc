@@ -36,7 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibrarySeparatorLightColor;
 + (instancetype)VLClibrarySeparatorDarkColor;
 + (instancetype)VLClibraryProgressIndicatorBackgroundColor;
-+ (instancetype)VLClibraryProgressIndicatorForegroundColor;
 + (instancetype)VLClibraryItemBorderLightColor;
 + (instancetype)VLClibraryItemBorderDarkColor;
 + (instancetype)VLClibraryCollectionViewItemBackgroundLightColor;
