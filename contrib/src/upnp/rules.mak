@@ -26,7 +26,8 @@ ifdef HAVE_WINSTORE
 UPNP_CONF += -DUPNP_ENABLE_IPV6=OFF -DUPNP_ENABLE_UNSPECIFIED_SERVER=ON
 else
 ifdef HAVE_IOS
-UPNP_CONF += -DUPNP_ENABLE_IPV6=OFF -DUPNP_ENABLE_UNSPECIFIED_SERVER=ON
+UPNP_CONF += -DUPNP_ENABLE_IPV6=OFF -DUPNP_ENABLE_UNSPECIFIED_SERVER=ON \
+ -DUPNP_MINISERVER_REUSEADDR=OFF
 else
 UPNP_CONF += -DUPNP_ENABLE_IPV6=ON
 endif
@@ -46,6 +47,9 @@ else
 	$(APPLY) $(SRC)/upnp/libtool-nostdlib-workaround.patch
 endif
 	$(APPLY) $(SRC)/upnp/miniserver.patch
+ifdef HAVE_IOS
+	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
+endif
 	$(MOVE)
 
 .upnp: upnp toolchain.cmake
