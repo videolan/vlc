@@ -1,7 +1,7 @@
 # mfx (Media SDK)
 
-mfx_GITURL := $(GITHUB)/lu-zero/mfx_dispatch.git
-MFX_GITHASH := 7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca
+MFX_VERSION := 1.35.1
+MFX_URL := $(GITHUB)/lu-zero/mfx_dispatch/archive/refs/tags/$(MFX_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
@@ -12,27 +12,30 @@ PKGS += mfx
 endif
 endif
 
+DEPS_mfx :=
 ifdef HAVE_WINSTORE
-MFX_CONF := CFLAGS="$(CFLAGS) -DMEDIASDK_UWP_LOADER -DMEDIASDK_UWP_PROCTABLE"
-MFX_CONF += CXXFLAGS="$(CXXFLAGS) -DMEDIASDK_UWP_LOADER -DMEDIASDK_UWP_PROCTABLE"
+DEPS_mfx += alloweduwp $(DEPS_alloweduwp)
 endif
 
-$(TARBALLS)/mfx-$(MFX_GITHASH).tar.xz:
-	$(call download_git,$(mfx_GITURL),,$(MFX_GITHASH))
+ifdef HAVE_WINSTORE
+MFX_CONF := CFLAGS="$(CFLAGS) -DMEDIASDK_UWP_DISPATCHER"
+MFX_CONF += CXXFLAGS="$(CXXFLAGS) -DMEDIASDK_UWP_DISPATCHER"
+endif
 
-.sum-mfx: mfx-$(MFX_GITHASH).tar.xz
-	$(call check_githash,$(MFX_GITHASH))
-	touch $@
+$(TARBALLS)/mfx_dispatch-$(MFX_VERSION).tar.gz:
+	$(call download_pkg,$(MFX_URL),mfx)
 
-mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
+.sum-mfx: mfx_dispatch-$(MFX_VERSION).tar.gz
+
+mfx: mfx_dispatch-$(MFX_VERSION).tar.gz .sum-mfx
 	$(UNPACK)
-	$(APPLY) $(SRC)/mfx/0001-detect-winstore-builds-with-a-regular-mingw32-toolch.patch
-	$(APPLY) $(SRC)/mfx/0002-Fix-linking-statically-with-intel_gfx_api-x86.dll.patch
-	$(APPLY) $(SRC)/mfx/0003-Don-t-change-the-calling-convention-of-x86-gfx-api.patch
-	cd $(UNPACK_DIR) && autoreconf -ivf
+	$(APPLY) $(SRC)/mfx/0001-fix-UWP-build-in-ming-w64.patch
+	$(APPLY) $(SRC)/mfx/0002-fix-UWP-build-in-ming-w64.patch
+	$(APPLY) $(SRC)/mfx/0001-Add-missing-mfx_dispatcher_uwp.h-.cpp.patch
 	$(MOVE)
 
 .mfx: mfx
+	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(MFX_CONF)
 	+$(MAKEBUILD)

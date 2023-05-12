@@ -1,0 +1,32 @@
+From ca523b11e2e4e6a33708353095585a44cbd3d818 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 12 May 2023 11:45:47 +0200
+Subject: [PATCH] fix UWP build in ming-w64
+
+minwg-w64 doesn't define these types in UWP mode and would require
+a bit of code refactoring to do so.
+---
+ src/mfx_driver_store_loader.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/mfx_driver_store_loader.h b/src/mfx_driver_store_loader.h
+index 372794f..650e170 100644
+--- a/src/mfx_driver_store_loader.h
++++ b/src/mfx_driver_store_loader.h
+@@ -35,6 +35,13 @@
+ #endif
+ #endif
+ 
++#if defined(__MINGW64_VERSION_MAJOR) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++// mingw-w64 doesn't set these types for WINAPI_PARTITION_APP
++typedef DWORD      DEVINST;
++typedef DEVINST    *PDEVINST;
++typedef ULONG      REGDISPOSITION;
++#endif
++
+ namespace MFX
+ {
+ 
+-- 
+2.37.3.windows.1
+
