@@ -71,11 +71,6 @@ DEPS_gnutls = nettle $(DEPS_nettle)
 ifdef HAVE_ANDROID
 GNUTLS_ENV := gl_cv_header_working_stdint_h=yes
 endif
-ifdef HAVE_WINSTORE
-ifeq ($(ARCH),x86_64)
-	GNUTLS_CONF += --disable-hardware-acceleration
-endif
-endif
 ifdef HAVE_WIN32
 	GNUTLS_CONF += --without-idn
 ifeq ($(ARCH),aarch64)
