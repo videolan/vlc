@@ -197,25 +197,14 @@ if [ ! -z "$BUILD_UCRT" ]; then
     fi
 
     if [ ! -z "$WINSTORE" ]; then
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image --disable-caca"
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image"
+        # FIXME enable discs ?
         # modplug uses GlobalAlloc/Free and lstrcpyA/wsprintfA/lstrcpynA
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-modplug"
-        # x265 uses too many forbidden APIs
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265"
-        # aribb25 uses ANSI strings in WIDE APIs
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-aribb25"
         # gettext uses sys/socket.h improperly
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-gettext"
         # fontconfig uses GetWindowsDirectory and SHGetFolderPath
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-fontconfig"
-        # asdcplib uses some fordbidden SetErrorModes, GetModuleFileName in fileio.cpp
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-asdcplib"
-        # projectM is openGL based
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-projectM"
-        # gpg-error doesn't know minwg32uwp
-        # CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpg-error"
-        # x264 build system claims it needs MSVC to build for WinRT
-        CONTRIBFLAGS="$CONTRIBFLAGS --disable-x264"
 
         # libdsm is not enabled by default
         CONTRIBFLAGS="$CONTRIBFLAGS --enable-libdsm"
