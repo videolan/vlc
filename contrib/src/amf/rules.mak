@@ -1,6 +1,6 @@
 # AMF
 
-AMF_VERSION := 1.4.26
+AMF_VERSION := 1.4.29
 AMF_URL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF/archive/refs/tags/v$(AMF_VERSION).tar.gz
 
 ifeq ($(ARCH),x86_64)
