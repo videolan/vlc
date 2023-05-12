@@ -68,7 +68,7 @@ public:
 public: // Interface
     Q_INVOKABLE void sortByColumn(QByteArray name, Qt::SortOrder order);
 
-    Q_INVOKABLE virtual QVariant getIdForIndex(QVariant index) const;
+    Q_INVOKABLE virtual MLItemId getIdForIndex(QVariant index) const;
 
     Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QVariantList    & indexes) const;
     Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QModelIndexList & indexes) const;

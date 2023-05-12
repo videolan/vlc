@@ -355,7 +355,7 @@ int MLBaseModel::rowCount(const QModelIndex &parent) const
     return m_cache->count();
 }
 
-QVariant MLBaseModel::getIdForIndex(QVariant index) const
+MLItemId MLBaseModel::getIdForIndex(QVariant index) const
 {
     MLItem* obj = nullptr;
     if (index.canConvert<int>())
@@ -366,7 +366,7 @@ QVariant MLBaseModel::getIdForIndex(QVariant index) const
     if (!obj)
         return {};
 
-    return QVariant::fromValue(obj->getId());
+    return obj->getId();
 }
 
 QVariantList MLBaseModel::getIdsForIndexes(const QModelIndexList & indexes) const
