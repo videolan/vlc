@@ -44,6 +44,10 @@ public:
     int64_t id;
     vlc_ml_parent_type type;
 
+    Q_INVOKABLE constexpr bool hasParent() const {
+        return (type != VLC_ML_PARENT_UNKNOWN);
+    }
+
     Q_INVOKABLE inline QString toString() const {
 
 #define ML_PARENT_TYPE_CASE(type) case type: return QString("%1 - %2").arg(#type).arg(id)
