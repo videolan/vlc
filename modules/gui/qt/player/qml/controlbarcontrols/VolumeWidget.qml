@@ -116,7 +116,11 @@ T.Pane {
             enabled: !root.paintOnly // disables event handling depending on this
 
             toolTipTextProvider: function (value) {
-                return Math.round(value * 100) + "%"
+                // the real value i.e 'Player.volume' bounds can be different
+                // from bounds of this widget and we want to show the current
+                // volume here, so directly use Player.volume instead of "value"
+
+                return Math.round(Player.volume * 100) + "%"
             }
 
             Accessible.name: I18n.qtr("Volume")
