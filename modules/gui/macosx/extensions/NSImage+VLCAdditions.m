@@ -72,4 +72,19 @@
     return image;
 }
 
+- (instancetype)imageTintedWithColor:(NSColor *)color
+{
+    NSImage * const image = [self copy];
+
+    if (color != nil) {
+        [image lockFocus];
+        [color set];
+        const NSRect imageRect = {NSZeroPoint, image.size};
+        NSRectFillUsingOperation(imageRect, NSCompositeSourceIn);
+        [image unlockFocus];
+    }
+
+    return image;
+}
+
 @end

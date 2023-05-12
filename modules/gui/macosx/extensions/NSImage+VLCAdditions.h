@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)quickLookPreviewForLocalPath:(NSString*)path withSize:(NSSize)size;
 + (instancetype)quickLookPreviewForLocalURL:(NSURL*)url withSize:(NSSize)size;
 
+- (instancetype)imageTintedWithColor:(NSColor *)color;
+
 @end
 
 NS_ASSUME_NONNULL_END
