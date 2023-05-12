@@ -1,0 +1,45 @@
+From 0070532c09865a95f63987ccec25d529ce198683 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 30 May 2023 15:29:31 +0200
+Subject: [PATCH] fix UWP build in ming-w64
+
+minwg-w64 doesn't define these types in UWP mode and would require
+a bit of code refactoring to do so.
+---
+ src/mfx_driver_store_loader.h | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/mfx_driver_store_loader.h b/src/mfx_driver_store_loader.h
+index 650e170..3895854 100644
+--- a/src/mfx_driver_store_loader.h
++++ b/src/mfx_driver_store_loader.h
+@@ -35,11 +35,24 @@
+ #endif
+ #endif
+ 
+-#if defined(__MINGW64_VERSION_MAJOR) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+-// mingw-w64 doesn't set these types for WINAPI_PARTITION_APP
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++// these are not defined for WINAPI_PARTITION_APP
+ typedef DWORD      DEVINST;
+ typedef DEVINST    *PDEVINST;
+ typedef ULONG      REGDISPOSITION;
++#include <initguid.h>
++DEFINE_GUID( GUID_DEVCLASS_DISPLAY,             0x4d36e968L, 0xe325, 0x11ce, 0xbf, 0xc1, 0x08, 0x00, 0x2b, 0xe1, 0x03, 0x18 );
++
++#if defined(__MINGW64_VERSION_MAJOR)
++#define CR_SUCCESS                     (0x00)
++#define CR_BUFFER_SMALL                (0x1A)
++#define CM_LOCATE_DEVNODE_NORMAL       (0x00000000)
++#define CM_REGISTRY_SOFTWARE           (0x00000001)
++#define CM_GETIDLIST_FILTER_PRESENT    (0x00000100)
++#define CM_GETIDLIST_FILTER_CLASS      (0x00000200)
++#define RegDisposition_OpenExisting    (0x00000001)
++#endif
++
+ #endif
+ 
+ namespace MFX
+-- 
+2.37.3.windows.1
+
