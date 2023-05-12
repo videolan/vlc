@@ -24,10 +24,10 @@ ifeq ($(shell uname -m),aarch64)
 FXC2_CXX=aarch64-w64-mingw32-g++
 FXC2_DLL=dll/d3dcompiler_47_arm64.dll
 else ifeq ($(ARCH),x86_64)
-FXC2_CXX=$(CXX)
+FXC2_CXX=$(CXX:uwp-g++=-g++)
 FXC2_DLL=dll/d3dcompiler_47.dll
 else ifeq ($(ARCH),i386)
-FXC2_CXX=$(CXX)
+FXC2_CXX=$(CXX:uwp-g++=-g++)
 FXC2_DLL=dll/d3dcompiler_47_32.dll
 else ifeq ($(shell command -v x86_64-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
 FXC2_CXX=x86_64-w64-mingw32-g++
