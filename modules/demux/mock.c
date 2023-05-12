@@ -1000,6 +1000,7 @@ Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     demux->p_sys = sys;
+    vlc_vector_init(&sys->tracks);
 
     if (var_LocationParse(obj, demux->psz_location, "mock-") != VLC_SUCCESS)
         return VLC_ENOMEM;
@@ -1039,7 +1040,6 @@ Open(vlc_object_t *obj)
         sys->program_count = 1;
     size_t track_count = (sys->video_track_count + sys->audio_track_count +
                           sys->sub_track_count) * sys->program_count;
-    vlc_vector_init(&sys->tracks);
 
     if (track_count > 0)
     {
