@@ -148,6 +148,7 @@ var_Read_float(const char *psz)
 
 /* var_name, type, module_header_type, getter, default_value */
 #define OPTIONS_GLOBAL(X) \
+    X(node_count, ssize_t, add_integer, Ssize, 0) \
     X(length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(5000)) \
     X(audio_track_count, ssize_t, add_integer, Ssize, 0) \
     X(video_track_count, ssize_t, add_integer, Ssize, 0) \
@@ -971,6 +972,156 @@ Demux(demux_t *demux)
     return eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
+static char *
+StripNodeParams(const char *orignal_url)
+{
+    char *url = strdup(orignal_url);
+    if (url == NULL)
+        return NULL;
+
+    /* Strip "node_count=xxx" */
+    char *substr_start = strcasestr(url, "node_count=");
+    assert(substr_start != NULL);
+
+    char *substr_end = strchr(substr_start, ';');
+    if (substr_end != NULL)
+        substr_end++;
+    else
+        substr_end = strchr(substr_start, '\0');
+
+    assert(substr_end != NULL);
+    memmove(substr_start, substr_end, strlen(substr_end) + 1);
+
+    /* Strip "node[xxx]={xxx}" */
+    while ((substr_start = strcasestr(url, "node[")) != NULL)
+    {
+        substr_end = strchr(substr_start, '{');
+        if (substr_end != NULL)
+        {
+            substr_end = strchr(substr_start, '}');
+            substr_end++;
+            if (*substr_end == ';')
+                substr_end++;
+        }
+
+        if (substr_end == NULL)
+        {
+            free(url);
+            return NULL;
+        }
+
+        memmove(substr_start, substr_end, strlen(substr_end) + 1);
+    }
+
+    return url;
+}
+
+/*
+ * Create sub items from the demux URL
+ *
+ * Example:
+ * "mock://node[2]{video_track_count=1};node_count=4;length=1000000;node[1]{length=2000000}"
+ * Will create the following sub items:
+ * - input_item_New(mock://length=1000000, submock[0]);
+ * - input_item_New(mock://length=2000000, submock[1]);
+ * - input_item_New(mock://video_track_count=1, submock[2]);
+ * - input_item_New(mock://length=1000000, submock[3]);
+ *
+ * If specified with node[]{}, a sub item will use the params between "{}".
+ * If not specified, all subitems will use the same params from the url (here:
+ * "length=1000000").
+ */
+static int
+Readdir(stream_t *demux, input_item_node_t *node)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    char *default_url = StripNodeParams(demux->psz_url);
+    if (default_url == NULL)
+        return VLC_EGENERIC;
+
+    int ret = VLC_ENOMEM;
+    for (ssize_t i = 0; i < sys->node_count; ++i)
+    {
+        const char *url;
+        char *name, *option_name, *url_buf = NULL;
+        int len;
+
+        len = asprintf(&option_name, "node[%zd]{", i);
+        if (len < 0)
+            goto error;
+        char *option = strstr(demux->psz_url, option_name);
+        free(option_name);
+
+        if (option != NULL)
+        {
+            option = strchr(option, '{');
+            assert(option != NULL);
+            option++;
+            char *option_end = strchr(option, '}');
+            if (option_end == NULL)
+            {
+                ret = VLC_EINVAL;
+                goto error;
+            }
+
+            ptrdiff_t option_size = option_end - option;
+            if (option_size > INT_MAX)
+            {
+                ret = VLC_EINVAL;
+                goto error;
+            }
+
+            len = asprintf(&url_buf, "mock://%.*s", (int) option_size, option);
+            if (len < 0)
+                goto error;
+            url = url_buf;
+        }
+        else
+            url = default_url;
+
+        len = asprintf(&name, "submock[%zd]", i);
+        if (len < 0)
+        {
+            free(url_buf);
+            goto error;
+        }
+
+        input_item_t *item = input_item_New(url, name);
+        free(name);
+        free(url_buf);
+
+        if (item == NULL)
+            goto error;
+
+        input_item_node_AppendItem(node, item);
+        input_item_Release(item);
+    }
+
+    ret = VLC_SUCCESS;
+error:
+    free(default_url);
+    return ret;
+}
+
+static int
+ReaddirControl(demux_t *demux, int query, va_list args)
+{
+    (void) demux;
+    switch (query)
+    {
+        case DEMUX_GET_META:
+        case DEMUX_GET_TYPE:
+            return VLC_EGENERIC;
+        case DEMUX_HAS_UNSUPPORTED_META:
+        {
+            *(va_arg(args, bool *)) = false;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+}
+
 static void
 Close(vlc_object_t *obj)
 {
@@ -1009,6 +1160,13 @@ Open(vlc_object_t *obj)
     OPTIONS_AUDIO(READ_SUBOPTION)
     OPTIONS_VIDEO(READ_SUBOPTION)
     OPTIONS_SUB(READ_SUBOPTION)
+
+    if (sys->node_count > 0)
+    {
+        demux->pf_control = ReaddirControl;
+        demux->pf_readdir = Readdir;
+        return VLC_SUCCESS;
+    }
 
     if (sys->chapter_count > 0 && sys->title_count == 0)
         sys->title_count++;
