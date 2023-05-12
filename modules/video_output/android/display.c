@@ -386,16 +386,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     assert(picture->context);
     if (sys->avctx->render_ts != NULL)
-    {
-        vlc_tick_t now = vlc_tick_now();
-        if (date > now)
-        {
-            if (date - now <= VLC_TICK_FROM_SEC(1))
-                sys->avctx->render_ts(picture->context, date);
-            else /* The picture will be displayed from the Display callback */
-                msg_Warn(vd, "picture way too early to release at time");
-        }
-    }
+        sys->avctx->render_ts(picture->context, date);
 
     if (sys->sub.window != NULL)
         subpicture_Prepare(vd, subpicture);
