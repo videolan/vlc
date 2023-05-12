@@ -53,6 +53,8 @@ FocusScope {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    signal menuOpened(var menu)
+
     // Settings
 
     implicitWidth: {
@@ -240,6 +242,12 @@ FocusScope {
                     if (item.requestLockUnlockAutoHide) {
                         item.requestLockUnlockAutoHide.connect(function(lock) {
                             controlLayout.requestLockUnlockAutoHide(lock)
+                        })
+                    }
+
+                    if (item.menuOpened) {
+                        item.menuOpened.connect(function(menu) {
+                            controlLayout.menuOpened(menu)
                         })
                     }
                 }

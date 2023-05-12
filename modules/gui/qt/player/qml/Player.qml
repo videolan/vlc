@@ -36,9 +36,6 @@ FocusScope {
 
     // Properties
 
-    //menu/overlay to dismiss
-    property var menu: undefined
-
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
 
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
@@ -120,26 +117,6 @@ FocusScope {
     }
 
     // Functions
-
-    function applyMenu(menu) {
-        if (rootPlayer.menu === menu)
-            return
-
-        // NOTE: When applying a new menu we hide the previous one.
-        if (menu)
-            dismiss()
-
-        rootPlayer.menu = menu
-    }
-
-    function dismiss() {
-        if ((typeof menu === undefined) || !menu)
-            return
-        if (menu.hasOwnProperty("dismiss"))
-            menu.dismiss()
-        else if (menu.hasOwnProperty("close"))
-            menu.close()
-    }
 
     function lockUnlockAutoHide(lock) {
         _lockAutoHide += lock ? 1 : -1;

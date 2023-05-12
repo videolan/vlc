@@ -40,6 +40,8 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    signal menuOpened(var menu)
+
     // Settings
 
     iconText: VLCIcons.audiosub
@@ -75,16 +77,14 @@ Widgets.IconControlButton {
             onOpened: {
                 root.requestLockUnlockAutoHide(true)
 
-                if (typeof parent.applyMenu === "function")
-                    parent.applyMenu(menu)
+                root.menuOpened(menu)
             }
 
             onClosed: {
                 root.requestLockUnlockAutoHide(false)
                 root.forceActiveFocus()
 
-                if (typeof parent.applyMenu === "function")
-                    parent.applyMenu(null)
+                root.menuOpened(null)
             }
         }
     }

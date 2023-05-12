@@ -45,6 +45,8 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    signal menuOpened(var menu)
+
     // Settings
 
     color: (popup.visible) ? control.colorContext.accent : control.colorContext.fg.primary
@@ -124,8 +126,7 @@ Widgets.IconControlButton {
 
             root.requestLockUnlockAutoHide(true)
 
-            if (root._isCurrentViewPlayer)
-                rootPlayer.applyMenu(popup)
+            root.menuOpened(popup)
         }
 
         onClosed: {
@@ -133,8 +134,7 @@ Widgets.IconControlButton {
 
             root.forceActiveFocus()
 
-            if (root._isCurrentViewPlayer)
-                rootPlayer.applyMenu(null)
+            root.menuOpened(null)
         }
 
         onWidthChanged: if (visible) root._updatePosition()

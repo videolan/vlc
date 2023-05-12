@@ -44,6 +44,8 @@ Control {
     property alias sliderHeight: trackPositionSlider.barHeight
     property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
 
+    property var menu: undefined
+
     signal requestLockUnlockAutoHide(bool lock)
 
     enabled: visible
@@ -68,6 +70,25 @@ Control {
         trackPositionSlider.showChapterMarks()
     }
 
+    function applyMenu(menu) {
+        if (root.menu === menu)
+            return
+
+        // NOTE: When applying a new menu we hide the previous one.
+        if (menu)
+            dismiss()
+
+        root.menu = menu
+    }
+
+    function dismiss() {
+        if ((typeof menu === undefined) || !menu)
+            return
+        if (menu.hasOwnProperty("dismiss"))
+            menu.dismiss()
+        else if (menu.hasOwnProperty("close"))
+            menu.close()
+    }
 
     function _layout() {
         switch (textPosition) {
@@ -152,6 +173,8 @@ Control {
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
             onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock)
+
+            onMenuOpened: root.applyMenu(menu)
         }
     }
 

@@ -57,6 +57,8 @@ FocusScope {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    signal menuOpened(var menu)
+
     // Settings
 
     // NOTE: We want a smaller ControlBar when the controls are pinned.
@@ -178,6 +180,8 @@ FocusScope {
             onCountChanged: playerControlLayout._updateLayout()
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
+
+            onMenuOpened: playerControlLayout.menuOpened(menu)
         }
     }
 
@@ -212,6 +216,8 @@ FocusScope {
             onCountChanged: playerControlLayout._updateLayout()
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
+
+            onMenuOpened: playerControlLayout.menuOpened(menu)
         }
     }
 
@@ -246,6 +252,8 @@ FocusScope {
             onCountChanged: playerControlLayout._updateLayout()
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
+
+            onMenuOpened: playerControlLayout.menuOpened(menu)
         }
     }
 }
