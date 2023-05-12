@@ -4,7 +4,7 @@ CACA_URL := $(GITHUB)/cacalabs/libcaca/releases/download/v$(CACA_VERSION)/libcac
 
 ifndef HAVE_DARWIN_OS
 ifndef HAVE_LINUX # see VLC Trac 17251
-ifndef HAVE_WINSTORE
+ifndef HAVE_WINSTORE # FIXME uses ANSI calls improperly
 PKGS += caca
 endif
 endif

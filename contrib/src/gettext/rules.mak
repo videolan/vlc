@@ -2,7 +2,7 @@
 GETTEXT_VERSION := 0.21
 GETTEXT_URL := $(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
-ifndef HAVE_WINSTORE
+ifndef HAVE_WINSTORE # FIXME uses sys/socket.h improperly
 PKGS += gettext
 endif
 ifneq ($(filter gnu%,$(subst -, ,$(HOST))),)

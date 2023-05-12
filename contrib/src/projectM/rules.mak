@@ -5,7 +5,7 @@ PROJECTM_URL := $(SF)/projectm/$(PROJECTM_VERSION)/projectM-$(PROJECTM_VERSION)-
 ifdef HAVE_WIN32
 ifneq ($(ARCH),arm)
 ifneq ($(ARCH),aarch64)
-ifndef HAVE_WINSTORE
+ifndef HAVE_WINSTORE # no OpenGL
 PKGS += projectM
 endif
 endif

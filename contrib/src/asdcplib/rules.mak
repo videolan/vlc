@@ -6,7 +6,7 @@ ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSIO
 
 ifndef HAVE_IOS
 ifndef HAVE_ANDROID
-ifndef HAVE_WINSTORE
+ifndef HAVE_WINSTORE # FIXME uses some fordbidden SetErrorModes, GetModuleFileName in fileio.cpp
 PKGS += asdcplib
 endif
 endif

@@ -6,7 +6,9 @@ X264_GITURL := https://code.videolan.org/videolan/x264.git
 
 ifdef BUILD_ENCODERS
 ifdef GPL
+ifndef HAVE_WINSTORE # FIXME x264 build system claims it needs MSVC to build for WinRT
 PKGS += x264
+endif
 endif
 endif
 

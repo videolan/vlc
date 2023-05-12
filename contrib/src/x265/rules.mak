@@ -6,7 +6,7 @@ X265_SNAPURL := https://bitbucket.org/multicoreware/x265_git/downloads/x265_$(X2
 
 ifdef BUILD_ENCODERS
 ifdef GPL
-ifndef HAVE_WINSTORE
+ifndef HAVE_WINSTORE # FIXME uses too many forbidden APIs
 PKGS += x265
 endif
 endif
