@@ -247,6 +247,7 @@ if [ ! -z "$BUILD_UCRT" ]; then
 
     if [ ! -z "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
+        TRIPLET=${TRIPLET}uwp
         CPPFLAGS="$CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
 
         if [ -z "$NTDDI" ]; then
