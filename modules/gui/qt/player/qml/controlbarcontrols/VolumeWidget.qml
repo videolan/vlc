@@ -115,7 +115,7 @@ T.Pane {
 
             enabled: !root.paintOnly // disables event handling depending on this
 
-            valueText: function (value) {
+            toolTipTextProvider: function (value) {
                 return Math.round(value * 100) + "%"
             }
 

@@ -51,10 +51,13 @@ T.Slider {
     // else tooltip will always be shown at current value.
     property bool tooltipFollowsMouse: false
 
-    // valueText -> function(value)
-    // arg value is between from and to
-    // returns the text for the given value, used for tooltip etc.
-    property var valueText: function (value) {
+
+    // toolTipTextProvider -> function(value)
+    // arg "value" is between from and to, this is "value"
+    // at which pointing tool tip is currently shown
+    //
+    // returns the text for the given value
+    property var toolTipTextProvider: function (value) {
         return value
     }
 
@@ -153,7 +156,7 @@ T.Slider {
            if (!visible) return ""
 
            var v = control.valueAt(control.positionAt(pos.x))
-           return control.valueText(v)
+           return control.toolTipTextProvider(v)
        }
 
        //tooltip is a Popup, palette should be passed explicitly

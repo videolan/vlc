@@ -246,7 +246,7 @@ ColumnLayout {
 
         wheelEnabled: true
 
-        valueText: function (value) {
+        toolTipTextProvider: function (value) {
             return sliderToSpeed(value).toFixed(2)
         }
 
