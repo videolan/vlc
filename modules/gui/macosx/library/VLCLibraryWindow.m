@@ -24,9 +24,10 @@
 
 #import "VLCLibraryDataTypes.h"
 
-#import "extensions/NSString+Helpers.h"
-#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
 
@@ -325,7 +326,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
         self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOff"];
     } else {
-        self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOn"];
+        self.shufflePlaylistButton.image = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:[NSColor VLCAccentColor]];
     }
 }
 
@@ -351,10 +352,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
     switch (currentRepeatState) {
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatAll"];
+            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:[NSColor VLCAccentColor]];
             break;
         case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOne"];
+            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:[NSColor VLCAccentColor]];
             break;
 
         default:

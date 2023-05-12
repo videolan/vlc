@@ -25,6 +25,7 @@
 #import "VLCControlsBarCommon.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
@@ -86,12 +87,12 @@
                                name:VLCPlaybackRepeatChanged
                              object:nil];
 
-    _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
+    _repeatAllImage = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:[NSColor VLCAccentColor]];
     _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
-    _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
+    _repeatOneImage = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:[NSColor VLCAccentColor]];
 
     _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
-    _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
+    _shuffleOnImage = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:[NSColor VLCAccentColor]];
 
     self.repeatButton.action = @selector(repeatAction:);
     self.shuffleButton.action = @selector(shuffleAction:);
