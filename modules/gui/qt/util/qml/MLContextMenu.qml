@@ -73,7 +73,16 @@ NativeMenu {
             "text": I18n.qtr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
-        }]
+        }, {
+            "text": I18n.qtr("Media Information"),
+            "action": function(dataList, options, indexes) {
+                DialogsProvider.mediaInfoDialog(model.getIdForIndex(indexes[0]))
+            },
+            "visible": function(options, indexes) {
+                return !(model.getIdForIndex(indexes[0]).hasParent())
+            }
+        }
+    ]
 
     // Events
 
