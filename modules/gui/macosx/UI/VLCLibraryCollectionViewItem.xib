@@ -17,6 +17,8 @@
                 <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="JlC-bE-i5Y"/>
                 <outlet property="progressIndicator" destination="dFt-oZ-h9P" id="JC6-gk-Mid"/>
                 <outlet property="secondaryInfoTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
+                <outlet property="trailingSecondaryTextToLeadingAnnotationConstraint" destination="IXL-bv-5zP" id="V4J-bi-UQB"/>
+                <outlet property="trailingSecondaryTextToTrailingSuperviewConstraint" destination="Zci-25-m59" id="czo-El-QT8"/>
                 <outlet property="unplayedIndicatorTextField" destination="u2r-zy-XEW" id="56s-K4-Kxr"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
