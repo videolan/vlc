@@ -124,6 +124,7 @@
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="top" id="Qpt-yS-z2k"/>
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="Yqz-VL-Ul7"/>
                 <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="14" id="ZVz-SL-rxZ"/>
+                <constraint firstAttribute="trailing" secondItem="VAn-gF-QiZ" secondAttribute="trailing" priority="750" id="Zci-25-m59"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="cvk-A5-enS"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="fH0-Om-7gV"/>
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="fag-50-6qS"/>
