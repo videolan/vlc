@@ -53,6 +53,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
     NSLayoutConstraint *_videoImageViewAspectRatioConstraint;
 }
+
 @end
 
 @implementation VLCLibraryCollectionViewItem
@@ -178,8 +179,9 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _mediaImageView.image = nil;
     _annotationTextField.hidden = YES;
     _progressIndicator.hidden = YES;
-    _unplayedIndicatorTextField.hidden = YES;
     _highlightBox.hidden = YES;
+
+    [self setUnplayedIndicatorHidden:YES];
 }
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
@@ -245,7 +247,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         }
 
         if (mediaItem.playCount == 0) {
-            _unplayedIndicatorTextField.hidden = NO;
+            [self setUnplayedIndicatorHidden:NO];
         }
     }
 }
@@ -259,6 +261,18 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _annotationTextField.stringValue = _NS("HD");
         _annotationTextField.hidden = NO;
     }
+}
+
+- (void)setUnplayedIndicatorHidden:(BOOL)indicatorHidden
+{
+    _unplayedIndicatorTextField.hidden = indicatorHidden;
+
+    // Set priority of constraints for secondary info label, which is alongside unplayed indicator
+    const NSLayoutPriority superViewConstraintPriority = indicatorHidden ? NSLayoutPriorityRequired : NSLayoutPriorityDefaultLow;
+    const NSLayoutPriority unplayedIndicatorConstraintPriority = indicatorHidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
+
+    _trailingSecondaryTextToTrailingSuperviewConstraint.priority = superViewConstraintPriority;
+    _trailingSecondaryTextToLeadingUnplayedIndicatorConstraint.priority = unplayedIndicatorConstraintPriority;
 }
 
 #pragma mark - actions
