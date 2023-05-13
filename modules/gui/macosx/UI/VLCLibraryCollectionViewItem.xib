@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -80,10 +81,10 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="u2r-zy-XEW">
-                    <rect key="frame" x="180" y="11" width="34" height="16"/>
+                    <rect key="frame" x="179" y="10" width="35" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="NEW" id="NeT-5U-eZn">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <font key="font" metaFont="systemBold"/>
+                        <color key="textColor" name="VLCAccentColor"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
@@ -102,10 +103,10 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">
-                    <rect key="frame" x="-2" y="11" width="37" height="16"/>
+                    <rect key="frame" x="-2" y="10" width="37" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="LSS-jh-llZ">
                         <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
@@ -114,10 +115,10 @@
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3Ah-0T-rA9"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" id="457-oy-EbD"/>
                 <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="8Qf-Un-Gdl"/>
-                <constraint firstItem="VAn-gF-QiZ" firstAttribute="top" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="4" id="ALi-0z-Mza"/>
+                <constraint firstItem="VAn-gF-QiZ" firstAttribute="top" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="5" id="ALi-0z-Mza"/>
                 <constraint firstAttribute="trailing" secondItem="u2r-zy-XEW" secondAttribute="trailing" id="Dd7-va-0UJ"/>
                 <constraint firstItem="u2r-zy-XEW" firstAttribute="centerY" secondItem="VAn-gF-QiZ" secondAttribute="centerY" id="H5N-j9-THf"/>
-                <constraint firstItem="u2r-zy-XEW" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="trailing" constant="4" id="IXL-bv-5zP"/>
+                <constraint firstItem="u2r-zy-XEW" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="trailing" constant="5" id="IXL-bv-5zP"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="bottom" id="Kp0-Hx-3Ek"/>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="QUW-dn-Fbc"/>
                 <constraint firstItem="Vwd-1n-Sbd" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="top" id="Qpt-yS-z2k"/>
@@ -138,5 +139,8 @@
     <resources>
         <image name="ellipsis" width="17" height="3"/>
         <image name="libraryPlay" width="64" height="64"/>
+        <namedColor name="VLCAccentColor">
+            <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>
