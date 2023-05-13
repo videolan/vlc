@@ -37,17 +37,16 @@
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 
+#include "library/VLCLibraryUIUnits.h"
 #include "main/VLCMain.h"
 #include "extensions/NSString+Helpers.h"
 #include "preferences/prefs_widgets.h"
 
-NSString *VLCPrefsWidgetModuleDragType = @"VLC media player module";
+NSString * const VLCPrefsWidgetModuleDragType = @"VLC media player module";
 
 #define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)
 #define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 10)
 
-#define LEFTMARGIN  18
-#define RIGHTMARGIN 18
 #define PREFS_WRAP 300
 #define OFFSET_RIGHT 20
 #define OFFSET_BETWEEN 2
@@ -417,6 +416,7 @@ my_width, tooltip, init_value)                                              \
         } else {
             psz_name = NULL;
         }
+
         [self setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin ];
     }
     return (self);
@@ -917,11 +917,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -994,11 +997,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame: mainFrame item:p_item]) {
@@ -1095,11 +1101,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_itemTooltip, *o_textfieldString;
     mainFrame.size.height = 46;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1135,7 +1144,6 @@ my_width, tooltip, init_value)                                              \
 
 - (void) alignWithXPosition:(int)i_xPos
 {
-    ;
 }
 
 - (IBAction)openFileDialog:(id)sender
@@ -1183,11 +1191,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_popupTooltip;
     mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1308,6 +1319,7 @@ my_width, tooltip, init_value)                                              \
 {
     NSTextField     *o_textfield;
     NSStepper       *o_stepper;
+    
 }
 @end
 
@@ -1315,11 +1327,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 24;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1404,11 +1419,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1494,11 +1512,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 50;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame: mainFrame item:p_item]) {
@@ -1606,11 +1627,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 24;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1697,11 +1721,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 50;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -1806,11 +1833,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 17;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     self = [super initWithFrame:mainFrame item:p_item];
@@ -1853,11 +1883,14 @@ my_width, tooltip, init_value)                                              \
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
     mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
@@ -2029,9 +2062,12 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     } /* FOR i_module_index */
     module_list_free(p_list);
 
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     // First, initialize and draw the table view to get its height
     // width is increased a little to fix horizontal auto-sizing
-    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 18, 50);
+    NSRect s_rc = NSMakeRect(12, 10, mainFrame.size.width - leftMargin - rightMargin + 18, 50);
     // height is automatically increased as needed
     o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
     [o_tableview setUsesAlternatingRowBackgroundColors:YES];
@@ -2074,8 +2110,8 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     CGFloat tableview_height = [o_tableview frame].size.height;
 
     mainFrame.size.height = 40 + tableview_height;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
     self.frame = mainFrame;
 
@@ -2247,11 +2283,14 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 - (id)initWithItem:(module_config_t *)p_item
           withView:(NSView *)parentView
 {
+    const NSUInteger leftMargin = [VLCLibraryUIUnits largeSpacing];
+    const NSUInteger rightMargin = [VLCLibraryUIUnits largeSpacing];
+
     NSRect mainFrame = [parentView frame];
     NSString *labelString;
     mainFrame.size.height = 17;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
-    mainFrame.origin.x = LEFTMARGIN;
+    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin;
+    mainFrame.origin.x = leftMargin;
     mainFrame.origin.y = 0;
 
     if (self = [super initWithFrame:mainFrame item:p_item]) {
