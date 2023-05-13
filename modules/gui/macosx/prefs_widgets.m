@@ -366,6 +366,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     [o_slider setToolTip: tooltip];                                         \
     [o_slider setMaxValue: higher];                                         \
     [o_slider setMinValue: lower];                                          \
+    if (@available(macOS 10.10, *)) {                                       \
+        [o_slider setControlSize: NSControlSizeSmall];                      \
+    }                                                                       \
 }
 
 #define ADD_CHECKBOX(o_checkbox, superFrame, x_offset, my_y_offset, label,  \
