@@ -343,7 +343,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     NSRect s_rc = superFrame;                                               \
     s_rc.origin.x = x_offset;                                               \
     s_rc.origin.y = my_y_offset;                                            \
-    s_rc.size.height = 23;                                                  \
+    s_rc.size.height = 24;                                                  \
     s_rc.size.width = 23;                                                   \
     o_stepper = [[NSStepper alloc] initWithFrame: s_rc];                    \
     [o_stepper setFont:[NSFont systemFontOfSize:0]];                        \
@@ -354,6 +354,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     [o_stepper setAction: @selector(stepperChanged:)];                      \
     [o_stepper sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |       \
         NSLeftMouseDraggedMask];                                            \
+    [o_stepper sizeToFit];                                                  \
 }
 
 #define ADD_SLIDER(o_slider, superFrame, x_offset, my_y_offset, my_width,   \
@@ -1316,7 +1317,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
-    mainFrame.size.height = 23;
+    mainFrame.size.height = 24;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
@@ -1607,7 +1608,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect mainFrame = [parentView frame];
     NSString *labelString, *toolTip;
-    mainFrame.size.height = 23;
+    mainFrame.size.height = 24;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
