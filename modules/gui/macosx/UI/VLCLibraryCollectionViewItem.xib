@@ -103,8 +103,8 @@
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">
-                    <rect key="frame" x="-2" y="10" width="37" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="LSS-jh-llZ">
+                    <rect key="frame" x="-2" y="10" width="180" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="LSS-jh-llZ">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
