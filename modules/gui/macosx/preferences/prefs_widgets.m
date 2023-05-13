@@ -274,15 +274,15 @@ NSString *VLCPrefsWidgetModuleDragType = @"VLC media player module";
 #define ADD_SECURETEXTFIELD(o_textfield, superFrame, x_offset, my_y_offset, \
 my_width, tooltip, init_value)                                              \
 {                                                                           \
-NSRect s_rc = superFrame;                                                   \
-s_rc.origin.x = x_offset;                                                   \
-s_rc.origin.y = my_y_offset;                                                \
-s_rc.size.height = 22;                                                      \
-s_rc.size.width = my_width;                                                 \
-o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
-[o_textfield setFont:[NSFont systemFontOfSize:0]];                          \
-[o_textfield setToolTip: tooltip];                                          \
-[o_textfield setStringValue: init_value];                                   \
+    NSRect s_rc = superFrame;                                               \
+    s_rc.origin.x = x_offset;                                               \
+    s_rc.origin.y = my_y_offset;                                            \
+    s_rc.size.height = 22;                                                  \
+    s_rc.size.width = my_width;                                             \
+    o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];          \
+    [o_textfield setFont:[NSFont systemFontOfSize:0]];                      \
+    [o_textfield setToolTip: tooltip];                                      \
+    [o_textfield setStringValue: init_value];                               \
 }
 
 #define ADD_COMBO(o_combo, superFrame, x_offset, my_y_offset, x2_offset,    \
