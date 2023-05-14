@@ -323,7 +323,8 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (!newMRL)
         newMRL = @"";
 
-    _MRL = newMRL;
+    NSString * const trimmedMRL = [newMRL stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    _MRL = trimmedMRL;
     [self.mrlTextField performSelectorOnMainThread:@selector(setStringValue:) withObject:_MRL waitUntilDone:NO];
     if ([_MRL length] > 0)
         [_okButton setEnabled: YES];
