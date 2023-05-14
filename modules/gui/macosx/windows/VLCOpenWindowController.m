@@ -344,7 +344,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     if (!newMRL)
         newMRL = @"";
 
-    _MRL = newMRL;
+    NSString * const trimmedMRL = [newMRL stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    _MRL = trimmedMRL;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.mrlTextField setStringValue:self.MRL];
