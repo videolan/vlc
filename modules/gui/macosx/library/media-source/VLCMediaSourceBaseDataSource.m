@@ -343,6 +343,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
                 [currentDevices addObjectsFromArray:rootNode.children];
             }
         }
+
+        NSAssert(currentDevices != nil, @"Current devices should not be nil");
         _discoveredLANdevices = [currentDevices copy];
         return _discoveredLANdevices.count;
     }
