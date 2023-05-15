@@ -147,12 +147,15 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 - (void)loadMediaSources
 {
     [self.pathControl clearInputNodePathControlItems];
+    
     NSArray *mediaSources;
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
         mediaSources = [VLCMediaSourceProvider listOfLocalMediaSources];
     } else {
         mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_INTERNET];
     }
+    NSAssert(mediaSources != nil, @"Media sources array should not be nil");
+
     NSUInteger count = mediaSources.count;
     if (count > 0) {
         for (NSUInteger x = 0; x < count; x++) {
