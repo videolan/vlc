@@ -16,6 +16,9 @@ libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(APPLY) $(SRC)/libtasn1/0001-fcntl-do-not-call-GetHandleInformation-in-Winstore-a.patch
+
+	# use CreateFile2 instead of CreateFile in UWP
+	$(APPLY) $(SRC)/libtasn1/0001-Use-CreateFile2-in-UWP-builds.patch
 	$(MOVE)
 
 LIBTASN1_CONF := --disable-doc
