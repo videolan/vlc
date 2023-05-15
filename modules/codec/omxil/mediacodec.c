@@ -661,19 +661,15 @@ CreateVideoContext(decoder_t *p_dec)
     assert(dec_dev->opaque);
     AWindowHandler *awh = dec_dev->opaque;
 
-    const bool has_subtitle_surface =
-        AWindowHandler_getANativeWindow(awh, AWindow_Subtitles) != NULL;
-
     /* Force OpenGL interop (via AWindow_SurfaceTexture) if there is a
      * projection or an orientation to handle, if the Surface owner is not able
-     * to modify its layout, or if there is no external subtitle surfaces. */
+     * to modify its layout. */
 
     p_sys->video.surfacetexture = NULL;
     bool use_surfacetexture =
         p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
      || (!p_sys->api.b_support_rotation && p_dec->fmt_out.video.orientation != ORIENT_NORMAL)
-     || !AWindowHandler_canSetVideoLayout(awh)
-     || !has_subtitle_surface;
+     || !AWindowHandler_canSetVideoLayout(awh);
 
     if (!use_surfacetexture)
     {
