@@ -181,8 +181,8 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
 
             while ( p_out < p_out_line_end )
             {
-                *p_out++ = (((*p_old++) * i_oldfactor) +
-                            ((*p_new++) * i_newfactor)) >> 7;
+                *p_out++ = ((((*p_old++) * i_oldfactor) + (1 << 7 >> 1) +
+                            ((*p_new++) * i_newfactor))) >> 7;
             }
 
             p_old += p_sys->p_tmp->p[i_plane].i_pitch - i_visible_pitch;
