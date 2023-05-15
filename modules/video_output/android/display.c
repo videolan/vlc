@@ -501,13 +501,23 @@ static int Open(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
-    int ret = subpicture_OpenDisplay(vd);
-    if (ret != 0 && !vd->obj.force)
+    const bool has_subtitle_surface =
+        AWindowHandler_getANativeWindow(sys->awh, AWindow_Subtitles) != NULL;
+    if (has_subtitle_surface)
     {
-        msg_Warn(vd, "cannot blend subtitle with an opaque surface, "
-                     "trying next vout");
-        free(sys);
-        return VLC_EGENERIC;
+        int ret = subpicture_OpenDisplay(vd);
+        if (ret != 0 && !vd->obj.force)
+        {
+            msg_Warn(vd, "cannot blend subtitle with an opaque surface, "
+                         "trying next vout");
+            free(sys);
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        msg_Warn(vd, "using android display without subtitles support");
+        sys->sub.window = NULL;
     }
 
     video_format_t rot_fmt;
