@@ -19,6 +19,7 @@ endif
 
 libdsm: libdsm-$(LIBDSM_VERSION).tar.xz .sum-libdsm
 	$(UNPACK)
+	$(APPLY) $(SRC)/libdsm/0001-Avoid-relying-on-implicit-function-declarations.patch
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
