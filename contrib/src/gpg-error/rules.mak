@@ -28,6 +28,10 @@ ifndef HAVE_WIN32
 	cp -f -- "$(SRC)/gpg-error/lock-obj-pub.posix.h" \
 		"$(UNPACK_DIR)/src/lock-obj-pub.native.h"
 endif
+	# gpg-error doesn't know about mingw32uwp but it's the same as mingw32
+	cp -f -- "$(UNPACK_DIR)/src/syscfg/lock-obj-pub.mingw32.h" \
+		"$(UNPACK_DIR)/src/syscfg/lock-obj-pub.mingw32uwp.h"
+	$(APPLY) $(SRC)/gpg-error/gpg-error-uwp-fix.patch
 	$(MOVE)
 
 GPGERROR_CONF := \

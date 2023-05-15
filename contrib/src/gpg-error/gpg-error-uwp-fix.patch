@@ -1,0 +1,11 @@
+--- libgpg-error/src/mkheader.c.orig	2023-05-12 13:24:34.270562700 +0200
++++ libgpg-error/src/mkheader.c	2023-05-15 08:26:10.678024100 +0200
+@@ -518,7 +518,7 @@ write_special (const char *fname, int ln
+     }
+   else if (!strcmp (tag, "include:os-add"))
+     {
+-      if (!strcmp (host_os, "mingw32"))
++      if (!strcmp (host_os, "mingw32") || !strcmp (host_os, "mingw32uwp") || !strcmp (host_os, "mingw32ucrt"))
+         {
+           include_file (fname, lnr, "w32-add.h", write_line);
+         }
