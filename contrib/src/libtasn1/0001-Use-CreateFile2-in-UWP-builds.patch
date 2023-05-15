@@ -1,0 +1,73 @@
+From 8425c77fe89d66cd8d5411d0ccd14c688de1416a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 16 May 2023 09:40:34 +0200
+Subject: [PATCH] Use CreateFile2 in UWP builds
+
+CreateFileA and CreateFileW are forbidden calls in UWP.
+CreateFile2 is close enough, some parameters are passed in a structure
+and it requires a WCHAR filename. Given the original stat uses the
+"multibyte code page currently in use" [1], the char should be converted
+using CP_ACP [2].
+
+[1] https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/stat-functions
+[2] https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar#parameters
+---
+ lib/stat.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/src/gl/stat.c b/src/gl/stat.c
+index 7987e26583..f0e95a27dc 100644
+--- a/src/gl/stat.c
++++ b/src/gl/stat.c
+@@ -197,6 +197,7 @@ rpl_stat (char const *name, struct stat *buf)
+     {
+       /* Approach based on the file.  */
+ 
++# if !defined WINAPI_FAMILY || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+       /* Open a handle to the file.
+          CreateFile
+          <https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilea>
+@@ -212,6 +213,40 @@ rpl_stat (char const *name, struct stat *buf)
+                        filesystem operations.  */
+                     FILE_FLAG_BACKUP_SEMANTICS /* | FILE_FLAG_POSIX_SEMANTICS */,
+                     NULL);
++# else
++      /* Only CreateFile2 is available in UWP builds.
++         <https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2>
++         <https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-file-l1-2-1dll>  */
++      HANDLE h = INVALID_HANDLE_VALUE;
++      int wlen = MultiByteToWideChar (CP_ACP, 0, rname, -1, NULL, 0);
++      if (wlen > 0)
++        {
++          WCHAR *wrname = malloca (wlen * sizeof (WCHAR));
++          if (wrname != NULL)
++            {
++              MultiByteToWideChar (CP_ACP, 0, rname, -1, wrname, wlen);
++
++              CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++              createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++              createExParams.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
++              /* FILE_FLAG_POSIX_SEMANTICS (treat file names that differ only
++                  in case as different) makes sense only when applied to *all*
++                  filesystem operations.  */
++              createExParams.dwFileFlags = FILE_FLAG_BACKUP_SEMANTICS;
++              createExParams.dwSecurityQosFlags = 0;
++              createExParams.lpSecurityAttributes = NULL;
++              createExParams.hTemplateFile = NULL;
++
++              h =
++                CreateFile2 (wrname,
++                             FILE_READ_ATTRIBUTES,
++                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
++                             OPEN_EXISTING,
++                             &createExParams);
++              freea(wrname);
++            }
++        }
++# endif
+       if (h != INVALID_HANDLE_VALUE)
+         {
+           ret = _gl_fstat_by_handle (h, rname, buf);
+-- 
+2.37.3.windows.1
+
