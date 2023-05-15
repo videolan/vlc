@@ -481,17 +481,6 @@ index 47b7cb8e..9743f310 100644
  #if !defined(__BORLANDC__) && !defined(__WATCOMC__)
  #define setmode		_setmode
  #endif
-@@ -122,8 +124,10 @@
- #define	umask		_umask
- #endif
- #endif
-+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
- #define	waitpid		__la_waitpid
- #define	write		__la_write
-+#endif
- 
- #if !defined(__WATCOMC__)
- 
 @@ -276,8 +280,10 @@ extern int	 __la_stat(const char *path, struct stat *st);
  extern pid_t	 __la_waitpid(HANDLE child, int *status, int option);
  extern ssize_t	 __la_write(int fd, const void *buf, size_t nbytes);

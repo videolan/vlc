@@ -1,0 +1,16 @@
+--- libarchive/libarchive/archive_digest.c.orig	2022-04-08 13:40:26.000000000 +0200
++++ libarchive/libarchive/archive_digest.c	2023-05-12 15:35:03.525598300 +0200
+@@ -30,6 +30,13 @@
+ #include "archive.h"
+ #include "archive_digest_private.h"
+ 
++#ifdef WINSTORECOMPAT
++WINIMPM WINBOOL WINAPI CryptCreateHash (HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey, DWORD dwFlags, HCRYPTHASH *phHash);
++WINIMPM WINBOOL WINAPI CryptHashData (HCRYPTHASH hHash, CONST BYTE *pbData, DWORD dwDataLen, DWORD dwFlags);
++WINIMPM WINBOOL WINAPI CryptGetHashParam (HCRYPTHASH hHash, DWORD dwParam, BYTE *pbData, DWORD *pdwDataLen, DWORD dwFlags);
++WINIMPM WINBOOL WINAPI CryptDestroyHash (HCRYPTHASH hHash);
++#endif
++
+ /* In particular, force the configure probe to break if it tries
+  * to test a combination of OpenSSL and libmd. */
+ #if defined(ARCHIVE_CRYPTO_OPENSSL) && defined(ARCHIVE_CRYPTO_LIBMD)
