@@ -276,6 +276,9 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
         childNode = mediaSource.rootNode;
     }
 
+    NSAssert(mediaSource != nil, @"Media source should not be nil");
+    NSAssert(childNode != nil, @"Child node should not be nil");
+
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
     [self reloadData];
 }
