@@ -1,0 +1,14 @@
+--- orc/orc/orccodemem.c.orig	2023-05-12 16:46:43.316809200 +0200
++++ orc/orc/orccodemem.c	2023-05-12 15:58:42.687027500 +0200
+@@ -289,7 +289,11 @@ orc_code_region_allocate_codemem (OrcCod
+ void
+ orc_code_region_allocate_codemem (OrcCodeRegion *region)
+ {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   region->write_ptr = VirtualAlloc(NULL, SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
++#else /* !WINAPI_PARTITION_DESKTOP */
++  region->write_ptr = VirtualAllocFromApp(NULL, SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
++#endif /* !WINAPI_PARTITION_DESKTOP */
+   region->exec_ptr = region->write_ptr;
+   region->size = SIZE;
+ }
