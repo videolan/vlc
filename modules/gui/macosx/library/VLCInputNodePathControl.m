@@ -28,12 +28,13 @@
 
 - (void)appendInputNodePathControlItem:(VLCInputNodePathControlItem *)inputNodePathControlItem
 {
+    NSParameterAssert(inputNodePathControlItem != nil);
+    NSParameterAssert(inputNodePathControlItem.image != nil);
+    NSParameterAssert(inputNodePathControlItem.image.name != nil);
+    NSParameterAssert(![inputNodePathControlItem.image.name isEqualToString:@""]);
+
     if (_inputNodePathControlItems == nil) {
         _inputNodePathControlItems = [NSMutableDictionary dictionary];
-    }
-
-    if ([inputNodePathControlItem.image.name isEqualToString:@""]) {
-        return;
     }
 
     [_inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.name];
