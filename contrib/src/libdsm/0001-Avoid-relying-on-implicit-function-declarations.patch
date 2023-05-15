@@ -1,0 +1,51 @@
+From a95e2ee2056317383d885574464f64dcc5509ce4 Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+Date: Wed, 7 Sep 2022 00:54:00 +0200
+Subject: [PATCH] Avoid relying on implicit function declarations
+
+smb_ntlm.c includes stdlib.h transitively via config.h -> compat.h.
+This means that defining _CRT_RAND_S in smb_ntlm.c (before including
+config.h itself) does not have the desired effect of pulling in the
+rand_s() function declaration.
+
+To fix this (and the Wimplicit-function-declaration warning, which has
+become an error in Clang 16), define _CRT_RAND_S before including
+stdlib.h.
+---
+ compat/compat.h | 4 ++++
+ src/smb_ntlm.c  | 4 ----
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/compat/compat.h b/compat/compat.h
+index eadfae8..014298c 100644
+--- a/compat/compat.h
++++ b/compat/compat.h
+@@ -31,6 +31,10 @@
+ #ifndef BDSM_COMPAT_H
+ # define BDSM_COMPAT_H
+ 
++#ifdef _WIN32
++# define _CRT_RAND_S    /* needed before including stdlib.h !!! */
++#endif
++
+ #include <stdlib.h>
+ #if !defined HAVE_STRLCPY && !defined HAVE_LIBBSD
+ size_t strlcpy(char *dst, const char *src, size_t siz);
+diff --git a/src/smb_ntlm.c b/src/smb_ntlm.c
+index 998afd3..c55d169 100644
+--- a/src/smb_ntlm.c
++++ b/src/smb_ntlm.c
+@@ -32,10 +32,6 @@
+ # include "config.h"
+ #endif
+ 
+-#ifdef _WIN32
+-# define _CRT_RAND_S
+-#endif
+-
+ #include <assert.h>
+ #include <ctype.h>
+ #include <wctype.h>
+-- 
+2.37.3.windows.1
+
