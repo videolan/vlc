@@ -23,6 +23,7 @@ SF := https://netcologne.dl.sourceforge.net/
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
 GITHUB := https://github.com/
+GNUGPG := https://www.gnupg.org/ftp/gcrypt
 
 #
 # Machine-dependent variables
