@@ -52,6 +52,9 @@ endif
 
 	$(APPLY) $(SRC)/gnutls/0001-windows-Avoid-Wint-conversion-errors.patch
 
+	# use CreateFile2 instead of CreateFile in UWP
+	$(APPLY) $(SRC)/gnutls/0001-Use-CreateFile2-in-UWP-builds.patch
+
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
