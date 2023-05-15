@@ -658,6 +658,17 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
         ml->addToPlaylist(ids);
     });
 
+    if (ids.count() == 1)
+    {
+        action = m_menu->addAction(qtr("Rename"));
+
+        QModelIndex index = selected.first();
+
+        connect(action, &QAction::triggered, [this, index]() {
+            m_model->showDialogRename(index);
+        });
+    }
+
     action = m_menu->addAction(qtr("Delete"));
 
     connect(action, &QAction::triggered, [this, ids]() {
