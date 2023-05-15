@@ -1,14 +1,25 @@
---- libgcrypt/configure.ac.old	2017-04-20 16:49:00.239092950 +0200
-+++ libgcrypt/configure.ac	2017-04-20 16:57:18.205011934 +0200
-@@ -215,7 +215,6 @@
- print_egd_notice=no
+From 54a245738b12ad8985935de0ffea24980ce48db9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Thu, 20 Apr 2017 17:26:02 +0200
+Subject: [PATCH 2/5] Fix pthread detection
+
+---
+ configure.ac | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6ea38f53..781f3163 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -239,7 +239,6 @@ LIBGCRYPT_THREAD_MODULES=""
+ # Other definitions.
  have_w32_system=no
  have_w32ce_system=no
 -have_pthread=no
  
  
  # Setup some stuff depending on host.
-@@ -751,10 +750,9 @@
+@@ -828,10 +827,9 @@ AC_SUBST(PTH_LIBS)
  # Check whether pthreads is available
  #
  if test "$have_w32_system" != yes; then
@@ -22,3 +33,6 @@
  fi
  
  
+-- 
+2.37.3.windows.1
+
