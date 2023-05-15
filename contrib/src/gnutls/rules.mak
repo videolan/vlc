@@ -1,7 +1,7 @@
 # GnuTLS
 
 GNUTLS_VERSION := 3.6.16
-GNUTLS_URL := https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-$(GNUTLS_VERSION).tar.xz
+GNUTLS_URL := $(GNUGPG)/gnutls/v3.6/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
 ifndef HAVE_DARWIN_OS
