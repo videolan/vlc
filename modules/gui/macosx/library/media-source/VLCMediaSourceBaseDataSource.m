@@ -391,8 +391,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
     } else {
         childNode = mediaSource.rootNode;
     }
-    [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
 
+    NSAssert(childNode != nil, @"Child node should not be nil");
+
+    [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
     [self reloadData];
 }
 
