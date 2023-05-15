@@ -765,7 +765,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     }
 
     while (cdt2_size > 0) {
-         *(out++) = CC_PKT_BYTE0(0); /* cc1 == field 0 */
+         *(out++) = CC_PKT_BYTE0(1); /* cc2 == field 1 */
          *(out++) = *(cdt2++);
          *(out++) = *(cdt2++);
          cdt2_size -= 2;
