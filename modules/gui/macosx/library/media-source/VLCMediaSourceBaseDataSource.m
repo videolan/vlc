@@ -215,8 +215,8 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
         const BOOL isStream = childRootInput.isStream;
         
         NSURL *artworkURL = childRootInput.artworkURL;
-        NSImage *placeholder = nil;
         
+        NSImage *placeholder;
         if (mediaSource.category == SD_CAT_LAN) {
             placeholder = [NSImage imageNamed:@"bw-Music"];
         } else {
@@ -240,6 +240,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
                     break;
             }
         }
+        NSAssert(placeholder != nil, @"Placeholder image should not be nil");
         
         if (artworkURL) {
             [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
