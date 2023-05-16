@@ -126,7 +126,9 @@ MainInterface.MainViewLoader {
                 height: width / 2
                 pictureWidth: width
                 pictureHeight: height
-                image: model.cover || VLCStyle.noArtAlbumCover
+                image: model.cover || ""
+                fallbackImage: VLCStyle.noArtAlbumCover
+
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
 
