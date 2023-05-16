@@ -155,6 +155,7 @@ static int Control( demux_t *, int i_query, va_list args );
 
 static void DemuxVideo( demux_t *, real_track_t *tk, vlc_tick_t i_dts, unsigned i_flags );
 static void DemuxAudio( demux_t *, real_track_t *tk, vlc_tick_t i_pts, unsigned i_flags );
+static void UpdatePcr( demux_t * );
 
 static int ControlSeekByte( demux_t *, int64_t i_bytes );
 static int ControlSeekTime( demux_t *, vlc_tick_t i_time );
@@ -317,7 +318,19 @@ static int Demux( demux_t *p_demux )
 
     p_sys->i_buffer = vlc_stream_Read( p_demux->s, p_sys->buffer, i_size );
     if( p_sys->i_buffer < i_size )
+    {
+        /* Set Last PCR */
+        for( int i = 0; i < p_sys->i_track; i++ )
+        {
+            vlc_tick_t i_pcr = VLC_TICK_INVALID;
+            const real_track_t *tk = p_sys->track[i];
+            if( i_pcr < tk->i_last_dts )
+                i_pcr = tk->i_last_dts;
+            if( p_sys->i_pcr != i_pcr )
+                es_out_SetPCR( p_demux->out, i_pcr );
+        }
         return 0;
+    }
 
     real_track_t *tk = NULL;
     for( int i = 0; i < p_sys->i_track; i++ )
@@ -343,19 +356,8 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Update PCR */
-    vlc_tick_t i_pcr = VLC_TICK_INVALID;
-    for( int i = 0; i < p_sys->i_track; i++ )
-    {
-        tk = p_sys->track[i];
+    UpdatePcr( p_demux );
 
-        if( i_pcr <= VLC_TICK_INVALID || ( tk->i_last_dts > VLC_TICK_INVALID && tk->i_last_dts < i_pcr ) )
-            i_pcr = tk->i_last_dts;
-    }
-    if( i_pcr > VLC_TICK_INVALID && i_pcr != p_sys->i_pcr )
-    {
-        p_sys->i_pcr = i_pcr;
-        es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-    }
     return 1;
 }
 
@@ -495,18 +497,32 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * Helpers: demux
  *****************************************************************************/
-static void CheckPcr( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_dts )
+static void UpdatePcr( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    vlc_tick_t pcr = VLC_TICK_INVALID;
+    for( int i=0; i<p_sys->i_track; i++ )
+    {
+         const real_track_t *tk = p_sys->track[i];
+         if( tk->i_last_dts <= VLC_TICK_INVALID )
+             continue;
+         if( pcr <= VLC_TICK_INVALID || pcr > tk->i_last_dts )
+             pcr = tk->i_last_dts;
+    }
+    if( p_sys->i_pcr < pcr && pcr != VLC_TICK_INVALID )
+    {
+        es_out_SetPCR( p_demux->out, pcr );
+        p_sys->i_pcr = pcr;
+    }
+}
+
+static void CheckPcr( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_dts )
+{
     if( i_dts > VLC_TICK_INVALID )
         tk->i_last_dts = i_dts;
 
-    if( p_sys->i_pcr > VLC_TICK_INVALID || i_dts <= VLC_TICK_INVALID )
-        return;
-
-    p_sys->i_pcr = i_dts;
-    es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+    UpdatePcr( p_demux );
 }
 
 static void DemuxVideo( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_dts, unsigned i_flags )
