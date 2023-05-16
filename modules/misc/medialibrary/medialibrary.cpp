@@ -722,6 +722,18 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
+        case VLC_ML_PLAYLIST_RENAME:
+        {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
+            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            const char * name = va_arg( args, const char * );
+            if ( playlist->setName(name) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         default:
             return VLC_EGENERIC;
     }
