@@ -47,8 +47,13 @@
 #include <mmsystem.h>
 #endif
 
-#ifndef NTDDI_WIN10_RS3
-#define NTDDI_WIN10_RS3  0x0A000004
+#ifndef NTDDI_WIN10_RS1
+#define NTDDI_WIN10_RS1  0x0A000002
+#endif
+
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 && defined(__MINGW64_VERSION_MAJOR)
+// SetThreadDescription is not defined yet in mingw64
+WINBASEAPI HRESULT WINAPI SetThreadDescription(HANDLE,PCWSTR);
 #endif
 
 /*** Static mutex and condition variable ***/
@@ -710,6 +715,9 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     {
         case DLL_PROCESS_ATTACH:
         {
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1
+            SetThreadDescription_ = SetThreadDescription;
+#else // !NTDDI_WIN10_RS1
             HMODULE h;
             h = GetModuleHandle(TEXT("kernelbase.dll"));
             if (h == NULL)
@@ -718,6 +726,7 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
                 LOOKUP(SetThreadDescription);
             else
                 SetThreadDescription_ = NULL;
+#endif // !NTDDI_WIN10_RS1
 
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
             h = GetModuleHandle(TEXT("api-ms-win-core-synch-l1-2-0.dll"));
