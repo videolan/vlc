@@ -248,11 +248,9 @@ if [ ! -z "$BUILD_UCRT" ]; then
             fi
         fi
 
-        # WinstoreCompat: hopefully can go away someday
-        LDFLAGS="$LDFLAGS -lwindowsapp -lwindowsappcompat"
-        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
-        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
-        CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
+        LDFLAGS="$LDFLAGS -lwindowsapp"
+        CFLAGS="$CFLAGS -Wl,-lwindowsapp"
+        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp"
     else
         SHORTARCH="$SHORTARCH-ucrt"
     fi
