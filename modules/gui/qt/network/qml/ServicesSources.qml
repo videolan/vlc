@@ -65,12 +65,18 @@ MainInterface.MainGridView {
                         .accent(this.colorContext.accent)
                         .uri()
                 }
+
                 return model.artwork
-            } else {
-                return SVGColorImage.colorize("qrc:///sd/directory.svg")
-                           .color1(this.colorContext.fg.secondary)
-                           .uri()
             }
+
+            // use fallbackImage
+            return ""
+        }
+
+        fallbackImage: {
+            return SVGColorImage.colorize("qrc:///sd/directory.svg")
+                .color1(this.colorContext.fg.secondary)
+                .uri()
         }
 
         onItemDoubleClicked: {
