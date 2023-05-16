@@ -87,7 +87,9 @@ MainInterface.MainViewLoader {
             delegate: AudioGridItem {
                 id: gridItem
 
-                image: model.cover || VLCStyle.noArtArtistSmall
+                image: model.cover || ""
+                fallbackImage: VLCStyle.noArtArtistSmall
+
                 title: model.name || I18n.qtr("Unknown artist")
                 subtitle: model.nb_tracks > 1 ? I18n.qtr("%1 songs").arg(model.nb_tracks) : I18n.qtr("%1 song").arg(model.nb_tracks)
                 pictureRadius: VLCStyle.artistGridCover_radius
