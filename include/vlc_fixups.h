@@ -344,6 +344,14 @@ struct timezone;
 int gettimeofday(struct timeval *, struct timezone *);
 #endif
 
+#if defined(WIN32) && !defined(WINSTORECOMPAT)
+#include <winapifamily.h>
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+// getpid is incorrectly detected in UWP so we won't use the compat version
+#define getpid()  GetCurrentProcessId()
+#endif
+#endif
+
 /* unistd.h */
 #ifndef HAVE_GETPID
 pid_t getpid (void) VLC_NOTHROW;
