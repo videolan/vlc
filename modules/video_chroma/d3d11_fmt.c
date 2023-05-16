@@ -446,7 +446,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
     if (hw_decoding || !obj->force)
         creationFlags |= D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
 
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && !defined(BUILD_FOR_UAP)
     if (IsDebuggerPresent())
     {
         HINSTANCE sdklayer_dll = LoadLibraryW(L"d3d11_1sdklayers.dll");
