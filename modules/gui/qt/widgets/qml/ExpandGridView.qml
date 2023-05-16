@@ -595,7 +595,7 @@ FocusScope {
         colorSet: ColorContext.View
     }
 
-    //Gridview visible above the expanded item
+
     Flickable {
         id: flickable
 
