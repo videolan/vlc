@@ -25,8 +25,8 @@
 // VLC includes
 #include <vlc_media_library.h>
 #include "qt.hpp"
-
 #include "util/vlctick.hpp"
+#include "dialogs/dialogs_provider.hpp"
 
 // MediaLibrary includes
 #include "mlhelper.hpp"
@@ -161,8 +161,6 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     return result;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 /* Q_INVOKABLE */ bool MLPlaylistListModel::deletePlaylists(const QVariantList & ids)
 {
     assert(m_mediaLib);
@@ -197,6 +195,47 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     [this](){
         endTransaction();
     });
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/* Q_INVOKABLE */ bool MLPlaylistListModel::showDialogRename(const QModelIndex & index)
+{
+    int row = index.row();
+
+    if (row < 0 || row >= rowCount())
+        return false;
+
+    MLPlaylist * playlist = static_cast<MLPlaylist *> (item(row));
+
+    QString name = playlist->getName();
+
+    static DialogsProvider * provider = DialogsProvider::getInstance();
+
+    bool ok = false;
+
+    QString result = provider->getTextDialog(NULL, qtr("Rename playlist"),
+                                             qtr("Please enter the new playlist name:"),
+                                             name, &ok).toString();
+
+    if (ok == false || result.isEmpty() || result == name)
+        return false;
+
+    int64_t id = playlist->getId().id;
+
+    m_mediaLib->runOnMLThread(this,
+    // ML thread
+    [id, result](vlc_medialibrary_t * ml)
+    {
+        vlc_ml_playlist_rename(ml, id, qtu(result));
+    });
+
+    // NOTE: We want the change to be visible right away.
+    playlist->setName(result);
+
+    emit dataChanged(index, index, { PLAYLIST_NAME });
 
     return true;
 }

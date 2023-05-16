@@ -68,6 +68,8 @@ public: // Interface
 
     Q_INVOKABLE bool deletePlaylists(const QVariantList & ids);
 
+    Q_INVOKABLE bool showDialogRename(const QModelIndex & index);
+
     MLItemId getItemId(int index) const;
 
 public: // QAbstractItemModel implementation
