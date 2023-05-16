@@ -235,6 +235,10 @@ if [ ! -z "$BUILD_UCRT" ]; then
         LDFLAGS="$LDFLAGS -lwindowsapp"
         CFLAGS="$CFLAGS -Wl,-lwindowsapp"
         CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp"
+        if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
+            CFLAGS="$CFLAGS -Wno-unused-command-line-argument"
+            CXXFLAGS="$CXXFLAGS -Wno-unused-command-line-argument"
+        fi
     else
         SHORTARCH="$SHORTARCH-ucrt"
         WINVER=0x0601
