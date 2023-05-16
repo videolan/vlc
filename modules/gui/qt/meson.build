@@ -145,6 +145,7 @@ moc_headers = files(
     'widgets/native/navigation_attached.hpp',
     'widgets/native/mlfolderseditor.hpp',
     'widgets/native/roundimage.hpp',
+    'widgets/native/roundimage_p.hpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
 )

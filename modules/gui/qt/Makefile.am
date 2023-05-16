@@ -341,7 +341,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/mlfolderseditor.hpp \
 	gui/qt/widgets/native/qvlcframe.cpp \
 	gui/qt/widgets/native/qvlcframe.hpp \
-	gui/qt/widgets/native/roundimage.cpp gui/qt/widgets/native/roundimage.hpp \
+	gui/qt/widgets/native/roundimage.cpp gui/qt/widgets/native/roundimage.hpp gui/qt/widgets/native/roundimage_p.hpp \
 	gui/qt/widgets/native/searchlineedit.cpp gui/qt/widgets/native/searchlineedit.hpp \
 	gui/qt/widgets/native/viewblockingrectangle.cpp gui/qt/widgets/native/viewblockingrectangle.hpp
 if HAVE_WIN32
@@ -521,6 +521,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/navigation_attached.moc.cpp \
 	gui/qt/widgets/native/mlfolderseditor.moc.cpp \
 	gui/qt/widgets/native/roundimage.moc.cpp \
+	gui/qt/widgets/native/roundimage_p.moc.cpp \
 	gui/qt/widgets/native/searchlineedit.moc.cpp \
 	gui/qt/widgets/native/viewblockingrectangle.moc.cpp
 

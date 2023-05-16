@@ -20,25 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include "qt.hpp"
+
 #include "roundimage.hpp"
+#include "roundimage_p.hpp"
 #include "util/asynctask.hpp"
 #include "util/qsgroundedrectangularimagenode.hpp"
 
 #include <qhashfunctions.h>
 
 #include <QBuffer>
-#include <QCache>
 #include <QFile>
 #include <QImage>
 #include <QImageReader>
 #include <QPainter>
 #include <QPainterPath>
-#include <QQuickImageProvider>
 #include <QQuickWindow>
 #include <QGuiApplication>
 #include <QSGImageNode>
@@ -51,33 +51,24 @@
 #include <QNetworkRequest>
 #endif
 
+
+bool operator ==(const ImageCacheKey &lhs, const ImageCacheKey &rhs)
+{
+    return lhs.radius == rhs.radius && lhs.size == rhs.size && lhs.url == rhs.url;
+}
+
+uint qHash(const ImageCacheKey &key, uint seed)
+{
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, key.url);
+    seed = hash(seed, key.size.width());
+    seed = hash(seed, key.size.height());
+    seed = hash(seed, key.radius);
+    return seed;
+}
+
 namespace
 {
-    struct ImageCacheKey
-    {
-        QUrl url;
-        QSize size;
-        qreal radius;
-    };
-
-    bool operator ==(const ImageCacheKey &lhs, const ImageCacheKey &rhs)
-    {
-        return lhs.radius == rhs.radius && lhs.size == rhs.size && lhs.url == rhs.url;
-    }
-
-    uint qHash(const ImageCacheKey &key, uint seed)
-    {
-        QtPrivate::QHashCombine hash;
-        seed = hash(seed, key.url);
-        seed = hash(seed, key.size.width());
-        seed = hash(seed, key.size.height());
-        seed = hash(seed, key.radius);
-        return seed;
-    }
-
-    // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
-    QCache<ImageCacheKey, QImage> imageCache(32 * 1024 * 1024); // 32 MiB
-
     QImage prepareImage(const QSize &targetSize, const qreal radius, const QImage sourceImage)
     {
         if (qFuzzyIsNull(radius))
@@ -319,43 +310,131 @@ namespace
         TaskHandle<RoundImageGenerator> generator;
     };
 
-    QQuickImageResponse *getAsyncImageResponse(const QUrl &url, const QSize &requestedSize, const qreal radius, QQmlEngine *engine)
-    {
-        if (url.scheme() == QStringLiteral("image"))
-        {
-            auto provider = engine->imageProvider(url.host());
-            if (!provider)
-                return nullptr;
+// global RoundImage cache
+RoundImageCache g_imageCache = {};
 
-            assert(provider->imageType() == QQmlImageProviderBase::ImageResponse);
-
-            const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);
-
-            if (provider->imageType() == QQmlImageProviderBase::ImageResponse)
-            {
-                auto rawImageResponse = static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(imageId, requestedSize);
-                return new ImageResponseRadiusAdaptor(rawImageResponse, radius);
-            }
-
-            return nullptr;
-        }
-        else if (QQmlFile::isLocalFile(url))
-        {
-            return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize, radius);
-        }
-#ifdef QT_NETWORK_LIB
-        else
-        {
-            QNetworkRequest request(url);
-            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-            auto reply = engine->networkAccessManager()->get(request);
-            return new NetworkImageResponse(reply, requestedSize, radius);
-        }
-#else
-        return nullptr;
-#endif
-    }
 }
+
+// RoundImageCache
+
+RoundImageCache::RoundImageCache()
+    : m_imageCache(32 * 1024 * 1024) // 32 MiB
+{}
+
+std::shared_ptr<RoundImageRequest> RoundImageCache::requestImage(const ImageCacheKey& key, qreal dpr, QQmlEngine *engine)
+{
+    //do we already have a pending request?
+    auto it = m_pendingRequests.find(key);
+    if (it != m_pendingRequests.end())
+    {
+        std::shared_ptr<RoundImageRequest> request = it->second.lock();
+        if (request)
+            return request;
+    }
+    auto request = std::make_shared<RoundImageRequest>(key, dpr, engine);
+    if (request->getStatus() == RoundImage::Status::Error)
+        return {};
+    m_pendingRequests[key] = request;
+    return request;
+}
+
+void RoundImageCache::removeRequest(const ImageCacheKey& key)
+{
+    m_pendingRequests.erase(key);
+}
+
+// RoundImageRequest
+
+RoundImageRequest::RoundImageRequest(const ImageCacheKey& key, qreal dpr, QQmlEngine *engine)
+    : m_key(key)
+    , m_dpr(dpr)
+{
+    m_imageResponse = getAsyncImageResponse(key.url, key.size, key.radius, engine);
+    if (m_imageResponse)
+        connect(m_imageResponse, &QQuickImageResponse::finished, this, &RoundImageRequest::handleImageResponseFinished);
+    else
+        m_status = RoundImage::Error;
+}
+
+RoundImageRequest::~RoundImageRequest()
+{
+    if (m_imageResponse)
+    {
+        if (m_cancelOnDelete)
+            m_imageResponse->cancel();
+
+        m_imageResponse->deleteLater();
+    }
+    g_imageCache.removeRequest(m_key);
+}
+
+void RoundImageRequest::handleImageResponseFinished()
+{
+    m_cancelOnDelete = false;
+    g_imageCache.removeRequest(m_key);
+
+    const QString error = m_imageResponse->errorString();
+    QImage image;
+
+    if (auto textureFactory = m_imageResponse->textureFactory())
+    {
+        image = textureFactory->image();
+        delete textureFactory;
+    }
+
+    if (image.isNull())
+    {
+        qDebug() << "failed to get image, error" << error << m_key.url;
+        m_status = RoundImage::Status::Error;
+        emit requestCompleted(m_status, {});
+        return;
+    }
+
+    image.setDevicePixelRatio(m_dpr);
+
+    g_imageCache.insert(m_key, new QImage(image), image.sizeInBytes());
+    emit requestCompleted(RoundImage::Status::Ready, image);
+}
+
+
+QQuickImageResponse* RoundImageRequest::getAsyncImageResponse(const QUrl &url, const QSize &requestedSize, const qreal radius, QQmlEngine *engine)
+{
+    if (url.scheme() == QStringLiteral("image"))
+    {
+        auto provider = engine->imageProvider(url.host());
+        if (!provider)
+            return nullptr;
+
+        assert(provider->imageType() == QQmlImageProviderBase::ImageResponse);
+
+        const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);
+
+        if (provider->imageType() == QQmlImageProviderBase::ImageResponse)
+        {
+            auto rawImageResponse = static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(imageId, requestedSize);
+            return new ImageResponseRadiusAdaptor(rawImageResponse, radius);
+        }
+
+        return nullptr;
+    }
+    else if (QQmlFile::isLocalFile(url))
+    {
+        return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize, radius);
+    }
+#ifdef QT_NETWORK_LIB
+    else
+    {
+        QNetworkRequest request(url);
+        request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+        auto reply = engine->networkAccessManager()->get(request);
+        return new NetworkImageResponse(reply, requestedSize, radius);
+    }
+#else
+    return nullptr;
+#endif
+}
+
+// RoundImage
 
 RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 {
@@ -377,7 +456,6 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 
 RoundImage::~RoundImage()
 {
-    resetImageResponse(true);
 }
 
 QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -519,51 +597,6 @@ void RoundImage::setDPR(const qreal value)
     regenerateRoundImage();
 }
 
-void RoundImage::handleImageResponseFinished()
-{
-    const QString error = m_activeImageResponse->errorString();
-    QImage image;
-    if (auto textureFactory = m_activeImageResponse->textureFactory())
-    {
-        image = textureFactory->image();
-        delete textureFactory;
-    }
-
-    resetImageResponse(false);
-
-    if (image.isNull())
-    {
-        setStatus(Status::Error);
-        qDebug() << "failed to get image, error" << error << source();
-        return;
-    }
-
-    image.setDevicePixelRatio(m_dpr);
-    setRoundImage(image);
-    setStatus(Status::Ready);
-
-    // FIXME: These should be gathered from the generator:
-    const qreal scaledWidth = this->width() * m_dpr;
-    const qreal scaledHeight = this->height() * m_dpr;
-    const qreal scaledRadius = m_QSGCustomGeometry ? 0.0 : (this->radius() * m_dpr);
-
-    const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
-    imageCache.insert(key, new QImage(image), image.sizeInBytes());
-}
-
-void RoundImage::resetImageResponse(bool cancel)
-{
-    if (!m_activeImageResponse)
-        return;
-
-    m_activeImageResponse->disconnect(this);
-
-    if (cancel)
-        m_activeImageResponse->cancel();
-
-    m_activeImageResponse = nullptr;
-}
-
 void RoundImage::load()
 {
     m_enqueuedGeneration = false;
@@ -577,21 +610,57 @@ void RoundImage::load()
     const qreal scaledRadius = m_QSGCustomGeometry ? 0.0 : (this->radius() * m_dpr);
 
     const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
-    if (auto image = imageCache.object(key)) // should only by called in mainthread
+
+    if (auto image = g_imageCache.object(key)) // should only by called in mainthread
     {
-        setRoundImage(*image);
-        setStatus(Status::Ready);
+        onRequestCompleted(Status::Ready, *image);
         return;
     }
 
-    m_activeImageResponse = getAsyncImageResponse(source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius, engine);
+    m_activeImageResponse = g_imageCache.requestImage(key, m_dpr, engine);
+    if (!m_activeImageResponse)
+    {
+        onRequestCompleted(RoundImage::Error, {});
+        return;
+    }
 
-    connect(m_activeImageResponse, &QQuickImageResponse::finished, this, &RoundImage::handleImageResponseFinished);
-    connect(m_activeImageResponse, &QQuickImageResponse::finished, m_activeImageResponse, &QObject::deleteLater);
+    connect(m_activeImageResponse.get(), &RoundImageRequest::requestCompleted, this, &RoundImage::onRequestCompleted);
+    //at this point m_activeImageResponse is either in Loading or Error status
+    onRequestCompleted(RoundImage::Loading, {});
+}
+
+void RoundImage::onRequestCompleted(Status status, const QImage& image)
+{
+    setRoundImage(image);
+    switch (status)
+    {
+    case RoundImage::Error:
+        setStatus(Status::Error);
+        m_activeImageResponse.reset();
+        break;
+    case RoundImage::Ready:
+    {
+        if (image.isNull())
+            setStatus(Status::Error);
+        else
+            setStatus(Status::Ready);
+        m_activeImageResponse.reset();
+        break;
+    }
+    case RoundImage::Loading:
+        setStatus(Status::Loading);
+        break;
+    case RoundImage::Null:
+        //requests should not be yield this state
+        vlc_assert_unreachable();
+    }
 }
 
 void RoundImage::setRoundImage(QImage image)
 {
+    if (m_roundImage.isNull() && image.isNull())
+        return;
+
     m_dirty = true;
     m_roundImage = image;
 
@@ -600,7 +669,7 @@ void RoundImage::setRoundImage(QImage image)
     if (image.isNull())
         update();
 
-    setFlag(ItemHasContents, not image.isNull());
+    setFlag(ItemHasContents, !image.isNull());
     update();
 }
 
@@ -623,7 +692,7 @@ void RoundImage::regenerateRoundImage()
     // remove old contents
     setRoundImage({});
 
-    resetImageResponse(true);
+    m_activeImageResponse.reset();
 
     // use Qt::QueuedConnection to delay generation, so that dependent properties
     // subsequent updates can be merged, f.e when VLCStyle.scale changes
