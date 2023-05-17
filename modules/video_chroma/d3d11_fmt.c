@@ -615,10 +615,12 @@ bool isXboxHardware(const d3d11_device_t *d3ddev)
 {
     bool result = false;
 
+#if BUILD_FOR_UAP
     if (d3ddev->adapterDesc.VendorId == 0 &&
         d3ddev->adapterDesc.DeviceId == 0 &&
         !wcscmp(L"ROOT\\SraKmd\\0000", d3ddev->adapterDesc.Description))
         result = true;
+#endif
 
     return result;
 }
