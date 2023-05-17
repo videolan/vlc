@@ -803,7 +803,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source->i_chroma)
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
             && vd->obj.force
 #endif
                 )
