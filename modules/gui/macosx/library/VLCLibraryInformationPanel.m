@@ -50,6 +50,8 @@
 
 - (void)updateRepresentation
 {
+    _titleTextField.stringValue = _representedItem.displayString;
+    
     NSMutableString * const textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
 
     NSString * itemDetailsString;
