@@ -284,7 +284,7 @@ done:
 
 typedef struct
 {
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
     HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
@@ -305,7 +305,7 @@ typedef struct {
 
 static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
 {
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
     hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
     if (!hd3d->hdll)
     {
@@ -331,13 +331,13 @@ static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
         }
     }
 # endif // !NDEBUG && HAVE_DXGIDEBUG_H
-#endif // !VLC_WINSTORE_APP
+#endif // !BUILD_FOR_UAP
     return VLC_SUCCESS;
 }
 
 static void D3D11_Destroy(d3d11_handle_t *hd3d)
 {
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
 
@@ -429,7 +429,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                             IDXGIAdapter *adapter,
                             bool hw_decoding, d3d11_device_t *out)
 {
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
 # define D3D11CreateDevice(a,b,c,d,e,f,g,h,i,j)   pf_CreateDevice(a,b,c,d,e,f,g,h,i,j)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
@@ -438,7 +438,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         msg_Err(obj, "Cannot locate reference to D3D11CreateDevice ABI in DLL");
         return E_NOINTERFACE;
     }
-#endif /* VLC_WINSTORE_APP */
+#endif
 
     HRESULT hr = E_NOTIMPL;
     UINT creationFlags = 0;
@@ -562,7 +562,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                   engineType == libvlc_video_engine_d3d11 )
         {
             /* internal decoder device */
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
             if (!forced)
             {
                 /* Allow using D3D11 automatically starting from Windows 8.1 */
@@ -573,7 +573,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                 if (!isWin81OrGreater)
                     goto error;
             }
-#endif /* !VLC_WINSTORE_APP */
+#endif
 
             hr = CreateDevice( obj, &sys->hd3d, adapter, hw_decoding, &sys->dec_device.d3d_dev );
         }
@@ -929,7 +929,7 @@ error:
 
 void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
 {
-#ifndef VLC_WINSTORE_APP
+#if !BUILD_FOR_UAP
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     d3d11_decoder_device *sys = container_of(dev_sys, d3d11_decoder_device, dec_device);
     d3d11_handle_t *hd3d = &sys->hd3d;
