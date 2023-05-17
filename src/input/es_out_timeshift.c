@@ -839,16 +839,16 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
              (int)p_sys->i_tmp_size_max/(1024*1024) );
 
     p_sys->psz_tmp_path = var_InheritString( p_input, "input-timeshift-path" );
-#if defined (_WIN32) && !defined(VLC_WINSTORE_APP)
+#if defined (_WIN32)
     if( p_sys->psz_tmp_path == NULL )
     {
-        const DWORD count = GetTempPath( 0, NULL );
+        const DWORD count = GetTempPathW( 0, NULL );
         if( count > 0 )
         {
             WCHAR *path = vlc_alloc( count + 1, sizeof(WCHAR) );
             if( path != NULL )
             {
-                DWORD ret = GetTempPath( count + 1, path );
+                DWORD ret = GetTempPathW( count + 1, path );
                 if( ret != 0 && ret <= count )
                     p_sys->psz_tmp_path = FromWide( path );
                 free( path );
