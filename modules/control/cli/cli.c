@@ -961,7 +961,7 @@ static int Activate( vlc_object_t *p_this )
     if (pi_socket != NULL)
 #else
     p_sys->i_socket = -1;
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     p_sys->b_quiet = true;
 #else
     p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
