@@ -44,6 +44,11 @@ QString MLPlaylist::getName() const
     return m_name;
 }
 
+void MLPlaylist::setName(const QString & name)
+{
+    m_name = name;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 VLCTick MLPlaylist::getDuration() const
