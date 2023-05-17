@@ -74,7 +74,7 @@ typedef struct
 } demux_sys_t;
 
 int      screen_InitCapture ( demux_t * );
-#if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
+#if defined(_WIN32)
 int      screen_InitCaptureGDI ( demux_t * );
 #endif
 

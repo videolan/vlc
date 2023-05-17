@@ -99,7 +99,7 @@ static block_t *screen_Capture(demux_t *p_demux)
         goto error;
     }
 
-#if defined(SCREEN_SUBSCREEN) && !defined(VLC_WINSTORE_APP)
+#if defined(SCREEN_SUBSCREEN) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     if( p_sys->b_follow_mouse )
     {
         POINT pos;
@@ -108,7 +108,7 @@ static block_t *screen_Capture(demux_t *p_demux)
         pos.y -= p_data->screen_y;
         FollowMouse( p_sys, pos.x, pos.y );
     }
-#endif // SCREEN_SUBSCREEN && !VLC_WINSTORE_APP
+#endif // SCREEN_SUBSCREEN && WINAPI_PARTITION_DESKTOP
 
     /* copy the texture into the block texture */
     hr = resource.As(&d3d11res);
@@ -177,19 +177,19 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
         return VLC_ENOTSUP;
     }
 
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     if (p_sys->b_follow_mouse)
     {
         msg_Dbg(p_demux, "screen-follow-mouse not supported in UWP DXGI");
         return VLC_ENOTSUP;
     }
-#endif // VLC_WINSTORE_APP
+#endif // !WINAPI_PARTITION_DESKTOP
 
     p_data = new (std::nothrow) screen_data_t();
     if (unlikely(p_data == nullptr))
         return VLC_ENOMEM;
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     p_data->screen_x = GetSystemMetrics( SM_XVIRTUALSCREEN );
     p_data->screen_y = GetSystemMetrics( SM_YVIRTUALSCREEN );
 #endif
@@ -290,7 +290,7 @@ int screen_InitCapture(demux_t *p_demux)
     int ret = screen_InitCaptureDXGI(p_demux);
     if (ret == VLC_SUCCESS)
         return VLC_SUCCESS;
-#if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     return screen_InitCaptureGDI(p_demux);
 #else
     return ret;
