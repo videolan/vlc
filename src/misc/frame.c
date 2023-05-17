@@ -451,7 +451,7 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         HANDLE hMap;
         DWORD prot = write ? PAGE_READWRITE : PAGE_READONLY;
         DWORD access = FILE_MAP_READ | (write ? FILE_MAP_WRITE : 0);
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         hMap = CreateFileMappingFromApp(handle, NULL, prot, length, NULL);
         if (hMap != INVALID_HANDLE_VALUE)
             addr = MapViewOfFileFromApp(hMap, access, 0, length);
