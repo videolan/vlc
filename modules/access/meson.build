@@ -566,10 +566,19 @@ endif
 
 # DCP
 asdcp_dep = dependency('asdcplib', required: get_option('asdcplib'))
+asdcp_extra_cppargs = []
+if asdcp_dep.found()
+    if (asdcp_dep.version().version_compare('>= 2.12.2'))
+        asdcp_extra_cppargs += ['-DASDCPLIB_FACTORY=1']
+    else
+        asdcp_extra_cppargs += ['-DASDCPLIB_FACTORY=0']
+    endif
+endif
 vlc_modules += {
     'name' : 'dcp',
     'sources' : files('dcp/dcp.cpp', 'dcp/dcpparser.cpp', 'dcp/dcpdecrypt.cpp'),
     'dependencies' : [asdcp_dep, gcrypt_dep],
+    'cpp_args' : asdcp_extra_cppargs,
     'enabled' : asdcp_dep.found() and gcrypt_dep.found(),
 }
 

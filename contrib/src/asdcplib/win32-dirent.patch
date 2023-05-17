@@ -1,24 +1,18 @@
---- asdcplib/src/KM_fileio.h.orig	2017-02-14 17:17:22.745776193 +0100
-+++ asdcplib/src/KM_fileio.h	2017-02-14 17:17:29.713782420 +0100
-@@ -37,7 +37,6 @@
- 
- #ifdef KM_WIN32
- # include <io.h>
--# include "dirent_win.h"
- #else
- # include <dirent.h>
- # include <unistd.h>
-@@ -46,6 +45,7 @@
- #include <regex.h>
- #endif
- 
-+#include <dirent.h>
- #include <sys/stat.h>
- 
- 
---- asdcplib/src/KM_fileio.cpp.orig	2017-02-14 17:16:18.297717750 +0100
-+++ asdcplib/src/KM_fileio.cpp	2017-02-14 17:17:48.833799420 +0100
-@@ -1478,7 +1478,7 @@
+From 5a17329a5b228327e5e980e6d42c39c8b7a6ba31 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Tue, 14 Feb 2017 17:21:29 +0100
+Subject: [PATCH 4/5] Remove use of dirent_win.h
+
+---
+ src/KM_fileio.cpp | 7 ++++---
+ src/KM_fileio.h   | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/src/KM_fileio.cpp b/src/KM_fileio.cpp
+index 4d50722..f8e93c3 100644
+--- a/src/KM_fileio.cpp
++++ b/src/KM_fileio.cpp
+@@ -1582,7 +1582,7 @@ Kumu::DirScannerEx::GetNext(std::string& next_item_name, DirectoryEntryType_t& n
    if ( m_Handle == 0 )
      return RESULT_FILEOPEN;
  
@@ -27,7 +21,7 @@
    struct stat s;
  #endif
    struct dirent* entry;
-@@ -1493,7 +1493,7 @@
+@@ -1597,7 +1597,7 @@ Kumu::DirScannerEx::GetNext(std::string& next_item_name, DirectoryEntryType_t& n
  
    next_item_name.assign(entry->d_name, strlen(entry->d_name));
  
@@ -36,7 +30,7 @@
  
    stat(entry->d_name, &s);
  
-@@ -1506,10 +1506,11 @@
+@@ -1610,10 +1610,11 @@ Kumu::DirScannerEx::GetNext(std::string& next_item_name, DirectoryEntryType_t& n
      case S_IFREG:
        next_item_type = DET_FILE;
        break;
@@ -49,3 +43,26 @@
  
      default:
        next_item_type = DET_DEV;
+diff --git a/src/KM_fileio.h b/src/KM_fileio.h
+index 1ef5e75..8d07429 100755
+--- a/src/KM_fileio.h
++++ b/src/KM_fileio.h
+@@ -37,7 +37,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #ifdef KM_WIN32
+ # include <io.h>
+-# include "dirent_win.h"
+ #else
+ # include <dirent.h>
+ # include <unistd.h>
+@@ -46,6 +45,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <regex.h>
+ #endif
+ 
++#include <dirent.h>
+ #include <sys/stat.h>
+ 
+ 
+-- 
+2.37.3.windows.1
+

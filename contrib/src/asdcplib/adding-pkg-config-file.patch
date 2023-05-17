@@ -1,48 +1,82 @@
-From 283142c645a906a64da4a8e9d6d619762a0c8305 Mon Sep 17 00:00:00 2001
-From: Aaron Boxer <boxerab@gmail.com>
-Date: Fri, 27 May 2016 19:25:38 -0400
-Subject: [PATCH 5/5] adding pkg-config file
+From aae5b28b08d67e4ddf18d0d265ea6bd772492bd6 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 26 Mar 2020 08:54:36 +0100
+Subject: [PATCH] generate a pkg-config file
 
+(hardcoded to nettle for now)
 ---
- asdcplib.pc | 10 ++++++++++
- 1 file changed, 10 insertions(+)
- create mode 100644 asdcplib.pc
+ CMakeLists.txt |  5 +++++
+ Makefile.am    |  4 ++++
+ asdcplib.pc.in | 10 ++++++++++
+ configure.ac   | 11 +++++++++++
+ 4 files changed, 30 insertions(+)
+ create mode 100644 asdcplib.pc.in
 
-diff --git a/asdcplib.pc.in b/asdcplib.pc.in
-new file mode 100644
-index 0000000..36fdd12
---- /dev/null
-+++ b/asdcplib.pc.in
-@@ -0,0 +1,10 @@
-+prefix=@prefix@
-+exec_prefix=@exec_prefix@
-+includedir=@includedir@
-+libdir=@libdir@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index cf5b240..daef20b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -51,3 +51,8 @@ set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
+ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+ set(CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME}{VERSION_MAJOR}.${VERSION_MINOR})
+ include(CPack)
 +
-+Name: asdcplib
-+Description: The asdcp library
-+Version: 2.7.19
-+Cflags: -I${includedir}
-+Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
--- 
-2.11.0
-
---- asdcplib/configure.ac.old	2021-07-23 12:28:12.527748193 +0200
-+++ asdcplib/configure.ac	2021-07-23 12:28:37.223750245 +0200
-@@ -142,5 +142,6 @@
- AC_CONFIG_FILES([Makefile
-                  src/Makefile
- 		 win32/Makefile
--		 win32/Makefile.mak:win32/Makefile.wmk])
-+		 win32/Makefile.mak:win32/Makefile.wmk
-+         asdcplib.pc])
- AC_OUTPUT
---- asdcplib/Makefile.am	2021-07-23 12:38:49.607823290 +0200
-+++ asdcplib/Makefile.am.old	2021-07-23 12:39:46.655848784 +0200
-@@ -28,3 +28,6 @@
++# Produce a pkg-config file
++configure_file("asdcplib.pc.in" "asdcplib.pc" @ONLY)
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/asdcplib.pc"
++		DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
+diff --git a/Makefile.am b/Makefile.am
+index b107364..bb8c729 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -28,3 +28,7 @@
  SUBDIRS = src win32
  
  ACLOCAL_AMFLAGS = -I m4
++
 +pkgconfigdir = $(libdir)/pkgconfig
 +pkgconfig_DATA = asdcplib.pc
 +CLEANFILES = asdcplib.pc
+diff --git a/asdcplib.pc.in b/asdcplib.pc.in
+new file mode 100644
+index 0000000..8d86dc2
+--- /dev/null
++++ b/asdcplib.pc.in
+@@ -0,0 +1,10 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++includedir=${prefix}/include
++libdir=${exec_prefix}/@LIB_INSTALL_DIR@
++
++Name: asdcplib
++Description: @CPACK_PACKAGE_DESCRIPTION_SUMMARY@
++Version: @VERSION_STRING@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
+diff --git a/configure.ac b/configure.ac
+index c26f4d1..325faee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -141,8 +141,19 @@ AC_CHECK_LIB([pthread], [pthread_create])
+ #AC_FUNC_STAT
+ #AC_CHECK_FUNCS([getcwd memset regcomp strchr strerror strrchr strstr strtol])
+ 
++dnl Mimick CMake strings
++CPACK_PACKAGE_DESCRIPTION_SUMMARY="asdcplib from cinecert.com"
++CMAKE_INSTALL_PREFIX=${prefix}
++LIB_INSTALL_DIR=lib
++VERSION_STRING=${VERSION}
++AC_SUBST(CPACK_PACKAGE_DESCRIPTION_SUMMARY)
++AC_SUBST(CMAKE_INSTALL_PREFIX)
++AC_SUBST(LIB_INSTALL_DIR)
++AC_SUBST(VERSION_STRING)
++
+ AC_CONFIG_FILES([Makefile
+                  src/Makefile
++                 asdcplib.pc
+ 		 win32/Makefile
+ 		 win32/Makefile.mak:win32/Makefile32.wmk])
+ AC_OUTPUT
+-- 
+2.37.3.windows.1
+

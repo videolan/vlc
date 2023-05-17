@@ -2464,7 +2464,18 @@ AM_CONDITIONAL([HAVE_AVFOUNDATION], [test "${have_avfoundation}" != "no"])
 dnl
 dnl  DCP plugin (using asdcplib)
 dnl
-PKG_WITH_MODULES([ASDCP], [asdcplib], [have_asdcp="yes"])
+PKG_WITH_MODULES([ASDCP], [asdcplib], [
+    have_asdcp="yes"
+
+    dnl asdcplib doesn't provide a version define
+    dnl check the factory necessary API from the package version
+    PKG_WITH_MODULES([ASDCP], [asdcplib >= 2.12.2], [
+        ASDCPLIB_FACTORY=1
+    ],[
+        ASDCPLIB_FACTORY=0
+    ])
+])
+AC_SUBST([ASDCPLIB_FACTORY])
 AM_CONDITIONAL([HAVE_ASDCP], [test "${have_asdcp}" = "yes"])
 
 dnl

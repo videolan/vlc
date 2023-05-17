@@ -19,7 +19,7 @@ access_PLUGINS += libdata_plugin.la
 
 libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp access/dcp/dcpdecrypt.cpp
 if HAVE_ASDCP
-libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(ASDCP_CFLAGS)
+libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(ASDCP_CFLAGS) -DASDCPLIB_FACTORY=@ASDCPLIB_FACTORY@
 libdcp_plugin_la_LIBADD = $(AM_LIBADD) $(ASDCP_LIBS)
 if HAVE_GCRYPT
 libdcp_plugin_la_CPPFLAGS += $(GCRYPT_CFLAGS)

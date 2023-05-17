@@ -64,6 +64,14 @@
 
 #include "dcpparser.h"
 
+#if defined(ASDCPLIB_FACTORY) && ASDCPLIB_FACTORY
+# define MAYBE_FACTORY  p_dcp->factory
+# define END_FACTORY    , MAYBE_FACTORY
+#else
+# define MAYBE_FACTORY
+# define END_FACTORY
+#endif
+
 using namespace ASDCP;
 
 #define FRAME_BUFFER_SIZE 1302083 /* maximum frame length, in bytes, after
@@ -337,7 +345,7 @@ static int Open( vlc_object_t *obj )
     EssenceType_t essInter;
     for ( size_t i = 0; i < ( p_sys->p_dcp->video_reels.size() ); i++ )
     {
-        EssenceType( p_sys->p_dcp->video_reels[i].filename.c_str(), essInter );
+        EssenceType( p_sys->p_dcp->video_reels[i].filename.c_str(), essInter END_FACTORY );
         if ( i == 0 )
         {
             p_sys->PictureEssType = essInter;
@@ -363,7 +371,7 @@ static int Open( vlc_object_t *obj )
             case ESS_JPEG_2000_S: {
                 JP2K::PictureDescriptor PicDesc;
                 if (p_sys->PictureEssType == ESS_JPEG_2000_S) {     /* 3D JPEG2000 */
-                    JP2K::MXFSReader * p_PicMXFSReader = new ( nothrow ) JP2K::MXFSReader();
+                    JP2K::MXFSReader * p_PicMXFSReader = new ( nothrow ) JP2K::MXFSReader(MAYBE_FACTORY);
 
                     if( !p_PicMXFSReader) {
                         retval = VLC_ENOMEM;
@@ -381,7 +389,7 @@ static int Open( vlc_object_t *obj )
                     videoReader.p_PicMXFSReader = p_PicMXFSReader;
                     p_sys->v_videoReader.push_back(videoReader);
                 } else {                                            /* 2D JPEG2000 */
-                    JP2K::MXFReader *p_PicMXFReader = new ( nothrow ) JP2K::MXFReader();
+                    JP2K::MXFReader *p_PicMXFReader = new ( nothrow ) JP2K::MXFReader(MAYBE_FACTORY);
                     if( !p_PicMXFReader ) {
                         retval = VLC_ENOMEM;
                         goto error;
@@ -424,7 +432,7 @@ static int Open( vlc_object_t *obj )
             }
             case ESS_MPEG2_VES: {
 
-                MPEG2::MXFReader *p_VideoMXFReader = new ( nothrow ) MPEG2::MXFReader();
+                MPEG2::MXFReader *p_VideoMXFReader = new ( nothrow ) MPEG2::MXFReader(MAYBE_FACTORY);
 
                 videoReader_t videoReader;
                 videoReader.p_VideoMXFReader = p_VideoMXFReader;
@@ -494,7 +502,7 @@ static int Open( vlc_object_t *obj )
 
     if( !p_sys->p_dcp->audio_reels.empty() )
     {
-        EssenceType( p_sys->p_dcp->audio_reels[0].filename.c_str(), AudioEssType );
+        EssenceType( p_sys->p_dcp->audio_reels[0].filename.c_str(), AudioEssType END_FACTORY );
 
         if ( (AudioEssType == ESS_PCM_24b_48k) || (AudioEssType == ESS_PCM_24b_96k) ) {
             PCM::AudioDescriptor AudioDesc;
@@ -503,7 +511,7 @@ static int Open( vlc_object_t *obj )
             {
                 if ( i != 0 )
                 {
-                    EssenceType( p_sys->p_dcp->audio_reels[i].filename.c_str(), AudioEssTypeCompare );
+                    EssenceType( p_sys->p_dcp->audio_reels[i].filename.c_str(), AudioEssTypeCompare END_FACTORY );
                     if ( AudioEssTypeCompare != AudioEssType )
                     {
                         msg_Err( p_demux, "Integrity check failed : different audio essence types in %s",
@@ -512,7 +520,7 @@ static int Open( vlc_object_t *obj )
                         goto error;
                     }
                 }
-                PCM::MXFReader *p_AudioMXFReader = new ( nothrow ) PCM::MXFReader();
+                PCM::MXFReader *p_AudioMXFReader = new ( nothrow ) PCM::MXFReader(MAYBE_FACTORY);
 
                 if( !p_AudioMXFReader ) {
                     retval = VLC_ENOMEM;
