@@ -27,25 +27,25 @@
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JzV-HY-whQ">
                         <rect key="frame" x="0.0" y="0.0" width="512" height="640"/>
                         <clipView key="contentView" id="Bl4-q7-swx">
-                            <rect key="frame" x="1" y="1" width="495" height="623"/>
+                            <rect key="frame" x="1" y="1" width="510" height="638"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view translatesAutoresizingMaskIntoConstraints="NO" id="bU3-vL-IQb">
-                                    <rect key="frame" x="15" y="194" width="480" height="429"/>
+                                    <rect key="frame" x="0.0" y="209" width="510" height="429"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wv4-dn-5EA">
-                                            <rect key="frame" x="0.0" y="0.0" width="480" height="429"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="510" height="429"/>
                                             <subviews>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="eeq-7b-IbI">
-                                                    <rect key="frame" x="0.0" y="408" width="495" height="21"/>
-                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="Jc0-rT-PNg">
+                                                    <rect key="frame" x="10" y="408" width="490" height="21"/>
+                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="Media data" id="Jc0-rT-PNg">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="N4h-LP-IRY">
-                                                    <rect key="frame" x="0.0" y="0.0" width="400" height="400"/>
+                                                    <rect key="frame" x="55" y="0.0" width="400" height="400"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="N4h-LP-IRY" secondAttribute="height" multiplier="1:1" id="0Uq-LT-xPG"/>
                                                         <constraint firstAttribute="height" constant="400" id="wfM-2D-T6r"/>
@@ -82,21 +82,44 @@
                                 <constraint firstItem="bU3-vL-IQb" firstAttribute="leading" secondItem="Bl4-q7-swx" secondAttribute="leading" id="oko-yV-hzs"/>
                             </constraints>
                         </clipView>
+                        <edgeInsets key="contentInsets" left="0.0" right="0.0" top="48" bottom="0.0"/>
                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ePK-Cw-UmB">
-                            <rect key="frame" x="1" y="624" width="495" height="15"/>
+                            <rect key="frame" x="1" y="623" width="510" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="SJs-Xf-ZA5">
-                            <rect key="frame" x="496" y="1" width="15" height="623"/>
+                            <rect key="frame" x="495" y="48" width="16" height="591"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="g0J-FC-bJg">
+                        <rect key="frame" x="0.0" y="592" width="512" height="48"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ode-s8-X3t">
+                                <rect key="frame" x="8" y="10" width="496" height="28"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Media title" id="zdh-w0-JZI">
+                                    <font key="font" metaFont="systemBold" size="24"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Ode-s8-X3t" secondAttribute="bottom" constant="10" id="oE4-HB-V0G"/>
+                            <constraint firstItem="Ode-s8-X3t" firstAttribute="top" secondItem="g0J-FC-bJg" secondAttribute="top" constant="10" id="uPW-bq-Yz8"/>
+                            <constraint firstAttribute="trailing" secondItem="Ode-s8-X3t" secondAttribute="trailing" constant="10" id="vQs-z2-uLJ"/>
+                            <constraint firstItem="Ode-s8-X3t" firstAttribute="leading" secondItem="g0J-FC-bJg" secondAttribute="leading" constant="10" id="z5w-VS-BIE"/>
+                        </constraints>
+                    </visualEffectView>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" secondItem="g0J-FC-bJg" secondAttribute="trailing" id="7ae-5U-Vrw"/>
                     <constraint firstAttribute="bottom" secondItem="JzV-HY-whQ" secondAttribute="bottom" id="BzO-t8-fnM"/>
+                    <constraint firstItem="g0J-FC-bJg" firstAttribute="top" secondItem="Nfs-rF-cUN" secondAttribute="top" id="IcV-al-V2S"/>
                     <constraint firstItem="JzV-HY-whQ" firstAttribute="top" secondItem="Nfs-rF-cUN" secondAttribute="top" id="Rs3-rb-V0C"/>
                     <constraint firstAttribute="trailing" secondItem="JzV-HY-whQ" secondAttribute="trailing" id="cpi-7A-Gzv"/>
                     <constraint firstItem="JzV-HY-whQ" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" id="eFQ-HA-0eR"/>
+                    <constraint firstItem="g0J-FC-bJg" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" id="lXa-Mv-lIm"/>
                 </constraints>
             </view>
             <point key="canvasLocation" x="209.5" y="121"/>
