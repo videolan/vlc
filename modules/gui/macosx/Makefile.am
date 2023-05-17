@@ -75,6 +75,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/NSView+VLCAdditions.h \
 	gui/macosx/extensions/NSView+VLCAdditions.m \
+	gui/macosx/extensions/NSWindow+VLCAdditions.h \
+	gui/macosx/extensions/NSWindow+VLCAdditions.m \
 	gui/macosx/extensions/NSPasteboardItem+VLCAdditions.h \
 	gui/macosx/extensions/NSPasteboardItem+VLCAdditions.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.h \
