@@ -68,10 +68,8 @@ static void FillPresentationParameters(D3DPRESENT_PARAMETERS *d3dpp)
     d3dpp->hDeviceWindow          = NULL;
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->BackBufferCount        = 1;
-#ifndef VLC_WINSTORE_APP
     d3dpp->BackBufferWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
     d3dpp->BackBufferHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-#endif // VLC_WINSTORE_APP
 }
 
 int D3D9_ResetDevice(vlc_object_t *o, d3d9_decoder_device_t *dec_dev)
