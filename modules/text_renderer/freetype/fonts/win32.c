@@ -57,7 +57,7 @@
 #include "../platform_fonts.h"
 #include "backends.h"
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #define FONT_DIR_NT  TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
 #define FONT_LINKING_NT TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink")
 

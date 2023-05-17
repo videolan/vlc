@@ -89,12 +89,12 @@ int DWrite_GetFallbacks( vlc_font_select_t *, const char *psz_family,
 int InitDWrite( vlc_font_select_t * );
 int ReleaseDWrite( vlc_font_select_t * );
 int DWrite_GetFontStream( vlc_font_select_t *, int i_index, FT_Stream *pp_stream );
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 int Win32_GetFallbacks( vlc_font_select_t *, const char *psz_family,
                         uni_char_t codepoint, vlc_family_t ** );
 
 int Win32_GetFamily( vlc_font_select_t *, const char *psz_family, const vlc_family_t ** );
-#endif /* !VLC_WINSTORE_APP */
+#endif /* WINAPI_PARTITION_DESKTOP */
 #endif /* _WIN32 */
 
 #ifdef __APPLE__

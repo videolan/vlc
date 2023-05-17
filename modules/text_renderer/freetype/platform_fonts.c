@@ -902,7 +902,7 @@ vlc_font_select_t * FontSelectNew( filter_t *p_filter )
     }
     else
     {
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         msg_Err( p_filter, "Error initializing DirectWrite" );
         goto error;
 #else
