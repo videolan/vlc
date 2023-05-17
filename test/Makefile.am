@@ -41,6 +41,7 @@ check_PROGRAMS = \
 	test_libvlc_media_thumbnail_png \
 	test_libvlc_media_thumbnail_webp \
 	test_libvlc_media_list \
+	test_libvlc_media_list_player \
 	test_libvlc_media_player \
 	test_libvlc_video_callback \
 	test_libvlc_media_player_record \
@@ -124,7 +125,6 @@ check_SCRIPTS = \
 
 # Disabled tests:
 EXTRA_PROGRAMS = \
-	test_libvlc_media_list_player \
 	test_src_input_stream_net \
 	$(NULL)
 
@@ -139,8 +139,7 @@ EXTRA_DIST = \
 	samples/slaves \
 	$(check_SCRIPTS)
 
-check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h libvlc/media_utils.h \
-	libvlc/media_player.h
+check_HEADERS = libvlc/test.h libvlc/media_utils.h libvlc/media_player.h
 
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
@@ -181,7 +180,7 @@ test_libvlc_media_thumbnail_webp_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_webp_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_webp_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_WebP -DTEST_REQUIRED_MODULES=\"vpx\"
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
-test_libvlc_media_list_player_LDADD = $(LIBVLC)
+test_libvlc_media_list_player_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_list_SOURCES = libvlc/media_list.c
 test_libvlc_media_list_LDADD = $(LIBVLC)
 test_libvlc_media_player_SOURCES = libvlc/media_player.c
