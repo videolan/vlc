@@ -1589,6 +1589,10 @@ static int MP4_ReadBox_stts( stream_t *p_stream, MP4_Box_t *p_box )
     {
         MP4_GET4BYTES( p_box->data.p_stts->pi_sample_count[i] );
         MP4_GET4BYTES( p_box->data.p_stts->pi_sample_delta[i] );
+        /* Patch bogus durations, including negative stored values */
+        if( p_box->data.p_stts->pi_sample_delta[i] == 0 ||
+            p_box->data.p_stts->pi_sample_delta[i] >= 0xF0000000 )
+            p_box->data.p_stts->pi_sample_delta[i] = 1;
     }
 
 #ifdef MP4_VERBOSE
