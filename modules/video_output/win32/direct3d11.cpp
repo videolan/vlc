@@ -44,7 +44,7 @@
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
 #include "d3d11_scaler.h"
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include "d3d11_swapchain.h"
 #endif
 
@@ -396,10 +396,10 @@ static int Open(vout_display_t *vd,
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         msg_Err(vd, "UWP apps needs to set an external rendering target");
         goto error;
-#else // !VLC_WINSTORE_APP
+#else // WINAPI_PARTITION_DESKTOP
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area,
@@ -424,7 +424,7 @@ static int Open(vout_display_t *vd,
         sys->startEndRenderingCb = D3D11_LocalSwapchainStartEndRendering;
         sys->sendMetadataCb      = D3D11_LocalSwapchainSetMetadata;
         sys->selectPlaneCb       = D3D11_LocalSwapchainSelectPlane;
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
     }
 
     if (Direct3D11Open(vd, fmtp, context)) {
@@ -462,7 +462,7 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     D3D_ReleaseShaderCompiler(sys->shaders);
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     CommonWindowClean(&sys->area);
 #endif
     Direct3D11Close(vd);
@@ -822,10 +822,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         }
         if (err != VLC_SUCCESS)
         {
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
             if ( sys->swapCb == D3D11_LocalSwapchainSwap )
                 D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
             return err;
         }
     }
@@ -872,10 +872,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         if ( sys->swapCb == D3D11_LocalSwapchainSwap )
             D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
         return VLC_EGENERIC;
     }
 
@@ -1008,10 +1008,10 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     if ( sys->swapCb == D3D11_LocalSwapchainSwap )
         D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
 
     if (sys->d3d_dev && sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
         D3D11_ReleaseDevice( sys->local_d3d_dev );

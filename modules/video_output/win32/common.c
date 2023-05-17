@@ -48,7 +48,7 @@ void CommonInit(display_win32_area_t *area, const video_format_t *src_fmt)
     area->src_fmt = src_fmt;
 }
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* */
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      bool projection_gestures)
@@ -70,7 +70,7 @@ HWND CommonVideoHWND(const display_win32_area_t *area)
 {
     return EventThreadVideoHWND(area->event);
 }
-#endif /* !VLC_WINSTORE_APP */
+#endif /* WINAPI_PARTITION_DESKTOP */
 
 /*****************************************************************************
 * UpdateRects: update clipping rectangles
@@ -101,25 +101,25 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
     }
 }
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* */
 void CommonWindowClean(display_win32_area_t *sys)
 {
     EventThreadDestroy(sys->event);
 }
-#endif /* !VLC_WINSTORE_APP */
+#endif /* WINAPI_PARTITION_DESKTOP */
 
 void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         // Update dimensions
         if (area->event != NULL)
         {
             EventThreadUpdateSize(area->event);
         }
-#endif /* !VLC_WINSTORE_APP */
+#endif /* WINAPI_PARTITION_DESKTOP */
         // fallthrough
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:

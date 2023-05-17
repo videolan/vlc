@@ -28,7 +28,7 @@
 #include "dxgi_swapchain.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND, d3d11_device_t *d3d_dev);
 #if defined(HAVE_DCOMP_H)
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev);
@@ -40,6 +40,6 @@ bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter );
 bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *output );
 void D3D11_LocalSwapchainSwap( void *opaque );
 void D3D11_LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t, const void * );
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
 
 #endif /* VLC_D3D11_SWAPCHAIN_H */

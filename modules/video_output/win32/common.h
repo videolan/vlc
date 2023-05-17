@@ -48,12 +48,12 @@ typedef struct display_win32_area_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 int  CommonWindowInit(vout_display_t *, display_win32_area_t *,
                       bool projection_gestures);
 void CommonWindowClean(display_win32_area_t *);
 HWND CommonVideoHWND(const display_win32_area_t *);
-#endif /* !VLC_WINSTORE_APP */
+#endif /* WINAPI_PARTITION_DESKTOP */
 void CommonControl(vout_display_t *, display_win32_area_t *, int );
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
