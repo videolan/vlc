@@ -33,7 +33,7 @@
 #include "../vlc.h"
 #include "../libs.h"
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 /* Based on modules/control/rc.c and include/vlc_interface.h */
 static HANDLE GetConsole( lua_State *L )
@@ -183,4 +183,4 @@ void luaopen_win( lua_State *L )
     lua_setfield( L, -2, "win" );
 }
 
-#endif /* !VLC_WINSTORE_APP */
+#endif // WINAPI_PARTITION_DESKTOP

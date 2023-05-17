@@ -762,8 +762,10 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
     luaopen_rand(L);
     luaopen_rd(L);
     luaopen_ml(L);
-#if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
+#if defined(_WIN32)
+# if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     luaopen_win(L);
+# endif
 #endif
 
     /* Register extension specific functions */
