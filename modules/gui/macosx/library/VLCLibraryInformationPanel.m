@@ -23,9 +23,11 @@
 #import "VLCLibraryInformationPanel.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCInputItem.h"
 
 @interface VLCLibraryInformationPanel ()
@@ -37,8 +39,11 @@
 
 @implementation VLCLibraryInformationPanel
 
-- (void)windowDidLoad {
+- (void)windowDidLoad
+{
     [super windowDidLoad];
+
+    _titleTextFieldTopConstraint.constant = self.window.titlebarHeight + [VLCLibraryUIUnits smallSpacing];
     [self updateRepresentation];
 }
 
@@ -51,7 +56,7 @@
 - (void)updateRepresentation
 {
     _titleTextField.stringValue = _representedItem.displayString;
-    
+
     NSMutableString * const textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
 
     NSString * itemDetailsString;

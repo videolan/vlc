@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *textField;
 @property (readwrite, weak) IBOutlet NSImageView *imageView;
 
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *titleTextFieldTopConstraint;
+
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem;
 
 @end
