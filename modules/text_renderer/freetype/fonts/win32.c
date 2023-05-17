@@ -683,6 +683,9 @@ done:
     *pp_result = p_family;
     return i_ret;
 }
+#else // !WINAPI_PARTITION_DESKTOP
+#define GetWindowsFontPath()  (NULL)
+#endif // !WINAPI_PARTITION_DESKTOP
 
 char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )
 {
@@ -705,6 +708,4 @@ char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )
 
     return psz_filepath;
 }
-
-#endif
 
