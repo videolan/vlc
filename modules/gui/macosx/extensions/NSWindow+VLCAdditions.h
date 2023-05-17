@@ -24,7 +24,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSWindow(VLCAdditions)
+@interface NSWindow (VLCAdditions)
+
+@property (readonly) CGFloat titlebarHeight;
 
 @end
 

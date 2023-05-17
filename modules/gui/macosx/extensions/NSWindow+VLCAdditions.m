@@ -20,8 +20,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "NSWindow+Helpers.h"
+#import "NSWindow+VLCAdditions.h"
 
-@implementation NSWindow(VLCAdditions)
+@implementation NSWindow (Helpers)
+
+- (CGFloat)titlebarHeight
+{
+    const NSView * const titlebarView = [self standardWindowButton:NSWindowCloseButton].superview;
+    return titlebarView.frame.size.height;
+}
 
 @end
