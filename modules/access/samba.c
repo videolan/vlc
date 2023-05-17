@@ -358,7 +358,6 @@ static int Open(vlc_object_t *obj)
             break;
     }
 
-    vlc_credential_store(&sys->credential, access);
     free(psz_decoded_path);
 
     access->p_sys = sys;
@@ -408,6 +407,7 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
+    vlc_credential_store(&sys->credential, access);
     return VLC_SUCCESS;
 
 error:
