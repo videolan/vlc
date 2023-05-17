@@ -1576,7 +1576,7 @@ static int MP4_ReadBox_stts( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     p_box->data.p_stts->pi_sample_count = vlc_alloc( count, sizeof(uint32_t) );
-    p_box->data.p_stts->pi_sample_delta = vlc_alloc( count, sizeof(int32_t) );
+    p_box->data.p_stts->pi_sample_delta = vlc_alloc( count, sizeof(uint32_t) );
     p_box->data.p_stts->i_entry_count = count;
 
     if( p_box->data.p_stts->pi_sample_count == NULL

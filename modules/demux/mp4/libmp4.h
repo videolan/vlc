@@ -678,7 +678,7 @@ typedef struct MP4_Box_data_stts_s
 
     uint32_t i_entry_count;
     uint32_t *pi_sample_count; /* these are array */
-    int32_t  *pi_sample_delta;
+    uint32_t *pi_sample_delta;
 
 } MP4_Box_data_stts_t;
 
