@@ -75,11 +75,13 @@ static unsigned ConsoleWidth(void)
     if (ioctl(STDOUT_FILENO, WIOCGETD, &uw) == 0)
         return uw.uw_height / uw.uw_vs;
 #endif
-#if defined (_WIN32) && !defined(VLC_WINSTORE_APP)
+#if defined (_WIN32)
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     CONSOLE_SCREEN_BUFFER_INFO buf;
 
     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buf))
         return buf.dwSize.X;
+#endif
 #endif
     return 80;
 }
