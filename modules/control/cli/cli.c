@@ -75,7 +75,9 @@ struct intf_sys_t
     vlc_mutex_t clients_lock;
     struct vlc_list clients;
 #else
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     HANDLE hConsoleIn;
+#endif
     bool b_quiet;
     int i_socket;
 #endif
@@ -577,7 +579,7 @@ static void *Run(void *data)
     }
 }
 
-#else
+#else // _WIN32
 static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
@@ -616,7 +618,7 @@ int cli_printf(struct cli_client *cl, const char *fmt, ...)
     return VLC_SUCCESS;
 }
 
-#ifndef VLC_WINSTORE_APP
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
@@ -704,7 +706,7 @@ static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_s
 
 static bool ReadCommand(intf_thread_t *p_intf, char *p_buffer, int *pi_size)
 {
-#ifndef VLC_WINSTORE_APP
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
         return ReadWin32( p_intf, (unsigned char*)p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )
@@ -773,7 +775,7 @@ static void *Run( void *data )
 
     p_buffer[0] = 0;
 
-#ifndef VLC_WINSTORE_APP
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
@@ -816,7 +818,7 @@ static void *Run( void *data )
 #undef msg_rc
 #define msg_rc(...)  msg_print(p_intf, __VA_ARGS__)
 #include "../intromsg.h"
-#endif
+#endif // _WIN32
 
 /*****************************************************************************
  * Activate: initialize and create stuff
