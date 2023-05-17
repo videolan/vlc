@@ -69,8 +69,8 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
-            Acessible.role: Acessible.Grouping
-            Acessible.name: I18n.qtr("Primary subtitle delay")
+            Accessible.role: Accessible.Grouping
+            Accessible.name: I18n.qtr("Primary subtitle delay")
 
             Widgets.MenuCaption {
                 Layout.fillWidth: true
@@ -144,8 +144,8 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
-            Acessible.role: Acessible.Grouping
-            Acessible.name: I18n.qtr("Secondary subtitle delay")
+            Accessible.role: Accessible.Grouping
+            Accessible.name: I18n.qtr("Secondary subtitle delay")
 
             Widgets.MenuCaption {
                 Layout.fillWidth: true
@@ -218,8 +218,8 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
-            Acessible.role: Acessible.Grouping
-            Acessible.name: I18n.qtr("Subtitle Speed")
+            Accessible.role: Accessible.Grouping
+            Accessible.name: I18n.qtr("Subtitle Speed")
 
             Widgets.MenuCaption {
                 Layout.fillWidth: true
