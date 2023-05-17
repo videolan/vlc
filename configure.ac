@@ -423,7 +423,6 @@ AS_IF([test "${SYS}" = "mingw32"],[
     LDFLAGS="${LDFLAGS} -lwindowsappcompat"
     VLC_ADD_LIBS([libvlccore], [-lruntimeobject])
     AC_LIBOBJ([gai_strerror])
-    AC_DEFINE([VLC_WINSTORE_APP], [1], [Define to 1 if building for Windows Store.])
   ],[])
   AC_SUBST([LIBCOM])
   AC_SUBST([LIBCOMCXXFLAGS])

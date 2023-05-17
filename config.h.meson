@@ -521,9 +521,6 @@
 /* host which ran configure */
 #mesondefine VLC_COMPILE_HOST
 
-/* Define to 1 if building for Windows Store. */
-#mesondefine VLC_WINSTORE_APP
-
 #ifdef _WIN32
 
 /* Define to limit the scope of <windows.h>. */
