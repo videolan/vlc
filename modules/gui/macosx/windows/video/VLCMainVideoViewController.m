@@ -22,6 +22,8 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "extensions/NSWindow+VLCAdditions.h"
+
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -305,8 +307,7 @@
     }
 
     const NSWindow * const viewWindow = self.view.window;
-    const NSView * const titlebarView = [viewWindow standardWindowButton:NSWindowCloseButton].superview;
-    const CGFloat windowTitlebarHeight = titlebarView.frame.size.height;
+    const CGFloat windowTitlebarHeight = viewWindow.titlebarHeight;
 
     const BOOL windowFullscreen = [(VLCWindow*)viewWindow isInNativeFullscreen] ||
                                   [(VLCWindow*)viewWindow fullscreen];
