@@ -31,14 +31,14 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view translatesAutoresizingMaskIntoConstraints="NO" id="bU3-vL-IQb">
-                                    <rect key="frame" x="0.0" y="209" width="510" height="429"/>
+                                    <rect key="frame" x="0.0" y="214" width="510" height="424"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wv4-dn-5EA">
-                                            <rect key="frame" x="0.0" y="0.0" width="510" height="429"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="510" height="424"/>
                                             <subviews>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="eeq-7b-IbI">
-                                                    <rect key="frame" x="10" y="408" width="490" height="21"/>
-                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="Media data" id="Jc0-rT-PNg">
+                                                    <rect key="frame" x="8" y="408" width="494" height="16"/>
+                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" title="Media data" id="Jc0-rT-PNg">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -54,9 +54,9 @@
                                                 </imageView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="eeq-7b-IbI" secondAttribute="trailing" id="hIV-HK-m3A"/>
+                                                <constraint firstAttribute="trailing" secondItem="eeq-7b-IbI" secondAttribute="trailing" constant="10" id="hIV-HK-m3A"/>
                                                 <constraint firstItem="N4h-LP-IRY" firstAttribute="centerX" secondItem="Wv4-dn-5EA" secondAttribute="centerX" id="iwt-XU-iJg"/>
-                                                <constraint firstItem="eeq-7b-IbI" firstAttribute="leading" secondItem="Wv4-dn-5EA" secondAttribute="leading" id="k7h-rh-AJ1"/>
+                                                <constraint firstItem="eeq-7b-IbI" firstAttribute="leading" secondItem="Wv4-dn-5EA" secondAttribute="leading" constant="10" id="k7h-rh-AJ1"/>
                                             </constraints>
                                             <visibilityPriorities>
                                                 <integer value="1000"/>
@@ -82,13 +82,13 @@
                                 <constraint firstItem="bU3-vL-IQb" firstAttribute="leading" secondItem="Bl4-q7-swx" secondAttribute="leading" id="oko-yV-hzs"/>
                             </constraints>
                         </clipView>
-                        <edgeInsets key="contentInsets" left="0.0" right="0.0" top="48" bottom="0.0"/>
+                        <edgeInsets key="contentInsets" left="0.0" right="0.0" top="58" bottom="0.0"/>
                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ePK-Cw-UmB">
                             <rect key="frame" x="1" y="623" width="510" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="SJs-Xf-ZA5">
-                            <rect key="frame" x="495" y="48" width="16" height="591"/>
+                            <rect key="frame" x="495" y="58" width="16" height="581"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
