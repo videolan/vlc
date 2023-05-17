@@ -169,7 +169,11 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
 
     int depth = libvlc_media_list_path_depth(p_mlp->current_playing_item_path);
     if (depth < 1 || !p_parent_of_playing_item)
+    {
+        if (p_parent_of_playing_item)
+            libvlc_media_list_release(p_parent_of_playing_item);
         return NULL;
+    }
 
     ret = libvlc_media_list_path_copy(p_mlp->current_playing_item_path);
     ret[depth - 1]++; /* set to next element */
@@ -195,6 +199,7 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
         }
         ret[depth] = -1;
         ret[depth-1]++;
+        libvlc_media_list_release(p_parent_of_playing_item);
         p_parent_of_playing_item  = libvlc_media_list_parentlist_at_path(
                                         p_mlp->p_mlist,
                                         ret);
