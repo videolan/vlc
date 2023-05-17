@@ -45,7 +45,13 @@
 #endif
 #include <unistd.h>
 
-#if defined( _WIN32 ) && !defined( VLC_WINSTORE_APP )
+#if defined( _WIN32 )
+# if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#  define HAVE_VLC_SHOWCONSOLE
+# endif
+#endif
+
+#ifdef HAVE_VLC_SHOWCONSOLE
 static void ShowConsole (void);
 static void PauseConsole (void);
 #else
@@ -698,7 +704,7 @@ static void Version( void )
     PauseConsole();
 }
 
-#if defined( _WIN32 ) && !defined(VLC_WINSTORE_APP)
+#ifdef HAVE_VLC_SHOWCONSOLE
 /*****************************************************************************
  * ShowConsole: On Win32, create an output console for debug messages
  *****************************************************************************
