@@ -321,7 +321,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
     ID3D10Blob* pShaderBlob = NULL, *pErrBlob = NULL;
 
     UINT compileFlags = 0;
-#ifdef VLC_WINSTORE_APP
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     VLC_UNUSED(compiler);
 #else
 # define D3DCompile(a,b,c,d,e,f,g,h,i,j,k)    compiler->OurD3DCompile(a,b,c,d,e,f,g,h,i,j,k)
@@ -647,7 +647,7 @@ int D3D_CreateShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t **compiler
     *compiler = calloc(1, sizeof(d3d_shader_compiler_t));
     if (unlikely(*compiler == NULL))
         return VLC_ENOMEM;
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     /* d3dcompiler_47 is the latest on windows 10 */
     for (int i = 47; i > 41; --i)
     {
@@ -665,17 +665,17 @@ int D3D_CreateShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t **compiler
         free(*compiler);
         return VLC_EGENERIC;
     }
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
 
     return VLC_SUCCESS;
 }
 
 void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *compiler)
 {
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     if (compiler->compiler_dll)
         FreeLibrary(compiler->compiler_dll);
-#endif // !VLC_WINSTORE_APP
+#endif // WINAPI_PARTITION_DESKTOP
     free(compiler);
 }
 
