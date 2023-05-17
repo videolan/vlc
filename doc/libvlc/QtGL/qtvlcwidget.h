@@ -31,6 +31,10 @@ protected:
     void paintGL() override;
     void resizeGL(int width, int height) override;
 
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
 private:
     QOpenGLVertexArrayObject m_vao;
     std::unique_ptr<QOpenGLShaderProgram> m_program;

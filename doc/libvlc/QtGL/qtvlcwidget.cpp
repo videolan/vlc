@@ -61,6 +61,67 @@ public:
         return mBuffers[m_idx_display].get();
     }
 
+    void onResize(QSize size)
+    {
+        QMutexLocker lock(&m_cb_lock);
+        m_windowSize = size;
+        if (!report_size_change)
+            return;
+        report_size_change(reportOpaque, size.width(), size.height());
+    }
+
+    void onMouseMove(QPoint pos)
+    {
+        QMutexLocker lock(&m_cb_lock);
+        if (!report_mouse_move)
+            return;
+        report_mouse_move(reportOpaque, pos.x(), pos.y());
+    }
+
+    void onMousePress(Qt::MouseButton button)
+    {
+        QMutexLocker lock(&m_cb_lock);
+        if (!report_mouse_press)
+            return;
+        bool ok;
+        auto vlcButton = qtToVlcMouseButton(button, &ok);
+        if (!ok)
+            return;
+        report_mouse_press(reportOpaque, vlcButton);
+    }
+
+    void onMouseRelease(Qt::MouseButton button)
+    {
+        QMutexLocker lock(&m_cb_lock);
+        if (!report_mouse_release)
+            return;
+        bool ok;
+        auto vlcButton = qtToVlcMouseButton(button, &ok);
+        if (!ok)
+            return;
+        report_mouse_release(reportOpaque, vlcButton);
+    }
+
+    static void setReportCallbacks(void* data,
+        libvlc_video_output_resize_cb report_size_change,
+        libvlc_video_output_mouse_move_cb report_mouse_move,
+        libvlc_video_output_mouse_press_cb report_mouse_press,
+        libvlc_video_output_mouse_release_cb report_mouse_release,
+        void* reportOpaque)
+    {
+        VLCVideo* that = static_cast<VLCVideo*>(data);
+        QMutexLocker lock(&that->m_cb_lock);
+        that->reportOpaque = reportOpaque;
+        that->report_size_change = report_size_change;
+        that->report_mouse_move = report_mouse_move;
+        that->report_mouse_press = report_mouse_press;
+        that->report_mouse_release = report_mouse_release;
+
+        //report initial window size
+        if (report_size_change && that->m_windowSize.isValid())
+            report_size_change(that->reportOpaque, that->m_windowSize.width(), that->m_windowSize.height());
+    }
+
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
     static bool resizeRenderTextures(void* data, const libvlc_video_render_cfg_t *cfg,
                                      libvlc_video_output_cfg_t *render_cfg)
@@ -159,6 +220,24 @@ public:
     }
 
 private:
+    libvlc_video_output_mouse_button_t qtToVlcMouseButton(Qt::MouseButton button, bool* ok)
+    {
+        assert(ok != nullptr);
+        *ok = true;
+        switch (button)
+        {
+        case Qt::LeftButton:
+            return libvlc_video_output_mouse_button_left;
+        case Qt::RightButton:
+            return libvlc_video_output_mouse_button_right;
+        case Qt::MiddleButton:
+            return libvlc_video_output_mouse_button_middle;
+        default:
+            *ok = false;
+            return libvlc_video_output_mouse_button_left;
+        }
+    }
+
     QtVLCWidget *mWidget;
     QOpenGLContext *mContext;
     QOffscreenSurface *mSurface;
@@ -173,6 +252,16 @@ private:
     size_t m_idx_swap = 1;
     size_t m_idx_display = 2;
     bool m_updated = false;
+
+    QSize m_windowSize;
+
+    QMutex m_cb_lock;
+    void* reportOpaque = nullptr;
+    libvlc_video_output_resize_cb report_size_change = nullptr;
+    libvlc_video_output_mouse_move_cb report_mouse_move = nullptr;
+    libvlc_video_output_mouse_press_cb report_mouse_press = nullptr;
+    libvlc_video_output_mouse_release_cb report_mouse_release = nullptr;
+
 };
 
 
@@ -181,6 +270,8 @@ QtVLCWidget::QtVLCWidget(QWidget *parent)
       vertexBuffer(QOpenGLBuffer::VertexBuffer),
       vertexIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
+    setMouseTracking(true);
+
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
 
@@ -209,7 +300,7 @@ bool QtVLCWidget::playMedia(const char* url)
     // Define the opengl rendering callbacks
     libvlc_video_set_output_callbacks(m_mp,
         mVLC->isOpenGLES() ? libvlc_video_engine_gles2 : libvlc_video_engine_opengl,
-        VLCVideo::setup, VLCVideo::cleanup, nullptr, VLCVideo::resizeRenderTextures, VLCVideo::swap,
+        VLCVideo::setup, VLCVideo::cleanup, VLCVideo::setReportCallbacks, VLCVideo::resizeRenderTextures, VLCVideo::swap,
         VLCVideo::make_current, VLCVideo::get_proc_address, nullptr, nullptr,
         mVLC.get());
 
@@ -371,7 +462,23 @@ void QtVLCWidget::paintGL()
 
 void QtVLCWidget::resizeGL(int w, int h)
 {
-    Q_UNUSED(w);
-    Q_UNUSED(h);
-    /* TODO */
+    mVLC->onResize(QSize(w, h));
+}
+
+void QtVLCWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    QOpenGLWidget::mouseMoveEvent(event);
+    mVLC->onMouseMove(event->pos());
+}
+
+void QtVLCWidget::mousePressEvent(QMouseEvent *event)
+{
+    QOpenGLWidget::mousePressEvent(event);
+    mVLC->onMousePress(event->button());
+}
+
+void QtVLCWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    QOpenGLWidget::mouseReleaseEvent(event);
+    mVLC->onMouseRelease(event->button());
 }
