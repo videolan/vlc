@@ -274,10 +274,18 @@ _Noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 }
 #endif
 
+#if !defined(_WIN32)
+# define HAVE_WEAK_SPAWN
+#else
+# if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#  define HAVE_WEAK_SPAWN
+# endif
+#endif
+
+#ifdef HAVE_WEAK_SPAWN
 #include <errno.h>
 #include <vlc_spawn.h>
 
-#if !defined(_WIN32) || defined(VLC_WINSTORE_APP)
 VLC_WEAK
 int vlc_spawn(pid_t *pid, const char *file, const int *fds,
               const char *const *args)
