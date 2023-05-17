@@ -40,34 +40,18 @@
 using Microsoft::WRL::ComPtr;
 using namespace std;
 
-typedef HRESULT ( WINAPI *DWriteCreateFactoryProc ) (
-        _In_ DWRITE_FACTORY_TYPE factory_type,
-        _In_ REFIID              iid,
-        _Out_ IUnknown         **pp_factory );
-
 struct dw_sys_t
 {
-    HMODULE                                  p_dw_dll;
     ComPtr< IDWriteFactory2 >                p_dw_factory;
     ComPtr< IDWriteFontCollection >          p_dw_system_fonts;
     ComPtr< IDWriteNumberSubstitution >      p_dw_substitution;
     ComPtr< IDWriteFontFallback >            p_dw_fallbacks;
     vector< FT_Stream >                      streams;
 
-    dw_sys_t( HMODULE p_dw_dll ) : p_dw_dll( p_dw_dll )
+    dw_sys_t( )
     {
         /* This will fail on versions of Windows prior to 8.1 */
-        DWriteCreateFactoryProc pf;
-#ifdef VLC_WINSTORE_APP
-        pf = DWriteCreateFactory;
-#else
-        pf = ( DWriteCreateFactoryProc ) GetProcAddress( p_dw_dll, "DWriteCreateFactory" );
-
-        if( pf == NULL )
-            throw runtime_error( "GetProcAddress() failed" );
-#endif
-
-        if( pf( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
+        if( DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
                 &p_dw_factory ) )
             throw runtime_error( "failed to create DWrite factory" );
 
@@ -131,28 +115,14 @@ static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family 
 extern "C" int InitDWrite( vlc_font_select_t *fs )
 {
     dw_sys_t *p_dw_sys;
-    HMODULE p_dw_dll = NULL;
 
     try
     {
-#ifdef VLC_WINSTORE_APP
-        p_dw_sys = new dw_sys_t( p_dw_dll );
-#else
-        p_dw_dll = LoadLibrary( TEXT( "Dwrite.dll" ) );
-        if( p_dw_dll == NULL )
-            return VLC_EGENERIC;
-
-        p_dw_sys = new dw_sys_t( p_dw_dll );
-#endif
+        p_dw_sys = new dw_sys_t( );
     }
     catch( const exception &e )
     {
-#ifndef VLC_WINSTORE_APP
-        FreeLibrary( p_dw_dll );
-        (void)e;
-#else
         msg_Err( fs->p_obj, "InitDWrite(): %s", e.what() );
-#endif
 
         return VLC_EGENERIC;
     }
@@ -166,16 +136,7 @@ extern "C" int ReleaseDWrite( vlc_font_select_t *fs )
 {
     dw_sys_t *p_dw_sys = ( dw_sys_t * ) fs->p_dw_sys;
 
-#ifdef VLC_WINSTORE_APP
     delete p_dw_sys;
-#else
-    HMODULE p_dw_dll = NULL;
-    if( p_dw_sys && p_dw_sys->p_dw_dll )
-        p_dw_dll = p_dw_sys->p_dw_dll;
-
-    delete p_dw_sys;
-    if( p_dw_dll ) FreeLibrary( p_dw_dll );
-#endif
 
     return VLC_SUCCESS;
 }
