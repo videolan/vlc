@@ -503,6 +503,7 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     p_context->opaque = p_dec;
     p_context->reordered_opaque = 0;
 
+    int max_thread_count;
     int i_thread_count = p_sys->b_hardware_only ? 1 : var_InheritInteger( p_dec, "avcodec-threads" );
     if( i_thread_count <= 0 )
     {
@@ -511,13 +512,17 @@ static int InitVideoDecCommon( decoder_t *p_dec )
             i_thread_count++;
 
         //FIXME: take in count the decoding time
-#ifdef VLC_WINSTORE_APP
-        i_thread_count = __MIN( i_thread_count, 6 );
-#else
-        i_thread_count = __MIN( i_thread_count, p_codec->id == AV_CODEC_ID_HEVC ? 10 : 6 );
+        max_thread_count = p_codec->id == AV_CODEC_ID_HEVC ? 10 : 6;
+#if defined(_WIN32)
+# if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+        // reduce memory when decoding on Xbox
+        max_thread_count = 6 ;
+# endif
 #endif
     }
-    i_thread_count = __MIN( i_thread_count, p_codec->id == AV_CODEC_ID_HEVC ? 32 : 16 );
+    else
+        max_thread_count = p_codec->id == AV_CODEC_ID_HEVC ? 32 : 16;
+    i_thread_count = __MIN( i_thread_count, max_thread_count );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_context->thread_count = i_thread_count;
 #if LIBAVCODEC_VERSION_MAJOR < 60
