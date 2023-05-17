@@ -126,8 +126,10 @@ get_path_rec( const libvlc_media_list_path_t path, libvlc_media_list_t * p_curre
         if( !p_md )
             return NULL;
 
-        if( p_md == p_searched_md )
+        if( p_md == p_searched_md ) {
+            libvlc_media_release( p_md );
             return libvlc_media_list_path_copy_by_appending( path, i ); /* Found! */
+        }
 
         libvlc_media_list_t * p_subitems = libvlc_media_subitems( p_md );
         libvlc_media_release( p_md );
