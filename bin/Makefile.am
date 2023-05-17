@@ -143,7 +143,7 @@ endif
 ../modules/plugins.dat: vlc-cache-gen$(EXEEXT)
 	$(AM_V_at)rm -f ../modules/plugins.dat
 	$(AM_V_GEN)if test "$(build)" = "$(host)"; then \
-		./vlc-cache-gen$(EXEEXT) `realpath ../modules` ; \
+		./vlc-cache-gen$(EXEEXT) `cd "../modules" ; pwd -P` ; \
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
