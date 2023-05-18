@@ -82,8 +82,7 @@
     [textContent appendAttributedString:[self detailLineWithTitle:@"ID" detailText:[NSString stringWithFormat:@"%lli", _representedItem.libraryID]]];
 
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        NSString * const itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
-        [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:itemDetailsString]];
+        [textContent appendAttributedString:[self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem]];
     } else {
         NSString * const itemDetailsString = [self detailsStringForLibraryItem:_representedItem];
         [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:itemDetailsString]];
@@ -101,31 +100,43 @@
     }];
 }
 
-- (NSString *)detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+- (NSAttributedString *)detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
 {
-    NSMutableString *detailsString = [[NSMutableString alloc] init];
+    NSMutableAttributedString * const detailsString = [[NSMutableAttributedString alloc] init];
 
+    NSMutableString * const mediaTypeString = [[NSMutableString alloc] initWithFormat:@" %@", mediaItem.readableMediaType];
     if (mediaItem.mediaSubType != VLC_ML_MEDIA_SUBTYPE_UNKNOWN) {
-        [detailsString appendFormat:@"Type: %@ — %@\n", mediaItem.readableMediaType, mediaItem.readableMediaSubType];
-    } else {
-        [detailsString appendFormat:@"Type: %@\n", mediaItem.readableMediaType];
+        [mediaTypeString appendFormat:@" — %@", mediaItem.readableMediaSubType];
     }
+    [mediaTypeString appendString:@"\n"];
 
-    [detailsString appendFormat:@"Duration: %@\n", _representedItem.durationString];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Type" detailText:mediaTypeString]];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Duration" detailText:_representedItem.durationString]];
 
-    [detailsString appendFormat:@"Play count: %u, last played: %@\n", mediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:mediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
+    NSString * const playCountString = [NSString stringWithFormat:@"%u", mediaItem.playCount];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Play count" detailText:playCountString]];
 
-    [detailsString appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated ? _NS("Yes") : _NS("No")];
+    NSDate * const lastPlayedDate = [NSDate dateWithTimeIntervalSince1970:mediaItem.lastPlayedDate];
+    NSString * const lastPlayedString = [NSDateFormatter localizedStringFromDate:lastPlayedDate
+                                                                       dateStyle:NSDateFormatterShortStyle
+                                                                       timeStyle:NSDateFormatterShortStyle];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Last played" detailText:lastPlayedString]];
 
-    [detailsString appendFormat:@"Favorited? %@\n", mediaItem.favorited ? _NS("Yes") : _NS("No")];
+    NSString * const smallArtworkGeneratedString = _representedItem.smallArtworkGenerated ? _NS("Yes") : _NS("No");
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Small artwork generated" detailText:smallArtworkGeneratedString]];
 
-    [detailsString appendFormat:@"Playback progress: %2.f%%\n", mediaItem.progress * 100.]; // TODO: Calculate progress for other library item types
+    NSString * const favouritedString = mediaItem.favorited ? _NS("Yes") : _NS("No");
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Favourited" detailText:favouritedString]];
 
-    [detailsString appendFormat:@"\nNumber of tracks: %lu\n", mediaItem.tracks.count];
+    NSString * const playbackProgressString = [NSString stringWithFormat:@"%2.f%%", mediaItem.progress * 100.];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Playback progress" detailText:playbackProgressString]];
+    // TODO: Calculate progress for other library item types
+
+    NSString * const trackCountString = [NSString stringWithFormat:@"%lu", mediaItem.tracks.count];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Number of tracks" detailText:trackCountString]];
 
     for (VLCMediaLibraryTrack *track in mediaItem.tracks) {
-        NSString *trackDetailsString = [self detailsStringForTrack:track];
-        [detailsString appendString:trackDetailsString];
+        [detailsString appendAttributedString:[[NSAttributedString alloc] initWithString:[self detailsStringForTrack:track]]];
     }
 
     return detailsString;
