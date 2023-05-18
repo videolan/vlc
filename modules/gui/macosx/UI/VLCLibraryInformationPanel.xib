@@ -8,9 +8,11 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryInformationPanel">
             <connections>
                 <outlet property="imageView" destination="N4h-LP-IRY" id="Ned-Ju-hyu"/>
+                <outlet property="scrollView" destination="JzV-HY-whQ" id="19b-bb-AK0"/>
                 <outlet property="textField" destination="eeq-7b-IbI" id="tex-TF-135"/>
                 <outlet property="titleTextField" destination="Ode-s8-X3t" id="Ahy-Gv-rPN"/>
                 <outlet property="titleTextFieldTopConstraint" destination="uPW-bq-Yz8" id="J75-Rk-mlI"/>
+                <outlet property="topBarView" destination="g0J-FC-bJg" id="Bkb-Cr-226"/>
                 <outlet property="window" destination="oPi-wT-0nK" id="ODs-Hv-85I"/>
             </connections>
         </customObject>

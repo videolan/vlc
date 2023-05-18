@@ -44,6 +44,11 @@
     [super windowDidLoad];
 
     _titleTextFieldTopConstraint.constant = self.window.titlebarHeight + [VLCLibraryUIUnits smallSpacing];
+
+    NSEdgeInsets scrollViewInsets = _scrollView.contentInsets;
+    scrollViewInsets.top = _topBarView.frame.size.height + [VLCLibraryUIUnits mediumSpacing];
+    _scrollView.contentInsets = scrollViewInsets;
+
     [self updateRepresentation];
 }
 

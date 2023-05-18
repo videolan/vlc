@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *textField;
 @property (readwrite, weak) IBOutlet NSImageView *imageView;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *topBarView;
+@property (readwrite, weak) IBOutlet NSScrollView *scrollView;
 
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *titleTextFieldTopConstraint;
 
