@@ -36,8 +36,12 @@ T.Button {
 
     padding: 0
     width: VLCStyle.dp(40, VLCStyle.scale)
-    implicitWidth: contentItem.implicitWidth
-    implicitHeight: contentItem.implicitHeight
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     focusPolicy: Qt.NoFocus
 
     background: Rectangle {

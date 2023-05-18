@@ -37,10 +37,11 @@ T.AbstractButton {
 
     // Settings
 
-    implicitWidth: Math.max(background.implicitWidth,
-            (contentItem ? contentItem.implicitWidth : 0) + leftPadding + rightPadding)
-    implicitHeight: Math.max(background.implicitHeight,
-            (contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     baselineOffset: contentItem ? contentItem.y + contentItem.baselineOffset : 0
 
 

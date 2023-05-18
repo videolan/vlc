@@ -77,10 +77,10 @@ T.Slider {
         return (x - offset) / extend
     }
 
-    implicitWidth: Math.max(background ? background.implicitWidth : 0,
-                           (handle ? handle.implicitWidth : 0) + leftPadding + rightPadding)
-    implicitHeight: Math.max(background ? background.implicitHeight : 0,
-                            (handle ? handle.implicitHeight : 0) + topPadding + bottomPadding)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitHandleWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitHandleHeight + topPadding + bottomPadding)
 
     handle: Rectangle {
         x: control.leftPadding + (control.horizontal

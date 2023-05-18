@@ -52,11 +52,10 @@ T.ItemDelegate {
 
     rightPadding: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
 
-    implicitWidth: Math.max(background.implicitWidth,
-                            contentItem.implicitWidth + leftPadding + rightPadding)
-
-    implicitHeight: Math.max(background.implicitHeight,
-                            contentItem.implicitHeight + topPadding + bottomPadding)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
     ListView.delayRemove: mouseArea.drag.active
 
