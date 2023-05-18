@@ -63,6 +63,16 @@
     [self updateRepresentation];
 }
 
+- (NSAttributedString *)detailLineWithTitle:(NSString *)title detailText:(NSString *)detailText
+{
+    NSString * const detailStringStart = [NSString stringWithFormat:@"%@:", title];
+    NSMutableAttributedString * const detailLine = [[NSMutableAttributedString alloc] initWithString:detailStringStart attributes:_boldStringAttribute];
+    NSString * const detailStringEnd = [NSString stringWithFormat:@" %@\n", detailText];
+    [detailLine appendAttributedString:[[NSAttributedString alloc] initWithString:detailStringEnd]];
+
+    return [detailLine copy];
+}
+
 - (void)updateRepresentation
 {
     _titleTextField.stringValue = _representedItem.displayString;
