@@ -77,13 +77,9 @@
 {
     _titleTextField.stringValue = _representedItem.displayString;
 
-    NSMutableAttributedString * const textContent = [[NSMutableAttributedString alloc] initWithString:@"Title:" attributes:_boldStringAttribute];
-    NSString * const titleContent = [NSString stringWithFormat:@" %@\n", _representedItem.displayString];
-    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:titleContent]];
-
-    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:@"ID:" attributes:_boldStringAttribute]];
-    NSString * const idContent = [NSString stringWithFormat:@" %lli\n", _representedItem.libraryID];
-    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:idContent]];
+    NSMutableAttributedString * const textContent = [[NSMutableAttributedString alloc] init];
+    [textContent appendAttributedString:[self detailLineWithTitle:@"Title" detailText:_representedItem.displayString]];
+    [textContent appendAttributedString:[self detailLineWithTitle:@"ID" detailText:[NSString stringWithFormat:@"%lli", _representedItem.libraryID]]];
 
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         NSString * const itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
