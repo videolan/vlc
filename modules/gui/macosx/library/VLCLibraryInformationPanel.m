@@ -33,6 +33,8 @@
 @interface VLCLibraryInformationPanel ()
 {
     id<VLCMediaLibraryItemProtocol> _representedItem;
+    NSFont *_boldSystemFont;
+    NSDictionary<NSAttributedStringKey, id> *_boldStringAttribute;
 }
 
 @end
@@ -49,6 +51,9 @@
     scrollViewInsets.top = _topBarView.frame.size.height + [VLCLibraryUIUnits mediumSpacing];
     _scrollView.contentInsets = scrollViewInsets;
 
+    _boldSystemFont = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];
+    _boldStringAttribute = @{NSFontAttributeName: _boldSystemFont};
+
     [self updateRepresentation];
 }
 
@@ -62,20 +67,26 @@
 {
     _titleTextField.stringValue = _representedItem.displayString;
 
-    NSMutableString * const textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
+    NSMutableAttributedString * const textContent = [[NSMutableAttributedString alloc] initWithString:@"Title:" attributes:_boldStringAttribute];
+    NSString * const titleContent = [NSString stringWithFormat:@" %@\n", _representedItem.displayString];
+    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:titleContent]];
 
-    NSString * itemDetailsString;
+    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:@"ID:" attributes:_boldStringAttribute]];
+    NSString * const idContent = [NSString stringWithFormat:@" %lli\n", _representedItem.libraryID];
+    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:idContent]];
+
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
+        NSString * const itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
+        [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:itemDetailsString]];
     } else {
-        itemDetailsString = [self detailsStringForLibraryItem:_representedItem];
+        NSString * const itemDetailsString = [self detailsStringForLibraryItem:_representedItem];
+        [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:itemDetailsString]];
     }
-    [textContent appendString:itemDetailsString];
-    
+
     NSString * const fileDetailsString = [self fileDetailsStringForLibraryItem:_representedItem];
-    [textContent appendString:fileDetailsString];
+    [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:fileDetailsString]];
     
-    _textField.attributedStringValue = [[NSAttributedString alloc] initWithString:textContent];
+    _textField.attributedStringValue = textContent;
     _textField.font = [NSFont systemFontOfSize:13.];
     _textField.textColor = [NSColor whiteColor];
 
