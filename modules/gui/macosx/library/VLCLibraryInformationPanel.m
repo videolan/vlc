@@ -136,34 +136,50 @@
     [detailsString appendAttributedString:[self detailLineWithTitle:@"Number of tracks" detailText:trackCountString]];
 
     for (VLCMediaLibraryTrack *track in mediaItem.tracks) {
-        [detailsString appendAttributedString:[[NSAttributedString alloc] initWithString:[self detailsStringForTrack:track]]];
+        [detailsString appendAttributedString:[self detailsStringForTrack:track]];
     }
 
     return detailsString;
 }
 
-- (NSString *)detailsStringForTrack:(VLCMediaLibraryTrack *)track
+- (NSAttributedString *)detailsStringForTrack:(VLCMediaLibraryTrack *)track
 {
-    NSMutableString *detailsString = [[NSMutableString alloc] init];
+    NSMutableAttributedString * const detailsString = [[NSMutableAttributedString alloc] init];
 
-    [detailsString appendFormat:@"Type: %@\n", track.readableTrackType];
-    [detailsString appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Type" detailText:track.readableTrackType]];
+
+    NSString * const codecString = [NSString stringWithFormat:@"%@ (%@) @ %u kB/s\n",
+                                    track.readableCodecName,
+                                    track.codec,
+                                    track.bitrate / 1024 / 8];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Codec" detailText:codecString]];
+
     if (track.language.length > 0) {
-        [detailsString appendFormat:@"Language: %@\n", track.language];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Language" detailText:track.language]];
     }
+
     if (track.trackDescription.length > 0) {
-        [detailsString appendFormat:@"Description: %@\n", track.trackDescription];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Description" detailText:track.trackDescription]];
     }
 
     if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
-        [detailsString appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
-    } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
-        [detailsString appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
-        [detailsString appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
-    }
-    [detailsString appendString:@"\n"];
+        NSString * const numChannelsString = [NSString stringWithFormat:@"%u", track.numberOfAudioChannels];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Number of channels" detailText:numChannelsString]];
 
-    return detailsString;
+        NSString * const sampleRateString = [NSString stringWithFormat:@"%u", track.audioSampleRate];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Sample rate" detailText:sampleRateString]];
+    } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
+        NSString * const dimensionsString = [NSString stringWithFormat:@"%ux%u px", track.videoWidth, track.videoHeight];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Dimensions" detailText:dimensionsString]];
+
+        NSString * const aspectRatioString = [NSString stringWithFormat:@"%2.f", (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Aspect ratio" detailText:aspectRatioString]];
+
+        NSString * const frameRateString = [NSString stringWithFormat:@"%2.f", (float)track.frameRate / track.frameRateDenominator];
+        [detailsString appendAttributedString:[self detailLineWithTitle:@"Framerate" detailText:frameRateString]];
+    }
+
+    return [detailsString copy];
 }
 
 - (NSString *)detailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
