@@ -661,8 +661,9 @@ FocusScope {
 
             readonly property alias sliderY: controllerId.sliderY
 
-            height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
-            width: controlBarView.width
+            implicitHeight: controllerId.implicitHeight
+            implicitWidth: controllerId.implicitWidth
+
             hoverEnabled: true
 
             function showChapterMarks() {
@@ -675,10 +676,12 @@ FocusScope {
                 id: controllerId
 
                 focus: true
+
                 anchors.fill: parent
-                anchors.leftMargin: VLCStyle.applicationHorizontalMargin
-                anchors.rightMargin: VLCStyle.applicationHorizontalMargin
-                anchors.bottomMargin: VLCStyle.applicationVerticalMargin
+
+                rightPadding: VLCStyle.applicationHorizontalMargin
+                leftPadding: VLCStyle.applicationHorizontalMargin
+                bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
 
                 textPosition: (MainCtx.pinVideoControls)
                               ? ControlBar.TimeTextPosition.LeftRightSlider
