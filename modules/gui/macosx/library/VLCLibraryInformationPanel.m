@@ -82,7 +82,6 @@
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
         self->_imageView.image = thumbnail;
     }];
-    self.window.title = _representedItem.displayString;
 }
 
 - (NSString *)detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
