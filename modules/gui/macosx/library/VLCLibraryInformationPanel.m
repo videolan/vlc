@@ -84,8 +84,7 @@
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         [textContent appendAttributedString:[self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem]];
     } else {
-        NSString * const itemDetailsString = [self detailsStringForLibraryItem:_representedItem];
-        [textContent appendAttributedString:[[NSAttributedString alloc] initWithString:itemDetailsString]];
+        [textContent appendAttributedString:[self detailsStringForLibraryItem:_representedItem]];
     }
 
     NSString * const fileDetailsString = [self fileDetailsStringForLibraryItem:_representedItem];
@@ -182,14 +181,15 @@
     return [detailsString copy];
 }
 
-- (NSString *)detailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+- (NSAttributedString *)detailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
-    NSMutableString *detailsString = [[NSMutableString alloc] init];
+    NSMutableAttributedString * const detailsString = [[NSMutableAttributedString alloc] init];
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Duration" detailText:libraryItem.durationString]];
 
-    [detailsString appendFormat:@"Duration: %@\n", libraryItem.durationString];
-    [detailsString appendFormat:@"Small artwork generated? %@\n", libraryItem.smallArtworkGenerated ? _NS("Yes") : _NS("No")];
+    NSString * const smallArtworkGeneratedString = libraryItem.smallArtworkGenerated ? _NS("Yes") : _NS("No");
+    [detailsString appendAttributedString:[self detailLineWithTitle:@"Small artwork generated" detailText:smallArtworkGeneratedString]];
 
-    return detailsString;
+    return [detailsString copy];
 }
 
 - (NSString *)fileDetailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
