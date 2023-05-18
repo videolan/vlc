@@ -28,20 +28,20 @@
                 <rect key="frame" x="0.0" y="0.0" width="512" height="640"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JzV-HY-whQ">
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JzV-HY-whQ">
                         <rect key="frame" x="0.0" y="0.0" width="512" height="640"/>
                         <clipView key="contentView" id="Bl4-q7-swx">
-                            <rect key="frame" x="1" y="1" width="510" height="638"/>
+                            <rect key="frame" x="0.0" y="0.0" width="512" height="640"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view translatesAutoresizingMaskIntoConstraints="NO" id="bU3-vL-IQb">
-                                    <rect key="frame" x="0.0" y="214" width="510" height="424"/>
+                                    <rect key="frame" x="0.0" y="216" width="512" height="424"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wv4-dn-5EA">
-                                            <rect key="frame" x="0.0" y="0.0" width="510" height="424"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="512" height="424"/>
                                             <subviews>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="eeq-7b-IbI">
-                                                    <rect key="frame" x="8" y="408" width="494" height="16"/>
+                                                    <rect key="frame" x="8" y="408" width="496" height="16"/>
                                                     <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" title="Media data" id="Jc0-rT-PNg">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
