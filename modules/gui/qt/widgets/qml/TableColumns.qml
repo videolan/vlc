@@ -114,8 +114,11 @@ Item {
                     if (!!titleDel.rowModel) {
                         cover = titleDel.rowModel[root.criteriaCover]
                     }
-                    return cover || titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
+                    return cover || ""
                 }
+
+                fallbackImageSource: titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
+
                 playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: g_mainDisplay.play(MediaLib, titleDel.rowModel.id)
