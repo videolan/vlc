@@ -118,6 +118,7 @@ T.Pane {
 
             spacing: 0
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: VLCStyle.margin_normal
         }
@@ -142,6 +143,7 @@ T.Pane {
             spacing: VLCStyle.margin_xsmall
 
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.leftMargin: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.margin_xsmall
                                                                                               : 0
 
