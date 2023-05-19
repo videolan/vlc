@@ -277,21 +277,10 @@
                                 <rect key="frame" x="0.0" y="0.0" width="896" height="45"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="YAj-e7-KCU" userLabel="New play controls group ">
-                                        <rect key="frame" x="16" y="4" width="180" height="37"/>
+                                        <rect key="frame" x="16" y="4" width="108" height="37"/>
                                         <subviews>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="SYG-jf-oHJ" userLabel="Shuffle Button">
-                                                <rect key="frame" x="0.0" y="9" width="20" height="20"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="20" id="LX7-2l-Zub"/>
-                                                    <constraint firstAttribute="width" constant="20" id="b8L-ly-Ydj"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="shuffleOn" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="kIq-yj-yfU">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                </buttonCell>
-                                            </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="jGc-Xw-GYI" userLabel="Prev Button">
-                                                <rect key="frame" x="36" y="7" width="24" height="24"/>
+                                                <rect key="frame" x="0.0" y="7" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="0T4-E0-vJm"/>
                                                     <constraint firstAttribute="width" constant="24" id="abb-Z1-wB3"/>
@@ -305,7 +294,7 @@
                                                 </connections>
                                             </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="WgO-zh-k4s" userLabel="Play Button">
-                                                <rect key="frame" x="76" y="5" width="28" height="28"/>
+                                                <rect key="frame" x="40" y="5" width="28" height="28"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="28" id="SMx-UH-bYG"/>
                                                     <constraint firstAttribute="height" constant="28" id="X5G-Of-T7b"/>
@@ -319,7 +308,7 @@
                                                 </connections>
                                             </button>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="dPD-MZ-5oT" userLabel="Next Button">
-                                                <rect key="frame" x="120" y="7" width="24" height="24"/>
+                                                <rect key="frame" x="84" y="7" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="Idh-YB-yxU"/>
                                                     <constraint firstAttribute="width" constant="24" id="eA3-ci-O1T"/>
@@ -332,41 +321,26 @@
                                                     <action selector="fwd:" target="Uzf-Tf-H8x" id="cnd-1b-e3l"/>
                                                 </connections>
                                             </button>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="t4r-bt-Jxm" userLabel="Repeat Button">
-                                                <rect key="frame" x="160" y="9" width="20" height="20"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="20" id="V4c-eg-QOT"/>
-                                                    <constraint firstAttribute="height" constant="20" id="Wom-ko-4Rp"/>
-                                                </constraints>
-                                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="repeatOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="RJn-3f-SpX">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                </buttonCell>
-                                            </button>
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="WgO-zh-k4s" firstAttribute="leading" secondItem="jGc-Xw-GYI" secondAttribute="trailing" constant="16" id="7Jh-Rk-goR"/>
-                                            <constraint firstItem="t4r-bt-Jxm" firstAttribute="centerY" secondItem="YAj-e7-KCU" secondAttribute="centerY" id="Fra-T2-IQx"/>
                                             <constraint firstItem="dPD-MZ-5oT" firstAttribute="leading" secondItem="WgO-zh-k4s" secondAttribute="trailing" constant="16" id="L7k-XW-mNm"/>
-                                            <constraint firstAttribute="trailing" secondItem="t4r-bt-Jxm" secondAttribute="trailing" id="W3e-SL-a7f"/>
                                             <constraint firstItem="jGc-Xw-GYI" firstAttribute="centerY" secondItem="YAj-e7-KCU" secondAttribute="centerY" id="XTJ-tG-WAb"/>
                                             <constraint firstItem="WgO-zh-k4s" firstAttribute="centerX" secondItem="YAj-e7-KCU" secondAttribute="centerX" id="dj3-Cx-RLd"/>
-                                            <constraint firstItem="jGc-Xw-GYI" firstAttribute="leading" secondItem="SYG-jf-oHJ" secondAttribute="trailing" constant="16" id="f1r-vM-kxs"/>
                                             <constraint firstItem="WgO-zh-k4s" firstAttribute="centerY" secondItem="YAj-e7-KCU" secondAttribute="centerY" id="g2R-aO-KbT"/>
-                                            <constraint firstItem="SYG-jf-oHJ" firstAttribute="centerY" secondItem="YAj-e7-KCU" secondAttribute="centerY" id="heY-1b-UBH"/>
-                                            <constraint firstItem="t4r-bt-Jxm" firstAttribute="leading" secondItem="dPD-MZ-5oT" secondAttribute="trailing" constant="16" id="lY4-vR-Qva"/>
+                                            <constraint firstAttribute="trailing" secondItem="dPD-MZ-5oT" secondAttribute="trailing" id="oOi-7M-aLf"/>
                                             <constraint firstItem="dPD-MZ-5oT" firstAttribute="centerY" secondItem="YAj-e7-KCU" secondAttribute="centerY" id="rCy-3x-EJD"/>
-                                            <constraint firstItem="SYG-jf-oHJ" firstAttribute="leading" secondItem="YAj-e7-KCU" secondAttribute="leading" id="vUG-bU-2ce"/>
+                                            <constraint firstItem="jGc-Xw-GYI" firstAttribute="leading" secondItem="YAj-e7-KCU" secondAttribute="leading" id="xeh-Bo-f7P"/>
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr">
-                                        <rect key="frame" x="212" y="4" width="472" height="37"/>
+                                        <rect key="frame" x="140" y="4" width="616" height="37"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
-                                                <rect key="frame" x="171" y="21" width="164" height="16"/>
+                                                <rect key="frame" x="248" y="21" width="153" height="16"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name" customClass="VLCWrappableTextField">
-                                                        <rect key="frame" x="-2" y="0.0" width="78" height="16"/>
+                                                        <rect key="frame" x="-2" y="0.0" width="157" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="aQy-pz-H7F"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="uah-Xv-MK9"/>
@@ -388,8 +362,8 @@
                                                     <real value="3.4028234663852886e+38"/>
                                                 </customSpacing>
                                             </stackView>
-                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zOB-QJ-TUy" customClass="VLCTimeField">
-                                                <rect key="frame" x="39" y="0.0" width="44" height="13"/>
+                                            <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zOB-QJ-TUy" customClass="VLCTimeField">
+                                                <rect key="frame" x="39" y="1" width="44" height="11"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="40" id="Rox-Cf-MSz"/>
                                                 </constraints>
@@ -428,8 +402,8 @@
                                                     <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                                 </connections>
                                             </slider>
-                                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
-                                                <rect key="frame" x="422" y="0.0" width="52" height="13"/>
+                                            <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
+                                                <rect key="frame" x="566" y="1" width="52" height="11"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="48" id="mAg-xF-yHo"/>
                                                 </constraints>
@@ -815,8 +789,6 @@
                 <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
                 <outlet property="playingItemDisplayField" destination="d0e-29-yNq" id="QUe-1S-TQO"/>
-                <outlet property="repeatButton" destination="t4r-bt-Jxm" id="U7s-Tb-Ado"/>
-                <outlet property="shuffleButton" destination="SYG-jf-oHJ" id="b4m-v0-sC9"/>
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
                 <outlet property="trailingTimeField" destination="oGd-mG-cFw" id="geo-iq-0th"/>
