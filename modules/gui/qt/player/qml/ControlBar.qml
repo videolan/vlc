@@ -63,14 +63,6 @@ T.Pane {
 
     Accessible.name: I18n.qtr("Player controls")
 
-    Component.onCompleted: {
-        // if initially textPosition = Hide, then _onTextPositionChanged isn't called
-        if (textPosition === ControlBar.TimeTextPosition.Hide)
-            _layout()
-    }
-
-    onTextPositionChanged: _layout()
-
     function showChapterMarks() {
         trackPositionSlider.showChapterMarks()
     }
@@ -95,44 +87,6 @@ T.Pane {
             menu.close()
     }
 
-    function _layout() {
-        switch (textPosition) {
-            case ControlBar.TimeTextPosition.Hide:
-                row1.children = []
-                row2.children = [trackPositionSlider]
-                row2.Layout.leftMargin = 0
-                row2.Layout.rightMargin = 0
-                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-                break;
-
-            case ControlBar.TimeTextPosition.AboveSlider:
-                row1.children = [mediaTime, spacer, mediaRemainingTime]
-                row2.children = [trackPositionSlider]
-                row2.Layout.leftMargin = 0
-                row2.Layout.rightMargin = 0
-                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-                break;
-
-            case ControlBar.TimeTextPosition.LeftRightSlider:
-                row1.children = []
-                row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
-                row2.Layout.leftMargin = VLCStyle.margin_xsmall
-                row2.Layout.rightMargin = VLCStyle.margin_xsmall
-                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
-                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
-                trackPositionSlider.Layout.alignment = Qt.AlignVCenter
-                break;
-
-            default:
-                console.assert(false, "invalid text position")
-        }
-
-        row1.visible = row1.children.length > 0
-        row2.visible = row2.children.length > 0
-    }
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -149,6 +103,19 @@ T.Pane {
         RowLayout {
             id: row1
 
+            children: {
+                switch (textPosition) {
+                case ControlBar.TimeTextPosition.AboveSlider:
+                    return [mediaTime, spacer, mediaRemainingTime]
+                case ControlBar.TimeTextPosition.Hide:
+                case ControlBar.TimeTextPosition.LeftRightSlider:
+                default:
+                    return []
+                }
+            }
+
+            visible: children.length > 0
+
             spacing: 0
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
@@ -158,8 +125,27 @@ T.Pane {
         RowLayout {
             id: row2
 
+            children: {
+                switch (textPosition) {
+                case ControlBar.TimeTextPosition.Hide:
+                case ControlBar.TimeTextPosition.AboveSlider:
+                    return [trackPositionSlider]
+                case ControlBar.TimeTextPosition.LeftRightSlider:
+                    return [mediaTime, trackPositionSlider, mediaRemainingTime]
+                default:
+                    return []
+                }
+            }
+
+            visible: children.length > 0
+
             spacing: VLCStyle.margin_xsmall
+
             Layout.fillWidth: true
+            Layout.leftMargin: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.margin_xsmall
+                                                                                              : 0
+
+            Layout.rightMargin: Layout.leftMargin
         }
 
         PlayerControlLayout {
@@ -183,6 +169,8 @@ T.Pane {
             id: mediaTime
             text: Player.time.formatHMS()
             color: theme.fg.primary
+            font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
+                                                                                           : VLCStyle.fontSize_normal
         },
         T.Label {
             id: mediaRemainingTime
@@ -190,7 +178,8 @@ T.Pane {
             text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
                   ? "-" + Player.remainingTime.formatHMS()
                   : Player.length.formatHMS()
-            color: theme.fg.primary
+            color: mediaTime.color
+            font.pixelSize: mediaTime.font.pixelSize
 
             MouseArea {
                 anchors.fill: parent
