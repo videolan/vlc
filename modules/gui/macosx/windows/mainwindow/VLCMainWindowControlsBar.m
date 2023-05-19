@@ -50,12 +50,6 @@
 
 @interface VLCMainWindowControlsBar()
 {
-    NSImage *_repeatOffImage;
-    NSImage *_repeatAllImage;
-    NSImage *_repeatOneImage;
-    NSImage *_shuffleOffImage;
-    NSImage *_shuffleOnImage;
-
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
 }
@@ -78,27 +72,6 @@
                            selector:@selector(playbackStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(shuffleStateUpdated:)
-                               name:VLCPlaybackOrderChanged
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(repeatStateUpdated:)
-                               name:VLCPlaybackRepeatChanged
-                             object:nil];
-
-    _repeatAllImage = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:[NSColor VLCAccentColor]];
-    _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
-    _repeatOneImage = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:[NSColor VLCAccentColor]];
-
-    _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
-    _shuffleOnImage = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:[NSColor VLCAccentColor]];
-
-    self.repeatButton.action = @selector(repeatAction:);
-    self.shuffleButton.action = @selector(shuffleAction:);
-
-    [self repeatStateUpdated:nil];
-    [self shuffleStateUpdated:nil];
 
     [self.stopButton setToolTip: _NS("Stop")];
     self.stopButton.accessibilityLabel = self.stopButton.toolTip;
@@ -159,32 +132,6 @@
     [[VLCMain sharedInstance].libraryWindow reopenVideoView];
 }
 
-- (IBAction)shuffleAction:(id)sender
-{
-    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
-    } else {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
-    }
-}
-
-- (IBAction)repeatAction:(id)sender
-{
-    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
-    switch (currentRepeatState) {
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-            break;
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
-            break;
-
-        default:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
-            break;
-    }
-}
-
 #pragma mark -
 #pragma mark Extra updaters
 
@@ -236,40 +183,6 @@
         default:
             self.stopButton.enabled = YES;
             break;
-    }
-}
-
-- (void)repeatStateUpdated:(NSNotification *)aNotification
-{
-    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
-
-    switch (currentRepeatState) {
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            self.repeatButton.image = _repeatOneImage;
-            break;
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            self.repeatButton.image = _repeatAllImage;
-            break;
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
-        default:
-            self.repeatButton.image = _repeatOffImage;
-            break;
-    }
-
-    if (@available(macOS 11.0, *)) {
-        self.repeatButton.contentTintColor = currentRepeatState == VLC_PLAYLIST_PLAYBACK_REPEAT_NONE ?
-            nil : [NSColor VLCAccentColor];
-    }
-}
-
-- (void)shuffleStateUpdated:(NSNotification *)aNotification
-{
-    self.shuffleButton.image = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
-        _shuffleOffImage : _shuffleOnImage;
-
-    if (@available(macOS 11.0, *)) {
-        self.shuffleButton.contentTintColor = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
-            nil : [NSColor VLCAccentColor];
     }
 }
 

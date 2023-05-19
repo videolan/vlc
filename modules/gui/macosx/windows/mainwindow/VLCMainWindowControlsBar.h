@@ -40,9 +40,6 @@
 @property (readwrite, strong) IBOutlet NSButton *prevButton;
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
 
-@property (readwrite, strong) IBOutlet NSButton *repeatButton;
-@property (readwrite, strong) IBOutlet NSButton *shuffleButton;
-
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
 
 - (IBAction)stop:(id)sender;
