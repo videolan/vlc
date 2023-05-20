@@ -95,7 +95,12 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
     _representedMediaItem = representedMediaItem;
     self.songNameTextField.stringValue = representedMediaItem.displayString;
     self.durationTextField.stringValue = representedMediaItem.durationString;
-    self.trackNumberTextField.stringValue = [NSString stringWithFormat:@"%d", representedMediaItem.trackNumber];
+
+    if (representedMediaItem.trackNumber == 0) {
+        self.trackNumberTextField.stringValue = @"—";
+    } else {
+        self.trackNumberTextField.stringValue = [NSString stringWithFormat:@"%d", representedMediaItem.trackNumber];
+    }
 
 }
 
