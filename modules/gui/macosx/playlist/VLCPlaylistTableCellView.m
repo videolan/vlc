@@ -70,14 +70,10 @@
 
 - (void)updateColouredElements
 {
-    NSColor * const primaryColor = NSColor.labelColor;
-    NSColor * const secondaryColor = NSColor.secondaryLabelColor;
-    NSImage * const audioIndicator = [NSImage imageNamed:@"note"];
-    NSImage * const displayedAudioIndicator = _representsCurrentPlaylistItem ?
-        [audioIndicator imageTintedWithColor:primaryColor] :
-        [audioIndicator imageTintedWithColor:secondaryColor];
 
-    self.audioMediaTypeIndicator.image = displayedAudioIndicator;
+    self.audioMediaTypeIndicator.textColor = _representsCurrentPlaylistItem ?
+        NSColor.labelColor :
+        NSColor.secondaryLabelColor;
 }
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item

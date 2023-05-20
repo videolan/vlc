@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
 @property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSImageView *audioMediaTypeIndicator;
+@property (readwrite, assign) IBOutlet NSTextField *audioMediaTypeIndicator;
 @property (readwrite, assign) IBOutlet VLCImageView *audioArtworkImageView;
 
 @end
