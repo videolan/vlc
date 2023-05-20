@@ -22,8 +22,10 @@
 
 #import "VLCPlaylistTableCellView.h"
 
-#import "extensions/NSString+Helpers.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryImageCache.h"
 
@@ -54,10 +56,16 @@
         [NSFont boldSystemFontOfSize:NSFont.smallSystemFontSize] :
         [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
 
+    NSImage * const audioIndicator = [NSImage imageNamed:@"note"];
+    NSImage * const displayedAudioIndicator = _representsCurrentPlaylistItem ?
+        [audioIndicator imageTintedWithColor:[NSColor VLCAccentColor]] :
+        audioIndicator;
+
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
     self.durationTextField.font = displayedFont;
     self.artistTextField.font = sublineDisplayedFont;
+    self.audioMediaTypeIndicator.image = displayedAudioIndicator;
 }
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
