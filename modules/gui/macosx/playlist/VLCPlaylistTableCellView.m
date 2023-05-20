@@ -50,8 +50,13 @@
         [NSFont boldSystemFontOfSize:NSFont.systemFontSize] :
         [NSFont systemFontOfSize:NSFont.systemFontSize];
 
+    NSFont * const sublineDisplayedFont = _representsCurrentPlaylistItem ?
+        [NSFont boldSystemFontOfSize:NSFont.smallSystemFontSize] :
+        [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
+
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
+    self.artistTextField.font = sublineDisplayedFont;
 }
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
