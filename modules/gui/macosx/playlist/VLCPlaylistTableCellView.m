@@ -56,6 +56,7 @@
 
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
+    self.durationTextField.font = displayedFont;
     self.artistTextField.font = sublineDisplayedFont;
 }
 
