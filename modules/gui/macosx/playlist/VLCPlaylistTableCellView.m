@@ -61,13 +61,23 @@
         self.mediaImageView.image = thumbnail;
     }];
 
-    NSString *artist = item.artistName;
-    if (artist && artist.length > 0) {
+    const BOOL validArtistString = item.artistName && item.artistName.length > 0;
+    const BOOL validAlbumString = item.albumName && item.albumName > 0;
+
+    NSString *songDetailString;
+
+    if (validArtistString && validAlbumString) {
+        songDetailString = [NSString stringWithFormat:@"%@ · %@", item.artistName, item.albumName];
+    } else if (validArtistString) {
+        songDetailString = item.artistName;
+    }
+
+    if (songDetailString) {
         self.mediaTitleTextField.hidden = YES;
         self.secondaryMediaTitleTextField.hidden = NO;
         self.artistTextField.hidden = NO;
         self.secondaryMediaTitleTextField.stringValue = item.title;
-        self.artistTextField.stringValue = artist;
+        self.artistTextField.stringValue = songDetailString;
         self.audioMediaTypeIndicator.hidden = NO;
 
         self.audioArtworkImageView.hidden = NO;
