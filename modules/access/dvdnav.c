@@ -1739,9 +1739,29 @@ static int ProbeDVD( const char *psz_name )
          goto bailout;
     if( !S_ISREG( stat_info.st_mode ) )
     {
-        if( S_ISDIR( stat_info.st_mode ) || S_ISBLK( stat_info.st_mode ) )
+        if( S_ISBLK( stat_info.st_mode ) )
+        {
             ret = VLC_SUCCESS; /* Let dvdnav_open() do the probing */
-        goto bailout;
+            goto bailout;
+        }
+        if( S_ISDIR( stat_info.st_mode ) )
+        {
+            // If we have directory, check if VIDEO_TS/VIDEO_TS.IFO exists, as
+            // dvdnav will check and fail without it
+            char *video_ts_location;
+            if( asprintf( &video_ts_location, "%s/VIDEO_TS/VIDEO_TS.IFO", psz_name) == -1 )
+            {
+                ret = VLC_EGENERIC;
+                goto bailout;
+            }
+
+            if( access(video_ts_location, R_OK) == -1 )
+                ret = VLC_EGENERIC;
+            else
+                ret = VLC_SUCCESS;
+            free( video_ts_location );
+            goto bailout;
+        }
     }
 
     /* ISO 9660 volume descriptor */
