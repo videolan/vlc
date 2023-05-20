@@ -48,6 +48,12 @@
 {
     _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
 
+    [self updateFonts];
+    [self updateColouredElements];
+}
+
+- (void)updateFonts
+{
     NSFont * const displayedFont = _representsCurrentPlaylistItem ?
         [NSFont boldSystemFontOfSize:NSFont.systemFontSize] :
         [NSFont systemFontOfSize:NSFont.systemFontSize];
@@ -56,15 +62,21 @@
         [NSFont boldSystemFontOfSize:NSFont.smallSystemFontSize] :
         [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
 
-    NSImage * const audioIndicator = [NSImage imageNamed:@"note"];
-    NSImage * const displayedAudioIndicator = _representsCurrentPlaylistItem ?
-        [audioIndicator imageTintedWithColor:[NSColor VLCAccentColor]] :
-        audioIndicator;
-
     self.mediaTitleTextField.font = displayedFont;
     self.secondaryMediaTitleTextField.font = displayedFont;
     self.durationTextField.font = displayedFont;
     self.artistTextField.font = sublineDisplayedFont;
+}
+
+- (void)updateColouredElements
+{
+    NSColor * const primaryColor = NSColor.labelColor;
+    NSColor * const secondaryColor = NSColor.secondaryLabelColor;
+    NSImage * const audioIndicator = [NSImage imageNamed:@"note"];
+    NSImage * const displayedAudioIndicator = _representsCurrentPlaylistItem ?
+        [audioIndicator imageTintedWithColor:primaryColor] :
+        [audioIndicator imageTintedWithColor:secondaryColor];
+
     self.audioMediaTypeIndicator.image = displayedAudioIndicator;
 }
 
