@@ -59,7 +59,6 @@
     self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.wantsLayer = YES;
     [self setCropsImagesToRoundedCorners:YES];
-    [self setupBorderColor];
 }
 
 - (void)setCropsImagesToRoundedCorners:(BOOL)cropsImagesToRoundedCorners
@@ -67,26 +66,15 @@
     if (cropsImagesToRoundedCorners) {
         self.layer.cornerRadius = 5.;
         self.layer.masksToBounds = YES;
-        self.layer.borderWidth = 2.;
     } else {
         self.layer.cornerRadius = 0.;
         self.layer.masksToBounds = NO;
-        self.layer.borderWidth = 0.;
     }
 }
 
 - (BOOL)cropsImagesToRoundedCorners
 {
     return self.layer.masksToBounds;
-}
-
-- (void)setupBorderColor
-{
-    if (self.shouldShowDarkAppearance) {
-        self.layer.borderColor = [NSColor VLClibraryItemBorderDarkColor].CGColor;
-    } else {
-        self.layer.borderColor = [NSColor VLClibraryItemBorderLightColor].CGColor;
-    }
 }
 
 - (void)setImage:(NSImage *)image
@@ -143,11 +131,6 @@
             self.layer.contentsGravity = kCAGravityResizeAspectFill;
             break;
     }
-}
-
-- (void)viewDidChangeEffectiveAppearance
-{
-    [self setupBorderColor];
 }
 
 - (void)setImageURL:(NSURL * _Nonnull)artworkURL placeholderImage:(NSImage * _Nullable)image
