@@ -44,7 +44,7 @@ Rectangle {
     property alias source: image.source
     property bool isImageReady: image.status == RoundImage.Ready
 
-    property alias fallbackImageSource: fallbackImage.source
+    property string fallbackImageSource
 
     property alias imageOverlay: overlay.sourceComponent
 
@@ -81,6 +81,10 @@ Rectangle {
         radius: root.radius
 
         visible: !root.isImageReady
+
+        // we only keep this image till there is no main image
+        // try to release the resources otherwise
+        source: !root.isImageReady ? root.fallbackImageSource : ""
     }
 
     Loader {
