@@ -783,7 +783,7 @@ static void InitScaleProcessor(vout_display_t *vd)
         return;
 
     sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), sys->d3d_dev, sys->picQuad.quad_fmt.i_chroma,
-                                          sys->upscaleMode == upscale_SuperResolution);
+                                          sys->upscaleMode == upscale_SuperResolution, &sys->picQuad.generic.textureFormat);
     if (sys->scaleProc == NULL)
     {
         msg_Dbg(vd, "forcing linear sampler");
