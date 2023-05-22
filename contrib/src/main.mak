@@ -122,6 +122,11 @@ XCODE_FLAGS += -arch $(ARCH)
 endif
 endif
 
+ifdef HAVE_EMSCRIPTEN
+EXTRA_CFLAGS += -pthread
+EXTRA_CXXFLAGS += -pthread
+endif
+
 CCAS=$(CC) -c
 
 LN_S = ln -s
