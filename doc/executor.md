@@ -7,7 +7,7 @@ threads.
 
 The runnable instances are allocated and freed by the caller. It is the
 responsibility of the caller to guarantee that the runnable is valid until
-the task is canceled or complete.
+the task is canceled or completed.
 
 The caller is expected to (but not forced to) embed the runnable into its
 custom task structure:
@@ -44,7 +44,7 @@ Since the task is allocated by the caller, vlc_executor_Submit() may not fail
 (it returns void).
 
 The cancelation of a submitted runnable may be requested. It succeeds only if
-the runnable is not started yet.
+the runnable has not started yet.
 
 ```c
 VLC_API void
@@ -114,7 +114,7 @@ void Run(void *userdata)
     vlc_executor_Cancel(executor, task->runnable); /* boom, use-after-free */
 ```
 
-To avoid the use-after-free, the runnable ownership must be shared. This makes
+To avoid use-after-free, runnable ownership must be shared. This makes
 the API more complex:
 
 ```c
@@ -130,10 +130,10 @@ would not be known by the user.
 Since in practice, the client needs its own task structure (to store the
 parameters, state and result of the execution), so it must allocate it and pass
 it to the executor (as userdata) anyway. Therefore, it's simpler if the task
-already embed the runnable.
+already embeds the runnable.
 
 Note that it is not mandatory to embed the runnable into the client task
-structure (it's just convenient). The runnable could be anywhere, for example on
+structure (it's just convenient). The runnable could be anywhere, for example, on
 the stack (provided that it lives long enough).
 
 This design also has disadvantages. In particular, it forces the runnable queue
@@ -143,11 +143,11 @@ and the same runnable may not be queued twice (it is not possible to put the
 same item twice in the same intrusive list).
 
 Therefore, a client must always explicitly create a new runnable for each
-execution. In practice, it should not be a problem though, since it must often
+execution. In practice, it should not be a problem, since it must often
 create a new custom task for the execution state anyway.
 
 In addition, further extensions of the executor API are constrained by the fact
-that it could not allocate and store per-task data (other than the intrusive
+that it can not allocate and store per-task data (other than the intrusive
 list node).
 
 
@@ -156,15 +156,15 @@ list node).
 It is important to be able to cancel and interrupt a running task.
 
 However, in C, the interruption mechanism is very specific to the concrete task
-implementation, so it could not be provided by the executor: it has to be
+implementation, so it can not be provided by the executor: it has to be
 provided by the user. And since the user is also at the origin of the
 cancelation request (which could lead to the interruption), the executor just
-let the user handle interruption manually.
+lets the user handle the interruption manually.
 
-Since it does not handle interruption, it could not provide a generic timeout
-mechanism either (see below). The user has to handle timeout manually.
+Since it does not handle interruptions, it could not provide a generic timeout
+mechanism either (see below). The user has to handle timeouts manually.
 
-It just provides a way to cancel a queued task not started yet:
+It just provides a way to cancel a queued task that has not started yet:
 
 ```c
 VLC_API bool
@@ -177,12 +177,12 @@ possible use-after-free race condition.
 Since the runnable is queued via an intrusive list, it can be removed in O(1).
 
 The tricky part is that it must indicate to the user if the runnable has
-actually been dequeued or not (i.e. if it has already been taken by a thread to
+actually been dequeued or not (i.e., if it has already been taken by a thread to
 be run). Indeed, the user must be able to know if the `run()` callback will be
 executed or not, in order to release the task resources correctly in all cases,
 without race conditions. This adds some complexity for the user.
 
-For the implementation, the problem is that even if we can remove an item in an
+For the implementation, the problem is that even if we can remove an item from an
 intrusive list in O(1), there is a priori no way to know immediately if the item
 was in a specific list or not. To circumvent this problem, when an item is
 dequeued, the executor resets the list nodes to `NULL`. This allows to store 1
@@ -234,11 +234,11 @@ it could have been used to provide a timeout mechanism "for free" (for the
 user).
 
 We decided against it, for several reasons:
- - in theory, the user may want to do something different on timeout and
-   cancelation (it may for example consider that one is an error and the other
+ - In theory, the user may want to do something different on timeout and
+   cancelation (it may, for example, consider that one is an error and the other
    is not);
- - this would require more callbacks and would complexify the executor API;
- - if it's necessary, the user could just use a separate component (timer) to
+ - This would require more callbacks and complicate the executor API;
+ - If it's necessary, the user could just use a separate component (timer) to
    trigger the interruption.
 
 
@@ -247,7 +247,7 @@ We decided against it, for several reasons:
 The resulting executor is a "minimal" API, simple and general: it just handles
 execution.
 
-As a drawback, it does not help for interruption, cancelation and timeout, so
+As a drawback, it does not help with interruption, cancelation, or timeout, so
 the user has more work to do on its own. For example, it must always track its
 submitted tasks, and implement boilerplate to correctly handle cancelation and
 interruption on deletion.
