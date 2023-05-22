@@ -112,6 +112,7 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
     video_format_t           pool_fmt;
+    const d3d_format_t       *pool_d3dfmt;
 
     int                      log_level;
 
@@ -396,7 +397,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         }
     }
 
-    if (sys->picQuad.formatInfo->formatTexture == DXGI_FORMAT_UNKNOWN)
+    if (sys->pool_d3dfmt->formatTexture == DXGI_FORMAT_UNKNOWN)
         sys->sys.pool = picture_pool_NewFromFormat( &sys->pool_fmt, pool_size );
     else
     {
@@ -407,7 +408,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             /* only provide enough for the filters, we can still do direct rendering */
             slices = __MIN(slices, 6);
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &sys->pool_fmt, slices, textures))
+        if (AllocateTextures(vd, &sys->d3d_dev, sys->pool_d3dfmt, &sys->pool_fmt, slices, textures))
             goto error;
 
         pictures = calloc(pool_size, sizeof(*pictures));
@@ -431,7 +432,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             }
 
             picsys->slice_index = picture_count < slices ? picture_count : 0;
-            picsys->formatTexture = sys->picQuad.formatInfo->formatTexture;
+            picsys->formatTexture = sys->pool_d3dfmt->formatTexture;
             picsys->context = sys->d3d_dev.d3dcontext;
 
             picture_resource_t resource = {
@@ -455,11 +456,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         if (is_d3d11_opaque(sys->pool_fmt.i_chroma) && !sys->legacy_shader)
 #endif
         {
-            sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
+            sys->picQuad.resourceCount = DxgiResourceCount(sys->pool_d3dfmt);
             for (picture_count = 0; picture_count < slices; picture_count++) {
                 if (!pictures[picture_count]->p_sys->texture[0])
                     continue;
-                if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.formatInfo,
+                if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->pool_d3dfmt,
                                        pictures[picture_count]->p_sys->texture, picture_count,
                                        pictures[picture_count]->p_sys->resourceView))
                     goto error;
@@ -1675,6 +1676,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
     }
+    sys->pool_d3dfmt = sys->picQuad.formatInfo;
 
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.formatInfo->name,
                  (char *)&fmt->i_chroma );
