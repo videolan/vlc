@@ -42,7 +42,7 @@ static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_devi
 }
 
 d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma,
-                                   bool super_res)
+                                   bool super_res, const d3d_format_t **out_fmt)
 {
     bool canProcess = !super_res;
     // NVIDIA 530+ driver

@@ -1457,7 +1457,8 @@ static void InitScaleProcessor(vout_display_t *vd)
         return;
 
     sys->scaleProc = D3D11_UpscalerCreate(VLC_OBJECT(vd), &sys->d3d_dev, sys->quad_fmt.i_chroma,
-                                          sys->upscaleMode == upscale_SuperResolution);
+                                          sys->upscaleMode == upscale_SuperResolution,
+                                          &sys->picQuad.formatInfo);
     if (sys->scaleProc == NULL)
         sys->upscaleMode = upscale_LinearSampler;
 
