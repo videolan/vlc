@@ -146,11 +146,6 @@ EXTRA_LDFLAGS += -m32
 endif
 endif
 
-ifdef HAVE_WINSTORE
-EXTRA_CFLAGS += -DWINSTORECOMPAT
-EXTRA_LDFLAGS += -lwindowsappcompat
-endif
-
 ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)
 HAVE_CLANG := 1
 endif
