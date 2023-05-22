@@ -40,7 +40,8 @@ struct d3d11_scaler
 static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
-    return FindD3D11Format( vd, d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
+    return FindD3D11Format( vd, d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0,
+                            DXGI_CHROMA_CPU|DXGI_CHROMA_GPU, supportFlags );
 }
 
 d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma,
@@ -66,7 +67,15 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         return nullptr;
     }
 
-    const d3d_format_t *fmt = GetDirectRenderingFormat(vd, d3d_dev, i_chroma);
+    const d3d_format_t *fmt = nullptr;
+    if ((*out_fmt)->bitsPerChannel > 10)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA64);
+    if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 8)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA10);
+    if (fmt == nullptr)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA);
+    if (fmt == nullptr)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_BGRA);
     if (fmt == nullptr || fmt->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
@@ -94,6 +103,7 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
 
     scaleProc->d3d_fmt = fmt;
     scaleProc->super_res = super_res;
+    *out_fmt = scaleProc->d3d_fmt;
     return scaleProc;
 error:
     delete scaleProc;
