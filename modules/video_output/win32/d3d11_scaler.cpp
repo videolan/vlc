@@ -137,6 +137,8 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     quad_fmt->i_width = quad_fmt->i_visible_width = out_width;
     quad_fmt->i_y_offset = 0;
     quad_fmt->i_height = quad_fmt->i_visible_height = out_height;
+    quad_fmt->i_sar_num = 1;
+    quad_fmt->i_sar_den = 1;
 
     if (scaleProc->Width == out_width && scaleProc->Height == out_height &&
         vout_display_PlaceEquals(&scaleProc->place, &place))
