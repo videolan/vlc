@@ -247,7 +247,15 @@ static void subpicture_CloseDisplay(vout_display_t *vd)
     struct sys *sys = vd->sys;
     struct subpicture *sub = &sys->sub;
 
-    vlc_gl_MakeCurrent(sub->gl);
+    int ret = vlc_gl_MakeCurrent(sub->gl);
+
+    if (ret == 0)
+    {
+        /* Clear the surface */
+        sub->api.vt.ClearColor(0.f, 0.f, 0.f, 0.f);
+        sub->api.vt.Clear(GL_COLOR_BUFFER_BIT);
+        vlc_gl_Swap(sub->gl);
+    }
 
     vlc_gl_sub_renderer_Delete(sub->renderer);
     vlc_gl_interop_Delete(sub->interop);
