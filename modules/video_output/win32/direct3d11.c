@@ -1520,6 +1520,22 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 
     D3D11SetColorSpace(vd);
 
+    char *psz_upscale = var_InheritString(vd, "d3d11-upscale-mode");
+    if (strcmp("linear", psz_upscale) == 0)
+        sys->upscaleMode = upscale_LinearSampler;
+    else if (strcmp("point", psz_upscale) == 0)
+        sys->upscaleMode = upscale_PointSampler;
+    else if (strcmp("processor", psz_upscale) == 0)
+        sys->upscaleMode = upscale_VideoProcessor;
+    else if (strcmp("super", psz_upscale) == 0)
+        sys->upscaleMode = upscale_SuperResolution;
+    else
+    {
+        msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
+        sys->upscaleMode = upscale_LinearSampler;
+    }
+    free(psz_upscale);
+
     video_format_t fmt;
     video_format_Copy(&fmt, &vd->source);
     int err = SetupOutputFormat(vd, &fmt);
@@ -1547,27 +1563,10 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
             return err;
     }
 
-    char *psz_upscale = var_InheritString(vd, "d3d11-upscale-mode");
-    if (strcmp("linear", psz_upscale) == 0)
-        sys->upscaleMode = upscale_LinearSampler;
-    else if (strcmp("point", psz_upscale) == 0)
-        sys->upscaleMode = upscale_PointSampler;
-    else if (strcmp("processor", psz_upscale) == 0)
-        sys->upscaleMode = upscale_VideoProcessor;
-    else if (strcmp("super", psz_upscale) == 0)
-        sys->upscaleMode = upscale_SuperResolution;
-    else
-    {
-        msg_Warn(vd, "unknown upscale mode %s, using linear sampler", psz_upscale);
-        sys->upscaleMode = upscale_LinearSampler;
-    }
-    free(psz_upscale);
-
     video_format_Init(&sys->quad_fmt, vd->source.i_chroma);
     video_format_Copy(&sys->quad_fmt, &vd->source);
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
         sys->sys.src_fmt = &sys->quad_fmt;
-    InitScaleProcessor(vd);
 
     video_format_Copy(&sys->pool_fmt, &fmt);
 
@@ -1687,6 +1686,8 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
     sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_RGBA);
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
+
+    InitScaleProcessor(vd);
 
     if (Direct3D11CreateFormatResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate format resources");
