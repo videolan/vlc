@@ -13,12 +13,8 @@ endif
 
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(UNPACK)
-ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gpg-error/windres-make.patch
-ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/gpg-error/winrt.patch
-endif
-endif
 	$(APPLY) $(SRC)/gpg-error/missing-unistd-include.patch
 	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
