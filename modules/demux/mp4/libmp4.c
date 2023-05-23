@@ -1581,6 +1581,7 @@ static int MP4_ReadBox_stts( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->data.p_stts->pi_sample_count == NULL
      || p_box->data.p_stts->pi_sample_delta == NULL )
     {
+        MP4_FreeBox_stts( p_box );
         MP4_READBOX_EXIT( 0 );
     }
 
@@ -1625,7 +1626,10 @@ static int MP4_ReadBox_ctts( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_ctts->pi_sample_offset = vlc_alloc( count, sizeof(int32_t) );
     if( unlikely(p_box->data.p_ctts->pi_sample_count == NULL
               || p_box->data.p_ctts->pi_sample_offset == NULL) )
+    {
+        MP4_FreeBox_ctts( p_box );
         MP4_READBOX_EXIT( 0 );
+    }
     p_box->data.p_ctts->i_entry_count = count;
 
     for( uint32_t i = 0; i < count; i++ )
