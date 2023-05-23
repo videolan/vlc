@@ -75,7 +75,7 @@ static void rtp_process (demux_t *demux, block_t *block)
     }
 #endif
 
-    rtp_queue (demux, sys->session, block);
+    rtp_queue (sys, sys->session, block);
     return;
 drop:
     block_Release (block);
@@ -156,7 +156,7 @@ void *rtp_dgram_thread (void *opaque)
         }
 
     dequeue:
-        if (!rtp_dequeue (demux, sys->session, &deadline))
+        if (!rtp_dequeue (sys, sys->session, &deadline))
             deadline = VLC_TICK_INVALID;
         vlc_restorecancel (canc);
     }

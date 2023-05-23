@@ -48,7 +48,7 @@ static rtp_source_t *
 rtp_source_create (struct vlc_logger *, const rtp_session_t *, uint32_t, uint16_t);
 static void rtp_source_destroy(struct vlc_logger *, rtp_source_t *);
 
-static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
+static void rtp_decode (struct vlc_logger *, const rtp_session_t *, rtp_source_t *);
 
 /**
  * Creates a new RTP session.
@@ -199,10 +199,8 @@ static struct vlc_rtp_pt *rtp_find_ptype(const rtp_session_t *session,
  * @param block RTP packet including the RTP header
  */
 void
-rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
+rtp_queue (rtp_sys_t *p_sys, rtp_session_t *session, block_t *block)
 {
-    rtp_sys_t *p_sys = demux->p_sys;
-
     /* RTP header sanity checks (see RFC 3550) */
     if (block->i_buffer < 12)
         goto drop;
@@ -237,7 +235,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         /* RTP source garbage collection */
         if ((tmp->last_rx + p_sys->timeout) < now)
         {
-            rtp_source_destroy(VLC_OBJECT(demux)->logger, tmp);
+            rtp_source_destroy(p_sys->logger, tmp);
             if (--session->srcc > 0)
                 session->srcv[i] = session->srcv[session->srcc - 1];
         }
@@ -248,7 +246,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         /* New source */
         if (session->srcc >= p_sys->max_src)
         {
-            msg_Warn (demux, "too many RTP sessions");
+            vlc_warning (p_sys->logger, "too many RTP sessions");
             goto drop;
         }
 
@@ -258,7 +256,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
             goto drop;
         session->srcv = tab;
 
-        src = rtp_source_create (VLC_OBJECT(demux)->logger, session, ssrc, seq);
+        src = rtp_source_create (p_sys->logger, session, ssrc, seq);
         if (src == NULL)
             goto drop;
 
@@ -297,13 +295,13 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     if ((delta_seq.s >= 0) ? (delta_seq.u > p_sys->max_dropout)
                            : (delta_seq.u < p_sys->max_misorder))
     {
-        msg_Dbg (demux, "sequence discontinuity"
+        vlc_debug (p_sys->logger, "sequence discontinuity"
                  " (got: %"PRIu16", expected: %"PRIu16")", seq, src->max_seq);
         if (seq == src->bad_seq)
         {
             src->max_seq = src->bad_seq = seq + 1;
             src->last_seq = seq - 0x7fffe; /* hack for rtp_decode() */
-            msg_Warn (demux, "sequence resynchronized");
+            vlc_warning (p_sys->logger, "sequence resynchronized");
             block_ChainRelease (src->blocks);
             src->blocks = NULL;
         }
@@ -327,7 +325,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
             break;
         if (delta_seq.s == 0)
         {
-            msg_Dbg (demux, "duplicate packet (sequence: %"PRIu16")", seq);
+            vlc_debug (p_sys->logger, "duplicate packet (sequence: %"PRIu16")", seq);
             goto drop; /* duplicate */
         }
         pp = &prev->p_next;
@@ -343,8 +341,6 @@ drop:
 }
 
 
-static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
-
 /**
  * Dequeues RTP packets and pass them to decoder. Not cancellation-safe(?).
  * A packet is decoded if it is the next in sequence order, or if we have
@@ -357,7 +353,7 @@ static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
  * @return true if the buffer is not empty, false otherwise.
  * In the later case, *deadlinep is undefined.
  */
-bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
+bool rtp_dequeue (rtp_sys_t *sys, const rtp_session_t *session,
                   vlc_tick_t *restrict deadlinep)
 {
     vlc_tick_t now = vlc_tick_now ();
@@ -390,7 +386,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
         {
             if ((int16_t)(rtp_seq (block) - (src->last_seq + 1)) <= 0)
             {   /* Next (or earlier) block ready, no need to wait */
-                rtp_decode (demux, session, src);
+                rtp_decode (sys->logger, session, src);
                 continue;
             }
 
@@ -416,7 +412,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
             deadline += block->i_pts;
             if (now >= deadline)
             {
-                rtp_decode (demux, session, src);
+                rtp_decode (sys->logger, session, src);
                 continue;
             }
             if (*deadlinep > deadline)
@@ -432,7 +428,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
  * Decodes one RTP packet.
  */
 static void
-rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
+rtp_decode (struct vlc_logger *logger, const rtp_session_t *session, rtp_source_t *src)
 {
     block_t *block = src->blocks;
 
@@ -446,11 +442,11 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     {
         if (delta_seq >= 0x8000)
         {   /* Trash too late packets (and PIM Assert duplicates) */
-            msg_Dbg (demux, "ignoring late packet (sequence: %"PRIu16")",
+            vlc_debug (logger, "ignoring late packet (sequence: %"PRIu16")",
                       rtp_seq (block));
             goto drop;
         }
-        msg_Warn (demux, "%"PRIu16" packet(s) lost", delta_seq);
+        vlc_warning (logger, "%"PRIu16" packet(s) lost", delta_seq);
         block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
     src->last_seq = rtp_seq (block);
@@ -459,7 +455,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     struct vlc_rtp_pt *pt = rtp_find_ptype(session, block);
     if (pt == NULL)
     {
-        msg_Dbg (demux, "unknown payload (%"PRIu8")",
+        vlc_debug (logger, "unknown payload (%"PRIu8")",
                  rtp_ptype (block));
         goto drop;
     }
