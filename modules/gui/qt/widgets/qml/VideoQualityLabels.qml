@@ -46,10 +46,7 @@ Row {
         delegate: T.Label {
             id: label
 
-            bottomPadding: VLCStyle.margin_xxxsmall
-            topPadding: VLCStyle.margin_xxxsmall
-            leftPadding: VLCStyle.margin_xxxsmall
-            rightPadding: VLCStyle.margin_xxxsmall
+            padding: VLCStyle.margin_xxxsmall
 
             visible: index < root.labels.length
             text: index >= root.labels.length ? "" :  root.labels[index]

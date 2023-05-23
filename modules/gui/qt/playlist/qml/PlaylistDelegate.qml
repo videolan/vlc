@@ -44,9 +44,7 @@ T.ItemDelegate {
 
     // Settings
 
-    topPadding: VLCStyle.playlistDelegate_verticalPadding
-
-    bottomPadding: VLCStyle.playlistDelegate_verticalPadding
+    verticalPadding: VLCStyle.playlistDelegate_verticalPadding
 
     leftPadding: VLCStyle.margin_xxsmall
 

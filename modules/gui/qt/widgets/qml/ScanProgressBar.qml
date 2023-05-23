@@ -33,10 +33,8 @@ T.ProgressBar {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    rightPadding: VLCStyle.margin_large
-    leftPadding: VLCStyle.margin_large
-    bottomPadding: VLCStyle.margin_small
-    topPadding: VLCStyle.margin_small
+    horizontalPadding: VLCStyle.margin_large
+    verticalPadding: VLCStyle.margin_small
 
     from: 0
     to: 100
