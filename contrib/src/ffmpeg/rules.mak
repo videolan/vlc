@@ -228,6 +228,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-vulkan-Fix-win-i386-calling-convention.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-lavu-vulkan-fix-handle-type-for-32-bit-targets.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-w32pthread-fix-signature-of-WinRT-version-of-thread-.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg

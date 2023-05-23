@@ -1,0 +1,34 @@
+From 090616d80ee58c334647877ab8e9f4d04f4fde1a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 12:24:46 +0200
+Subject: [PATCH] w32pthread: fix signature of WinRT version of thread worker
+
+The callback passed to CreateThread is not the same as with _beginthreadex().
+
+This WinRT check could be removed if Win8 WinRT is not maintained
+as _beginthreadex() is now available [1]
+
+[1] https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps?view=msvc-160#windows-8x-store-apps-and-windows-phone-8x-apps
+---
+ compat/w32pthreads.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/compat/w32pthreads.h b/compat/w32pthreads.h
+index 6405e72b64..364eebfe4e 100644
+--- a/compat/w32pthreads.h
++++ b/compat/w32pthreads.h
+@@ -66,7 +66,11 @@ typedef CONDITION_VARIABLE pthread_cond_t;
+ #define PTHREAD_CANCEL_ENABLE 1
+ #define PTHREAD_CANCEL_DISABLE 0
+ 
++#if HAVE_WINRT
++static av_unused DWORD WINAPI attribute_align_arg win32thread_worker(void *arg)
++#else
+ static av_unused unsigned __stdcall attribute_align_arg win32thread_worker(void *arg)
++#endif
+ {
+     pthread_t *h = (pthread_t*)arg;
+     h->ret = h->func(h->arg);
+-- 
+2.37.3.windows.1
+
