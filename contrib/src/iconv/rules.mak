@@ -15,6 +15,12 @@ endif
 endif
 endif
 
+DEPS_iconv :=
+ifdef HAVE_WINSTORE
+# gnulib uses GetFileInformationByHandle
+DEPS_iconv += alloweduwp $(DEPS_alloweduwp)
+endif
+
 $(TARBALLS)/libiconv-$(LIBICONV_VERSION).tar.gz:
 	$(call download_pkg,$(LIBICONV_URL),iconv)
 
@@ -24,7 +30,7 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(UNPACK)
 	$(APPLY) $(SRC)/iconv/bins.patch
 
-	# use CreateFile2 instead of CreateFile in UWP
+	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/iconv/0001-Use-CreateFile2-in-UWP-builds.patch
 
 	# fix forbidden UWP call which can't be upstreamed as they won't
