@@ -28,6 +28,10 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/should-win32-ws2tcpip.patch
 	$(APPLY) $(SRC)/shout/win32-gettimeofday.patch
 	$(APPLY) $(SRC)/shout/add-missing-stdlib-stdio.patch
+
+	# don't use getpid in UWP as it's not actually available
+	$(APPLY) $(SRC)/shout/0001-Favor-GetCurrentProcessId-on-Windows.patch
+
 	$(call pkg_static,"shout.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

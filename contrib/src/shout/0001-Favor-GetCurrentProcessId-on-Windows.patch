@@ -1,0 +1,33 @@
+From 8a11efd9c218275816f75148e7096c27f390932c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 14:23:11 +0200
+Subject: [PATCH] Favor GetCurrentProcessId() on Windows
+
+getpid() is not available in UWP [1] builds but GetCurrentProcessId() is.
+It's available since Windows XP [2].
+
+[1] https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps
+[2] https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessid
+---
+ src/proto_roaraudio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/proto_roaraudio.c b/src/proto_roaraudio.c
+index 041590d..a2b1fb5 100644
+--- a/src/proto_roaraudio.c
++++ b/src/proto_roaraudio.c
+@@ -111,7 +111,11 @@ static int shout_create_roaraudio_request_ident(shout_t *self, shout_connection_
+     size_t      datalen;
+     uint8_t    *data;
+     const char *agent;
++#ifdef _WIN32
++    uint32_t    pid = GetCurrentProcessId();
++#else
+     uint32_t    pid = getpid();
++#endif
+ 
+     /* We implement version 1 IDENTIFY header.
+      * It has the following structure:
+-- 
+2.37.3.windows.1
+
