@@ -1392,7 +1392,8 @@ static int MpgaInit( demux_t *p_demux )
                or if we verified the file isn't truncated */
             if( xing->i_bytes == 0 ||
                 vlc_stream_GetSize( p_demux->s, &i_stream_size ) ||
-                i_stream_size >= xing->i_bytes + p_sys->mpgah.i_frame_size )
+               (i_stream_size >= xing->i_bytes &&
+                i_stream_size <= xing->i_bytes + p_sys->mpgah.i_frame_size) )
             {
                 p_sys->i_duration = vlc_tick_from_samples( i_total_samples - i_dropped_samples,
                                                            p_sys->mpgah.i_sample_rate );
