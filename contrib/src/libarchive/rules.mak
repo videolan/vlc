@@ -31,8 +31,6 @@ endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
-	# fallback to Winstore Compat versions of Crypt API's
-	$(APPLY) $(SRC)/libarchive/libarchive-winstorecompat-crypt.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
