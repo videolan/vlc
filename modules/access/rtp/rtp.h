@@ -376,6 +376,8 @@ void *rtp_dgram_thread (void *data);
 /* Global data */
 typedef struct
 {
+    struct vlc_logger *logger;
+
     rtp_session_t *session;
     struct vlc_demux_chained_t *chained_demux;
 #ifdef HAVE_SRTP

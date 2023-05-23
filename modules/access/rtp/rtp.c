@@ -416,6 +416,7 @@ static int OpenSDP(vlc_object_t *obj)
         }
     }
 
+    sys->logger = obj->logger;
     sys->chained_demux = NULL;
     sys->max_src = var_InheritInteger(obj, "rtp-max-src");
     sys->timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
@@ -568,6 +569,7 @@ static int OpenURL(vlc_object_t *obj)
 #ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
 #endif
+    p_sys->logger       = obj->logger;
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
     p_sys->timeout      = vlc_tick_from_sec( var_CreateGetInteger (obj, "rtp-timeout") );
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
