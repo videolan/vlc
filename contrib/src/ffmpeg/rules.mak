@@ -254,6 +254,7 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-vulkan-Fix-win-i386-calling-convention.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-lavu-vulkan-fix-handle-type-for-32-bit-targets.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-w32pthread-fix-signature-of-WinRT-version-of-thread-.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
