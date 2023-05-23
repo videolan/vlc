@@ -47,7 +47,7 @@ endif
 
 	$(APPLY) $(SRC)/gnutls/0001-windows-Avoid-Wint-conversion-errors.patch
 
-	# use CreateFile2 instead of CreateFile in UWP
+	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/gnutls/0001-Use-CreateFile2-in-UWP-builds.patch
 
 	$(UPDATE_AUTOCONFIG)
@@ -70,6 +70,10 @@ GNUTLS_CONF := \
 	--with-included-unistring
 
 DEPS_gnutls = nettle $(DEPS_nettle)
+ifdef HAVE_WINSTORE
+# gnulib uses GetFileInformationByHandle
+DEPS_gnutls += alloweduwp $(DEPS_alloweduwp)
+endif
 
 ifdef HAVE_ANDROID
 GNUTLS_ENV := gl_cv_header_working_stdint_h=yes
