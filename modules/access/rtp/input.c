@@ -54,7 +54,7 @@
  */
 static void rtp_process (demux_t *demux, block_t *block)
 {
-    demux_sys_t *sys = demux->p_sys;
+    rtp_sys_t *sys = demux->p_sys;
 
     if (block->i_buffer < 2)
         goto drop;
@@ -102,7 +102,7 @@ static int rtp_timeout (vlc_tick_t deadline)
 void *rtp_dgram_thread (void *opaque)
 {
     demux_t *demux = opaque;
-    demux_sys_t *sys = demux->p_sys;
+    rtp_sys_t *sys = demux->p_sys;
     vlc_tick_t deadline = VLC_TICK_INVALID;
     struct vlc_dtls *rtp_sock = sys->rtp_sock;
 

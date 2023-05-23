@@ -203,7 +203,7 @@ static struct vlc_rtp_pt *rtp_find_ptype(const rtp_session_t *session,
 void
 rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
 {
-    demux_sys_t *p_sys = demux->p_sys;
+    rtp_sys_t *p_sys = demux->p_sys;
 
     /* RTP header sanity checks (see RFC 3550) */
     if (block->i_buffer < 12)

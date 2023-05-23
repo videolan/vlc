@@ -218,7 +218,7 @@ static int extract_port (char **phost)
  */
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *sys = demux->p_sys;
+    rtp_sys_t *sys = demux->p_sys;
 
     switch (query)
     {
@@ -268,7 +268,7 @@ static int Control (demux_t *demux, int query, va_list args)
 static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sys_t *p_sys = demux->p_sys;
+    rtp_sys_t *p_sys = demux->p_sys;
 
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
@@ -305,7 +305,7 @@ static int OpenSDP(vlc_object_t *obj)
     if (sdplen < 0)
         return sdplen;
 
-    demux_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
+    rtp_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -479,7 +479,7 @@ static int OpenURL(vlc_object_t *obj)
     else
         return VLC_EGENERIC;
 
-    demux_sys_t *p_sys = vlc_obj_malloc(obj, sizeof (*p_sys));
+    rtp_sys_t *p_sys = vlc_obj_malloc(obj, sizeof (*p_sys));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
