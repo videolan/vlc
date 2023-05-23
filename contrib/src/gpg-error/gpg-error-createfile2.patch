@@ -1,0 +1,62 @@
+--- libgpg-error/src/estream.c.uwp	2023-05-23 09:53:33.222246200 +0200
++++ libgpg-error/src/estream.c	2023-05-22 12:00:18.105186500 +0200
+@@ -4561,6 +4561,17 @@ tmpfd (void)
+ #else
+       strcpy (p, ".tmp");
+ #endif
++#if _WIN32_WINNT >= 0x0602 // _WIN32_WINNT_WIN8
++      CREATEFILE2_EXTENDED_PARAMETERS params;
++      memset (&params, 0, sizeof params);
++      params.dwSize = sizeof(params);
++      params.dwFileFlags = FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE;
++      file = CreateFile2 (buffer,
++                         GENERIC_READ | GENERIC_WRITE,
++                         0,
++                         CREATE_NEW,
++                         &params);
++#else
+       file = CreateFile (buffer,
+                          GENERIC_READ | GENERIC_WRITE,
+                          0,
+@@ -4568,6 +4579,7 @@ tmpfd (void)
+                          CREATE_NEW,
+                          FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
+                          NULL);
++#endif
+       if (file != INVALID_HANDLE_VALUE)
+         {
+ #ifdef HAVE_W32CE_SYSTEM
+--- libgpg-error/src/w32-gettext.c.uwp	2023-05-23 09:53:33.184247600 +0200
++++ libgpg-error/src/w32-gettext.c	2023-05-22 11:45:24.077340000 +0200
+@@ -53,7 +53,7 @@
+ #include "init.h"
+ #include "gpg-error.h"
+ 
+-#if defined(HAVE_W32CE_SYSTEM) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
++#if defined(HAVE_W32CE_SYSTEM) || !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ /* Forward declaration.  */
+ static wchar_t *utf8_to_wchar (const char *string, size_t length, size_t *retlen);
+ 
+@@ -72,9 +72,22 @@ MyCreateFileA (LPCSTR lpFileName, DWORD
+   if (!filename)
+     return INVALID_HANDLE_VALUE;
+ 
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++  CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++  createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++  createExParams.dwFileAttributes = dwFlagsAndAttributes & 0xFFFF;
++  createExParams.dwFileFlags = dwFlagsAndAttributes & 0xFFF00000;
++  createExParams.dwSecurityQosFlags = dwFlagsAndAttributes & 0x000F0000;
++  createExParams.lpSecurityAttributes = lpSecurityAttributes;
++  createExParams.hTemplateFile = hTemplateFile;
++
++  result = CreateFile2 (filename, dwDesiredAccess, dwSharedMode,
++			dwCreationDisposition, &createExParams);
++#else
+   result = CreateFileW (filename, dwDesiredAccess, dwSharedMode,
+ 			lpSecurityAttributes, dwCreationDisposition,
+ 			dwFlagsAndAttributes, hTemplateFile);
++#endif
+ 
+   err = GetLastError ();
+   free (filename);

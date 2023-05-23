@@ -1,0 +1,18 @@
+--- libgpg-error/src/w32-gettext.c.uwp	2023-05-23 09:53:33.184247600 +0200
++++ libgpg-error/src/w32-gettext.c	2023-05-22 11:45:24.077340000 +0200
+@@ -1240,7 +1253,15 @@ load_domain (const char *filename)
+   if (fh == INVALID_HANDLE_VALUE)
+     return NULL;
+ 
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++  FILE_STANDARD_INFO fStdInfo;
++  if (GetFileInformationByHandleEx(fh, FileStandardInfo, (LPVOID)&fStdInfo, sizeof(fStdInfo)))
++    size = fStdInfo.EndOfFile.LowPart;
++  else
++      size = INVALID_FILE_SIZE;
++#else
+   size = GetFileSize (fh, NULL);
++#endif
+   if (size == INVALID_FILE_SIZE)
+     {
+       CloseHandle (fh);

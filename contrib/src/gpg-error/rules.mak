@@ -28,6 +28,13 @@ endif
 	cp -f -- "$(UNPACK_DIR)/src/syscfg/lock-obj-pub.mingw32.h" \
 		"$(UNPACK_DIR)/src/syscfg/lock-obj-pub.mingw32uwp.h"
 	$(APPLY) $(SRC)/gpg-error/gpg-error-uwp-fix.patch
+
+	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
+	$(APPLY) $(SRC)/gpg-error/gpg-error-createfile2.patch
+
+	# don't use GetFileSize on UWP
+	$(APPLY) $(SRC)/gpg-error/gpg-error-uwp-GetFileSize.patch
+
 	$(MOVE)
 
 GPGERROR_CONF := \
