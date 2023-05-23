@@ -20,6 +20,10 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(MOVE)
 
 TAGLIB_CONF := -DBUILD_BINDINGS=OFF
+ifdef HAVE_WINSTORE
+TAGLIB_CONF += -DPLATFORM_WINRT=ON
+endif
+
 
 .taglib: taglib toolchain.cmake
 	$(CMAKECLEAN)
