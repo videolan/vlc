@@ -1,0 +1,30 @@
+From 8d4514b109976eb33cd848828f29767f28b135ae Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 10:08:17 +0200
+Subject: [PATCH] LockFile: favor CreateFile2 over CreateFileW
+
+The API is always available in Win8+ even in UWP builds, unlike CreateFileW.
+The API is pretty much the same.
+---
+ src/LockFile.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/LockFile.cpp b/src/LockFile.cpp
+index 613ff694..acd65502 100644
+--- a/src/LockFile.cpp
++++ b/src/LockFile.cpp
+@@ -50,7 +50,11 @@ std::unique_ptr<LockFile> LockFile::lock( const std::string& mlFolderPath )
+     Handle handle;
+ #ifdef _WIN32
+     auto wide = charset::ToWide( lockFile.c_str() );
++# if _WIN32_WINNT >= 0x0602 /* _WIN32_WINNT_WIN8 */
++    handle = CreateFile2(wide.get(), GENERIC_WRITE, 0, CREATE_ALWAYS, NULL);
++# else
+     handle = CreateFileW(wide.get(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
++# endif
+     if ( handle == INVALID_HANDLE_VALUE )
+     {
+         LOG_ERROR( "Could not open lockfile: ", lockFile );
+-- 
+2.37.3.windows.1
+
