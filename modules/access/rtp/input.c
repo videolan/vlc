@@ -52,10 +52,8 @@
 /**
  * Processes a packet received from the RTP socket.
  */
-static void rtp_process (demux_t *demux, block_t *block)
+static void rtp_process (rtp_sys_t *sys, block_t *block)
 {
-    rtp_sys_t *sys = demux->p_sys;
-
     if (block->i_buffer < 2)
         goto drop;
     const uint8_t ptype = rtp_ptype (block);
@@ -68,7 +66,7 @@ static void rtp_process (demux_t *demux, block_t *block)
         size_t len = block->i_buffer;
         if (srtp_recv (sys->srtp, block->p_buffer, &len))
         {
-            msg_Dbg (demux, "SRTP authentication/decryption failed");
+            vlc_debug (sys->logger, "SRTP authentication/decryption failed");
             goto drop;
         }
         block->i_buffer = len;
@@ -101,8 +99,7 @@ static int rtp_timeout (vlc_tick_t deadline)
  */
 void *rtp_dgram_thread (void *opaque)
 {
-    demux_t *demux = opaque;
-    rtp_sys_t *sys = demux->p_sys;
+    rtp_sys_t *sys = opaque;
     vlc_tick_t deadline = VLC_TICK_INVALID;
     struct vlc_dtls *rtp_sock = sys->rtp_sock;
 
@@ -134,20 +131,20 @@ void *rtp_dgram_thread (void *opaque)
                                        block->i_buffer, &truncated);
             if (len >= 0) {
                 if (truncated) {
-                    msg_Err(demux, "packet truncated (MRU was %zu)",
+                    vlc_error (sys->logger, "packet truncated (MRU was %zu)",
                             block->i_buffer);
                     block->i_flags |= BLOCK_FLAG_CORRUPTED;
                 }
                 else
                     block->i_buffer = len;
 
-                rtp_process (demux, block);
+                rtp_process (sys, block);
             }
             else
             {
                 if (errno == EPIPE)
                     break; /* connection terminated */
-                msg_Warn (demux, "RTP network error: %s",
+                vlc_warning (sys->logger, "RTP network error: %s",
                           vlc_strerror_c(errno));
                 block_Release (block);
             }
