@@ -5491,7 +5491,7 @@ static int DemuxFrag( demux_t *p_demux )
             {
                 if( i_pos > p_sys->context.i_post_mdat_offset )
                     msg_Err( p_demux, " Overread mdat by %" PRIu64, i_pos - p_sys->context.i_post_mdat_offset );
-                else
+                else if( !p_sys->b_seekable )
                     msg_Warn( p_demux, "mdat had still %"PRIu64" bytes unparsed as samples",
                                         p_sys->context.i_post_mdat_offset - i_pos );
                 if( MP4_Seek( p_demux->s, p_sys->context.i_post_mdat_offset ) != VLC_SUCCESS )
