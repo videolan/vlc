@@ -1,0 +1,29 @@
+From 5cbbac2ca7b7f4a190582ab757a388fd28fc8a02 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 May 2023 09:57:47 +0200
+Subject: [PATCH] use GetCurrentProcessId for the process ID on Windows
+
+getpid is not available in UWP even though it's detected.
+---
+ src/smb_message.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/smb_message.c b/src/smb_message.c
+index d7717a6..d9b7d28 100644
+--- a/src/smb_message.c
++++ b/src/smb_message.c
+@@ -79,7 +79,11 @@ smb_message   *smb_message_new(uint8_t cmd)
+     for (unsigned i = 0; i < 4; i++)
+         msg->packet->header.magic[i] = magic[i];
+     msg->packet->header.command   = cmd;
++#ifdef _WIN32
++    msg->packet->header.pid       = GetCurrentProcessId();
++#else
+     msg->packet->header.pid       = getpid();
++#endif
+ 
+     return msg;
+ }
+-- 
+2.37.3.windows.1
+
