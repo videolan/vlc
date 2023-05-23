@@ -15,6 +15,7 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
+	$(APPLY) $(SRC)/flac/0001-Fixed-compilation-of-get_utf8_argv-for-Windows-UWP.patch
 	# disable building a tool we don't use
 	sed -e 's,add_subdirectory("microbench"),#add_subdirectory("microbench"),' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	$(call pkg_static,"src/libFLAC/flac.pc.in")

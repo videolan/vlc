@@ -1,0 +1,148 @@
+From fd842b6a3bacac9e47504ca4d4fb611fab014fa2 Mon Sep 17 00:00:00 2001
+From: DK <dmitrykos@neutroncode.com>
+Date: Tue, 9 May 2023 15:37:57 +0300
+Subject: [PATCH] Fixed compilation of get_utf8_argv() for Windows UWP
+
+Fixed compilation in Win32 environment.
+Use FLAC_WINDOWS_APP define to check between UWP app and Win32 for more consistency.
+---
+ src/share/win_utf8_io/win_utf8_io.c | 41 ++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 13 deletions(-)
+
+diff --git a/src/share/win_utf8_io/win_utf8_io.c b/src/share/win_utf8_io/win_utf8_io.c
+index 65b56997..18921748 100644
+--- a/src/share/win_utf8_io/win_utf8_io.c
++++ b/src/share/win_utf8_io/win_utf8_io.c
+@@ -39,9 +39,12 @@
+ 
+ #define UTF8_BUFFER_SIZE 32768
+ 
+-#if !defined(WINAPI_FAMILY_PARTITION)
+-#define WINAPI_FAMILY_PARTITION(x) x
+-#define WINAPI_PARTITION_DESKTOP 1
++/* detect whether it is Windows APP (UWP) or standard Win32 envionment */
++#if defined(WINAPI_FAMILY_PARTITION) &&\
++	WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++	#define FLAC_WINDOWS_APP 1
++#else
++	#define FLAC_WINDOWS_APP 0
+ #endif
+ 
+ static int local_vsnprintf(char *str, size_t size, const char *fmt, va_list va)
+@@ -106,15 +109,22 @@ static wchar_t *wchar_from_utf8(const char *str)
+ /* retrieve WCHAR commandline, expand wildcards and convert everything to UTF-8 */
+ int get_utf8_argv(int *argc, char ***argv)
+ {
++#if !FLAC_WINDOWS_APP
+ 	typedef int (__cdecl *wgetmainargs_t)(int*, wchar_t***, wchar_t***, int, int*);
+ 	wgetmainargs_t wgetmainargs;
+ 	HMODULE handle;
++#endif // !FLAC_WINDOWS_APP
+ 	int wargc;
+ 	wchar_t **wargv;
+ 	wchar_t **wenv;
+ 	char **utf8argv;
+ 	int ret, i;
+ 
++#if FLAC_WINDOWS_APP
++	wargc = __argc;
++	wargv = __wargv;
++	wenv = _wenviron;
++#else // !FLAC_WINDOWS_APP
+ 	if ((handle = LoadLibraryW(L"msvcrt.dll")) == NULL) return 1;
+ 	if ((wgetmainargs = (wgetmainargs_t)GetProcAddress(handle, "__wgetmainargs")) == NULL) {
+ 		FreeLibrary(handle);
+@@ -126,8 +136,11 @@ int get_utf8_argv(int *argc, char ***argv)
+ 		FreeLibrary(handle);
+ 		return 1;
+ 	}
++#endif // !FLAC_WINDOWS_APP
+ 	if ((utf8argv = (char **)calloc(wargc, sizeof(char*))) == NULL) {
++	#if !FLAC_WINDOWS_APP
+ 		FreeLibrary(handle);
++	#endif // !FLAC_WINDOWS_APP
+ 		return 1;
+ 	}
+ 
+@@ -139,7 +152,9 @@ int get_utf8_argv(int *argc, char ***argv)
+ 		}
+ 	}
+ 
++#if !FLAC_WINDOWS_APP
+ 	FreeLibrary(handle); /* do not free it when wargv or wenv are still in use */
++#endif // !FLAC_WINDOWS_APP
+ 
+ 	if (ret == 0) {
+ 		*argc = wargc;
+@@ -160,9 +175,9 @@ HANDLE WINAPI CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWO
+ 	HANDLE handle = INVALID_HANDLE_VALUE;
+ 
+ 	if ((wname = wchar_from_utf8(lpFileName)) != NULL) {
+-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#if !FLAC_WINDOWS_APP
+ 		handle = CreateFileW(wname, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+-#else // !WINAPI_PARTITION_DESKTOP
++#else // FLAC_WINDOWS_APP
+ 		CREATEFILE2_EXTENDED_PARAMETERS params;
+ 		params.dwSize = sizeof(params);
+ 		params.dwFileAttributes = dwFlagsAndAttributes & 0xFFFF;
+@@ -171,7 +186,7 @@ HANDLE WINAPI CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWO
+ 		params.lpSecurityAttributes = lpSecurityAttributes;
+ 		params.hTemplateFile = hTemplateFile;
+ 		handle = CreateFile2(wname, dwDesiredAccess, dwShareMode, dwCreationDisposition, &params);
+-#endif // !WINAPI_PARTITION_DESKTOP
++#endif // FLAC_WINDOWS_APP
+ 		free(wname);
+ 	}
+ 
+@@ -193,19 +208,19 @@ size_t strlen_utf8(const char *str)
+ int win_get_console_width(void)
+ {
+ 	int width = 80;
+-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#if !FLAC_WINDOWS_APP
+ 	CONSOLE_SCREEN_BUFFER_INFO csbi;
+ 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+ 	if(hOut != INVALID_HANDLE_VALUE && hOut != NULL)
+ 		if (GetConsoleScreenBufferInfo(hOut, &csbi) != 0)
+ 			width = csbi.dwSize.X;
+-#endif // WINAPI_PARTITION_DESKTOP
++#endif // !FLAC_WINDOWS_APP
+ 	return width;
+ }
+ 
+ /* print functions */
+ 
+-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#if !FLAC_WINDOWS_APP
+ static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
+ {
+ 	DWORD out;
+@@ -235,7 +250,7 @@ static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
+ 		return ret;
+ 	return len;
+ }
+-#endif // WINAPI_PARTITION_DESKTOP
++#endif // !FLAC_WINDOWS_APP
+ 
+ int printf_utf8(const char *format, ...)
+ {
+@@ -276,12 +291,12 @@ int vfprintf_utf8(FILE *stream, const char *format, va_list argptr)
+ 			ret = -1;
+ 			break;
+ 		}
+-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#if !FLAC_WINDOWS_APP
+ 		ret = wprint_console(stream, wout, wcslen(wout));
+-#else // !WINAPI_PARTITION_DESKTOP
++#else // FLAC_WINDOWS_APP
+ 		OutputDebugStringW(wout);
+ 		ret = 0;
+-#endif // !WINAPI_PARTITION_DESKTOP
++#endif // FLAC_WINDOWS_APP
+ 	} while(0);
+ 
+ 	free(utmp);
+-- 
+2.37.3.windows.1
+
