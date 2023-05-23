@@ -168,11 +168,10 @@ static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
         goto error;
     }
 
-    box->data.p_payload = malloc( typesize );
+    box->data.p_payload = calloc( 1, typesize );
     if( unlikely(box->data.p_payload == NULL) )
         goto error;
 
-    memset( box->data.p_payload, 0, typesize );
     box->pf_free = release;
     return buf;
 error:
