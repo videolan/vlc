@@ -7,6 +7,13 @@ ifeq ($(call need_pkg,"libtasn1 >= 4.3"),)
 PKGS_FOUND += libtasn1
 endif
 
+DEPS_libtasn1 :=
+ifdef HAVE_WINSTORE
+# gnulib uses GetFileInformationByHandle
+DEPS_libtasn1 += alloweduwp $(DEPS_alloweduwp)
+endif
+
+
 $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 	$(call download_pkg,$(LIBTASN1_URL),libtasn1)
 
@@ -16,8 +23,9 @@ libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
 	$(APPLY) $(SRC)/libtasn1/0001-fcntl-do-not-call-GetHandleInformation-in-Winstore-a.patch
 
-	# use CreateFile2 instead of CreateFile in UWP
+	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/libtasn1/0001-Use-CreateFile2-in-UWP-builds.patch
+
 	$(MOVE)
 
 LIBTASN1_CONF := --disable-doc
