@@ -1,0 +1,16 @@
+--- gcrypt/compat/libcompat.h.orig	2019-06-23 17:35:08.000000000 +0200
++++ gcrypt/compat/libcompat.h	2023-05-23 14:09:47.426668700 +0200
+@@ -26,6 +26,13 @@ const char *_gcry_compat_identification
+ #ifndef HAVE_GETPID
+ pid_t _gcry_getpid (void);
+ #define getpid() _gcry_getpid ()
++#elif defined(_WIN32)
++#include <winapifamily.h>
++# if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++# include <windows.h>
++   /* getpid is incorrectly detected, it's not available in this case */
++#  define getpid() GetCurrentProcessId ()
++# endif
+ #endif
+ 
+ #ifndef HAVE_CLOCK
