@@ -178,7 +178,7 @@ void MainWindow::OnStop(wxCommandEvent& event) {
 }
 
 void MainWindow::OnPositionChanged_USR(wxCommandEvent& event) {
-    libvlc_media_player_set_position(media_player, (float) event.GetInt() / (float) TIMELINE_MAX);
+    libvlc_media_player_set_position(media_player, (float) event.GetInt() / (float) TIMELINE_MAX, false);
 }
 
 void MainWindow::OnPositionChanged_VLC(wxCommandEvent& event) {
@@ -205,7 +205,7 @@ void MainWindow::OnVolumeClicked(wxMouseEvent& event) {
 void MainWindow::OnTimelineClicked(wxMouseEvent& event) {
     wxSize size = mainWindow->timeline->GetSize();
     float position = (float) event.GetX() / (float) size.GetWidth();
-    libvlc_media_player_set_position(mainWindow->media_player, position);
+    libvlc_media_player_set_position(mainWindow->media_player, position, false);
     mainWindow->setTimeline(position);
     event.Skip();
 }
