@@ -229,7 +229,7 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
         xing->encoder != VLC_FOURCC('L','a','v','f') )
         return VLC_SUCCESS;
 
-    xing->brmode  = p_fixed[8] & 0x0f; /* version upper / mode lower */
+    xing->brmode  = p_fixed[9] & 0x0f; /* version upper / mode lower */
     uint32_t peak_signal  = GetDWBE( &p_fixed[11] );
     xing->f_peak_signal = peak_signal / 8388608.0; /* pow(2, 23) */
     uint16_t gain = GetWBE( &p_fixed[15] );
