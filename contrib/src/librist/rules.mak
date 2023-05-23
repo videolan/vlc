@@ -30,6 +30,7 @@ librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 	$(UNPACK)
 	$(APPLY) $(SRC)/librist/librist-fix-libcjson-meson.patch
 	$(APPLY) $(SRC)/librist/win32-timing.patch
+	$(APPLY) $(SRC)/librist/0001-Use-bcrypt-on-Windows-Vista.patch
 	$(MOVE)
 
 .librist: librist crossfile.meson
