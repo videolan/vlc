@@ -359,8 +359,8 @@ static inline uint8_t rtp_ptype (const block_t *block)
  * \defgroup rtp_session RTP session
  * @{
  */
-rtp_session_t *rtp_session_create (demux_t *);
-void rtp_session_destroy (demux_t *, rtp_session_t *);
+rtp_session_t *rtp_session_create (void);
+void rtp_session_destroy (struct vlc_logger *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);

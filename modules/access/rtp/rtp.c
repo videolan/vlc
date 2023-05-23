@@ -276,7 +276,7 @@ static void Close (vlc_object_t *obj)
     if (p_sys->srtp)
         srtp_destroy (p_sys->srtp);
 #endif
-    rtp_session_destroy (demux, p_sys->session);
+    rtp_session_destroy (obj->logger, p_sys->session);
     if (p_sys->rtcp_sock != NULL)
         vlc_dtls_Close(p_sys->rtcp_sock);
     vlc_dtls_Close(p_sys->rtp_sock);
@@ -426,7 +426,7 @@ static int OpenSDP(vlc_object_t *obj)
     demux->pf_control = Control;
     demux->p_sys = sys;
 
-    sys->session = rtp_session_create(demux);
+    sys->session = rtp_session_create();
     if (sys->session == NULL)
         goto error;
 
@@ -441,7 +441,7 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
 
     if (vlc_clone(&sys->thread, rtp_dgram_thread, demux)) {
-        rtp_session_destroy(demux, sys->session);
+        rtp_session_destroy(obj->logger, sys->session);
         goto error;
     }
 
@@ -577,7 +577,7 @@ static int OpenURL(vlc_object_t *obj)
     demux->pf_control = Control;
     demux->p_sys      = p_sys;
 
-    p_sys->session = rtp_session_create (demux);
+    p_sys->session = rtp_session_create();
     if (p_sys->session == NULL)
         goto error;
 
@@ -620,7 +620,7 @@ error:
         srtp_destroy(p_sys->srtp);
 #endif
     if (p_sys->session != NULL)
-        rtp_session_destroy(demux, p_sys->session);
+        rtp_session_destroy(obj->logger, p_sys->session);
     if (p_sys->rtcp_sock != NULL)
         vlc_dtls_Close(p_sys->rtcp_sock);
     vlc_dtls_Close(p_sys->rtp_sock);

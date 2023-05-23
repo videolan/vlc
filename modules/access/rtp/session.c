@@ -45,8 +45,8 @@ struct rtp_session_t
 };
 
 static rtp_source_t *
-rtp_source_create (demux_t *, const rtp_session_t *, uint32_t, uint16_t);
-static void rtp_source_destroy(demux_t *, rtp_source_t *);
+rtp_source_create (struct vlc_logger *, const rtp_session_t *, uint32_t, uint16_t);
+static void rtp_source_destroy(struct vlc_logger *, rtp_source_t *);
 
 static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
 
@@ -54,7 +54,7 @@ static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
  * Creates a new RTP session.
  */
 rtp_session_t *
-rtp_session_create (demux_t *demux)
+rtp_session_create (void)
 {
     rtp_session_t *session = malloc (sizeof (*session));
     if (session == NULL)
@@ -65,7 +65,6 @@ rtp_session_create (demux_t *demux)
     session->ptc = 0;
     session->ptv = NULL;
 
-    (void)demux;
     return session;
 }
 
@@ -73,10 +72,10 @@ rtp_session_create (demux_t *demux)
 /**
  * Destroys an RTP session.
  */
-void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
+void rtp_session_destroy (struct vlc_logger *logger, rtp_session_t *session)
 {
     for (unsigned i = 0; i < session->srcc; i++)
-        rtp_source_destroy(demux, session->srcv[i]);
+        rtp_source_destroy(logger, session->srcv[i]);
 
     for (uint_fast8_t i = 0; i < session->ptc; i++)
         vlc_rtp_pt_release(session->ptv[i]);
@@ -84,7 +83,6 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
     free (session->srcv);
     free (session->ptv);
     free (session);
-    (void)demux;
 }
 
 /**
@@ -132,7 +130,7 @@ struct rtp_source_t
  * Initializes a new RTP source within an RTP session.
  */
 static rtp_source_t *
-rtp_source_create (demux_t *demux, const rtp_session_t *session,
+rtp_source_create (struct vlc_logger *logger, const rtp_session_t *session,
                    uint32_t ssrc, uint16_t init_seq)
 {
     rtp_source_t *source;
@@ -149,7 +147,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
     source->last_seq = init_seq - 1;
     source->blocks = NULL;
     source->pt.instance = NULL;
-    msg_Dbg (demux, "added RTP source (%08x)", ssrc);
+    vlc_debug (logger, "added RTP source (%08x)", ssrc);
     return source;
 }
 
@@ -157,9 +155,9 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
 /**
  * Destroys an RTP source and its associated streams.
  */
-static void rtp_source_destroy(demux_t *demux, rtp_source_t *source)
+static void rtp_source_destroy(struct vlc_logger *logger, rtp_source_t *source)
 {
-    msg_Dbg (demux, "removing RTP source (%08x)", source->ssrc);
+    vlc_debug (logger, "removing RTP source (%08x)", source->ssrc);
     if (source->pt.instance != NULL)
         vlc_rtp_pt_end(source->pt.instance, source->pt.opaque);
     block_ChainRelease (source->blocks);
@@ -239,7 +237,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         /* RTP source garbage collection */
         if ((tmp->last_rx + p_sys->timeout) < now)
         {
-            rtp_source_destroy(demux, tmp);
+            rtp_source_destroy(VLC_OBJECT(demux)->logger, tmp);
             if (--session->srcc > 0)
                 session->srcv[i] = session->srcv[session->srcc - 1];
         }
@@ -260,7 +258,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
             goto drop;
         session->srcv = tab;
 
-        src = rtp_source_create (demux, session, ssrc, seq);
+        src = rtp_source_create (VLC_OBJECT(demux)->logger, session, ssrc, seq);
         if (src == NULL)
             goto drop;
 
