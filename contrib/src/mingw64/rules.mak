@@ -58,6 +58,8 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(UNPACK)
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -132,5 +134,6 @@ MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/winbase.h "$(PREFIX)/include"
 	touch $@
 

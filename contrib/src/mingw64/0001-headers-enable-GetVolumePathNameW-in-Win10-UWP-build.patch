@@ -1,0 +1,39 @@
+From de5009b7952c6c74511facef02c3d21855b4ee0e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Sat, 27 May 2023 11:52:25 +0200
+Subject: [PATCH] headers: enable GetVolumePathNameW in Win10 UWP builds
+
+The documentation doesn't say it's allowed, but the WIndows SDK allow it and
+the Windows App Certification as well.
+
+The official page for allowed API's also doesn't say it's allowed [1]
+but the DLL that contains it is there.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-file-l2-1-0dll
+---
+ mingw-w64-headers/include/fileapi.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mingw-w64-headers/include/fileapi.h b/mingw-w64-headers/include/fileapi.h
+index 8ea09f6c9..e9e0c647f 100644
+--- a/mingw-w64-headers/include/fileapi.h
++++ b/mingw-w64-headers/include/fileapi.h
+@@ -81,6 +81,7 @@ WINBASEAPI DWORD WINAPI SetFilePointer (HANDLE hFile, LONG lDistanceToMove, PLON
+   WINBASEAPI DWORD WINAPI GetFullPathNameA (LPCSTR lpFileName, DWORD nBufferLength, LPSTR lpBuffer, LPSTR *lpFilePart);
+   WINBASEAPI DWORD WINAPI GetFullPathNameW (LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
+   WINBASEAPI DWORD WINAPI GetLogicalDrives (VOID);
++  WINBASEAPI WINBOOL WINAPI GetVolumePathNameW (LPCWSTR lpszFileName, LPWSTR lpszVolumePathName, DWORD cchBufferLength);
+ #define FindFirstFile __MINGW_NAME_AW(FindFirstFile)
+ #define GetDiskFreeSpace __MINGW_NAME_AW(GetDiskFreeSpace)
+ #define GetDriveType __MINGW_NAME_AW(GetDriveType)
+@@ -89,7 +90,6 @@ WINBASEAPI DWORD WINAPI SetFilePointer (HANDLE hFile, LONG lDistanceToMove, PLON
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   WINBASEAPI DWORD WINAPI GetLogicalDriveStringsW (DWORD nBufferLength, LPWSTR lpBuffer);
+   WINBASEAPI DWORD WINAPI GetShortPathNameW (LPCWSTR lpszLongPath, LPWSTR lpszShortPath, DWORD cchBuffer);
+-  WINBASEAPI WINBOOL WINAPI GetVolumePathNameW (LPCWSTR lpszFileName, LPWSTR lpszVolumePathName, DWORD cchBufferLength);
+   WINBASEAPI DWORD WINAPI QueryDosDeviceW (LPCWSTR lpDeviceName, LPWSTR lpTargetPath, DWORD ucchMax);
+   WINBASEAPI WINBOOL WINAPI ReadFileScatter (HANDLE hFile, FILE_SEGMENT_ELEMENT aSegmentArray[], DWORD nNumberOfBytesToRead, LPDWORD lpReserved, LPOVERLAPPED lpOverlapped);
+   WINBASEAPI WINBOOL WINAPI SetFileValidData (HANDLE hFile, LONGLONG ValidDataLength);
+-- 
+2.37.3.windows.1
+
