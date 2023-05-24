@@ -642,8 +642,6 @@ static void Close(encoder_t *enc)
 
     MFXVideoENCODE_Close(sys->session);
     MFXClose(sys->session);
-    /* if (enc->fmt_out.p_extra) */
-    /*     free(enc->fmt_out.p_extra); */
     assert(vlc_list_is_empty(&sys->packets));
     if (sys->input_pool)
         picture_pool_Release(sys->input_pool);
