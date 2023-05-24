@@ -364,6 +364,19 @@ static uint64_t qsv_params_get_value(const char *const *text,
     return list[result];
 }
 
+static void delete_sys(encoder_sys_t *sys)
+{
+    MFXVideoENCODE_Close(sys->session);
+    MFXClose(sys->session);
+
+    assert(vlc_list_is_empty(&sys->packets));
+
+    if (sys->input_pool)
+        picture_pool_Release(sys->input_pool);
+
+    free(sys);
+}
+
 static int Open(vlc_object_t *this)
 {
     encoder_t *enc = (encoder_t *)this;
@@ -629,23 +642,16 @@ static int Open(vlc_object_t *this)
     return VLC_SUCCESS;
 
  error:
-    Close(enc);
+    delete_sys(sys);
     return VLC_EGENERIC;
  nomem:
-    Close(enc);
+    delete_sys(sys);
     return VLC_ENOMEM;
 }
 
 static void Close(encoder_t *enc)
 {
-    encoder_sys_t *sys = enc->p_sys;
-
-    MFXVideoENCODE_Close(sys->session);
-    MFXClose(sys->session);
-    assert(vlc_list_is_empty(&sys->packets));
-    if (sys->input_pool)
-        picture_pool_Release(sys->input_pool);
-    free(sys);
+    delete_sys(enc->p_sys);
 }
 
 /*
