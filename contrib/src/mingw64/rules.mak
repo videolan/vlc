@@ -10,7 +10,7 @@ PKGS += winpthreads
 
 ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
-PKGS += winrt_headers
+PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += d3d9 dcomp
 endif # !HAVE_WINSTORE
@@ -42,7 +42,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp
+PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp alloweduwp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -56,6 +56,8 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -121,5 +123,14 @@ MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 .dxva: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
+	touch $@
+
+.sum-alloweduwp: .sum-mingw64
+	touch $@
+
+.alloweduwp: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
 	touch $@
 

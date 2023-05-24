@@ -1,0 +1,37 @@
+From 9559b683801027a3a944b60dd4c7b49debbcb66e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 25 May 2023 08:19:26 +0200
+Subject: [PATCH] headers: enable VirtualAlloc(Ex) in Win10 UWP builds
+
+It is now officially allowed [1].
+
+[1] https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
+---
+ mingw-w64-headers/include/memoryapi.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mingw-w64-headers/include/memoryapi.h b/mingw-w64-headers/include/memoryapi.h
+index 0f2b4ae79..152671c18 100644
+--- a/mingw-w64-headers/include/memoryapi.h
++++ b/mingw-w64-headers/include/memoryapi.h
+@@ -29,6 +29,8 @@ extern "C" {
+ #endif
+ 
+ #if (WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP) && _WIN32_WINNT >= _WIN32_WINNT_WIN10) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++    WINBASEAPI LPVOID WINAPI VirtualAlloc (LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
++    WINBASEAPI LPVOID WINAPI VirtualAllocEx (HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+     WINBASEAPI WINBOOL WINAPI VirtualFree (LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType);
+ #endif
+ 
+@@ -78,8 +80,6 @@ extern "C" {
+ #define FILE_CACHE_MIN_HARD_ENABLE 0x00000004
+ #define FILE_CACHE_MIN_HARD_DISABLE 0x00000008
+ 
+-  WINBASEAPI LPVOID WINAPI VirtualAlloc (LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+-  WINBASEAPI LPVOID WINAPI VirtualAllocEx (HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+   WINBASEAPI WINBOOL WINAPI VirtualProtectEx (HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
+   WINBASEAPI SIZE_T WINAPI VirtualQueryEx (HANDLE hProcess, LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength);
+   WINBASEAPI WINBOOL WINAPI ReadProcessMemory (HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T *lpNumberOfBytesRead);
+-- 
+2.37.3.windows.1
+
