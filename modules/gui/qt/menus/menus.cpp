@@ -296,6 +296,22 @@ void VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
         if( m && m->parent() == menu ) delete m;
     }
 
+    QString title;
+
+    if (mi->hasMediaLibrary())
+        title = qtr("Media Library");
+    else
+        title = qtr("Browse and Discover");
+
+    action = menu->addAction(
+#ifndef __APPLE__
+            QIcon( ":/menu/media_library.svg" ),
+#endif
+            title);
+    action->setCheckable( true );
+    connect( action, &QAction::triggered, mi, &MainCtx::setMediaLibraryVisible );
+    action->setChecked( mi->isMediaLibraryVisible() );
+
     action = menu->addAction(
 #ifndef __APPLE__
             QIcon( ":/menu/playlist.svg" ),
