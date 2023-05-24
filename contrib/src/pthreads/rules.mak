@@ -9,8 +9,11 @@ ifdef HAVE_WIN32
 PKGS += pthreads
 
 ifndef HAVE_VISUALSTUDIO
+ifdef HAVE_WINSTORE
+PKGS += alloweduwp
+endif
 PKGS += dxva dxvahd
-PKGS_ALL += dxva dxvahd
+PKGS_ALL += dxva dxvahd alloweduwp
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
@@ -37,6 +40,8 @@ pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	$(UNPACK)
 	$(APPLY) $(SRC)/pthreads/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
 	$(APPLY) $(SRC)/pthreads/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
+	$(APPLY) $(SRC)/pthreads/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
+	$(APPLY) $(SRC)/pthreads/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
 	$(MOVE)
 
 .pthreads: pthreads
@@ -60,3 +65,12 @@ pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	cd $< && cp mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 
+
+.sum-alloweduwp: .sum-pthreads
+	touch $@
+
+.alloweduwp: pthreads
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
+	touch $@
