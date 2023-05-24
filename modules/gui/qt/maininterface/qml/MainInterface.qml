@@ -107,11 +107,46 @@ Item {
             return
         }
         stackView.loadView(g_mainInterface.pageModel, current.name, current.properties)
+
+        MainCtx.mediaLibraryVisible = (current.name !== "player")
     }
 
     Connections {
         target: History
         onCurrentChanged: loadCurrentHistoryView()
+    }
+
+    Connections {
+        target: MainCtx
+
+        onMediaLibraryVisibleChanged: {
+            if (MainCtx.mediaLibraryVisible) {
+                // NOTE: Useful when we started the application on the 'player' view.
+                if (History.previousEmpty) {
+                    if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
+                        mainPlaylistController.stop()
+
+                    _pushHome()
+
+                    return
+                }
+
+                if (History.current.name !== "player")
+                    return
+
+                if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
+                    mainPlaylistController.stop()
+
+                History.previous()
+            } else {
+                if (History.current.name === "player")
+                    return
+
+                stackView.currentItem._inhibitMiniPlayer = true
+
+                History.push(["player"])
+            }
+        }
     }
 
     function setInitialView() {
@@ -127,6 +162,12 @@ Item {
             History.push(["player"])
     }
 
+    function _pushHome() {
+        if (MainCtx.mediaLibraryAvailable)
+            History.push(["mc", "video"])
+        else
+            History.push(["mc", "home"])
+    }
 
     Component.onCompleted: {
         g_mainInterface._interfaceReady = true;
@@ -177,12 +218,7 @@ Item {
                     if (Player.playingState === Player.PLAYING_STATE_STOPPED
                             && History.current.name === "player") {
                         if (History.previousEmpty)
-                        {
-                            if (MainCtx.mediaLibraryAvailable)
-                                History.push(["mc", "video"])
-                            else
-                                History.push(["mc", "home"])
-                        }
+                            _pushHome()
                         else
                             History.previous()
                     }
