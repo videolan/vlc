@@ -1,6 +1,6 @@
 # winpthreads, dxvahd
 
-MINGW64_VERSION := 10.0.0
+MINGW64_VERSION := 11.0.0
 MINGW64_URL := $(SF)/mingw-w64/mingw-w64/mingw-w64-release/mingw-w64-v$(MINGW64_VERSION).tar.bz2
 MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
 MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
@@ -44,8 +44,6 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
-	$(APPLY) $(SRC)/mingw64/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
-	$(APPLY) $(SRC)/mingw64/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
