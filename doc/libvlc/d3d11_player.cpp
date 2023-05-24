@@ -11,6 +11,7 @@
 */
 
 #include <windows.h>
+#include <windowsx.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <cassert>
@@ -81,6 +82,9 @@ struct render_context
         unsigned width, height;
     } client_area;
     libvlc_video_output_resize_cb ReportSize;
+    libvlc_video_output_mouse_move_cb MouseMove;
+    libvlc_video_output_mouse_press_cb MousePress;
+    libvlc_video_output_mouse_release_cb MouseRelease;
     void *ReportOpaque;
 };
 
@@ -508,6 +512,9 @@ static void SetReport_cb( void *opaque,
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     AcquireSRWLockExclusive(&ctx->sizeLock);
     ctx->ReportSize = report_size_change;
+    ctx->MouseMove = report_mouse_move;
+    ctx->MousePress = report_mouse_press;
+    ctx->MouseRelease = report_mouse_release;
     ctx->ReportOpaque = report_opaque;
 
     if (ctx->ReportSize != nullptr)
@@ -516,6 +523,25 @@ static void SetReport_cb( void *opaque,
         ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
     }
     ReleaseSRWLockExclusive(&ctx->sizeLock);
+}
+
+static libvlc_video_output_mouse_button_t windowsButtonToVLC(UINT message)
+{
+    switch (message)
+    {
+    case WM_LBUTTONUP:
+    case WM_LBUTTONDOWN:
+        return libvlc_video_output_mouse_button_left;
+    case WM_MBUTTONUP:
+    case WM_MBUTTONDOWN:
+        return libvlc_video_output_mouse_button_middle;
+    case WM_RBUTTONUP:
+    case WM_RBUTTONDOWN:
+        return libvlc_video_output_mouse_button_right;
+    default:
+        //should not happen
+        return libvlc_video_output_mouse_button_right;
+    }
 }
 
 static const char *AspectRatio = NULL;
@@ -571,6 +597,42 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             AcquireSRWLockExclusive(&ctx->sizeLock);
             if (ctx->ReportSize != nullptr)
                 ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+            ReleaseSRWLockExclusive(&ctx->sizeLock);
+        }
+        break;
+
+        case WM_MOUSEMOVE:
+        {
+            int mouseX = int(GET_X_LPARAM(lParam) - ctx->client_area.width * (BORDER_LEFT + 1)/2.0f);
+            int mouseY = int(GET_Y_LPARAM(lParam) - ctx->client_area.width * (1 - BORDER_TOP) / 2.0f);
+
+            AcquireSRWLockExclusive(&ctx->sizeLock);
+            if (ctx->MouseMove != nullptr)
+                ctx->MouseMove(ctx->ReportOpaque, mouseX, mouseY);
+            ReleaseSRWLockExclusive(&ctx->sizeLock);
+        }
+        break;
+
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_LBUTTONDOWN:
+        {
+            auto button = windowsButtonToVLC(message);
+            AcquireSRWLockExclusive(&ctx->sizeLock);
+            if (ctx->MousePress != nullptr)
+                ctx->MousePress(ctx->ReportOpaque, button);
+            ReleaseSRWLockExclusive(&ctx->sizeLock);
+        }
+        break;
+
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_LBUTTONUP:
+        {
+            auto button = windowsButtonToVLC(message);
+            AcquireSRWLockExclusive(&ctx->sizeLock);
+            if (ctx->MouseRelease != nullptr)
+                ctx->MouseRelease(ctx->ReportOpaque, button);
             ReleaseSRWLockExclusive(&ctx->sizeLock);
         }
         break;
