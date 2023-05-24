@@ -148,6 +148,8 @@ class MainCtx : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool mediaLibraryVisible READ isMediaLibraryVisible WRITE setMediaLibraryVisible
+               NOTIFY mediaLibraryVisibleChanged FINAL)
     Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged FINAL)
     Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged FINAL)
     Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged FINAL)
@@ -231,6 +233,7 @@ public:
 
     inline bool isInterfaceFullScreen() const { return m_windowVisibility == QWindow::FullScreen; }
     inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
+    bool isMediaLibraryVisible() { return m_mediaLibraryVisible; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return playlistVisible; }
     inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
@@ -364,6 +367,7 @@ protected:
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
+    bool                 m_mediaLibraryVisible = true;
     bool                 playlistVisible = false;       ///< Is the playlist visible ?
     double               playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
 
@@ -390,6 +394,7 @@ public slots:
     void hideUpdateSystrayMenu();
     void toggleToolbarMenu();
     void toggleInterfaceFullScreen();
+    void setMediaLibraryVisible( bool );
     void setPlaylistDocked( bool );
     void setPlaylistVisible( bool );
     void setPlaylistWidthFactor( double );
@@ -436,6 +441,7 @@ signals:
     void askRaise();
     void kc_pressed(); /* easter eggs */
 
+    void mediaLibraryVisibleChanged(bool);
     void playlistDockedChanged(bool);
     void playlistVisibleChanged(bool);
     void playlistWidthFactorChanged(double);

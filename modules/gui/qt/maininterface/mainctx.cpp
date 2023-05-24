@@ -488,6 +488,15 @@ inline void MainCtx::initSystray()
         createSystray();
 }
 
+void MainCtx::setMediaLibraryVisible( bool visible )
+{
+    if (m_mediaLibraryVisible == visible)
+        return;
+
+    m_mediaLibraryVisible = visible;
+
+    emit mediaLibraryVisibleChanged(visible);
+}
 
 void MainCtx::setPlaylistDocked( bool docked )
 {
