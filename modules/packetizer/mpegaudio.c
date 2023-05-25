@@ -643,7 +643,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_layer = p_sys->i_bit_rate = 0;
 
     /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_MPGA;
+    p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
