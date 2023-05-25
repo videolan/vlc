@@ -53,6 +53,7 @@ OpenDecoder(vlc_object_t *p_this)
     switch (p_dec->fmt_in->i_codec)
     {
     case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP2:
     case VLC_CODEC_MP3:
         /* Disabled by default */
         if (!p_dec->obj.force)
