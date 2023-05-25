@@ -382,6 +382,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in->i_codec != VLC_CODEC_MPGA &&
+        p_dec->fmt_in->i_codec != VLC_CODEC_MP2 &&
         p_dec->fmt_in->i_codec != VLC_CODEC_MP3 )
         return VLC_EGENERIC;
 
