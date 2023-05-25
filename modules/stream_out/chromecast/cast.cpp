@@ -760,8 +760,16 @@ bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
 {
     if( transcoding_state & TRANSCODING_VIDEO )
         return false;
-    return i_codec == VLC_CODEC_H264 || i_codec == VLC_CODEC_HEVC
-        || i_codec == VLC_CODEC_VP8 || i_codec == VLC_CODEC_VP9;
+    switch( i_codec )
+    {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+        case VLC_CODEC_VP8:
+        case VLC_CODEC_VP9:
+            return true;
+        default:
+            return false;
+    }
 }
 
 bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
