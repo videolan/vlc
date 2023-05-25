@@ -1208,8 +1208,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         block_t *p_data;
         if( p_stream == p_pcr_stream || p_sys->b_data_alignment
-             || ((p_input->p_fmt->i_codec != VLC_CODEC_MPGA ) &&
-                 (p_input->p_fmt->i_codec != VLC_CODEC_MP3) ) )
+             || (p_input->p_fmt->i_codec != VLC_CODEC_MPGA &&
+                 p_input->p_fmt->i_codec != VLC_CODEC_MP2 &&
+                 p_input->p_fmt->i_codec != VLC_CODEC_MP3 ) )
         {
             p_data = block_FifoGet( p_input->p_fifo );
             if( p_data->i_dts == VLC_TICK_INVALID )
