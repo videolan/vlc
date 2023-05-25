@@ -766,10 +766,10 @@ static int MpgaCheckSync( const uint8_t *p_peek )
 
 #define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
 #define MPGA_MODE(h)        (((h)>> 6)&0x03)
-
+#define MPGA_LAYER(h)       ( 3 - (((h)>>17)&0x03) )
 static int MpgaGetFrameSamples( uint32_t h )
 {
-    const int i_layer = 3 - (((h)>>17)&0x03);
+    const int i_layer = MPGA_LAYER( h );
     switch( i_layer )
     {
     case 0:
@@ -1016,6 +1016,9 @@ static int MpgaInit( demux_t *p_demux )
     const uint32_t header = GetDWBE( p_peek );
     if( !MpgaCheckSync( p_peek ) )
         return VLC_SUCCESS;
+
+    if( MPGA_LAYER( header ) == 2 )
+        p_sys->codec.i_codec = VLC_CODEC_MP3;
 
     /* Xing header */
     const uint8_t *p_xing = p_peek;
