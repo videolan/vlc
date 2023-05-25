@@ -46,6 +46,12 @@ FocusScope{
 
     property int reservedHeight: 0
 
+    // Private
+
+    property bool _showTopBar: (pinControls === false || root.showToolbar === false)
+
+    property bool _showCenterText: (pinControls && showToolbar === false && showCSD)
+
     readonly property int _sideMargin: VLCStyle.margin_small + sideMargin
 
     // Aliases
@@ -69,6 +75,9 @@ FocusScope{
     onShowToolbarChanged: root._layout()
     onTopMarginChanged: root._layout()
     onSideMarginChanged: root._layout()
+
+    on_ShowTopBarChanged: _layout()
+    on_ShowCenterText: _layout()
 
     function _layoutLine(c1, c2, offset)
     {
@@ -100,7 +109,7 @@ FocusScope{
     function _layout() {
         let offset = root.topMargin
 
-        if (root.pinControls && !root.showToolbar && root.showCSD) {
+        if (root._showCenterText) {
             //place everything on one line
             //csdDecorations.implicitHeight gets overwritten when the height is set,
             //VLCStyle.icon_normal is its initial value
@@ -156,16 +165,8 @@ FocusScope{
 
             right = playlistGroup
 
-            const secondLineOffset = offset
-            const secondLineHeight = root._layoutLine(left, right, offset)
-
-            offset += secondLineHeight
-
-            if (root.pinControls) {
-                centerTitleText.y = secondLineOffset
-                centerTitleText.height = secondLineHeight
-            }
-
+            if (_showTopBar)
+                offset += _layoutLine(left, right, offset)
         }
 
         root.implicitHeight = offset
@@ -203,7 +204,6 @@ FocusScope{
         onMenuOpenedChanged: root.requestLockUnlockAutoHide(menuOpened)
     }
 
-
     Item {
         id: logoOrResume
 
@@ -214,8 +214,14 @@ FocusScope{
         implicitWidth: resumeVisible ? resumeDialog.implicitWidth
                                      : logoGroup.implicitWidth
 
-        implicitHeight: resumeVisible ? resumeDialog.implicitHeight
-                                      : logoGroup.implicitHeight
+        implicitHeight: {
+            if (root.resumeVisible)
+                return resumeDialog.implicitHeight
+            else if (_showTopBar)
+                return logoGroup.implicitHeight
+            else
+                return 0
+        }
 
         onImplicitHeightChanged: root._layout()
 
@@ -223,7 +229,8 @@ FocusScope{
             id: logoGroup
 
             anchors.fill: parent
-            visible: !resumeVisible
+
+            visible: (root._showTopBar && root.resumeVisible === false)
 
             implicitHeight: VLCStyle.icon_banner + VLCStyle.margin_xxsmall * 2
             implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall
@@ -266,7 +273,6 @@ FocusScope{
             }
         }
 
-
         ResumeDialog {
             id: resumeDialog
 
@@ -305,7 +311,8 @@ FocusScope{
         readonly property bool _alignHCenter: _centerX > _leftLimit
                                               && _centerX + centerTitleText.implicitWidth < _rightLimit
 
-        visible: root.pinControls && !resumeVisible
+        visible: (_showCenterText && root.resumeVisible === false)
+
         enabled: visible
 
         width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
@@ -345,6 +352,7 @@ FocusScope{
         width: root.textWidth - VLCStyle.margin_normal
 
         visible: !root.pinControls
+
         enabled: visible
 
         topPadding: VLCStyle.margin_large
@@ -391,6 +399,8 @@ FocusScope{
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.rightMargin: root._sideMargin + extraRightMargin
+
+        visible: root._showTopBar
 
         Widgets.IconControlButton {
             id: menuSelector
