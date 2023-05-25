@@ -1368,6 +1368,9 @@ static int MpgaInit( demux_t *p_demux )
     if( !MpgaCheckSync( p_peek ) || mpga_decode_frameheader( header, &p_sys->mpgah ) )
         return VLC_SUCCESS;
 
+    if( p_sys->mpgah.i_layer == 3 )
+        p_sys->codec.i_codec = VLC_CODEC_MP3;
+
     /* Xing header */
     int i_skip;
 
