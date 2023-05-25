@@ -100,6 +100,7 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
             mp4mux_AddExtraBrand(h, BRAND_iso6);
             break;
         case VLC_CODEC_MP3:
+        case VLC_CODEC_MP2:
         case VLC_CODEC_MPGA:
         case VLC_CODEC_MP4V:
         case VLC_CODEC_DIV1:
@@ -638,6 +639,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         i_object_profile_indication = 0x40; /* Audio 14496-3 */
         break;
     case VLC_CODEC_MP3:
+    case VLC_CODEC_MP2:
     case VLC_CODEC_MPGA:
         i_object_profile_indication =
             p_track->fmt.audio.i_rate < 32000 ? 0x69 /* Audio 13818-3 */
@@ -1182,6 +1184,7 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             } else b_descr = true;
             break;
         case VLC_CODEC_MPGA:
+        case VLC_CODEC_MP2:
         case VLC_CODEC_MP3:
             if (b_mov) {
                 /* mpeg audio in mov */
@@ -2326,6 +2329,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP2:
     case VLC_CODEC_MP3:
     case VLC_CODEC_MPGV:
     case VLC_CODEC_MP2V:
