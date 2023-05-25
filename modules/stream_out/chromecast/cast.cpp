@@ -791,6 +791,8 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
         case VLC_CODEC_VORBIS:
         case VLC_CODEC_OPUS:
         case VLC_CODEC_MP3:
+        case VLC_CODEC_MP2:
+        case VLC_CODEC_MPGA:
             return true;
         default:
             return false;
