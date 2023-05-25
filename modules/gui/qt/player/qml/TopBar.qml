@@ -193,7 +193,7 @@ FocusScope{
 
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin: root._sideMargin
+        anchors.leftMargin: root.sideMargin
 
         width: implicitWidth
 
