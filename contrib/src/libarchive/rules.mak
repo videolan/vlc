@@ -14,13 +14,16 @@ DEPS_libarchive += alloweduwp $(DEPS_alloweduwp)
 endif
 
 LIBARCHIVE_CONF := \
-		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
-		--without-nettle \
-		--without-xml2 --without-lzma --without-iconv --without-expat
+		-DENABLE_CPIO=OFF -DENABLE_TAR=OFF -DENABLE_CAT=OFF \
+		-DENABLE_NETTLE=OFF \
+		-DENABLE_LIBXML2=OFF -DENABLE_LZMA=OFF -DENABLE_ICONV=OFF -DENABLE_EXPAT=OFF \
+		-DENABLE_TEST=OFF
+
+# CNG enables bcrypt on Windows and useless otherwise, it's OK we build for Win7+
+LIBARCHIVE_CONF +=-DENABLE_CNG=ON
 
 ifdef HAVE_WIN32
-# CNG enables bcrypt on Windows and useless otherwise, it's OK we build for Win7+
-LIBARCHIVE_CONF += --without-openssl --with-cng
+LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
 endif
 
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
@@ -30,9 +33,10 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
-ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/libarchive/android.patch
-endif
+	$(APPLY) $(SRC)/libarchive/0001-Fix-compile-on-Android.patch
+	$(APPLY) $(SRC)/libarchive/0001-Fix-build-error-when-cross-compiling-for-Windows.patch
+	$(APPLY) $(SRC)/libarchive/0001-Fix-bcrypt-detection-on-UNIX-cross-compilation.patch
+	$(APPLY) $(SRC)/libarchive/0001-Use-the-common-CMake-BUILD_SHARED_LIBS-to-build-shar.patch
 	$(APPLY) $(SRC)/libarchive/0001-Use-CreateHardLinkW-and-CreateSymbolicLinkW-directly.patch
 	$(APPLY) $(SRC)/libarchive/0002-Disable-CreateSymbolicLinkW-use-in-UWP-builds.patch
 	$(APPLY) $(SRC)/libarchive/0003-fix-the-CreateHardLinkW-signature-to-match-the-real-.patch
@@ -45,10 +49,9 @@ endif
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
-.libarchive: libarchive
-	$(RECONF)
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(LIBARCHIVE_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.libarchive: libarchive toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) $(LIBARCHIVE_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@

@@ -1,0 +1,33 @@
+From eaa608e13ea8c3953fc479af65eab863b94b4cd3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 25 May 2023 11:33:23 +0200
+Subject: [PATCH] Fix build error when cross-compiling for Windows
+
+CHECK_C_SOURCE_RUNS generates a build error when cross-compiling.
+
+ZLIB_WINAPI is the only one tested. When the run test fails, it's tested again
+with just a compilation.
+---
+ CMakeLists.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dbb95e34..f0bbfd02 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -370,7 +370,11 @@ MACRO (TRY_MACRO_FOR_LIBRARY INCLUDES LIBRARIES
+       IF("${TRY_TYPE}" MATCHES "COMPILES")
+         CHECK_C_SOURCE_COMPILES("${SAMPLE_SOURCE}" ${VAR})
+       ELSEIF("${TRY_TYPE}" MATCHES "RUNS")
+-        CHECK_C_SOURCE_RUNS("${SAMPLE_SOURCE}" ${VAR})
++        IF(CMAKE_CROSSCOMPILING)
++          MESSAGE(WARNING "Cannot test run \"${VAR}\" when cross-compiling")
++        ELSE(CMAKE_CROSSCOMPILING)
++          CHECK_C_SOURCE_RUNS("${SAMPLE_SOURCE}" ${VAR})
++        ENDIF(CMAKE_CROSSCOMPILING)
+       ELSE("${TRY_TYPE}" MATCHES "COMPILES")
+         MESSAGE(FATAL_ERROR "UNKNOWN KEYWORD \"${TRY_TYPE}\" FOR TRY_TYPE")
+       ENDIF("${TRY_TYPE}" MATCHES "COMPILES")
+-- 
+2.37.3.windows.1
+
