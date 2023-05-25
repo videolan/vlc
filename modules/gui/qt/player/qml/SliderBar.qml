@@ -86,20 +86,91 @@ Slider {
         pos: Qt.point(sliderRectMouseArea.mouseX, 0)
     }
 
-    Item {
+    QtObject {
         id: fsm
-
         signal playerUpdatePosition(real position)
         signal pressControl(real position, bool forcePrecise)
         signal releaseControl(real position, bool forcePrecise)
         signal moveControl(real position, bool forcePrecise)
 
-        property var _state: fsmReleased
+        //each signal is associated to a key, when a signal is received,
+        //transitions of active state for the given key are evaluated
+        property var signalMap: ({
+            playerUpdatePosition: fsm.playerUpdatePosition,
+            pressControl: fsm.pressControl,
+            releaseControl: fsm.releaseControl,
+            moveControl: fsm.moveControl
+        })
 
-        function _changeState(state) {
-            _state.enabled = false
+        property var initialState: fsmReleased
+        property var _state: null
+
+        function _evaluateTransition(state, event, t, ...args) {
+            if ("guard" in t) {
+                if (!(t.guard instanceof Function)) {
+                    console.error(`guard property of ${state}::${event} is not a function`)
+                }
+                if (!t.guard(...args))
+                   return false
+            }
+
+            if ("action" in t) {
+                if (!(t.action instanceof Function))
+                    console.error(`action property of ${state}::${event} is not a function`)
+                t.action(...args)
+            }
+
+            if ("target" in t)
+                changeState(t.target)
+
+            return true
+        }
+
+        function handleSignal(event, state, ...args) {
+            if (!state)
+                return
+
+            if (!(event in _state.transitions))
+                return
+
+            const transitions = state.transitions[event]
+            if (Array.isArray(transitions)) {
+                for (const t of transitions) {
+                    //stop at the first accepted transition
+                    if (_evaluateTransition(state, event, t, ...args))
+                        return
+                }
+            } else {
+                _evaluateTransition(state, event, transitions, ...args)
+            }
+        }
+
+        function changeState(state) {
+            if (_state) {
+                if (_state.exit instanceof Function)
+                    _state.exit()
+            }
+
             _state = state
-            _state.enabled = true
+
+            if (_state) {
+                if (_state.enter instanceof Function)
+                    _state.enter()
+            }
+        }
+
+        Component.onCompleted: {
+            for (const signalName of Object.keys(signalMap)) {
+                signalMap[signalName].connect((...args) => {
+                    //use callLater to ensure transitions are ordered.
+                    //signal are not queued by default, this is an issue
+                    //if an action/enter/exit function raise another signal
+                    Qt.callLater(() => {
+                        handleSignal(signalName, fsm._state, ...args)
+                    })
+                })
+            }
+            changeState(initialState)
         }
 
         function _seekToPosition(position, threshold, forcePrecise) {
@@ -115,37 +186,38 @@ Slider {
             Player.position = position
         }
 
-        Item {
-            id: fsmReleased
-            enabled: true
-
-            Connections {
-                enabled: fsmReleased.enabled
-                target: fsm
-
-                onPlayerUpdatePosition: control.value = position
-
-                onPressControl: {
-                    control.forceActiveFocus()
-                    fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
-                    fsm._changeState(fsmHeld)
-                }
+        property list<QtObject> subStates: [
+            QtObject {
+                id: fsmReleased
+                property var transitions: ({
+                    playerUpdatePosition: {
+                        action: (position) => {
+                            control.value = position
+                        }
+                    },
+                    pressControl: {
+                        action: (position, forcePrecise) => {
+                            control.forceActiveFocus()
+                            fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
+                        },
+                        target: fsmHeld
+                    }
+                })
+            },
+            QtObject  {
+                id: fsmHeld
+                property var transitions: ({
+                    moveControl: {
+                        action: (position, forcePrecise) => {
+                            fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
+                        }
+                    },
+                    releaseControl: {
+                        target: fsmReleased
+                    }
+                })
             }
-        }
-
-        Item {
-            id: fsmHeld
-            enabled: false
-
-            Connections {
-                enabled: fsmHeld.enabled
-                target: fsm
-
-                onMoveControl: fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
-
-                onReleaseControl: fsm._changeState(fsmReleased)
-            }
-        }
+        ]
     }
 
     Connections {
@@ -283,7 +355,7 @@ Slider {
                     }
                 ]
 
-                state: (seekpointsRect._hovered || (seekpointsRect._currentChapter === 0 && fsm._state == fsmHeld))
+                state: (seekpointsRect._hovered || (seekpointsRect._currentChapter === 0 && fsm._state == fsm.fsmHeld))
                        ? "visibleLarge"
                        : "visible"
             }
@@ -433,7 +505,7 @@ Slider {
         ]
 
         state: (control.hovered || control.activeFocus)
-               ? ((control._currentChapterHovered || (Player.hasChapters && fsm._state == fsmHeld)) ? "visibleLarge" : "visible")
+               ? ((control._currentChapterHovered || (Player.hasChapters && fsm._state == fsm.fsmHeld)) ? "visibleLarge" : "visible")
                : "hidden"
     }
 }
