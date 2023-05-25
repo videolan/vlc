@@ -1,6 +1,6 @@
 # LIBARCHIVE
 LIBARCHIVE_VERSION := 3.6.1
-LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
+LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
 ifeq ($(call need_pkg,"libarchive >= 3.2.0"),)
