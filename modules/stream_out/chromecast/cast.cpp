@@ -794,15 +794,17 @@ bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
     const bool original_chromecast = name.size() >= suffix.size() &&
         std::equal(suffix.rbegin(), suffix.rend(), name.rbegin());
 
-    if( i_codec == VLC_CODEC_HEVC )
+    switch( i_codec )
     {
-        if( original_chromecast )
-            // Original Chromecasts do not support HEVC
+        case VLC_CODEC_HEVC:
+            return !original_chromecast; // Original Chromecasts do not support HEVC
+        case VLC_CODEC_H264:
+        case VLC_CODEC_VP8:
+        case VLC_CODEC_VP9:
+            return true;
+        default:
             return false;
-        return true;
     }
-    return i_codec == VLC_CODEC_H264
-        || i_codec == VLC_CODEC_VP8 || i_codec == VLC_CODEC_VP9;
 }
 
 bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
@@ -811,19 +813,23 @@ bool sout_stream_sys_t::canDecodeAudio( sout_stream_t *p_stream,
 {
     if( transcoding_state & TRANSCODING_AUDIO )
         return false;
-    if ( i_codec == VLC_CODEC_A52 || i_codec == VLC_CODEC_EAC3 )
+    switch( i_codec )
     {
-        return var_InheritBool( p_stream, SOUT_CFG_PREFIX "audio-passthrough" );
+        case VLC_CODEC_A52:
+        case VLC_CODEC_EAC3:
+            return var_InheritBool( p_stream, SOUT_CFG_PREFIX "audio-passthrough" );
+        case VLC_FOURCC('h', 'a', 'a', 'c'):
+        case VLC_FOURCC('l', 'a', 'a', 'c'):
+        case VLC_FOURCC('s', 'a', 'a', 'c'):
+        case VLC_CODEC_MP4A:
+            return p_fmt->i_channels <= 2;
+        case VLC_CODEC_VORBIS:
+        case VLC_CODEC_OPUS:
+        case VLC_CODEC_MP3:
+            return true;
+        default:
+            return false;
     }
-    if ( i_codec == VLC_FOURCC('h', 'a', 'a', 'c') ||
-            i_codec == VLC_FOURCC('l', 'a', 'a', 'c') ||
-            i_codec == VLC_FOURCC('s', 'a', 'a', 'c') ||
-            i_codec == VLC_CODEC_MP4A )
-    {
-        return p_fmt->i_channels <= 2;
-    }
-    return i_codec == VLC_CODEC_VORBIS || i_codec == VLC_CODEC_OPUS ||
-           i_codec == VLC_CODEC_MP3;
 }
 
 void sout_stream_sys_t::stopSoutChain(sout_stream_t *p_stream)
