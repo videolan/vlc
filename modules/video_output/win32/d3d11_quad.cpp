@@ -341,6 +341,9 @@ void d3d11_quad_t::UpdateViewport(const RECT *rect, const d3d_format_t *display)
     case DXGI_FORMAT_UNKNOWN:
         switch ( generic.textureFormat->fourcc )
         {
+        case VLC_CODEC_I444_16L:
+        case VLC_CODEC_I444_12L:
+        case VLC_CODEC_I444_10L:
         case VLC_CODEC_I444:
             if ( display->formatTexture != DXGI_FORMAT_NV12 &&
                  display->formatTexture != DXGI_FORMAT_P010 )
