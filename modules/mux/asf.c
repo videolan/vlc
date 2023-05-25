@@ -373,6 +373,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     i_blockalign = 1;
                     i_extra = 12;
                     break;
+                case VLC_CODEC_MP2:
                 case VLC_CODEC_MPGA:
                     tk->psz_name = "MPEG Audio Layer 1/2";
                     tk->i_tag = WAVE_FORMAT_MPEG;
