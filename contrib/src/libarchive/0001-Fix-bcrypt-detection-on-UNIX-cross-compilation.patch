@@ -1,0 +1,58 @@
+From d11155deb2a8ae33f2d0d293721980ae8fa95e6e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 25 May 2023 11:47:13 +0200
+Subject: [PATCH] Fix bcrypt detection on UNIX cross-compilation
+
+The Windows SDK uses an uppercase on the B, but mingw-w64 doesn't.
+The autoconf detection already uses a lowercase bcrypt.
+---
+ CMakeLists.txt                        | 4 ++--
+ build/cmake/config.h.in               | 2 +-
+ contrib/android/config/windows_host.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dbb95e34..a174fc2c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -734,9 +734,9 @@ LA_CHECK_INCLUDE_FILE("wchar.h" HAVE_WCHAR_H)
+ LA_CHECK_INCLUDE_FILE("wctype.h" HAVE_WCTYPE_H)
+ LA_CHECK_INCLUDE_FILE("windows.h" HAVE_WINDOWS_H)
+ IF(ENABLE_CNG)
+-  LA_CHECK_INCLUDE_FILE("Bcrypt.h" HAVE_BCRYPT_H)
++  LA_CHECK_INCLUDE_FILE("bcrypt.h" HAVE_BCRYPT_H)
+   IF(HAVE_BCRYPT_H)
+-    LIST(APPEND ADDITIONAL_LIBS "Bcrypt")
++    LIST(APPEND ADDITIONAL_LIBS "bcrypt")
+   ENDIF(HAVE_BCRYPT_H)
+ ELSE(ENABLE_CNG)
+   UNSET(HAVE_BCRYPT_H CACHE)
+diff --git a/build/cmake/config.h.in b/build/cmake/config.h.in
+index ff74f33f..e4ff6969 100644
+--- a/build/cmake/config.h.in
++++ b/build/cmake/config.h.in
+@@ -366,7 +366,7 @@ typedef uint64_t uintmax_t;
+ /* Define to 1 if you have the <attr/xattr.h> header file. */
+ #cmakedefine HAVE_ATTR_XATTR_H 1
+ 
+-/* Define to 1 if you have the <Bcrypt.h> header file. */
++/* Define to 1 if you have the <bcrypt.h> header file. */
+ #cmakedefine HAVE_BCRYPT_H 1
+ 
+ /* Define to 1 if you have the <bsdxml.h> header file. */
+diff --git a/contrib/android/config/windows_host.h b/contrib/android/config/windows_host.h
+index 712b7491..6550e5e8 100644
+--- a/contrib/android/config/windows_host.h
++++ b/contrib/android/config/windows_host.h
+@@ -160,7 +160,7 @@
+ /* Define to 1 if you have the <attr/xattr.h> header file. */
+ /* #undef HAVE_ATTR_XATTR_H */
+ 
+-/* Define to 1 if you have the <Bcrypt.h> header file. */
++/* Define to 1 if you have the <bcrypt.h> header file. */
+ #define HAVE_BCRYPT_H
+ 
+ /* Define to 1 if you have the <bzlib.h> header file. */
+-- 
+2.37.3.windows.1
+
