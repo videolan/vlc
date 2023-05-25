@@ -51,6 +51,7 @@ typedef struct
     uint8_t      bitsPerChannel;
     uint8_t      widthDenominator;
     uint8_t      heightDenominator;
+    uint8_t      resourceFactor; // the plane depth doesn't match the resource depth
     DXGI_FORMAT  resourceFormat[DXGI_MAX_SHADER_VIEW];
 } d3d_format_t;
 

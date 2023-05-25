@@ -571,6 +571,10 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
+    WhitePoint[0*4 + 0] *= quad->textureFormat->resourceFactor;
+    WhitePoint[1*4 + 1] *= quad->textureFormat->resourceFactor;
+    WhitePoint[2*4 + 2] *= quad->textureFormat->resourceFactor;
+
     MultMat43(quad->shaderConstants->Colorspace, ppColorspace, WhitePoint);
 
     if (fmt->primaries != displayFormat->primaries)
