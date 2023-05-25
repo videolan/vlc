@@ -75,7 +75,9 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
 
     /* shine is an 'MP3' encoder */
-    if( (p_enc->fmt_out.i_codec != VLC_CODEC_MP3 && p_enc->fmt_out.i_codec != VLC_CODEC_MPGA) ||
+    if( (p_enc->fmt_out.i_codec != VLC_CODEC_MP3 &&
+         p_enc->fmt_out.i_codec != VLC_CODEC_MP2 &&
+         p_enc->fmt_out.i_codec != VLC_CODEC_MPGA) ||
         p_enc->fmt_out.audio.i_channels > 2 )
         return VLC_EGENERIC;
 
