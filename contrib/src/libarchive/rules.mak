@@ -8,6 +8,10 @@ PKGS_FOUND += libarchive
 endif
 
 DEPS_libarchive = zlib $(DEPS_zlib)
+ifdef HAVE_WINSTORE
+# libarchive uses CreateHardLinkW
+DEPS_libarchive += alloweduwp $(DEPS_alloweduwp)
+endif
 
 LIBARCHIVE_CONF := \
 		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
