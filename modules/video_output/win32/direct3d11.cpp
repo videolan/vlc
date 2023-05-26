@@ -790,8 +790,7 @@ static void InitScaleProcessor(vout_display_t *vd)
         sys->upscaleMode = upscale_LinearSampler;
     }
 
-    msg_Dbg(vd, "Using %s scaler", sys->upscaleMode != upscale_SuperResolution ?
-            "Video Processor": "Super Resolution");
+    msg_Dbg(vd, "Using %s scaler", ppsz_upscale_mode_text[sys->upscaleMode]);
 }
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
