@@ -67,6 +67,11 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         return nullptr;
     }
 
+    if ((*out_fmt)->formatTexture == DXGI_FORMAT_UNKNOWN)
+    {
+        msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
+        return nullptr;
+    }
     const d3d_format_t *fmt = nullptr;
     if ((*out_fmt)->bitsPerChannel > 10)
         fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA64);
