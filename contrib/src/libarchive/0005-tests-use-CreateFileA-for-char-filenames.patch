@@ -1,0 +1,35 @@
+From 442c857f5d34a2230058f12c46e92e53940b1444 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 24 May 2023 15:00:04 +0200
+Subject: [PATCH 5/9] tests: use CreateFileA for char* filenames
+
+In case the code is compiled with the UNICODE define.
+---
+ test_utils/test_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test_utils/test_main.c b/test_utils/test_main.c
+index 3250423a..e4b884ee 100644
+--- a/test_utils/test_main.c
++++ b/test_utils/test_main.c
+@@ -327,7 +327,7 @@ my_GetFileInformationByName(const char *path, BY_HANDLE_FILE_INFORMATION *bhfi)
+ 	int r;
+ 
+ 	memset(bhfi, 0, sizeof(*bhfi));
+-	h = CreateFile(path, FILE_READ_ATTRIBUTES, 0, NULL,
++	h = CreateFileA(path, FILE_READ_ATTRIBUTES, 0, NULL,
+ 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+ 	if (h == INVALID_HANDLE_VALUE)
+ 		return (0);
+@@ -1432,7 +1432,7 @@ assertion_file_time(const char *file, int line,
+ 	/* Note: FILE_FLAG_BACKUP_SEMANTICS applies to open
+ 	 * a directory file. If not, CreateFile() will fail when
+ 	 * the pathname is a directory. */
+-	h = CreateFile(pathname, FILE_READ_ATTRIBUTES, 0, NULL,
++	h = CreateFileA(pathname, FILE_READ_ATTRIBUTES, 0, NULL,
+ 	    OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+ 	if (h == INVALID_HANDLE_VALUE) {
+ 		failure_start(file, line, "Can't access %s\n", pathname);
+-- 
+2.37.3.windows.1
+

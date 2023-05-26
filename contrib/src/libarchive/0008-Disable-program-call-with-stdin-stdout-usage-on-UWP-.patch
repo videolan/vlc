@@ -1,0 +1,47 @@
+From 243b00a950c396850859822ceaf0056e4b8cf0bc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 24 May 2023 15:14:33 +0200
+Subject: [PATCH 8/9] Disable program call with stdin/stdout usage on UWP
+ builds
+
+Some calls are not allowed:
+* WaitForInputIdle [1]
+* SetHandleInformation [2]
+* STARTF_XXX flags for CreateProcess are not allowed
+
+[1] https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-waitforinputidle#requirements
+[2] https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-sethandleinformation#requirements
+---
+ libarchive/filter_fork_windows.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/libarchive/filter_fork_windows.c b/libarchive/filter_fork_windows.c
+index 6b0ed7df..e977c396 100644
+--- a/libarchive/filter_fork_windows.c
++++ b/libarchive/filter_fork_windows.c
+@@ -31,6 +31,7 @@
+ 
+ #include "filter_fork.h"
+ 
++#if !defined(WINAPI_FAMILY_PARTITION) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ /* There are some editions of Windows ("nano server," for example) that
+  * do not host user32.dll. If we want to keep running on those editions,
+  * we need to delay-load WaitForInputIdle. */
+@@ -224,6 +225,14 @@ fail:
+ 	__archive_cmdline_free(acmd);
+ 	return ARCHIVE_FAILED;
+ }
++#else /* !WINAPI_PARTITION_DESKTOP */
++int
++__archive_create_child(const char *cmd, int *child_stdin, int *child_stdout, HANDLE *out_child)
++{
++	(void)cmd; (void)child_stdin; (void) child_stdout; (void) out_child;
++	return ARCHIVE_FAILED;
++}
++#endif /* !WINAPI_PARTITION_DESKTOP */
+ 
+ void
+ __archive_check_child(int in, int out)
+-- 
+2.37.3.windows.1
+

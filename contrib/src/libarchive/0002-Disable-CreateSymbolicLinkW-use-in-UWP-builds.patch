@@ -1,0 +1,30 @@
+From 8f390c3eb57ddbf4b1aa9aecd1da35151a0d8636 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 25 May 2023 09:38:30 +0200
+Subject: [PATCH 2/9] Disable CreateSymbolicLinkW use in UWP builds
+
+The call is forbidden:
+https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinkw#requirements
+---
+ libarchive/archive_write_disk_windows.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libarchive/archive_write_disk_windows.c b/libarchive/archive_write_disk_windows.c
+index 8a8c6d00..b42010d4 100644
+--- a/libarchive/archive_write_disk_windows.c
++++ b/libarchive/archive_write_disk_windows.c
+@@ -646,7 +646,11 @@ la_CreateSymbolicLinkW(const wchar_t *linkname, const wchar_t *target,
+ 		f = la_GetFunctionKernel32("CreateSymbolicLinkW");
+ 	}
+ #else
++# if !defined(WINAPI_FAMILY_PARTITION) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 	f = CreateSymbolicLinkW;
++# else
++	f = NULL;
++# endif
+ #endif
+ 	if (!f)
+ 		return (0);
+-- 
+2.37.3.windows.1
+

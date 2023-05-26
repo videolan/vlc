@@ -1,0 +1,349 @@
+From 9817dab89dc01ea42e48e0fa38e721c63cc0bd5c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 26 May 2023 11:58:48 +0200
+Subject: [PATCH 9/9] Use Windows bcrypt when enabled and building for Vista+
+
+The wincrypt API is deprecated and is not allowed in UWP builds.
+We can use the more modern bcrypt API which has equivalent calls.
+---
+ libarchive/archive_digest.c         | 60 +++++++++++++++++++++++++++++
+ libarchive/archive_digest_private.h | 10 +++++
+ libarchive/archive_random.c         | 28 +++++++++++++-
+ libarchive/archive_util.c           | 42 ++++++++++++++++++--
+ 4 files changed, 135 insertions(+), 5 deletions(-)
+
+diff --git a/libarchive/archive_digest.c b/libarchive/archive_digest.c
+index a7bd5f02..cd9b3f9d 100644
+--- a/libarchive/archive_digest.c
++++ b/libarchive/archive_digest.c
+@@ -36,6 +36,11 @@
+ #error Cannot use both OpenSSL and libmd.
+ #endif
+ 
++/* Common in other bcrypt implementations, but missing from VS2008. */
++#ifndef BCRYPT_SUCCESS
++#define BCRYPT_SUCCESS(r) ((NTSTATUS)(r) == STATUS_SUCCESS)
++#endif
++
+ /*
+  * Message digest functions for Windows platform.
+  */
+@@ -48,6 +53,26 @@
+ /*
+  * Initialize a Message digest.
+  */
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++static int
++win_crypto_init(Digest_CTX *ctx, const WCHAR *algo)
++{
++	NTSTATUS status;
++	ctx->valid = 0;
++
++	status = BCryptOpenAlgorithmProvider(&ctx->hAlg, algo, NULL, 0);
++	if (!BCRYPT_SUCCESS(status))
++		return (ARCHIVE_FAILED);
++	status = BCryptCreateHash(ctx->hAlg, &ctx->hHash, NULL, 0, NULL, 0, 0);
++	if (!BCRYPT_SUCCESS(status)) {
++		BCryptCloseAlgorithmProvider(ctx->hAlg, 0);
++		return (ARCHIVE_FAILED);
++	}
++
++	ctx->valid = 1;
++	return (ARCHIVE_OK);
++}
++#else
+ static int
+ win_crypto_init(Digest_CTX *ctx, ALG_ID algId)
+ {
+@@ -70,6 +95,7 @@ win_crypto_init(Digest_CTX *ctx, ALG_ID algId)
+ 	ctx->valid = 1;
+ 	return (ARCHIVE_OK);
+ }
++#endif
+ 
+ /*
+  * Update a Message digest.
+@@ -81,23 +107,37 @@ win_crypto_Update(Digest_CTX *ctx, const unsigned char *buf, size_t len)
+ 	if (!ctx->valid)
+ 		return (ARCHIVE_FAILED);
+ 
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	BCryptHashData(ctx->hHash,
++		      (PUCHAR)(uintptr_t)buf,
++		      len, 0);
++#else
+ 	CryptHashData(ctx->hash,
+ 		      (unsigned char *)(uintptr_t)buf,
+ 		      (DWORD)len, 0);
++#endif
+ 	return (ARCHIVE_OK);
+ }
+ 
+ static int
+ win_crypto_Final(unsigned char *buf, size_t bufsize, Digest_CTX *ctx)
+ {
++#if !(defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA)
+ 	DWORD siglen = (DWORD)bufsize;
++#endif
+ 
+ 	if (!ctx->valid)
+ 		return (ARCHIVE_FAILED);
+ 
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	BCryptFinishHash(ctx->hHash, buf, (ULONG)bufsize, 0);
++	BCryptDestroyHash(ctx->hHash);
++	BCryptCloseAlgorithmProvider(ctx->hAlg, 0);
++#else
+ 	CryptGetHashParam(ctx->hash, HP_HASHVAL, buf, &siglen, 0);
+ 	CryptDestroyHash(ctx->hash);
+ 	CryptReleaseContext(ctx->cryptProv, 0);
++#endif
+ 	ctx->valid = 0;
+ 	return (ARCHIVE_OK);
+ }
+@@ -276,7 +316,11 @@ __archive_md5final(archive_md5_ctx *ctx, void *md)
+ static int
+ __archive_md5init(archive_md5_ctx *ctx)
+ {
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++  return (win_crypto_init(ctx, BCRYPT_MD5_ALGORITHM));
++#else
+   return (win_crypto_init(ctx, CALG_MD5));
++#endif
+ }
+ 
+ static int
+@@ -659,7 +703,11 @@ __archive_sha1final(archive_sha1_ctx *ctx, void *md)
+ static int
+ __archive_sha1init(archive_sha1_ctx *ctx)
+ {
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++  return (win_crypto_init(ctx, BCRYPT_SHA1_ALGORITHM));
++#else
+   return (win_crypto_init(ctx, CALG_SHA1));
++#endif
+ }
+ 
+ static int
+@@ -919,7 +967,11 @@ __archive_sha256final(archive_sha256_ctx *ctx, void *md)
+ static int
+ __archive_sha256init(archive_sha256_ctx *ctx)
+ {
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++  return (win_crypto_init(ctx, BCRYPT_SHA256_ALGORITHM));
++#else
+   return (win_crypto_init(ctx, CALG_SHA_256));
++#endif
+ }
+ 
+ static int
+@@ -1155,7 +1207,11 @@ __archive_sha384final(archive_sha384_ctx *ctx, void *md)
+ static int
+ __archive_sha384init(archive_sha384_ctx *ctx)
+ {
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++  return (win_crypto_init(ctx, BCRYPT_SHA384_ALGORITHM));
++#else
+   return (win_crypto_init(ctx, CALG_SHA_384));
++#endif
+ }
+ 
+ static int
+@@ -1415,7 +1471,11 @@ __archive_sha512final(archive_sha512_ctx *ctx, void *md)
+ static int
+ __archive_sha512init(archive_sha512_ctx *ctx)
+ {
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++  return (win_crypto_init(ctx, BCRYPT_SHA512_ALGORITHM));
++#else
+   return (win_crypto_init(ctx, CALG_SHA_512));
++#endif
+ }
+ 
+ static int
+diff --git a/libarchive/archive_digest_private.h b/libarchive/archive_digest_private.h
+index 9b3bd662..339b4edc 100644
+--- a/libarchive/archive_digest_private.h
++++ b/libarchive/archive_digest_private.h
+@@ -164,6 +164,15 @@
+   defined(ARCHIVE_CRYPTO_SHA256_WIN) ||\
+   defined(ARCHIVE_CRYPTO_SHA384_WIN) ||\
+   defined(ARCHIVE_CRYPTO_SHA512_WIN)
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++/* don't use bcrypt when XP needs to be supported */
++#include <bcrypt.h>
++typedef struct {
++  int   valid;
++  BCRYPT_ALG_HANDLE  hAlg;
++  BCRYPT_HASH_HANDLE hHash;
++} Digest_CTX;
++#else
+ #include <windows.h>
+ #include <wincrypt.h>
+ typedef struct {
+@@ -172,6 +181,7 @@ typedef struct {
+   HCRYPTHASH  hash;
+ } Digest_CTX;
+ #endif
++#endif
+ 
+ /* typedefs */
+ #if defined(ARCHIVE_CRYPTO_MD5_LIBC)
+diff --git a/libarchive/archive_random.c b/libarchive/archive_random.c
+index 9d1aa493..57d57e10 100644
+--- a/libarchive/archive_random.c
++++ b/libarchive/archive_random.c
+@@ -58,9 +58,20 @@ static void arc4random_buf(void *, size_t);
+ #include "archive.h"
+ #include "archive_random_private.h"
+ 
+-#if defined(HAVE_WINCRYPT_H) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++/* don't use bcrypt when XP needs to be supported */
++#include <bcrypt.h>
++
++/* Common in other bcrypt implementations, but missing from VS2008. */
++#ifndef BCRYPT_SUCCESS
++#define BCRYPT_SUCCESS(r) ((NTSTATUS)(r) == STATUS_SUCCESS)
++#endif
++
++#elif defined(HAVE_WINCRYPT_H)
+ #include <wincrypt.h>
+ #endif
++#endif
+ 
+ #ifndef O_CLOEXEC
+ #define O_CLOEXEC	0
+@@ -75,6 +86,20 @@ int
+ archive_random(void *buf, size_t nbytes)
+ {
+ #if defined(_WIN32) && !defined(__CYGWIN__)
++# if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	NTSTATUS status;
++	BCRYPT_ALG_HANDLE hAlg;
++
++	status = BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_RNG_ALGORITHM, NULL, 0);
++	if (!BCRYPT_SUCCESS(status))
++		return ARCHIVE_FAILED;
++	status = BCryptGenRandom(hAlg, buf, nbytes, 0);
++	BCryptCloseAlgorithmProvider(hAlg, 0);
++	if (!BCRYPT_SUCCESS(status))
++		return ARCHIVE_FAILED;
++
++	return ARCHIVE_OK;
++# else
+ 	HCRYPTPROV hProv;
+ 	BOOL success;
+ 
+@@ -92,6 +117,7 @@ archive_random(void *buf, size_t nbytes)
+ 	}
+ 	/* TODO: Does this case really happen? */
+ 	return ARCHIVE_FAILED;
++# endif
+ #else
+ 	arc4random_buf(buf, nbytes);
+ 	return ARCHIVE_OK;
+diff --git a/libarchive/archive_util.c b/libarchive/archive_util.c
+index 17123b94..40603c48 100644
+--- a/libarchive/archive_util.c
++++ b/libarchive/archive_util.c
+@@ -42,9 +42,20 @@ __FBSDID("$FreeBSD: head/lib/libarchive/archive_util.c 201098 2009-12-28 02:58:1
+ #ifdef HAVE_STRING_H
+ #include <string.h>
+ #endif
+-#if defined(HAVE_WINCRYPT_H) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++/* don't use bcrypt when XP needs to be supported */
++#include <bcrypt.h>
++
++/* Common in other bcrypt implementations, but missing from VS2008. */
++#ifndef BCRYPT_SUCCESS
++#define BCRYPT_SUCCESS(r) ((NTSTATUS)(r) == STATUS_SUCCESS)
++#endif
++
++#elif defined(HAVE_WINCRYPT_H)
+ #include <wincrypt.h>
+ #endif
++#endif
+ #ifdef HAVE_ZLIB_H
+ #include <zlib.h>
+ #endif
+@@ -233,14 +244,16 @@ __archive_mktempx(const char *tmpdir, wchar_t *template)
+ 		L'm', L'n', L'o', L'p', L'q', L'r', L's', L't',
+ 		L'u', L'v', L'w', L'x', L'y', L'z'
+ 	};
+-	HCRYPTPROV hProv;
+ 	struct archive_wstring temp_name;
+ 	wchar_t *ws;
+ 	DWORD attr;
+ 	wchar_t *xp, *ep;
+ 	int fd;
+-
+-	hProv = (HCRYPTPROV)NULL;
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	BCRYPT_ALG_HANDLE hAlg = NULL;
++#else
++	HCRYPTPROV hProv = (HCRYPTPROV)NULL;
++#endif
+ 	fd = -1;
+ 	ws = NULL;
+ 
+@@ -314,11 +327,19 @@ __archive_mktempx(const char *tmpdir, wchar_t *template)
+ 			abort();
+ 	}
+ 
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	if (!BCRYPT_SUCCESS(BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_RNG_ALGORITHM,
++		NULL, 0))) {
++		la_dosmaperr(GetLastError());
++		goto exit_tmpfile;
++	}
++#else
+ 	if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL,
+ 		CRYPT_VERIFYCONTEXT)) {
+ 		la_dosmaperr(GetLastError());
+ 		goto exit_tmpfile;
+ 	}
++#endif
+ 
+ 	for (;;) {
+ 		wchar_t *p;
+@@ -329,11 +350,19 @@ __archive_mktempx(const char *tmpdir, wchar_t *template)
+ 
+ 		/* Generate a random file name through CryptGenRandom(). */
+ 		p = xp;
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++		if (!BCRYPT_SUCCESS(BCryptGenRandom(hAlg, (PUCHAR)p,
++		    (DWORD)(ep - p)*sizeof(wchar_t), 0))) {
++			la_dosmaperr(GetLastError());
++			goto exit_tmpfile;
++		}
++#else
+ 		if (!CryptGenRandom(hProv, (DWORD)(ep - p)*sizeof(wchar_t),
+ 		    (BYTE*)p)) {
+ 			la_dosmaperr(GetLastError());
+ 			goto exit_tmpfile;
+ 		}
++#endif
+ 		for (; p < ep; p++)
+ 			*p = num[((DWORD)*p) % (sizeof(num)/sizeof(num[0]))];
+ 
+@@ -387,8 +416,13 @@ __archive_mktempx(const char *tmpdir, wchar_t *template)
+ 			break;/* success! */
+ 	}
+ exit_tmpfile:
++#if defined(HAVE_BCRYPT_H) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++	if (hAlg != NULL)
++		BCryptCloseAlgorithmProvider(hAlg, 0);
++#else
+ 	if (hProv != (HCRYPTPROV)NULL)
+ 		CryptReleaseContext(hProv, 0);
++#endif
+ 	free(ws);
+ 	if (template == temp_name.s)
+ 		archive_wstring_free(&temp_name);
+-- 
+2.37.3.windows.1
+

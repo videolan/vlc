@@ -1,0 +1,36 @@
+From 4d018f8cd3104fb34e0f4c6c5bebbdd47351643d Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 24 May 2023 15:23:14 +0200
+Subject: [PATCH 4/9] Don't call GetOEMCP() in Universal Windows Platform
+ builds
+
+It's not available [1] [2]. However we can use the intermediate CP_OEMCP
+value. It can be used to compare charsets in create_sconv_object().
+It won't work with comparing charsets in archive_string_default_conversion_for_read()
+and archive_string_default_conversion_for_write(). current_codepage being
+an actual CodePage value.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-localization-l1-2-0dll
+[2] https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-getoemcp#requirements
+---
+ libarchive/archive_string.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libarchive/archive_string.c b/libarchive/archive_string.c
+index 69458e1a..accf5263 100644
+--- a/libarchive/archive_string.c
++++ b/libarchive/archive_string.c
+@@ -1324,6 +1324,10 @@ free_sconv_object(struct archive_string_conv *sc)
+ }
+ 
+ #if defined(_WIN32) && !defined(__CYGWIN__)
++# if defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#  define GetOEMCP() CP_OEMCP
++# endif
++
+ static unsigned
+ my_atoi(const char *p)
+ {
+-- 
+2.37.3.windows.1
+
