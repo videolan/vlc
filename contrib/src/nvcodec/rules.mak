@@ -1,7 +1,7 @@
 # NVCODEC_HASH := 84483da70d903239d4536763fde8c7e6c4e80784
 # NVCODEC_GITURL := $(VIDEOLAN_GIT)/ffmpeg/nv-codec-headers.git
 # NVCODEC_GITURL := $(GITHUB)/FFmpeg/nv-codec-headers.git
-NVCODEC_VERSION := 11.1.5.1
+NVCODEC_VERSION := 12.0.16.0
 NVCODEC_URL := $(GITHUB)/FFmpeg/nv-codec-headers/releases/download/n$(NVCODEC_VERSION)/nv-codec-headers-$(NVCODEC_VERSION).tar.gz
 
 ifndef HAVE_DARWIN_OS
