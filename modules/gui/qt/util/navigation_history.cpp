@@ -11,6 +11,8 @@ NavigationHistory::NavigationHistory(QObject *parent)
 
 QVariant NavigationHistory::getCurrent()
 {
+    assert(m_history.isEmpty() == false);
+
     return m_history.back();
 }
 
