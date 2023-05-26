@@ -1462,8 +1462,7 @@ static void InitScaleProcessor(vout_display_t *vd)
     if (sys->scaleProc == NULL)
         sys->upscaleMode = upscale_LinearSampler;
 
-    msg_Dbg(vd, "Using %s scaler", sys->upscaleMode != upscale_SuperResolution ?
-            "Video Processor": "Super Resolution");
+    msg_Dbg(vd, "Using %s scaler", ppsz_upscale_mode_text[sys->upscaleMode]);
 }
 
 static int Direct3D11Open(vout_display_t *vd, bool external_device)
