@@ -731,6 +731,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/folder.svg \
 	gui/qt/pixmaps/menu/help.svg \
 	gui/qt/pixmaps/menu/info.svg \
+	gui/qt/pixmaps/menu/media_library.svg \
 	gui/qt/pixmaps/menu/messages.svg \
 	gui/qt/pixmaps/menu/movie.svg \
 	gui/qt/pixmaps/menu/music.svg \

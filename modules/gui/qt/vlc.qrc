@@ -24,6 +24,7 @@
         <file alias="folder.svg">pixmaps/menu/folder.svg</file>
         <file alias="help.svg">pixmaps/menu/help.svg</file>
         <file alias="info.svg">pixmaps/menu/info.svg</file>
+        <file alias="media_library.svg">pixmaps/menu/media_library.svg</file>
         <file alias="messages.svg">pixmaps/menu/messages.svg</file>
         <file alias="movie.svg">pixmaps/menu/movie.svg</file>
         <file alias="music.svg">pixmaps/menu/music.svg</file>
