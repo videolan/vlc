@@ -1,6 +1,6 @@
 # fontconfig
 
-FONTCONFIG_VERSION := 2.12.6
+FONTCONFIG_VERSION := 2.14.2
 FONTCONFIG_URL := https://www.freedesktop.org/software/fontconfig/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
 ifndef HAVE_WIN32
