@@ -70,26 +70,37 @@ should go with the `msvcrt` version. The official VLC builds use `msvcrt` for de
 ```sh
 wget https://github.com/mstorsjo/llvm-mingw/releases/download/20220906/llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64.tar.xz
 tar xvf llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64.tar.xz -C /opt
-export PATH=/opt/llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64/bin:$PATH
+```
+Every time you build VLC, you will need to have the toolchain in your PATH.  
+We recommend creating a script file to do this, so that you can call 
+it when you start your build sesson:
+
+```sh
+echo 'export PATH=/opt/llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64/bin:$PATH' > toolchain.sh
+```
+
+You will need to call this file when you start your build session:
+
+```sh
+source toolchain.sh
 ```
 
 * On msys2, **use the mingw64 (blue) environment** (ie not msys (purple) the  or mingw32 (grey) environments):
 ```sh
 wget https://github.com/mstorsjo/llvm-mingw/releases/download/20220906/llvm-mingw-20220906-msvcrt-x86_64.zip
 unzip llvm-mingw-20220906-msvcrt-x86_64.zip -d /opt
-export PATH=/opt/llvm-mingw-20220906-msvcrt-x86_64/bin:$PATH
 ```
 
-Every time you build VLC, you will need to have the toolchain in your PATH.
-A convenient way to setup your environment is to set command in a file and call
+Every time you build VLC, you will need to have the toolchain in your PATH.  
+We recommend creating a script file to do this, so that you can call 
 it when you start your build sesson:
 
-Create toolchain.sh:
 ```sh
-cat export PATH=/opt/llvm-mingw-20220906-msvcrt-x86_64/bin:$PATH > toolchain.sh
+echo 'export PATH=/opt/llvm-mingw-20220906-msvcrt-x86_64/bin:$PATH' > toolchain.sh
 ```
 
-Use toolchain.sh to set the path to your compiler:
+You will need to call this file when you start your build session:
+
 ```sh
 source toolchain.sh
 ```
