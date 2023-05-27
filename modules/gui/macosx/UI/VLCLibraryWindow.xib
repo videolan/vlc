@@ -333,8 +333,8 @@
                                             <constraint firstItem="jGc-Xw-GYI" firstAttribute="leading" secondItem="YAj-e7-KCU" secondAttribute="leading" id="xeh-Bo-f7P"/>
                                         </constraints>
                                     </customView>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr">
-                                        <rect key="frame" x="140" y="4" width="616" height="37"/>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr" customClass="VLCTrackingView">
+                                        <rect key="frame" x="140" y="4" width="616" height="32"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
                                                 <rect key="frame" x="248" y="21" width="153" height="16"/>
@@ -796,7 +796,9 @@
                 <outlet property="forwardButton" destination="dPD-MZ-5oT" id="btH-v5-s7F"/>
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
                 <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
+                <outlet property="openMainVideoViewIndicator" destination="UEB-eN-eFu" id="243-Kh-nzy"/>
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
+                <outlet property="playbackStateTrackingView" destination="Ktr-qT-1fr" id="QgM-di-DFw"/>
                 <outlet property="playingItemDisplayField" destination="d0e-29-yNq" id="QUe-1S-TQO"/>
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>

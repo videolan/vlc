@@ -26,6 +26,7 @@
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 
 @class VLCVolumeSlider;
+@class VLCTrackingView;
 
 /*****************************************************************************
  * VLCMainWindowControlsBar
@@ -41,6 +42,9 @@
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
 
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
+
+@property (readwrite, strong) IBOutlet VLCTrackingView *playbackStateTrackingView;
+@property (readwrite, strong) IBOutlet NSImageView *openMainVideoViewIndicator;
 
 - (IBAction)stop:(id)sender;
 
