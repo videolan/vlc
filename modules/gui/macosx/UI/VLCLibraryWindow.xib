@@ -386,13 +386,22 @@
                                                             <action selector="artworkButtonAction:" target="Uzf-Tf-H8x" id="am9-q0-AXg"/>
                                                         </connections>
                                                     </button>
+                                                    <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UEB-eN-eFu">
+                                                        <rect key="frame" x="5" y="5" width="22" height="22"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="VLCFullscreenOffTemplate" id="x19-fe-Qg8"/>
+                                                    </imageView>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="5o7-Z0-dqS" secondAttribute="height" multiplier="1:1" id="0jj-cr-D72"/>
                                                     <constraint firstItem="15t-2s-22l" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" id="AS7-P7-l0D"/>
                                                     <constraint firstItem="15t-2s-22l" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="Aq6-SV-NCD"/>
+                                                    <constraint firstAttribute="height" constant="32" id="DYU-eT-dYg"/>
+                                                    <constraint firstAttribute="trailing" secondItem="UEB-eN-eFu" secondAttribute="trailing" constant="5" id="QaU-Gt-dmE"/>
                                                     <constraint firstAttribute="bottom" secondItem="15t-2s-22l" secondAttribute="bottom" id="VGx-AQ-FZ1"/>
+                                                    <constraint firstItem="UEB-eN-eFu" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" constant="5" id="iMc-o1-QsG"/>
                                                     <constraint firstAttribute="trailing" secondItem="15t-2s-22l" secondAttribute="trailing" id="l3U-tz-a1t"/>
+                                                    <constraint firstAttribute="bottom" secondItem="UEB-eN-eFu" secondAttribute="bottom" constant="5" id="pdu-1T-gdK"/>
+                                                    <constraint firstItem="UEB-eN-eFu" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" constant="5" id="pxK-cv-xgC"/>
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
@@ -1704,6 +1713,7 @@
         <image name="VLC" width="512" height="512"/>
         <image name="VLCBackwardTemplate" width="128" height="128"/>
         <image name="VLCForwardTemplate" width="128" height="128"/>
+        <image name="VLCFullscreenOffTemplate" width="128" height="128"/>
         <image name="VLCVolumeOffTemplate" width="128" height="128"/>
         <image name="VLCVolumeOnTemplate" width="128" height="128"/>
         <image name="arrow.up.arrow.down" catalog="system" width="19" height="15"/>
