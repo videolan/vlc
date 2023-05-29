@@ -114,4 +114,9 @@
     return [NSColor colorWithCalibratedWhite:1 alpha:0.2];
 }
 
++ (NSColor *)VLCSubtleBorderColor
+{
+    return [NSColor colorWithWhite:0 alpha:0.1];
+}
+
 @end

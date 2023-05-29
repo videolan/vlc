@@ -56,7 +56,7 @@
 - (void)setupLayer
 {
     self.layer = [[CALayer alloc] init];
-    self.layer.borderColor = [NSColor colorWithRed:0. green:0. blue:0. alpha:0.1].CGColor;
+    self.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
     
     self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.wantsLayer = YES;
