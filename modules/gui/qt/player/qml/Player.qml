@@ -694,6 +694,8 @@ FocusScope {
 
                 identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
                                                     : PlayerControlbarModel.Audioplayer
+
+                background: null
             }
         }
     }

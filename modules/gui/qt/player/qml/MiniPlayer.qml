@@ -69,8 +69,4 @@ ControlBar {
         hoverEnabled: true
         acceptedButtons: Qt.AllButtons
     }
-
-    background: Rectangle {
-        color: colorContext.bg.primary
-    }
 }

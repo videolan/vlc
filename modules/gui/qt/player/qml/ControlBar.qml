@@ -138,6 +138,10 @@ T.Pane {
         colorSet: ColorContext.Window
     }
 
+    background: Rectangle {
+        color: theme.bg.primary
+    }
+
     contentItem: ColumnLayout {
         spacing: VLCStyle.margin_xsmall
         z: 1
