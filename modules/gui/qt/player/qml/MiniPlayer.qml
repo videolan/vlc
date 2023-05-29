@@ -62,11 +62,4 @@ ControlBar {
             NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
         }
     }
-
-    // this MouseArea prevents mouse events to be sent below miniplayer
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.AllButtons
-    }
 }
