@@ -56,6 +56,8 @@
 - (void)setupLayer
 {
     self.layer = [[CALayer alloc] init];
+    self.layer.borderColor = [NSColor colorWithRed:0. green:0. blue:0. alpha:0.1].CGColor;
+    
     self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.wantsLayer = YES;
     [self setCropsImagesToRoundedCorners:YES];
@@ -66,9 +68,11 @@
     if (cropsImagesToRoundedCorners) {
         self.layer.cornerRadius = 5.;
         self.layer.masksToBounds = YES;
+        self.layer.borderWidth = 1.;
     } else {
         self.layer.cornerRadius = 0.;
         self.layer.masksToBounds = NO;
+        self.layer.borderWidth = 0.;
     }
 }
 
