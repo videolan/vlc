@@ -60,6 +60,10 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-more-module-API-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
+	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -127,6 +131,21 @@ MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 
+MINGW64_UWP_CONF := --without-headers --with-crt --without-libraries --without-tools
+ifeq ($(ARCH),x86_64)
+MINGW64_UWP_CONF +=--disable-lib32 --enable-lib64
+MINGW64_BUILDDIR := lib64
+else ifeq ($(ARCH),i686)
+MINGW64_UWP_CONF +=--enable-lib32 --disable-lib64
+MINGW64_BUILDDIR := lib32
+else ifeq ($(ARCH),aarch64)
+MINGW64_UWP_CONF +=--disable-lib32 --disable-lib64 --enable-libarm64
+MINGW64_BUILDDIR := libarm64
+else ifeq ($(ARCH),arm)
+MINGW64_UWP_CONF +=--disable-lib32 --disable-lib64 --enable-libarm32
+MINGW64_BUILDDIR := libarm32
+endif
+
 .sum-alloweduwp: .sum-mingw64
 	touch $@
 
@@ -135,5 +154,14 @@ MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/winbase.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/libloaderapi.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/winreg.h "$(PREFIX)/include"
+
+	# Trick mingw-w64 into just building libwindowsapp.a
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MINGW64_UWP_CONF)
+	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
+	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a DATA= HEADERS=
+	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a install-$(MINGW64_BUILDDIR)LIBRARIES
 	touch $@
 
