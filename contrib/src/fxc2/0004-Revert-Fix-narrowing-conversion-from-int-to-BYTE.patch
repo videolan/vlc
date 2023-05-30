@@ -12,27 +12,6 @@ diff --git a/fxc2.cpp b/fxc2.cpp
 index 01a8d07..ac17328 100755
 --- a/fxc2.cpp
 +++ b/fxc2.cpp
-@@ -216,7 +216,7 @@ int main(int argc, const char* argv[])
-   memset(dllPath + bytes, '\0', MAX_PATH - bytes);
-   //Copy the dll location over top fxc2.exe
-   strcpy(strrchr(dllPath, '\\') + 1, "d3dcompiler_47.dll");
--  
-+
-   HMODULE h = LoadLibrary(dllPath);
-   if(h == NULL) {
-     printf("Error: could not load d3dcompiler_47.dll from %s\n", dllPath);
-@@ -235,9 +235,9 @@ int main(int argc, const char* argv[])
- 
-   if(verbose) {
-     printf("Calling D3DCompileFromFile(\n");
--    
-+
-     wprintf(L"\t %ls,\n", inputFile);
--    
-+
-     printf("\t");
-     for(int i=0; i<numDefines-1; i++)
-       printf(" %s=%s", defines[i].Name, defines[i].Definition);
 @@ -310,7 +310,7 @@ int main(int argc, const char* argv[])
      FILE* f;
      errno_t err = fopen_s(&f, outputFile, "w");
