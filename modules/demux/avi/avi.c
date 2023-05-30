@@ -1636,7 +1636,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
             for( unsigned i = 0; i < p_sys->i_track; i++ )
             {
                 avi_track_t *p_track = p_sys->track[i];
-                if( !p_track->b_activated || p_stream->fmt.i_cat == SPU_ES )
+                if( !p_track->b_activated || p_track->fmt.i_cat == SPU_ES )
                     continue;
 
                 p_stream = p_track;
