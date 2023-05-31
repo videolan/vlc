@@ -1381,9 +1381,11 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     vout_statistic_AddDisplayed(&sys->statistic, 1);
 
     if (tracer != NULL && system_pts != VLC_TICK_MAX)
-        vlc_tracer_TraceWithTs(tracer, system_pts, VLC_TRACE("type", "RENDER"),
+        vlc_tracer_TraceWithTs(tracer, system_pts,
+                               VLC_TRACE("type", "RENDER"),
                                VLC_TRACE("id", sys->str_id),
-                               VLC_TRACE("drift", drift), VLC_TRACE_END);
+                               VLC_TRACE("drift", drift),
+                               VLC_TRACE_END);
 
     return VLC_SUCCESS;
 }
