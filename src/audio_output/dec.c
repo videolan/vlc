@@ -474,7 +474,7 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
     if (tracer != NULL)
         vlc_tracer_Trace(tracer, VLC_TRACE("type", "RENDER"),
                                  VLC_TRACE("id", stream->str_id),
-                                 VLC_TRACE("drift", drift),
+                                 VLC_TRACE_TICK_NS("drift", drift),
                                  VLC_TRACE_END);
 
     /* Following calculations expect an opposite drift. Indeed,

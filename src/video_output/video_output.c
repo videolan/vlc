@@ -1384,7 +1384,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         vlc_tracer_TraceWithTs(tracer, system_pts,
                                VLC_TRACE("type", "RENDER"),
                                VLC_TRACE("id", sys->str_id),
-                               VLC_TRACE("drift", drift),
+                               VLC_TRACE_TICK_NS("drift", drift),
                                VLC_TRACE_END);
 
     return VLC_SUCCESS;

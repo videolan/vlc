@@ -46,14 +46,12 @@
 enum vlc_tracer_value
 {
     VLC_TRACER_INT,
-    VLC_TRACER_TICK,
     VLC_TRACER_STRING
 };
 
 typedef union
 {
     int64_t integer;
-    vlc_tick_t tick;
     const char *string;
 } vlc_tracer_value_t;
 
@@ -106,11 +104,11 @@ VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ..
  * @{
  */
 
-static inline struct vlc_tracer_entry vlc_tracer_entry_FromTick(const char *key, vlc_tick_t value)
+static inline struct vlc_tracer_entry vlc_tracer_entry_FromInt(const char *key, int64_t value)
 {
     vlc_tracer_value_t tracer_value;
-    tracer_value.tick = value;
-    struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_TICK };
+    tracer_value.integer = value;
+    struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_INT };
     return trace;
 }
 
@@ -128,16 +126,16 @@ static inline struct vlc_tracer_entry vlc_tracer_entry_FromString(const char *ke
 
 #define VLC_TRACE(key, value) \
         _Generic((value), \
-        vlc_tick_t: vlc_tracer_entry_FromTick, \
+        int64_t: vlc_tracer_entry_FromInt, \
         char *: vlc_tracer_entry_FromString, \
         const char *: vlc_tracer_entry_FromString) (key, value)
 #else
 #define VLC_TRACE_END \
         vlc_tracer_entry_FromString(nullptr, nullptr)
 
-static inline struct vlc_tracer_entry VLC_TRACE(const char *key, vlc_tick_t value)
+static inline struct vlc_tracer_entry VLC_TRACE(const char *key, int64_t value)
 {
-    return vlc_tracer_entry_FromTick(key, value);
+    return vlc_tracer_entry_FromInt(key, value);
 }
 
 static inline struct vlc_tracer_entry VLC_TRACE(const char *key, char *value)
@@ -151,6 +149,8 @@ static inline struct vlc_tracer_entry VLC_TRACE(const char *key, const char *val
 }
 #endif
 
+#define VLC_TRACE_TICK_NS(key, tick) VLC_TRACE((key), NS_FROM_VLC_TICK((tick)))
+
 /*
  * Helper trace functions
  */
@@ -162,7 +162,7 @@ static inline void vlc_tracer_TraceStreamPTS(struct vlc_tracer *tracer, const ch
     vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
                              VLC_TRACE("id", id),
                              VLC_TRACE("stream", stream),
-                             VLC_TRACE("pts", pts),
+                             VLC_TRACE_TICK_NS("pts", pts),
                              VLC_TRACE_END);
 }
 
@@ -173,8 +173,8 @@ static inline void vlc_tracer_TraceStreamDTS(struct vlc_tracer *tracer, const ch
     vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
                              VLC_TRACE("id", id),
                              VLC_TRACE("stream", stream),
-                             VLC_TRACE("pts", pts),
-                             VLC_TRACE("dts", dts),
+                             VLC_TRACE_TICK_NS("pts", pts),
+                             VLC_TRACE_TICK_NS("dts", dts),
                              VLC_TRACE_END);
 }
 
@@ -186,20 +186,20 @@ static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char 
         vlc_tracer_TraceWithTs(tracer, vlc_tick_now(),
                                VLC_TRACE("type", type),
                                VLC_TRACE("id", id),
-                               VLC_TRACE("pts", pts),
-                               VLC_TRACE("render_ts", now),
+                               VLC_TRACE_TICK_NS("pts", pts),
+                               VLC_TRACE_TICK_NS("render_ts", now),
                                VLC_TRACE_END);
         vlc_tracer_TraceWithTs(tracer, now,
                                VLC_TRACE("type", type),
                                VLC_TRACE("id", id),
-                               VLC_TRACE("render_pts", pts),
+                               VLC_TRACE_TICK_NS("render_pts", pts),
                                VLC_TRACE_END);
 
     }
     else
         vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
                                  VLC_TRACE("id", id),
-                                 VLC_TRACE("pts", pts),
+                                 VLC_TRACE_TICK_NS("pts", pts),
                                  VLC_TRACE_END);
 }
 
@@ -217,7 +217,7 @@ static inline void vlc_tracer_TracePCR( struct vlc_tracer *tracer, const char *t
 {
     vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
                              VLC_TRACE("id", id),
-                             VLC_TRACE("pcr", pcr),
+                             VLC_TRACE_TICK_NS("pcr", pcr),
                              VLC_TRACE_END);
 }
 

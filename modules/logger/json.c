@@ -178,10 +178,6 @@ static void TraceJson(void *opaque, vlc_tick_t ts, va_list entries)
             case VLC_TRACER_INT:
                 JsonPrintKeyValueNumber(stream, entry.key, entry.value.integer);
                 break;
-            case VLC_TRACER_TICK:
-                JsonPrintKeyValueNumber(stream, entry.key,
-                                        TIME_FROM_TICK(entry.value.tick));
-                break;
             case VLC_TRACER_STRING:
                 JsonPrintKeyValueLabel(stream, entry.key, entry.value.string);
                 break;
