@@ -1,0 +1,60 @@
+From d4758caa1d6ffc1f800dce06aa38f6d7a3b6d306 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 31 May 2023 13:55:51 +0200
+Subject: [PATCH 10/10] headers: allow Get/SetHandleInformation in Win10 19H1
+ UWP builds
+
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
+
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-handle-l1-1-0 in mincore and windowsapp.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-handle-l1-1-0dll
+---
+ mingw-w64-headers/include/handleapi.h | 2 +-
+ mingw-w64-headers/include/winbase.h   | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/mingw-w64-headers/include/handleapi.h b/mingw-w64-headers/include/handleapi.h
+index 9f814f151..f33ceef71 100644
+--- a/mingw-w64-headers/include/handleapi.h
++++ b/mingw-w64-headers/include/handleapi.h
+@@ -23,7 +23,7 @@ extern "C" {
+ #endif
+ #endif
+ 
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
+   WINBASEAPI WINBOOL WINAPI GetHandleInformation (HANDLE hObject, LPDWORD lpdwFlags);
+   WINBASEAPI WINBOOL WINAPI SetHandleInformation (HANDLE hObject, DWORD dwMask, DWORD dwFlags);
+ #endif
+diff --git a/mingw-w64-headers/include/winbase.h b/mingw-w64-headers/include/winbase.h
+index c6c34ed3b..6e114e28f 100644
+--- a/mingw-w64-headers/include/winbase.h
++++ b/mingw-w64-headers/include/winbase.h
+@@ -1346,6 +1346,8 @@ typedef enum FILE_FLUSH_MODE {
+ 
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= _WIN32_WINNT_WIN10
+   WINBASEAPI DWORD WINAPI WaitForMultipleObjects (DWORD nCount, CONST HANDLE *lpHandles, WINBOOL bWaitAll, DWORD dwMilliseconds);
++#define HANDLE_FLAG_INHERIT 0x1
++#define HANDLE_FLAG_PROTECT_FROM_CLOSE 0x2
+ #endif
+ 
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+@@ -1357,9 +1359,6 @@ typedef enum FILE_FLUSH_MODE {
+     DEPTotalPolicyCount
+   } DEP_SYSTEM_POLICY_TYPE;
+ 
+-#define HANDLE_FLAG_INHERIT 0x1
+-#define HANDLE_FLAG_PROTECT_FROM_CLOSE 0x2
+-
+ #define HINSTANCE_ERROR 32
+ 
+ #define GET_TAPE_MEDIA_INFORMATION 0
+-- 
+2.37.3.windows.1
+

@@ -64,6 +64,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
 	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0010-headers-allow-Get-SetHandleInformation-in-Win10-19H1.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -156,6 +157,7 @@ endif
 	install $</mingw-w64-headers/include/winbase.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/libloaderapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/winreg.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/handleapi.h "$(PREFIX)/include"
 
 	# Trick mingw-w64 into just building libwindowsapp.a
 	$(MAKEBUILDDIR)
