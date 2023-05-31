@@ -1,6 +1,6 @@
 # Nettle
 
-NETTLE_VERSION := 3.7.3
+NETTLE_VERSION := 3.9
 NETTLE_URL := $(GNU)/nettle/nettle-$(NETTLE_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"nettle >= 3.4.1"),)
