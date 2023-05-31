@@ -6,11 +6,9 @@ Subject: [PATCH 8/9] Disable program call with stdin/stdout usage on UWP
 
 Some calls are not allowed:
 * WaitForInputIdle [1]
-* SetHandleInformation [2]
 * STARTF_XXX flags for CreateProcess are not allowed
 
 [1] https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-waitforinputidle#requirements
-[2] https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-sethandleinformation#requirements
 ---
  libarchive/filter_fork_windows.c | 9 +++++++++
  1 file changed, 9 insertions(+)
