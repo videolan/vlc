@@ -69,6 +69,13 @@ extern "C" char **environ;
 #include "dialogs/help/help.hpp"     /* Launch Update */
 #include "util/dismiss_popup_event_filter.hpp"
 #include "maininterface/compositor.hpp"
+#include "util/vlctick.hpp"
+#include "util/shared_input_item.hpp"
+#include "network/networkmediamodel.hpp"
+#include "playlist/playlist_common.hpp"
+#include "playlist/playlist_item.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
+#include "medialibrary/mlqmltypes.hpp"
 
 #include <QVector>
 #include "playlist/playlist_item.hpp"
@@ -662,10 +669,17 @@ static void Close( vlc_object_t *p_this )
 
 static inline void qRegisterMetaTypes()
 {
-    // register all types used by signal/slots
-    qRegisterMetaType<size_t>("size_t");
-    qRegisterMetaType<ssize_t>("ssize_t");
-    qRegisterMetaType<vlc_tick_t>("vlc_tick_t");
+    qRegisterMetaType<size_t>();
+    qRegisterMetaType<ssize_t>();
+    qRegisterMetaType<vlc_tick_t>();
+
+    qRegisterMetaType<VLCTick>();
+    qRegisterMetaType<SharedInputItem>();
+    qRegisterMetaType<NetworkTreeItem>();
+    qRegisterMetaType<PlaylistPtr>();
+    qRegisterMetaType<PlaylistItem>();
+    qRegisterMetaType<DialogId>();
+    qRegisterMetaType<MLItemId>();
 }
 
 static void *Thread( void *obj )
