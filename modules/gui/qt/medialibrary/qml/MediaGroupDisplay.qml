@@ -45,8 +45,6 @@ VideoAll {
         id: modelVideo
 
         ml: MediaLib
-
-        parentId: initialId
     }
 
     contextMenu: Util.MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
