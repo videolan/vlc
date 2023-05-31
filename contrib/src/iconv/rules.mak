@@ -33,10 +33,6 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/iconv/0001-Use-CreateFile2-in-UWP-builds.patch
 
-	# fix forbidden UWP call which can't be upstreamed as they won't
-	# differentiate for winstore, only _WIN32_WINNT
-	$(APPLY) $(SRC)/iconv/0001-do-not-call-GetHandleInformation-in-Winstore-apps.patch
-
 	$(UPDATE_AUTOCONFIG)
 	cd $(UNPACK_DIR) && cp config.guess config.sub build-aux \
 	                 && mv config.guess config.sub libcharset/build-aux
