@@ -24,10 +24,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# backport gnulib patch
 	$(APPLY) $(SRC)/gnutls/0001-Don-t-assume-that-UNICODE-is-not-defined.patch
 
-	# fix forbidden UWP call which can't be upstreamed as they won't
-	# differentiate for winstore, only _WIN32_WINNT
-	$(APPLY) $(SRC)/gnutls/0001-fcntl-do-not-call-GetHandleInformation-in-Winstore-a.patch
-
 	# forbidden RtlSecureZeroMemory call in winstore builds
 	$(APPLY) $(SRC)/gnutls/0001-explicit_bzero-Do-not-call-SecureZeroMemory-on-UWP-b.patch
 
