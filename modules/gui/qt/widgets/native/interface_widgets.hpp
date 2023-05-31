@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include "util/shared_input_item.hpp"
+
 #include <QLabel>
 
 class QWidget;
@@ -43,7 +45,7 @@ class CoverArtLabel : public QLabel
     Q_OBJECT
 public:
     CoverArtLabel( QWidget *parent, qt_intf_t * );
-    void setItem( input_item_t * );
+    void setItem( const SharedInputItem & );
     virtual ~CoverArtLabel();
 
 protected:
@@ -51,7 +53,7 @@ protected:
 
 private:
     qt_intf_t *p_intf;
-    input_item_t *p_item;
+    SharedInputItem p_item;
 
 public slots:
     void showArtUpdate( const QString& );

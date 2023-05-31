@@ -344,6 +344,16 @@ void DialogsProvider::mediaInfoDialog( void )
         dialog->hide();
 }
 
+void DialogsProvider::mediaInfoDialog( const SharedInputItem& inputItem )
+{
+    assert(inputItem.get());
+
+    MediaInfoDialog * const mid = new MediaInfoDialog( p_intf, inputItem );
+    mid->setWindowFlag( Qt::Dialog );
+    mid->setAttribute( Qt::WA_DeleteOnClose );
+    mid->showTab( MediaInfoDialog::META_PANEL );
+}
+
 void DialogsProvider::mediaInfoDialog( const PlaylistItem& pItem )
 {
     input_item_t *p_input = nullptr;
@@ -357,10 +367,47 @@ void DialogsProvider::mediaInfoDialog( const PlaylistItem& pItem )
 
     if( p_input )
     {
-        MediaInfoDialog * const mid = new MediaInfoDialog( p_intf, p_input );
-        mid->setWindowFlag( Qt::Dialog );
-        mid->setAttribute(Qt::WA_DeleteOnClose);
-        mid->showTab( MediaInfoDialog::META_PANEL );
+        mediaInfoDialog( SharedInputItem{ p_input } );
+    }
+}
+
+void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
+{
+    assert( p_intf );
+
+    vlc_medialibrary_t* const ml = vlc_ml_instance_get( p_intf );
+    assert( ml );
+
+    input_item_t * const inputItem = vlc_ml_get_input_item( ml, itemId.id );
+    assert( inputItem );
+
+    const SharedInputItem sharedInputItem { inputItem, false };
+    if ( input_item_IsPreparsed( inputItem ) )
+    {
+        mediaInfoDialog( sharedInputItem );
+    }
+    else
+    {
+        static const struct input_item_parser_cbs_t cbs = {
+            // on_ended
+            []( input_item_t * const item, const int status, void * const userData ) {
+                const auto dp = static_cast<DialogsProvider *>( userData );
+
+                if ( status == ITEM_PREPARSE_TIMEOUT || status == ITEM_PREPARSE_FAILED )
+                    qWarning( "Could not preparse input item %p. Status %i", item, status );
+
+                const SharedInputItem sharedInputItem{ item };
+
+                QMetaObject::invokeMethod( dp, [dp, sharedInputItem]() {
+                        dp->mediaInfoDialog( sharedInputItem );
+                    }, Qt::QueuedConnection );
+            },
+            // on_subtree_added
+            NULL
+        };
+
+        input_item_parser_id_t * const parser = input_item_Parse( inputItem, VLC_OBJECT( p_intf ), &cbs, this );
+        assert( parser );
     }
 }
 

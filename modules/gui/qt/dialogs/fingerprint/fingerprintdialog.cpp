@@ -65,7 +65,7 @@ void FingerprintDialog::applyIdentity()
     Q_ASSERT( p_r );
     if ( ui->recordsList->currentIndex().isValid() )
         t->apply( p_r, ui->recordsList->currentIndex().row() );
-    emit metaApplied( p_r->p_item );
+    emit metaApplied( SharedInputItem{ p_r->p_item } );
     close();
 }
 

@@ -30,6 +30,7 @@
 #endif
 
 #include "qt.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <vlc_common.h>
 #include <QWidget>
@@ -55,7 +56,7 @@ public:
     void setEditMode( bool );
 
 private:
-    input_item_t *p_input;
+    SharedInputItem p_input;
     qt_intf_t *p_intf;
     bool b_inEditMode;
 
@@ -81,10 +82,10 @@ private:
     QPushButton *fingerprintButton;
 
 public slots:
-    void update( input_item_t * );
+    void update( const SharedInputItem & );
     void clear();
     void fingerprint();
-    void fingerprintUpdate( input_item_t * );
+    void fingerprintUpdate( const SharedInputItem & );
 
 private slots:
     void enterEditMode();

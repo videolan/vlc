@@ -667,7 +667,7 @@ static void Close( vlc_object_t *p_this )
     }
 }
 
-static inline void qRegisterMetaTypes()
+static inline void registerMetaTypes()
 {
     qRegisterMetaType<size_t>();
     qRegisterMetaType<ssize_t>();
@@ -735,6 +735,8 @@ static void *Thread( void *obj )
     /* Start the QApplication here */
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
+
+    registerMetaTypes();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,1)
     //suppress deprecation warnings about QML 'Connections' syntax
@@ -890,8 +892,6 @@ static void *Thread( void *obj )
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();
     if( s_style.compare("") != 0 )
         QApplication::setStyle( s_style );
-
-    qRegisterMetaTypes();
 
     /* Launch */
     app.exec();

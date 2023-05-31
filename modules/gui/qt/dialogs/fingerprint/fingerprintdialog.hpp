@@ -25,6 +25,7 @@
 #endif
 
 #include "qt.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <QDialog>
 
@@ -57,7 +58,7 @@ private slots:
     void applyIdentity();
 
 signals:
-    void metaApplied( input_item_t * );
+    void metaApplied( const SharedInputItem& );
 };
 
 #endif // FINGERPRINTDIALOG_HPP

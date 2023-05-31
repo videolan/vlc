@@ -44,7 +44,7 @@
 #include <vlc_player.h>
 
 CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
-    : QLabel( parent ), p_intf( _p_i ), p_item( NULL )
+    : QLabel( parent ), p_intf( _p_i )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
     connect( THEMIM, QOverload<QString>::of(&PlayerController::artChanged),
@@ -63,11 +63,10 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     connect( action, &QAction::triggered, this, &CoverArtLabel::setArtFromFile );
     addAction( action );
 
-    p_item = THEMIM->getInput();
+    p_item = SharedInputItem{ THEMIM->getInput() } ;
     if( p_item )
     {
-        input_item_Hold( p_item );
-        showArtUpdate( p_item );
+        showArtUpdate( p_item.get() );
     }
     else
         showArtUpdate( "" );
@@ -78,14 +77,11 @@ CoverArtLabel::~CoverArtLabel()
     QList< QAction* > artActions = actions();
     foreach( QAction *act, artActions )
         removeAction( act );
-    if ( p_item ) input_item_Release( p_item );
 }
 
-void CoverArtLabel::setItem( input_item_t *_p_item )
+void CoverArtLabel::setItem( const SharedInputItem& _p_item )
 {
-    if ( p_item ) input_item_Release( p_item );
     p_item = _p_item;
-    if ( p_item ) input_item_Hold( p_item );
 }
 
 void CoverArtLabel::mouseDoubleClickEvent( QMouseEvent *event )
@@ -116,7 +112,7 @@ void CoverArtLabel::showArtUpdate( const QString& url )
 void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
 {
     /* not for me */
-    if ( _p_item != p_item )
+    if ( _p_item != p_item.get() )
         return;
 
     QString url;
@@ -126,7 +122,7 @@ void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
 
 void CoverArtLabel::askForUpdate()
 {
-    THEMIM->requestArtUpdate( p_item, true );
+    THEMIM->requestArtUpdate( p_item.get(), true );
 }
 
 void CoverArtLabel::setArtFromFile()
@@ -140,7 +136,7 @@ void CoverArtLabel::setArtFromFile()
     if( fileUrl.isEmpty() )
         return;
 
-    THEMIM->setArt( p_item, fileUrl.toString() );
+    THEMIM->setArt( p_item.get(), fileUrl.toString() );
 }
 
 void CoverArtLabel::clear()

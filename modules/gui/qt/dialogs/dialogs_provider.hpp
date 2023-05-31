@@ -37,6 +37,9 @@
 #include "playlist/playlist_item.hpp"
 
 #include "util/singleton.hpp"
+#include "util/shared_input_item.hpp"
+
+#include "medialibrary/mlqmltypes.hpp"
 
 #include <QObject>
 #include <QStringList>
@@ -130,7 +133,9 @@ public slots:
     void playlistsDialog( const QVariantList & listMedia );
     void bookmarksDialog();
     void mediaInfoDialog( void );
+    void mediaInfoDialog( const SharedInputItem& inputItem );
     void mediaInfoDialog( const PlaylistItem& pItem );
+    void mediaInfoDialog( const MLItemId& itemId );
     void mediaCodecDialog();
     void prefsDialog();
     void firstRunDialog();
