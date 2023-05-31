@@ -18,9 +18,11 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
 	$(MOVE)
 
+OGG_CONF := -DINSTALL_DOCS:BOOL=OFF
+
 .ogg: libogg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
-	$(CMAKEBUILD)
+	$(HOSTVARS) $(CMAKE) $(OGG_CONF)
+	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
