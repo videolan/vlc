@@ -1,6 +1,6 @@
 # libogg
 
-OGG_VERSION := 1.3.4
+OGG_VERSION := 1.3.5
 
 OGG_URL := $(XIPH)/ogg/libogg-$(OGG_VERSION).tar.xz
 #OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
@@ -17,7 +17,6 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
-	$(APPLY) $(SRC)/ogg/libogg-uint-macos.patch
 	$(MOVE)
 
 .ogg: libogg toolchain.cmake
