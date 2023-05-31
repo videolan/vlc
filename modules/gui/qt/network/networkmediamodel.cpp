@@ -421,7 +421,7 @@ bool NetworkMediaModel::initializeMediaSources()
         input_item_node_t* parent = nullptr;
         vlc_media_tree_Lock(tree);
         vlc_media_tree_PreparseCancel( libvlc, this );
-        std::vector<InputItemPtr> itemList;
+        std::vector<SharedInputItem> itemList;
         m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
         if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, &parent))
         {
@@ -459,7 +459,7 @@ bool NetworkMediaModel::initializeMediaSources()
 
 void NetworkMediaModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item_node_t* node)
 {
-    InputItemPtr p_node { node->p_item };
+    SharedInputItem p_node { node->p_item };
     QMetaObject::invokeMethod(model, [model=model, p_node = std::move(p_node), tree = std::move(tree)]() {
         if (p_node != model->m_treeItem.media)
             return;
@@ -473,7 +473,7 @@ void NetworkMediaModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item
         if (!found)
             return;
 
-        std::vector<InputItemPtr> itemList;
+        std::vector<SharedInputItem> itemList;
         itemList.reserve( static_cast<size_t>(res->i_children) );
         for (int i = 0; i < res->i_children; i++)
             itemList.emplace_back(res->pp_children[i]->p_item);
@@ -486,8 +486,8 @@ void NetworkMediaModel::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_n
                                                  input_item_node_t *const children[],
                                                  size_t count )
 {
-    InputItemPtr p_parent { parent->p_item };
-    std::vector<InputItemPtr> itemList;
+    SharedInputItem p_parent { parent->p_item };
+    std::vector<SharedInputItem> itemList;
     itemList.reserve( count );
     for (size_t i = 0; i < count; i++)
         itemList.emplace_back(children[i]->p_item);
@@ -502,12 +502,12 @@ void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node
                                                    input_item_node_t *const children[],
                                                    size_t count )
 {
-    std::vector<InputItemPtr> itemList;
+    std::vector<SharedInputItem> itemList;
     itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
         itemList.emplace_back( children[i]->p_item );
 
-    InputItemPtr p_node { node->p_item };
+    SharedInputItem p_node { node->p_item };
     QMetaObject::invokeMethod(model, [model=model, p_node=std::move(p_node), itemList=std::move(itemList)]() {
         if (p_node != model->m_treeItem.media)
             return;
@@ -543,7 +543,7 @@ void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node
 void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, enum input_item_preparse_status )
 {
     model->m_preparseSem.release();
-    InputItemPtr p_node { node->p_item };
+    SharedInputItem p_node { node->p_item };
     QMetaObject::invokeMethod(model, [model=model, p_node=std::move(p_node)]() {
         if (p_node != model->m_treeItem.media)
             return;
@@ -554,7 +554,7 @@ void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item
 }
 
 void NetworkMediaModel::refreshMediaList( MediaTreePtr tree,
-                                          std::vector<InputItemPtr> children,
+                                          std::vector<SharedInputItem> children,
                                           bool clear )
 {
     std::vector<Item> items;

@@ -149,7 +149,7 @@ void StandardPathModel::addItem(const QString & path, const QString & name, cons
 
     input_item_t * inputItem = input_item_NewDirectory(qtu(url.toString()), qtu(name), ITEM_LOCAL);
 
-    item.inputItem = InputItemPtr(inputItem, false);
+    item.inputItem = SharedInputItem(inputItem, false);
 
     vlc_media_tree_t * tree = vlc_media_tree_New();
 

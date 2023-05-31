@@ -19,19 +19,14 @@
 #ifndef VLC_QT_MEDIA_HPP_
 #define VLC_QT_MEDIA_HPP_
 
-#include <vlc_cxx_helpers.hpp>
-#include <vlc_common.h>
-#include <vlc_input_item.h>
 #include <QString>
 #include <QStringList>
+
 #include "util/qt_dirs.hpp"
+#include "util/shared_input_item.hpp"
 
 namespace vlc {
   namespace playlist {
-
-using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                              input_item_Hold,
-                                              input_item_Release);
 
 class Media
 {
@@ -97,7 +92,7 @@ public:
     }
 
 private:
-    InputItemPtr ptr;
+    SharedInputItem ptr;
 };
 
   } // namespace playlist

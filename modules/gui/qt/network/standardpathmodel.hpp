@@ -27,9 +27,9 @@
 
 // VLC includes
 #include <vlc_media_source.h>
-#include <vlc_cxx_helpers.hpp>
 #include "networkdevicemodel.hpp"
 #include "util/cliplistmodel.hpp"
+#include "util/shared_input_item.hpp"
 
 // Qt includes
 #include <QAbstractListModel>
@@ -56,10 +56,6 @@ public: // Enums
     };
 
 public: // Declarations
-    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                                  input_item_Hold,
-                                                  input_item_Release);
-
     using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
                                                   vlc_media_tree_Hold,
                                                   vlc_media_tree_Release);
@@ -95,7 +91,7 @@ struct StandardPathItem
 
     NetworkDeviceModel::ItemType type;
 
-    StandardPathModel::InputItemPtr inputItem;
+    SharedInputItem inputItem;
     StandardPathModel::MediaTreePtr tree;
 
     QUrl artwork;

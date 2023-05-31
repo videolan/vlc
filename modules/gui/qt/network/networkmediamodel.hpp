@@ -29,7 +29,8 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "mediatreelistener.hpp"
-#include <maininterface/mainctx.hpp>
+#include "maininterface/mainctx.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <QSemaphore>
 #include <QDateTime>
@@ -42,10 +43,6 @@ using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
 using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
                                               vlc_media_tree_Hold,
                                               vlc_media_tree_Release);
-
-using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                              input_item_Hold,
-                                              input_item_Release);
 
 class NetworkTreeItem
 {
@@ -77,7 +74,7 @@ public:
     }
 
     MediaTreePtr tree;
-    InputItemPtr media;
+    SharedInputItem media;
 };
 
 class PathNode
@@ -218,7 +215,7 @@ private:
 
     bool initializeMediaSources();
 
-    void refreshMediaList(MediaTreePtr tree, std::vector<InputItemPtr> children , bool clear);
+    void refreshMediaList(MediaTreePtr tree, std::vector<SharedInputItem> children , bool clear);
 
     bool canBeIndexed(const QUrl& url , ItemType itemType );
 

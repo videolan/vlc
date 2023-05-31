@@ -23,6 +23,7 @@
 #include "dialogs/extensions/extensions_manager.hpp"
 #include "player_controller.hpp"
 #include "player_controller_p.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <vlc_actions.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */
@@ -42,10 +43,6 @@
 #define POSITION_MIN_UPDATE_INTERVAL VLC_TICK_FROM_MS(15)
 
 //PlayerController private implementation
-
-using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                              input_item_Hold,
-                                              input_item_Release);
 
 using EsIdPtr = vlc_shared_data_ptr_type(vlc_es_id_t,
                                          vlc_es_id_Hold,
@@ -284,7 +281,7 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         return;
     }
 
-    InputItemPtr newMediaPtr = InputItemPtr( new_media );
+    SharedInputItem newMediaPtr = SharedInputItem( new_media );
     that->callAsync([that,newMediaPtr] () {
         PlayerController* q = that->q_func();
         that->UpdateName( newMediaPtr.get() );
@@ -762,7 +759,7 @@ static void on_player_media_meta_changed(vlc_player_t *, input_item_t *media, vo
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_item_meta_changed");
 
-    InputItemPtr mediaPtr(media);
+    SharedInputItem mediaPtr(media);
     //call on object thread
     that->callAsync([that,mediaPtr] () {
         that->UpdateName(mediaPtr.get());

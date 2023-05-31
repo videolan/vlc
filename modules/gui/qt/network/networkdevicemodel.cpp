@@ -322,7 +322,7 @@ void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_ite
     if (node != &tree->root)
         return;
 
-    std::vector<InputItemPtr> itemList;
+    std::vector<SharedInputItem> itemList;
 
     itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
@@ -387,7 +387,7 @@ void NetworkDeviceModel::refreshDeviceList(MediaSourcePtr mediaSource,
         });
     }
 
-    std::vector<InputItemPtr> itemList;
+    std::vector<SharedInputItem> itemList;
 
     itemList.reserve(count);
 
@@ -404,14 +404,14 @@ void NetworkDeviceModel::refreshDeviceList(MediaSourcePtr mediaSource,
     }, Qt::QueuedConnection);
 }
 
-void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
+void NetworkDeviceModel::addItems(const std::vector<SharedInputItem> & inputList,
                                   const MediaSourcePtr & mediaSource)
 {
     // NOTE: We need to check duplicates when we're not sorting by name. Otherwise it's handled via
     //       the 'name' sorting functions.
     bool checkDuplicate = (m_sortCriteria != "name");
 
-    for (const InputItemPtr & inputItem : inputList)
+    for (const SharedInputItem & inputItem : inputList)
     {
         NetworkDeviceItem item;
 
@@ -453,7 +453,7 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
 
         item.mediaSource = mediaSource;
 
-        item.inputItem = InputItemPtr(inputItem);
+        item.inputItem = SharedInputItem(inputItem);
 
         char * artwork = input_item_GetArtworkURL(inputItem.get());
         if (artwork)

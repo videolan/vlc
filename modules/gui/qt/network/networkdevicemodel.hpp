@@ -27,10 +27,10 @@
 #include <QUrl>
 
 #include <vlc_media_source.h>
-#include <vlc_cxx_helpers.hpp>
 
 #include "mediatreelistener.hpp"
 #include "util/cliplistmodel.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <memory>
 
@@ -88,11 +88,6 @@ public: // Declarations
     using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
                                                   vlc_media_tree_Hold,
                                                   vlc_media_tree_Release);
-
-    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                                  input_item_Hold,
-                                                  input_item_Release);
-
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
 
@@ -134,7 +129,7 @@ private:
 
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
 
-    void addItems(const std::vector<InputItemPtr> & inputList, const MediaSourcePtr & mediaSource);
+    void addItems(const std::vector<SharedInputItem> & inputList, const MediaSourcePtr & mediaSource);
 
     void eraseItem(std::vector<NetworkDeviceItem>::iterator & it, int index, int count);
 
@@ -179,7 +174,7 @@ struct NetworkDeviceItem
     QString protocol;
     NetworkDeviceModel::ItemType type;
     NetworkDeviceModel::MediaSourcePtr mediaSource;
-    NetworkDeviceModel::InputItemPtr inputItem;
+    SharedInputItem inputItem;
     QString artwork;
 };
 

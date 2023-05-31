@@ -23,6 +23,7 @@
 #include "util/variables.hpp"
 #include "input_models.hpp"
 #include "util/varchoicemodel.hpp"
+#include "util/shared_input_item.hpp"
 
 #include <QTimer>
 #include <QUrl>
@@ -85,11 +86,7 @@ public:
     QString m_highResolutionTime { "00:00:00:00" };
     unsigned m_smpteTimerRequestCount = 0;
 
-    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                                  input_item_Hold,
-                                                  input_item_Release);
-
-    InputItemPtr    m_currentItem;
+    SharedInputItem    m_currentItem;
     bool            m_canRestorePlayback = false;
 
     int             m_capabilities = 0;
