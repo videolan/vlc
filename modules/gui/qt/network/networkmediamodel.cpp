@@ -22,7 +22,7 @@
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 
 //use the same queue as in mlfoldermodel
 static const char* const ML_FOLDER_ADD_QUEUE = "ML_FOLDER_ADD_QUEUE";
@@ -356,9 +356,7 @@ QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & index
 
         const NetworkTreeItem & tree = m_items[index].tree;
 
-        QmlInputItem input(tree.media.get(), true);
-
-        items.append(QVariant::fromValue(input));
+        items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
     }
 
     return items;

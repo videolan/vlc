@@ -28,6 +28,7 @@
 #include "medialib.hpp"
 #include "mlhelper.hpp"
 
+#include "util/shared_input_item.hpp"
 #include "util/vlctick.hpp"
 #include "player/player_controller.hpp"
 
@@ -338,7 +339,7 @@ void MLBookmarkModel::onCurrentMediaChanged( vlc_player_t*, input_item_t* media,
 {
     //Player thread
     auto self = static_cast<MLBookmarkModel*>( data );
-    QmlInputItem item(media, true);
+    SharedInputItem item(media, true);
     QString mediaUri;
     uint64_t revision;
     {

@@ -28,7 +28,7 @@ DragItem {
 
     /* required */ property MLModel mlModel: null
 
-    // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for QmlInputItem
+    // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for SharedInputItem
     property string mlIDRole: "id"
 
     function getSelectedInputItem(cb) {

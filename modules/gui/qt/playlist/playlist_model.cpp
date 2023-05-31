@@ -24,7 +24,7 @@
 #include "playlist_model_p.hpp"
 #include <algorithm>
 #include <cassert>
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 
 namespace vlc {
 namespace playlist {
@@ -442,9 +442,7 @@ QVariantList PlaylistListModel::getItemsForIndexes(const QList<int> & indexes) c
         if (media == nullptr)
             continue;
 
-        QmlInputItem input(media, true);
-
-        items.append(QVariant::fromValue(input));
+        items.append(QVariant::fromValue(SharedInputItem(media, true)));
     }
 
     return items;

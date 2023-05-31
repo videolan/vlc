@@ -16,44 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QMLINPUTITEM_HPP
-#define QMLINPUTITEM_HPP
+#ifndef SHAREDINPUTITEM_HPP
+#define SHAREDINPUTITEM_HPP
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include <QMetaType>
 
-// VLC includes
-#include <vlc_media_source.h>
+#include <vlc_common.h>
+#include <vlc_input_item.h>
 #include <vlc_cxx_helpers.hpp>
 
-// Qt includes
-#include <QObject>
 
-class QmlInputItem
-{
-    Q_GADGET
+using SharedInputItem = vlc_shared_data_ptr_type(input_item_t,
+                                                 input_item_Hold,
+                                                 input_item_Release);
 
-    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                                  input_item_Hold,
-                                                  input_item_Release);
+Q_DECLARE_METATYPE(SharedInputItem)
 
-public:
-    QmlInputItem() : item(nullptr) {}
-
-    QmlInputItem(input_item_t * item, bool hold) : item(item, hold) {}
-
-public: // Operators
-    QmlInputItem(const QmlInputItem &)  = default;
-    QmlInputItem(QmlInputItem       &&) = default;
-
-    QmlInputItem & operator=(const QmlInputItem &)  = default;
-    QmlInputItem & operator=(QmlInputItem       &&) = default;
-
-public: // Variables
-    InputItemPtr item;
-};
-
-Q_DECLARE_METATYPE(QmlInputItem)
-
-#endif // QMLINPUTITEM_HPP
+#endif // SHAREDINPUTITEM_HPP

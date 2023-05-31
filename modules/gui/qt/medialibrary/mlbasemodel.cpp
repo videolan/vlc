@@ -21,7 +21,6 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "mllistcache.hpp"
-#include "util/qmlinputitem.hpp"
 
 // MediaLibrary includes
 #include "mlbasemodel.hpp"

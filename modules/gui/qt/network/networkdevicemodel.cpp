@@ -20,7 +20,7 @@
 #include "networkmediamodel.hpp"
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 #include <maininterface/mainctx.hpp>
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
@@ -226,9 +226,7 @@ QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & inde
         if (index < 0 || index >= count())
             continue;
 
-        QmlInputItem input(m_items[index].inputItem.get(), true);
-
-        items.append(QVariant::fromValue(input));
+        items.append(QVariant::fromValue(SharedInputItem(m_items[index].inputItem.get(), true)));
     }
 
     return items;

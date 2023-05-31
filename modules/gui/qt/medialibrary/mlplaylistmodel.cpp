@@ -23,7 +23,7 @@
 #include "mlplaylistmodel.hpp"
 
 // Util includes
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 #include "util/vlctick.hpp"
 
 // MediaLibrary includes
@@ -67,17 +67,12 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
     std::vector<QString> mrlList;
     for (const QVariant & variant : items)
     {
-        if (variant.canConvert<QmlInputItem>() == false)
+        if (variant.canConvert<SharedInputItem>() == false)
             continue;
 
-        const QmlInputItem & item = variant.value<QmlInputItem>();
 
-        const char * psz_uri = item.item ? item.item->psz_uri : nullptr;
-
-        if (psz_uri == nullptr)
-            continue;
-
-        mrlList.emplace_back(psz_uri);
+        if (const char * psz_uri = ((variant.value<SharedInputItem>())->psz_uri))
+            mrlList.emplace_back(psz_uri);
     }
 
     m_transactionPending = true;

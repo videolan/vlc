@@ -18,8 +18,9 @@
 
 #include "medialib.hpp"
 #include "mlhelper.hpp"
-
 #include "playlist/playlist_controller.hpp"
+#include "util/shared_input_item.hpp"
+
 
 MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     : QObject( _parent )
@@ -284,7 +285,7 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
             mlIdList.push_back(variant.value<MLItemId>());
     }
     struct Ctx {
-        std::vector<QmlInputItem> items;
+        std::vector<SharedInputItem> items;
     };
 
     if (mlIdList.empty())

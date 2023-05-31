@@ -27,7 +27,6 @@
 #include "mlthreadpool.hpp"
 #include "mlqmltypes.hpp"
 
-#include "util/qmlinputitem.hpp"
 
 class MLCustomCover;
 

@@ -321,7 +321,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/variables.cpp gui/qt/util/variables.hpp \
 	gui/qt/util/vlctick.cpp \
 	gui/qt/util/vlctick.hpp \
-	gui/qt/util/qmlinputitem.hpp \
+	gui/qt/util/shared_input_item.hpp \
 	gui/qt/util/effects_image_provider.cpp \
 	gui/qt/util/effects_image_provider.hpp \
 	gui/qt/util/qsgroundedrectangularimagenode.cpp \
@@ -511,7 +511,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
-	gui/qt/util/qmlinputitem.moc.cpp \
 	gui/qt/util/qsgroundedrectangularimagenode.moc.cpp \
 	gui/qt/util/dismiss_popup_event_filter.moc.cpp \
 	gui/qt/widgets/native/animators.moc.cpp \

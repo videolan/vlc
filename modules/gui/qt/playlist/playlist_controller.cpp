@@ -24,7 +24,7 @@
 #include "playlist_controller_p.hpp"
 #include <vlc_player.h>
 #include <vlc_url.h>
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 #include <algorithm>
 #include <QVariant>
 #include <QDesktopServices>
@@ -80,10 +80,9 @@ QVector<Media> toMediaList(const QVariantList &sources)
                 mrl = resolveWinSymlinks(mrl);
 
             return Media(mrl.toString(QUrl::None), mrl.fileName());
-        } else if (value.canConvert<QmlInputItem>())
+        } else if (value.canConvert<SharedInputItem>())
         {
-            const QmlInputItem & item = value.value<QmlInputItem>();
-            return Media(item.item.get());
+            return Media(value.value<SharedInputItem>().get());
         }
         return Media{};
     });

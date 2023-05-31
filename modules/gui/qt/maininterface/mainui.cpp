@@ -39,7 +39,7 @@
 #include "style/systempalette.hpp"
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
-#include "util/qmlinputitem.hpp"
+#include "util/shared_input_item.hpp"
 #include "util/flickable_scroll_handler.hpp"
 #include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
@@ -250,7 +250,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
 
-        qRegisterMetaType<QmlInputItem>();
+        qRegisterMetaType<SharedInputItem>();
 
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
 
