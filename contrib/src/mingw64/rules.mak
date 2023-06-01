@@ -60,7 +60,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
 	$(APPLY) $(SRC)/mingw64/0004-headers-enable-CreateHardLinkW-in-Win10-19H1-UWP-bui.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-more-module-API-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0006-headers-enable-more-module-API-in-Win10-19H1-UWP-bui.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
 	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch

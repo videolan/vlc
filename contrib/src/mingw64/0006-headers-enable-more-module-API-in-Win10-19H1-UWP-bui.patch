@@ -1,18 +1,25 @@
-From f24fb397cf423d55d363ac4fdc7e6b7aeb7ae830 Mon Sep 17 00:00:00 2001
+From c9bb6512f22df36c104d1539ed1de52b8d41b322 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 30 May 2023 14:42:07 +0200
-Subject: [PATCH] headers: enable more module API in Win10 UWP builds
+Subject: [PATCH 06/10] headers: enable more module API in Win10 19H1 UWP
+ builds
 
-The documentation doesn't say they're allowed, but the WIndows SDK allow it
-since 22000 and the Windows App Certification as well.
-It is not restricted to Win11 in both cases but applies when targeting Win10
-as well.
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
+
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-libraryloader-l1-2-0 in mincore and windowsapp.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-libraryloader-l1-2-0dll
 ---
- mingw-w64-headers/include/libloaderapi.h | 51 ++++++++++++++----------
- 1 file changed, 29 insertions(+), 22 deletions(-)
+ mingw-w64-headers/include/libloaderapi.h | 44 ++++++++++++++----------
+ 1 file changed, 26 insertions(+), 18 deletions(-)
 
 diff --git a/mingw-w64-headers/include/libloaderapi.h b/mingw-w64-headers/include/libloaderapi.h
-index d4c82ef8c..288e78d9f 100644
+index d4c82ef8c..c96e1a07b 100644
 --- a/mingw-w64-headers/include/libloaderapi.h
 +++ b/mingw-w64-headers/include/libloaderapi.h
 @@ -37,11 +37,6 @@ extern "C" {
@@ -27,7 +34,7 @@ index d4c82ef8c..288e78d9f 100644
    typedef PVOID DLL_DIRECTORY_COOKIE, *PDLL_DIRECTORY_COOKIE;
  
  #define FIND_RESOURCE_DIRECTORY_TYPES (0x0100)
-@@ -90,32 +85,18 @@ extern "C" {
+@@ -90,31 +85,21 @@ extern "C" {
  
    WINBASEAPI WINBOOL WINAPI EnumResourceNamesW(HMODULE hModule, LPCWSTR lpType, ENUMRESNAMEPROCW lpEnumFunc, LONG_PTR lParam);
    WINBASEAPI HRSRC WINAPI FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
@@ -36,8 +43,8 @@ index d4c82ef8c..288e78d9f 100644
 -  WINBASEAPI HMODULE WINAPI LoadLibraryExA (LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
 -  WINBASEAPI HMODULE WINAPI LoadLibraryExW (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
    WINBASEAPI HGLOBAL WINAPI LoadResource (HMODULE hModule, HRSRC hResInfo);
--  WINUSERAPI int WINAPI LoadStringA (HINSTANCE hInstance, UINT uID, LPSTR lpBuffer, int cchBufferMax);
--  WINUSERAPI int WINAPI LoadStringW (HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, int cchBufferMax);
+   WINUSERAPI int WINAPI LoadStringA (HINSTANCE hInstance, UINT uID, LPSTR lpBuffer, int cchBufferMax);
+   WINUSERAPI int WINAPI LoadStringW (HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, int cchBufferMax);
    WINBASEAPI LPVOID WINAPI LockResource (HGLOBAL hResData);
 -  WINBASEAPI DWORD WINAPI SizeofResource (HMODULE hModule, HRSRC hResInfo);
    WINBASEAPI DLL_DIRECTORY_COOKIE WINAPI AddDllDirectory (PCWSTR NewDirectory);
@@ -53,14 +60,13 @@ index d4c82ef8c..288e78d9f 100644
  #endif
  
 -#define PGET_MODULE_HANDLE_EX __MINGW_NAME_AW(PGET_MODULE_HANDLE_EX)
--#define LoadString __MINGW_NAME_AW(LoadString)
+ #define LoadString __MINGW_NAME_AW(LoadString)
 -#define GetModuleHandleEx __MINGW_NAME_AW(GetModuleHandleEx)
 -#define LoadLibraryEx __MINGW_NAME_AW(LoadLibraryEx)
--
+ 
  #define EnumResourceLanguages __MINGW_NAME_AW(EnumResourceLanguages)
    WINBASEAPI WINBOOL WINAPI EnumResourceLanguagesA(HMODULE hModule,LPCSTR lpType,LPCSTR lpName,ENUMRESLANGPROCA lpEnumFunc,LONG_PTR lParam);
-   WINBASEAPI WINBOOL WINAPI EnumResourceLanguagesW(HMODULE hModule,LPCWSTR lpType,LPCWSTR lpName,ENUMRESLANGPROCW lpEnumFunc,LONG_PTR lParam);
-@@ -136,11 +117,8 @@ extern "C" {
+@@ -136,11 +121,8 @@ extern "C" {
  #endif
  #endif
  #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
@@ -72,11 +78,11 @@ index d4c82ef8c..288e78d9f 100644
  #define LoadLibrary __MINGW_NAME_AW(LoadLibrary)
  #endif
  
-@@ -176,6 +154,35 @@ typedef const REDIRECTION_DESCRIPTOR *PCREDIRECTION_DESCRIPTOR;
+@@ -176,6 +158,32 @@ typedef const REDIRECTION_DESCRIPTOR *PCREDIRECTION_DESCRIPTOR;
  #endif
  #endif
  
-+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= 0x0A00
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
 +  WINBASEAPI HRSRC WINAPI FindResourceExW (HMODULE hModule, LPCWSTR lpType, LPCWSTR lpName, WORD wLanguage);
 +  WINBASEAPI HMODULE WINAPI GetModuleHandleA (LPCSTR lpModuleName);
 +  WINBASEAPI HMODULE WINAPI GetModuleHandleW (LPCWSTR lpModuleName);
@@ -84,8 +90,6 @@ index d4c82ef8c..288e78d9f 100644
 +  WINBASEAPI WINBOOL WINAPI GetModuleHandleExW (DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule);
 +  WINBASEAPI HMODULE WINAPI LoadLibraryExA (LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
 +  WINBASEAPI HMODULE WINAPI LoadLibraryExW (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
-+  WINUSERAPI int WINAPI LoadStringA (HINSTANCE hInstance, UINT uID, LPSTR lpBuffer, int cchBufferMax);
-+  WINUSERAPI int WINAPI LoadStringW (HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, int cchBufferMax);
 +  WINBASEAPI DWORD WINAPI SizeofResource (HMODULE hModule, HRSRC hResInfo);
 +
 +#ifdef UNICODE
@@ -95,7 +99,6 @@ index d4c82ef8c..288e78d9f 100644
 +#define GetModuleHandle __MINGW_NAME_AW(GetModuleHandle)
 +#define GetModuleHandleEx __MINGW_NAME_AW(GetModuleHandleEx)
 +#define LoadLibraryEx __MINGW_NAME_AW(LoadLibraryEx)
-+#define LoadString __MINGW_NAME_AW(LoadString)
 +
 +#ifndef RC_INVOKED
 +  typedef WINBOOL (WINAPI *PGET_MODULE_HANDLE_EXA) (DWORD dwFlags, LPCSTR lpModuleName, HMODULE *phModule);
