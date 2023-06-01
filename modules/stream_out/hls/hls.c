@@ -27,6 +27,7 @@
 #include <vlc_configuration.h>
 #include <vlc_frame.h>
 #include <vlc_list.h>
+#include <vlc_memstream.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_tick.h>
@@ -34,6 +35,7 @@
 
 #include "hls.h"
 #include "segments.h"
+#include "storage.h"
 #include "variant_maps.h"
 
 typedef struct
@@ -57,6 +59,8 @@ typedef struct hls_playlist
 {
     unsigned int id;
 
+    const struct hls_config *config;
+
     sout_access_out_t *access;
     sout_mux_t *mux;
     /** Every ES muxed in this playlist. */
@@ -72,6 +76,16 @@ typedef struct hls_playlist
      * segment.
      */
     hls_segment_queue_t segments;
+
+    char *url;
+    const char *name;
+
+    /**
+     * Current playlist manifest as in RFC 8216 section 4.3.3.
+     */
+    struct hls_storage *manifest;
+
+    bool ended;
 
     struct vlc_list node;
 } hls_playlist_t;
@@ -127,6 +141,74 @@ typedef struct
             (i_##it == 0 ? &sys->variant_playlists : &sys->media_playlists),   \
             node)
 
+static struct hls_storage *
+GeneratePlaylistManifest(const hls_playlist_t *playlist)
+{
+    struct vlc_memstream out;
+    vlc_memstream_open(&out);
+
+#define MANIFEST_ADD_TAG(fmt, ...)                                             \
+    do                                                                         \
+    {                                                                          \
+        if (vlc_memstream_printf(&out, fmt "\n", ##__VA_ARGS__) < 0)           \
+            goto error;                                                        \
+    } while (0)
+
+    MANIFEST_ADD_TAG("#EXTM3U");
+    const double seg_duration =
+        secf_from_vlc_tick(playlist->config->segment_length);
+    MANIFEST_ADD_TAG("#EXT-X-TARGETDURATION:%.0f", seg_duration);
+    // First version adding CMAF fragments support.
+    MANIFEST_ADD_TAG("#EXT-X-VERSION:7");
+
+    const bool will_destroy_segments = playlist->config->max_segments == 0;
+    if (playlist->ended)
+        MANIFEST_ADD_TAG("#EXT-X-PLAYLIST-TYPE:VOD");
+    else if (!will_destroy_segments)
+        MANIFEST_ADD_TAG("#EXT-X-PLAYLIST-TYPE:EVENT");
+
+    const hls_segment_t *first_seg = hls_segment_GetFirst(&playlist->segments);
+    MANIFEST_ADD_TAG("#EXT-X-MEDIA-SEQUENCE:%u",
+                     (first_seg == NULL) ? 0u : first_seg->id);
+
+    const hls_segment_t *segment;
+    hls_segment_queue_Foreach(&playlist->segments, segment)
+    {
+        MANIFEST_ADD_TAG("#EXTINF:%.2f,", secf_from_vlc_tick(segment->length));
+        MANIFEST_ADD_TAG("%s", segment->url);
+    }
+
+    if (playlist->ended)
+        MANIFEST_ADD_TAG("#EXT-X-ENDLIST");
+
+#undef MANIFEST_ADD_TAG
+
+    if (vlc_memstream_close(&out) != 0)
+        return NULL;
+
+    const struct hls_storage_config storage_config = {
+        .name = playlist->name};
+    return hls_storage_FromBytes(
+        out.ptr, out.length, &storage_config, playlist->config);
+error:
+    if (vlc_memstream_close(&out) != 0)
+        return NULL;
+    free(out.ptr);
+    return NULL;
+}
+
+static int UpdatePlaylistManifest(hls_playlist_t *playlist)
+{
+    struct hls_storage *new_manifest = GeneratePlaylistManifest(playlist);
+    if (unlikely(new_manifest == NULL))
+        return VLC_EGENERIC;
+
+    if (playlist->manifest != NULL)
+        hls_storage_Destroy(playlist->manifest);
+    playlist->manifest = new_manifest;
+    return VLC_SUCCESS;
+}
+
 static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
 {
     hls_playlist_t *playlist = access->p_sys;
@@ -164,6 +246,18 @@ static sout_access_out_t *CreateAccessOut(sout_stream_t *stream,
     return access;
 }
 
+static inline char *FormatPlaylistManifestURL(const hls_playlist_t *playlist)
+{
+    char *url;
+    const int status = asprintf(&url,
+                                "%s/playlist-%u-index.m3u8",
+                                playlist->config->base_url,
+                                playlist->id);
+    if (unlikely(status == -1))
+        return NULL;
+    return url;
+}
+
 static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 {
     sout_stream_sys_t *sys = stream->p_sys;
@@ -178,9 +272,17 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 
     playlist->mux = sout_MuxNew(playlist->access, "ts");
     if (unlikely(playlist->mux == NULL))
-        goto error;
+        goto mux_err;
 
     playlist->id = sys->playlist_created_count;
+    playlist->config = &sys->config;
+    playlist->ended = false;
+
+    playlist->url = FormatPlaylistManifestURL(playlist);
+    if (unlikely(playlist->url == NULL))
+        goto url_err;
+
+    playlist->name = playlist->url + strlen(sys->config.base_url) + 1;
 
     struct hls_segment_queue_config config = {
         .playlist_id = playlist->id,
@@ -189,10 +291,19 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 
     hls_block_chain_Reset(&playlist->muxed_output);
 
+    playlist->manifest = NULL;
+    if (UpdatePlaylistManifest(playlist) != VLC_SUCCESS)
+        goto error;
+
     vlc_list_init(&playlist->tracks);
 
     return playlist;
 error:
+    hls_segment_queue_Clear(&playlist->segments);
+    free(playlist->url);
+url_err:
+    sout_MuxDelete(playlist->mux);
+mux_err:
     sout_AccessOutDelete(playlist->access);
 access_err:
     free(playlist);
@@ -204,6 +315,9 @@ static void DeletePlaylist(hls_playlist_t *playlist)
     sout_MuxDelete(playlist->mux);
 
     sout_AccessOutDelete(playlist->access);
+
+    if (playlist->manifest != NULL)
+        hls_storage_Destroy(playlist->manifest);
 
     block_ChainRelease(playlist->muxed_output.begin);
     hls_segment_queue_Clear(&playlist->segments);
@@ -302,8 +416,11 @@ static void ExtractAndAddSegment(hls_playlist_t *playlist,
 
     const int status = hls_segment_queue_NewSegment(
         &playlist->segments, segment.begin, segment.length);
-}
+    if (unlikely(status != VLC_SUCCESS))
+        return;
 
+    UpdatePlaylistManifest(playlist);
+}
 static void Del(sout_stream_t *stream, void *id)
 {
     sout_stream_sys_t *sys = stream->p_sys;
@@ -322,6 +439,9 @@ static void Del(sout_stream_t *stream, void *id)
         hls_playlist_t *playlist;
         hls_playlists_foreach (playlist)
             ExtractAndAddSegment(playlist, sys->config.segment_length);
+
+        playlist->ended = true;
+        UpdatePlaylistManifest(playlist);
 
         DeletePlaylist(track->playlist_ref);
     }
