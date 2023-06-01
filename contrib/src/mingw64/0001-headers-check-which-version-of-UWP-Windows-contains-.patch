@@ -1,0 +1,40 @@
+From c060d692db86b56ef8b7da16776be69d31ff97e4 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 1 Jun 2023 13:04:21 +0200
+Subject: [PATCH] headers: check which version of UWP Windows contains Virtual
+ functions
+
+* VirtualFree is always available in UWP
+* VirtualAlloc is only available since 19H1/18362 SDK
+* VirtualAllocEx is only available since 20H1/19041 SDK
+
+They are all found in api-ms-win-core-memory-l1-1-0 which is in mincore
+and windowsapp. It's one of the target DLLs [1]
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-memory-l1-1-0dll
+---
+ mingw-w64-headers/include/memoryapi.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/mingw-w64-headers/include/memoryapi.h b/mingw-w64-headers/include/memoryapi.h
+index 152671c18..889c2a504 100644
+--- a/mingw-w64-headers/include/memoryapi.h
++++ b/mingw-w64-headers/include/memoryapi.h
+@@ -29,9 +29,13 @@ extern "C" {
+ #endif
+ 
+ #if (WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP) && _WIN32_WINNT >= _WIN32_WINNT_WIN10) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++    WINBASEAPI WINBOOL WINAPI VirtualFree (LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType);
++#endif
++#if (WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP) && NTDDI_VERSION >= NTDDI_WIN10_19H1) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+     WINBASEAPI LPVOID WINAPI VirtualAlloc (LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
++#endif
++#if (WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP) && NTDDI_VERSION >= NTDDI_WIN10_VB) || WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+     WINBASEAPI LPVOID WINAPI VirtualAllocEx (HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect);
+-    WINBASEAPI WINBOOL WINAPI VirtualFree (LPVOID lpAddress, SIZE_T dwSize, DWORD dwFreeType);
+ #endif
+ 
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
+-- 
+2.37.3.windows.1
+

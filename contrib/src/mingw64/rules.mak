@@ -58,6 +58,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(UNPACK)
 	$(APPLY) $(SRC)/mingw64/0001-headers-only-enable-GetFileInformationByHandle-for-1.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-check-which-version-of-UWP-Windows-contains-.patch
 	$(APPLY) $(SRC)/mingw64/0004-headers-enable-CreateHardLinkW-in-Win10-19H1-UWP-bui.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
 	$(APPLY) $(SRC)/mingw64/0006-headers-enable-more-module-API-in-Win10-19H1-UWP-bui.patch
