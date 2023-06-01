@@ -628,16 +628,16 @@ eof:
     return 0;
 }
 
-static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t i_skip )
+static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t *pi_skip )
 {
-    while( i_skip )
+    while( *pi_skip )
     {
-        ssize_t i_read = Read( p_extractor, NULL, i_skip );
+        ssize_t i_read = Read( p_extractor, NULL, *pi_skip );
 
         if( i_read < 1 )
             return VLC_EGENERIC;
 
-        i_skip -= i_read;
+        *pi_skip -= i_read;
     }
 
     return VLC_SUCCESS;
@@ -680,9 +680,13 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
             i_skip = i_req;
         }
-
-        if( archive_skip_decompressed( p_extractor, i_skip ) )
-            msg_Dbg( p_extractor, "failed to skip to seek position" );
+        if( archive_skip_decompressed( p_extractor, &i_skip ) )
+        {
+            msg_Warn( p_extractor, "failed to skip to seek position %" PRIu64 "/%" PRId64,
+                      i_req, archive_entry_size( p_sys->p_entry ) );
+            p_sys->i_offset += i_skip;
+            return VLC_EGENERIC;
+        }
     }
 
     p_sys->i_offset = i_req;
