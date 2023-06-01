@@ -23,15 +23,32 @@
 
 #include <vlc_common.h>
 
+#include <vlc_block.h>
 #include <vlc_configuration.h>
 #include <vlc_frame.h>
 #include <vlc_list.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
+#include <vlc_tick.h>
 #include <vlc_vector.h>
 
 #include "hls.h"
+#include "segments.h"
 #include "variant_maps.h"
+
+typedef struct
+{
+    block_t *begin;
+    block_t **end;
+    vlc_tick_t length;
+} hls_block_chain_t;
+
+static inline void hls_block_chain_Reset(hls_block_chain_t *chain)
+{
+    chain->begin = NULL;
+    chain->end = &chain->begin;
+    chain->length = 0;
+}
 
 /**
  * Represent one HLS playlist as in RFC 8216 section 4.
@@ -40,9 +57,21 @@ typedef struct hls_playlist
 {
     unsigned int id;
 
+    sout_access_out_t *access;
     sout_mux_t *mux;
     /** Every ES muxed in this playlist. */
     struct vlc_list tracks;
+
+    hls_block_chain_t muxed_output;
+
+    /**
+     * Completed segments queue.
+     *
+     * The queue is generally max-sized (configurable by the user). Which means
+     * that, when the max size is reached, pushing in the queue erase the first
+     * segment.
+     */
+    hls_segment_queue_t segments;
 
     struct vlc_list node;
 } hls_playlist_t;
@@ -85,6 +114,10 @@ typedef struct
      * Notably used to create unique playlists IDs.
      */
     unsigned int playlist_created_count;
+
+    vlc_tick_t first_pcr;
+    vlc_tick_t last_pcr;
+    vlc_tick_t last_segment;
 } sout_stream_sys_t;
 
 #define hls_playlists_foreach(it)                                              \
@@ -94,6 +127,43 @@ typedef struct
             (i_##it == 0 ? &sys->variant_playlists : &sys->media_playlists),   \
             node)
 
+static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
+{
+    hls_playlist_t *playlist = access->p_sys;
+
+    size_t size = 0;
+    block_ChainProperties(block, NULL, &size, NULL);
+
+    block_ChainLastAppend(&playlist->muxed_output.end, block);
+    return size;
+}
+
+static sout_access_out_t *CreateAccessOut(sout_stream_t *stream,
+                                          hls_playlist_t *sys)
+{
+    sout_access_out_t *access = vlc_object_create(stream, sizeof(*access));
+    if (unlikely(access == NULL))
+        return NULL;
+
+    access->psz_access = strdup("hls");
+    if (unlikely(access->psz_access == NULL))
+    {
+        vlc_object_delete(access);
+        return NULL;
+    }
+
+    access->p_cfg = NULL;
+    access->p_module = NULL;
+    access->p_sys = sys;
+    access->psz_path = NULL;
+
+    access->pf_control = NULL;
+    access->pf_read = NULL;
+    access->pf_seek = NULL;
+    access->pf_write = AccessOutWrite;
+    return access;
+}
+
 static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 {
     sout_stream_sys_t *sys = stream->p_sys;
@@ -102,17 +172,29 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
     if (unlikely(playlist == NULL))
         return NULL;
 
-    playlist->mux = sout_MuxNew(
-        NULL /* TODO The access out will be introduced in the next commits. */,
-        "ts");
+    playlist->access = CreateAccessOut(stream, playlist);
+    if (unlikely(playlist->access == NULL))
+        goto access_err;
+
+    playlist->mux = sout_MuxNew(playlist->access, "ts");
     if (unlikely(playlist->mux == NULL))
         goto error;
 
     playlist->id = sys->playlist_created_count;
+
+    struct hls_segment_queue_config config = {
+        .playlist_id = playlist->id,
+    };
+    hls_segment_queue_Init(&playlist->segments, &config, &sys->config);
+
+    hls_block_chain_Reset(&playlist->muxed_output);
+
     vlc_list_init(&playlist->tracks);
 
     return playlist;
 error:
+    sout_AccessOutDelete(playlist->access);
+access_err:
     free(playlist);
     return NULL;
 }
@@ -120,6 +202,12 @@ error:
 static void DeletePlaylist(hls_playlist_t *playlist)
 {
     sout_MuxDelete(playlist->mux);
+
+    sout_AccessOutDelete(playlist->access);
+
+    block_ChainRelease(playlist->muxed_output.begin);
+    hls_segment_queue_Clear(&playlist->segments);
+
     vlc_list_remove(&playlist->node);
 
     free(playlist);
@@ -182,6 +270,40 @@ error:
     return NULL;
 }
 
+static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
+                                        vlc_tick_t max_segment_length)
+{
+    hls_block_chain_t segment = {.begin = playlist->muxed_output.begin};
+
+    block_t *prev = NULL;
+    for (block_t *it = playlist->muxed_output.begin; it != NULL;
+         it = it->p_next)
+    {
+        if (segment.length + it->i_length > max_segment_length)
+        {
+            playlist->muxed_output.begin = it;
+
+            if (prev != NULL)
+                prev->p_next = NULL;
+            return segment;
+        }
+        segment.length += it->i_length;
+        prev = it;
+    }
+
+    hls_block_chain_Reset(&playlist->muxed_output);
+    return segment;
+}
+
+static void ExtractAndAddSegment(hls_playlist_t *playlist,
+                                 vlc_tick_t last_segment_time)
+{
+    hls_block_chain_t segment = ExtractSegment(playlist, last_segment_time);
+
+    const int status = hls_segment_queue_NewSegment(
+        &playlist->segments, segment.begin, segment.length);
+}
+
 static void Del(sout_stream_t *stream, void *id)
 {
     sout_stream_sys_t *sys = stream->p_sys;
@@ -197,6 +319,10 @@ static void Del(sout_stream_t *stream, void *id)
         if (map != NULL)
             map->playlist_ref = NULL;
 
+        hls_playlist_t *playlist;
+        hls_playlists_foreach (playlist)
+            ExtractAndAddSegment(playlist, sys->config.segment_length);
+
         DeletePlaylist(track->playlist_ref);
     }
 
@@ -208,6 +334,44 @@ static int Send(sout_stream_t *stream, void *id, vlc_frame_t *frame)
     hls_track_t *track = id;
     return sout_MuxSendBuffer(track->playlist_ref->mux, track->input, frame);
     (void)stream;
+}
+
+/**
+ * PCR events are used to have a reliable stream time status. Segmenting is done
+ * after a PCR testifying that we are above the segment limit arrives.
+ */
+static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    const vlc_tick_t last_pcr = sys->last_pcr;
+    sys->last_pcr = pcr;
+
+    if (sys->first_pcr == VLC_TICK_INVALID)
+    {
+        sys->first_pcr = pcr;
+        return;
+    }
+
+    const vlc_tick_t stream_time = pcr - sys->first_pcr;
+    const vlc_tick_t current_seglen = stream_time - sys->last_segment;
+
+    const vlc_tick_t pcr_gap = pcr - last_pcr;
+    /* PCR and segment length aren't necessarily aligned. Testing segment length
+     * with a **next** PCR  approximation will avoid piling up data:
+     *
+     * |------x#|-----x##|----x###| time
+     * ^ PCR  ^ Segment end     ^ Buffer expanding
+     *
+     * The segments are then a little shorter than they could be.
+     */
+    if (current_seglen + pcr_gap >= sys->config.segment_length)
+    {
+        hls_playlist_t *playlist;
+        hls_playlists_foreach (playlist)
+            ExtractAndAddSegment(playlist, sys->config.segment_length);
+        sys->last_segment = stream_time;
+    }
 }
 
 #define SOUT_CFG_PREFIX "sout-hls-"
@@ -260,10 +424,16 @@ static int Open(vlc_object_t *this)
 
     vlc_list_init(&sys->variant_playlists);
     vlc_list_init(&sys->media_playlists);
+
+    sys->first_pcr = VLC_TICK_INVALID;
+    sys->last_pcr = VLC_TICK_INVALID;
+    sys->last_segment = 0;
+
     static const struct sout_stream_operations ops = {
         .add = Add,
         .del = Del,
         .send = Send,
+        .set_pcr = SetPCR,
     };
     stream->ops = &ops;
 
