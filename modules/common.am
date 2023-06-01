@@ -10,7 +10,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 NULL =
 pluginsdir = $(pkglibdir)/plugins
 BUILT_SOURCES =
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES += $(BUILT_SOURCES)
 
 LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 

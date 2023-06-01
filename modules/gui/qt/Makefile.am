@@ -11,6 +11,8 @@
 # For each qml and js resource
 #   - Add it to ..._QML
 
+CLEANFILES =
+
 include ../../common.am
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
