@@ -1,13 +1,17 @@
-From dd4f835601548529980550ddb0a66a7c8881ce9b Mon Sep 17 00:00:00 2001
+From b7ce09e8a811dc60e4c6ca68ca60773757b6cf20 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 25 May 2023 09:44:35 +0200
-Subject: [PATCH] headers: enable CreateHardLinkW in Win10 UWP builds
+Subject: [PATCH 04/10] headers: enable CreateHardLinkW in Win10 19H1 UWP
+ builds
 
-The documentation doesn't say it's allowed, but the WIndows SDK allow it and
-the Windows App Certification as well.
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
 
-The official page for allowed API's also doesn't say it's allowed [1]
-but the DLL that contains it is there.
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-file-l2-1-0 in mincore and windowsapp.
 
 [1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-file-l2-1-0dll
 ---
@@ -15,14 +19,14 @@ but the DLL that contains it is there.
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/mingw-w64-headers/include/winbase.h b/mingw-w64-headers/include/winbase.h
-index 82c8b7cc3..94f5df309 100644
+index 82c8b7cc3..c6c34ed3b 100644
 --- a/mingw-w64-headers/include/winbase.h
 +++ b/mingw-w64-headers/include/winbase.h
 @@ -2464,9 +2464,11 @@ typedef enum FILE_FLUSH_MODE {
    WINBASEAPI WINBOOL WINAPI ReplaceFileA (LPCSTR lpReplacedFileName, LPCSTR lpReplacementFileName, LPCSTR lpBackupFileName, DWORD dwReplaceFlags, LPVOID lpExclude, LPVOID lpReserved);
    WINBASEAPI WINBOOL WINAPI ReplaceFileW (LPCWSTR lpReplacedFileName, LPCWSTR lpReplacementFileName, LPCWSTR lpBackupFileName, DWORD dwReplaceFlags, LPVOID lpExclude, LPVOID lpReserved);
  #endif
-+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= _WIN32_WINNT_WIN10
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
 +  WINBASEAPI WINBOOL WINAPI CreateHardLinkW (LPCWSTR lpFileName, LPCWSTR lpExistingFileName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 +#endif
  #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
