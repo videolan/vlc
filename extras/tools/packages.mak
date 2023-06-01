@@ -6,8 +6,9 @@ VIDEOLAN=http://downloads.videolan.org/pub/contrib
 NASM_VERSION=2.14
 NASM_URL=http://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 
-CMAKE_VERSION=3.24.2
-CMAKE_URL=http://www.cmake.org/files/v3.24/cmake-$(CMAKE_VERSION).tar.gz
+CMAKE_VERSION_MAJ=3.29
+CMAKE_VERSION=$(CMAKE_VERSION_MAJ).5
+CMAKE_URL=http://www.cmake.org/files/v$(CMAKE_VERSION_MAJ)/cmake-$(CMAKE_VERSION).tar.gz
 
 LIBTOOL_VERSION=2.4.7
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz

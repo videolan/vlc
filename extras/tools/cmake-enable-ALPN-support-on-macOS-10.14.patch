@@ -1,4 +1,4 @@
-From f0d87cb7c54464a1b2677346a6f53771527ad50a Mon Sep 17 00:00:00 2001
+From 9ab37d83eb74676e09e107d109be6a7dc71c25a6 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 11 Jun 2020 15:09:53 +0200
 Subject: [PATCH] enable ALPN support on macOS 10.14
@@ -17,10 +17,10 @@ ld: symbol(s) not found for architecture x86_64
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/Utilities/cmcurl/lib/vtls/sectransp.c b/Utilities/cmcurl/lib/vtls/sectransp.c
-index 2e57d83785..87fefba263 100644
+index 1f37305ce8..c380c134a4 100644
 --- a/Utilities/cmcurl/lib/vtls/sectransp.c
 +++ b/Utilities/cmcurl/lib/vtls/sectransp.c
-@@ -80,6 +80,7 @@
+@@ -89,6 +89,7 @@
  #define CURL_BUILD_MAC_10_9 MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
  #define CURL_BUILD_MAC_10_11 MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
  #define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
@@ -28,24 +28,24 @@ index 2e57d83785..87fefba263 100644
  #define CURL_BUILD_MAC_10_15 MAC_OS_X_VERSION_MAX_ALLOWED >= 101500
  /* These macros mean "the following code is present to allow runtime backward
     compatibility with at least this cat or earlier":
-@@ -1838,7 +1839,7 @@ static CURLcode sectransp_connect_step1(struct Curl_easy *data,
+@@ -1805,7 +1806,7 @@ static CURLcode sectransp_connect_step1(struct Curl_cfilter *cf,
    }
  #endif /* CURL_BUILD_MAC_10_8 || CURL_BUILD_IOS */
  
 -#if (CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
 +#if (CURL_BUILD_MAC_10_14 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
-   if(conn->bits.tls_enable_alpn) {
+   if(connssl->alpn) {
      if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
-       CFMutableArrayRef alpnArr = CFArrayCreateMutable(NULL, 0,
-@@ -2832,7 +2833,7 @@ sectransp_connect_step2(struct Curl_easy *data, struct connectdata *conn,
+       struct alpn_proto_buf proto;
+@@ -2800,7 +2801,7 @@ check_handshake:
          break;
      }
  
 -#if(CURL_BUILD_MAC_10_13 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
 +#if(CURL_BUILD_MAC_10_14 || CURL_BUILD_IOS_11) && HAVE_BUILTIN_AVAILABLE == 1
-     if(conn->bits.tls_enable_alpn) {
+     if(connssl->alpn) {
        if(__builtin_available(macOS 10.13.4, iOS 11, tvOS 11, *)) {
          CFArrayRef alpnArr = NULL;
 -- 
-2.37.0 (Apple Git-136)
+2.45.0.windows.1
 
