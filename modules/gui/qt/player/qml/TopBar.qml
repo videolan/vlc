@@ -35,20 +35,25 @@ FocusScope{
 
     /* required */ property int textWidth
 
+    property int reservedHeight: 0
+
+    property int topMargin: 0
+    property int sideMargin: 0
+
     property string title
 
     property bool showCSD: false
     property bool showToolbar: false
     property bool pinControls: false
 
-    property int topMargin: 0
-    property int sideMargin: 0
-
-    property int reservedHeight: 0
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
 
     // Private
 
-    property bool _showTopBar: (pinControls === false || root.showToolbar === false)
+    property bool _showTopBar: (pinControls === false || showToolbar === false)
 
     property bool _showCenterText: (pinControls && showToolbar === false && showCSD)
 
@@ -64,20 +69,25 @@ FocusScope{
     signal requestLockUnlockAutoHide(bool lock)
     signal backRequested()
 
+    // Settings
 
     Accessible.name: I18n.qtr("Player topbar")
     Accessible.role: Accessible.ToolBar
 
-    Component.onCompleted:  root._layout()
+    // Events
 
-    onShowCSDChanged: root._layout()
-    onPinControlsChanged: root._layout()
-    onShowToolbarChanged: root._layout()
-    onTopMarginChanged: root._layout()
-    onSideMarginChanged: root._layout()
+    Component.onCompleted: _layout()
+
+    onShowCSDChanged: _layout()
+    onPinControlsChanged: _layout()
+    onShowToolbarChanged: _layout()
+    onTopMarginChanged: _layout()
+    onSideMarginChanged: _layout()
 
     on_ShowTopBarChanged: _layout()
     on_ShowCenterText: _layout()
+
+    // Functions
 
     function _layoutLine(c1, c2, offset)
     {
@@ -107,9 +117,9 @@ FocusScope{
     //FIXME: if CSD will be weirdly placed if application safe-area are used,
     //nota that if you need a safe area (kiosk mode), you probably don't need CSD
     function _layout() {
-        let offset = root.topMargin
+        let offset = topMargin
 
-        if (root._showCenterText) {
+        if (_showCenterText) {
             //place everything on one line
             //csdDecorations.implicitHeight gets overwritten when the height is set,
             //VLCStyle.icon_normal is its initial value
@@ -124,10 +134,10 @@ FocusScope{
 
             playlistGroup.height = lineHeight
             playlistGroup.anchors.topMargin = 0
-            playlistGroup.extraRightMargin = Qt.binding(function() { return root.width - csdDecorations.x })
+            playlistGroup.extraRightMargin = Qt.binding(function() { return width - csdDecorations.x })
 
 
-            root.implicitHeight = lineHeight
+            implicitHeight = lineHeight
             offset += lineHeight
 
         } else {
@@ -137,11 +147,11 @@ FocusScope{
             let right = undefined
             let logoPlaced = false
 
-            if (root.showToolbar) {
+            if (showToolbar) {
                 left = menubar
             }
 
-            if (root.showCSD) {
+            if (showCSD) {
                 right = csdDecorations
                 if (!left) {
                     left = logoOrResume
@@ -150,9 +160,9 @@ FocusScope{
             }
 
             if (!!left || !!right) {
-                offset += root._layoutLine(left, right, offset)
+                offset += _layoutLine(left, right, offset)
 
-                if (root.showCSD) {
+                if (showCSD) {
                     tapNDrag.height = offset
                 }
             }
@@ -169,14 +179,11 @@ FocusScope{
                 offset += _layoutLine(left, right, offset)
         }
 
-        root.implicitHeight = offset
+        implicitHeight = offset
         reservedHeight = offset
     }
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
-    }
+    // Children
 
     //drag and dbl click the titlebar in CSD mode
     Loader {
