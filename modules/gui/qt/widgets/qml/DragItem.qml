@@ -81,7 +81,7 @@ Item {
         console.assert(data.length === indexes.length)
         _data = data
 
-        if (!dragItem._active)
+        if (!dragItem.Drag.active)
             return
 
         Qt.callLater(dragItem.getSelectedInputItem, dragItem.setInputItems)
@@ -126,8 +126,6 @@ Item {
 
     readonly property int _maxCovers: 3
 
-    readonly property bool _active: Drag.active
-
     readonly property int _indexesSize: !!indexes ? indexes.length : 0
 
     readonly property int _displayedCoversCount: Math.min(_indexesSize, _maxCovers + 1)
@@ -141,11 +139,6 @@ Item {
     property string _title: ""
 
     property int _currentRequest: 0
-
-    Drag.onActiveChanged: {
-        if (!Drag.active)
-            dragItem._inputItems = undefined
-    }
 
     //---------------------------------------------------------------------------------------------
     // Implementation
@@ -183,9 +176,8 @@ Item {
     Accessible.role: Accessible.NoRole
     Accessible.name: I18n.qtr("drag item")
 
-    on_ActiveChanged: {
-        if (_active) {
-
+    Drag.onActiveChanged: {
+        if (Drag.active) {
             // reset any data from previous drags before requesting new data,
             // so that we don't show invalid data while data is being requested
             _title = ""
@@ -198,6 +190,8 @@ Item {
             MainCtx.setCursor(Qt.DragMoveCursor)
         } else {
             MainCtx.restoreCursor()
+
+            dragItem._inputItems = undefined
         }
     }
 
