@@ -284,6 +284,8 @@ hls_storage_t *hls_storage_FromBlocks(block_t *content,
     else
         storage = fs_storage_FromBlock(content, config, hls_config);
 
+    if (storage != NULL)
+        storage->mime = config->mime;
     return storage;
 }
 
@@ -298,6 +300,8 @@ hls_storage_t *hls_storage_FromBytes(void *data,
     else
         storage = fs_storage_FromBytes(data, size, config, hls_config);
 
+    if (storage != NULL)
+        storage->mime = config->mime;
     return storage;
 }
 

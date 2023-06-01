@@ -28,10 +28,12 @@
 struct hls_storage_config
 {
     const char *name;
+    const char *mime;
 };
 
 typedef struct hls_storage
 {
+    const char *mime;
     /**
      * Get a copy of the whole storage content.
      *

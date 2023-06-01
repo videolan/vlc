@@ -332,6 +332,7 @@ static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
 
     const struct hls_storage_config storage_conf = {
         .name = "index.m3u8",
+        .mime = "application/vnd.apple.mpegurl",
     };
     return hls_storage_FromBytes(
         out.ptr, out.length, &storage_conf, &sys->config);
@@ -388,7 +389,7 @@ GeneratePlaylistManifest(const hls_playlist_t *playlist)
         return NULL;
 
     const struct hls_storage_config storage_config = {
-        .name = playlist->name};
+        .name = playlist->name, .mime = "application/vnd.apple.mpegurl"};
     return hls_storage_FromBytes(
         out.ptr, out.length, &storage_config, playlist->config);
 error:
