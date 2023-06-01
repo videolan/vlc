@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///util/" as Util
 
 Slider {
     id: control
@@ -86,7 +87,7 @@ Slider {
         pos: Qt.point(sliderRectMouseArea.mouseX, 0)
     }
 
-    QtObject {
+    Util.FSM {
         id: fsm
         signal playerUpdatePosition(real position)
         signal pressControl(real position, bool forcePrecise)
@@ -95,83 +96,14 @@ Slider {
 
         //each signal is associated to a key, when a signal is received,
         //transitions of active state for the given key are evaluated
-        property var signalMap: ({
-            playerUpdatePosition: fsm.playerUpdatePosition,
-            pressControl: fsm.pressControl,
-            releaseControl: fsm.releaseControl,
-            moveControl: fsm.moveControl
+        signalMap: ({
+            "playerUpdatePosition": fsm.playerUpdatePosition,
+            "pressControl": fsm.pressControl,
+            "releaseControl": fsm.releaseControl,
+            "moveControl": fsm.moveControl
         })
 
-        property var initialState: fsmReleased
-        property var _state: null
-
-        function _evaluateTransition(state, event, t, ...args) {
-            if ("guard" in t) {
-                if (!(t.guard instanceof Function)) {
-                    console.error(`guard property of ${state}::${event} is not a function`)
-                }
-                if (!t.guard(...args))
-                   return false
-            }
-
-            if ("action" in t) {
-                if (!(t.action instanceof Function))
-                    console.error(`action property of ${state}::${event} is not a function`)
-                t.action(...args)
-            }
-
-            if ("target" in t)
-                changeState(t.target)
-
-            return true
-        }
-
-        function handleSignal(event, state, ...args) {
-            if (!state)
-                return
-
-            if (!(event in _state.transitions))
-                return
-
-            const transitions = state.transitions[event]
-            if (Array.isArray(transitions)) {
-                for (const t of transitions) {
-                    //stop at the first accepted transition
-                    if (_evaluateTransition(state, event, t, ...args))
-                        return
-                }
-            } else {
-                _evaluateTransition(state, event, transitions, ...args)
-            }
-        }
-
-        function changeState(state) {
-            if (_state) {
-                if (_state.exit instanceof Function)
-                    _state.exit()
-            }
-
-            _state = state
-
-            if (_state) {
-                if (_state.enter instanceof Function)
-                    _state.enter()
-            }
-        }
-
-        Component.onCompleted: {
-            for (const signalName of Object.keys(signalMap)) {
-                signalMap[signalName].connect((...args) => {
-                    //use callLater to ensure transitions are ordered.
-                    //signal are not queued by default, this is an issue
-                    //if an action/enter/exit function raise another signal
-                    Qt.callLater(() => {
-                        handleSignal(signalName, fsm._state, ...args)
-                    })
-                })
-            }
-            changeState(initialState)
-        }
+        initialState: fsmReleased
 
         function _seekToPosition(position, threshold, forcePrecise) {
             position = Helpers.clamp(position, 0., 1.)
@@ -186,38 +118,39 @@ Slider {
             Player.position = position
         }
 
-        property list<QtObject> subStates: [
-            QtObject {
-                id: fsmReleased
-                property var transitions: ({
-                    playerUpdatePosition: {
-                        action: (position) => {
-                            control.value = position
-                        }
-                    },
-                    pressControl: {
-                        action: (position, forcePrecise) => {
-                            control.forceActiveFocus()
-                            fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
-                        },
-                        target: fsmHeld
+        Util.FSMState {
+            id: fsmReleased
+
+            transitions: ({
+                "playerUpdatePosition": {
+                    action: (position) => {
+                        control.value = position
                     }
-                })
-            },
-            QtObject  {
-                id: fsmHeld
-                property var transitions: ({
-                    moveControl: {
-                        action: (position, forcePrecise) => {
-                            fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
-                        }
+                },
+                "pressControl": {
+                    action: (position, forcePrecise) => {
+                        control.forceActiveFocus()
+                        fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
                     },
-                    releaseControl: {
-                        target: fsmReleased
+                    target: fsmHeld
+                }
+            })
+        }
+
+        Util.FSMState  {
+            id: fsmHeld
+
+            transitions: ({
+                "moveControl": {
+                    action: (position, forcePrecise) => {
+                        fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
                     }
-                })
-            }
-        ]
+                },
+                "releaseControl": {
+                    target: fsmReleased
+                }
+            })
+        }
     }
 
     Connections {

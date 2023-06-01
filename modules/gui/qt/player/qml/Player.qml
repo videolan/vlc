@@ -152,12 +152,10 @@ FocusScope {
         id: playlistVisibility
 
         onShowPlaylist: {
-            rootPlayer.lockUnlockAutoHide(true)
             MainCtx.playlistVisible = true
         }
 
         onHidePlaylist: {
-            rootPlayer.lockUnlockAutoHide(false)
             MainCtx.playlistVisible = false
         }
     }

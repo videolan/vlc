@@ -18,6 +18,8 @@
 import QtQuick 2.12
 import org.videolan.vlc 0.1
 
+import "qrc:///util/" as Util
+
 /**
  * playlist visibility state machine
  *
@@ -37,7 +39,7 @@ import org.videolan.vlc 0.1
  * @enduml
  *
  */
-Item {
+Util.FSM {
     id: fsm
 
     //incoming signals
@@ -51,180 +53,101 @@ Item {
     signal hidePlaylist()
 
     //exposed internal states
-    property alias isPlaylistVisible: fsmVisible.enabled
+    property alias isPlaylistVisible: fsmVisible.active
 
-    property var _substate: undefined
+    initialState: MainCtx.playlistDocked ? fsmDocked : fsmFloating
 
-    function setState(state, substate) {
-        //callLater is used to avoid Connections on a signal to be immediatly
-        //re-trigered on the new state
-        Qt.callLater(function() {
-            if (state._substate === substate)
-                return;
+    signalMap: ({
+        togglePlaylistVisibility: fsm.togglePlaylistVisibility,
+        updatePlaylistVisible: fsm.updatePlaylistVisible,
+        updatePlaylistDocked: fsm.updatePlaylistDocked,
+        updateVideoEmbed: fsm.updateVideoEmbed
+    })
 
-            if (state._substate !== undefined) {
-                if (state._substate.exited) {
-                    state._substate.exited()
+    Util.FSMState {
+        id: fsmFloating
+
+        transitions: ({
+            togglePlaylistVisibility: {
+                action: () => {
+                    MainCtx.playlistVisible = !MainCtx.playlistVisible
                 }
-                state._substate.enabled = false
-            }
-
-            state._substate = substate
-
-            if (state._substate !== undefined) {
-                state._substate.enabled = true
-                if (state._substate.entered) {
-                    state._substate.entered()
-                }
+            },
+            updatePlaylistDocked: {
+                guard: () => MainCtx.playlistDocked,
+                target: fsmDocked
             }
         })
     }
 
-    //initial state
-    Component.onCompleted: {
-        if (MainCtx.playlistDocked)
-            fsm.setState(fsm, fsmDocked)
-        else
-            fsm.setState(fsm, fsmFloating)
-    }
-
-    Item {
-        id: fsmFloating
-        enabled: false
-
-        Connections {
-            target: fsm
-            //explicitly bind on parent enabled, as Connections doens't behave as Item
-            //regarding enabled propagation on children, ditto bellow
-            enabled: fsmFloating.enabled
-
-            onTogglePlaylistVisibility: {
-                MainCtx.playlistVisible = !MainCtx.playlistVisible
-            }
-
-            onUpdatePlaylistDocked: {
-                if (MainCtx.playlistDocked) {
-                    fsm.setState(fsm, fsmDocked)
-                }
-            }
-        }
-    }
-
-    Item {
+    Util.FSMState {
         id: fsmDocked
-        enabled: false
 
-        property var _substate: undefined
+        initialState: MainCtx.hasEmbededVideo ? fsmForceHidden : fsmFollowVisible
 
-        function entered() {
-            if(MainCtx.hasEmbededVideo) {
-                fsm.setState(fsmDocked, fsmForceHidden)
-            } else {
-                fsm.setState(fsmDocked, fsmFollowVisible)
-            }
-        }
-
-        function exited() {
-            fsm.setState(fsmDocked, undefined)
-        }
-
-        Item {
+        Util.FSMState {
             id: fsmFollowVisible
-            enabled: false
 
-            property var _substate: undefined
+            initialState: MainCtx.playlistVisible ? fsmVisible : fsmHidden
 
-            function entered() {
-                if(MainCtx.playlistVisible)
-                    fsm.setState(this, fsmVisible)
-                else
-                    fsm.setState(this, fsmHidden)
-            }
-
-            function exited() {
-                fsm.setState(this, undefined)
-            }
-
-            Connections {
-                target: fsm
-                enabled: fsmFollowVisible.enabled
-
-                onUpdatePlaylistDocked: {
-                    if (!MainCtx.playlistDocked) {
-                        fsm.setState(fsm, fsmFloating)
-                    }
+            transitions: ({
+                updatePlaylistDocked: {
+                    guard: () => !MainCtx.playlistDocked,
+                    target: fsmFloating
+                },
+                updateVideoEmbed: {
+                    guard: () => MainCtx.hasEmbededVideo,
+                    target: fsmForceHidden
                 }
+            })
 
-                onUpdateVideoEmbed: {
-                    if (MainCtx.hasEmbededVideo) {
-                        fsm.setState(fsmDocked, fsmForceHidden)
-                    }
-                }
-            }
-
-            Item {
+            Util.FSMState {
                 id: fsmVisible
-                enabled: false
 
-                function entered() {
-                    fsm.showPlaylist()
-                }
-
-                function exited() {
-                    fsm.hidePlaylist()
-                }
-
-                Connections {
-                    target: fsm
-                    enabled: fsmVisible.enabled
-
-                    onUpdatePlaylistVisible: {
-                        if (!MainCtx.playlistVisible)
-                            fsm.setState(fsmFollowVisible, fsmHidden)
+                transitions: ({
+                    updatePlaylistVisible: {
+                        guard: ()=> !MainCtx.playlistVisible,
+                        target: fsmHidden
+                    },
+                    togglePlaylistVisibility: {
+                        action: () => { MainCtx.playlistVisible = false },
+                        target: fsmHidden
                     }
-
-                    onTogglePlaylistVisibility: fsm.setState(fsmFollowVisible, fsmHidden)
-                }
+                })
             }
 
-            Item {
+            Util.FSMState {
                 id: fsmHidden
-                enabled: false
 
-                Connections {
-                    target: fsm
-                    enabled: fsmHidden.enabled
-
-                    onUpdatePlaylistVisible: {
-                        if (MainCtx.playlistVisible)
-                            fsm.setState(fsmFollowVisible, fsmVisible)
+                transitions: ({
+                    updatePlaylistVisible: {
+                        guard: () => MainCtx.playlistVisible,
+                        target: fsmVisible
+                    },
+                    togglePlaylistVisibility: {
+                        action: () => { MainCtx.playlistVisible = true },
+                        target: fsmVisible
                     }
-
-                    onTogglePlaylistVisibility: fsm.setState(fsmFollowVisible, fsmVisible)
-                }
+                })
             }
 
         }
 
-        Item {
+        Util.FSMState {
             id: fsmForceHidden
-            enabled: false
 
-            Connections {
-                target: fsm
-                enabled: fsmForceHidden.enabled
-
-                onUpdateVideoEmbed: {
-                    if (!MainCtx.hasEmbededVideo) {
-                        fsm.setState(fsmDocked, fsmFollowVisible)
-                    }
+            transitions: ({
+                updateVideoEmbed: {
+                    guard: () => !MainCtx.hasEmbededVideo,
+                    target: fsmFollowVisible
+                },
+                togglePlaylistVisibility: {
+                    action: () => {
+                        MainCtx.playlistVisible = true
+                    },
+                    target: fsmFollowVisible
                 }
-
-                onTogglePlaylistVisibility: {
-                    MainCtx.playlistVisible = true
-                    fsm.setState(fsmDocked, fsmFollowVisible)
-                }
-            }
+            })
         }
     }
 }
