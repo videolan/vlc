@@ -67,3 +67,8 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
             return VLC_ENOTSUP;
     }
 }
+
+bool hls_codec_IsSupported(const es_format_t *fmt)
+{
+    return fmt->i_codec == VLC_CODEC_H264 || fmt->i_codec == VLC_CODEC_MP4A;
+}

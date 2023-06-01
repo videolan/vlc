@@ -21,6 +21,7 @@
 #define HLS_CODECS_H
 
 int hls_codec_Format(struct vlc_memstream *, const es_format_t *);
+bool hls_codec_IsSupported(const es_format_t *);
 
 #endif
 

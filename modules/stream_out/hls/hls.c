@@ -541,6 +541,9 @@ static hls_playlist_t *AddPlaylist(sout_stream_t *stream, struct vlc_list *head)
 static void *
 Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 {
+    if (!hls_codec_IsSupported(fmt))
+        return NULL;
+
     sout_stream_sys_t *sys = stream->p_sys;
 
     // Either retrieve the already created playlist from the map or create it.
