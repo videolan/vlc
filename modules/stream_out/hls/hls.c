@@ -712,6 +712,22 @@ static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
     }
 }
 
+static int Control(sout_stream_t *stream, int query, va_list args)
+{
+    const sout_stream_sys_t *sys = stream->p_sys;
+    switch (query)
+    {
+        case SOUT_STREAM_IS_SYNCHRONOUS:
+            *va_arg(args, bool *) = sys->config.pace;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 #define SOUT_CFG_PREFIX "sout-hls-"
 
 static int Open(vlc_object_t *this)
@@ -774,6 +790,7 @@ static int Open(vlc_object_t *this)
         .del = Del,
         .send = Send,
         .set_pcr = SetPCR,
+        .control = Control,
     };
     stream->ops = &ops;
 
