@@ -36,7 +36,8 @@ libstream_out_udp_plugin_la_SOURCES = \
 libstream_out_udp_plugin_la_LIBADD = $(SOCKET_LIBS)
 
 libstream_out_hls_plugin_la_SOURCES = \
-	stream_out/hls/hls.h stream_out/hls/hls.c
+	stream_out/hls/hls.h stream_out/hls/hls.c \
+	stream_out/hls/variant_maps.h stream_out/hls/variant_maps.c
 
 sout_LTLIBRARIES = \
 	libstream_out_dummy_plugin.la \
