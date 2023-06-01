@@ -31,12 +31,17 @@ typedef struct hls_segment
 
     struct hls_storage *storage;
 
+    httpd_url_t *http_url;
+
     struct vlc_list priv_node;
 } hls_segment_t;
 
 struct hls_segment_queue_config
 {
     unsigned int playlist_id;
+
+    httpd_host_t *httpd_ref;
+    httpd_callback_t httpd_callback;
 };
 
 typedef struct

@@ -534,6 +534,8 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 
     struct hls_segment_queue_config config = {
         .playlist_id = playlist->id,
+        .httpd_ref = sys->http_host,
+        .httpd_callback = HTTPCallback,
     };
     hls_segment_queue_Init(&playlist->segments, &config, &sys->config);
 

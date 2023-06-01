@@ -25,6 +25,7 @@
 
 #include <vlc_common.h>
 
+#include <vlc_httpd.h>
 #include <vlc_list.h>
 #include <vlc_tick.h>
 
@@ -34,6 +35,8 @@
 
 static void hls_segment_Destroy(hls_segment_t *segment)
 {
+    if (segment->http_url != NULL)
+        httpd_UrlDelete(segment->http_url);
     hls_storage_Destroy(segment->storage);
     free(segment->url);
     free(segment);
@@ -85,6 +88,21 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
         hls_storage_FromBlocks(content, &storage_conf, queue->hls_config);
     if (unlikely(segment->storage == NULL))
         goto nomem;
+
+    if (queue->config.httpd_ref != NULL)
+    {
+        segment->http_url =
+            httpd_UrlNew(queue->config.httpd_ref, segment->url, NULL, NULL);
+        if (segment->http_url == NULL)
+            goto nomem;
+
+        httpd_UrlCatch(segment->http_url,
+                       HTTPD_MSG_GET,
+                       queue->config.httpd_callback,
+                       (httpd_callback_sys_t *)segment->storage);
+    }
+    else
+        segment->http_url = NULL;
 
     if (queue->hls_config->max_segments != 0 &&
         queue->hls_config->max_segments <= queue->total_segments)
