@@ -1,33 +1,26 @@
-From bc8986696605c29c8ef54f9c448ab889c2195d93 Mon Sep 17 00:00:00 2001
+From c6538fe93fcc5930e5ddf33ce910346787f09375 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 30 May 2023 16:54:31 +0200
-Subject: [PATCH] add api-ms-core-registry-* def files
+Subject: [PATCH 08/10] crt: add api-ms-core-registry-* def files
 
 These are needed to enable the registry API calls available in UWP.
+
+Add the target DLL to windowsapp, but not mincore (Win8) where it doesn't
+exist.
 ---
- mingw-w64-crt/Makefile.in                     |  4 ++
+ mingw-w64-crt/Makefile.in                     |  2 +
  .../api-ms-win-core-registry-l1-1-0.def       | 47 +++++++++++++++++++
  .../api-ms-win-core-registry-l2-1-0.def       | 37 +++++++++++++++
- mingw-w64-crt/lib-common/mincore.mri          |  3 +-
  mingw-w64-crt/lib-common/windowsapp.mri       |  2 +
- 5 files changed, 92 insertions(+), 1 deletion(-)
+ 4 files changed, 88 insertions(+)
  create mode 100644 mingw-w64-crt/lib-common/api-ms-win-core-registry-l1-1-0.def
  create mode 100644 mingw-w64-crt/lib-common/api-ms-win-core-registry-l2-1-0.def
 
-diff --git a/mingw-w64-crt/Makefile.am b/mingw-w64-crt/Makefile.am
-index a4a1ed922..6087f050e 100644
+diff --git a/mingw-w64-crt/Makefile.in b/mingw-w64-crt/Makefile.in
+index 0454ecec3..cff260421 100644
 --- a/mingw-w64-crt/Makefile.in
 +++ b/mingw-w64-crt/Makefile.in
-@@ -2104,6 +2104,8 @@ endif
- 		%/libapi-ms-win-core-realtime-l1-1-0.a \
- 		%/libapi-ms-win-core-realtime-l1-1-1.a \
- 		%/libapi-ms-win-core-realtime-l1-1-2.a \
-+		%/libapi-ms-win-core-registry-l1-1-0.a \
-+		%/libapi-ms-win-core-registry-l2-1-0.a \
- 		%/libapi-ms-win-core-rtlsupport-l1-2-0.a \
- 		%/libapi-ms-win-core-string-l1-1-0.a \
- 		%/libapi-ms-win-core-synch-l1-1-0.a \
-@@ -2237,6 +2239,8 @@ endif
+@@ -2237,6 +2237,8 @@ endif
  		%/libapi-ms-win-core-profile-l1-1-0.a \
  		%/libapi-ms-win-core-realtime-l1-1-0.a \
  		%/libapi-ms-win-core-realtime-l1-1-1.a \
@@ -132,20 +125,6 @@ index 000000000..3e05bbf74
 +RegSetKeyValueW
 +RegSetValueA
 +RegSetValueW
-diff --git a/mingw-w64-crt/lib-common/mincore.mri b/mingw-w64-crt/lib-common/mincore.mri
-index 7073eeb8d..03f4b4c37 100644
---- a/mingw-w64-crt/lib-common/mincore.mri
-+++ b/mingw-w64-crt/lib-common/mincore.mri
-@@ -85,7 +85,8 @@ ADDLIB libapi-ms-win-core-psapi-ansi-l1-1-0.a
- ADDLIB libapi-ms-win-core-realtime-l1-1-0.a
- ADDLIB libapi-ms-win-core-realtime-l1-1-1.a
- ADDLIB libapi-ms-win-core-realtime-l1-1-2.a
--; FIXME libapi-ms-win-core-registry-l1-1-0.a
-+ADDLIB libapi-ms-win-core-registry-l1-1-0.a
-+ADDLIB libapi-ms-win-core-registry-l2-1-0.a
- ; FIXME libapi-ms-win-core-registry-l1-1-1.a
- ; FIXME libapi-ms-win-core-registry-l1-1-2.a
- ; FIXME libapi-ms-win-core-rtlsupport-l1-1-0.a
 diff --git a/mingw-w64-crt/lib-common/windowsapp.mri b/mingw-w64-crt/lib-common/windowsapp.mri
 index 8e0e3d888..2496280a5 100644
 --- a/mingw-w64-crt/lib-common/windowsapp.mri

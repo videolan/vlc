@@ -62,8 +62,8 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
 	$(APPLY) $(SRC)/mingw64/0006-headers-enable-more-module-API-in-Win10-19H1-UWP-bui.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
-	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0008-crt-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0009-headers-enable-some-Registry-API-calls-in-Win10-19H1.patch
 	$(APPLY) $(SRC)/mingw64/0010-headers-allow-Get-SetHandleInformation-in-Win10-19H1.patch
 	$(MOVE)
 
