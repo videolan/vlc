@@ -407,6 +407,9 @@ CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 ifdef HAVE_WIN32
 CMAKE += -DCMAKE_DEBUG_POSTFIX:STRING=
 endif
+ifdef HAVE_ANDROID
+CMAKE += -DANDROID:BOOL=ON
+endif
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
