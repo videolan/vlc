@@ -1,7 +1,7 @@
 # libmpeg2
 
 LIBMPEG2_VERSION := 0.5.1
-LIBMPEG2_URL := http://libmpeg2.sourceforge.net/files/libmpeg2-$(LIBMPEG2_VERSION).tar.gz
+LIBMPEG2_URL := $(SF)/libmpeg2/libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 ifdef GPL
 PKGS += libmpeg2
