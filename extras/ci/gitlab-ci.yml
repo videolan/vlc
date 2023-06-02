@@ -193,7 +193,7 @@ uwp64-libvlc-llvm:
         <<: *variables-win64
         VLCARCH: win64-uwp
         LIBVLC_EXTRA_BUILD_FLAGS: -z
-        UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000006
+        UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000007
 
 .nightly-win-common:
     extends: .win-common
