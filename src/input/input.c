@@ -2660,7 +2660,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
 
-    if( input_priv(p_input)->master == NULL /* XXX ugly */)
+    if( master /* XXX ugly */)
     {   /* On master stream only, use input-list */
         char *str = var_InheritString( p_input, "input-list" );
         if( str != NULL )
