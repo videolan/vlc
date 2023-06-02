@@ -41,6 +41,8 @@ endif
 endif
 else ifdef HAVE_BSD
 RUST_TARGET = $(HOST)
+else ifdef HAVE_EMSCRIPTEN
+RUST_TARGET = $(HOST)
 endif
 
 # For now, VLC don't support Tier 3 platforms (ios 32bit, tvOS).
