@@ -96,8 +96,7 @@ using namespace TagLib;
 #include <algorithm>
 #include <limits>
 
-#if defined(VLC_PATCHED_TAGLIB_IOSTREAM_RESOLVERS) || \
-    TAGLIB_VERSION >= VERSION_INT(1, 13, 0)
+#if TAGLIB_VERSION >= VERSION_INT(1, 13, 0)
 #define USE_IOSTREAM_RESOLVER 1
 #endif
 
