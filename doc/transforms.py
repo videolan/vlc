@@ -18,7 +18,7 @@ def vector (N):
     return [0j] * N
 
 
-# Let us start withthe canonical definition of the unscaled DFT algorithm :
+# Let us start with the canonical definition of the unscaled DFT algorithm :
 # (I can not draw sigmas in a text file so I'll use python code instead)  :)
 
 def W (k, N):
@@ -38,7 +38,7 @@ def unscaled_DFT (N, input, output):
 # some ways to use the trigonometric properties of the coefficients to find
 # some decompositions that can accelerate the calculation by several orders
 # of magnitude... This is a well known and studied problem. One of the
-# available explanations of this process is at this url :
+# available explanations of this process is at this URL :
 # www.cmlab.csie.ntu.edu.tw/cml/dsp/training/coding/transform/fft.html
 
 
@@ -99,7 +99,7 @@ def unscaled_DFT_radix2_freq (N, input, output):
 	output[2*i] = even_output[i]
 	output[2*i+1] = odd_output[i]
 
-# Note that the decimation-in-time and the decimation-in-frequency varients
+# Note that the decimation-in-time and the decimation-in-frequency variants
 # have exactly the same complexity, they only do the operations in a different
 # order.
 
@@ -224,7 +224,7 @@ def unscaled_DFT_radix4_freq (N, input, output):
 # different.
 
 
-# Now let us reorder the radix-4 algorithms in a different way :
+# Now, let us reorder the radix-4 algorithms in a different way :
 
 #def unscaled_DFT_radix4_time (N, input, output):
 #   input_0 = vector(N/4)
@@ -371,7 +371,7 @@ def unscaled_DFT_split_radix_freq (N, input, output):
 # The complexity is again the same as for the decimation-in-time variant.
 
 
-# Now let us now summarize our various algorithms for DFT decomposition :
+# Now let us summarize our various algorithms for DFT decomposition :
 
 # radix-2 : DFT(N) -> 2*DFT(N/2) using N/2 multiplies and N additions
 # radix-4 : DFT(N) -> 4*DFT(N/2) using 3*N/4 multiplies and 2*N additions
@@ -410,7 +410,7 @@ def unscaled_DFT_split_radix_freq (N, input, output):
 
 # If we chose to implement complex multiplies with 3 real muls + 3 real adds,
 # then these results are consistent with the table at the end of the
-# www.cmlab.csie.ntu.edu.tw DFT tutorial that I mentionned earlier.
+# www.cmlab.csie.ntu.edu.tw DFT tutorial that I mentioned earlier.
 
 
 # Now another important case for the DFT is the one where the inputs are
@@ -723,7 +723,7 @@ def DFT4 (input, output):
 # A similar idea might be used to calculate only the real part of the output
 # of a complex DFT : we take an DFT algorithm for real inputs and complex
 # outputs and we simply reverse it. The resulting algorithm will only work
-# with inputs that satisfy the conjugaison rule (input[i] is the conjugate of
+# with inputs that satisfy the conjugation rule (input[i] is the conjugate of
 # input[N-i]) so we can do a first pass to modify the input so that it follows
 # this rule. An example implementation is as follows (adapted from the
 # unscaled_DFT_split_radix_time algorithm) :
