@@ -324,8 +324,10 @@ FocusScope {
                     }
 
                     Rectangle {
+                        // overlay for smallscreens
+
                         anchors.fill: parent
-                        visible: VLCStyle.isScreenSmall && MainCtx.playlistVisible
+                        visible: VLCStyle.isScreenSmall && MainCtx.playlistVisible && MainCtx.playlistDocked
                         color: "black"
                         opacity: 0.4
 
