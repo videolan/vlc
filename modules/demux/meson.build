@@ -84,6 +84,12 @@ vlc_modules += {
     'sources' : files('hx.c'),
 }
 
+# G64 RTP dumps demuxer
+vlc_modules += {
+    'name' : 'g64rtp',
+    'sources' : files('g64rtp.c'),
+}
+
 # MPEG PS demux
 vlc_modules += {
     'name' : 'ps',

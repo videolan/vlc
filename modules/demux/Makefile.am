@@ -34,6 +34,9 @@ demux_LTLIBRARIES += librawdv_plugin.la
 librawvid_plugin_la_SOURCES = demux/rawvid.c
 demux_LTLIBRARIES += librawvid_plugin.la
 
+libg64rtp_plugin_la_SOURCES = demux/g64rtp.c
+demux_LTLIBRARIES += libg64rtp_plugin.la
+
 libau_plugin_la_SOURCES = demux/au.c
 demux_LTLIBRARIES += libau_plugin.la
 
