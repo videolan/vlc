@@ -217,7 +217,7 @@ T.Popup {
                         "menuIcon": VLCIcons.expand,
                         "menuText": I18n.qtr("Menu"),
                         "menuAction": function(menuPos) {
-                            menuSubtitle.popup(menuPos)
+                            menuAudio.popup(menuPos)
                         }
                     }, {
                         "title": I18n.qtr("Video Tracks"),
