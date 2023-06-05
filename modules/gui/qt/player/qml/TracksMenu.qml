@@ -183,7 +183,7 @@ T.Popup {
                     iconText: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
                                             : modelData.icon
 
-                    T.ToolTip.visible: (hovered || activeFocus)
+                    T.ToolTip.visible: (hovered || visualFocus)
                     T.ToolTip.text: modelData.tooltip
                     T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
