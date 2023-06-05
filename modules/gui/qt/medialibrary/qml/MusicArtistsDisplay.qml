@@ -68,12 +68,8 @@ Widgets.PageLoader {
         MusicAllArtists {
             onCurrentIndexChanged: _updateArtistsAllHistory(currentIndex)
 
-            onRequestArtistAlbumView: {
-                History.push(["mc", "music", "artists", "albums",
-                              { initialIndex: currentIndex } ]);
-
-                stackView.currentItem.setCurrentItemFocus(reason);
-            }
+            onRequestArtistAlbumView: History.push(["mc", "music", "artists", "albums",
+                                                    { initialIndex: currentIndex }], reason)
         }
     }
 

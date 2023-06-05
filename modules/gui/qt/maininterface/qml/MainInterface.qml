@@ -154,9 +154,11 @@ Item {
         const loadPlayer = !mainPlaylistController.empty;
 
         if (MainCtx.mediaLibraryAvailable)
-            History.push(["mc", "video"], loadPlayer ? History.Stay : History.Go)
+            History.push(["mc", "video"],
+                         Qt.OtherFocusReason, loadPlayer ? History.Stay : History.Go)
         else
-            History.push(["mc", "home"], loadPlayer ? History.Stay : History.Go)
+            History.push(["mc", "home"],
+                         Qt.OtherFocusReason, loadPlayer ? History.Stay : History.Go)
 
         if (loadPlayer)
             History.push(["player"])

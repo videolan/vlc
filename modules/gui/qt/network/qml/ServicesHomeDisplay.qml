@@ -75,23 +75,15 @@ Widgets.PageLoader {
             property Component addressBar: NetworkAddressbar {
                 path: [{display: deviceModel.name, tree: {}}]
 
-                onHomeButtonClicked: {
-                    History.push(["mc", "discover", "services"]);
-
-                    root.setCurrentItemFocus(reason);
-                }
+                onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
             }
 
             providerModel: deviceModel
             contextMenu: contextMenu
 
-            onBrowse: {
-                History.push(["mc", "discover", "services", "source_browse",
-                              { tree: tree, "root_name": deviceModel.name,
-                                "source_name": source_name }]);
-
-                root.setCurrentItemFocus(reason);
-            }
+            onBrowse: History.push(["mc", "discover", "services", "source_browse",
+                                    { tree: tree, "root_name": deviceModel.name,
+                                      "source_name": source_name }], reason)
 
             NetworkDeviceModel {
                 id: deviceModel
@@ -122,30 +114,20 @@ Widgets.PageLoader {
                     return _path
                 }
 
-                onHomeButtonClicked: {
-                    History.push(["mc", "discover", "services"]);
-
-                    root.setCurrentItemFocus(reason);
-                }
+                onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
 
                 onBrowse: {
                     if (!!tree.isRoot)
                         History.push(["mc", "discover", "services", "source_root",
-                                      { source_name: tree.source_name }]);
+                                      { source_name: tree.source_name }], reason)
                     else
                         History.push(["mc", "discover", "services", "source_browse",
-                                      { tree: tree, "root": root_name }]);
-
-                    root.setCurrentItemFocus(reason);
+                                      { tree: tree, "root": root_name }], reason)
                 }
             }
 
-            onBrowse: {
-                History.push(["mc", "discover", "services", "source_browse",
-                              { tree: tree, "root": root_name }]);
-
-                root.setCurrentItemFocus(reason);
-            }
+            onBrowse: History.push(["mc", "discover", "services", "source_browse",
+                                    { tree: tree, "root": root_name }], reason)
 
             providerModel: NetworkMediaModel {
                 ctx: MainCtx

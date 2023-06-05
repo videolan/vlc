@@ -84,22 +84,17 @@ Widgets.PageLoader {
 
         onSeeAll: {
             if (sd_source === -1)
-                History.push(["mc", "network", "folders", { title: title }])
+                History.push(["mc", "network", "folders", { title: title }], reason)
             else
-                History.push(["mc", "network", "device", { title: title, sd_source: sd_source }])
-
-            stackViewItem.setCurrentItemFocus(reason)
+                History.push(["mc", "network", "device", { title: title, sd_source: sd_source }],
+                             reason)
         }
     }
 
     Connections {
         target: stackViewItem
 
-        onBrowse: {
-            History.push(["mc", "network", "browse", { tree: tree }])
-
-            stackViewItem.setCurrentItemFocus(reason)
-        }
+        onBrowse: History.push(["mc", "network", "browse", { tree: tree }], reason)
     }
 
     // Children
@@ -160,9 +155,7 @@ Widgets.PageLoader {
             }
 
             Navigation.cancelAction: function() {
-                History.previous()
-
-                stackViewItem.setCurrentItemFocus(Qt.BacktabFocusReason)
+                History.previous(Qt.BacktabFocusReason)
             }
         }
     }
@@ -173,17 +166,9 @@ Widgets.PageLoader {
         NetworkAddressbar {
             path: view.name === "browse" ? root.stackViewItem.providerModel.path : []
 
-            onHomeButtonClicked: {
-                History.push(["mc", "network", "home"])
+            onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
 
-                stackViewItem.setCurrentItemFocus(reason)
-            }
-
-            onBrowse: {
-                History.push(["mc", "network", "browse", { "tree": tree }])
-
-                stackViewItem.setCurrentItemFocus(reason)
-            }
+            onBrowse: History.push(["mc", "network", "browse", { "tree": tree }], reason)
         }
     }
 }

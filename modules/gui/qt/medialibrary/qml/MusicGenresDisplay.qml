@@ -68,12 +68,8 @@ Widgets.PageLoader {
         MusicGenres {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
 
-            onShowAlbumView: {
-                History.push(["mc", "music", "genres", "albums",
-                             { parentId: id, genreName: name }]);
-
-                stackView.currentItem.setCurrentItemFocus(reason);
-            }
+            onShowAlbumView: History.push(["mc", "music", "genres", "albums",
+                                           { parentId: id, genreName: name }], reason)
         }
     }
 

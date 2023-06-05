@@ -80,12 +80,8 @@ Widgets.PageLoader {
         VideoAllSubDisplay {
             // Events
 
-            onShowList: {
-                History.push(["mc", "video", "all", "group",
-                             { parentId: model.id, title: model.title }])
-
-                root.stackView.currentItem.setCurrentItemFocus(reason)
-            }
+            onShowList: History.push(["mc", "video", "all", "group",
+                                      { parentId: model.id, title: model.title }], reason)
 
             // NOTE: The model can change over time.
             onModelChanged: root.model = model
