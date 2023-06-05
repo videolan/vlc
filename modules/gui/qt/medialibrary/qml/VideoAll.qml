@@ -52,17 +52,22 @@ MainInterface.MainViewLoader {
         { text: I18n.qtr("Duration"),   criteria: "duration" }
     ]
 
-    property alias dragItem: dragItem
-
     // function(model) -> [strings....]
     // used to get grid labels per model item
     property var gridLabels: getLabel
     property var listLabels: getLabel
 
+    // Aliases
+
+    property alias dragItem: dragItem
+
+    // Settings
+
     list: list
     grid: grid
     emptyLabel: emptylabel
 
+    // Functions
 
     function getLabel(model) {
         if (!model) return ""
