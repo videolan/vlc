@@ -84,6 +84,9 @@ FocusScope {
             console.error("pageModel is not defined")
             return
         }
+
+        const reason = History.takeFocusReason()
+
         const found = stackView.loadView(root.pageModel, view.name, view.properties)
         if (!found) {
             console.error("failed to load", JSON.stringify(History.current))
@@ -91,6 +94,10 @@ FocusScope {
         }
 
         stackView.currentItem.Navigation.parentItem = root
+
+        if (reason !== Qt.OtherFocusReason)
+            setCurrentItemFocus(reason)
+
         root.currentItemChanged(stackView.currentItem)
     }
 
