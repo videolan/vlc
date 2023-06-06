@@ -919,6 +919,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/TracksPageAudio.qml \
 	gui/qt/player/qml/TracksPageSpeed.qml \
 	gui/qt/player/qml/TracksPageSubtitle.qml \
+	gui/qt/player/qml/TracksListPage.qml \
 	gui/qt/player/qml/ControlLayout.qml \
 	gui/qt/player/qml/controlbarcontrols/HighResolutionTimeWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml \

@@ -848,6 +848,7 @@ modules/gui/qt/player/qml/TopBar.qml
 modules/gui/qt/player/qml/TracksMenu.qml
 modules/gui/qt/player/qml/TracksPageAudio.qml
 modules/gui/qt/player/qml/TracksPageSubtitle.qml
+modules/gui/qt/player/qml/TracksListPage.qml
 modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml
