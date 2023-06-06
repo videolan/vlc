@@ -1,14 +1,16 @@
-From 6dd0fae912ee08193a28670f51a3f1a6292b4c55 Mon Sep 17 00:00:00 2001
+From 5f7be029976e3e5ad00901167ded70b5ca53ebb2 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Mon, 5 Jun 2023 16:41:53 +0200
-Subject: [PATCH] headers: enabled LoadLibraryEx flags in Win10 19H1 UWP builds
+Date: Wed, 7 Jun 2023 09:46:58 +0200
+Subject: [PATCH 15/17] headers: enabled LoadLibraryEx flags in Win10 19H1 UWP
+ builds
 
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/libloaderapi.h | 48 ++++++++++++------------
  1 file changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/mingw-w64-headers/include/libloaderapi.h b/mingw-w64-headers/include/libloaderapi.h
-index 6a84aa1c9..51837f122 100644
+index 00aa50f2a..6a5f59ed4 100644
 --- a/mingw-w64-headers/include/libloaderapi.h
 +++ b/mingw-w64-headers/include/libloaderapi.h
 @@ -50,30 +50,6 @@ extern "C" {
@@ -42,7 +44,7 @@ index 6a84aa1c9..51837f122 100644
  #endif /* WINAPI_PARTITION_DESKTOP */
  
  #define GET_MODULE_HANDLE_EX_FLAG_PIN (0x1)
-@@ -162,6 +138,30 @@ typedef const REDIRECTION_DESCRIPTOR *PCREDIRECTION_DESCRIPTOR;
+@@ -166,6 +142,30 @@ typedef const REDIRECTION_DESCRIPTOR *PCREDIRECTION_DESCRIPTOR;
  #endif
  
  #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1

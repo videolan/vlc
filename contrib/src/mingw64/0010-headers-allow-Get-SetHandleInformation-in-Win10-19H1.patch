@@ -1,7 +1,7 @@
-From d4758caa1d6ffc1f800dce06aa38f6d7a3b6d306 Mon Sep 17 00:00:00 2001
+From d598a2338f212cf88ae1ea54a2953ae3b2bd87d5 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Wed, 31 May 2023 13:55:51 +0200
-Subject: [PATCH 10/10] headers: allow Get/SetHandleInformation in Win10 19H1
+Date: Thu, 1 Jun 2023 15:32:15 +0200
+Subject: [PATCH 10/17] headers: allow Get/SetHandleInformation in Win10 19H1
  UWP builds
 
 The documentation doesn't say it's allowed but they are allowed by the
@@ -14,6 +14,8 @@ be used when targeting older Windows 10 versions in UWP mode.
 We already have api-ms-win-core-handle-l1-1-0 in mincore and windowsapp.
 
 [1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-handle-l1-1-0dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/handleapi.h | 2 +-
  mingw-w64-headers/include/winbase.h   | 5 ++---

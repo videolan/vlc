@@ -56,17 +56,23 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
-	$(APPLY) $(SRC)/mingw64/0001-headers-only-enable-GetFileInformationByHandle-for-1.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-check-which-version-of-UWP-Windows-contains-.patch
-	$(APPLY) $(SRC)/mingw64/0004-headers-enable-CreateHardLinkW-in-Win10-19H1-UWP-bui.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
+	$(APPLY) $(SRC)/mingw64/0002-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0003-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0004-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
+	$(APPLY) $(SRC)/mingw64/0005-headers-enable-CreateHardLinkW-in-Win10-19H1-UWP-bui.patch
 	$(APPLY) $(SRC)/mingw64/0006-headers-enable-more-module-API-in-Win10-19H1-UWP-bui.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
-	$(APPLY) $(SRC)/mingw64/0008-crt-add-api-ms-core-registry-def-files.patch
-	$(APPLY) $(SRC)/mingw64/0009-headers-enable-some-Registry-API-calls-in-Win10-19H1.patch
+	$(APPLY) $(SRC)/mingw64/0007-crt-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0008-headers-enable-some-Registry-API-calls-in-Win10-19H1.patch
+	$(APPLY) $(SRC)/mingw64/0009-headers-only-enable-GetFileInformationByHandle-for-1.patch
 	$(APPLY) $(SRC)/mingw64/0010-headers-allow-Get-SetHandleInformation-in-Win10-19H1.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enabled-LoadLibraryEx-flags-in-Win10-19H1-UW.patch
+	$(APPLY) $(SRC)/mingw64/0011-crt-add-missing-api-ms-win-core-heap-l1-1-0.patch
+	$(APPLY) $(SRC)/mingw64/0012-headers-Allow-some-Heap-API-in-Win10-19H1-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0013-headers-enable-FindResourceW-in-Win10-19H1-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0014-headers-check-which-version-of-UWP-Windows-contains-.patch
+	$(APPLY) $(SRC)/mingw64/0015-headers-enabled-LoadLibraryEx-flags-in-Win10-19H1-UW.patch
+	$(APPLY) $(SRC)/mingw64/0016-headers-Allow-SetDllDirectoryW-A-API-in-Win10-19H1-U.patch
+	$(APPLY) $(SRC)/mingw64/0017-headers-allow-FORMAT_MESSAGE_ALLOCATE_BUFFER-in-UWP.patch
 	$(MOVE)
 
 .mingw64: mingw64

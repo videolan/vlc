@@ -1,12 +1,14 @@
-From c6538fe93fcc5930e5ddf33ce910346787f09375 Mon Sep 17 00:00:00 2001
+From 71fabf70d06913e8e8eafd050ff9f177eb53f3c6 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Tue, 30 May 2023 16:54:31 +0200
-Subject: [PATCH 08/10] crt: add api-ms-core-registry-* def files
+Date: Thu, 1 Jun 2023 15:30:03 +0200
+Subject: [PATCH 07/17] crt: add api-ms-core-registry-* def files
 
 These are needed to enable the registry API calls available in UWP.
 
 Add the target DLL to windowsapp, but not mincore (Win8) where it doesn't
 exist.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-crt/Makefile.in                     |  2 +
  .../api-ms-win-core-registry-l1-1-0.def       | 47 +++++++++++++++++++
@@ -31,7 +33,7 @@ index 0454ecec3..cff260421 100644
  		%/libapi-ms-win-core-synch-ansi-l1-1-0.a \
 diff --git a/mingw-w64-crt/lib-common/api-ms-win-core-registry-l1-1-0.def b/mingw-w64-crt/lib-common/api-ms-win-core-registry-l1-1-0.def
 new file mode 100644
-index 000000000..5cb72046b
+index 000000000..2f01992ed
 --- /dev/null
 +++ b/mingw-w64-crt/lib-common/api-ms-win-core-registry-l1-1-0.def
 @@ -0,0 +1,47 @@
@@ -84,7 +86,7 @@ index 000000000..5cb72046b
 +RegUnLoadKeyW
 diff --git a/mingw-w64-crt/lib-common/api-ms-win-core-registry-l2-1-0.def b/mingw-w64-crt/lib-common/api-ms-win-core-registry-l2-1-0.def
 new file mode 100644
-index 000000000..3e05bbf74
+index 000000000..b35c308c4
 --- /dev/null
 +++ b/mingw-w64-crt/lib-common/api-ms-win-core-registry-l2-1-0.def
 @@ -0,0 +1,37 @@

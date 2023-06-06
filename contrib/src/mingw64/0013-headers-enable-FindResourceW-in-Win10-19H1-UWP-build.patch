@@ -1,0 +1,93 @@
+From 2609975f80bd2c6357b5e6c01210eafee277a00e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 1 Jun 2023 15:34:34 +0200
+Subject: [PATCH 13/17] headers: enable FindResourceW in Win10 19H1 UWP builds
+
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
+
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-libraryloader-l1-2-1 in mincore and windowsapp.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-libraryloader-l1-2-1dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/libloaderapi.h |  9 +++++++--
+ mingw-w64-headers/include/winbase.h      | 10 +++++++---
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/mingw-w64-headers/include/libloaderapi.h b/mingw-w64-headers/include/libloaderapi.h
+index 25bacfd29..00aa50f2a 100644
+--- a/mingw-w64-headers/include/libloaderapi.h
++++ b/mingw-w64-headers/include/libloaderapi.h
+@@ -80,13 +80,19 @@ extern "C" {
+ #define GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT (0x2)
+ #define GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS (0x4)
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= 0x0A00
++  WINBASEAPI HRSRC WINAPI FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
++#ifdef UNICODE
++#define FindResource FindResourceW
++#endif
++#endif
++
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ #define ENUMRESLANGPROC __MINGW_NAME_AW(ENUMRESLANGPROC)
+ #define ENUMRESNAMEPROC __MINGW_NAME_AW(ENUMRESNAMEPROC)
+ #define ENUMRESTYPEPROC __MINGW_NAME_AW(ENUMRESTYPEPROC)
+ 
+   WINBASEAPI WINBOOL WINAPI EnumResourceNamesW(HMODULE hModule, LPCWSTR lpType, ENUMRESNAMEPROCW lpEnumFunc, LONG_PTR lParam);
+-  WINBASEAPI HRSRC WINAPI FindResourceW(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+   WINBASEAPI WINBOOL WINAPI FreeResource (HGLOBAL hResData);
+   WINBASEAPI HGLOBAL WINAPI LoadResource (HMODULE hModule, HRSRC hResInfo);
+   WINUSERAPI int WINAPI LoadStringA (HINSTANCE hInstance, UINT uID, LPSTR lpBuffer, int cchBufferMax);
+@@ -98,7 +104,6 @@ extern "C" {
+ 
+ #ifdef UNICODE
+ #define EnumResourceNames EnumResourceNamesW
+-#define FindResource FindResourceW
+ #endif
+ 
+ #define LoadString __MINGW_NAME_AW(LoadString)
+diff --git a/mingw-w64-headers/include/winbase.h b/mingw-w64-headers/include/winbase.h
+index 6e114e28f..050c5e7d4 100644
+--- a/mingw-w64-headers/include/winbase.h
++++ b/mingw-w64-headers/include/winbase.h
+@@ -2015,7 +2015,6 @@ typedef enum FILE_FLUSH_MODE {
+   WINBASEAPI VOID WINAPI FatalAppExitW (UINT uAction, LPCWSTR lpMessageText);
+   WINBASEAPI VOID WINAPI GetStartupInfoA (LPSTARTUPINFOA lpStartupInfo);
+   WINBASEAPI HRSRC WINAPI FindResourceA (HMODULE hModule, LPCSTR lpName, LPCSTR lpType);
+-  WINBASEAPI HRSRC WINAPI FindResourceW (HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+   WINBASEAPI HRSRC WINAPI FindResourceExA (HMODULE hModule, LPCSTR lpType, LPCSTR lpName, WORD wLanguage);
+   WINBASEAPI WINBOOL WINAPI EnumResourceTypesA (HMODULE hModule, ENUMRESTYPEPROCA lpEnumFunc, LONG_PTR lParam);
+   WINBASEAPI WINBOOL WINAPI EnumResourceTypesW (HMODULE hModule, ENUMRESTYPEPROCW lpEnumFunc, LONG_PTR lParam);
+@@ -2082,7 +2081,6 @@ typedef enum FILE_FLUSH_MODE {
+ #define FatalAppExit __MINGW_NAME_AW(FatalAppExit)
+ #define GetFirmwareEnvironmentVariable __MINGW_NAME_AW(GetFirmwareEnvironmentVariable)
+ #define SetFirmwareEnvironmentVariable __MINGW_NAME_AW(SetFirmwareEnvironmentVariable)
+-#define FindResource __MINGW_NAME_AW(FindResource)
+ #define EnumResourceTypes __MINGW_NAME_AW(EnumResourceTypes)
+ #define EnumResourceNames __MINGW_NAME_AW(EnumResourceNames)
+ #define EnumResourceLanguages __MINGW_NAME_AW(EnumResourceLanguages)
+@@ -2168,7 +2166,13 @@ typedef enum FILE_FLUSH_MODE {
+ #endif /* WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP) */
+ 
+ 
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
++  WINBASEAPI HRSRC WINAPI FindResourceW (HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
++
++#define FindResource __MINGW_NAME_AW(FindResource)
++#endif
++
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_VB
+   WINBASEAPI WINBOOL WINAPI CreateDirectoryExA (LPCSTR lpTemplateDirectory, LPCSTR lpNewDirectory, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+   WINBASEAPI WINBOOL WINAPI CreateDirectoryExW (LPCWSTR lpTemplateDirectory, LPCWSTR lpNewDirectory, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+ 
+-- 
+2.37.3.windows.1
+

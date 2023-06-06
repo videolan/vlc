@@ -1,25 +1,27 @@
-From e769423cf0acfbda5810025a57942465110ed9ff Mon Sep 17 00:00:00 2001
+From 20619a25985e84980d8fdc1ff7828e5fdff42ff4 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Thu, 1 Jun 2023 11:49:51 +0200
-Subject: [PATCH 01/10] headers: only enable GetFileInformationByHandle for
+Date: Thu, 1 Jun 2023 15:31:43 +0200
+Subject: [PATCH 09/17] headers: only enable GetFileInformationByHandle for
  19H1 UWP builds
 
 It is not allowed in older SDK. It won't compile or won't link. The target DLL
 will likely not have the function, so it should not be used when targetting older
 Windows 10 versions in UWP mode.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/fileapi.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mingw-w64-headers/include/fileapi.h b/mingw-w64-headers/include/fileapi.h
-index ffbe12560..3640efd52 100644
+index e9e0c647f..8124bd5cc 100644
 --- a/mingw-w64-headers/include/fileapi.h
 +++ b/mingw-w64-headers/include/fileapi.h
 @@ -32,7 +32,7 @@ WINBASEAPI DWORD WINAPI GetFileAttributesW (LPCWSTR lpFileName);
  #define GetFileAttributes __MINGW_NAME_AW(GetFileAttributes)
  WINBASEAPI DWORD WINAPI SetFilePointer (HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
  #endif
--#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= _WIN32_WINNT_WIN10
 +#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1 || defined(WINSTORECOMPAT)
    typedef struct _BY_HANDLE_FILE_INFORMATION {
      DWORD dwFileAttributes;

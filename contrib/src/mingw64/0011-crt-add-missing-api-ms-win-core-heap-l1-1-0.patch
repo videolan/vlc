@@ -1,0 +1,113 @@
+From 3f2dcd43490f263210a7a61ae1a7250c70cd9330 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 1 Jun 2023 15:33:39 +0200
+Subject: [PATCH 11/17] crt: add missing api-ms-win-core-heap-l1-1-0
+
+It was supposed to be in mincore already.
+
+The parameters size in lib32 were generated from values found in other .def
+files of lib32.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-crt/Makefile.in                     |  1 +
+ .../api-ms-win-core-heap-l1-1-0.def           | 20 +++++++++++++++++++
+ mingw-w64-crt/lib-common/mincore.mri          |  2 +-
+ mingw-w64-crt/lib-common/windowsapp.mri       |  1 +
+ .../lib32/api-ms-win-core-heap-l1-1-0.def     | 20 +++++++++++++++++++
+ 5 files changed, 43 insertions(+), 1 deletion(-)
+ create mode 100644 mingw-w64-crt/lib-common/api-ms-win-core-heap-l1-1-0.def
+ create mode 100644 mingw-w64-crt/lib32/api-ms-win-core-heap-l1-1-0.def
+
+diff --git a/mingw-w64-crt/Makefile.in b/mingw-w64-crt/Makefile.in
+index cff260421..3310b0a44 100644
+--- a/mingw-w64-crt/Makefile.in
++++ b/mingw-w64-crt/Makefile.in
+@@ -2206,6 +2206,7 @@ endif
+ 		%/libapi-ms-win-core-file-l2-1-0.a \
+ 		%/libapi-ms-win-core-file-l2-1-1.a \
+ 		%/libapi-ms-win-core-handle-l1-1-0.a \
++		%/libapi-ms-win-core-heap-l1-1-0.a \
+ 		%/libapi-ms-win-core-heap-l1-2-0.a \
+ 		%/libapi-ms-win-core-interlocked-l1-2-0.a \
+ 		%/libapi-ms-win-core-io-l1-1-0.a \
+diff --git a/mingw-w64-crt/lib-common/api-ms-win-core-heap-l1-1-0.def b/mingw-w64-crt/lib-common/api-ms-win-core-heap-l1-1-0.def
+new file mode 100644
+index 000000000..202bce3ac
+--- /dev/null
++++ b/mingw-w64-crt/lib-common/api-ms-win-core-heap-l1-1-0.def
+@@ -0,0 +1,20 @@
++LIBRARY api-ms-win-core-heap-l1-1-0
++
++EXPORTS
++
++GetProcessHeap
++GetProcessHeaps
++HeapAlloc
++HeapCompact
++HeapCreate
++HeapDestroy
++HeapFree
++HeapLock
++HeapQueryInformation
++HeapReAlloc
++HeapSetInformation
++HeapSize
++HeapSummary
++HeapUnlock
++HeapValidate
++HeapWalk
+diff --git a/mingw-w64-crt/lib-common/mincore.mri b/mingw-w64-crt/lib-common/mincore.mri
+index 7073eeb8d..27f5f50c9 100644
+--- a/mingw-w64-crt/lib-common/mincore.mri
++++ b/mingw-w64-crt/lib-common/mincore.mri
+@@ -38,7 +38,7 @@ ADDLIB libapi-ms-win-core-file-l2-1-2.a
+ ; FIXME libapi-ms-win-core-file-l2-1-3.a
+ ADDLIB libapi-ms-win-core-firmware-l1-1-0.a
+ ADDLIB libapi-ms-win-core-handle-l1-1-0.a
+-; FIXME libapi-ms-win-core-heap-l1-1-0.a
++ADDLIB libapi-ms-win-core-heap-l1-1-0.a
+ ADDLIB libapi-ms-win-core-heap-l1-2-0.a
+ ADDLIB libapi-ms-win-core-interlocked-l1-1-0.a
+ ADDLIB libapi-ms-win-core-interlocked-l1-2-0.a
+diff --git a/mingw-w64-crt/lib-common/windowsapp.mri b/mingw-w64-crt/lib-common/windowsapp.mri
+index 2496280a5..d1445a4a7 100644
+--- a/mingw-w64-crt/lib-common/windowsapp.mri
++++ b/mingw-w64-crt/lib-common/windowsapp.mri
+@@ -20,6 +20,7 @@ ADDLIB libapi-ms-win-core-file-l1-2-2.a
+ ADDLIB libapi-ms-win-core-file-l2-1-0.a
+ ADDLIB libapi-ms-win-core-file-l2-1-1.a
+ ADDLIB libapi-ms-win-core-handle-l1-1-0.a
++ADDLIB libapi-ms-win-core-heap-l1-1-0.a
+ ADDLIB libapi-ms-win-core-heap-l1-2-0.a
+ ADDLIB libapi-ms-win-core-interlocked-l1-2-0.a
+ ADDLIB libapi-ms-win-core-io-l1-1-0.a
+diff --git a/mingw-w64-crt/lib32/api-ms-win-core-heap-l1-1-0.def b/mingw-w64-crt/lib32/api-ms-win-core-heap-l1-1-0.def
+new file mode 100644
+index 000000000..419896a62
+--- /dev/null
++++ b/mingw-w64-crt/lib32/api-ms-win-core-heap-l1-1-0.def
+@@ -0,0 +1,20 @@
++LIBRARY api-ms-win-core-heap-l1-1-0
++
++EXPORTS
++
++GetProcessHeap@0
++GetProcessHeaps@8
++HeapAlloc@12
++HeapCompact@8
++HeapCreate@12
++HeapDestroy@4
++HeapFree@12
++HeapLock@4
++HeapQueryInformation@20
++HeapReAlloc@16
++HeapSetInformation@16
++HeapSize@12
++HeapSummary@12
++HeapUnlock@4
++HeapValidate@12
++HeapWalk@8
+-- 
+2.37.3.windows.1
+

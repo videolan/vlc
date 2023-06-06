@@ -1,7 +1,7 @@
-From b7ce09e8a811dc60e4c6ca68ca60773757b6cf20 Mon Sep 17 00:00:00 2001
+From ae87f01321d98012576270bd85ee59fe2096fb92 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Thu, 25 May 2023 09:44:35 +0200
-Subject: [PATCH 04/10] headers: enable CreateHardLinkW in Win10 19H1 UWP
+Date: Thu, 1 Jun 2023 15:27:53 +0200
+Subject: [PATCH 05/17] headers: enable CreateHardLinkW in Win10 19H1 UWP
  builds
 
 The documentation doesn't say it's allowed but they are allowed by the
@@ -14,6 +14,8 @@ be used when targeting older Windows 10 versions in UWP mode.
 We already have api-ms-win-core-file-l2-1-0 in mincore and windowsapp.
 
 [1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-file-l2-1-0dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/winbase.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)

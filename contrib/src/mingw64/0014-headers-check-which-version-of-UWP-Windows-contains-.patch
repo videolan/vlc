@@ -1,8 +1,8 @@
-From c060d692db86b56ef8b7da16776be69d31ff97e4 Mon Sep 17 00:00:00 2001
+From 5cd281859723b5fcb3c7a488a3f059aa8f2f74cf Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Thu, 1 Jun 2023 13:04:21 +0200
-Subject: [PATCH] headers: check which version of UWP Windows contains Virtual
- functions
+Date: Thu, 1 Jun 2023 15:35:32 +0200
+Subject: [PATCH 14/17] headers: check which version of UWP Windows contains
+ Virtual functions
 
 * VirtualFree is always available in UWP
 * VirtualAlloc is only available since 19H1/18362 SDK
@@ -12,6 +12,8 @@ They are all found in api-ms-win-core-memory-l1-1-0 which is in mincore
 and windowsapp. It's one of the target DLLs [1]
 
 [1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-memory-l1-1-0dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/memoryapi.h | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)

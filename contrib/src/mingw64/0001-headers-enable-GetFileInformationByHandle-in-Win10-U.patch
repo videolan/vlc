@@ -1,0 +1,30 @@
+From d6b24ec2508f10dadbe9ccd8789b22ed1c0832bb Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 24 May 2023 08:30:19 +0200
+Subject: [PATCH 01/17] headers: enable GetFileInformationByHandle in Win10 UWP
+ builds
+
+Contrary to what the documentation says, it's available in the Windows SDK,
+both in the headers and when linking with WindowsApp.lib.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/fileapi.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mingw-w64-headers/include/fileapi.h b/mingw-w64-headers/include/fileapi.h
+index ffbe12560..8ea09f6c9 100644
+--- a/mingw-w64-headers/include/fileapi.h
++++ b/mingw-w64-headers/include/fileapi.h
+@@ -32,7 +32,7 @@ WINBASEAPI DWORD WINAPI GetFileAttributesW (LPCWSTR lpFileName);
+ #define GetFileAttributes __MINGW_NAME_AW(GetFileAttributes)
+ WINBASEAPI DWORD WINAPI SetFilePointer (HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod);
+ #endif
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || _WIN32_WINNT >= _WIN32_WINNT_WIN10
+   typedef struct _BY_HANDLE_FILE_INFORMATION {
+     DWORD dwFileAttributes;
+     FILETIME ftCreationTime;
+-- 
+2.37.3.windows.1
+

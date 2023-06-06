@@ -1,7 +1,7 @@
-From 7bfb7d0537f1e1dc67a0993c96a92b6b26705315 Mon Sep 17 00:00:00 2001
+From f17aabd6ad7db49419950cbb456c8ecf64eba62a Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Tue, 30 May 2023 15:16:03 +0200
-Subject: [PATCH 09/10] headers: enable some Registry API calls in Win10 19H1
+Date: Thu, 1 Jun 2023 15:30:04 +0200
+Subject: [PATCH 08/17] headers: enable some Registry API calls in Win10 19H1
  UWP builds
 
 The documentation doesn't say it's allowed but they are allowed by the
@@ -13,6 +13,8 @@ function, so it should not be used when targeting older Windows 10 versions
 in UWP mode.
 
 We now have api-ms-win-core-registry-l1-1-0 in windowsapp.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/winreg.h | 92 ++++++++++++++++--------------
  1 file changed, 49 insertions(+), 43 deletions(-)

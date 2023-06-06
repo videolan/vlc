@@ -1,11 +1,13 @@
-From 9559b683801027a3a944b60dd4c7b49debbcb66e Mon Sep 17 00:00:00 2001
+From 7669cac6e5266b8bb0a23cf6dbdcd0511aaee52c Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Thu, 25 May 2023 08:19:26 +0200
-Subject: [PATCH] headers: enable VirtualAlloc(Ex) in Win10 UWP builds
+Date: Thu, 25 May 2023 08:31:24 +0200
+Subject: [PATCH 02/17] headers: enable VirtualAlloc(Ex) in Win10 UWP builds
 
 It is now officially allowed [1].
 
 [1] https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/memoryapi.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

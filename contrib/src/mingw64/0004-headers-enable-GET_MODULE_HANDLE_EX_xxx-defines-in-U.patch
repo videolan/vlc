@@ -1,16 +1,18 @@
-From 5ce33c808919cc129fe04fa306ca64cdd9762248 Mon Sep 17 00:00:00 2001
+From 0ed84b9108a3a13dd7a7fb881ff1e4e82d6b19f1 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Tue, 30 May 2023 15:52:28 +0200
-Subject: [PATCH] headers: enable GET_MODULE_HANDLE_EX_xxx defines in UWP
+Date: Wed, 31 May 2023 07:44:13 +0200
+Subject: [PATCH 04/17] headers: enable GET_MODULE_HANDLE_EX_xxx defines in UWP
  builds
 
 It's available in the Windows 11 SDK for all builds targeting FAMILY_APP and more.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/libloaderapi.h | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/mingw-w64-headers/include/libloaderapi.h b/mingw-w64-headers/include/libloaderapi.h
-index 26115ad9e..2705c18a4 100644
+index d4c82ef8c..00070da2e 100644
 --- a/mingw-w64-headers/include/libloaderapi.h
 +++ b/mingw-w64-headers/include/libloaderapi.h
 @@ -79,11 +79,13 @@ extern "C" {

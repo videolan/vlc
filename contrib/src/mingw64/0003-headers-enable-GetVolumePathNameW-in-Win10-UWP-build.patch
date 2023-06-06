@@ -1,7 +1,7 @@
-From de5009b7952c6c74511facef02c3d21855b4ee0e Mon Sep 17 00:00:00 2001
+From 25beff61340b108d6b6fc4054c9a30a6f4fea281 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Sat, 27 May 2023 11:52:25 +0200
-Subject: [PATCH] headers: enable GetVolumePathNameW in Win10 UWP builds
+Date: Sat, 27 May 2023 12:05:37 +0200
+Subject: [PATCH 03/17] headers: enable GetVolumePathNameW in Win10 UWP builds
 
 The documentation doesn't say it's allowed, but the WIndows SDK allow it and
 the Windows App Certification as well.
@@ -10,6 +10,8 @@ The official page for allowed API's also doesn't say it's allowed [1]
 but the DLL that contains it is there.
 
 [1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-file-l2-1-0dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
 ---
  mingw-w64-headers/include/fileapi.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

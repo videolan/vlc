@@ -1,0 +1,39 @@
+From be84314c974c5c3004ceeb3f510944a4074f137c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 1 Jun 2023 15:33:40 +0200
+Subject: [PATCH 12/17] headers: Allow some Heap API in Win10 19H1 UWP builds
+
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
+
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-heap-l1-1-0 and api-ms-win-core-heap-l1-2-0
+in mincore and windowsapp.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-heap-l1-2-0dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/heapapi.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mingw-w64-headers/include/heapapi.h b/mingw-w64-headers/include/heapapi.h
+index b150e1056..fe937f301 100644
+--- a/mingw-w64-headers/include/heapapi.h
++++ b/mingw-w64-headers/include/heapapi.h
+@@ -30,6 +30,9 @@ extern "C" {
+   WINBASEAPI DWORD WINAPI GetProcessHeaps (DWORD NumberOfHeaps, PHANDLE ProcessHeaps);
+   WINBASEAPI WINBOOL WINAPI HeapLock (HANDLE hHeap);
+   WINBASEAPI WINBOOL WINAPI HeapUnlock (HANDLE hHeap);
++#endif
++
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
+   WINBASEAPI WINBOOL WINAPI HeapWalk (HANDLE hHeap, LPPROCESS_HEAP_ENTRY lpEntry);
+   WINBASEAPI WINBOOL WINAPI HeapQueryInformation (HANDLE HeapHandle, HEAP_INFORMATION_CLASS HeapInformationClass, PVOID HeapInformation, SIZE_T HeapInformationLength, PSIZE_T ReturnLength);
+ #endif
+-- 
+2.37.3.windows.1
+

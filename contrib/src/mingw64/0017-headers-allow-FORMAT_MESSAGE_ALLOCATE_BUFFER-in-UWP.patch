@@ -1,0 +1,36 @@
+From 856d9ba2e3095c8775d00933353641de0cee0236 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 14 Jun 2023 09:59:19 +0200
+Subject: [PATCH 17/17] headers: allow FORMAT_MESSAGE_ALLOCATE_BUFFER in UWP
+
+FormatMessageA/W are allowed, so the flag should be allowed too.
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/winbase.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/mingw-w64-headers/include/winbase.h b/mingw-w64-headers/include/winbase.h
+index ad8f069c4..24eb6b78d 100644
+--- a/mingw-w64-headers/include/winbase.h
++++ b/mingw-w64-headers/include/winbase.h
+@@ -1448,6 +1448,7 @@ typedef enum FILE_FLUSH_MODE {
+ #define FORMAT_MESSAGE_FROM_SYSTEM 0x00001000
+ #define FORMAT_MESSAGE_ARGUMENT_ARRAY 0x00002000
+ #define FORMAT_MESSAGE_MAX_WIDTH_MASK 0x000000ff
++#define FORMAT_MESSAGE_ALLOCATE_BUFFER 0x00000100
+ #endif
+ 
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+@@ -1465,8 +1466,6 @@ typedef enum FILE_FLUSH_MODE {
+ #define FILE_READ_ONLY 8
+ #define FILE_DIR_DISALLOWED 9
+ 
+-#define FORMAT_MESSAGE_ALLOCATE_BUFFER 0x00000100
+-
+ #define EFS_USE_RECOVERY_KEYS (0x1)
+ 
+ #define CREATE_FOR_IMPORT (1)
+-- 
+2.37.3.windows.1
+

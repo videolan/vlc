@@ -1,0 +1,48 @@
+From b4d090324cbb623584b372c6a978f0d877b7e019 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 7 Jun 2023 09:46:59 +0200
+Subject: [PATCH 16/17] headers: Allow SetDllDirectoryW/A API in Win10 19H1 UWP
+ builds
+
+The documentation doesn't say it's allowed but they are allowed by the
+Windows Application Certification Kit and the 18362 Windows SDK.
+
+It is not allowed in older SDK. It won't compile or won't link.
+The target DLL [1] will likely not have the function, so it should not
+be used when targeting older Windows 10 versions in UWP mode.
+
+We already have api-ms-win-core-kernel32-legacy-l1-1-1
+in windowsapp.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-core-kernel32-legacy-l1-1-1dll
+
+Signed-off-by: LIU Hao <lh_mouse@126.com>
+---
+ mingw-w64-headers/include/winbase.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mingw-w64-headers/include/winbase.h b/mingw-w64-headers/include/winbase.h
+index 050c5e7d4..ad8f069c4 100644
+--- a/mingw-w64-headers/include/winbase.h
++++ b/mingw-w64-headers/include/winbase.h
+@@ -2136,8 +2136,6 @@ typedef enum FILE_FLUSH_MODE {
+ #define GET_SYSTEM_WOW64_DIRECTORY_NAME_T_T __MINGW_NAME_UAW_EXT(GET_SYSTEM_WOW64_DIRECTORY_NAME,T)
+ #endif
+ 
+-  WINBASEAPI WINBOOL WINAPI SetDllDirectoryA (LPCSTR lpPathName);
+-  WINBASEAPI WINBOOL WINAPI SetDllDirectoryW (LPCWSTR lpPathName);
+   WINBASEAPI DWORD WINAPI GetDllDirectoryA (DWORD nBufferLength, LPSTR lpBuffer);
+   WINBASEAPI DWORD WINAPI GetDllDirectoryW (DWORD nBufferLength, LPWSTR lpBuffer);
+ 
+@@ -2167,6 +2165,8 @@ typedef enum FILE_FLUSH_MODE {
+ 
+ 
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
++  WINBASEAPI WINBOOL WINAPI SetDllDirectoryA (LPCSTR lpPathName);
++  WINBASEAPI WINBOOL WINAPI SetDllDirectoryW (LPCWSTR lpPathName);
+   WINBASEAPI HRSRC WINAPI FindResourceW (HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType);
+ 
+ #define FindResource __MINGW_NAME_AW(FindResource)
+-- 
+2.37.3.windows.1
+
