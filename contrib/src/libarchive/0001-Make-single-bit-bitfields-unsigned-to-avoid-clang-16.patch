@@ -1,0 +1,101 @@
+From f180dcab3321149ef348e9899737db29eeaaecf0 Mon Sep 17 00:00:00 2001
+From: Dimitry Andric <dimitry@andric.com>
+Date: Tue, 18 Apr 2023 02:59:32 +0200
+Subject: [PATCH] Make single bit bitfields unsigned to avoid clang 16 warning
+ (#1860)
+
+Clang 16 introduced a warning about single bit bitfields in structs,
+which is triggered by a few libarchive formats:
+
+libarchive/archive_write_set_format_7zip.c:1541:13: error: implicit
+truncation from 'int' to a one-bit wide bit-field changes value from 1
+to -1 [-Werror,-Wsingle-bit-bitfield-constant-conversion]
+                    file->dir = 1;
+                              ^ ~
+
+This is because single bit bitfields only support values -1 and 0, if
+they are signed.
+
+For bitfields with two or more bits this can be intentional, but single
+bit bitfields are typically used as booleans, so it is better to make
+them unsigned.
+---
+ libarchive/archive_write_set_format_7zip.c    |  2 +-
+ libarchive/archive_write_set_format_iso9660.c | 14 +++++++-------
+ libarchive/archive_write_set_format_xar.c     |  4 ++--
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/libarchive/archive_write_set_format_7zip.c b/libarchive/archive_write_set_format_7zip.c
+index d5ca9a66..95fd7164 100644
+--- a/libarchive/archive_write_set_format_7zip.c
++++ b/libarchive/archive_write_set_format_7zip.c
+@@ -165,7 +165,7 @@ struct file {
+ 	mode_t			 mode;
+ 	uint32_t		 crc32;
+ 
+-	signed int		 dir:1;
++	unsigned		 dir:1;
+ };
+ 
+ struct _7zip {
+diff --git a/libarchive/archive_write_set_format_iso9660.c b/libarchive/archive_write_set_format_iso9660.c
+index 197b0ee6..2a3ae07f 100644
+--- a/libarchive/archive_write_set_format_iso9660.c
++++ b/libarchive/archive_write_set_format_iso9660.c
+@@ -289,12 +289,12 @@ struct isoent {
+ 		struct extr_rec	*current;
+ 	}			 extr_rec_list;
+ 
+-	signed int		 virtual:1;
++	unsigned int		 virtual:1;
+ 	/* If set to one, this file type is a directory.
+ 	 * A convenience flag to be used as
+ 	 * "archive_entry_filetype(isoent->file->entry) == AE_IFDIR".
+ 	 */
+-	signed int		 dir:1;
++	unsigned int		 dir:1;
+ };
+ 
+ struct hardlink {
+@@ -755,9 +755,9 @@ struct iso9660 {
+ 
+ 	/* Used for making zisofs. */
+ 	struct {
+-		signed int	 detect_magic:1;
+-		signed int	 making:1;
+-		signed int	 allzero:1;
++		unsigned int	 detect_magic:1;
++		unsigned int	 making:1;
++		unsigned int	 allzero:1;
+ 		unsigned char	 magic_buffer[64];
+ 		int		 magic_cnt;
+ 
+@@ -7798,8 +7798,8 @@ struct zisofs_extract {
+ 	uint64_t	 pz_uncompressed_size;
+ 	size_t		 uncompressed_buffer_size;
+ 
+-	signed int	 initialized:1;
+-	signed int	 header_passed:1;
++	unsigned int	 initialized:1;
++	unsigned int	 header_passed:1;
+ 
+ 	uint32_t	 pz_offset;
+ 	unsigned char	*block_pointers;
+diff --git a/libarchive/archive_write_set_format_xar.c b/libarchive/archive_write_set_format_xar.c
+index 7849062c..7307757d 100644
+--- a/libarchive/archive_write_set_format_xar.c
++++ b/libarchive/archive_write_set_format_xar.c
+@@ -212,8 +212,8 @@ struct file {
+ 	struct heap_data	 data;
+         struct archive_string    script;
+ 
+-	signed int		 virtual:1;
+-	signed int		 dir:1;
++	unsigned int		 virtual:1;
++	unsigned int		 dir:1;
+ };
+ 
+ struct hardlink {
+-- 
+2.37.3.windows.1
+
