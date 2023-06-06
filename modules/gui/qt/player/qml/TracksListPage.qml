@@ -251,6 +251,13 @@ RowLayout {
                             if (model.checked !== checked)
                                 model.checked = checked
                         }
+
+                        onClicked: {
+                            tracksList.currentIndex = index
+                            tracksList.setCurrentItemFocus(Qt.MouseFocusReason)
+                        }
+
+                        Navigation.parentItem: tracksList
                     }
                 }
             }
