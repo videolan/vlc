@@ -25,6 +25,9 @@ public:
     bool isPreviousEmpty();
     QString viewPath() const;
 
+    // NOTE: The first item to call this takes ownership over the focus reason.
+    Q_INVOKABLE Qt::FocusReason takeFocusReason();
+
 signals:
     void currentChanged(QVariant current);
     void previousEmptyChanged(bool empty);
@@ -48,7 +51,8 @@ public slots:
      * }, History.Go)
      * \endcode
      */
-    Q_INVOKABLE void push( QVariantMap, PostAction = PostAction::Go );
+    Q_INVOKABLE void push( QVariantMap, Qt::FocusReason = Qt::OtherFocusReason,
+                           PostAction = PostAction::Go );
 
     /**
      * provide a short version of the history push({k:v}), which implicitly create a dictonnary tree from the input list
@@ -65,7 +69,8 @@ public slots:
      *  push(["foo", "bar", {baz: "plop"} ], History.Go)
      * \endcode
      */
-    Q_INVOKABLE void push(QVariantList itemList, PostAction = PostAction::Go );
+    Q_INVOKABLE void push(QVariantList itemList, Qt::FocusReason = Qt::OtherFocusReason,
+                          PostAction = PostAction::Go );
 
 
     /**
@@ -91,13 +96,15 @@ public slots:
 
 
     // Go to previous page
-    void previous( PostAction = PostAction::Go );
+    void previous( Qt::FocusReason = Qt::OtherFocusReason, PostAction = PostAction::Go );
 
 private:
     void updateViewPath();
 
     QVariantList m_history;
     QString m_viewPath;
+
+    Qt::FocusReason m_reason;
 };
 
 #endif // NAVIGATION_HISTORY_HPP

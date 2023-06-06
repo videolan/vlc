@@ -5,7 +5,8 @@
 
 
 NavigationHistory::NavigationHistory(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_reason(Qt::OtherFocusReason)
 {
 }
 
@@ -21,13 +22,16 @@ bool NavigationHistory::isPreviousEmpty()
     return m_history.count() <= 1;
 }
 
-void NavigationHistory::push(QVariantMap item, PostAction postAction)
+void NavigationHistory::push(QVariantMap item, Qt::FocusReason reason, PostAction postAction)
 {
     m_history.push_back(item);
     emit previousEmptyChanged(false);
     if (postAction == PostAction::Go)
     {
         updateViewPath();
+
+        m_reason = reason;
+
         emit currentChanged(m_history.back());
     }
 }
@@ -143,7 +147,8 @@ static QString getViewPath(QVariantMap map)
     return r;
 }
 
-void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostAction postAction)
+void NavigationHistory::push(QVariantList itemList, Qt::FocusReason reason,
+                             NavigationHistory::PostAction postAction)
 {
     QVariantMap itemMap;
     pushListRec(itemMap, itemList.cbegin(), itemList.cend());
@@ -152,7 +157,7 @@ void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostActio
     QVariant rootView = itemMap["view"];
     if (!rootView.canConvert(QVariant::Map))
         return;
-    push(rootView.toMap(), postAction);
+    push(rootView.toMap(), reason, postAction);
 }
 
 
@@ -182,7 +187,7 @@ void NavigationHistory::addLeaf(QVariantMap itemMap)
     updateViewPath();
 }
 
-void NavigationHistory::previous(PostAction postAction)
+void NavigationHistory::previous(Qt::FocusReason reason, PostAction postAction)
 {
     if (m_history.count() == 1)
         return;
@@ -197,8 +202,11 @@ void NavigationHistory::previous(PostAction postAction)
     if (m_history.count() == 1)
         emit previousEmptyChanged(true);
 
-    if (postAction == PostAction::Go)
+    if (postAction == PostAction::Go) {
+        m_reason = reason;
+
         emit currentChanged( m_history.back() );
+    }
 }
 
 void NavigationHistory::updateViewPath()
@@ -214,4 +222,13 @@ void NavigationHistory::updateViewPath()
 QString NavigationHistory::viewPath() const
 {
     return m_viewPath;
+}
+
+Qt::FocusReason NavigationHistory::takeFocusReason()
+{
+    Qt::FocusReason reason = m_reason;
+
+    m_reason = Qt::OtherFocusReason;
+
+    return reason;
 }
