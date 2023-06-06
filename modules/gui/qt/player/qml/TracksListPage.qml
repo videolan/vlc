@@ -30,9 +30,7 @@ import "qrc:///util/" as Util
 
 
 RowLayout {
-    id: frontRoot
-
-    property var currentItem: StackView.view.currentItem
+    id: root
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -40,30 +38,13 @@ RowLayout {
         colorSet: ColorContext.Window // copied from TracksPage, maybe use Pane?
     }
 
+    /* required */ property var trackMenuController: null
+
     spacing: 0
 
     focus: true
 
     onActiveFocusChanged: if (activeFocus) column.forceActiveFocus()
-
-    Connections {
-        target: frontRoot.StackView.view
-
-        onCurrentItemChanged: {
-            if (currentItem instanceof TracksPage)
-                root.width = Qt.binding(function () {
-                    return Math.min(currentItem.preferredWidth, root.parent.width)
-                })
-            else
-                root.width = Qt.binding(function () { return root.parent.width })
-        }
-    }
-
-    Connections {
-        target: (currentItem && currentItem instanceof TracksPage) ? currentItem : null
-
-        onBackRequested: frontRoot.StackView.view.pop()
-    }
 
     Widgets.NavigableCol {
         id: column
@@ -76,10 +57,15 @@ RowLayout {
 
         Navigation.rightItem: row
 
-        model: [{
+        //we store the model in a different property as functions can't be passed in modelData
+        property var modelDefination: [{
             "tooltip": I18n.qtr("Playback Speed"),
-            "source": "qrc:///player/TracksPageSpeed.qml"
+            "action": function () {
+                trackMenuController.requestPlaybackSpeedPage()
+            }
         }]
+
+        model: modelDefination
 
         delegate: Widgets.IconTrackButton {
             size: (index === 0) ? VLCStyle.fontSize_large
@@ -97,7 +83,7 @@ RowLayout {
 
             Navigation.parentItem: column
 
-            onClicked: frontRoot.StackView.view.push(modelData.source)
+            onClicked: column.modelDefination[index].action()
         }
     }
 
@@ -268,7 +254,7 @@ RowLayout {
                 DialogsProvider.loadSubtitlesFile()
             }
             else if (action === QmlSubtitleMenu.Synchronize) {
-                contentItem.currentItem.StackView.view.push("qrc:///player/TracksPageSubtitle.qml")
+                trackMenuController.requestSubtitlePage()
             }
             else if (action === QmlSubtitleMenu.Download) {
                 Player.openVLsub()
@@ -284,7 +270,7 @@ RowLayout {
                 DialogsProvider.loadAudioFile()
             }
             else if (action === QmlSubtitleMenu.Synchronize) {
-                contentItem.currentItem.StackView.view.push("qrc:///player/TracksPageAudio.qml")
+                trackMenuController.requestAudioPage()
             }
         }
     }

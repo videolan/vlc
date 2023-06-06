@@ -89,7 +89,16 @@ T.Popup {
         }
 
         initialItem: TracksListPage {
+            trackMenuController: trackMenuController
+        }
 
+        onCurrentItemChanged: {
+            if (currentItem instanceof TracksPage)
+                root.width = Qt.binding(function () {
+                    return Math.min(currentItem.preferredWidth, root.parent.width)
+                })
+            else
+                root.width = Qt.binding(function () { return root.parent.width })
         }
 
         pushEnter: Transition {
@@ -124,5 +133,30 @@ T.Popup {
                 duration: VLCStyle.duration_long
             }
         }
+    }
+
+    QtObject {
+      id: trackMenuController
+
+      signal requestAudioPage()
+      signal requestSubtitlePage()
+      signal requestPlaybackSpeedPage()
+      signal requestBack()
+
+      onRequestBack: {
+          stackView.pop()
+      }
+
+      onRequestAudioPage: {
+          stackView.push("qrc:///player/TracksPageAudio.qml", {"trackMenuController": trackMenuController})
+      }
+
+      onRequestSubtitlePage: {
+          stackView.push("qrc:///player/TracksPageSubtitle.qml", {"trackMenuController": trackMenuController})
+      }
+
+      onRequestPlaybackSpeedPage: {
+          stackView.push("qrc:///player/TracksPageSpeed.qml", {"trackMenuController": trackMenuController})
+      }
     }
 }

@@ -35,6 +35,8 @@ RowLayout {
 
     property int preferredWidth: VLCStyle.dp(512, VLCStyle.scale)
 
+    /* required */ property var trackMenuController: null
+
     // Settings
 
     spacing: 0
@@ -42,10 +44,6 @@ RowLayout {
     focus: true
 
     Navigation.leftItem: button
-
-    // Signals
-
-    signal backRequested
 
     // Children
 
@@ -73,7 +71,7 @@ RowLayout {
             Navigation.parentItem: root
             Navigation.rightItem: content
 
-            onClicked: root.backRequested()
+            onClicked: trackMenuController.requestBack()
         }
     }
 
