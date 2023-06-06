@@ -126,118 +126,131 @@ RowLayout {
         //note that parenthesis around functions are *mandatory*
         model: modelDefinition
 
-        delegate: Column {
+        delegate: Container {
+            // wrap the contentItem i.e Column into Container
+            // so that we can get focusReason, also Container
+            // is a FocusScope
+
             id: tracksListContainer
 
             property var tracksModel: modelData.tracksModel
 
+            focus: true
+
             width: row.width / 3
             height: row.height
 
-            focus: true
-
-            Accessible.role: Accessible.Pane
-            Accessible.name: modelData.title
-
             onActiveFocusChanged: if (activeFocus) tracksList.forceActiveFocus(focusReason)
 
-            Item {
-                // keep it inside so "Column" doesn't mess with it
-               Rectangle {
-                   id: separator
+            // this is required to initialize attached Navigation property
+            Navigation.parentItem: row
 
-                   x: 0
-                   y: 0
-                   width: VLCStyle.margin_xxxsmall
-
-                   height: tracksListContainer.height
-                   color: theme.border
-               }
-            }
-
-            Row {
-                id: titleHeader
-
-                width: tracksListContainer.width
-                height: implicitHeight
-
-                padding: VLCStyle.margin_xsmall
-
-                topPadding: VLCStyle.margin_large
-                leftPadding: VLCStyle.margin_xxlarge + separator.width
+            contentItem: Column {
+                anchors.fill: parent
 
                 focus: true
 
-                clip: true
+                Accessible.role: Accessible.Pane
+                Accessible.name: modelData.title
 
-                Widgets.SubtitleLabel {
-                    id: titleText
+                Item {
+                    // keep it inside so "Column" doesn't mess with it
+                   Rectangle {
+                       id: separator
 
-                    width: parent.width - button.width - parent.leftPadding
-                           - parent.rightPadding
+                       x: 0
+                       y: 0
+                       width: VLCStyle.margin_xxxsmall
 
-                    text: modelData.title
-                    color: theme.fg.primary
+                       height: tracksListContainer.height
+                       color: theme.border
+                   }
                 }
 
-                Widgets.IconTrackButton {
-                    id: button
+                Row {
+                    id: titleHeader
 
-                    size: VLCStyle.icon_track
+                    width: tracksListContainer.width
+                    height: implicitHeight
+
+                    padding: VLCStyle.margin_xsmall
+
+                    topPadding: VLCStyle.margin_large
+                    leftPadding: VLCStyle.margin_xxlarge + separator.width
 
                     focus: true
 
-                    text: modelData.menuText
-                    iconText: modelData.menuIcon
-
-                    Navigation.parentItem: tracksListContainer
-                    Navigation.downItem: tracksList
-
-                    onClicked: {
-                        //functions aren't passed to modelData
-                        row.modelDefinition[index].menuAction(mapToGlobal(0, height))
-                    }
-                }
-            }
-
-            ListView {
-                id: tracksList
-
-                model: tracksListContainer.tracksModel
-                width: tracksListContainer.width
-                height: tracksListContainer.height - titleHeader.height
-                leftMargin: separator.width
-                focus: true
-                clip: true
-
-                Accessible.role: Accessible.List
-                Accessible.name: I18n.qtr("Track list")
-
-                Navigation.parentItem: tracksListContainer
-                Navigation.upItem: button
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
-
-                delegate: Widgets.CheckedDelegate {
-                    readonly property bool isModelChecked: model.checked
                     clip: true
 
-                    focus: true
-                    text: model.display
-                    width: tracksListContainer.width - VLCStyle.margin_xxxsmall
-                    height: VLCStyle.dp(40, VLCStyle.scale)
-                    opacity: hovered || activeFocus || checked ? 1 : .6
-                    font.weight: hovered
-                                 || activeFocus ? Font.DemiBold : Font.Normal
+                    Widgets.SubtitleLabel {
+                        id: titleText
 
-                    onIsModelCheckedChanged: {
-                        if (model.checked !== checked)
-                            checked = model.checked
+                        width: parent.width - button.width - parent.leftPadding
+                               - parent.rightPadding
+
+                        text: modelData.title
+                        color: theme.fg.primary
                     }
 
-                    onCheckedChanged: {
-                        if (model.checked !== checked)
-                            model.checked = checked
+                    Widgets.IconTrackButton {
+                        id: button
+
+                        size: VLCStyle.icon_track
+
+                        focus: true
+
+                        text: modelData.menuText
+                        iconText: modelData.menuIcon
+
+                        Navigation.parentItem: tracksListContainer
+                        Navigation.downItem: tracksList
+
+                        onClicked: {
+                            //functions aren't passed to modelData
+                            row.modelDefinition[index].menuAction(mapToGlobal(0, height))
+                        }
+                    }
+                }
+
+                Widgets.KeyNavigableListView {
+                    id: tracksList
+
+                    model: tracksListContainer.tracksModel
+                    width: tracksListContainer.width
+                    height: tracksListContainer.height - titleHeader.height
+                    leftMargin: separator.width
+                    focus: true
+                    clip: true
+
+                    Accessible.role: Accessible.List
+                    Accessible.name: I18n.qtr("Track list")
+
+                    Navigation.parentItem: tracksListContainer
+                    Navigation.upItem: button
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: Navigation.defaultKeyAction(event)
+
+                    delegate: Widgets.CheckedDelegate {
+                        readonly property bool isModelChecked: model.checked
+                        clip: true
+
+                        focus: true
+                        text: model.display
+                        width: tracksListContainer.width - VLCStyle.margin_xxxsmall
+                        height: VLCStyle.dp(40, VLCStyle.scale)
+                        opacity: hovered || activeFocus || checked ? 1 : .6
+                        font.weight: hovered
+                                     || activeFocus ? Font.DemiBold : Font.Normal
+
+                        onIsModelCheckedChanged: {
+                            if (model.checked !== checked)
+                                checked = model.checked
+                        }
+
+                        onCheckedChanged: {
+                            if (model.checked !== checked)
+                                model.checked = checked
+                        }
                     }
                 }
             }
