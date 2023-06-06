@@ -66,6 +66,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0008-crt-add-api-ms-core-registry-def-files.patch
 	$(APPLY) $(SRC)/mingw64/0009-headers-enable-some-Registry-API-calls-in-Win10-19H1.patch
 	$(APPLY) $(SRC)/mingw64/0010-headers-allow-Get-SetHandleInformation-in-Win10-19H1.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enabled-LoadLibraryEx-flags-in-Win10-19H1-UW.patch
 	$(MOVE)
 
 .mingw64: mingw64
