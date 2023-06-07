@@ -646,9 +646,6 @@ ifdef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 CMAKE_SYSTEM_NAME = WindowsStore
 endif
-ifdef HAVE_WINDOWSPHONE
-CMAKE_SYSTEM_NAME = WindowsPhone
-endif
 endif
 endif
 ifdef HAVE_DARWIN_OS
