@@ -1,0 +1,64 @@
+From 65ed1f91133be6af7a8403db50e103c005272004 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 13 Jan 2025 12:53:41 +0100
+Subject: [PATCH] use OpenFileMappingW instead of OpenFileMappingA
+
+And use the corresponding UWP apps in UWP builds.
+---
+ source/common/ringmem.cpp | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/source/common/ringmem.cpp b/source/common/ringmem.cpp
+index cfd44e83d..8d60f5193 100644
+--- a/source/common/ringmem.cpp
++++ b/source/common/ringmem.cpp
+@@ -135,11 +135,25 @@ namespace X265_NS {
+             int32_t shrMemSize = (itemSize * itemCnt + sizeof(ShrMemCtrl) + RINGMEM_ALLIGNMENT - 1) & ~(RINGMEM_ALLIGNMENT - 1);
+ 
+ #ifdef _WIN32
+-            HANDLE h = OpenFileMappingA(FILE_MAP_WRITE | FILE_MAP_READ, FALSE, nameBuf);
++            wchar_t nameBuf_utf16[MAX_PATH * 2];
++
++            void *pool;
++            if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, nameBuf, -1, nameBuf_utf16, sizeof(nameBuf_utf16)/sizeof(wchar_t)))
++                pool = NULL;
++            else
++            {
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++            HANDLE h = OpenFileMappingW(FILE_MAP_WRITE | FILE_MAP_READ, FALSE, nameBuf_utf16);
++#else
++            HANDLE h = OpenFileMappingFromApp(FILE_MAP_WRITE | FILE_MAP_READ, FALSE, nameBuf_utf16);
++#endif
+             if (!h)
+             {
+-                h = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, shrMemSize, nameBuf);
+-
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++                h = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, shrMemSize, nameBuf_utf16);
++#else
++                h = CreateFileMappingFromApp(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, shrMemSize, nameBuf_utf16);
++#endif
+                 if (!h)
+                 {
+                     return false;
+@@ -148,11 +162,16 @@ namespace X265_NS {
+                 newCreated = true;
+             }
+ 
+-            void *pool = MapViewOfFile(h, FILE_MAP_ALL_ACCESS, 0, 0, 0);
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++            pool = MapViewOfFile(h, FILE_MAP_ALL_ACCESS, 0, 0, 0);
++#else
++            pool = MapViewOfFileFromApp(h, FILE_MAP_ALL_ACCESS, 0, 0);
++#endif
+ 
+             ///< should not close the handle here, otherwise the OpenFileMapping would fail
+             //CloseHandle(h);
+             m_handle = h;
++            }
+ 
+             if (!pool)
+             {
+-- 
+2.45.0.windows.1
+

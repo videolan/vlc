@@ -1,7 +1,7 @@
 # x265
 
 #X265_GITURL := https://github.com/videolan/x265
-X265_VERSION := 2.9
+X265_VERSION := 4.1
 X265_SNAPURL := https://bitbucket.org/multicoreware/x265_git/downloads/x265_$(X265_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
@@ -25,8 +25,8 @@ $(TARBALLS)/x265_$(X265_VERSION).tar.gz:
 x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(UNPACK)
 	$(APPLY) $(SRC)/x265/0001-fix-ldl-linking-error-of-x265.patch
-	$(APPLY) $(SRC)/x265/0002-do-not-copy-.pdb-files-that-don-t-exist.patch
 	$(APPLY) $(SRC)/x265/0003-add-patch-to-enable-detect512.patch
+	$(APPLY) $(SRC)/x265/0001-use-OpenFileMappingW-instead-of-OpenFileMappingA.patch
 	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
@@ -38,6 +38,5 @@ X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) -S $</source $(X265_CONF)
 	+$(CMAKEBUILD)
-	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(BUILD_DIR)/x265.pc"
 	$(CMAKEINSTALL)
 	touch $@
