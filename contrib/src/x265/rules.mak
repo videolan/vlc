@@ -30,9 +30,6 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/x265-no-pdb-install.patch
 	$(APPLY) $(SRC)/x265/x265-enable-detect512.patch
 	$(call pkg_static,"source/x265.pc.in")
-ifndef HAVE_WIN32
-	$(APPLY) $(SRC)/x265/x265-pkg-libs.patch
-endif
 	$(MOVE)
 
 X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
