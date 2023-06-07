@@ -1,0 +1,109 @@
+From d5f07f19fba444a2639cd93ddae0b2556d6fbb7e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 7 Jun 2023 10:39:09 +0200
+Subject: [PATCH] threadpool: disable group affinity in UWP builds
+
+GetNumaNodeProcessorMaskEx() is not allowed in any UWP builds.
+---
+ source/common/threadpool.cpp | 14 +++++++-------
+ source/common/threadpool.h   | 11 ++++++++++-
+ 2 files changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/source/common/threadpool.cpp b/source/common/threadpool.cpp
+index 91e82a24e..ab0b3b76a 100644
+--- a/source/common/threadpool.cpp
++++ b/source/common/threadpool.cpp
+@@ -71,7 +71,7 @@
+ # define strcasecmp _stricmp
+ #endif
+ 
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7
++#ifdef USE_WIN32_AFFINITY
+ const uint64_t m1 = 0x5555555555555555; //binary: 0101...
+ const uint64_t m2 = 0x3333333333333333; //binary: 00110011..
+ const uint64_t m3 = 0x0f0f0f0f0f0f0f0f; //binary:  4 zeros,  4 ones ...
+@@ -262,14 +262,14 @@ ThreadPool* ThreadPool::allocThreadPools(x265_param* p, int& numPools, bool isTh
+     int numNumaNodes = X265_MIN(getNumaNodeCount(), MAX_NODE_NUM);
+     bool bNumaSupport = false;
+ 
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7 
++#ifdef USE_WIN32_AFFINITY
+     bNumaSupport = true;
+ #elif HAVE_LIBNUMA
+     bNumaSupport = numa_available() >= 0;
+ #endif
+ 
+ 
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7
++#ifdef USE_WIN32_AFFINITY
+     PGROUP_AFFINITY groupAffinityPointer = new GROUP_AFFINITY;
+     for (int i = 0; i < numNumaNodes; i++)
+     {
+@@ -475,7 +475,7 @@ bool ThreadPool::create(int numThreads, int maxProviders, uint64_t nodeMask)
+ {
+     X265_CHECK(numThreads <= MAX_POOL_THREADS, "a single thread pool cannot have more than MAX_POOL_THREADS threads\n");
+ 
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7 
++#ifdef USE_WIN32_AFFINITY
+     memset(&m_groupAffinity, 0, sizeof(GROUP_AFFINITY));
+     for (int i = 0; i < getNumaNodeCount(); i++)
+     {
+@@ -568,7 +568,7 @@ void ThreadPool::setCurrentThreadAffinity()
+ 
+ void ThreadPool::setThreadNodeAffinity(void *numaMask)
+ {
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7 
++#ifdef USE_WIN32_AFFINITY
+     UNREFERENCED_PARAMETER(numaMask);
+     GROUP_AFFINITY groupAffinity;
+     memset(&groupAffinity, 0, sizeof(GROUP_AFFINITY));
+@@ -597,7 +597,7 @@ void ThreadPool::setThreadNodeAffinity(void *numaMask)
+ /* static */
+ int ThreadPool::getNumaNodeCount()
+ {
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7 
++#ifdef USE_WIN32_AFFINITY
+     ULONG num = 1;
+     if (GetNumaHighestNodeNumber(&num))
+         num++;
+@@ -615,7 +615,7 @@ int ThreadPool::getNumaNodeCount()
+ /* static */
+ int ThreadPool::getCpuCount()
+ {
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7
++#ifdef USE_WIN32_AFFINITY
+     enum { MAX_NODE_NUM = 127 };
+     int cpus = 0;
+     int numNumaNodes = X265_MIN(getNumaNodeCount(), MAX_NODE_NUM);
+diff --git a/source/common/threadpool.h b/source/common/threadpool.h
+index 867539f3a..d295a02bd 100644
+--- a/source/common/threadpool.h
++++ b/source/common/threadpool.h
+@@ -44,6 +44,15 @@ static const sleepbitmap_t ALL_POOL_THREADS = (sleepbitmap_t)-1;
+ enum { MAX_POOL_THREADS = sizeof(sleepbitmap_t) * 8 };
+ enum { INVALID_SLICE_PRIORITY = 10 }; // a value larger than any X265_TYPE_* macro
+ 
++#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7
++#include <winapifamily.h>
++# if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++// GetNumaNodeProcessorMaskEx is not available in UWP apps
++#  define USE_WIN32_AFFINITY 1
++# endif
++#endif
++
++
+ // Frame level job providers. FrameEncoder and Lookahead derive from
+ // this class and implement findJob()
+ class JobProvider
+@@ -84,7 +93,7 @@ public:
+     int           m_numProviders;
+     int           m_numWorkers;
+     void*         m_numaMask; // node mask in linux, cpu mask in windows
+-#if defined(_WIN32_WINNT) && _WIN32_WINNT >= _WIN32_WINNT_WIN7 
++#ifdef USE_WIN32_AFFINITY
+     GROUP_AFFINITY m_groupAffinity;
+ #endif
+     bool          m_isActive;
+-- 
+2.37.3.windows.1
+

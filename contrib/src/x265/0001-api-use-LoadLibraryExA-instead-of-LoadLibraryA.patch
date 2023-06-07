@@ -1,0 +1,47 @@
+From 2c465c6112734c6879d789dd6d679205b3ae7a17 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 7 Jun 2023 10:36:43 +0200
+Subject: [PATCH 1/2] api: use LoadLibraryExA instead of LoadLibraryA
+
+They were introduced in XP but only LoadLibraryExA is allowed in
+Universal Windows Platform 19H1 builds.
+
+Using LOAD_LIBRARY_SEARCH_DEFAULT_DIRS is equivalent to the behavior
+of LoadLibraryA.
+---
+ source/encoder/api.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/source/encoder/api.cpp b/source/encoder/api.cpp
+index 10031d109..46d84a75c 100644
+--- a/source/encoder/api.cpp
++++ b/source/encoder/api.cpp
+@@ -720,10 +720,10 @@ const x265_api* x265_api_get(int bitDepth)
+             g_recursion++;
+ 
+ #if _WIN32
+-        HMODULE h = LoadLibraryA(libname);
++        HMODULE h = LoadLibraryExA(libname, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+         if (!h)
+         {
+-            h = LoadLibraryA(multilibname);
++            h = LoadLibraryExA(multilibname, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+             reqDepth = bitDepth;
+         }
+         if (h)
+@@ -813,10 +813,10 @@ const x265_api* x265_api_query(int bitDepth, int apiVersion, int* err)
+             g_recursion++;
+ 
+ #if _WIN32
+-        HMODULE h = LoadLibraryA(libname);
++        HMODULE h = LoadLibraryExA(libname, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+         if (!h)
+         {
+-            h = LoadLibraryA(multilibname);
++            h = LoadLibraryExA(multilibname, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+             reqDepth = bitDepth;
+         }
+         if (h)
+-- 
+2.37.3.windows.1
+

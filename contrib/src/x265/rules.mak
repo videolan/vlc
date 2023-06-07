@@ -6,10 +6,14 @@ X265_SNAPURL := https://bitbucket.org/multicoreware/x265_git/downloads/x265_$(X2
 
 ifdef BUILD_ENCODERS
 ifdef GPL
-ifndef HAVE_WINSTORE # FIXME uses too many forbidden APIs
 PKGS += x265
 endif
 endif
+
+DEPS_x265 :=
+ifdef HAVE_WINSTORE
+# x265 uses LoadLibraryEx
+DEPS_x265 += alloweduwp $(DEPS_alloweduwp)
 endif
 
 ifeq ($(call need_pkg,"x265 >= 0.6"),)
@@ -29,6 +33,8 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
 	$(APPLY) $(SRC)/x265/x265-no-pdb-install.patch
 	$(APPLY) $(SRC)/x265/x265-enable-detect512.patch
+	$(APPLY) $(SRC)/x265/0001-api-use-LoadLibraryExA-instead-of-LoadLibraryA.patch
+	$(APPLY) $(SRC)/x265/0001-threadpool-disable-group-affinity-in-UWP-builds.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
