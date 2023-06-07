@@ -34,7 +34,7 @@ xiph_test = executable('xiph_test',
     files('xiph_test.c'),
     include_directories: [vlc_include_dirs])
 
-test('xiph_test', hpack_test, suite: 'demux')
+test('xiph_test', xiph_test, suite: 'demux')
 
 # Demux dump
 vlc_modules += {
