@@ -24,17 +24,17 @@
 
 @implementation NSFont (VLCAdditions)
 
-+ (instancetype)VLClibrarySectionHeaderFont
++ (NSFont *)VLClibrarySectionHeaderFont
 {
     return [NSFont systemFontOfSize:24. weight:NSFontWeightBold];
 }
 
-+ (instancetype)VLCLibrarySubsectionHeaderFont
++ (NSFont *)VLCLibrarySubsectionHeaderFont
 {
     return [NSFont systemFontOfSize:17. weight:NSFontWeightSemibold];
 }
 
-+ (instancetype)VLCLibrarySubsectionSubheaderFont
++ (NSFont *)VLCLibrarySubsectionSubheaderFont
 {
     return [NSFont systemFontOfSize:15. weight:NSFontWeightMedium];
 }

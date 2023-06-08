@@ -26,9 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSFont (VLCAdditions)
 
-+ (instancetype)VLClibrarySectionHeaderFont;
-+ (instancetype)VLCLibrarySubsectionHeaderFont;
-+ (instancetype)VLCLibrarySubsectionSubheaderFont;
+@property (class, readonly) NSFont *VLClibrarySectionHeaderFont;
+@property (class, readonly) NSFont *VLCLibrarySubsectionHeaderFont;
+@property (class, readonly) NSFont *VLCLibrarySubsectionSubheaderFont;
 
 @end
 
