@@ -33,11 +33,11 @@ extern NSString *VLCLibraryCellIdentifier;
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
 // NOTE: These will need to be changed after changes to XIB
-+ (const NSSize)defaultSize;
-+ (const NSSize)defaultVideoItemSize;
-+ (const CGFloat)defaultWidth;
-+ (const CGFloat)bottomTextViewsHeight;
-+ (const CGFloat)videoHeightAspectRatioMultiplier;
+@property (class, readonly) const NSSize defaultSize;
+@property (class, readonly) const NSSize defaultVideoItemSize;
+@property (class, readonly) const CGFloat defaultWidth;
+@property (class, readonly) const CGFloat bottomTextViewsHeight;
+@property (class, readonly) const CGFloat videoHeightAspectRatioMultiplier;
 
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
