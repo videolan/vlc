@@ -98,29 +98,33 @@ T.Pane {
 
     contentItem: ColumnLayout {
         spacing: VLCStyle.margin_xsmall
-        z: 1
 
-        RowLayout {
-            id: row1
+        Item {
+            // BUG: RowLayout can not be used here
+            // because of a Qt bug. (Height is
+            // incorrectly determined. Could be
+            // about nested layouting).
+
+            id: pseudoRow
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+            Layout.leftMargin: VLCStyle.margin_normal
+            Layout.rightMargin: VLCStyle.margin_normal
+
+            implicitHeight: visible ? Math.max(mediaTime.implicitHeight, mediaRemainingTime.implicitHeight) : 0
+
+            visible: children.length > 0
 
             children: {
                 switch (textPosition) {
                 case ControlBar.TimeTextPosition.AboveSlider:
-                    return [mediaTime, spacer, mediaRemainingTime]
+                    return [mediaTime, mediaRemainingTime]
                 case ControlBar.TimeTextPosition.Hide:
                 case ControlBar.TimeTextPosition.LeftRightSlider:
                 default:
                     return []
                 }
             }
-
-            visible: children.length > 0
-
-            spacing: 0
-            Layout.fillWidth: true
-            Layout.fillHeight: false
-            Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: VLCStyle.margin_normal
         }
 
         RowLayout {
@@ -173,6 +177,9 @@ T.Pane {
             color: theme.fg.primary
             font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
                                                                                            : VLCStyle.fontSize_normal
+
+            anchors.left: (parent === pseudoRow) ? parent.left : undefined
+            anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
         },
         T.Label {
             id: mediaRemainingTime
@@ -183,15 +190,13 @@ T.Pane {
             color: mediaTime.color
             font.pixelSize: mediaTime.font.pixelSize
 
+            anchors.right: (parent === pseudoRow) ? parent.right : undefined
+            anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
+
             MouseArea {
                 anchors.fill: parent
                 onClicked: MainCtx.showRemainingTime = !MainCtx.showRemainingTime
             }
-        },
-        Item {
-            id: spacer
-
-            Layout.fillWidth: true
         },
         SliderBar {
             id: trackPositionSlider
