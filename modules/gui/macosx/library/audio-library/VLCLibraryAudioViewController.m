@@ -254,7 +254,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     _audioCollectionSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioLibraryGridModeSplitViewListTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
-    _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
+    _audioGroupSelectionTableView.rowHeight = VLCLibraryAlbumTableCellView.defaultHeight;
 
     const NSEdgeInsets defaultContentInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
     const CGFloat topAudioScrollViewContentInset = defaultContentInsets.top + _optionBarView.frame.size.height;
