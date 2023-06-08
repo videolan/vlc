@@ -539,9 +539,14 @@ if host_system == 'windows'
 endif
 
 if qt5_dep.found()
+    qt5pre_qrc = qt5.preprocess(
+        qresources: qrc_files,
+        include_directories: qt_include_dir,
+        dependencies: qt5_dep)
+
+
     qt5pre_files = qt5.preprocess(ui_files: ui_sources,
         moc_headers: moc_headers,
-        qresources: qrc_files,
         include_directories: qt_include_dir,
         dependencies: qt5_dep)
 
@@ -681,11 +686,23 @@ if qt5_dep.found()
 
     vlc_modules += {
         'name' : 'qt',
-        'sources' : [qt5pre_files, qt_sources, some_sources],
+        'sources' : [qt5pre_files, qt5pre_qrc, qt_sources, some_sources],
         'dependencies' : [qt5_dep, qt_extra_deps],
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
         'cpp_args' : [qt_extra_flags, qt_cppargs]
     }
 
+    test_qt5_dep = dependency('qt5', modules: ['QuickTest'], required: false)
+    if test_qt5_dep.found()
+        qml_test = executable(
+          'qml_test',
+          files('tests/qml_test.cpp'),
+          qt5pre_qrc,
+          build_by_default: false,
+          dependencies: [test_qt5_dep],
+          cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
+        )
+        test('qml_test', qml_test, suite:'qt')
+    endif
 endif

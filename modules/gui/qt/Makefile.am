@@ -1140,4 +1140,21 @@ if !HAVE_OS2
 pkglibexec_PROGRAMS += vlc-qt-check
 endif
 endif
+
+if HAVE_QT5_QUICK_TEST
+
+qml_test_SOURCES = gui/qt/tests/qml_test.cpp
+nodist_qml_test_SOURCES = gui/qt/resources.cpp
+if HAVE_QMLCACHE
+nodist_qml_test_SOURCES += gui/qt/qmlcache_loader.cpp $(libqt_plugin_la_QML)
+endif
+qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT5_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/gui/qt/tests\""
+qml_test_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS}
+check_PROGRAMS += qml_test
+EXTRA_DIST += gui/qt/tests/tst_FSM.qml
+
+TESTS += qml_test
+
+endif
+
 endif

@@ -3951,6 +3951,7 @@ AC_ARG_ENABLE([qt],
 ])
 have_qt5_x11="no"
 have_qt5_gtk="no"
+have_qt5_quick_test="no"
 AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], [Qt5Core >= 5.12.0 Qt5Widgets Qt5Gui Qt5Quick Qt5QuickWidgets Qt5QuickControls2 Qt5Svg], [
       PKG_CHECK_MODULES([QT5_X11], [Qt5X11Extras], [
@@ -3963,6 +3964,11 @@ AS_IF([test "${enable_qt}" != "no"], [
           have_qt5_wayland="yes"
       ],[
           AC_MSG_WARN([Not building Qt Interface with wayland support.])
+      ])
+
+      PKG_CHECK_MODULES([QT5_QUICK_TEST], [Qt5QuickTest], [
+          have_qt5_quick_test="yes"
+      ],[
       ])
 
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix Qt5Core)"
@@ -4069,6 +4075,7 @@ AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_WAYLAND], [test "${have_qt5_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_GTK], [test "${have_qt5_gtk}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_DECLARATIVE_PRIVATE], [test "${have_declarative_private}" = "yes"])
+AM_CONDITIONAL([HAVE_QT5_QUICK_TEST], [test "${have_qt5_quick_test}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
