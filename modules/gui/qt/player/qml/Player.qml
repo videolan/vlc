@@ -216,19 +216,6 @@ FocusScope {
         }
     }
 
-    // Backgrounds of topControlbar and controlBar are drawn separately since they can outgrow their content
-    Component {
-        id: backgroundForPinnedControls
-
-        Rectangle {
-            width: rootPlayer.width
-
-            opacity: MainCtx.pinOpacity
-
-            color: windowTheme.bg.primary
-        }
-    }
-
     Component {
         id: acrylicBackground
 
@@ -281,49 +268,22 @@ FocusScope {
         }
     }
 
-    /* bottom control bar background */
-    Widgets.LoaderFade {
+    Rectangle {
         anchors.bottom: controlBarView.bottom
         anchors.left: controlBarView.left
         anchors.right: controlBarView.right
 
-        height: item.height
+        implicitHeight: VLCStyle.dp(206, VLCStyle.scale)
 
-        state: controlBarView.state
+        opacity: controlBarView.opacity
 
-        sourceComponent: (MainCtx.pinVideoControls)
-                         ? backgroundForPinnedControls
-                         : (rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia)
-
-        onItemChanged: {
-            if (rootPlayer._controlsUnderVideo)
-                item.height = Qt.binding(function () { return rootPlayer.height - rootPlayer.positionSliderY; })
+        gradient: Gradient {
+            GradientStop { position: 0; color: "transparent" }
+            GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
+            GradientStop { position: 1; color: "black" }
         }
 
-        Component {
-            id: forVideoMedia
-
-            Rectangle {
-                width: rootPlayer.width
-                height: VLCStyle.dp(206, VLCStyle.scale)
-                gradient: Gradient {
-                    GradientStop { position: 0; color: "transparent" }
-                    GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
-                    GradientStop { position: 1; color: "black" }
-                }
-            }
-        }
-
-        Component {
-            id: forMusicMedia
-
-            Rectangle {
-                width: controlBarView.width
-                height: controlBarView.height - (rootPlayer.positionSliderY - controlBarView.y)
-                color: windowTheme.bg.primary
-                opacity: 0.7
-            }
-        }
+        visible: (controlBarView.item ? !controlBarView.item.background.visible : true)
     }
 
     Widgets.LoaderFade {
@@ -677,9 +637,17 @@ FocusScope {
             identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
                                                 : PlayerControlbarModel.Audioplayer
 
-            background: null
-
             onHoveredChanged: rootPlayer.lockUnlockAutoHide(hovered)
+
+            background: Rectangle {
+                id: controlBarBackground
+
+                visible: !MainCtx.hasEmbededVideo
+
+                opacity: MainCtx.pinVideoControls ? MainCtx.pinOpacity : 0.7
+
+                color: windowTheme.bg.primary
+            }
         }
     }
 

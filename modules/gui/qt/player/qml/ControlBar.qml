@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -44,6 +45,11 @@ T.Pane {
                              contentHeight + topPadding + bottomPadding)
 
     bottomPadding: VLCStyle.margin_xsmall
+
+    BindingCompat on topInset {
+        delayed: true
+        value: row2.y
+    }
 
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
