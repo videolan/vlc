@@ -38,7 +38,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 {
     self = [super initWithFrame:frameRect];
     if (self) {
-        self.font = [NSFont VLClibrarySectionHeaderFont];
+        self.font = NSFont.VLClibrarySectionHeaderFont;
         self.textColor = self.shouldShowDarkAppearance ? NSColor.VLClibraryDarkTitleColor : NSColor.VLClibraryLightTitleColor;
         self.editable = NO;
         self.selectable = NO;

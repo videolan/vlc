@@ -51,7 +51,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
     _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsTableViewDelegate;
     
-    _audioGroupNameTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
+    _audioGroupNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self

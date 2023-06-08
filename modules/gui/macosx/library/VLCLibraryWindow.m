@@ -230,7 +230,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
-    self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
+    self.upNextLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.upNextLabel.stringValue = _NS("Playlist");
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
