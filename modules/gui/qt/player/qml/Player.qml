@@ -656,47 +656,30 @@ FocusScope {
                 item.showChapterMarks()
         }
 
-        sourceComponent: MouseArea {
-            id: controllerMouseArea
-
-            readonly property alias sliderY: controllerId.sliderY
-
-            implicitHeight: controllerId.implicitHeight
-            implicitWidth: controllerId.implicitWidth
-
+        sourceComponent: ControlBar {
             hoverEnabled: true
 
-            function showChapterMarks() {
-                controllerId.showChapterMarks()
-            }
+            focus: true
 
-            onContainsMouseChanged: rootPlayer.lockUnlockAutoHide(containsMouse)
+            rightPadding: VLCStyle.applicationHorizontalMargin
+            leftPadding: VLCStyle.applicationHorizontalMargin
+            bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
 
-            ControlBar {
-                id: controllerId
+            textPosition: (MainCtx.pinVideoControls)
+                          ? ControlBar.TimeTextPosition.LeftRightSlider
+                          : ControlBar.TimeTextPosition.AboveSlider
 
-                focus: true
+            Navigation.parentItem: rootPlayer
+            Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
 
-                anchors.fill: parent
+            onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
 
-                rightPadding: VLCStyle.applicationHorizontalMargin
-                leftPadding: VLCStyle.applicationHorizontalMargin
-                bottomPadding: VLCStyle.applicationVerticalMargin + VLCStyle.margin_xsmall
+            identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
+                                                : PlayerControlbarModel.Audioplayer
 
-                textPosition: (MainCtx.pinVideoControls)
-                              ? ControlBar.TimeTextPosition.LeftRightSlider
-                              : ControlBar.TimeTextPosition.AboveSlider
+            background: null
 
-                Navigation.parentItem: rootPlayer
-                Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
-
-                onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
-
-                identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
-                                                    : PlayerControlbarModel.Audioplayer
-
-                background: null
-            }
+            onHoveredChanged: rootPlayer.lockUnlockAutoHide(hovered)
         }
     }
 
