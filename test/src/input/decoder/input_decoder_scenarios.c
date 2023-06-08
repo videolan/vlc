@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input_decoder_scenario.c: testflight for input_decoder state machine
  *****************************************************************************
- * Copyright (C) 2022 VideoLabs
+ * Copyright (C) 2022-2023 VideoLabs
  *
  * Author: Alexandre Janniaux <ajanni@videolabs.io>
  *
@@ -30,6 +30,7 @@
 #include <vlc_messages.h>
 #include <vlc_player.h>
 #include <vlc_interface.h>
+#include <vlc_frame.h>
 #include <vlc_codec.h>
 #include <vlc_vout_display.h>
 
@@ -317,11 +318,37 @@ static int sout_filter_send(sout_stream_t *stream, void *id, block_t *block)
     return VLC_SUCCESS;
 }
 
+static int sout_filter_wait_cc(sout_stream_t *stream, void *id, block_t *block)
+{
+    (void)stream; (void)id;
+    block_Release(block);
+    vlc_fourcc_t *codec = id;
+    if (*codec == VLC_CODEC_CEA608)
+    {
+        scenario_data.stream_out_sent = true;
+        vlc_sem_post(&scenario_data.wait_ready_to_flush);
+    }
+    return VLC_SUCCESS;
+}
+
 static void sout_filter_flush(sout_stream_t *stream, void *id)
 {
     (void)stream; (void)id;
     assert(scenario_data.stream_out_sent);
     vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    (void)dec;
+
+    cc_desc->i_608_channels = 1;
+    cc_desc->i_reorder_depth = -1;
+
+    vlc_frame_t *f =  vlc_frame_Alloc(1);
+    assert(f != NULL);
+
+    return f;
 }
 
 const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
@@ -371,6 +398,14 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_trigger_reload,
     .decoder_destroy = decoder_destroy_trigger_update,
+},
+{
+    .source = source_800_600,
+    .sout = "#" MODULE_STRING,
+    .packetizer_getcc = packetizer_getcc,
+    .sout_filter_send = sout_filter_wait_cc,
+    .sout_filter_flush = sout_filter_flush,
+    .interface_setup = interface_setup_check_flush,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 

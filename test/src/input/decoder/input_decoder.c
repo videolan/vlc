@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input_decoder.c: test for vlc_input_decoder state machine
  *****************************************************************************
- * Copyright (C) 2022 VideoLabs
+ * Copyright (C) 2022-2023 VideoLabs
  *
  * Author: Alexandre Janniaux <ajanni@videolabs.io>
  *
@@ -112,6 +112,39 @@ static void CloseDecoder(vlc_object_t *obj)
         vlc_video_context_Release(vctx);
 }
 
+static vlc_frame_t *PacketizerPacketize(decoder_t *dec, vlc_frame_t **in)
+{
+    (void)dec;
+    if (in == NULL)
+        return NULL;
+
+    vlc_frame_t *ret = *in;
+    if (ret != NULL)
+        *in = NULL;
+    return ret;
+}
+
+static vlc_frame_t *PacketizerGetCC(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->packetizer_getcc != NULL)
+        return scenario->packetizer_getcc(dec, cc_desc);
+    return NULL;
+}
+
+static int OpenPacketizer(vlc_object_t *obj)
+{
+    decoder_t *dec = (decoder_t*)obj;
+
+    dec->pf_packetize = PacketizerPacketize;
+    dec->pf_get_cc = PacketizerGetCC;
+    dec->pf_flush = NULL;
+    es_format_Clean(&dec->fmt_out);
+    es_format_Copy(&dec->fmt_out, dec->fmt_in);
+
+    return VLC_SUCCESS;
+}
+
 static int OpenDecoder(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t*)obj;
@@ -121,6 +154,7 @@ static int OpenDecoder(vlc_object_t *obj)
     vlc_decoder_device_Release(device);
 
     dec->pf_decode = DecoderDecode;
+    dec->pf_get_cc = NULL;
     dec->pf_flush = DecoderFlush;
     es_format_Clean(&dec->fmt_out);
     es_format_Copy(&dec->fmt_out, dec->fmt_in);
@@ -179,9 +213,10 @@ static int OpenWindow(vlc_window_t *wnd)
 static void *SoutFilterAdd(sout_stream_t *stream, const es_format_t *fmt,
                            const char *es_id)
 {
-    (void)stream; (void)fmt; (void)es_id;
-    void *id = malloc(1);
+    (void)stream; (void)es_id;
+    vlc_fourcc_t *id = malloc(sizeof(*id));
     assert(id != NULL);
+    *id = fmt->i_codec;
     return id;
 }
 
@@ -207,6 +242,15 @@ static void SoutFilterFlush(sout_stream_t *stream, void *id)
         scenario->sout_filter_flush(stream, id);
 }
 
+static int SoutFilterControl(sout_stream_t *stream, int query, va_list args)
+{
+    (void)stream;
+    if (query != SOUT_STREAM_WANTS_SUBSTREAMS)
+        return VLC_EGENERIC;
+    *va_arg(args, bool *) = true;
+    return VLC_SUCCESS;
+}
+
 static int OpenSoutFilter(vlc_object_t *obj)
 {
     sout_stream_t *stream = (sout_stream_t *)obj;
@@ -215,6 +259,7 @@ static int OpenSoutFilter(vlc_object_t *obj)
         .del = SoutFilterDel,
         .send = SoutFilterSend,
         .flush = SoutFilterFlush,
+        .control = SoutFilterControl,
     };
     stream->ops = &ops;
     return VLC_SUCCESS;
@@ -310,6 +355,10 @@ vlc_module_begin()
     add_submodule()
         set_callbacks(OpenDecoder, CloseDecoder)
         set_capability("video decoder", INT_MAX)
+
+    add_submodule()
+        set_callback(OpenPacketizer)
+        set_capability("packetizer", INT_MAX)
 
     add_submodule()
         set_callback(OpenWindow)

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input_decoder.h: test for input_decoder state machine
  *****************************************************************************
- * Copyright (C) 2022 VideoLabs
+ * Copyright (C) 2022-2023 VideoLabs
  *
  * Author: Alexandre Janniaux <ajanni@videolabs.io>
  *
@@ -27,6 +27,7 @@
 
 typedef struct vout_display_t vout_display_t;
 typedef struct intf_thread_t intf_thread_t;
+typedef struct decoder_cc_desc_t decoder_cc_desc_t;
 
 struct input_decoder_scenario {
     const char *source;
@@ -34,6 +35,7 @@ struct input_decoder_scenario {
     void (*decoder_setup)(decoder_t *);
     void (*decoder_destroy)(decoder_t *);
     int (*decoder_decode)(decoder_t *, picture_t *);
+    vlc_frame_t * (*packetizer_getcc)(decoder_t *, decoder_cc_desc_t *);
     void (*decoder_flush)(decoder_t *);
     void (*display_prepare)(vout_display_t *vd, picture_t *pic);
     void (*interface_setup)(intf_thread_t *intf);
