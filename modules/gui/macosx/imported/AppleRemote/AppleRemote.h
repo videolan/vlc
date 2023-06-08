@@ -148,7 +148,7 @@ The class is not thread safe
 
 @interface AppleRemote (Singleton)
 
-+ (AppleRemote*) sharedRemote;
+@property (class, readonly) AppleRemote *sharedRemote;
 
 @end
 

@@ -643,14 +643,14 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     }
 }
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
-    [[AppleRemote sharedRemote] setListeningToRemote: YES];
+    [AppleRemote.sharedRemote setListeningToRemote: YES];
 
     if ([applicationDelegate respondsToSelector: @selector(applicationDidBecomeActive:)]) {
         [applicationDelegate applicationDidBecomeActive: aNotification];
     }
 }
 - (void)applicationWillResignActive:(NSNotification *)aNotification {
-    [[AppleRemote sharedRemote] setListeningToRemote: NO];
+    [AppleRemote.sharedRemote setListeningToRemote: NO];
 
     if ([applicationDelegate respondsToSelector: @selector(applicationWillResignActive:)]) {
         [applicationDelegate applicationWillResignActive: aNotification];
