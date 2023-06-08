@@ -1,0 +1,49 @@
+From 43a0870bbb4cfba5d3c9472f04ea9a31dc39a527 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 8 Jun 2023 09:13:36 +0200
+Subject: [PATCH 4/5] win32: use CreateFile2 when compiling for Win8+
+
+The API is always available in Win8+ even in UWP builds, unlike CreateFileW.
+The API is pretty much the same. CONOUT is also supported [1].
+
+[1] https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2#consoles
+---
+ caca/driver/win32.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/caca/driver/win32.c b/caca/driver/win32.c
+index 40aeeed..0c84470 100644
+--- a/caca/driver/win32.c
++++ b/caca/driver/win32.c
+@@ -104,6 +104,9 @@ static int win32_init_graphics(caca_display_t *dp)
+     CONSOLE_CURSOR_INFO cci_screen;
+     SMALL_RECT rect;
+     COORD size;
++#if _WIN32_WINNT >= 0x0602 /* _WIN32_WINNT_WIN8 */
++    CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++#endif
+ 
+     dp->drv.p = malloc(sizeof(struct driver_private));
+ 
+@@ -111,9 +114,18 @@ static int win32_init_graphics(caca_display_t *dp)
+     dp->drv.p->new_console = AllocConsole();
+ 
+     dp->drv.p->hin = GetStdHandle(STD_INPUT_HANDLE);
++#if _WIN32_WINNT >= 0x0602 /* _WIN32_WINNT_WIN8 */
++    ZeroMemory(&createExParams, sizeof(createExParams));
++    createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++    createExParams.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
++    dp->drv.p->hout = CreateFile2(L"CONOUT$", GENERIC_READ | GENERIC_WRITE,
++                                 FILE_SHARE_READ | FILE_SHARE_WRITE,
++                                 OPEN_EXISTING, &createExParams);
++#else
+     dp->drv.p->hout = CreateFile("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+                                  FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
++#endif
+     if(dp->drv.p->hout == INVALID_HANDLE_VALUE)
+         return -1;
+ 
+-- 
+2.37.3.windows.1
+

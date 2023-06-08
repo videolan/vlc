@@ -4,9 +4,7 @@ CACA_URL := $(GITHUB)/cacalabs/libcaca/releases/download/v$(CACA_VERSION)/libcac
 
 ifndef HAVE_DARWIN_OS
 ifndef HAVE_LINUX # see VLC Trac 17251
-ifndef HAVE_WINSTORE # FIXME uses ANSI calls improperly
 PKGS += caca
-endif
 endif
 endif
 
@@ -23,6 +21,11 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(UNPACK)
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
+	$(APPLY) $(SRC)/caca/0001-win32-don-t-for-_WIN32_WINNT-to-Win2K.patch
+	$(APPLY) $(SRC)/caca/0002-win32-don-t-redefine-GetCurrentConsoleFont-with-ming.patch
+	$(APPLY) $(SRC)/caca/0003-win32-use-ANSI-calls-explicitly.patch
+	$(APPLY) $(SRC)/caca/0004-win32-use-CreateFile2-when-compiling-for-Win8.patch
+	$(APPLY) $(SRC)/caca/0005-canvas-use-GetCurrentProcessId-on-Windows.patch
 	$(call pkg_static,"caca/caca.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

@@ -1,0 +1,26 @@
+From 3b4670c82c650fb9aff07bdd9b98896821d6a2d0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 8 Jun 2023 09:09:18 +0200
+Subject: [PATCH 3/5] win32: use ANSI calls explicitly
+
+If the environment forces the UNICODE define it will use the wrong call.
+---
+ caca/driver/win32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/caca/driver/win32.c b/caca/driver/win32.c
+index 9509172..40aeeed 100644
+--- a/caca/driver/win32.c
++++ b/caca/driver/win32.c
+@@ -196,7 +196,7 @@ static int win32_end_graphics(caca_display_t *dp)
+ 
+ static int win32_set_display_title(caca_display_t *dp, char const *title)
+ {
+-    SetConsoleTitle(title);
++    SetConsoleTitleA(title);
+     return 0;
+ }
+ 
+-- 
+2.37.3.windows.1
+

@@ -1,0 +1,43 @@
+From d78bdde484524c737c9285d5332cf5e7dbbf9a56 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 8 Jun 2023 09:15:53 +0200
+Subject: [PATCH 5/5] canvas: use GetCurrentProcessId() on Windows
+
+getpid() or _getpid() are not available in UWP builds [1] but we can use
+GetCurrentProcessId() instead.
+
+[1] https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps#unsupported-crt-functions
+---
+ caca/canvas.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/caca/canvas.c b/caca/canvas.c
+index 7beff5b..c7021d8 100644
+--- a/caca/canvas.c
++++ b/caca/canvas.c
+@@ -27,6 +27,10 @@
+ #       include <unistd.h>
+ #   endif
+ #endif
++#ifdef _WIN32
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#endif
+ 
+ #include "caca.h"
+ #include "caca_internals.h"
+@@ -351,7 +355,11 @@ int caca_rand(int min, int max)
+ 
+     if(need_init)
+     {
++#ifdef _WIN32
++        srand(GetCurrentProcessId() + _caca_getticks(&timer));
++#else
+         srand(getpid() + _caca_getticks(&timer));
++#endif
+         need_init = 0;
+     }
+ 
+-- 
+2.37.3.windows.1
+
