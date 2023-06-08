@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSColor (VLCAdditions)
 
 @property (class, readonly) NSColor *VLCAccentColor;
-@property (class, readonly) NSColor *VLCOrangeElementColor;
 @property (class, readonly) NSColor *VLClibraryLightTitleColor;
 @property (class, readonly) NSColor *VLClibraryDarkTitleColor;
 @property (class, readonly) NSColor *VLClibrarySubtitleColor;
@@ -36,10 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) NSColor *VLClibrarySeparatorLightColor;
 @property (class, readonly) NSColor *VLClibrarySeparatorDarkColor;
 @property (class, readonly) NSColor *VLClibraryProgressIndicatorBackgroundColor;
-@property (class, readonly) NSColor *VLClibraryItemBorderLightColor;
-@property (class, readonly) NSColor *VLClibraryItemBorderDarkColor;
-@property (class, readonly) NSColor *VLClibraryCollectionViewItemBackgroundLightColor;
-@property (class, readonly) NSColor *VLClibraryCollectionViewItemBackgroundDarkColor;
 @property (class, readonly) NSColor *VLCSliderFillColor;
 @property (class, readonly) NSColor *VLCSliderLightBackgroundColor;
 @property (class, readonly) NSColor *VLCSliderDarkBackgroundColor;

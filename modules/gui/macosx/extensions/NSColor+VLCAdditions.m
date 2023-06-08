@@ -78,29 +78,9 @@
     return [NSColor colorWithRed:37./255. green:41./255. blue:44./255. alpha:.8];
 }
 
-+ (NSColor *)VLClibraryItemBorderLightColor
-{
-    return [NSColor colorWithRed:0.89 green:0.89 blue:0.91 alpha:1.];
-}
-
-+ (NSColor *)VLClibraryItemBorderDarkColor
-{
-    return [NSColor colorWithRed:0.48 green:0.48 blue:0.48 alpha:1.];
-}
-
-+ (NSColor *)VLClibraryCollectionViewItemBackgroundLightColor
-{
-    return [NSColor colorWithRed:0.23 green:0.23 blue:0.23 alpha:1.];
-}
-
-+ (NSColor *)VLClibraryCollectionViewItemBackgroundDarkColor
-{
-    return [NSColor colorWithRed:0.23 green:0.23 blue:0.23 alpha:1.];
-}
-
 + (NSColor *)VLCSliderFillColor
 {
-    return [NSColor VLCAccentColor];
+    return NSColor.VLCAccentColor;
 }
 
 
