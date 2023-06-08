@@ -26,24 +26,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSColor (VLCAdditions)
 
-+ (instancetype)VLCAccentColor;
-+ (instancetype)VLCOrangeElementColor;
-+ (instancetype)VLClibraryLightTitleColor;
-+ (instancetype)VLClibraryDarkTitleColor;
-+ (instancetype)VLClibrarySubtitleColor;
-+ (instancetype)VLClibraryAnnotationColor;
-+ (instancetype)VLClibraryAnnotationBackgroundColor;
-+ (instancetype)VLClibrarySeparatorLightColor;
-+ (instancetype)VLClibrarySeparatorDarkColor;
-+ (instancetype)VLClibraryProgressIndicatorBackgroundColor;
-+ (instancetype)VLClibraryItemBorderLightColor;
-+ (instancetype)VLClibraryItemBorderDarkColor;
-+ (instancetype)VLClibraryCollectionViewItemBackgroundLightColor;
-+ (instancetype)VLClibraryCollectionViewItemBackgroundDarkColor;
-+ (instancetype)VLCSliderFillColor;
-+ (instancetype)VLCSliderLightBackgroundColor;
-+ (instancetype)VLCSliderDarkBackgroundColor;
-
+@property (class, readonly) NSColor *VLCAccentColor;
+@property (class, readonly) NSColor *VLCOrangeElementColor;
+@property (class, readonly) NSColor *VLClibraryLightTitleColor;
+@property (class, readonly) NSColor *VLClibraryDarkTitleColor;
+@property (class, readonly) NSColor *VLClibrarySubtitleColor;
+@property (class, readonly) NSColor *VLClibraryAnnotationColor;
+@property (class, readonly) NSColor *VLClibraryAnnotationBackgroundColor;
+@property (class, readonly) NSColor *VLClibrarySeparatorLightColor;
+@property (class, readonly) NSColor *VLClibrarySeparatorDarkColor;
+@property (class, readonly) NSColor *VLClibraryProgressIndicatorBackgroundColor;
+@property (class, readonly) NSColor *VLClibraryItemBorderLightColor;
+@property (class, readonly) NSColor *VLClibraryItemBorderDarkColor;
+@property (class, readonly) NSColor *VLClibraryCollectionViewItemBackgroundLightColor;
+@property (class, readonly) NSColor *VLClibraryCollectionViewItemBackgroundDarkColor;
+@property (class, readonly) NSColor *VLCSliderFillColor;
+@property (class, readonly) NSColor *VLCSliderLightBackgroundColor;
+@property (class, readonly) NSColor *VLCSliderDarkBackgroundColor;
 @property (class, readonly) NSColor *VLCSubtleBorderColor;
 
 @end
