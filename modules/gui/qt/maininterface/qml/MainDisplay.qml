@@ -47,8 +47,7 @@ FocusScope {
     property bool hasMiniPlayer: miniPlayer.visible
 
     // NOTE: The main view must be above the indexing bar and the mini player.
-    property int displayMargin: (loaderProgress.active) ? miniPlayer.height + loaderProgress.height
-                                                        : miniPlayer.height
+    property real displayMargin: (height - miniPlayer.y) + (loaderProgress.active ? loaderProgress.height : 0)
 
     readonly property int positionSliderY: {
         var size = miniPlayer.y + miniPlayer.sliderY
@@ -59,7 +58,6 @@ FocusScope {
             return size
     }
 
-    property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
 
@@ -195,7 +193,6 @@ FocusScope {
 
 
     function showPlayer() {
-        g_mainDisplay._inhibitMiniPlayer = true
         History.push(["player"])
     }
 
@@ -248,13 +245,7 @@ FocusScope {
                 tint: frostedTheme.bg.secondary
 
                 effectRect: {
-                    let _height = 0
-                    if (loaderProgress.active && loaderProgress.item.visible)
-                        _height += loaderProgress.item.height
-                    if (miniPlayer.visible)
-                        _height += miniPlayer.height
-
-                    return Qt.rect(0, height - _height, width, _height)
+                    return Qt.rect(0, loaderProgress.y, width, height -  loaderProgress.y)
                 }
             }
 
@@ -484,6 +475,8 @@ FocusScope {
 
             active: (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
 
+            height: active ? implicitHeight : 0
+
             source: "qrc:///widgets/ScanProgressBar.qml"
 
             onLoaded: {
@@ -507,8 +500,8 @@ FocusScope {
             width: VLCStyle.dp(320, VLCStyle.scale)
             height: VLCStyle.dp(180, VLCStyle.scale)
             z: 2
-            visible: !g_mainDisplay._inhibitMiniPlayer && g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
-            enabled: !g_mainDisplay._inhibitMiniPlayer && g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+            visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+            enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
 
             dragXMin: 0
             dragXMax: g_mainDisplay.width - playerPip.width
@@ -542,11 +535,6 @@ FocusScope {
 
         P.MiniPlayer {
             id: miniPlayer
-
-            BindingCompat on state {
-                when: g_mainDisplay._inhibitMiniPlayer && !miniPlayer.visible
-                value: ""
-            }
 
             anchors.left: parent.left
             anchors.right: parent.right

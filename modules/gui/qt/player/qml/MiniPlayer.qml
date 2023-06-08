@@ -18,18 +18,27 @@
 import QtQuick 2.12
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 
 ControlBar {
     id: root
 
-    height: 0
+    // Binding evaluation order:
+    // state -> implicitHeight OR visible -> anchors.bottomMargin
+    // Care must be taken to not cause binding loops.
+    visible: {
+        if (state === "inViewport")
+            return true
+        else if ((anchors.bottomMargin + implicitHeight) > Number.EPSILON)
+            return true
+        else
+            return false
+    }
 
-    visible: false
-
-    state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
-                                                                  : "expanded"
+    state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? "outViewport"
+                                                                  : "inViewport"
 
     textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
                                              : ControlBar.TimeTextPosition.Hide
@@ -42,24 +51,27 @@ ControlBar {
 
     identifier: PlayerControlbarModel.Miniplayer
 
-    states: State {
-        name: "expanded"
-
-        PropertyChanges {
-            target: root
-            visible: true
-            height: implicitHeight
-        }
+    Component.onCompleted: {
+        // Enable the behavior only when everything is resolved:
+        Qt.callLater(() => { behavior.enabled = true })
     }
 
-    transitions: Transition {
-        from: ""; to: "expanded"
-        reversible: true
+    BindingCompat on anchors.bottomMargin {
+        id: binding
 
-        SequentialAnimation {
-            // visible should change first, in order for inner layouts to calculate implicitHeight correctly
-            PropertyAction { property: "visible" }
-            NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
-        }
+        // eliminate intermediate adjustments until implicit height is calculated fully
+        // we can not delay on component load because we do not want twitching
+        // NOTE: The delay here can be removed, as long as a direct height is set
+        //       for the whole control instead of implicit height.
+        delayed: behavior.enabled
+
+        value: (root.state === "outViewport") ? -root.implicitHeight : 0
+    }
+
+    Behavior on anchors.bottomMargin {
+        id: behavior
+        enabled: false
+        NumberAnimation { easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
     }
 }
+
