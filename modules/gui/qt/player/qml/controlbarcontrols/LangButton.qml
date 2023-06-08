@@ -64,8 +64,6 @@ Widgets.IconControlButton {
 
             parent: root._parentItem
 
-            width: parent.width
-
             x: 0
             y: (parent.positionSliderY - height)
             z: 1

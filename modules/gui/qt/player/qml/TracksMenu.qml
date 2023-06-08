@@ -33,6 +33,11 @@ T.Popup {
     id: root
 
     // Settings
+    property var preferredWidth : stackView.currentItem.preferredWidth
+
+    width: Math.min((typeof preferredWidth !== "undefined")
+                          ? preferredWidth : Number.MAX_VALUE
+                    , root.parent.width)
 
     height: VLCStyle.dp(296, VLCStyle.scale)
 
@@ -90,15 +95,6 @@ T.Popup {
 
         initialItem: TracksListPage {
             trackMenuController: trackMenuController
-        }
-
-        onCurrentItemChanged: {
-            if (currentItem instanceof TracksPage)
-                root.width = Qt.binding(function () {
-                    return Math.min(currentItem.preferredWidth, root.parent.width)
-                })
-            else
-                root.width = Qt.binding(function () { return root.parent.width })
         }
 
         pushEnter: Transition {
