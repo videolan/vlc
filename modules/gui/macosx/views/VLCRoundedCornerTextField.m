@@ -51,7 +51,7 @@ const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
     self.wantsLayer = YES;
     self.layer.cornerRadius = VLCRoundedCornerTextFieldLightCornerRadius;
     self.layer.masksToBounds = YES;
-    self.layer.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor].CGColor;
+    self.layer.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor.CGColor;
 }
 
 - (void)setBackgroundColor:(NSColor *)backgroundColor

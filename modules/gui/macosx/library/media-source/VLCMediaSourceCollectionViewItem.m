@@ -62,8 +62,8 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 {
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.annotationTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
-    self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
-    self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
+    self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
+    self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
 
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -97,7 +97,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
         isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
     }
 
-    self.mediaTitleTextField.textColor = isDark ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    self.mediaTitleTextField.textColor = isDark ? NSColor.VLClibraryDarkTitleColor : NSColor.VLClibraryLightTitleColor;
 }
 
 #pragma mark - view representation

@@ -39,7 +39,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
     self = [super initWithFrame:frameRect];
     if (self) {
         self.font = [NSFont VLClibrarySectionHeaderFont];
-        self.textColor = self.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+        self.textColor = self.shouldShowDarkAppearance ? NSColor.VLClibraryDarkTitleColor : NSColor.VLClibraryLightTitleColor;
         self.editable = NO;
         self.selectable = NO;
         self.bordered = NO;
@@ -52,7 +52,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    self.textColor = self.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    self.textColor = self.shouldShowDarkAppearance ? NSColor.VLClibraryDarkTitleColor : NSColor.VLClibraryLightTitleColor;
 }
 
 @end

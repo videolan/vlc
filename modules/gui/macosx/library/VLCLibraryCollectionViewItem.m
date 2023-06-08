@@ -124,14 +124,14 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _videoImageViewAspectRatioConstraint.active = NO;
 
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
-    self.secondaryInfoTextField.textColor = [NSColor VLClibrarySubtitleColor];
+    self.secondaryInfoTextField.textColor = NSColor.VLClibrarySubtitleColor;
     self.annotationTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
-    self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
-    self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
+    self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
+    self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
     self.unplayedIndicatorTextField.stringValue = _NS("NEW");
     self.unplayedIndicatorTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
-    self.highlightBox.borderColor = [NSColor VLCAccentColor];
-    self.unplayedIndicatorTextField.textColor = [NSColor VLCAccentColor];
+    self.highlightBox.borderColor = NSColor.VLCAccentColor;
+    self.unplayedIndicatorTextField.textColor = NSColor.VLCAccentColor;
 
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -165,7 +165,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
     }
 
-    self.mediaTitleTextField.textColor = isDark ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    self.mediaTitleTextField.textColor = isDark ? NSColor.VLClibraryDarkTitleColor : NSColor.VLClibraryLightTitleColor;
 }
 
 #pragma mark - view representation

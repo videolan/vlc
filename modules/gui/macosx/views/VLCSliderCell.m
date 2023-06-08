@@ -54,12 +54,12 @@
 
 - (void)setSliderStyleLight
 {
-    _emptySliderBackgroundColor = [NSColor VLCSliderLightBackgroundColor];
+    _emptySliderBackgroundColor = NSColor.VLCSliderLightBackgroundColor;
 }
 
 - (void)setSliderStyleDark
 {
-    _emptySliderBackgroundColor = [NSColor VLCSliderDarkBackgroundColor];
+    _emptySliderBackgroundColor = NSColor.VLCSliderDarkBackgroundColor;
 }
 
 - (void)dealloc
@@ -136,7 +136,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
                                                                     xRadius:trackBorderRadius
                                                                     yRadius:trackBorderRadius];
 
-    [[NSColor VLCAccentColor] setFill];
+    [NSColor.VLCAccentColor setFill];
     [filledTrackPath fill];
 }
 

@@ -210,7 +210,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
     _playlistCounterTextField.font = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];
-    _playlistCounterTextField.textColor = [NSColor VLClibraryAnnotationColor];
+    _playlistCounterTextField.textColor = NSColor.VLClibraryAnnotationColor;
     _playlistCounterTextField.hidden = YES;
 
     _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
@@ -233,7 +233,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
     self.openMediaButton.title = _NS("Open media...");
-    self.dragDropImageBackgroundBox.fillColor = [NSColor VLClibrarySeparatorLightColor];
+    self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
 
     [self updateColorsBasedOnAppearance:self.effectiveAppearance];
 
@@ -298,14 +298,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // responding to the effectiveAppearance change (???) so it is a better idea to pull from the general system
     // theme preference, which is always up-to-date
     if (isDark) {
-        self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
-        self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
-        self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
+        self.upNextLabel.textColor = NSColor.VLClibraryDarkTitleColor;
+        self.upNextSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
+        self.clearPlaylistSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
         self.dragDropImageBackgroundBox.hidden = NO;
     } else {
-        self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
-        self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
-        self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+        self.upNextLabel.textColor = NSColor.VLClibraryLightTitleColor;
+        self.upNextSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
+        self.clearPlaylistSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.dragDropImageBackgroundBox.hidden = YES;
     }
 }
@@ -326,7 +326,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
         self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOff"];
     } else {
-        self.shufflePlaylistButton.image = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:[NSColor VLCAccentColor]];
+        self.shufflePlaylistButton.image = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
     }
 }
 
@@ -352,10 +352,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
     switch (currentRepeatState) {
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:[NSColor VLCAccentColor]];
+            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
             break;
         case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:[NSColor VLCAccentColor]];
+            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
             break;
 
         default:

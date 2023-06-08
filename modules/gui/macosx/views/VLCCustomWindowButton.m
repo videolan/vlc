@@ -268,7 +268,7 @@
 -(void)awakeFromNib
 {
     self.wantsLayer = YES;
-    self.layer.backgroundColor = [NSColor VLCAccentColor].CGColor;
+    self.layer.backgroundColor = NSColor.VLCAccentColor.CGColor;
     self.layer.cornerRadius = 6.0f;
     
     self.bezelStyle = NSBezelStyleRecessed;
@@ -283,7 +283,7 @@
     
     // Highlighted
     [title removeAttribute:NSForegroundColorAttributeName range:titleRange];
-    [title addAttribute:NSForegroundColorAttributeName value:[NSColor VLClibraryLightTitleColor] range:titleRange];
+    [title addAttribute:NSForegroundColorAttributeName value:NSColor.VLClibraryLightTitleColor range:titleRange];
     
     [self setAttributedAlternateTitle:title];
         

@@ -56,12 +56,12 @@
 
 - (void)setSliderStyleLight
 {
-    _emptySliderBackgroundColor = [NSColor VLCSliderLightBackgroundColor];
+    _emptySliderBackgroundColor = NSColor.VLCSliderLightBackgroundColor;
 }
 
 - (void)setSliderStyleDark
 {
-    _emptySliderBackgroundColor = [NSColor VLCSliderDarkBackgroundColor];
+    _emptySliderBackgroundColor = NSColor.VLCSliderDarkBackgroundColor;
 }
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
@@ -88,7 +88,7 @@
     NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
                                                                     xRadius:trackBorderRadius
                                                                     yRadius:trackBorderRadius];
-    NSColor *filledColor = [NSColor VLCSliderFillColor];
+    NSColor *filledColor = NSColor.VLCSliderFillColor;
 
     [_emptySliderBackgroundColor setFill];
     [emptyTrackPath fill];

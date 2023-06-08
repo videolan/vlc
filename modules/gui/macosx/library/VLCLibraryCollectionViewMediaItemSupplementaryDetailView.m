@@ -54,10 +54,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 {
     _mediaItemTitleTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
     _mediaItemDetailTextField.font = [NSFont VLCLibrarySubsectionSubheaderFont];
-    _mediaItemDetailTextField.textColor = [NSColor VLCAccentColor];
+    _mediaItemDetailTextField.textColor = NSColor.VLCAccentColor;
 
     if(@available(macOS 10.12.2, *)) {
-        _playMediaItemButton.bezelColor = [NSColor VLCAccentColor];
+        _playMediaItemButton.bezelColor = NSColor.VLCAccentColor;
     }
 }
 

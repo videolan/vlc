@@ -74,10 +74,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTitleTextField.font = [NSFont VLCLibrarySubsectionHeaderFont];
     _albumDetailsTextField.font = [NSFont VLCLibrarySubsectionSubheaderFont];
 
-    _albumDetailsTextField.textColor = [NSColor VLCAccentColor];
+    _albumDetailsTextField.textColor = NSColor.VLCAccentColor;
 
     if(@available(macOS 10.12.2, *)) {
-        _playAlbumButton.bezelColor = [NSColor VLCAccentColor];
+        _playAlbumButton.bezelColor = NSColor.VLCAccentColor;
     }
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;

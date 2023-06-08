@@ -52,13 +52,13 @@
 - (void)setupSubviews
 {
     self.wantsLayer = YES;
-    self.layer.backgroundColor = [NSColor VLClibraryProgressIndicatorBackgroundColor].CGColor;
+    self.layer.backgroundColor = NSColor.VLClibraryProgressIndicatorBackgroundColor.CGColor;
 
     CGRect frame = self.frame;
     frame.size.width = 0.;
     _foregroundView = [[NSView alloc] initWithFrame:frame];
     _foregroundView.wantsLayer = YES;
-    _foregroundView.layer.backgroundColor = [NSColor VLCAccentColor].CGColor;
+    _foregroundView.layer.backgroundColor = NSColor.VLCAccentColor.CGColor;
     _foregroundView.autoresizingMask = NSViewWidthSizable;
     _foregroundView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_foregroundView];
