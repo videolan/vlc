@@ -1,0 +1,27 @@
+From ceed13243b729e8795a0897f432cbd8a021805bc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 8 Jun 2023 09:08:12 +0200
+Subject: [PATCH 2/5] win32: don't redefine GetCurrentConsoleFont with
+ mingw-w64
+
+It's already defined properly.
+---
+ caca/driver/win32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/caca/driver/win32.c b/caca/driver/win32.c
+index 53ff881..9509172 100644
+--- a/caca/driver/win32.c
++++ b/caca/driver/win32.c
+@@ -25,7 +25,7 @@
+ #define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ 
+-#ifdef __MINGW32__
++#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
+ /* This is missing from the MinGW headers. */
+ #   if (_WIN32_WINNT >= 0x0500)
+ BOOL WINAPI GetCurrentConsoleFont(HANDLE hConsoleOutput, BOOL bMaximumWindow,
+-- 
+2.37.3.windows.1
+

@@ -1,0 +1,27 @@
+From 93b558f26b53f4a677bd1b5afaf60a8849292afc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 8 Jun 2023 09:07:01 +0200
+Subject: [PATCH 1/5] win32: don't for _WIN32_WINNT to Win2K
+
+If the system allows newer API's we should downversion it.
+---
+ caca/driver/win32.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/caca/driver/win32.c b/caca/driver/win32.c
+index 439b8dc..53ff881 100644
+--- a/caca/driver/win32.c
++++ b/caca/driver/win32.c
+@@ -19,7 +19,9 @@
+ 
+ #if defined(USE_WIN32)
+ 
++#if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x500 /* _WIN32_WINNT_WIN2K */
+ #define _WIN32_WINNT 0x500 /* Require WinXP or later */
++#endif
+ #define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ 
+-- 
+2.37.3.windows.1
+
