@@ -34,7 +34,7 @@
     self = [super init];
     if (self) {
         _dynamicItemSizing = YES;
-        _staticItemSize = [VLCLibraryCollectionViewItem defaultSize];
+        _staticItemSize = VLCLibraryCollectionViewItem.defaultSize;
         _itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
     }
     return self;

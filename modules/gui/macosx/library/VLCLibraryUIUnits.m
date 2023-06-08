@@ -143,8 +143,8 @@
 
     const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
     const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem ?
-        itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight] :
-        (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) + [VLCLibraryCollectionViewItem bottomTextViewsHeight];
+        itemWidth + VLCLibraryCollectionViewItem.bottomTextViewsHeight :
+        (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) + VLCLibraryCollectionViewItem.bottomTextViewsHeight;
 
     return NSMakeSize(itemWidth, itemHeight);
 }

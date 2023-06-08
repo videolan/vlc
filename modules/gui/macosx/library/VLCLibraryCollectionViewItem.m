@@ -60,15 +60,15 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 + (const NSSize)defaultSize
 {
-    const CGFloat width = [VLCLibraryCollectionViewItem defaultWidth];
-    return CGSizeMake(width, width + [self bottomTextViewsHeight]);
+    const CGFloat width = VLCLibraryCollectionViewItem.defaultWidth;
+    return CGSizeMake(width, width + self.bottomTextViewsHeight);
 }
 
 + (const NSSize)defaultVideoItemSize
 {
-    const CGFloat width = [VLCLibraryCollectionViewItem defaultWidth];
+    const CGFloat width = VLCLibraryCollectionViewItem.defaultWidth;
     const CGFloat imageViewHeight = width * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier];
-    return CGSizeMake(width, imageViewHeight + [self bottomTextViewsHeight]);
+    return CGSizeMake(width, imageViewHeight + self.bottomTextViewsHeight);
 }
 
 + (const CGFloat)defaultWidth
