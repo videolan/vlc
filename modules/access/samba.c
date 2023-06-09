@@ -65,27 +65,17 @@ typedef struct
 } access_sys_t;
 
 /* Build an SMB URI
- * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-static char *smb_get_uri(
-                       const char *psz_domain,
-                       const char *psz_user, const char *psz_pwd,
-                       const char *psz_server, const char *psz_share_path,
-                       const char *psz_name)
+ * smb://server[/share[/path[/file]]]] */
+static char *smb_get_uri(const char *psz_server, const char *psz_share_path,
+                         const char *psz_name)
 {
     char *uri;
 
     assert(psz_server);
-#define PSZ_SHARE_PATH_OR_NULL psz_share_path ? psz_share_path : ""
-#define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
-    if( (psz_user
-        ? asprintf( &uri, "smb://%s%s%s%s%s@%s%s%s%s",
-                         psz_domain ? psz_domain : "", psz_domain ? ";" : "",
-                         psz_user, psz_pwd ? ":" : "",
-                         psz_pwd ? psz_pwd : "", psz_server,
-                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL )
-        : asprintf( &uri, "smb://%s%s%s%s", psz_server,
-                         PSZ_SHARE_PATH_OR_NULL, PSZ_NAME_OR_NULL )) == -1 )
-        uri = NULL;
+    if (asprintf( &uri, "smb://%s%s%s%s", psz_server,
+                  psz_share_path ? psz_share_path : "",
+                  psz_name ? "/" : "", psz_name ? psz_name : "" ) == -1)
+        return NULL;
     return uri;
 }
 
@@ -189,8 +179,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
             break;
         }
 
-        char *uri = smb_get_uri(NULL, NULL, NULL,
-                                psz_server, psz_path, psz_encoded_name);
+        char *uri = smb_get_uri(psz_server, psz_path, psz_encoded_name);
         if (uri == NULL) {
             free(psz_encoded_name);
             i_ret = VLC_ENOMEM;
@@ -331,7 +320,7 @@ static int Open(vlc_object_t *obj)
     {
         struct stat st;
 
-        uri = smb_get_uri(NULL, NULL, NULL, url.psz_host, psz_decoded_path, NULL);
+        uri = smb_get_uri(url.psz_host, psz_decoded_path, NULL);
         if (uri == NULL)
         {
             free(psz_decoded_path);
