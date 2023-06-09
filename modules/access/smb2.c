@@ -658,6 +658,24 @@ vlc_smb2_FreeContext(void *context)
 }
 
 static int
+vlc_smb2_connect_share(stream_t *access, const char *server,
+                       const char *share, const char *username)
+{
+    struct access_sys *sys = access->p_sys;
+
+    struct vlc_smb2_op op = VLC_SMB2_OP(access, &sys->smb2);
+    int err = smb2_connect_share_async(sys->smb2, server, share,
+                                       username, smb2_generic_cb, &op);
+    if (err < 0)
+    {
+        VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", err);
+        return op.error_status;
+    }
+
+    return vlc_smb2_mainloop(&op);
+}
+
+static int
 vlc_smb2_connect_open_share(stream_t *access, const char *url,
                             const vlc_credential *credential)
 {
@@ -665,6 +683,7 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
 
     struct smb2_url *smb2_url = NULL;
 
+    int err;
     sys->smb2 = smb2_init_context();
     if (sys->smb2 == NULL)
     {
@@ -676,6 +695,7 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (!smb2_url || !smb2_url->share || !smb2_url->server)
     {
         msg_Err(access, "smb2_parse_url failed");
+        err = -EINVAL;
         goto error;
     }
 
@@ -697,7 +717,7 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (cache_entry != NULL)
     {
         struct smb2_context *smb2 = cache_entry->context;
-        int err = vlc_smb2_open_share(access, &smb2, smb2_url, do_enum);
+        err = vlc_smb2_open_share(access, &smb2, smb2_url, do_enum);
         if (err == 0)
         {
             assert(smb2 != NULL);
@@ -719,15 +739,8 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     smb2_set_password(sys->smb2, password);
     smb2_set_domain(sys->smb2, domain ? domain : "");
 
-    struct vlc_smb2_op op = VLC_SMB2_OP(access, &sys->smb2);
-    int err = smb2_connect_share_async(sys->smb2, smb2_url->server, share,
-                                       username, smb2_generic_cb, &op);
+    err = vlc_smb2_connect_share(access, smb2_url->server, share, username);
     if (err < 0)
-    {
-        VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", err);
-        goto error;
-    }
-    if (vlc_smb2_mainloop(&op) != 0)
         goto error;
 
     sys->smb2_connected = true;
@@ -736,17 +749,14 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
 
     err = vlc_smb2_open_share(access, &sys->smb2, smb2_url, do_enum);
     if (err < 0)
-    {
-        op.error_status = err;
         goto error;
-    }
 
     sys->cache_entry = vlc_access_cache_entry_NewSmb(sys->smb2, smb2_url->server, share,
                                                      credential->psz_username,
                                                      vlc_smb2_FreeContext);
     if (sys->cache_entry == NULL)
     {
-        op.error_status = -ENOMEM;
+        err = -ENOMEM;
         goto error;
     }
 
@@ -770,7 +780,7 @@ error:
             sys->smb2 = NULL;
         }
     }
-    return op.error_status;
+    return err;
 }
 
 static int
