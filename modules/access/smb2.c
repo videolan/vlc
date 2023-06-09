@@ -688,7 +688,7 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (sys->smb2 == NULL)
     {
         msg_Err(access, "smb2_init_context failed");
-        return -1;
+        return -ENOMEM;
     }
     smb2_url = smb2_parse_url(sys->smb2, url);
 
