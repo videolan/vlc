@@ -30,8 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaSourceProvider : NSObject
 
+@property (class, readonly) NSArray <VLCMediaSource *> *listOfLocalMediaSources;
+
 + (NSArray <VLCMediaSource *> *)listOfMediaSourcesForCategory:(enum services_discovery_category_e)category;
-+ (NSArray <VLCMediaSource *> *)listOfLocalMediaSources;
 
 @end
 

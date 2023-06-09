@@ -150,7 +150,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     NSArray *mediaSources;
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
-        mediaSources = [VLCMediaSourceProvider listOfLocalMediaSources];
+        mediaSources = VLCMediaSourceProvider.listOfLocalMediaSources;
     } else {
         mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_INTERNET];
     }
