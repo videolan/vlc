@@ -108,8 +108,6 @@ T.Pane {
                 iconText: VLCIcons.transparency
                 text: I18n.qtr("Teletext transparency")
 
-                T.ToolTip.visible: (hovered || visualFocus)
-
                 Navigation.parentItem: root
                 Navigation.leftItem: teleActivateBtn
                 Navigation.rightItem: telePageNumber
@@ -183,8 +181,6 @@ T.Pane {
 
                 iconText: VLCIcons.home
                 text: I18n.qtr("Index key")
-
-                T.ToolTip.visible: (hovered || visualFocus)
 
                 Navigation.parentItem: root
                 Navigation.leftItem: telePageNumber

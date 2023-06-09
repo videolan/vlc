@@ -28,6 +28,4 @@ Widgets.IconControlButton {
     // Settings
 
     iconText: VLCIcons.circle
-
-    T.ToolTip.visible: (hovered || visualFocus)
 }

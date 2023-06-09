@@ -143,8 +143,6 @@ WindowDialog {
                         MainCtx.controlbarProfileModel.cloneSelectedProfile(npDialog.text)
                         MainCtx.controlbarProfileModel.selectedProfile = (MainCtx.controlbarProfileModel.rowCount() - 1)
                     }
-
-                    T.ToolTip.visible: hovered
                 }
 
                 Widgets.IconToolButton {
@@ -156,8 +154,6 @@ WindowDialog {
                     onClicked: {
                         MainCtx.controlbarProfileModel.currentModel.injectDefaults(false)
                     }
-
-                    T.ToolTip.visible: hovered
                 }
 
                 Widgets.IconToolButton {
@@ -167,8 +163,6 @@ WindowDialog {
                     onClicked: {
                           MainCtx.controlbarProfileModel.deleteSelectedProfile()
                     }
-
-                    T.ToolTip.visible: hovered
                 }
             }
 
