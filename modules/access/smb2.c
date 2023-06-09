@@ -663,7 +663,8 @@ error:
 
 static int
 vlc_smb2_connect_open_share(stream_t *access, const char *url,
-                            const vlc_credential *credential)
+                            const vlc_credential *credential,
+                            bool guest_with_valid_passwd)
 {
     struct access_sys *sys = access->p_sys;
 
@@ -692,7 +693,7 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     {
         username = "Guest";
         /* A NULL password enable ntlmssp anonymous login */
-        password = NULL;
+        password = guest_with_valid_passwd ? "" : NULL;
     }
 
     smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
@@ -854,13 +855,27 @@ Open(vlc_object_t *p_obj)
      * keystore/user interaction) */
     vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL,
                        NULL);
-    ret = vlc_smb2_connect_open_share(access, url, &credential);
+    ret = vlc_smb2_connect_open_share(access, url, &credential, false);
+    if (ret == -EINVAL && credential.psz_username == NULL)
+    {
+        /* Since last Windows 11 update (KB5026436), Windows SMB servers need a
+         * valid Auth (user + password) even for a guest/anonymous login. The
+         * server will return 'STATUS_INVALID_PARAMETER' (so, libsmb2 will
+         * return '-EINVAL') if the password is invalid. Therefore, try to
+         * connect again with a valid password in that case.
+         *
+         * We don't try to connect with a valid password on the first try since
+         * it seems to break anonymous login with other samba servers (but
+         * samba.c doesn't have this problem so this might be libsmb2 issue).
+         * */
+        ret = vlc_smb2_connect_open_share(access, url, &credential, true);
+    }
 
     while (VLC_SMB2_STATUS_DENIED(ret)
         && vlc_credential_get(&credential, access, "smb-user", "smb-pwd",
                               SMB_LOGIN_DIALOG_TITLE, SMB_LOGIN_DIALOG_TEXT,
                               sys->encoded_url.psz_host))
-        ret = vlc_smb2_connect_open_share(access, url, &credential);
+        ret = vlc_smb2_connect_open_share(access, url, &credential, false);
     free(resolved_host);
     free(url);
     if (ret == 0)
