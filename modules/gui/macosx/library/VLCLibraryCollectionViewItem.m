@@ -78,11 +78,11 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 + (const CGFloat)bottomTextViewsHeight
 {
-    return [VLCLibraryUIUnits smallSpacing] +
+    return VLCLibraryUIUnits.smallSpacing +
            16 +
-           [VLCLibraryUIUnits smallSpacing] +
+           VLCLibraryUIUnits.smallSpacing +
            16 +
-           [VLCLibraryUIUnits smallSpacing];
+           VLCLibraryUIUnits.smallSpacing;
 }
 
 + (const CGFloat)videoHeightAspectRatioMultiplier

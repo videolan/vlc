@@ -91,7 +91,7 @@
     }
 
     _collectionsStackView = collectionsStackView;
-    _collectionsStackView.spacing = [VLCLibraryUIUnits largeSpacing];
+    _collectionsStackView.spacing = VLCLibraryUIUnits.largeSpacing;
     _collectionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
     _collectionsStackView.alignment = NSLayoutAttributeLeading;
     _collectionsStackView.distribution = NSStackViewDistributionFill;

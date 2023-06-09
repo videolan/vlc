@@ -149,11 +149,11 @@
 
 - (void)setupVideoLibraryViews
 {
-    _videoLibraryGroupsTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
-    _videoLibraryGroupSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _videoLibraryGroupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
 
-    const NSEdgeInsets defaultInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
-    const NSEdgeInsets scrollerInsets = [VLCLibraryUIUnits libraryViewScrollViewScrollerInsets];
+    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
     _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;

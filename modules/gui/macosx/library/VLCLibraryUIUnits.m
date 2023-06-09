@@ -105,14 +105,14 @@
                                  withItemsAspectRatio:itemsAspectRatio
                                withNumberOfItemsInRow:numItemsInRow];
 
-    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth]) {
+    while (itemSize.width > VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
     }
-    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth] && numItemsInRow > minItemsInRow) {
+    while (itemSize.width < VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth && numItemsInRow > minItemsInRow) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
@@ -151,10 +151,10 @@
 
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets
 {
-    return NSEdgeInsetsMake([VLCLibraryUIUnits mediumSpacing],
-                            [VLCLibraryUIUnits mediumSpacing],
-                            [VLCLibraryUIUnits mediumSpacing],
-                            [VLCLibraryUIUnits mediumSpacing]);
+    return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing,
+                            VLCLibraryUIUnits.mediumSpacing,
+                            VLCLibraryUIUnits.mediumSpacing,
+                            VLCLibraryUIUnits.mediumSpacing);
 }
 
 + (const NSEdgeInsets)libraryViewScrollViewScrollerInsets

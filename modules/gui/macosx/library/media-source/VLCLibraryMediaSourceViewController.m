@@ -78,7 +78,7 @@
 
 - (void)setupCollectionView
 {
-    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
     
     NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
@@ -91,10 +91,10 @@
 
 - (void)setupMediaSourceLibraryViews
 {
-    _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _mediaSourceTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
 
-    const NSEdgeInsets defaultInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
-    const NSEdgeInsets scrollerInsets = [VLCLibraryUIUnits libraryViewScrollViewScrollerInsets];
+    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = defaultInsets;

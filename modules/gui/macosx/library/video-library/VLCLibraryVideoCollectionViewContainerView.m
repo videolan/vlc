@@ -104,7 +104,7 @@
 {
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 
-    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
     _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     _collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
@@ -210,7 +210,7 @@
     }
 
     if (_groupDescriptor.isHorizontalBarCollectionView) {
-        const CGFloat viewHeight = itemHeight + insetsHeight + [VLCLibraryUIUnits scrollBarSmallSideSize];
+        const CGFloat viewHeight = itemHeight + insetsHeight + VLCLibraryUIUnits.smallSpacing;
         return NSMakeSize(width, viewHeight);
     }
 

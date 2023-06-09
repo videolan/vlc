@@ -84,8 +84,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     self = [super init];
     if (self) {
-        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:[VLCLibraryUIUnits mediumDetailSupplementaryViewCollectionViewHeight]]];
-        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:[VLCLibraryUIUnits largeDetailSupplementaryViewCollectionViewHeight]]];
+        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
+        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
         
         _animationType = VLCExpandAnimationTypeDefault;
         _prevProvidedAnimationStep = 0;
@@ -278,7 +278,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         
         float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY([[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame]);
         detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame) + self.minimumInteritemSpacing,
-                                                selectedItemFrameMaxY + [VLCLibraryUIUnits mediumSpacing],
+                                                selectedItemFrameMaxY + VLCLibraryUIUnits.mediumSpacing,
                                                 self.collectionViewContentSize.width - (self.minimumInteritemSpacing * 2),
                                                 [self currentAnimationStep]);
 
@@ -322,7 +322,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
         
         if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
-            attributesFrame.origin.y += [self currentAnimationStep] + [VLCLibraryUIUnits mediumSpacing];
+            attributesFrame.origin.y += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
         }
     }
 

@@ -214,7 +214,7 @@
     }
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
-        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:0.0f];
     } completionHandler:nil];
 }
@@ -252,7 +252,7 @@
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
         self->_isFadingIn = YES;
-        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [context setDuration:VLCLibraryUIUnits.controlsFadeAnimationDuration];
         [self->_mainControlsView.animator setAlphaValue:1.0f];
     } completionHandler:^{
         self->_isFadingIn = NO;
@@ -314,7 +314,7 @@
     const BOOL placeInFakeToolbar = viewWindow.titlebarAppearsTransparent &&
                                     !windowFullscreen;
 
-    const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : [VLCLibraryUIUnits largeSpacing];
+    const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCLibraryUIUnits.largeSpacing;
 
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
 
@@ -354,8 +354,8 @@
     const CGFloat realButtonSpace = (windowTitlebarHeight - _playlistButton.cell.cellSize.height) / 2;
     const NSRect windowButtonBox = [self windowButtonsRect];
 
-    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + [VLCLibraryUIUnits mediumSpacing] + realButtonSpace : [VLCLibraryUIUnits largeSpacing];
-    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: [VLCLibraryUIUnits largeSpacing];
+    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + VLCLibraryUIUnits.mediumSpacing + realButtonSpace : VLCLibraryUIUnits.largeSpacing;
+    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCLibraryUIUnits.largeSpacing;
 
     _overlayView.drawGradientForTopControls = !placeInFakeToolbar;
     [_overlayView drawRect:_overlayView.frame];

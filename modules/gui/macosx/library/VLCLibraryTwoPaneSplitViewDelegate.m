@@ -41,7 +41,7 @@ constrainMaxCoordinate:(CGFloat)proposedMinimumPosition
     const CGFloat libraryWindowWidth = libraryWindow.frame.size.width;
 
     NSNumber * const leftPaneIndex = [NSNumber numberWithLong:0];
-    NSNumber * const leftPaneMaxWidth = [NSNumber numberWithDouble:libraryWindowWidth - [VLCLibraryUIUnits librarySplitViewMainViewMinimumWidth]];
+    NSNumber * const leftPaneMaxWidth = [NSNumber numberWithDouble:libraryWindowWidth - VLCLibraryUIUnits.librarySplitViewMainViewMinimumWidth];
 
     return leftPaneMaxWidth.floatValue;
 }
