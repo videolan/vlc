@@ -263,6 +263,14 @@ static void smb_auth(SMBCCTX *ctx, const char *srv, const char *shr,
         strlcpy(un, sys->credential.psz_username, unlen);
     if (sys->credential.psz_password != NULL)
         strlcpy(pw, sys->credential.psz_password, pwlen);
+    else
+    {
+        /* Since last Windows 11 update (KB5026436), Windows SMB servers need a
+         * valid Auth (user + password) even for a guest/anonymous login.
+         * Therefore, store the user in the password to fake a valid password.
+         * */
+        strlcpy(pw, un, pwlen);
+    }
 }
 
 static int Open(vlc_object_t *obj)
