@@ -61,7 +61,9 @@ T.ItemDelegate {
                          !overlayMenu.shown && MainCtx.playlistVisible &&
                          (textInfoColumn.implicitWidth > textInfoColumn.width) )
 
-    T.ToolTip.timeout: (hovered ? 0 : VLCStyle.duration_humanMoment)
+    // NOTE: This is useful for keyboard navigation on a column, to avoid blocking visibility on
+    //       the surrounding items.
+    T.ToolTip.timeout: (visualFocus) ? VLCStyle.duration_humanMoment : 0
 
     T.ToolTip.text: (textInfo.text + '\n' + textArtist.text)
 
