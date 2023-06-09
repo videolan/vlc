@@ -274,25 +274,22 @@ static int Open(vlc_object_t *obj)
     vlc_url_t url;
     vlc_credential credential;
     char *psz_decoded_path = NULL, *uri, *psz_var_domain = NULL;
-    uint64_t size;
     bool is_dir;
     int ret = VLC_EGENERIC;
-    SMBCFILE *file = NULL;
-    SMBCCTX *ctx;
 
     /* Init access */
     access_sys_t *sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    ctx = smbc_new_context();
-    if (ctx == NULL)
+    sys->ctx = smbc_new_context();
+    if (sys->ctx == NULL)
         return VLC_ENOMEM;
 
-    smbc_setDebug(ctx, 0);
-    smbc_setFunctionAuthData(ctx, smb_auth);
+    smbc_setDebug(sys->ctx, 0);
+    smbc_setFunctionAuthData(sys->ctx, smb_auth);
 
-    if (!smbc_init_context(ctx))
+    if (!smbc_init_context(sys->ctx))
         goto error;
 
     if (vlc_UrlParseFixup(&url, access->psz_url) != 0)
@@ -318,7 +315,7 @@ static int Open(vlc_object_t *obj)
         == -EINTR)
         goto error;
 
-    smbc_stat_fn stat_fn = smbc_getFunctionStat(ctx);
+    smbc_stat_fn stat_fn = smbc_getFunctionStat(sys->ctx);
     assert(stat_fn);
 
     for (;;)
@@ -339,16 +336,16 @@ static int Open(vlc_object_t *obj)
         }
 
 
-        if (stat_fn(ctx, uri, &st) == 0)
+        if (stat_fn(sys->ctx, uri, &st) == 0)
         {
             is_dir = S_ISDIR(st.st_mode) != 0;
-            size = st.st_size;
+            sys->size = st.st_size;
             break;
         }
 
         /* smbc_stat() fails with servers or shares. Assume directory. */
         is_dir = true;
-        size = 0;
+        sys->size = 0;
 
         if (errno != EACCES && errno != EPERM)
             break;
@@ -369,57 +366,53 @@ static int Open(vlc_object_t *obj)
 
     if (is_dir)
     {
-        smbc_opendir_fn opendir_fn = smbc_getFunctionOpendir(ctx);
+        smbc_opendir_fn opendir_fn = smbc_getFunctionOpendir(sys->ctx);
         assert(opendir_fn);
 
-        sys->dirvt.closedir = smbc_getFunctionClosedir(ctx);
+        sys->dirvt.closedir = smbc_getFunctionClosedir(sys->ctx);
         assert(sys->dirvt.closedir);
-        sys->dirvt.readdir = smbc_getFunctionReaddir(ctx);
+        sys->dirvt.readdir = smbc_getFunctionReaddir(sys->ctx);
         assert(sys->dirvt.readdir);
         sys->dirvt.stat = stat_fn;
 
         sys->url = url;
         access->pf_readdir = DirRead;
         access->pf_control = access_vaDirectoryControlHelper;
-        file = opendir_fn(ctx, uri);
-        if (file == NULL)
+        sys->file = opendir_fn(sys->ctx, uri);
+        if (sys->file == NULL)
             vlc_UrlClean(&sys->url);
     }
     else
     {
-        smbc_open_fn open_fn = smbc_getFunctionOpen(ctx);
+        smbc_open_fn open_fn = smbc_getFunctionOpen(sys->ctx);
         assert(open_fn);
 
-        sys->filevt.close = smbc_getFunctionClose(ctx);
+        sys->filevt.close = smbc_getFunctionClose(sys->ctx);
         assert(sys->filevt.close);
-        sys->filevt.read = smbc_getFunctionRead(ctx);
+        sys->filevt.read = smbc_getFunctionRead(sys->ctx);
         assert(sys->filevt.read);
-        sys->filevt.lseek = smbc_getFunctionLseek(ctx);
+        sys->filevt.lseek = smbc_getFunctionLseek(sys->ctx);
         assert(sys->filevt.lseek);
 
         access->pf_read = Read;
         access->pf_control = Control;
         access->pf_seek = Seek;
-        file = open_fn(ctx, uri, O_RDONLY, 0);
+        sys->file = open_fn(sys->ctx, uri, O_RDONLY, 0);
         vlc_UrlClean(&url);
     }
     free(uri);
 
-    if (file == NULL)
+    if (sys->file == NULL)
     {
         msg_Err(obj, "cannot open %s: %s",
                 access->psz_location, vlc_strerror_c(errno));
         goto error;
     }
 
-    sys->size = size;
-    sys->ctx = ctx;
-    sys->file = file;
-
     return VLC_SUCCESS;
 
 error:
-    smbc_free_context(ctx, 1);
+    smbc_free_context(sys->ctx, 1);
     return ret;
 }
 
