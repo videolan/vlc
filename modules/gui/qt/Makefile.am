@@ -674,13 +674,13 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/ic_fluent_more_vertical.svg \
 	gui/qt/pixmaps/icons/multiselect.svg \
 	gui/qt/pixmaps/icons/next.svg \
-	gui/qt/pixmaps/icons/pause.svg \
+	gui/qt/pixmaps/icons/ic_pause_filled.svg \
 	gui/qt/pixmaps/icons/pip.svg \
 	gui/qt/pixmaps/icons/ic_playlist_clear.svg \
 	gui/qt/pixmaps/icons/playlist.svg \
-	gui/qt/pixmaps/icons/play_outline.svg \
+	gui/qt/pixmaps/icons/ic_fluent_play.svg \
 	gui/qt/pixmaps/icons/play_reverse.svg \
-	gui/qt/pixmaps/icons/play.svg \
+	gui/qt/pixmaps/icons/ic_fluent_play_filled.svg \
 	gui/qt/pixmaps/icons/podcast.svg \
 	gui/qt/pixmaps/icons/previous.svg \
 	gui/qt/pixmaps/icons/profile_new.svg \
