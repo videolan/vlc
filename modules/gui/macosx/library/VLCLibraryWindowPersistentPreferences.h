@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowPersistentPreferences : NSObject
 
-+ (VLCLibraryWindowPersistentPreferences *)sharedInstance;
+@property (class, readonly) VLCLibraryWindowPersistentPreferences *sharedInstance;
 
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment videoLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment albumLibraryViewMode;
