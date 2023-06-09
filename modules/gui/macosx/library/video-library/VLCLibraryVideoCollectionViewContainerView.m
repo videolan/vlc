@@ -106,7 +106,7 @@
 
     const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
     const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
-    _collectionViewLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     _collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     _collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     _collectionViewLayout.sectionInset = collectionViewSectionInset;

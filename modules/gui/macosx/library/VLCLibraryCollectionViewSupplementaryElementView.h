@@ -28,7 +28,7 @@ extern NSString *VLCLibrarySupplementaryElementViewIdentifier;
 
 @interface VLCLibraryCollectionViewSupplementaryElementView : NSTextField
 
-+ (CGSize)defaultHeaderSize;
+@property (class, readonly) const CGSize defaultHeaderSize;
 
 @end
 

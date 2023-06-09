@@ -306,10 +306,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
         VLCMediaSource * const mediaSource = _mediaSources[section];
         VLCInputNode * const rootNode = mediaSource.rootNode;
         // Hide Section if no children under the root node are found.
-        return rootNode.numberOfChildren == 0 ? CGSizeZero : [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+        return rootNode.numberOfChildren == 0 ? CGSizeZero : VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
     }
     
-    return [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    return VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
 }
 
 - (NSSize)collectionView:(NSCollectionView *)collectionView
