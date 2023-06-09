@@ -23,54 +23,6 @@
 #include "test.h"
 #include <vlc_common.h>
 
-struct event_ctx
-{
-    vlc_sem_t sem_ev;
-    vlc_sem_t sem_done;
-    const struct libvlc_event_t *ev;
-};
-
-static void event_ctx_init(struct event_ctx *ctx)
-{
-    vlc_sem_init(&ctx->sem_ev, 0);
-    vlc_sem_init(&ctx->sem_done, 0);
-    ctx->ev = NULL;
-}
-
-static const struct libvlc_event_t *event_ctx_wait_event(struct event_ctx *ctx)
-{
-    vlc_sem_wait(&ctx->sem_ev);
-    assert(ctx->ev != NULL);
-    return ctx->ev;
-}
-
-static void event_ctx_release(struct event_ctx *ctx)
-{
-    assert(ctx->ev != NULL);
-    ctx->ev = NULL;
-    vlc_sem_post(&ctx->sem_done);
-}
-
-static void event_ctx_wait(struct event_ctx *ctx)
-{
-    event_ctx_wait_event(ctx);
-    event_ctx_release(ctx);
-}
-
-static void on_event(const struct libvlc_event_t *event, void *data)
-{
-    struct event_ctx *ctx = data;
-
-    assert(ctx->ev == NULL);
-    ctx->ev = event;
-
-    vlc_sem_post(&ctx->sem_ev);
-
-    vlc_sem_wait(&ctx->sem_done);
-
-    assert(ctx->ev == NULL);
-}
-
 static void play_and_wait(libvlc_media_player_t *mp)
 {
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
@@ -79,7 +31,7 @@ static void play_and_wait(libvlc_media_player_t *mp)
     event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerPlaying, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerPlaying, event_ctx_on_event, &ctx);
     assert(!res);
 
     libvlc_media_player_play(mp);
@@ -87,7 +39,7 @@ static void play_and_wait(libvlc_media_player_t *mp)
     test_log("Waiting for playing\n");
     event_ctx_wait(&ctx);
 
-    libvlc_event_detach(em, libvlc_MediaPlayerPlaying, on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerPlaying, event_ctx_on_event, &ctx);
 }
 
 static void pause_and_wait(libvlc_media_player_t *mp)
@@ -98,7 +50,7 @@ static void pause_and_wait(libvlc_media_player_t *mp)
     event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerPaused, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerPaused, event_ctx_on_event, &ctx);
     assert(!res);
 
     assert(libvlc_media_player_get_state(mp) == libvlc_Playing);
@@ -110,7 +62,7 @@ static void pause_and_wait(libvlc_media_player_t *mp)
 
     assert(libvlc_media_player_get_state(mp) == libvlc_Paused);
 
-    libvlc_event_detach(em, libvlc_MediaPlayerPaused, on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerPaused, event_ctx_on_event, &ctx);
 }
 
 /* Test a bunch of A/V properties. This most does nothing since the current
@@ -364,11 +316,11 @@ static void test_media_player_tracks(const char** argv, int argc)
     event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerESAdded, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerESAdded, event_ctx_on_event, &ctx);
     assert(!res);
-    res = libvlc_event_attach(em, libvlc_MediaPlayerESDeleted, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerESDeleted, event_ctx_on_event, &ctx);
     assert(!res);
-    res = libvlc_event_attach(em, libvlc_MediaPlayerESSelected, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerESSelected, event_ctx_on_event, &ctx);
     assert(!res);
 
     libvlc_media_player_play (mp);
@@ -538,9 +490,9 @@ static void test_media_player_tracks(const char** argv, int argc)
         event_ctx_release(&ctx);
     }
 
-    libvlc_event_detach(em, libvlc_MediaPlayerESAdded, on_event, &ctx);
-    libvlc_event_detach(em, libvlc_MediaPlayerESDeleted, on_event, &ctx);
-    libvlc_event_detach(em, libvlc_MediaPlayerESSelected, on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerESAdded, event_ctx_on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerESDeleted, event_ctx_on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerESSelected, event_ctx_on_event, &ctx);
 
     libvlc_media_player_release (mp);
     libvlc_release (vlc);
@@ -575,11 +527,11 @@ static void test_media_player_programs(const char** argv, int argc)
     event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramAdded, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramAdded, event_ctx_on_event, &ctx);
     assert(!res);
-    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramDeleted, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramDeleted, event_ctx_on_event, &ctx);
     assert(!res);
-    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramSelected, on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerProgramSelected, event_ctx_on_event, &ctx);
     assert(!res);
 
     libvlc_media_player_select_program_id(mp, 2);
@@ -670,9 +622,9 @@ static void test_media_player_programs(const char** argv, int argc)
         event_ctx_release(&ctx);
     }
 
-    libvlc_event_detach(em, libvlc_MediaPlayerProgramAdded, on_event, &ctx);
-    libvlc_event_detach(em, libvlc_MediaPlayerProgramDeleted, on_event, &ctx);
-    libvlc_event_detach(em, libvlc_MediaPlayerProgramSelected, on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerProgramAdded, event_ctx_on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerProgramDeleted, event_ctx_on_event, &ctx);
+    libvlc_event_detach(em, libvlc_MediaPlayerProgramSelected, event_ctx_on_event, &ctx);
 
     libvlc_media_player_release (mp);
     libvlc_release (vlc);
