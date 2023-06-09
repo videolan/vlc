@@ -127,7 +127,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)awakeFromNib
 {
-    _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playlistController = [VLCMain.sharedInstance playlistController];
     _playerController = _playlistController.playerController;
 
     /* check whether the user runs OSX with a RTL language */
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     /* setup extensions menu */
     /* Let the ExtensionsManager itself build the menu */
-    VLCExtensionsManager *extMgr = [[VLCMain sharedInstance] extensionsManager];
+    VLCExtensionsManager *extMgr = [VLCMain.sharedInstance extensionsManager];
     [extMgr buildMenu:_extensionsMenu];
     [_extensions setEnabled:([_extensionsMenu numberOfItems] > 0)];
 
@@ -1332,29 +1332,29 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)intfOpenFile:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
+    [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
         [self->_playlistController addPlaylistItems:files];
     }];
 }
 
 - (IBAction)intfOpenFileGeneric:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openFileGeneric];
+    [[VLCMain.sharedInstance open] openFileGeneric];
 }
 
 - (IBAction)intfOpenDisc:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openDisc];
+    [[VLCMain.sharedInstance open] openDisc];
 }
 
 - (IBAction)intfOpenNet:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openNet];
+    [[VLCMain.sharedInstance open] openNet];
 }
 
 - (IBAction)intfOpenCapture:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openCapture];
+    [[VLCMain.sharedInstance open] openCapture];
 }
 
 - (IBAction)savePlaylist:(id)sender
@@ -1398,32 +1398,32 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showConvertAndSave:(id)sender
 {
-    [[[VLCMain sharedInstance] convertAndSaveWindow] showWindow:self];
+    [[VLCMain.sharedInstance convertAndSaveWindow] showWindow:self];
 }
 
 - (IBAction)showVideoEffects:(id)sender
 {
-    [[[VLCMain sharedInstance] videoEffectsPanel] toggleWindow:sender];
+    [[VLCMain.sharedInstance videoEffectsPanel] toggleWindow:sender];
 }
 
 - (IBAction)showTrackSynchronization:(id)sender
 {
-    [[[VLCMain sharedInstance] trackSyncPanel] toggleWindow:sender];
+    [[VLCMain.sharedInstance trackSyncPanel] toggleWindow:sender];
 }
 
 - (IBAction)showAudioEffects:(id)sender
 {
-    [[[VLCMain sharedInstance] audioEffectsPanel] toggleWindow:sender];
+    [[VLCMain.sharedInstance audioEffectsPanel] toggleWindow:sender];
 }
 
 - (IBAction)showBookmarks:(id)sender
 {
-    [[[VLCMain sharedInstance] bookmarks] toggleWindow:sender];
+    [[VLCMain.sharedInstance bookmarks] toggleWindow:sender];
 }
 
 - (IBAction)showPreferences:(id)sender
 {
-    VLCMain *mainInstance = [VLCMain sharedInstance];
+    VLCMain *mainInstance = VLCMain.sharedInstance;
     NSInteger i_level = [[mainInstance voutProvider] currentStatusWindowLevel];
     [[mainInstance simplePreferences] showSimplePrefsWithLevel:i_level];
 }
@@ -1438,22 +1438,22 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showErrorsAndWarnings:(id)sender
 {
-    [[[[VLCMain sharedInstance] coreDialogProvider] errorPanel] showWindow:self];
+    [[[VLCMain.sharedInstance coreDialogProvider] errorPanel] showWindow:self];
 }
 
 - (IBAction)showMessagesPanel:(id)showMessagesPanel
 {
-    [[[VLCMain sharedInstance] debugMsgPanel] showWindow:self];
+    [[VLCMain.sharedInstance debugMsgPanel] showWindow:self];
 }
 
 - (IBAction)showMainWindow:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:sender];
+    [[VLCMain.sharedInstance libraryWindow] makeKeyAndOrderFront:sender];
 }
 
 - (IBAction)showPlaylist:(id)sender
 {
-    [[[[VLCMain sharedInstance] libraryWindowController] window] makeKeyAndOrderFront:sender];
+    [[[VLCMain.sharedInstance libraryWindowController] window] makeKeyAndOrderFront:sender];
 }
 
 #pragma mark - Help and Docs

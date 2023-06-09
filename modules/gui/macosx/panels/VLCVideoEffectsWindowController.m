@@ -130,7 +130,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
     /* filter handling */
     NSString *tempString = B64DecNSStr([items firstObject]);
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
 
     /* enable the new filters */
@@ -434,7 +434,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
         return;
     }
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return;
@@ -493,7 +493,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 /// Sets widget values based on variables
 - (void)resetValues
 {
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return;
@@ -667,7 +667,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
 - (NSString *)generateProfileString
 {
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return nil;
@@ -778,7 +778,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     if ([self.window isKeyWindow])
         [self.window orderOut:sender];
     else {
-        [self.window setLevel: [[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
+        [self.window setLevel: [[VLCMain.sharedInstance voutProvider] currentStatusWindowLevel]];
         [self.window makeKeyAndOrderFront:sender];
     }
 }
@@ -1029,7 +1029,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
             [self setCropRightValue: [self cropLeftValue]];
     }
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *p_vout = [playerController mainVideoOutputThread];
     if (p_vout) {
         var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);

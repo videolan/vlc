@@ -67,7 +67,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 {
     self = [super init];
     if (self) {
-        _playlistController = [[VLCMain sharedInstance] playlistController];
+        _playlistController = [VLCMain.sharedInstance playlistController];
         _playerController = [_playlistController playerController];
 
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

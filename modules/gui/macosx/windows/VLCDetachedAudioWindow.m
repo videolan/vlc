@@ -45,7 +45,7 @@
     self.title = @"";
     self.imageView.cropsImagesToRoundedCorners = NO;
 
-    _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    _playerController = [[VLCMain.sharedInstance playlistController] playerController];
     VLCTrackingView *trackingView = self.contentView;
     trackingView.viewToHide = self.wrapperView;
     trackingView.animatesTransition = YES;

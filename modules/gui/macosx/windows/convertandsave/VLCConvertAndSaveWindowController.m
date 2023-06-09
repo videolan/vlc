@@ -316,7 +316,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     }
     inputMetaItem.playbackOptions = options;
 
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlaylistController *playlistController = [VLCMain.sharedInstance playlistController];
     [playlistController addPlaylistItems:@[inputMetaItem]];
     [playlistController playItemAtIndex:(playlistController.playlistModel.numberOfPlaylistItems -1)];
 

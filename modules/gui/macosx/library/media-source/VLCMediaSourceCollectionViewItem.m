@@ -156,12 +156,12 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (IBAction)playInstantly:(id)sender
 {
-    [[[VLCMain sharedInstance] playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
+    [[VLCMain.sharedInstance playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
 }
 
 - (IBAction)addToPlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:NO];
+    [[VLCMain.sharedInstance playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:NO];
 }
 
 -(void)mouseDown:(NSEvent *)theEvent

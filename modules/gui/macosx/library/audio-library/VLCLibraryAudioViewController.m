@@ -131,7 +131,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupAudioDataSource
 {
     _audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
-    _audioDataSource.libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
+    _audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _audioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
     _audioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _audioDataSource.songsTableView = _audioSongTableView;

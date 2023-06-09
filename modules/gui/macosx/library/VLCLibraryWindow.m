@@ -144,7 +144,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.toolbar.allowsUserCustomization = NO;
 
-    VLCMain *mainInstance = [VLCMain sharedInstance];
+    VLCMain *mainInstance = VLCMain.sharedInstance;
     _playlistController = [mainInstance playlistController];
 
     libvlc_int_t *libvlc = vlc_object_instance(getIntf());
@@ -620,7 +620,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (selectedRow == -1)
         return;
 
-    [[[VLCMain sharedInstance] playlistController] playItemAtIndex:selectedRow];
+    [[VLCMain.sharedInstance playlistController] playItemAtIndex:selectedRow];
 }
 
 - (IBAction)clearPlaylist:(id)sender
@@ -646,7 +646,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)filterLibrary:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] filterByString:_librarySearchField.stringValue];
+    [[VLCMain.sharedInstance libraryController] filterByString:_librarySearchField.stringValue];
 }
 
 - (void)clearLibraryFilterString
@@ -657,7 +657,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)openMedia:(id)sender
 {
-    [[[VLCMain sharedInstance] open] openFileGeneric];
+    [[VLCMain.sharedInstance open] openFileGeneric];
 }
 
 - (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
@@ -899,7 +899,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)disableVideoPlaybackAppearance
 {
     [self makeFirstResponder: _playlistTableView];
-    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [[VLCMain.sharedInstance voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];

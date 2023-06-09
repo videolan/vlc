@@ -57,7 +57,7 @@
     self = [super init];
     if (self) {
         [self createMenu];
-        _playlistController = [[VLCMain sharedInstance] playlistController];
+        _playlistController = [VLCMain.sharedInstance playlistController];
     }
     return self;
 }
@@ -148,7 +148,7 @@
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
-    [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
+    [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
         [self->_playlistController addPlaylistItems:files
                                          atPosition:selectedRow
                                       startPlayback:NO];

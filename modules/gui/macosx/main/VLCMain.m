@@ -146,7 +146,7 @@ int OpenIntf (vlc_object_t *p_this)
 
         @try {
             [VLCApplication sharedApplication];
-            [VLCMain sharedInstance];
+            VLCMain.sharedInstance;
 
             msg_Dbg(p_intf, "Finished loading macosx interface");
             return VLC_SUCCESS;
@@ -161,7 +161,7 @@ void CloseIntf (vlc_object_t *p_this)
 {
     @autoreleasepool {
         msg_Dbg(p_this, "Closing macosx interface");
-        [[VLCMain sharedInstance] applicationWillTerminate:nil];
+        [VLCMain.sharedInstance applicationWillTerminate:nil];
         [VLCMain killInstance];
     }
 

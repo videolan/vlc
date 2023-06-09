@@ -279,12 +279,12 @@
 
 - (void)hasPreviousChanged:(NSNotification *)aNotification
 {
-    backwardsButton.enabled = [[VLCMain sharedInstance] playlistController].hasPreviousPlaylistItem;
+    backwardsButton.enabled = [VLCMain.sharedInstance playlistController].hasPreviousPlaylistItem;
 }
 
 - (void)hasNextChanged:(NSNotification *)aNotification
 {
-    forwardButton.enabled = [[VLCMain sharedInstance] playlistController].hasNextPlaylistItem;
+    forwardButton.enabled = [VLCMain.sharedInstance playlistController].hasNextPlaylistItem;
 }
 
 /* Updates the Metadata for the currently
@@ -373,7 +373,7 @@
 - (void)updateMenuItemRandom
 {
     // Get current random status
-    [randomButton setState:[[VLCMain sharedInstance] playlistController].playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
+    [randomButton setState:[VLCMain.sharedInstance playlistController].playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
 }
 
 #pragma mark -
@@ -443,13 +443,13 @@
 - (IBAction)statusBarIconShowMainWindow:(id)sender
 {
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-    [(NSWindow *)[[VLCMain sharedInstance] libraryWindow] makeKeyAndOrderFront:sender];
+    [(NSWindow *)[VLCMain.sharedInstance libraryWindow] makeKeyAndOrderFront:sender];
 }
 
 // Action: Toggle Play / Pause
 - (IBAction)statusBarIconTogglePlayPause:(id)sender
 {
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlaylistController *playlistController = [VLCMain.sharedInstance playlistController];
     VLCPlayerController *playerController = playlistController.playerController;
     enum vlc_player_state playerState = playerController.playerState;
     if (playerState != VLC_PLAYER_STATE_PAUSED) {
@@ -464,19 +464,19 @@
 // Action: Go to next track
 - (IBAction)statusBarIconNext:(id)sender
 {
-    [[[VLCMain sharedInstance] playlistController] playNextItem];
+    [[VLCMain.sharedInstance playlistController] playNextItem];
 }
 
 // Action: Go to previous track
 - (IBAction)statusBarIconPrevious:(id)sender
 {
-    [[[VLCMain sharedInstance] playlistController] playPreviousItem];
+    [[VLCMain.sharedInstance playlistController] playPreviousItem];
 }
 
 // Action: Toggle random playback (shuffle)
 - (IBAction)statusBarIconToggleRandom:(id)sender
 {
-    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlaylistController *playlistController = [VLCMain.sharedInstance playlistController];
     playlistController.playbackOrder = (playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM) ? VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL : VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
 }
 

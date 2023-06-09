@@ -63,7 +63,7 @@ extern NSString *VLCConfigurationChangedNotification;
 
 @interface VLCMain : NSObject
 
-+ (VLCMain *)sharedInstance;
+@property (class, readonly) VLCMain *sharedInstance;
 + (void)relaunchApplication;
 
 @property (readonly) BOOL isTerminating;

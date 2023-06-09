@@ -493,7 +493,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)homeButtonAction:(id)sender
 {
     [self returnHome];
-    VLCLibraryNavigationStack * const mainNavStack = [VLCMain sharedInstance].libraryWindow.navigationStack;
+    VLCLibraryNavigationStack * const mainNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
     [mainNavStack clear];
 }
 

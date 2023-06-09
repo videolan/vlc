@@ -66,7 +66,7 @@
         return;
     }
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return;
@@ -128,7 +128,7 @@
         return;
     }
 
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
     vout_thread_t *vout = [playerController mainVideoOutputThread];
     if (!vout)
         return;

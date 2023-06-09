@@ -79,7 +79,7 @@
 
 - (BOOL)handleVideoOutputKeyDown:(id)anEvent forVideoOutput:(vout_thread_t *)p_vout
 {
-    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
     unichar key = 0;
     vlc_value_t val;
     NSEventModifierFlags i_pressed_modifiers = 0;
@@ -173,8 +173,8 @@
         unichar key = [characters characterAtIndex: 0];
 
         if (key) {
-            VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-            vout_thread_t *p_vout = [playerController mainVideoOutputThread];
+            VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+            vout_thread_t * const p_vout = playerController.mainVideoOutputThread;
             if (p_vout != NULL) {
                 /* Escape */
                 if (key == (unichar) 0x1b) {
@@ -221,7 +221,7 @@
 
         /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
         if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
-            [[[[VLCMain sharedInstance] playlistController] playerController] toggleFullscreen];
+            [VLCMain.sharedInstance.playlistController.playerController toggleFullscreen];
             return YES;
         }
 

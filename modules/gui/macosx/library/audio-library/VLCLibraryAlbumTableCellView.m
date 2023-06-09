@@ -229,7 +229,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 - (IBAction)playInstantly:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     BOOL playImmediately = YES;
@@ -284,7 +284,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 - (void)tracksTableViewDoubleClickAction:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     NSArray *tracks = [_representedAlbum tracksAsMediaItems];

@@ -61,11 +61,11 @@
         return;
     }
 
-    if([VLCMain sharedInstance].libraryWindowController == nil) {
-        [VLCMain sharedInstance].libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
+    if(VLCMain.sharedInstance.libraryWindowController == nil) {
+        VLCMain.sharedInstance.libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
     }
 
-    VLCLibraryWindow *libraryWindow = [VLCMain sharedInstance].libraryWindow;
+    VLCLibraryWindow *libraryWindow = VLCMain.sharedInstance.libraryWindow;
 
     NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
     NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];

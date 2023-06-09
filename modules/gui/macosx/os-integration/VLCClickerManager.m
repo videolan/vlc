@@ -54,7 +54,7 @@
 {
     self = [super init];
     if (self) {
-        _playlistController = [[VLCMain sharedInstance] playlistController];
+        _playlistController = [VLCMain.sharedInstance playlistController];
         _playerController = [_playlistController playerController];
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 
@@ -117,7 +117,7 @@
     if (b_mediaKeySupport && !_mediaKeyController)
         _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
-    VLCMain *main = [VLCMain sharedInstance];
+    VLCMain *main = VLCMain.sharedInstance;
     if (b_mediaKeySupport && ([[[main playlistController] playlistModel] numberOfPlaylistItems] > 0)) {
         if (!b_mediaKeyTrapEnabled) {
             [self enableMediaKeySupport];
@@ -155,7 +155,7 @@
         return;
     }
 
-    BOOL numberOfMediaLargerThanZero = [[[[VLCMain sharedInstance] playlistController] playlistModel] numberOfPlaylistItems] > 0;
+    BOOL numberOfMediaLargerThanZero = [[[VLCMain.sharedInstance playlistController] playlistModel] numberOfPlaylistItems] > 0;
 
     if (b_mediaKeyTrapEnabled && !numberOfMediaLargerThanZero) {
         [self disableMediaKeySupport];

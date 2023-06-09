@@ -106,7 +106,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (IBAction)playAction:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:YES];
@@ -115,7 +115,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (IBAction)enqueueAction:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:NO];

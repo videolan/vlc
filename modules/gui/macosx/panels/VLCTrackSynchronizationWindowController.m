@@ -57,7 +57,7 @@
 
 - (void)windowDidLoad
 {
-    _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    _playerController = [[VLCMain.sharedInstance playlistController] playerController];
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(updateValues:)
@@ -133,7 +133,7 @@
     if ([self.window isVisible])
         [self.window orderOut:sender];
     else {
-        [self.window setLevel: [[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
+        [self.window setLevel: [[VLCMain.sharedInstance voutProvider] currentStatusWindowLevel]];
         [self.window makeKeyAndOrderFront:sender];
 
         [self updateValues:nil];

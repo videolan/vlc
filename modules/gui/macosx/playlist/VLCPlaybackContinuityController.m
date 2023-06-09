@@ -87,7 +87,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
     if (_currentInput) {
         /* continue playback where you left off */
-        [self storePlaybackPositionForItem:_currentInput player:[VLCMain sharedInstance].playlistController.playerController];
+        [self storePlaybackPositionForItem:_currentInput player:VLCMain.sharedInstance.playlistController.playerController];
     }
 }
 
@@ -110,7 +110,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 {
     // On shutdown, input might not be dead yet. Cleanup actions like itunes playback
     // and playback positon are done in different code paths (dealloc and appWillTerminate:).
-    if ([[VLCMain sharedInstance] isTerminating]) {
+    if ([VLCMain.sharedInstance isTerminating]) {
         return;
     }
 

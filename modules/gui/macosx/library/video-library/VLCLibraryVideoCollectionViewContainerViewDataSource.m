@@ -77,7 +77,7 @@
                                    name:VLCLibraryModelRecentsMediaItemDeleted
                                  object:nil];
 
-        _libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
+        _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         self.collectionArray = [NSArray array];
     }
     return self;

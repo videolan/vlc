@@ -816,7 +816,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     NSArray *tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
-    [[[VLCMain sharedInstance] libraryController] appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
+    [[VLCMain.sharedInstance libraryController] appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
 }
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
@@ -824,7 +824,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[self.collectionSelectionTableView.selectedRow];
     
     [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:YES];
+        [[VLCMain.sharedInstance libraryController] appendItemToPlaylist:mediaItem playImmediately:YES];
     }];
 }
 
@@ -867,7 +867,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCMediaLibraryAlbum * const album = self.displayedCollection[indexPath.item];
         albumSupplementaryDetailView.representedAlbum = album;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        albumSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
+        albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         return albumSupplementaryDetailView;
@@ -879,7 +879,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         id<VLCMediaLibraryAudioGroupProtocol> audioGroup = self.displayedCollection[indexPath.item];
         audioGroupSupplementaryDetailView.representedAudioGroup = audioGroup;
         audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        audioGroupSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
+        audioGroupSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         return audioGroupSupplementaryDetailView;

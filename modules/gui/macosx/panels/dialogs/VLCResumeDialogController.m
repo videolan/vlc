@@ -87,7 +87,7 @@
                                                       repeats:YES];
 
     NSWindow *window = [self window];
-    [window setLevel:[[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
+    [window setLevel:[[VLCMain.sharedInstance voutProvider] currentStatusWindowLevel]];
     [window center];
     [window makeKeyAndOrderFront:nil];
 }

@@ -124,7 +124,7 @@
     else
         return NO;
 
-    return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: tempString];
+    return [[VLCMain.sharedInstance simplePreferences] changeHotkeyTo: tempString];
 }
 
 @end

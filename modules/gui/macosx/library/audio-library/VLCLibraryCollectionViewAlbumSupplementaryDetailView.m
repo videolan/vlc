@@ -136,7 +136,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 - (IBAction)playAction:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     // We want to add all the tracks to the playlist but only play the first one immediately,
@@ -154,7 +154,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 - (IBAction)enqueueAction:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryController = [VLCMain.sharedInstance libraryController];
     }
 
     [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {

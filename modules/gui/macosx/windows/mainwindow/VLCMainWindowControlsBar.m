@@ -61,7 +61,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playlistController = [VLCMain.sharedInstance playlistController];
     _playerController = _playlistController.playerController;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -132,7 +132,7 @@
 
 - (IBAction)artworkButtonAction:(id)sender
 {
-    [[VLCMain sharedInstance].libraryWindow reopenVideoView];
+    [VLCMain.sharedInstance.libraryWindow reopenVideoView];
 }
 
 #pragma mark -
