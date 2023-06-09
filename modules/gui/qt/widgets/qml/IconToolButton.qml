@@ -62,10 +62,19 @@ T.ToolButton {
 
     Accessible.onPressAction: control.clicked()
 
-    // Childs
+    // Tooltip
 
-    T.ToolTip.text: control.text
+    T.ToolTip.visible: (hovered || visualFocus)
+
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
+    T.ToolTip.text: text
+
+    // Events
+
+    Component.onCompleted: console.assert(text !== "", "text is empty")
+
+    // Children
 
     readonly property ColorContext colorContext : ColorContext {
         id: theme
