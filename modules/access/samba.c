@@ -257,18 +257,23 @@ static int Control( stream_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static void smb_auth(const char *srv, const char *shr, char *wg, int wglen,
-                     char *un, int unlen, char *pw, int pwlen)
+static void smb_auth(SMBCCTX *ctx, const char *srv, const char *shr,
+                     char *wg, int wglen,
+                     char *un, int unlen,
+                     char *pw, int pwlen)
 {
     VLC_UNUSED(srv);
     VLC_UNUSED(shr);
-    VLC_UNUSED(wg);
-    VLC_UNUSED(wglen);
-    VLC_UNUSED(un);
-    VLC_UNUSED(unlen);
-    VLC_UNUSED(pw);
-    VLC_UNUSED(pwlen);
-    //wglen = unlen = pwlen = 0;
+
+    access_sys_t *sys = smbc_getOptionUserData(ctx);
+    assert(sys != NULL);
+
+    if (sys->credential.psz_realm != NULL)
+        strlcpy(wg, sys->credential.psz_realm, wglen);
+    if (sys->credential.psz_username != NULL)
+        strlcpy(un, sys->credential.psz_username, unlen);
+    if (sys->credential.psz_password != NULL)
+        strlcpy(pw, sys->credential.psz_password, pwlen);
 }
 
 static int Open(vlc_object_t *obj)
@@ -289,7 +294,8 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     smbc_setDebug(sys->ctx, 0);
-    smbc_setFunctionAuthData(sys->ctx, smb_auth);
+    smbc_setOptionUserData(sys->ctx, sys);
+    smbc_setFunctionAuthDataWithContext(sys->ctx, smb_auth);
 
     if (!smbc_init_context(sys->ctx))
         goto error;
@@ -325,9 +331,7 @@ static int Open(vlc_object_t *obj)
     {
         struct stat st;
 
-        uri = smb_get_uri(sys->credential.psz_realm, sys->credential.psz_username,
-                          sys->credential.psz_password, url.psz_host,
-                          psz_decoded_path, NULL);
+        uri = smb_get_uri(NULL, NULL, NULL, url.psz_host, psz_decoded_path, NULL);
         if (uri == NULL)
         {
             free(psz_decoded_path);
