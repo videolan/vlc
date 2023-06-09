@@ -280,6 +280,11 @@ static int Open(vlc_object_t *obj)
     SMBCFILE *file = NULL;
     SMBCCTX *ctx;
 
+    /* Init access */
+    access_sys_t *sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
     ctx = smbc_new_context();
     if (ctx == NULL)
         return VLC_ENOMEM;
@@ -359,15 +364,6 @@ static int Open(vlc_object_t *obj)
     vlc_credential_clean(&credential);
     free(psz_var_domain);
     free(psz_decoded_path);
-
-    /* Init access */
-    access_sys_t *sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
-    if (unlikely(sys == NULL))
-    {
-        free(uri);
-        vlc_UrlClean(&url);
-        return VLC_ENOMEM;
-    }
 
     access->p_sys = sys;
 
