@@ -43,6 +43,9 @@ typedef struct
     SMBCCTX *ctx;
     SMBCFILE *file;
 
+    vlc_credential credential;
+    char *var_domain;
+
     union
     {
         struct {
@@ -272,8 +275,7 @@ static int Open(vlc_object_t *obj)
 {
     stream_t *access = (stream_t *)obj;
     vlc_url_t url;
-    vlc_credential credential;
-    char *psz_decoded_path = NULL, *uri, *psz_var_domain = NULL;
+    char *psz_decoded_path = NULL, *uri;
     bool is_dir;
     int ret = VLC_EGENERIC;
 
@@ -308,10 +310,11 @@ static int Open(vlc_object_t *obj)
         }
     }
 
-    vlc_credential_init(&credential, &url);
-    psz_var_domain = var_InheritString(access, "smb-domain");
-    credential.psz_realm = psz_var_domain;
-    if (vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL, NULL)
+    vlc_credential_init(&sys->credential, &url);
+    sys->var_domain = var_InheritString(access, "smb-domain");
+    sys->credential.psz_realm = sys->var_domain;
+    if (vlc_credential_get(&sys->credential, access, "smb-user", "smb-pwd",
+                           NULL, NULL)
         == -EINTR)
         goto error;
 
@@ -322,13 +325,11 @@ static int Open(vlc_object_t *obj)
     {
         struct stat st;
 
-        uri = smb_get_uri(credential.psz_realm, credential.psz_username,
-                          credential.psz_password, url.psz_host,
+        uri = smb_get_uri(sys->credential.psz_realm, sys->credential.psz_username,
+                          sys->credential.psz_password, url.psz_host,
                           psz_decoded_path, NULL);
         if (uri == NULL)
         {
-            vlc_credential_clean(&credential);
-            free(psz_var_domain);
             free(psz_decoded_path);
             vlc_UrlClean(&url);
             ret = VLC_ENOMEM;
@@ -351,15 +352,13 @@ static int Open(vlc_object_t *obj)
             break;
 
         errno = 0;
-        if (vlc_credential_get(&credential, access, "smb-user",
+        if (vlc_credential_get(&sys->credential, access, "smb-user",
                                "smb-pwd", SMB_LOGIN_DIALOG_TITLE,
                                SMB_LOGIN_DIALOG_TEXT, url.psz_host) != 0)
             break;
     }
 
-    vlc_credential_store(&credential, access);
-    vlc_credential_clean(&credential);
-    free(psz_var_domain);
+    vlc_credential_store(&sys->credential, access);
     free(psz_decoded_path);
 
     access->p_sys = sys;
@@ -412,6 +411,8 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    vlc_credential_clean(&sys->credential);
+    free(sys->var_domain);
     smbc_free_context(sys->ctx, 1);
     return ret;
 }
@@ -420,6 +421,9 @@ static void Close(vlc_object_t *obj)
 {
     stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
+
+    vlc_credential_clean(&sys->credential);
+    free(sys->var_domain);
 
     vlc_UrlClean(&sys->url);
 
