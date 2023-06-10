@@ -216,7 +216,7 @@ static int Open(vlc_object_t *p_this)
             return VLC_EGENERIC;
         }
 
-        if ([device isInUseByAnotherApplication]) {
+        if (device.isInUseByAnotherApplication) {
             msg_Err(p_demux, "Capture device is exclusively in use by another application");
             return VLC_EGENERIC;
         }

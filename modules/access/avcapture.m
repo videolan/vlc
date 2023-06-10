@@ -402,7 +402,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 
     AVCaptureDevice *device = _device;
 
-    if ( [device isInUseByAnotherApplication] == YES )
+    if ( device.isInUseByAnotherApplication == YES )
     {
         msg_Err(_demux, "default capture device is exclusively in use by another application");
         return nil;
