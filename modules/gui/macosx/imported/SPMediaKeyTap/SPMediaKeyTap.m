@@ -324,7 +324,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     if([_mediaKeyAppList count] == 0)
         return;
 
-    NSRunningApplication *thisApp = [NSRunningApplication currentApplication];
+    NSRunningApplication *thisApp = NSRunningApplication.currentApplication;
     NSRunningApplication *otherApp = [_mediaKeyAppList firstObject];
 
     BOOL isCurrent = [thisApp isEqual:otherApp];
