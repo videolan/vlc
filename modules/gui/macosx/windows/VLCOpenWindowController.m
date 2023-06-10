@@ -175,7 +175,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     _allMediaDevices = [[NSMutableArray alloc] init];
     _specialMediaFolders = [[NSMutableArray alloc] init];
     _displayInfos = [[NSMutableArray alloc] init];
-    NSNotificationCenter *sharedNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    NSNotificationCenter *sharedNotificationCenter = NSWorkspace.sharedWorkspace.notificationCenter;
     [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
     [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
 
@@ -605,7 +605,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         [_fileNameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_filePath]];
         [_fileNameStubLabel setHidden: YES];
         [_fileTreatAsPipeButton setHidden: NO];
-        [_fileIconWell setImage: [[NSWorkspace sharedWorkspace] iconForFile: _filePath]];
+        [_fileIconWell setImage: [NSWorkspace.sharedWorkspace iconForFile: _filePath]];
         [_fileIconWell setHidden: NO];
         [self setMRL: mrlString];
     } else {
@@ -652,7 +652,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     }
     if (_fileSlavePath && [_fileSlaveCheckbox state] == NSOnState) {
         [_fileSlaveFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_fileSlavePath]];
-        [_fileSlaveIconWell setImage: [[NSWorkspace sharedWorkspace] iconForFile: _fileSlavePath]];
+        [_fileSlaveIconWell setImage: [NSWorkspace.sharedWorkspace iconForFile: _fileSlavePath]];
     } else {
         [_fileSlaveFilenameLabel setStringValue: @""];
         [_fileSlaveIconWell setImage: NULL];
@@ -748,7 +748,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 {
     NSString *path = [url path];
     NSString *type = getVolumeTypeFromMountPath(path);
-    NSImage *image = [[NSWorkspace sharedWorkspace] iconForFile: path];
+    NSImage *image = [NSWorkspace.sharedWorkspace iconForFile: path];
     NSString *devicePath;
 
     // BDMV path must not end with BDMV directory
@@ -1211,7 +1211,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         [_fileSubSettingsButton setEnabled:YES];
         if (_subPath) {
             [_fileSubtitlesFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_subPath]];
-            [_fileSubtitlesIconWell setImage: [[NSWorkspace sharedWorkspace] iconForFile:_subPath]];
+            [_fileSubtitlesIconWell setImage: [NSWorkspace.sharedWorkspace iconForFile:_subPath]];
         }
     } else {
         [_fileSubSettingsButton setEnabled:NO];
@@ -1244,7 +1244,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         [_fileSubtitlesFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_subPath]];
         [_fileSubPathTextField setStringValue: [_fileSubtitlesFilenameLabel stringValue]];
         [_fileSubPathLabel setHidden: YES];
-        [_fileSubtitlesIconWell setImage: [[NSWorkspace sharedWorkspace] iconForFile:_subPath]];
+        [_fileSubtitlesIconWell setImage: [NSWorkspace.sharedWorkspace iconForFile:_subPath]];
         [_fileSubIconView setImage: [_fileSubtitlesIconWell image]];
     } else {
         [_fileSubPathLabel setHidden: NO];

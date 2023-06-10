@@ -174,7 +174,7 @@ static const char *const localDevicesDescription = "My Machine";
         }
     }
     if (_respondsToDiskChanges) {
-        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+        [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self];
     }
 }
 
@@ -280,7 +280,7 @@ static const char *const localDevicesDescription = "My Machine";
             if (!self->_respondsToDiskChanges) {
                 // We register the notifications here, as they are retrieved from the OS.
                 // We need to avoid receiving a notification while the array is still being populated.
-                NSNotificationCenter *workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+                NSNotificationCenter *workspaceNotificationCenter = NSWorkspace.sharedWorkspace.notificationCenter;
                 [workspaceNotificationCenter addObserver:self
                                                 selector:@selector(volumeIsMounted:)
                                                     name:NSWorkspaceDidMountNotification

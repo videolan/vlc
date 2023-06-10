@@ -429,7 +429,7 @@
 
     if ([itemURI.scheme isEqualToString:@"file"]) {
         // Local file, open in Finder
-        [[NSWorkspace sharedWorkspace] selectFile:itemURI.path
+        [NSWorkspace.sharedWorkspace selectFile:itemURI.path
                          inFileViewerRootedAtPath:itemURI.path];
     } else {
         // URL, copy to pasteboard

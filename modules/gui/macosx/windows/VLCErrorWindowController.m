@@ -69,7 +69,7 @@
                      range: NSMakeRange(0, [title length])];
     [_errors addObject: ourError];
 
-    [_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
+    [_icons addObject: [NSWorkspace.sharedWorkspace iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
 
     [self.errorTable reloadData];
 }

@@ -127,7 +127,7 @@ static const int kCurrentPreferencesVersion = 4;
         NSArray *ourPreferences = @[[[NSURL alloc] initFileURLWithPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]],
                                     [[NSURL alloc] initFileURLWithPath:[preferences stringByAppendingPathComponent:@"VLC"]]];
 
-        [[NSWorkspace sharedWorkspace] recycleURLs:ourPreferences completionHandler:^(NSDictionary *newURLs, NSError *error){
+        [NSWorkspace.sharedWorkspace recycleURLs:ourPreferences completionHandler:^(NSDictionary *newURLs, NSError *error){
             [self resetAndReinitializeUserDefaults];
             [VLCMain relaunchApplication];
         }];

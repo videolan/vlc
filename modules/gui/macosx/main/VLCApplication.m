@@ -116,7 +116,7 @@
     if (alertButton == NSAlertFirstButtonReturn) {
         /* terminate and restart
          * NOTE you may not use [VLCMain relaunchApplication] here as it depends on the app not having moved and WILL crash */
-        [[NSWorkspace sharedWorkspace] launchApplicationAtURL:_appLocationURL.absoluteURL
+        [NSWorkspace.sharedWorkspace launchApplicationAtURL:_appLocationURL.absoluteURL
                                                       options:NSWorkspaceLaunchNewInstance
                                                 configuration:@{}
                                                         error:nil];

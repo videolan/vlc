@@ -247,7 +247,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     /* Handle sleep notification */
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+    [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
                                                            selector:@selector(computerWillSleep:)
                                                                name:NSWorkspaceWillSleepNotification
                                                              object:nil];
@@ -278,7 +278,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)dealloc
 {
-    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+    [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self];
     [_defaultNotificationCenter removeObserver:self];
 }
 
@@ -607,7 +607,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&b_dir]
         && b_dir &&
-        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:path
+        [NSWorkspace.sharedWorkspace getFileSystemInfoForPath:path
                                                     isRemovable:&b_rem
                                                      isWritable:&b_writable
                                                   isUnmountable:NULL

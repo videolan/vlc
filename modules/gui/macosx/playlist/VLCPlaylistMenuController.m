@@ -141,7 +141,7 @@
         return;
 
     NSString *path = item.path;
-    [[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:path];
+    [NSWorkspace.sharedWorkspace selectFile:path inFileViewerRootedAtPath:path];
 }
 
 - (void)addFilesToPlaylist:(id)sender

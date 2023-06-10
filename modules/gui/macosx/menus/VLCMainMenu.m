@@ -1486,28 +1486,28 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/doc/"];
 
-    [[NSWorkspace sharedWorkspace] openURL: url];
+    [NSWorkspace.sharedWorkspace openURL: url];
 }
 
 - (IBAction)openWebsite:(id)sender
 {
     NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/"];
 
-    [[NSWorkspace sharedWorkspace] openURL: url];
+    [NSWorkspace.sharedWorkspace openURL: url];
 }
 
 - (IBAction)openForum:(id)sender
 {
     NSURL *url = [NSURL URLWithString: @"https://forum.videolan.org/"];
 
-    [[NSWorkspace sharedWorkspace] openURL: url];
+    [NSWorkspace.sharedWorkspace openURL: url];
 }
 
 - (IBAction)openDonate:(id)sender
 {
     NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/contribute.html#paypal"];
 
-    [[NSWorkspace sharedWorkspace] openURL: url];
+    [NSWorkspace.sharedWorkspace openURL: url];
 }
 
 - (IBAction)showInformationPanel:(id)sender

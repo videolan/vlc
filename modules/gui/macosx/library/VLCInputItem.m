@@ -607,7 +607,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
                                                      withSize:size];
 
                 if (!image) {
-                    image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+                    image = [NSWorkspace.sharedWorkspace iconForFile:path];
                     image.size = size;
                 }
             }

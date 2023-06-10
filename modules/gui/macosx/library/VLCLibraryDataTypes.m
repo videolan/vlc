@@ -1085,7 +1085,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     if (firstFile) {
         NSURL *URL = [NSURL URLWithString:firstFile.MRL];
         if (URL) {
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
+            [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
         }
     }
 }

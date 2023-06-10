@@ -79,13 +79,13 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     // Listen to "app switched" event, so that we don't intercept media keys if we
     // weren't the last "media key listening" app to be active
 
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+    [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
                                                            selector:@selector(frontmostAppChanged:)
                                                                name:NSWorkspaceDidActivateApplicationNotification
                                                              object:nil];
 
 
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+    [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
                                                            selector:@selector(appTerminated:)
                                                                name:NSWorkspaceDidTerminateApplicationNotification
                                                              object:nil];
@@ -93,7 +93,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)stopWatchingAppSwitching
 {
-    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+    [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self];
 }
 
 - (BOOL)startWatchingMediaKeys

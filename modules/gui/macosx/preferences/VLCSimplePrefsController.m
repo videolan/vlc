@@ -1335,7 +1335,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (NSString *)bundleIdentifierForApplicationName:(NSString *)appName
 {
-    NSWorkspace * workspace = [NSWorkspace sharedWorkspace];
+    NSWorkspace * workspace = NSWorkspace.sharedWorkspace;
     NSString * appPath = [workspace fullPathForApplication:appName];
     if (appPath) {
         NSBundle * appBundle = [NSBundle bundleWithPath:appPath];
@@ -1346,12 +1346,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (NSString *)applicationNameForBundleIdentifier:(NSString *)bundleIdentifier
 {
-    return [[[NSFileManager defaultManager] displayNameAtPath:[[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:bundleIdentifier]] stringByDeletingPathExtension];
+    return [[[NSFileManager defaultManager] displayNameAtPath:[NSWorkspace.sharedWorkspace absolutePathForAppBundleWithIdentifier:bundleIdentifier]] stringByDeletingPathExtension];
 }
 
 - (NSImage *)iconForBundleIdentifier:(NSString *)bundleIdentifier
 {
-    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    NSWorkspace *workspace = NSWorkspace.sharedWorkspace;
     NSSize iconSize = NSMakeSize(16., 16.);
     NSImage *icon = [workspace iconForFile:[workspace absolutePathForAppBundleWithIdentifier:bundleIdentifier]];
     [icon setSize:iconSize];
