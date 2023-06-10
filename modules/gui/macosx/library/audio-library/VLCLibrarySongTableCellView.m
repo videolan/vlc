@@ -83,7 +83,7 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
     }
 
     if (!_libraryController) {
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
     BOOL playImmediately = YES;

@@ -42,7 +42,7 @@
     self = [super init];
     if (self) {
         [self createMenu];
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
     }
     return self;
 }

@@ -815,8 +815,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         return;
     }
 
-    NSArray *tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
-    [[VLCMain.sharedInstance libraryController] appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
+    NSArray * const tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
+    [VLCMain.sharedInstance.libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
 }
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
@@ -824,7 +824,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[self.collectionSelectionTableView.selectedRow];
     
     [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [[VLCMain.sharedInstance libraryController] appendItemToPlaylist:mediaItem playImmediately:YES];
+        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
     }];
 }
 

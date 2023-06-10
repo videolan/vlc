@@ -69,7 +69,7 @@
 {
     [super awakeFromNib];
 
-    _playlistController = [VLCMain.sharedInstance playlistController];
+    _playlistController = VLCMain.sharedInstance.playlistController;
     _playerController = _playlistController.playerController;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

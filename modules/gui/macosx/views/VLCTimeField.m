@@ -72,7 +72,7 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if ( [ourEvent clickCount] > 1 ) {
-        [[VLCMain.sharedInstance mainMenu] goToSpecificTime: nil];
+        [VLCMain.sharedInstance.mainMenu goToSpecificTime: nil];
     } else {
         self.isTimeRemaining = !self.isTimeRemaining;
     }

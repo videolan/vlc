@@ -230,12 +230,12 @@ enum VLCTreeBranchType {
 - (IBAction)showSimplePrefs: (id)sender
 {
     [self.window orderOut: self];
-    [[VLCMain.sharedInstance simplePreferences] showSimplePrefs];
+    [VLCMain.sharedInstance.simplePreferences showSimplePrefs];
 }
 
 - (IBAction)resetPrefs:(id)sender
 {
-    [[VLCMain.sharedInstance simplePreferences] resetPreferences:sender];
+    [VLCMain.sharedInstance.simplePreferences resetPreferences:sender];
 }
 
 - (void)loadConfigTree

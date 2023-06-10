@@ -57,7 +57,7 @@
     self = [super init];
     if (self) {
         [self createMenu];
-        _playlistController = [VLCMain.sharedInstance playlistController];
+        _playlistController = VLCMain.sharedInstance.playlistController;
     }
     return self;
 }

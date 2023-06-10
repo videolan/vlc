@@ -127,7 +127,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)awakeFromNib
 {
-    _playlistController = [VLCMain.sharedInstance playlistController];
+    _playlistController = VLCMain.sharedInstance.playlistController;
     _playerController = _playlistController.playerController;
 
     /* check whether the user runs OSX with a RTL language */
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     /* setup extensions menu */
     /* Let the ExtensionsManager itself build the menu */
-    VLCExtensionsManager *extMgr = [VLCMain.sharedInstance extensionsManager];
+    VLCExtensionsManager *extMgr = VLCMain.sharedInstance.extensionsManager;
     [extMgr buildMenu:_extensionsMenu];
     [_extensions setEnabled:([_extensionsMenu numberOfItems] > 0)];
 
@@ -1448,7 +1448,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showMainWindow:(id)sender
 {
-    [[VLCMain.sharedInstance libraryWindow] makeKeyAndOrderFront:sender];
+    [VLCMain.sharedInstance.libraryWindow makeKeyAndOrderFront:sender];
 }
 
 - (IBAction)showPlaylist:(id)sender

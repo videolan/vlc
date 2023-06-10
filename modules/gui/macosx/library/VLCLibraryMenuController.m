@@ -185,7 +185,7 @@
     NSModalResponse modalResponse = [openPanel runModal];
 
     if (modalResponse == NSModalResponseOK) {
-        VLCLibraryController *libraryController = [VLCMain.sharedInstance libraryController];
+        VLCLibraryController *libraryController = VLCMain.sharedInstance.libraryController;
         for (NSURL *url in [openPanel URLs]) {
             [libraryController addFolderWithFileURL:url];
         }

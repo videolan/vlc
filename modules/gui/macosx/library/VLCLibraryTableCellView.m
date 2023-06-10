@@ -142,7 +142,7 @@
 
 - (void)playInputItemInstantly:(id)sender
 {
-    [[VLCMain.sharedInstance playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
+    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
 }
 
 @end

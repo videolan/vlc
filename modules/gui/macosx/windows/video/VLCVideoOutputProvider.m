@@ -57,7 +57,7 @@ static int WindowEnable(vlc_window_t *p_wnd, const vlc_window_cfg_t *cfg)
 
         NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
-        VLCVideoOutputProvider *voutProvider = [VLCMain.sharedInstance voutProvider];
+        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
         if (!voutProvider) {
             return VLC_EGENERIC;
         }
@@ -83,7 +83,7 @@ static int WindowEnable(vlc_window_t *p_wnd, const vlc_window_cfg_t *cfg)
 static void WindowDisable(vlc_window_t *p_wnd)
 {
     @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [VLCMain.sharedInstance voutProvider];
+        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutProvider removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
@@ -95,7 +95,7 @@ static void WindowResize(vlc_window_t *p_wnd,
                          unsigned i_width, unsigned i_height)
 {
     @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [VLCMain.sharedInstance voutProvider];
+        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
@@ -110,7 +110,7 @@ static void WindowSetState(vlc_window_t *p_wnd, unsigned i_state)
         msg_Dbg(p_wnd, "Ignore change to VLC_WINDOW_STATE_BELOW");
 
     @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [VLCMain.sharedInstance voutProvider];
+        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
 
         NSInteger i_cocoa_level = NSNormalWindowLevel;
 
@@ -136,7 +136,7 @@ static void WindowSetFullscreen(vlc_window_t *p_wnd, const char *psz_id)
     BOOL b_animation = YES;
 
     @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [VLCMain.sharedInstance voutProvider];
+        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutProvider setFullscreen:i_full
@@ -560,7 +560,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 
     if (b_nativeFullscreenMode) {
         if(!o_current_window)
-            o_current_window = [VLCMain.sharedInstance libraryWindow] ;
+            o_current_window = VLCMain.sharedInstance.libraryWindow ;
         assert(o_current_window);
 
         // fullscreen might be triggered twice (vout event)

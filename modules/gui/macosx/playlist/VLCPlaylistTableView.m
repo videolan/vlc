@@ -70,14 +70,14 @@
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
         {
-            VLCPlaylistController *playlistController = [VLCMain.sharedInstance playlistController];
+            VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
             [playlistController removeItemsAtIndexes:selectedIndexes];
             break;
         }
 
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
-            [[VLCMain.sharedInstance playlistController] playItemAtIndex:indexOfSelectedItem];
+            [VLCMain.sharedInstance.playlistController playItemAtIndex:indexOfSelectedItem];
             break;
 
         default:

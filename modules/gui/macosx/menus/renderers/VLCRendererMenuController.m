@@ -172,7 +172,7 @@
     _selectedItem = sender;
 
     VLCRendererItem *item = [sender representedObject];
-    VLCPlayerController *playerController = [[VLCMain.sharedInstance playlistController] playerController];
+    VLCPlayerController *playerController = VLCMain.sharedInstance.playlistController.playerController;
 
     if (item) {
         [item setRendererForPlayerController:playerController];

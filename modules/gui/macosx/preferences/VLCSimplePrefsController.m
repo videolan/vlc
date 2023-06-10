@@ -305,7 +305,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     static NSArray<NSString *> *toolbarIdentifiers = nil;
 
     dispatch_once(&onceToken, ^{
-        if ([[VLCMain.sharedInstance libraryController] libraryModel]) {
+        if (VLCMain.sharedInstance.libraryController.libraryModel) {
             toolbarIdentifiers = @[VLCIntfSettingToolbarIdentifier,
                                    VLCAudioSettingToolbarIdentifier,
                                    VLCVideoSettingToolbarIdentifier,
@@ -888,7 +888,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [self.window orderOut: sender];
     } else if (sender == _showAllButton) {
         [self.window orderOut: self];
-        [[VLCMain.sharedInstance preferences] showPrefsWithLevel:[self.window level]];
+        [VLCMain.sharedInstance.preferences showPrefsWithLevel:[self.window level]];
     } else
         msg_Warn(p_intf, "unknown buttonAction sender");
 }
@@ -1536,7 +1536,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 {
     self = [super init];
     if (self) {
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
         _libraryModel = _libraryController.libraryModel;
 
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

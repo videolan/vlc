@@ -187,7 +187,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
 {
     if (!_libraryController) {
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
     _representedItem = representedItem;
@@ -280,7 +280,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (IBAction)playInstantly:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
     // We want to add all the tracks to the playlist but only play the first one immediately,
@@ -298,7 +298,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (IBAction)addToPlaylist:(id)sender
 {
     if (!_libraryController) {
-        _libraryController = [VLCMain.sharedInstance libraryController];
+        _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
     [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {

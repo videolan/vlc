@@ -33,7 +33,7 @@
 
 - (void)changeFont:(id)sender
 {
-    [[VLCMain.sharedInstance simplePreferences] changeFont: sender];
+    [VLCMain.sharedInstance.simplePreferences changeFont: sender];
 }
 @end
 
