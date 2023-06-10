@@ -54,7 +54,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+        [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
 }
 
@@ -66,7 +66,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
 
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] addObserver:self
+        [NSApplication.sharedApplication addObserver:self
                                             forKeyPath:@"effectiveAppearance"
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];

@@ -190,7 +190,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                              object:nil];
 
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] addObserver:self
+        [NSApplication.sharedApplication addObserver:self
                                             forKeyPath:@"effectiveAppearance"
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];
@@ -258,7 +258,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+        [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
 
     libvlc_int_t *libvlc = vlc_object_instance(getIntf());

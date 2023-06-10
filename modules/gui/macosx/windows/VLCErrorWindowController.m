@@ -52,7 +52,7 @@
     [self.window setTitle: _NS("Errors and Warnings")];
     [self.cleanupButton setTitle: _NS("Clean up")];
 
-    if ([[NSApplication sharedApplication] userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft) {
+    if ([NSApplication.sharedApplication userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft) {
         [self.errorTable moveColumn:0 toColumn:1];
     }
 }

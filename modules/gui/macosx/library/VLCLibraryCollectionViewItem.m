@@ -107,7 +107,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+        [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
 }
 
@@ -134,7 +134,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.unplayedIndicatorTextField.textColor = NSColor.VLCAccentColor;
 
     if (@available(macOS 10.14, *)) {
-        [[NSApplication sharedApplication] addObserver:self
+        [NSApplication.sharedApplication addObserver:self
                                             forKeyPath:@"effectiveAppearance"
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];

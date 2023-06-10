@@ -571,7 +571,7 @@ static int BossCallback(vlc_object_t *p_this,
         dispatch_async(dispatch_get_main_queue(), ^{
             VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
             [playerController pause];
-            [[NSApplication sharedApplication] hide:nil];
+            [NSApplication.sharedApplication hide:nil];
         });
         return VLC_SUCCESS;
     }

@@ -477,7 +477,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     CGLSetParameter ([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
 
     [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidChangeScreenParametersNotification
-                                                      object:[NSApplication sharedApplication]
+                                                      object:NSApplication.sharedApplication
                                                        queue:nil
                                                   usingBlock:^(NSNotification *notification) {
                                                       [self performSelectorOnMainThread:@selector(reshape)

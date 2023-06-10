@@ -442,7 +442,7 @@
 // Action: Show VLC main window
 - (IBAction)statusBarIconShowMainWindow:(id)sender
 {
-    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [NSApplication.sharedApplication activateIgnoringOtherApps:YES];
     [(NSWindow *)VLCMain.sharedInstance.libraryWindow makeKeyAndOrderFront:sender];
 }
 
@@ -489,7 +489,7 @@
 // Action: Quit VLC
 - (IBAction)quitAction:(id)sender
 {
-    [[NSApplication sharedApplication] terminate:nil];
+    [NSApplication.sharedApplication terminate:nil];
 }
 
 - (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender
