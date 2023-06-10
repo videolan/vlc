@@ -156,8 +156,7 @@
     [[self window] setExcludedFromWindowsMenu:YES];
     [[self window] setMenu:nil];
 
-    [o_icon_view setImage:
-        [[VLCApplication sharedApplication] vlcAppIconImage]];
+    [o_icon_view setImage:[VLCApplication.sharedApplication vlcAppIconImage]];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification

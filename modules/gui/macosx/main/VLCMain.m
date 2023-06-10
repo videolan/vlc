@@ -145,7 +145,7 @@ int OpenIntf (vlc_object_t *p_this)
         msg_Dbg(p_intf, "Starting macosx interface");
 
         @try {
-            [VLCApplication sharedApplication];
+            VLCApplication.sharedApplication;
             VLCMain.sharedInstance;
 
             msg_Dbg(p_intf, "Finished loading macosx interface");
@@ -210,7 +210,7 @@ static VLCMain *sharedInstance = nil;
     if (self) {
         _p_intf = getIntf();
 
-        [VLCApplication sharedApplication].delegate = self;
+        VLCApplication.sharedApplication.delegate = self;
 
         _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
         _libraryController = [[VLCLibraryController alloc] init];
@@ -245,8 +245,8 @@ static VLCMain *sharedInstance = nil;
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
 
-    NSImage *appIconImage = [[VLCApplication sharedApplication] vlcAppIconImage];
-    [[VLCApplication sharedApplication]
+    NSImage *appIconImage = [VLCApplication.sharedApplication vlcAppIconImage];
+    [VLCApplication.sharedApplication
         setApplicationIconImage:appIconImage];
 }
 
