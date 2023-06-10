@@ -135,11 +135,11 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                    name:VLCLibraryModelGenreListUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelGenresUpdated:)
+                               selector:@selector(libraryModelGenreUpdated:)
                                    name:VLCLibraryModelGenreUpdated
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryModelGenresDeleted:)
+                               selector:@selector(libraryModelGenreDeleted:)
                                    name:VLCLibraryModelGenreDeleted
                                  object:nil];
 
