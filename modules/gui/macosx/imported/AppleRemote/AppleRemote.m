@@ -174,19 +174,19 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (BOOL) listeningOnAppActivate {
-    id appDelegate = [NSApp delegate];
+    id appDelegate = NSApp.delegate;
     return (appDelegate!=nil && [appDelegate isKindOfClass: [AppleRemoteApplicationDelegate class]]);
 }
 - (void) setListeningOnAppActivate: (BOOL) value {
     if (value) {
         if ([self listeningOnAppActivate]) return;
-        AppleRemoteApplicationDelegate* appDelegate = [[AppleRemoteApplicationDelegate alloc] initWithApplicationDelegate: [NSApp delegate]];
+        AppleRemoteApplicationDelegate* appDelegate = [[AppleRemoteApplicationDelegate alloc] initWithApplicationDelegate: NSApp.delegate];
         /* NSApp does not retain its delegate therefore we keep retain count on 1 */
         [(NSApplication *)NSApp setDelegate: appDelegate];
     } else {
         if ([self listeningOnAppActivate]==NO) return;
-        AppleRemoteApplicationDelegate* appDelegate = (AppleRemoteApplicationDelegate*)[NSApp delegate];
-        id previousAppDelegate = [appDelegate applicationDelegate];
+        AppleRemoteApplicationDelegate* appDelegate = (AppleRemoteApplicationDelegate*)NSApp.delegate;
+        id previousAppDelegate = appDelegate.applicationDelegate;
         [(NSApplication *)NSApp setDelegate: previousAppDelegate];
     }
 }
