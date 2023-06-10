@@ -173,7 +173,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(handleTableViewSelectionIsChanging:)
                                name:NSTableViewSelectionIsChangingNotification

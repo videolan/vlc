@@ -120,7 +120,7 @@
     [self updatePlaylistToggleState];
     [self updateLibraryControls];
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowControls:)
                                name:VLCVideoWindowShouldShowFullscreenController

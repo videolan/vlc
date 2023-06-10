@@ -296,7 +296,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 
     // update ui
     [_addonsTable reloadData];
-    [[NSNotificationCenter defaultCenter] postNotificationName:NSTableViewSelectionDidChangeNotification object:_addonsTable];
+    [NSNotificationCenter.defaultCenter postNotificationName:NSTableViewSelectionDidChangeNotification object:_addonsTable];
 }
 
 - (void)_findNewAddons

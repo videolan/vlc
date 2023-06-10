@@ -55,7 +55,7 @@
 {
     self = [super initWithWindowNibName:@"Bookmarks"];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCocoaWindowLevel:) name:VLCWindowShouldUpdateLevel object:nil];
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateCocoaWindowLevel:) name:VLCWindowShouldUpdateLevel object:nil];
     }
     return self;
 }
@@ -65,7 +65,7 @@
     //if (p_old_input)
     //    input_Release(p_old_input);
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)windowDidLoad

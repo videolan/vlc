@@ -32,7 +32,7 @@
 
 - (void)awakeFromNib
 {
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(playStateOrItemChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
@@ -45,7 +45,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)prepareForReuse

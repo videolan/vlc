@@ -180,7 +180,7 @@
 {
     NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
     if ([self mouse: ml inRect: [self bounds]]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
                                                             object:self];
     }
 

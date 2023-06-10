@@ -66,7 +66,7 @@
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
 
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelVideoMediaListReset

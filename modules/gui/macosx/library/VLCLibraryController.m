@@ -50,7 +50,7 @@
         _libraryModel = [[VLCLibraryModel alloc] initWithLibrary:_p_libraryInstance];
         _unsorted = YES;
 
-        NSNotificationCenter *defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [defaultNotificationCenter addObserver:self
                                       selector:@selector(playbackStateChanged:)
                                           name:VLCPlayerStateChanged
@@ -61,7 +61,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     _p_libraryInstance = NULL;
 }
 

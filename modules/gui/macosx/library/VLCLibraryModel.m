@@ -192,7 +192,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _artistCacheModificationQueue = dispatch_queue_create("artistCacheModificationQueue", 0);
         _genreCacheModificationQueue = dispatch_queue_create("genreCacheModificationQueue", 0);
 
-        _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [_defaultNotificationCenter addObserver:self
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification

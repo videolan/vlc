@@ -85,7 +85,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 #pragma mark - view and model state management

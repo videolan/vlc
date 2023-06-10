@@ -52,13 +52,13 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)windowDidLoad
 {
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updateValues:)
                                name:VLCPlayerCurrentMediaItemChanged

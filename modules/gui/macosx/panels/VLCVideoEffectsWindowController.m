@@ -82,7 +82,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     self = [super initWithWindowNibName:@"VideoEffects"];
     if (self) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+            NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
             [notificationCenter addObserver:self
                                    selector:@selector(updateCocoaWindowLevel:)
                                        name:VLCWindowShouldUpdateLevel
@@ -348,7 +348,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)updateCocoaWindowLevel:(NSNotification *)aNotification

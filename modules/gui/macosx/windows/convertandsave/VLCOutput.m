@@ -110,43 +110,43 @@
     [_channelNameLabel setStringValue: _NS("Channel Name")];
     [_sdpURLLabel setStringValue: _NS("SDP URL")];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(outputInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _fileTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(outputInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _streamAddressTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(outputInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _streamPortTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(TTLChanged:)
         name: NSControlTextDidChangeNotification
         object: _streamTTLTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _transcodeVideoBitrateComboBox];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _transcodeVideoScaleComboBox];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _transcodeAudioBitrateComboBox];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _transcodeAudioChannelsComboBox];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _channelNameTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
+    [NSNotificationCenter.defaultCenter addObserver: self
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: _sdpURLTextField];

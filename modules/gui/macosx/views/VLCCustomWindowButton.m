@@ -99,7 +99,7 @@
 
 - (void)commonInitializer
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self
+    [NSNotificationCenter.defaultCenter addObserver:self
                                              selector:@selector(controlTintChanged:)
                                                  name:NSControlTintDidChangeNotification
                                                object:nil];

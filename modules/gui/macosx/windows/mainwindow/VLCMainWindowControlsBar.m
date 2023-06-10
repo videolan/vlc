@@ -64,7 +64,7 @@
     _playlistController = VLCMain.sharedInstance.playlistController;
     _playerController = _playlistController.playerController;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updatePlaybackControls:)
                                name:VLCPlayerCurrentMediaItemChanged

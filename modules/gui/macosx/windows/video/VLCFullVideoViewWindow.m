@@ -46,7 +46,7 @@
     [super setup];
     _autohideTitlebar = NO;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowFullscreenController:)
                                name:VLCVideoWindowShouldShowFullscreenController

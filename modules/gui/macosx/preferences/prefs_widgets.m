@@ -1359,7 +1359,7 @@ my_width, tooltip, init_value)                                              \
                       1, 49, toolTip, @"")
         [o_textfield setIntegerValue: p_item->value.i];
         [o_textfield setDelegate: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
+        [NSNotificationCenter.defaultCenter addObserver: self
                                                  selector: @selector(textfieldChanged:)
                                                      name: NSControlTextDidChangeNotification
                                                    object: o_textfield];
@@ -1539,7 +1539,7 @@ my_width, tooltip, init_value)                                              \
         [o_textfield setIntegerValue: p_item->value.i];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield setDelegate: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
+        [NSNotificationCenter.defaultCenter addObserver: self
                                                  selector: @selector(textfieldChanged:)
                                                      name: NSControlTextDidChangeNotification
                                                    object: o_textfield];
@@ -1660,7 +1660,7 @@ my_width, tooltip, init_value)                                              \
                       1, 49, toolTip, @"")
         [o_textfield setFloatValue: p_item->value.f];
         [o_textfield setDelegate: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
+        [NSNotificationCenter.defaultCenter addObserver: self
                                                  selector: @selector(textfieldChanged:)
                                                      name: NSControlTextDidChangeNotification
                                                    object: o_textfield];
@@ -1748,7 +1748,7 @@ my_width, tooltip, init_value)                                              \
         [o_textfield setFloatValue: p_item->value.f];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield setDelegate: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
+        [NSNotificationCenter.defaultCenter addObserver: self
                                                  selector: @selector(textfieldChanged:)
                                                      name: NSControlTextDidChangeNotification
                                                    object: o_textfield];

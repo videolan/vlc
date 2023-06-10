@@ -218,7 +218,7 @@ enum VLCTreeBranchType {
     [_rootTreeItem applyChanges];
     fixIntfSettings();
     config_SaveConfigFile(getIntf());
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCConfigurationChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
     [self.window orderOut:self];
 }
 

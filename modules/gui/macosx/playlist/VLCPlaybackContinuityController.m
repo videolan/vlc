@@ -66,7 +66,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 {
     self = [super init];
     if (self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(inputItemChanged:)
                                    name:VLCPlayerCurrentMediaItemChanged
@@ -83,7 +83,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 {
     msg_Dbg(getIntf(), "Deinitializing input manager");
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 
     if (_currentInput) {
         /* continue playback where you left off */

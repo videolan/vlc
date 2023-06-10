@@ -76,7 +76,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
+    [NSNotificationCenter.defaultCenter postNotificationName: VLCOpenTextFieldWasClicked
                                                         object: self];
     [super mouseDown: theEvent];
 }
@@ -142,7 +142,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     [self setupSubtitlesPanel];
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver: self
                            selector: @selector(openNetInfoChanged:)
                                name: NSControlTextDidChangeNotification
@@ -963,13 +963,13 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     if (i_tag == 0) {
         [_netUDPPortTextField setIntValue: [_netUDPPortStepper intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
+        [NSNotificationCenter.defaultCenter postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: _netUDPPortTextField];
         [self.window makeFirstResponder: _netUDPPortTextField];
     }
     else if (i_tag == 1) {
         [_netUDPMPortTextField setIntValue: [_netUDPMPortStepper intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
+        [NSNotificationCenter.defaultCenter postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: _netUDPMPortTextField];
         [self.window makeFirstResponder: _netUDPMPortTextField];
     }

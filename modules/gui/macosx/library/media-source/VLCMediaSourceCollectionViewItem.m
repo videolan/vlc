@@ -52,7 +52,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }

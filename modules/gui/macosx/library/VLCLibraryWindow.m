@@ -97,7 +97,7 @@ static int ShowFullscreenController(vlc_object_t *p_this, const char *psz_variab
 {
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
                                                                 object:nil];
         });
 
@@ -110,7 +110,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     @autoreleasepool {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCWindowShouldShowController
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCWindowShouldShowController
                                                                 object:nil];
         });
 
@@ -167,7 +167,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.librarySortButton setHidden:NO];
     [self.librarySearchField setEnabled:YES];
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowController:)
                                name:VLCWindowShouldShowController
@@ -256,7 +256,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
@@ -928,7 +928,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         NSRect videoViewRect = [videoView convertRect:videoView.frame toView:self.contentView];
 
         if ([self.contentView mouse:mouseLocation inRect:videoViewRect]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
                                                                 object:self];
         }
     }

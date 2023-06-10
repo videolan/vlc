@@ -70,7 +70,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         _playlistController = VLCMain.sharedInstance.playlistController;
         _playerController = [_playlistController playerController];
 
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(playbackPositionUpdated:)
                                    name:VLCPlayerTimeAndPositionChanged
@@ -97,7 +97,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)playbackStateChanged:(NSNotification *)aNotification

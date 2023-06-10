@@ -46,7 +46,7 @@ static void cb_children_reset(vlc_media_tree_t *p_tree,
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
-        [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenReset
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenReset
                                                             object:mediaSource];
     });
 }
@@ -59,7 +59,7 @@ static void cb_children_added(vlc_media_tree_t *p_tree,
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
-        [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenAdded
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenAdded
                                                             object:mediaSource];
     });
 }
@@ -72,7 +72,7 @@ static void cb_children_removed(vlc_media_tree_t *p_tree,
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
-        [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenRemoved
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenRemoved
                                                             object:mediaSource];
     });
 }
@@ -84,7 +84,7 @@ static void cb_preparse_ended(vlc_media_tree_t *p_tree,
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
-        [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourcePreparsingEnded
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourcePreparsingEnded
                                                             object:mediaSource];
     });
 }
@@ -275,7 +275,7 @@ static const char *const localDevicesDescription = "My Machine";
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenReset object:self];
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenReset object:self];
             
             if (!self->_respondsToDiskChanges) {
                 // We register the notifications here, as they are retrieved from the OS.
@@ -399,7 +399,7 @@ static const char *const localDevicesDescription = "My Machine";
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenAdded
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenAdded
                                                                 object:self];
         });
     });
@@ -442,7 +442,7 @@ static const char *const localDevicesDescription = "My Machine";
         input_item_node_Delete(nodeToRemove);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenRemoved
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenRemoved
                                                                 object:self];
         });
         

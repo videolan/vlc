@@ -48,7 +48,7 @@
 {
     self = [super initWithWindowNibName:@"ResumeDialog"];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
+        [NSNotificationCenter.defaultCenter addObserver:self
                                                  selector:@selector(updateCocoaWindowLevel:)
                                                      name:VLCWindowShouldUpdateLevel
                                                    object:nil];
@@ -58,7 +58,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)windowDidLoad

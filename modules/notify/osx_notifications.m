@@ -189,7 +189,7 @@ static inline NSString* CharsToNSString(char * _Nullable cStr)
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 
     // Clear a remaining lastNotification in Notification Center, if any
     if (_lastNotification) {

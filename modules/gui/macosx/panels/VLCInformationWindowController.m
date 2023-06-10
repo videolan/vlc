@@ -71,7 +71,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)awakeFromNib
@@ -82,7 +82,7 @@
 
     _outlineView.dataSource = self;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     if (_mainMenuInstance) {
         [notificationCenter addObserver:self
                                selector:@selector(currentPlayingItemChanged:)

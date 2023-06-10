@@ -56,7 +56,7 @@
     if (self) {
         _playlistController = VLCMain.sharedInstance.playlistController;
         _playerController = [_playlistController playerController];
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
 
         /* init media key support */
         b_mediaKeySupport = var_InheritBool(getIntf(), "macosx-mediakeys");
@@ -96,7 +96,7 @@
 {
     _mediaKeyController = nil;
     _remote = nil;
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 #pragma mark -

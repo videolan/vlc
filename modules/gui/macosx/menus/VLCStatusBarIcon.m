@@ -107,7 +107,7 @@
     [_vlcStatusBarIconMenu setDelegate:self];
 
     // Register notifications
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updateTimeAndPosition:)
                                name:VLCPlayerTimeAndPositionChanged
@@ -213,7 +213,7 @@
     }
 
     // Cleanup
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 #pragma mark -

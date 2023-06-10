@@ -216,7 +216,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     self = [super init];
     if (self) {
-        _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [_defaultNotificationCenter addObserver:self
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification

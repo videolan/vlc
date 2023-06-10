@@ -221,7 +221,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
 
 - (void)windowDidLoad
 {
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updateCocoaWindowLevel:)
                                name:VLCWindowShouldUpdateLevel
@@ -319,7 +319,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 #pragma mark -

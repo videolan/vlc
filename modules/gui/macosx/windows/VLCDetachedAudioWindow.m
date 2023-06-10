@@ -50,7 +50,7 @@
     trackingView.viewToHide = self.wrapperView;
     trackingView.animatesTransition = YES;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
 
     [self inputItemChanged:nil];
@@ -58,7 +58,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)inputItemChanged:(NSNotification *)aNotification

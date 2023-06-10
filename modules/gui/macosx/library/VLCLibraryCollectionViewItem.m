@@ -94,7 +94,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(mediaItemThumbnailGenerated:)
                                    name:VLCLibraryModelMediaItemThumbnailGenerated
@@ -105,7 +105,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication removeObserver:self forKeyPath:@"effectiveAppearance"];
     }

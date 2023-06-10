@@ -518,7 +518,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 
 - (void)parsingEnded:(int)status
 {
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     if (status) {
         [notificationCenter postNotificationName:VLCInputItemParsingSucceeded object:self];
     } else {
@@ -546,7 +546,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 
 - (void)preparsingEnded:(enum input_item_preparse_status)status
 {
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     switch (status) {
         case ITEM_PREPARSE_SKIPPED:
             [notificationCenter postNotificationName:VLCInputItemPreparsingSkipped object:self];
@@ -582,7 +582,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 - (void)subTreeAdded:(input_item_node_t *)p_node
 {
     _subTree = p_node;
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputItemSubtreeAdded object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCInputItemSubtreeAdded object:self];
 }
 
 - (int)writeMetadataToFile

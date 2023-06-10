@@ -120,7 +120,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)dealloc
 {
     msg_Dbg(getIntf(), "Deinitializing main menu");
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [NSNotificationCenter.defaultCenter removeObserver: self];
 
     [self releaseRepresentedObjects:[NSApp mainMenu]];
 }
@@ -166,7 +166,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(refreshVoutDeviceMenu:)
                                name:NSApplicationDidChangeScreenParametersNotification

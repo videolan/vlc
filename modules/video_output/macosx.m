@@ -476,7 +476,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     GLint params[] = { 1 };
     CGLSetParameter ([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
 
-    [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidChangeScreenParametersNotification
+    [NSNotificationCenter.defaultCenter addObserverForName:NSApplicationDidChangeScreenParametersNotification
                                                       object:NSApplication.sharedApplication
                                                        queue:nil
                                                   usingBlock:^(NSNotification *notification) {
@@ -491,7 +491,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     [super dealloc];
 }
 

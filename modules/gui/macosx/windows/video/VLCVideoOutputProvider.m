@@ -604,7 +604,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     VLCMain *main = VLCMain.sharedInstance;
     [[main libraryWindow] setWindowLevel:i_level];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCWindowShouldUpdateLevel object:self userInfo:@{VLCWindowLevelKey : @(_currentWindowLevel)}];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCWindowShouldUpdateLevel object:self userInfo:@{VLCWindowLevelKey : @(_currentWindowLevel)}];
 }
 
 @end

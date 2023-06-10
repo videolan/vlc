@@ -50,7 +50,7 @@
 {
     self = [super init];
     if(self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelVideoListReset:)
                                    name:VLCLibraryModelVideoMediaListReset

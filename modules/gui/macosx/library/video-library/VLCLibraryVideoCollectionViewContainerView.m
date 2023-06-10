@@ -143,7 +143,7 @@
 
 - (void)setupCollectionViewSizeChangeListener
 {
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(collectionViewFrameChanged:)
                                name:NSViewFrameDidChangeNotification

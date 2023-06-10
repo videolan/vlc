@@ -302,7 +302,7 @@ static VLCMain *sharedInstance = nil;
         return;
     _interfaceIsTerminating = true;
 
-    NSNotificationCenter *notiticationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notiticationCenter = NSNotificationCenter.defaultCenter;
     if (notification == nil) {
         [notiticationCenter postNotificationName: NSApplicationWillTerminateNotification object: nil];
     }

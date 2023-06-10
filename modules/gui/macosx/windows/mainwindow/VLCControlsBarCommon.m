@@ -72,7 +72,7 @@
     _playlistController = VLCMain.sharedInstance.playlistController;
     _playerController = _playlistController.playerController;
 
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updateTimeSlider:)
                                name:VLCPlayerTimeAndPositionChanged
@@ -188,7 +188,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (CGFloat)height

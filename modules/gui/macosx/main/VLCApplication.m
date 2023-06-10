@@ -50,7 +50,7 @@
 {
     self = [super init];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
+        [NSNotificationCenter.defaultCenter addObserver:self
                                                  selector:@selector(appBecameActive:)
                                                      name:NSApplicationDidBecomeActiveNotification
                                                    object:nil];
@@ -64,7 +64,7 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (NSImage *)vlcAppIconImage

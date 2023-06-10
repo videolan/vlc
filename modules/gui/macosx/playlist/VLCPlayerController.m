@@ -585,7 +585,7 @@ static int BossCallback(vlc_object_t *p_this,
 {
     self = [super init];
     if (self) {
-        _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
+        _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [_defaultNotificationCenter addObserver:self
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification

@@ -1106,7 +1106,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
     /* okay, let's save our changes to vlcrc */
     config_SaveConfigFile(p_intf);
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCConfigurationChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
 }
 
 - (void)showSettingsForCategory:(NSView *)categoryView
@@ -1539,7 +1539,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         _libraryController = VLCMain.sharedInstance.libraryController;
         _libraryModel = _libraryController.libraryModel;
 
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(listOfMonitoredFoldersUpdated:)
                                    name:VLCLibraryModelListOfMonitoredFoldersUpdated
@@ -1550,7 +1550,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)listOfMonitoredFoldersUpdated:(NSNotification *)aNotification
