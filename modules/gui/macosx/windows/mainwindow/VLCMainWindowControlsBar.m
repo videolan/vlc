@@ -99,7 +99,7 @@
     [self.timeField setAlignment: NSCenterTextAlignment];
     [self.trailingTimeField setAlignment: NSCenterTextAlignment];
 
-    [self.playbackStateTrackingView setViewToHide:_openMainVideoViewButtonOverlay];
+    [self.thumbnailTrackingView setViewToHide:_openMainVideoViewButtonOverlay];
 }
 
 #pragma mark -

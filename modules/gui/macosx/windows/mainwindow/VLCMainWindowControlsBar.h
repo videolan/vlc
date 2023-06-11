@@ -43,7 +43,7 @@
 
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
 
-@property (readwrite, strong) IBOutlet VLCTrackingView *playbackStateTrackingView;
+@property (readwrite, strong) IBOutlet VLCTrackingView *thumbnailTrackingView;
 @property (readwrite, strong) IBOutlet NSView *openMainVideoViewButtonOverlay;
 
 - (IBAction)stop:(id)sender;

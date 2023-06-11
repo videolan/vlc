@@ -373,50 +373,62 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="5o7-Z0-dqS" userLabel="Artwork image view" customClass="VLCImageView">
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="SM6-nx-NKD" customClass="VLCTrackingView">
                                                 <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                                                 <subviews>
-                                                    <box boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="CzG-0S-Kke">
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5o7-Z0-dqS" userLabel="Artwork image view" customClass="VLCImageView">
                                                         <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
-                                                        <view key="contentView" id="xiz-t0-wHG">
-                                                            <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f5c-zt-tHy">
-                                                                    <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                                        <subviews>
+                                                            <box boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="CzG-0S-Kke">
+                                                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                                                <view key="contentView" id="xiz-t0-wHG">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                    <subviews>
+                                                                        <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f5c-zt-tHy">
+                                                                            <rect key="frame" x="8" y="8" width="24" height="24"/>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="width" secondItem="f5c-zt-tHy" secondAttribute="height" multiplier="1:1" id="CUT-Da-xxl"/>
+                                                                                <constraint firstAttribute="height" constant="24" id="tgT-WN-T5x"/>
+                                                                            </constraints>
+                                                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCFullscreenOffTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ewW-8p-s67">
+                                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                <font key="font" metaFont="system"/>
+                                                                            </buttonCell>
+                                                                            <color key="contentTintColor" red="1" green="1" blue="1" alpha="0.85574306502402275" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            <connections>
+                                                                                <action selector="artworkButtonAction:" target="Uzf-Tf-H8x" id="E2T-ee-34i"/>
+                                                                            </connections>
+                                                                        </button>
+                                                                    </subviews>
                                                                     <constraints>
-                                                                        <constraint firstAttribute="width" secondItem="f5c-zt-tHy" secondAttribute="height" multiplier="1:1" id="CUT-Da-xxl"/>
-                                                                        <constraint firstAttribute="height" constant="24" id="tgT-WN-T5x"/>
+                                                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="bottom" constant="5" id="SbH-TQ-eXI"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="centerY" secondItem="xiz-t0-wHG" secondAttribute="centerY" id="cD9-w6-RdD"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="top" constant="5" id="inr-OT-TWe"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="leading" constant="5" id="sPR-Go-Z1e"/>
+                                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="trailing" constant="5" id="tls-Px-be5"/>
+                                                                        <constraint firstItem="f5c-zt-tHy" firstAttribute="centerX" secondItem="xiz-t0-wHG" secondAttribute="centerX" id="uA7-o6-9kY"/>
                                                                     </constraints>
-                                                                    <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCFullscreenOffTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ewW-8p-s67">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <color key="contentTintColor" red="1" green="1" blue="1" alpha="0.85574306502402275" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <connections>
-                                                                        <action selector="artworkButtonAction:" target="Uzf-Tf-H8x" id="E2T-ee-34i"/>
-                                                                    </connections>
-                                                                </button>
-                                                            </subviews>
-                                                            <constraints>
-                                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="bottom" constant="5" id="SbH-TQ-eXI"/>
-                                                                <constraint firstItem="f5c-zt-tHy" firstAttribute="centerY" secondItem="xiz-t0-wHG" secondAttribute="centerY" id="cD9-w6-RdD"/>
-                                                                <constraint firstItem="f5c-zt-tHy" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="top" constant="5" id="inr-OT-TWe"/>
-                                                                <constraint firstItem="f5c-zt-tHy" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xiz-t0-wHG" secondAttribute="leading" constant="5" id="sPR-Go-Z1e"/>
-                                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="f5c-zt-tHy" secondAttribute="trailing" constant="5" id="tls-Px-be5"/>
-                                                                <constraint firstItem="f5c-zt-tHy" firstAttribute="centerX" secondItem="xiz-t0-wHG" secondAttribute="centerX" id="uA7-o6-9kY"/>
-                                                            </constraints>
-                                                        </view>
-                                                        <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="displayP3"/>
-                                                    </box>
+                                                                </view>
+                                                                <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="displayP3"/>
+                                                            </box>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="5o7-Z0-dqS" secondAttribute="height" multiplier="1:1" id="0jj-cr-D72"/>
+                                                            <constraint firstAttribute="height" constant="40" id="DYU-eT-dYg"/>
+                                                            <constraint firstItem="CzG-0S-Kke" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="LLd-6R-Tgh"/>
+                                                            <constraint firstItem="CzG-0S-Kke" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" id="V2e-KG-ewZ"/>
+                                                            <constraint firstAttribute="trailing" secondItem="CzG-0S-Kke" secondAttribute="trailing" id="XY7-2u-LL2"/>
+                                                            <constraint firstAttribute="bottom" secondItem="CzG-0S-Kke" secondAttribute="bottom" id="Zcd-VT-O2c"/>
+                                                        </constraints>
+                                                    </customView>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" secondItem="5o7-Z0-dqS" secondAttribute="height" multiplier="1:1" id="0jj-cr-D72"/>
-                                                    <constraint firstAttribute="height" constant="40" id="DYU-eT-dYg"/>
-                                                    <constraint firstItem="CzG-0S-Kke" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="LLd-6R-Tgh"/>
-                                                    <constraint firstItem="CzG-0S-Kke" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" id="V2e-KG-ewZ"/>
-                                                    <constraint firstAttribute="trailing" secondItem="CzG-0S-Kke" secondAttribute="trailing" id="XY7-2u-LL2"/>
-                                                    <constraint firstAttribute="bottom" secondItem="CzG-0S-Kke" secondAttribute="bottom" id="Zcd-VT-O2c"/>
+                                                    <constraint firstAttribute="bottom" secondItem="5o7-Z0-dqS" secondAttribute="bottom" id="5gD-ks-r9L"/>
+                                                    <constraint firstAttribute="width" secondItem="SM6-nx-NKD" secondAttribute="height" multiplier="1:1" id="Yot-e5-HEG"/>
+                                                    <constraint firstItem="5o7-Z0-dqS" firstAttribute="top" secondItem="SM6-nx-NKD" secondAttribute="top" id="g3o-Qr-2hn"/>
+                                                    <constraint firstAttribute="trailing" secondItem="5o7-Z0-dqS" secondAttribute="trailing" id="gFl-4M-3OF"/>
+                                                    <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="leading" id="vGw-cB-VLb"/>
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
@@ -441,20 +453,19 @@
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="trailing" id="25y-hg-Obr"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="leading" constant="-4" id="6HG-39-dSt"/>
-                                            <constraint firstItem="5o7-Z0-dqS" firstAttribute="centerY" secondItem="Ktr-qT-1fr" secondAttribute="centerY" id="6rb-4H-ISj"/>
+                                            <constraint firstItem="SM6-nx-NKD" firstAttribute="top" secondItem="Ktr-qT-1fr" secondAttribute="top" id="7u8-Q1-M8V"/>
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="centerY" secondItem="9Hg-t2-K5z" secondAttribute="centerY" id="Egp-c6-x6Y"/>
                                             <constraint firstItem="oGd-mG-cFw" firstAttribute="centerY" secondItem="9Hg-t2-K5z" secondAttribute="centerY" id="Gzr-dU-oMG"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="top" secondItem="jlv-jC-dQB" secondAttribute="bottom" constant="8" id="HiH-c5-MZq"/>
-                                            <constraint firstAttribute="bottom" secondItem="5o7-Z0-dqS" secondAttribute="bottom" id="Hui-Gh-xyv"/>
+                                            <constraint firstAttribute="bottom" secondItem="SM6-nx-NKD" secondAttribute="bottom" id="LRa-t5-mhX"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="top" secondItem="Ktr-qT-1fr" secondAttribute="top" id="ORY-q8-DFB"/>
-                                            <constraint firstItem="5o7-Z0-dqS" firstAttribute="top" secondItem="Ktr-qT-1fr" secondAttribute="top" id="Qmp-zE-IXn"/>
                                             <constraint firstAttribute="bottom" secondItem="9Hg-t2-K5z" secondAttribute="bottom" id="UzQ-FS-i2L"/>
-                                            <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="Ktr-qT-1fr" secondAttribute="leading" id="Zqk-vQ-rnV"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jlv-jC-dQB" secondAttribute="trailing" constant="4" id="dE6-x3-y9L"/>
+                                            <constraint firstItem="SM6-nx-NKD" firstAttribute="leading" secondItem="Ktr-qT-1fr" secondAttribute="leading" id="m6d-Bi-Vex"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zOB-QJ-TUy" secondAttribute="leading" id="nyg-q0-uLs"/>
-                                            <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="trailing" constant="4" id="ob8-aS-evc"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="9Hg-t2-K5z" secondAttribute="centerX" id="spW-Wf-nKA"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="zOB-QJ-TUy" secondAttribute="trailing" constant="4" id="tjf-4h-ukW"/>
+                                            <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="SM6-nx-NKD" secondAttribute="trailing" constant="4" id="wML-fX-wuF"/>
                                         </constraints>
                                     </customView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S1K-Lp-DVO">
@@ -814,6 +825,7 @@
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
                 <outlet property="playbackStateTrackingView" destination="Ktr-qT-1fr" id="QgM-di-DFw"/>
                 <outlet property="playingItemDisplayField" destination="d0e-29-yNq" id="QUe-1S-TQO"/>
+                <outlet property="thumbnailTrackingView" destination="SM6-nx-NKD" id="el1-jM-Jo2"/>
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
                 <outlet property="trailingTimeField" destination="oGd-mG-cFw" id="geo-iq-0th"/>
