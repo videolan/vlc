@@ -63,6 +63,14 @@ T.TabButton {
 
     Accessible.onPressAction: control.clicked()
 
+    // Tooltip
+
+    T.ToolTip.visible: (showText === false && T.ToolTip.text && (hovered || visualFocus))
+
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
+    T.ToolTip.text: text
+
     // Childs
 
     ColorContext {
