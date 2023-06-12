@@ -25,6 +25,11 @@
  * filesystem HLS segment/manifest storage.
  */
 
+struct hls_storage_config
+{
+    const char *name;
+};
+
 typedef struct hls_storage
 {
     /**
@@ -43,11 +48,15 @@ typedef struct hls_storage
  * \note The returned storage must be destroyed with \ref hls_storage_Destroy.
  *
  * \param content The block chain.
+ * \param hls_storage_config The storage specific config.
+ * \param hls_config The global hls config.
  *
  * \return An opaque pointer on the HLS storage.
  * \retval NULL on allocation error.
  */
-hls_storage_t *hls_storage_FromBlocks(block_t *content) VLC_USED;
+hls_storage_t *hls_storage_FromBlocks(block_t *content,
+                                      const struct hls_storage_config *,
+                                      const struct hls_config *) VLC_USED;
 
 /**
  * Create an HLS opaque storage from a byte buffer.
@@ -56,11 +65,16 @@ hls_storage_t *hls_storage_FromBlocks(block_t *content) VLC_USED;
  *
  * \param data Pointer on the buffer.
  * \param size Byte size of the buffer.
+ * \param hls_storage_config The storage specific config.
+ * \param hls_config The global hls config.
  *
  * \return An opaque pointer on the HLS storage.
  * \retval NULL on allocation error.
  */
-hls_storage_t * hls_storage_FromBytes(void *data, size_t size) VLC_USED;
+hls_storage_t *hls_storage_FromBytes(void *data,
+                                     size_t size,
+                                     const struct hls_storage_config *,
+                                     const struct hls_config *) VLC_USED;
 
 size_t hls_storage_GetSize(const hls_storage_t *);
 

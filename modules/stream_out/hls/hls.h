@@ -35,4 +35,10 @@ static inline void hls_config_Clean(struct hls_config *config)
     free(config->outdir);
 }
 
+static inline bool
+hls_config_IsMemStorageEnabled(const struct hls_config *config)
+{
+    return config->outdir == NULL;
+}
+
 #endif

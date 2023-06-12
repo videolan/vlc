@@ -22,11 +22,14 @@
 #endif
 
 #include <assert.h>
+#include <fcntl.h>
 
 #include <vlc_common.h>
 
 #include <vlc_block.h>
+#include <vlc_fs.h>
 
+#include "hls.h"
 #include "storage.h"
 
 struct storage_priv
@@ -41,6 +44,11 @@ struct storage_priv
         {
             block_t *content;
         } mem;
+
+        struct
+        {
+            char *path;
+        } fs;
     };
 };
 
@@ -102,14 +110,195 @@ static hls_storage_t *mem_storage_FromBytes(void *bytes, size_t size)
     return &priv->storage;
 }
 
-hls_storage_t *hls_storage_FromBlocks(block_t *content)
+static ssize_t fs_storage_Read(int fd, uint8_t buf[], size_t len)
 {
-    return mem_storage_FromBlock(content);
+    size_t total = 0;
+    while (total < len)
+    {
+        const ssize_t n = read(fd, buf + total, len - total);
+        if (n == -1)
+        {
+            if (errno == EINTR || errno == EAGAIN)
+                continue;
+            return -1;
+        }
+        else if (n == 0)
+            break;
+
+        total += n;
+    }
+    return total;
 }
 
-hls_storage_t *hls_storage_FromBytes(void *data, size_t size)
+static ssize_t fs_storage_GetContent(const hls_storage_t *storage,
+                                     uint8_t **dest)
 {
-    return hls_storage_FromBytes(data, size);
+    const struct storage_priv *priv =
+        container_of(storage, struct storage_priv, storage);
+
+    const int fd = vlc_open(priv->fs.path, O_RDONLY);
+
+    if (fd == -1)
+        return -1;
+
+    *dest = malloc(priv->size);
+    if (unlikely(*dest == NULL))
+        goto err;
+
+    const ssize_t read = fs_storage_Read(fd, *dest, priv->size);
+    if (read == -1)
+        goto err;
+
+    close(fd);
+    return read;
+err:
+    free(dest);
+    close(fd);
+    return -1;
+}
+
+static int fs_storage_Write(int fd, const uint8_t *data, size_t len)
+{
+    size_t written = 0;
+    while (written < len)
+    {
+        const ssize_t n = vlc_write(fd, data + written, len - written);
+        if (n == -1)
+        {
+            if (errno == EINTR || errno == EAGAIN)
+                continue;
+            return VLC_EGENERIC;
+        }
+
+        written += n;
+    }
+    return VLC_SUCCESS;
+}
+
+static void fs_storage_Destroy(struct storage_priv *priv)
+{
+    free(priv->fs.path);
+    free(priv);
+}
+
+static inline char *fs_storage_CreatePath(const char *outdir,
+                                          const char *storage_name)
+{
+    char *ret;
+
+    if (asprintf(&ret, "%s/%s", outdir, storage_name) == -1)
+        return NULL;
+    return ret;
+}
+
+static hls_storage_t *
+fs_storage_FromBlock(block_t *content,
+                     const struct hls_storage_config *config,
+                     const struct hls_config *hls_config)
+{
+    struct storage_priv *priv = malloc(sizeof(*priv));
+    if (unlikely(priv == NULL))
+        goto err;
+
+    priv->fs.path = fs_storage_CreatePath(hls_config->outdir, config->name);
+    if (unlikely(priv->fs.path == NULL))
+        goto err;
+
+    const int fd = vlc_open(priv->fs.path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd == -1)
+        goto err;
+
+    size_t size = 0;
+    for (const block_t *it = content; it != NULL; it = it->p_next)
+    {
+        const int status = fs_storage_Write(fd, it->p_buffer, it->i_buffer);
+        if (status != VLC_SUCCESS)
+        {
+            close(fd);
+            goto err;
+        }
+        size += it->i_buffer;
+    }
+
+    close(fd);
+    block_ChainRelease(content);
+
+    priv->storage.get_content = fs_storage_GetContent;
+    priv->size = size;
+    priv->destroy = fs_storage_Destroy;
+
+    return &priv->storage;
+err:
+    block_ChainRelease(content);
+    if (priv != NULL)
+        free(priv->fs.path);
+    free(priv);
+    return NULL;
+}
+
+static hls_storage_t *
+fs_storage_FromBytes(void *bytes,
+                     size_t size,
+                     const struct hls_storage_config *config,
+                     const struct hls_config *hls_config)
+{
+    struct storage_priv *priv = malloc(sizeof(*priv));
+    if (unlikely(priv == NULL))
+        return NULL;
+
+    priv->fs.path = fs_storage_CreatePath(hls_config->outdir, config->name);
+    if (unlikely(priv->fs.path == NULL))
+        goto err;
+
+    const int fd = vlc_open(priv->fs.path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd == -1)
+        goto err;
+
+    const int status = fs_storage_Write(fd, bytes, size);
+    close(fd);
+
+    if (unlikely(status != VLC_SUCCESS))
+        goto err;
+
+    priv->storage.get_content = fs_storage_GetContent;
+    priv->size = size;
+    priv->destroy = fs_storage_Destroy;
+
+    free(bytes);
+    return &priv->storage;
+err:
+    free(bytes);
+    if (priv != NULL)
+        free(priv->fs.path);
+    free(priv);
+    return NULL;
+}
+
+hls_storage_t *hls_storage_FromBlocks(block_t *content,
+                                      const struct hls_storage_config *config,
+                                      const struct hls_config *hls_config)
+{
+    hls_storage_t *storage;
+    if (hls_config_IsMemStorageEnabled(hls_config))
+        storage = mem_storage_FromBlock(content);
+    else
+        storage = fs_storage_FromBlock(content, config, hls_config);
+
+    return storage;
+}
+
+hls_storage_t *hls_storage_FromBytes(void *data,
+                                     size_t size,
+                                     const struct hls_storage_config *config,
+                                     const struct hls_config *hls_config)
+{
+    hls_storage_t *storage;
+    if (hls_config_IsMemStorageEnabled(hls_config))
+        storage = mem_storage_FromBytes(data, size);
+    else
+        storage = fs_storage_FromBytes(data, size, config, hls_config);
+
+    return storage;
 }
 
 size_t hls_storage_GetSize(const hls_storage_t *storage)
