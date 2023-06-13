@@ -80,11 +80,11 @@ static void VglSwapBuffers(vlc_gl_t *gl)
     ReleaseCurrent(gl);
 }
 
-static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
+static int ResizeInternal(vlc_gl_t * gl, unsigned w, unsigned h)
 {
     vout_display_sys_t *sys = gl->sys;
     if( sys->width == w && sys->height == h )
-        return;
+        return VLC_SUCCESS;
 
     MakeCurrent(gl);
     libvlc_video_render_cfg_t output_cfg = {
@@ -100,8 +100,12 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
         .transfer = libvlc_video_transfer_func_SRGB,
         .orientation = libvlc_video_orient_top_left,
     };
-    sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);
+    bool ret = sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);
     ReleaseCurrent(gl);
+
+    if (!ret)
+        return VLC_EGENERIC;
+
     assert(render_cfg.opengl_format == GL_RGBA);
     assert(render_cfg.full_range == true);
     assert(render_cfg.colorspace == libvlc_video_colorspace_BT709);
@@ -113,6 +117,13 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
 
     sys->width = w;
     sys->height = h;
+
+    return VLC_SUCCESS;
+}
+
+static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
+{
+    ResizeInternal(gl, w, h);
 }
 
 static void Close(vlc_gl_t *gl)
@@ -171,7 +182,12 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
             return VLC_EGENERIC;
         }
     }
-    Resize(gl, width, height);
+    if (ResizeInternal(gl, width, height) != VLC_SUCCESS)
+    {
+        if( sys->cleanupCb )
+            sys->cleanupCb(sys->opaque);
+        return VLC_EGENERIC;
+    }
 
     static const struct vlc_gl_operations gl_ops =
     {
