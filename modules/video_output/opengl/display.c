@@ -146,6 +146,42 @@ FlipVerticalAlign(struct vout_display_placement *dp)
         dp->align.vertical = VLC_VIDEO_ALIGN_TOP;
 }
 
+static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
+                         struct vout_display_placement dp)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* Copy the initial source, sine we might rotate it to fake a rotated
+     * display also. */
+    video_format_t source;
+    video_format_Init(&source, 0);
+    video_format_Copy(&source, vd->source);
+
+    video_transform_t transform = (video_transform_t)sys->gl->orientation;
+    video_format_TransformBy(&source, transform_Inverse(transform));
+
+    if (ORIENT_IS_SWAP(transform)) {
+        unsigned width = dp.width;
+        dp.width = dp.height;
+        dp.height = width;
+    }
+
+    FlipVerticalAlign(&dp);
+
+    vout_display_PlacePicture(place, &source, &dp);
+
+    if (ORIENT_IS_SWAP(transform))
+    {
+        *place = (vout_display_place_t){
+            .x = place->y,
+            .y = place->x,
+            .width = place->height,
+            .height = place->width,
+        };
+    }
+    sys->place_changed = true;
+}
+
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
@@ -190,10 +226,10 @@ static int Open(vout_display_t *vd,
     free(gl_name);
     if (sys->gl == NULL)
         goto error;
+    vd->sys = sys;
 
-    struct vout_display_placement flipped_dp = vd->cfg->display;
-    FlipVerticalAlign(&flipped_dp);
-    vout_display_PlacePicture(&sys->place, vd->source, &flipped_dp);
+    struct vout_display_placement dp = vd->cfg->display;
+    PlacePicture(vd, &sys->place, dp);
     sys->place_changed = true;
     vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
@@ -219,7 +255,6 @@ static int Open(vout_display_t *vd,
 
     vlc_viewpoint_init(&sys->viewpoint);
 
-    vd->sys = sys;
     vd->info.subpicture_chromas = spu_chromas;
     vd->ops = &ops;
     return VLC_SUCCESS;
@@ -228,6 +263,7 @@ error:
     if (sys->gl != NULL)
         vlc_gl_Delete(sys->gl);
     free (sys);
+    vd->sys = NULL;
     return VLC_EGENERIC;
 }
 
@@ -295,9 +331,7 @@ static int Control (vout_display_t *vd, int query)
       {
         struct vout_display_placement dp = vd->cfg->display;
 
-        FlipVerticalAlign(&dp);
-
-        vout_display_PlacePicture(&sys->place, vd->source, &dp);
+        PlacePicture(vd, &sys->place, dp);
         sys->place_changed = true;
         vlc_gl_Resize (sys->gl, dp.width, dp.height);
         return VLC_SUCCESS;
@@ -308,9 +342,7 @@ static int Control (vout_display_t *vd, int query)
       {
         struct vout_display_placement dp = vd->cfg->display;
 
-        FlipVerticalAlign(&dp);
-
-        vout_display_PlacePicture(&sys->place, vd->source, &dp);
+        PlacePicture(vd, &sys->place, dp);
         sys->place_changed = true;
         return VLC_SUCCESS;
       }
