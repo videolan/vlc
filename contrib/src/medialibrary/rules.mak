@@ -1,4 +1,4 @@
-MEDIALIBRARY_VERSION := 0.12.3
+MEDIALIBRARY_VERSION := 0.12.4
 MEDIALIBRARY_URL := https://code.videolan.org/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
 PKGS += medialibrary
@@ -15,7 +15,6 @@ $(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2:
 
 medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(UNPACK)
-	$(APPLY) $(SRC)/medialibrary/0001-LockFile-favor-CreateFile2-over-CreateFileW.patch
 	$(MOVE)
 
 .medialibrary: medialibrary crossfile.meson
