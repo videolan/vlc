@@ -248,7 +248,7 @@ static int Open( vlc_object_t *obj )
     }
     free(glfilters_config);
 
-    if (sys->gl->offscreen_vflip)
+    if (sys->gl->orientation == ORIENT_VFLIPPED)
     {
         /* OpenGL renders upside-down, add a filter to get the pixels in the
          * normal orientation */

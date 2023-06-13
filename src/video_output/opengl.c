@@ -89,6 +89,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
 
     vlc_gl_t *gl = &glpriv->gl;
     gl->api_type = api_type;
+    gl->orientation = ORIENT_NORMAL;
     gl->surface = wnd;
     gl->device = NULL;
 
@@ -144,9 +145,9 @@ vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
     vlc_gl_t *gl = &glpriv->gl;
 
     gl->api_type = api_type;
+    gl->orientation = ORIENT_NORMAL;
 
     gl->offscreen_chroma_out = VLC_CODEC_UNKNOWN;
-    gl->offscreen_vflip = false;
     gl->offscreen_vctx_out = NULL;
 
     gl->surface = NULL;

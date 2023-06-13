@@ -355,7 +355,7 @@ static void FreeCVBuffer(picture_t *picture)
         .close = Close,
     };
     gl->ops = &gl_ops;
-    gl->offscreen_vflip = true;
+    gl->orientation = ORIENT_VFLIPPED;
     gl->offscreen_vctx_out = _vctx_out;
     gl->offscreen_chroma_out = VLC_CODEC_CVPX_BGRA;
 

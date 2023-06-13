@@ -437,7 +437,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
         .close = Close,
     };
     gl->ops = &gl_ops;
-    gl->offscreen_vflip = true;
+    gl->orientation = ORIENT_VFLIPPED;
 
     eglMakeCurrent(sys->display, sys->surface, sys->surface,
                    sys->context);
