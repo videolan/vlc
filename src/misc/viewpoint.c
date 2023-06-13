@@ -25,6 +25,7 @@
 #endif
 
 #include <vlc_viewpoint.h>
+#include <vlc_es.h>
 
 void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *vp, float *m )
 {
@@ -68,4 +69,37 @@ void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *vp, float *m )
             for (int k=0; k<4; ++k)
                 for (int l=0; l<4; ++l)
                     m[4*i+l] += y_rot[i][j] * x_rot[j][k] * z_rot[k][l];
+}
+
+void vlc_viewpoint_from_orientation(vlc_viewpoint_t *vp,
+                                    video_orientation_t orient)
+{
+    switch(orient)
+    {
+        default:
+        case ORIENT_NORMAL:
+        case ORIENT_HFLIPPED:
+            *vp = (vlc_viewpoint_t) { .fov = vp->fov };
+            break;
+
+        case ORIENT_ROTATED_90:
+        case ORIENT_ANTI_TRANSPOSED:
+            *vp = (vlc_viewpoint_t) {
+                .roll = -90.f, .fov = vp->fov
+            };
+            break;
+
+        case ORIENT_ROTATED_180:
+        case ORIENT_VFLIPPED:
+            *vp = (vlc_viewpoint_t) {
+                .roll = -180.f, .fov = vp->fov
+            };
+            break;
+        case ORIENT_ROTATED_270:
+        case ORIENT_TRANSPOSED:
+            *vp = (vlc_viewpoint_t) {
+                .roll = -270.f, .fov = vp->fov
+            };
+            break;
+    }
 }

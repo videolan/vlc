@@ -211,6 +211,9 @@ typedef enum video_orientation_t
 /** Applies 180 degree rotation to an orientation */
 #define ORIENT_ROTATE_180(orient) ((orient) ^ 3)
 
+VLC_API void
+vlc_viewpoint_from_orientation(vlc_viewpoint_t *vp, video_orientation_t orient);
+
 typedef enum video_transform_t
 {
     TRANSFORM_IDENTITY       = ORIENT_NORMAL,
