@@ -173,10 +173,12 @@ FocusScope{
                 left = undefined
             }
 
-            right = playlistGroup
-
             if (_showTopBar)
-                offset += _layoutLine(left, right, offset)
+                right = playlistGroup
+            else
+                right = undefined
+
+            offset += _layoutLine(left, right, offset)
         }
 
         implicitHeight = offset
