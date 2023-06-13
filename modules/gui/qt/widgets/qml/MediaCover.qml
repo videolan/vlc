@@ -35,8 +35,6 @@ Rectangle {
 
     property real playIconSize: VLCStyle.play_cover_normal
 
-    property real playCoverBorderWidth: VLCStyle.table_cover_border
-
     property bool playCoverShowPlay: true
 
     // Aliases

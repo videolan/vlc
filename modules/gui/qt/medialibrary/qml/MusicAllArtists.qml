@@ -113,7 +113,6 @@ MainInterface.MainViewLoader {
                 pictureRadius: VLCStyle.artistGridCover_radius
                 pictureHeight: VLCStyle.artistGridCover_radius
                 pictureWidth: VLCStyle.artistGridCover_radius
-                playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 titleMargin: VLCStyle.margin_xlarge
                 playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true

@@ -64,7 +64,6 @@ MainInterface.MainGridView {
         pictureWidth: VLCStyle.colWidth(1)
         pictureHeight: VLCStyle.gridCover_network_height
         height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
-        playCoverBorderWidth: VLCStyle.gridCover_network_border
         playCoverShowPlay: false
         image: {
             if (is_dummy) {

@@ -142,7 +142,6 @@ MainInterface.MainViewLoader {
 
                 fallbackImage: VLCStyle.noArtAlbumCover
 
-                playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
 
                 onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)

@@ -35,7 +35,6 @@ Widgets.GridItem {
     subtitle: model.main_artist || qsTr("Unknown artist")
     pictureWidth: VLCStyle.gridCover_music_width
     pictureHeight: VLCStyle.gridCover_music_height
-    playCoverBorderWidth: VLCStyle.gridCover_music_border
     onPlayClicked: {
         if ( model.id !== undefined ) {
             MediaLib.addAndPlay( model.id )

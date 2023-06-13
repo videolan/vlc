@@ -183,7 +183,6 @@ FocusScope {
                             y: selectedBorderWidth
                             pictureWidth: VLCStyle.gridCover_music_width
                             pictureHeight: VLCStyle.gridCover_music_height
-                            playCoverBorderWidth: VLCStyle.gridCover_music_border
                             dragItem: albumDragItem
 
                             onPlayClicked: play()
