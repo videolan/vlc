@@ -92,7 +92,14 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
         libvlc_video_colorspace_BT709, libvlc_video_primaries_BT709,
         libvlc_video_transfer_func_SRGB, NULL,
     };
-    libvlc_video_output_cfg_t render_cfg;
+    libvlc_video_output_cfg_t render_cfg = {
+        .opengl_format = GL_RGBA,
+        .full_range = true,
+        .colorspace = libvlc_video_colorspace_BT709,
+        .primaries = libvlc_video_primaries_BT709,
+        .transfer = libvlc_video_transfer_func_SRGB,
+        .orientation = libvlc_video_orient_top_left,
+    };
     sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);
     ReleaseCurrent(gl);
     assert(render_cfg.opengl_format == GL_RGBA);
