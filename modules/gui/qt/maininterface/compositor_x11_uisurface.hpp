@@ -90,6 +90,8 @@ protected:
     void resizeFbo();
 
 private:
+    static void applyNvidiaWorkaround(QSurfaceFormat& format);
+
     QQuickItem* m_rootItem = nullptr;
     QOpenGLContext *m_context = nullptr;
     CompositorOffscreenWindow* m_uiWindow = nullptr;

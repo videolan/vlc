@@ -21,7 +21,8 @@
 #include <QQuickWindow>
 #include <QQuickItem>
 #include <QOffscreenSurface>
-#include <QGuiApplication>
+#include <QApplication>
+#include <QThread>
 
 #include "compositor_x11_uisurface.hpp"
 #include "compositor_common.hpp"
@@ -47,6 +48,13 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
 
     // UI is renderred on offscreen, no need for double bufferring
     format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
+
+    // Check if this is XWayland:
+    if (Q_UNLIKELY(QApplication::platformName() == QLatin1String("xcb") &&
+                   qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland")))
+    {
+        applyNvidiaWorkaround(format);
+    }
 
     setFormat(format);
 
@@ -319,6 +327,33 @@ void CompositorX11UISurface::resizeFbo()
         createFbo();
         m_context->doneCurrent();
         updateSizes();
+    }
+}
+
+void CompositorX11UISurface::applyNvidiaWorkaround(QSurfaceFormat &format)
+{
+    assert(QThread::currentThread() == qApp->thread());
+
+    QOffscreenSurface surface;
+    surface.setFormat(format);
+    surface.create();
+
+    QOpenGLContext ctx;
+    ctx.setFormat(format);
+    if (ctx.create() && ctx.makeCurrent(&surface))
+    {
+        // Context needs to be created to access the functions
+        if (QOpenGLFunctions * const func = ctx.functions())
+        {
+            if (const GLubyte* str = func->glGetString(GL_VENDOR))
+            {
+                if (!strcmp(reinterpret_cast<const char *>(str), "NVIDIA Corporation"))
+                {
+                    // for some reason SingleBuffer is not supported:
+                    format.setSwapBehavior(QSurfaceFormat::DefaultSwapBehavior);
+                }
+            }
+        }
     }
 }
 
