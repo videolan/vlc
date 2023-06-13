@@ -100,8 +100,8 @@ Item {
                 text: I18n.qtr("play/pause")
                 iconText: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                        && Player.playingState !== Player.PLAYING_STATE_STOPPED)
-                      ? VLCIcons.pause
-                      : VLCIcons.play
+                      ? VLCIcons.pause_filled
+                      : VLCIcons.play_filled
 
                 onClicked: MainPlaylistController.togglePlayPause()
             }

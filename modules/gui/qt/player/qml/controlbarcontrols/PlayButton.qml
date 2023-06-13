@@ -203,9 +203,9 @@ T.Control {
             if (!paintOnly
                     && state !== Player.PLAYING_STATE_PAUSED
                     && state !== Player.PLAYING_STATE_STOPPED)
-                return VLCIcons.pause
+                return VLCIcons.pause_filled
             else
-                return VLCIcons.play
+                return VLCIcons.play_filled
         }
 
         color: cursorInside ? theme.accent

@@ -207,7 +207,7 @@ T.ItemDelegate {
                     if (Player.playingState === Player.PLAYING_STATE_PLAYING)
                         return VLCIcons.volume_high
                     else if (Player.playingState === Player.PLAYING_STATE_PAUSED)
-                        return VLCIcons.pause
+                        return VLCIcons.pause_filled
                     else
                         return ""
                 }

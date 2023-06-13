@@ -164,7 +164,7 @@ FocusScope {
                 model: ObjectModel {
                     Widgets.ActionButtonPrimary {
                         id: playActionBtn
-                        iconTxt: VLCIcons.play_outline
+                        iconTxt: VLCIcons.play
                         text: I18n.qtr("Play all")
                         focus: true
 

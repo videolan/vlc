@@ -30,7 +30,7 @@ Widgets.OverlayMenu {
         id: playAction
         text: I18n.qtr("Play")
         onTriggered: MainPlaylistController.goTo(root.model.getSelection()[0], true)
-        readonly property string fontIcon: VLCIcons.play
+        readonly property string fontIcon: VLCIcons.play_filled
     }
 
     Action {

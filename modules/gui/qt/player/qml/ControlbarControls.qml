@@ -30,7 +30,7 @@ QtObject {
     readonly property string controlPath : "qrc:///player/controlbarcontrols/"
 
     readonly property var controlList: [
-        { id: ControlListModel.PLAY_BUTTON, file: "PlayButton.qml", label: VLCIcons.play, text: I18n.qtr("Play") },
+        { id: ControlListModel.PLAY_BUTTON, file: "PlayButton.qml", label: VLCIcons.play_filled, text: I18n.qtr("Play") },
         { id: ControlListModel.STOP_BUTTON, file: "StopButton.qml", label: VLCIcons.stop, text: I18n.qtr("Stop") },
         { id: ControlListModel.OPEN_BUTTON, file: "OpenButton.qml", label: VLCIcons.eject, text: I18n.qtr("Open") },
         { id: ControlListModel.PREVIOUS_BUTTON, file: "PreviousButton.qml", label: VLCIcons.previous, text: I18n.qtr("Previous") },

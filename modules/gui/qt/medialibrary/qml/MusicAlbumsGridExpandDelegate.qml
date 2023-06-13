@@ -153,7 +153,7 @@ FocusScope {
                     Widgets.ActionButtonPrimary {
                         id: _playActionBtn
 
-                        iconTxt: VLCIcons.play_outline
+                        iconTxt: VLCIcons.play
                         text: I18n.qtr("Play")
                         onClicked: MediaLib.addAndPlay( root.model.id )
 

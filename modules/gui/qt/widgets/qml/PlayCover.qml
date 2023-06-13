@@ -90,7 +90,7 @@ MouseArea {
     Widgets.IconLabel {
         anchors.centerIn: parent
 
-        text: VLCIcons.play
+        text: VLCIcons.play_filled
 
         color: (containsMouse) ? theme.accent
                                : "black"
