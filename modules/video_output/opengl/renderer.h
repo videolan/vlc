@@ -70,6 +70,7 @@ struct vlc_gl_renderer
         GLint ProjectionMatrix;
         GLint ViewMatrix;
         GLint ZoomMatrix;
+        GLint OrientationMatrix;
     } uloc;
 
     struct {

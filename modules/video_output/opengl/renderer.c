@@ -186,9 +186,10 @@ opengl_link_program(struct vlc_gl_filter *filter)
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n"
         "void main() {\n"
         " PicCoords = (StereoMatrix * vec3(PicCoordsIn, 1.0)).st;\n"
-        " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
+        " gl_Position = OrientationMatrix * ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
         "}\n";
 
@@ -267,6 +268,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
     GET_ULOC(ViewMatrix, "ViewMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
+    GET_ULOC(OrientationMatrix, "OrientationMatrix");
 
     GET_ALOC(PicCoordsIn, "PicCoordsIn");
     GET_ALOC(VertexPosition, "VertexPosition");
@@ -733,6 +735,15 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
         renderer->valid_coords = true;
     }
 
+    float orientation_matrix[ARRAY_SIZE(MATRIX4_IDENTITY)];
+    if (meta->orientation != ORIENT_NORMAL)
+    {
+        vlc_viewpoint_t orient_vp;
+        vlc_viewpoint_from_orientation(&orient_vp, meta->orientation);
+        vlc_viewpoint_to_4x4(&orient_vp, orientation_matrix);
+    }
+    else memcpy(orientation_matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
+
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
     vt->EnableVertexAttribArray(renderer->aloc.PicCoordsIn);
@@ -751,6 +762,8 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                          renderer->var.ViewMatrix);
     vt->UniformMatrix4fv(renderer->uloc.ZoomMatrix, 1, GL_FALSE,
                          renderer->var.ZoomMatrix);
+    vt->UniformMatrix4fv(renderer->uloc.OrientationMatrix, 1, GL_FALSE,
+                         orientation_matrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
     GL_ASSERT_NOERROR(vt);
