@@ -229,7 +229,7 @@ static int Open( vlc_object_t *obj )
     }
 
 
-    sys->filters = vlc_gl_filters_New(sys->gl, api, sys->interop);
+    sys->filters = vlc_gl_filters_New(sys->gl, api, sys->interop, ORIENT_NORMAL);
     if (!sys->filters)
     {
         msg_Err(obj, "Could not create filters");

@@ -43,7 +43,8 @@ struct vlc_gl_filter;
  */
 struct vlc_gl_filters *
 vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   struct vlc_gl_interop *interop);
+                   struct vlc_gl_interop *interop,
+                   video_orientation_t orientation);
 
 /**
  * Delete the OpenGL filter chain

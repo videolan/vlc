@@ -101,7 +101,7 @@ CreateFilters(vlc_gl_t *gl, const struct vlc_gl_api *api,
               struct vlc_gl_interop *interop,
               struct vlc_gl_renderer **out_renderer)
 {
-    struct vlc_gl_filters *filters = vlc_gl_filters_New(gl, api, interop);
+    struct vlc_gl_filters *filters = vlc_gl_filters_New(gl, api, interop, gl->orientation);
     if (!filters)
     {
         msg_Err(gl, "Could not create filters");

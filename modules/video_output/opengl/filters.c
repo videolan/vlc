@@ -145,11 +145,13 @@ struct vlc_gl_filters {
 
     bool can_blit;
     GLenum draw_framebuffer_target;
+    video_orientation_t orientation;
 };
 
 struct vlc_gl_filters *
 vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   struct vlc_gl_interop *interop)
+                   struct vlc_gl_interop *interop,
+                   video_orientation_t orientation)
 {
     struct vlc_gl_filters *filters = malloc(sizeof(*filters));
     if (!filters)
@@ -165,6 +167,7 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     filters->gl = gl;
     filters->api = api;
     filters->interop = interop;
+    filters->orientation = orientation;
     vlc_list_init(&filters->list);
 
     memset(&filters->viewport, 0, sizeof(filters->viewport));
@@ -502,6 +505,10 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 vt->Viewport(0, 0, priv->tex_widths[0], priv->tex_heights[0]);
 
             meta.plane = 0;
+            meta.orientation = ORIENT_NORMAL;
+            if (vlc_list_is_last(&priv->node, &filters->list))
+                meta.orientation = filters->orientation;
+
             int ret = filter->ops->draw(filter, pic, &meta);
             if (ret != VLC_SUCCESS)
                 return ret;
