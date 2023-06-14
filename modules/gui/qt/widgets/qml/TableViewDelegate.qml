@@ -232,6 +232,8 @@ T.Control {
 
                 size: VLCStyle.icon_normal
 
+                text: I18n.qtr("Menu")
+
                 visible: delegate.hovered
 
                 onClicked: {

@@ -204,6 +204,8 @@ ColumnLayout {
 
             focus: true
 
+            text: I18n.qtr("Reset")
+
             Navigation.parentItem: rowA
             Navigation.downItem: slider
 

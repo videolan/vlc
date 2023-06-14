@@ -176,6 +176,8 @@ FocusScope {
 
                         iconText: VLCIcons.close
 
+                        text: I18n.qtr("Close")
+
                         onClicked: root.retract()
 
                         Navigation.parentItem: root

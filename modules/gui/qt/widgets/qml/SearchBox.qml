@@ -173,6 +173,8 @@ FocusScope {
                 size: VLCStyle.icon_banner
                 iconText: VLCIcons.close
 
+                text: I18n.qtr("Clear")
+
                 visible: (textField.text.length > 0)
 
                 onVisibleChanged: {

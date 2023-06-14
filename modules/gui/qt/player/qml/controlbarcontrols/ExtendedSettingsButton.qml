@@ -27,6 +27,9 @@ Widgets.IconControlButton {
     id: extdSettingsBtn
 
     iconText: VLCIcons.extended
+
+    text: I18n.qtr("Extended settings")
+
     onClicked: DialogsProvider.extendedDialog()
-    Accessible.name: I18n.qtr("Extended settings")
+    Accessible.name: text
 }
