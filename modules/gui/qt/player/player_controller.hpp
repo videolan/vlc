@@ -312,10 +312,13 @@ public slots:
 
     VLCTick getAudioDelay() const;
     void setAudioDelay( VLCTick );
+    Q_INVOKABLE void addAudioDelay( VLCTick );
     VLCTick getSubtitleDelay() const;
     VLCTick getSecondarySubtitleDelay() const;
     void setSubtitleDelay( VLCTick );
+    Q_INVOKABLE void addSubtitleDelay( VLCTick );
     void setSecondarySubtitleDelay( VLCTick );
+    Q_INVOKABLE void addSecondarySubtitleDelay( VLCTick );
     int getAudioDelayMS() const;
     void setAudioDelayMS( int );
     int getSubtitleDelayMS() const;

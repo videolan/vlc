@@ -1306,6 +1306,14 @@ void PlayerController::setAudioDelay(VLCTick delay)
     vlc_player_SetAudioDelay( d->m_player, delay, VLC_PLAYER_WHENCE_ABSOLUTE );
 }
 
+/*Q_INVOKABLE*/void PlayerController::addAudioDelay(VLCTick delay)
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    vlc_player_SetAudioDelay( d->m_player, delay, VLC_PLAYER_WHENCE_RELATIVE );
+    emit audioDelayChanged(delay);
+}
+
 void PlayerController::setSubtitleDelay(VLCTick delay)
 {
     Q_D(PlayerController);
@@ -1313,6 +1321,14 @@ void PlayerController::setSubtitleDelay(VLCTick delay)
     if(!isCurrentItemSynced() )
         return;
     vlc_player_SetSubtitleDelay( d->m_player, delay, VLC_PLAYER_WHENCE_ABSOLUTE );
+}
+
+/*Q_INVOKABLE*/void PlayerController::addSubtitleDelay(VLCTick delay)
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    vlc_player_SetSubtitleDelay( d->m_player, delay, VLC_PLAYER_WHENCE_RELATIVE);
+    emit subtitleDelayChanged(delay);
 }
 
 void PlayerController::setSecondarySubtitleDelay(VLCTick delay)
@@ -1324,6 +1340,17 @@ void PlayerController::setSecondarySubtitleDelay(VLCTick delay)
     if (d->m_secondarySpuEsId.get() != NULL)
         vlc_player_SetEsIdDelay(d->m_player, d->m_secondarySpuEsId.get(),
                                 delay, VLC_PLAYER_WHENCE_ABSOLUTE);
+}
+
+/*Q_INVOKABLE*/void PlayerController::addSecondarySubtitleDelay(VLCTick delay)
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if (d->m_secondarySpuEsId.get() != NULL) {
+        vlc_player_SetEsIdDelay(d->m_player, d->m_secondarySpuEsId.get(),
+                                delay, VLC_PLAYER_WHENCE_RELATIVE);
+        emit secondarySubtitleDelayChanged(delay);
+    }
 }
 
 int PlayerController::getAudioDelayMS() const
