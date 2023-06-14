@@ -269,6 +269,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/style/defaultthemeproviders.hpp \
 	gui/qt/style/systempalettethemeprovider.cpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
+	gui/qt/player/delay_estimator.cpp \
+	gui/qt/player/delay_estimator.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/player_controlbar_model.cpp gui/qt/player/player_controlbar_model.hpp \
 	gui/qt/player/control_list_model.cpp gui/qt/player/control_list_model.hpp \
@@ -482,6 +484,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/network/standardpathmodel.moc.cpp \
 	gui/qt/style/colorcontext.moc.cpp \
 	gui/qt/style/systempalette.moc.cpp \
+	gui/qt/player/delay_estimator.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/player_controlbar_model.moc.cpp \
