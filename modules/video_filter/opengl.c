@@ -127,20 +127,20 @@ LoadFilters(filter_sys_t *sys, const char *glfilters_config)
         next_module = leftover;
         string = next_module; /* const view of next_module */
 
-        if (name)
-        {
-            struct vlc_gl_filter *filter =
-                vlc_gl_filters_Append(filters, name, config);
-            config_ChainDestroy(config);
-            if (!filter)
-            {
-                msg_Err(sys->gl, "Could not load GL filter: %s", name);
-                free(name);
-                return VLC_EGENERIC;
-            }
+        if (name == NULL)
+            continue;
 
+        struct vlc_gl_filter *filter =
+            vlc_gl_filters_Append(filters, name, config);
+        config_ChainDestroy(config);
+        if (!filter)
+        {
+            msg_Err(sys->gl, "Could not load GL filter: %s", name);
             free(name);
+            return VLC_EGENERIC;
         }
+
+        free(name);
     } while (string);
 
     return VLC_SUCCESS;
