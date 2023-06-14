@@ -397,6 +397,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
     [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
     [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
+    [voutView setVoutWindow:p_wnd];
     videoWindow.hasActiveVideo = YES;
     _playerController.activeVideoPlayback = YES;
     VLCMain.sharedInstance.libraryWindow.nonembedded = !b_mainWindowHasVideo;

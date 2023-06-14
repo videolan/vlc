@@ -32,6 +32,7 @@
 #include <vlc_threads.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
+#include <vlc_mouse.h>
 
 #define VLC_ASSERT_MAINTHREAD NSAssert([[NSThread currentThread] isMainThread], \
     @"Must be called from the main thread!")
@@ -93,6 +94,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Reports the new window size in pixels
 - (void)reportSizeChanged:(NSSize)newSize;
+
+///
+- (void)reportMousePressed:(int)button;
+
+///
+- (void)reportMouseReleased:(int)button;
+
+///
+- (void)reportMouseMoved:(NSPoint)location;
 
 /// Reports that the window was closed
 - (void)reportClose;
@@ -226,6 +236,26 @@ NS_ASSUME_NONNULL_BEGIN
         }];
     }
     vlc_mutex_unlock(&_lock);
+}
+
+- (void)reportMousePressed:(int)button
+{
+    [self enqueueEventBlock:^void (void) {
+        vlc_window_ReportMousePressed(vlc_vout_window, button);
+    }];
+}
+
+- (void)reportMouseReleased:(int)button
+{
+    [self enqueueEventBlock:^void (void) {
+        vlc_window_ReportMouseReleased(vlc_vout_window, button);
+    }];
+}
+
+- (void)reportMouseMoved:(NSPoint)location {
+    [self enqueueEventBlock:^void (void) {
+        vlc_window_ReportMouseMoved(vlc_vout_window, location.x, location.y);
+    }];
 }
 
 - (void)reportClose
@@ -373,16 +403,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@implementation VLCVideoWindowContentView
+@implementation VLCVideoWindowContentView {
+    NSTrackingArea *_trackingArea;
+}
 
 - (instancetype)initWithModuleDelegate:(VLCVideoWindowModuleDelegate *)delegate;
 {
     self = [super init];
     if (self) {
         NSAssert(delegate != nil, @"Invalid VLCVideoWindowModuleDelegate passed.");
+        self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
         _moduleDelegate = delegate;
     }
     return self;
+}
+
+- (void)layout {
+    [self reportBackingSize];
+    [super layout];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -421,6 +459,121 @@ NS_ASSUME_NONNULL_BEGIN
     [super viewDidChangeBackingProperties];
 }
 
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
+
+
+#pragma mark View mouse events
+
+- (void)updateTrackingAreas {
+    if (_trackingArea) {
+        [self removeTrackingArea:_trackingArea];
+    }
+
+    _trackingArea = [[NSTrackingArea alloc]
+        initWithRect:self.bounds
+        options: NSTrackingMouseMoved | NSTrackingActiveAlways
+        owner:self
+        userInfo:nil
+    ];
+
+    [self addTrackingArea:_trackingArea];
+}
+
+/* Left mouse button down */
+- (void)mouseDown:(NSEvent *)event
+{
+    @synchronized(self) {
+        if (event.type == NSLeftMouseDown &&
+            !(event.modifierFlags & NSControlKeyMask) &&
+            event.clickCount == 1) {
+            [_moduleDelegate reportMousePressed:MOUSE_BUTTON_LEFT];
+        }
+    }
+
+    [super mouseDown:event];
+}
+
+/* Left mouse button up */
+- (void)mouseUp:(NSEvent *)event
+{
+    @synchronized(self) {
+        if (event.type == NSLeftMouseUp) {
+            [_moduleDelegate reportMouseReleased:MOUSE_BUTTON_LEFT];
+        }
+    }
+
+    [super mouseUp:event];
+}
+
+/* Middle mouse button down */
+- (void)otherMouseDown:(NSEvent *)event
+{
+    @synchronized(self) {
+        [_moduleDelegate reportMousePressed:MOUSE_BUTTON_CENTER];
+    }
+
+    [super otherMouseDown:event];
+}
+
+/* Middle mouse button up */
+- (void)otherMouseUp:(NSEvent *)event
+{
+    @synchronized(self) {
+        [_moduleDelegate reportMouseReleased:MOUSE_BUTTON_CENTER];
+    }
+
+    [super otherMouseUp:event];
+}
+
+- (void)mouseMovedInternal:(NSEvent *)event
+{
+    NSPoint pointInView = 
+        [self convertPoint:event.locationInWindow fromView:nil];
+    if ([self mouse:pointInView inRect:self.bounds]) {
+        // Invert Y coordinates
+        CGPoint pointInWindow = 
+            CGPointMake(pointInView.x, self.bounds.size.height - pointInView.y);
+        NSPoint pointInBacking = [self convertPointToBacking:pointInWindow];
+        [_moduleDelegate reportMouseMoved:pointInBacking];
+    }
+}
+
+/* Mouse moved */
+- (void)mouseMoved:(NSEvent *)event
+{
+    [self mouseMovedInternal:event];
+    [super mouseMoved:event];
+}
+
+/* Mouse moved while clicked */
+- (void)mouseDragged:(NSEvent *)event
+{
+    [self mouseMovedInternal:event];
+    [super mouseDragged:event];
+}
+
+/* Mouse moved while center-clicked */
+- (void)otherMouseDragged:(NSEvent *)event
+{
+    [self mouseMovedInternal:event];
+    [super otherMouseDragged:event];
+}
+
+/* Mouse moved while right-clicked */
+- (void)rightMouseDragged:(NSEvent *)event
+{
+    [self mouseMovedInternal:event];
+    [super rightMouseDragged:event];
+}
+
 @end
 
 @implementation VLCVideoWindow
@@ -440,20 +593,23 @@ NS_ASSUME_NONNULL_END
 #pragma mark -
 #pragma mark VLC module
 
-typedef struct
-{
-    VLCVideoStandaloneWindowController *windowController;
-    VLCVideoWindowModuleDelegate *delegate;
-} vout_window_sys_t;
+@interface VLCVoutWindow : NSObject
+    @property (nonatomic) VLCVideoStandaloneWindowController *windowController;
+    @property (nonatomic) VLCVideoWindowContentView *contentView;
+    @property (nonatomic) VLCVideoWindowModuleDelegate *delegate;
+@end
+
+@implementation VLCVoutWindow
+@end
 
 /* Enable Window
  */
 static int WindowEnable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_sync(dispatch_get_main_queue(), ^{
             [weakWc showWindowWithConfig:cfg];
         });
@@ -465,10 +621,10 @@ static int WindowEnable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
 /* Request to close the window */
 static void WindowDisable(vlc_window_t *wnd)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakWc close];
         });
@@ -478,10 +634,10 @@ static void WindowDisable(vlc_window_t *wnd)
 /* Request to resize the window */
 static void WindowResize(vlc_window_t *wnd, unsigned width, unsigned height)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             VLCVideoStandaloneWindowController *wc = weakWc;
             // Convert from backing to window coordinates
@@ -498,10 +654,10 @@ static void WindowResize(vlc_window_t *wnd, unsigned width, unsigned height)
 /* Request to enable/disable Window decorations */
 static void SetDecoration(vlc_window_t *wnd, bool decorated)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakWc setWindowDecorated:decorated];
         });
@@ -511,10 +667,10 @@ static void SetDecoration(vlc_window_t *wnd, bool decorated)
 /* Request to enter fullscreen */
 static void WindowSetFullscreen(vlc_window_t *wnd, const char *idstr)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakWc setWindowFullscreen:YES];
         });
@@ -524,10 +680,10 @@ static void WindowSetFullscreen(vlc_window_t *wnd, const char *idstr)
 /* Request to exit fullscreen */
 static void WindowUnsetFullscreen(vlc_window_t *wnd)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
 
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakWc setWindowFullscreen:NO];
         });
@@ -536,9 +692,9 @@ static void WindowUnsetFullscreen(vlc_window_t *wnd)
 
 static void WindowSetTitle(struct vlc_window *wnd, const char *title)
 {
-    vout_window_sys_t *sys = wnd->sys;
+    VLCVoutWindow *sys = (__bridge VLCVoutWindow*)wnd->sys;
     @autoreleasepool {
-        __weak VLCVideoStandaloneWindowController *weakWc = sys->windowController;
+        __weak VLCVideoStandaloneWindowController *weakWc = sys.windowController;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakWc.window setTitle:[NSString stringWithUTF8String:title]];
         });
@@ -550,12 +706,8 @@ static void WindowSetTitle(struct vlc_window *wnd, const char *title)
  */
 void Close(vlc_window_t *wnd)
 {
-    vout_window_sys_t *sys = wnd->sys;
-
-    // ARC can not know when to release an object in a heap-allocated
-    // struct, so we need to explicitly set it to nil here.
-    sys->windowController = nil;
-    sys->delegate = nil;
+    VLCVoutWindow *sys = (__bridge_transfer VLCVoutWindow*)wnd->sys;
+    VLC_UNUSED(sys);
 }
 
 /*
@@ -587,32 +739,32 @@ int Open(vlc_window_t *wnd)
             return VLC_EGENERIC;
         }
 
-        vout_window_sys_t *sys = vlc_obj_calloc(VLC_OBJECT(wnd), 1, sizeof(*sys));
-        if (unlikely(sys == NULL))
+        VLCVoutWindow *sys = [VLCVoutWindow new];
+        if (unlikely(sys == nil))
             return VLC_ENOMEM;
 
-        VLCVideoWindowModuleDelegate *_moduleDelegate;
-        _moduleDelegate = [[VLCVideoWindowModuleDelegate alloc] initWithVLCVoutWindow:wnd];
-        if (unlikely(_moduleDelegate == nil))
+        VLCVideoWindowModuleDelegate *moduleDelegate;
+        moduleDelegate = [[VLCVideoWindowModuleDelegate alloc] initWithVLCVoutWindow:wnd];
+        if (unlikely(moduleDelegate == nil))
             return VLC_ENOMEM;
-        sys->delegate = _moduleDelegate;
+        sys.delegate = moduleDelegate;
 
-        __block VLCVideoStandaloneWindowController *_windowController;
+        __block VLCVideoStandaloneWindowController *windowController;
         dispatch_sync(dispatch_get_main_queue(), ^{
-            _windowController = [[VLCVideoStandaloneWindowController alloc] initWithModuleDelegate:_moduleDelegate];
+            windowController = [[VLCVideoStandaloneWindowController alloc] initWithModuleDelegate:moduleDelegate];
         });
-        if (unlikely(_windowController == nil))
+        if (unlikely(windowController == nil))
             return VLC_ENOMEM;
-        sys->windowController = _windowController;
+        sys.windowController = windowController;
 
         wnd->ops = &ops;
-        wnd->sys = sys;
+        wnd->sys = (__bridge_retained void*)sys;
 
         return VLC_SUCCESS;
     }
 }
 
-static void DrawableClose(vlc_window_t *wnd)
+static void EmbedClose(vlc_window_t *wnd)
 {
     id drawable = (__bridge_transfer id)wnd->handle.nsobject;
     wnd->handle.nsobject = nil;
@@ -621,19 +773,56 @@ static void DrawableClose(vlc_window_t *wnd)
 
 static const struct vlc_window_operations drawable_ops =
 {
-    .destroy = DrawableClose,
+    .destroy = EmbedClose,
 };
 
-static int DrawableOpen(vlc_window_t *wnd)
+static int EmbedOpen(vlc_window_t *wnd)
 {
-    id drawable = (__bridge id)
+    NSView *drawable = (__bridge NSView*)
         var_InheritAddress(wnd, "drawable-nsobject");
-    if (drawable == nil)
+    if (drawable == nil) {
+        msg_Err(wnd, "cannot create video output window without NSApplication");
         return VLC_EGENERIC;
+    }
 
-    wnd->ops = &drawable_ops;
-    wnd->handle.nsobject = (__bridge_retained void*)drawable;
-    wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
+    msg_Info(wnd, "using the macOS embed window module");
+
+    // Check if there is an NSApplication, needed for the connection
+    // to the Window Server so we can use NSWindows, NSViews, etc.
+    if (NSApp == nil) {
+        msg_Err(wnd, "cannot create video output window without NSApplication");
+        return VLC_EGENERIC;
+    }
+
+    @autoreleasepool {
+        VLCVoutWindow *sys = [VLCVoutWindow new];
+        if (unlikely(sys == nil))
+            return VLC_ENOMEM;
+
+        VLCVideoWindowModuleDelegate *moduleDelegate;
+        moduleDelegate = [[VLCVideoWindowModuleDelegate alloc] initWithVLCVoutWindow:wnd];
+        if (unlikely(moduleDelegate == nil))
+            return VLC_ENOMEM;
+        sys.delegate = moduleDelegate;
+
+        __block VLCVideoWindowContentView *contentView;
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            contentView = [[VLCVideoWindowContentView alloc] initWithModuleDelegate:moduleDelegate];
+            contentView.frame = drawable.frame;
+            [drawable addSubview:contentView];
+        });
+        if (unlikely(contentView == nil))
+            return VLC_ENOMEM;
+        sys.contentView = contentView;
+
+        [moduleDelegate setViewObject:contentView];
+
+        wnd->ops = &ops;
+        wnd->sys = (__bridge_retained void*)sys;
+
+        return VLC_SUCCESS;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -644,11 +833,12 @@ vlc_module_begin()
     set_description("macOS Video Output Window")
     set_capability("vout window", 1)
     set_callback(Open)
+    add_shortcut("macos-window")
 
     add_submodule()
     set_shortname(N_("NSObject Drawable"))
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
-    set_callback(DrawableOpen)
-    add_shortcut("embed-nsobject")
+    set_callback(EmbedOpen)
+    add_shortcut("macos-embed")
 vlc_module_end()

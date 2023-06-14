@@ -56,6 +56,9 @@
     CGFloat f_cumulated_magnification;
 
     vout_thread_t *p_vout;
+    vlc_window_t *_wnd;
+    dispatch_queue_t _eventQueue;
+    NSTrackingArea *_trackingArea;
     VLCPlayerController *_playerController;
     VLCHotkeysController *_hotkeysController;
 }
@@ -68,6 +71,9 @@
 
 - (void)dealloc
 {
+    dispatch_sync(_eventQueue, ^{
+        _wnd = NULL;
+    });
     if (p_vout)
         vout_Release(p_vout);
 
@@ -96,6 +102,17 @@
 
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
     _hotkeysController = [[VLCHotkeysController alloc] init];
+    _eventQueue = dispatch_queue_create("org.videolan.vlc.vout.mouseevents", DISPATCH_QUEUE_SERIAL);
+}
+
+- (void)layout {
+    NSRect bounds = [self convertRectToBacking:self.bounds];
+    dispatch_sync(_eventQueue, ^{
+        if (_wnd == NULL)
+            return;
+        vlc_window_ReportSize(_wnd, bounds.size.width, bounds.size.height);
+    });
+    [super layout];
 }
 
 - (void)drawRect:(NSRect)rect
@@ -146,9 +163,29 @@
     return [_hotkeysController performKeyEquivalent:o_event];
 }
 
+- (void)updateTrackingAreas {
+    if (_trackingArea) {
+        [self removeTrackingArea:_trackingArea];
+    }
+
+    _trackingArea = [[NSTrackingArea alloc]
+        initWithRect:self.bounds
+        options: NSTrackingMouseMoved | NSTrackingActiveAlways
+        owner:self
+        userInfo:nil
+    ];
+
+    [self addTrackingArea:_trackingArea];
+}
+
 - (void)mouseDown:(NSEvent *)o_event
 {
     if (([o_event type] == NSLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
+        if ([o_event clickCount] == 1)
+            dispatch_sync(_eventQueue, ^{
+                if (_wnd)
+                    vlc_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
+            });
         if ([o_event clickCount] == 2)
             [_playerController toggleFullscreen];
 
@@ -159,6 +196,19 @@
 
     [super mouseDown: o_event];
 }
+
+- (void)mouseUp:(NSEvent *)event
+{
+    if (event.type == NSLeftMouseUp) {
+        dispatch_sync(_eventQueue, ^{
+            if (_wnd)
+                vlc_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
+        });
+    }
+
+    [super mouseUp:event];
+}
+
 
 - (void)rightMouseDown:(NSEvent *)o_event
 {
@@ -176,15 +226,24 @@
     [super mouseUp: o_event];
 }
 
-- (void)mouseMoved:(NSEvent *)o_event
+- (void)mouseMoved:(NSEvent *)event
 {
-    NSPoint ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
-    if ([self mouse: ml inRect: [self bounds]]) {
+    NSPoint pointInView = 
+        [self convertPoint:event.locationInWindow fromView:nil];
+    if ([self mouse:pointInView inRect:self.bounds]) {
         [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
-                                                            object:self];
+                      object:self];
+        // Invert Y coordinates
+        CGPoint pointInWindow = 
+            CGPointMake(pointInView.x, self.bounds.size.height - pointInView.y);
+        NSPoint pointInBacking = [self convertPointToBacking:pointInWindow];
+        dispatch_sync(_eventQueue, ^{
+            if (_wnd == NULL)
+                return;
+            vlc_window_ReportMouseMoved(_wnd, pointInBacking.x, pointInBacking.y);
+        });
     }
-
-    [super mouseMoved: o_event];
+    [super mouseMoved:event];
 }
 
 - (void)resetScrollWheelDirection
@@ -262,6 +321,20 @@
 
 #pragma mark -
 #pragma mark Handling of vout related actions
+
+- (void)setVoutWindow:(vlc_window_t *)p_wnd {
+    dispatch_sync(_eventQueue, ^{
+        _wnd = p_wnd;
+    });
+}
+
+- (vlc_window_t *)voutWindow {
+    __block vlc_window_t *p_wnd = NULL;
+    dispatch_sync(_eventQueue, ^{
+        p_wnd = _wnd;
+    });
+    return p_wnd;
+}
 
 - (void)setVoutThread:(vout_thread_t *)p_vout_thread
 {

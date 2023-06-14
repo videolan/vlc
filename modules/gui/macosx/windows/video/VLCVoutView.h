@@ -28,6 +28,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import <vlc_vout.h>
+#import <vlc_window.h>
 
 /*****************************************************************************
  * VLCVoutView interface
@@ -35,6 +36,7 @@
 @interface VLCVoutView : NSView
 
 @property (readwrite, assign) vout_thread_t * voutThread;
+@property (readwrite, assign) vlc_window_t *voutWindow;
 
 - (void)releaseVoutThread;
 
