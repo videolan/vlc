@@ -161,13 +161,10 @@ MainInterface.MainTableView {
 
         // NOTE: Dropping medialibrary content into the playlist.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            if (item.inputItems) {
-                model.insert(item.inputItems, destinationIndex)
-            } else {
-                item.getSelectedInputItem(function(inputItems) {
+            item.getSelectedInputItem()
+                .then(inputItems => {
                     model.insert(inputItems, destinationIndex)
                 })
-            }
         }
 
         root.forceActiveFocus()

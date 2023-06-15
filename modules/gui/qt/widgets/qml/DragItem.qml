@@ -29,6 +29,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///playlist/" as Playlist
 import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///util/" as Util
 
 Item {
     id: dragItem
@@ -40,9 +41,6 @@ Item {
     readonly property int coverSize: VLCStyle.icon_normal
 
     property var indexes: []
-
-    // data from last setData
-    readonly property alias indexesData: dragItem._data
 
     property string defaultCover: VLCStyle.noArtAlbumCover
 
@@ -60,65 +58,32 @@ Item {
     // string => role
     property string titleRole: "title"
 
-    readonly property var inputItems: _inputItems
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
+    signal requestData(var indexes, var resolve, var reject)
+    signal requestInputItems(var indexes, var data, var resolve, var reject)
 
     function coversXPos(index) {
         return VLCStyle.margin_small + (coverSize / 3) * index;
     }
 
-    signal requestData(var identifier)
-
-    function getSelectedInputItem(cb) {
-        console.assert(false, "getSelectedInputItem is not implemented.")
-
-        return undefined
-    }
-
-    function setData(id, data) {
-        if (id !== dragItem._currentRequest)
-            return
-
-        console.assert(data.length === indexes.length)
-        _data = data
-
-        if (!dragItem.Drag.active)
-            return
-
-        Qt.callLater(dragItem.getSelectedInputItem, dragItem.setInputItems)
-
-        const covers = []
-        const titleList = []
-
-        for (let i in indexes) {
-            if (covers.length === _maxCovers)
-                break
-
-            const cover = _getCover(indexes[i], data[i])
-            const itemTitle = _getTitle(indexes[i], data[i])
-            if (!cover || !itemTitle) continue
-
-            covers.push(cover)
-            titleList.push(itemTitle)
-        }
-
-        if (covers.length === 0)
-            covers.push({artwork: dragItem.defaultCover})
-
-        if (titleList.length === 0)
-            titleList.push(defaultText)
-
-        _covers = covers
-        _title = titleList.join(",") + (indexes.length > _maxCovers ? "..." : "")
-    }
-
-    function setInputItems(inputItems) {
-        if (!Array.isArray(inputItems) || inputItems.length === 0) {
-            console.warn("can't convert items to input items");
-            dragItem._inputItems = null
-            return
-        }
-
-        dragItem._inputItems = inputItems
+    /**
+      * @return {Promise} Promise object of the input items
+      */
+    function getSelectedInputItem() {
+        if (_inputItems)
+            return Promise.resolve(dragItem._inputItems)
+        else if (dragItem._dropPromise)
+            return dragItem._dropPromise
+        else
+            dragItem._dropPromise = new Promise((resolve, reject) => {
+                dragItem._dropCallback = resolve
+                dragItem._dropFailedCallback = reject
+            })
+            return dragItem._dropPromise
     }
 
     //---------------------------------------------------------------------------------------------
@@ -130,7 +95,7 @@ Item {
 
     readonly property int _displayedCoversCount: Math.min(_indexesSize, _maxCovers + 1)
 
-    property var _inputItems
+    property var _inputItems: []
 
     property var _data: []
 
@@ -139,6 +104,10 @@ Item {
     property string _title: ""
 
     property int _currentRequest: 0
+
+    property var _dropPromise: null
+    property var _dropCallback: null
+    property var _dropFailedCallback: null
 
     //---------------------------------------------------------------------------------------------
     // Implementation
@@ -154,6 +123,46 @@ Item {
 
     visible: Drag.active
     enabled: visible
+
+    function _setData(data) {
+        console.assert(data.length === indexes.length)
+        _data = data
+
+        const covers = []
+        const titleList = []
+
+        for (let i in indexes) {
+            if (covers.length === _maxCovers)
+                break
+
+            const cover = _getCover(indexes[i], data[i])
+            const itemTitle = _getTitle(indexes[i], data[i])
+            if (!cover || !itemTitle)
+                continue
+
+            covers.push(cover)
+            titleList.push(itemTitle)
+        }
+
+        if (covers.length === 0)
+            covers.push({artwork: dragItem.defaultCover})
+
+        if (titleList.length === 0)
+            titleList.push(defaultText)
+
+        _covers = covers
+        _title = titleList.join(",") + (indexes.length > _maxCovers ? "..." : "")
+    }
+
+    function _setInputItems(inputItems) {
+        if (!Array.isArray(inputItems) || inputItems.length === 0) {
+            console.warn("can't convert items to input items");
+            dragItem._inputItems = null
+            return
+        }
+
+        dragItem._inputItems = inputItems
+    }
 
     function _getCover(index, data) {
         console.assert(dragItem.coverRole)
@@ -178,20 +187,9 @@ Item {
 
     Drag.onActiveChanged: {
         if (Drag.active) {
-            // reset any data from previous drags before requesting new data,
-            // so that we don't show invalid data while data is being requested
-            _title = ""
-            _covers = []
-            _data = []
-
-            dragItem._currentRequest += 1
-            dragItem.requestData(dragItem._currentRequest)
-
-            MainCtx.setCursor(Qt.DragMoveCursor)
+            fsm.startDrag()
         } else {
-            MainCtx.restoreCursor()
-
-            dragItem._inputItems = undefined
+            fsm.stopDrag()
         }
     }
 
@@ -202,15 +200,141 @@ Item {
         }
     }
 
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
+    Util.FSM {
+        id: fsm
+
+        signal startDrag()
+        signal stopDrag()
+
+        //internal signals
+        signal resolveData(var requestId, var indexes)
+        signal resolveInputItems(var requestId, var indexes)
+        signal resolveFailed()
+
+        signalMap: ({
+            startDrag: startDrag,
+            stopDrag: stopDrag,
+            resolveData: resolveData,
+            resolveInputItems: resolveInputItems,
+            resolveFailed: resolveFailed
+        })
+
+        initialState: fsmDragInactive
+
+        Util.FSMState {
+            id: fsmDragInactive
+
+            function enter() {
+                _title = ""
+                _covers = []
+                _data = []
+            }
+
+            transitions: ({
+                startDrag: fsmDragActive
+            })
+        }
+
+        Util.FSMState {
+            id: fsmDragActive
+
+            initialState: fsmRequestData
+
+            function enter() {
+                MainCtx.setCursor(Qt.DragMoveCursor)
+            }
+
+            function exit() {
+                MainCtx.restoreCursor()
+                if (dragItem._dropFailedCallback) {
+                    dragItem._dropFailedCallback()
+                }
+                dragItem._dropPromise = null
+                dragItem._dropFailedCallback = null
+                dragItem._dropCallback = null
+            }
+
+            transitions: ({
+                stopDrag: fsmDragInactive
+            })
+
+            Util.FSMState {
+                id: fsmRequestData
+
+                function enter() {
+                    const requestId = ++dragItem._currentRequest
+                    dragItem.requestData(
+                        dragItem.indexes,
+                        (data) => fsm.resolveData(requestId, data),
+                        fsm.resolveFailed)
+                }
+
+                transitions: ({
+                    resolveData: {
+                        guard: (requestId, data) => requestId === dragItem._currentRequest,
+                        action: (requestId, data) => {
+                            dragItem._setData(data)
+                        },
+                        target: fsmRequestInputItem
+                    },
+                    resolveFailed: fsmLoadingFailed
+                })
+            }
+
+            Util.FSMState {
+                id: fsmRequestInputItem
+
+                function enter() {
+                    const requestId = ++dragItem._currentRequest
+                    dragItem.requestInputItems(
+                        dragItem.indexes, _data,
+                        (items) => { fsm.resolveInputItems(requestId, items) },
+                        fsm.resolveFailed)
+                }
+
+                transitions: ({
+                    resolveInputItems: {
+                        guard: (requestId, items) => requestId === dragItem._currentRequest,
+                        action: (requestId, items) => {
+                            dragItem._setInputItems(items)
+                        },
+                        target: fsmLoadingDone,
+                    },
+                    resolveFailed: fsmLoadingFailed
+                })
+            }
+
+            Util.FSMState {
+                id: fsmLoadingDone
+
+                function enter() {
+                    if (dragItem._dropCallback) {
+                        dragItem._dropCallback(dragItem._inputItems)
+                    }
+                    dragItem._dropPromise = null
+                    dragItem._dropCallback = null
+                    dragItem._dropFailedCallback = null
+                }
+            }
+
+            Util.FSMState {
+                id: fsmLoadingFailed
+                function enter() {
+                    if (dragItem._dropFailedCallback) {
+                        dragItem._dropFailedCallback()
+                    }
+                    dragItem._dropPromise = null
+                    dragItem._dropCallback = null
+                    dragItem._dropFailedCallback = null
+                }
+            }
+        }
     }
 
     Rectangle {
         /* background */
         anchors.fill: parent
-        color: theme.bg.primary
+        color: fsmLoadingFailed.active ? theme.bg.negative : theme.bg.primary
         border.color: theme.border
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         radius: VLCStyle.dp(6, VLCStyle.scale)

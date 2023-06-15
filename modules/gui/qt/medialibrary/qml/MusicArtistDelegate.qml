@@ -86,11 +86,13 @@ T.ItemDelegate {
             titleRole: "name"
 
             onRequestData: {
-                setData(identifier, [model])
+                console.assert(indexes[0] === index)
+                resolve([model])
             }
 
-            function getSelectedInputItem(cb) {
-                return MediaLib.mlInputItem([model.id], cb)
+            onRequestInputItems: {
+                const idList = data.map((o) => o.id)
+                MediaLib.mlInputItem(idList, resolve)
             }
         }
 

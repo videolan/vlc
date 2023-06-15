@@ -75,22 +75,20 @@ Control {
         const item = drop.source;
 
         // NOTE: Move implementation.
-        if (dragItem == item) {
+        if (dragItem === item) {
             model.moveItemsPre(model.getSelection(), index);
 
         // NOTE: Dropping medialibrary content into the queue.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            if (item.inputItems) {
-                mainPlaylistController.insert(index, item.inputItems, false)
-            } else {
-                item.getSelectedInputItem(function(inputItems) {
+
+            item.getSelectedInputItem()
+                .then((inputItems) => {
                     if (!Array.isArray(inputItems) || inputItems.length === 0) {
                         console.warn("can't convert items to input items");
                         return
                     }
                     mainPlaylistController.insert(index, inputItems, false)
                 })
-            }
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
         } else if (drop.hasUrls) {
@@ -142,7 +140,7 @@ Control {
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
         onRequestData: {
-            setData(identifier, indexes.map(function (index) {
+            resolve(indexes.map((index) => {
                 const item = root.model.itemAt(index)
                 return {
                     "title": item.title,
@@ -151,8 +149,8 @@ Control {
             }))
         }
 
-        function getSelectedInputItem(cb) {
-            cb(root.model.getItemsForIndexes(root.model.getSelection()))
+        onRequestInputItems: {
+            resolve(root.model.getItemsForIndexes(indexes))
         }
     }
 

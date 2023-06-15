@@ -112,14 +112,15 @@ MainInterface.MainViewLoader {
         }
 
         onRequestData: {
-            setData(identifier, selectionModel.selectedIndexes.map(function (x){
-                return filterModel.getDataAt(x.row)
-            }))
+            resolve(
+                indexes.map(x => filterModel.getDataAt(x.row))
+            )
         }
 
-        function getSelectedInputItem(cb) {
-            //directly call the callback
-            cb(providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(selectionModel.selectedIndexes)))
+        onRequestInputItems: {
+            resolve(
+                providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(indexes))
+            )
         }
 
         Component {

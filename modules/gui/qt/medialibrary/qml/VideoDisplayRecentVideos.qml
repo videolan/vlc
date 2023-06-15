@@ -142,11 +142,12 @@ FocusScope {
                     indexes: [index]
 
                     onRequestData: {
-                        setData(identifier, [model])
+                        resolve([model])
                     }
 
-                    function getSelectedInputItem(cb) {
-                        return MediaLib.mlInputItem([model.id], cb)
+                    onRequestInputItems: {
+                        const idList = data.map((o) => o.id)
+                        MediaLib.mlInputItem(idList, resolve)
                     }
                 }
 
