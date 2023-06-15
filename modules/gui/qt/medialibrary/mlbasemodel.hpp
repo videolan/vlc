@@ -57,7 +57,7 @@ class MLBaseModel : public QAbstractListModel
 
     Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged FINAL)
 
-    // isReady is true when ml is not null pointer and cache count is not uninitialized
+    // isReady is true when the ml object is not null and the cache count is initialized
     Q_PROPERTY(bool isReady READ isReady NOTIFY isReadyChanged FINAL)
 
 public:
