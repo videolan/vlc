@@ -56,6 +56,14 @@ check_PROGRAMS = \
 	test_modules_stream_out_transcode \
 	$(NULL)
 
+if HAVE_GL
+check_PROGRAMS += test_modules_video_output_opengl_filters
+endif
+
+if HAVE_GLES2
+check_PROGRAMS += test_modules_video_output_opengl_es2_filters
+endif
+
 if HAVE_DARWIN
 check_PROGRAMS += test_src_misc_image_cvpx
 endif
@@ -190,6 +198,23 @@ test_modules_codec_hxxx_helper_SOURCES = modules/codec/hxxx_helper.c \
                                       ../modules/packetizer/h264_nal.c \
                                       ../modules/packetizer/hevc_nal.c
 test_modules_codec_hxxx_helper_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_video_output_opengl_filters_SOURCES = \
+	modules/video_output/opengl/filters.c \
+	../modules/video_output/opengl/filters.c \
+	../modules/video_output/opengl/filters.h \
+	../modules/video_output/opengl/filter.c \
+	../modules/video_output/opengl/gl_api.c \
+	../modules/video_output/opengl/gl_api.h \
+	../modules/video_output/opengl/interop.c \
+	../modules/video_output/opengl/interop.h \
+	../modules/video_output/opengl/importer.c \
+	../modules/video_output/opengl/importer.h
+test_modules_video_output_opengl_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_video_output_opengl_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL
+test_modules_video_output_opengl_es2_filters_SOURCES = $(test_modules_video_output_opengl_filters_SOURCES)
+test_modules_video_output_opengl_es2_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_video_output_opengl_es2_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
+
 
 test_src_video_output_SOURCES = \
 	src/video_output/video_output.c \
