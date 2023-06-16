@@ -230,14 +230,26 @@ void MLListCache::deleteRange(int first, int last)
 {
     if (unlikely(!m_cachedData))
         return;
-
     assert(first <= last);
+    assert(first >= 0);
+    assert(static_cast<size_t>(last) < m_cachedData->totalCount);
     emit beginRemoveRows(first, last);
-    auto it = m_cachedData->list.begin();
-    m_cachedData->list.erase(it+first, it+(last+1));
-    size_t delta = m_cachedData->loadedCount - m_cachedData->list.size();
-    m_cachedData->loadedCount -= delta;
-    m_cachedData->totalCount -= delta;
+    if (static_cast<size_t>(first) < m_cachedData->loadedCount)
+    {
+        auto itFirst = std::next(m_cachedData->list.begin(), first);
+
+        auto itLast = m_cachedData->list.begin();
+        if (static_cast<size_t>(last) < m_cachedData->loadedCount)
+            itLast = std::next(itLast, last + 1);
+        else
+            itLast = m_cachedData->list.end();
+
+        m_cachedData->list.erase(itFirst, itLast);
+        m_cachedData->loadedCount = m_cachedData->list.size();
+    }
+    //else data are not loaded, just mark them as deleted
+
+    m_cachedData->totalCount -= (last + 1) - first;
     emit endRemoveRows();
     emit localSizeChanged(m_cachedData->totalCount);
 }
