@@ -28,9 +28,10 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryInformationPanel.h"
 
 #import "main/VLCMain.h"
+
+#import "panels/VLCInformationWindowController.h"
 
 #import "playlist/VLCPlaylistController.h"
 
@@ -39,7 +40,7 @@
 
 @interface VLCLibraryMenuController ()
 {
-    VLCLibraryInformationPanel *_informationPanel;
+    VLCInformationWindowController *_informationWindowController;
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
@@ -212,13 +213,17 @@
 
 - (void)showInformation:(id)sender
 {
-    if (!_informationPanel) {
-        _informationPanel = [[VLCLibraryInformationPanel alloc] initWithWindowNibName:@"VLCLibraryInformationPanel"];
+    if (!_informationWindowController) {
+        _informationWindowController = [[VLCInformationWindowController alloc] init];
     }
 
-    [_informationPanel setRepresentedItem:_representedItem];
-    [_informationPanel showWindow:self];
-    
+    if (_representedItem != nil) {
+        _informationWindowController.representedInputItem = _representedItem.firstMediaItem.inputItem;
+    } else if (_representedInputItem != nil) {
+        _informationWindowController.representedInputItem = _representedInputItem;
+    }
+
+    [_informationWindowController toggleWindow:sender];
 }
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
