@@ -143,7 +143,8 @@ FocusScope {
                 property alias playActionBtn: _playActionBtn
 
                 focus: true
-                width: expand_cover_id.width
+                width: VLCStyle.expandCover_music_width
+
                 spacing: VLCStyle.margin_small
 
                 Layout.alignment: Qt.AlignCenter
@@ -276,7 +277,6 @@ FocusScope {
                 id: row
 
                 width: parent.width
-                height: implicitHeight
                 implicitHeight: col.implicitHeight
 
                 Loader {
@@ -442,6 +442,8 @@ FocusScope {
                     criteria: "duration",
 
                     visible: true,
+
+                    text: I18n.qtr("Duration"),
 
                     showSection: "",
 
