@@ -403,6 +403,10 @@ VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
 int main( int argc, char **argv )
 {
     (void)argc; (void)argv;
+#ifndef ENABLE_SOUT
+    (void) libvlc_playlist_play;
+    return 77;
+#endif
     test_init();
 
     const char * const args[] = {
