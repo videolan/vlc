@@ -209,13 +209,11 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     addDPStaticEntry( menu, qfut( I_PL_SAVE ), "", &DialogsProvider::savePlayingToPlaylist,
         "Ctrl+Y" );
 
-#ifdef ENABLE_SOUT
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
         &DialogsProvider::openAndTranscodingDialogs, "Ctrl+R" );
     addDPStaticEntry( menu, qtr( "&Stream..." ),
         ":/menu/stream.svg", &DialogsProvider::openAndStreamingDialogs, "Ctrl+S" );
     menu->addSeparator();
-#endif
 
     action = addMPLStaticEntry( p_intf, menu, qtr( "Quit at the end of playlist" ), "",
                                &PlaylistControllerModel::playAndExitChanged );
