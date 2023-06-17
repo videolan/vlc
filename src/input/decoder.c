@@ -1038,8 +1038,6 @@ static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const vlc_frame
         *pi_preroll = __MIN( *pi_preroll, p->i_pts );
 }
 
-#ifdef ENABLE_SOUT
-
 static void DecoderSendSubstream(vlc_input_decoder_t *p_owner)
 {
     decoder_t *p_dec = &p_owner->dec;
@@ -1153,7 +1151,6 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
         }
     }
 }
-#endif
 
 static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
                            const decoder_cc_desc_t *p_desc )
@@ -1600,13 +1597,11 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
         }
     }
 
-#ifdef ENABLE_SOUT
     if( p_owner->p_sout != NULL )
     {
         DecoderThread_ProcessSout( p_owner, frame );
         return;
     }
-#endif
     if( packetize )
     {
         vlc_frame_t *packetized_frame;
@@ -2024,14 +2019,12 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
     block_FifoEmpty( p_owner->p_fifo );
 
     /* Cleanup */
-#ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
     {
         sout_InputDelete( p_owner->p_sout, p_owner->p_sout_input );
         if( p_owner->cc.p_sout_input )
             sout_InputDelete( p_owner->p_sout, p_owner->cc.p_sout_input );
     }
-#endif
 
     switch( i_cat )
     {
@@ -2140,7 +2133,6 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 
     assert( p_dec->fmt_in->i_cat != UNKNOWN_ES );
 
-#ifdef ENABLE_SOUT
     /* Do not delay sout creation for SPU or DATA. */
     if( cfg->sout && cfg->fmt->b_packetized &&
         (cfg->fmt->i_cat != VIDEO_ES && cfg->fmt->i_cat != AUDIO_ES) )
@@ -2153,7 +2145,6 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
             p_owner->error = true;
         }
     }
-#endif
 
     if( !vlc_input_decoder_IsSynchronous( p_owner ) )
     {
@@ -2294,12 +2285,9 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
 
     bool b_empty;
 
-#ifdef ENABLE_SOUT
     if( p_owner->p_sout_input != NULL )
         b_empty = true;
-    else
-#endif
-    if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
+    else if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
     else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_astream != NULL )
         b_empty = vlc_aout_stream_IsDrained( p_owner->p_astream );
@@ -2361,9 +2349,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 
     if ( p_owner->p_sout_input != NULL )
     {
-#ifdef ENABLE_SOUT
         sout_InputFlush( p_owner->p_sout, p_owner->p_sout_input );
-#endif
     }
     else if( cat == AUDIO_ES )
     {
@@ -2739,11 +2725,9 @@ int vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *p_owner,
 {
     assert( p_owner->dec.fmt_in->i_cat == SPU_ES );
 
-#ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
         sout_InputControl( p_owner->p_sout, p_owner->p_sout_input,
                            SOUT_INPUT_SET_SPU_HIGHLIGHT, spu_hl );
-#endif
 
     vlc_fifo_Lock(p_owner->p_fifo);
     if( !p_owner->p_vout )

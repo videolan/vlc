@@ -739,7 +739,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     }
 }
 
-#ifdef ENABLE_SOUT
 static int InitSout( input_thread_t * p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
@@ -782,7 +781,6 @@ static int InitSout( input_thread_t * p_input )
 
     return VLC_SUCCESS;
 }
-#endif
 
 static void InitProperties( input_thread_t *input )
 {
@@ -805,12 +803,7 @@ static void InitProperties( input_thread_t *input )
     if( !master->b_rescale_ts && !master->b_can_pace_control && master->b_can_rate_control )
         capabilities |= VLC_INPUT_CAPABILITIES_REWINDABLE;
 
-#ifdef ENABLE_SOUT
     capabilities |= VLC_INPUT_CAPABILITIES_RECORDABLE;
-#else
-    if( master->b_can_stream_record )
-        capabilities |= VLC_INPUT_CAPABILITIES_RECORDABLE;
-#endif
 
     input_SendEventCapabilities( input, capabilities );
 
@@ -1275,10 +1268,8 @@ static int Init( input_thread_t * p_input )
         var_SetBool( p_input, "sub-autodetect-file", false );
     }
 
-#ifdef ENABLE_SOUT
     if( InitSout( p_input ) )
         goto error;
-#endif
 
     /* Create es out */
     priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display, priv->rate );
@@ -1327,14 +1318,12 @@ static int Init( input_thread_t * p_input )
         }
     }
 
-#ifdef ENABLE_SOUT
     if( priv->type != INPUT_TYPE_PREPARSING && priv->p_sout )
     {
         priv->b_out_pace_control = sout_StreamIsSynchronous(priv->p_sout);
         msg_Dbg( p_input, "starting in %ssync mode",
                  priv->b_out_pace_control ? "a" : "" );
     }
-#endif
 
     if (!input_item_IsPreparsed(input_priv(p_input)->p_item))
     {
@@ -1814,7 +1803,6 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     }
 }
 
-#ifdef ENABLE_SOUT
 static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
 {
     if( b_enable )
@@ -1842,8 +1830,6 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
     else if ( psz_demux_chain != NULL )
         msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
 }
-
-#endif // ENABLE_SOUT
 
 void input_SetProgramId(input_thread_t *input, int group_id)
 
@@ -2365,7 +2351,6 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_RENDERER:
         {
-#ifdef ENABLE_SOUT
             vlc_renderer_item_t *p_item = param.val.p_address;
             input_thread_private_t *p_priv = input_priv( p_input );
             // We do not support switching from a renderer to another for now
@@ -2396,7 +2381,6 @@ static bool Control( input_thread_t *p_input,
                 }
             }
             es_out_StartAllEs( priv->p_es_out_display, context );
-#endif
             break;
         }
         case INPUT_CONTROL_SET_VBI_PAGE:
@@ -2805,10 +2789,8 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
         in->b_can_stream_record = false;
-#ifdef ENABLE_SOUT
     if( !var_GetBool( p_input, "input-record-native" ) )
         in->b_can_stream_record = false;
-#endif
 
     demux_Control( in->p_demux, DEMUX_CAN_PAUSE, &in->b_can_pause );
 

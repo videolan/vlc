@@ -538,13 +538,11 @@ endif
 endif
 endif
 
-if ENABLE_SOUT
 libvlccore_la_SOURCES += \
 	stream_output/sap.c \
 	stream_output/stream_output.c stream_output/stream_output.h
 if ENABLE_VLM
 libvlccore_la_SOURCES += input/vlm.c input/vlm_event.c input/vlmshell.c
-endif
 endif
 
 if UPDATE_CHECK
