@@ -52,17 +52,15 @@ check_PROGRAMS = \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
 	test_modules_stream_out_pcr_sync \
+	test_modules_tls \
+	test_modules_stream_out_transcode \
 	$(NULL)
 
 if HAVE_DARWIN
 check_PROGRAMS += test_src_misc_image_cvpx
 endif
 
-if ENABLE_SOUT
-check_PROGRAMS += test_modules_tls \
-	test_modules_stream_out_transcode \
 
-endif
 if UPDATE_CHECK
 check_PROGRAMS += test_src_crypto_update
 endif
