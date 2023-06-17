@@ -51,6 +51,7 @@ check_PROGRAMS = \
 	test_modules_demux_timestamps_filter \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
+	test_modules_stream_out_pcr_sync \
 	$(NULL)
 
 if HAVE_DARWIN
@@ -60,7 +61,6 @@ endif
 if ENABLE_SOUT
 check_PROGRAMS += test_modules_tls \
 	test_modules_stream_out_transcode \
-	test_modules_stream_out_pcr_sync
 
 endif
 if UPDATE_CHECK
