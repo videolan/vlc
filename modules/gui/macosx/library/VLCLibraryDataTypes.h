@@ -130,6 +130,9 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
+@property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
+
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @end
 
@@ -137,20 +140,11 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 // Do not use directly -- subclass to create new media library item types.
 @interface VLCAbstractMediaLibraryItem : NSObject
 
-@property (readonly) int64_t libraryID;
-@property (readonly) BOOL smallArtworkGenerated;
-@property (readonly, strong, atomic) NSString *smallArtworkMRL;
-
 @end
 
 // Like VLCAbstractMediaLibraryItem but with some additional functionality for audio groupings
 // such as artists and genres. Do not use directly, subclass instead.
 @interface VLCAbstractMediaLibraryAudioGroup : VLCAbstractMediaLibraryItem<VLCLocallyManipulableItemProtocol>
-
-@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
-@property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
-
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @end
 
