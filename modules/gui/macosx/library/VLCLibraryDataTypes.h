@@ -138,7 +138,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 // Base abstract class with common implementations of properties used by media library items.
 // Do not use directly -- subclass to create new media library item types.
-@interface VLCAbstractMediaLibraryItem : NSObject
+@interface VLCAbstractMediaLibraryItem : NSObject<VLCMediaLibraryItemProtocol>
 
 @end
 
