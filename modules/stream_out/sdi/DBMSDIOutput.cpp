@@ -370,8 +370,8 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         size_t len = strlen(psz_string);
         if (len > 4)
         {
-            free(psz_string);
             msg_Err(p_stream, "Invalid mode %s", psz_string);
+            free(psz_string);
             goto error;
         }
         strncpy(wanted_mode.str, psz_string, 4);
