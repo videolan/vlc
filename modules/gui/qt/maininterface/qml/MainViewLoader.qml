@@ -52,7 +52,6 @@ Widgets.StackViewExt {
     // optional, loaded when model.loading is true
     property Component loadingComponent: null
 
-
     property var selectionModel: Util.SelectableDelegateModel {
         model: root.model
     }
@@ -71,12 +70,12 @@ Widgets.StackViewExt {
         return Helpers.get(currentItem, "setCurrentItemFocus", _setCurrentItemFocusDefault)
     }
 
-    property var currentComponent: {
-        if (typeof model === "undefined" || !model)
-            return null // invalid state
+    // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
+    //       gets called multiple times even when the currentComponent stays the same.
+    property Component currentComponent: {
         if (model.loading)
             return loadingComponent
-        if (model.count === 0)
+        else if (model.count === 0)
             return emptyLabel
         else if (MainCtx.gridView)
             return grid
@@ -84,8 +83,11 @@ Widgets.StackViewExt {
             return list
     }
 
-    onCurrentComponentChanged: {
-        _loadCurrentViewType()
+    Component.onCompleted: {
+        _updateView()
+
+        // NOTE: This call is useful to avoid a binding loop on currentComponent.
+        currentComponentChanged.connect(function() { _updateView() })
     }
 
     onModelChanged: resetFocus()
@@ -103,19 +105,27 @@ Widgets.StackViewExt {
         }
     }
 
+    function _updateView() {
+        // NOTE: When the currentItem is null we default to the StackView focusReason.
+        if (currentItem && currentItem.activeFocus)
+            _applyView(currentItem.focusReason)
+        else if (activeFocus)
+            _applyView(focusReason)
+        else
+            replace(null, currentComponent)
+    }
+
+    function _applyView(reason) {
+        replace(null, currentComponent)
+
+        setCurrentItemFocus(reason)
+    }
+
     function _setCurrentItemFocusDefault(reason) {
         if (currentItem)
             currentItem.forceActiveFocus(reason)
-    }
-
-    function _loadCurrentViewType() {
-        if (typeof currentComponent === "undefined" || !currentComponent) {
-            // invalid case, don't show anything
-            clear()
-            return
-        }
-
-        replace(null, currentComponent)
+        else
+            Helpers.enforceFocus(root, reason)
     }
 
     // makes the views currentIndex initial index and position view at that index
