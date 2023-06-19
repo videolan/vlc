@@ -803,8 +803,6 @@ static void InitProperties( input_thread_t *input )
     if( !master->b_rescale_ts && !master->b_can_pace_control && master->b_can_rate_control )
         capabilities |= VLC_INPUT_CAPABILITIES_REWINDABLE;
 
-    capabilities |= VLC_INPUT_CAPABILITIES_RECORDABLE;
-
     input_SendEventCapabilities( input, capabilities );
 
     int i_attachment;

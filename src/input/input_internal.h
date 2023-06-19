@@ -155,7 +155,6 @@ typedef enum input_event_type_e
 #define VLC_INPUT_CAPABILITIES_PAUSEABLE (1<<1)
 #define VLC_INPUT_CAPABILITIES_CHANGE_RATE (1<<2)
 #define VLC_INPUT_CAPABILITIES_REWINDABLE (1<<3)
-#define VLC_INPUT_CAPABILITIES_RECORDABLE (1<<4)
 
 struct vlc_input_event_state
 {
