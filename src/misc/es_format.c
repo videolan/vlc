@@ -82,6 +82,7 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
     p_fmt->i_visible_height = i_visible_height;
     p_fmt->i_x_offset       =
     p_fmt->i_y_offset       = 0;
+    p_fmt->orientation      = ORIENT_NORMAL;
     vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
                  i_sar_num, i_sar_den, 0 );
 
