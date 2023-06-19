@@ -27,9 +27,11 @@
 
 #include <vlc_media_library.h>
 #include <QString>
+#include <QUrl>
 
 // Forward declarations
 class MLBaseModel;
+class MLItem;
 class MLItemId;
 class CoverGenerator;
 class QUrl;
@@ -100,5 +102,18 @@ void thumbnailCopy(const MLListRange<T> &list, O dst, const int max)
 }
 
 QString urlToDisplayString(const QUrl &url);
+
+template<typename T>
+QUrl getParentURLFromMLItem(T *mlItem)
+{
+    if (mlItem == nullptr)
+        return QUrl();
+
+    QString mrl = mlItem->getMRL();
+    QUrl fileUrl(mrl);
+    QUrl parentDirUrl = fileUrl.adjusted(QUrl::RemoveFilename);
+
+    return parentDirUrl;
+}
 
 #endif // MLHELPER_HPP

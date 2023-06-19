@@ -43,6 +43,7 @@ public:
         VIDEO_FILENAME,
         VIDEO_TITLE,
         VIDEO_THUMBNAIL,
+        VIDEO_IS_LOCAL,
         VIDEO_DURATION,
         VIDEO_PROGRESS,
         VIDEO_PLAYCOUNT,
@@ -59,9 +60,12 @@ public:
 
 public:
     explicit MLVideoModel(QObject* parent = nullptr);
+
     virtual ~MLVideoModel() = default;
 
     QHash<int, QByteArray> roleNames() const override;
+
+    Q_INVOKABLE QUrl getParentURL(const QModelIndex & index);
 
 public: // Interface
     // NOTE: These functions are useful when we want to apply a change before the database event.
@@ -99,3 +103,4 @@ private:
 };
 
 #endif // MCVIDEOMODEL_H
+

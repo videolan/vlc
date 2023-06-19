@@ -18,6 +18,7 @@
 
 #include "mlalbumtrackmodel.hpp"
 #include "util/vlctick.hpp"
+#include "mlhelper.hpp"
 
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},
@@ -44,14 +45,19 @@ QVariant MLAlbumTrackModel::itemRoleData(MLItem *item, const int role) const
     // Tracks
     case TRACK_ID:
         return QVariant::fromValue( ml_track->getId() );
-    case TRACK_TITLE :
+    case TRACK_TITLE:
         return QVariant::fromValue( ml_track->getTitle() );
-    case TRACK_COVER :
+    case TRACK_COVER:
         return QVariant::fromValue( ml_track->getCover() );
-    case TRACK_NUMBER :
+    case TRACK_NUMBER:
         return QVariant::fromValue( ml_track->getTrackNumber() );
     case TRACK_DISC_NUMBER:
         return QVariant::fromValue( ml_track->getDiscNumber() );
+    case TRACK_IS_LOCAL:
+    {
+        QUrl trackUrl(ml_track->getMRL());
+        return QVariant::fromValue( trackUrl.isLocalFile() );
+    }
     case TRACK_DURATION :
         return QVariant::fromValue( ml_track->getDuration() );
     case TRACK_ALBUM:
@@ -77,6 +83,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_COVER, "cover" },
         { TRACK_NUMBER, "track_number" },
         { TRACK_DISC_NUMBER, "disc_number" },
+        { TRACK_IS_LOCAL, "isLocal" },
         { TRACK_DURATION, "duration" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
@@ -196,3 +203,8 @@ MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId)
     return std::make_unique<MLAlbumTrack>(ml, media.get());
 }
 
+/* Q_INVOKABLE */ QUrl MLAlbumTrackModel::getParentURL(const QModelIndex &index)
+{
+    MLAlbumTrack *ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
+    return getParentURLFromMLItem(ml_track);
+}

@@ -120,6 +120,11 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
             }
             return QVariant::fromValue( thumbnail );
         }
+        case VIDEO_IS_LOCAL:
+        {
+            QUrl videoUrl(video->getMRL());
+            return QVariant::fromValue( videoUrl.isLocalFile() );
+        }
         case VIDEO_DURATION:
             return QVariant::fromValue( video->getDuration() );
         case VIDEO_PROGRESS:
@@ -155,6 +160,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_FILENAME, "fileName" },
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },
+        { VIDEO_IS_LOCAL, "isLocal"},
         { VIDEO_DURATION, "duration" },
         { VIDEO_PROGRESS, "progress" },
         { VIDEO_PLAYCOUNT, "playcount" },
@@ -302,3 +308,8 @@ MLVideoModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) cons
     return std::make_unique<MLVideo>(media.get());
 }
 
+/* Q_INVOKABLE */ QUrl MLVideoModel::getParentURL(const QModelIndex &index)
+{
+    MLVideo *video = static_cast<MLVideo *>(item(index.row()));
+    return getParentURLFromMLItem(video);
+}

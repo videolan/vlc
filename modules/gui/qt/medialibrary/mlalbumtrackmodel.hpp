@@ -37,6 +37,7 @@ public:
         TRACK_COVER,
         TRACK_NUMBER,
         TRACK_DISC_NUMBER,
+        TRACK_IS_LOCAL,
         TRACK_DURATION,
         TRACK_ALBUM,
         TRACK_ARTIST,
@@ -52,6 +53,8 @@ public:
     virtual ~MLAlbumTrackModel() = default;
 
     QHash<int, QByteArray> roleNames() const override;
+
+    Q_INVOKABLE QUrl getParentURL(const QModelIndex &index);
 
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
