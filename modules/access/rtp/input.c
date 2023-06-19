@@ -73,7 +73,7 @@ static void rtp_process (rtp_sys_t *sys, block_t *block)
     }
 #endif
 
-    rtp_queue (sys, sys->session, block);
+    rtp_queue (sys->logger, &sys->session_sys, sys->session, block);
     return;
 drop:
     block_Release (block);

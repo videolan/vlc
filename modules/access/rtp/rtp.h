@@ -354,6 +354,13 @@ static inline uint8_t rtp_ptype (const block_t *block)
 }
 
 /** @} */
+typedef struct
+{
+    vlc_tick_t    timeout;
+    uint16_t      max_dropout; /**< Max packet forward misordering */
+    uint16_t      max_misorder; /**< Max packet backward misordering */
+    uint8_t       max_src; /**< Max simultaneous RTP sources */
+} rtp_session_sys_t;
 
 /* Global data */
 typedef struct
@@ -367,12 +374,11 @@ typedef struct
 #endif
     struct vlc_dtls *rtp_sock;
     struct vlc_dtls *rtcp_sock;
+
     vlc_thread_t  thread;
 
-    vlc_tick_t    timeout;
-    uint16_t      max_dropout; /**< Max packet forward misordering */
-    uint16_t      max_misorder; /**< Max packet backward misordering */
-    uint8_t       max_src; /**< Max simultaneous RTP sources */
+    rtp_session_sys_t session_sys;
+
 } rtp_sys_t;
 
 /**
@@ -381,7 +387,7 @@ typedef struct
  */
 rtp_session_t *rtp_session_create (void);
 void rtp_session_destroy (struct vlc_logger *, rtp_session_t *);
-void rtp_queue (rtp_sys_t *, rtp_session_t *, block_t *);
+void rtp_queue (struct vlc_logger *, rtp_session_sys_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (rtp_sys_t *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);
 int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *ses,
