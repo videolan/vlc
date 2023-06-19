@@ -52,7 +52,9 @@
 /**
  * Processes a packet received from the RTP socket.
  */
-static void rtp_process (rtp_sys_t *sys, block_t *block)
+static void rtp_process (struct vlc_logger *logger,
+                         rtp_input_sys_t *sys, rtp_session_sys_t *ssys,
+                         rtp_session_t *session, block_t *block)
 {
     if (block->i_buffer < 2)
         goto drop;
@@ -66,14 +68,14 @@ static void rtp_process (rtp_sys_t *sys, block_t *block)
         size_t len = block->i_buffer;
         if (srtp_recv (sys->srtp, block->p_buffer, &len))
         {
-            vlc_debug (sys->logger, "SRTP authentication/decryption failed");
+            vlc_debug (logger, "SRTP authentication/decryption failed");
             goto drop;
         }
         block->i_buffer = len;
     }
 #endif
 
-    rtp_queue (sys->logger, &sys->session_sys, sys->session, block);
+    rtp_queue (logger, ssys, session, block);
     return;
 drop:
     block_Release (block);
@@ -101,7 +103,7 @@ void *rtp_dgram_thread (void *opaque)
 {
     rtp_sys_t *sys = opaque;
     vlc_tick_t deadline = VLC_TICK_INVALID;
-    struct vlc_dtls *rtp_sock = sys->rtp_sock;
+    struct vlc_dtls *rtp_sock = sys->input_sys.rtp_sock;
 
     vlc_thread_set_name("vlc-rtp");
 
@@ -138,7 +140,8 @@ void *rtp_dgram_thread (void *opaque)
                 else
                     block->i_buffer = len;
 
-                rtp_process (sys, block);
+                rtp_process (sys->logger, &sys->input_sys,
+                             &sys->session_sys, sys->session, block);
             }
             else
             {

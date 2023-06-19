@@ -273,13 +273,13 @@ static void Close (vlc_object_t *obj)
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
 #ifdef HAVE_SRTP
-    if (p_sys->srtp)
-        srtp_destroy (p_sys->srtp);
+    if (p_sys->input_sys.srtp)
+        srtp_destroy (p_sys->input_sys.srtp);
 #endif
     rtp_session_destroy (obj->logger, p_sys->session);
-    if (p_sys->rtcp_sock != NULL)
-        vlc_dtls_Close(p_sys->rtcp_sock);
-    vlc_dtls_Close(p_sys->rtp_sock);
+    if (p_sys->input_sys.rtcp_sock != NULL)
+        vlc_dtls_Close(p_sys->input_sys.rtcp_sock);
+    vlc_dtls_Close(p_sys->input_sys.rtp_sock);
 }
 
 static int OpenSDP(vlc_object_t *obj)
@@ -309,11 +309,11 @@ static int OpenSDP(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    sys->rtp_sock = NULL;
-    sys->rtcp_sock = NULL;
+    sys->input_sys.rtp_sock = NULL;
+    sys->input_sys.rtcp_sock = NULL;
     sys->session = NULL;
 #ifdef HAVE_SRTP
-    sys->srtp = NULL;
+    sys->input_sys.srtp = NULL;
 #endif
 
     struct vlc_sdp *sdp = vlc_sdp_parse((const char *)peek, sdplen);
@@ -398,8 +398,8 @@ static int OpenSDP(vlc_object_t *obj)
     if (fd == -1)
         goto error;
 
-    sys->rtp_sock = vlc_datagram_CreateFD(fd);
-    if (unlikely(sys->rtp_sock == NULL)) {
+    sys->input_sys.rtp_sock = vlc_datagram_CreateFD(fd);
+    if (unlikely(sys->input_sys.rtp_sock == NULL)) {
         net_Close(fd);
         goto error;
     }
@@ -409,8 +409,8 @@ static int OpenSDP(vlc_object_t *obj)
         if (fd == -1)
             goto error;
 
-        sys->rtcp_sock = vlc_datagram_CreateFD(fd);
-        if (unlikely(sys->rtcp_sock == NULL)) {
+        sys->input_sys.rtcp_sock = vlc_datagram_CreateFD(fd);
+        if (unlikely(sys->input_sys.rtcp_sock == NULL)) {
             net_Close(fd);
             goto error;
         }
@@ -450,10 +450,10 @@ static int OpenSDP(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    if (sys->rtcp_sock != NULL)
-        vlc_dtls_Close(sys->rtcp_sock);
-    if (sys->rtp_sock != NULL)
-        vlc_dtls_Close(sys->rtp_sock);
+    if (sys->input_sys.rtcp_sock != NULL)
+        vlc_dtls_Close(sys->input_sys.rtcp_sock);
+    if (sys->input_sys.rtp_sock != NULL)
+        vlc_dtls_Close(sys->input_sys.rtp_sock);
     vlc_sdp_free(sdp);
     return VLC_EGENERIC;
 }
@@ -549,8 +549,8 @@ static int OpenURL(vlc_object_t *obj)
     if(fd == -1)
         return VLC_EGENERIC;
 
-    p_sys->rtp_sock = (co ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
-    if (p_sys->rtp_sock == NULL) {
+    p_sys->input_sys.rtp_sock = (co ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
+    if (p_sys->input_sys.rtp_sock == NULL) {
         if (rtcp_fd != -1)
             net_Close(rtcp_fd);
         return VLC_EGENERIC;
@@ -558,16 +558,16 @@ static int OpenURL(vlc_object_t *obj)
     net_SetCSCov (fd, -1, 12);
 
     if (rtcp_fd != -1) {
-        p_sys->rtcp_sock = vlc_datagram_CreateFD(rtcp_fd);
-        if (p_sys->rtcp_sock == NULL)
+        p_sys->input_sys.rtcp_sock = vlc_datagram_CreateFD(rtcp_fd);
+        if (p_sys->input_sys.rtcp_sock == NULL)
             net_Close (rtcp_fd);
     } else
-        p_sys->rtcp_sock = NULL;
+        p_sys->input_sys.rtcp_sock = NULL;
 
     /* Initializes demux */
     p_sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
-    p_sys->srtp         = NULL;
+    p_sys->input_sys.srtp         = NULL;
 #endif
     p_sys->logger       = obj->logger;
     p_sys->session_sys.max_src      = var_CreateGetInteger (obj, "rtp-max-src");
@@ -591,16 +591,16 @@ static int OpenURL(vlc_object_t *obj)
     if (key)
     {
         vlc_gcrypt_init ();
-        p_sys->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
+        p_sys->input_sys.srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
                                    SRTP_PRF_AES_CM, SRTP_RCC_MODE1);
-        if (p_sys->srtp == NULL)
+        if (p_sys->input_sys.srtp == NULL)
         {
             free (key);
             goto error;
         }
 
         char *salt = var_CreateGetNonEmptyString (demux, "srtp-salt");
-        int val = srtp_setkeystring (p_sys->srtp, key, salt ? salt : "");
+        int val = srtp_setkeystring (p_sys->input_sys.srtp, key, salt ? salt : "");
         free (salt);
         free (key);
         if (val)
@@ -618,14 +618,14 @@ static int OpenURL(vlc_object_t *obj)
 
 error:
 #ifdef HAVE_SRTP
-    if (p_sys->srtp != NULL)
-        srtp_destroy(p_sys->srtp);
+    if (p_sys->input_sys.srtp != NULL)
+        srtp_destroy(p_sys->input_sys.srtp);
 #endif
     if (p_sys->session != NULL)
         rtp_session_destroy(obj->logger, p_sys->session);
-    if (p_sys->rtcp_sock != NULL)
-        vlc_dtls_Close(p_sys->rtcp_sock);
-    vlc_dtls_Close(p_sys->rtp_sock);
+    if (p_sys->input_sys.rtcp_sock != NULL)
+        vlc_dtls_Close(p_sys->input_sys.rtcp_sock);
+    vlc_dtls_Close(p_sys->input_sys.rtp_sock);
     return VLC_EGENERIC;
 }
 

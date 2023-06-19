@@ -362,6 +362,15 @@ typedef struct
     uint8_t       max_src; /**< Max simultaneous RTP sources */
 } rtp_session_sys_t;
 
+typedef struct
+{
+#ifdef HAVE_SRTP
+    struct srtp_session_t *srtp;
+#endif
+    struct vlc_dtls *rtp_sock;
+    struct vlc_dtls *rtcp_sock;
+} rtp_input_sys_t;
+
 /* Global data */
 typedef struct
 {
@@ -369,15 +378,11 @@ typedef struct
 
     rtp_session_t *session;
     struct vlc_demux_chained_t *chained_demux;
-#ifdef HAVE_SRTP
-    struct srtp_session_t *srtp;
-#endif
-    struct vlc_dtls *rtp_sock;
-    struct vlc_dtls *rtcp_sock;
 
     vlc_thread_t  thread;
 
     rtp_session_sys_t session_sys;
+    rtp_input_sys_t input_sys;
 
 } rtp_sys_t;
 
