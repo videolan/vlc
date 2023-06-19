@@ -391,7 +391,7 @@ rtp_session_t *rtp_session_create_custom (uint16_t max_dropout, uint16_t max_mis
                                           uint8_t max_src, vlc_tick_t timeout);
 void rtp_session_destroy (struct vlc_logger *, rtp_session_t *);
 void rtp_queue (struct vlc_logger *, rtp_session_t *, block_t *);
-bool rtp_dequeue (rtp_sys_t *, const rtp_session_t *, vlc_tick_t *);
+bool rtp_dequeue (struct vlc_logger *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);
 int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *ses,
                             const struct vlc_sdp_media *media,

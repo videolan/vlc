@@ -370,13 +370,13 @@ drop:
  * given up waiting on the missing packets (time out) from the last one
  * already decoded.
  *
- * @param demux VLC demux object
+ * @param logger pointer to VLC logger
  * @param session RTP session receiving the packet
  * @param deadlinep pointer to deadline to call rtp_dequeue() again
  * @return true if the buffer is not empty, false otherwise.
  * In the later case, *deadlinep is undefined.
  */
-bool rtp_dequeue (rtp_sys_t *sys, const rtp_session_t *session,
+bool rtp_dequeue (struct vlc_logger *logger, const rtp_session_t *session,
                   vlc_tick_t *restrict deadlinep)
 {
     vlc_tick_t now = vlc_tick_now ();
@@ -409,7 +409,7 @@ bool rtp_dequeue (rtp_sys_t *sys, const rtp_session_t *session,
         {
             if ((int16_t)(rtp_seq (block) - (src->last_seq + 1)) <= 0)
             {   /* Next (or earlier) block ready, no need to wait */
-                rtp_decode (sys->logger, session, src);
+                rtp_decode (logger, session, src);
                 continue;
             }
 
@@ -435,7 +435,7 @@ bool rtp_dequeue (rtp_sys_t *sys, const rtp_session_t *session,
             deadline += block->i_pts;
             if (now >= deadline)
             {
-                rtp_decode (sys->logger, session, src);
+                rtp_decode (logger, session, src);
                 continue;
             }
             if (*deadlinep > deadline)
