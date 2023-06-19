@@ -1129,8 +1129,7 @@ static block_t *Encap_J2K( block_t *p_data, const es_format_t *p_fmt )
     return p_data;
 }
 
-/* returns true if needs more data */
-static bool MuxStreams(sout_mux_t *p_mux )
+static int MuxStreams( sout_mux_t *p_mux )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_input_sys_t *p_pcr_stream = (sout_input_sys_t*)p_sys->p_pcr_input->p_sys;
@@ -1175,8 +1174,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             if( ( p_input->p_fmt->i_cat == AUDIO_ES ) ||
                 ( p_input->p_fmt->i_cat == VIDEO_ES ) )
             {
-                /* We need more data */
-                return true;
+                return -EAGAIN;
             }
             else if( block_FifoCount( p_input->p_fifo ) <= 0 )
             {
@@ -1339,7 +1337,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                     msg_Warn( p_mux, "Unsupported interlaced J2K content. Expect broken result");
                 p_data = Encap_J2K( p_data, &p_input->fmt );
                 if( !p_data )
-                    return false;
+                    return VLC_EGENERIC;
             }
         }
         else if( p_data->i_length < 0 || p_data->i_length > VLC_TICK_FROM_SEC(2) )
@@ -1511,7 +1509,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
     /* 4: date and send */
     TSSchedule( p_mux, &chain_ts, i_pcr_length, i_pcr_dts );
-    return false;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1533,9 +1531,9 @@ static int Mux( sout_mux_t *p_mux )
         return VLC_SUCCESS;
     }
 
-    while (!MuxStreams(p_mux))
-        ;
-    return VLC_SUCCESS;
+    int status; 
+    while( (status = MuxStreams( p_mux )) == VLC_SUCCESS );
+    return (status == -EAGAIN) ? VLC_SUCCESS : status;
 }
 
 #define STD_PES_PAYLOAD 170
