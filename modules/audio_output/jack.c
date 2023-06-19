@@ -1,10 +1,11 @@
 /*****************************************************************************
  * jack.c : JACK audio output module
  *****************************************************************************
- * Copyright (C) 2006 VLC authors and VideoLAN
+ * Copyright (C) 2006-2023 VLC authors and VideoLAN
  *
  * Authors: Cyril Deguet <asmax _at_ videolan.org>
  *          Jon Griffiths <jon_p_griffiths _At_ yahoo _DOT_ com>
+ *          Zipdox <zipdox _at_ zipdox.net>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_configuration.h>
 
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
@@ -56,6 +58,7 @@ typedef struct
     jack_client_t  *p_jack_client;
     jack_port_t   **p_jack_ports;
     jack_sample_t **p_jack_buffers;
+    jack_sample_t *read_buffer;
     unsigned int    i_channels;
     unsigned int    i_rate;
     jack_nframes_t latency;
@@ -74,9 +77,8 @@ static void Pause        ( audio_output_t *aout, bool paused, vlc_tick_t date );
 static void Flush        ( audio_output_t *p_aout );
 static int  TimeGet      ( audio_output_t *, vlc_tick_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
+static int  Buffer_ch    ( jack_nframes_t nframes, void *p_arg );
 static int  GraphChange  ( void *p_arg );
-
-#include "audio_output/volume.h"
 
 #define AUTO_CONNECT_OPTION "jack-auto-connect"
 #define AUTO_CONNECT_TEXT N_("Automatically connect to writable clients")
@@ -106,7 +108,10 @@ vlc_module_begin ()
                 CONNECT_REGEX_LONGTEXT )
     add_string( "jack-name", "", JACK_NAME_TEXT, NULL)
 
-    add_sw_gain( )
+    add_float("jack-gain", 1., N_("Software gain"),
+    N_("This linear gain will be applied in software."))
+        change_float_range(0., 8.)
+
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -150,14 +155,13 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
     /* JACK only supports fl32 format */
     fmt->i_format = VLC_CODEC_FL32;
-    // TODO add buffer size callback
+
     p_sys->i_rate = fmt->i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
     p_aout->play = Play;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
     p_aout->time_get = TimeGet;
-    aout_SoftVolumeStart( p_aout );
 
     p_sys->i_channels = aout_FormatNbChannels( fmt );
     aout_FormatPrepare(fmt);
@@ -173,6 +177,22 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     if( p_sys->p_jack_buffers == NULL )
     {
         status = VLC_ENOMEM;
+        goto error_out;
+    }
+
+    jack_nframes_t jack_buf_size = jack_get_buffer_size( p_sys->p_jack_client );
+    p_sys->read_buffer = vlc_alloc( p_sys->i_channels * jack_buf_size, sizeof(jack_sample_t) );
+    if( p_sys->read_buffer == NULL )
+    {
+        status = VLC_ENOMEM;
+        goto error_out;
+    }
+
+    int buf_cb_set = jack_set_buffer_size_callback( p_sys->p_jack_client, Buffer_ch, p_sys );
+    if( buf_cb_set != 0 )
+    {
+        msg_Err( p_aout, "jack_set_buffer_size_callback failed");
+        status = VLC_EGENERIC;
         goto error_out;
     }
 
@@ -274,6 +294,7 @@ error_out:
 
         free( p_sys->p_jack_ports );
         free( p_sys->p_jack_buffers );
+        free( p_sys->read_buffer );
     }
     free( psz_name );
     return status;
@@ -334,6 +355,24 @@ static void Flush(audio_output_t *p_aout)
     jack_ringbuffer_reset(rb);
 }
 
+static int VolumeSet(audio_output_t *p_aout, float vol)
+{
+    aout_sys_t * p_sys = p_aout->sys;
+    p_sys->soft_gain = vol * vol * vol;
+    aout_VolumeReport(p_aout, vol);
+    if (var_InheritBool(p_aout, "volume-save"))
+        config_PutFloat("jack-gain", p_sys->soft_gain);
+    return 0;
+}
+
+static int MuteSet(audio_output_t *p_aout, bool mute)
+{
+    aout_sys_t * p_sys = p_aout->sys;
+    p_sys->soft_mute = mute;
+    aout_MuteReport(p_aout, mute);
+    return 0;
+}
+
 static int TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 {
     aout_sys_t * p_sys = p_aout->sys;
@@ -352,47 +391,67 @@ static int TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
  *****************************************************************************/
 int Process( jack_nframes_t i_frames, void *p_arg )
 {
-    unsigned int i, j, frames_from_rb = 0;
-    size_t bytes_read = 0;
+    unsigned int i, ch, frames_from_rb = 0;
+    size_t bytes_read;
     size_t frames_read;
     audio_output_t *p_aout = (audio_output_t*) p_arg;
     aout_sys_t *p_sys = p_aout->sys;
+    float gain = p_sys->soft_gain;
 
     /* Get the next audio data buffer unless paused */
 
     if( p_sys->paused == VLC_TICK_INVALID )
         frames_from_rb = i_frames;
 
-    /* Get the JACK buffers to write to */
-    for( i = 0; i < p_sys->i_channels; i++ )
-    {
-        p_sys->p_jack_buffers[i] = jack_port_get_buffer( p_sys->p_jack_ports[i],
-                                                         i_frames );
-    }
+    /* Read audio data from buffer */
+    jack_sample_t *samples = p_sys->read_buffer;
+    bytes_read = jack_ringbuffer_read( p_sys->p_jack_ringbuffer,
+                    (char *) samples,
+                    p_sys->i_channels * sizeof(jack_sample_t) * frames_from_rb );
+    frames_read = p_sys->soft_mute ? 0 : bytes_read / sizeof(jack_sample_t) / p_sys->i_channels;
 
     /* Copy in the audio data */
-    for( j = 0; j < frames_from_rb; j++ )
+    for( ch = 0; ch < p_sys->i_channels; ch++ )
     {
-        for( i = 0; i < p_sys->i_channels; i++ )
+        p_sys->p_jack_buffers[ch] = jack_port_get_buffer( p_sys->p_jack_ports[ch],
+                                                         i_frames );
+        /* De-interleave */
+        for( i = 0; i < frames_read; i++ )
         {
-            jack_sample_t *p_dst = p_sys->p_jack_buffers[i] + j;
-            bytes_read += jack_ringbuffer_read( p_sys->p_jack_ringbuffer,
-                    (char *) p_dst, sizeof(jack_sample_t) );
+            p_sys->p_jack_buffers[ch][i] = gain * samples[p_sys->i_channels * i + ch];
         }
-    }
 
-    /* Fill any remaining buffer with silence */
-    frames_read = (bytes_read / sizeof(jack_sample_t)) / p_sys->i_channels;
-    if( frames_read < i_frames )
-    {
-        for( i = 0; i < p_sys->i_channels; i++ )
+        /* Fill any remaining buffer with silence */
+        if (frames_read < i_frames)
         {
-            memset( p_sys->p_jack_buffers[i] + frames_read, 0,
+            memset( p_sys->p_jack_buffers[ch] + frames_read, 0,
                     sizeof( jack_sample_t ) * (i_frames - frames_read) );
         }
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * Buffer_ch: callback for when the buffer size changes
+ *****************************************************************************/
+static int Buffer_ch( jack_nframes_t nframes, void *p_arg )
+{
+    audio_output_t *p_aout = (audio_output_t*) p_arg;
+    aout_sys_t *p_sys = p_aout->sys;
+
+    jack_sample_t *orig_buffer = p_sys->read_buffer;
+    p_sys->read_buffer = vlc_reallocarray( p_sys->read_buffer, p_sys->i_channels * nframes, sizeof(jack_sample_t) );
+    int status = 0;
+    if( p_sys->read_buffer == NULL )
+    {
+        msg_Err( p_aout, "failed to allocate read buffer" );
+        jack_deactivate( p_sys->p_jack_client );
+        p_sys->read_buffer = orig_buffer;
+        status = ENOMEM;
+        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+    }
+    return status;
 }
 
 /*****************************************************************************
@@ -443,6 +502,7 @@ static void Stop( audio_output_t *p_aout )
     }
     free( p_sys->p_jack_ports );
     free( p_sys->p_jack_buffers );
+    free( p_sys->read_buffer );
     jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
 }
 
@@ -453,10 +513,17 @@ static int Open(vlc_object_t *obj)
 
     if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
+
+    sys->soft_gain = var_InheritFloat(aout, "jack-gain");
+    sys->soft_mute = var_InheritBool(aout, "mute");
+    aout_VolumeReport(aout, cbrtf(sys->soft_gain));
+    aout_MuteReport(aout, sys->soft_mute);
+
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout_SoftVolumeInit(aout);
+    aout->volume_set = VolumeSet;
+    aout->mute_set = MuteSet;
     return VLC_SUCCESS;
 }
 
