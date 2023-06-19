@@ -225,8 +225,23 @@
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
+    if (_representedInputItem == representedInputItem) {
+        return;
+    }
+    
     _representedInputItem = representedInputItem;
+    _representedMediaLibraryAudioGroup = nil;
+    [self updateRepresentation];
+}
 
+- (void)setRepresentedMediaLibraryGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
+{
+    if (_representedMediaLibraryAudioGroup == representedMediaLibraryAudioGroup) {
+        return;
+    }
+    
+    _representedMediaLibraryAudioGroup = representedMediaLibraryAudioGroup;
+    _representedInputItem = nil;
     [self updateRepresentation];
 }
 

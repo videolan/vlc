@@ -25,6 +25,7 @@
 
 @class VLCInputItem;
 @class VLCImageView;
+@protocol VLCMediaLibraryAudioGroupProtocol;
 
 @interface VLCInformationWindowController : NSWindowController
 
@@ -107,6 +108,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *demuxDiscontinuitiesTextField;
 
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
+@property (readwrite, strong, nonatomic) id<VLCMediaLibraryAudioGroupProtocol> representedMediaLibraryAudioGroup;
 @property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;
