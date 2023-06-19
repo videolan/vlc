@@ -369,7 +369,6 @@ typedef struct
     struct vlc_logger *logger;
 
     rtp_session_t *session;
-    struct vlc_demux_chained_t *chained_demux;
 
     vlc_thread_t  thread;
 

@@ -218,8 +218,6 @@ static int extract_port (char **phost)
  */
 static int Control (demux_t *demux, int query, va_list args)
 {
-    rtp_sys_t *sys = demux->p_sys;
-
     switch (query)
     {
         case DEMUX_GET_PTS_DELAY:
@@ -238,9 +236,6 @@ static int Control (demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
         }
     }
-
-    if (sys->chained_demux != NULL)
-        return vlc_demux_chained_ControlVa (sys->chained_demux, query, args);
 
     switch (query)
     {
@@ -417,7 +412,6 @@ static int OpenSDP(vlc_object_t *obj)
     }
 
     sys->logger = obj->logger;
-    sys->chained_demux = NULL;
 
     demux->pf_demux = NULL;
     demux->pf_control = Control;
@@ -563,8 +557,6 @@ static int OpenURL(vlc_object_t *obj)
     } else
         p_sys->input_sys.rtcp_sock = NULL;
 
-    /* Initializes demux */
-    p_sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
     p_sys->input_sys.srtp         = NULL;
 #endif
