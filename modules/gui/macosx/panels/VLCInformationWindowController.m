@@ -330,10 +330,12 @@
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD(foo)                                                         \
-NSString *const foo = [dict objectForKey:[NSString stringWithUTF8String:#foo]]; \
-if (foo != nil) { _##foo##TextField.stringValue = foo; }
-
+#define FILL_FIELD(foo)                                                                      \
+{                                                                                            \
+    NSString * const fooString = [dict objectForKey:[NSString stringWithUTF8String:#foo]];   \
+    if (fooString != nil) { _##foo##TextField.stringValue = fooString; }                     \
+}
+    
     FILL_FIELD(artist);
     FILL_FIELD(album);
     FILL_FIELD(genre);
