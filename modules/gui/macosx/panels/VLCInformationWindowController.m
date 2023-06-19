@@ -482,6 +482,13 @@ _##foo##TextField.stringValue = @"";
 {
     if (_representedInputItem != nil) {
         [self saveInputItemsMetadata:@[_representedInputItem] ignoreEmpty:NO];
+    } else if (_representedMediaLibraryAudioGroup != nil) {
+        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
+        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
+            [inputItems addObject:mediaItem.inputItem];
+        }
+        
+        [self saveInputItemsMetadata:inputItems ignoreEmpty:YES];
     } else {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:_NS("Error while saving meta")];
