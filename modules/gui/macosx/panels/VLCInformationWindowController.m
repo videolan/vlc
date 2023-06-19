@@ -326,6 +326,24 @@
     }
 }
 
+- (void)fillWindowWithDictionaryData:(NSDictionary<NSString *, id> *)dict
+{
+    NSParameterAssert(dict != nil);
+
+#define FILL_FIELD(foo)                                                         \
+NSString *const foo = [dict objectForKey:[NSString stringWithUTF8String:#foo]]; \
+if (foo != nil) { _##foo##TextField.stringValue = foo; }
+
+    FILL_FIELD(artist);
+    FILL_FIELD(album);
+    FILL_FIELD(genre);
+    FILL_FIELD(trackTotal);
+    FILL_FIELD(trackNumber);
+    FILL_FIELD(date);
+
+#undef FILL_FIELD
+}
+
 - (void)updateRepresentation
 {
     [_saveMetaDataButton setEnabled: NO];
