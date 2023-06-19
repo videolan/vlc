@@ -441,34 +441,54 @@ _##foo##TextField.stringValue = @"";
     [_saveMetaDataButton setEnabled: YES];
 }
 
+- (void)saveInputItemsMetadata:(NSArray<VLCInputItem *> *)inputItems
+                   ignoreEmpty:(BOOL)ignoreEmpty
+{
+    NSParameterAssert(inputItems);
+
+#define SET_INPUTITEM_PROP(inputItemProp, valueName)                    \
+{                                                                       \
+    NSString * const value = _##valueName##TextField.stringValue;       \
+    if (![value isEqualToString:@""] || !ignoreEmpty) {                 \
+        inputItemProp = value;                                          \
+    }                                                                   \
+}
+    
+    for (VLCInputItem * const inputItem in inputItems) {
+        SET_INPUTITEM_PROP(inputItem.name, title);
+        SET_INPUTITEM_PROP(inputItem.title, title);
+        SET_INPUTITEM_PROP(inputItem.artist, artist);
+        SET_INPUTITEM_PROP(inputItem.albumName, album);
+        SET_INPUTITEM_PROP(inputItem.genre, genre);
+        SET_INPUTITEM_PROP(inputItem.trackNumber, trackNumber);
+        SET_INPUTITEM_PROP(inputItem.date, date);
+        SET_INPUTITEM_PROP(inputItem.copyright, copyright);
+        SET_INPUTITEM_PROP(inputItem.publisher, publisher);
+        SET_INPUTITEM_PROP(inputItem.contentDescription, description);
+        SET_INPUTITEM_PROP(inputItem.language, language);
+        SET_INPUTITEM_PROP(inputItem.showName, showName);
+        SET_INPUTITEM_PROP(inputItem.actors, actors);
+        SET_INPUTITEM_PROP(inputItem.director, director);
+
+        [inputItem writeMetadataToFile];
+    }
+
+    #undef SET_INPUTITEM_PROP
+    
+    [_saveMetaDataButton setEnabled: NO];
+}
+
 - (IBAction)saveMetaData:(id)sender
 {
-    if (!_representedInputItem) {
+    if (_representedInputItem != nil) {
+        [self saveInputItemsMetadata:@[_representedInputItem] ignoreEmpty:NO];
+    } else {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:_NS("Error while saving meta")];
         [alert setInformativeText:_NS("VLC was unable to save the meta data.")];
         [alert addButtonWithTitle:_NS("OK")];
         [alert runModal];
-        return;
     }
-
-    _representedInputItem.name = _titleTextField.stringValue;
-    _representedInputItem.title = _titleTextField.stringValue;
-    _representedInputItem.artist = _artistTextField.stringValue;
-    _representedInputItem.albumName = _albumTextField.stringValue;
-    _representedInputItem.genre = _genreTextField.stringValue;
-    _representedInputItem.trackNumber = _trackNumberTextField.stringValue;
-    _representedInputItem.date = _dateTextField.stringValue;
-    _representedInputItem.copyright = _copyrightTextField.stringValue;
-    _representedInputItem.publisher = _publisherTextField.stringValue;
-    _representedInputItem.contentDescription = _descriptionTextField.stringValue;
-    _representedInputItem.language = _languageTextField.stringValue;
-    _representedInputItem.showName = _showNameTextField.stringValue;
-    _representedInputItem.actors = _actorsTextField.stringValue;
-    _representedInputItem.director = _directorTextField.stringValue;
-
-    [_representedInputItem writeMetadataToFile];
-    [_saveMetaDataButton setEnabled: NO];
 }
 
 @end
