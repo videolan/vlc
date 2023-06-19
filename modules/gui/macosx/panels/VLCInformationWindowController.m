@@ -348,10 +348,11 @@ if (foo != nil) { _##foo##TextField.stringValue = foo; }
 {
     [_saveMetaDataButton setEnabled: NO];
 
-    if (!_representedInputItem) {
+    if (!_representedInputItem && !_representedMediaLibraryAudioGroup) {
         /* Erase */
 #define SET( foo ) \
-[_##foo##TextField setStringValue:@""];
+_##foo##TextField.stringValue = @"";
+
         SET( uri );
         SET( title );
         SET( artist );
@@ -371,10 +372,20 @@ if (foo != nil) { _##foo##TextField.stringValue = foo; }
         SET( date );
         SET( description );
         SET( encodedby );
+
 #undef SET
         [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
-    } else {
+    } else if (_representedInputItem) {
         [self fillWindowWithInputItemData:_representedInputItem];
+    } else if (_representedMediaLibraryAudioGroup) {
+        NSDictionary * const commonItemsData = _representedMediaLibraryAudioGroup.commonItemData;
+
+        if ([commonItemsData objectForKey:@"inputItem"]) {
+            [self setRepresentedInputItem:[commonItemsData objectForKey:@"inputItem"]];
+            return;
+        } else {
+            [self fillWindowWithDictionaryData:commonItemsData];
+        }
     }
 
     /* reload the codec details table */
