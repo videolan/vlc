@@ -42,6 +42,11 @@ struct rtp_session_t
     unsigned       srcc;
     uint8_t        ptc;
     rtp_pt_t     **ptv;
+    /* params */
+    vlc_tick_t    timeout;
+    uint16_t      max_dropout; /**< Max packet forward misordering */
+    uint16_t      max_misorder; /**< Max packet backward misordering */
+    uint8_t       max_src; /**< Max simultaneous RTP sources */
 };
 
 static rtp_source_t *
@@ -50,16 +55,26 @@ static void rtp_source_destroy(struct vlc_logger *, rtp_source_t *);
 
 static void rtp_decode (struct vlc_logger *, const rtp_session_t *, rtp_source_t *);
 
+/** @} */
+
 /**
  * Creates a new RTP session.
  */
 rtp_session_t *
-rtp_session_create (void)
+rtp_session_create_custom (uint16_t max_dropout, uint16_t max_misorder,
+                           uint8_t max_src, vlc_tick_t timeout)
 {
     rtp_session_t *session = malloc (sizeof (*session));
     if (session == NULL)
         return NULL;
 
+    /* fixed parameters */
+    session->max_dropout = max_dropout;
+    session->max_misorder = -1 * max_misorder;
+    session->max_src = max_src;
+    session->timeout = timeout;
+
+    /* state variables */
     session->srcv = NULL;
     session->srcc = 0;
     session->ptc = 0;
@@ -68,6 +83,14 @@ rtp_session_create (void)
     return session;
 }
 
+rtp_session_t *
+rtp_session_create (void)
+{
+    return rtp_session_create_custom(RTP_MAX_DROPOUT_DEFAULT,
+                                     RTP_MAX_MISORDER_DEFAULT,
+                                     RTP_MAX_SRC_DEFAULT,
+                                     RTP_MAX_TIMEOUT_DEFAULT);
+}
 
 /**
  * Destroys an RTP session.
@@ -195,13 +218,11 @@ static struct vlc_rtp_pt *rtp_find_ptype(const rtp_session_t *session,
  * Receives an RTP packet and queues it. Not a cancellation point.
  *
  * @param logger VLC logger handle
- * @param sys rtp_session_sys object
  * @param session RTP session receiving the packet
  * @param block RTP packet including the RTP header
  */
 void
-rtp_queue (struct vlc_logger *logger, rtp_session_sys_t *p_sys,
-           rtp_session_t *session, block_t *block)
+rtp_queue (struct vlc_logger *logger, rtp_session_t *session, block_t *block)
 {
     /* RTP header sanity checks (see RFC 3550) */
     if (block->i_buffer < 12)
@@ -235,7 +256,7 @@ rtp_queue (struct vlc_logger *logger, rtp_session_sys_t *p_sys,
         }
 
         /* RTP source garbage collection */
-        if ((tmp->last_rx + p_sys->timeout) < now)
+        if ((tmp->last_rx + session->timeout) < now)
         {
             rtp_source_destroy(logger, tmp);
             if (--session->srcc > 0)
@@ -246,7 +267,7 @@ rtp_queue (struct vlc_logger *logger, rtp_session_sys_t *p_sys,
     if (src == NULL)
     {
         /* New source */
-        if (session->srcc >= p_sys->max_src)
+        if (session->srcc >= session->max_src)
         {
             vlc_warning (logger, "too many RTP sessions");
             goto drop;
@@ -294,8 +315,8 @@ rtp_queue (struct vlc_logger *logger, rtp_session_sys_t *p_sys,
         int16_t s;
     } delta_seq = { .u = seq - src->max_seq };
 
-    if ((delta_seq.s >= 0) ? (delta_seq.u > p_sys->max_dropout)
-                           : (delta_seq.u < p_sys->max_misorder))
+    if ((delta_seq.s >= 0) ? (delta_seq.u > session->max_dropout)
+                           : (delta_seq.u < session->max_misorder))
     {
         vlc_debug (logger, "sequence discontinuity"
                  " (got: %"PRIu16", expected: %"PRIu16")", seq, src->max_seq);

@@ -418,16 +418,15 @@ static int OpenSDP(vlc_object_t *obj)
 
     sys->logger = obj->logger;
     sys->chained_demux = NULL;
-    sys->session_sys.max_src = var_InheritInteger(obj, "rtp-max-src");
-    sys->session_sys.timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
-    sys->session_sys.max_dropout  = var_InheritInteger(obj, "rtp-max-dropout");
-    sys->session_sys.max_misorder = -var_InheritInteger(obj, "rtp-max-misorder");
 
     demux->pf_demux = NULL;
     demux->pf_control = Control;
     demux->p_sys = sys;
 
-    sys->session = rtp_session_create();
+    sys->session = rtp_session_create_custom(var_InheritInteger(obj, "rtp-max-dropout"),
+                                             var_InheritInteger(obj, "rtp-max-misorder"),
+                                             var_InheritInteger(obj, "rtp-max-src"),
+                                             vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout")));
     if (sys->session == NULL)
         goto error;
 
@@ -570,16 +569,16 @@ static int OpenURL(vlc_object_t *obj)
     p_sys->input_sys.srtp         = NULL;
 #endif
     p_sys->logger       = obj->logger;
-    p_sys->session_sys.max_src      = var_CreateGetInteger (obj, "rtp-max-src");
-    p_sys->session_sys.timeout      = vlc_tick_from_sec( var_CreateGetInteger (obj, "rtp-timeout") );
-    p_sys->session_sys.max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
-    p_sys->session_sys.max_misorder = -var_CreateGetInteger (obj, "rtp-max-misorder");
 
     demux->pf_demux   = NULL;
     demux->pf_control = Control;
     demux->p_sys      = p_sys;
 
-    p_sys->session = rtp_session_create();
+    p_sys->session = rtp_session_create_custom(
+                        var_InheritInteger(obj, "rtp-max-dropout"),
+                        var_InheritInteger(obj, "rtp-max-misorder"),
+                        var_InheritInteger(obj, "rtp-max-src"),
+                        vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout")) );
     if (p_sys->session == NULL)
         goto error;
 

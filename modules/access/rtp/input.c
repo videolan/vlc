@@ -52,8 +52,7 @@
 /**
  * Processes a packet received from the RTP socket.
  */
-static void rtp_process (struct vlc_logger *logger,
-                         rtp_input_sys_t *sys, rtp_session_sys_t *ssys,
+static void rtp_process (struct vlc_logger *logger, rtp_input_sys_t *sys,
                          rtp_session_t *session, block_t *block)
 {
     if (block->i_buffer < 2)
@@ -75,7 +74,7 @@ static void rtp_process (struct vlc_logger *logger,
     }
 #endif
 
-    rtp_queue (logger, ssys, session, block);
+    rtp_queue (logger, session, block);
     return;
 drop:
     block_Release (block);
@@ -140,8 +139,7 @@ void *rtp_dgram_thread (void *opaque)
                 else
                     block->i_buffer = len;
 
-                rtp_process (sys->logger, &sys->input_sys,
-                             &sys->session_sys, sys->session, block);
+                rtp_process (sys->logger, &sys->input_sys, sys->session, block);
             }
             else
             {
