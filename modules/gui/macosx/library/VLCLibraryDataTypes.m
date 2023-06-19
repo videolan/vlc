@@ -297,18 +297,47 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     BOOL differingGenre = NO;
     BOOL differingDate = NO;
 
+    // NOTE: These are unlikely to be filled for an audio group's input items
+    BOOL differingSeason = NO;
+    BOOL differingEpisode = NO;
+    BOOL differingActors = NO;
+    BOOL differingDirector = NO;
+    BOOL differingShowName = NO;
+    BOOL differingCopyright = NO;
+    BOOL differingPublisher = NO;
+    BOOL differingNowPlaying = NO;
+    BOOL differingLanguage = NO;
+    BOOL differingContentDescription = NO;
+    BOOL differingEncodedBy = NO;
+
     VLCMediaLibraryMediaItem * const firstMediaItem = mediaItems.firstObject;
     const int64_t firstItemArtistId = firstMediaItem.artistID;
     const int64_t firstItemGenreId = firstMediaItem.genreID;
     const int64_t firstItemAlbumId = firstMediaItem.albumID;
     
     VLCInputItem * const firstInputItem = firstMediaItem.inputItem;
+    NSString * const firstItemArtist = firstInputItem.artist;
+    NSString * const firstItemAlbum = firstInputItem.albumName;
+    NSString * const firstItemGenre = firstInputItem.genre;
     NSString * const firstItemUri = firstInputItem.decodedMRL;
     NSString * const firstItemTitle = firstInputItem.title;
     NSString * const firstItemTrackNumber = firstInputItem.trackNumber;
     NSString * const firstItemTrackTotal = firstInputItem.trackTotal;
     NSString * const firstItemDate = firstInputItem.date;
-    
+
+    // NOTE: These are unlikely to be filled for an audio group's input items
+    NSString * const firstItemSeason = firstInputItem.season;
+    NSString * const firstItemEpisode = firstInputItem.episode;
+    NSString * const firstItemActors = firstInputItem.actors;
+    NSString * const firstItemDirector = firstInputItem.director;
+    NSString * const firstItemShowName = firstInputItem.showName;
+    NSString * const firstItemCopyright = firstInputItem.copyright;
+    NSString * const firstItemPublisher = firstInputItem.publisher;
+    NSString * const firstItemNowPlaying = firstInputItem.nowPlaying;
+    NSString * const firstItemLanguage = firstInputItem.language;
+    NSString * const firstItemContentDescription = firstInputItem.contentDescription;
+    NSString * const firstItemEncodedBy = firstInputItem.encodedBy;
+
     for (VLCMediaLibraryMediaItem * const item in mediaItems) {
         VLCInputItem * const inputItem = item.inputItem;
 
@@ -320,34 +349,47 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         differingTrackNumber = differingTrackNumber || ![inputItem.trackNumber isEqualToString:firstItemTrackNumber];
         differingTrackTotal = differingTrackTotal || ![inputItem.trackTotal isEqualToString:firstItemTrackTotal];
         differingDate = differingDate || ![inputItem.date isEqualToString:firstItemDate];
+
+        differingSeason = differingSeason || ![inputItem.season isEqualToString:firstItemSeason];
+        differingEpisode = differingEpisode || ![inputItem.episode isEqualToString:firstItemEpisode];
+        differingActors = differingActors || ![inputItem.actors isEqualToString:firstItemActors];
+        differingShowName = differingShowName || ![inputItem.showName isEqualToString:firstItemDirector];
+        differingCopyright = differingCopyright || ![inputItem.copyright isEqualToString:firstItemCopyright];
+        differingPublisher = differingPublisher || ![inputItem.publisher isEqualToString:firstItemPublisher];
+        differingNowPlaying = differingNowPlaying || ![inputItem.nowPlaying isEqualToString:firstItemNowPlaying];
+        differingLanguage = differingLanguage || ![inputItem.language isEqualToString:firstItemLanguage];
+        differingContentDescription = differingContentDescription || ![inputItem.contentDescription isEqualToString:firstItemContentDescription];
+        differingEncodedBy = differingEncodedBy || ![inputItem.encodedBy isEqualToString:firstItemEncodedBy];
     }
 
     if (!differingUri) { // This can only mean we have one item
         return @{@"inputItem": firstInputItem};
     }
-    
-    if (!differingArtist) {
-        [commonData setObject:firstInputItem.artist forKey:@"artist"];
-        [commonData setObject:[NSNumber numberWithLongLong:firstItemArtistId] forKey:@"artistID"];
-    }
-    if (!differingAlbum) {
-        [commonData setObject:firstInputItem.albumName forKey:@"album"];
-        [commonData setObject:[NSNumber numberWithLongLong:firstItemAlbumId] forKey:@"albumID"];
-    }
-    if (!differingGenre) {
-        [commonData setObject:firstInputItem.genre forKey:@"genre"];
-        [commonData setObject:[NSNumber numberWithLongLong:firstItemGenreId] forKey:@"genreID"];
-    }
-    if (!differingTrackNumber) {
-        [commonData setObject:firstItemTrackNumber forKey:@"trackNumber"];
-    }
-    if (!differingTrackTotal) {
-        [commonData setObject:firstItemTrackTotal forKey:@"trackTotal"];
-    }
-    if (!differingDate) {
-        [commonData setObject:firstItemDate forKey:@"date"];
-    }
 
+#define ADD_FIELD_IF_DIFFERING(Foo) \
+if (!differing##Foo) {              \
+    [commonData setObject:firstItem##Foo forKey:[NSString stringWithUTF8String:#Foo]]; \
+}
+    
+    ADD_FIELD_IF_DIFFERING(Artist);
+    ADD_FIELD_IF_DIFFERING(Album);
+    ADD_FIELD_IF_DIFFERING(Genre);
+    ADD_FIELD_IF_DIFFERING(TrackNumber);
+    ADD_FIELD_IF_DIFFERING(TrackTotal);
+    ADD_FIELD_IF_DIFFERING(Date);
+    ADD_FIELD_IF_DIFFERING(Season);
+    ADD_FIELD_IF_DIFFERING(Episode);
+    ADD_FIELD_IF_DIFFERING(Actors);
+    ADD_FIELD_IF_DIFFERING(ShowName);
+    ADD_FIELD_IF_DIFFERING(Copyright);
+    ADD_FIELD_IF_DIFFERING(Publisher);
+    ADD_FIELD_IF_DIFFERING(NowPlaying);
+    ADD_FIELD_IF_DIFFERING(Language);
+    ADD_FIELD_IF_DIFFERING(ContentDescription);
+    ADD_FIELD_IF_DIFFERING(EncodedBy);
+    
+#undef ADD_FIELD_IF_DIFFERING
+    
     return [commonData copy];
 }
 

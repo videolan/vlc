@@ -330,19 +330,30 @@
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD(foo)                                                                      \
-{                                                                                            \
-    NSString * const fooString = [dict objectForKey:[NSString stringWithUTF8String:#foo]];   \
-    if (fooString != nil) { _##foo##TextField.stringValue = fooString; }                     \
+#define FILL_FIELD(dictKey, field)                                      \
+{                                                                       \
+    NSString * const fooString = [dict objectForKey:[NSString stringWithUTF8String:#dictKey]];   \
+    if (fooString != nil) { _##field##TextField.stringValue = fooString; } \
 }
     
-    FILL_FIELD(artist);
-    FILL_FIELD(album);
-    FILL_FIELD(genre);
-    FILL_FIELD(trackTotal);
-    FILL_FIELD(trackNumber);
-    FILL_FIELD(date);
-
+    FILL_FIELD(Artist, artist);
+    FILL_FIELD(Album, album);
+    FILL_FIELD(Genre, genre);
+    FILL_FIELD(TrackTotal, trackTotal);
+    FILL_FIELD(TrackNumber, trackNumber);
+    FILL_FIELD(Date, date);
+    FILL_FIELD(Season, season);
+    FILL_FIELD(Episode, episode);
+    FILL_FIELD(Actors, actors);
+    FILL_FIELD(Director, director);
+    FILL_FIELD(ShowName, showName);
+    FILL_FIELD(Copyright, copyright);
+    FILL_FIELD(Publisher, publisher);
+    FILL_FIELD(NowPlaying, nowPlaying);
+    FILL_FIELD(Language, language);
+    FILL_FIELD(ContentDescription, description);
+    FILL_FIELD(EncodedBy, encodedby);
+    
 #undef FILL_FIELD
 }
 
