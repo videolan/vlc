@@ -390,6 +390,11 @@ typedef struct
  * \defgroup rtp_session RTP session
  * @{
  */
+#define RTP_MAX_SRC_DEFAULT 1
+#define RTP_MAX_DROPOUT_DEFAULT 3000
+#define RTP_MAX_TIMEOUT_DEFAULT 5
+#define RTP_MAX_MISORDER_DEFAULT 100
+
 rtp_session_t *rtp_session_create (void);
 void rtp_session_destroy (struct vlc_logger *, rtp_session_t *);
 void rtp_queue (struct vlc_logger *, rtp_session_sys_t *, rtp_session_t *, block_t *);

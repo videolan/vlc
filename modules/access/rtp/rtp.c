@@ -689,15 +689,15 @@ vlc_module_begin()
                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT)
         change_safe()
 #endif
-    add_integer("rtp-max-src", 1, RTP_MAX_SRC_TEXT,
+    add_integer("rtp-max-src", RTP_MAX_SRC_DEFAULT, RTP_MAX_SRC_TEXT,
                 RTP_MAX_SRC_LONGTEXT)
         change_integer_range (1, 255)
-    add_integer("rtp-timeout", 5, RTP_TIMEOUT_TEXT,
+    add_integer("rtp-timeout", RTP_MAX_TIMEOUT_DEFAULT, RTP_TIMEOUT_TEXT,
                 RTP_TIMEOUT_LONGTEXT)
-    add_integer("rtp-max-dropout", 3000, RTP_MAX_DROPOUT_TEXT,
+    add_integer("rtp-max-dropout", RTP_MAX_DROPOUT_DEFAULT, RTP_MAX_DROPOUT_TEXT,
                 RTP_MAX_DROPOUT_LONGTEXT)
         change_integer_range (0, 32767)
-    add_integer("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
+    add_integer("rtp-max-misorder", RTP_MAX_MISORDER_DEFAULT, RTP_MAX_MISORDER_TEXT,
                 RTP_MAX_MISORDER_LONGTEXT)
         change_integer_range (0, 32767)
     add_obsolete_string("rtp-dynamic-pt") /* since 4.0.0 */
