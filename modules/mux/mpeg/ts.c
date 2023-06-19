@@ -448,9 +448,9 @@ static int Mux      ( sout_mux_t * );
 
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
 static block_t *Add_ADTS( block_t *, const es_format_t * );
-static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
+static int TSSchedule   ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts );
-static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
+static int TSDate       ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts );
 static void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
@@ -1508,8 +1508,7 @@ static int MuxStreams( sout_mux_t *p_mux )
     }
 
     /* 4: date and send */
-    TSSchedule( p_mux, &chain_ts, i_pcr_length, i_pcr_dts );
-    return VLC_SUCCESS;
+    return TSSchedule( p_mux, &chain_ts, i_pcr_length, i_pcr_dts );
 }
 
 /*****************************************************************************
@@ -1643,8 +1642,8 @@ static block_t *Add_ADTS( block_t *p_data, const es_format_t *p_fmt )
     return p_new_block;
 }
 
-static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                        vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
+static int TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
+                       vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_buffer_chain_t new_chain;
@@ -1684,20 +1683,28 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         msg_Dbg( p_mux, "adjusting rate at %"PRId64"/%"PRId64" (%zu/%zu)",
                  i_cut_dts - i_pcr_dts, i_pcr_length, new_chain.i_depth,
                  p_chain_ts->i_depth );
-        if ( new_chain.i_depth )
-            TSDate( p_mux, &new_chain, i_cut_dts - i_pcr_dts, i_pcr_dts );
-        if ( p_chain_ts->i_depth )
-            TSSchedule( p_mux, p_chain_ts, i_pcr_dts + i_pcr_length - i_cut_dts,
-                        i_cut_dts );
-        return;
+        int status = VLC_SUCCESS;
+        if( new_chain.i_depth )
+        {
+            status = TSDate( p_mux, &new_chain, i_cut_dts - i_pcr_dts,
+                             i_pcr_dts );
+        }
+        if( p_chain_ts->i_depth && status == VLC_SUCCESS )
+        {
+            status = TSSchedule( p_mux, p_chain_ts,
+                                 i_pcr_dts + i_pcr_length - i_cut_dts,
+                                 i_cut_dts );
+        }
+        return status;
     }
 
     if ( new_chain.i_depth )
-        TSDate( p_mux, &new_chain, i_pcr_length, i_pcr_dts );
+        return TSDate( p_mux, &new_chain, i_pcr_length, i_pcr_dts );
+    return VLC_SUCCESS;
 }
 
-static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                    vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
+static int TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
+                   vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     int i_packet_count = p_chain_ts->i_depth;
@@ -1737,8 +1744,10 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 
         block_ChainLastAppend( &pp_last, p_ts );
     }
+    ssize_t written = 0;
     if ( p_list != NULL )
-        sout_AccessOutWrite( p_mux->p_access, p_list );
+        written = sout_AccessOutWrite( p_mux->p_access, p_list );
+    return ( written == -1 ) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream,
