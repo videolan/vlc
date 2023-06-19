@@ -370,6 +370,10 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
                                            id->downstream_id, spu_hl );
             break;
         }
+	case SOUT_STREAM_IS_SYNCHRONOUS:
+        {
+            return sout_StreamControl(p_stream->p_next, i_query, va_arg(args, bool *));
+        }
     }
     return VLC_EGENERIC;
 }
