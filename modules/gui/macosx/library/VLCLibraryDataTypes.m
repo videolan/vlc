@@ -279,6 +279,78 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     [self doesNotRecognizeSelector:_cmd];
 }
 
+- (NSDictionary *)commonItemData
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = self.tracksAsMediaItems;
+
+    if (mediaItems.count == 0) {
+        return @{};
+    }
+
+    NSMutableDictionary<NSString *, id> *const commonData = [[NSMutableDictionary alloc] init];
+
+    BOOL differingUri = NO;
+    BOOL differingArtist = NO;
+    BOOL differingAlbum = NO;
+    BOOL differingTrackNumber = NO;
+    BOOL differingTrackTotal = NO;
+    BOOL differingGenre = NO;
+    BOOL differingDate = NO;
+
+    VLCMediaLibraryMediaItem * const firstMediaItem = mediaItems.firstObject;
+    const int64_t firstItemArtistId = firstMediaItem.artistID;
+    const int64_t firstItemGenreId = firstMediaItem.genreID;
+    const int64_t firstItemAlbumId = firstMediaItem.albumID;
+    
+    VLCInputItem * const firstInputItem = firstMediaItem.inputItem;
+    NSString * const firstItemUri = firstInputItem.decodedMRL;
+    NSString * const firstItemTitle = firstInputItem.title;
+    NSString * const firstItemTrackNumber = firstInputItem.trackNumber;
+    NSString * const firstItemTrackTotal = firstInputItem.trackTotal;
+    NSString * const firstItemDate = firstInputItem.date;
+    
+    for (VLCMediaLibraryMediaItem * const item in mediaItems) {
+        VLCInputItem * const inputItem = item.inputItem;
+
+        differingArtist = differingArtist || item.artistID != firstItemArtistId;
+        differingAlbum = differingAlbum || item.albumID != firstItemAlbumId;
+        differingGenre = differingGenre || item.genreID != firstItemGenreId;
+        
+        differingUri = differingUri || ![inputItem.decodedMRL isEqualToString:firstItemUri];
+        differingTrackNumber = differingTrackNumber || ![inputItem.trackNumber isEqualToString:firstItemTrackNumber];
+        differingTrackTotal = differingTrackTotal || ![inputItem.trackTotal isEqualToString:firstItemTrackTotal];
+        differingDate = differingDate || ![inputItem.date isEqualToString:firstItemDate];
+    }
+
+    if (!differingUri) { // This can only mean we have one item
+        return @{@"inputItem": firstInputItem};
+    }
+    
+    if (!differingArtist) {
+        [commonData setObject:firstInputItem.artist forKey:@"artist"];
+        [commonData setObject:[NSNumber numberWithLongLong:firstItemArtistId] forKey:@"artistID"];
+    }
+    if (!differingAlbum) {
+        [commonData setObject:firstInputItem.albumName forKey:@"album"];
+        [commonData setObject:[NSNumber numberWithLongLong:firstItemAlbumId] forKey:@"albumID"];
+    }
+    if (!differingGenre) {
+        [commonData setObject:firstInputItem.genre forKey:@"genre"];
+        [commonData setObject:[NSNumber numberWithLongLong:firstItemGenreId] forKey:@"genreID"];
+    }
+    if (!differingTrackNumber) {
+        [commonData setObject:firstItemTrackNumber forKey:@"trackNumber"];
+    }
+    if (!differingTrackTotal) {
+        [commonData setObject:firstItemTrackTotal forKey:@"trackTotal"];
+    }
+    if (!differingDate) {
+        [commonData setObject:firstItemDate forKey:@"date"];
+    }
+
+    return [commonData copy];
+}
+
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
     return [[self tracksAsMediaItems] firstObject];
