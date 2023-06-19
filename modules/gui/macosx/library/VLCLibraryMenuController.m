@@ -218,7 +218,11 @@
     }
 
     if (_representedItem != nil) {
-        _informationWindowController.representedInputItem = _representedItem.firstMediaItem.inputItem;
+        if ([_representedItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
+            _informationWindowController.representedMediaLibraryAudioGroup = (VLCAbstractMediaLibraryAudioGroup *)_representedItem;
+        } else {
+            _informationWindowController.representedInputItem = _representedItem.firstMediaItem.inputItem;
+        }
     } else if (_representedInputItem != nil) {
         _informationWindowController.representedInputItem = _representedInputItem;
     }
