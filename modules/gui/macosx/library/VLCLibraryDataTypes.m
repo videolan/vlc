@@ -290,6 +290,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     NSMutableDictionary<NSString *, id> *const commonData = [[NSMutableDictionary alloc] init];
 
     BOOL differingUri = NO;
+    BOOL differingArtworkURL = NO;
     BOOL differingArtist = NO;
     BOOL differingAlbum = NO;
     BOOL differingTrackNumber = NO;
@@ -316,6 +317,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     const int64_t firstItemAlbumId = firstMediaItem.albumID;
     
     VLCInputItem * const firstInputItem = firstMediaItem.inputItem;
+    NSURL * const firstItemArtworkURL = firstInputItem.artworkURL;
     NSString * const firstItemArtist = firstInputItem.artist;
     NSString * const firstItemAlbum = firstInputItem.albumName;
     NSString * const firstItemGenre = firstInputItem.genre;
@@ -344,7 +346,9 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         differingArtist = differingArtist || item.artistID != firstItemArtistId;
         differingAlbum = differingAlbum || item.albumID != firstItemAlbumId;
         differingGenre = differingGenre || item.genreID != firstItemGenreId;
-        
+
+        differingArtworkURL = differingArtworkURL || [inputItem.artworkURL.absoluteString isEqualToString:firstItemArtworkURL.absoluteString];
+
         differingUri = differingUri || ![inputItem.decodedMRL isEqualToString:firstItemUri];
         differingTrackNumber = differingTrackNumber || ![inputItem.trackNumber isEqualToString:firstItemTrackNumber];
         differingTrackTotal = differingTrackTotal || ![inputItem.trackTotal isEqualToString:firstItemTrackTotal];
@@ -366,11 +370,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         return @{@"inputItem": firstInputItem};
     }
 
-#define ADD_FIELD_IF_DIFFERING(Foo) \
-if (!differing##Foo) {              \
+#define ADD_FIELD_IF_DIFFERING(Foo)                                                    \
+if (!differing##Foo && firstItem##Foo != nil) {                                        \
     [commonData setObject:firstItem##Foo forKey:[NSString stringWithUTF8String:#Foo]]; \
 }
-    
+
+    ADD_FIELD_IF_DIFFERING(ArtworkURL);
     ADD_FIELD_IF_DIFFERING(Artist);
     ADD_FIELD_IF_DIFFERING(Album);
     ADD_FIELD_IF_DIFFERING(Genre);
