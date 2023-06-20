@@ -321,28 +321,22 @@ actionCallback(encodedBy);
         [inputItem preparseInputItem];
     }
 
-    _decodedMRLTextField.stringValue = inputItem.decodedMRL;
-    _titleTextField.stringValue = inputItem.title;
-    _artistTextField.stringValue = inputItem.artist;
-    _albumTextField.stringValue = inputItem.album;
-    _trackNumberTextField.stringValue = inputItem.trackNumber;
-    _trackTotalTextField.stringValue = inputItem.trackTotal;
-    _genreTextField.stringValue = inputItem.genre;
-    _seasonTextField.stringValue = inputItem.season;
-    _episodeTextField.stringValue = inputItem.episode;
-    _actorsTextField.stringValue = inputItem.actors;
-    _directorTextField.stringValue = inputItem.director;
-    _showNameTextField.stringValue = inputItem.showName;
-    _copyrightTextField.stringValue = inputItem.copyright;
-    _publisherTextField.stringValue = inputItem.publisher;
-    _nowPlayingTextField.stringValue = inputItem.nowPlaying;
-    _languageTextField.stringValue = inputItem.language;
-    _dateTextField.stringValue = inputItem.date;
-    _contentDescriptionTextField.stringValue = inputItem.contentDescription;
-    _encodedByTextField.stringValue = inputItem.encodedBy;
+#define FILL_FIELD_FROM_INPUTITEM(field)                    \
+{                                                           \
+    NSString * const inputItemString = inputItem.field;     \
+    if (inputItemString != nil) {                           \
+        _##field##TextField.stringValue = inputItemString;  \
+    } else {                                                \
+        _##field##TextField.stringValue = @"";              \
+    }                                                       \
+}                                                           
 
-    NSURL *artworkURL = inputItem.artworkURL;
-    NSImage *placeholderImage = [NSImage imageNamed: @"noart.png"];
+    PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_INPUTITEM);
+
+#undef FILL_FIELD_FROM_INPUTITEM
+
+    NSURL * const artworkURL = inputItem.artworkURL;
+    NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
     [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
 
     if (!_mainMenuInstance) {
@@ -354,7 +348,7 @@ actionCallback(encodedBy);
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD(field)                                               \
+#define FILL_FIELD_FROM_DICT(field)                                     \
 {                                                                       \
     NSString * const dictKey = [NSString stringWithUTF8String:#field].capitalizedString; \
     NSString * const fieldValue = [dict objectForKey:dictKey];          \
@@ -365,9 +359,11 @@ actionCallback(encodedBy);
     }                                                                   \
 }                                                                       \
 
-    PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD);
+    PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_DICT);
     
-#undef FILL_FIELD
+#undef FILL_FIELD_FROM_DICT
+
+    NSLog(@"%@", dict);
 
     NSURL * const artworkURL = [dict objectForKey:@"ArtworkURL"];
     NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
