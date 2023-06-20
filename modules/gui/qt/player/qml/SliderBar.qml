@@ -78,13 +78,24 @@ Slider {
         //tooltip is a Popup, palette should be passed explicitly
         colorContext.palette: theme.palette
 
-        visible: control.hovered
+        visible: control.hovered || control.visualFocus
 
-        text: Player.length.scale(pos.x / control.width).formatHMS() +
-              (Player.hasChapters ?
-                   " - " + Player.chapters.getNameAtPosition(control._tooltipPosition) : "")
+        text: {
+            let _text
 
-        pos: Qt.point(sliderRectMouseArea.mouseX, 0)
+            if (sliderRectMouseArea.containsMouse)
+                _text = Player.length.scale(pos.x / control.width).formatHMS()
+            else
+                _text = Player.time.formatHMS()
+
+            if (Player.hasChapters)
+                _text += " - " + Player.chapters.getNameAtPosition(control._tooltipPosition)
+
+            return _text
+        }
+
+        pos: Qt.point(sliderRectMouseArea.containsMouse ? sliderRectMouseArea.mouseX
+                                                        : (control.visualPosition * control.width), 0)
     }
 
     Util.FSM {
