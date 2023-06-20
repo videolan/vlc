@@ -70,9 +70,9 @@ Widgets.StackViewExt {
     }
 
     property var currentComponent: {
-        if (typeof model === "undefined" || !model)
+        if (typeof model === "undefined" || !model || !Helpers.get(model, "isReady", true))
             return null // invalid state
-        if (model.isReady && model.count === 0)
+        if (model.count === 0)
             return emptyLabel
         else if (MainCtx.gridView)
             return grid
