@@ -260,18 +260,61 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @property (readwrite, assign) int64_t libraryID;
 @property (readwrite, assign) BOOL smallArtworkGenerated;
 @property (readwrite, atomic, strong) NSString *smallArtworkMRL;
+@property (readwrite, atomic, strong) NSString *displayString;
+@property (readwrite, atomic, strong) NSString *detailString;
+@property (readwrite, atomic, strong) NSString *durationString;
 
 @end
 
 @implementation VLCAbstractMediaLibraryItem
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (void)moveToTrash
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
+- (void)revealInFinder
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
 @end
 
 @implementation VLCAbstractMediaLibraryAudioGroup
 
-- (NSArray <VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+- (NSArray<VLCMediaLibraryArtist *> *)artists
 {
     [self doesNotRecognizeSelector:_cmd];
     return nil;
+}
+
+- (NSArray<VLCMediaLibraryAlbum *> *)albums
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (unsigned int)numberOfTracks
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return 0;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -649,7 +692,6 @@ if (!differing##Foo && firstItem##Foo != nil) {                                 
 
 - (NSArray<VLCMediaLibraryArtist *> *)artists
 {
-
     return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, self.libraryID);
 }
 
