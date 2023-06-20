@@ -49,8 +49,9 @@ T.Slider {
 
     // when set the tooltip will follow the mouse when control is hoverred
     // else tooltip will always be shown at current value.
-    property bool tooltipFollowsMouse: false
+    property bool toolTipFollowsMouse: false
 
+    property alias toolTip: toolTip
 
     // toolTipTextProvider -> function(value)
     // arg "value" is between from and to, this is "value"
@@ -61,10 +62,8 @@ T.Slider {
         return value
     }
 
-    // on control.pressed, tooltipTracker mouse states are invalid
-    readonly property real _tooltipX: (tooltipFollowsMouse && !control.pressed)
-                                      ? tooltipTracker.mouseX
-                                      : (handle.x + handle.width / 2) // handle center
+    readonly property real _tooltipX: toolTipFollowsMouse ? hoverHandler.point.position.x
+                                                          : (handle.x + handle.width / 2) // handle center
 
     // find position under given x, can be used with Slider::valueAt()
     // x is coordinate in this control's coordinate space
@@ -127,30 +126,22 @@ T.Slider {
         }
     }
 
-    MouseArea {
-        id: tooltipTracker
+    HoverHandler {
+        id: hoverHandler
 
-        anchors.fill: parent
+        acceptedPointerTypes: PointerDevice.Mouse
 
-        acceptedButtons: Qt.NoButton
-
-        hoverEnabled: true
-
-        onPressed: {
-            mouse.accepted = false
-        }
-
-        preventStealing: true
-
-        propagateComposedEvents: true
+        enabled: true
     }
 
     PointingTooltip {
+       id: toolTip
+
        z: 1 // without this tooltips get placed below root's parent popup (if any)
 
        pos: Qt.point(control._tooltipX, control.handle.height / 2)
 
-       visible: control.pressed || tooltipTracker.containsMouse
+       visible: hoverHandler.hovered
 
        text: {
            if (!visible) return ""

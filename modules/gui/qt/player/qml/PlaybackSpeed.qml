@@ -252,7 +252,7 @@ ColumnLayout {
             return sliderToSpeed(value).toFixed(2)
         }
 
-        tooltipFollowsMouse: true
+        toolTipFollowsMouse: true
 
         Navigation.parentItem: root
         Navigation.upItem: buttonReset
