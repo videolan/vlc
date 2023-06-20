@@ -514,7 +514,7 @@ VLC_API float aout_VolumeGet (audio_output_t *);
 VLC_API int aout_VolumeSet (audio_output_t *, float);
 
 /**
- * Raises the volume.
+ * Adjusts the volume.
  * \param aout the audio output to update the volume for
  * \param value how much to increase (> 0) or decrease (< 0) the volume
  * \param volp if non-NULL, will contain contain the resulting volume

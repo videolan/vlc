@@ -46,6 +46,16 @@ typedef struct aout_dev
 
 /* Local functions */
 
+static inline float clampf(const float value, const float min, const float max)
+{
+    if (value < min)
+        return min;
+    else if (value > max)
+        return max;
+    else
+        return value;
+}
+
 static int var_Copy (vlc_object_t *src, const char *name, vlc_value_t prev,
                      vlc_value_t value, void *data)
 {
@@ -830,18 +840,15 @@ int aout_VolumeSet (audio_output_t *aout, float vol)
 int aout_VolumeUpdate (audio_output_t *aout, int value, float *volp)
 {
     int ret = -1;
-    float stepSize = var_InheritFloat (aout, "volume-step") / (float)AOUT_VOLUME_DEFAULT;
-    float delta = value * stepSize;
+    const float defaultVolume = (float)AOUT_VOLUME_DEFAULT;
+    const float stepSize = var_InheritFloat (aout, "volume-step") / defaultVolume;
     float vol = aout_VolumeGet (aout);
 
     if (vol >= 0.f)
     {
-        vol += delta;
-        if (vol < 0.f)
-            vol = 0.f;
-        if (vol > 2.f)
-            vol = 2.f;
+        vol += (value * stepSize);
         vol = (roundf (vol / stepSize)) * stepSize;
+        vol = clampf(vol, 0.f, AOUT_VOLUME_MAX / defaultVolume);
         if (volp != NULL)
             *volp = vol;
         ret = aout_VolumeSet (aout, vol);
