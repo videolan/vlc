@@ -32,9 +32,9 @@
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedView;
 
-@property (readwrite, weak) IBOutlet NSTextField *uriLabel;
+@property (readwrite, weak) IBOutlet NSTextField *decodedMRLLabel;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
-@property (readwrite, weak) IBOutlet NSTextField *uriTextField;
+@property (readwrite, weak) IBOutlet NSTextField *decodedMRLTextField;
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *artistLabel;
 @property (readwrite, weak) IBOutlet NSTextField *artistTextField;

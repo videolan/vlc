@@ -23,6 +23,7 @@
                 <outlet property="copyrightTextField" destination="486" id="659"/>
                 <outlet property="dateLabel" destination="436" id="656"/>
                 <outlet property="dateTextField" destination="435" id="655"/>
+                <outlet property="decodedMRLTextField" destination="509" id="cRO-43-SO3"/>
                 <outlet property="demuxBitrateLabel" destination="545" id="693"/>
                 <outlet property="demuxBitrateTextField" destination="hUq-0S-i6D" id="Jgq-FQ-1CE"/>
                 <outlet property="demuxCorruptedLabel" destination="545" id="c36-hh-IPQ"/>
@@ -78,7 +79,6 @@
                 <outlet property="trackTotalLabel" destination="cIj-bq-nFH" id="DTy-a5-z5z"/>
                 <outlet property="trackTotalTextField" destination="Ken-fu-rsj" id="5tM-3S-iBE"/>
                 <outlet property="uriLabel" destination="510" id="677"/>
-                <outlet property="uriTextField" destination="509" id="678"/>
                 <outlet property="videoDecodedLabel" destination="555" id="727"/>
                 <outlet property="videoDecodedTextField" destination="556" id="728"/>
                 <outlet property="videoLabel" destination="553" id="711"/>

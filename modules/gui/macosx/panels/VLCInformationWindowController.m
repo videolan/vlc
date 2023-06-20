@@ -101,7 +101,7 @@ actionCallback(encodedBy);
 {
     [self.window setExcludedFromWindowsMenu: YES];
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-    [self.window setInitialFirstResponder: _uriLabel];
+    [self.window setInitialFirstResponder: _decodedMRLLabel];
 
     _outlineView.dataSource = self;
 
@@ -148,7 +148,7 @@ actionCallback(encodedBy);
 {
     [self.window setTitle: _NS("Media Information")];
 
-    [_uriLabel setStringValue: _NS("Location")];
+    [_decodedMRLLabel setStringValue: _NS("Location")];
     [_titleLabel setStringValue: NSTR(VLC_META_TITLE)];
     [_artistLabel setStringValue: NSTR(VLC_META_ARTIST)];
     [_saveMetaDataButton setStringValue: _NS("Save Metadata")];
@@ -320,7 +320,7 @@ actionCallback(encodedBy);
         [inputItem preparseInputItem];
     }
 
-    _uriTextField.stringValue = inputItem.decodedMRL;
+    _decodedMRLTextField.stringValue = inputItem.decodedMRL;
     _titleTextField.stringValue = inputItem.title;
     _artistTextField.stringValue = inputItem.artist;
     _albumTextField.stringValue = inputItem.album;
