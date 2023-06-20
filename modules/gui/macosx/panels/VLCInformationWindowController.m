@@ -330,33 +330,34 @@
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD(dictKey, field)                                      \
+#define FILL_FIELD(field)                                               \
 {                                                                       \
-    NSString * const fooString = [dict objectForKey:[NSString stringWithUTF8String:#dictKey]];   \
-    if (fooString != nil) {                                             \
-        _##field##TextField.stringValue = fooString;                    \
+    NSString * const dictKey = [NSString stringWithUTF8String:#field].capitalizedString; \
+    NSString * const fieldValue = [dict objectForKey:dictKey];          \
+    if (fieldValue != nil) {                                            \
+        _##field##TextField.stringValue = fieldValue;                   \
     } else {                                                            \
         _##field##TextField.stringValue = @"";                          \
     }                                                                   \
 }                                                                       \
 
-    FILL_FIELD(Artist, artist);
-    FILL_FIELD(Album, album);
-    FILL_FIELD(Genre, genre);
-    FILL_FIELD(TrackTotal, trackTotal);
-    FILL_FIELD(TrackNumber, trackNumber);
-    FILL_FIELD(Date, date);
-    FILL_FIELD(Season, season);
-    FILL_FIELD(Episode, episode);
-    FILL_FIELD(Actors, actors);
-    FILL_FIELD(Director, director);
-    FILL_FIELD(ShowName, showName);
-    FILL_FIELD(Copyright, copyright);
-    FILL_FIELD(Publisher, publisher);
-    FILL_FIELD(NowPlaying, nowPlaying);
-    FILL_FIELD(Language, language);
-    FILL_FIELD(ContentDescription, contentDescription);
-    FILL_FIELD(EncodedBy, encodedBy);
+    FILL_FIELD(artist);
+    FILL_FIELD(album);
+    FILL_FIELD(genre);
+    FILL_FIELD(trackTotal);
+    FILL_FIELD(trackNumber);
+    FILL_FIELD(date);
+    FILL_FIELD(season);
+    FILL_FIELD(episode);
+    FILL_FIELD(actors);
+    FILL_FIELD(director);
+    FILL_FIELD(showName);
+    FILL_FIELD(copyright);
+    FILL_FIELD(publisher);
+    FILL_FIELD(nowPlaying);
+    FILL_FIELD(language);
+    FILL_FIELD(contentDescription);
+    FILL_FIELD(encodedBy);
     
 #undef FILL_FIELD
 
@@ -371,30 +372,30 @@
 
     if (!_representedInputItem && !_representedMediaLibraryAudioGroup) {
         /* Erase */
-#define SET( foo ) \
+#define CLEAR_TEXT(foo) \
 _##foo##TextField.stringValue = @"";
 
-        SET( uri );
-        SET( title );
-        SET( artist );
-        SET( album );
-        SET( trackNumber );
-        SET( trackTotal );
-        SET( genre );
-        SET( season );
-        SET( episode );
-        SET( actors );
-        SET( director );
-        SET( showName );
-        SET( copyright );
-        SET( publisher );
-        SET( nowPlaying );
-        SET( language );
-        SET( date );
-        SET( contentDescription );
-        SET( encodedBy );
+        CLEAR_TEXT(uri);
+        CLEAR_TEXT(title);
+        CLEAR_TEXT(artist);
+        CLEAR_TEXT(album);
+        CLEAR_TEXT(trackNumber);
+        CLEAR_TEXT(trackTotal);
+        CLEAR_TEXT(genre);
+        CLEAR_TEXT(season);
+        CLEAR_TEXT(episode);
+        CLEAR_TEXT(actors);
+        CLEAR_TEXT(director);
+        CLEAR_TEXT(showName);
+        CLEAR_TEXT(copyright);
+        CLEAR_TEXT(publisher);
+        CLEAR_TEXT(nowPlaying);
+        CLEAR_TEXT(language);
+        CLEAR_TEXT(date);
+        CLEAR_TEXT(contentDescription);
+        CLEAR_TEXT(encodedBy);
 
-#undef SET
+#undef CLEAR_TEXT
         [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
     } else if (_representedInputItem) {
         [self fillWindowWithInputItemData:_representedInputItem];
@@ -465,34 +466,38 @@ _##foo##TextField.stringValue = @"";
 {
     NSParameterAssert(inputItems);
 
-#define SET_INPUTITEM_PROP(inputItemProp, valueName)                    \
+#define SET_INPUTITEM_PROP(valueName, prop)                             \
 {                                                                       \
     NSString * const value = _##valueName##TextField.stringValue;       \
     if (![value isEqualToString:@""] || !ignoreEmpty) {                 \
-        inputItemProp = value;                                          \
+        inputItem.prop = value;                                         \
     }                                                                   \
 }
+
+#define SET_INPUTITEM_MATCHING_PROP(valueName)      \
+SET_INPUTITEM_PROP(valueName, valueName)            \
     
     for (VLCInputItem * const inputItem in inputItems) {
-        SET_INPUTITEM_PROP(inputItem.name, title);
-        SET_INPUTITEM_PROP(inputItem.title, title);
-        SET_INPUTITEM_PROP(inputItem.artist, artist);
-        SET_INPUTITEM_PROP(inputItem.album, album);
-        SET_INPUTITEM_PROP(inputItem.genre, genre);
-        SET_INPUTITEM_PROP(inputItem.trackNumber, trackNumber);
-        SET_INPUTITEM_PROP(inputItem.date, date);
-        SET_INPUTITEM_PROP(inputItem.copyright, copyright);
-        SET_INPUTITEM_PROP(inputItem.publisher, publisher);
-        SET_INPUTITEM_PROP(inputItem.contentDescription, contentDescription);
-        SET_INPUTITEM_PROP(inputItem.language, language);
-        SET_INPUTITEM_PROP(inputItem.showName, showName);
-        SET_INPUTITEM_PROP(inputItem.actors, actors);
-        SET_INPUTITEM_PROP(inputItem.director, director);
+        SET_INPUTITEM_PROP(title, name);
+        SET_INPUTITEM_MATCHING_PROP(title);
+        SET_INPUTITEM_MATCHING_PROP(artist);
+        SET_INPUTITEM_MATCHING_PROP(album);
+        SET_INPUTITEM_MATCHING_PROP(genre);
+        SET_INPUTITEM_MATCHING_PROP(trackNumber);
+        SET_INPUTITEM_MATCHING_PROP(date);
+        SET_INPUTITEM_MATCHING_PROP(copyright);
+        SET_INPUTITEM_MATCHING_PROP(publisher);
+        SET_INPUTITEM_MATCHING_PROP(contentDescription);
+        SET_INPUTITEM_MATCHING_PROP(language);
+        SET_INPUTITEM_MATCHING_PROP(showName);
+        SET_INPUTITEM_MATCHING_PROP(actors);
+        SET_INPUTITEM_MATCHING_PROP(director);
 
         [inputItem writeMetadataToFile];
     }
 
-    #undef SET_INPUTITEM_PROP
+#undef SET_INPUTITEM_MATCHING_PROP
+#undef SET_INPUTITEM_PROP
     
     [_saveMetaDataButton setEnabled: NO];
 }
