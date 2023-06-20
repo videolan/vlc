@@ -27,6 +27,8 @@
 
 #include <memory>
 #include <QAbstractListModel>
+#include <QQmlParserStatus>
+
 #include <vlc_media_library.h>
 #include "mlqmltypes.hpp"
 #include "medialib.hpp"
@@ -39,9 +41,10 @@
 class MLListCache;
 class MediaLib;
 
-class MLBaseModel : public QAbstractListModel
+class MLBaseModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 
     Q_PROPERTY(MLItemId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged
                RESET unsetParentId FINAL)
@@ -99,6 +102,9 @@ private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
 protected:
+    void classBegin() override;
+    void componentComplete() override;
+
     virtual vlc_ml_sorting_criteria_t roleToCriteria(int role) const = 0;
     static QString getFirstSymbol(QString str);
     virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray) const {
@@ -183,6 +189,8 @@ private:
     void onCacheBeginRemoveRows(int first, int last);
     void onCacheBeginMoveRows(int first, int last, int destination);
 
+    inline bool cachable() const { return m_mediaLib && !m_qmlInitializing; }
+
 protected:
     MLItemId m_parent;
 
@@ -199,6 +207,8 @@ protected:
 
     //loader used to load single items
     std::shared_ptr<BaseLoader> m_itemLoader;
+
+    bool m_qmlInitializing = false;
 };
 
 #endif // MLBASEMODEL_HPP

@@ -251,6 +251,18 @@ void MLBaseModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
     });
 }
 
+void MLBaseModel::classBegin()
+{
+    m_qmlInitializing = true;
+}
+
+void MLBaseModel::componentComplete()
+{
+    m_qmlInitializing = false;
+
+    validateCache();
+}
+
 MLItemId MLBaseModel::parentId() const
 {
     return m_parent;
@@ -349,7 +361,7 @@ void MLBaseModel::unsetSortCriteria()
 
 int MLBaseModel::rowCount(const QModelIndex &parent) const
 {
-    if (!m_mediaLib || parent.isValid())
+    if (!cachable() || parent.isValid())
         return 0;
 
     validateCache();
@@ -409,9 +421,11 @@ QVariantList MLBaseModel::getIdsForIndexes(const QVariantList & indexes) const
 
 unsigned MLBaseModel::getCount() const
 {
-    if (!m_mediaLib)
+    if (!cachable())
         return 0;
+
     validateCache();
+
     if (m_cache->count() == COUNT_UNINITIALIZED)
         return 0;
     return static_cast<unsigned>(m_cache->count());
@@ -443,7 +457,7 @@ void MLBaseModel::validateCache() const
     if (m_cache)
         return;
 
-    if (!m_mediaLib)
+    if (!cachable())
         return;
 
     auto loader = createLoader();
