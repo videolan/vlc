@@ -1,7 +1,7 @@
 # RTP plugin
 access_LTLIBRARIES += librtp_plugin.la
 librtp_plugin_la_SOURCES = \
-	access/rtp/input.c \
+	access/rtp/input.c access/rtp/input.h \
 	access/rtp/sdp.c access/rtp/sdp.h \
 	access/rtp/datagram.c access/rtp/vlc_dtls.h \
 	access/rtp/rtp.c access/rtp/rtp.h

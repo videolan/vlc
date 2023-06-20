@@ -354,27 +354,6 @@ static inline uint8_t rtp_ptype (const block_t *block)
 }
 
 /** @} */
-typedef struct
-{
-#ifdef HAVE_SRTP
-    struct srtp_session_t *srtp;
-#endif
-    struct vlc_dtls *rtp_sock;
-    struct vlc_dtls *rtcp_sock;
-} rtp_input_sys_t;
-
-/* Global data */
-typedef struct
-{
-    struct vlc_logger *logger;
-
-    rtp_session_t *session;
-
-    vlc_thread_t  thread;
-
-    rtp_input_sys_t input_sys;
-
-} rtp_sys_t;
 
 /**
  * \defgroup rtp_session RTP session

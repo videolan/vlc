@@ -41,6 +41,7 @@
 # include <vlc_gcrypt.h>
 #endif
 #include "sdp.h"
+#include "input.h"
 
 /*
  * TODO: so much stuff
