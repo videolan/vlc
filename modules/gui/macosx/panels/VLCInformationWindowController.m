@@ -333,9 +333,13 @@
 #define FILL_FIELD(dictKey, field)                                      \
 {                                                                       \
     NSString * const fooString = [dict objectForKey:[NSString stringWithUTF8String:#dictKey]];   \
-    if (fooString != nil) { _##field##TextField.stringValue = fooString; } \
-}
-    
+    if (fooString != nil) {                                             \
+        _##field##TextField.stringValue = fooString;                    \
+    } else {                                                            \
+        _##field##TextField.stringValue = @"";                          \
+    }                                                                   \
+}                                                                       \
+
     FILL_FIELD(Artist, artist);
     FILL_FIELD(Album, album);
     FILL_FIELD(Genre, genre);
@@ -355,6 +359,10 @@
     FILL_FIELD(EncodedBy, encodedby);
     
 #undef FILL_FIELD
+
+    NSURL * const artworkURL = [dict objectForKey:@"ArtworkURL"];
+    NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
+    [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
 }
 
 - (void)updateRepresentation
