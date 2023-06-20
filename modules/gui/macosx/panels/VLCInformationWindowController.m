@@ -348,22 +348,26 @@ actionCallback(encodedBy);
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD_FROM_DICT(field)                                     \
-{                                                                       \
-    NSString * const dictKey = [NSString stringWithUTF8String:#field].capitalizedString; \
-    NSString * const fieldValue = [dict objectForKey:dictKey];          \
-    if (fieldValue != nil) {                                            \
-        _##field##TextField.stringValue = fieldValue;                   \
-    } else {                                                            \
-        _##field##TextField.stringValue = @"";                          \
-    }                                                                   \
-}                                                                       \
+#define FILL_FIELD_FROM_DICT(field)                                         \
+{                                                                           \
+    /* The keys in the dict are all CapitalisedLikeThis, so build key */    \
+    NSString * const fieldString = [NSString stringWithUTF8String:#field];  \
+    NSString * const keyFirstChar = [fieldString substringToIndex:1];       \
+    NSString * const keyOtherChars = [fieldString substringWithRange:NSMakeRange(1, fieldString.length - 1)];      \
+    NSString * const dictKey = [NSString stringWithFormat:@"%@%@", [keyFirstChar uppercaseString], keyOtherChars]; \
+                                                                            \
+    NSString * const fieldValue = [dict objectForKey:dictKey];              \
+                                                                            \
+    if (fieldValue != nil) {                                                \
+        _##field##TextField.stringValue = fieldValue;                       \
+    } else {                                                                \
+        _##field##TextField.stringValue = @"";                              \
+    }                                                                       \
+}                                                                           \
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_DICT);
     
 #undef FILL_FIELD_FROM_DICT
-
-    NSLog(@"%@", dict);
 
     NSURL * const artworkURL = [dict objectForKey:@"ArtworkURL"];
     NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
