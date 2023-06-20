@@ -362,7 +362,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     VLCInputItem * const firstInputItem = firstMediaItem.inputItem;
     NSURL * const firstItemArtworkURL = firstInputItem.artworkURL;
     NSString * const firstItemArtist = firstInputItem.artist;
-    NSString * const firstItemAlbum = firstInputItem.albumName;
+    NSString * const firstItemAlbum = firstInputItem.album;
     NSString * const firstItemGenre = firstInputItem.genre;
     NSString * const firstItemUri = firstInputItem.decodedMRL;
     NSString * const firstItemTitle = firstInputItem.title;

@@ -44,10 +44,10 @@
 @property (readwrite, weak) IBOutlet NSTextField *copyrightTextField;
 @property (readwrite, weak) IBOutlet NSTextField *dateLabel;
 @property (readwrite, weak) IBOutlet NSTextField *dateTextField;
-@property (readwrite, weak) IBOutlet NSTextField *descriptionLabel;
-@property (readwrite, weak) IBOutlet NSTextField *descriptionTextField;
-@property (readwrite, weak) IBOutlet NSTextField *encodedbyLabel;
-@property (readwrite, weak) IBOutlet NSTextField *encodedbyTextField;
+@property (readwrite, weak) IBOutlet NSTextField *contentDescriptionLabel;
+@property (readwrite, weak) IBOutlet NSTextField *contentDescriptionTextField;
+@property (readwrite, weak) IBOutlet NSTextField *encodedByLabel;
+@property (readwrite, weak) IBOutlet NSTextField *encodedByTextField;
 @property (readwrite, weak) IBOutlet NSTextField *genreLabel;
 @property (readwrite, weak) IBOutlet NSTextField *genreTextField;
 @property (readwrite, weak) IBOutlet NSTextField *languageLabel;

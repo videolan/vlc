@@ -159,7 +159,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     }
 }
 
-- (NSString *)albumName
+- (NSString *)album
 {
     if (!_vlcInputItem) {
         return nil;
@@ -169,7 +169,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     FREENULL(psz_album);
     return returnValue;
 }
-- (void)setAlbumName:(NSString *)albumName
+- (void)setAlbum:(NSString *)albumName
 {
     if (_vlcInputItem) {
         input_item_SetAlbum(_vlcInputItem, [albumName UTF8String]);

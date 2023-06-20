@@ -155,7 +155,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 
     currentlyPlayingTrackInfo[MPMediaItemPropertyTitle] = inputItem.title;
     currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = inputItem.artist;
-    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = inputItem.albumName;
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = inputItem.album;
     currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([inputItem.trackNumber intValue]);
 
     const vlc_tick_t duration = inputItem.duration;

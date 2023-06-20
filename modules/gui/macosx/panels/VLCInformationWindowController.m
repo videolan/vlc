@@ -140,12 +140,12 @@
     [_albumLabel setStringValue: NSTR(VLC_META_ALBUM)];
     [_trackNumberLabel setStringValue: NSTR(VLC_META_TRACK_NUMBER)];
     [_trackTotalLabel setStringValue: _NS("Track Total")];
-    [_descriptionLabel setStringValue: NSTR(VLC_META_DESCRIPTION)];
+    [_contentDescriptionLabel setStringValue: NSTR(VLC_META_DESCRIPTION)];
     [_dateLabel setStringValue: NSTR(VLC_META_DATE)];
     [_languageLabel setStringValue: NSTR(VLC_META_LANGUAGE)];
     [_nowPlayingLabel setStringValue: NSTR(VLC_META_NOW_PLAYING)];
     [_publisherLabel setStringValue: NSTR(VLC_META_PUBLISHER)];
-    [_encodedbyLabel setStringValue: NSTR(VLC_META_ENCODED_BY)];
+    [_encodedByLabel setStringValue: NSTR(VLC_META_ENCODED_BY)];
     [_showNameLabel setStringValue: NSTR(VLC_META_SHOW_NAME)];
     [_episodeLabel setStringValue: NSTR(VLC_META_EPISODE)];
     [_seasonLabel setStringValue: NSTR(VLC_META_SEASON)];
@@ -300,7 +300,7 @@
     _uriTextField.stringValue = inputItem.decodedMRL;
     _titleTextField.stringValue = inputItem.title;
     _artistTextField.stringValue = inputItem.artist;
-    _albumTextField.stringValue = inputItem.albumName;
+    _albumTextField.stringValue = inputItem.album;
     _trackNumberTextField.stringValue = inputItem.trackNumber;
     _trackTotalTextField.stringValue = inputItem.trackTotal;
     _genreTextField.stringValue = inputItem.genre;
@@ -314,8 +314,8 @@
     _nowPlayingTextField.stringValue = inputItem.nowPlaying;
     _languageTextField.stringValue = inputItem.language;
     _dateTextField.stringValue = inputItem.date;
-    _descriptionTextField.stringValue = inputItem.contentDescription;
-    _encodedbyTextField.stringValue = inputItem.encodedBy;
+    _contentDescriptionTextField.stringValue = inputItem.contentDescription;
+    _encodedByTextField.stringValue = inputItem.encodedBy;
 
     NSURL *artworkURL = inputItem.artworkURL;
     NSImage *placeholderImage = [NSImage imageNamed: @"noart.png"];
@@ -355,8 +355,8 @@
     FILL_FIELD(Publisher, publisher);
     FILL_FIELD(NowPlaying, nowPlaying);
     FILL_FIELD(Language, language);
-    FILL_FIELD(ContentDescription, description);
-    FILL_FIELD(EncodedBy, encodedby);
+    FILL_FIELD(ContentDescription, contentDescription);
+    FILL_FIELD(EncodedBy, encodedBy);
     
 #undef FILL_FIELD
 
@@ -391,8 +391,8 @@ _##foo##TextField.stringValue = @"";
         SET( nowPlaying );
         SET( language );
         SET( date );
-        SET( description );
-        SET( encodedby );
+        SET( contentDescription );
+        SET( encodedBy );
 
 #undef SET
         [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
@@ -477,13 +477,13 @@ _##foo##TextField.stringValue = @"";
         SET_INPUTITEM_PROP(inputItem.name, title);
         SET_INPUTITEM_PROP(inputItem.title, title);
         SET_INPUTITEM_PROP(inputItem.artist, artist);
-        SET_INPUTITEM_PROP(inputItem.albumName, album);
+        SET_INPUTITEM_PROP(inputItem.album, album);
         SET_INPUTITEM_PROP(inputItem.genre, genre);
         SET_INPUTITEM_PROP(inputItem.trackNumber, trackNumber);
         SET_INPUTITEM_PROP(inputItem.date, date);
         SET_INPUTITEM_PROP(inputItem.copyright, copyright);
         SET_INPUTITEM_PROP(inputItem.publisher, publisher);
-        SET_INPUTITEM_PROP(inputItem.contentDescription, description);
+        SET_INPUTITEM_PROP(inputItem.contentDescription, contentDescription);
         SET_INPUTITEM_PROP(inputItem.language, language);
         SET_INPUTITEM_PROP(inputItem.showName, showName);
         SET_INPUTITEM_PROP(inputItem.actors, actors);

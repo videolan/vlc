@@ -330,7 +330,7 @@
         title = inputItem.title;
         nowPlaying = inputItem.nowPlaying;
         artist = inputItem.artist;
-        album = inputItem.albumName;
+        album = inputItem.album;
     } else {
         /* Nothing playing */
         title = _NS("VLC media player");

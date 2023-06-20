@@ -49,7 +49,7 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 @property (readwrite) NSString *name;
 @property (readwrite) NSString *title;
 @property (readwrite) NSString *artist;
-@property (readwrite) NSString *albumName;
+@property (readwrite) NSString *album;
 @property (readwrite) NSString *trackNumber;
 @property (readwrite) NSString *genre;
 @property (readwrite) NSString *copyright;
