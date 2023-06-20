@@ -10,6 +10,7 @@
  *          Adrien Maglo <magsoft at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -593,8 +594,9 @@ error:
     return VLC_ENOMEM;
 }
 
-static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
-                          GLushort **indices, unsigned *nbIndices)
+static int BuildRectangle(
+        GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+        GLushort **indices, unsigned *nbIndices, video_orientation_t orientation)
 {
     *nbVertices = 4;
     *nbIndices = 6;
@@ -625,12 +627,29 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
 
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
-    static const GLfloat tex[] = {
+    static const GLfloat tex_normal[] = {
         0.0, 1.0,
         0.0, 0.0,
         1.0, 1.0,
         1.0, 0.0,
     };
+
+    static const GLfloat tex_hflip[] = {
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 1.0,
+        0.0, 0.0,
+    };
+
+    /* Since there is a bijection between symmetry and rotation,
+     * applying the general orientation in each case is equivalent
+     * to choosing the rotation we want to apply to the frame, and
+     * then decide whether we apply a horizontal flip or not. */
+    const GLfloat *tex;
+    if (ORIENT_IS_MIRROR(orientation))
+        tex = tex_hflip;
+    else
+        tex = tex_normal;
 
     memcpy(*textureCoord, tex, *nbVertices * 2 * sizeof(GLfloat));
 
@@ -645,7 +664,8 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
 }
 
 static int SetupCoords(struct vlc_gl_renderer *renderer,
-                       const struct vlc_gl_picture *pic)
+                       const struct vlc_gl_picture *pic,
+                       video_orientation_t orientation)
 {
     const opengl_vtable_t *vt = renderer->vt;
     struct vlc_gl_sampler *sampler = renderer->sampler;
@@ -660,7 +680,7 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
     {
     case PROJECTION_MODE_RECTANGULAR:
         i_ret = BuildRectangle(&vertexCoord, &textureCoord, &nbVertices,
-                               &indices, &nbIndices);
+                               &indices, &nbIndices, orientation);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
         i_ret = BuildSphere(&vertexCoord, &textureCoord, &nbVertices,
@@ -728,7 +748,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     if (!renderer->valid_coords)
     {
-        int ret = SetupCoords(renderer, pic);
+        int ret = SetupCoords(renderer, pic, meta->orientation);
         if (ret != VLC_SUCCESS)
             return ret;
 
