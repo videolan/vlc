@@ -234,7 +234,7 @@
     [self updateRepresentation];
 }
 
-- (void)setRepresentedMediaLibraryGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
+- (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
 {
     if (_representedMediaLibraryAudioGroup == representedMediaLibraryAudioGroup) {
         return;
