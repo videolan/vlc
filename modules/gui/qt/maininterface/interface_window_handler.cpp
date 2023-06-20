@@ -66,8 +66,9 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 
     const auto updateMinimumSize = [this]()
     {
-        int width = 320;
-        int height = 300;
+        int margin = m_mainCtx->windowExtendedMargin() * 2;
+        int width = 320 + margin;
+        int height = 300 + margin;
 
         double intfScaleFactor = m_mainCtx->getIntfScaleFactor();
         int scaledWidth = std::ceil( intfScaleFactor * width );
@@ -76,6 +77,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
         m_window->setMinimumSize( QSize(scaledWidth, scaledHeight) );
     };
     connect( m_mainCtx, &MainCtx::intfScaleFactorChanged, this, updateMinimumSize );
+    connect( m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, updateMinimumSize );
     m_mainCtx->updateIntfScaleFactor();
 
     m_mainCtx->onWindowVisibilityChanged(m_window->visibility());
