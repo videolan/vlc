@@ -256,9 +256,12 @@ void MLListCache::deleteRange(int first, int last)
 
 ssize_t MLListCache::count() const
 {
-    if (!m_cachedData)
-        return -1;
-    return m_cachedData->totalCount;
+    if (m_cachedData)
+        return m_cachedData->totalCount;
+    else if (m_oldData)
+        return m_oldData->totalCount;
+    else
+        return COUNT_UNINITIALIZED;
 }
 
 void MLListCache::initCount()
