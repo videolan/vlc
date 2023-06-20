@@ -46,12 +46,13 @@ actionCallback(publisher);                                  \
 actionCallback(language);                                   \
 actionCallback(contentDescription);
 
-#define PERFORM_ACTION_ALL_TEXTFIELDS(actionCallback) \
-PERFORM_ACTION_READWRITE_TEXTFIELDS(actionCallback);  \
-actionCallback(trackTotal);                           \
-actionCallback(season);                               \
-actionCallback(episode);                              \
-actionCallback(nowPlaying);                           \
+#define PERFORM_ACTION_ALL_TEXTFIELDS(actionCallback)   \
+PERFORM_ACTION_READWRITE_TEXTFIELDS(actionCallback);    \
+actionCallback(decodedMRL);                             \
+actionCallback(trackTotal);                             \
+actionCallback(season);                                 \
+actionCallback(episode);                                \
+actionCallback(nowPlaying);                             \
 actionCallback(encodedBy);
 
 #pragma mark - data storage object
