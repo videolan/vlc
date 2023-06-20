@@ -31,6 +31,29 @@
 #import "library/VLCInputItem.h"
 #import "views/VLCImageView.h"
 
+#define PERFORM_ACTION_READWRITE_TEXTFIELDS(actionCallback) \
+actionCallback(title);                                      \
+actionCallback(artist);                                     \
+actionCallback(album);                                      \
+actionCallback(genre);                                      \
+actionCallback(trackNumber);                                \
+actionCallback(date);                                       \
+actionCallback(actors);                                     \
+actionCallback(director);                                   \
+actionCallback(showName);                                   \
+actionCallback(copyright);                                  \
+actionCallback(publisher);                                  \
+actionCallback(language);                                   \
+actionCallback(contentDescription);
+
+#define PERFORM_ACTION_ALL_TEXTFIELDS(actionCallback) \
+PERFORM_ACTION_READWRITE_TEXTFIELDS(actionCallback);  \
+actionCallback(trackTotal);                           \
+actionCallback(season);                               \
+actionCallback(episode);                              \
+actionCallback(nowPlaying);                           \
+actionCallback(encodedBy);
+
 #pragma mark - data storage object
 
 @interface VLCCodecInformationTreeItem : NSObject
@@ -341,23 +364,7 @@
     }                                                                   \
 }                                                                       \
 
-    FILL_FIELD(artist);
-    FILL_FIELD(album);
-    FILL_FIELD(genre);
-    FILL_FIELD(trackTotal);
-    FILL_FIELD(trackNumber);
-    FILL_FIELD(date);
-    FILL_FIELD(season);
-    FILL_FIELD(episode);
-    FILL_FIELD(actors);
-    FILL_FIELD(director);
-    FILL_FIELD(showName);
-    FILL_FIELD(copyright);
-    FILL_FIELD(publisher);
-    FILL_FIELD(nowPlaying);
-    FILL_FIELD(language);
-    FILL_FIELD(contentDescription);
-    FILL_FIELD(encodedBy);
+    PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD);
     
 #undef FILL_FIELD
 
@@ -372,28 +379,10 @@
 
     if (!_representedInputItem && !_representedMediaLibraryAudioGroup) {
         /* Erase */
-#define CLEAR_TEXT(foo) \
-_##foo##TextField.stringValue = @"";
+#define CLEAR_TEXT(field) \
+_##field##TextField.stringValue = @"";
 
-        CLEAR_TEXT(uri);
-        CLEAR_TEXT(title);
-        CLEAR_TEXT(artist);
-        CLEAR_TEXT(album);
-        CLEAR_TEXT(trackNumber);
-        CLEAR_TEXT(trackTotal);
-        CLEAR_TEXT(genre);
-        CLEAR_TEXT(season);
-        CLEAR_TEXT(episode);
-        CLEAR_TEXT(actors);
-        CLEAR_TEXT(director);
-        CLEAR_TEXT(showName);
-        CLEAR_TEXT(copyright);
-        CLEAR_TEXT(publisher);
-        CLEAR_TEXT(nowPlaying);
-        CLEAR_TEXT(language);
-        CLEAR_TEXT(date);
-        CLEAR_TEXT(contentDescription);
-        CLEAR_TEXT(encodedBy);
+        PERFORM_ACTION_ALL_TEXTFIELDS(CLEAR_TEXT);
 
 #undef CLEAR_TEXT
         [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
@@ -466,32 +455,20 @@ _##foo##TextField.stringValue = @"";
 {
     NSParameterAssert(inputItems);
 
-#define SET_INPUTITEM_PROP(valueName, prop)                             \
-{                                                                       \
-    NSString * const value = _##valueName##TextField.stringValue;       \
-    if (![value isEqualToString:@""] || !ignoreEmpty) {                 \
-        inputItem.prop = value;                                         \
-    }                                                                   \
+#define SET_INPUTITEM_PROP(field, prop)                          \
+{                                                                \
+    NSString * const value = _##field##TextField.stringValue;    \
+    if (![value isEqualToString:@""] || !ignoreEmpty) {          \
+        inputItem.prop = value;                                  \
+    }                                                            \
 }
 
-#define SET_INPUTITEM_MATCHING_PROP(valueName)      \
-SET_INPUTITEM_PROP(valueName, valueName)            \
+#define SET_INPUTITEM_MATCHING_PROP(field)      \
+SET_INPUTITEM_PROP(field, field)                \
     
     for (VLCInputItem * const inputItem in inputItems) {
         SET_INPUTITEM_PROP(title, name);
-        SET_INPUTITEM_MATCHING_PROP(title);
-        SET_INPUTITEM_MATCHING_PROP(artist);
-        SET_INPUTITEM_MATCHING_PROP(album);
-        SET_INPUTITEM_MATCHING_PROP(genre);
-        SET_INPUTITEM_MATCHING_PROP(trackNumber);
-        SET_INPUTITEM_MATCHING_PROP(date);
-        SET_INPUTITEM_MATCHING_PROP(copyright);
-        SET_INPUTITEM_MATCHING_PROP(publisher);
-        SET_INPUTITEM_MATCHING_PROP(contentDescription);
-        SET_INPUTITEM_MATCHING_PROP(language);
-        SET_INPUTITEM_MATCHING_PROP(showName);
-        SET_INPUTITEM_MATCHING_PROP(actors);
-        SET_INPUTITEM_MATCHING_PROP(director);
+        PERFORM_ACTION_READWRITE_TEXTFIELDS(SET_INPUTITEM_MATCHING_PROP);
 
         [inputItem writeMetadataToFile];
     }
