@@ -294,6 +294,39 @@ int main( int argc, char **argv )
     test_opengl_offscreen(root, ORIENT_ROTATED_270,
                           points_rotated_270, ARRAY_SIZE(points_rotated_270));
 
+    struct test_point points_hflip[] = {
+        { 1, 1, green },
+        { 2, 2, red },
+        { 0, 2, blue },
+    };
+    test_opengl_offscreen(root, ORIENT_HFLIPPED,
+                          points_hflip, ARRAY_SIZE(points_hflip));
+
+    struct test_point points_vflip[] = {
+        { 1, 1, green },
+        { 0, 0, red },
+        { 2, 0, blue },
+    };
+    test_opengl_offscreen(root, ORIENT_VFLIPPED,
+                          points_vflip, ARRAY_SIZE(points_vflip));
+
+    struct test_point points_transposed[] = {
+        { 1, 1, green },
+        { 2, 0, red },
+        { 2, 2, blue },
+    };
+    test_opengl_offscreen(root, ORIENT_TRANSPOSED,
+                          points_transposed, ARRAY_SIZE(points_transposed));
+
+    struct test_point points_antitransposed[] = {
+        { 1, 1, green },
+        { 0, 2, red },
+        { 0, 0, blue },
+    };
+    test_opengl_offscreen(root, ORIENT_ANTI_TRANSPOSED,
+                          points_antitransposed, ARRAY_SIZE(points_antitransposed));
+
+
 
     libvlc_release(vlc);
     return 0;
