@@ -130,4 +130,88 @@ void setTransparentForMouseEvent(xcb_connection_t* conn, xcb_window_t window)
      xcb_xfixes_destroy_region(conn, region);
 }
 
+//see https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html#idm45894597940912
+bool wmScreenHasCompositor(xcb_connection_t* conn, int screen)
+{
+     QByteArray propName("_NET_WM_CM_S");
+     propName += QByteArray::number(screen);
+
+     xcb_atom_t atom = getInternAtom(conn, propName.constData());
+     if (atom == 0)
+        return false;
+
+     xcb_get_selection_owner_cookie_t cookie = xcb_get_selection_owner(conn, atom);
+     auto reply = wrap_cptr(xcb_get_selection_owner_reply(conn, cookie, nullptr));
+     if (!reply)
+        return false;
+
+     return reply->owner != 0;
+}
+
+//see https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html#idm45894598144416
+static std::vector<xcb_atom_t> getNetSupportedList(xcb_connection_t* conn, xcb_window_t rootWindow)
+{
+    std::vector<xcb_atom_t> netSupportedList;
+
+    xcb_atom_t netSupportedAtom = getInternAtom(conn, "_NET_SUPPORTED");
+    if (netSupportedAtom == 0)
+       return netSupportedList;
+
+    int offset = 0;
+    int remaining = 0;
+    do {
+       xcb_get_property_cookie_t cookie = xcb_get_property(conn,
+            false, rootWindow, netSupportedAtom, XCB_ATOM_ATOM, offset, 1024);
+       auto reply = wrap_cptr(xcb_get_property_reply(conn, cookie, NULL));
+       if (!reply)
+            break;
+       if (reply->type == XCB_ATOM_ATOM && reply->format == 32)
+       {
+            int length = xcb_get_property_value_length(reply.get())/sizeof(xcb_atom_t);
+            xcb_atom_t *atoms = (xcb_atom_t *)xcb_get_property_value(reply.get());
+
+            //&atoms[length] -> pointer past the last item
+            std::copy(&atoms[0], &atoms[length], std::back_inserter(netSupportedList));
+            remaining = reply->bytes_after;
+            offset += length;
+       }
+    } while (remaining > 0);
+
+    return netSupportedList;
+}
+
+static xcb_window_t getWindowProperty(xcb_connection_t* conn, xcb_window_t window, xcb_atom_t atom)
+{
+    xcb_get_property_cookie_t cookie = xcb_get_property(conn,
+        false, window, atom, 0, 0, 4096);
+    auto reply = wrap_cptr(xcb_get_property_reply(conn, cookie, NULL));
+    if (!reply)
+       return 0;
+
+    return ((xcb_window_t *)xcb_get_property_value(reply.get()))[0];
+}
+
+//see https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html#idm45894598113264
+static bool supportWMCheck(xcb_connection_t* conn, xcb_window_t rootWindow)
+{
+    xcb_atom_t atom = getInternAtom(conn, "_NET_SUPPORTING_WM_CHECK");
+    xcb_window_t wmWindow = getWindowProperty(conn, rootWindow, atom);
+    if (wmWindow == 0)
+        return false;
+
+    xcb_window_t wmWindowProp = getWindowProperty(conn, wmWindow, atom);
+    return (wmWindow == wmWindowProp);
+}
+
+bool wmNetSupport(xcb_connection_t* conn, xcb_window_t rootWindow, xcb_atom_t atom)
+{
+    if (!supportWMCheck(conn, rootWindow))
+        return false;
+
+    std::vector<xcb_atom_t> netSupported = getNetSupportedList(conn, rootWindow);
+
+    auto it = std::find(netSupported.cbegin(), netSupported.cend(), atom);
+    return it != netSupported.cend();
+}
+
 }

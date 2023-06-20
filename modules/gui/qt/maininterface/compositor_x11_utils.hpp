@@ -110,6 +110,11 @@ bool findVisualFormat(xcb_connection_t* conn, xcb_visualid_t visual, xcb_render_
 xcb_atom_t getInternAtom(xcb_connection_t* conn, const char* atomName);
 
 void setTransparentForMouseEvent(xcb_connection_t* conn, xcb_window_t window);
+
+bool wmScreenHasCompositor(xcb_connection_t* conn, int screen);
+
+bool wmNetSupport(xcb_connection_t* conn, xcb_window_t rootWindow, xcb_atom_t atom);
+
 }
 
 

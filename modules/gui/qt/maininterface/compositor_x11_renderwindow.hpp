@@ -83,6 +83,7 @@ public slots:
     void onVisibilityChanged(bool visible);
 
     void onAcrylicChanged(bool enabled);
+    void onExtendedFrameChanged(bool enabled);
 
 signals:
     void requestRefreshInternal(unsigned int requestId, QPrivateSignal priv);
@@ -109,6 +110,7 @@ private:
     CompositorX11RenderClient* m_interfaceClient = nullptr;
 
     bool m_hasAcrylic = false;
+    bool m_hasExtendedFrame = false;
     bool m_visible = true;
 };
 
@@ -163,6 +165,7 @@ public:
     void setVideoSize(const QSize& size);
 
     inline bool hasAcrylic() const { return m_hasAcrylic; }
+    inline bool supportExtendedFrame() const { return m_supportExtendedFrame; }
 
     void setVideoWindow(QWindow* window);
     void setInterfaceWindow(CompositorX11UISurface* window);
@@ -179,6 +182,7 @@ signals:
     void videoSurfaceChanged(CompositorX11RenderClient*);
     void visiblityChanged(bool visible);
     void registerVideoWindow(unsigned int xid);
+    bool hasExtendedFrameChanged(bool hasExtendedFrame);
 
 protected:
     //override from QWindow
@@ -189,7 +193,8 @@ protected:
 
 private:
     void resetClientPixmaps();
-
+    void onWindowExtendedMarginChanged(unsigned margin);
+    void setHasExtendedFrame(bool hasExtendedFrame);
 
     qt_intf_t* m_intf = nullptr;
     xcb_connection_t* m_conn = nullptr;
@@ -202,6 +207,10 @@ private:
     xcb_window_t m_wid = 0;
 
     bool m_hasAcrylic = false;
+    //does the compositor support extended frames
+    bool m_supportExtendedFrame = false;
+    //is extended frame enabled
+    bool m_hasExtendedFrame = false;
 
     QWindow* m_videoWindow = nullptr;
     std::unique_ptr<CompositorX11RenderClient> m_videoClient;
