@@ -271,6 +271,20 @@ void MainCtx::setUseGlobalShortcuts( bool useShortcuts )
     emit useGlobalShortcutsChanged(m_useGlobalShortcuts);
 }
 
+void MainCtx::setWindowSuportExtendedFrame(bool support) {
+    if (m_windowSuportExtendedFrame == support)
+        return;
+    m_windowSuportExtendedFrame = support;
+    emit windowSuportExtendedFrameChanged();
+}
+
+void MainCtx::setWindowExtendedMargin(unsigned int margin) {
+    if (margin == m_windowExtendedMargin)
+        return;
+    m_windowExtendedMargin = margin;
+    emit windowExtendedMarginChanged(margin);
+}
+
 /*****************************
  *   Main UI handling        *
  *****************************/

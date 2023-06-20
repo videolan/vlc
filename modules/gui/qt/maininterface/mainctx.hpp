@@ -187,6 +187,9 @@ class MainCtx : public QObject
     // NOTE: This is useful when we want to prioritize player hotkeys over QML keyboard navigation.
     Q_PROPERTY(bool preferHotkeys READ preferHotkeys WRITE setPreferHotkeys NOTIFY preferHotkeysChanged FINAL)
 
+    Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
+    Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
+
 public:
     /* tors */
     MainCtx(qt_intf_t *);
@@ -266,6 +269,11 @@ public:
     inline int maxVolume() const { return m_maxVolume; }
 
     inline float safeArea() const { return m_safeArea; }
+
+    inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
+    inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
+    void setWindowSuportExtendedFrame(bool support);
+    void setWindowExtendedMargin(unsigned margin);
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -381,6 +389,9 @@ protected:
 
     float m_safeArea = 0.0;
 
+    bool m_windowSuportExtendedFrame = false;
+    unsigned m_windowExtendedMargin = 0;
+
     std::unique_ptr<CSDButtonModel> m_csdButtonModel;
 
 public slots:
@@ -476,6 +487,9 @@ signals:
     void maxVolumeChanged();
 
     void safeAreaChanged();
+
+    void windowSuportExtendedFrameChanged();
+    void windowExtendedMarginChanged(unsigned margin);
 
 private:
     void loadPrefs(bool callSignals);

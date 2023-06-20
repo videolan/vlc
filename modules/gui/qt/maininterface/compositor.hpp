@@ -92,7 +92,8 @@ public:
     enum Flag : unsigned
     {
         CAN_SHOW_PIP = 1,
-        HAS_ACRYLIC = 2
+        HAS_ACRYLIC = 2,
+        HAS_EXTENDED_FRAME = 4,
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 

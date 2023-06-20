@@ -260,6 +260,7 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, QWidget* rootWidget, 
     m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx,  window, rootWidget);
 #endif
     m_mainCtx->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
+    m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
 
 #ifdef _WIN32
     m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, window);
