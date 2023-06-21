@@ -449,8 +449,8 @@ bool NetworkMediaModel::initializeMediaSources()
 
     m_preparseSem.acquire();
     vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get(), this );
-    m_parsingPending = true;
-    emit parsingPendingChanged(m_parsingPending);
+    m_loading = true;
+    emit loadingChanged(m_loading);
 
     m_listener = std::move( l );
 
@@ -548,8 +548,8 @@ void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item
         if (p_node != model->m_treeItem.media)
             return;
 
-        model->m_parsingPending = false;
-        model->emit parsingPendingChanged(false);
+        model->m_loading = false;
+        model->emit loadingChanged(false);
     });
 }
 

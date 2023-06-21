@@ -154,8 +154,8 @@ void ServicesDiscoveryModel::initializeManager()
     m_manager = addons_manager_New( VLC_OBJECT( m_ctx->getIntf() ), &owner );
     assert( m_manager );
 
-    m_parsingPending = true;
-    emit parsingPendingChanged();
+    m_loading = true;
+    emit loadingChanged();
     addons_manager_LoadCatalog( m_manager );
     addons_manager_Gather( m_manager, "repo://" );
 }
@@ -215,9 +215,9 @@ void ServicesDiscoveryModel::addonChanged( ServicesDiscoveryModel::AddonPtr addo
 
 void ServicesDiscoveryModel::discoveryEnded()
 {
-    assert( m_parsingPending );
-    m_parsingPending = false;
-    emit parsingPendingChanged();
+    assert( m_loading );
+    m_loading = false;
+    emit loadingChanged();
 }
 
 ServicesDiscoveryModel::Item::Item( ServicesDiscoveryModel::AddonPtr addon )

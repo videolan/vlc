@@ -141,7 +141,7 @@ public:
     Q_PROPERTY(ItemType type READ getType NOTIFY typeChanged)
     Q_PROPERTY(bool indexed READ isIndexed WRITE setIndexed NOTIFY isIndexedChanged)
     Q_PROPERTY(bool canBeIndexed READ canBeIndexed NOTIFY canBeIndexedChanged)
-    Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged)
+    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
 
     explicit NetworkMediaModel(QObject* parent = nullptr);
@@ -167,7 +167,7 @@ public:
     inline ItemType getType() const { return m_type; }
     inline bool isIndexed() const { return m_indexed; }
     inline bool canBeIndexed() const { return m_canBeIndexed; }
-    inline bool getParsingPending() const { return m_parsingPending; }
+    inline bool isLoading() const { return m_loading; }
     int getCount() const;
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
@@ -188,7 +188,7 @@ signals:
     void typeChanged();
     void isIndexedChanged();
     void canBeIndexedChanged();
-    void parsingPendingChanged(bool);
+    void loadingChanged(bool);
     void countChanged();
 
     void ctxChanged();
@@ -237,7 +237,7 @@ private:
     ItemType m_type = ItemType::TYPE_UNKNOWN;
     bool m_indexed = false;
     bool m_canBeIndexed  = false;
-    bool m_parsingPending = false;
+    bool m_loading = false;
     QSemaphore m_preparseSem;
 
     std::vector<Item> m_items;

@@ -39,8 +39,8 @@ MainInterface.MainViewLoader {
 
     readonly property bool isViewMultiView: true
 
-     // 'parsingPending' property is not available with NetworkDevicesModel
-    readonly property bool parsing: Helpers.get(providerModel, "parsingPending", false)
+     // 'loading' property is not available with NetworkDevicesModel
+    readonly property bool loading: Helpers.get(providerModel, "loading", false)
 
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name"},
@@ -68,7 +68,7 @@ MainInterface.MainViewLoader {
     // override the default currentComponent assignment from MainViewLoader
     // because we need to show empty label when model is parsing
     currentComponent: {
-        if (filterModel.count == 0 || root.parsing)
+        if (filterModel.count == 0 || root.loading)
             return emptyLabelComponent
         else if (MainCtx.gridView)
             return gridComponent
@@ -349,7 +349,7 @@ MainInterface.MainViewLoader {
                 Widgets.EmptyLabelButton {
                     id: emptyLabel
 
-                    visible: !root.parsing
+                    visible: !root.loading
 
                     // FIXME: find better cover
                     cover: VLCStyle.noArtVideoCover
@@ -384,7 +384,7 @@ MainInterface.MainViewLoader {
                 }
 
                 Item {
-                    visible: root.parsing
+                    visible: root.loading
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -392,7 +392,7 @@ MainInterface.MainViewLoader {
                     Widgets.BusyIndicatorExt {
                         id: busyIndicator
 
-                        runningDelayed: root.parsing
+                        runningDelayed: root.loading
                         anchors.centerIn: parent
                         z: 1
                     }

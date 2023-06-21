@@ -40,7 +40,7 @@ class ServicesDiscoveryModel : public QAbstractListModel
 public:
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-    Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged FINAL)
+    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged FINAL)
     Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
     enum State // equivalent to addon_state_t
@@ -74,7 +74,7 @@ public:
     void setCtx(MainCtx* ctx);
 
     inline MainCtx* getCtx() const { return m_ctx; }
-    inline bool getParsingPending() const { return m_parsingPending; }
+    inline bool isLoading() const { return m_loading; }
     int getCount() const;
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
@@ -82,7 +82,7 @@ public:
     Q_INVOKABLE void removeService(int idx);
 
 signals:
-    void parsingPendingChanged();
+    void loadingChanged();
     void countChanged();
     void ctxChanged();
 
@@ -116,7 +116,7 @@ private:
     std::vector<Item> m_items;
     MainCtx* m_ctx = nullptr;
     addons_manager_t* m_manager = nullptr;
-    bool m_parsingPending = false;
+    bool m_loading = false;
 };
 
 #endif // MLServicesDiscoveryModel_HPP

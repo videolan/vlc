@@ -143,7 +143,7 @@ Widgets.KeyNavigableListView {
     }
 
     Widgets.BusyIndicatorExt {
-        runningDelayed: discoveryModel.parsingPending
+        runningDelayed: discoveryModel.loading
         anchors.centerIn: parent
         color: servicesView.colorContext.fg.primary
         z: 1
