@@ -69,9 +69,17 @@ WindowDialog {
         ColumnLayout {
             anchors.fill: parent
 
+            spacing: VLCStyle.margin_small
+
             RowLayout {
+                Layout.fillHeight: false
+
+                spacing: VLCStyle.margin_xsmall
+
                 Widgets.MenuLabel {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: implicitWidth
+
                     color: root.colorContext.fg.primary
                     text: I18n.qtr("Select profile:")
                 }
@@ -79,12 +87,15 @@ WindowDialog {
                 Widgets.ComboBoxExt {
                     id: comboBox
 
-                    Layout.maximumWidth: (root.width / 2)
+                    Layout.fillWidth: (implicitWidth > Layout.minimumWidth)
+                    Layout.minimumWidth: VLCStyle.combobox_width_large
+                    Layout.minimumHeight: VLCStyle.combobox_height_normal
 
+                    // this is not proper way to do it,
+                    // but ComboBoxExt does not provide
+                    // correct implicit width:
+                    implicitWidth: implicitContentWidth
                     font.pixelSize: VLCStyle.fontSize_normal
-
-                    width: VLCStyle.combobox_width_large
-                    height: VLCStyle.combobox_height_normal
 
                     delegate: ItemDelegate {
                         width: comboBox.width
