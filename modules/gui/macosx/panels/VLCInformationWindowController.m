@@ -471,14 +471,13 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 }
 
 - (void)saveInputItemsMetadata:(NSArray<VLCInputItem *> *)inputItems
-                   ignoreEmpty:(BOOL)ignoreEmpty
 {
     NSParameterAssert(inputItems);
 
 #define SET_INPUTITEM_PROP(field, prop)                          \
 {                                                                \
     NSString * const value = _##field##TextField.stringValue;    \
-    if (![value isEqualToString:@""] || !ignoreEmpty) {          \
+    if (_##field##TextField.settingChanged) {                    \
         inputItem.prop = value;                                  \
     }                                                            \
 }
@@ -502,18 +501,7 @@ SET_INPUTITEM_PROP(field, field)                \
 - (IBAction)saveMetaData:(id)sender
 {
     if (_representedInputItems.count > 0) {
-        // In multi-file editing mode (day, when editing an album) we often have several empty
-        // fields as the files diverge in these areas (e.g. all inputItems won't have the same title
-        // but they might have the same artist.)
-        //
-        // For this reason we don't want to write the empty fields, as we don't want to delete the
-        // titles for all of the inputItems when the field is actually empty because we have
-        // diverging details.
-        //
-        // TODO: Track when the fields have changed instead of only when they are empty
-        
-        const BOOL multipleItems = _representedInputItems.count > 1;
-        [self saveInputItemsMetadata:_representedInputItems ignoreEmpty:multipleItems];
+        [self saveInputItemsMetadata:_representedInputItems];
     } else {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:_NS("Error while saving meta")];
