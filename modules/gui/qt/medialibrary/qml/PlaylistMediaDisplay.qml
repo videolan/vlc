@@ -199,7 +199,7 @@ FocusScope {
     Widgets.EmptyLabelButton {
         anchors.fill: parent
 
-        visible: model.isReady && (model.count <= 0)
+        visible: !model.loading && (model.count <= 0)
 
         focus: visible
 

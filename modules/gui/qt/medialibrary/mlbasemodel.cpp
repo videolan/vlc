@@ -39,8 +39,8 @@ MLBaseModel::MLBaseModel(QObject *parent)
 {
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
 
-    connect( this, &MLBaseModel::mlChanged, this, &MLBaseModel::isReadyChanged );
-    connect( this, &MLBaseModel::countChanged, this, &MLBaseModel::isReadyChanged );
+    connect( this, &MLBaseModel::mlChanged, this, &MLBaseModel::loadingChanged );
+    connect( this, &MLBaseModel::countChanged, this, &MLBaseModel::loadingChanged );
 }
 
 /* For std::unique_ptr, see Effective Modern C++, Item 22 */
@@ -485,7 +485,7 @@ void MLBaseModel::validateCache() const
 
     m_cache->initCount();
 
-    emit isReadyChanged();
+    emit loadingChanged();
 }
 
 
@@ -502,7 +502,7 @@ void MLBaseModel::invalidateCache()
     if (m_cache)
     {
         m_cache->invalidate();
-        emit isReadyChanged();
+        emit loadingChanged();
     }
     else
         validateCache();
@@ -645,7 +645,7 @@ MLQueryParams MLBaseModel::BaseLoader::getParams(size_t index, size_t count) con
     return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
 }
 
-bool MLBaseModel::isReady() const
+bool MLBaseModel::loading() const
 {
-    return (m_mediaLib && m_cache && (m_cache->count() != COUNT_UNINITIALIZED));
+    return !(m_mediaLib && m_cache && (m_cache->count() != COUNT_UNINITIALIZED));
 }

@@ -70,7 +70,7 @@ Widgets.StackViewExt {
     }
 
     property var currentComponent: {
-        if (typeof model === "undefined" || !model || !Helpers.get(model, "isReady", true))
+        if (typeof model === "undefined" || !model || Helpers.get(model, "loading", true))
             return null // invalid state
         if (model.count === 0)
             return emptyLabel
