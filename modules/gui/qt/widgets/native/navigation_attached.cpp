@@ -100,7 +100,7 @@ void NavigationAttached::defaultNavigationCancel()
 {
     defaultNavigationGeneric(m_cancelAction, m_cancelItem,
                              &NavigationAttached::defaultNavigationCancel,
-                             Qt::OtherFocusReason);
+                             Qt::BacktabFocusReason);
 }
 
 void NavigationAttached::defaultKeyAction(QObject* event)
