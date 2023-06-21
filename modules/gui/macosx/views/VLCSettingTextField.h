@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCSettingTextField : NSTextField
 
+@property (readonly) BOOL settingChanged;
+@property (readwrite, nonatomic, strong) NSString *originalStateString;
+
 @end
 
 NS_ASSUME_NONNULL_END

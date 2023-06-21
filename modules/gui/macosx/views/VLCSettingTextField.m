@@ -24,6 +24,14 @@
 
 @implementation VLCSettingTextField
 
-
+- (void)setOriginalStateString:(NSString *)stateString
+{
+    if ([stateString isEqualToString:_originalStateString]) {
+        return;
+    }
+    
+    _originalStateString = stateString;
+    _settingChanged = NO;
+}
 
 @end
