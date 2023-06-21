@@ -104,8 +104,7 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     else
         segment->http_url = NULL;
 
-    if (queue->hls_config->max_segments != 0 &&
-        queue->hls_config->max_segments <= queue->total_segments)
+    if (hls_segment_queue_IsAtMaxCapacity(queue))
     {
         hls_segment_t *old = hls_segment_GetFirst(queue);
         assert(old != NULL);

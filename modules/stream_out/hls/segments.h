@@ -80,4 +80,11 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *,
                                  block_t *content,
                                  vlc_tick_t length);
 
+static inline bool
+hls_segment_queue_IsAtMaxCapacity(const hls_segment_queue_t *queue)
+{
+    return queue->hls_config->max_segments != 0 &&
+           queue->hls_config->max_segments <= queue->total_segments;
+}
+
 #endif

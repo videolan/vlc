@@ -27,7 +27,11 @@ struct hls_config
     unsigned int max_segments;
     bool pace;
     vlc_tick_t segment_length;
+    size_t max_memory;
 };
+
+#define BYTES_FROM_KB(x) ((x) * 1000)
+#define BYTES_TO_KB(x) ((x) / 1000)
 
 static inline void hls_config_Clean(struct hls_config *config)
 {

@@ -64,6 +64,7 @@ typedef struct hls_playlist
     unsigned int id;
 
     const struct hls_config *config;
+    size_t *current_memory_cached_ref;
 
     sout_access_out_t *access;
     sout_mux_t *mux;
@@ -146,6 +147,8 @@ typedef struct
     vlc_tick_t first_pcr;
     vlc_tick_t last_pcr;
     vlc_tick_t last_segment;
+
+    size_t current_memory_cached;
 } sout_stream_sys_t;
 
 #define hls_playlists_foreach(it)                                              \
@@ -466,6 +469,22 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     size_t size = 0;
     block_ChainProperties(block, NULL, &size, NULL);
 
+    if (hls_config_IsMemStorageEnabled(playlist->config))
+    {
+        *playlist->current_memory_cached_ref += size;
+        if (*playlist->current_memory_cached_ref >=
+            playlist->config->max_memory)
+        {
+            vlc_error(playlist->logger,
+                      "Maximum memory capacity (%luKb) for segment storage was "
+                      "reached. The HLS server will stop creating segments. "
+                      "Please refer to the max-memory option for more info.",
+                      BYTES_TO_KB(playlist->config->max_memory));
+            block_ChainRelease(block);
+            return -1;
+        }
+    }
+
     block_ChainLastAppend(&playlist->muxed_output.end, block);
     return size;
 }
@@ -527,6 +546,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
     playlist->id = sys->playlist_created_count;
     playlist->config = &sys->config;
     playlist->ended = false;
+    playlist->current_memory_cached_ref = &sys->current_memory_cached;
 
     playlist->url = FormatPlaylistManifestURL(playlist);
     if (unlikely(playlist->url == NULL))
@@ -716,6 +736,15 @@ static void ExtractAndAddSegment(hls_playlist_t *playlist,
 {
     hls_block_chain_t segment = ExtractSegment(playlist, last_segment_time);
 
+    if (hls_config_IsMemStorageEnabled(playlist->config) &&
+        hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
+    {
+        const hls_segment_t *to_be_removed =
+            hls_segment_GetFirst(&playlist->segments);
+        *playlist->current_memory_cached_ref -=
+            hls_storage_GetSize(to_be_removed->storage);
+    }
+
     const int status = hls_segment_queue_NewSegment(
         &playlist->segments, segment.begin, segment.length);
     if (unlikely(status != VLC_SUCCESS))
@@ -855,6 +884,7 @@ static int Open(vlc_object_t *this)
 
     static const char *const options[] = {"base-url",
                                           "host-http",
+                                          "max-memory",
                                           "num-seg",
                                           "out-dir",
                                           "pace",
@@ -871,6 +901,8 @@ static int Open(vlc_object_t *this)
     sys->config.pace = var_GetBool(stream, SOUT_CFG_PREFIX "pace");
     sys->config.segment_length =
         VLC_TICK_FROM_SEC(var_GetInteger(stream, SOUT_CFG_PREFIX "seg-len"));
+    sys->config.max_memory =
+        BYTES_FROM_KB(var_GetInteger(stream, SOUT_CFG_PREFIX "max-memory"));
 
     int status = VLC_EINVAL;
 
@@ -916,6 +948,8 @@ static int Open(vlc_object_t *this)
     sys->first_pcr = VLC_TICK_INVALID;
     sys->last_pcr = VLC_TICK_INVALID;
     sys->last_segment = 0;
+
+    sys->current_memory_cached = 0;
 
     static const struct sout_stream_operations ops = {
         .add = Add,
@@ -972,6 +1006,11 @@ static void Close(vlc_object_t *this)
        "quick testing on networks with a small load")
 #define HOSTHTTP_TEXT                                                          \
     N_("Enable hosting the HLS output on the internal HTTP server")
+#define MAXMEMORY_LONGTEXT                                                     \
+    N_("Maximum allowed memory for segment storage in Kb. This option is "     \
+       "only relevant when segments are stored in internal memory. If the "    \
+       "value is bypassed, the HLS server will stop with an error")
+#define MAXMEMORY_TEXT N_("Maximum allowed memory for segment storage in Kb")
 #define NUMSEG_TEXT N_("Number of maximum segment exposed")
 #define OUTDIR_TEXT N_("Output directory path")
 #define OUTDIR_LONGTEXT                                                        \
@@ -994,6 +1033,7 @@ vlc_module_begin()
 
     add_string(SOUT_CFG_PREFIX "base-url", "", BASEURL_TEXT, BASEURL_TEXT)
     add_bool(SOUT_CFG_PREFIX "host-http", false, HOSTHTTP_TEXT, HOSTHTTP_LONGTEXT)
+    add_integer(SOUT_CFG_PREFIX "max-memory", 20000, MAXMEMORY_TEXT, MAXMEMORY_LONGTEXT)
     add_integer(SOUT_CFG_PREFIX "num-seg", 0, NUMSEG_TEXT, NUMSEG_TEXT)
     add_string(SOUT_CFG_PREFIX "out-dir", NULL, OUTDIR_TEXT, OUTDIR_LONGTEXT)
     add_bool(SOUT_CFG_PREFIX "pace", false, PACE_TEXT, PACE_LONGTEXT)
