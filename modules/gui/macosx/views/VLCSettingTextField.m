@@ -39,6 +39,7 @@
 - (void)textDidChange:(NSNotification *)notification
 {
     _settingChanged = ![self.stringValue isEqualToString:self.originalStateString];
+    NSLog(@"text changed bruh %@ %@ %i", self.stringValue, _originalStateString, _settingChanged);
     [super textDidChange:notification];
 }
 

@@ -322,14 +322,14 @@ actionCallback(encodedBy);
         [inputItem preparseInputItem];
     }
 
-#define FILL_FIELD_FROM_INPUTITEM(field)                    \
-{                                                           \
-    NSString * const inputItemString = inputItem.field;     \
-    if (inputItemString != nil) {                           \
-        _##field##TextField.stringValue = inputItemString;  \
-    } else {                                                \
-        _##field##TextField.stringValue = @"";              \
-    }                                                       \
+#define FILL_FIELD_FROM_INPUTITEM(field)                            \
+    {                                                               \
+    NSString * const inputItemString = inputItem.field;             \
+    if (inputItemString != nil) {                                   \
+        _##field##TextField.originalStateString = inputItemString;  \
+    } else {                                                        \
+        _##field##TextField.originalStateString = @"";              \
+    }                                                               \
 }                                                           
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_INPUTITEM);
@@ -355,9 +355,9 @@ actionCallback(encodedBy);
     NSString * const fieldValue = [dict objectForKey:dictKey];              \
                                                                             \
     if (fieldValue != nil) {                                                \
-        _##field##TextField.stringValue = fieldValue;                       \
+        _##field##TextField.originalStateString = fieldValue;               \
     } else {                                                                \
-        _##field##TextField.stringValue = @"";                              \
+        _##field##TextField.originalStateString = @"";                      \
     }                                                                       \
 }                                                                           \
 
@@ -365,6 +365,7 @@ actionCallback(encodedBy);
     
 #undef FILL_FIELD_FROM_DICT
 
+    _decodedMRLTextField.originalStateString = @"test";
     NSURL * const artworkURL = [dict objectForKey:@"artworkURL"];
     NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
     [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
@@ -372,12 +373,12 @@ actionCallback(encodedBy);
 
 - (void)updateRepresentation
 {
-    [_saveMetaDataButton setEnabled: NO];
+    _saveMetaDataButton.enabled = NO;
 
     if (_representedInputItems.count == 0) {
         /* Erase */
 #define CLEAR_TEXT(field) \
-_##field##TextField.stringValue = @"";
+_##field##TextField.originalStateString = @"";
 
         PERFORM_ACTION_ALL_TEXTFIELDS(CLEAR_TEXT);
 
@@ -453,7 +454,16 @@ _##field##TextField.stringValue = @"";
 
 - (IBAction)metaFieldChanged:(id)sender
 {
-    [_saveMetaDataButton setEnabled: YES];
+    BOOL settingsChanged = NO;
+    
+#define CHECK_FIELD_SETTING_CHANGED(field)                              \
+settingsChanged = settingsChanged || _##field##TextField.settingChanged;
+
+    PERFORM_ACTION_ALL_TEXTFIELDS(CHECK_FIELD_SETTING_CHANGED);
+
+#undef CHECK_FIELD_SETTING_CHANGED
+    
+    _saveMetaDataButton.enabled = settingsChanged;
 }
 
 - (void)saveInputItemsMetadata:(NSArray<VLCInputItem *> *)inputItems
