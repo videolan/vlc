@@ -65,17 +65,11 @@ MainInterface.MainViewLoader {
         searchRole: "name"
     }
 
-    // override the default currentComponent assignment from MainViewLoader
-    // because we need to show empty label when model is parsing
-    currentComponent: {
-        if (filterModel.count == 0 || root.loading)
-            return emptyLabelComponent
-        else if (MainCtx.gridView)
-            return gridComponent
-        else
-            return tableComponent
-    }
+    grid: gridComponent
+    list: tableComponent
 
+    loadingComponent: emptyLabelComponent
+    emptyLabel: emptyLabelComponent
 
     onTreeChanged: providerModel.tree = tree
 
