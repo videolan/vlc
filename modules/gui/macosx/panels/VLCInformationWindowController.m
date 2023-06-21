@@ -350,12 +350,7 @@ actionCallback(encodedBy);
 
 #define FILL_FIELD_FROM_DICT(field)                                         \
 {                                                                           \
-    /* The keys in the dict are all CapitalisedLikeThis, so build key */    \
-    NSString * const fieldString = [NSString stringWithUTF8String:#field];  \
-    NSString * const keyFirstChar = [fieldString substringToIndex:1];       \
-    NSString * const keyOtherChars = [fieldString substringWithRange:NSMakeRange(1, fieldString.length - 1)];      \
-    NSString * const dictKey = [NSString stringWithFormat:@"%@%@", [keyFirstChar uppercaseString], keyOtherChars]; \
-                                                                            \
+    NSString * const dictKey = [NSString stringWithUTF8String:#field];      \
     NSString * const fieldValue = [dict objectForKey:dictKey];              \
                                                                             \
     if (fieldValue != nil) {                                                \
@@ -369,7 +364,7 @@ actionCallback(encodedBy);
     
 #undef FILL_FIELD_FROM_DICT
 
-    NSURL * const artworkURL = [dict objectForKey:@"ArtworkURL"];
+    NSURL * const artworkURL = [dict objectForKey:@"artworkURL"];
     NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
     [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
 }

@@ -331,113 +331,68 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     }
 
     NSMutableDictionary<NSString *, id> *const commonData = [[NSMutableDictionary alloc] init];
+    VLCInputItem * const firstInputItem = mediaItems.firstObject.inputItem;
 
-    BOOL differingUri = NO;
-    BOOL differingArtworkURL = NO;
-    BOOL differingArtist = NO;
-    BOOL differingAlbum = NO;
-    BOOL differingTrackNumber = NO;
-    BOOL differingTrackTotal = NO;
-    BOOL differingGenre = NO;
-    BOOL differingDate = NO;
+#define PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(action)                                  \
+action(decodedMRL);                                                                         \
+action(artist);                                                                             \
+action(album);                                                                              \
+action(trackNumber);                                                                        \
+action(trackTotal);                                                                         \
+action(genre);                                                                              \
+action(date);                                                                               \
+action(episode);                                                                            \
+action(actors);                                                                             \
+action(director);                                                                           \
+action(showName);                                                                           \
+action(copyright);                                                                          \
+action(publisher);                                                                          \
+action(nowPlaying);                                                                         \
+action(language);                                                                           \
+action(contentDescription);                                                                 \
+action(encodedBy);
 
-    // NOTE: These are unlikely to be filled for an audio group's input items
-    BOOL differingSeason = NO;
-    BOOL differingEpisode = NO;
-    BOOL differingActors = NO;
-    BOOL differingDirector = NO;
-    BOOL differingShowName = NO;
-    BOOL differingCopyright = NO;
-    BOOL differingPublisher = NO;
-    BOOL differingNowPlaying = NO;
-    BOOL differingLanguage = NO;
-    BOOL differingContentDescription = NO;
-    BOOL differingEncodedBy = NO;
+#define PERFORM_ACTION_PER_INPUTITEM_PROP(action)                                           \
+PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(action)                                          \
+action(artworkURL);
 
-    VLCMediaLibraryMediaItem * const firstMediaItem = mediaItems.firstObject;
-    const int64_t firstItemArtistId = firstMediaItem.artistID;
-    const int64_t firstItemGenreId = firstMediaItem.genreID;
-    const int64_t firstItemAlbumId = firstMediaItem.albumID;
-    
-    VLCInputItem * const firstInputItem = firstMediaItem.inputItem;
-    NSURL * const firstItemArtworkURL = firstInputItem.artworkURL;
-    NSString * const firstItemArtist = firstInputItem.artist;
-    NSString * const firstItemAlbum = firstInputItem.album;
-    NSString * const firstItemGenre = firstInputItem.genre;
-    NSString * const firstItemUri = firstInputItem.decodedMRL;
-    NSString * const firstItemTitle = firstInputItem.title;
-    NSString * const firstItemTrackNumber = firstInputItem.trackNumber;
-    NSString * const firstItemTrackTotal = firstInputItem.trackTotal;
-    NSString * const firstItemDate = firstInputItem.date;
+#define CREATE_DIFFER_BOOL(prop)                                                            \
+BOOL differing_##prop = NO;
 
-    // NOTE: These are unlikely to be filled for an audio group's input items
-    NSString * const firstItemSeason = firstInputItem.season;
-    NSString * const firstItemEpisode = firstInputItem.episode;
-    NSString * const firstItemActors = firstInputItem.actors;
-    NSString * const firstItemDirector = firstInputItem.director;
-    NSString * const firstItemShowName = firstInputItem.showName;
-    NSString * const firstItemCopyright = firstInputItem.copyright;
-    NSString * const firstItemPublisher = firstInputItem.publisher;
-    NSString * const firstItemNowPlaying = firstInputItem.nowPlaying;
-    NSString * const firstItemLanguage = firstInputItem.language;
-    NSString * const firstItemContentDescription = firstInputItem.contentDescription;
-    NSString * const firstItemEncodedBy = firstInputItem.encodedBy;
+#define CREATE_PROP_VAR(prop)                                                               \
+NSString * const firstItem_##prop = firstInputItem.prop;
+
+#define SET_IF_DIFFERING(prop)                                                              \
+differing_##prop = differing_##prop || ![inputItem.prop isEqualToString:firstItem_##prop];
+
+#define ADD_PROP_TO_DICT_IF_DIFFERING(prop)                                                 \
+if (!differing_##prop && firstItem_##prop != nil) {                                         \
+    [commonData setObject:firstItem_##prop forKey:[NSString stringWithUTF8String:#prop]];   \
+}
+
+    PERFORM_ACTION_PER_INPUTITEM_PROP(CREATE_DIFFER_BOOL);
+    PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(CREATE_PROP_VAR);
+    NSString * const firstItem_artworkURL = firstInputItem.artworkURL.absoluteString;
 
     for (VLCMediaLibraryMediaItem * const item in mediaItems) {
         VLCInputItem * const inputItem = item.inputItem;
 
-        differingArtist = differingArtist || item.artistID != firstItemArtistId;
-        differingAlbum = differingAlbum || item.albumID != firstItemAlbumId;
-        differingGenre = differingGenre || item.genreID != firstItemGenreId;
-
-        differingArtworkURL = differingArtworkURL || [inputItem.artworkURL.absoluteString isEqualToString:firstItemArtworkURL.absoluteString];
-
-        differingUri = differingUri || ![inputItem.decodedMRL isEqualToString:firstItemUri];
-        differingTrackNumber = differingTrackNumber || ![inputItem.trackNumber isEqualToString:firstItemTrackNumber];
-        differingTrackTotal = differingTrackTotal || ![inputItem.trackTotal isEqualToString:firstItemTrackTotal];
-        differingDate = differingDate || ![inputItem.date isEqualToString:firstItemDate];
-
-        differingSeason = differingSeason || ![inputItem.season isEqualToString:firstItemSeason];
-        differingEpisode = differingEpisode || ![inputItem.episode isEqualToString:firstItemEpisode];
-        differingActors = differingActors || ![inputItem.actors isEqualToString:firstItemActors];
-        differingShowName = differingShowName || ![inputItem.showName isEqualToString:firstItemDirector];
-        differingCopyright = differingCopyright || ![inputItem.copyright isEqualToString:firstItemCopyright];
-        differingPublisher = differingPublisher || ![inputItem.publisher isEqualToString:firstItemPublisher];
-        differingNowPlaying = differingNowPlaying || ![inputItem.nowPlaying isEqualToString:firstItemNowPlaying];
-        differingLanguage = differingLanguage || ![inputItem.language isEqualToString:firstItemLanguage];
-        differingContentDescription = differingContentDescription || ![inputItem.contentDescription isEqualToString:firstItemContentDescription];
-        differingEncodedBy = differingEncodedBy || ![inputItem.encodedBy isEqualToString:firstItemEncodedBy];
+        PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(SET_IF_DIFFERING);
+        differing_artworkURL = differing_artworkURL || [inputItem.artworkURL.absoluteString isEqualToString:firstItem_artworkURL];
     }
 
-    if (!differingUri) { // This can only mean we have one item
+    if (!differing_decodedMRL) { // This can only mean we have one item
         return @{@"inputItem": firstInputItem};
     }
 
-#define ADD_FIELD_IF_DIFFERING(Foo)                                                    \
-if (!differing##Foo && firstItem##Foo != nil) {                                        \
-    [commonData setObject:firstItem##Foo forKey:[NSString stringWithUTF8String:#Foo]]; \
-}
+    PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT_IF_DIFFERING);
 
-    ADD_FIELD_IF_DIFFERING(ArtworkURL);
-    ADD_FIELD_IF_DIFFERING(Artist);
-    ADD_FIELD_IF_DIFFERING(Album);
-    ADD_FIELD_IF_DIFFERING(Genre);
-    ADD_FIELD_IF_DIFFERING(TrackNumber);
-    ADD_FIELD_IF_DIFFERING(TrackTotal);
-    ADD_FIELD_IF_DIFFERING(Date);
-    ADD_FIELD_IF_DIFFERING(Season);
-    ADD_FIELD_IF_DIFFERING(Episode);
-    ADD_FIELD_IF_DIFFERING(Actors);
-    ADD_FIELD_IF_DIFFERING(ShowName);
-    ADD_FIELD_IF_DIFFERING(Copyright);
-    ADD_FIELD_IF_DIFFERING(Publisher);
-    ADD_FIELD_IF_DIFFERING(NowPlaying);
-    ADD_FIELD_IF_DIFFERING(Language);
-    ADD_FIELD_IF_DIFFERING(ContentDescription);
-    ADD_FIELD_IF_DIFFERING(EncodedBy);
-    
-#undef ADD_FIELD_IF_DIFFERING
-    
+#undef PERFORM_ACTION_PER_INPUTITEM_PROP
+#undef CREATE_DIFFER_BOOL
+#undef CREATE_PROP_VAR
+#undef SET_IF_DIFFERING
+#undef ADD_PROP_TO_DICT_IF_DIFFERING
+
     return [commonData copy];
 }
 
