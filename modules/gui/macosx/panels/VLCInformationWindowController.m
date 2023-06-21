@@ -26,6 +26,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import "main/VLCMain.h"
 
@@ -86,7 +87,7 @@ actionCallback(encodedBy);
 @interface VLCInformationWindowController () <NSOutlineViewDataSource>
 {
     VLCCodecInformationTreeItem *_rootCodecInformationItem;
-
+    NSImage *_artwork;
     BOOL _statisticsEnabled;
 }
 @end
@@ -261,6 +262,7 @@ _##field##TextField.delegate = self
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
     _representedInputItems = @[representedInputItem];
+    _artwork = [VLCLibraryImageCache thumbnailForInputItem:representedInputItem];
     [self updateRepresentation];
 }
 
@@ -272,6 +274,11 @@ _##field##TextField.delegate = self
     }
 
     _representedInputItems = [inputItems copy];
+
+    // HACK: Input items retrieved via an audio group do not acquire an artwork URL.
+    // To show something in the information window, set the small artwork from the audio group.
+    _artwork = [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup];
+
     [self updateRepresentation];
 }
 
@@ -341,9 +348,7 @@ _##field##TextField.delegate = self
 
 #undef FILL_FIELD_FROM_INPUTITEM
 
-    NSURL * const artworkURL = inputItem.artworkURL;
-    NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
-    [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
+    _artworkImageView.image = _artwork;
 
     if (!_mainMenuInstance) {
         [self.window setTitle:inputItem.title];
@@ -370,10 +375,7 @@ _##field##TextField.delegate = self
     
 #undef FILL_FIELD_FROM_DICT
 
-    _decodedMRLTextField.originalStateString = @"test";
-    NSURL * const artworkURL = [dict objectForKey:@"artworkURL"];
-    NSImage * const placeholderImage = [NSImage imageNamed:@"noart.png"];
-    [_artworkImageView setImageURL:artworkURL placeholderImage:placeholderImage];
+    _artworkImageView.image = _artwork;
 }
 
 - (void)updateRepresentation
@@ -388,7 +390,7 @@ _##field##TextField.originalStateString = @"";
         PERFORM_ACTION_ALL_TEXTFIELDS(CLEAR_TEXT);
 
 #undef CLEAR_TEXT
-        [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
+        [_artworkImageView setImage:[NSImage imageNamed:@"noart.png"]];
     } else if (_representedInputItems.count == 1) {
         [self fillWindowWithInputItemData:_representedInputItems.firstObject];
     } else if (_representedInputItems.count > 1) {
