@@ -404,31 +404,31 @@ _##field##TextField.stringValue = @"";
     [self updateStreamsList];
 }
 
-- (void)updateStreamsList
+- (void)updateStreamsForInputItems:(NSArray<VLCInputItem *> *)inputItems
 {
-    _rootCodecInformationItem = [[VLCCodecInformationTreeItem alloc] init];
+    NSParameterAssert(inputItems != nil);
 
-    if (_representedInputItem) {
-        input_item_t *p_input = _representedInputItem.vlcInputItem;
+    for (VLCInputItem * const inputItem in inputItems) {
+        input_item_t * const p_input = _representedInputItem.vlcInputItem;
         vlc_mutex_lock(&p_input->lock);
         // build list of streams
-        NSMutableArray *streams = [NSMutableArray array];
+        NSMutableArray * const streams = NSMutableArray.array;
 
         info_category_t *cat;
         vlc_list_foreach(cat, &p_input->categories, node) {
-            info_t *info;
-
-            if (info_category_IsHidden(cat))
+            if (info_category_IsHidden(cat)) {
                 continue;
+            }
 
-            VLCCodecInformationTreeItem *subItem = [[VLCCodecInformationTreeItem alloc] init];
+            VLCCodecInformationTreeItem * const subItem = [[VLCCodecInformationTreeItem alloc] init];
             subItem.propertyName = toNSStr(cat->psz_name);
 
             // Build list of codec details
-            NSMutableArray *infos = [NSMutableArray array];
+            NSMutableArray * const infos = NSMutableArray.array;
 
+            info_t *info;
             info_foreach(info, &cat->infos) {
-                VLCCodecInformationTreeItem *infoItem = [[VLCCodecInformationTreeItem alloc] init];
+                VLCCodecInformationTreeItem * const infoItem = [[VLCCodecInformationTreeItem alloc] init];
                 infoItem.propertyName = toNSStr(info->psz_name);
                 infoItem.propertyValue = toNSStr(info->psz_value);
                 [infos addObject:infoItem];
@@ -440,6 +440,22 @@ _##field##TextField.stringValue = @"";
 
         _rootCodecInformationItem.children = [streams copy];
         vlc_mutex_unlock(&p_input->lock);
+    }
+}
+
+- (void)updateStreamsList
+{
+    _rootCodecInformationItem = [[VLCCodecInformationTreeItem alloc] init];
+
+    if (_representedInputItem) {
+        [self updateStreamsForInputItems:@[_representedInputItem]];
+    } else if (_representedMediaLibraryAudioGroup) {
+        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
+        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
+            [inputItems addObject:mediaItem.inputItem];
+        }
+
+        [self updateStreamsForInputItems:inputItems];
     }
 
     [_outlineView reloadData];
