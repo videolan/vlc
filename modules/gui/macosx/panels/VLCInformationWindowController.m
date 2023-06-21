@@ -24,12 +24,18 @@
 #import "VLCInformationWindowController.h"
 
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
+
 #import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
-#import "windows/video/VLCVideoOutputProvider.h"
-#import "library/VLCInputItem.h"
+
 #import "views/VLCImageView.h"
+#import "views/VLCSettingTextField.h"
+
+#import "windows/video/VLCVideoOutputProvider.h"
 
 #define PERFORM_ACTION_READWRITE_TEXTFIELDS(actionCallback) \
 actionCallback(title);                                      \

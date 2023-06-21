@@ -25,6 +25,7 @@
 
 @class VLCInputItem;
 @class VLCImageView;
+@class VLCSettingTextField;
 @protocol VLCMediaLibraryAudioGroupProtocol;
 
 @interface VLCInformationWindowController : NSWindowController
@@ -34,42 +35,42 @@
 
 @property (readwrite, weak) IBOutlet NSTextField *decodedMRLLabel;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
-@property (readwrite, weak) IBOutlet NSTextField *decodedMRLTextField;
-@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *decodedMRLTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *artistLabel;
-@property (readwrite, weak) IBOutlet NSTextField *artistTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *artistTextField;
 @property (readwrite, weak) IBOutlet NSTextField *albumLabel;
-@property (readwrite, weak) IBOutlet NSTextField *albumTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *albumTextField;
 @property (readwrite, weak) IBOutlet NSTextField *copyrightLabel;
-@property (readwrite, weak) IBOutlet NSTextField *copyrightTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *copyrightTextField;
 @property (readwrite, weak) IBOutlet NSTextField *dateLabel;
-@property (readwrite, weak) IBOutlet NSTextField *dateTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *dateTextField;
 @property (readwrite, weak) IBOutlet NSTextField *contentDescriptionLabel;
-@property (readwrite, weak) IBOutlet NSTextField *contentDescriptionTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *contentDescriptionTextField;
 @property (readwrite, weak) IBOutlet NSTextField *encodedByLabel;
-@property (readwrite, weak) IBOutlet NSTextField *encodedByTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *encodedByTextField;
 @property (readwrite, weak) IBOutlet NSTextField *genreLabel;
-@property (readwrite, weak) IBOutlet NSTextField *genreTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *genreTextField;
 @property (readwrite, weak) IBOutlet NSTextField *languageLabel;
-@property (readwrite, weak) IBOutlet NSTextField *languageTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *languageTextField;
 @property (readwrite, weak) IBOutlet NSTextField *nowPlayingLabel;
-@property (readwrite, weak) IBOutlet NSTextField *nowPlayingTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *nowPlayingTextField;
 @property (readwrite, weak) IBOutlet NSTextField *publisherLabel;
-@property (readwrite, weak) IBOutlet NSTextField *publisherTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *publisherTextField;
 @property (readwrite, weak) IBOutlet NSTextField *trackNumberLabel;
-@property (readwrite, weak) IBOutlet NSTextField *trackNumberTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *trackNumberTextField;
 @property (readwrite, weak) IBOutlet NSTextField *trackTotalLabel;
-@property (readwrite, weak) IBOutlet NSTextField *trackTotalTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *trackTotalTextField;
 @property (readwrite, weak) IBOutlet NSTextField *showNameLabel;
-@property (readwrite, weak) IBOutlet NSTextField *showNameTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *showNameTextField;
 @property (readwrite, weak) IBOutlet NSTextField *seasonLabel;
-@property (readwrite, weak) IBOutlet NSTextField *seasonTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *seasonTextField;
 @property (readwrite, weak) IBOutlet NSTextField *episodeLabel;
-@property (readwrite, weak) IBOutlet NSTextField *episodeTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *episodeTextField;
 @property (readwrite, weak) IBOutlet NSTextField *actorsLabel;
-@property (readwrite, weak) IBOutlet NSTextField *actorsTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *actorsTextField;
 @property (readwrite, weak) IBOutlet NSTextField *directorLabel;
-@property (readwrite, weak) IBOutlet NSTextField *directorTextField;
+@property (readwrite, weak) IBOutlet VLCSettingTextField *directorTextField;
 @property (readwrite, weak) IBOutlet VLCImageView *artworkImageView;
 @property (readwrite, weak) IBOutlet NSButton *saveMetaDataButton;
 
