@@ -107,13 +107,15 @@
 @property (readwrite, weak) IBOutlet NSTextField *demuxDiscontinuitiesLabel;
 @property (readwrite, weak) IBOutlet NSTextField *demuxDiscontinuitiesTextField;
 
-@property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
-@property (readwrite, strong, nonatomic) id<VLCMediaLibraryAudioGroupProtocol> representedMediaLibraryAudioGroup;
+@property (readwrite, strong, atomic) NSArray<VLCInputItem *> *representedInputItems;
 @property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
+
+- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;
+- (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup;
 
 @end

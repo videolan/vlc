@@ -249,23 +249,18 @@ actionCallback(encodedBy);
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
-    if (_representedInputItem == representedInputItem) {
-        return;
-    }
-    
-    _representedInputItem = representedInputItem;
-    _representedMediaLibraryAudioGroup = nil;
+    _representedInputItems = @[representedInputItem];
     [self updateRepresentation];
 }
 
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
 {
-    if (_representedMediaLibraryAudioGroup == representedMediaLibraryAudioGroup) {
-        return;
+    NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
+    for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.tracksAsMediaItems) {
+        [inputItems addObject:mediaItem.inputItem];
     }
-    
-    _representedMediaLibraryAudioGroup = representedMediaLibraryAudioGroup;
-    _representedInputItem = nil;
+
+    _representedInputItems = [inputItems copy];
     [self updateRepresentation];
 }
 
@@ -373,7 +368,7 @@ actionCallback(encodedBy);
 {
     [_saveMetaDataButton setEnabled: NO];
 
-    if (!_representedInputItem && !_representedMediaLibraryAudioGroup) {
+    if (_representedInputItems.count == 0) {
         /* Erase */
 #define CLEAR_TEXT(field) \
 _##field##TextField.stringValue = @"";
@@ -382,15 +377,10 @@ _##field##TextField.stringValue = @"";
 
 #undef CLEAR_TEXT
         [_artworkImageView setImage: [NSImage imageNamed:@"noart.png"]];
-    } else if (_representedInputItem) {
-        [self fillWindowWithInputItemData:_representedInputItem];
-    } else if (_representedMediaLibraryAudioGroup) {
-        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
-        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
-            [inputItems addObject:mediaItem.inputItem];
-        }
-
-        NSDictionary * const commonItemsData = commonInputItemData(inputItems);
+    } else if (_representedInputItems.count == 1) {
+        [self fillWindowWithInputItemData:_representedInputItems.firstObject];
+    } else if (_representedInputItems.count > 1) {
+        NSDictionary * const commonItemsData = commonInputItemData(_representedInputItems);
 
         if ([commonItemsData objectForKey:@"inputItem"]) {
             [self setRepresentedInputItem:[commonItemsData objectForKey:@"inputItem"]];
@@ -447,15 +437,8 @@ _##field##TextField.stringValue = @"";
 {
     _rootCodecInformationItem = [[VLCCodecInformationTreeItem alloc] init];
 
-    if (_representedInputItem) {
-        [self updateStreamsForInputItems:@[_representedInputItem]];
-    } else if (_representedMediaLibraryAudioGroup) {
-        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
-        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
-            [inputItems addObject:mediaItem.inputItem];
-        }
-
-        [self updateStreamsForInputItems:inputItems];
+    if (_representedInputItems.count > 0) {
+        [self updateStreamsForInputItems:_representedInputItems];
     }
 
     [_outlineView reloadData];
@@ -498,15 +481,19 @@ SET_INPUTITEM_PROP(field, field)                \
 
 - (IBAction)saveMetaData:(id)sender
 {
-    if (_representedInputItem != nil) {
-        [self saveInputItemsMetadata:@[_representedInputItem] ignoreEmpty:NO];
-    } else if (_representedMediaLibraryAudioGroup != nil) {
-        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
-        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
-            [inputItems addObject:mediaItem.inputItem];
-        }
+    if (_representedInputItems.count > 0) {
+        // In multi-file editing mode (day, when editing an album) we often have several empty
+        // fields as the files diverge in these areas (e.g. all inputItems won't have the same title
+        // but they might have the same artist.)
+        //
+        // For this reason we don't want to write the empty fields, as we don't want to delete the
+        // titles for all of the inputItems when the field is actually empty because we have
+        // diverging details.
+        //
+        // TODO: Track when the fields have changed instead of only when they are empty
         
-        [self saveInputItemsMetadata:inputItems ignoreEmpty:YES];
+        const BOOL multipleItems = _representedInputItems.count > 1;
+        [self saveInputItemsMetadata:_representedInputItems ignoreEmpty:multipleItems];
     } else {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:_NS("Error while saving meta")];
