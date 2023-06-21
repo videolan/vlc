@@ -32,6 +32,14 @@
     
     _originalStateString = stateString;
     _settingChanged = NO;
+
+    self.stringValue = stateString;
+}
+
+- (void)textDidChange:(NSNotification *)notification
+{
+    _settingChanged = ![self.stringValue isEqualToString:self.originalStateString];
+    [super textDidChange:notification];
 }
 
 @end
