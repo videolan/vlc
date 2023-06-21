@@ -148,6 +148,11 @@ actionCallback(encodedBy);
         [self initMediaPanelStats];
     }
 
+#define SET_METADATA_SETTING_FIELD_DELEGATE(field)  \
+_##field##TextField.delegate = self
+
+    PERFORM_ACTION_ALL_TEXTFIELDS(SET_METADATA_SETTING_FIELD_DELEGATE)
+    
     [self updateRepresentation];
 }
 
@@ -451,7 +456,7 @@ _##field##TextField.originalStateString = @"";
     [_outlineView expandItem:nil expandChildren:YES];
 }
 
-- (IBAction)metaFieldChanged:(id)sender
+- (void)controlTextDidChange:(NSNotification *)notification
 {
     BOOL settingsChanged = NO;
     

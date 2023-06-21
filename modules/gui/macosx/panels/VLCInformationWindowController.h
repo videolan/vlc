@@ -28,7 +28,7 @@
 @class VLCSettingTextField;
 @protocol VLCMediaLibraryAudioGroupProtocol;
 
-@interface VLCInformationWindowController : NSWindowController
+@interface VLCInformationWindowController : NSWindowController<NSTextFieldDelegate>
 
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedView;
@@ -112,8 +112,6 @@
 @property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;
-
-- (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;

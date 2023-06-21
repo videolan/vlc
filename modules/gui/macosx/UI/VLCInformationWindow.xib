@@ -112,9 +112,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="726"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="429">
                                             <rect key="frame" x="35" y="495" width="373" height="14"/>
@@ -153,9 +150,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="724"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="432">
                                             <rect key="frame" x="35" y="452" width="262" height="13"/>
@@ -172,9 +166,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="725"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="436">
                                             <rect key="frame" x="343" y="452" width="27" height="13"/>
@@ -191,9 +182,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="722"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="440">
                                             <rect key="frame" x="35" y="409" width="35" height="13"/>
@@ -210,9 +198,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="723"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="442">
                                             <rect key="frame" x="343" y="409" width="72" height="13"/>
@@ -229,9 +214,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="720"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="462">
                                             <rect key="frame" x="35" y="280" width="33" height="13"/>
@@ -248,9 +230,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="719"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="477">
                                             <rect key="frame" x="35" y="237" width="64" height="13"/>
@@ -267,9 +246,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="715"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="482">
                                             <rect key="frame" x="35" y="108" width="233" height="13"/>
@@ -286,9 +262,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="716"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="505">
                                             <rect key="frame" x="274" y="108" width="231" height="13"/>
@@ -305,9 +278,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="717"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="487">
                                             <rect key="frame" x="35" y="151" width="64" height="13"/>
@@ -324,9 +294,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="718"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="498">
                                             <rect key="frame" x="35" y="194" width="64" height="13"/>
@@ -343,9 +310,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="721"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="464">
                                             <rect key="frame" x="343" y="280" width="93" height="13"/>
@@ -365,9 +329,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="ooI-gO-3JF"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8ES-YK-OvS">
                                             <rect key="frame" x="35" y="323" width="36" height="13"/>
@@ -384,9 +345,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="1zo-ng-tk9"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cXh-Kb-cBh">
                                             <rect key="frame" x="343" y="323" width="93" height="13"/>
@@ -419,9 +377,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="JEp-DM-q9j"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cIj-bq-nFH">
                                             <rect key="frame" x="427" y="409" width="58" height="13"/>
@@ -438,9 +393,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="k01-t1-MYA"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJe-7E-Uca">
                                             <rect key="frame" x="35" y="366" width="61" height="13"/>
@@ -469,9 +421,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="adw-HY-vZ4"/>
-                                            </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="32r-kK-YIK">
                                             <rect key="frame" x="427" y="366" width="43" height="13"/>
@@ -491,9 +440,6 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
-                                            <connections>
-                                                <action selector="metaFieldChanged:" target="-2" id="dB5-84-DY8"/>
-                                            </connections>
                                         </textField>
                                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="9Mp-s6-NGc" customClass="VLCImageView">
                                             <rect key="frame" x="345" y="129" width="160" height="121"/>
