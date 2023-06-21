@@ -310,6 +310,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCRoundedCornerTextField.m \
 	gui/macosx/views/VLCScrollingClipView.h \
 	gui/macosx/views/VLCScrollingClipView.m \
+	gui/macosx/views/VLCSettingTextField.h \
+	gui/macosx/views/VLCSettingTextField.m \
 	gui/macosx/views/VLCSlider.h \
 	gui/macosx/views/VLCSlider.m \
 	gui/macosx/views/VLCSliderCell.h \

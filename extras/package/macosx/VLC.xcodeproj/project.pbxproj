@@ -100,6 +100,7 @@
 		536BFD1929B181E100BD0776 /* VLCMainVideoViewOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 536BFD1829B181E100BD0776 /* VLCMainVideoViewOverlayView.m */; };
 		536EFBF5295BCB8300F4CB13 /* VLCLibraryUIUnits.m in Sources */ = {isa = PBXBuildFile; fileRef = 536EFBF4295BCB8300F4CB13 /* VLCLibraryUIUnits.m */; };
 		536EFC39295E521600F4CB13 /* VLCLibraryVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */; };
+		537976BA2A4319330036827E /* VLCSettingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 537976B82A4319330036827E /* VLCSettingTextField.m */; };
 		5387FFF52A15127100A3A70A /* NSWindow+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5387FFF42A15127100A3A70A /* NSWindow+VLCAdditions.m */; };
 		538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 538A7ED929A63EE40068AD4F /* VLCFullVideoViewWindow.m */; };
 		53903D3A29576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53903D3929576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m */; };
@@ -312,6 +313,8 @@
 		536EFC37295E521600F4CB13 /* VLCLibraryVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoViewController.h; sourceTree = "<group>"; };
 		536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoViewController.m; sourceTree = "<group>"; };
 		536EFC3A295F828000F4CB13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		537976B82A4319330036827E /* VLCSettingTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSettingTextField.m; sourceTree = "<group>"; };
+		537976B92A4319330036827E /* VLCSettingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSettingTextField.h; sourceTree = "<group>"; };
 		5387FFF32A15127100A3A70A /* NSWindow+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSWindow+VLCAdditions.h"; sourceTree = "<group>"; };
 		5387FFF42A15127100A3A70A /* NSWindow+VLCAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSWindow+VLCAdditions.m"; sourceTree = "<group>"; };
 		538A7ED829A63EE40068AD4F /* VLCFullVideoViewWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCFullVideoViewWindow.h; sourceTree = "<group>"; };
@@ -1008,6 +1011,8 @@
 				7D1BF28922A153E20027C50F /* VLCRoundedCornerTextField.m */,
 				6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */,
 				6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */,
+				537976B92A4319330036827E /* VLCSettingTextField.h */,
+				537976B82A4319330036827E /* VLCSettingTextField.m */,
 				6B0AB0EC1F1AC8B3003A1B4E /* VLCSlider.h */,
 				6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */,
 				6B0AB0EE1F1AC8B3003A1B4E /* VLCSliderCell.h */,
@@ -1930,6 +1935,7 @@
 				7DFBDCA82269E77500B700A5 /* VLCLibraryController.m in Sources */,
 				1CCC88F12078A3D500E5626F /* AddonManager.xib in Sources */,
 				7DFBDCC1226DC16200B700A5 /* VLCInputItem.m in Sources */,
+				537976BA2A4319330036827E /* VLCSettingTextField.m in Sources */,
 				1CCC88F22078A3D500E5626F /* AudioEffects.xib in Sources */,
 				1CCC88F32078A3D500E5626F /* VideoEffects.xib in Sources */,
 				1CCC88F42078A3D500E5626F /* Bookmarks.xib in Sources */,
