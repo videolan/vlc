@@ -85,6 +85,8 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 
 @end
 
+NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem*> * const inputItems);
+
 @interface VLCInputNode : NSObject
 
 - (instancetype)initWithInputNode:(struct input_item_node_t *)p_inputNode;

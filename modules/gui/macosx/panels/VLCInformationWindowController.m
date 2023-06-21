@@ -385,7 +385,12 @@ _##field##TextField.stringValue = @"";
     } else if (_representedInputItem) {
         [self fillWindowWithInputItemData:_representedInputItem];
     } else if (_representedMediaLibraryAudioGroup) {
-        NSDictionary * const commonItemsData = _representedMediaLibraryAudioGroup.commonItemData;
+        NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
+        for (VLCMediaLibraryMediaItem * const mediaItem in _representedMediaLibraryAudioGroup.tracksAsMediaItems) {
+            [inputItems addObject:mediaItem.inputItem];
+        }
+
+        NSDictionary * const commonItemsData = commonInputItemData(inputItems);
 
         if ([commonItemsData objectForKey:@"inputItem"]) {
             [self setRepresentedInputItem:[commonItemsData objectForKey:@"inputItem"]];

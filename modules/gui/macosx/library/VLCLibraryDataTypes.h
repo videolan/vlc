@@ -131,7 +131,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
-@property (readonly) NSDictionary<NSString *, id> *commonItemData;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 

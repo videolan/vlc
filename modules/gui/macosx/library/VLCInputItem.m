@@ -654,6 +654,81 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 @end
 
 
+NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem *> * const inputItems)
+{
+    if (inputItems.count == 0) {
+        return @{};
+    }
+
+    VLCInputItem * const firstInputItem = inputItems.firstObject;
+
+    if (inputItems.count == 1) {
+        return @{@"inputItem": firstInputItem};
+    }
+
+    NSMutableDictionary<NSString *, id> *const commonData = [[NSMutableDictionary alloc] init];
+
+#define PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(action)                                  \
+action(artist);                                                                             \
+action(album);                                                                              \
+action(trackNumber);                                                                        \
+action(trackTotal);                                                                         \
+action(genre);                                                                              \
+action(date);                                                                               \
+action(episode);                                                                            \
+action(actors);                                                                             \
+action(director);                                                                           \
+action(showName);                                                                           \
+action(copyright);                                                                          \
+action(publisher);                                                                          \
+action(nowPlaying);                                                                         \
+action(language);                                                                           \
+action(contentDescription);                                                                 \
+action(encodedBy);
+
+#define PERFORM_ACTION_PER_INPUTITEM_PROP(action)                                           \
+PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(action)                                          \
+action(artworkURL);
+
+#define CREATE_DIFFER_BOOL(prop)                                                            \
+BOOL differing_##prop = NO;
+
+#define CREATE_PROP_VAR(prop)                                                               \
+NSString * const firstItem_##prop = firstInputItem.prop;
+
+#define SET_IF_DIFFERING(prop)                                                              \
+differing_##prop = differing_##prop || ![inputItem.prop isEqualToString:firstItem_##prop];
+
+#define ADD_PROP_TO_DICT_IF_DIFFERING(prop)                                                 \
+if (!differing_##prop && firstItem_##prop != nil) {                                         \
+    [commonData setObject:firstItem_##prop forKey:[NSString stringWithUTF8String:#prop]];   \
+}
+
+    PERFORM_ACTION_PER_INPUTITEM_PROP(CREATE_DIFFER_BOOL);
+    PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(CREATE_PROP_VAR);
+    // Since artworkURL is a URL, we have to handle it differently
+    NSURL * const firstItem_artworkURL = firstInputItem.artworkURL;
+
+    // Skip first item
+    for (uint i = 1; i < inputItems.count; ++i) {
+        VLCInputItem * const inputItem = inputItems[i];
+
+        PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(SET_IF_DIFFERING);
+        differing_artworkURL = differing_artworkURL || ![inputItem.artworkURL.absoluteString isEqualToString:firstItem_artworkURL.absoluteString];
+    }
+
+    PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT_IF_DIFFERING);
+
+#undef PERFORM_ACTION_PER_INPUTITEM_PROP
+#undef CREATE_DIFFER_BOOL
+#undef CREATE_PROP_VAR
+#undef SET_IF_DIFFERING
+#undef ADD_PROP_TO_DICT_IF_DIFFERING
+
+    return [commonData copy];
+}
+
+
 @implementation VLCInputNode
 
 - (instancetype)initWithInputNode:(struct input_item_node_t *)p_inputNode
