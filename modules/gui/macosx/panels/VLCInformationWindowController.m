@@ -404,7 +404,7 @@ _##field##TextField.stringValue = @"";
     NSParameterAssert(inputItems != nil);
 
     for (VLCInputItem * const inputItem in inputItems) {
-        input_item_t * const p_input = _representedInputItem.vlcInputItem;
+        input_item_t * const p_input = inputItem.vlcInputItem;
         vlc_mutex_lock(&p_input->lock);
         // build list of streams
         NSMutableArray * const streams = NSMutableArray.array;
