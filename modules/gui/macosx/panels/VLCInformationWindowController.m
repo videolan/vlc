@@ -391,7 +391,6 @@ _##field##TextField.originalStateString = @"";
 
         if ([commonItemsData objectForKey:@"inputItem"]) {
             [self setRepresentedInputItem:[commonItemsData objectForKey:@"inputItem"]];
-            return;
         } else {
             [self fillWindowWithDictionaryData:commonItemsData];
         }
@@ -492,7 +491,7 @@ SET_INPUTITEM_PROP(field, field)                \
 #undef SET_INPUTITEM_MATCHING_PROP
 #undef SET_INPUTITEM_PROP
     
-    [_saveMetaDataButton setEnabled: NO];
+    [self updateRepresentation];
 }
 
 - (IBAction)saveMetaData:(id)sender
