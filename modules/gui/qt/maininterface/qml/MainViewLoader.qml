@@ -49,6 +49,8 @@ Widgets.StackViewExt {
     // view's model
     /* required */ property var model
 
+    // optional, loaded when model.loading is true
+    property Component loadingComponent: null
 
 
     property var selectionModel: Util.SelectableDelegateModel {
@@ -70,8 +72,10 @@ Widgets.StackViewExt {
     }
 
     property var currentComponent: {
-        if (typeof model === "undefined" || !model || Helpers.get(model, "loading", true))
+        if (typeof model === "undefined" || !model)
             return null // invalid state
+        if (model.loading)
+            return loadingComponent
         if (model.count === 0)
             return emptyLabel
         else if (MainCtx.gridView)
