@@ -108,7 +108,7 @@ MainInterface.MainGridView {
     Navigation.parentItem: root
 
     Navigation.cancelAction: function() {
-        History.previous(Qt.TabFocusReason)
+        History.previous(Qt.BacktabFocusReason)
     }
 
     NetworkSourcesModel {

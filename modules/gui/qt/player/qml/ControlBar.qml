@@ -65,7 +65,7 @@ T.Pane {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: root.Navigation.defaultKeyAction(event)
-    Navigation.cancelAction: function() { History.previous() }
+    Navigation.cancelAction: function() { History.previous(Qt.BacktabFocusReason) }
 
     Accessible.name: I18n.qtr("Player controls")
 

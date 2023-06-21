@@ -37,8 +37,8 @@ EmptyLabel {
 
     // Functions
 
-    function onNavigate() {
-        History.push(["mc", "network"])
+    function onNavigate(reason) {
+        History.push(["mc", "network"], reason)
     }
 
     // Keys
@@ -58,7 +58,7 @@ EmptyLabel {
         _keyPressed = false
 
         if (KeyHelper.matchOk(event))
-            onNavigate()
+            onNavigate(Qt.TabFocusReason)
 
         Navigation.defaultKeyReleaseAction(event)
     }
@@ -79,6 +79,6 @@ EmptyLabel {
 
         Navigation.parentItem: root
 
-        onClicked: onNavigate()
+        onClicked: onNavigate(Qt.OtherFocusReason)
     }
 }

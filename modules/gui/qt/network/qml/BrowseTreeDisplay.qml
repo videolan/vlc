@@ -55,7 +55,7 @@ MainInterface.MainViewLoader {
     signal browse(var tree, int reason)
 
     Navigation.cancelAction: function() {
-        History.previous()
+        History.previous(Qt.BacktabFocusReason)
     }
 
     model: SortFilterProxyModel {
@@ -358,8 +358,8 @@ MainInterface.MainViewLoader {
                     button.enabled: !History.previousEmpty
                     button.width: button.implicitWidth
 
-                    function onNavigate() {
-                        History.previous()
+                    function onNavigate(reason) {
+                        History.previous(reason)
                     }
 
                     Layout.fillHeight: true

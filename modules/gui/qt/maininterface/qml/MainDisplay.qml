@@ -122,7 +122,7 @@ FocusScope {
     }
 
     Navigation.cancelAction: function() {
-        History.previous()
+        History.previous(Qt.BacktabFocusReason)
     }
 
     Keys.onPressed: {
