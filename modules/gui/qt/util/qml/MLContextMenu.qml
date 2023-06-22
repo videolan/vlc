@@ -74,6 +74,10 @@ NativeMenu {
             "action": openContainingFolder,
             "visible": _openContainingFolder
         }, {
+            "text": I18n.qtr("Delete"),
+            "action": deleteStream,
+            "visible": _deleteStream
+        }, {
             "text": I18n.qtr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
@@ -136,6 +140,9 @@ NativeMenu {
         Qt.openUrlExternally(parentDir)
     }
 
+    function deleteStream(dataList, options, indexes) {
+        model.deleteStream(dataList[0][idDataRole])
+    }
 
     function showInformationAvailable(options, indexes) {
         return indexes.length === 1
@@ -192,6 +199,16 @@ NativeMenu {
 
         // NOTE: Strictly comparing 'isLocal' given it might be undefined.
         return (isLocal === true)
+    }
+
+    function _deleteStream(options, indexes) {
+        if (indexes.length !== 1)
+            return false
+
+        const isDeletable = model.getDataAt(indexes[0]).isDeletable
+
+        // NOTE: Strictly comparing 'isDeletable' given it might be undefined.
+        return (isDeletable === true)
     }
 
     function _signalShowInformation(dataList, options) {
