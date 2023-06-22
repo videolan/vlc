@@ -522,6 +522,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_RESUME_BACKGROUND:
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         case VLC_ML_NEW_STREAM:
+        case VLC_ML_REMOVE_STREAM:
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         {
             /* These operations require the media library to be started
@@ -606,6 +607,17 @@ int MediaLibrary::Control( int query, va_list args )
             if ( media == nullptr )
                 return VLC_EGENERIC;
             *va_arg( args, vlc_ml_media_t**) = CreateAndConvert<vlc_ml_media_t>( media.get() );
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_REMOVE_STREAM:
+        {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
+            auto id = va_arg( args, int64_t );
+            auto media = m_ml->media( id );
+            if ( media == nullptr )
+                return VLC_EGENERIC;
+            m_ml->removeExternalMedia( media );
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:

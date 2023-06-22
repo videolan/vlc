@@ -576,6 +576,8 @@ enum vlc_ml_control
     VLC_ML_NEW_EXTERNAL_MEDIA,      /**< arg1: const char*; arg2(out): vlc_ml_media_t** */
     VLC_ML_NEW_STREAM,              /**< arg1: const char*; arg2(out): vlc_ml_media_t** */
 
+    VLC_ML_REMOVE_STREAM,
+
     /* Media management */
     VLC_ML_MEDIA_UPDATE_PROGRESS,           /**< arg1: media id; arg2: playback position; can fail */
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: char**; */
@@ -1024,6 +1026,11 @@ static inline vlc_ml_media_t* vlc_ml_new_stream( vlc_medialibrary_t* p_ml, const
     if ( vlc_ml_control( p_ml, VLC_ML_NEW_STREAM, psz_mrl, &res ) != VLC_SUCCESS )
         return NULL;
     return res;
+}
+
+static inline int vlc_ml_remove_stream( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+{
+    return vlc_ml_control(p_ml, VLC_ML_REMOVE_STREAM, i_media_id);
 }
 
 static inline int vlc_ml_media_update_progress( vlc_medialibrary_t* p_ml, int64_t i_media_id,
