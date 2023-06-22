@@ -33,7 +33,8 @@
 sout_stream_t *sout_NewInstance( vlc_object_t *, const char * );
 #define sout_NewInstance(a,b) sout_NewInstance(VLC_OBJECT(a),b)
 
-sout_packetizer_input_t *sout_InputNew( sout_stream_t *, const es_format_t * );
+sout_packetizer_input_t *
+sout_InputNew( sout_stream_t *, const es_format_t *, const char * );
 int sout_InputDelete( sout_stream_t *, sout_packetizer_input_t * );
 int sout_InputSendBuffer( sout_stream_t *, sout_packetizer_input_t *,
                           block_t * );
