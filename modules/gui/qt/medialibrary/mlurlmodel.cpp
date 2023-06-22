@@ -39,6 +39,8 @@ QVariant MLUrlModel::itemRoleData(MLItem *item, int role) const
         return QVariant::fromValue( ml_url->getUrl() );
     case URL_LAST_PLAYED_DATE :
         return QVariant::fromValue( ml_url->getLastPlayedDate() );
+    case URL_IS_DELETABLE:
+        return QVariant::fromValue( true );
     default :
         return QVariant();
     }
@@ -49,7 +51,8 @@ QHash<int, QByteArray> MLUrlModel::roleNames() const
     return {
         { URL_ID, "id" },
         { URL_URL, "url" },
-        { URL_LAST_PLAYED_DATE, "last_played_date" }
+        { URL_LAST_PLAYED_DATE, "last_played_date" },
+        { URL_IS_DELETABLE, "isDeletable" },
     };
 }
 

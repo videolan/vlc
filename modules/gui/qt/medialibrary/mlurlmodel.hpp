@@ -50,7 +50,8 @@ public:
     enum Roles {
         URL_ID = Qt::UserRole + 1,
         URL_URL,
-        URL_LAST_PLAYED_DATE
+        URL_LAST_PLAYED_DATE,
+        URL_IS_DELETABLE
     };
     Q_ENUM(Roles)
 
