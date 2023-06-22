@@ -695,6 +695,39 @@ void libvlc_media_set_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta, const ch
     input_item_SetMeta( p_md->p_input_item, libvlc_to_vlc_meta[e_meta], psz_value );
 }
 
+// Getter for meta extra information
+char *libvlc_media_get_meta_extra( libvlc_media_t *p_md, const char *psz_name )
+{
+    assert( p_md );
+    return input_item_GetMetaExtra( p_md->p_input_item, psz_name );
+}
+
+// Set the meta extra of the media
+void libvlc_media_set_meta_extra( libvlc_media_t *p_md, const char *psz_name, const char *psz_value)
+{
+    assert( p_md );
+    input_item_SetMetaExtra( p_md->p_input_item, psz_name, psz_value );
+}
+
+// Getter for meta extra names
+unsigned libvlc_media_get_meta_extra_names( libvlc_media_t *p_md, char ***pppsz_names )
+{
+    assert( p_md && pppsz_names );
+    return input_item_GetMetaExtraNames( p_md->p_input_item, pppsz_names );
+}
+
+// Release a media meta extra names
+void libvlc_media_meta_extra_names_release( char **ppsz_names, unsigned i_count )
+{
+    if( i_count > 0 )
+    {
+        assert( ppsz_names );
+        for ( unsigned i = 0; i < i_count; i++ )
+            free( ppsz_names[i] );
+    }
+    free( ppsz_names );
+}
+
 // Save the meta previously set
 int libvlc_media_save_meta( libvlc_instance_t *inst, libvlc_media_t *p_md )
 {

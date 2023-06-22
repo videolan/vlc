@@ -474,6 +474,54 @@ LIBVLC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
                                            libvlc_meta_t e_meta,
                                            const char *psz_value );
 
+/**
+ * Read the meta extra of the media.
+ *
+ * If the media has not yet been parsed this will return NULL.
+ *
+ * \see libvlc_media_parse
+ * \see libvlc_media_parse_with_options
+ *
+ * \param p_md the media descriptor
+ * \param psz_name the meta extra to read (nonnullable)
+ * \return the media's meta extra or NULL
+ */
+LIBVLC_API char *libvlc_media_get_meta_extra( libvlc_media_t *p_md,
+                                              const char *psz_name );
+
+/**
+ * Set the meta of the media (this function will not save the meta, call
+ * libvlc_media_save_meta in order to save the meta)
+ *
+ * \param p_md the media descriptor
+ * \param psz_name the meta extra to write (nonnullable)
+ * \param psz_value the media's meta extra (nullable)
+ * Removed from meta extra if set to NULL
+ */
+LIBVLC_API void libvlc_media_set_meta_extra( libvlc_media_t *p_md,
+                                             const char *psz_name,
+                                             const char *psz_value );
+
+/**
+ * Read the meta extra names of the media.
+ *
+ * \param p_md the media descriptor
+ * \param pppsz_names the media's meta extra name array
+ * you can access the elements using the return value (count)
+ * must be released with libvlc_media_meta_extra_names_release()
+ * \return the meta extra count
+ */
+LIBVLC_API unsigned libvlc_media_get_meta_extra_names( libvlc_media_t *p_md,
+                                                       char ***pppsz_names );
+
+/**
+ * Release a media meta extra names
+ *
+ * \param ppsz_names meta extra names array to release
+ * \param i_count number of elements in the array
+ */
+LIBVLC_API void libvlc_media_meta_extra_names_release( char **ppsz_names,
+                                                       unsigned i_count );
 
 /**
  * Save the meta previously set
