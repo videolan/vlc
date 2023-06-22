@@ -81,6 +81,27 @@ void MLUrlModel::addAndPlay( const QString &url )
     });
 }
 
+void MLUrlModel::deleteStream( const MLItemId itemId )
+{
+    struct Ctx{
+        bool succeed = false;
+    };
+    m_mediaLib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [itemId](vlc_medialibrary_t* ml, Ctx& ctx){
+            int64_t id = itemId.id;
+            vlc_ml_remove_stream(ml, id);
+            ctx.succeed = true;
+        },
+        //UI Thread
+        [this](quint64, Ctx& ctx){
+            if (!ctx.succeed)
+                return;
+
+            emit resetRequested();
+        });
+}
+
 vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
 {
     switch (role) {
