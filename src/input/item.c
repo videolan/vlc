@@ -134,6 +134,13 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
         .u.input_item_meta_changed.meta_type = meta_type } );
 }
 
+void input_item_SetMetaExtra( input_item_t *p_i, const char *psz_name, const char *psz_value )
+{
+    vlc_mutex_lock( &p_i->lock );
+    vlc_meta_SetExtra( p_i->p_meta, psz_name, psz_value );
+    vlc_mutex_unlock( &p_i->lock );
+}
+
 void input_item_CopyOptions( input_item_t *p_child,
                              input_item_t *p_parent )
 {
@@ -246,6 +253,30 @@ char *input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
     char *psz = value ? strdup( value ) : NULL;
     vlc_mutex_unlock( &p_i->lock );
     return psz;
+}
+
+const char *input_item_GetMetaExtraLocked( input_item_t *item, const char *psz_name )
+{
+    vlc_mutex_assert( &item->lock );
+    return vlc_meta_GetExtra( item->p_meta, psz_name );
+}
+
+char *input_item_GetMetaExtra( input_item_t *p_i, const char *psz_name )
+{
+    vlc_mutex_lock( &p_i->lock );
+    const char *value = input_item_GetMetaExtraLocked( p_i, psz_name );
+    char *psz = value ? strdup( value ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz;
+}
+
+unsigned input_item_GetMetaExtraNames( input_item_t *p_i, char ***pppsz_names )
+{
+    vlc_mutex_lock( &p_i->lock );
+    unsigned count = vlc_meta_GetExtraCount( p_i->p_meta );
+    *pppsz_names = vlc_meta_CopyExtraNames( p_i->p_meta );
+    vlc_mutex_unlock( &p_i->lock );
+    return count;
 }
 
 /* Get the title of a given item or fallback to the name if the title is empty */

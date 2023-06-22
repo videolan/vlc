@@ -224,6 +224,9 @@ input_item_AddSlave
 input_item_Parse
 input_item_parser_id_Interrupt
 input_item_parser_id_Release
+input_item_GetMetaExtra
+input_item_GetMetaExtraNames
+input_item_SetMetaExtra
 input_resource_New
 input_resource_Release
 vlc_readdir_helper_init

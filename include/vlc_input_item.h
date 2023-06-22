@@ -293,6 +293,9 @@ VLC_API vlc_tick_t input_item_GetDuration( input_item_t * p_i );
 VLC_API void input_item_SetDuration( input_item_t * p_i, vlc_tick_t i_duration );
 VLC_API bool input_item_IsPreparsed( input_item_t *p_i );
 VLC_API bool input_item_IsArtFetched( input_item_t *p_i );
+VLC_API char * input_item_GetMetaExtra( input_item_t *p_i, const char *psz_name ) VLC_USED;
+VLC_API unsigned input_item_GetMetaExtraNames( input_item_t *p_i, char ***pppsz_names ) VLC_USED;
+VLC_API void input_item_SetMetaExtra( input_item_t *p_i, const char *psz_name, const char *psz_value );
 
 #define INPUT_META( name ) \
 static inline \
