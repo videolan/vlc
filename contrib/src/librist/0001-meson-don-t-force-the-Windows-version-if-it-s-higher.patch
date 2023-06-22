@@ -1,4 +1,4 @@
-From 673191638f6030f1822d32df159bfa64e4cea5c3 Mon Sep 17 00:00:00 2001
+From ce4c19c96fb0f90c7728fc209f3544023bb5ddcd Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 23 May 2023 15:02:15 +0200
 Subject: [PATCH 1/2] meson: don't force the Windows version if it's higher
@@ -16,22 +16,22 @@ Vista [1]. So building for a Vista target should be fine.
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index c06be2c..10f0acd 100755
+index f8ec49b..c2df33a 100755
 --- a/meson.build
 +++ b/meson.build
 @@ -64,7 +64,17 @@ threads = []
  test_args = []
  if host_machine.system() == 'windows'
- 	deps += [ cc.find_library('ws2_32'), cc.find_library('bcrypt') ]
+ 	deps += [ cc.find_library('ws2_32') ]
 -	add_project_arguments(['-D_WIN32_WINNT=0x0601'], language: 'c')
 +
 +windows_version_test = '''
-+#include <sdkddkver.h>
-+#if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
-+# error _WIN32_WINNT toolchain default high enough
++#include <windef.h>
++#if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600
++# error _WIN32_WINNT toolchain default not high enough
 +#endif
 +'''
-+	if cc.compiles(windows_version_test, name: 'need _WIN32_WINNT defined to Vista')
++	if not cc.compiles(windows_version_test, name: '_WIN32_WINNT includes Vista')
 +		add_project_arguments(['-D_WIN32_WINNT=0x0600'], language: 'c')
 +	endif
 +
