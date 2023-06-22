@@ -591,7 +591,7 @@ static void *transcode_downstream_Add( sout_stream_t *p_stream,
     if( tmp.i_group != fmt_orig->i_group )
         tmp.i_group = fmt_orig->i_group;
 
-    void *downstream = sout_StreamIdAdd( p_stream->p_next, &tmp );
+    void *downstream = sout_StreamIdAdd( p_stream->p_next, &tmp, NULL );
     es_format_Clean( &tmp );
     return downstream;
 }

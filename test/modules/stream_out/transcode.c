@@ -225,7 +225,7 @@ static int ErrorCheckerSend(sout_stream_t *stream, void *id, vlc_frame_t *f)
 }
 
 static void* ErrorCheckerAdd(sout_stream_t *stream, const es_format_t *fmt)
-    { return sout_StreamIdAdd(stream->p_next, fmt); }
+    { return sout_StreamIdAdd(stream->p_next, fmt, NULL); }
 
 static void ErrorCheckerDel(sout_stream_t *stream, void *id)
     { sout_StreamIdDel(stream->p_next, id); };

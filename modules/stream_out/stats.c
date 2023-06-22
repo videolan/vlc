@@ -238,7 +238,7 @@ static void *FilterAdd(sout_stream_t *stream, const es_format_t *fmt)
     sout_stream_id_sys_t *id = Add(stream, fmt);
 
     if (likely(id != NULL))
-        id->next_id = sout_StreamIdAdd(stream->p_next, fmt);
+        id->next_id = sout_StreamIdAdd(stream->p_next, fmt, NULL);
 
     return id;
 }

@@ -291,7 +291,9 @@ VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
  * \return An opaque pointer identifying the ES.
  * \retval NULL In case of error.
  */
-VLC_API void *sout_StreamIdAdd(sout_stream_t *, const es_format_t *fmt) VLC_USED;
+VLC_API void *sout_StreamIdAdd(sout_stream_t *,
+                               const es_format_t *fmt,
+                               const char *es_id) VLC_USED;
 
 /**
  * Delete an ES from the stream output.

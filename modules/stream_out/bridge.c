@@ -388,7 +388,7 @@ static void* AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
     sout_stream_id_sys_t *id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( !id ) return NULL;
 
-    id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
+    id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
     if( !id->id )
     {
         free( id );
@@ -494,7 +494,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
                 if( !p_sys->b_placeholder )
                 {
                     p_bridge->pp_es[i]->id = sout_StreamIdAdd(
-                                p_stream->p_next, &p_bridge->pp_es[i]->fmt );
+                                p_stream->p_next, &p_bridge->pp_es[i]->fmt, NULL );
                     if ( p_bridge->pp_es[i]->id == NULL )
                     {
                         msg_Warn( p_stream, "couldn't create chain for id %d",

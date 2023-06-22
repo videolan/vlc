@@ -120,7 +120,7 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
                 fmt.video.i_frame_rate = 30;
                 fmt.video.i_frame_rate_base = 1;
 
-                void *id = sout_StreamIdAdd( p_sout_test, &fmt );
+                void *id = sout_StreamIdAdd( p_sout_test, &fmt, "video/1" );
 
                 es_format_Clean( &fmt );
                 const bool success = id != NULL;

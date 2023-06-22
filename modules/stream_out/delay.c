@@ -50,11 +50,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     {
         msg_Dbg( p_stream, "delaying ID %d by %"PRId64,
                  p_sys->i_id, p_sys->i_delay );
-        p_sys->id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
+        p_sys->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
         return p_sys->id;
     }
 
-    return sout_StreamIdAdd( p_stream->p_next, p_fmt );
+    return sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
 }
 
 static void Del( sout_stream_t *p_stream, void *id )

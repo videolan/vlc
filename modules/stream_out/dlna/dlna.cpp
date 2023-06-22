@@ -194,7 +194,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     {
         sout_stream_id_sys_t *p_sys_id = *it;
         p_sys_id->p_sub_id = static_cast<sout_stream_id_sys_t *>(
-                sout_StreamIdAdd( p_out, &p_sys_id->fmt ) );
+                sout_StreamIdAdd( p_out, &p_sys_id->fmt, NULL ) );
         if ( p_sys_id->p_sub_id == nullptr )
         {
             msg_Err( p_stream, "can't handle %4.4s stream",

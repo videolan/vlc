@@ -372,7 +372,7 @@ static int OutputNew( sout_stream_t *p_stream,
     {
         sout_stream_id_sys_t *id = p_sys->id[i];
 
-        id->id = sout_StreamIdAdd( p_sys->p_out, &id->fmt );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->fmt, NULL );
         if( id->id )
             i_count++;
     }

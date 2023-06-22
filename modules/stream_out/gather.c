@@ -165,7 +165,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     es_format_Copy( &id->fmt, p_fmt );
     id->b_streamswap     = false;
     id->b_used           = true;
-    id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt );
+    id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt, NULL );
     if( id->id == NULL )
     {
         free( id );

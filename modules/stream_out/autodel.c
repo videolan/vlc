@@ -96,7 +96,7 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
                                                            : p_sys->last_pcr;
     if ( !p_es->id && !p_es->b_error )
     {
-        p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt );
+        p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt, NULL );
         if ( p_es->id == NULL )
         {
             p_es->b_error = true;

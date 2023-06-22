@@ -200,7 +200,7 @@ static void *AddId( sout_stream_t *p_stream, const es_format_t *p_fmt )
         p_fmt = &fmt;
     }
 
-    return sout_StreamIdAdd( p_stream->p_next, p_fmt );
+    return sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
 }
 
 static void *AddLang( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -219,7 +219,7 @@ static void *AddLang( sout_stream_t *p_stream, const es_format_t *p_fmt )
         p_fmt = &fmt;
     }
 
-    return sout_StreamIdAdd( p_stream->p_next, p_fmt );
+    return sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
 }
 
 static void Del( sout_stream_t *p_stream, void *id )
