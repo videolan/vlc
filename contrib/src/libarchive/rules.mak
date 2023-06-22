@@ -9,7 +9,7 @@ endif
 
 DEPS_libarchive = zlib $(DEPS_zlib)
 ifdef HAVE_WINSTORE
-# libarchive uses CreateHardLinkW
+# libarchive uses CreateHardLinkW and wincrypt
 DEPS_libarchive += alloweduwp $(DEPS_alloweduwp)
 endif
 
@@ -45,7 +45,6 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(APPLY) $(SRC)/libarchive/0006-Use-CreateFile2-instead-of-CreateFileW-on-Win8-build.patch
 	$(APPLY) $(SRC)/libarchive/0007-Disable-CreateFileA-calls-in-UWP-builds.patch
 	$(APPLY) $(SRC)/libarchive/0008-Disable-program-call-with-stdin-stdout-usage-on-UWP-.patch
-	$(APPLY) $(SRC)/libarchive/0009-Use-Windows-bcrypt-when-enabled-and-building-for-Vis.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
