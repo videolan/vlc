@@ -140,11 +140,13 @@ const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
 
 void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
 {
+    assert( psz_name );
     char *psz_oldvalue = (char *)vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
     if( psz_oldvalue != kVLCDictionaryNotFound )
         vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
                                             vlc_meta_FreeExtraKey, NULL );
-    vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
+    if ( psz_value )
+        vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
 }
 
 const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
