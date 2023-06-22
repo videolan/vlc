@@ -94,7 +94,7 @@ typedef struct
     vlc_clock_t *clock;
 } sout_stream_id_sys_t;
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -130,6 +130,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         vlc_input_decoder_ChangeDelay( id->dec, p_sys->i_delay );
 
     return id;
+    (void)es_id;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )

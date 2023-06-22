@@ -105,10 +105,12 @@ typedef struct
     bool                  synchronous;
 } sout_stream_sys_t;
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     return sout_MuxAddStream( p_sys->p_mux, p_fmt );
+    (void)es_id;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )

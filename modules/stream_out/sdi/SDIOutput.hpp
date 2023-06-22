@@ -81,7 +81,7 @@ namespace sdi_sout
             } ancillary;
 
         private:
-            static void *SoutCallback_Add(sout_stream_t *, const es_format_t *);
+            static void *SoutCallback_Add(sout_stream_t *, const es_format_t *, const char *);
             static void  SoutCallback_Del(sout_stream_t *, void *);
             static int   SoutCallback_Send(sout_stream_t *, void *, block_t*);
             static int   SoutCallback_Control(sout_stream_t *, int, va_list);

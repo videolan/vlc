@@ -55,7 +55,8 @@ typedef struct
     vlc_hash_md5_t hash;
 } sout_stream_id_sys_t;
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *id;
@@ -88,6 +89,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     msg_Dbg( p_stream, "%s: Adding track type:%s id:%d", p_sys->prefix, id->type, id->id);
     return id;
+    (void)es_id;
 }
 
 static void Del( sout_stream_t *p_stream, void *_id )
@@ -233,12 +235,13 @@ static int OutputOpen(vlc_object_t *obj)
     return val;
 }
 
-static void *FilterAdd(sout_stream_t *stream, const es_format_t *fmt)
+static void *
+FilterAdd(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 {
-    sout_stream_id_sys_t *id = Add(stream, fmt);
+    sout_stream_id_sys_t *id = Add(stream, fmt, es_id);
 
     if (likely(id != NULL))
-        id->next_id = sout_StreamIdAdd(stream->p_next, fmt, NULL);
+        id->next_id = sout_StreamIdAdd(stream->p_next, fmt, es_id);
 
     return id;
 }

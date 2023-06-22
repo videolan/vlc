@@ -58,7 +58,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static void *Add( sout_stream_t *, const es_format_t * );
+static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 static void  SetPCR( sout_stream_t *, vlc_tick_t );
@@ -209,7 +209,8 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Add:
  *****************************************************************************/
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t  *id;
@@ -233,7 +234,9 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         {
             sout_stream_t *out = p_sys->pp_streams[i_stream];
 
-            id_new = (void*)sout_StreamIdAdd( out, p_fmt, NULL );
+            /* FIXME(Alaric): suffix the string id with the duplicated track
+             * count. */
+            id_new = (void*)sout_StreamIdAdd( out, p_fmt, es_id );
             if( id_new )
             {
                 msg_Dbg( p_stream, "    - added for output %d", i_stream );

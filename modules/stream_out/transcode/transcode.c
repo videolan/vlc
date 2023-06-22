@@ -233,7 +233,7 @@ static const char *const ppsz_sout_options[] = {
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static void *Add( sout_stream_t *, const es_format_t * );
+static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 static void  SetPCR(sout_stream_t *, vlc_tick_t );
@@ -597,7 +597,8 @@ static void *transcode_downstream_Add( sout_stream_t *p_stream,
     return downstream;
 }
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id;
@@ -620,7 +621,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     es_format_SetMeta( &id->p_decoder->fmt_out, id->p_decoder->fmt_in );
 
-    id->es_id = NULL; /* Will be copied once added to `pf_add` */
+    id->es_id = es_id;
 
     switch( p_fmt->i_cat )
     {

@@ -701,11 +701,12 @@ void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt, const char *es_
 {
     void *id;
 
+    assert(es_id != NULL);
+
     sout_StreamLock(s);
-    id = s->ops->add(s, fmt);
+    id = s->ops->add(s, fmt, es_id);
     sout_StreamUnlock(s);
     return id;
-    (void)es_id;
 }
 
 void sout_StreamIdDel(sout_stream_t *s, void *id)

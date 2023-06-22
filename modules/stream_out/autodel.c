@@ -60,7 +60,7 @@ typedef struct
     struct vlc_list ids;
 } sout_stream_sys_t;
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *p_es = malloc( sizeof(sout_stream_id_sys_t) );
@@ -71,7 +71,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     p_es->id = NULL;
     p_es->i_last = VLC_TICK_INVALID;
-    p_es->es_id = NULL; /* Will be copied once added to `pf_add` */
+    p_es->es_id = es_id;
     p_es->b_error = false;
     vlc_list_append(&p_es->node, &p_sys->ids);
     return p_es;

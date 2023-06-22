@@ -42,7 +42,8 @@ typedef struct
     vlc_tick_t i_delay;
 } sout_stream_sys_t;
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
@@ -50,11 +51,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     {
         msg_Dbg( p_stream, "delaying ID %d by %"PRId64,
                  p_sys->i_id, p_sys->i_delay );
-        p_sys->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
+        p_sys->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, es_id );
         return p_sys->id;
     }
 
-    return sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
+    return sout_StreamIdAdd( p_stream->p_next, p_fmt, es_id );
 }
 
 static void Del( sout_stream_t *p_stream, void *id )

@@ -49,11 +49,13 @@ struct sout_stream_udp
     uint_fast16_t mtu;
 };
 
-static void *Add(sout_stream_t *stream, const es_format_t *fmt)
+static void *
+Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 {
     struct sout_stream_udp *sys = stream->p_sys;
 
     return sout_MuxAddStream(sys->mux, fmt);
+    (void)es_id;
 }
 
 static void Del(sout_stream_t *stream, void *id)

@@ -124,7 +124,7 @@ static const char *const ppsz_sout_options[] = {
     "video-postrender-callback", "audio-postrender-callback", "video-data", "audio-data", "time-sync", NULL
 };
 
-static void *Add( sout_stream_t *, const es_format_t * );
+static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 
@@ -267,7 +267,8 @@ static void Close( vlc_object_t * p_this )
     free( p_stream->p_sys );
 }
 
-static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *
+Add(sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id)
 {
     sout_stream_id_sys_t *id = NULL;
 
@@ -276,6 +277,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     else if ( p_fmt->i_cat == AUDIO_ES )
         id = AddAudio( p_stream, p_fmt );
     return id;
+    (void)es_id;
 }
 
 static void *AddVideo( sout_stream_t *p_stream, const es_format_t *p_fmt )

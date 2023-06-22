@@ -174,7 +174,7 @@ typedef struct out_sout_stream_sys_t
     char *psz_name;
 } out_sout_stream_sys_t;
 
-static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_stream));
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
@@ -212,11 +212,7 @@ static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
     char *bridged_es_id;
     if ( p_sys->new_id != NULL )
         bridged_es_id = strdup( p_sys->new_id );
-    else if ( asprintf(&bridged_es_id,
-                      "%s/%s/%d",
-                      "placeholder", /* Will be the es_id once added to `pf_add` */
-                      p_sys->psz_name,
-                      i) == -1 )
+    else if ( asprintf(&bridged_es_id, "%s/%s/%d", es_id, p_sys->psz_name, i) == -1 )
         bridged_es_id = NULL;
 
     if ( unlikely(bridged_es_id == NULL) )
@@ -396,14 +392,14 @@ struct sout_stream_id_sys_t
     enum es_format_category_e i_cat; /* es category. Used for placeholder option */
 };
 
-static void* AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
+static void* AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
     sout_stream_id_sys_t *id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( !id ) return NULL;
 
-    id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, NULL );
+    id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt, es_id );
     if( !id->id )
     {
         free( id );

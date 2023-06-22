@@ -242,10 +242,10 @@ vlc_module_begin ()
         set_callbacks(AccessOpen, AccessClose)
 vlc_module_end ()
 
-static void *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt)
+static void *ProxyAdd(sout_stream_t *p_stream, const es_format_t *p_fmt, const char* es_id)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
-    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( sout_StreamIdAdd(p_stream->p_next, p_fmt, nullptr) );
+    sout_stream_id_sys_t *id = reinterpret_cast<sout_stream_id_sys_t *>( sout_StreamIdAdd(p_stream->p_next, p_fmt, es_id) );
     if (id)
     {
         if (p_fmt->i_cat == VIDEO_ES)
@@ -658,7 +658,7 @@ static void AccessClose(vlc_object_t *p_this)
 /*****************************************************************************
  * Sout callbacks
  *****************************************************************************/
-static void *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
+static void *Add(sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id)
 {
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
     vlc_mutex_locker locker(&p_sys->lock);
@@ -673,7 +673,7 @@ static void *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
     if (p_sys_id != NULL)
     {
         es_format_Copy( &p_sys_id->fmt, p_fmt );
-        p_sys_id->es_id = nullptr; /* Will be copied once added to `pf_add` */
+        p_sys_id->es_id = es_id;
         p_sys_id->p_sub_id = NULL;
         p_sys_id->flushed = false;
 
