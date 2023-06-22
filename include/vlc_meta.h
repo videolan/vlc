@@ -76,7 +76,15 @@ VLC_API void vlc_meta_Delete( vlc_meta_t *m );
 VLC_API void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val );
 VLC_API const char * vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type );
 
-VLC_API void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value );
+/**
+ * set the meta extra
+ *
+ * \param m vlc_meta_t
+ * \param psz_name meta extra name (nonnullable)
+ * \param psz_value meta extra value (nullable)
+ *  Removed from meta extra if set to NULL
+ */
+VLC_API void vlc_meta_SetExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value );
 VLC_API const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name );
 VLC_API unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m );
 

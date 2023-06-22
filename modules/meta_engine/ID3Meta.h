@@ -61,7 +61,7 @@ static bool ID3TextTagHandler( const uint8_t *p_buf, size_t i_buf,
             if( pb_updated )
                 *pb_updated = true;
             if( psz_extra )
-                vlc_meta_AddExtra( p_meta, psz_extra, psz );
+                vlc_meta_SetExtra( p_meta, psz_extra, psz );
             else
                 vlc_meta_Set( p_meta, type, psz );
         }
@@ -121,7 +121,7 @@ static bool ID3HandleTag( const uint8_t *p_buf, size_t i_buf,
                                                        p_buf[0], &psz_val_alloc );
                     if( psz_val )
                     {
-                        vlc_meta_AddExtra( p_meta, psz_key, psz_val );
+                        vlc_meta_SetExtra( p_meta, psz_key, psz_val );
                         free( psz_val_alloc );
                     }
                 }

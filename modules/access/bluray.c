@@ -2573,12 +2573,12 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
         if (!EMPTY_STR(meta->di_name)) vlc_meta_SetTitle(p_meta, meta->di_name);
 
-        if (!EMPTY_STR(meta->language_code)) vlc_meta_AddExtra(p_meta, "Language", meta->language_code);
-        if (!EMPTY_STR(meta->filename)) vlc_meta_AddExtra(p_meta, "Filename", meta->filename);
-        if (!EMPTY_STR(meta->di_alternative)) vlc_meta_AddExtra(p_meta, "Alternative", meta->di_alternative);
+        if (!EMPTY_STR(meta->language_code)) vlc_meta_SetExtra(p_meta, "Language", meta->language_code);
+        if (!EMPTY_STR(meta->filename)) vlc_meta_SetExtra(p_meta, "Filename", meta->filename);
+        if (!EMPTY_STR(meta->di_alternative)) vlc_meta_SetExtra(p_meta, "Alternative", meta->di_alternative);
 
         // if (meta->di_set_number > 0) vlc_meta_SetTrackNum(p_meta, meta->di_set_number);
-        // if (meta->di_num_sets > 0) vlc_meta_AddExtra(p_meta, "Discs numbers in Set", meta->di_num_sets);
+        // if (meta->di_num_sets > 0) vlc_meta_SetExtra(p_meta, "Discs numbers in Set", meta->di_num_sets);
 
         if (p_sys->i_cover_idx >= 0 && p_sys->i_cover_idx < p_sys->i_attachments) {
             char psz_url[128];

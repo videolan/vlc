@@ -243,7 +243,7 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, const MP4
     if( psz_utf )
     {
         if( type ) vlc_meta_Set( p_meta, *type, psz_utf );
-        else       vlc_meta_AddExtra( p_meta, key, psz_utf );
+        else       vlc_meta_SetExtra( p_meta, key, psz_utf );
 
         free( psz_utf );
     }
@@ -313,7 +313,7 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
                 char* key;
                 if( asprintf( &key, "%s (%s)", meta_key, charset+11 ) != -1 )
                 {
-                    vlc_meta_AddExtra( p_meta_intl, key, data );
+                    vlc_meta_SetExtra( p_meta_intl, key, data );
                     free( key );
                 }
             }
@@ -350,7 +350,7 @@ static void ExtractItunesInfoTriplets( vlc_meta_t *p_meta, const MP4_Box_t *p_bo
                                  p_name->data.p_binary->i_blob - 4 );
         char *psz_value = ExtractString( p_data );
         if( psz_name && psz_value )
-            vlc_meta_AddExtra( p_meta, psz_name, psz_value );
+            vlc_meta_SetExtra( p_meta, psz_name, psz_value );
         free( psz_name );
         free( psz_value );
     }
@@ -380,7 +380,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
             char psz_utf[11];
             snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
                       GetDWBE(BOXDATA(p_data)->p_blob) );
-            vlc_meta_AddExtra( p_meta, "iTunes Account ID", psz_utf );
+            vlc_meta_SetExtra( p_meta, "iTunes Account ID", psz_utf );
         }
         break;
     }
@@ -392,7 +392,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
             char psz_utf[11];
             snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
                       GetDWBE(BOXDATA(p_data)->p_blob) );
-            vlc_meta_AddExtra( p_meta, "iTunes Catalog ID", psz_utf );
+            vlc_meta_SetExtra( p_meta, "iTunes Catalog ID", psz_utf );
         }
         break;
     }
@@ -438,7 +438,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
                 psz_rating = N_("None");
                 break;
             }
-            vlc_meta_AddExtra( p_meta, N_("Rating"), psz_rating );
+            vlc_meta_SetExtra( p_meta, N_("Rating"), psz_rating );
         }
         break;
     }

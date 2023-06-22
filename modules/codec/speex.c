@@ -895,7 +895,7 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
     char *psz_mode;
     if( asprintf( &psz_mode, "%s%s", p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" ) >= 0 )
     {
-        vlc_meta_AddExtra( p_dec->p_description, _("Mode"), psz_mode );
+        vlc_meta_SetExtra( p_dec->p_description, _("Mode"), psz_mode );
         free( psz_mode );
     }
 

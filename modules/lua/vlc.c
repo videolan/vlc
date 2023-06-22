@@ -311,7 +311,7 @@ void vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
             const char *psz_key = lua_tostring( L, -2 );
             const char *psz_value = lua_tostring( L, -1 );
 
-            vlc_meta_AddExtra( p_input->p_meta, psz_key, psz_value );
+            vlc_meta_SetExtra( p_input->p_meta, psz_key, psz_value );
 
             lua_pop( L, 1 ); /* pop "value" */
         }

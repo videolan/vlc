@@ -1322,7 +1322,7 @@ static int DemuxInit( demux_t *p_demux )
                     *p_ecd->ppsz_value[i] != '\0' && /* no empty value */
                     *p_ecd->ppsz_value[i] != '{'  && /* no guid value */
                     *p_ecd->ppsz_name[i] != '{' )    /* no guid name */
-                    vlc_meta_AddExtra( p_sys->meta, p_ecd->ppsz_name[i], p_ecd->ppsz_value[i] );
+                    vlc_meta_SetExtra( p_sys->meta, p_ecd->ppsz_name[i], p_ecd->ppsz_value[i] );
             /* TODO map WM/Composer, WM/Provider, WM/PartOfSet, PeakValue, AverageLevel  */
 #undef set_meta
         }

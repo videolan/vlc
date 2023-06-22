@@ -673,9 +673,9 @@ static void ImportMeta( stream_t *p_access )
             if( psz_name )
             {
                 *psz_name = '\0';
-                vlc_meta_AddExtra( p_meta, "Channel", psz_name + 1 );
+                vlc_meta_SetExtra( p_meta, "Channel", psz_name + 1 );
             }
-            vlc_meta_AddExtra( p_meta, "Transponder", text );
+            vlc_meta_SetExtra( p_meta, "Transponder", text );
         }
 
         else if( tag == 'E' )
@@ -690,14 +690,14 @@ static void ImportMeta( stream_t *p_access )
 
                 /* TODO: locale */
                 strftime( str, sizeof(str), "%Y-%m-%d %H:%M", &tm );
-                vlc_meta_AddExtra( p_meta, "Date", str );
+                vlc_meta_SetExtra( p_meta, "Date", str );
                 free( psz_date );
                 psz_date = strdup( str );
 
                 /* display in minutes */
                 i_length = ( i_length + 59 ) / 60;
                 snprintf( str, sizeof(str), "%u:%02u", i_length / 60, i_length % 60 );
-                vlc_meta_AddExtra( p_meta, "Duration", str );
+                vlc_meta_SetExtra( p_meta, "Duration", str );
             }
         }
 
@@ -705,14 +705,14 @@ static void ImportMeta( stream_t *p_access )
         {
             free( psz_title );
             psz_title = strdup( text );
-            vlc_meta_AddExtra( p_meta, "Title", text );
+            vlc_meta_SetExtra( p_meta, "Title", text );
         }
 
         else if( tag == 'S' )
         {
             free( psz_smalltext );
             psz_smalltext = strdup( text );
-            vlc_meta_AddExtra( p_meta, "Info", text );
+            vlc_meta_SetExtra( p_meta, "Info", text );
         }
 
         else if( tag == 'D' )
@@ -731,17 +731,17 @@ static void ImportMeta( stream_t *p_access )
             float fps = atof( text );
             if( fps >= 1 )
                 p_sys->fps = fps;
-            vlc_meta_AddExtra( p_meta, "Frame Rate", text );
+            vlc_meta_SetExtra( p_meta, "Frame Rate", text );
         }
 
         else if( tag == 'P' )
         {
-            vlc_meta_AddExtra( p_meta, "Priority", text );
+            vlc_meta_SetExtra( p_meta, "Priority", text );
         }
 
         else if( tag == 'L' )
         {
-            vlc_meta_AddExtra( p_meta, "Lifetime", text );
+            vlc_meta_SetExtra( p_meta, "Lifetime", text );
         }
     }
 

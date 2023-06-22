@@ -2952,7 +2952,7 @@ static void AVI_MetaLoad( demux_t *p_demux,
             continue;
 
         if( *psz_value )
-            vlc_meta_AddExtra( p_meta, p_strz->p_type, psz_value );
+            vlc_meta_SetExtra( p_meta, p_strz->p_type, psz_value );
         free( psz_value );
     }
 }

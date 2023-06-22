@@ -380,7 +380,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                           i_num_channels, i_num_patterns, i_num_samples,
                           ( i_num_instruments ? psz_instrument_info : "" ) ) >= 0 )
             {
-                vlc_meta_AddExtra( p_meta, "Module Information",
+                vlc_meta_SetExtra( p_meta, "Module Information",
                                    psz_module_info );
                 free( psz_module_info );
             }
@@ -400,7 +400,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", lBuffer );
             }
 
-            vlc_meta_AddExtra( p_meta, "Instruments", psz_temp );
+            vlc_meta_SetExtra( p_meta, "Instruments", psz_temp );
         }
 
         /* Make list of samples */
@@ -412,7 +412,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", psz_buffer );
         }
 
-        vlc_meta_AddExtra( p_meta, "Samples", psz_temp );
+        vlc_meta_SetExtra( p_meta, "Samples", psz_temp );
 
         return VLC_SUCCESS;
     }

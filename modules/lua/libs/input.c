@@ -812,7 +812,7 @@ static int vlclua_input_item_set_meta( lua_State *L )
         }
     }
 
-    vlc_meta_AddExtra( p_item->p_meta, psz_name, psz_value );
+    vlc_meta_SetExtra( p_item->p_meta, psz_name, psz_value );
     return 1;
 }
 

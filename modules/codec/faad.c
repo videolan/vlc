@@ -447,7 +447,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             if( !p_dec->p_description )
                 p_dec->p_description = vlc_meta_New();
             if( p_dec->p_description )
-                vlc_meta_AddExtra( p_dec->p_description, _("AAC extension"), psz_ext );
+                vlc_meta_SetExtra( p_dec->p_description, _("AAC extension"), psz_ext );
 
             p_sys->b_sbr = b_sbr;
             p_sys->b_ps = frame.ps;

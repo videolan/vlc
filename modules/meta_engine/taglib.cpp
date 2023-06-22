@@ -394,7 +394,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 #define SET_EXTRA( keyName, metaName ) \
     iter = fields.find( keyName ); \
     if( iter != fields.end() && !iter->second.isEmpty() ) { \
-        vlc_meta_AddExtra( p_meta, metaName, iter->second.toString().toCString( true ) ); \
+        vlc_meta_SetExtra( p_meta, metaName, iter->second.toString().toCString( true ) ); \
         fields.erase(iter); \
     }
 
@@ -431,7 +431,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
         if( iter->second.type() != APE::Item::Text )
             continue;
 
-        vlc_meta_AddExtra( p_meta,
+        vlc_meta_SetExtra( p_meta,
                            iter->first.toCString( true ),
                            iter->second.toString().toCString( true ) );
     }
@@ -459,7 +459,7 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     if( tag->attributeListMap().contains(keyName) )                                  \
     {                                                                                \
         list = tag->attributeListMap()[keyName];                                     \
-        vlc_meta_AddExtra( p_meta, metaName, list.front().toString().toCString( true ) ); \
+        vlc_meta_SetExtra( p_meta, metaName, list.front().toString().toCString( true ) ); \
     }
 
     SET("MusicBrainz/Track Id", TrackID );
@@ -691,10 +691,10 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
         }
         if( !strcmp( p_txxx->description().toCString( true ), "MusicBrainz Album Id" ) )
         {
-            vlc_meta_AddExtra( p_meta, VLC_META_EXTRA_MB_ALBUMID, p_txxx->fieldList().back().toCString( true ) );
+            vlc_meta_SetExtra( p_meta, VLC_META_EXTRA_MB_ALBUMID, p_txxx->fieldList().back().toCString( true ) );
             continue;
         }
-        vlc_meta_AddExtra( p_meta, p_txxx->description().toCString( true ),
+        vlc_meta_SetExtra( p_meta, p_txxx->description().toCString( true ),
                            p_txxx->fieldList().back().toCString( true ) );
     }
 
@@ -708,7 +708,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
 #define SET_EXTRA( tagName, metaName )\
     list = tag->frameListMap()[tagName];\
     if( !list.isEmpty() )\
-        vlc_meta_AddExtra( p_meta, metaName,\
+        vlc_meta_SetExtra( p_meta, metaName,\
                            (*list.begin())->toString().toCString( true ) );
 
 
@@ -764,7 +764,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     { \
         StringList tmp_list = tag->fieldListMap()[keyName]; \
         if( !tmp_list.isEmpty() ) \
-            vlc_meta_AddExtra( p_meta, keyName, (*tmp_list.begin()).toCString( true ) ); \
+            vlc_meta_SetExtra( p_meta, keyName, (*tmp_list.begin()).toCString( true ) ); \
     }
 
     SET( "COPYRIGHT", Copyright );
@@ -879,7 +879,7 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
     if( tag->contains(keyName) )                                                         \
     {                                                                                    \
         list = tag->item(keyName);                                                       \
-        vlc_meta_AddExtra( p_meta, metaName, list.toStringList().front().toCString( true ) ); \
+        vlc_meta_SetExtra( p_meta, metaName, list.toStringList().front().toCString( true ) ); \
     }
 
     SET("----:com.apple.iTunes:MusicBrainz Track Id", TrackID );

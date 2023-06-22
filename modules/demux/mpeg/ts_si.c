@@ -301,7 +301,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                                       TS_ARIB_LOGO_TYPE_HD_LARGE ) > -1 )
                         {
                             vlc_meta_SetArtURL( p_meta, psz_name );
-                            vlc_meta_AddExtra( p_meta, "ARTURL", psz_name );
+                            vlc_meta_SetExtra( p_meta, "ARTURL", psz_name );
                             free( psz_name );
                         }
                     }
@@ -324,9 +324,9 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         }
 
         if( psz_type )
-            vlc_meta_AddExtra( p_meta, "Type", psz_type );
+            vlc_meta_SetExtra( p_meta, "Type", psz_type );
         if( psz_status )
-            vlc_meta_AddExtra( p_meta, "Status", psz_status );
+            vlc_meta_SetExtra( p_meta, "Status", psz_status );
 
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
                         p_srv->i_service_id, p_meta );

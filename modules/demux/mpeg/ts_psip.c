@@ -648,7 +648,7 @@ static void ATSC_VCT_Callback( void *p_cb_basepid, dvbpsi_atsc_vct_t* p_vct )
 
             const char *psz_service_type = ATSC_A53_get_service_type( p_channel->i_service_type );
             if( psz_service_type )
-                vlc_meta_AddExtra( p_meta, "Type", psz_service_type );
+                vlc_meta_SetExtra( p_meta, "Type", psz_service_type );
 
             es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
                             p_channel->i_program_number, p_meta );

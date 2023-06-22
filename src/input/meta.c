@@ -105,7 +105,7 @@ vlc_meta_t *vlc_meta_New( void )
     return m;
 }
 
-/* Free a dictionary key allocated by strdup() in vlc_meta_AddExtra() */
+/* Free a dictionary key allocated by strdup() in vlc_meta_SetExtra() */
 static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
 {
     VLC_UNUSED( p_obj );
@@ -138,7 +138,7 @@ const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
     return p_meta->ppsz_meta[meta_type];
 }
 
-void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
+void vlc_meta_SetExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
 {
     assert( psz_name );
     char *psz_oldvalue = (char *)vlc_dictionary_value_for_key( &m->extra_tags, psz_name );

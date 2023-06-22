@@ -332,7 +332,7 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
         }
     }
     msg_Dbg( &sys.demuxer, "|   |   + Meta %s: %s", pout_simple->tag_name.c_str (), pout_simple->value.c_str ());
-    vlc_meta_AddExtra( sys.meta, pout_simple->tag_name.c_str (), pout_simple->value.c_str ());
+    vlc_meta_SetExtra( sys.meta, pout_simple->tag_name.c_str (), pout_simple->value.c_str ());
 done:
     return true;
 }

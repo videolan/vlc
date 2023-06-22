@@ -851,13 +851,13 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
             input_item_SetAlbum(item, album);
 
         if (NONEMPTY(author))
-            vlc_meta_AddExtra(item->p_meta, "AUTHOR", author);
+            vlc_meta_SetExtra(item->p_meta, "AUTHOR", author);
         if (NONEMPTY(composer))
-            vlc_meta_AddExtra(item->p_meta, "COMPOSER", composer);
+            vlc_meta_SetExtra(item->p_meta, "COMPOSER", composer);
         if (NONEMPTY(arranger))
-            vlc_meta_AddExtra(item->p_meta, "ARRANGER", arranger);
+            vlc_meta_SetExtra(item->p_meta, "ARRANGER", arranger);
         if (NONEMPTY(isrc))
-            vlc_meta_AddExtra(item->p_meta, "ISRC", isrc);
+            vlc_meta_SetExtra(item->p_meta, "ISRC", isrc);
 
         if (year != 0)
         {

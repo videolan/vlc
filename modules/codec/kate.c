@@ -1224,7 +1224,7 @@ static void ParseKateComments( decoder_t *p_dec )
             if( !p_dec->p_description )
                 p_dec->p_description = vlc_meta_New();
             if( p_dec->p_description )
-                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
+                vlc_meta_SetExtra( p_dec->p_description, psz_name, psz_value );
         }
         free( psz_comment );
         i++;

@@ -535,7 +535,7 @@ static void ParseDaalaComments( decoder_t *p_dec )
             /* TODO:  Since psz_value can contain NULLs see if there is an
              * instance where we need to preserve the full length of this string */
             if( p_dec->p_description )
-                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
+                vlc_meta_SetExtra( p_dec->p_description, psz_name, psz_value );
         }
         free( psz_comment );
     }
