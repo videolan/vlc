@@ -1,0 +1,33 @@
+From 8c7a455ce283451a8f2cfb8ab785ec2b0b3a0f0a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 Jun 2023 09:00:49 +0200
+Subject: [PATCH 1/5] headers: allow CryptAcquireContext in Win10 RS4 UWP
+ builds
+
+It's allowed by the WACK and in api-ms-win-security-cryptoapi-l1-1-0
+since the 16299/RS4 SDK.
+---
+ mingw-w64-headers/include/wincrypt.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/mingw-w64-headers/include/wincrypt.h b/mingw-w64-headers/include/wincrypt.h
+index 8c719b1c5..e60e3cd23 100644
+--- a/mingw-w64-headers/include/wincrypt.h
++++ b/mingw-w64-headers/include/wincrypt.h
+@@ -773,10 +773,12 @@ extern "C" {
+ #endif
+ #endif
+ 
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS4 || defined(WINSTORECOMPAT)
+   WINIMPM WINBOOL WINAPI CryptAcquireContextA (HCRYPTPROV *phProv, LPCSTR szContainer, LPCSTR szProvider, DWORD dwProvType, DWORD dwFlags);
+   WINIMPM WINBOOL WINAPI CryptAcquireContextW (HCRYPTPROV *phProv, LPCWSTR szContainer, LPCWSTR szProvider, DWORD dwProvType, DWORD dwFlags);
+ #define CryptAcquireContext __MINGW_NAME_AW(CryptAcquireContext)
++#endif
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
+   WINIMPM WINBOOL WINAPI CryptGenRandom (HCRYPTPROV hProv, DWORD dwLen, BYTE *pbBuffer);
+ #endif
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
+-- 
+2.37.3.windows.1
+

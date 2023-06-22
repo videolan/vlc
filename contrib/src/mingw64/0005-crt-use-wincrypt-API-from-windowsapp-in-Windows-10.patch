@@ -1,0 +1,108 @@
+From 92d8233a063e7170c234bdfc8409689f15150d83 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 Jun 2023 09:01:28 +0200
+Subject: [PATCH 5/5] crt: use wincrypt API from windowsapp in Windows 10
+
+The hidden API are found in windowsapp since the RS4/19H1 SDK. They are
+also allowed by the WACK in api-ms-win-security-cryptoapi-l1-1-0.
+That DLL has been on all Windows 10 versions [1].
+
+It's better to use the real API than using CCryptography winrt API just for
+these calls.
+
+Crypto.c is kept in the old winstorecompat when targetting Windows 8.
+
+Apps targetting UWP before 19H1 and using CryptGenRandom may not work
+if api-ms-win-security-cryptoapi-l1-1-0.dll on older Windows doesn't
+contain the entry.
+
+[1] https://learn.microsoft.com/en-us/uwp/win32-and-com/win32-apis#apis-from-api-ms-win-security-cryptoapi-l1-1-0dll
+---
+ .../lib-common/api-ms-win-security-cryptoapi-l1-1-0.def  | 9 ++++-----
+ .../lib32/api-ms-win-security-cryptoapi-l1-1-0.def       | 9 ++++-----
+ mingw-w64-libraries/winstorecompat/Makefile.am           | 1 -
+ 3 files changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/mingw-w64-crt/lib-common/api-ms-win-security-cryptoapi-l1-1-0.def b/mingw-w64-crt/lib-common/api-ms-win-security-cryptoapi-l1-1-0.def
+index 93bdb91e6..ebeeda2c5 100644
+--- a/mingw-w64-crt/lib-common/api-ms-win-security-cryptoapi-l1-1-0.def
++++ b/mingw-w64-crt/lib-common/api-ms-win-security-cryptoapi-l1-1-0.def
+@@ -2,9 +2,8 @@ LIBRARY api-ms-win-security-cryptoapi-l1-1-0
+ 
+ EXPORTS
+ 
+-; Implemented in windowsappcompat
+-;CryptAcquireContextA
+-;CryptAcquireContextW
++CryptAcquireContextA
++CryptAcquireContextW
+ CryptCreateHash
+ CryptDecrypt
+ CryptDeriveKey
+@@ -16,7 +15,7 @@ CryptEnumProvidersA
+ CryptEnumProvidersW
+ CryptExportKey
+ CryptGenKey
+-;CryptGenRandom
++CryptGenRandom
+ CryptGetDefaultProviderA
+ CryptGetDefaultProviderW
+ CryptGetHashParam
+@@ -25,7 +24,7 @@ CryptGetProvParam
+ CryptGetUserKey
+ CryptHashData
+ CryptImportKey
+-;CryptReleaseContext
++CryptReleaseContext
+ CryptSetHashParam
+ CryptSetKeyParam
+ CryptSetProviderW
+diff --git a/mingw-w64-crt/lib32/api-ms-win-security-cryptoapi-l1-1-0.def b/mingw-w64-crt/lib32/api-ms-win-security-cryptoapi-l1-1-0.def
+index e175547ec..2590c143c 100644
+--- a/mingw-w64-crt/lib32/api-ms-win-security-cryptoapi-l1-1-0.def
++++ b/mingw-w64-crt/lib32/api-ms-win-security-cryptoapi-l1-1-0.def
+@@ -2,9 +2,8 @@ LIBRARY api-ms-win-security-cryptoapi-l1-1-0
+ 
+ EXPORTS
+ 
+-; Implemented in windowsappcompat
+-;CryptAcquireContextA@20
+-;CryptAcquireContextW@20
++CryptAcquireContextA@20
++CryptAcquireContextW@20
+ CryptCreateHash@20
+ CryptDecrypt@24
+ CryptDeriveKey@20
+@@ -16,7 +15,7 @@ CryptEnumProvidersA@24
+ CryptEnumProvidersW@24
+ CryptExportKey@24
+ CryptGenKey@16
+-;CryptGenRandom@12
++CryptGenRandom@12
+ CryptGetDefaultProviderA@20
+ CryptGetDefaultProviderW@20
+ CryptGetHashParam@20
+@@ -25,7 +24,7 @@ CryptGetProvParam@20
+ CryptGetUserKey@12
+ CryptHashData@16
+ CryptImportKey@24
+-;CryptReleaseContext@8
++CryptReleaseContext@8
+ CryptSetHashParam@16
+ CryptSetKeyParam@16
+ CryptSetProviderW@8
+diff --git a/mingw-w64-libraries/winstorecompat/Makefile.am b/mingw-w64-libraries/winstorecompat/Makefile.am
+index 8b3312312..469b28b19 100644
+--- a/mingw-w64-libraries/winstorecompat/Makefile.am
++++ b/mingw-w64-libraries/winstorecompat/Makefile.am
+@@ -59,7 +59,6 @@ libwindowsappcompat_a_SOURCES = \
+   src/GetFileSize.c \
+   src/SHGetFolderPathW.c \
+   src/QueueTimer.c \
+-  src/Crypto.c \
+   src/GetStartupInfo.c \
+   src/EnumProcessModules.c \
+   src/RtlAddFunctionTable.c \
+-- 
+2.37.3.windows.1
+

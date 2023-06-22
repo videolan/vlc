@@ -1,0 +1,60 @@
+From 920f2e29b1a3a296f6863bcd26179094aa94535a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 Jun 2023 10:53:22 +0200
+Subject: [PATCH 4/5] headers: allow more wincrypt API's in Win10 19H1 UWP
+ builds
+
+The API's are allowed in windowsapp since 19H1 and are allowed by the WACK.
+Only the MS header don't specify it properly for WINAPI_FAMILY_PC_APP
+but since the DLL is on all WINAPI_FAMILY_DESKTOP_APP and allowed by the
+WACK this always works.
+---
+ mingw-w64-headers/include/wincrypt.h | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/mingw-w64-headers/include/wincrypt.h b/mingw-w64-headers/include/wincrypt.h
+index 4bcc3ff70..475ef7883 100644
+--- a/mingw-w64-headers/include/wincrypt.h
++++ b/mingw-w64-headers/include/wincrypt.h
+@@ -785,22 +785,17 @@ extern "C" {
+   WINIMPM WINBOOL WINAPI CryptReleaseContext (HCRYPTPROV hProv, DWORD dwFlags);
+ #endif
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+-#define CryptEnumProviders __MINGW_NAME_AW(CryptEnumProviders)
+ #define CryptEnumProviderTypes __MINGW_NAME_AW(CryptEnumProviderTypes)
+ #define CryptSetProvider __MINGW_NAME_AW(CryptSetProvider)
+ #define CryptSetProviderEx __MINGW_NAME_AW(CryptSetProviderEx)
+ 
+   WINIMPM WINBOOL WINAPI CryptHashSessionKey (HCRYPTHASH hHash, HCRYPTKEY hKey, DWORD dwFlags);
+   WINIMPM WINBOOL WINAPI CryptSetProviderA (LPCSTR pszProvName, DWORD dwProvType);
+-  WINIMPM WINBOOL WINAPI CryptSetProviderW (LPCWSTR pszProvName, DWORD dwProvType);
+   WINIMPM WINBOOL WINAPI CryptSetProviderExA (LPCSTR pszProvName, DWORD dwProvType, DWORD *pdwReserved, DWORD dwFlags);
+   WINIMPM WINBOOL WINAPI CryptSetProviderExW (LPCWSTR pszProvName, DWORD dwProvType, DWORD *pdwReserved, DWORD dwFlags);
+   WINIMPM WINBOOL WINAPI CryptEnumProviderTypesA (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPSTR szTypeName, DWORD *pcbTypeName);
+   WINIMPM WINBOOL WINAPI CryptEnumProviderTypesW (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPWSTR szTypeName, DWORD *pcbTypeName);
+-  WINIMPM WINBOOL WINAPI CryptEnumProvidersA (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPSTR szProvName, DWORD *pcbProvName);
+-  WINIMPM WINBOOL WINAPI CryptEnumProvidersW (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPWSTR szProvName, DWORD *pcbProvName);
+   WINIMPM WINBOOL WINAPI CryptContextAddRef (HCRYPTPROV hProv, DWORD *pdwReserved, DWORD dwFlags);
+-  WINIMPM WINBOOL WINAPI CryptDuplicateKey (HCRYPTKEY hKey, DWORD *pdwReserved, DWORD dwFlags, HCRYPTKEY *phKey);
+   WINIMPM WINBOOL WINAPI CryptDuplicateHash (HCRYPTHASH hHash, DWORD *pdwReserved, DWORD dwFlags, HCRYPTHASH *phHash);
+ #if NTDDI_VERSION >= NTDDI_WS03
+   WINBOOL __cdecl GetEncSChannel (BYTE **pData, DWORD *dwDecSize);
+@@ -845,6 +840,15 @@ extern "C" {
+   WINIMPM WINBOOL WINAPI CryptGetDefaultProviderW (DWORD dwProvType, DWORD *pdwReserved, DWORD dwFlags, LPWSTR pszProvName, DWORD *pcbProvName);
+ #endif
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1
++  WINIMPM WINBOOL WINAPI CryptDuplicateKey (HCRYPTKEY hKey, DWORD *pdwReserved, DWORD dwFlags, HCRYPTKEY *phKey);
++  WINIMPM WINBOOL WINAPI CryptEnumProvidersA (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPSTR szProvName, DWORD *pcbProvName);
++  WINIMPM WINBOOL WINAPI CryptEnumProvidersW (DWORD dwIndex, DWORD *pdwReserved, DWORD dwFlags, DWORD *pdwProvType, LPWSTR szProvName, DWORD *pcbProvName);
++  WINIMPM WINBOOL WINAPI CryptSetProviderW (LPCWSTR pszProvName, DWORD dwProvType);
++
++#define CryptEnumProviders __MINGW_NAME_AW(CryptEnumProviders)
++#endif
++
+ #ifndef _DDK_DRIVER_
+   typedef ULONG_PTR HCRYPTPROV_OR_NCRYPT_KEY_HANDLE;
+   typedef ULONG_PTR HCRYPTPROV_LEGACY;
+-- 
+2.37.3.windows.1
+

@@ -73,6 +73,11 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0015-headers-enabled-LoadLibraryEx-flags-in-Win10-19H1-UW.patch
 	$(APPLY) $(SRC)/mingw64/0016-headers-Allow-SetDllDirectoryW-A-API-in-Win10-19H1-U.patch
 	$(APPLY) $(SRC)/mingw64/0017-headers-allow-FORMAT_MESSAGE_ALLOCATE_BUFFER-in-UWP.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-allow-CryptAcquireContext-in-Win10-RS4-UWP-b.patch
+	$(APPLY) $(SRC)/mingw64/0002-headers-allow-CryptGenRandom-in-Win10-19H1-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0003-headers-allow-more-wincrypt-API-s-in-Win10-RS4-UWP-b.patch
+	$(APPLY) $(SRC)/mingw64/0004-headers-allow-more-wincrypt-API-s-in-Win10-19H1-UWP-.patch
+	$(APPLY) $(SRC)/mingw64/0005-crt-use-wincrypt-API-from-windowsapp-in-Windows-10.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -160,12 +165,13 @@ endif
 
 .alloweduwp: mingw64
 	install -d "$(PREFIX)/include"
-	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
-	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
-	install $</mingw-w64-headers/include/winbase.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/fileapi.h      "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/memoryapi.h    "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/winbase.h      "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/libloaderapi.h "$(PREFIX)/include"
-	install $</mingw-w64-headers/include/winreg.h "$(PREFIX)/include"
-	install $</mingw-w64-headers/include/handleapi.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/winreg.h       "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/handleapi.h    "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/wincrypt.h     "$(PREFIX)/include"
 
 	# Trick mingw-w64 into just building libwindowsapp.a
 	$(MAKEBUILDDIR)

@@ -1,0 +1,27 @@
+From b19b9c357d29769c7f1dd03ef0fa47315e4f2705 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 22 Jun 2023 09:03:08 +0200
+Subject: [PATCH 2/5] headers: allow CryptGenRandom in Win10 19H1 UWP builds
+
+It's allowed by the WACK and in api-ms-win-security-cryptoapi-l1-1-0
+since the 18362/19H1 SDK.
+---
+ mingw-w64-headers/include/wincrypt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mingw-w64-headers/include/wincrypt.h b/mingw-w64-headers/include/wincrypt.h
+index e60e3cd23..05fd577fb 100644
+--- a/mingw-w64-headers/include/wincrypt.h
++++ b/mingw-w64-headers/include/wincrypt.h
+@@ -778,7 +778,7 @@ extern "C" {
+   WINIMPM WINBOOL WINAPI CryptAcquireContextW (HCRYPTPROV *phProv, LPCWSTR szContainer, LPCWSTR szProvider, DWORD dwProvType, DWORD dwFlags);
+ #define CryptAcquireContext __MINGW_NAME_AW(CryptAcquireContext)
+ #endif
+-#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || defined(WINSTORECOMPAT)
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_19H1 || defined(WINSTORECOMPAT)
+   WINIMPM WINBOOL WINAPI CryptGenRandom (HCRYPTPROV hProv, DWORD dwLen, BYTE *pbBuffer);
+ #endif
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
+-- 
+2.37.3.windows.1
+
