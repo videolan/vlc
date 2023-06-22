@@ -982,12 +982,22 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         .proc_ctx = gl,
 #endif
     };
+
+    const opengl_vtable_t *vt = priv->vt;
+
+    /* Workaround libplacebo changing the current framebuffer when running
+     * with OpenGL. */
+    GLint out_fb;
+    vt->GetIntegerv(GL_FRAMEBUFFER_BINDING, &out_fb);
+
     priv->pl_opengl = pl_opengl_create(priv->pl_log, &gl_params);
     if (!priv->pl_opengl)
     {
         vlc_gl_sampler_Delete(sampler);
         return NULL;
     }
+
+    vt->BindFramebuffer(GL_FRAMEBUFFER, out_fb);
 
     priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
         .gpu = priv->pl_opengl->gpu,
