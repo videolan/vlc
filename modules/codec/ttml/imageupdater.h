@@ -131,10 +131,16 @@ static inline subpicture_t *decoder_NewTTML_ImageSpu(decoder_t *p_dec)
     ttml_image_updater_sys_t *p_sys = calloc(1, sizeof(*p_sys));
     if(!p_sys)
         return NULL;
+
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = TTML_ImageSpuUpdate,
+        .destroy  = TTML_ImageSpuDestroy,
+    };
+
     subpicture_updater_t updater = {
-        .pf_update   = TTML_ImageSpuUpdate,
-        .pf_destroy  = TTML_ImageSpuDestroy,
-        .sys         = p_sys,
+        .sys = p_sys,
+        .ops = &spu_ops,
     };
     p_sys->p_regions = NULL;
     p_sys->pp_append = &p_sys->p_regions;
