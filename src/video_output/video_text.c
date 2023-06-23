@@ -107,10 +107,15 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     sys->position = position;
     sys->text     = strdup(text);
 
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = OSDTextUpdate,
+        .destroy  = OSDTextDestroy,
+    };
+
     subpicture_updater_t updater = {
-        .pf_update   = OSDTextUpdate,
-        .pf_destroy  = OSDTextDestroy,
-        .sys         = sys,
+        .sys = sys,
+        .ops = &spu_ops,
     };
     subpicture_t *subpic = subpicture_New(&updater);
     if (!subpic) {
