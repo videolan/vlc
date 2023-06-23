@@ -379,7 +379,7 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 	done
 
 ifdef HAVE_DARWIN_OS
-AUTORECONF = AUTOPOINT=true autoreconf
+AUTORECONF = AUTOPOINT=true GTKDOCIZE=true autoreconf
 else
 AUTORECONF = GTKDOCIZE=true autoreconf
 endif
