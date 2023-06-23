@@ -287,11 +287,18 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
 static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
 {
     subtext_updater_sys_t *sys = calloc(1, sizeof(*sys));
-    subpicture_updater_t updater = {
-        .pf_update   = SubpictureTextUpdate,
-        .pf_destroy  = SubpictureTextDestroy,
-        .sys         = sys,
+
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = SubpictureTextUpdate,
+        .destroy  = SubpictureTextDestroy,
     };
+
+    subpicture_updater_t updater = {
+        .sys = sys,
+        .ops = &spu_ops,
+    };
+
     SubpictureUpdaterSysRegionInit( &sys->region );
     sys->margin_ratio = 0.04f;
     sys->p_default_style = text_style_Create( STYLE_NO_DEFAULTS );
