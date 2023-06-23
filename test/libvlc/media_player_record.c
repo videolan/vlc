@@ -56,6 +56,7 @@ static void test_media_player_record(const char** argv, int argc)
     libvlc_media_player_play (mp);
 
     const char path[] = "./";
+    char *filepath;
 
     libvlc_media_player_record(mp, true, path);
 
@@ -72,12 +73,23 @@ static void test_media_player_record(const char** argv, int argc)
         const struct libvlc_event_t *ev = event_ctx_wait_event(&ctx);
         assert(!ev->u.media_player_record_changed.recording);
         assert(ev->u.media_player_record_changed.recorded_file_path != NULL);
+        filepath = strdup(ev->u.media_player_record_changed.recorded_file_path);
+        assert(filepath != NULL);
         event_ctx_release(&ctx);
     }
 
     libvlc_media_player_stop_async (mp);
     libvlc_media_player_release (mp);
     libvlc_release (vlc);
+
+    res = unlink(filepath);
+    /** TODO:
+     * We should check assert(res == 0);, but the record is currently
+     * creating a stream output pipeline instance for recording with
+     * a specific mux after the end of the Open() of the recording
+     * module, with a file{no-overwrite} option. It means that the
+     * file might not exist yet. */
+    free(filepath);
 }
 
 int main(void)
