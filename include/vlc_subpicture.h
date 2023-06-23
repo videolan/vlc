@@ -167,6 +167,25 @@ VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
 VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
 
 /**
+ * Subpicture updater operation virtual table.
+ *
+ * This structure gathers the operations that are implemented by a
+ * subpicture_updater_t instance. */
+struct vlc_spu_updater_ops
+{
+    /** Mandatory callback called after pf_validate and doing
+      * the main job of creating the subpicture regions for the
+      * current video_format */
+    void (*update)(subpicture_t *,
+                   bool has_src_changed, const video_format_t *p_fmt_src,
+                   bool has_dst_changed, const video_format_t *p_fmt_dst,
+                   vlc_tick_t);
+
+    /** Optional callback for subpicture private data cleanup */
+    void (*destroy)(subpicture_t *);
+};
+
+/**
  * Tells if the region is a text-based region.
  */
 #define subpicture_region_IsText(r)  \
@@ -184,9 +203,12 @@ typedef struct
                          bool has_src_changed, const video_format_t *p_fmt_src,
                          bool has_dst_changed, const video_format_t *p_fmt_dst,
                          vlc_tick_t );
+
     /** Optional callback for subpicture private data cleanup */
     void (*pf_destroy) ( subpicture_t * );
+
     void *sys;
+    const struct vlc_spu_updater_ops *ops;
 } subpicture_updater_t;
 
 typedef struct subpicture_private_t subpicture_private_t;
