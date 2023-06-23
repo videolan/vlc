@@ -190,6 +190,10 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
 static int Open(vout_display_t *vd,
                 video_format_t *fmt, vlc_video_context *context)
 {
+#if TARGET_OS_IPHONE
+    if (fmt->i_chroma == VLC_CODEC_CVPX_P010)
+        return VLC_EGENERIC;
+#endif
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
