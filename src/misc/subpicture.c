@@ -70,8 +70,6 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
     else
     {
         p_subpic->p_private = NULL;
-        p_subpic->updater.pf_update   = NULL;
-        p_subpic->updater.pf_destroy  = NULL;
         p_subpic->updater.ops = NULL;
         p_subpic->updater.sys = NULL;
     }
@@ -82,9 +80,7 @@ void subpicture_Delete( subpicture_t *p_subpic )
 {
     vlc_spu_regions_Clear( &p_subpic->regions );
 
-    if( p_subpic->updater.pf_destroy )
-        p_subpic->updater.pf_destroy( p_subpic );
-    else if (p_subpic->updater.ops != NULL &&
+    if (p_subpic->updater.ops != NULL &&
         p_subpic->updater.ops->destroy != NULL)
     {
         p_subpic->updater.ops->destroy(p_subpic);
@@ -175,20 +171,15 @@ void subpicture_Update( subpicture_t *p_subpicture,
     subpicture_updater_t *p_upd = &p_subpicture->updater;
     subpicture_private_t *p_private = p_subpicture->p_private;
 
-    if (p_upd->pf_update != NULL)
-        p_upd->pf_update(p_subpicture,
-                         !video_format_IsSimilar( &p_private->src,
-                                                  p_fmt_src ), p_fmt_src,
-                         !video_format_IsSimilar( &p_private->dst,
-                                                  p_fmt_dst ), p_fmt_dst,
-                         i_ts);
-    else
-        p_upd->ops->update(p_subpicture,
-                           !video_format_IsSimilar( &p_private->src,
-                                                    p_fmt_src ), p_fmt_src,
-                           !video_format_IsSimilar( &p_private->dst,
-                                                    p_fmt_dst ), p_fmt_dst,
-                           i_ts);
+    if (p_upd->ops == NULL)
+        return;
+
+    p_upd->ops->update(p_subpicture,
+                       !video_format_IsSimilar( &p_private->src,
+                                                p_fmt_src ), p_fmt_src,
+                       !video_format_IsSimilar( &p_private->dst,
+                                                p_fmt_dst ), p_fmt_dst,
+                       i_ts);
 
     video_format_Clean( &p_private->src );
     video_format_Clean( &p_private->dst );
