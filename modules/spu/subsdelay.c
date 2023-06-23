@@ -656,8 +656,6 @@ static subsdelay_heap_entry_t * SubsdelayEntryCreate( subpicture_t *p_source, fi
 
     subpicture_t *p_new_subpic;
 
-    subpicture_updater_t updater;
-
     /* allocate structure */
 
     p_entry = (subsdelay_heap_entry_t *) malloc( sizeof( subsdelay_heap_entry_t ) );
@@ -668,10 +666,17 @@ static subsdelay_heap_entry_t * SubsdelayEntryCreate( subpicture_t *p_source, fi
     }
 
     /* initialize local updater */
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = SubpicUpdateWrapper,
+        .destroy  = SubpicDestroyWrapper,
+    };
 
-    updater.sys = p_entry;
-    updater.pf_update = SubpicUpdateWrapper;
-    updater.pf_destroy = SubpicDestroyWrapper;
+    subpicture_updater_t updater =
+    {
+        .sys = p_entry,
+        .ops = &spu_ops,
+    };
 
     /* create new subpic */
 
@@ -944,9 +949,15 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, c
 
     p_entry->p_source->regions = p_entry->p_subpic->regions;
 
-    p_entry->p_source->updater.pf_update( p_entry->p_source,
-                                          has_src_changed, p_fmt_src,
-                                          has_dst_changed, p_fmt_dst, i_new_ts );
+    subpicture_updater_t *updater = &p_entry->p_source->updater;
+    if (updater->pf_update != NULL)
+            updater->pf_update( p_entry->p_source,
+                                has_src_changed, p_fmt_src,
+                                has_dst_changed, p_fmt_dst, i_new_ts );
+    else
+        updater->ops->update( p_entry->p_source,
+                              has_src_changed, p_fmt_src,
+                              has_dst_changed, p_fmt_dst, i_new_ts );
 
     p_entry->p_subpic->regions = p_entry->p_source->regions;
 
