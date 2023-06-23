@@ -1016,12 +1016,20 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         if( !p_spu_sys )
             return NULL;
     }
-    subpicture_updater_t updater = {
+
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
 #ifdef HAVE_TIGER
-        .pf_update   = TigerUpdateSubpicture,
-        .pf_destroy  = TigerDestroySubpicture,
+        .update   = TigerUpdateSubpicture,
+        .destroy  = TigerDestroySubpicture,
+#else
+        .update = NULL, .destroy = NULL,
 #endif
-        .sys         = p_spu_sys,
+    };
+
+    subpicture_updater_t updater = {
+        .sys = p_spu_sys,
+        .ops = &spu_ops,
     };
     p_spu = decoder_NewSubpicture( p_dec, p_sys->b_use_tiger ? &updater : NULL );
     if( !p_spu )
