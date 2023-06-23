@@ -196,17 +196,6 @@ struct vlc_spu_updater_ops
  */
 typedef struct
 {
-    /** Mandatory callback doing
-      * the main job of creating the subpicture regions for the
-      * current video_format */
-    void (*pf_update)  ( subpicture_t *,
-                         bool has_src_changed, const video_format_t *p_fmt_src,
-                         bool has_dst_changed, const video_format_t *p_fmt_dst,
-                         vlc_tick_t );
-
-    /** Optional callback for subpicture private data cleanup */
-    void (*pf_destroy) ( subpicture_t * );
-
     void *sys;
     const struct vlc_spu_updater_ops *ops;
 } subpicture_updater_t;
