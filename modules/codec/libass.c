@@ -363,10 +363,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             return VLCDEC_SUCCESS;
         }
 
+        static const struct vlc_spu_updater_ops spu_ops =
+        {
+            .update   = SubpictureUpdate,
+            .destroy  = SubpictureDestroy,
+        };
+
         subpicture_updater_t updater = {
-            .pf_update   = SubpictureUpdate,
-            .pf_destroy  = SubpictureDestroy,
-            .sys         = p_spu_sys,
+            .sys = p_spu_sys,
+            .ops = &spu_ops,
         };
 
         p_spu = decoder_NewSubpicture( p_dec, &updater );
