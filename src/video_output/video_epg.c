@@ -613,10 +613,15 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
     if( !sys->art )
         sys->art = GetDefaultArtUri();
 
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = OSDEpgUpdate,
+        .destroy  = OSDEpgDestroy,
+    };
+
     subpicture_updater_t updater = {
-        .pf_update   = OSDEpgUpdate,
-        .pf_destroy  = OSDEpgDestroy,
-        .sys         = sys
+        .sys = sys,
+        .ops = &spu_ops,
     };
 
     const vlc_tick_t now = vlc_tick_now();
