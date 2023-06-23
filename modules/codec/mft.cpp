@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_charset.h> /* FromWide */
 extern "C" {
 #include "hxxx_helper.h"
 }
@@ -1485,6 +1486,43 @@ static void DestroyMFT(decoder_t *p_dec)
         hxxx_helper_clean(&p_sys->hh);
 }
 
+static int ListTransforms(decoder_t *p_dec, GUID category, const char *type)
+{
+    HRESULT hr;
+
+    UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
+                 | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
+                 | MFT_ENUM_FLAG_HARDWARE;
+    IMFActivate **activate_objects = NULL;
+    UINT32 count = 0;
+    hr = MFTEnumEx(category, flags, nullptr, nullptr, &activate_objects, &count);
+    msg_Dbg(p_dec, "Listing %u %s%s", count, type, (count?"s":""));
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
+    for (UINT32 o=0; o<count; o++)
+    {
+        WCHAR Name[256];
+        hr = activate_objects[o]->GetString(MFT_FRIENDLY_NAME_Attribute, Name, ARRAY_SIZE(Name), nullptr);
+        if (FAILED(hr))
+            wcscpy(Name,L"<unknown>");
+        char *name = FromWide(Name);
+
+#ifndef NDEBUG
+        ComPtr<IMFTransform> mft;
+        hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
+        msg_Dbg(p_dec, "%s '%s' is%s available", type, name, (FAILED(hr)?" not":""));
+        mft.Reset();
+#else
+        msg_Dbg(p_dec, "found %s '%s'", type, name);
+#endif
+        free(name);
+        activate_objects[o]->ShutdownObject();
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int FindMFT(decoder_t *p_dec)
 {
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
@@ -1512,6 +1550,11 @@ static int FindMFT(decoder_t *p_dec)
     }
     if (input_type.guidSubtype == GUID_NULL)
         return VLC_EGENERIC;
+
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+        ListTransforms(p_dec, MFT_CATEGORY_VIDEO_DECODER, "video decoder");
+    else
+        ListTransforms(p_dec, MFT_CATEGORY_VIDEO_DECODER, "audio decoder");
 
     UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
                  | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
