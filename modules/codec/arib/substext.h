@@ -121,10 +121,16 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
 {
     arib_spu_updater_sys_t *sys = (arib_spu_updater_sys_t*)
         calloc( 1, sizeof(arib_spu_updater_sys_t) );
+
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update   = SubpictureTextUpdate,
+        .destroy  = SubpictureTextDestroy,
+    };
+
     subpicture_updater_t updater = {
-        .pf_update   = SubpictureTextUpdate,
-        .pf_destroy  = SubpictureTextDestroy,
-        .sys         = sys,
+        .sys = sys,
+        .ops = &spu_ops,
     };
     subpicture_t *subpic = decoder_NewSubpicture(decoder, &updater);
     if( subpic == NULL )
