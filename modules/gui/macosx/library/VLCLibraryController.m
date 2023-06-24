@@ -164,6 +164,17 @@
     return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
 
+- (int)reloadFolderWithFileURL:(NSURL *)fileURL
+{
+    if (!_p_libraryInstance) {
+        return VLC_EACCES;
+    }
+    if (!fileURL) {
+        return VLC_EINVAL;
+    }
+    return vlc_ml_reload_folder(_p_libraryInstance, fileURL.absoluteString.UTF8String);
+}
+
 - (int)clearHistory
 {
     if (!_p_libraryInstance) {
