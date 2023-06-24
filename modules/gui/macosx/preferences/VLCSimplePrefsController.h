@@ -69,6 +69,7 @@
 @property (readwrite, weak) IBOutlet NSButton *mediaLibraryAddFolderButton;
 @property (readwrite, weak) IBOutlet NSButton *mediaLibraryRemoveFolderButton;
 @property (readwrite, weak) IBOutlet NSButton *mediaLibraryBanFolderButton;
+@property (readwrite, weak) IBOutlet NSButton *mediaLibraryReloadFolderButton;
 
 // hotkeys pane
 @property (readwrite, strong) IBOutlet NSView *hotkeysView;

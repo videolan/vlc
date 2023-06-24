@@ -146,6 +146,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 @property (readwrite, weak) NSTableColumn *bannedTableColumn;
 @property (readwrite, weak) NSButton *removeFolderButton;
 @property (readwrite, weak) NSButton *banFolderButton;
+@property (readwrite, weak) NSButton *reloadFolderButton;
 
 - (IBAction)addFolder:(id)sender;
 - (IBAction)removeFolder:(id)sender;
@@ -246,6 +247,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     _mediaLibraryManagementController.pathTableColumn = _mediaLibraryPathTableColumn;
     _mediaLibraryManagementController.removeFolderButton = _mediaLibraryRemoveFolderButton;
     _mediaLibraryManagementController.banFolderButton = _mediaLibraryBanFolderButton;
+    _mediaLibraryManagementController.reloadFolderButton = _mediaLibraryReloadFolderButton;
 
     _mediaLibraryAddFolderButton.target = _mediaLibraryManagementController;
     _mediaLibraryAddFolderButton.action = @selector(addFolder:);
@@ -253,6 +255,8 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     _mediaLibraryBanFolderButton.action = @selector(banFolder:);
     _mediaLibraryRemoveFolderButton.target = _mediaLibraryManagementController;
     _mediaLibraryRemoveFolderButton.action = @selector(removeFolder:);
+    _mediaLibraryReloadFolderButton.target = _mediaLibraryManagementController;
+    _mediaLibraryReloadFolderButton.action = @selector(reloadFolder:);
 }
 
 #define CreateToolbarItem(name, desc, img, sel) \
@@ -458,6 +462,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_mediaLibraryAddFolderButton setTitle:_NS("Add Folder...")];
     [_mediaLibraryBanFolderButton setTitle:_NS("Ban Folder")];
     [_mediaLibraryRemoveFolderButton setTitle:_NS("Remove Folder")];
+    [_mediaLibraryReloadFolderButton setTitle:_NS("Reload Folder")];
     [_mediaLibraryNameTableColumn setTitle:_NS("Name")];
     [_mediaLibraryPresentTableColumn setTitle:_NS("Present")];
     [_mediaLibraryBannedTableColumn setTitle:_NS("Banned")];
@@ -1625,11 +1630,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 {
     NSInteger selectedRow = self.libraryFolderTableView.selectedRow;
     if (selectedRow == -1) {
-        self.banFolderButton.enabled = self.removeFolderButton.enabled = NO;
+        self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = NO;
         return;
     }
-    self.banFolderButton.enabled = self.removeFolderButton.enabled = YES;
-    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[selectedRow];
+    self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = YES;
+    VLCMediaLibraryEntryPoint * const entryPoint = _libraryModel.listOfMonitoredFolders[selectedRow];
     [self.banFolderButton setTitle:entryPoint.isBanned ? _NS("Unban Folder") : _NS("Ban Folder")];
 }
 
