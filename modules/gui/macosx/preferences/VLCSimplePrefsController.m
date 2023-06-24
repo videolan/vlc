@@ -150,6 +150,8 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 - (IBAction)addFolder:(id)sender;
 - (IBAction)removeFolder:(id)sender;
 - (IBAction)banFolder:(id)sender;
+- (IBAction)reloadFolder:(id)sender;
+
 @end
 
 @interface VLCSimplePrefsController() <NSToolbarDelegate, NSWindowDelegate>
@@ -1592,6 +1594,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 {
     VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
     [_libraryController removeFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
+}
+
+- (IBAction)reloadFolder:(id)sender
+{
+    VLCMediaLibraryEntryPoint * const entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
+    [_libraryController reloadFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
