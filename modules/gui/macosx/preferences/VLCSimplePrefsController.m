@@ -235,7 +235,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 - (void)setupMediaLibraryControlInterface
 {
     _mediaLibraryManagementController = [[VLCMediaLibraryFolderManagementController alloc] init];
-    _mediaLibraryBanFolderButton.enabled = _mediaLibraryRemoveFolderButton.enabled = NO;
+    _mediaLibraryBanFolderButton.enabled = _mediaLibraryRemoveFolderButton.enabled = _mediaLibraryReloadFolderButton.enabled = NO;
 
     _mediaLibraryFolderTableView.delegate = _mediaLibraryManagementController;
     _mediaLibraryFolderTableView.dataSource = _mediaLibraryManagementController;
