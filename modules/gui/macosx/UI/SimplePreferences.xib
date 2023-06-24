@@ -86,6 +86,7 @@
                 <outlet property="mediaLibraryNameTableColumn" destination="wAS-Qh-rAS" id="2ei-jH-cvI"/>
                 <outlet property="mediaLibraryPathTableColumn" destination="QBg-HT-Vvb" id="4AQ-jb-HLf"/>
                 <outlet property="mediaLibraryPresentTableColumn" destination="kVl-Wj-9vm" id="cmW-Jn-uIQ"/>
+                <outlet property="mediaLibraryReloadFolderButton" destination="hvb-5M-TTc" id="HV0-Gc-GLE"/>
                 <outlet property="mediaLibraryRemoveFolderButton" destination="WnC-lv-27l" id="EUb-bH-L13"/>
                 <outlet property="mediaLibraryView" destination="eei-wi-f9H" id="Oh4-jV-mOk"/>
                 <outlet property="osdView" destination="2523" id="d1o-FZ-hXa"/>
@@ -2429,14 +2430,23 @@ Gw
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hvb-5M-TTc">
+                    <rect key="frame" x="342" y="13" width="118" height="32"/>
+                    <buttonCell key="cell" type="push" title="Reload Folder" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xjS-NX-mCc">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="AsR-G7-aHo" firstAttribute="leading" secondItem="eei-wi-f9H" secondAttribute="leading" constant="20" id="3jm-3z-Xs7"/>
-                <constraint firstAttribute="trailing" secondItem="Yvu-g1-fLU" secondAttribute="trailing" constant="250" id="5LJ-Ux-874"/>
                 <constraint firstItem="AsR-G7-aHo" firstAttribute="centerY" secondItem="WnC-lv-27l" secondAttribute="centerY" id="Aj1-lf-d90"/>
+                <constraint firstItem="hvb-5M-TTc" firstAttribute="centerY" secondItem="Yvu-g1-fLU" secondAttribute="centerY" id="DcL-IY-5xh"/>
+                <constraint firstItem="hvb-5M-TTc" firstAttribute="leading" secondItem="Yvu-g1-fLU" secondAttribute="trailing" constant="12" id="GTh-Ae-evd"/>
                 <constraint firstItem="WnC-lv-27l" firstAttribute="centerY" secondItem="Yvu-g1-fLU" secondAttribute="centerY" id="Rsb-k3-Qtk"/>
                 <constraint firstItem="gbE-0a-hRm" firstAttribute="top" secondItem="eei-wi-f9H" secondAttribute="top" constant="60" id="VDk-uE-IWD"/>
                 <constraint firstItem="Yvu-g1-fLU" firstAttribute="leading" secondItem="WnC-lv-27l" secondAttribute="trailing" constant="12" id="YM9-u7-u7m"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hvb-5M-TTc" secondAttribute="trailing" constant="20" id="dM1-kS-zcj"/>
                 <constraint firstItem="gbE-0a-hRm" firstAttribute="leading" secondItem="eei-wi-f9H" secondAttribute="leading" constant="20" id="ggB-z1-D2B"/>
                 <constraint firstAttribute="bottom" secondItem="AsR-G7-aHo" secondAttribute="bottom" constant="20" id="hxw-eg-Qfw"/>
                 <constraint firstAttribute="trailing" secondItem="gbE-0a-hRm" secondAttribute="trailing" constant="20" id="n4Z-j5-Mtr"/>
