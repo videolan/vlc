@@ -73,16 +73,22 @@ FocusScope {
     function setCurrentItemFocus(reason) { view.setCurrentItemFocus(reason); }
 
     function resetFocus() {
-        if (model.count === 0) return
+        const count = model.count
 
-        let initialIndex = root.initialIndex
+        if (count === 0 || initialIndex === -1) return
 
-        if (initialIndex >= model.count)
-            initialIndex = 0
+        var index
 
-        modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
+        if (initialIndex < count)
+            index = initialIndex
+        else
+            index = 0
 
-        view.positionViewAtIndex(initialIndex, ItemView.Contain);
+        modelSelect.select(model.index(index, 0), ItemSelectionModel.ClearAndSelect)
+
+        view.positionViewAtIndex(index, ItemView.Contain)
+
+        view.setCurrentItem(index)
     }
 
     // Events
@@ -181,8 +187,9 @@ FocusScope {
             if (view.currentIndex <= 0) {
                 root.Navigation.defaultNavigationCancel()
             } else {
-                view.currentIndex = 0;
-                view.positionViewAtIndex(0, ItemView.Contain);
+                positionViewAtIndex(0, ItemView.Contain)
+
+                setCurrentItem(0)
             }
         }
 
