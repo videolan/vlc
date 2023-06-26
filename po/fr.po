@@ -5407,19 +5407,19 @@ msgstr "Commande+"
 #: src/misc/update.c:482
 #, c-format
 msgid "%.1f GiB"
-msgstr "%.lf Gio"
+msgstr "%.1f Gio"
 
 #: src/misc/update.c:484
 #, c-format
 msgid "%.1f MiB"
-msgstr "%.lf Mio"
+msgstr "%.1f Mio"
 
 #: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:148
 #: modules/gui/macosx/VLCPlaylistInfo.m:150
 #: modules/gui/macosx/VLCPlaylistInfo.m:160
 #, c-format
 msgid "%.1f KiB"
-msgstr "%.lf Kio"
+msgstr "%.1f Kio"
 
 #: src/misc/update.c:488
 #, c-format
