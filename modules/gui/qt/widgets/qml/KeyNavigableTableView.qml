@@ -159,6 +159,10 @@ FocusScope {
 
     // Functions
 
+    function setCurrentItem(index) {
+        view.setCurrentItem(index)
+    }
+
     function setCurrentItemFocus(reason) {
         view.setCurrentItemFocus(reason);
     }
