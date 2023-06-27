@@ -372,14 +372,14 @@ drop:
  *
  * @param logger pointer to VLC logger
  * @param session RTP session receiving the packet
+ * @param now monotonic clock reference for packets timing (ex: vlc_tick_now())
  * @param deadlinep pointer to deadline to call rtp_dequeue() again
  * @return true if the buffer is not empty, false otherwise.
  * In the later case, *deadlinep is undefined.
  */
 bool rtp_dequeue (struct vlc_logger *logger, const rtp_session_t *session,
-                  vlc_tick_t *restrict deadlinep)
+                  vlc_tick_t now, vlc_tick_t *restrict deadlinep)
 {
-    vlc_tick_t now = vlc_tick_now ();
     bool pending = false;
 
     *deadlinep = VLC_TICK_MAX;

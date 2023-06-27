@@ -155,7 +155,7 @@ void *rtp_dgram_thread (void *opaque)
         }
 
     dequeue:
-        if (!rtp_dequeue (sys->logger, sys->session, &deadline))
+        if (!rtp_dequeue (sys->logger, sys->session, vlc_tick_now(), &deadline))
             deadline = VLC_TICK_INVALID;
         vlc_restorecancel (canc);
     }
