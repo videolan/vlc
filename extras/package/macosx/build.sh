@@ -166,7 +166,7 @@ if [ "$REBUILD" = "yes" ]; then
     rm -rf $HOST_TRIPLET
 fi
 mkdir -p contrib-$HOST_TRIPLET && cd contrib-$HOST_TRIPLET
-../bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET > $out
+../bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET $CONTRIBFLAGS > $out
 
 make list
 if [ "$CONTRIBFROMSOURCE" != "yes" ]; then
