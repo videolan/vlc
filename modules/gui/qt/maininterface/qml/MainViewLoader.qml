@@ -52,6 +52,8 @@ Widgets.StackViewExt {
     // optional, loaded when model.loading is true
     property Component loadingComponent: null
 
+    readonly property int count: model.count
+
     property var selectionModel: Util.SelectableDelegateModel {
         model: root.model
     }
@@ -75,7 +77,7 @@ Widgets.StackViewExt {
     property Component currentComponent: {
         if (model.loading)
             return loadingComponent
-        else if (model.count === 0)
+        else if (count === 0)
             return emptyLabel
         else if (MainCtx.gridView)
             return grid
@@ -98,7 +100,7 @@ Widgets.StackViewExt {
         target: model
 
         onCountChanged: {
-            if (model.count === 0 || selectionModel.hasSelection)
+            if (count === 0 || selectionModel.hasSelection)
                 return
 
             resetFocus()
@@ -107,10 +109,10 @@ Widgets.StackViewExt {
 
     // makes the views currentIndex initial index and position view at that index
     function resetFocus() {
-        if (!model || model.count === 0) return
+        if (!model || count === 0) return
 
         let initialIndex = root.initialIndex
-        if (initialIndex >= model.count)
+        if (initialIndex >= count)
             initialIndex = 0
 
         selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
