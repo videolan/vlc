@@ -4,7 +4,16 @@ ASDCPLIB_VERSION := 2.7.19
 
 ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSION).tar.gz
 
-ifndef HAVE_IOS
+# nettle/gmp can't be used with the LGPLv2 license
+ifdef GPL
+ASDCP_PKG=1
+else
+ifdef GNUV3
+ASDCP_PKG=1
+endif
+endif
+
+ifdef ASDCP_PKG
 ifndef HAVE_ANDROID
 ifndef HAVE_WINSTORE # FIXME uses some fordbidden SetErrorModes, GetModuleFileName in fileio.cpp
 PKGS += asdcplib
