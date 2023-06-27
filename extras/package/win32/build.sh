@@ -45,10 +45,6 @@ ARCH="x86_64"
 while getopts "hra:pcli:W:sb:dD:xS:uwzo:m" OPTION
 do
      case $OPTION in
-         h)
-             usage
-             exit 1
-         ;;
          r)
              RELEASE="yes"
              INSTALLER="r"
@@ -104,6 +100,10 @@ do
          ;;
          m)
              BUILD_MESON="yes"
+         ;;
+         h|*)
+             usage
+             exit 1
          ;;
      esac
 done
