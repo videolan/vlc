@@ -3,8 +3,19 @@
 SRT_VERSION := 1.4.4
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
+# gnutls (nettle/gmp) can't be used with the LGPLv2 license
+ifdef GPL
+SRT_PKG=1
+else
+ifdef GNUV3
+SRT_PKG=1
+endif
+endif
+
 ifdef BUILD_NETWORK
+ifdef SRT_PKG
 PKGS += srt
+endif
 endif
 
 ifeq ($(call need_pkg,"srt >= 1.3.2"),)
