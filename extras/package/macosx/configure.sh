@@ -11,7 +11,6 @@ OPTIONS="
         --enable-macosx
         --enable-merge-ffmpeg
         --enable-osx-notifications
-        --enable-faad
         --enable-flac
         --enable-theora
         --enable-shout

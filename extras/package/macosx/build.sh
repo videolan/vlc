@@ -40,6 +40,10 @@ OPTIONS:
    -C            Use the specified VLC build dir
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Disable debug mode (on by default)
+   -g <g|l|a>    Select the license of contribs
+                     g: GPLv3 (default)
+                     l: LGPLv3 + ad-clauses
+                     a: LGPLv2 + ad-clauses
 EOF
 
 }
@@ -54,7 +58,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "qhvrcdpi:k:a:j:C:b:" OPTION
+while getopts "qhvrcdpi:k:a:j:C:b:g:" OPTION
 do
      case $OPTION in
          h)
@@ -94,6 +98,9 @@ do
          ;;
          b)
              BREAKPAD=$OPTARG
+         ;;
+         g)
+             LICENSE=$OPTARG
          ;;
          *)
              usage
@@ -160,6 +167,22 @@ vlcSetContribEnvironment "$MINIMAL_OSX_VERSION"
 
 info "Building contribs"
 spushd "${vlcroot}/contrib"
+
+case $LICENSE in
+    l)
+        # LGPL v3 + ad-clauses
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --enable-ad-clauses"
+        VLC_CONFIGURE_ARGS="$VLC_CONFIGURE_ARGS --disable-a52"
+    ;;
+    a)
+        # LGPL v2.1 + ad-clauses
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --disable-gnuv3 --enable-ad-clauses"
+        VLC_CONFIGURE_ARGS="$VLC_CONFIGURE_ARGS --disable-a52"
+    ;;
+    g|*)
+        # GPL v3
+    ;;
+esac
 
 if [ "$REBUILD" = "yes" ]; then
     rm -rf contrib-$HOST_TRIPLET
