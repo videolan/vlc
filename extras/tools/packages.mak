@@ -45,7 +45,7 @@ BISON_URL=$(GNU)/bison/bison-$(BISON_VERSION).tar.xz
 FLEX_VERSION=2.6.4
 FLEX_URL=https://github.com/westes/flex/releases/download/v$(FLEX_VERSION)/flex-$(FLEX_VERSION).tar.gz
 
-GETTEXT_VERSION=0.19.8.1
+GETTEXT_VERSION=0.22
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 HELP2MAN_VERSION=1.47.6
