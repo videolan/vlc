@@ -38,11 +38,15 @@ OPTIONS:
    -z            Build without GUI (libvlc only)
    -o <path>     Install the built binaries in the absolute path
    -m            Build with Meson rather than autotools
+   -g <g|l|a>    Select the license of contribs
+                     g: GPLv3 (default)
+                     l: LGPLv3 + ad-clauses
+                     a: LGPLv2 + ad-clauses
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:W:sb:dD:xS:uwzo:m" OPTION
+while getopts "hra:pcli:W:sb:dD:xS:uwzo:mg:" OPTION
 do
      case $OPTION in
          r)
@@ -100,6 +104,9 @@ do
          ;;
          m)
              BUILD_MESON="yes"
+         ;;
+         g)
+             LICENSE=$OPTARG
          ;;
          h|*)
              usage
@@ -219,6 +226,23 @@ if [ ! -z "$WIXPATH" ]; then
     # the CI didn't provide its own WIX, make sure we use our own
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-wix"
 fi
+
+case $LICENSE in
+    l)
+        # LGPL v3 + ad-clauses
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --enable-ad-clauses"
+        CONFIGFLAGS="$CONFIGFLAGS --disable-a52 --enable-live555"
+    ;;
+    a)
+        # LGPL v2.1 + ad-clauses
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --disable-gnuv3 --enable-ad-clauses"
+        CONFIGFLAGS="$CONFIGFLAGS --disable-a52"
+    ;;
+    g|*)
+        # GPL v3
+        CONFIGFLAGS="$CONFIGFLAGS --enable-live555"
+    ;;
+esac
 
 export PATH="$PWD/contrib/$CONTRIB_PREFIX/bin":"$PATH"
 

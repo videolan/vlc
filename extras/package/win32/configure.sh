@@ -9,7 +9,6 @@ OPTIONS="
       --enable-dca
       --enable-libass
       --enable-schroedinger
-      --enable-live555
       --enable-shout
       --enable-goom
       --enable-sse
