@@ -43,10 +43,6 @@ ARCH="x86_64"
 while getopts "hra:pcli:sb:dD:xS:uwzo:" OPTION
 do
      case $OPTION in
-         h)
-             usage
-             exit 1
-         ;;
          r)
              RELEASE="yes"
              INSTALLER="r"
@@ -96,6 +92,10 @@ do
          ;;
          o)
              INSTALL_PATH=$OPTARG
+         ;;
+         h|*)
+             usage
+             exit 1
          ;;
      esac
 done
