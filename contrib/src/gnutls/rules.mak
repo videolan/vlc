@@ -3,9 +3,20 @@
 GNUTLS_VERSION := 3.6.16
 GNUTLS_URL := $(GNUGPG)/gnutls/v3.6/gnutls-$(GNUTLS_VERSION).tar.xz
 
+# nettle/gmp can't be used with the LGPLv2 license
+ifdef GPL
+GNUTLS_PKG=1
+else
+ifdef GNUV3
+GNUTLS_PKG=1
+endif
+endif
+
 ifdef BUILD_NETWORK
 ifndef HAVE_DARWIN_OS
+ifdef GNUTLS_PKG
 PKGS += gnutls
+endif
 endif
 endif
 ifeq ($(call need_pkg,"gnutls >= 3.5.0"),)
