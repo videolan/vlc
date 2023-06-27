@@ -85,6 +85,24 @@ Widgets.StackViewExt {
             return list
     }
 
+    // Navigation
+
+    // handle cancelAction, if currentIndex is set reset it to 0
+    // otherwise perform default Navigation action
+    Navigation.cancelAction: function () {
+        if (count === 0 || currentItem === null || currentItem.currentIndex === 0)
+            return false // transfer cancel action to parent
+
+        if (currentItem.hasOwnProperty("positionViewAtIndex"))
+            currentItem.positionViewAtIndex(0, ItemView.Contain)
+
+        currentItem.setCurrentItem(0)
+
+        return true
+    }
+
+    // Events
+
     Component.onCompleted: {
         _updateView()
 
@@ -109,20 +127,21 @@ Widgets.StackViewExt {
 
     // makes the views currentIndex initial index and position view at that index
     function resetFocus() {
-        if (!model || count === 0) return
+        if (count === 0 || initialIndex === -1) return
 
-        let initialIndex = root.initialIndex
-        if (initialIndex >= count)
-            initialIndex = 0
+        var index
 
-        selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (currentItem && currentItem.hasOwnProperty("positionViewAtIndex")) {
-            currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (initialIndex < count)
+            index = initialIndex
+        else
+            index = 0
 
-            // Table View require this for focus handling
-            if (!MainCtx.gridView)
-                currentItem.currentIndex = initialIndex
-        }
+        selectionModel.select(model.index(index, 0), ItemSelectionModel.ClearAndSelect)
+
+        if (currentItem.hasOwnProperty("positionViewAtIndex"))
+            currentItem.positionViewAtIndex(index, ItemView.Contain)
+
+        currentItem.setCurrentItem(index)
     }
 
     function setCurrentItemFocusDefault(reason) {
@@ -150,17 +169,4 @@ Widgets.StackViewExt {
 
         setCurrentItemFocus(reason)
     }
-
-    // handle cancelAction, if currentIndex is set reset it to 0
-    // otherwise perform default Navigation action
-    Navigation.cancelAction: function () {
-        if (Helpers.get(currentItem, "currentIndex", 0) <= 0) {
-            return false // transfer cancel action to parent
-        }
-
-        currentItem.currentIndex = 0
-        currentItem.positionViewAtIndex(0, ItemView.Contain)
-        return true
-    }
-
 }
