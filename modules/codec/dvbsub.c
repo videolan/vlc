@@ -415,10 +415,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     {
         Flush( p_dec );
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        {
-            block_Release( p_block );
-            return VLCDEC_SUCCESS;
-        }
+            goto end;
     }
 
     /* configure for SD res in case DDS is not present */
@@ -434,8 +431,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
          * don't complain too loudly. */
         msg_Warn( p_dec, "non dated subtitle" );
 #endif
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        goto end;
     }
 
     bs_init( &p_sys->bs, p_block->p_buffer, p_block->i_buffer );
@@ -443,15 +439,13 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if( bs_read( &p_sys->bs, 8 ) != 0x20 ) /* Data identifier */
     {
         msg_Dbg( p_dec, "invalid data identifier" );
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        goto end;
     }
 
     if( bs_read( &p_sys->bs, 8 ) ) /* Subtitle stream id */
     {
         msg_Dbg( p_dec, "invalid subtitle stream id" );
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        goto end;
     }
 
 #ifdef DEBUG_DVBSUB
@@ -470,8 +464,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if( ( i_sync_byte & 0x3f ) != 0x3f ) /* End marker */
     {
         msg_Warn( p_dec, "end marker not found (corrupted subtitle ?)" );
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        goto end;
     }
 
     /* Check if the page is to be displayed */
@@ -482,8 +475,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             decoder_QueueSub( p_dec, p_spu );
     }
 
-    block_Release( p_block );
-
+end:
+    block_Release(p_block);
     return VLCDEC_SUCCESS;
 }
 
