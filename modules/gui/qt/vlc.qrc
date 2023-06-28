@@ -69,7 +69,6 @@
         <file alias="wait4.svg">pixmaps/misc/wait4.svg</file>
     </qresource>
     <qresource prefix="/util">
-        <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
         <file alias="Helpers.js">util/qml/Helpers.js</file>
         <file alias="MultipleBinding.qml">util/qml/MultipleBinding.qml</file>
         <file alias="ModelSortSettingHandler.qml">util/qml/ModelSortSettingHandler.qml</file>
