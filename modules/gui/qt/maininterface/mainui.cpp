@@ -44,6 +44,7 @@
 #include "util/effects_image_provider.hpp"
 #include "util/csdbuttonmodel.hpp"
 #include "util/vlctick.hpp"
+#include "util/list_selection_model.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -313,6 +314,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
+
+        qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
 
         qmlProtectModule(uri, versionMajor);
     }
