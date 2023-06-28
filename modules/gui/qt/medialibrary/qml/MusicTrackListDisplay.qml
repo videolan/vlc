@@ -178,9 +178,6 @@ Widgets.KeyNavigableTableView {
     section.property: "title_first_symbol"
 
     model: rootmodel
-    selectionModel: ListSelectionModel {
-        model: rootmodel
-    }
     rowHeight: VLCStyle.tableCoverRow_height
 
     onActionForSelection:  model.addAndPlay(selection)

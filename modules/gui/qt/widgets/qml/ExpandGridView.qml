@@ -71,7 +71,10 @@ FocusScope {
 
     readonly property int _contentWidth: width - rightMargin - leftMargin
 
-    property ListSelectionModel selectionModel
+    property ListSelectionModel selectionModel: ListSelectionModel {
+        model: root.model
+    }
+
     property QtAbstractItemModel model
 
     property int currentIndex: 0

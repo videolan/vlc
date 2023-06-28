@@ -49,9 +49,6 @@ Widgets.KeyNavigableTableView {
 
     visible: urlModel.count > 0
     model: urlModel
-    selectionModel: ListSelectionModel {
-        model: urlModel
-    }
 
     sortModel: [{
         size: Math.max(listView_id._nbCols - 1, 1),

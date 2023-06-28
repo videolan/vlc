@@ -161,10 +161,6 @@ FocusScope {
 
         model: root.model
 
-        selectionModel: ListSelectionModel {
-            model: root.model
-        }
-
         dragItem: root.dragItem
 
         isMusic: root.isMusic

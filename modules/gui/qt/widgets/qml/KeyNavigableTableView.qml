@@ -73,7 +73,10 @@ FocusScope {
     property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0
 
-    property ListSelectionModel selectionModel
+    property ListSelectionModel selectionModel: ListSelectionModel {
+        model: root.model
+    }
+
     property real rowHeight: VLCStyle.tableRow_height
 
     property real availableRowWidth: 0

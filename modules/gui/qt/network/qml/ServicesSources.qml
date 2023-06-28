@@ -96,7 +96,7 @@ MainInterface.MainGridView {
         }
 
         onItemClicked : {
-            selectionModel.updateSelection(modifier , root.currentIndex, index)
+            root.selectionModel.updateSelection(modifier, root.currentIndex, index)
             root.currentIndex = index
             root.forceActiveFocus()
         }
