@@ -401,3 +401,10 @@ vlc_tests += {
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
 }
+
+vlc_tests += {
+    'name' : 'test_src_video_output_spu',
+    'sources' : files('video_output/spu.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+}

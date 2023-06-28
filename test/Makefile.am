@@ -69,6 +69,7 @@ check_PROGRAMS = \
 	test_src_misc_viewpoint \
 	test_src_video_output \
 	test_src_video_output_opengl \
+	test_src_video_output_spu \
 	test_modules_lua_extension \
 	test_modules_lua_playlist_parser \
 	test_modules_misc_medialibrary \
@@ -311,6 +312,8 @@ test_src_video_output_SOURCES = \
 test_src_video_output_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_video_output_opengl_SOURCES = src/video_output/opengl.c
 test_src_video_output_opengl_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_video_output_spu_SOURCES = src/video_output/spu.c
+test_src_video_output_spu_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_src_input_decoder_SOURCES = \
 	src/input/decoder/input_decoder.c \
