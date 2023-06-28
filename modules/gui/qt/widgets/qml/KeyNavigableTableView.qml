@@ -73,9 +73,6 @@ FocusScope {
     property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0
 
-    property ListSelectionModel selectionModel: ListSelectionModel {
-        model: root.model
-    }
 
     property real rowHeight: VLCStyle.tableRow_height
 
@@ -100,6 +97,7 @@ FocusScope {
     property alias spacing: view.spacing
 
     property alias model: view.model
+    property alias selectionModel: view.selectionModel
 
     property alias delegate: view.delegate
 
@@ -237,15 +235,7 @@ FocusScope {
 
         Navigation.parentItem: root
 
-        onSelectAll: selectionModel.selectAll()
-        onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
         onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
-
-        onDeselectAll: {
-            if (selectionModel) {
-                selectionModel.clearSelection()
-            }
-        }
 
         onShowContextMenu: {
             if (selectionModel.hasSelection)

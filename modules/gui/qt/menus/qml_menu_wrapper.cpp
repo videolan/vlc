@@ -837,14 +837,14 @@ PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
 
 void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
 {
-    if (!m_controler || !m_model)
+    if (!m_controler || !m_model || !m_selectionModel)
         return;
 
     m_menu = std::make_unique<QMenu>();
     QAction* action;
 
     QList<QUrl> selectedUrlList;
-    for (const int modelIndex : m_model->getSelection())
+    for (const int modelIndex : m_selectionModel->selectedIndexesFlat())
         selectedUrlList.push_back(m_model->itemAt(modelIndex).getUrl());
 
     PlaylistItem currentItem;
@@ -861,7 +861,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         m_menu->addSeparator();
     }
 
-    if (m_model->getSelectedCount() > 0) {
+    if (m_selectionModel->hasSelection()) {
         action = m_menu->addAction( qtr("Stream") );
         connect(action, &QAction::triggered, [selectedUrlList]( ) {
             DialogsProvider::getInstance()->streamingDialog(selectedUrlList, false);
@@ -913,7 +913,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
 
     m_menu->addSeparator();
 
-    if (m_model->getSelectedCount() > 0)
+    if (m_selectionModel->hasSelection())
     {
         action = m_menu->addAction( qtr("Save Playlist to File...") );
         connect(action, &QAction::triggered, []( ) {
@@ -925,7 +925,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         action = m_menu->addAction( qtr("Remove Selected") );
         action->setIcon(QIcon(":/menu/remove.svg"));
         connect(action, &QAction::triggered, [this]( ) {
-            m_model->removeItems(m_model->getSelection());
+            m_model->removeItems(m_selectionModel->selectedIndexesFlat());
         });
     }
 

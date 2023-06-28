@@ -155,6 +155,7 @@ FocusScope {
                         topMargin: VLCStyle.margin_xsmall
                         bottomMargin: VLCStyle.margin_xsmall
                         model: albumModel
+                        selectionModel: albumSelectionModel
                         orientation: ListView.Horizontal
                         spacing: VLCStyle.column_spacing
 
@@ -188,15 +189,15 @@ FocusScope {
                             onItemDoubleClicked: play()
 
                             onItemClicked: {
-                                albumSelectionModel.updateSelection( modifier , albumsList.currentIndex, index )
+                                albumsList.selectionModel.updateSelection( modifier , albumsList.currentIndex, index )
                                 albumsList.currentIndex = index
                                 albumsList.forceActiveFocus()
                             }
 
                             Connections {
-                                target: albumSelectionModel
+                                target: albumsList.selectionModel
 
-                                onSelectionChanged: gridItem.selected = albumSelectionModel.isSelected(index)
+                                onSelectionChanged: gridItem.selected = albumsList.selectionModel.isSelected(index)
                             }
 
                             function play() {
@@ -206,8 +207,6 @@ FocusScope {
                             }
                         }
 
-                        onSelectAll: albumSelectionModel.selectAll()
-                        onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
                         onActionAtIndex: albumModel.addAndPlay( new Array(index) )
                     }
 

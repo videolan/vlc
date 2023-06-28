@@ -38,6 +38,10 @@ ListView {
 
     property bool keyNavigationWraps: false
 
+    property ListSelectionModel selectionModel: ListSelectionModel {
+        model: root.model
+    }
+
     // Private
 
     property bool _keyPressed: false
@@ -55,14 +59,7 @@ ListView {
     property alias buttonRight: buttonRight
 
     // Signals
-
-    signal selectionUpdated(int keyModifiers, int oldIndex, int newIndex)
-
-    signal selectAll()
-
     signal actionAtIndex(int index)
-
-    signal deselectAll()
 
     signal showContextMenu(point globalPos)
 
@@ -169,6 +166,14 @@ ListView {
         root.contentX -= Math.min(root.width,root.contentX - root.originX)
     }
 
+    // Add an indirection here because additional control
+    // might be necessary as in Playqueue.
+    // Derived views may override this function.
+    function updateSelection(modifiers, oldIndex, newIndex) {
+        if (selectionModel)
+            selectionModel.updateSelection(modifiers, oldIndex, newIndex)
+    }
+
     Keys.onPressed: {
         let newIndex = -1
 
@@ -221,7 +226,7 @@ ListView {
 
             currentIndex = newIndex;
 
-            selectionUpdated(event.modifiers, oldIndex, newIndex);
+            root.updateSelection(event.modifiers, oldIndex, newIndex);
 
             // NOTE: If we skip this call the item might end up under the header.
             positionViewAtIndex(currentIndex, ItemView.Contain);
@@ -246,7 +251,8 @@ ListView {
 
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
-            selectAll()
+            if (selectionModel)
+                selectionModel.selectAll()
         } else if (KeyHelper.matchOk(event)) { //enter/return/space
             event.accepted = true
             actionAtIndex(currentIndex)
@@ -312,7 +318,8 @@ ListView {
             root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
 
             if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
-                root.deselectAll()
+                if (selectionModel)
+                    selectionModel.clearSelection()
             }
 
             mouse.accepted = true

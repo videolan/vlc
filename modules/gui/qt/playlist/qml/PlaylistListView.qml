@@ -35,6 +35,7 @@ T.Pane {
     property var model: PlaylistListModel {
         playlist: MainPlaylistController.playlist
     }
+    readonly property ListSelectionModel selectionModel: listView ? listView.selectionModel : null
 
     property bool useAcrylic: true
 
@@ -70,7 +71,7 @@ T.Pane {
 
     function isDropAcceptable(drop, index) {
         if (drop.source === dragItem)
-            return Helpers.itemsMovable(drop.source.indexes, index)
+            return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
         else
             return true
     }
@@ -80,7 +81,7 @@ T.Pane {
 
         // NOTE: Move implementation.
         if (dragItem === item) {
-            model.moveItemsPre(model.getSelection(), index);
+            model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
 
         // NOTE: Dropping medialibrary content into the queue.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
@@ -126,13 +127,14 @@ T.Pane {
         }
 
         onRequestInputItems: {
-            resolve(root.model.getItemsForIndexes(indexes))
+            resolve(root.model.getItemsForIndexes(root.selectionModel.selectedIndexesFlat))
         }
     }
 
     PlaylistContextMenu {
         id: contextMenu
         model: root.model
+        selectionModel: root.selectionModel
         controler: MainPlaylistController
     }
 
@@ -264,10 +266,6 @@ T.Pane {
 
             property int shiftIndex: -1
             property Item itemContainsDrag: null
-
-            onDeselectAll: {
-                root.model.deselectAll()
-            }
 
             onShowContextMenu: {
                 contextMenu.popup(-1, globalPos)
@@ -446,12 +444,7 @@ T.Pane {
                 }
             }
 
-            onSelectAll: root.model.selectAll()
-            onSelectionUpdated: {
-                updateSelection(keyModifiers, oldIndex, newIndex);
-            }
-
-            Keys.onDeletePressed: onDelete()
+            Keys.onDeletePressed: model.removeItems(selectionModel.selectedIndexesFlat)
 
             Navigation.parentItem: root
 
@@ -460,54 +453,6 @@ T.Pane {
                     return
 
                 MainPlaylistController.goTo(index, true)
-            }
-
-            function onDelete() {
-                const selection = root.model.getSelection()
-                if (selection.length === 0)
-                    return
-                root.model.removeItems(selection)
-            }
-
-            function _addRange(from, to) {
-                root.model.setRangeSelected(from, to - from + 1, true)
-            }
-
-            function _delRange(from, to) {
-                root.model.setRangeSelected(from, to - from + 1, false)
-            }
-
-            // copied from SelectableDelegateModel, which is intended to be removed
-            function updateSelection( keymodifiers, oldIndex, newIndex ) {
-                if ((keymodifiers & Qt.ShiftModifier)) {
-                    if ( shiftIndex === oldIndex) {
-                        if ( newIndex > shiftIndex )
-                            _addRange(shiftIndex, newIndex)
-                        else
-                            _addRange(newIndex, shiftIndex)
-                    } else if (shiftIndex <= newIndex && newIndex < oldIndex) {
-                        _delRange(newIndex + 1, oldIndex )
-                    } else if ( shiftIndex < oldIndex && oldIndex < newIndex ) {
-                        _addRange(oldIndex, newIndex)
-                    } else if ( newIndex < shiftIndex && shiftIndex < oldIndex ) {
-                        _delRange(shiftIndex, oldIndex)
-                        _addRange(newIndex, shiftIndex)
-                    } else if ( newIndex < oldIndex && oldIndex < shiftIndex  ) {
-                        _addRange(newIndex, oldIndex)
-                    } else if ( oldIndex <= shiftIndex && shiftIndex < newIndex ) {
-                        _delRange(oldIndex, shiftIndex)
-                        _addRange(shiftIndex, newIndex)
-                    } else if ( oldIndex < newIndex && newIndex <= shiftIndex  ) {
-                        _delRange(oldIndex, newIndex - 1)
-                    }
-                } else {
-                    shiftIndex = newIndex
-                    if (keymodifiers & Qt.ControlModifier) {
-                        root.model.toggleSelected(newIndex)
-                    } else {
-                        root.model.setSelection([newIndex])
-                    }
-                }
             }
 
             Column {

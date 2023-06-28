@@ -65,13 +65,13 @@ public:
     /* provided for convenience */
     Q_INVOKABLE PlaylistItem itemAt(int index) const;
 
-    Q_INVOKABLE virtual void removeItems(const QList<int> &indexes);
-    Q_INVOKABLE virtual void moveItemsPre(const QList<int> &indexes, int preTarget);
-    Q_INVOKABLE virtual void moveItemsPost(const QList<int> &indexes, int postTarget);
+    Q_INVOKABLE virtual void removeItems(const QVector<int> &indexes);
+    Q_INVOKABLE virtual void moveItemsPre(const QVector<int> &indexes, int preTarget);
+    Q_INVOKABLE virtual void moveItemsPost(const QVector<int> &indexes, int postTarget);
 
     int getCurrentIndex() const;
 
-    Q_INVOKABLE QVariantList getItemsForIndexes(const QList<int> & indexes) const;
+    Q_INVOKABLE QVariantList getItemsForIndexes(const QVector<int> & indexes) const;
 
 protected:
     bool isRowSelected(int row) const override;
@@ -91,7 +91,7 @@ signals:
 private:
     Q_DECLARE_PRIVATE(PlaylistListModel)
 
-    void moveItems(const QList<int> &indexes, int target, bool isPreTarget);
+    void moveItems(const QVector<int> &indexes, int target, bool isPreTarget);
 
     QScopedPointer<PlaylistListModelPrivate> d_ptr;
 

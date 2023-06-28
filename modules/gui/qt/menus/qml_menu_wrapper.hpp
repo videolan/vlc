@@ -25,6 +25,7 @@
 #include <QQuickItem>
 #include "menus.hpp"
 #include "maininterface/mainctx.hpp"
+#include "util/list_selection_model.hpp"
 
 class MediaLib;
 class MLPlaylistListModel;
@@ -360,6 +361,7 @@ class PlaylistContextMenu : public QObject {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistListModel*, model, nullptr)
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistController*, controler, nullptr)
+    SIMPLE_MENU_PROPERTY(ListSelectionModel*, selectionModel, nullptr)
 public:
     PlaylistContextMenu(QObject* parent = nullptr);
 

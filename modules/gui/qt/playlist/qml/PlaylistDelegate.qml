@@ -20,6 +20,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Templates 2.12 as T
 import QtQuick.Layouts 1.12
+import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
@@ -34,9 +35,7 @@ T.ItemDelegate {
 
     property Flickable view: ListView.view
 
-    readonly property int selectionLength: view.model.selectedCount
-
-    readonly property bool selected : model.selected
+    readonly property bool selected : view.selectionModel.selectedIndexesFlat.includes(index)
 
     readonly property bool topContainsDrag: higherDropArea.containsDrag
 
@@ -266,8 +265,8 @@ T.ItemDelegate {
         onClicked: {
             /* to receive keys events */
             view.forceActiveFocus(Qt.MouseFocusReason)
-            if (!(view.model.isSelected(index) && mouse.button === Qt.RightButton)) {
-                view.updateSelection(mouse.modifiers, view.currentIndex, index)
+            if (!(delegate.selected && mouse.button === Qt.RightButton)) {
+                view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
                 view.currentIndex = index
             }
 
@@ -289,10 +288,11 @@ T.ItemDelegate {
                 if (drag.active) {
                     if (!selected) {
                         /* the dragged item is not in the selection, replace the selection */
-                        view.model.setSelection([index])
+                        view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
                     }
 
-                    dragItem.indexes = view.model.getSelection()
+                    dragItem.indexes = view.selectionModel.selectedIndexesFlat
+                    dragItem.indexesFlat = true
                     dragItem.Drag.active = true
                 } else {
                     dragItem.Drag.drop()

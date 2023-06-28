@@ -331,7 +331,7 @@ PlaylistListModel::itemAt(int index) const
     return d->m_items[index];
 }
 
-void PlaylistListModel::removeItems(const QList<int>& indexes)
+void PlaylistListModel::removeItems(const QVector<int>& indexes)
 {
     Q_D(PlaylistListModel);
     if (!d->m_playlist)
@@ -361,7 +361,7 @@ void PlaylistListModel::removeItems(const QList<int>& indexes)
  * move.
  */
 static int
-getMovePostTarget(const QList<int> &sortedIndexesToMove, int preTarget)
+getMovePostTarget(const QVector<int> &sortedIndexesToMove, int preTarget)
 {
     int postTarget = preTarget;
     for (int index : sortedIndexesToMove)
@@ -374,7 +374,7 @@ getMovePostTarget(const QList<int> &sortedIndexesToMove, int preTarget)
 }
 
 void
-PlaylistListModel::moveItems(const QList<int> &sortedIndexes, int target,
+PlaylistListModel::moveItems(const QVector<int> &sortedIndexes, int target,
                              bool isPreTarget)
 {
     Q_D(PlaylistListModel);
@@ -403,13 +403,13 @@ PlaylistListModel::moveItems(const QList<int> &sortedIndexes, int target,
 }
 
 void
-PlaylistListModel::moveItemsPre(const QList<int> &sortedIndexes, int preTarget)
+PlaylistListModel::moveItemsPre(const QVector<int> &sortedIndexes, int preTarget)
 {
     return moveItems(sortedIndexes, preTarget, true);
 }
 
 void
-PlaylistListModel::moveItemsPost(const QList<int> &sortedIndexes,
+PlaylistListModel::moveItemsPost(const QVector<int> &sortedIndexes,
                                  int postTarget)
 {
     return moveItems(sortedIndexes, postTarget, false);
@@ -422,7 +422,7 @@ int PlaylistListModel::getCurrentIndex() const
 }
 
 /* Q_INVOKABLE */
-QVariantList PlaylistListModel::getItemsForIndexes(const QList<int> & indexes) const
+QVariantList PlaylistListModel::getItemsForIndexes(const QVector<int> & indexes) const
 {
     Q_D(const PlaylistListModel);
 

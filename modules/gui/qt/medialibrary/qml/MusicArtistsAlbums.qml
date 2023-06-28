@@ -49,6 +49,7 @@ FocusScope {
     readonly property bool isSearchable: true
 
     property alias model: artistModel
+    property alias selectionModel: selectionModel
 
     property alias searchPattern: albumSubView.searchPattern
     property alias sortOrder: albumSubView.sortOrder
@@ -139,6 +140,7 @@ FocusScope {
 
             spacing: 4
             model: artistModel
+            selectionModel: root.selectionModel
             currentIndex: -1
             z: 1
             height: parent.height
