@@ -736,9 +736,9 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/music.svg \
 	gui/qt/pixmaps/menu/network.svg \
 	gui/qt/pixmaps/menu/next.svg \
-	gui/qt/pixmaps/menu/pause.svg \
-	gui/qt/pixmaps/menu/play.svg \
 	gui/qt/pixmaps/menu/playlist.svg \
+	gui/qt/pixmaps/menu/ic_pause_filled.svg \
+	gui/qt/pixmaps/menu/ic_fluent_play_filled.svg \
 	gui/qt/pixmaps/menu/preferences.svg \
 	gui/qt/pixmaps/menu/previous.svg \
 	gui/qt/pixmaps/menu/profile_new.svg \

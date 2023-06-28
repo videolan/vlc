@@ -49,7 +49,7 @@
       <string>Add</string>
      </property>
      <property name="icon" >
-      <iconset resource="../vlc.qrc" >:/menu/play.svg</iconset>
+      <iconset resource="../vlc.qrc" >:/menu/ic_fluent_play_filled.svg</iconset>
      </property>
     </widget>
    </item>

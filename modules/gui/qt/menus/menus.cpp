@@ -579,13 +579,13 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
                 THEMPL->togglePlayPause();
         });
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/play.svg" ) );
+        action->setIcon( QIcon( ":/menu/ic_fluent_play_filled.svg" ) );
 #endif
     }
     else
     {
         action = addMPLStaticEntry( p_intf, menu, qtr( "Pause" ),
-                ":/menu/pause.svg", &PlaylistController::togglePlayPause );
+                ":/menu/ic_pause_filled.svg", &PlaylistController::togglePlayPause );
     }
 
     /* Stop */
