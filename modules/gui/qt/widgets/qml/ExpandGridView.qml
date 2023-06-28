@@ -71,7 +71,7 @@ FocusScope {
 
     readonly property int _contentWidth: width - rightMargin - leftMargin
 
-    property Util.SelectableDelegateModel selectionDelegateModel
+    property ListSelectionModel selectionModel
     property QtAbstractItemModel model
 
     property int currentIndex: 0
@@ -216,7 +216,7 @@ FocusScope {
 
             const oldIndex = currentIndex;
             currentIndex = newIndex;
-            selectionDelegateModel.updateSelection(event.modifiers, oldIndex, newIndex)
+            selectionModel.updateSelection(event.modifiers, oldIndex, newIndex)
 
             // NOTE: We make sure we have the proper visual focus on components.
             if (oldIndex < currentIndex)
@@ -236,7 +236,7 @@ FocusScope {
 
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
-            selectionDelegateModel.select(model.index(0, 0), ItemSelectionModel.Select | ItemSelectionModel.Columns)
+            selectionModel.selectAll()
         } else if ( KeyHelper.matchOk(event) ) {
             event.accepted = true
             actionAtIndex(currentIndex)
@@ -265,7 +265,7 @@ FocusScope {
     }
 
     Connections {
-        target: selectionDelegateModel
+        target: selectionModel
 
         onSelectionChanged: {
             for (let i = 0; i < selected.length; ++i) {
@@ -419,8 +419,8 @@ FocusScope {
     }
 
     function leftClickOnItem(modifier, index) {
-        selectionDelegateModel.updateSelection(modifier, currentIndex, index)
-        if (selectionDelegateModel.isSelected(model.index(index, 0)))
+        selectionModel.updateSelection(modifier, currentIndex, index)
+        if (selectionModel.isSelected(index))
             currentIndex = index
         else if (currentIndex === index) {
             if (_containsItem(currentIndex))
@@ -433,7 +433,7 @@ FocusScope {
     }
 
     function rightClickOnItem(index) {
-        if (!selectionDelegateModel.isSelected(model.index(index, 0))) {
+        if (!selectionModel.isSelected(index)) {
             leftClickOnItem(Qt.NoModifier, index)
         }
     }
@@ -516,7 +516,7 @@ FocusScope {
         item.x = x
         item.y = y
         item.z = _indexToZ(id)
-        item.selected = selectionDelegateModel.isSelected(model.index(id, 0))
+        item.selected = selectionModel.isSelected(id)
 
         return item
     }
@@ -527,7 +527,7 @@ FocusScope {
 
         item.index = id
         item.model = model.getDataAt(id)
-        item.selected = selectionDelegateModel.isSelected(model.index(id, 0))
+        item.selected = selectionModel.isSelected(id)
         item.x = x
         item.y = y
         item.z = _indexToZ(id)
@@ -540,7 +540,7 @@ FocusScope {
 
     function _createItem(id, x, y) {
         const item = delegate.createObject( flickable.contentItem, {
-                        selected: selectionDelegateModel.isSelected(model.index(id, 0)),
+                        selected: selectionModel.isSelected(id),
                         index: id,
                         model: model.getDataAt(id),
                         x: x,
@@ -633,8 +633,8 @@ FocusScope {
                 Helpers.enforceFocus(flickable, Qt.MouseFocusReason)
 
                 if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
-                    if (selectionDelegateModel)
-                        selectionDelegateModel.clear()
+                    if (selectionModel)
+                        selectionModel.clearSelection()
                 }
             }
 

@@ -43,6 +43,12 @@ Item {
 
     property var indexes: []
 
+    // FIXME: This should not be required.
+    //        Qt does not pick the right method overload.
+    //        So we provide this additional information
+    //        in order to pick the right method.
+    property bool indexesFlat: false
+
     property string defaultCover: VLCStyle.noArtAlbumCover
 
     property string defaultText: I18n.qtr("Unknown")

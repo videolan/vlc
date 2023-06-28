@@ -143,7 +143,9 @@ MainInterface.MainViewLoader {
 
         mlModel: model
 
-        indexes: selectionModel.selectedIndexes
+        indexes: indexesFlat ? root.selectionModel.selectedIndexesFlat
+                             : root.selectionModel.selectedIndexes
+        indexesFlat: !!root.selectionModel.selectedIndexesFlat
 
         coverRole: "thumbnail"
 
@@ -173,7 +175,7 @@ MainInterface.MainViewLoader {
 
             model: root.model
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
 
             Navigation.parentItem: root
 
@@ -212,7 +214,7 @@ MainInterface.MainViewLoader {
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
 
-                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos);
+                    contextMenu.popup(selectionModel.selectedRows(), globalMousePos);
                 }
 
                 //---------------------------------------------------------------------------------
@@ -309,7 +311,7 @@ MainInterface.MainViewLoader {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
 
             dragItem: dragItemPlaylist
 
@@ -322,10 +324,10 @@ MainInterface.MainViewLoader {
 
             onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedRows(),
                                                           globalMousePos)
 
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onRightClick: contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
 
             //-------------------------------------------------------------------------------------
             // Childs

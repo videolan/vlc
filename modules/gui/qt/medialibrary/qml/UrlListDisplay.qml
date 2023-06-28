@@ -49,7 +49,9 @@ Widgets.KeyNavigableTableView {
 
     visible: urlModel.count > 0
     model: urlModel
-    selectionDelegateModel: selectionModel
+    selectionModel: ListSelectionModel {
+        model: urlModel
+    }
 
     sortModel: [{
         size: Math.max(listView_id._nbCols - 1, 1),
@@ -88,11 +90,6 @@ Widgets.KeyNavigableTableView {
     MLUrlModel {
         id: urlModel
         ml: MediaLib
-    }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-        model: urlModel
     }
 
     Util.MLContextMenu {

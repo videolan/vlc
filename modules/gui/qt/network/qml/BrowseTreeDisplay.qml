@@ -139,7 +139,7 @@ MainInterface.MainViewLoader {
         MainInterface.MainGridView {
             id: gridView
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             model: root.model
 
             headerDelegate: BrowseTreeHeader {
@@ -267,7 +267,7 @@ MainInterface.MainViewLoader {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             focus: true
 
             Navigation.parentItem: root

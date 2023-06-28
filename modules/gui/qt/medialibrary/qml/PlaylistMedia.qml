@@ -159,8 +159,7 @@ MainInterface.MainTableView {
 
         // NOTE: Move implementation.
         if (dragItem === item) {
-            model.move(modelSelect.selectedIndexes, destinationIndex)
-
+            model.move(selectionModel.selectedRows(), destinationIndex)
         // NOTE: Dropping medialibrary content into the playlist.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             item.getSelectedInputItem()

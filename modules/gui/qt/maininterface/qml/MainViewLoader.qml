@@ -63,7 +63,7 @@ Widgets.StackViewExt {
 
     property var sortModel: []
 
-    property var selectionModel: Util.SelectableDelegateModel {
+    property ItemSelectionModel selectionModel: ListSelectionModel {
         model: root.model
     }
 

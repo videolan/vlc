@@ -83,7 +83,9 @@ MainInterface.MainViewLoader {
 
         mlModel: genreModel
 
-        indexes: selectionModel.selectedIndexes
+        indexes: indexesFlat ? selectionModel.selectedIndexesFlat
+                             : selectionModel.selectedIndexes
+        indexesFlat: !!selectionModel.selectedIndexesFlat
     }
 
     /*
@@ -114,7 +116,7 @@ MainInterface.MainViewLoader {
         MainInterface.MainGridView {
             id: gridView_id
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             model: genreModel
             topMargin: VLCStyle.margin_large
 
@@ -253,7 +255,7 @@ MainInterface.MainViewLoader {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             focus: true
             onActionForSelection: _actionAtIndex(selection)
             Navigation.parentItem: root

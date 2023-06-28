@@ -32,7 +32,10 @@ DragItem {
     property string mlIDRole: "id"
 
     onRequestData: {
-        mlModel.getData(indexes, resolve)
+        if (indexesFlat)
+            mlModel.getDataFlat(indexes, resolve)
+        else
+            mlModel.getData(indexes, resolve)
     }
 
     onRequestInputItems: {

@@ -41,7 +41,6 @@ MainInterface.MainGridView {
 
     //settings
 
-    selectionDelegateModel: selectionModel
     model: sourcesModel
     topMargin: VLCStyle.margin_large
     cellWidth: VLCStyle.gridItem_network_width
@@ -124,11 +123,5 @@ MainInterface.MainGridView {
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
-    }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-
-        model: sourcesModel
     }
 }

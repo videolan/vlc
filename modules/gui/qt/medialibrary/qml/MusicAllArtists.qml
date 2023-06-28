@@ -67,8 +67,9 @@ MainInterface.MainViewLoader {
         id: artistsDragItem
 
         mlModel: artistModel
-        indexes: selectionModel.selectedIndexes
-
+        indexes: indexesFlat ? selectionModel.selectedIndexesFlat
+                             : selectionModel.selectedIndexes
+        indexesFlat: !!selectionModel.selectedIndexesFlat
         defaultCover: VLCStyle.noArtArtistSmall
     }
 
@@ -79,7 +80,7 @@ MainInterface.MainViewLoader {
             id: artistGrid
 
             topMargin: VLCStyle.margin_large
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             model: artistModel
             focus: true
             cellWidth: VLCStyle.colWidth(1)
@@ -178,7 +179,7 @@ MainInterface.MainViewLoader {
                 }
             }]
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             model: artistModel
             focus: true
             dragItem: artistsDragItem

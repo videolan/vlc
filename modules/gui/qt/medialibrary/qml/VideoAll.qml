@@ -114,7 +114,9 @@ MainInterface.MainViewLoader {
 
         mlModel: root.model
 
-        indexes: selectionModel.selectedIndexes
+        indexes: indexesFlat ? selectionModel.selectedIndexesFlat
+                             : selectionModel.selectedIndexes
+        indexesFlat: !!selectionModel.selectedIndexesFlat
 
         coverRole: "thumbnail"
 
@@ -131,7 +133,7 @@ MainInterface.MainViewLoader {
 
             model: root.model
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
 
             headerDelegate: root.header
 
@@ -171,7 +173,7 @@ MainInterface.MainViewLoader {
 
             model: root.model
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
 
             dragItem: root.dragItem
 

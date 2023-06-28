@@ -196,7 +196,7 @@ FocusScope {
                             Connections {
                                 target: albumSelectionModel
 
-                                onSelectionChanged: gridItem.selected = albumSelectionModel.isSelected(albumModel.index(index, 0))
+                                onSelectionChanged: gridItem.selected = albumSelectionModel.isSelected(index)
                             }
 
                             function play() {
@@ -243,7 +243,7 @@ FocusScope {
         let initialIndex = root.initialIndex
         if (initialIndex >= albumModel.count)
             initialIndex = 0
-        albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+        albumSelectionModel.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         const albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
@@ -291,7 +291,7 @@ FocusScope {
         }
     }
 
-    Util.SelectableDelegateModel {
+    ListSelectionModel {
         id: albumSelectionModel
         model: albumModel
     }
@@ -300,7 +300,9 @@ FocusScope {
         id: albumDragItem
 
         mlModel: albumModel
-        indexes: albumSelectionModel.selectedIndexes
+        indexes: indexesFlat ? albumSelectionModel.selectedIndexesFlat
+                             : albumSelectionModel.selectedIndexes
+        indexesFlat: !!albumSelectionModel.selectedIndexesFlat
         defaultCover: VLCStyle.noArtAlbumCover
     }
 
@@ -334,7 +336,7 @@ FocusScope {
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
             headerDelegate: root.header
-            selectionDelegateModel: albumSelectionModel
+            selectionModel: albumSelectionModel
             model: albumModel
 
             Connections {
@@ -422,7 +424,10 @@ FocusScope {
 
             clip: true // content may overflow if not enough space is provided
             model: trackModel
-            selectionDelegateModel: trackSelectionModel
+            selectionModel: ListSelectionModel {
+                model: trackModel
+            }
+
             onActionForSelection: {
                 model.addAndPlay(selection)
             }
@@ -492,13 +497,15 @@ FocusScope {
             Navigation.cancelAction: root._onNavigationCancel
 
             onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-            onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
-            onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
+            onRightClick: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
 
             dragItem: Widgets.MLDragItem {
                 mlModel: trackModel
 
-                indexes: trackSelectionModel.selectedIndexes
+                indexes: indexesFlat ? tableView_id.selectionModel.selectedIndexesFlat
+                                     : tableView_id.selectionModel.selectedIndexes
+                indexesFlat: !!tableView_id.selectionModel.selectedIndexesFlat
 
                 defaultCover: VLCStyle.noArtArtistCover
             }
@@ -507,12 +514,6 @@ FocusScope {
                 id: tableColumns
 
                 showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
-            }
-
-            Util.SelectableDelegateModel {
-                id: trackSelectionModel
-
-                model: trackModel
             }
         }
     }

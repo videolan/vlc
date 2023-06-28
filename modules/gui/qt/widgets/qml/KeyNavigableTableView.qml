@@ -73,7 +73,7 @@ FocusScope {
     property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0
 
-    property Util.SelectableDelegateModel selectionDelegateModel
+    property ListSelectionModel selectionModel
     property real rowHeight: VLCStyle.tableRow_height
 
     property real availableRowWidth: 0
@@ -234,18 +234,18 @@ FocusScope {
 
         Navigation.parentItem: root
 
-        onSelectAll: selectionDelegateModel.selectAll()
-        onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( selectionDelegateModel.selectedIndexes )
+        onSelectAll: selectionModel.selectAll()
+        onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+        onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
 
         onDeselectAll: {
-            if (selectionDelegateModel) {
-                selectionDelegateModel.clear()
+            if (selectionModel) {
+                selectionModel.clearSelection()
             }
         }
 
         onShowContextMenu: {
-            if (selectionDelegateModel.hasSelection)
+            if (selectionModel.hasSelection)
                 root.rightClick(null, null, globalPos);
         }
 
@@ -382,7 +382,7 @@ FocusScope {
             rowModel: model
             sortModel: root.sortModel
 
-            selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
+            selected: selectionModel.selectedIndexesFlat.includes(index)
 
             acceptDrop: root.acceptDrop
 
@@ -396,7 +396,7 @@ FocusScope {
             onDropEvent: root.dropEvent(tableDelegate, index, drag, drop, before)
 
             onSelectAndFocus:  {
-                selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)
+                selectionModel.updateSelection(modifiers, view.currentIndex, index)
 
                 view.currentIndex = index
                 view.positionViewAtIndex(index, ListView.Contain)
@@ -405,11 +405,11 @@ FocusScope {
             }
 
             Connections {
-                target: selectionDelegateModel
+                target: selectionModel
 
                 onSelectionChanged: {
                     tableDelegate.selected = Qt.binding(function() {
-                      return  selectionDelegateModel.isSelected(root.model.index(index, 0))
+                      return root.selectionModel.selectedIndexesFlat.includes(index)
                     })
                 }
             }

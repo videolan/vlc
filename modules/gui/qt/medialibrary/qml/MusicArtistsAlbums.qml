@@ -112,7 +112,7 @@ FocusScope {
         }
     }
 
-    Util.SelectableDelegateModel {
+    ListSelectionModel {
         id: selectionModel
         model: artistModel
     }

@@ -162,7 +162,7 @@ FocusScope {
 
     // Children
 
-    Util.SelectableDelegateModel {
+    ListSelectionModel {
         id: modelSelect
 
         model: root.model
@@ -197,7 +197,7 @@ FocusScope {
 
             headerDelegate: root.header
 
-            selectionDelegateModel: modelSelect
+            selectionModel: modelSelect
 
             Navigation.parentItem: root
 
@@ -292,7 +292,7 @@ FocusScope {
 
             header: root.header
 
-            selectionDelegateModel: modelSelect
+            selectionModel: modelSelect
 
             Navigation.parentItem: root
 

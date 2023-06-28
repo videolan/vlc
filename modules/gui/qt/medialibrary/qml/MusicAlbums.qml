@@ -81,7 +81,9 @@ MainInterface.MainViewLoader {
         id: albumDragItem
 
         mlModel: albumModelId
-        indexes: selectionModel.selectedIndexes
+        indexes: indexesFlat ? selectionModel.selectedIndexesFlat
+                             : selectionModel.selectedIndexes
+        indexesFlat: !!selectionModel.selectedIndexesFlat
         defaultCover: VLCStyle.noArtAlbumCover
     }
 
@@ -104,7 +106,7 @@ MainInterface.MainViewLoader {
 
             headerDelegate: root.header
 
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             model: albumModelId
 
             delegate: AudioGridItem {
@@ -232,7 +234,7 @@ MainInterface.MainViewLoader {
             }]
 
             model: albumModelId
-            selectionDelegateModel: selectionModel
+            selectionModel: root.selectionModel
             onActionForSelection: _actionAtIndex(selection[0]);
             Navigation.parentItem: root
             section.property: "title_first_symbol"

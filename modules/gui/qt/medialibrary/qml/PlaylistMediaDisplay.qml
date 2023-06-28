@@ -88,7 +88,7 @@ FocusScope {
         else
             index = 0
 
-        modelSelect.select(model.index(index, 0), ItemSelectionModel.ClearAndSelect)
+        view.selectionModel.select(model.index(index, 0), ItemSelectionModel.ClearAndSelect);
 
         view.positionViewAtIndex(index, ItemView.Contain)
 
@@ -99,7 +99,7 @@ FocusScope {
 
     function onDelete()
     {
-        const indexes = modelSelect.selectedIndexes;
+        const indexes = view.selectionModel.selectedIndexes;
 
         if (indexes.length === 0)
             return;
@@ -119,7 +119,7 @@ FocusScope {
             //       from 'onModelReset' only ?
             dragItem.Drag.cancel();
 
-            if (count === 0 || modelSelect.hasSelection)
+            if (count === 0 || view.selectionModel.hasSelection)
                 return;
 
             resetFocus();
@@ -131,18 +131,15 @@ FocusScope {
 
         mlModel: model
 
-        indexes: modelSelect.selectedIndexes
+        indexes: indexesFlat ? view.selectionModel.selectedIndexesFlat
+                             : view.selectionModel.selectedIndexes
+        indexesFlat: !!view.selectionModel.selectedIndexesFlat
 
         coverRole: "thumbnail"
 
         defaultCover: root._placeHolder
     }
 
-    Util.SelectableDelegateModel {
-        id: modelSelect
-
-        model: root.model
-    }
 
     PlaylistMediaContextMenu {
         id: contextMenu
@@ -164,7 +161,9 @@ FocusScope {
 
         model: root.model
 
-        selectionDelegateModel: modelSelect
+        selectionModel: ListSelectionModel {
+            model: root.model
+        }
 
         dragItem: root.dragItem
 
@@ -199,10 +198,10 @@ FocusScope {
 
         // Events
 
-        onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
+        onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedRows(),
                                                       globalMousePos)
 
-        onRightClick: contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
+        onRightClick: contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
 
         // Keys
 

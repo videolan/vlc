@@ -47,7 +47,7 @@ FocusScope {
 
     property alias isSearchable: tracklistdisplay_id.isSearchable
     property alias model: tracklistdisplay_id.model
-    property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
+    property alias selectionModel: tracklistdisplay_id.selectionModel
 
     function setCurrentItemFocus(reason) {
         tracklistdisplay_id.setCurrentItemFocus(reason);

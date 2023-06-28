@@ -64,7 +64,9 @@ public:
     Q_INVOKABLE void sortByColumn(QByteArray criteria, Qt::SortOrder order);
 
     Q_INVOKABLE void getData(const QModelIndexList &indexes, QJSValue callback);
-
+    // FIXME: Qt does not pick the right method overload: (reinvestigate Qt 6)
+    //        Ideally it should be named the same.
+    Q_INVOKABLE void getDataFlat(const QVector<int> &indexList, QJSValue callback);
     QVariant data(const QModelIndex &index, int role) const override final;
 
 public:

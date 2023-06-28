@@ -129,7 +129,6 @@ quint64 MLBaseModel::loadItems(const QVector<int> &indexes, MLBaseModel::ItemCal
     return m_itemLoader->loadItemsTask(d->m_offset, indexes, cb);
 }
 
-
 void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
 {
     if (!callback.isCallable()) // invalid argument
@@ -140,9 +139,17 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
                    , std::back_inserter(indx)
                    , std::mem_fn(&QModelIndex::row));
 
+    getDataFlat(indx, callback);
+}
+
+void MLBaseModel::getDataFlat(const QVector<int> &indexes, QJSValue callback)
+{
+    if (!callback.isCallable()) // invalid argument
+        return;
+
     std::shared_ptr<quint64> requestId = std::make_shared<quint64>();
 
-    ItemCallback cb = [this, indxSize = indx.size(), callback, requestId]
+    ItemCallback cb = [this, indxSize = indexes.size(), callback, requestId]
     (quint64 id, std::vector<std::unique_ptr<MLItem>> &items) mutable
     {
         auto jsEngine = qjsEngine(this);
@@ -169,7 +176,7 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
         callback.call({jsArray});
     };
 
-    *requestId = loadItems(indx, cb);
+    *requestId = loadItems(indexes, cb);
 }
 
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const

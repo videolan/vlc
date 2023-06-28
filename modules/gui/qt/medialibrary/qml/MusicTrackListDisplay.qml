@@ -178,7 +178,9 @@ Widgets.KeyNavigableTableView {
     section.property: "title_first_symbol"
 
     model: rootmodel
-    selectionDelegateModel: selectionModel
+    selectionModel: ListSelectionModel {
+        model: rootmodel
+    }
     rowHeight: VLCStyle.tableCoverRow_height
 
     onActionForSelection:  model.addAndPlay(selection)
@@ -187,7 +189,9 @@ Widgets.KeyNavigableTableView {
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
     dragItem: Widgets.MLDragItem {
-        indexes: selectionModel.selectedIndexes
+        indexes: indexesFlat ? root.selectionModel.selectedIndexesFlat
+                             : root.selectionModel.selectedIndexes
+        indexesFlat: !!root.selectionModel.selectedIndexesFlat
 
         mlModel: model
     }
@@ -213,12 +217,6 @@ Widgets.KeyNavigableTableView {
                 section.property = ""
             }
         }
-    }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-
-        model: rootmodel
     }
 
     Util.MLContextMenu {
