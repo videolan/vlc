@@ -311,8 +311,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/proxycolumnmodel.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
 	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
-	gui/qt/util/selectable_list_model.cpp \
-	gui/qt/util/selectable_list_model.hpp \
 	gui/qt/util/singleton.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
@@ -511,7 +509,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/effects_image_provider.moc.cpp \
 	gui/qt/util/flickable_scroll_handler.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
-	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
