@@ -25,14 +25,15 @@
 
 #include "playlist_common.hpp"
 #include "playlist_item.hpp"
-#include "util/selectable_list_model.hpp"
 #include "util/vlctick.hpp"
+
+#include <QAbstractListModel>
 
 namespace vlc {
 namespace playlist {
 
 class PlaylistListModelPrivate;
-class PlaylistListModel : public SelectableListModel
+class PlaylistListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(Playlist playlist READ getPlaylist WRITE setPlaylist NOTIFY playlistChanged FINAL)
@@ -48,8 +49,7 @@ public:
         IsCurrentRole,
         ArtistRole,
         AlbumRole,
-        ArtworkRole,
-        SelectedRole,
+        ArtworkRole
     };
 
     PlaylistListModel(QObject *parent = nullptr);
@@ -72,11 +72,6 @@ public:
     int getCurrentIndex() const;
 
     Q_INVOKABLE QVariantList getItemsForIndexes(const QVector<int> & indexes) const;
-
-protected:
-    bool isRowSelected(int row) const override;
-    void setRowSelected(int row, bool selected) override;
-    int getSelectedRole() const override;
 
 public slots:
     Playlist getPlaylist() const;
