@@ -744,14 +744,14 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/profile_new.svg \
 	gui/qt/pixmaps/menu/record.svg \
 	gui/qt/pixmaps/menu/remove.svg \
-	gui/qt/pixmaps/menu/repeat_all.svg \
+	gui/qt/pixmaps/menu/ic_fluent_arrow_repeat_all.svg \
 	gui/qt/pixmaps/menu/repeat_off.svg \
-	gui/qt/pixmaps/menu/repeat_one.svg \
+	gui/qt/pixmaps/menu/ic_fluent_arrow_repeat_1.svg \
 	gui/qt/pixmaps/menu/search_clear.svg \
 	gui/qt/pixmaps/menu/settings.svg \
 	gui/qt/pixmaps/menu/skip_for.svg \
 	gui/qt/pixmaps/menu/skip_back.svg \
-	gui/qt/pixmaps/menu/shuffle_on.svg \
+	gui/qt/pixmaps/menu/ic_fluent_arrow_shuffle.svg \
 	gui/qt/pixmaps/menu/slower.svg \
 	gui/qt/pixmaps/menu/stop.svg \
 	gui/qt/pixmaps/menu/stream.svg \

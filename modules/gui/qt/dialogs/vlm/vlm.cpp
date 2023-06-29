@@ -529,7 +529,7 @@ void VLMBroadcast::update()
 {
     vlm->EditBroadcast( name, input, inputOptions, output, b_enabled, b_looped );
     if( b_looped )
-        loopButton->setIcon( QIcon( ":/menu/repeat_all.svg" ) );
+        loopButton->setIcon( QIcon( ":/menu/ic_fluent_arrow_repeat_all.svg" ) );
     else
         loopButton->setIcon( QIcon( ":/menu/repeat_off.svg" ) );
 }

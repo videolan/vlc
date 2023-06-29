@@ -38,12 +38,12 @@
         <file alias="profile_new.svg">pixmaps/menu/profile_new.svg</file>
         <file alias="record.svg">pixmaps/menu/record.svg</file>
         <file alias="remove.svg">pixmaps/menu/remove.svg</file>
-        <file alias="repeat_all.svg">pixmaps/menu/repeat_all.svg</file>
+        <file alias="ic_fluent_arrow_repeat_all.svg">pixmaps/menu/ic_fluent_arrow_repeat_all.svg</file>
         <file alias="repeat_off.svg">pixmaps/menu/repeat_off.svg</file>
-        <file alias="repeat_one.svg">pixmaps/menu/repeat_one.svg</file>
+        <file alias="ic_fluent_arrow_repeat_1.svg">pixmaps/menu/ic_fluent_arrow_repeat_1.svg</file>
         <file alias="search_clear.svg">pixmaps/menu/search_clear.svg</file>
         <file alias="settings.svg">pixmaps/menu/settings.svg</file>
-        <file alias="shuffle_on.svg">pixmaps/menu/shuffle_on.svg</file>
+        <file alias="ic_fluent_arrow_shuffle.svg">pixmaps/menu/ic_fluent_arrow_shuffle.svg</file>
         <file alias="skip_fw.svg">pixmaps/menu/skip_for.svg</file>
         <file alias="skip_back.svg">pixmaps/menu/skip_back.svg</file>
         <file alias="slower.svg">pixmaps/menu/slower.svg</file>
