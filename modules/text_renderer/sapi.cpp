@@ -2,9 +2,11 @@
  * sapi.cpp: Simple text to Speech renderer for Windows, based on SAPI
  *****************************************************************************
  * Copyright (c) 2015 Moti Zilberman
+ * Copyright (c) 2023 Videolabs
  *
  * Authors: Moti Zilberman
  *          Jean-Baptiste Kempf
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * The MIT License (MIT)
  *
@@ -230,5 +232,6 @@ static int RenderText(filter_t *p_filter,
         }
     }
 
-    return VLC_SUCCESS;
+    /* Return an error since we won't render the subtitle into pixmap. */
+    return VLC_ENOTSUP;
 }
