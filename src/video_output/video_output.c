@@ -1915,8 +1915,7 @@ void vout_Close(vout_thread_t *vout)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
-    if (sys->display != NULL)
-        vout_Stop(vout);
+    vout_Stop(vout);
 
     vout_IntfDeinit(VLC_OBJECT(vout));
     vout_snapshot_End(sys->snapshot);
