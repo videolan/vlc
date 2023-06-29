@@ -110,13 +110,19 @@ static int Create (filter_t *p_filter)
 
     p_filter->p_sys = p_sys = (filter_sys_t*) malloc(sizeof(filter_sys_t));
     if (!p_sys)
-        goto error;
+        return VLC_ENOMEM;
 
     p_sys->cpVoice = NULL;
     p_sys->lastString = NULL;
 
     hr = CoCreateInstance(__uuidof(SpVoice), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_sys->cpVoice));
-    if (SUCCEEDED(hr)) {
+    if (!SUCCEEDED(hr))
+    {
+        msg_Err(p_filter, "Could not create SpVoice");
+        free(p_sys);
+        return VLC_ENOTSUP;
+    }
+
         ISpObjectToken*        cpVoiceToken = NULL;
         IEnumSpObjectTokens*   cpEnum = NULL;
         ULONG ulCount = 0;
@@ -154,20 +160,10 @@ static int Create (filter_t *p_filter)
             /* Set Output */
             hr = p_sys->cpVoice->SetOutput(NULL, TRUE);
         }
-    }
-    else
-    {
-        msg_Err(p_filter, "Could not create SpVoice");
-        goto error;
-    }
 
     p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
-
-error:
-    free(p_sys);
-    return VLC_EGENERIC;
 }
 
 static void Destroy(filter_t *p_filter)
