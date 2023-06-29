@@ -49,6 +49,12 @@ Item {
         }
         gesturePolicy: TapHandler.DragThreshold
     }
+
+    HoverHandler {
+        // explicitely set cursor shape here so no other control can interfere, causing confusion (see #28115)
+        cursorShape: Qt.ArrowCursor
+    }
+
     DragHandler {
         target: null
         grabPermissions: TapHandler.CanTakeOverFromAnything
