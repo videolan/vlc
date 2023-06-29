@@ -64,7 +64,7 @@ vlc_module_begin ()
 
  set_callback_text_renderer(Create, 0)
  /* Note: Skip label translation - too technical */
- add_integer("sapi-voice", -1, "Voice Index", nullptr)
+ add_integer("sapi-voice", -1, "Voice Index", "Voice Index")
 vlc_module_end ()
 
 namespace {
