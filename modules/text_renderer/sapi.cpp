@@ -68,7 +68,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 namespace {
-struct filter_sys_t
+struct filter_sapi
 {
     ISpVoice* cpVoice;
     char* lastString;
@@ -148,14 +148,14 @@ static const struct vlc_filter_operations filter_ops = []{
 
 static int Create (filter_t *p_filter)
 {
-    filter_sys_t *p_sys;
+    struct filter_sapi *p_sys;
     HRESULT hr;
 
     MTAGuard guard {};
     if (FAILED(guard.result_mta))
         return VLC_EGENERIC;
 
-    p_filter->p_sys = p_sys = (filter_sys_t*) malloc(sizeof(filter_sys_t));
+    p_filter->p_sys = p_sys = static_cast<decltype(p_sys)>(malloc(sizeof(*p_sys)));
     if (!p_sys)
         return VLC_ENOMEM;
 
@@ -180,7 +180,7 @@ static int Create (filter_t *p_filter)
 
 static void Destroy(filter_t *p_filter)
 {
-    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
+    struct filter_sapi *p_sys = reinterpret_cast<struct filter_sapi *>( p_filter->p_sys );
 
     if (p_sys->cpVoice)
         p_sys->cpVoice->Release();
@@ -194,7 +194,7 @@ static int RenderText(filter_t *p_filter,
         subpicture_region_t *p_region_in,
         const vlc_fourcc_t *)
 {
-    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
+    struct filter_sapi *p_sys = reinterpret_cast<struct filter_sapi *>( p_filter->p_sys );
     text_segment_t *p_segment = p_region_in->p_text;
 
     if (!p_segment)
