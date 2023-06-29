@@ -107,30 +107,30 @@ static int SelectVoice(filter_t *filter, ISpVoice* cpVoice)
     if (!SUCCEEDED(hr))
         return -ENOENT;
 
-        // Get the number of voices.
-        hr = cpEnum->GetCount(&ulCount);
-        if (!SUCCEEDED (hr))
-            goto error;
+    // Get the number of voices.
+    hr = cpEnum->GetCount(&ulCount);
+    if (!SUCCEEDED (hr))
+        goto error;
 
-                if ((unsigned)voiceIndex >= ulCount) {
-                    msg_Err(filter, "Voice index exceeds available count");
-                    cpEnum->Release();
-                    return -EINVAL;
-                }
-                    hr = cpEnum->Item(voiceIndex, &cpVoiceToken);
-                    if (!SUCCEEDED(hr))
-                        goto error;
-
-                        hr = cpVoice->SetVoice(cpVoiceToken);
-                        if (SUCCEEDED(hr)) {
-                            msg_Dbg(filter, "Selected voice %d", voiceIndex);
-                        }
-                        else {
-                            msg_Err(filter, "Failed to set voice %d", voiceIndex);
-                        }
-                        cpVoiceToken->Release();
-                        cpVoiceToken = NULL;
+    if ((unsigned)voiceIndex >= ulCount) {
+        msg_Err(filter, "Voice index exceeds available count");
         cpEnum->Release();
+        return -EINVAL;
+    }
+    hr = cpEnum->Item(voiceIndex, &cpVoiceToken);
+    if (!SUCCEEDED(hr))
+        goto error;
+
+    hr = cpVoice->SetVoice(cpVoiceToken);
+    if (SUCCEEDED(hr)) {
+        msg_Dbg(filter, "Selected voice %d", voiceIndex);
+    }
+    else {
+        msg_Err(filter, "Failed to set voice %d", voiceIndex);
+    }
+    cpVoiceToken->Release();
+    cpVoiceToken = NULL;
+    cpEnum->Release();
 
     return voiceIndex;
 
