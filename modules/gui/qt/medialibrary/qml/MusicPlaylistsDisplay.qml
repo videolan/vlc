@@ -98,11 +98,8 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
-            onShowList: {
-                History.push(["mc", "music", "playlists", "list",
-                             { parentId: model.id, name: model.name }]);
-
-            }
+            onShowList: History.push(["mc", "music", "playlists", "list",
+                                      { parentId: model.id, name: model.name }], reason)
         }
     }
 

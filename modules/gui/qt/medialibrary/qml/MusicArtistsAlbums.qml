@@ -69,19 +69,13 @@ FocusScope {
             return
         }
 
-        if (artistModel.count === 0) {
-            return
-        }
-        let initialIndex = root.initialIndex
-        if (initialIndex >= artistModel.count)
-            initialIndex = 0
-        if (initialIndex !== artistList.currentIndex) {
-            selectionModel.select(artistModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            if (artistList) {
-                artistList.currentIndex = initialIndex
-                artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
-            }
-        }
+        if (model.count === 0 || initialIndex === -1) return
+
+        selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+
+        artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
+
+        artistList.setCurrentItem(initialIndex)
     }
 
     function setCurrentItemFocus(reason) {
@@ -101,12 +95,10 @@ FocusScope {
         ml: MediaLib
 
         onCountChanged: {
-            if (artistModel.count > 0 && !selectionModel.hasSelection) {
-                let initialIndex = root.initialIndex
-                if (initialIndex >= artistModel.count)
-                    initialIndex = 0
-                artistList.currentIndex = initialIndex
-            }
+            if (count === 0 || selectionModel.hasSelection)
+                return
+
+            root.resetFocus()
         }
 
         onDataChanged: {
@@ -167,10 +159,15 @@ FocusScope {
             }
 
             Navigation.cancelAction: function() {
-                if (artistList.currentIndex <= 0)
+                if (artistList.currentIndex <= 0) {
                     root.Navigation.defaultNavigationCancel()
-                else
-                    artistList.currentIndex = 0;
+
+                    return
+                }
+
+                artistList.positionViewAtIndex(0, ItemView.Contain)
+
+                artistList.setCurrentItem(0)
             }
 
             header: Widgets.SubtitleLabel {
