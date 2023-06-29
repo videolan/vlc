@@ -73,31 +73,23 @@ struct filter_sys_t
     ISpVoice* cpVoice;
     char* lastString;
 };
-}
 
-/* MTA functions */
-static int TryEnterMTA(vlc_object_t *obj)
+struct MTAGuard
 {
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (unlikely(FAILED(hr)))
+    HRESULT result_mta;
+
+    MTAGuard()
     {
-        msg_Err (obj, "cannot initialize COM (error 0x%lX)", hr);
-        return -1;
+        this->result_mta = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     }
-    return 0;
-}
-#define TryEnterMTA(o) TryEnterMTA(VLC_OBJECT(o))
 
-static void EnterMTA(void)
-{
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (unlikely(FAILED(hr)))
-        abort();
-}
+    ~MTAGuard()
+    {
+        if (SUCCEEDED(this->result_mta))
+            CoUninitialize();
+    }
 
-static void LeaveMTA(void)
-{
-    CoUninitialize();
+};
 }
 
 static const struct FilterOperationInitializer {
@@ -114,7 +106,8 @@ static int Create (filter_t *p_filter)
     filter_sys_t *p_sys;
     HRESULT hr;
 
-    if (TryEnterMTA(p_filter))
+    MTAGuard guard {};
+    if (FAILED(guard.result_mta))
         return VLC_EGENERIC;
 
     p_filter->p_sys = p_sys = (filter_sys_t*) malloc(sizeof(filter_sys_t));
@@ -170,14 +163,11 @@ static int Create (filter_t *p_filter)
         goto error;
     }
 
-    LeaveMTA();
-
     p_filter->ops = &filter_ops.ops;
 
     return VLC_SUCCESS;
 
 error:
-    LeaveMTA();
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -225,14 +215,15 @@ static int RenderText(filter_t *p_filter,
         if (p_sys->lastString) {
             msg_Dbg(p_filter, "Speaking '%s'", s->psz_text);
 
-            EnterMTA();
+            MTAGuard guard {};
+            if (FAILED(guard.result_mta))
+                abort();
             wchar_t* wideText = ToWide(s->psz_text);
             HRESULT hr = p_sys->cpVoice->Speak(wideText, SPF_ASYNC, NULL);
             free(wideText);
             if (!SUCCEEDED(hr)) {
                 msg_Err(p_filter, "Speak() error");
             }
-            LeaveMTA();
         }
     }
 
