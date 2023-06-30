@@ -19,7 +19,7 @@
         <file alias="download.svg">pixmaps/menu/download.svg</file>
         <file alias="eject.svg">pixmaps/menu/eject.svg</file>
         <file alias="exit.svg">pixmaps/menu/exit.svg</file>
-        <file alias="faster.svg">pixmaps/menu/faster.svg</file>
+        <file alias="ic_fluent_fast_forward.svg">pixmaps/menu/ic_fluent_fast_forward.svg</file>
         <file alias="file.svg">pixmaps/menu/file.svg</file>
         <file alias="folder.svg">pixmaps/menu/folder.svg</file>
         <file alias="help.svg">pixmaps/menu/help.svg</file>
@@ -41,12 +41,12 @@
         <file alias="ic_fluent_arrow_repeat_all.svg">pixmaps/menu/ic_fluent_arrow_repeat_all.svg</file>
         <file alias="repeat_off.svg">pixmaps/menu/repeat_off.svg</file>
         <file alias="ic_fluent_arrow_repeat_1.svg">pixmaps/menu/ic_fluent_arrow_repeat_1.svg</file>
+        <file alias="ic_fluent_rewind.svg">pixmaps/menu/ic_fluent_rewind.svg</file>
         <file alias="search_clear.svg">pixmaps/menu/search_clear.svg</file>
         <file alias="settings.svg">pixmaps/menu/settings.svg</file>
         <file alias="ic_fluent_arrow_shuffle.svg">pixmaps/menu/ic_fluent_arrow_shuffle.svg</file>
         <file alias="skip_fw.svg">pixmaps/menu/skip_for.svg</file>
         <file alias="skip_back.svg">pixmaps/menu/skip_back.svg</file>
-        <file alias="slower.svg">pixmaps/menu/slower.svg</file>
         <file alias="stop.svg">pixmaps/menu/stop.svg</file>
         <file alias="stream.svg">pixmaps/menu/stream.svg</file>
         <file alias="sync.svg">pixmaps/menu/sync.svg</file>

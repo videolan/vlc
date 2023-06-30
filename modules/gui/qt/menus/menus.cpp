@@ -626,17 +626,17 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
         action = rateMenu->addAction( qtr( "&Faster" ), THEMIM,
                                   &PlayerController::faster );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/faster.svg") );
+        action->setIcon( QIcon( ":/menu/ic_fluent_fast_forward.svg") );
 #endif
     }
 
-    action = rateMenu->addAction( QIcon( ":/menu/faster.svg" ), qtr( "Faster (fine)" ), THEMIM,
+    action = rateMenu->addAction( QIcon( ":/menu/ic_fluent_fast_forward.svg" ), qtr( "Faster (fine)" ), THEMIM,
                               &PlayerController::littlefaster );
 
     action = rateMenu->addAction( qtr( "N&ormal Speed" ), THEMIM,
                               &PlayerController::normalRate );
 
-    action = rateMenu->addAction( QIcon( ":/menu/slower.svg" ), qtr( "Slower (fine)" ), THEMIM,
+    action = rateMenu->addAction( QIcon( ":/menu/ic_fluent_rewind.svg" ), qtr( "Slower (fine)" ), THEMIM,
                               &PlayerController::littleslower );
 
     if( b_normal )
@@ -644,7 +644,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
         action = rateMenu->addAction( qtr( "Slo&wer" ), THEMIM,
                                   &PlayerController::slower );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/slower.svg") );
+        action->setIcon( QIcon( ":/menu/ic_fluent_rewind.svg") );
 #endif
     }
 
