@@ -29,12 +29,12 @@
         <file alias="movie.svg">pixmaps/menu/movie.svg</file>
         <file alias="music.svg">pixmaps/menu/music.svg</file>
         <file alias="network.svg">pixmaps/menu/network.svg</file>
-        <file alias="next.svg">pixmaps/menu/next.svg</file>
+        <file alias="ic_fluent_next.svg">pixmaps/menu/ic_fluent_next.svg</file>
         <file alias="ic_pause_filled.svg">pixmaps/menu/ic_pause_filled.svg</file>
         <file alias="playlist.svg">pixmaps/menu/playlist.svg</file>
         <file alias="ic_fluent_play_filled.svg">pixmaps/menu/ic_fluent_play_filled.svg</file>
         <file alias="preferences.svg">pixmaps/menu/preferences.svg</file>
-        <file alias="previous.svg">pixmaps/menu/previous.svg</file>
+        <file alias="ic_fluent_previous.svg">pixmaps/menu/ic_fluent_previous.svg</file>
         <file alias="profile_new.svg">pixmaps/menu/profile_new.svg</file>
         <file alias="record.svg">pixmaps/menu/record.svg</file>
         <file alias="remove.svg">pixmaps/menu/remove.svg</file>
