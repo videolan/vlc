@@ -33,7 +33,7 @@
 #include <vlc_picture.h>
 #include <vlc_codec.h>
 
-#include <mfx/mfxvideo.h>
+#include <vpl/mfxvideo.h>
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"
 

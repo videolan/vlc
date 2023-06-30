@@ -618,9 +618,9 @@ EXTRA_LTLIBRARIES += libcrystalhd_plugin.la
 codec_LTLIBRARIES += $(LTLIBcrystalhd)
 
 libqsv_plugin_la_SOURCES = codec/qsv.c
-libqsv_plugin_la_CFLAGS = $(AM_CFLAGS) $(MFX_CFLAGS)
+libqsv_plugin_la_CFLAGS = $(AM_CFLAGS) $(VPL_CFLAGS)
 libqsv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libqsv_plugin_la_LIBADD = $(MFX_LIBS)
+libqsv_plugin_la_LIBADD = $(VPL_LIBS)
 EXTRA_LTLIBRARIES += libqsv_plugin.la
 codec_LTLIBRARIES += $(LTLIBqsv)
 
