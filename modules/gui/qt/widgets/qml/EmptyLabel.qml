@@ -23,14 +23,12 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-FocusScope {
+T.Control {
     id: root
 
     // Aliases
 
     default property alias contents: column.data
-
-    property alias spacing: column.spacing
 
     property alias cover: cover.source
 
@@ -41,7 +39,10 @@ FocusScope {
 
     property alias column: column
 
+    spacing: VLCStyle.margin_small
+
     enabled: visible
+
     Accessible.role: Accessible.Pane
     Accessible.name: I18n.qtr("Empty view")
 
@@ -59,7 +60,7 @@ FocusScope {
 
         width: root.width
 
-        spacing: VLCStyle.margin_small
+        spacing: root.spacing
 
         Item {
             width: parent.width

@@ -54,9 +54,7 @@ MainInterface.MainViewLoader {
 
     signal browse(var tree, int reason)
 
-    Navigation.cancelAction: function() {
-        History.previous(Qt.BacktabFocusReason)
-    }
+    // Settings
 
     model: SortFilterProxyModel {
         id: filterModel
@@ -69,7 +67,12 @@ MainInterface.MainViewLoader {
     list: tableComponent
 
     loadingComponent: emptyLabelComponent
+
     emptyLabel: emptyLabelComponent
+
+    Navigation.cancelAction: function() {
+        History.previous(Qt.BacktabFocusReason)
+    }
 
     onTreeChanged: providerModel.tree = tree
 
@@ -310,17 +313,22 @@ MainInterface.MainViewLoader {
         FocusScope {
             id: focusScope
 
+            // NOTE: This is required to pass the focusReason when the current view changes in
+            //       MainViewLoader.
+            property int focusReason: (header.activeFocus) ? header.focusReason
+                                                           : emptyLabel.focusReason
+
             Navigation.navigable: layout.Navigation.navigable || (emptyLabel.visible && emptyLabel.button.enabled)
 
             // used by MainDisplay to transfer focus
             function setCurrentItemFocus(reason) {
-                if (!focusScope.Navigation.navigable)
+                if (!Navigation.navigable)
                     return
 
                 if (header.Navigation.navigable)
-                    header.forceActiveFocus(reason)
+                    Helpers.enforceFocus(header, reason)
                 else
-                    emptyLabel.forceActiveFocus(reason)
+                    Helpers.enforceFocus(emptyLabel, reason)
             }
 
             ColumnLayout {

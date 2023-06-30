@@ -16,8 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
 import QtQuick.Layouts 1.11
+import QtQuick.Templates 2.12 as T
 
 import org.videolan.vlc 0.1
 
@@ -26,7 +28,7 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-FocusScope {
+T.Control {
     id: root
 
     // Network* model
@@ -38,16 +40,16 @@ FocusScope {
         colorSet: ColorContext.View
     }
 
-    property int leftPadding: VLCStyle.margin_large
-    property int rightPadding: VLCStyle.margin_small
-
-    property int topPadding: VLCStyle.margin_large
-    property int bottomPadding: VLCStyle.margin_normal
-
     height: implicitHeight
     implicitHeight: layout.implicitHeight + topPadding + bottomPadding
 
+    leftPadding: VLCStyle.margin_large
+    rightPadding: VLCStyle.margin_small
+    topPadding: VLCStyle.margin_large
+    bottomPadding: VLCStyle.margin_normal
+
     focus: medialibraryBtn.visible
+
     Navigation.navigable: medialibraryBtn.visible
 
     RowLayout {
