@@ -60,9 +60,10 @@ endif
 	$(MAKECONFIGURE) $(GETTEXT_CONF)
 	+$(MAKEBUILD) -C gettext-runtime
 ifndef HAVE_ANDROID
-	# build libgettextpo first so we can use its textstyle.h
+	# build libgettextpo first so we can use its textstyle.h and unistd.h (fsync)
 	+$(MAKEBUILD) -C gettext-tools -C libgettextpo
 	cd $(BUILD_DIR) && cp gettext-tools/libgettextpo/textstyle.h gettext-tools/src/textstyle.h
+	cd $(BUILD_DIR) && cp gettext-tools/libgettextpo/unistd.h    gettext-tools/src/unistd.h
 	+$(MAKEBUILD) -C gettext-tools
 	+$(MAKEBUILD) -C gettext-tools install
 else
