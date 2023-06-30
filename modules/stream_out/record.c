@@ -83,6 +83,7 @@ typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 struct sout_stream_id_sys_t
 {
     es_format_t fmt;
+    const char *es_id;
 
     block_t *p_first;
     block_t **pp_last;
@@ -190,7 +191,9 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( !id )
         return NULL;
 
+
     es_format_Copy( &id->fmt, p_fmt );
+    id->es_id = NULL; /* Will be copied once added to `pf_add` */
     id->p_first = NULL;
     id->pp_last = &id->p_first;
     id->id = NULL;
@@ -218,7 +221,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         sout_StreamIdDel( p_sys->p_out, id->id );
 
     es_format_Clean( &id->fmt );
-
+    
     TAB_REMOVE( p_sys->i_id, p_sys->id, id );
 
     if( p_sys->i_id <= 0 )
@@ -372,7 +375,7 @@ static int OutputNew( sout_stream_t *p_stream,
     {
         sout_stream_id_sys_t *id = p_sys->id[i];
 
-        id->id = sout_StreamIdAdd( p_sys->p_out, &id->fmt, NULL );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->fmt, id->es_id );
         if( id->id )
             i_count++;
     }
