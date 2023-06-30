@@ -52,6 +52,7 @@ namespace DLNA
 struct sout_stream_id_sys_t
 {
     es_format_t           fmt;
+    const char            *es_id;
     sout_stream_id_sys_t  *p_sub_id;
 };
 
@@ -194,7 +195,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     {
         sout_stream_id_sys_t *p_sys_id = *it;
         p_sys_id->p_sub_id = static_cast<sout_stream_id_sys_t *>(
-                sout_StreamIdAdd( p_out, &p_sys_id->fmt, NULL ) );
+            sout_StreamIdAdd( p_out, &p_sys_id->fmt, p_sys_id->es_id ) );
         if ( p_sys_id->p_sub_id == nullptr )
         {
             msg_Err( p_stream, "can't handle %4.4s stream",
@@ -780,6 +781,7 @@ static void *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
     if(p_sys_id != nullptr)
     {
         es_format_Copy(&p_sys_id->fmt, p_fmt);
+        p_sys_id->es_id = nullptr; /* Will be copied once added to `pf_add` */
         p_sys_id->p_sub_id = nullptr;
         p_sys->streams.push_back(p_sys_id);
         p_sys->es_changed = true;
