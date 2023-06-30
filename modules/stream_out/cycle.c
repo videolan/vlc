@@ -52,6 +52,7 @@ struct sout_stream_id_sys_t
 {
     struct vlc_list node;
     es_format_t fmt;
+    const char *es_id;
     void *id;
 };
 
@@ -85,8 +86,10 @@ static void *Add(sout_stream_t *stream, const es_format_t *fmt)
         return NULL;
     }
 
+    id->es_id = NULL; /* Will be copied once added to `pf_add` */
     if (sys->stream != NULL)
-        id->id = sout_StreamIdAdd(sys->stream, &id->fmt, NULL);
+        id->id = sout_StreamIdAdd(sys->stream, &id->fmt, id->es_id);
+
 
     vlc_list_append(&id->node, &sys->ids);
     return id;
@@ -119,7 +122,7 @@ static int AddStream(sout_stream_t *stream, char *chain)
         return -1;
 
     vlc_list_foreach (id, &sys->ids, node)
-        id->id = sout_StreamIdAdd(sys->stream, &id->fmt, NULL);
+        id->id = sout_StreamIdAdd(sys->stream, &id->fmt, id->es_id);
 
     return 0;
 }
