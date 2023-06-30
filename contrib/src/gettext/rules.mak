@@ -48,6 +48,12 @@ GETTEXT_CONF = \
 ifdef HAVE_WIN32
 GETTEXT_CONF += --disable-threads
 endif
+ifdef HAVE_LINUX
+GETTEXT_CONF += --disable-libasprintf
+endif
+ifdef HAVE_MINGW_W64
+GETTEXT_CONF += --disable-libasprintf
+endif
 
 .gettext: gettext
 	$(MAKEBUILDDIR)
