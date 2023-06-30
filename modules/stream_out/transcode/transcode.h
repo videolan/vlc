@@ -84,7 +84,8 @@ struct sout_stream_id_sys_t
     void *downstream_id;
     void *(*pf_transcode_downstream_add)( sout_stream_t *,
                                           const es_format_t *orig,
-                                          const es_format_t *current );
+                                          const es_format_t *current,
+                                          const char *es_id );
 
     vlc_fifo_t *output_fifo;
 
@@ -154,6 +155,8 @@ struct sout_stream_id_sys_t
     /* Sync */
     date_t          next_input_pts; /**< Incoming calculated PTS */
     vlc_tick_t      i_drift; /** how much buffer is ahead of calculated PTS */
+
+    const char *es_id;
 
     transcode_track_pcr_helper_t *pcr_helper;
 };

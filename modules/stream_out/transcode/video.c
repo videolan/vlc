@@ -223,7 +223,8 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
         id->downstream_id =
             id->pf_transcode_downstream_add( p_owner->p_stream,
                                              id->p_decoder->fmt_in,
-                                             transcode_encoder_format_out( id->encoder ) );
+                                             transcode_encoder_format_out( id->encoder ),
+                                             id->es_id );
     msg_Info( p_dec, "video format update succeed" );
 
 end:
