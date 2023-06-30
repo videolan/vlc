@@ -3124,9 +3124,9 @@ fi
 
 
 dnl
-dnl Intel QuickSync (aka MediaSDK) H264/H262 encoder
+dnl Intel Video Processing Library
 dnl
-PKG_ENABLE_MODULES_VLC([MFX], [qsv], [libmfx], [Intel QuickSync MPEG4-Part10/MPEG2 (aka H.264/H.262) encoder], [auto])
+PKG_ENABLE_MODULES_VLC([VPL], [qsv], [vpl], [Intel Video Processing Library encoder], [auto])
 
 
 dnl

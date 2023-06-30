@@ -339,10 +339,10 @@ option('twolame',
     value : 'auto',
     description : 'Enable/disable twolame support')
 
-option('mfx',
+option('vpl',
     type : 'feature',
     value : 'auto',
-    description : 'Enable/disable libmfx support')
+    description : 'Enable/disable libvpl support')
 
 option('spatialaudio',
     type : 'feature',

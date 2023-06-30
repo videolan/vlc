@@ -36,7 +36,7 @@
 #include <vlc_list.h>
 
 
-#include <mfx/mfxvideo.h>
+#include <vpl/mfxvideo.h>
 #include "../demux/mpeg/timestamps.h"
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"

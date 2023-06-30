@@ -886,7 +886,7 @@ vlc_modules += {
 ## Hardware encoders
 
 # QSV encoder
-qsv_dep = dependency('libmfx', required: get_option('mfx'))
+qsv_dep = dependency('vpl', required: get_option('vpl'))
 vlc_modules += {
     'name' : 'qsv',
     'sources' : files('qsv.c'),
