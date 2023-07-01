@@ -85,8 +85,6 @@
                 <outlet property="play" destination="5142" id="B2I-n1-EOc"/>
                 <outlet property="player" destination="999" id="A2q-jC-Whd"/>
                 <outlet property="playlist" destination="1002" id="nhI-Gw-yev"/>
-                <outlet property="playlistTableColumns" destination="5247" id="06N-Dh-fFm"/>
-                <outlet property="playlistTableColumnsMenu" destination="5248" id="EIe-gQ-bnk"/>
                 <outlet property="postprocessing" destination="2133" id="Yn3-kZ-0qr"/>
                 <outlet property="postprocessingMenu" destination="2132" id="7NO-zF-sUN"/>
                 <outlet property="prefs" destination="801" id="Kaq-ct-Qwu"/>
@@ -157,7 +155,6 @@
                 <outlet property="videoeffects" destination="2390" id="fXe-JA-9GI"/>
                 <outlet property="videotrack" destination="1511" id="Xct-Wt-cAE"/>
                 <outlet property="videotrackMenu" destination="1512" id="x59-Qz-nIx"/>
-                <outlet property="viewMenu" destination="5238" id="6q8-rn-VZB"/>
                 <outlet property="visual" destination="1605" id="yya-qJ-xEn"/>
                 <outlet property="visualMenu" destination="1604" id="RLh-Kp-uL6"/>
                 <outlet property="vol_down" destination="1065" id="iI9-ay-pAs"/>
@@ -373,18 +370,6 @@
                                 <connections>
                                     <action selector="highlightSearchField:" target="-1" id="GlP-7U-XF1"/>
                                 </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
-                </menuItem>
-                <menuItem title="View" id="5237">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="View" id="5238">
-                        <items>
-                            <menuItem isSeparatorItem="YES" id="5250"/>
-                            <menuItem title="Playlist Table Columns" id="5247">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Playlist Table Columns" id="5248"/>
                             </menuItem>
                         </items>
                     </menu>
