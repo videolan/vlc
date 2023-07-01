@@ -30,6 +30,8 @@
 
 #import <vlc_media_library.h>
 
+typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
+
 @interface VLCLibraryController()
 {
     vlc_medialibrary_t *_p_libraryInstance;
@@ -119,6 +121,18 @@
 }
 
 #pragma mark - folder management
+
+- (int)performFolderAction:(folder_action_f)action withFileUrl:(NSURL *)fileURL
+{
+    if (!_p_libraryInstance) {
+        return VLC_EACCES;
+    }
+    if (!fileURL) {
+        return VLC_EINVAL;
+    }
+
+    return action(_p_libraryInstance, fileURL.absoluteString.UTF8String);
+}
 
 - (int)addFolderWithFileURL:(NSURL *)fileURL
 {
