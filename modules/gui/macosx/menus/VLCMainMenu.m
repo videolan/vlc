@@ -106,8 +106,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCPlaylistSortingMenuController *_playlistSortingController;
     VLCInformationWindowController *_infoWindowController;
 
-    NSMenu *_playlistTableColumnsContextMenu;
-
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
     __strong VLCCustomCropArWindowController *_customARController;
 }
@@ -377,7 +375,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_findItem setTitle: _NS("Find")];
 
     [_viewMenu setTitle: _NS("View")];
-    [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
     [_play setTitle: _NS("Play")];

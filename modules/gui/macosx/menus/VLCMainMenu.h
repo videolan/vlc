@@ -66,9 +66,6 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *toggleJumpButtons;
 @property (readwrite, weak) IBOutlet NSMenuItem *togglePlaymodeButtons;
 @property (readwrite, weak) IBOutlet NSMenuItem *toggleEffectsButton;
-@property (readwrite, weak) IBOutlet NSMenu *playlistTableColumnsMenu;
-@property (readwrite, weak) IBOutlet NSMenuItem *playlistTableColumns;
-
 @property (readwrite, weak) IBOutlet NSMenu *controlsMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *play;
 @property (readwrite, weak) IBOutlet NSMenuItem *stop;
