@@ -136,46 +136,22 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
 
 - (int)addFolderWithFileURL:(NSURL *)fileURL
 {
-    if (!_p_libraryInstance) {
-        return VLC_EACCES;
-    }
-    if (!fileURL) {
-        return VLC_EINVAL;
-    }
-    return vlc_ml_add_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+    return [self performFolderAction:vlc_ml_add_folder withFileUrl:fileURL];
 }
 
 - (int)banFolderWithFileURL:(NSURL *)fileURL
 {
-    if (!_p_libraryInstance) {
-        return VLC_EACCES;
-    }
-    if (!fileURL) {
-        return VLC_EINVAL;
-    }
-    return vlc_ml_ban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+    return [self performFolderAction:vlc_ml_ban_folder withFileUrl:fileURL];
 }
 
 - (int)unbanFolderWithFileURL:(NSURL *)fileURL
 {
-    if (!_p_libraryInstance) {
-        return VLC_EACCES;
-    }
-    if (!fileURL) {
-        return VLC_EINVAL;
-    }
-    return vlc_ml_unban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+    return [self performFolderAction:vlc_ml_unban_folder withFileUrl:fileURL];
 }
 
 - (int)removeFolderWithFileURL:(NSURL *)fileURL
 {
-    if (!_p_libraryInstance) {
-        return VLC_EACCES;
-    }
-    if (!fileURL) {
-        return VLC_EINVAL;
-    }
-    return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
+    return [self performFolderAction:vlc_ml_remove_folder withFileUrl:fileURL];
 }
 
 - (int)reloadFolderWithFileURL:(NSURL *)fileURL
