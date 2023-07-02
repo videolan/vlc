@@ -113,6 +113,7 @@
 
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
+- (IBAction)chooseArtwork:(id)sender;
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup;

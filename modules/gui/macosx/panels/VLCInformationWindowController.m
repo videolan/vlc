@@ -88,6 +88,7 @@ actionCallback(encodedBy);
 {
     VLCCodecInformationTreeItem *_rootCodecInformationItem;
     NSImage *_artwork;
+    NSURL *_newArtworkURL;
     BOOL _statisticsEnabled;
 }
 @end
@@ -381,6 +382,7 @@ _##field##TextField.delegate = self
 - (void)updateRepresentation
 {
     _saveMetaDataButton.enabled = NO;
+    _newArtworkURL = nil;
 
     if (_representedInputItems.count == 0) {
         /* Erase */
@@ -468,6 +470,8 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
     PERFORM_ACTION_ALL_TEXTFIELDS(CHECK_FIELD_SETTING_CHANGED);
 
 #undef CHECK_FIELD_SETTING_CHANGED
+
+    settingsChanged = settingsChanged || _newArtworkURL != nil;
     
     _saveMetaDataButton.enabled = settingsChanged;
 }
@@ -488,8 +492,12 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 SET_INPUTITEM_PROP(field, field)                \
     
     for (VLCInputItem * const inputItem in inputItems) {
-        SET_INPUTITEM_PROP(title, name);
+        SET_INPUTITEM_PROP(title, name); // Input items do not have a title field
         PERFORM_ACTION_READWRITE_TEXTFIELDS(SET_INPUTITEM_MATCHING_PROP);
+
+        if (_newArtworkURL != nil) { // Artwork urls require their own handling
+            inputItem.artworkURL = _newArtworkURL;
+        }
 
         [inputItem writeMetadataToFile];
     }
@@ -511,6 +519,34 @@ SET_INPUTITEM_PROP(field, field)                \
         [alert addButtonWithTitle:_NS("OK")];
         [alert runModal];
     }
+}
+
+- (IBAction)chooseArtwork:(id)sender
+{
+    NSOpenPanel * const panel = [NSOpenPanel openPanel];
+    [panel setAllowedFileTypes:@[@"png", @"jpg", @"jpeg", @"gif", @"tiff", @"tif", @"bmp"]];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanChooseFiles:YES];
+    [panel setCanCreateDirectories:NO];
+    [panel setResolvesAliases:YES];
+    [panel setAllowsOtherFileTypes:NO];
+    [panel setPrompt:_NS("Choose")];
+    [panel beginSheetModalForWindow:self.window completionHandler:^(const NSInteger result) {
+        if (result != NSFileHandlingPanelOKButton) {
+            return;
+        }
+
+        NSURL * const url = panel.URLs.firstObject;
+        NSImage * const image = [[NSImage alloc] initWithContentsOfURL:url];
+        if (image) {
+            _artwork = image;
+            _artworkImageView.image = _artwork;
+
+            _newArtworkURL = url;
+            _saveMetaDataButton.enabled = YES;
+        }
+    }];
 }
 
 @end
