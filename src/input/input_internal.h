@@ -392,6 +392,9 @@ struct input_source_t
     /* */
     vlc_tick_t i_pts_delay;
 
+    /* Read-write protected by es_out.c lock */
+    vlc_tick_t i_normal_time;
+
     bool       b_eof;   /* eof of demuxer */
 
 };

@@ -3876,6 +3876,11 @@ static int EsOutVaPrivControlLocked( es_out_t *out, input_source_t *source,
         vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
 
+        source->i_normal_time = i_normal_time;
+
+        if( source != p_sys->main_source )
+            return VLC_SUCCESS;
+
         if( !p_sys->b_buffering )
         {
             vlc_tick_t i_delay;

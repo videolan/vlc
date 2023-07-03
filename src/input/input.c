@@ -2612,6 +2612,8 @@ static input_source_t *InputSourceNew( const char *psz_mrl )
         vlc_hash_FinishHex( &md5, in->str_id );
     }
 
+    in->i_normal_time = VLC_TICK_0;
+
     return in;
 }
 
