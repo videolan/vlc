@@ -3156,7 +3156,10 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
                                  int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    assert( source ); /* == p_sys->main_source if the given source is NULL */
+
+    /* Controls from the main source are called with a NULL source */
+    if( !source )
+        source = p_sys->main_source;
 
     switch( i_query )
     {
@@ -3984,9 +3987,6 @@ static int EsOutControl( es_out_t *out, input_source_t *source,
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     int i_ret;
-
-    if( !source )
-        source = p_sys->main_source;
 
     vlc_mutex_lock( &p_sys->lock );
     i_ret = EsOutVaControlLocked( out, source, i_query, args );
