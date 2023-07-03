@@ -599,6 +599,12 @@ static void MainLoopStatistics( input_thread_t *p_input )
 
     InputSourceStatistics( priv->master, priv->p_es_out );
 
+    for( int i = 0; i < priv->i_slave; i++ )
+    {
+        input_source_t *in = priv->slave[i];
+        InputSourceStatistics( in, in->p_slave_es_out );
+    }
+
     if (priv->stats != NULL)
     {
         struct input_stats_t new_stats;
