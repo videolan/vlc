@@ -155,8 +155,6 @@ FocusScope {
         availableRowWidthUpdater.enqueueUpdate()
     }
 
-    Component.onDestruction: _qtAvoidSectionUpdate()
-
     on_CurrentAvailableRowWidthChanged: if (_ready) availableRowWidthUpdater.enqueueUpdate()
 
     // Functions
@@ -183,31 +181,6 @@ FocusScope {
     }
 
     // Private
-
-    function _qtAvoidSectionUpdate() {
-        // Qt SEG. FAULT WORKAROUND
-
-        // There exists a Qt bug that tries to access null
-        // pointer while updating sections. Qt does not
-        // check if `QQmlEngine::contextForObject(sectionItem)->parentContext()`
-        // is null and when it's null which might be the case for
-        // views during destruction it causes segmentation fault.
-
-        // As a workaround, when section delegate is set to null
-        // during destruction, Qt does not proceed with updating
-        // the sections so null pointer access is avoided. Updating
-        // sections during destruction should not make sense anyway.
-
-        // Setting section delegate to null seems to has no
-        // negative impact and safely could be used as a fix.
-        // However, the problem lying beneath prevails and
-        // should be taken care of sooner than later.
-
-        // Affected Qt versions are 5.11.3, and 5.15.2 (not
-        // limited).
-
-        section.delegate = null
-    }
 
     // Childs
 
