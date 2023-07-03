@@ -71,6 +71,14 @@ static int EsOutSourceControl(es_out_t *out, input_source_t *in, int query,
     return sys->parent_out->cbs->control(sys->parent_out, sys->in, query, args);
 }
 
+static int EsOutSourcePrivControl(es_out_t *out, input_source_t *in, int query,
+                                  va_list args)
+{
+    assert(in == NULL);
+    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    return sys->parent_out->cbs->priv_control(sys->parent_out, sys->in, query, args);
+}
+
 static void EsOutSourceDestroy(es_out_t *out)
 {
     es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
@@ -88,6 +96,7 @@ es_out_t *input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
         .del = EsOutSourceDel,
         .control = EsOutSourceControl,
         .destroy = EsOutSourceDestroy,
+        .priv_control = EsOutSourcePrivControl,
     };
 
     es_out_sys_t *sys = malloc(sizeof(*sys));

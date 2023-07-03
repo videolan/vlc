@@ -262,7 +262,7 @@ static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
 static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_progmeta );
 static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es, const es_format_t *fmt);
 static int EsOutControlLocked( es_out_t *out, input_source_t *, int i_query, ... );
-static int EsOutPrivControlLocked( es_out_t *out, int i_query, ... );
+static int EsOutPrivControlLocked( es_out_t *out, input_source_t *, int i_query, ... );
 
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
@@ -718,7 +718,7 @@ static void EsOutUpdateDelayJitter(es_out_t *out)
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
     /* Update the clock pts delay only if the extra tracks delay changed */
-    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
+    EsOutPrivControlLocked(out, NULL, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
                            p_sys->i_pts_jitter, p_sys->i_cr_average);
 }
 
@@ -3439,7 +3439,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
                 /* Force a rebufferization when we are too late */
                 EsOutControlLocked( out, source, ES_OUT_RESET_PCR );
 
-                EsOutPrivControlLocked( out, ES_OUT_PRIV_SET_JITTER,
+                EsOutPrivControlLocked( out, source, ES_OUT_PRIV_SET_JITTER,
                                         p_sys->i_pts_delay, i_new_jitter,
                                         p_sys->i_cr_average );
             }
@@ -3666,9 +3666,14 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
     }
 }
 
-static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
+static int EsOutVaPrivControlLocked( es_out_t *out, input_source_t *source,
+                                     int query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    /* Controls from the main source are called with a NULL source */
+    if( !source )
+        source = p_sys->main_source;
 
     switch (query)
     {
@@ -3995,22 +4000,23 @@ static int EsOutControl( es_out_t *out, input_source_t *source,
     return i_ret;
 }
 
-static int EsOutPrivControlLocked( es_out_t *out, int i_query, ... )
+static int EsOutPrivControlLocked( es_out_t *out, input_source_t *source, int i_query, ... )
 {
     va_list args;
 
     va_start( args, i_query );
-    int ret = EsOutVaPrivControlLocked( out, i_query, args );
+    int ret = EsOutVaPrivControlLocked( out, source, i_query, args );
     va_end( args );
     return ret;
 }
 
-static int EsOutPrivControl( es_out_t *out, int query, va_list args )
+static int EsOutPrivControl( es_out_t *out, input_source_t *source,
+                             int query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
     vlc_mutex_lock( &p_sys->lock );
-    int ret = EsOutVaPrivControlLocked( out, query, args );
+    int ret = EsOutVaPrivControlLocked( out, source, query, args );
     vlc_mutex_unlock( &p_sys->lock );
 
     return ret;

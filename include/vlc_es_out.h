@@ -140,7 +140,7 @@ struct es_out_callbacks
     /**
      * Private control callback, must be NULL for es_out created from modules.
      */
-    int          (*priv_control)(es_out_t *, int query, va_list);
+    int          (*priv_control)(es_out_t *, input_source_t *in, int query, va_list);
 };
 
 struct es_out_t

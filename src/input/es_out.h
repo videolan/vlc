@@ -102,7 +102,7 @@ enum es_out_query_private_e
 static inline int es_out_vaPrivControl( es_out_t *out, int query, va_list args )
 {
     vlc_assert( out->cbs->priv_control );
-    return out->cbs->priv_control( out, query, args );
+    return out->cbs->priv_control( out, NULL, query, args );
 }
 
 static inline int es_out_PrivControl( es_out_t *out, int query, ... )
