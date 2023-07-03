@@ -426,6 +426,8 @@ FocusScope {
 
                                 property bool _inhibitMainInterfaceUpdate: false
 
+                                parent: playlist
+
                                 anchors {
                                     top: parent.top
                                     bottom: parent.bottom

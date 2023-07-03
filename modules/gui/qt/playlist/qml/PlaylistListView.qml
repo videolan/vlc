@@ -28,7 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-Control {
+T.Pane {
     id: root
 
     property var model: PlaylistListModel {
@@ -44,12 +44,15 @@ Control {
 
     readonly property ListView listView: contentItem.listView
 
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            contentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             contentHeight + topPadding + bottomPadding)
+
     topPadding: VLCStyle.margin_normal
     bottomPadding: VLCStyle.margin_normal
 
     Accessible.name: I18n.qtr("Playqueue")
-
-    onActiveFocusChanged: if (activeFocus) listView.forceActiveFocus(focusReason)
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -112,6 +115,8 @@ Control {
 
     Loader {
         id: overlayMenu
+
+        parent: root
         anchors.fill: parent
         z: 1
 
@@ -121,7 +126,7 @@ Control {
 
         onFocusChanged: {
             if (!focus)
-                listView.forceActiveFocus(Qt.BacktabFocusReason)
+                listView.focus = true
         }
 
         readonly property bool shown: (status === Loader.Ready) ? item.visible : false
