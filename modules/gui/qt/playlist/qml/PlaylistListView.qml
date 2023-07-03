@@ -113,34 +113,23 @@ T.Pane {
         listView.forceActiveFocus();
     }
 
-    Loader {
+    PlaylistOverlayMenu {
         id: overlayMenu
 
-        parent: root
         anchors.fill: parent
+        parent: root
         z: 1
 
-        active: MainCtx.playlistDocked
-
-        focus: shown ? item.focus : false
-
-        onFocusChanged: {
-            if (!focus)
+        onVisibleChanged: {
+            if (visible)
+                focus = true
+            else
                 listView.focus = true
         }
 
-        readonly property bool shown: (status === Loader.Ready) ? item.visible : false
-
-        function open() {
-            if (status === Loader.Ready)
-                item.open()
-        }
-
-        sourceComponent: PlaylistOverlayMenu {
-            isRight: true
-            rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
-            bottomPadding: VLCStyle.margin_large + root.bottomPadding
-        }
+        isRight: true
+        rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
+        bottomPadding: VLCStyle.margin_large + root.bottomPadding
     }
 
     Widgets.DragItem {

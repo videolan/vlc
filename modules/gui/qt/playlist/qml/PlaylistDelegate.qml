@@ -58,7 +58,7 @@ T.ItemDelegate {
     ListView.delayRemove: mouseArea.drag.active
 
     T.ToolTip.visible: ( (visualFocus || hovered) &&
-                         !overlayMenu.shown && MainCtx.playlistVisible &&
+                         !overlayMenu.visible && MainCtx.playlistVisible &&
                          (textInfoColumn.implicitWidth > textInfoColumn.width) )
 
     // NOTE: This is useful for keyboard navigation on a column, to avoid blocking visibility on
