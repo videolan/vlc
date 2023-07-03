@@ -70,6 +70,10 @@ NativeMenu {
             "action": markUnseen,
             "visible": _showUnseen
         }, {
+            "text": I18n.qtr("Open Containing Folder"),
+            "action": openContainingFolder,
+            "visible": _openContainingFolder
+        }, {
             "text": I18n.qtr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
@@ -126,6 +130,13 @@ NativeMenu {
         model.setItemPlayed(indexes[0], false)
     }
 
+    function openContainingFolder(dataList, options, indexes) {
+        const parentDir = model.getParentURL(indexes[0]);
+
+        Qt.openUrlExternally(parentDir)
+    }
+
+
     function showInformationAvailable(options, indexes) {
         return indexes.length === 1
                 && Helpers.isInteger(Helpers.get(options, "information", null))
@@ -171,6 +182,16 @@ NativeMenu {
 
         // NOTE: Strictly comparing 'isNew' given it might be undefined.
         return (isNew === false)
+    }
+
+    function _openContainingFolder(options, indexes) {
+        if (indexes.length !== 1)
+            return false
+
+        const isLocal = model.getDataAt(indexes[0]).isLocal
+
+        // NOTE: Strictly comparing 'isLocal' given it might be undefined.
+        return (isLocal === true)
     }
 
     function _signalShowInformation(dataList, options) {
