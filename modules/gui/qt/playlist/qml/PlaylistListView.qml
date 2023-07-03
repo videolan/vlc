@@ -31,14 +31,18 @@ import "qrc:///style/"
 Control {
     id: root
 
-    property alias model: listView.model
+    property var model: PlaylistListModel {
+        playlist: MainPlaylistController.playlist
+    }
 
     property bool useAcrylic: true
 
-    readonly property real minimumWidth: noContentInfoColumn.implicitWidth +
+    readonly property real minimumWidth: contentItem.Layout.minimumWidth +
                                          leftPadding +
                                          rightPadding +
                                          2 * (VLCStyle.margin_xsmall)
+
+    readonly property ListView listView: contentItem.listView
 
     topPadding: VLCStyle.margin_normal
     bottomPadding: VLCStyle.margin_normal
@@ -168,6 +172,10 @@ Control {
     contentItem: ColumnLayout {
         spacing: 0
 
+        Layout.minimumWidth: noContentInfoColumn.implicitWidth
+
+        readonly property ListView listView: listView
+
         ColumnLayout {
             id: headerTextLayout
 
@@ -276,9 +284,7 @@ Control {
 
             clip: true // else out of view items will overlap with surronding items
 
-            model: PlaylistListModel {
-                playlist: MainPlaylistController.playlist
-            }
+            model: root.model
 
             dragAutoScrollDragItem: dragItem
 
