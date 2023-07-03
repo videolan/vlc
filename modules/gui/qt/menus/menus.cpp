@@ -657,13 +657,13 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
     action = menu->addAction( qtr( "&Jump Forward" ), THEMIM,
              &PlayerController::jumpFwd );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/menu/skip_fw.svg") );
+    action->setIcon( QIcon( ":/menu/ic_fluent_skip_forward_10.svg") );
 #endif
 
     action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM,
              &PlayerController::jumpBwd );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/menu/skip_back.svg") );
+    action->setIcon( QIcon( ":/menu/ic_fluent_skip_back_10.svg") );
 #endif
 
     action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog, qtr( "Ctrl+T" ) );
