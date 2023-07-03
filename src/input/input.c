@@ -565,34 +565,39 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
     return VLC_SUCCESS;
 }
 
-/**
- * Update timing infos and statistics.
- */
-static void MainLoopStatistics( input_thread_t *p_input )
+static void InputSourceStatistics( input_source_t *source, es_out_t *out )
 {
-    input_thread_private_t *priv = input_priv(p_input);
     double f_position = 0.0;
     vlc_tick_t i_time;
     vlc_tick_t i_length;
     vlc_tick_t i_normal_time;
 
     /* update input status variables */
-    if( demux_Control( priv->master->p_demux,
+    if( demux_Control( source->p_demux,
                        DEMUX_GET_POSITION, &f_position ) )
         f_position = 0.0;
 
-    if( demux_Control( priv->master->p_demux, DEMUX_GET_TIME, &i_time ) )
+    if( demux_Control( source->p_demux, DEMUX_GET_TIME, &i_time ) )
         i_time = VLC_TICK_INVALID;
 
-    if( demux_Control( priv->master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
+    if( demux_Control( source->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
 
     /* In case of failure (not implemented or in case of seek), use VLC_TICK_0. */
-    if (demux_Control( priv->master->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
+    if (demux_Control( source->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
         i_normal_time = VLC_TICK_0;
 
-    es_out_SetTimes( priv->p_es_out, f_position, i_time, i_normal_time,
-                     i_length );
+    es_out_SetTimes( out, f_position, i_time, i_normal_time, i_length );
+}
+
+/**
+ * Update timing infos and statistics.
+ */
+static void MainLoopStatistics( input_thread_t *p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+
+    InputSourceStatistics( priv->master, priv->p_es_out );
 
     if (priv->stats != NULL)
     {
