@@ -32,7 +32,9 @@ T.ItemDelegate {
 
     // Properties
 
-    readonly property int selectionLength: root.model.selectedCount
+    property Flickable view: ListView.view
+
+    readonly property int selectionLength: view.model.selectedCount
 
     readonly property bool selected : model.selected
 
@@ -42,13 +44,28 @@ T.ItemDelegate {
 
     readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
+    // Optional
+    property var contextMenu
+
+    // Optional, an item to show as drag target
+    property Item dragItem
+
+    // Optional, used to show the drop indicator
+    property var isDropAcceptable
+
+    // Optional, but required to drop a drag
+    property var acceptDrop
+
+    // Optional, but required for some actions
+    property int mode: -1
+
     // Settings
 
     verticalPadding: VLCStyle.playlistDelegate_verticalPadding
 
     leftPadding: VLCStyle.margin_xxsmall
 
-    rightPadding: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
+    rightPadding: Math.max(view.scrollBarWidth, VLCStyle.margin_normal)
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -57,8 +74,7 @@ T.ItemDelegate {
 
     ListView.delayRemove: mouseArea.drag.active
 
-    T.ToolTip.visible: ( (visualFocus || hovered) &&
-                         !overlayMenu.visible && MainCtx.playlistVisible &&
+    T.ToolTip.visible: ( visible && (visualFocus || hovered) &&
                          (textInfoColumn.implicitWidth > textInfoColumn.width) )
 
     // NOTE: This is useful for keyboard navigation on a column, to avoid blocking visibility on
@@ -74,7 +90,7 @@ T.ItemDelegate {
     // Functions
 
     function moveSelected() {
-        const selectedIndexes = root.model.getSelection()
+        const selectedIndexes = view.model.getSelection()
         if (selectedIndexes.length === 0)
             return
         let preTarget = index
@@ -82,8 +98,8 @@ T.ItemDelegate {
          * _below_ the clicked item if move down */
         if (preTarget > selectedIndexes[0])
             preTarget++
-        listView.currentIndex = selectedIndexes[0]
-        root.model.moveItemsPre(selectedIndexes, preTarget)
+        view.currentIndex = selectedIndexes[0]
+        view.model.moveItemsPre(selectedIndexes, preTarget)
     }
 
     // Childs
@@ -247,29 +263,31 @@ T.ItemDelegate {
 
         onClicked: {
             /* to receive keys events */
-            listView.forceActiveFocus()
-            if (root.mode === PlaylistListView.Mode.Move) {
+            view.forceActiveFocus(Qt.MouseFocusReason)
+            if (mode === PlaylistListView.Mode.Move) {
                 moveSelected()
                 return
-            } else if (root.mode === PlaylistListView.Mode.Select) {
-            } else if (!(root.model.isSelected(index) && mouse.button === Qt.RightButton)) {
-                listView.updateSelection(mouse.modifiers, listView.currentIndex, index)
-                listView.currentIndex = index
+            } else if (mode === PlaylistListView.Mode.Select) {
+            } else if (!(view.model.isSelected(index) && mouse.button === Qt.RightButton)) {
+                view.updateSelection(mouse.modifiers, view.currentIndex, index)
+                view.currentIndex = index
             }
 
-            if (mouse.button === Qt.RightButton)
+            if (contextMenu && mouse.button === Qt.RightButton)
                 contextMenu.popup(index, this.mapToGlobal(mouse.x, mouse.y))
         }
 
         onDoubleClicked: {
-            if (mouse.button !== Qt.RightButton && root.mode === PlaylistListView.Mode.Normal)
+            if (mouse.button !== Qt.RightButton && (mode >= 0 && mode === PlaylistListView.Mode.Normal))
                 MainPlaylistController.goTo(index, true)
         }
 
         onPressed: {
-            const pos = mapToItem(dragItem.parent, mouseX, mouseY)
-            dragItem.x = pos.x + VLCStyle.dragDelta
-            dragItem.y = pos.y + VLCStyle.dragDelta
+            if (dragItem) {
+                const pos = mapToItem(dragItem.parent, mouseX, mouseY)
+                dragItem.x = pos.x + VLCStyle.dragDelta
+                dragItem.y = pos.y + VLCStyle.dragDelta
+            }
         }
 
         drag.target: dragItem
@@ -277,16 +295,18 @@ T.ItemDelegate {
         drag.smoothed: false
 
         drag.onActiveChanged: {
-            if (drag.active) {
-                if (!selected) {
-                    /* the dragged item is not in the selection, replace the selection */
-                    root.model.setSelection([index])
-                }
+            if (dragItem) {
+                if (drag.active) {
+                    if (!selected) {
+                        /* the dragged item is not in the selection, replace the selection */
+                        view.model.setSelection([index])
+                    }
 
-                dragItem.indexes = root.model.getSelection()
-                dragItem.Drag.active = true
-            } else {
-                dragItem.Drag.drop()
+                    dragItem.indexes = view.model.getSelection()
+                    dragItem.Drag.active = true
+                } else {
+                    dragItem.Drag.drop()
+                }
             }
         }
 
@@ -294,15 +314,16 @@ T.ItemDelegate {
             acceptedDevices: PointerDevice.TouchScreen
             
             onTapped: {
-                if (root.mode === PlaylistListView.Mode.Normal) {
+                if (mode >= 0 && mode === PlaylistListView.Mode.Normal) {
                     MainPlaylistController.goTo(index, true)
-                } else if (root.mode === PlaylistListView.Mode.Move) {
+                } else if (mode >= 0 && mode === PlaylistListView.Mode.Move) {
                     moveSelected()
                 }
             }
 
             onLongPressed: {
-                contextMenu.popup(index, point.scenePosition)
+                if (contextMenu)
+                    contextMenu.popup(index, point.scenePosition)
             }
         }
     }
@@ -318,14 +339,20 @@ T.ItemDelegate {
             Layout.fillHeight: true
 
             onEntered: {
-                if (!isDropAcceptable(drag, index)) {
+                if (!acceptDrop) {
+                    drag.accept = false
+                    return
+                }
+
+                if (isDropAcceptable && !isDropAcceptable(drag, index)) {
                     drag.accepted = false
                     return
                 }
             }
 
             onDropped: {
-                root.acceptDrop(index, drop)
+                console.assert(acceptDrop)
+                acceptDrop(index, drop)
             }
         }
 
@@ -336,14 +363,20 @@ T.ItemDelegate {
             Layout.fillHeight: true
 
             onEntered: {
-                if (!isDropAcceptable(drag, index + 1)) {
+                if (!acceptDrop) {
+                    drag.accept = false
+                    return
+                }
+
+                if (isDropAcceptable && !isDropAcceptable(drag, index + 1)) {
                     drag.accepted = false
                     return
                 }
             }
 
             onDropped: {
-                root.acceptDrop(index + 1, drop)
+                console.assert(acceptDrop)
+                acceptDrop(index + 1, drop)
             }
         }
     }

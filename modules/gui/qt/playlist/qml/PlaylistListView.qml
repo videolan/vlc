@@ -44,6 +44,10 @@ T.Pane {
 
     readonly property ListView listView: contentItem.listView
 
+    property alias contextMenu: contextMenu
+
+    property alias dragItem: dragItem
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
@@ -420,6 +424,20 @@ T.Pane {
                 id: delegate
 
                 width: listView.width
+
+                contextMenu: root.contextMenu
+
+                dragItem: root.dragItem
+
+                isDropAcceptable: root.isDropAcceptable
+                acceptDrop: root.acceptDrop
+
+                mode: root.mode
+
+                BindingCompat on T.ToolTip.visible {
+                    value: false
+                    when: overlayMenu.visible
+                }
 
                 onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
             }
