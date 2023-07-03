@@ -74,7 +74,7 @@ typedef struct
      * Find a suitable decoder configuration for the input and set the
      * internal state to use that output
      */
-    int (*pf_setup_output)(vlc_va_t *, const GUID *input, const video_format_t *fmt);
+    int (*pf_setup_output)(vlc_va_t *, const GUID *input, int surface_width, int surface_height);
 
 } directx_sys_t;
 

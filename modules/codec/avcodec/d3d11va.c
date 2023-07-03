@@ -131,7 +131,7 @@ static char *DxDescribe(vlc_va_sys_t *);
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
-static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
+static int DxSetupOutput(vlc_va_t *, const GUID *, int surface_width, int surface_height);
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
                                    const video_format_t *fmt, unsigned surface_count);
@@ -555,7 +555,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
 extern const GUID DXVA_ModeHEVC_VLD_Main10;
 extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
 
-static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
+static int DxSetupOutput(vlc_va_t *va, const GUID *input, int surface_width, int surface_height)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
@@ -625,8 +625,8 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
         D3D11_VIDEO_DECODER_DESC decoderDesc;
         ZeroMemory(&decoderDesc, sizeof(decoderDesc));
         decoderDesc.Guid = *input;
-        decoderDesc.SampleWidth = fmt->i_width;
-        decoderDesc.SampleHeight = fmt->i_height;
+        decoderDesc.SampleWidth = surface_width;
+        decoderDesc.SampleHeight = surface_height;
         decoderDesc.OutputFormat = processorInput[idx];
 
         UINT cfg_count = 0;

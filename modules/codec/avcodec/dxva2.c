@@ -138,7 +138,7 @@ static void D3dDestroyDeviceManager(vlc_va_t *);
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
-static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
+static int DxSetupOutput(vlc_va_t *, const GUID *, int surface_width, int surface_height);
 
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
@@ -490,9 +490,9 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
-static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
+static int DxSetupOutput(vlc_va_t *va, const GUID *input, int surface_width, int surface_height)
 {
-    VLC_UNUSED(fmt);
+    VLC_UNUSED(surface_width); VLC_UNUSED(surface_height);
     vlc_va_sys_t *sys = va->sys;
 
     const D3DADAPTER_IDENTIFIER9 *identifier = &sys->d3d_dev.identifier;

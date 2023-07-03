@@ -54,23 +54,11 @@ static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 }
 
 /* */
-int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count, int alignment)
+int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count,
+                         int surface_width, int surface_height)
 {
     int err = VLC_ENOMEM;
     unsigned i = va_pool->surface_count;
-
-    if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
-        return VLC_EGENERIC;
-
-    assert((alignment & (alignment - 1)) == 0); /* power of 2 */
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-    int surface_width  = ALIGN(avctx->coded_width,  alignment);
-    int surface_height = ALIGN(avctx->coded_height, alignment);
-
-    if (avctx->coded_width != surface_width || avctx->coded_height != surface_height)
-        msg_Warn( va, "surface dimensions (%dx%d) differ from avcodec dimensions (%dx%d)",
-                  surface_width, surface_height,
-                  avctx->coded_width, avctx->coded_height);
 
     if ( va_pool->surface_count >= count &&
          va_pool->surface_width == surface_width &&

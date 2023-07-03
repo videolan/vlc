@@ -300,7 +300,8 @@ static const directx_va_mode_t DXVA_MODES[] = {
 };
 
 static int FindVideoServiceConversion(vlc_va_t *, directx_sys_t *, const es_format_t *,
-                                      const AVCodecContext *, const AVPixFmtDescriptor *);
+                                      const AVCodecContext *, const AVPixFmtDescriptor *,
+                                      int surface_width, int surface_height);
 
 char *directx_va_GetDecoderName(const GUID *guid)
 {
@@ -320,12 +321,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys,
                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
                      const es_format_t *fmt, int flag_xbox)
 {
-    /* */
-    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx, desc)) {
-        msg_Err(va, "FindVideoServiceConversion failed");
-        return VLC_EGENERIC;
-    }
-
     int surface_alignment = 16;
     unsigned surface_count = 2;
 
@@ -365,7 +360,26 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys,
     if ( avctx->active_thread_type & FF_THREAD_FRAME )
         surface_count += avctx->thread_count;
 
-    int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_alignment);
+    if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
+        return VLC_EGENERIC;
+
+    assert((surface_alignment & (surface_alignment - 1)) == 0); /* power of 2 */
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+    int surface_width  = ALIGN(avctx->coded_width,  surface_alignment);
+    int surface_height = ALIGN(avctx->coded_height, surface_alignment);
+
+    if (avctx->coded_width != surface_width || avctx->coded_height != surface_height)
+        msg_Warn( va, "surface dimensions (%dx%d) differ from avcodec dimensions (%dx%d)",
+                  surface_width, surface_height,
+                  avctx->coded_width, avctx->coded_height);
+
+    /* */
+    if (FindVideoServiceConversion(va, dx_sys, fmt, avctx, desc, surface_width, surface_height)) {
+        msg_Err(va, "FindVideoServiceConversion failed");
+        return VLC_EGENERIC;
+    }
+
+    int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_width, surface_height);
     if (err != VLC_SUCCESS)
         return err;
     if (dx_sys->can_extern_pool)
@@ -428,7 +442,8 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
  */
 static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
                                       const es_format_t *fmt,
-                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc)
+                                      const AVCodecContext *avctx, const AVPixFmtDescriptor *desc,
+                                      int surface_width, int surface_height)
 {
     input_list_t p_list = { 0 };
     int err = dx_sys->pf_get_input_list(va, &p_list);
@@ -483,7 +498,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
 
         /* */
         msg_Dbg(va, "Trying to use '%s' as input", mode->name);
-        if (dx_sys->pf_setup_output(va, mode->guid, &fmt->video)==VLC_SUCCESS)
+        if (dx_sys->pf_setup_output(va, mode->guid, surface_width, surface_height)==VLC_SUCCESS)
         {
             dx_sys->input = *mode->guid;
             err = VLC_SUCCESS;
