@@ -2911,6 +2911,25 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    /* Shift all slaves timestamps with the main source normal time. This will
+     * allow to synchronize 2 demuxers with different time bases. Remove the
+     * normal time from the current source and add the main source normal time.
+     * */
+    if( es->id.source != p_sys->main_source )
+    {
+        if( p_block->i_dts != VLC_TICK_INVALID )
+        {
+            p_block->i_dts -= es->id.source->i_normal_time - VLC_TICK_0;
+            p_block->i_dts += p_sys->main_source->i_normal_time - VLC_TICK_0;
+        }
+
+        if( p_block->i_pts != VLC_TICK_INVALID )
+        {
+            p_block->i_pts -= es->id.source->i_normal_time - VLC_TICK_0;
+            p_block->i_pts += p_sys->main_source->i_normal_time - VLC_TICK_0;
+        }
+    }
+
     /* Drop all ESes except the video one in case of next-frame */
     if( p_sys->p_next_frame_es != NULL && p_sys->p_next_frame_es != es )
     {
