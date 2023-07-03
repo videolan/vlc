@@ -104,7 +104,7 @@ T.ItemDelegate {
         }
 
         onPressed: {
-            const pos = drag.target.parent.mapFromItem(root, mouseX, mouseY);
+            const pos = mapToItem(drag.target.parent, mouseX, mouseY);
 
             drag.target.x = pos.x + VLCStyle.dragDelta;
             drag.target.y = pos.y + VLCStyle.dragDelta;
