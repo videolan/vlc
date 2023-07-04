@@ -57,7 +57,6 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
-#define MAX_CHANNELS 6
 
 typedef struct
 {
