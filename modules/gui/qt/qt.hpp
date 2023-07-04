@@ -116,6 +116,23 @@ struct qt_intf_t
     bool isShuttingDown;
 };
 
+template <typename T, void (*LOCK)(T *), void (*UNLOCK)(T *)>
+class vlc_locker {
+    T * const ptr = nullptr;
+
+public:
+    explicit vlc_locker(T * const ptr)
+        : ptr(ptr)
+    {
+        LOCK(ptr);
+    }
+
+    ~vlc_locker()
+    {
+        UNLOCK(ptr);
+    }
+};
+
 /**
  * This class may be used for scope-bound locking/unlocking
  * of a player_t*. As hinted, the player is locked when
