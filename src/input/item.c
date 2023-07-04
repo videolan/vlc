@@ -255,7 +255,7 @@ char *input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
     return psz;
 }
 
-const char *input_item_GetMetaExtraLocked( input_item_t *item, const char *psz_name )
+static const char *input_item_GetMetaExtraLocked( input_item_t *item, const char *psz_name )
 {
     vlc_mutex_assert( &item->lock );
     return vlc_meta_GetExtra( item->p_meta, psz_name );
