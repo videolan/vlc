@@ -163,7 +163,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_channel_mask = 0;
     if( p_input->p_fmt->audio.i_physical_channels )
     {
-        for( unsigned i = 0; i < pi_vlc_chan_order_wg4[i]; i++ )
+        for( unsigned i = 0; pi_vlc_chan_order_wg4[i]; i++ )
             if( p_input->p_fmt->audio.i_physical_channels & pi_vlc_chan_order_wg4[i])
                 p_sys->i_channel_mask |= pi_vlc_chan_order_wg4[i];
 
