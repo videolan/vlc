@@ -62,7 +62,6 @@ class VideoSurfaceProvider;
 class ControlbarProfileModel;
 namespace vlc {
 namespace playlist {
-class PlaylistController;
 }
 }
 
@@ -173,7 +172,6 @@ class MainCtx : public QObject
     Q_PROPERTY(float pinOpacity READ pinOpacity WRITE setPinOpacity NOTIFY pinOpacityChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
     Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
-    Q_PROPERTY(vlc::playlist::PlaylistController* mainPlaylistController READ getMainPlaylistController CONSTANT FINAL)
     Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
     Q_PROPERTY(QWindow* intfMainWindow READ intfMainWindow CONSTANT FINAL)
     Q_PROPERTY(QScreen* screen READ screen NOTIFY screenChanged)
@@ -201,7 +199,6 @@ public:
 public:
     /* Getters */
     inline qt_intf_t* getIntf() const { return p_intf; }
-    inline vlc::playlist::PlaylistController* getMainPlaylistController() const { return p_intf->p_mainPlaylistController; }
     bool smoothScroll() const { return m_smoothScroll; }
 
     QSystemTrayIcon *getSysTray() { return sysTray; }

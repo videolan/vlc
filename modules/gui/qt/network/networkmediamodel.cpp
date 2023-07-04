@@ -245,7 +245,7 @@ bool NetworkMediaModel::insertIntoPlaylist(const QModelIndexList &itemIdList, co
     }
     if (medias.isEmpty())
         return false;
-    m_ctx->getMainPlaylistController()->insert(playlistIndex, medias, false);
+    m_ctx->getIntf()->p_mainPlaylistController->insert(playlistIndex, medias, false);
     return true;
 }
 
@@ -257,7 +257,7 @@ bool NetworkMediaModel::addToPlaylist(const int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
-    m_ctx->getMainPlaylistController()->append( { media }, false);
+    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, false);
     return true;
 }
 
@@ -300,7 +300,7 @@ bool NetworkMediaModel::addAndPlay(int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
-    m_ctx->getMainPlaylistController()->append( { media }, true);
+    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, true);
     return true;
 }
 
