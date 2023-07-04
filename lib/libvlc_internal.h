@@ -24,17 +24,13 @@
 #ifndef _LIBVLC_INTERNAL_H
 #define _LIBVLC_INTERNAL_H 1
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_dialog.h>
 #include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_events.h>
-#include <vlc_atomic.h>
 
+#include <vlc_atomic.h>
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_threads.h>

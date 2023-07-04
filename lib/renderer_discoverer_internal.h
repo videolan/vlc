@@ -21,10 +21,6 @@
 #ifndef _LIBVLC_RENDERER_DISCOVERER_INTERNAL_H
 #define _LIBVLC_RENDERER_DISCOVERER_INTERNAL_H 1
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <vlc_renderer_discovery.h>
 
 vlc_renderer_item_t *
