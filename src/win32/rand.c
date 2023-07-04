@@ -25,6 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 
+#include <windows.h>
 #include <bcrypt.h>
 
 void vlc_rand_bytes (void *buf, size_t len)

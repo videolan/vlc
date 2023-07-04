@@ -51,6 +51,7 @@
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
 #ifdef _WIN32
+#include <windows.h>
 #include <shellapi.h>
 #endif
 #include "update.h"

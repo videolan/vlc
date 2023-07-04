@@ -30,6 +30,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>
