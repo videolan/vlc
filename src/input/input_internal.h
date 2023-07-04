@@ -23,17 +23,10 @@
 #ifndef LIBVLC_INPUT_INTERNAL_H
 #define LIBVLC_INPUT_INTERNAL_H 1
 
-#include <stddef.h>
-#include <stdatomic.h>
-
-#include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
-#include <vlc_viewpoint.h>
-#include <vlc_atomic.h>
-#include <libvlc.h>
 #include "input_interface.h"
-#include "misc/interrupt.h"
+#include "../misc/interrupt.h"
 
 struct input_stats;
 
