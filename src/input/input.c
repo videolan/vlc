@@ -2021,11 +2021,9 @@ static bool Control( input_thread_t *p_input,
                                    !param.time.b_fast_seek, absolute );
             if( i_ret )
             {
-                vlc_tick_t i_length;
-
+                vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item );
                 /* Emulate it with a SET_POS */
-                if( !demux_Control( priv->master->p_demux,
-                                    DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
+                if( i_length > 0 )
                 {
                     double f_pos = (double)param.time.i_val / (double)i_length;
                     i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
