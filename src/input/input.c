@@ -565,6 +565,17 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
     return VLC_SUCCESS;
 }
 
+static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *item )
+{
+    vlc_tick_t length;
+    if( demux_Control( source->p_demux, DEMUX_GET_LENGTH, &length ) )
+        length = 0;
+    if( length == 0 && item != NULL )
+        length = input_item_GetDuration( item );
+
+    return length;
+}
+
 static void InputSourceStatistics( input_source_t *source, es_out_t *out )
 {
     double f_position = 0.0;
@@ -1301,12 +1312,7 @@ static int Init( input_thread_t * p_input )
     InitTitle( p_input, false );
 
     /* Load master infos */
-    /* Init length */
-    vlc_tick_t i_length;
-    if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = 0;
-    if( i_length == 0 )
-        i_length = input_item_GetDuration( priv->p_item );
+    vlc_tick_t i_length = InputSourceGetLength( master, priv->p_item );
 
     input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, VLC_TICK_0, i_length );
 
