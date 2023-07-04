@@ -31,6 +31,8 @@
 
 struct timespec;
 
+#include <vlc_config.h>
+
 /**
  * High precision date or time interval
  *
