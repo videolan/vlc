@@ -35,6 +35,8 @@
 
 #include "screen.h"
 
+#include <windows.h>
+
 
 static void screen_CloseCapture(screen_data_t *);
 static block_t *screen_Capture(demux_t *);

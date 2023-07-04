@@ -29,6 +29,7 @@
 
 #include <vlc_es.h>
 
+#include <windows.h>
 #if defined(HAVE_DCOMP_H)
 # include <dcomp.h>
 #endif

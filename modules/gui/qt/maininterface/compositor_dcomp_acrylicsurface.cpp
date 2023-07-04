@@ -27,6 +27,9 @@
 
 #include "compositor_dcomp.hpp"
 
+#include <windows.h>
+#include <ntdef.h>
+
 namespace
 {
 

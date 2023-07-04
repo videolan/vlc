@@ -26,6 +26,8 @@
 
 #include "../src/os_timer.hpp"
 
+#include <windows.h>
+
 class CmdGeneric;
 
 // Win32 specific timer

@@ -33,6 +33,7 @@
 
 #define _DECL_DLLMAIN
 #include <vlc_common.h>
+#include <windows.h>
 #include <vlc_aout.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>

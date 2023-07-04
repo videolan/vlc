@@ -32,6 +32,8 @@
 #include <vlc_window.h>
 #include "../wasync_resize_compressor.h"
 
+#include <windows.h>
+
 #define HWND_TEXT N_("Window handle (HWND)")
 #define HWND_LONGTEXT N_( \
     "Video will be embedded in this pre-existing window. " \

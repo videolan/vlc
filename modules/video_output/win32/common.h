@@ -24,6 +24,8 @@
 
 #include <vlc_vout_display.h>
 
+#include <windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif// __cplusplus

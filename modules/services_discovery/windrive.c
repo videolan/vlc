@@ -28,6 +28,8 @@
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
 
+#include <windows.h>
+
 static int Open (vlc_object_t *);
 
 VLC_SD_PROBE_HELPER("disc", N_("Discs"), SD_CAT_DEVICES)

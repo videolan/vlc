@@ -24,6 +24,8 @@
 #include <vlc_window.h>
 #include <vlc_vout_display.h>
 
+#include <windows.h>
+
 /**
  * HWNDs manager.
  */
