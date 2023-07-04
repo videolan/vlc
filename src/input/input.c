@@ -1312,9 +1312,7 @@ static int Init( input_thread_t * p_input )
     InitTitle( p_input, false );
 
     /* Load master infos */
-    vlc_tick_t i_length = InputSourceGetLength( master, priv->p_item );
-
-    input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, VLC_TICK_0, i_length );
+    InputSourceStatistics( master, priv->p_item, priv->p_es_out );
 
     if( priv->type != INPUT_TYPE_PREPARSING )
     {
