@@ -172,6 +172,7 @@ static const uint64_t pi_channels_map[][2] =
     { AV_CH_STEREO_RIGHT,      0 },
 };
 
+#if !LIBAVCODEC_VERSION_CHECK(59, 24, 100)
 static const uint32_t channel_mask[][2] = {
     {0,0},
     {AOUT_CHAN_CENTER, AV_CH_LAYOUT_MONO},
@@ -184,6 +185,7 @@ static const uint32_t channel_mask[][2] = {
     {AOUT_CHANS_7_1, AV_CH_LAYOUT_7POINT1},
     {AOUT_CHANS_8_1, AV_CH_LAYOUT_OCTAGONAL},
 };
+#endif
 
 static const char *const ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "codec", "hq",
@@ -757,48 +759,36 @@ int InitVideoEnc( vlc_object_t *p_this )
         date_Init( &p_sys->buffer_date, p_enc->fmt_out.audio.i_rate, 1 );
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
-        p_context->channels      = p_enc->fmt_out.audio.i_channels;
-        p_context->channel_layout = channel_mask[p_context->channels][1];
 
-        /* Setup Channel ordering for multichannel audio
+        /* Setup Channel ordering for audio
          * as VLC channel order isn't same as libavcodec expects
          */
 
         p_sys->i_channels_to_reorder = 0;
 
-        /* Specified order
+        /* Create channel layout for avcodec
          * Copied from audio.c
          */
-        const unsigned i_order_max = 8 * sizeof(p_context->channel_layout);
         uint32_t pi_order_dst[AOUT_CHAN_MAX] = { 0 };
         uint32_t order_mask = 0;
         int i_channels_src = 0;
 
-        if( p_context->channel_layout )
+        msg_Dbg( p_enc, "Creating channel order for reordering");
+#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+        av_channel_layout_default( &p_context->ch_layout, p_enc->fmt_out.audio.i_channels );
+        uint64_t channel_mask = p_context->ch_layout.u.mask;
+#else
+        p_context->channels = p_enc->fmt_out.audio.i_channels;
+        p_context->channel_layout = channel_mask[p_context->channels][1];
+        uint64_t channel_mask = p_context->channel_layout;
+#endif
+        for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
         {
-            msg_Dbg( p_enc, "Creating channel order for reordering");
-            for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
+            if( channel_mask & pi_channels_map[i][0] )
             {
-                if( p_context->channel_layout & pi_channels_map[i][0] )
-                {
-                    msg_Dbg( p_enc, "%d %"PRIx64" mapped to %"PRIx64"", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
-                    pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
-                    order_mask |= pi_channels_map[i][1];
-                }
-            }
-        }
-        else
-        {
-            msg_Dbg( p_enc, "Creating default channel order for reordering");
-            /* Create default order  */
-            for( unsigned int i = 0; i < __MIN( i_order_max, (unsigned)p_sys->p_context->channels ); i++ )
-            {
-                if( i < sizeof(pi_channels_map)/sizeof(*pi_channels_map) )
-                {
-                    msg_Dbg( p_enc, "%d channel is %"PRIx64"", i_channels_src, pi_channels_map[i][1]);
-                    pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
-                    order_mask |= pi_channels_map[i][1];
-                }
+                msg_Dbg( p_enc, "%d %"PRIx64" mapped to %"PRIx64"", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
+                pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
+                order_mask |= pi_channels_map[i][1];
             }
         }
         if( i_channels_src != p_enc->fmt_out.audio.i_channels )
