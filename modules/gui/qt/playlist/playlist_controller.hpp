@@ -23,6 +23,8 @@
 # include "config.h"
 #endif
 
+#include "qt.hpp"
+
 #include <QObject>
 #include <QVector>
 #include <QVariantList>
@@ -33,6 +35,8 @@
 
 namespace vlc {
   namespace playlist {
+
+  using vlc_playlist_locker = vlc_locker<vlc_playlist_t, vlc_playlist_Lock, vlc_playlist_Unlock>;
 
 class PlaylistControllerPrivate;
 class PlaylistController : public QObject
