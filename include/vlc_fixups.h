@@ -348,6 +348,7 @@ int gettimeofday(struct timeval *, struct timezone *);
 #include <winapifamily.h>
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 // getpid is incorrectly detected in UWP so we won't use the compat version
+#include <processthreadsapi.h>
 #define getpid()  GetCurrentProcessId()
 #endif
 #endif
