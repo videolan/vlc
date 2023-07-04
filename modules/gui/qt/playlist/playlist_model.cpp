@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cassert>
 #include "util/shared_input_item.hpp"
+#include "playlist_controller.hpp"
 
 namespace vlc {
 namespace playlist {
@@ -165,7 +166,7 @@ PlaylistListModelPrivate::~PlaylistListModelPrivate()
 {
     if (m_playlist && m_listener)
     {
-        PlaylistLocker locker(m_playlist);
+        vlc_playlist_locker locker(m_playlist);
         vlc_playlist_RemoveListener(m_playlist, m_listener);
     }
 }
@@ -343,7 +344,7 @@ void PlaylistListModel::removeItems(const QList<int>& indexes)
     });
 
     {
-        PlaylistLocker locker(d->m_playlist);
+        vlc_playlist_locker locker(d->m_playlist);
         int ret = vlc_playlist_RequestRemove(d->m_playlist, itemsToRemove.constData(),
                                              itemsToRemove.size(), indexes[0]);
         if (ret != VLC_SUCCESS)
@@ -393,7 +394,7 @@ PlaylistListModel::moveItems(const QList<int> &sortedIndexes, int target,
         target = getMovePostTarget(sortedIndexes, target);
     }
 
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
     int ret = vlc_playlist_RequestMove(d->m_playlist, itemsToMove.constData(),
                                        itemsToMove.size(), target,
                                        sortedIndexes[0]);
@@ -461,14 +462,14 @@ void PlaylistListModel::setPlaylistId(vlc_playlist_t* playlist)
     Q_D(PlaylistListModel);
     if (d->m_playlist && d->m_listener)
     {
-        PlaylistLocker locker(d->m_playlist);
+        vlc_playlist_locker locker(d->m_playlist);
         vlc_playlist_RemoveListener(d->m_playlist, d->m_listener);
         d->m_playlist = nullptr;
         d->m_listener = nullptr;
     }
     if (playlist)
     {
-        PlaylistLocker locker(playlist);
+        vlc_playlist_locker locker(playlist);
         d->m_playlist = playlist;
         d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
     }

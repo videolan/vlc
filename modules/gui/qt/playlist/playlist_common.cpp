@@ -43,14 +43,3 @@ PlaylistPtr&PlaylistPtr::operator=(const PlaylistPtr& ptr)
     this->m_playlist = ptr.m_playlist;
     return *this;
 }
-
-PlaylistLocker::PlaylistLocker(vlc_playlist_t* playlist)
-    : m_playlist(playlist)
-{
-    vlc_playlist_Lock(m_playlist);
-}
-
-PlaylistLocker::~PlaylistLocker()
-{
-    vlc_playlist_Unlock(m_playlist);
-}

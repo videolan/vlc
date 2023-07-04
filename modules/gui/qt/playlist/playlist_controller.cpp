@@ -333,7 +333,7 @@ PlaylistControllerPrivate::~PlaylistControllerPrivate()
 {
     if (m_playlist && m_listener)
     {
-        PlaylistLocker lock(m_playlist);
+        vlc_playlist_locker lock(m_playlist);
         vlc_playlist_RemoveListener(m_playlist, m_listener);
     }
 }
@@ -381,7 +381,7 @@ PlaylistController::append(const QVector<Media> &media, bool startPlaying)
 {
     Q_D(PlaylistController);
 
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
     /* We can't append an empty media. */
@@ -405,7 +405,7 @@ void
 PlaylistController::insert(size_t index, const QVector<Media> &media, bool startPlaying)
 {
     Q_D(PlaylistController);
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
     /* We can't insert an empty media. */
@@ -429,7 +429,7 @@ PlaylistController::move(const QVector<PlaylistItem> &items, size_t target,
                ssize_t indexHint)
 {
     Q_D(PlaylistController);
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
 
     auto rawItems = toRaw<vlc_playlist_item_t *>(items);
     int ret = vlc_playlist_RequestMove(d->m_playlist, rawItems.constData(),
@@ -442,7 +442,7 @@ void
 PlaylistController::remove(const QVector<PlaylistItem> &items, ssize_t indexHint)
 {
     Q_D(PlaylistController);
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
     auto rawItems = toRaw<vlc_playlist_item_t *>(items);
     int ret = vlc_playlist_RequestRemove(d->m_playlist, rawItems.constData(),
                                          rawItems.size(), indexHint);
@@ -454,7 +454,7 @@ void
 PlaylistController::shuffle()
 {
     Q_D(PlaylistController);
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
     vlc_playlist_Shuffle(d->m_playlist);
 }
 
@@ -462,7 +462,7 @@ void
 PlaylistController::sort(const QVector<vlc_playlist_sort_criterion> &criteria)
 {
     Q_D(PlaylistController);
-    PlaylistLocker locker(d->m_playlist);
+    vlc_playlist_locker locker(d->m_playlist);
     vlc_playlist_Sort(d->m_playlist, criteria.constData(), criteria.size());
 }
 
@@ -541,42 +541,42 @@ void PlaylistController::explore(const PlaylistItem& pItem)
 void PlaylistController::play()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Start( d->m_playlist );
 }
 
 void PlaylistController::pause()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Pause( d->m_playlist );
 }
 
 void PlaylistController::stop()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Stop( d->m_playlist );
 }
 
 void PlaylistController::next()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Next( d->m_playlist );
 }
 
 void PlaylistController::prev()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Prev( d->m_playlist );
 }
 
 void PlaylistController::prevOrReset()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     bool seek = false;
     vlc_player_t* player = vlc_playlist_GetPlayer( d->m_playlist );
     Q_ASSERT(player);
@@ -595,7 +595,7 @@ void PlaylistController::prevOrReset()
 void PlaylistController::togglePlayPause()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_player_t* player = vlc_playlist_GetPlayer( d->m_playlist );
     if ( vlc_player_IsStarted(player) )
         vlc_player_TogglePause( player );
@@ -607,7 +607,7 @@ void PlaylistController::toggleRandom()
 {
     Q_D(PlaylistController);
     vlc_playlist_playback_order new_order;
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     if ( d->m_random )
         new_order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     else
@@ -634,7 +634,7 @@ void PlaylistController::toggleRepeatMode()
         break;
     }
     {
-        PlaylistLocker lock{ d->m_playlist };
+        vlc_playlist_locker lock{ d->m_playlist };
         vlc_playlist_SetPlaybackRepeat( d->m_playlist, new_repeat );
     }
     config_PutInt( "repeat", new_repeat );
@@ -643,14 +643,14 @@ void PlaylistController::toggleRepeatMode()
 void PlaylistController::clear()
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_Clear( d->m_playlist );
 }
 
 void PlaylistController::goTo(uint index, bool startPlaying)
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     size_t count = vlc_playlist_Count( d->m_playlist );
     if (count == 0 || index > count-1)
         return;
@@ -668,7 +668,7 @@ bool PlaylistController::isRandom() const
 void PlaylistController::setRandom(bool random)
 {
     Q_D(const PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_SetPlaybackOrder( d->m_playlist, random ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL );
 }
 
@@ -683,14 +683,14 @@ void PlaylistController::setPlaylistPtr(vlc_playlist_t* newPlaylist)
     Q_D(PlaylistController);
     if (d->m_playlist && d->m_listener)
     {
-        PlaylistLocker locker(d->m_playlist);
+        vlc_playlist_locker locker(d->m_playlist);
         vlc_playlist_RemoveListener(d->m_playlist, d->m_listener);
         d->m_playlist = nullptr;
         d->m_listener = nullptr;
     }
     if (newPlaylist)
     {
-        PlaylistLocker locker(newPlaylist);
+        vlc_playlist_locker locker(newPlaylist);
         d->m_playlist = newPlaylist;
         d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
         /*
@@ -727,7 +727,7 @@ PlaylistController::PlaybackRepeat PlaylistController::getRepeatMode() const
 void PlaylistController::setRepeatMode(PlaylistController::PlaybackRepeat mode)
 {
     Q_D(const PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_playlist_SetPlaybackRepeat( d->m_playlist, static_cast<vlc_playlist_playback_repeat>(mode) );
 }
 
@@ -741,7 +741,7 @@ bool PlaylistController::isPlayAndExit() const
 void PlaylistController::setPlayAndExit(bool enable)
 {
     Q_D(PlaylistController);
-    PlaylistLocker lock{ d->m_playlist };
+    vlc_playlist_locker lock{ d->m_playlist };
     vlc_player_t* player = vlc_playlist_GetPlayer( d->m_playlist );
     vlc_player_SetMediaStoppedAction( player, enable ? VLC_PLAYER_MEDIA_STOPPED_EXIT :  VLC_PLAYER_MEDIA_STOPPED_CONTINUE );
 }

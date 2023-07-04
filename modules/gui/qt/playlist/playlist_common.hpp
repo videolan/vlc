@@ -37,15 +37,4 @@ public:
     vlc_playlist_t* m_playlist = nullptr;
 };
 
-class PlaylistLocker
-{
-public:
-    PlaylistLocker(vlc_playlist_t* playlist);
-
-    ~PlaylistLocker();
-
-private:
-    vlc_playlist_t* m_playlist;
-};
-
 #endif // PLAYLIST_COMMON_HPP
