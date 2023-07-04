@@ -129,6 +129,9 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_intf->p_mainPlayerController);
     SingletonRegisterHelper<PlayerController>::setInstance(m_intf->p_mainPlayerController);
 
+    assert(m_intf->p_mainPlaylistController);
+    SingletonRegisterHelper<PlaylistController>::setInstance(m_intf->p_mainPlaylistController);
+
     assert(DialogsProvider::getInstance());
     SingletonRegisterHelper<DialogsProvider>::setInstance(DialogsProvider::getInstance());
 
@@ -234,6 +237,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
         qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
+        qmlRegisterSingletonType<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", SingletonRegisterHelper<PlaylistController>::callback);
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
