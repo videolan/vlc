@@ -21,10 +21,6 @@
 #ifndef VLC_ANSI_TERM_H
 #define VLC_ANSI_TERM_H 1
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #if !defined( _WIN32 )
 # include <termios.h>
 # include <sys/ioctl.h>
