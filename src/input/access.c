@@ -32,10 +32,9 @@
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_interrupt.h>
+#include <vlc_access.h>
 
-#include <libvlc.h>
 #include "stream.h"
-#include "input_internal.h"
 
 struct vlc_access_private
 {
