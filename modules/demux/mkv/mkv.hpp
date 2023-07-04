@@ -32,15 +32,10 @@
 # include "config.h"
 #endif
 
-#include <inttypes.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include <time.h>
-
 #include <vlc_meta.h>
-#include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_aout.h> /* For reordering */
