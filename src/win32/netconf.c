@@ -23,7 +23,6 @@
 #endif
 
 #include <string.h>
-#include <windows.h>
 
 #include <vlc_common.h>
 #include <vlc_configuration.h>
