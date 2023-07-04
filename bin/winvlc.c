@@ -141,21 +141,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
-    /* SetProcessDEPPolicy, SetDllDirectory, & Co. */
-    HINSTANCE h_Kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-    if (h_Kernel32 != NULL)
-    {
-        /* Enable DEP */
-#ifndef PROCESS_DEP_ENABLE
-# define PROCESS_DEP_ENABLE 1
-#endif /* PROCESS_DEP_ENABLE */
-        BOOL (WINAPI * mySetProcessDEPPolicy)( DWORD dwFlags);
-        mySetProcessDEPPolicy = (BOOL (WINAPI *)(DWORD))
-                            GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
-        if(mySetProcessDEPPolicy)
-            mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
-
-    }
+    /* Enable DEP */
+    SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
     /* Do NOT load any library from cwd. */
     SetDllDirectory(TEXT(""));
