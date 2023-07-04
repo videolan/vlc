@@ -737,10 +737,9 @@ static void* update_DownloadReal( void *obj )
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
         wchar_t psz_wdestfile[MAX_PATH];
         MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
-        answer = (int)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
-#endif
-        if(answer > 32)
+        if((intptr_t)(void*)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW) > 32)
             libvlc_Quit(vlc_object_instance(p_udt));
+#endif
     }
 #endif
 end:
