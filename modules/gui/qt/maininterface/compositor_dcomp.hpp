@@ -20,9 +20,7 @@
 
 #include "compositor.hpp"
 
-#include <windows.h>
-
-#include "maininterface/mainui.hpp"
+#include "../maininterface/mainui.hpp"
 #include "compositor_dcomp_acrylicsurface.hpp"
 #include "compositor_dcomp_uisurface.hpp"
 #include "videosurface.hpp"

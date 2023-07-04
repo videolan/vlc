@@ -1,8 +1,9 @@
+#include "../../maininterface/mainctx.hpp"
+
 #include <QQuickWindow>
 #include <QSGImageNode>
 
 #include "csdthemeimage.hpp"
-#include <maininterface/mainctx.hpp>
 
 
 CSDThemeImage::CSDThemeImage(QQuickItem *parent)

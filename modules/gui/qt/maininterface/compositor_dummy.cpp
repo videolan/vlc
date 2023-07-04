@@ -17,8 +17,6 @@
  *****************************************************************************/
 #include "compositor_dummy.hpp"
 
-#include <QQuickView>
-
 #include "maininterface/mainctx.hpp"
 #include "maininterface/mainui.hpp"
 #include "maininterface/interface_window_handler.hpp"

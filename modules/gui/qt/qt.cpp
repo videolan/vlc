@@ -85,7 +85,6 @@ extern "C" char **environ;
 #include <vlc_window.h>
 #include <vlc_player.h>
 #include <vlc_threads.h>
-#include <vlc_cxx_helpers.hpp>
 
 #include <QQuickWindow>
 

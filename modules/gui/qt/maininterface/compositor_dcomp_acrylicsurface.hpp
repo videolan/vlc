@@ -24,7 +24,7 @@
 #include <QAbstractNativeEventFilter>
 #include <QBasicTimer>
 
-#include <windows.h>
+#include "mainctx.hpp"
 
 // Win 8.1 for IDCompositionDevice3/IDCompositionVisual2
 # if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0603) // _WIN32_WINNT_WINBLUE
@@ -39,7 +39,6 @@
 #include <dwmapi.h>
 
 #include "compositor_dcomp_error.hpp"
-#include "mainctx.hpp"
 
 // Windows Private APIs, taken from https://blog.adeltax.com/dwm-thumbnails-but-with-idcompositionvisual/
 

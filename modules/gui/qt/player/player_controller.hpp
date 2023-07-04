@@ -23,12 +23,12 @@
 # include "config.h"
 #endif
 
-#include "qt.hpp"
+#include "../qt.hpp"
+#include <vlc_cxx_helpers.hpp>
 #include <QObject>
 #include <QEvent>
 #include <QScopedPointer>
 #include <QUrl>
-#include <vlc_cxx_helpers.hpp>
 #include "player/input_models.hpp"
 #include "util/audio_device_model.hpp"
 #include "util/varchoicemodel.hpp"
