@@ -202,7 +202,7 @@ Widgets.OverlayMenu {
 
             readonly property string marking: {
                 if (key === mainPlaylistController.sortKey) {
-                    return (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
+                    return (mainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC ? "↓" : "↑")
                 } else {
                     return null
                 }

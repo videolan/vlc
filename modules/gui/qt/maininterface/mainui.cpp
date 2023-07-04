@@ -268,7 +268,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "PlaylistItem", "");
         qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
-        qmlRegisterType<PlaylistControllerModel>( uri, versionMajor, versionMinor, "PlaylistControllerModel" );
+        qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
 
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 

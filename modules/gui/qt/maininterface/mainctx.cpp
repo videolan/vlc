@@ -689,7 +689,7 @@ void MainCtx::updateSystrayTooltipStatus( PlayerController::PlayingState )
 
 bool MainCtx::onWindowClose( QWindow* )
 {
-    PlaylistControllerModel* playlistController = p_intf->p_mainPlaylistController;
+    PlaylistController* playlistController = p_intf->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_mainPlayerController;
 
     if (m_videoSurfaceProvider)

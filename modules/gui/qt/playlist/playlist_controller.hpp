@@ -34,11 +34,11 @@
 namespace vlc {
   namespace playlist {
 
-class PlaylistControllerModelPrivate;
-class PlaylistControllerModel : public QObject
+class PlaylistControllerPrivate;
+class PlaylistController : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(PlaylistControllerModel)
+    Q_DISABLE_COPY(PlaylistController)
 
 public:
     enum PlaybackRepeat
@@ -122,9 +122,9 @@ public:
     Q_INVOKABLE void explore(const PlaylistItem& pItem);
 
 public:
-    PlaylistControllerModel(QObject *parent = nullptr);
-    PlaylistControllerModel(vlc_playlist_t *playlist, QObject *parent = nullptr);
-    virtual ~PlaylistControllerModel();
+    PlaylistController(QObject *parent = nullptr);
+    PlaylistController(vlc_playlist_t *playlist, QObject *parent = nullptr);
+    virtual ~PlaylistController();
 
 
 public slots:
@@ -184,8 +184,8 @@ signals:
     void playlistInitialized();
 
 private:
-    Q_DECLARE_PRIVATE(PlaylistControllerModel)
-    QScopedPointer<PlaylistControllerModelPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(PlaylistController)
+    QScopedPointer<PlaylistControllerPrivate> d_ptr;
 };
 
   } // namespace playlist

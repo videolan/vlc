@@ -940,13 +940,13 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         m_menu->addSeparator();
 
         using namespace vlc::playlist;
-        PlaylistControllerModel::SortKey currentKey = m_controler->getSortKey();
-        PlaylistControllerModel::SortOrder currentOrder = m_controler->getSortOrder();
+        PlaylistController::SortKey currentKey = m_controler->getSortKey();
+        PlaylistController::SortOrder currentOrder = m_controler->getSortOrder();
 
         QMenu* sortMenu = m_menu->addMenu(qtr("Sort by"));
         QActionGroup * group = new QActionGroup(sortMenu);
 
-        auto addSortAction = [&](const QString& label, PlaylistControllerModel::SortKey key, PlaylistControllerModel::SortOrder order) {
+        auto addSortAction = [&](const QString& label, PlaylistController::SortKey key, PlaylistController::SortOrder order) {
             QAction* action = sortMenu->addAction(label);
             connect(action, &QAction::triggered, this, [this, key, order]( ) {
                 m_controler->sort(key, order);
@@ -961,11 +961,11 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         {
             const QVariantMap varmap = it.toMap();
 
-            auto key = static_cast<PlaylistControllerModel::SortKey>(varmap.value("key").toInt());
+            auto key = static_cast<PlaylistController::SortKey>(varmap.value("key").toInt());
             QString label = varmap.value("title").toString();
 
-            addSortAction(qtr("%1 Ascending").arg(label), key, PlaylistControllerModel::SORT_ORDER_ASC);
-            addSortAction(qtr("%1 Descending").arg(label), key, PlaylistControllerModel::SORT_ORDER_DESC);
+            addSortAction(qtr("%1 Ascending").arg(label), key, PlaylistController::SORT_ORDER_ASC);
+            addSortAction(qtr("%1 Descending").arg(label), key, PlaylistController::SORT_ORDER_DESC);
         }
 
         action = m_menu->addAction( qtr("Shuffle the playlist") );

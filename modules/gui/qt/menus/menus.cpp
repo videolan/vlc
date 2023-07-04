@@ -216,7 +216,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     menu->addSeparator();
 
     action = addMPLStaticEntry( p_intf, menu, qtr( "Quit at the end of playlist" ), "",
-                               &PlaylistControllerModel::playAndExitChanged );
+                               &PlaylistController::playAndExitChanged );
     action->setCheckable( true );
     action->setChecked( THEMPL->isPlayAndExit() );
 
@@ -585,26 +585,26 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
     else
     {
         action = addMPLStaticEntry( p_intf, menu, qtr( "Pause" ),
-                ":/menu/pause.svg", &PlaylistControllerModel::togglePlayPause );
+                ":/menu/pause.svg", &PlaylistController::togglePlayPause );
     }
 
     /* Stop */
     action = addMPLStaticEntry( p_intf, menu, qtr( "&Stop" ),
-            ":/menu/stop.svg", &PlaylistControllerModel::stop );
+            ":/menu/stop.svg", &PlaylistController::stop );
     if( !hasInput )
         action->setEnabled( false );
 
     /* Next / Previous */
     bool bPlaylistEmpty = THEMPL->isEmpty();
     QAction* previousAction = addMPLStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-            ":/menu/previous.svg", &PlaylistControllerModel::prev );
+            ":/menu/previous.svg", &PlaylistController::prev );
     previousAction->setEnabled( !bPlaylistEmpty );
-    connect( THEMPL, &PlaylistControllerModel::isEmptyChanged, previousAction, &QAction::setDisabled);
+    connect( THEMPL, &PlaylistController::isEmptyChanged, previousAction, &QAction::setDisabled);
 
     QAction* nextAction = addMPLStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-            ":/menu/next.svg", &PlaylistControllerModel::next );
+            ":/menu/next.svg", &PlaylistController::next );
     nextAction->setEnabled( !bPlaylistEmpty );
-    connect( THEMPL, &PlaylistControllerModel::isEmptyChanged, nextAction, &QAction::setDisabled);
+    connect( THEMPL, &PlaylistController::isEmptyChanged, nextAction, &QAction::setDisabled);
 
     action = menu->addAction( qtr( "Record" ), THEMIM, &PlayerController::toggleRecord );
     action->setIcon( QIcon( ":/menu/record.svg" ) );

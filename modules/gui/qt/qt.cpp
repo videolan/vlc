@@ -784,7 +784,7 @@ static void *Thread( void *obj )
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
     p_intf->p_mainPlayerController = new PlayerController(p_intf);
-    p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistControllerModel(p_intf->p_playlist);
+    p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistController(p_intf->p_playlist);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

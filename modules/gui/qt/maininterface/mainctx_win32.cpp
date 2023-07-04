@@ -542,7 +542,7 @@ WinTaskbarWidget::WinTaskbarWidget(qt_intf_t *_p_intf, QWindow* windowHandle, QO
     taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
     if (taskbar_wmsg == 0)
         msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
-    connect(THEMPL, &PlaylistControllerModel::countChanged,
+    connect(THEMPL, &PlaylistController::countChanged,
             this, &WinTaskbarWidget::playlistItemCountChanged);
     connect(THEMIM, &PlayerController::fullscreenChanged,
             this, &WinTaskbarWidget::onVideoFullscreenChanged);
@@ -658,7 +658,7 @@ void WinTaskbarWidget::createTaskBarButtons()
     }
     connect( THEMIM, &PlayerController::playingStateChanged,
              this, &WinTaskbarWidget::changeThumbbarButtons);
-    connect( THEMPL, &vlc::playlist::PlaylistControllerModel::countChanged,
+    connect( THEMPL, &vlc::playlist::PlaylistController::countChanged,
             this, &WinTaskbarWidget::playlistItemCountChanged );
     if( THEMIM->getPlayingState() == PlayerController::PLAYING_STATE_PLAYING )
         changeThumbbarButtons( THEMIM->getPlayingState() );

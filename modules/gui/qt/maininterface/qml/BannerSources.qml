@@ -306,7 +306,7 @@ FocusScope {
                                 criteriaRole: "criteria"
 
                                 sortKey: contentModel ? contentModel.sortCriteria
-                                                      : PlaylistControllerModel.SORT_KEY_NONE
+                                                      : PlaylistController.SORT_KEY_NONE
 
                                 sortOrder: contentModel ? contentModel.sortOrder : undefined
 

@@ -34,7 +34,7 @@ class NetworkMediaModel;
 class MainCtx;
 namespace vlc {
 namespace playlist {
-class PlaylistControllerModel;
+class PlaylistController;
 class PlaylistListModel;
 }
 }
@@ -359,7 +359,7 @@ private:
 class PlaylistContextMenu : public QObject {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistListModel*, model, nullptr)
-    SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistControllerModel*, controler, nullptr)
+    SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistController*, controler, nullptr)
 public:
     PlaylistContextMenu(QObject* parent = nullptr);
 

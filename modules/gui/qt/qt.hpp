@@ -75,7 +75,7 @@ namespace vlc {
 class Compositor;
 
 namespace playlist {
-class PlaylistControllerModel;
+class PlaylistController;
 }
 
 }
@@ -104,7 +104,7 @@ struct qt_intf_t
 
     vlc_playlist_t *p_playlist;  /* playlist */
     vlc_player_t *p_player; /* player */
-    vlc::playlist::PlaylistControllerModel* p_mainPlaylistController;
+    vlc::playlist::PlaylistController* p_mainPlaylistController;
     PlayerController* p_mainPlayerController;
     vlc::Compositor*  p_compositor;
 
