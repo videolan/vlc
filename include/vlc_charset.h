@@ -197,6 +197,8 @@ VLC_USED static inline char *FromCFString(const CFStringRef cfString,
 #endif
 
 #ifdef _WIN32
+# include <windows.h>
+
 VLC_USED
 static inline char *FromWide (const wchar_t *wide)
 {
