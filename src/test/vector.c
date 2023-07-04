@@ -39,6 +39,8 @@ static void test_vector_insert_remove(void)
     assert(ok);
     assert(vec.data[0] == 42);
     assert(vec.size == 1);
+    assert(vlc_vector_last(&vec) == 42);
+    assert(*vlc_vector_last_ref(&vec) == 42);
 
     ok = vlc_vector_push(&vec, 37);
     assert(ok);
@@ -66,6 +68,8 @@ static void test_vector_insert_remove(void)
     assert(vec.data[0] == 42);
     assert(vec.data[1] == 37);
     assert(vec.data[2] == 77);
+    assert(vlc_vector_last(&vec) == 77);
+    assert(*vlc_vector_last_ref(&vec) == 77);
 
     vlc_vector_clear(&vec);
     assert(vec.size == 0);

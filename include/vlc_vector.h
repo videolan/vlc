@@ -664,6 +664,24 @@ vlc_vector_move_(char *array, size_t index, size_t count, size_t target)
              ((item) = (pv)->data[vlc_vector_idx_##item], true); \
          ++vlc_vector_idx_##item)
 
+/**
+ * Returns a reference to the vector's first element.
+ */
+#define vlc_vector_last(pv) \
+( \
+    assert((pv)->size != 0), \
+    (pv)->data[(pv)->size - 1] \
+)
+
+/**
+ * Returns a reference on the vector's last element.
+ */
+#define vlc_vector_last_ref(pv) \
+( \
+    assert((pv)->size != 0), \
+    &(pv)->data[(pv)->size - 1] \
+)
+
 /** @} */
 
 #endif
