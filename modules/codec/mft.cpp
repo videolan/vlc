@@ -20,13 +20,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <cassert>
 

@@ -23,17 +23,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <winapifamily.h>
+#undef WINAPI_FAMILY
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <assert.h>
-
-#include <winapifamily.h>
-#if defined(WINAPI_FAMILY)
-# undef WINAPI_FAMILY
-#endif
-#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
 #include <initguid.h>
 

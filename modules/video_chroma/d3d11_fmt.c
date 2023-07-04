@@ -20,6 +20,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define BUILD_FOR_UAP 0
+#else
+#define BUILD_FOR_UAP 1
+#endif
+#if defined(WINAPI_FAMILY)
+# undef WINAPI_FAMILY
+#endif
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -45,16 +56,6 @@
 
 #include "d3d11_fmt.h"
 
-#include <winapifamily.h>
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#define BUILD_FOR_UAP 0
-#else
-#define BUILD_FOR_UAP 1
-#endif
-#if defined(WINAPI_FAMILY)
-# undef WINAPI_FAMILY
-#endif
-#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 #include <wbemidl.h>
 
 #define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \

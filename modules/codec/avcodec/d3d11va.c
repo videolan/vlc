@@ -28,12 +28,14 @@
 /**
   * See https://msdn.microsoft.com/en-us/library/windows/desktop/hh162912%28v=vs.85%29.aspx
   **/
+
+#include <winapifamily.h>
+#undef WINAPI_FAMILY
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-# undef WINAPI_FAMILY
-# define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
 #include <assert.h>
 
