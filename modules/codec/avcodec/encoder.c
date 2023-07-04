@@ -927,11 +927,14 @@ errmsg:
 
         if( p_enc->fmt_out.audio.i_channels > 2 )
         {
+#if LIBAVCODEC_VERSION_CHECK(59, 999, 999, 24, 100)
+            av_channel_layout_default( &p_context->ch_layout, 2 );
+#else
             p_context->channels = 2;
-#if API_CHANNEL_LAYOUT
+# if API_CHANNEL_LAYOUT
             p_context->channel_layout = channel_mask[p_context->channels][1];
+# endif
 #endif
-
             /* Change fmt_in in order to ask for a channels conversion */
             p_enc->fmt_in.audio.i_channels =
             p_enc->fmt_out.audio.i_channels = 2;
@@ -1288,8 +1291,12 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, uns
     av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
+#if LIBAVCODEC_VERSION_CHECK(59, 999, 999, 24, 100)
+    av_channel_layout_copy(&p_sys->frame->ch_layout, &p_sys->p_context->ch_layout);
+#else
     p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
     p_sys->frame->channels = p_sys->p_context->channels;
+#endif
 
     p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
                                 CLOCK_FREQ / p_sys->p_context->time_base.num;
@@ -1419,8 +1426,12 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
                                     CLOCK_FREQ / p_sys->p_context->time_base.num;
 
+#if LIBAVCODEC_VERSION_CHECK(59, 999, 999, 24, 100)
+        av_channel_layout_copy(&p_sys->frame->ch_layout, &p_sys->p_context->ch_layout);
+#else
         p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
         p_sys->frame->channels = p_sys->p_context->channels;
+#endif
 
         const int in_bytes = p_sys->frame->nb_samples *
             p_enc->fmt_out.audio.i_channels* p_sys->i_sample_bytes;
