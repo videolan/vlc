@@ -29,6 +29,16 @@
 #include <list>
 #include <shlobj.h>
 
+#include <vlc_charset.h>
+
+/// Wrapper around FromWide, to avoid the need to call free()
+static inline std::string sFromWide( const std::wstring &rWide )
+{
+    char *s = FromWide( rWide.c_str() );
+    std::string res = s;
+    free( s );
+    return res;
+}
 
 Win32DragDrop::Win32DragDrop( intf_thread_t *pIntf,
                               GenericWindow* pWin )

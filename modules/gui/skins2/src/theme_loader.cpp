@@ -36,6 +36,7 @@
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include <vlc_stream_extractor.h>
+#include <vlc_charset.h>
 
 #include "theme_loader.hpp"
 #include "theme.hpp"
@@ -47,6 +48,18 @@
 
 #define DEFAULT_XML_FILE "theme.xml"
 #define WINAMP2_XML_FILE "winamp2.xml"
+
+#if defined( __OS2__ )
+/// Wrapper around FromLocale, to avoid the need to call LocaleFree()
+static inline std::string sFromLocale( const std::string &rLocale )
+{
+    const char *s = FromLocale( rLocale.c_str() );
+    std::string res = s;
+    LocaleFree( s );
+    return res;
+}
+#endif
+
 
 /* Recursive make directory
  * Abort if you get an ENOENT errno somewhere in the middle

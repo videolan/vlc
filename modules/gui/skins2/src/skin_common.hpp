@@ -32,7 +32,6 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_player.h>
-#include <vlc_charset.h>
 #include <vlc_fs.h>
 
 #include <string>
@@ -60,26 +59,6 @@ class ThemeRepository;
 #pragma warning ( disable:4355 )
 // turn off 'identifier was truncated to '255' characters in the debug info'
 #pragma warning ( disable:4786 )
-#endif
-
-/// Wrapper around FromLocale, to avoid the need to call LocaleFree()
-static inline std::string sFromLocale( const std::string &rLocale )
-{
-    const char *s = FromLocale( rLocale.c_str() );
-    std::string res = s;
-    LocaleFree( s );
-    return res;
-}
-
-#ifdef _WIN32
-/// Wrapper around FromWide, to avoid the need to call free()
-static inline std::string sFromWide( const std::wstring &rWide )
-{
-    char *s = FromWide( rWide.c_str() );
-    std::string res = s;
-    free( s );
-    return res;
-}
 #endif
 
 //---------------------------------------------------------------------------

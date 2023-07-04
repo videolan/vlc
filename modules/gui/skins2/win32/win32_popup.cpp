@@ -25,6 +25,8 @@
 #include "win32_popup.hpp"
 #include "win32_factory.hpp"
 
+#include <vlc_charset.h>
+
 #ifndef TPM_NOANIMATION
 const UINT TPM_NOANIMATION = 0x4000L;
 #endif
