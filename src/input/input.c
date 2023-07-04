@@ -269,7 +269,6 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     priv->is_stopped = false;
     priv->b_recording = false;
     priv->rate = 1.f;
-    priv->normal_time = VLC_TICK_0;
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->p_sout   = NULL;
     priv->b_out_pace_control = priv->type == INPUT_TYPE_THUMBNAILING;
@@ -575,6 +574,7 @@ static void MainLoopStatistics( input_thread_t *p_input )
     double f_position = 0.0;
     vlc_tick_t i_time;
     vlc_tick_t i_length;
+    vlc_tick_t i_normal_time;
 
     /* update input status variables */
     if( demux_Control( priv->master->p_demux,
@@ -587,12 +587,11 @@ static void MainLoopStatistics( input_thread_t *p_input )
     if( demux_Control( priv->master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
 
-    /* In case of failure (not implemented or in case of seek), use the last
-     * normal_time value (that is VLC_TICK_0 by default). */
-    if (demux_Control( priv->master->p_demux, DEMUX_GET_NORMAL_TIME, &priv->normal_time ) != VLC_SUCCESS)
-        priv->normal_time = VLC_TICK_0;
+    /* In case of failure (not implemented or in case of seek), use VLC_TICK_0. */
+    if (demux_Control( priv->master->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
+        i_normal_time = VLC_TICK_0;
 
-    es_out_SetTimes( priv->p_es_out, f_position, i_time, priv->normal_time,
+    es_out_SetTimes( priv->p_es_out, f_position, i_time, i_normal_time,
                      i_length );
 
     if (priv->stats != NULL)
@@ -1298,8 +1297,7 @@ static int Init( input_thread_t * p_input )
     if( i_length == 0 )
         i_length = input_item_GetDuration( priv->p_item );
 
-    input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, priv->normal_time,
-                          i_length );
+    input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, VLC_TICK_0, i_length );
 
     if( priv->type != INPUT_TYPE_PREPARSING )
     {

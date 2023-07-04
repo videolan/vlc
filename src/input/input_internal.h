@@ -464,7 +464,6 @@ typedef struct input_thread_private_t
     bool        is_stopped;
     bool        b_recording;
     float       rate;
-    vlc_tick_t  normal_time;
 
     /* Playtime configuration and state */
     vlc_tick_t  i_start;    /* :start-time,0 by default */
