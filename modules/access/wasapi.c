@@ -32,6 +32,7 @@
 #include <stdlib.h>
 
 #define _DECL_DLLMAIN
+#include <process.h>
 #include <vlc_common.h>
 #include <windows.h>
 #include <vlc_aout.h>
@@ -74,7 +75,7 @@ static msftime_t GetQPC_100ns(void)
 
 static msftime_t (*get_qpc)(void);
 
-BOOL WINAPI DllMain(HANDLE dll, DWORD reason, LPVOID reserved)
+int __stdcall DllMain(void *dll, unsigned reason, void *reserved)
 {
     (void) dll;
     (void) reserved;
