@@ -35,6 +35,8 @@
 #include <vlc_block.h>
 #include <vlc_codecs.h>
 
+#include "../demux/windows_audio_commons.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -75,18 +77,6 @@ typedef struct
     uint8_t i_chans_to_reorder;            /* do we need channel reordering */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
 } sout_mux_sys_t;
-
-static const uint32_t pi_channels_in[] =
-    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
-      WAVE_SPEAKER_SIDE_LEFT, WAVE_SPEAKER_SIDE_RIGHT,
-      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT, WAVE_SPEAKER_BACK_CENTER,
-      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY, 0 };
-static const uint32_t pi_channels_out[] =
-    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
-      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY,
-      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT,
-      WAVE_SPEAKER_BACK_CENTER,
-      WAVE_SPEAKER_SIDE_LEFT, WAVE_SPEAKER_SIDE_RIGHT, 0 };
 
 /*****************************************************************************
  * Open:
@@ -175,10 +165,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         for( unsigned i = 0; i < pi_vlc_chan_order_wg4[i]; i++ )
             if( p_input->p_fmt->audio.i_physical_channels & pi_vlc_chan_order_wg4[i])
-                p_sys->i_channel_mask |= pi_channels_in[i];
+                p_sys->i_channel_mask |= pi_vlc_chan_order_wg4[i];
 
         p_sys->i_chans_to_reorder =
-            aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+            aout_CheckChannelReorder( NULL, pi_channels_aout,
                                       p_sys->i_channel_mask,
                                       p_sys->pi_chan_table );
 
