@@ -73,7 +73,7 @@ Item {
         z: 1
 
         hoverEnabled: true
-        onClicked: mainPlaylistController.togglePlayPause()
+        onClicked: MainPlaylistController.togglePlayPause()
 
         enabled: root.enabled
         visible: root.visible
@@ -103,7 +103,7 @@ Item {
                       ? VLCIcons.pause
                       : VLCIcons.play
 
-                onClicked: mainPlaylistController.togglePlayPause()
+                onClicked: MainPlaylistController.togglePlayPause()
             }
 
             Widgets.IconButton {
@@ -118,7 +118,7 @@ Item {
                 text: I18n.qtr("close video")
                 iconText: VLCIcons.close
 
-                onClicked: mainPlaylistController.stop()
+                onClicked: MainPlaylistController.stop()
             }
 
 

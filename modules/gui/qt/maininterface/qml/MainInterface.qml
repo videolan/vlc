@@ -83,10 +83,8 @@ Item {
         onClosing: MainCtx.playlistVisible = false
     }
 
-
-    PlaylistControllerModel {
-        id: mainPlaylistController
-        playlistPtr: MainCtx.mainPlaylist
+    Connections {
+        target: MainPlaylistController
 
         onPlaylistInitialized: {
             g_mainInterface._playlistReady = true
@@ -124,7 +122,7 @@ Item {
                 // NOTE: Useful when we started the application on the 'player' view.
                 if (History.previousEmpty) {
                     if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                        mainPlaylistController.stop()
+                        MainPlaylistController.stop()
 
                     _pushHome()
 
@@ -135,7 +133,7 @@ Item {
                     return
 
                 if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                    mainPlaylistController.stop()
+                    MainPlaylistController.stop()
 
                 History.previous()
             } else {
@@ -151,7 +149,7 @@ Item {
 
     function setInitialView() {
         //set the initial view
-        const loadPlayer = !mainPlaylistController.empty;
+        const loadPlayer = !MainPlaylistController.empty;
 
         if (MainCtx.mediaLibraryAvailable)
             History.push(["mc", "video"],
@@ -204,7 +202,7 @@ Item {
                     }
                 }
 
-                mainPlaylistController.append(urls, true)
+                MainPlaylistController.append(urls, true)
                 drop.accept()
             }
         }

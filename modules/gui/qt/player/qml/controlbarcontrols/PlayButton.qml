@@ -65,8 +65,8 @@ T.Control {
     Accessible.checkable: true
     Accessible.checked: Player.playingState !== Player.PLAYING_STATE_PAUSED
                         && Player.playingState !== Player.PLAYING_STATE_STOPPED
-    Accessible.onPressAction: mainPlaylistController.togglePlayPause()
-    Accessible.onToggleAction: mainPlaylistController.togglePlayPause()
+    Accessible.onPressAction: MainPlaylistController.togglePlayPause()
+    Accessible.onToggleAction: MainPlaylistController.togglePlayPause()
 
     // States
 
@@ -130,7 +130,7 @@ T.Control {
                 _keyOkPressed = false
                 keyHoldTimer.stop()
                 if (Player.playingState !== Player.PLAYING_STATE_STOPPED)
-                    mainPlaylistController.togglePlayPause()
+                    MainPlaylistController.togglePlayPause()
             }
             event.accepted = true
         }
@@ -140,7 +140,7 @@ T.Control {
 
     function _pressAndHoldAction() {
         _keyOkPressed = false
-        mainPlaylistController.stop()
+        MainPlaylistController.stop()
     }
 
     // Children
@@ -186,7 +186,7 @@ T.Control {
         }
 
         onClicked: {
-            mainPlaylistController.togglePlayPause()
+            MainPlaylistController.togglePlayPause()
             mouse.accepted = true
         }
 

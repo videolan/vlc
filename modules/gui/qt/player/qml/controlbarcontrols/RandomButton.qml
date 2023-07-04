@@ -25,8 +25,8 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: randomBtn
-    checked: mainPlaylistController.random
+    checked: MainPlaylistController.random
     iconText: VLCIcons.shuffle_on
-    onClicked: mainPlaylistController.toggleRandom()
+    onClicked: MainPlaylistController.toggleRandom()
     text: I18n.qtr("Random")
 }

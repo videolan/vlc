@@ -74,7 +74,7 @@ FocusScope {
                     if (urlListDisplay.status == Loader.Ready)
                         urlListDisplay.item.model.addAndPlay(text)
                     else
-                        mainPlaylistController.append([text], true)
+                        MainPlaylistController.append([text], true)
                 }
 
                 Keys.priority: Keys.AfterItem

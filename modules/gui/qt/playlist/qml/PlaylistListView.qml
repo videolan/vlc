@@ -87,7 +87,7 @@ Control {
                         console.warn("can't convert items to input items");
                         return
                     }
-                    mainPlaylistController.insert(index, inputItems, false)
+                    MainPlaylistController.insert(index, inputItems, false)
                 })
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
@@ -97,7 +97,7 @@ Control {
             for (let url in drop.urls)
                 urlList.push(drop.urls[url]);
 
-            mainPlaylistController.insert(index, urlList, false);
+            MainPlaylistController.insert(index, urlList, false);
 
             // NOTE This is required otherwise backend may handle the drop as well yielding double addition.
             drop.accept(Qt.IgnoreAction);
@@ -157,7 +157,7 @@ Control {
     PlaylistContextMenu {
         id: contextMenu
         model: root.model
-        controler: mainPlaylistController
+        controler: MainPlaylistController
     }
 
     background: Widgets.AcrylicBackground {
@@ -277,7 +277,7 @@ Control {
             clip: true // else out of view items will overlap with surronding items
 
             model: PlaylistListModel {
-                playlistId: MainCtx.mainPlaylistController.playlistPtr
+                playlistId: MainPlaylistController.playlistPtr
             }
 
             dragAutoScrollDragItem: dragItem
@@ -515,7 +515,7 @@ Control {
                 if (mode === PlaylistListView.Mode.Select)
                     root.model.toggleSelected(index)
                 else if (mode === PlaylistListView.Mode.Normal)
-                    mainPlaylistController.goTo(index, true)
+                    MainPlaylistController.goTo(index, true)
             }
 
             function onDelete() {

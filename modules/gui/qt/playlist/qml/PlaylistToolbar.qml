@@ -48,11 +48,11 @@ RowLayout {
 
             size: VLCStyle.icon_playlist
             text: I18n.qtr("Loop")
-            iconText: (mainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
+            iconText: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
                       ? VLCIcons.repeat_one
                       : VLCIcons.repeat_all
-            checked: mainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
-            onClicked: mainPlaylistController.toggleRepeatMode()
+            checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
+            onClicked: MainPlaylistController.toggleRepeatMode()
             focusPolicy: Qt.NoFocus
         }
     }
@@ -67,11 +67,11 @@ RowLayout {
 
             anchors.centerIn: parent
 
-            checked: mainPlaylistController.random
+            checked: MainPlaylistController.random
             size: VLCStyle.icon_playlist
             text: I18n.qtr("Shuffle")
             iconText: VLCIcons.shuffle_on
-            onClicked: mainPlaylistController.toggleRandom()
+            onClicked: MainPlaylistController.toggleRandom()
             focusPolicy: Qt.NoFocus
         }
     }
@@ -87,41 +87,41 @@ RowLayout {
 
             iconSize: VLCStyle.icon_playlist
 
-            enabled: mainPlaylistController.count > 1
+            enabled: MainPlaylistController.count > 1
 
-            checked: mainPlaylistController.sortKey !== PlaylistController.SORT_KEY_NONE
+            checked: MainPlaylistController.sortKey !== PlaylistController.SORT_KEY_NONE
 
             popupAbove: true
 
             focusPolicy: Qt.NoFocus
 
-            model: mainPlaylistController.sortKeyTitleList
+            model: MainPlaylistController.sortKeyTitleList
             textRole: "title"
             criteriaRole: "key"
 
             onSortSelected: {
-                mainPlaylistController.sortKey = key
+                MainPlaylistController.sortKey = key
             }
 
             onSortOrderSelected: {
                 if (type === Qt.AscendingOrder)
-                    mainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_ASC
+                    MainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_ASC
                 else if (type === Qt.DescendingOrder)
-                    mainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_DESC
+                    MainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_DESC
 
-                mainPlaylistController.sort()
+                MainPlaylistController.sort()
             }
 
             sortOrder: {
-                if (mainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC) {
+                if (MainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC) {
                     Qt.AscendingOrder
                 }
-                else if (mainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_DESC) {
+                else if (MainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_DESC) {
                     Qt.DescendingOrder
                 }
             }
 
-            sortKey: mainPlaylistController.sortKey
+            sortKey: MainPlaylistController.sortKey
         }
     }
 
@@ -135,10 +135,10 @@ RowLayout {
             anchors.centerIn: parent
 
             size: VLCStyle.icon_playlist
-            enabled: !mainPlaylistController.empty
+            enabled: !MainPlaylistController.empty
             text: I18n.qtr("Clear playqueue")
             iconText: VLCIcons.playlist_clear
-            onClicked: mainPlaylistController.clear()
+            onClicked: MainPlaylistController.clear()
             focusPolicy: Qt.NoFocus
         }
     }

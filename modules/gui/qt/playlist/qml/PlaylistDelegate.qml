@@ -263,7 +263,7 @@ T.ItemDelegate {
 
         onDoubleClicked: {
             if (mouse.button !== Qt.RightButton && root.mode === PlaylistListView.Mode.Normal)
-                mainPlaylistController.goTo(index, true)
+                MainPlaylistController.goTo(index, true)
         }
 
         onPressed: {
@@ -295,7 +295,7 @@ T.ItemDelegate {
             
             onTapped: {
                 if (root.mode === PlaylistListView.Mode.Normal) {
-                    mainPlaylistController.goTo(index, true)
+                    MainPlaylistController.goTo(index, true)
                 } else if (root.mode === PlaylistListView.Mode.Move) {
                     moveSelected()
                 }

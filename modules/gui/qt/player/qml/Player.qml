@@ -41,8 +41,9 @@ FocusScope {
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
 
     readonly property string coverSource: {
-        if (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-            mainPlaylistController.currentItem.artwork
+        if (MainPlaylistController.currentItem.artwork &&
+            MainPlaylistController.currentItem.artwork.toString())
+            MainPlaylistController.currentItem.artwork
         else if (Player.hasVideoOutput)
             VLCStyle.noArtVideoCover
         else
@@ -130,7 +131,7 @@ FocusScope {
             toolbarAutoHide.setVisibleControlBar(false)
         } else {
             if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
-               mainPlaylistController.stop()
+               MainPlaylistController.stop()
             }
             History.previous()
         }
@@ -318,7 +319,7 @@ FocusScope {
                       resumeVisible)
 
             focus: true
-            title: mainPlaylistController.currentItem.title
+            title: MainPlaylistController.currentItem.title
 
             pinControls: MainCtx.pinVideoControls
 
@@ -336,7 +337,7 @@ FocusScope {
 
             onBackRequested: {
                 if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
-                   mainPlaylistController.stop()
+                   MainPlaylistController.stop()
                 }
                 History.previous()
             }
@@ -431,7 +432,7 @@ FocusScope {
                     value: centerContent.height > (albumLabel.y + albumLabel.height)
                 }
 
-                text: mainPlaylistController.currentItem.album
+                text: MainPlaylistController.currentItem.album
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary
@@ -449,7 +450,7 @@ FocusScope {
                     value: centerContent.height > (artistLabel.y + artistLabel.height)
                 }
 
-                text: mainPlaylistController.currentItem.artist
+                text: MainPlaylistController.currentItem.artist
                 font.weight: Font.Light
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary

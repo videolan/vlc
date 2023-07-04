@@ -25,7 +25,7 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: prevBtn
     iconText: VLCIcons.previous
-    enabled: mainPlaylistController.hasPrev
-    onClicked: mainPlaylistController.prev()
+    enabled: MainPlaylistController.hasPrev
+    onClicked: MainPlaylistController.prev()
     text: I18n.qtr("Previous")
 }

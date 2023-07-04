@@ -25,10 +25,10 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: repeatBtn
-    checked: mainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
-    iconText: (mainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
+    checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
+    iconText: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
           ? VLCIcons.repeat_one
           : VLCIcons.repeat_all
-    onClicked: mainPlaylistController.toggleRepeatMode()
+    onClicked: MainPlaylistController.toggleRepeatMode()
     text: I18n.qtr("Repeat")
 }

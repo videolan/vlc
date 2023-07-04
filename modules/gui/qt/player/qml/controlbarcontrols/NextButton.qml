@@ -26,7 +26,7 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: nextBtn
     iconText: VLCIcons.next
-    enabled: mainPlaylistController.hasNext
-    onClicked: mainPlaylistController.next()
+    enabled: MainPlaylistController.hasNext
+    onClicked: MainPlaylistController.next()
     text: I18n.qtr("Next")
 }

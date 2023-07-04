@@ -29,7 +29,7 @@ Widgets.OverlayMenu {
     Action {
         id: playAction
         text: I18n.qtr("Play")
-        onTriggered: mainPlaylistController.goTo(root.model.getSelection()[0], true)
+        onTriggered: MainPlaylistController.goTo(root.model.getSelection()[0], true)
         readonly property string fontIcon: VLCIcons.play
     }
 
@@ -56,7 +56,7 @@ Widgets.OverlayMenu {
     Action {
         id: exploreAction
         text: I18n.qtr("Show Containing Directory")
-        onTriggered: mainPlaylistController.explore(root.model.itemAt(root.model.getSelection()[0]))
+        onTriggered: MainPlaylistController.explore(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/menu/folder.svg"
     }
 
@@ -90,7 +90,7 @@ Widgets.OverlayMenu {
     Action {
         id: clearAllAction
         text: I18n.qtr("Clear Playlist")
-        onTriggered: mainPlaylistController.clear()
+        onTriggered: MainPlaylistController.clear()
         icon.source: "qrc:/menu/clear.svg"
     }
 
@@ -103,7 +103,7 @@ Widgets.OverlayMenu {
     Action {
         id: shuffleAction
         text: I18n.qtr("Shuffle Playlist")
-        onTriggered: mainPlaylistController.shuffle()
+        onTriggered: MainPlaylistController.shuffle()
         readonly property string fontIcon: VLCIcons.shuffle_on
     }
 
@@ -201,21 +201,21 @@ Widgets.OverlayMenu {
             property int key
 
             readonly property string marking: {
-                if (key === mainPlaylistController.sortKey) {
-                    return (mainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC ? "↓" : "↑")
+                if (key === MainPlaylistController.sortKey) {
+                    return (MainPlaylistController.sortOrder === PlaylistController.SORT_ORDER_ASC ? "↓" : "↑")
                 } else {
                     return null
                 }
             }
 
-            readonly property bool tickMark: (key === mainPlaylistController.sortKey)
+            readonly property bool tickMark: (key === MainPlaylistController.sortKey)
 
-            onTriggered: mainPlaylistController.sort(key)
+            onTriggered: MainPlaylistController.sort(key)
         }
     }
 
     Repeater {
-        model: mainPlaylistController.sortKeyTitleList
+        model: MainPlaylistController.sortKeyTitleList
 
         delegate: Loader {
             sourceComponent: sortActionDelegate

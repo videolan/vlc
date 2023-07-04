@@ -27,6 +27,6 @@ Widgets.IconControlButton {
     id: stopBtn
     enabled: Player.isPlaying
     iconText: VLCIcons.stop
-    onClicked: mainPlaylistController.stop()
+    onClicked: MainPlaylistController.stop()
     text: I18n.qtr("Stop")
 }
