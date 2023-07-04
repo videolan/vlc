@@ -576,7 +576,8 @@ static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *it
     return length;
 }
 
-static void InputSourceStatistics( input_source_t *source, es_out_t *out )
+static void InputSourceStatistics( input_source_t *source, input_item_t *item,
+                                   es_out_t *out )
 {
     double f_position = 0.0;
     vlc_tick_t i_time;
@@ -591,8 +592,7 @@ static void InputSourceStatistics( input_source_t *source, es_out_t *out )
     if( demux_Control( source->p_demux, DEMUX_GET_TIME, &i_time ) )
         i_time = VLC_TICK_INVALID;
 
-    if( demux_Control( source->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = 0;
+    i_length = InputSourceGetLength( source, item );
 
     /* In case of failure (not implemented or in case of seek), use VLC_TICK_0. */
     if (demux_Control( source->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
@@ -608,12 +608,12 @@ static void MainLoopStatistics( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
 
-    InputSourceStatistics( priv->master, priv->p_es_out );
+    InputSourceStatistics( priv->master, priv->p_item, priv->p_es_out );
 
     for( int i = 0; i < priv->i_slave; i++ )
     {
         input_source_t *in = priv->slave[i];
-        InputSourceStatistics( in, in->p_slave_es_out );
+        InputSourceStatistics( in, NULL, in->p_slave_es_out );
     }
 
     if (priv->stats != NULL)
