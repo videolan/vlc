@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "audio_device_model.hpp"
+#include "player/player_controller.hpp"
 #include <vlc_player.h>
 #include <vlc_aout.h>
 

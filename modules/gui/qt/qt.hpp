@@ -133,20 +133,6 @@ public:
     }
 };
 
-/**
- * This class may be used for scope-bound locking/unlocking
- * of a player_t*. As hinted, the player is locked when
- * the object is created, and unlocked when the object is
- * destroyed.
- */
-struct vlc_player_locker {
-    vlc_player_locker( vlc_player_t* );
-    ~vlc_player_locker();
-
-    private:
-        vlc_player_t* p_player;
-};
-
 #define THEDP DialogsProvider::getInstance()
 #define THEMIM p_intf->p_mainPlayerController
 #define THEMPL p_intf->p_mainPlaylistController

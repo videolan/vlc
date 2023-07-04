@@ -1039,14 +1039,3 @@ static int WindowOpen( vlc_window_t *p_wnd )
         return ret ? VLC_SUCCESS : VLC_EGENERIC;
     }
 }
-
-vlc_player_locker::vlc_player_locker( vlc_player_t* p_player )
-    : p_player( p_player )
-{
-    vlc_player_Lock( p_player );
-}
-
-vlc_player_locker::~vlc_player_locker()
-{
-    vlc_player_Unlock( p_player );
-}

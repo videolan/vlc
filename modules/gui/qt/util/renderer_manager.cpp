@@ -3,6 +3,7 @@
 #endif
 
 #include "renderer_manager.hpp"
+#include "player/player_controller.hpp"
 
 #include <QApplication>
 

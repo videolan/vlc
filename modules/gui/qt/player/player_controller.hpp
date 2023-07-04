@@ -34,6 +34,9 @@
 #include "util/varchoicemodel.hpp"
 #include "util/vlctick.hpp"
 
+
+using vlc_player_locker = vlc_locker<vlc_player_t, vlc_player_Lock, vlc_player_Unlock>;
+
 class QSignalMapper;
 
 class IMEvent : public QEvent
