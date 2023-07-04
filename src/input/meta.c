@@ -31,10 +31,10 @@
 #include <vlc_url.h>
 #include <vlc_arrays.h>
 #include <vlc_modules.h>
-#include <vlc_charset.h>
 
 #include "input_internal.h"
 #include "../preparser/art.h"
+#include <vlc_charset.h>
 
 struct vlc_meta_t
 {

@@ -31,13 +31,13 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_url.h>
-#include <vlc_interface.h>
-#include <vlc_charset.h>
 #include <vlc_strings.h>
 
 #include "item.h"
 #include "info.h"
 #include "input_internal.h"
+
+#include <vlc_charset.h>
 
 struct input_item_opaque
 {

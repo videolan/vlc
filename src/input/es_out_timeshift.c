@@ -41,12 +41,12 @@
 #include <vlc_arrays.h>
 #include <vlc_fs.h>
 #include <vlc_mouse.h>
-#ifdef _WIN32
-#  include <vlc_charset.h>
-#endif
 #include <vlc_es_out.h>
 #include <vlc_block.h>
 #include "input_internal.h"
+#ifdef _WIN32
+#  include <vlc_charset.h> // FromWide
+#endif
 #include "es_out.h"
 
 /*****************************************************************************
