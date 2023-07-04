@@ -29,8 +29,8 @@
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
-#include <vlc_charset.h>
 #include <vlc_cxx_helpers.hpp>
+#include <vlc_charset.h>
 
 #include <memory>
 #include <vector>

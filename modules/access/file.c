@@ -54,12 +54,12 @@
 #include <vlc_common.h>
 #include "fs.h"
 #include <vlc_access.h>
+#include <vlc_interrupt.h>
 #ifdef _WIN32
 # include <vlc_charset.h>
 #endif
 #include <vlc_fs.h>
 #include <vlc_url.h>
-#include <vlc_interrupt.h>
 
 typedef struct
 {

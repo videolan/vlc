@@ -41,8 +41,8 @@
 #   include <poll.h>
 #endif
 
-#include <vlc_charset.h>
 #include <vlc_network.h>
+#include <vlc_charset.h>
 #include <vlc_url.h>
 #include <vlc_interrupt.h>
 #include <vlc_es.h>
