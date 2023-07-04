@@ -541,7 +541,6 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
  *****************************************************************************/
 #if defined( _WIN32 )
 #   include <malloc.h>
-#   include <windows.h>
 #endif
 
 #ifdef __APPLE__
