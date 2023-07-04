@@ -85,7 +85,7 @@ public:
     Q_PROPERTY(PlaybackRepeat repeatMode READ getRepeatMode WRITE setRepeatMode NOTIFY repeatModeChanged FINAL)
     Q_PROPERTY(bool playAndExit READ isPlayAndExit WRITE setPlayAndExit NOTIFY playAndExitChanged FINAL)
     Q_PROPERTY(bool empty READ isEmpty NOTIFY isEmptyChanged FINAL)
-    Q_PROPERTY(size_t count READ count NOTIFY countChanged FINAL)
+    Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
     Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged FINAL)
     Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged FINAL)
 
@@ -143,7 +143,7 @@ public slots:
     void setPlayAndExit(bool );
 
     bool isEmpty() const;
-    size_t count() const;
+    int count() const;
 
     SortKey getSortKey() const;
     void setSortKey(SortKey sortKey);
@@ -169,7 +169,7 @@ signals:
     void playAndExitChanged( bool );
     void repeatModeChanged( PlaybackRepeat );
     void isEmptyChanged( bool empty );
-    void countChanged(size_t );
+    void countChanged(int);
 
     void sortKeyChanged();
     void sortOrderChanged();

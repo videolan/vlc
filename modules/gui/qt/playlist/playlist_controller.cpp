@@ -752,9 +752,10 @@ bool PlaylistControllerModel::isEmpty() const
     return d->m_empty;
 }
 
-size_t PlaylistControllerModel::count() const
+int PlaylistControllerModel::count() const
 {
     Q_D(const PlaylistControllerModel);
+    assert(d->m_count <= (size_t)INT_MAX);
     return d->m_count;
 }
 
