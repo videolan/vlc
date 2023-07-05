@@ -174,10 +174,11 @@ enum sout_stream_query_e {
     SOUT_STREAM_IS_SYNCHRONOUS, /* arg1=bool *, can fail (assume false) */
 };
 
+typedef struct vlc_frame_t vlc_frame_t;
 struct sout_stream_operations {
     void *(*add)(sout_stream_t *, const es_format_t *);
     void (*del)(sout_stream_t *, void *);
-    int (*send)(sout_stream_t *, void *, block_t *);
+    int (*send)(sout_stream_t *, void *, vlc_frame_t *);
     int (*control)( sout_stream_t *, int, va_list );
     void (*flush)( sout_stream_t *, void *);
     void (*set_pcr)(sout_stream_t *, vlc_tick_t);
@@ -201,10 +202,10 @@ VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
 
 VLC_API void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt);
 VLC_API void sout_StreamIdDel(sout_stream_t *s, void *id);
-VLC_API int sout_StreamIdSend( sout_stream_t *s, void *id, block_t *b);
 VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
 VLC_API void sout_StreamSetPCR(sout_stream_t *s, vlc_tick_t pcr);
 VLC_API int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args);
+VLC_API int sout_StreamIdSend(sout_stream_t *, void *id, vlc_frame_t *);
 
 VLC_API vlc_clock_main_t *sout_ClockMainCreate(sout_stream_t *) VLC_USED;
 VLC_API void sout_ClockMainDelete(vlc_clock_main_t *);

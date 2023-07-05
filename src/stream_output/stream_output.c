@@ -46,6 +46,7 @@
 
 #include <vlc_meta.h>
 #include <vlc_block.h>
+#include <vlc_frame.h>
 #include <vlc_codec.h>
 #include <vlc_modules.h>
 
@@ -198,14 +199,14 @@ void sout_InputFlush( sout_stream_t *p_sout,
  *****************************************************************************/
 int sout_InputSendBuffer( sout_stream_t *p_sout,
                           sout_packetizer_input_t *p_input,
-                          block_t *p_buffer )
+                          vlc_frame_t *frame )
 {
     if( p_input->b_flushed )
     {
-        p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        frame->i_flags |= VLC_FRAME_FLAG_DISCONTINUITY;
         p_input->b_flushed = false;
     }
-    return sout_StreamIdSend( p_sout, p_input->id, p_buffer );
+    return sout_StreamIdSend( p_sout, p_input->id, frame );
 }
 
 #undef sout_AccessOutNew
@@ -711,12 +712,12 @@ void sout_StreamIdDel(sout_stream_t *s, void *id)
     sout_StreamUnlock(s);
 }
 
-int sout_StreamIdSend(sout_stream_t *s, void *id, block_t *b)
+int sout_StreamIdSend(sout_stream_t *s, void *id, vlc_frame_t *f)
 {
     int val;
 
     sout_StreamLock(s);
-    val = s->ops->send(s, id, b);
+    val = s->ops->send(s, id, f);
     sout_StreamUnlock(s);
     return val;
 }
