@@ -257,6 +257,15 @@ static void test_vector_foreach(void)
     }
     assert(count == 10);
 
+    count = 0;
+    const int *ref;
+    vlc_vector_foreach_ref(ref, &vec)
+    {
+        assert(*ref == count);
+        assert(ref == &vec.data[count]);
+        count++;
+    }
+
     vlc_vector_destroy(&vec);
 }
 

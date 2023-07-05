@@ -665,7 +665,21 @@ vlc_vector_move_(char *array, size_t index, size_t count, size_t target)
          ++vlc_vector_idx_##item)
 
 /**
- * Returns a reference to the vector's first element.
+ * For-each loop with a reference iterator.
+ *
+ * Should be used for vector holding non-trivially copyable data.
+ *
+ * \param[out] ref The reference iterator
+ * \param[in] pv a pointer to the vector
+ */
+#define vlc_vector_foreach_ref(ref, pv) \
+    for (size_t vlc_vector_idx_##ref = 0; \
+         vlc_vector_idx_##ref < (pv)->size && \
+             ((ref) = &(pv)->data[vlc_vector_idx_##ref], true); \
+         ++vlc_vector_idx_##ref)
+
+/**
+ * Returns the vector's last element.
  */
 #define vlc_vector_last(pv) \
 ( \
