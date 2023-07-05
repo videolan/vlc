@@ -439,8 +439,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     int i_index;
 
-    if( p_mux->b_waiting_stream
-     && block_FifoCount( p_input->p_fifo ) > 0 )
+    if( p_mux->b_waiting_stream )
     {
         /* We stop waiting, and call the muxer for taking care of the data
          * before we remove this es */
