@@ -136,8 +136,6 @@ static int Open( vlc_object_t *p_this )
 
     vlc_vector_init( &p_sys->streams );
 
-    char **ppsz_select = NULL;
-
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
         if( !strncmp( p_cfg->psz_name, "dst", strlen( "dst" ) ) )
@@ -150,8 +148,7 @@ static int Open( vlc_object_t *p_this )
 
             if( dup_stream.stream != NULL )
             {
-                vlc_vector_push( &p_sys->streams, dup_stream );
-                ppsz_select = &vlc_vector_last_ref( &p_sys->streams )->select_chain;
+                vlc_vector_push(&p_sys->streams, dup_stream);
             }
         }
         else if( !strncmp( p_cfg->psz_name, "select", strlen( "select" ) ) )
@@ -160,15 +157,16 @@ static int Open( vlc_object_t *p_this )
 
             if( psz && *psz )
             {
-                if( ppsz_select == NULL )
+                if( p_sys->streams.size == 0 )
                 {
                     msg_Err( p_stream, " * ignore selection `%s'", psz );
                 }
                 else
                 {
                     msg_Dbg( p_stream, " * apply selection `%s'", psz );
-                    *ppsz_select = strdup( psz );
-                    ppsz_select = NULL;
+                    char *select_chain = strdup( psz );
+                    vlc_vector_last_ref( &p_sys->streams )->select_chain =
+                        select_chain;
                 }
             }
         }
