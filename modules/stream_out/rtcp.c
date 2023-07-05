@@ -141,7 +141,7 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
     ptr[1] = 200; /* payload type: Sender Report */
     SetWBE (ptr + 2, 6); /* length = 6 (7 double words) */
     memset (ptr + 4, 0, 4); /* SSRC unknown yet */
-    SetQWBE (ptr + 8, NTPtime64 ());
+    SetQWBE (ptr + 8, vlc_ntp_time ());
     memset (ptr + 16, 0, 12); /* timestamp and counters */
     ptr += 28;
 
@@ -180,7 +180,7 @@ void CloseRTCP (rtcp_sender_t *rtcp)
         return;
 
     uint8_t *ptr = rtcp->payload;
-    uint64_t now64 = NTPtime64 ();
+    uint64_t now64 = vlc_ntp_time ();
     SetQWBE (ptr + 8, now64); /* Update the Sender Report timestamp */
 
     /* Bye */
@@ -216,7 +216,7 @@ void SendRTCP (rtcp_sender_t *restrict rtcp, const block_t *rtp)
 
     uint8_t *ptr = rtcp->payload;
     uint32_t last = GetDWBE (ptr + 8); // last RTCP SR send time
-    uint64_t now64 = NTPtime64 ();
+    uint64_t now64 = vlc_ntp_time ();
     if ((now64 >> 32) < (last + 5))
         return; // no more than one SR every 5 seconds
 

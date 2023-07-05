@@ -79,7 +79,7 @@ void vlc_rand_bytes (void *buf, size_t len)
     static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
     static uint64_t counter = 0;
 
-    uint64_t stamp = NTPtime64 ();
+    uint64_t stamp = vlc_ntp_time ();
 
     while (len > 0)
     {

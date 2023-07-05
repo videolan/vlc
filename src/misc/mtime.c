@@ -128,7 +128,7 @@ vlc_tick_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
-uint64_t NTPtime64(void)
+uint64_t vlc_ntp_time(void)
 {
     struct timespec ts;
 

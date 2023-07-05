@@ -306,7 +306,9 @@ VLC_API vlc_tick_t date_Decrement(date_t *restrict date, uint32_t count);
 /** @} */
 
 /**
- * @return NTP 64-bits timestamp in host byte order.
+ * Gets the current wallclock time as 64-bit NTP timestamp.
+ * 
+ * \return NTP 64-bits timestamp in host byte order
  */
-VLC_API uint64_t NTPtime64( void );
+VLC_API uint64_t vlc_ntp_time( void );
 #endif /* !__VLC_MTIME_ */

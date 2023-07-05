@@ -287,6 +287,7 @@ vlc_memstream_putc
 vlc_memstream_puts
 vlc_memstream_vprintf
 vlc_memstream_printf
+vlc_ntp_time
 vlc_Log
 vlc_LogSet
 vlc_vaLog
@@ -311,7 +312,6 @@ net_OpenDgram
 net_Read
 net_SetCSCov
 net_Write
-NTPtime64
 picture_AttachAncillary
 picture_AttachNewAncillary
 picture_BlendSubpicture
