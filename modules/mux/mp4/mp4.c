@@ -221,7 +221,7 @@ static void box_send(sout_mux_t *p_mux,  bo_t *box);
 
 static block_t *ConvertSUBT(block_t *);
 static bool CreateCurrentEdit(mp4_stream_t *, vlc_tick_t, bool);
-static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream);
+static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream, block_t *p_data);
 
 static int WriteSlowStartHeader(sout_mux_t *p_mux)
 {
@@ -540,8 +540,16 @@ static void DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
 
     if(!mp4mux_Is(p_sys->muxh, FRAGMENTED))
     {
-        while(block_FifoCount(p_input->p_fifo) > 0 &&
-              MuxStream(p_mux, p_input, p_stream) == VLC_SUCCESS) {};
+        vlc_fifo_Lock( p_input->p_fifo );
+        block_t *p_data = vlc_fifo_DequeueAllUnlocked( p_input->p_fifo );
+        vlc_fifo_Unlock( p_input->p_fifo );
+        while( p_data != NULL )
+        {
+              block_t *p_next = p_data->p_next;
+              p_data->p_next = NULL;
+              MuxStream(p_mux, p_input, p_stream, p_data);
+              p_data = p_next;
+        }
 
         if(CreateCurrentEdit(p_stream, p_sys->i_start_dts, false))
             mp4mux_track_DebugEdits(VLC_OBJECT(p_mux), p_stream->tinfo);
@@ -637,11 +645,10 @@ static inline vlc_tick_t dts_fb_pts( const block_t *p_data )
     return p_data->i_dts != VLC_TICK_INVALID ? p_data->i_dts: p_data->i_pts;
 }
 
-static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream)
+static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream, block_t *p_data)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
-    block_t *p_data = BlockDequeue(p_input, p_stream);
     if(!p_data)
         return VLC_SUCCESS;
 
@@ -866,7 +873,13 @@ static int Mux(sout_mux_t *p_mux)
         sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
         mp4_stream_t *p_stream = (mp4_stream_t*)p_input->p_sys;
 
-        i_ret = MuxStream(p_mux, p_input, p_stream);
+        vlc_fifo_Lock( p_input->p_fifo );
+        block_t *p_data = vlc_fifo_DequeueUnlocked( p_input->p_fifo );
+        vlc_fifo_Unlock( p_input->p_fifo );
+        if (unlikely(p_data == NULL))
+            continue;
+
+        i_ret = MuxStream(p_mux, p_input, p_stream, p_data);
     } while( i_ret == VLC_SUCCESS );
 
     return i_ret;
