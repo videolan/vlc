@@ -161,6 +161,8 @@ namespace adaptive
         vlc_tick_t currentDuration;
         uint64_t currentSequence;
 
+        SrcID nextSrcID = SrcID::dummy();
+
     private:
         void declaredCodecs();
         BufferingStatus doBufferize(Times, vlc_tick_t, vlc_tick_t,

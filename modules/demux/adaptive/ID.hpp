@@ -39,6 +39,19 @@ namespace adaptive
             std::string id;
     };
 
+    class SrcID
+    {
+         public:
+            bool operator==(const SrcID &) const;
+            bool operator!=(const SrcID &) const;
+            static const SrcID make();
+            static const SrcID dummy();
+         private:
+            SrcID(unsigned);
+            unsigned id;
+            static unsigned next;
+    };
+
     class Unique
     {
         public:

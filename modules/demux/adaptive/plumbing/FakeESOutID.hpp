@@ -20,6 +20,8 @@
 #ifndef FAKEESOUTID_HPP
 #define FAKEESOUTID_HPP
 
+#include "../ID.hpp"
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 
@@ -49,6 +51,7 @@ namespace adaptive
     {
         public:
             FakeESOutID( FakeESOut *, const es_format_t * );
+            FakeESOutID( FakeESOut *, const es_format_t *, const SrcID & );
             virtual ~FakeESOutID();
             void setRealESID( es_out_id_t * );
             virtual es_out_id_t * realESID() const override;
@@ -67,6 +70,7 @@ namespace adaptive
             es_out_id_t *p_real_es_id;
             es_format_t fmt;
             bool pending_delete;
+            SrcID srcid = SrcID::dummy();
     };
 }
 

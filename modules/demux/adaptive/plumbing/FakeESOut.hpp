@@ -23,6 +23,7 @@
 #include <vlc_common.h>
 #include <list>
 #include "../Time.hpp"
+#include "../ID.hpp"
 #include <vlc_threads.h>
 
 namespace adaptive
@@ -113,6 +114,7 @@ namespace adaptive
             void setSegmentProgressTimes(const SegmentTimes &);
             bool hasSynchronizationReference() const;
             void setSynchronizationReference(const SynchronizationReference &);
+            void setSrcID( const SrcID & );
             void schedulePCRReset();
             void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
@@ -145,6 +147,7 @@ namespace adaptive
             std::list<FakeESOutID *> declared;
             SegmentTimes startTimes;
             SynchronizationReference synchronizationReference;
+            SrcID srcID = SrcID::dummy();
     };
 
 }

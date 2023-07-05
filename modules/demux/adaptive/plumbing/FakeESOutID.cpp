@@ -33,6 +33,17 @@ FakeESOutID::FakeESOutID( FakeESOut *fakeesout, const es_format_t *p_fmt )
     , pending_delete( false )
 {
     es_format_Copy( &fmt, p_fmt );
+    srcid = SrcID::make();
+}
+
+FakeESOutID::FakeESOutID( FakeESOut *fakeesout, const es_format_t *p_fmt,
+                          const SrcID &srcid_ )
+    : fakeesout( fakeesout )
+    , p_real_es_id( nullptr )
+    , pending_delete( false )
+{
+    es_format_Copy( &fmt, p_fmt );
+    srcid = srcid_;
 }
 
 FakeESOutID::~FakeESOutID()
@@ -82,6 +93,9 @@ const es_format_t *FakeESOutID::getFmt() const
 
 bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
 {
+    if( p_other->srcid != srcid )
+        return false;
+
     if( p_other->fmt.i_cat != fmt.i_cat ||
         fmt.i_codec != p_other->fmt.i_codec ||
         fmt.i_original_fourcc != p_other->fmt.i_original_fourcc )
@@ -113,7 +127,7 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
             if(fmt.i_cat == AUDIO_ES)
             {
                 /* Reject audio streams with different or unknown rates */
-                if(fmt.audio.i_rate != p_other->fmt.audio.i_rate || !fmt.audio.i_rate)
+                if(fmt.audio.i_rate != p_other->fmt.audio.i_rate)
                     return false;
                 if(fmt.i_extra &&
                    (fmt.i_extra != p_other->fmt.i_extra ||

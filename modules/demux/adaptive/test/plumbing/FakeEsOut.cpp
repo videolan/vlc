@@ -240,13 +240,21 @@ static int check3(es_out_t *out, DummyEsOut *dummy, FakeESOut *fakees)
         es_format_Clean(&fmt);
         es_format_Init(&fmt, VIDEO_ES, VLC_CODEC_H264);
         FakeESOutID fakeid3(fakees, &fmt);
-        Expect(fakeid0.isCompatible(&fakeid0) == false); // aac without rate
+        fmt.i_codec = VLC_CODEC_MPGV;
+        FakeESOutID fakeid4(fakees, &fmt);
+        fakees->setSrcID(SrcID::make()); // change source sequence id
+        FakeESOutID fakeid0b(fakees, fakeid0.getFmt());
+        FakeESOutID fakeid4b(fakees, fakeid4.getFmt());
+        Expect(fakeid0.isCompatible(&fakeid0) == true); // aac without rate, same source
         Expect(fakeid0.isCompatible(&fakeid1) == false); // aac rate/unknown mix
         Expect(fakeid1.isCompatible(&fakeid1) == true);  // aac with same rate
         Expect(fakeid0.isCompatible(&fakeid3) == false); // different codecs
         Expect(fakeid1.isCompatible(&fakeid2) == false); // different original fourcc
         Expect(fakeid2.isCompatible(&fakeid2) == true);  // same original fourcc
         Expect(fakeid3.isCompatible(&fakeid3) == false);  // same video with extra codecs
+        Expect(fakeid0.isCompatible(&fakeid0b) == false); // aac without rate, different source
+        Expect(fakeid4.isCompatible(&fakeid4) == true);  // same codec, same sequence
+        Expect(fakeid4.isCompatible(&fakeid4b) == false);  // same codec, different sequence
         es_format_Clean(&fmt);
     } catch (...) {
         return 1;
@@ -327,24 +335,15 @@ static int check3(es_out_t *out, DummyEsOut *dummy, FakeESOut *fakees)
                 Expect(e->b_selected == true);
 
         /* on restart / new segment, incompatible codec parameters, ES MUST NOT be reused */
+        fakees->setSrcID(SrcID::make());
         fakees->recycleAll();
         Expect(dummy->eslist.size() == 2);
         es_format_Clean(&fmt);
         es_format_Init(&fmt, VIDEO_ES, VLC_CODEC_H264);
         id = es_out_Add(out, &fmt);
-        /* check ID signaling so we don't blame FakeEsOut */
-        {
-            FakeESOutID fakeid(fakees, &fmt);
-            Expect(fakeid.isCompatible(&fakeid) == false);
-        }
         es_format_Clean(&fmt);
         es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_MP4A);
         id = es_out_Add(out, &fmt);
-        /* check ID signaling so we don't blame FakeEsOut */
-        {
-            FakeESOutID fakeid(fakees, &fmt);
-            Expect(fakeid.isCompatible(&fakeid) == false);
-        }
         fakees->commandsQueue()->Commit();
         fakees->commandsQueue()->Process(drainTimes);
         Expect(dummy->eslist.size() == 4);
@@ -354,6 +353,18 @@ static int check3(es_out_t *out, DummyEsOut *dummy, FakeESOut *fakees)
             if( e->fmt.i_cat == VIDEO_ES )
                 Expect(e->b_selected == true);
 
+        /* on restart / new segment, with compatible codec parameters, ES MUST be reused */
+        fakees->recycleAll();
+        Expect(dummy->eslist.size() == 2);
+        es_format_Clean(&fmt);
+        es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_MP4A);
+        id = es_out_Add(out, &fmt);
+        fakees->commandsQueue()->Commit();
+        fakees->commandsQueue()->Process(drainTimes);
+        Expect(dummy->eslist.size() == 2); // mp4a reused
+        fakees->gc(); // should drop video
+        Expect(dummy->eslist.size() == 1);
+        Expect(dummy->eslist.front()->fmt.i_codec == fmt.i_codec);
     } catch (...) {
         return 1;
     }
