@@ -492,15 +492,15 @@ static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame )
     /* Interleave audio if required */
     if( av_sample_fmt_is_planar( ctx->sample_fmt ) )
     {
-        p_block = block_Alloc(frame->linesize[0] * ctx->channels);
+        p_block = block_Alloc(frame->linesize[0] * p_dec->fmt_out.audio.i_channels );
         if ( likely(p_block) )
         {
-            const void *planes[ctx->channels];
-            for (int i = 0; i < ctx->channels; i++)
+            const void *planes[p_dec->fmt_out.audio.i_channels];
+            for (int i = 0; i < p_dec->fmt_out.audio.i_channels; i++)
                 planes[i] = frame->extended_data[i];
 
             aout_Interleave(p_block->p_buffer, planes, frame->nb_samples,
-                            ctx->channels, p_dec->fmt_out.audio.i_format);
+                            p_dec->fmt_out.audio.i_channels, p_dec->fmt_out.audio.i_format);
             p_block->i_nb_samples = frame->nb_samples;
         }
         av_frame_free(&frame);
@@ -519,7 +519,7 @@ static block_t * ConvertAVFrame( decoder_t *p_dec, AVFrame *frame )
         {
             aout_ChannelExtract( p_buffer->p_buffer,
                                  p_dec->fmt_out.audio.i_channels,
-                                 p_block->p_buffer, ctx->channels,
+                                 p_block->p_buffer, p_dec->fmt_out.audio.i_channels,
                                  p_block->i_nb_samples, p_sys->pi_extraction,
                                  p_dec->fmt_out.audio.i_bitspersample );
             p_buffer->i_nb_samples = p_block->i_nb_samples;
@@ -608,13 +608,13 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     if( channel_layout )
     {
         for( unsigned i = 0; i < i_order_max
-         && i_channels_src < p_sys->p_context->channels; i++ )
+         && i_channels_src < p_dec->fmt_out.audio.i_channels; i++ )
         {
             if( channel_layout & pi_channels_map[i][0] )
                 pi_order_src[i_channels_src++] = pi_channels_map[i][1];
         }
 
-        if( i_channels_src != p_sys->p_context->channels && b_trust )
+        if( i_channels_src != p_dec->fmt_out.audio.i_channels && b_trust )
             msg_Err( p_dec, "Channel layout not understood" );
 
         /* Detect special dual mono case */
