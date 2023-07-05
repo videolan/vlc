@@ -585,6 +585,7 @@ static const uint64_t pi_channels_map[][2] =
     { AV_CH_TOP_BACK_RIGHT,    0 },
     { AV_CH_STEREO_LEFT,       0 },
     { AV_CH_STEREO_RIGHT,      0 },
+    { 0, 0 },
 };
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
@@ -617,8 +618,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     }
 #endif
 
-    const unsigned i_order_max = sizeof(pi_channels_map)/sizeof(*pi_channels_map);
-    uint32_t pi_order_src[i_order_max];
+    uint32_t pi_order_src[AOUT_CHAN_MAX] = { 0 };
 
     int i_channels_src = 0;
 #if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
@@ -633,7 +633,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     if( channel_layout_mask )
     {
-        for( unsigned i = 0; i < i_order_max
+        for( unsigned i = 0; pi_channels_map[i][0]
          && i_channels_src < channel_count; i++ )
         {
             if( channel_layout_mask & pi_channels_map[i][0] )
