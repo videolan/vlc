@@ -264,9 +264,13 @@ static int Mux( sout_mux_t *p_mux )
     p_sys->b_header = false;
 
     p_input = p_mux->pp_inputs[0];
-    while( block_FifoCount( p_input->p_fifo ) > 0 )
+
+    vlc_fifo_Lock( p_input->p_fifo );
+    block_t *p_block = vlc_fifo_DequeueAllUnlocked( p_input->p_fifo );
+    vlc_fifo_Unlock( p_input->p_fifo );
+
+    while( p_block != NULL)
     {
-        block_t *p_block = block_FifoGet( p_input->p_fifo );
         p_sys->i_data += p_block->i_buffer;
 
         /* Do the channel reordering */
@@ -275,7 +279,13 @@ static int Mux( sout_mux_t *p_mux )
                                  p_sys->i_chans_to_reorder,
                                  p_sys->pi_chan_table, p_input->p_fmt->i_codec );
 
+        /* We should not pass whole blockchain to accessoutwrite, as we only handled
+           current block channel reordering, so mark next as empty and handle next block separately
+           */
+        block_t *p_next_block = p_block->p_next;
+        p_block->p_next = NULL;
         sout_AccessOutWrite( p_mux->p_access, p_block );
+        p_block = p_next_block;
     }
 
     return VLC_SUCCESS;
