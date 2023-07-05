@@ -240,7 +240,8 @@ case $LICENSE in
     ;;
     g|*)
         # GPL v3
-        CONFIGFLAGS="$CONFIGFLAGS --enable-live555"
+        CONFIGFLAGS="$CONFIGFLAGS --enable-live555 --enable-dca --enable-dvdread"
+        MCONFIGFLAGS="$MCONFIGFLAGS -Ddvdread=enabled"
     ;;
 esac
 
@@ -436,8 +437,8 @@ if [ ! -z "$WINSTORE" ]; then
     # MCONFIGFLAGS="$MCONFIGFLAGS -Ddxva2=disabled"
 
 else
-    CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
-    MCONFIGFLAGS="$MCONFIGFLAGS -Ddvdread=enabled -Dcaca=enabled"
+    CONFIGFLAGS="$CONFIGFLAGS --enable-caca"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dcaca=enabled"
 fi
 if [ ! -z "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
