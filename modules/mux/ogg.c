@@ -75,7 +75,7 @@ static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
 static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
-static int MuxBlock ( sout_mux_t *, sout_input_t * );
+static int MuxBlock ( sout_mux_t *, sout_input_t *, block_t * );
 
 static bool OggCreateHeaders( sout_mux_t * );
 static void OggFillSkeletonFishead( uint8_t *p_buffer, sout_mux_t *p_mux );
@@ -561,8 +561,16 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         if( !p_stream->b_new )
         {
-            while( block_FifoCount( p_input->p_fifo ) )
-                MuxBlock( p_mux, p_input );
+            vlc_fifo_Lock( p_input->p_fifo);
+            block_t *p_block = vlc_fifo_DequeueAllUnlocked( p_input->p_fifo );
+            vlc_fifo_Unlock( p_input->p_fifo );
+            while( p_block != NULL )
+            {
+                block_t *p_next = p_block->p_next;
+                p_block->p_next = NULL;
+                MuxBlock( p_mux, p_input, p_block );
+                p_block = p_next;
+            }
         }
 
         if( !p_stream->b_new &&
@@ -1568,17 +1576,24 @@ static int Mux( sout_mux_t *p_mux )
         int i_stream = sout_MuxGetStream( p_mux, 1, NULL );
         if( i_stream < 0 )
             return VLC_SUCCESS;
-        MuxBlock( p_mux, p_mux->pp_inputs[i_stream] );
+
+        sout_input_t *p_input = p_mux->pp_inputs[i_stream];
+        vlc_fifo_Lock( p_input->p_fifo);
+        block_t *p_block = vlc_fifo_DequeueUnlocked( p_input->p_fifo );
+        vlc_fifo_Unlock( p_input->p_fifo );
+        if( unlikely( p_block == NULL ) )
+            continue;
+
+        MuxBlock( p_mux, p_mux->pp_inputs[i_stream], p_block );
     }
 
     return VLC_SUCCESS;
 }
 
-static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
+static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input, block_t *p_data )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
-    block_t *p_data = block_FifoGet( p_input->p_fifo );
     block_t *p_og = NULL;
     ogg_packet op;
     vlc_tick_t i_time;
