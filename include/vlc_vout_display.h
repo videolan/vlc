@@ -105,8 +105,9 @@ struct vout_display_placement {
  *
  * This primarily controls the size of the display area within the video
  * window, as follows:
- * - If \ref vout_display_cfg::display::fitting is not disabled,
- *   the video size is fitted to the display size.
+ * - If \ref vout_display_placement::fitting is not disabled, ie. equals
+ *   to \ref VLC_VIDEO_FIT_NONE, in \ref vout_display_cfg::display, the
+ *   video size is fitted to the display size.
  * - If \ref vout_display_cfg::window "window" size is valid, the video size
  *   is set to the window size,
  * - Otherwise, the video size is determined from the original video format,
