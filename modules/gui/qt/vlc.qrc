@@ -171,6 +171,7 @@
         <file alias="CSDWindowButtonSet.qml">widgets/qml/CSDWindowButtonSet.qml</file>
         <file alias="CSDTitlebarTapNDrapHandler.qml">widgets/qml/CSDTitlebarTapNDrapHandler.qml</file>
         <file alias="CSDMouseStealer.qml">widgets/qml/CSDMouseStealer.qml</file>
+        <file alias="TrackDelayButton.qml">widgets/qml/TrackDelayButton.qml</file>
         <file alias="CurrentIndicator.qml">widgets/qml/CurrentIndicator.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="LoaderFade.qml">widgets/qml/LoaderFade.qml</file>

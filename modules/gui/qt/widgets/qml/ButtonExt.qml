@@ -42,6 +42,8 @@ T.Button {
     property color color: theme.fg.primary
     property color colorFocus: theme.visualFocus
 
+    //set to true when user animates the background manually
+    property bool extBackgroundAnimation: false
 
     // Aliases
     property alias iconRotation: icon.rotation
@@ -91,7 +93,7 @@ T.Button {
         width: control.width
 
         active: control.visualFocus
-        animate: theme.initialized
+        animate: theme.initialized && !control.extBackgroundAnimation
 
         backgroundColor: theme.bg.primary
         foregroundColor: control.color

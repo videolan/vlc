@@ -1054,6 +1054,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/TableColumns.qml \
 	gui/qt/widgets/qml/TextFieldExt.qml \
 	gui/qt/widgets/qml/TextToolButton.qml \
+	gui/qt/widgets/qml/TrackDelayButton.qml \
 	gui/qt/widgets/qml/VideoProgressBar.qml \
 	gui/qt/widgets/qml/VideoQualityLabels.qml \
 	gui/qt/widgets/qml/ListSubtitleLabel.qml \
