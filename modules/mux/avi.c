@@ -521,7 +521,6 @@ static int Mux      ( sout_mux_t *p_mux )
 
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
-        int i_count;
         block_fifo_t *p_fifo;
 
         if (!p_mux->pp_inputs[i]->p_sys)
@@ -531,23 +530,25 @@ static int Mux      ( sout_mux_t *p_mux )
         p_stream = &p_sys->stream[i_stream];
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
-        i_count = block_FifoCount(  p_fifo );
-        while( i_count > 1 )
+        vlc_fifo_Lock( p_fifo );
+        block_t *p_data = vlc_fifo_DequeueAllUnlocked( p_fifo );
+        vlc_fifo_Unlock( p_fifo );
+
+        while( p_data != NULL )
         {
             avi_idx1_entry_t *p_idx;
-            block_t *p_data;
 
-            p_data = block_FifoGet( p_fifo );
-            if( block_FifoCount( p_fifo ) > 0 )
+            block_t *p_next = p_data->p_next;
+            p_data->p_next = NULL;
+            if( p_next )
             {
-                block_t *p_next = block_FifoShow( p_fifo );
                 p_data->i_length = p_next->i_dts - p_data->i_dts;
             }
 
             if( PrepareSamples( p_stream, &p_mux->pp_inputs[i]->fmt,
                                 &p_data ) != VLC_SUCCESS )
             {
-                i_count--;
+                p_data = p_next;
                 continue;
             }
 
@@ -556,7 +557,7 @@ static int Mux      ( sout_mux_t *p_mux )
             {
                 msg_Warn( p_mux, "argg length < 0 l" );
                 block_Release( p_data );
-                i_count--;
+                p_data = p_next;
                 continue;
             }
             p_stream->i_duration  += p_data->i_length;
@@ -598,7 +599,7 @@ static int Mux      ( sout_mux_t *p_mux )
                 }
             }
 
-            i_count--;
+            p_data = p_next;
         }
 
     }
