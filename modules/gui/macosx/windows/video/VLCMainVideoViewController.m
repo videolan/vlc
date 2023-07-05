@@ -358,7 +358,7 @@
     _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCLibraryUIUnits.largeSpacing;
 
     _overlayView.drawGradientForTopControls = !placeInFakeToolbar;
-    [_overlayView drawRect:_overlayView.frame];
+    [_overlayView setNeedsDisplay:YES];
 }
 
 - (IBAction)togglePlaylist:(id)sender
