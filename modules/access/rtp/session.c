@@ -55,8 +55,6 @@ static void rtp_source_destroy(struct vlc_logger *, rtp_source_t *);
 
 static void rtp_decode (struct vlc_logger *, const rtp_session_t *, rtp_source_t *);
 
-/** @} */
-
 /**
  * Creates a new RTP session.
  */
