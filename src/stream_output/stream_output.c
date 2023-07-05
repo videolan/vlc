@@ -716,6 +716,8 @@ int sout_StreamIdSend(sout_stream_t *s, void *id, vlc_frame_t *f)
 {
     int val;
 
+    assert(f->p_next == NULL);
+
     sout_StreamLock(s);
     val = s->ops->send(s, id, f);
     sout_StreamUnlock(s);

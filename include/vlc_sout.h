@@ -308,6 +308,9 @@ VLC_API void sout_StreamIdDel(sout_stream_t *, void *id);
  * Takes ownership of the frame, it should be considered as invalid
  * and released after this call.
  *
+ * \warning Only single frames are expected through this call, for frame chains,
+ * you'll have to call this for each frames.
+ *
  * \param id The ES identifier that sent the frame.
  *
  * \retval VLC_SUCCESS on success.
