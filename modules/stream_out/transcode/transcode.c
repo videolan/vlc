@@ -778,8 +778,6 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     sout_stream_sys_t *sys = p_stream->p_sys;
     if( p_buffer != NULL && sys->pcr_forwarding_enabled )
     {
-        assert( p_buffer->p_next == NULL );
-
         if( !sys->pcr_sync_has_input )
             sys->pcr_sync_has_input = true;
 
