@@ -650,7 +650,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/check.svg \
 	gui/qt/pixmaps/icons/clear.svg \
 	gui/qt/pixmaps/icons/close.svg \
-	gui/qt/pixmaps/icons/defullscreen.svg \
+	gui/qt/pixmaps/icons/ic_fluent_full_screen_minimize.svg \
 	gui/qt/pixmaps/icons/del.svg \
 	gui/qt/pixmaps/icons/download.svg \
 	gui/qt/pixmaps/icons/dropzone.svg \
@@ -665,7 +665,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/extended.svg \
 	gui/qt/pixmaps/icons/ic_fluent_fast_forward.svg \
 	gui/qt/pixmaps/icons/frame-by-frame.svg \
-	gui/qt/pixmaps/icons/fullscreen.svg \
+	gui/qt/pixmaps/icons/ic_fluent_full_screen_maximize.svg \
 	gui/qt/pixmaps/icons/ic_fluent_grid.svg \
 	gui/qt/pixmaps/icons/history.svg \
 	gui/qt/pixmaps/icons/home.svg \
