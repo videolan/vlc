@@ -327,6 +327,8 @@ static void *playlist_thread(void *data)
 {
     libvlc_media_list_player_t *mlp = data;
 
+    vlc_thread_set_name("vlc-playlist");
+
     vlc_mutex_lock(&mlp->mp_callback_lock);
 
     while (!mlp->dead)
