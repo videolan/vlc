@@ -64,6 +64,11 @@ TracksPage {
             Accessible.role: Accessible.Grouping
             Accessible.name: I18n.qtr("Audio track delay")
 
+            DelayEstimator {
+                id: delayEstimator
+                onDelayChanged: Player.addAudioDelay(delayEstimator.delay)
+            }
+
             Widgets.MenuCaption {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
@@ -121,10 +126,48 @@ TracksPage {
 
                 text: I18n.qtr("Reset")
 
-                onClicked: spinBox.value = 0
+                onClicked: {
+                    Player.audioDelayMS = 0
+                    delayEstimator.reset()
+                }
 
                 Navigation.parentItem: root
                 Navigation.leftItem: spinBox
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignRight
+
+            spacing: VLCStyle.margin_xsmall
+
+            Widgets.TrackDelayButton {
+                id: soundHeard
+
+                text: I18n.qtr("Sound Heard")
+                iconTxt: VLCIcons.check
+                selected: delayEstimator.isSpottedTimeMarked
+
+                onClicked: {
+                    delayEstimator.markSpottedTime() //method name should be changed
+                    if (!delayEstimator.isHeardTimeMarked && delayEstimator.isSpottedTimeMarked)
+                        soundSpotted.animate()
+                }
+            }
+
+            Widgets.TrackDelayButton {
+                id: soundSpotted
+
+                text: I18n.qtr("Sound Spotted")
+                iconTxt: VLCIcons.check
+                selected: delayEstimator.isHeardTimeMarked
+
+                onClicked: {
+                    delayEstimator.markHeardTime() //method name should be changed
+                    if (!delayEstimator.isSpottedTimeMarked && delayEstimator.isHeardTimeMarked)
+                        soundHeard.animate()
+                }
             }
         }
     }

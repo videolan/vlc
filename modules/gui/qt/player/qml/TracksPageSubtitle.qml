@@ -53,7 +53,7 @@ TracksPage {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        spacing: VLCStyle.margin_xxsmall
+        spacing: VLCStyle.margin_xsmall
 
         Widgets.SubtitleLabel {
             Layout.fillWidth: true
@@ -63,153 +63,260 @@ TracksPage {
             color: root.colorContext.fg.primary
         }
 
-        RowLayout {
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.topMargin: VLCStyle.margin_large
 
-            spacing: VLCStyle.margin_xsmall
+            spacing: VLCStyle.margin_xxxsmall
 
             Accessible.role: Accessible.Grouping
             Accessible.name: I18n.qtr("Primary subtitle delay")
 
-            Widgets.MenuCaption {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
+            DelayEstimator {
+                id: delayEstimatorPrimary
 
-                text: I18n.qtr("Primary subtitle delay")
-
-                color: root.colorContext.fg.primary
+                onDelayChanged: {
+                    Player.addSubtitleDelay(delayEstimatorPrimary.delay)
+                }
             }
 
-            Widgets.SpinBoxExt {
-                id: spinBoxA
+            RowLayout {
+                Layout.fillWidth: true
 
-                property bool update: false
+                spacing: VLCStyle.margin_xsmall
 
-                Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
+                Widgets.MenuCaption {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter
 
-                stepSize: 50
-                from: -10000
-                to: 10000
+                    text: I18n.qtr("Primary subtitle delay")
 
-                textFromValue: root.textFromValueA
-                valueFromText: root.valueFromTextA
-
-                Navigation.parentItem: root
-                Navigation.rightItem: resetA
-
-                Component.onCompleted: {
-                    value = Player.subtitleDelayMS
-
-                    update = true
+                    color: root.colorContext.fg.primary
                 }
 
-                onValueChanged: {
-                    if (update === false)
-                        return
+                Widgets.SpinBoxExt {
+                    id: spinBoxA
 
-                    Player.subtitleDelayMS = value
-                }
+                    property bool update: false
 
-                Connections {
-                    target: Player
+                    Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
 
-                    onSubtitleDelayChanged: {
-                        spinBoxA.update = false
+                    stepSize: 50
+                    from: -10000
+                    to: 10000
 
+                    textFromValue: root.textFromValueA
+                    valueFromText: root.valueFromTextA
+
+                    Navigation.parentItem: root
+                    Navigation.rightItem: resetA
+
+                    Component.onCompleted: {
                         spinBoxA.value = Player.subtitleDelayMS
 
                         spinBoxA.update = true
                     }
-                }
-            }
 
-            Widgets.ActionButtonOverlay {
-                id: resetA
+                    onValueChanged: {
+                        if (update === false)
+                            return
 
-                focus: true
+                        Player.subtitleDelayMS = spinBoxA.value
+                    }
 
-                text: I18n.qtr("Reset")
+                    Connections {
+                        target: Player
 
-                Navigation.parentItem: root
-                Navigation.leftItem: spinBoxA
-                Navigation.downItem: resetB
+                        onSubtitleDelayChanged: {
+                            spinBoxA.update = false
 
-                onClicked: spinBoxA.value = 0
-            }
-        }
+                            spinBoxA.value = Player.subtitleDelayMS
 
-        RowLayout {
-            Layout.fillWidth: true
+                            spinBoxA.update = true
+                        }
 
-            spacing: VLCStyle.margin_xsmall
-
-            Accessible.role: Accessible.Grouping
-            Accessible.name: I18n.qtr("Secondary subtitle delay")
-
-            Widgets.MenuCaption {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-
-                text: I18n.qtr("Secondary subtitle delay")
-
-                color: root.colorContext.fg.primary
-            }
-
-            Widgets.SpinBoxExt {
-                id: spinBoxB
-
-                property bool update: false
-
-                Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-
-                stepSize: 50
-                from: -10000
-                to: 10000
-
-                textFromValue: root.textFromValueA
-                valueFromText: root.valueFromTextA
-
-                Navigation.parentItem: root
-                Navigation.rightItem: resetB
-
-                Component.onCompleted: {
-                    value = Player.secondarySubtitleDelayMS
-
-                    update = true
+                    }
                 }
 
-                onValueChanged: {
-                    if (update === false)
-                        return
+                Widgets.TextToolButton {
+                    id: resetA
 
-                    Player.secondarySubtitleDelayMS = value
-                }
+                    text: I18n.qtr("Reset")
 
-                Connections {
-                    target: Player
+                    focus: true
 
-                    onSecondarySubtitleDelayChanged: {
-                        spinBoxB.update = false
+                    Navigation.parentItem: root
+                    Navigation.leftItem: spinBoxA
+                    Navigation.downItem: resetB
 
-                        spinBoxB.value = Player.secondarySubtitleDelayMS
-
-                        spinBoxB.update = true
+                    onClicked: {
+                        Player.subtitleDelayMS = 0
+                        delayEstimatorPrimary.reset()
                     }
                 }
             }
 
-            Widgets.ActionButtonOverlay {
-                id: resetB
+            RowLayout {
+                Layout.fillWidth: true
 
-                text: I18n.qtr("Reset")
+                Layout.alignment: Qt.AlignRight
 
-                Navigation.parentItem: root
-                Navigation.leftItem: spinBoxB
-                Navigation.upItem: resetA
-                Navigation.downItem: resetC
+                spacing: VLCStyle.margin_small
 
-                onClicked: spinBoxB.value = 0
+                Widgets.TrackDelayButton {
+                    id: voiceHeardA
+
+                    iconTxt: VLCIcons.check
+                    text: I18n.qtr("Voice Heard")
+                    selected: delayEstimatorPrimary.isHeardTimeMarked
+
+                    onClicked: {
+                        delayEstimatorPrimary.markHeardTime()
+                        if (!delayEstimatorPrimary.isSpottedTimeMarked && delayEstimatorPrimary.isHeardTimeMarked)
+                            textSeenA.animate()
+                    }
+                }
+
+                Widgets.TrackDelayButton {
+                    id: textSeenA
+
+                    iconTxt: VLCIcons.check
+                    text: I18n.qtr("Text Seen")
+                    selected: delayEstimatorPrimary.isSpottedTimeMarked
+
+                    onClicked: {
+                        delayEstimatorPrimary.markSpottedTime()
+                        if (!delayEstimatorPrimary.isHeardTimeMarked && delayEstimatorPrimary.isSpottedTimeMarked)
+                            voiceHeardA.animate()
+                    }
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+
+            spacing: VLCStyle.margin_xxxsmall
+
+            Accessible.role: Accessible.Grouping
+            Accessible.name: I18n.qtr("Secondary subtitle delay")
+
+            DelayEstimator {
+                id: delayEstimatorSecondary
+
+                onDelayChanged: {
+                    Player.addSecondarySubtitleDelay(delayEstimatorSecondary.delay)
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                spacing: VLCStyle.margin_xsmall
+
+                Widgets.MenuCaption {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter
+
+                    text: I18n.qtr("Secondary subtitle delay")
+
+                    color: root.colorContext.fg.primary
+                }
+
+                Widgets.SpinBoxExt {
+                    id: spinBoxB
+
+                    property bool update: false
+
+                    Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
+
+                    stepSize: 50
+                    from: -10000
+                    to: 10000
+
+                    textFromValue: root.textFromValueA
+                    valueFromText: root.valueFromTextA
+
+                    Navigation.parentItem: root
+                    Navigation.rightItem: resetB
+
+                    Component.onCompleted: {
+                        value = Player.secondarySubtitleDelayMS
+
+                        update = true
+                    }
+
+                    onValueChanged: {
+                        if (update === false)
+                            return
+
+                        Player.secondarySubtitleDelayMS = spinBoxB.value
+                    }
+
+                    Connections {
+                        target: Player
+
+                        onSecondarySubtitleDelayChanged: {
+                            spinBoxB.update = false
+
+                            spinBoxB.value = Player.secondarySubtitleDelayMS
+
+                            spinBoxB.update = true
+                        }
+                    }
+                }
+
+                Widgets.TextToolButton {
+                    id: resetB
+
+                    text: I18n.qtr("Reset")
+
+                    Navigation.parentItem: root
+                    Navigation.leftItem: spinBoxB
+                    Navigation.upItem: resetA
+                    Navigation.downItem: resetC
+
+                    onClicked: {
+                        Player.secondarySubtitleDelayMS = 0
+                        delayEstimatorSecondary.reset()
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                Layout.alignment: Qt.AlignRight
+
+                spacing: VLCStyle.margin_xsmall
+
+                Widgets.TrackDelayButton {
+                    id: voiceHeardB
+
+                    text: I18n.qtr("Voice Heard")
+                    iconTxt: VLCIcons.check
+                    selected: delayEstimatorSecondary.isHeardTimeMarked
+
+                    onClicked: {
+                        delayEstimatorSecondary.markHeardTime()
+                        if (!delayEstimatorSecondary.isSpottedTimeMarked && delayEstimatorSecondary.isHeardTimeMarked)
+                            textSeenB.animate()
+                    }
+                }
+
+                Widgets.TrackDelayButton {
+                    id: textSeenB
+
+                    text: I18n.qtr("Text Seen")
+                    iconTxt: VLCIcons.check
+                    selected: delayEstimatorSecondary.isSpottedTimeMarked
+
+                    onClicked: {
+                        delayEstimatorSecondary.markSpottedTime()
+                        if (!delayEstimatorSecondary.isHeardTimeMarked && delayEstimatorSecondary.isSpottedTimeMarked)
+                            voiceHeardB.animate()
+                    }
+                }
             }
         }
 
@@ -273,7 +380,7 @@ TracksPage {
                 }
             }
 
-            Widgets.ActionButtonOverlay {
+            Widgets.TextToolButton {
                 id: resetC
 
                 text: I18n.qtr("Reset")
