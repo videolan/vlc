@@ -241,6 +241,7 @@ case $LICENSE in
     g|*)
         # GPL v3
         CONFIGFLAGS="$CONFIGFLAGS --enable-live555 --enable-dca"
+        MCONFIGFLAGS="$MCONFIGFLAGS -Ddca=enabled"
         if [ -z "$WINSTORE" ]; then
             CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread"
             MCONFIGFLAGS="$MCONFIGFLAGS -Ddvdread=enabled"
