@@ -270,6 +270,7 @@ void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
         }
         else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat && cand->realESID() )
         {
+            b_preexisting = true;
             /* We need to enforce same selection when not reused
                Otherwise the es will select any other compatible track
                and will end this in a activate/select loop when reactivating a track */
