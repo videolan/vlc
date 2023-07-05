@@ -590,7 +590,7 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
 
     /* Stop */
     action = addMPLStaticEntry( p_intf, menu, qtr( "&Stop" ),
-            ":/menu/stop.svg", &PlaylistController::stop );
+            ":/menu/ic_fluent_stop.svg", &PlaylistController::stop );
     if( !hasInput )
         action->setEnabled( false );
 

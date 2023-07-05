@@ -510,7 +510,7 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( ":/menu/stop.svg" ) );
+    stopButton->setIcon( QIcon( ":/menu/ic_fluent_stop.svg" ) );
     stopButton->setToolTip( qtr("Stop") );
     objLayout->addWidget( stopButton, 1, 1 );
 

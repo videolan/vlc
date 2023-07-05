@@ -657,7 +657,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/dvd_menu.svg \
 	gui/qt/pixmaps/icons/dvd_next.svg \
 	gui/qt/pixmaps/icons/dvd_prev.svg \
-	gui/qt/pixmaps/icons/eject.svg \
+	gui/qt/pixmaps/icons/ic_fluent_arrow_eject.svg \
 	gui/qt/pixmaps/icons/ellipsis.svg \
 	gui/qt/pixmaps/icons/ic_playlist_add.svg \
 	gui/qt/pixmaps/icons/expand_inverted.svg \
@@ -696,7 +696,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/ic_fluent_skip_forward_10.svg \
 	gui/qt/pixmaps/icons/snapshot.svg \
 	gui/qt/pixmaps/icons/space.svg \
-	gui/qt/pixmaps/icons/stop.svg \
+	gui/qt/pixmaps/icons/ic_fluent_stop.svg \
 	gui/qt/pixmaps/icons/stream.svg \
 	gui/qt/pixmaps/icons/sync.svg \
 	gui/qt/pixmaps/icons/time.svg \
@@ -723,7 +723,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/clear.svg \
 	gui/qt/pixmaps/menu/disc.svg \
 	gui/qt/pixmaps/menu/download.svg \
-	gui/qt/pixmaps/menu/eject.svg \
+	gui/qt/pixmaps/menu/ic_fluent_arrow_eject.svg \
 	gui/qt/pixmaps/menu/exit.svg \
 	gui/qt/pixmaps/menu/ic_fluent_fast_forward.svg \
 	gui/qt/pixmaps/menu/file.svg \
@@ -753,7 +753,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/ic_fluent_skip_back_10.svg \
 	gui/qt/pixmaps/menu/ic_fluent_skip_forward_10.svg \
 	gui/qt/pixmaps/menu/ic_fluent_arrow_shuffle.svg \
-	gui/qt/pixmaps/menu/stop.svg \
+	gui/qt/pixmaps/menu/ic_fluent_stop.svg \
 	gui/qt/pixmaps/menu/stream.svg \
 	gui/qt/pixmaps/menu/sync.svg \
 	gui/qt/pixmaps/menu/update.svg \
