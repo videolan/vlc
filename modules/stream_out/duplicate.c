@@ -128,8 +128,6 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
     config_chain_t        *p_cfg;
 
-    msg_Dbg( p_stream, "creating 'duplicate'" );
-
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -197,7 +195,6 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    msg_Dbg( p_stream, "closing a duplication" );
     duplicated_stream_t *dup_stream;
     vlc_vector_foreach_ref( dup_stream, &p_sys->streams )
     {
