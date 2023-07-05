@@ -69,9 +69,15 @@ typedef struct
     struct VLC_VECTOR(char*) selected_chains;
 } sout_stream_sys_t;
 
+typedef struct {
+    void *id;
+    /* Reference to the duplicated output stream. */
+    sout_stream_t *stream_owner;
+} duplicated_id_t;
+
 typedef struct
 {
-    struct VLC_VECTOR(void*) dup_ids;
+    struct VLC_VECTOR(duplicated_id_t) dup_ids;
 } sout_stream_id_sys_t;
 
 static bool ESSelected( struct vlc_logger *, const es_format_t *fmt,
@@ -82,8 +88,6 @@ static bool ESSelected( struct vlc_logger *, const es_format_t *fmt,
  *****************************************************************************/
 static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /* Fanout controls */
     switch( i_query )
     {
@@ -91,18 +95,20 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
         {
             sout_stream_id_sys_t *id = va_arg(args, void *);
             const vlc_spu_highlight_t *spu_hl = va_arg(args, const vlc_spu_highlight_t *);
-            for( size_t i = 0; i < id->dup_ids.size; i++ )
+
+            duplicated_id_t *dup_id;
+            vlc_vector_foreach_ref( dup_id, &id->dup_ids )
             {
-                sout_stream_t *dup_stream = p_sys->streams.data[i];
-                void *dup_id = id->dup_ids.data[i];
-                if( dup_id != NULL )
-                    sout_StreamControl( dup_stream, i_query, dup_id, spu_hl );
+                if( dup_id->id != NULL )
+                    sout_StreamControl(
+                        dup_id->stream_owner, i_query, dup_id->id, spu_hl );
             }
             return VLC_SUCCESS;
         }
     }
 
     return VLC_EGENERIC;
+    (void)p_stream;
 }
 
 static const struct sout_stream_operations ops = {
@@ -224,16 +230,16 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
     for( i_stream = 0; i_stream < p_sys->streams.size; i_stream++ )
     {
-        void *id_new = NULL;
+        duplicated_id_t dup_id = {.stream_owner = p_sys->streams.data[i_stream]};
 
         if( ESSelected( p_stream->obj.logger, p_fmt,
                         p_sys->selected_chains.data[i_stream] ) )
         {
             /* FIXME(Alaric): suffix the string id with the duplicated track
              * count. */
-            id_new = sout_StreamIdAdd(
-                p_sys->streams.data[i_stream], p_fmt, es_id );
-            if( id_new )
+            dup_id.id = sout_StreamIdAdd( dup_id.stream_owner,
+                                          p_fmt, es_id );
+            if( dup_id.id != NULL )
             {
                 msg_Dbg( p_stream, "    - added for output %zu", i_stream );
                 i_valid_streams++;
@@ -250,7 +256,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
         /* Append failed attempts as well to keep track of which pp_id
          * belongs to which duplicated stream */
-        vlc_vector_push( &id->dup_ids, id_new );
+        vlc_vector_push( &id->dup_ids, dup_id );
     }
 
     if( i_valid_streams <= 0 )
@@ -267,20 +273,18 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
  *****************************************************************************/
 static void Del( sout_stream_t *p_stream, void *_id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
-    for( size_t i = 0; i < id->dup_ids.size; i++ )
+    duplicated_id_t *dup_id;
+    vlc_vector_foreach_ref( dup_id, &id->dup_ids )
     {
-        void *dup_id = id->dup_ids.data[i];
-        if( dup_id != NULL )
-        {
-            sout_StreamIdDel( p_sys->streams.data[i], dup_id );
-        }
+        if( dup_id->id != NULL )
+            sout_StreamIdDel( dup_id->stream_owner, dup_id->id );
     }
     vlc_vector_destroy( &id->dup_ids );
 
     free( id );
+    (void)p_stream;
 }
 
 /*****************************************************************************
@@ -290,7 +294,6 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
-    sout_stream_t     *p_dup_stream;
 
     /* Loop through the linked list of buffers */
     while( p_buffer )
@@ -304,23 +307,22 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 
         for( size_t i = 0; i < id->dup_ids.size - 1; i++ )
         {
-            p_dup_stream = p_sys->streams.data[i];
-            void *dup_id = id->dup_ids.data[i];
+            duplicated_id_t *dup_id = &id->dup_ids.data[i];
 
-            if( dup_id != NULL )
+            if( dup_id->id != NULL )
             {
                 block_t *p_dup = block_Duplicate( p_buffer );
 
                 if( p_dup )
-                    sout_StreamIdSend( p_dup_stream, dup_id, p_dup );
+                    sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
             }
         }
 
-        void *last_dup_id = vlc_vector_last( &id->dup_ids );
+        duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
         if( last_dup_id != NULL )
         {
-            p_dup_stream = vlc_vector_last( &p_sys->streams );
-            sout_StreamIdSend( p_dup_stream, last_dup_id, p_buffer );
+            sout_StreamIdSend(
+                last_dup_id->stream_owner, last_dup_id->id, p_buffer );
         }
         else
         {
