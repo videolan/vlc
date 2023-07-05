@@ -26,7 +26,7 @@
 #include <vlc_frame.h>
 
 /**
- * \defgroup block
+ * \defgroup block Blocks
  * \ingroup input
  *
  * Blocks of binary data.
