@@ -139,7 +139,6 @@ static int Mux( sout_mux_t *p_mux )
     for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         block_fifo_t *p_fifo;
-        int i_count;
 
         if( p_sys->b_header && p_mux->pp_inputs[i]->p_fmt->i_extra )
         {
@@ -157,14 +156,17 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
-        i_count = block_FifoCount( p_fifo );
-        while( i_count > 0 )
+        vlc_fifo_Lock( p_fifo );
+        block_t *p_data = vlc_fifo_DequeueAllUnlocked( p_fifo );
+        vlc_fifo_Unlock( p_fifo );
+        while( p_data != NULL )
         {
-            block_t *p_data = block_FifoGet( p_fifo );
+            block_t *p_next = p_data->p_next;
+            p_data->p_next = NULL;
 
             sout_AccessOutWrite( p_mux->p_access, p_data );
 
-            i_count--;
+            p_data = p_next;
         }
     }
     p_sys->b_header = false;
