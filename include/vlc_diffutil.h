@@ -78,6 +78,70 @@ enum vlc_diffutil_op_type {
 
 
 /**
+ * The data positionned at newModel[ y ] is inserted at position index
+ * in the current model.
+ *
+ * @example
+ * model = "abcdefg"
+ * newModel[3] = 'X'
+ * after operation insert(y=3, index = 3), model will be
+ * model = "abcXdefg"
+ */
+struct vlc_diffutil_insert {
+    /// data position in the old model
+    uint32_t x;
+    /// data position in the new model
+    uint32_t y;
+    /// insertion position in the updated model
+    uint32_t index;
+};
+
+
+/**
+ * The data positionned at oldModel[ y ] is removed at position index
+ * in the current model.
+ *
+ * @example
+ * model = "abCdefg"
+ * oldModel[4] = 'C'
+ * after operation remove(x=4, index = 2), model will be
+ * model = "abdefg"
+ */
+struct vlc_diffutil_remove {
+    /// data position in the old model
+    uint32_t x;
+    /// data position in the new model
+    uint32_t y;
+    /// removal position in the updated model
+    uint32_t index;
+};
+
+
+/**
+ * Moves the data from position model[ from ] to model[ to ]
+ * the data is available either at newModel[ y ] or oldModel[ x ]
+ *
+ * the positions @a from and @a to are given in the referenrial before the operation
+ *
+ * @example
+ * model = "aBCdefg"
+ * after operation move(from=1, to=5, count=2), model will be
+ * model = "adeCBfg"
+ */
+struct vlc_diffutil_move {
+    /// move origin
+    uint32_t from;
+    /// move destination
+    uint32_t to;
+    /// data position in the old model
+    uint32_t x;
+    /// data position in the new model
+    uint32_t y;
+};
+
+
+
+/**
  * represent a change to the model, each change assumes that previous changes
  * have already been applied
  *
@@ -86,64 +150,9 @@ enum vlc_diffutil_op_type {
  */
 typedef struct {
     union {
-        /**
-         * the data positionned at newModel[ y ] is inserted at position index in the current model
-         *
-         * @example
-         * model = "abcdefg"
-         * newModel[3] = 'X'
-         * after operation insert(y=3, index = 3), model will be
-         * model = "abcXdefg"
-         */
-        struct {
-            /// data position in the old model
-            uint32_t x;
-            /// data position in the new model
-            uint32_t y;
-            /// insertion position in the updated model
-            uint32_t index;
-        } insert;
-
-        /**
-         * the data positionned at oldModel[ y ] is removed at position index in the current model
-         *
-         * @example
-         * model = "abCdefg"
-         * oldModel[4] = 'C'
-         * after operation remove(x=4, index = 2), model will be
-         * model = "abdefg"
-         */
-        struct {
-            /// data position in the old model
-            uint32_t x;
-            /// data position in the new model
-            uint32_t y;
-            /// removal position in the updated model
-            uint32_t index;
-        } remove;
-
-        /**
-         * moves the data from position model[ from ] to model[ to ]
-         * the data is available either at newModel[ y ] or oldModel[ x ]
-         *
-         * the positions @a from and @a to are given in the referenrial before the operation
-         *
-         * @example
-         * model = "aBCdefg"
-         * after operation move(from=1, to=5, count=2), model will be
-         * model = "adeCBfg"
-         */
-        struct {
-            /// move origin
-            uint32_t from;
-            /// move destination
-            uint32_t to;
-            /// data position in the old model
-            uint32_t x;
-            /// data position in the new model
-            uint32_t y;
-        } move;
-
+        struct vlc_diffutil_insert insert;
+        struct vlc_diffutil_remove remove;
+        struct vlc_diffutil_move move;
     } op;
 
     /// type of change operation
