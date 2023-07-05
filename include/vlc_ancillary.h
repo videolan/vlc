@@ -217,4 +217,5 @@ typedef struct vlc_icc_profile_t
     uint8_t data[]; /* binary profile data, see ICC.1:2022 (or later) */
 } vlc_icc_profile_t;
 
+/** @} */
 #endif /* VLC_ANCILLARY_H */
