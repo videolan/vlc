@@ -21,9 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
+/// String transformation functions
+// @module vlc.strings
+
+/*
  * Preamble
- *****************************************************************************/
+ */
 #ifndef  _GNU_SOURCE
 #   define  _GNU_SOURCE
 #endif
@@ -40,9 +43,16 @@
 #include "../vlc.h"
 #include "../libs.h"
 
-/*****************************************************************************
+/*
  * String transformations
- *****************************************************************************/
+ */
+
+/// Decode a list of URIs.
+//
+// This function returns as many variables as it had arguments.
+// @function    decode_uri
+// @tparam      string uri The URI to decode
+// @treturn     string Decoded URI
 static int vlclua_decode_uri( lua_State *L )
 {
     int i_top = lua_gettop( L );
@@ -60,6 +70,12 @@ static int vlclua_decode_uri( lua_State *L )
     return i_top;
 }
 
+/// Encode a list of URI components.
+//
+// This function returns as many variables as it had arguments.
+// @function    encode_uri_component
+// @tparam      string uri_comp An URI component to encode
+// @treturn     string Encoded URI
 static int vlclua_encode_uri_component( lua_State *L )
 {
     int i_top = lua_gettop( L );
@@ -75,6 +91,11 @@ static int vlclua_encode_uri_component( lua_State *L )
     return i_top;
 }
 
+/// Convert a file path to a URI.
+// @function    make_uri
+// @tparam      string path The file path to convert
+// @tparam[opt] string scheme Scheme to use for the URI (default auto: `file`, `fd` or `smb`)
+// @treturn     string The URI for the given path
 static int vlclua_make_uri( lua_State *L )
 {
     const char *psz_input = luaL_checkstring( L, 1 );
@@ -90,6 +111,10 @@ static int vlclua_make_uri( lua_State *L )
     return 1;
 }
 
+/// Convert a URI to a local path.
+// @function    make_path
+// @tparam      string uri The URI to convert
+// @treturn     string The file path for the given URI
 static int vlclua_make_path( lua_State *L )
 {
     const char *psz_input = luaL_checkstring( L, 1 );
@@ -99,6 +124,22 @@ static int vlclua_make_path( lua_State *L )
     return 1;
 }
 
+/// URL components.
+//
+// A table returned by the @{url_parse} function.
+// @field[type=string] protocol
+// @field[type=string] username
+// @field[type=string] password
+// @field[type=string] host
+// @field[type=int] port
+// @field[type=string] path
+// @field[type=string] option
+// @table url_components
+
+/// Parse a URL.
+// @function    url_parse
+// @tparam      string url The URL to parse
+// @return      @{url_components}
 int vlclua_url_parse( lua_State *L )
 {
     const char *psz_url = luaL_checkstring( L, 1 );
@@ -127,6 +168,13 @@ int vlclua_url_parse( lua_State *L )
     return 1;
 }
 
+/// Resolve XML special characters.
+//
+// Decode the XML special characters in a list of strings.
+// This function returns as many variables as it had arguments.
+// @function    resolve_xml_special_chars
+// @tparam      string input Input string
+// @treturn     string String with the XML special characters decoded
 static int vlclua_resolve_xml_special_chars( lua_State *L )
 {
     int i_top = lua_gettop( L );
@@ -145,6 +193,13 @@ static int vlclua_resolve_xml_special_chars( lua_State *L )
     return i_top;
 }
 
+/// Encode XML special characters.
+//
+// Encode the XML special characters in a list of strings.
+// This function returns as many variables as it had arguments.
+// @function    convert_xml_special_chars
+// @tparam      string input Input string
+// @treturn     string String with the XML special characters encoded
 static int vlclua_convert_xml_special_chars( lua_State *L )
 {
     int i_top = lua_gettop( L );
@@ -159,6 +214,14 @@ static int vlclua_convert_xml_special_chars( lua_State *L )
     return i_top;
 }
 
+/// Convert string from given charset to UTF-8.
+//
+// Convert a string from the specified input character encoding into UTF-8.
+// @function    from_charset
+// @tparam      string charset The charset of the input string
+// @tparam      string input   Input string
+// @treturn[1]  string String converted to UTF-8
+// @treturn[2]  string Empty string on error
 static int vlclua_from_charset( lua_State *L )
 {
     if( lua_gettop( L ) < 2 ) return vlclua_error( L );

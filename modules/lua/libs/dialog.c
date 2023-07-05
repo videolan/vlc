@@ -20,9 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
+/// Dialog user interface APIs.
+// Functions to create interface dialogs from Lua extensions.
+// @module vlc.dialog
+
+/*
  * Preamble
- *****************************************************************************/
+ */
 #ifndef  _GNU_SOURCE
 #   define  _GNU_SOURCE
 #endif
@@ -40,57 +44,365 @@
 
 #include "assert.h"
 
-/*****************************************************************************
+/*
  *
- *****************************************************************************/
+ */
 
 /* Dialog functions */
+
+/// Dialog methods
+//
+// A dialog object represents a dialog window, which can
+// contain multiple Widgets.
+// @section        dialog_methods
+
+/// Create a dialog
+//
+// Create a new user interface dialog object
+// @function    dialog
+// @tparam      string title Human-readable title of the dialog
+// @treturn     Dialog A new Dialog object
 static int vlclua_dialog_create( lua_State *L );
+
+/// Close and delete this dialog.
+//
+// @function    Dialog:delete
 static int vlclua_dialog_delete( lua_State *L );
+
+/// Show this dialog.
+//
+// @function    Dialog:show
 static int vlclua_dialog_show( lua_State *L );
+
+/// Hide (but not close) this dialog.
+//
+// @function    Dialog:hide
 static int vlclua_dialog_hide( lua_State *L );
+
+/// Set the title for this dialog.
+//
+// @function    Dialog:set_title
+// @tparam      string title New human-readable title for this dialog
 static int vlclua_dialog_set_title( lua_State *L );
+
+/// Update this dialog immediately.
+//
+// Update the dialog immediately (don't wait for the current function to return).
+// @function    Dialog:update
 static int vlclua_dialog_update( lua_State *L );
+
 static void lua_SetDialogUpdate( lua_State *L, int flag );
 static int lua_GetDialogUpdate( lua_State *L );
 int lua_DialogFlush( lua_State *L );
 
+/// Widget creation.
+//
+// The functions in this section all create and add widgets to the dialog.
+//
+// In the following functions, you can always add some optional parameters:
+// `col`, `row`, `col_span`, `row_span`, `width`, `height`.
+//
+// They define the position of a widget in the dialog:
+// 
+// - `row` and `col` are the absolute positions on a grid of widgets. The first row and col are 1,1.
+// - `row_span` and `col_span` represent the relative size of a widget on the grid.
+//   A widget with a `col_span` of 4 will be displayed as wide as 4 widgets with a `col_span` of 1.
+// - `width` and `height` are size hints (in pixels) but may be discarded by the GUI module
+//
+// @usage
+// -- Creates a label at row 3, col 2, with a relative width of 4, height of 5.
+// w = d:add_label( "My Label", 2, 3, 4, 5 )
+// @section dialog_widgets
+
+/// Add a button to the dialog.
+//
+// Creates and adds a new button to the dialog
+// @function    Dialog:add_button
+// @tparam      string text Button label
+// @tparam      func   callback Function to call for button interaction
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created button widget.
 static int vlclua_dialog_add_button( lua_State *L );
+
+/// Add a label to the dialog.
+//
+// Creates and adds a new label to the dialog
+// @function    Dialog:add_label
+// @tparam      string text Label text
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created label widget.
 static int vlclua_dialog_add_label( lua_State *L );
+
 static int vlclua_dialog_add_html( lua_State *L );
 static int vlclua_dialog_add_text_inner( lua_State *L, int );
+
+/// Add an editable text field to the dialog.
+//
+// Creates and adds a new editable text field, in order to read user input.
+// @function    Dialog:add_text_input
+// @tparam      string text Default text of the text field
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created text field widget.
 static inline int vlclua_dialog_add_text_input( lua_State *L )
 {
     return vlclua_dialog_add_text_inner( L, EXTENSION_WIDGET_TEXT_FIELD );
 }
+
+/// Add an editable masked text field to the dialog.
+//
+// Creates and adds a new masked editable text field, in order to read user input,
+// typically used for password fields.
+// The text entered in this field will not be readable (masked/replaced by asterisks
+// or similar).
+// @function    Dialog:add_password
+// @tparam      string text Default text of the password field
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created password field widget.
 static inline int vlclua_dialog_add_password( lua_State *L )
 {
     return vlclua_dialog_add_text_inner( L, EXTENSION_WIDGET_PASSWORD );
 }
+
+/// Add a rich text HTML label to the dialog.
+//
+// Creates and adds a new rich-text label to the dialog
+// that supports basic HTML formatting (such as `<i>` or
+// `<h1>` for instance).
+// @function    Dialog:add_html
+// @tparam      string text HTML text
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created HTML label widget.
 static inline int vlclua_dialog_add_html( lua_State *L )
 {
     return vlclua_dialog_add_text_inner( L, EXTENSION_WIDGET_HTML );
 }
+
+/// Add a check box to the dialog.
+//
+// Creates and adds a new check box control to the dialog
+// with the given text as label next to it.
+// The check box has a boolean state (`true`/`false`)
+// @function    Dialog:add_check_box
+// @tparam      string text Label for the check box
+// @tparam      bool   state Initial state (`true` for checked, else `false`)
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created check box widget.
 static int vlclua_dialog_add_check_box( lua_State *L );
+
+/// Add a list to the dialog.
+//
+// Creates and adds a new list control to the dialog
+//
+// The list widget allows none, one or multiple items to be selected.
+// @function    Dialog:add_list
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created list widget.
 static int vlclua_dialog_add_list( lua_State *L );
+
+/// Add a drop down to the dialog.
+//
+// Creates and adds a new drop down control to the dialog
+//
+// The drop down allows only single item to be selected at the same time.
+// @function    Dialog:add_dropdown
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created drop down widget.
 static int vlclua_dialog_add_dropdown( lua_State *L );
+
+/// Add an image to the dialog.
+//
+// Creates and adds a new image control to the dialog
+//
+// The image widget loads and displays an image form the supplied
+// path which can be either an absolute or relative path to a local file.
+// @function    Dialog:add_image
+// @tparam      string path Relative or absolute path to the image
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created image widget.
 static int vlclua_dialog_add_image( lua_State *L );
+
+/// Add a loading spinner to the dialog.
+//
+// Creates and adds a new loading spinner control to the dialog
+// @function    Dialog:add_spin_icon
+// @tparam      string iterations FIXME, this is currently broken
+// @tparam[opt] int    col Column in the grid the Widget will be positioned at
+// @tparam[opt] int    row Row in the grid the Widget will be positioned at
+// @tparam[opt] int    col_span Relative grid column size
+// @tparam[opt] int    row_span Relative grid row size
+// @tparam[opt] int    width Width size hint (in pixels)
+// @tparam[opt] int    height Height size hint (in pixels)
+// @treturn     Widget The newly created loading spinner widget.
 static int vlclua_dialog_add_spin_icon( lua_State *L );
+
 static int vlclua_create_widget_inner( lua_State *L, int i_args,
                                        extension_widget_t *p_widget);
 
+
+/// Remove a widget from the dialog.
+//
+// Removes the specified widget from the dialog
+//
+// The widget is removed from the dialog and the UI is updated accordingly,
+// which might imply repositioning of other widgets.
+// This function always updates the dialog.
+// @function    Dialog:del_widget
+// @tparam      Widget widget The widget to remove
+// @raise Error if called with something that isn't a Widget.
 static int vlclua_dialog_delete_widget( lua_State *L );
 
-/* Widget methods */
+/// Widget methods
+//
+// A widget object represents a widget that is placed in
+// a Dialog.
+// @section        widget_methods
+
+/// Set the widget text.
+//
+// Set the text content or label for this widget.
+//
+// Applies to: Button, Label, HTML, Text Input, Password, Checkbox
+// @function    Widget:set_text
+// @tparam      string text New widget text
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_set_text( lua_State *L );
+
+/// Get the widget text.
+//
+// Get the text content or label for this widget.
+//
+// Applies to: Button, Label, HTML, Text Input, Password, Checkbox
+// @function    Widget:get_text
+// @raise Error if called for an unsupported widget type.
+// @treturn     string The current label or content of widget.
 static int vlclua_widget_get_text( lua_State *L );
+
+/// Set the checkbox widget checked state.
+//
+// Set if the widgets is currently displaying as checked.
+//
+// Applies to: Checkbox
+// @function    Widget:set_checked
+// @tparam      bool checked If the checkbox is checked (`true`) or not (`false`)
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_set_checked( lua_State *L );
+
+/// Get the checkbox widget checked state.
+//
+// Get if the widget is currently displaying as checked.
+//
+// Applies to: Checkbox
+// @function    Widget:get_checked
+// @treturn     bool If the checkbox is checked (`true`) or not (`false`)
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_get_checked( lua_State *L );
+
+/// Add an item to the widget
+//
+// Adds an item with the given `id` and user-facing `value` to the widget.
+//
+// Applies to: List, Drop-down
+// @function    Widget:add_value
+// @tparam      string value The user-facing text to be added
+// @tparam      int id An unique identifier for this item
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_add_value( lua_State *L );
+
+/// Get the current item of the drop-down
+//
+// Gets the `id` and `value` of the item that is the currently
+// selected one for this drop-down.
+//
+// If no item is selected, the `-1` is returned for the `id`
+// and `nil` for the string.
+//
+// Applies to: Drop-down
+// @function    Widget:get_value
+// @treturn[1]  int The unique identifier of the current item
+// @treturn[1]  string The user-facing value of the current item
+// @treturn[2]  int `-1` if no item is selected
+// @return[2]   `nil` if no item is selected
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_get_value( lua_State *L );
+
+/// Clear the items of the widget
+//
+// Clears all previously added items for this widget.
+//
+// Applies to: List, Drop-down
+// @function    Widget:clear
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_clear( lua_State *L );
+
+/// Get the currently selected item(s) of the list
+//
+// Gets a table of the currently selected items in the list.
+// The keys of the table are the `id` of the item and the value
+// is the user-facing text.
+//
+// Applies to: List
+// @function    Widget:get_selection
+// @treturn     int The unique identifier of the current item
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_get_selection( lua_State *L );
+
+/// Start animating the current widget.
+//
+// Applies to: Loading spinner
+// @function    Widget:animate
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_animate( lua_State *L );
+
+/// Stop animating the current widget.
+//
+// Applies to: Loading spinner
+// @function    Widget:stop
+// @raise Error if called for an unsupported widget type.
 static int vlclua_widget_stop( lua_State *L );
 
 /* Helpers */
@@ -135,16 +447,16 @@ static const luaL_Reg vlclua_widget_reg[] = {
     { NULL, NULL }
 };
 
-/** Private static variable used for the registry index */
+/* Private static variable used for the registry index */
 static const char key_opaque = 'A',
                   key_update = 'B';
 
-/**
+/*
  * Open dialog library for Lua
  * @param L lua_State
  * @param opaque Object associated to this lua state
  * @note opaque will be p_ext for extensions, p_sd for service discoveries
- **/
+ */
 void luaopen_dialog( lua_State *L, void *opaque )
 {
     lua_getglobal( L, "vlc" );
@@ -196,8 +508,8 @@ static int vlclua_dialog_create( lua_State *L )
     vlc_mutex_init( &p_dlg->lock );
     vlc_cond_init( &p_dlg->cond );
 
-    /** @todo Use the registry instead of __dialog,
-        so that the user can't tamper with it */
+    /* @todo Use the registry instead of __dialog,
+       so that the user can't tamper with it */
 
     lua_getglobal( L, "vlc" );
     lua_pushlightuserdata( L, p_dlg );
@@ -292,7 +604,6 @@ static int vlclua_dialog_delete( lua_State *L )
     return 1;
 }
 
-/** Show the dialog */
 static int vlclua_dialog_show( lua_State *L )
 {
     extension_dialog_t **pp_dlg =
@@ -307,7 +618,6 @@ static int vlclua_dialog_show( lua_State *L )
     return 1;
 }
 
-/** Hide the dialog */
 static int vlclua_dialog_hide( lua_State *L )
 {
     extension_dialog_t **pp_dlg =
@@ -322,8 +632,6 @@ static int vlclua_dialog_hide( lua_State *L )
     return 1;
 }
 
-
-/** Set the dialog's title */
 static int vlclua_dialog_set_title( lua_State *L )
 {
     extension_dialog_t **pp_dlg =
@@ -345,7 +653,6 @@ static int vlclua_dialog_set_title( lua_State *L )
     return 1;
 }
 
-/** Update the dialog immediately */
 static int vlclua_dialog_update( lua_State *L )
 {
     vlc_object_t *p_mgr = vlclua_get_this( L );
@@ -381,7 +688,7 @@ static int lua_GetDialogUpdate( lua_State *L )
     return luaL_checkinteger( L, -1 );
 }
 
-/** Manually update a dialog
+/* Manually update a dialog
  * This can be called after a lua_pcall
  * @return SUCCESS if there is no dialog or the update was successful
  * @todo If there can be multiple dialogs, this function will have to
@@ -406,11 +713,11 @@ int lua_DialogFlush( lua_State *L )
     return i_ret;
 }
 
-/**
+/*
  * Create a button: add_button
  * Arguments: text, function (as string)
  * Qt: QPushButton
- **/
+ */
 static int vlclua_dialog_add_button( lua_State *L )
 {
     /* Verify arguments */
@@ -429,11 +736,11 @@ static int vlclua_dialog_add_button( lua_State *L )
     return vlclua_create_widget_inner( L, 2, p_widget );
 }
 
-/**
+/*
  * Create a text label: add_label
  * Arguments: text
  * Qt: QLabel
- **/
+ */
 static int vlclua_dialog_add_label( lua_State *L )
 {
     /* Verify arguments */
@@ -446,11 +753,11 @@ static int vlclua_dialog_add_label( lua_State *L )
     return vlclua_create_widget_inner( L, 1, p_widget );
 }
 
-/**
+/*
  * Create a text area: add_html, add_text_input, add_password
  * Arguments: text (may be nil)
  * Qt: QLineEdit (Text/Password) or QTextArea (HTML)
- **/
+ */
 static int vlclua_dialog_add_text_inner( lua_State *L, int i_type )
 {
     /* Verify arguments */
@@ -465,11 +772,11 @@ static int vlclua_dialog_add_text_inner( lua_State *L, int i_type )
     return vlclua_create_widget_inner( L, 1, p_widget );
 }
 
-/**
+/*
  * Create a checkable box: add_check_box
  * Arguments: text, checked (as bool)
  * Qt: QCheckBox
- **/
+ */
 static int vlclua_dialog_add_check_box( lua_State *L )
 {
     /* Verify arguments */
@@ -484,12 +791,12 @@ static int vlclua_dialog_add_check_box( lua_State *L )
     return vlclua_create_widget_inner( L, 2, p_widget );
 }
 
-/**
+/*
  * Create a drop-down list (non editable)
  * Arguments: (none)
  * Qt: QComboBox
  * @todo make it editable?
- **/
+ */
 static int vlclua_dialog_add_dropdown( lua_State *L )
 {
     extension_widget_t *p_widget = calloc( 1, sizeof( extension_widget_t ) );
@@ -498,11 +805,11 @@ static int vlclua_dialog_add_dropdown( lua_State *L )
     return vlclua_create_widget_inner( L, 0, p_widget );
 }
 
-/**
+/*
  * Create a list panel (multiple selection)
  * Arguments: (none)
  * Qt: QListWidget
- **/
+ */
 static int vlclua_dialog_add_list( lua_State *L )
 {
     extension_widget_t *p_widget = calloc( 1, sizeof( extension_widget_t ) );
@@ -511,11 +818,11 @@ static int vlclua_dialog_add_list( lua_State *L )
     return vlclua_create_widget_inner( L, 0, p_widget );
 }
 
-/**
+/*
  * Create an image label
  * Arguments: (string) url
  * Qt: QLabel with setPixmap( QPixmap& )
- **/
+ */
 static int vlclua_dialog_add_image( lua_State *L )
 {
     /* Verify arguments */
@@ -529,11 +836,11 @@ static int vlclua_dialog_add_image( lua_State *L )
     return vlclua_create_widget_inner( L, 1, p_widget );
 }
 
-/**
+/*
  * Create a spinning icon
  * Arguments: (int) loop count to play: 0 means stopped, -1 means infinite.
  * Qt: SpinningIcon (custom widget)
- **/
+ */
 static int vlclua_dialog_add_spin_icon( lua_State *L )
 {
     /* Verify arguments */
@@ -546,12 +853,12 @@ static int vlclua_dialog_add_spin_icon( lua_State *L )
     return vlclua_create_widget_inner( L, 0, p_widget );
 }
 
-/**
+/*
  * Internal helper to finalize the creation of a widget
  * @param L Lua State
  * @param i_args Number of arguments before "row" (0 or more)
  * @param p_widget The widget to add
- **/
+ */
 static int vlclua_create_widget_inner( lua_State *L, int i_args,
                                        extension_widget_t *p_widget )
 {
@@ -955,11 +1262,11 @@ static int vlclua_widget_stop( lua_State *L )
     return 1;
 }
 
-/**
+/*
  * Delete a widget from a dialog
  * Remove it from the list once it has been safely destroyed by the interface
  * @note This will always update the dialog
- **/
+ */
 static int vlclua_dialog_delete_widget( lua_State *L )
 {
     /* Get dialog */
@@ -1033,21 +1340,21 @@ static int vlclua_dialog_delete_widget( lua_State *L )
  */
 
 
-/**
+/*
  * Add a widget to the widget list of a dialog
  * @note Must be entered with lock on dialog
- **/
+ */
 static void AddWidget( extension_dialog_t *p_dialog,
                        extension_widget_t *p_widget )
 {
     ARRAY_APPEND( p_dialog->widgets, p_widget );
 }
 
-/**
+/*
  * Remove a widget from the widget list of a dialog
  * @note The widget MUST have been safely killed before
  * @note Must be entered with lock on dialog
- **/
+ */
 static int DeleteWidget( extension_dialog_t *p_dialog,
                          extension_widget_t *p_widget )
 {
