@@ -349,7 +349,7 @@ _##field##TextField.delegate = self
 
 #undef FILL_FIELD_FROM_INPUTITEM
 
-    _artworkImageView.image = _artwork;
+    _artworkImageButton.image = _artwork;
 
     if (!_mainMenuInstance) {
         [self.window setTitle:inputItem.title];
@@ -376,13 +376,15 @@ _##field##TextField.delegate = self
     
 #undef FILL_FIELD_FROM_DICT
 
-    _artworkImageView.image = _artwork;
+    _artworkImageButton.image = _artwork;
 }
 
 - (void)updateRepresentation
 {
     _saveMetaDataButton.enabled = NO;
     _newArtworkURL = nil;
+    _artworkImageButton.image = _artwork;
+    _artworkImageButton.alternateImage = _artwork;
 
     if (_representedInputItems.count == 0) {
         /* Erase */
@@ -392,7 +394,7 @@ _##field##TextField.originalStateString = @"";
         PERFORM_ACTION_ALL_TEXTFIELDS(CLEAR_TEXT);
 
 #undef CLEAR_TEXT
-        [_artworkImageView setImage:[NSImage imageNamed:@"noart.png"]];
+        _artworkImageButton.image = [NSImage imageNamed:@"noart.png"];
     } else if (_representedInputItems.count == 1) {
         [self fillWindowWithInputItemData:_representedInputItems.firstObject];
     } else if (_representedInputItems.count > 1) {
@@ -539,13 +541,15 @@ SET_INPUTITEM_PROP(field, field)                \
 
         NSURL * const url = panel.URLs.firstObject;
         NSImage * const image = [[NSImage alloc] initWithContentsOfURL:url];
-        if (image) {
-            _artwork = image;
-            _artworkImageView.image = _artwork;
-
-            _newArtworkURL = url;
-            _saveMetaDataButton.enabled = YES;
+        if (!image) {
+            return;
         }
+
+        _artwork = image;
+        _artworkImageButton.image = [[NSImage alloc] initWithContentsOfURL:url];
+
+        _newArtworkURL = url;
+        _saveMetaDataButton.enabled = YES;
     }];
 }
 
