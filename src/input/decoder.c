@@ -1572,7 +1572,7 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
 /**
  * Decode a frame
  *
- * \param p_dec the decoder object
+ * \param p_owner the input decoder object
  * \param frame the block to decode
  */
 static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_t *frame )
@@ -1705,7 +1705,7 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
 /**
  * The decoding main loop
  *
- * \param p_dec the decoder
+ * \param p_data the input decoder object
  */
 static void *DecoderThread( void *p_data )
 {
@@ -1855,10 +1855,9 @@ static const struct decoder_owner_callbacks dec_spu_cbs =
 /**
  * Create a decoder object
  *
- * \param p_input the input thread
- * \param p_es the es descriptor
- * \param b_packetizer instead of a decoder
- * \return the decoder object
+ * \param p_parent a VLC parent object to inherit variable from
+ * \param cfg the input decoder configuration
+ * \return a new input decoder object
  */
 static vlc_input_decoder_t *
 CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
@@ -2011,8 +2010,8 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 /**
  * Destroys a decoder object
  *
- * \param p_dec the decoder object
- * \return nothing
+ * \param p_owner the input decoder object
+ * \param i_cat the elementary stream format category for the decoder
  */
 static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category_e i_cat )
 {
@@ -2181,8 +2180,8 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 /**
  * Spawns a new decoder thread from the input thread
  *
- * \param p_input the input thread
- * \param p_es the es descriptor
+ * \param parent the VLC object to inherit variable from
+ * \param cfg the input decoder configuration
  * \return the spawned decoder object
  */
 vlc_input_decoder_t *
