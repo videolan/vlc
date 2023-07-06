@@ -48,11 +48,12 @@ input_clock_t *input_clock_New( float rate );
  * It can be called only one time, with a valid clock, before the first update
  * (input_clock_Update()).
  *
+ * \param clock the input clock to attach the listener to
  * \param clock_listener clock created with vlc_clock_main_CreateInputMaster().
  * The input_clock_t will take ownership of this clock and drive the main
  * clock.
  */
-void input_clock_AttachListener( input_clock_t *, vlc_clock_t *clock_listener );
+void input_clock_AttachListener( input_clock_t *clock, vlc_clock_t *clock_listener );
 
 /**
  * This function destroys a input_clock_t created by input_clock_New.
@@ -63,11 +64,17 @@ void           input_clock_Delete( input_clock_t * );
  * This function will update a input_clock_t with a new clock reference point.
  * It will also tell if the clock point is late regarding our buffering.
  *
+ * \param clock the input clock object to update with the new point
+ * \param p_log the logger object to use
+ * \param b_can_pace_control whether the input can control the speed of playback
  * \param b_buffering_allowed tells if we are allowed to bufferize more data in
- * advanced (if possible).
+          advanced (if possible).
+ * \param i_clock the new clock reference value
+ * \param i_system the timestmap at which the new reference has been reported
+ *
  * \return clock update delay
  */
-vlc_tick_t input_clock_Update( input_clock_t *, vlc_object_t *p_log,
+vlc_tick_t input_clock_Update( input_clock_t *clock, vlc_object_t *p_log,
                             bool b_can_pace_control, bool b_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );
 /**
