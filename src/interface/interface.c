@@ -125,7 +125,7 @@ vlc_intf_GetMainPlaylist(intf_thread_t *intf)
 /**
  * Create and start an interface.
  *
- * @param playlist playlist and parent object for the interface
+ * @param libvlc the private libvlc instance starting the interface
  * @param chain configuration chain string
  * @return VLC_SUCCESS or an error code
  */
