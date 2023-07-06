@@ -435,7 +435,7 @@ vlc_playlist_Clear(vlc_playlist_t *playlist);
  * The index must be in range (less than or equal to vlc_playlist_Count()).
  *
  * \param playlist the playlist, locked
- * \index index    the index where the media are to be inserted
+ * \param index    the index where the media are to be inserted
  * \param media    the array of media to insert
  * \param count    the number of media to insert
  * \return VLC_SUCCESS on success, another value on error
@@ -450,7 +450,7 @@ vlc_playlist_Insert(vlc_playlist_t *playlist, size_t index,
  * The index must be in range (less than or equal to vlc_playlist_Count()).
  *
  * \param playlist the playlist, locked
- * \index index    the index where the media is to be inserted
+ * \param index    the index where the media is to be inserted
  * \param media    the media to insert
  * \return VLC_SUCCESS on success, another value on error
  */
@@ -561,7 +561,7 @@ vlc_playlist_RemoveOne(vlc_playlist_t *playlist, size_t index)
  * change.
  *
  * \param playlist the playlist, locked
- * \index index    the index where the media are to be inserted
+ * \param index    the index where the media are to be inserted
  * \param media    the array of media to insert
  * \param count    the number of media to insert
  * \return VLC_SUCCESS on success, another value on error
@@ -869,6 +869,7 @@ vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *media);
 /**
  * Export the playlist to a file.
  *
+ * \param playlist a playlist instance
  * \param filename the location where the exported file will be saved
  * \param type the type of the playlist file to create (m3u, m3u8, xspf, ...)
  * \return VLC_SUCCESS on success, another value on error
