@@ -118,7 +118,7 @@ static void AddressDestroy (sap_address_t *addr)
 
 /**
  * main SAP handler thread
- * \param p_this the SAP Handler object
+ * \param self the SAP Handler object
  * \return nothing
  */
 static void *RunThread (void *self)
