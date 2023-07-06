@@ -217,6 +217,7 @@ vlc_media_tree_Remove(vlc_media_tree_t *tree, input_item_t *media);
  * Find the node containing the requested input item (and its parent).
  *
  * \param tree the media tree, locked
+ * \param media the media to look for in the tree
  * \param result point to the matching node if the function returns true [OUT]
  * \param result_parent if not NULL, point to the matching node parent
  *                      if the function returns true [OUT]
