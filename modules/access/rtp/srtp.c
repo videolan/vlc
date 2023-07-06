@@ -126,6 +126,7 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
  * @param encr encryption algorithm number
  * @param auth authentication algorithm number
  * @param tag_len authentication tag byte length (NOT including RCC)
+ * @param prf the pseudo-random family to use for key derivation
  * @param flags OR'ed optional flags.
  *
  * @return NULL in case of error
@@ -379,6 +380,7 @@ srtp_setkeystring (srtp_session_t *s, const char *key, const char *salt)
  *
  * If RCC rate is 1, RCC mode 1 and 2 are functionally identical.
  *
+ * @param s the session to change the RCC for
  * @param rate RoC Carry rate (MUST NOT be zero)
  */
 void srtp_setrcc_rate (srtp_session_t *s, uint16_t rate)
@@ -451,6 +453,7 @@ rtp_digest (gcry_md_hd_t md, const uint8_t *data, size_t len,
  * (CTR block cypher mode of operation has identical encryption and
  * decryption function).
  *
+ * @param s a valid SRTP session to update and encrypt the packet from
  * @param buf RTP packet to be en-/decrypted
  * @param len RTP packet length
  *
@@ -525,16 +528,17 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
  * the authentication tag and appends it.
  * Note that you can encrypt packet in disorder.
  *
+ * @param s a valid SRTP session to convert the packet from and send to
  * @param buf RTP packet to be encrypted/digested
  * @param lenp pointer to the RTP packet length on entry,
  *             set to the SRTP length on exit (undefined on non-ENOSPC error)
  * @param bufsize size (bytes) of the packet buffer
  *
- * @return 0 on success, in case of error:
- *  EINVAL  malformatted RTP packet or internal error
- *  ENOSPC  bufsize is too small to add authentication tag
- *          (<lenp> will hold the required byte size)
- *  EACCES  packet would trigger a replay error on receiver
+ * @return 0 on success, an error code otherwise
+ * @retval EINVAL  malformatted RTP packet or internal error
+ * @retval ENOSPC  bufsize is too small to add authentication tag
+ *                 (\p lenp will hold the required byte size)
+ * @retval EACCES  packet would trigger a replay error on receiver
  */
 int
 srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
@@ -611,6 +615,7 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
  * Turns a SRTP packet into a RTP packet: authenticates the packet,
  * then decrypts it.
  *
+ * @param s a valid SRTP session to authenticate and decrypt the packet from
  * @param buf RTP packet to be digested/decrypted
  * @param lenp pointer to the SRTP packet length on entry,
  *             set to the RTP length on exit (undefined in case of error)
@@ -710,6 +715,7 @@ rtcp_digest (gcry_md_hd_t md, const void *data, size_t len)
  * (CTR block cypher mode of operation has identical encryption and
  * decryption function).
  *
+ * @param s A valid SRTP session to update
  * @param buf RTCP packet to be en-/decrypted
  * @param len RTCP packet length
  *
@@ -768,6 +774,7 @@ static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
  * Turns a RTCP packet into a SRTCP packet: encrypt it, then computes
  * the authentication tag and appends it.
  *
+ * @param s a valid SRTP session to encrypt and authenticate the packet from
  * @param buf RTCP packet to be encrypted/digested
  * @param lenp pointer to the RTCP packet length on entry,
  *             set to the SRTCP length on exit (undefined in case of error)
@@ -809,6 +816,7 @@ srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
  * Turns a SRTCP packet into a RTCP packet: authenticates the packet,
  * then decrypts it.
  *
+ * @param s a valid SRTP session to read from and convert the packet from
  * @param buf RTCP packet to be digested/decrypted
  * @param lenp pointer to the SRTCP packet length on entry,
  *             set to the RTCP length on exit (undefined in case of error)
@@ -834,4 +842,3 @@ srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
     *lenp = len;
     return srtp_crypt (s, buf, len);
 }
-
