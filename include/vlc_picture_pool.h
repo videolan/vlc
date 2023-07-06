@@ -110,6 +110,7 @@ VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
  * When the new pool is released, pictures are returned to the master pool.
  * If the master pool was already released, pictures will be destroyed.
  *
+ * @param pool A pool from ::picture_pool_New or ::picture_pool_NewFromFormat
  * @param count number of picture to reserve
  *
  * @return the new pool, or NULL if there were not enough pictures available
@@ -118,7 +119,7 @@ VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
  * @note This function is thread-safe (but it might return NULL if other
  * threads have already allocated too many pictures).
  */
-VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *, unsigned count)
+VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *pool, unsigned count)
 VLC_USED;
 
 /**
