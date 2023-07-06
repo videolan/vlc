@@ -101,19 +101,21 @@ const char *vlc_http_msg_get_agent(const struct vlc_http_msg *);
 /**
  * Parses a timestamp header field.
  *
+w* @param msg the response to get the timestamp header from
  * @param name header field name
  * @return a timestamp value, or -1 on error.
  */
-time_t vlc_http_msg_get_time(const struct vlc_http_msg *, const char *name);
+time_t vlc_http_msg_get_time(const struct vlc_http_msg *msg, const char *name);
 
 /**
  * Adds a timestamp header field.
  *
+ * @param msg the request to add the header to
  * @param name header field name
  * @param t pointer to timestamp
  * @return 0 on success, -1 on error (errno is set accordingly)
  */
-int vlc_http_msg_add_time(struct vlc_http_msg *, const char *name,
+int vlc_http_msg_add_time(struct vlc_http_msg *msg, const char *name,
                           const time_t *t);
 
 /**
@@ -165,6 +167,7 @@ char *vlc_http_msg_get_basic_realm(const struct vlc_http_msg *);
  * Formats a plain username and password pair using HTTP Basic (RFC7617)
  * syntax.
  *
+ * @param msg the request to add the credentials to
  * @param proxy true for proxy authentication,
  *              false for origin server authentication
  * @param username null-terminated username
@@ -172,7 +175,7 @@ char *vlc_http_msg_get_basic_realm(const struct vlc_http_msg *);
  * @return 0 on success, -1 on out-of-memory (ENOMEM) or if username or
  * password are invalid (EINVAL).
  */
-int vlc_http_msg_add_creds_basic(struct vlc_http_msg *, bool proxy,
+int vlc_http_msg_add_creds_basic(struct vlc_http_msg *msg, bool proxy,
                                  const char *username, const char *password);
 
 
@@ -230,11 +233,12 @@ const char *vlc_http_msg_get_path(const struct vlc_http_msg *);
  *
  * Finds the first occurrence of a token within a HTTP field header.
  *
+ * @param msg the request to get the token from
  * @param field HTTP header field name
  * @param token HTTP token name
  * @return the first byte of the token if found, NULL if not found.
  */
-const char *vlc_http_msg_get_token(const struct vlc_http_msg *,
+const char *vlc_http_msg_get_token(const struct vlc_http_msg *msg,
                                    const char *field, const char *token);
 
 /**
@@ -304,12 +308,13 @@ block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
  *
  * @note This function takes ownership of the passed data block(s).
  *
+ * @param msg the request to append the data block to
  * @param b chain of block of data to be sent
  * @param eos true to indicate the end of the payload
  * @retval 0 success
  * @retval -1 fatal error
  */
-int vlc_http_msg_write(struct vlc_http_msg *, block_t *b, bool eos);
+int vlc_http_msg_write(struct vlc_http_msg *msg, block_t *b, bool eos);
 
 /** @} */
 
