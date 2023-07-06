@@ -119,6 +119,7 @@ struct vlc_renderer_discovery_owner;
 /**
  * Return a list of renderer discovery modules
  *
+ * @param p_obj any VLC object to get a libvlc instance from TODO
  * @param pppsz_names a pointer to a list of module name, NULL terminated
  * @param pppsz_longnames a pointer to a list of module longname, NULL
  * terminated
@@ -134,8 +135,11 @@ vlc_rd_get_names(vlc_object_t *p_obj, char ***pppsz_names,
 /**
  * Create a new renderer discovery module
  *
+ * @param p_obj the parent VLC object the variables will be inherited from
  * @param psz_name name of the module to load, see vlc_rd_get_names() to get
  * the list of names
+ * @param owner owner object with callback that the renderer discovery will
+ * notify when new renderers are found or removed
  *
  * @return a valid vlc_renderer_discovery, need to be released with
  * vlc_rd_release()
