@@ -628,4 +628,3 @@ int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
         return -1;
     return vlc_accept(fd, addr, addrlen, nonblock);
 }
-
