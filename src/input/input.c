@@ -116,7 +116,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state, vlc_tick_t 
  *
  * You must not start an already running input_thread_t.
  *
- * \param the input thread to start
+ * \param p_input the input thread to start
  */
 int input_Start( input_thread_t *p_input )
 {
@@ -211,8 +211,12 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  * adding callback on the variables/events you want to monitor.
  *
  * \param p_parent a vlc_object
+ * \param events_cb the events virtual table
+ * \param events_data an opaque given to the events callbacks (\p events_cb)
  * \param p_item an input item
+ * \param type the type of task the input is created for (thumbnailing, playback, ...)
  * \param p_resource an optional input ressource
+ * \param p_renderer an optional renderer object to render the input to
  * \return a pointer to the spawned input thread
  */
 input_thread_t *input_Create( vlc_object_t *p_parent,
