@@ -286,23 +286,19 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     /* Should be ensured in `Add`. */
     assert(id->dup_ids.size > 0);
 
-    for( size_t i = 0; i < id->dup_ids.size - 1; i++ )
+    duplicated_id_t *dup_id;
+    vlc_vector_foreach_ref( dup_id, &id->dup_ids )
     {
-        duplicated_id_t *dup_id = &id->dup_ids.data[i];
-
-        block_t *p_dup = block_Duplicate( p_buffer );
-        if( unlikely(p_dup == NULL) )
+        const bool is_last = dup_id == vlc_vector_last_ref( &id->dup_ids );
+        block_t *to_send = (is_last) ? p_buffer : block_Duplicate( p_buffer );
+        if ( unlikely(to_send == NULL) )
         {
             block_Release( p_buffer );
             return VLC_ENOMEM;
         }
-
-        sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
+            
+        sout_StreamIdSend( dup_id->stream_owner, dup_id->id, to_send );
     }
-
-    duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
-    sout_StreamIdSend(
-        last_dup_id->stream_owner, last_dup_id->id, p_buffer );
 
     return VLC_SUCCESS;
     (void)p_stream;
