@@ -357,17 +357,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 if( qbutton ) qbutton->setEnabled( false );               \
             }
 
-#define START_SPREFS_CAT( name , label )    \
-        case SPrefs ## name:                \
-        {                                   \
-            Ui::SPrefs ## name ui;      \
-            ui.setupUi( panel );            \
-            panel_label->setText( label );
-
-#define END_SPREFS_CAT      \
-            break;          \
-        }
-
     QVBoxLayout *panel_layout = new QVBoxLayout();
     QWidget *panel = new QWidget();
     panel_layout->setContentsMargins(3, 3, 3, 3);
@@ -391,7 +380,12 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         /******************************
          * VIDEO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Video, qtr("Video Settings") );
+        case SPrefsVideo:
+        {
+            auto& ui = m_videoUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Video Settings") );
+
             CONFIG_BOOL( "video", enableVideo );
             ui.videoZone->setEnabled( ui.enableVideo->isChecked() );
             connect( ui.enableVideo, &QCheckBox::toggled,
@@ -446,12 +440,17 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                             snapshotsSequentialNumbering );
             CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
                             snapshotsFormat );
-        END_SPREFS_CAT;
+            break;
+        }
 
         /******************************
          * AUDIO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Audio, qtr("Audio Settings") );
+        case SPrefsAudio:
+        {
+            auto& ui = m_audioUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Audio Settings") );
 
             CONFIG_BOOL( "audio", enableAudio );
             ui.audioZone->setEnabled( ui.enableAudio->isChecked() );
@@ -636,12 +635,17 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             /* Volume Label */
             updateAudioVolume( ui.defaultVolume->value() ); // First time init
 
-        END_SPREFS_CAT;
+            break;
+        }
 
         /*****************************************
          * INPUT AND CODECS Panel Implementation *
          *****************************************/
-        START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs Settings") );
+        case SPrefsInputAndCodecs:
+        {
+            auto& ui = m_inputCodecUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Input & Codecs Settings") );
 
             /* Disk Devices */
             {
@@ -727,12 +731,17 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     ui.cachingCombo->findData( QVariant( i_cache ) ) );
 #undef TestCaC
 
-        END_SPREFS_CAT;
+            break;
+        }
 
         /**********************************
          * INTERFACE Panel Implementation *
          **********************************/
-        START_SPREFS_CAT( Interface, qtr("Interface Settings") );
+        case SPrefsInterface:
+        {
+            auto& ui = m_interfaceUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Interface Settings") );
 
 #ifndef _WIN32
             ui.langBox->hide();
@@ -944,14 +953,18 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 connect( ui.clearRecent, &QPushButton::clicked, recentsModel, &MLRecentsModel::clearHistory );
             }
 
-
-        END_SPREFS_CAT;
+            break;
+        }
 
         /**********************************
          * SUBTITLES Panel Implementation *
          **********************************/
-        START_SPREFS_CAT( Subtitles,
-                            qtr("Subtitle & On Screen Display Settings") );
+        case SPrefsSubtitles:
+        {
+            auto& ui = m_subtitlesUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Subtitle & On Screen Display Settings") );
+
             CONFIG_BOOL( "osd", OSDBox);
             CONFIG_BOOL( "video-title-show", OSDTitleBox);
             CONFIG_GENERIC( "video-title-position", IntegerList,
@@ -994,7 +1007,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "secondary-sub-alignment", IntegerList,
                             ui.secondarySubsAlignmentLabel, secondarySubsAlignment );
             CONFIG_GENERIC( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
-        END_SPREFS_CAT;
+            break;
+        }
 
         /********************************
          * HOTKEYS Panel Implementation *
@@ -1038,7 +1052,11 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         /**************************************
          * MEDIA LIBRARY Panel Implementation *
          **************************************/
-        START_SPREFS_CAT( MediaLibrary , qtr("Media Library Settings") );
+        case SPrefsMediaLibrary:
+        {
+            auto& ui = m_medialibUI;
+            ui.setupUi( panel );
+            panel_label->setText( qtr("Media Library Settings") );
 
             if ( vlc_ml_instance_get( p_intf ) != NULL )
             {
@@ -1060,7 +1078,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.mlGroupBox->hide( );
             }
 
-        END_SPREFS_CAT;
+            break;
+        }
     }
 
     panel_layout->addWidget( panel_label );
@@ -1074,8 +1093,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
     setLayout( panel_layout );
 
-#undef END_SPREFS_CAT
-#undef START_SPREFS_CAT
 #undef CONFIG_GENERIC_FILE
 #undef CONFIG_GENERIC_NO_UI
 #undef CONFIG_GENERIC

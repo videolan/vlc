@@ -122,6 +122,13 @@ private:
     bool m_isApplied = false;
     std::vector<std::unique_ptr<class PropertyResetter>> m_resetters;
 
+    Ui::SPrefsInterface m_interfaceUI;
+    Ui::SPrefsVideo m_videoUI;
+    Ui::SPrefsAudio m_audioUI;
+    Ui::SPrefsInputAndCodecs m_inputCodecUI;
+    Ui::SPrefsSubtitles m_subtitlesUI;
+    Ui::SPrefsMediaLibrary m_medialibUI;
+
 /* Display only the options for the selected audio output */
 private slots:
     void lastfm_Changed( int );
