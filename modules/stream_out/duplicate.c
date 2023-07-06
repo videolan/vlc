@@ -291,8 +291,13 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         duplicated_id_t *dup_id = &id->dup_ids.data[i];
 
         block_t *p_dup = block_Duplicate( p_buffer );
-        if( p_dup )
-            sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
+        if( unlikely(p_dup == NULL) )
+        {
+            block_Release( p_buffer );
+            return VLC_ENOMEM;
+        }
+
+        sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
     }
 
     duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
