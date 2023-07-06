@@ -469,74 +469,62 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             connect( ui.enableAudio, &QCheckBox::toggled,
                      ui.audioZone, &QWidget::setEnabled );
 
-#define audioCommon( name ) \
-            QLabel * name ## Label = new QLabel( qtr( "Device:" ) ); \
-            name ## Label->setMinimumSize(QSize(250, 0)); \
-            outputAudioLayout->addWidget( name ## Label, outputAudioLayout->rowCount(), 0, 1, 1 ); \
-
-#define audioControl( name) \
-            audioCommon( name ) \
-            QComboBox * name ## Device = new QComboBox; \
-            name ## Label->setBuddy( name ## Device ); \
-            name ## Device->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred  );\
-            outputAudioLayout->addWidget( name ## Device, outputAudioLayout->rowCount() - 1, 1, 1, -1 );
-
-#define audioControl2( name) \
-            audioCommon( name ) \
-            QHBoxLayout * name ## hboxLayout = new QHBoxLayout; \
-            QLineEdit * name ## Device = new QLineEdit; \
-            name ## Label->setBuddy( name ## Device ); \
-            name ## hboxLayout->addWidget( name ## Device ); \
-            QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ) ); \
-            name ## hboxLayout->addWidget( name ## Browse ); \
-            outputAudioLayout->addLayout( name ## hboxLayout, outputAudioLayout->rowCount() - 1, 1, 1, 1, Qt::AlignLeft );
-
             /* Build if necessary */
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
-#ifdef _WIN32
-            audioControl( DirectX );
-            optionWidgets["directxL" ] = DirectXLabel;
-            optionWidgets["directxW" ] = DirectXDevice;
-            configGenericNoUi<StringListConfigControl>( "directx-audio-device",
-                    DirectXLabel, DirectXDevice );
 
-            audioControl( Waveout );
-            optionWidgets["waveoutL" ] = WaveoutLabel;
-            optionWidgets["waveoutW" ] = WaveoutDevice;
-            configGenericNoUi<StringListConfigControl>( "waveout-audio-device",
-                    WaveoutLabel, WaveoutDevice );
+            auto audioControl = [this, outputAudioLayout](QString key, const char* property) {
+                QLabel* label = new QLabel( qtr( "Device:" ) );
+                label->setMinimumSize(QSize(250, 0));
+                outputAudioLayout->addWidget( label, outputAudioLayout->rowCount(), 0, 1, 1 );
 
-#elif defined( __OS2__ )
-            audioControl( kai );
-            optionWidgets["kaiL"] = kaiLabel;
-            optionWidgets["kaiW"] = kaiDevice;
-            configGenericNoUi<StringListConfigControl>( "kai-audio-device",  kaiLabel, kaiDevice );
-#else
-            if( module_exists( "alsa" ) )
-            {
-                audioControl( alsa );
-                optionWidgets["alsaL"] = alsaLabel;
-                optionWidgets["alsaW"] = alsaDevice;
-                configGenericNoUi<StringListConfigControl>( "alsa-audio-device" ,  alsaLabel,
-                                alsaDevice );
-            }
-            if( module_exists( "oss" ) )
-            {
-                audioControl2( OSS );
-                optionWidgets["ossL"] = OSSLabel;
-                optionWidgets["ossW"] = OSSDevice;
-                optionWidgets["ossB"] = OSSBrowse;
-                configGenericFile<FileConfigControl>( "oss-audio-device" ,  OSSLabel, OSSDevice,
-                                                     OSSBrowse );
-            }
+                QComboBox* device = new QComboBox;
+                label->setBuddy( device );
+                device->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred  );
+                outputAudioLayout->addWidget( device, outputAudioLayout->rowCount() - 1, 1, 1, -1 );
+
+                optionWidgets[key + "L" ] = label;
+                optionWidgets[key + "W" ] = device;
+                configGenericNoUi<StringListConfigControl>(property, label, device);
+            };
+
+//audioControlFile is only used for oss
+#if !defined(_WIN32) && !defined( __OS2__ )
+            auto audioControlFile = [this, outputAudioLayout](QString key, const char* property) {
+                QLabel* label = new QLabel( qtr( "Device:" ) );
+                label->setMinimumSize(QSize(250, 0));
+                outputAudioLayout->addWidget( label, outputAudioLayout->rowCount(), 0, 1, 1 );
+
+                QHBoxLayout* hboxLayout = new QHBoxLayout;
+                QLineEdit* device = new QLineEdit;
+                label->setBuddy( device ); \
+                hboxLayout->addWidget( device ); \
+                QPushButton * browse = new QPushButton( qtr( "Browse..." ) );
+                hboxLayout->addWidget( browse );
+                outputAudioLayout->addLayout( hboxLayout, outputAudioLayout->rowCount() - 1, 1, 1, 1, Qt::AlignLeft );
+
+                optionWidgets[key + "L"] = label;
+                optionWidgets[key + "W"] = device;
+                optionWidgets[key + "B"] = browse;
+                configGenericFile<FileConfigControl>(property, label, device, browse);
+            };
 #endif
 
 #ifdef _WIN32
-            audioControl( MMDevice );
-            optionWidgets["mmdeviceL" ] = MMDeviceLabel;
-            optionWidgets["mmdeviceW" ] = MMDeviceDevice;
-            configGenericNoUi<StringListConfigControl>( "mmdevice-audio-device",
-                                  MMDeviceLabel, MMDeviceDevice );
+            audioControl("directx", "directx-audio-device" );
+            audioControl("waveout", "waveout-audio-device" );
+
+#elif defined( __OS2__ )
+            audioControl("kai", "kai-audio-device" );
+#else
+            if( module_exists( "alsa" ) )
+                audioControl("alsa", "alsa-audio-device" );
+
+            if( module_exists( "oss" ) )
+                audioControlFile("oss", "oss-audio-device" );
+#endif
+
+#ifdef _WIN32
+            audioControl("mmdevice", "mmdevice-audio-device" );
 
             configGeneric<IntegerListConfigControl>( "mmdevice-passthrough",
                                                      ui.mmdevicePassthroughLabel, ui.mmdevicePassthroughBox );
@@ -546,11 +534,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.mmdevicePassthroughLabel->setVisible( false );
             ui.mmdevicePassthroughBox->setVisible( false );
 #endif
-
-
-#undef audioControl2
-#undef audioControl
-#undef audioCommon
 
             int i_max_volume = config_GetInt( "qt-max-volume" );
 
@@ -1107,34 +1090,36 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
 void SPrefsPanel::updateAudioOptions( int number )
 {
+
+    auto setAudioDeviceVisible = [this](QString key, bool visible) {
+        QWidget* widget = optionWidgets[key + "W"];
+        if (widget)
+            widget->setVisible( visible );
+        QWidget* label = optionWidgets[key + "L"];
+        if (label)
+            label->setVisible( visible );
+        QWidget* browse = optionWidgets[key + "B"];
+        if (browse)
+            browse->setVisible( visible );
+    };
+
     QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
-                                            ->itemData( number ).toString();
+              ->itemData( number ).toString();
 #ifdef _WIN32
     /* Since MMDevice is most likely to be used by default, we show MMDevice
      * options by default */
     const bool mmDeviceEnabled = value == "mmdevice" || value == "any";
     optionWidgets["mmdevicePassthroughL"]->setVisible( mmDeviceEnabled );
     optionWidgets["mmdevicePassthroughB"]->setVisible( mmDeviceEnabled );
-    optionWidgets["mmdeviceW"]->setVisible( mmDeviceEnabled );
-    optionWidgets["mmdeviceL"]->setVisible( mmDeviceEnabled );
+    setAudioDeviceVisible("mmdevice", mmDeviceEnabled);
 
-    optionWidgets["waveoutW"]->setVisible( ( value == "waveout" ) );
-    optionWidgets["waveoutL"]->setVisible( ( value == "waveout" ) );
+    setAudioDeviceVisible("waveout", value == "waveout");
 #elif defined( __OS2__ )
-    optionWidgets["kaiL"]->setVisible( ( value == "kai" ) );
-    optionWidgets["kaiW"]->setVisible( ( value == "kai" ) );
+    setAudioDeviceVisible("kai", value == "kai");
 #else
-    /* optionWidgets["ossW] can be NULL */
-    if( optionWidgets["ossW"] ) {
-        optionWidgets["ossW"]->setVisible( ( value == "oss" ) );
-        optionWidgets["ossL"]->setVisible( ( value == "oss" ) );
-        optionWidgets["ossB"]->setVisible( ( value == "oss" ) );
-    }
-    /* optionWidgets["alsaW] can be NULL */
-    if( optionWidgets["alsaW"] ) {
-        optionWidgets["alsaW"]->setVisible( ( value == "alsa" ) );
-        optionWidgets["alsaL"]->setVisible( ( value == "alsa" ) );
-    }
+    setAudioDeviceVisible("oss", value == "oss");
+    setAudioDeviceVisible("alsa", value == "alsa");
+
 #endif
     optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
     optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
