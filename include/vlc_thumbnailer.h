@@ -51,7 +51,7 @@ typedef void(*vlc_thumbnailer_cb)( void* data, picture_t* thumbnail );
  * \return A thumbnailer object, or NULL in case of failure
  */
 VLC_API vlc_thumbnailer_t*
-vlc_thumbnailer_Create( vlc_object_t* p_parent )
+vlc_thumbnailer_Create(vlc_object_t* parent)
 VLC_USED;
 
 enum vlc_thumbnailer_seek_speed
