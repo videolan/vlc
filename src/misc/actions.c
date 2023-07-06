@@ -490,6 +490,8 @@ static void add_wheel_mapping (void **map, uint32_t kmore, uint32_t kless,
 
 /**
  * Sets up all key mappings for a given action.
+ *
+ * \param obj the VLC object to inherit keys from and log to
  * \param map tree (of struct mapping entries) to write mappings to
  * \param confname VLC configuration item to read mappings from
  * \param action action ID
