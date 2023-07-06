@@ -95,7 +95,7 @@ VLC_API int vlc_open(const char *filename, int flags, ...) VLC_USED;
  * @note Contrary to standard open(), this function returns a file handle
  * with the close-on-exec flag preset.
  */
-VLC_API int vlc_openat(int fd, const char *filename, int flags, ...) VLC_USED;
+VLC_API int vlc_openat(int dir, const char *filename, int flags, ...) VLC_USED;
 
 VLC_API int vlc_mkstemp( char * );
 
@@ -192,16 +192,18 @@ VLC_API int vlc_close(int fd);
  * @note As far as possible, fstat() should be used instead.
  *
  * @param filename UTF-8 file path
+ * @param st the POSIX stat structure to fill
  */
-VLC_API int vlc_stat(const char *filename, struct stat *) VLC_USED;
+VLC_API int vlc_stat(const char *filename, struct stat *st) VLC_USED;
 
 /**
  * Finds file/inode information, as lstat().
  * Consider using fstat() instead, if possible.
  *
  * @param filename UTF-8 file path
+ * @param st the POSIX stat structure to fill
  */
-VLC_API int vlc_lstat(const char *filename, struct stat *) VLC_USED;
+VLC_API int vlc_lstat(const char *filename, struct stat *st) VLC_USED;
 
 /**
  * Removes a file.
