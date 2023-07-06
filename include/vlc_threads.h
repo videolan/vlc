@@ -212,7 +212,7 @@ typedef struct
  * Static initializer for (static) mutex.
  *
  * \note This only works in C code.
- * In C++, consider using a global \ref vlc::threads::mutex instance instead.
+ * In C++, consider using a global ::vlc::threads::mutex instance instead.
  */
 #define VLC_STATIC_MUTEX { \
     .value = ATOMIC_VAR_INIT(0), \
@@ -430,9 +430,10 @@ typedef struct
 /**
  * Initializes a semaphore.
  *
+ * @param sem a semaphore to initialize
  * @param count initial semaphore value (typically 0)
  */
-VLC_API void vlc_sem_init(vlc_sem_t *, unsigned count);
+VLC_API void vlc_sem_init(vlc_sem_t *sem, unsigned count);
 
 /**
  * Increments the value of a semaphore.
@@ -504,9 +505,10 @@ typedef struct
 /**
  * Initializes a latch.
  *
+ * @param latch a latch instance
  * @param value initial latch value (typically 1)
  */
-VLC_API void vlc_latch_init(vlc_latch_t *, size_t value);
+VLC_API void vlc_latch_init(vlc_latch_t *latch, size_t value);
 
 /**
  * Decrements the value of a latch.
@@ -518,11 +520,12 @@ VLC_API void vlc_latch_init(vlc_latch_t *, size_t value);
  * \warning If the result is (arithmetically) strictly negative, the behaviour
  * is undefined.
  *
+ * \param latch an initialized latch
  * \param n quantity to subtract from the latch value (typically 1)
  *
  * \note This function is not a cancellation point.
  */
-VLC_API void vlc_latch_count_down(vlc_latch_t *, size_t n);
+VLC_API void vlc_latch_count_down(vlc_latch_t *latch, size_t n);
 
 /**
  * Decrements the value of a latch and waits on it.
@@ -536,11 +539,12 @@ VLC_API void vlc_latch_count_down(vlc_latch_t *, size_t n);
  *
  * \warning If the result is strictly negative, the behaviour is undefined.
  *
- * @param n number of times to decrement the value (typically 1)
+ * \param latch an initialized latch
+ * \param n number of times to decrement the value (typically 1)
  *
  * \note This function may be a cancellation point.
  */
-VLC_API void vlc_latch_count_down_and_wait(vlc_latch_t *, size_t n);
+VLC_API void vlc_latch_count_down_and_wait(vlc_latch_t *latch, size_t n);
 
 /**
  * Checks if a latch is ready.
