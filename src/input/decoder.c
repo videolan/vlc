@@ -2191,9 +2191,6 @@ vlc_input_decoder_New( vlc_object_t *parent, const struct vlc_input_decoder_cfg 
     return decoder_New( parent, cfg );
 }
 
-/**
- * Spawn a decoder thread outside of the input thread.
- */
 vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const char *es_id,
                           struct vlc_clock_t *clock, input_resource_t *p_resource )
@@ -2210,14 +2207,6 @@ vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const 
     return decoder_New( p_parent, &cfg );
 }
 
-
-/**
- * Kills a decoder thread and waits until it's finished
- *
- * \param p_input the input thread
- * \param p_es the es descriptor
- * \return nothing
- */
 void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
 {
     decoder_t *p_dec = &p_owner->dec;
@@ -2244,13 +2233,6 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     DeleteDecoder( p_owner, p_dec->fmt_in->i_cat );
 }
 
-/**
- * Put a vlc_frame_t in the decoder's fifo.
- * Thread-safe w.r.t. the decoder. May be a cancellation point.
- *
- * \param p_dec the decoder object
- * \param frame the data frame
- */
 void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
                                bool b_do_pace )
 {
@@ -2315,14 +2297,6 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
     return b_empty;
 }
 
-/**
- * Signals that there are no further frames to decode, and requests that the
- * decoder drain all pending buffers. This is used to ensure that all
- * intermediate buffers empty and no samples get lost at the end of the stream.
- *
- * @note The function does not actually wait for draining. It just signals that
- * draining should be performed once the decoder has emptied FIFO.
- */
 void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
 {
     if ( vlc_input_decoder_IsSynchronous( p_owner ) )
@@ -2338,10 +2312,6 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
-/**
- * Requests that the decoder immediately discard all pending buffers.
- * This is useful when seeking or when deselecting a stream.
- */
 void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 {
     enum es_format_category_e cat = p_owner->dec.fmt_in->i_cat;

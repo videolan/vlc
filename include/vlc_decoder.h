@@ -40,6 +40,12 @@ typedef struct input_resource_t input_resource_t;
 
 /* */
 struct vlc_clock_t;
+struct vlc_frame_t;
+
+
+/**
+ * Spawn a decoder thread outside of the input thread.
+ */
 VLC_API vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *, const es_format_t *, const char *es_id,
                           struct vlc_clock_t *, input_resource_t * ) VLC_USED;
@@ -58,8 +64,30 @@ vlc_input_decoder_Create( vlc_object_t *, const es_format_t *, const char *es_id
  */
 VLC_API void vlc_input_decoder_Delete( vlc_input_decoder_t * decoder);
 
-VLC_API void vlc_input_decoder_Decode( vlc_input_decoder_t *, block_t *, bool b_do_pace );
+/**
+ * Put a vlc_frame_t in the decoder's fifo.
+ * Thread-safe w.r.t. the decoder. May be a cancellation point.
+ *
+ * @param p_dec the decoder object
+ * @param frame the data frame
+ * @param do_pace whether we wait for some decoding to happen or not
+ */
+VLC_API void vlc_input_decoder_Decode( vlc_input_decoder_t *p_dec, struct vlc_frame_t *frame, bool do_pace );
+
+/**
+ * Signals that there are no further frames to decode, and requests that the
+ * decoder drain all pending buffers. This is used to ensure that all
+ * intermediate buffers empty and no samples get lost at the end of the stream.
+ *
+ * @note The function does not actually wait for draining. It just signals that
+ * draining should be performed once the decoder has emptied FIFO.
+ */
 VLC_API void vlc_input_decoder_Drain( vlc_input_decoder_t * );
+
+/**
+ * Requests that the decoder immediately discard all pending buffers.
+ * This is useful when seeking or when deselecting a stream.
+ */
 VLC_API void vlc_input_decoder_Flush( vlc_input_decoder_t * );
 VLC_API int  vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *, const vlc_spu_highlight_t * );
 VLC_API void vlc_input_decoder_ChangeDelay( vlc_input_decoder_t *, vlc_tick_t i_delay );
