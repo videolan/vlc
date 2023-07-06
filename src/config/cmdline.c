@@ -158,7 +158,7 @@ void config_CmdLineEarlyScan( libvlc_int_t *p_this, int argc, const char *argv[]
  *
  * @param p_this object to write command line options as variables to
  * @param i_argc number of command line arguments
- * @param ppsz_args command line arguments [IN/OUT]
+ * @param ppsz_argv command line arguments [IN/OUT]
  * @param pindex index of the first non-option argument [OUT]
  * @return 0 on success, -1 on error.
  */
