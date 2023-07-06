@@ -131,6 +131,7 @@ struct vlc_player_media_provider
  * Create a new player instance
  *
  * @param parent parent VLC object
+ * @param lock_type whether the player lock is reentrant or not
  * @param media_provider pointer to a media_provider structure or NULL, the
  * structure must be valid during the lifetime of the player
  * @param media_provider_data opaque data used by provider callbacks
@@ -789,10 +790,12 @@ vlc_player_DisplayPosition(vlc_player_t *player);
  * Enable A to B loop of the current media
  *
  * This function need to be called 2 times with VLC_PLAYER_ABLOOP_A and
- * VLC_PLAYER_ABLOOP_B to setup an A to B loop. It current the current
- * time/position when called. The B time must be higher than the A time.
+ * VLC_PLAYER_ABLOOP_B to setup an A to B loop. It uses and stores the
+ * current time/position when called. The B time must be higher than the
+ * A time.
  *
  * @param player locked player instance
+ * @param abloop select which A/B cursor to set
  * @return VLC_SUCCESS or a VLC error code
  */
 VLC_API int
@@ -896,6 +899,10 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
  * Get the signal quality and strength of the current media
  *
  * @param player locked player instance
+ * @param quality a pointer that will be assigned with the signal quality
+ * @param strength a pointer that will be assigned with the signal strength
+ * @retval VLC_SUCCESS when quality and strength have been assigned
+ * @retval VLC_EGENERIC in case of error (strength and quality are not assigned)
  */
 VLC_API int
 vlc_player_GetSignal(vlc_player_t *player, float *quality, float *strength);
@@ -1008,6 +1015,7 @@ vlc_player_title_list_GetCount(vlc_player_title_list *titles);
 /**
  * Get the title at a given index
  *
+ * @param titles a valid title list
  * @param idx index in the range [0; count[
  * @return a valid title (can't be NULL)
  */
@@ -2240,6 +2248,7 @@ union vlc_player_metadata_cbs
  * vlc_player_RemoveMetadataListener().
  *
  * @param player locked player instance
+ * @param option select which metadata to listen
  * @param cbs pointer to a vlc_player_metadata_cbs union, the
  * structure must be valid during the lifetime of the player
  * @param cbs_data opaque pointer used by the callbacks
