@@ -329,19 +329,18 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     return path;
 }
 
-/**
- * Determines the network proxy server to use (if any).
- *
- * This function fetch the Android proxy using the System.getProperty() method
- * with "http.proxyHost" and "http.proxyPort" keys. This is working only for
- * Android 4.0 and after.
- *
- * @param url absolute URL for which to get the proxy server (unused)
- * @return proxy URL, NULL if no proxy or error
- */
 char *vlc_getProxyUrl(const char *url)
 {
     VLC_UNUSED(url);
+
+    /**
+     * Determines the network proxy server to use (if any).
+     *
+     * This function fetch the Android proxy using the System.getProperty()
+     * method with "http.proxyHost" and "http.proxyPort" keys. This is working
+     * only for Android 4.0 and after.
+     */
+
     JNIEnv *env;
     bool b_detach;
     char *psz_ret = NULL;

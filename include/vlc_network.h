@@ -292,6 +292,18 @@ static inline int vlc_setsockopt(int s, int level, int name,
 #endif
 
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
+
+/**
+ * Resolves a host name to a list of socket addresses (like getaddrinfo()).
+ *
+ * @param node host name to resolve (encoded as UTF-8), or NULL
+ * @param i_port port number for the socket addresses
+ * @param p_hints parameters (see getaddrinfo() manual page)
+ * @param res pointer set to the resulting chained list.
+ * @return 0 on success, a getaddrinfo() error otherwise.
+ * On failure, *res is undefined. On success, it must be freed with
+ * freeaddrinfo().
+ */
 VLC_API int vlc_getaddrinfo (const char *, unsigned,
                              const struct addrinfo *, struct addrinfo **);
 VLC_API int vlc_getaddrinfo_i11e(const char *, unsigned,
@@ -349,6 +361,11 @@ static inline int net_GetPeerAddress( int fd, char *address, int *port )
         ? VLC_EGENERIC : 0;
 }
 
+/**
+ * Determines the network proxy server to use (if any).
+ * @param url absolute URL for which to get the proxy server
+ * @return proxy URL, NULL if no proxy or error
+ */
 VLC_API char *vlc_getProxyUrl(const char *);
 
 # ifdef __cplusplus
