@@ -66,11 +66,12 @@ bool vlc_http_file_can_seek(struct vlc_http_resource *);
 /**
  * Sets the read offset.
  *
+ * @param file the HTTP file resource to set the read offset on
  * @param offset byte offset of next read
  * @retval 0 if seek succeeded
  * @retval -1 if seek failed
  */
-int vlc_http_file_seek(struct vlc_http_resource *, uintmax_t offset);
+int vlc_http_file_seek(struct vlc_http_resource *file, uintmax_t offset);
 
 /**
  * Reads data.
