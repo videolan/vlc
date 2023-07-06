@@ -81,6 +81,8 @@ static void aout_DrainedNotify(audio_output_t *aout)
 
 /**
  * Supply or update the current custom ("hardware") volume.
+ *
+ * @param aout the audio output notifying the new volume
  * @param volume current custom volume
  *
  * @warning The caller (i.e. the audio output plug-in) is responsible for
