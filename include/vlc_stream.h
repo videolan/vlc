@@ -59,7 +59,7 @@ struct vlc_stream_operations {
     union {
         struct {
             bool (*can_fastseek)(stream_t *);
-    
+
             ssize_t (*read)(stream_t *, void *buf, size_t len);
             block_t *(*block)(stream_t *, bool *restrict eof);
             int (*readdir)(stream_t *, input_item_node_t *);
@@ -82,7 +82,7 @@ struct vlc_stream_operations {
         struct {
             bool (*can_record)(demux_t *);
             bool (*can_control_rate)(demux_t *);
-    
+
             int (*demux)(demux_t *);
             int (*readdir)(demux_t *, input_item_node_t *);
 
@@ -109,7 +109,7 @@ struct vlc_stream_operations {
             int (*set_group_list)(demux_t *, size_t, const int *);
             int (*set_es)(demux_t *, int);
             int (*set_es_list)(demux_t *, size_t, const int *);
-           
+
             int (*nav_activate)(demux_t *);
             int (*nav_up)(demux_t *);
             int (*nav_down)(demux_t *);
