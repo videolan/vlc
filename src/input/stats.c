@@ -114,7 +114,7 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
 }
 
 /** Update a counter element with new values
- * \param p_counter the counter to update
+ * \param counter the counter to update
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see stats_Create
  */
