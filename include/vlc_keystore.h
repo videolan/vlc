@@ -100,6 +100,7 @@ vlc_keystore_release(vlc_keystore *p_keystore);
 /**
  * Store a secret associated with a set of key/values
  *
+ * @param p_keystore the keystore to store the secret into
  * @param ppsz_values set of key/values, see vlc_keystore_key.
  *        ppsz_values[KEY_PROTOCOL] and  ppsz_values[KEY_SERVER] must be valid
  *        strings
@@ -119,6 +120,7 @@ vlc_keystore_store(vlc_keystore *p_keystore,
 /**
  * Find all entries that match a set of key/values
  *
+ * @param p_keystore the keystore instance to look into
  * @param ppsz_values set of key/values, see vlc_keystore_key, any values can
  * be NULL
  * @param pp_entries list of found entries. To be released with
@@ -136,6 +138,7 @@ vlc_keystore_find(vlc_keystore *p_keystore,
  *
  * @note only entries added by VLC can be removed
  *
+ * @param p_keystore the keystore instance to remove the secrets from
  * @param ppsz_values set of key/values, see vlc_keystore_key, any values can
  * be NULL
  *
@@ -203,7 +206,8 @@ struct vlc_credential
  *
  * @note to be cleaned with vlc_credential_clean()
  *
- * @param psz_url url to store or to search
+ * @param p_credential a credential instance to initialize
+ * @param p_url url to store or to search
  */
 VLC_API void
 vlc_credential_init(vlc_credential *p_credential, const vlc_url_t *p_url);
@@ -224,6 +228,7 @@ vlc_credential_clean(vlc_credential *p_credential);
  * from the dialog (if any). This function will return true as long as the user
  * fill the dialog texts and will return false when the user cancel it.
  *
+ * @param p_credential a credential instance initialized with TODO
  * @param p_parent the parent object (for var, keystore and dialog)
  * @param psz_option_username VLC option name for the username
  * @param psz_option_password VLC option name for the password
