@@ -1616,7 +1616,7 @@ static void spu_Cleanup(spu_t *spu)
 /**
  * Destroy the subpicture unit
  *
- * \param p_this the parent object which destroys the subpicture unit
+ * \param spu a subpicture unit created with ::spu_Create
  */
 void spu_Destroy(spu_t *spu)
 {
@@ -1636,7 +1636,8 @@ void spu_Destroy(spu_t *spu)
 /**
  * Creates the subpicture unit
  *
- * \param p_this the parent object which creates the subpicture unit
+ * \param object the parent object which creates the subpicture unit
+ * \param vout the video output that will use the ::spu_t instance
  */
 spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
 {
