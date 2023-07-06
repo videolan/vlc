@@ -106,8 +106,11 @@ vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *newctx)
 
 /**
  * Prepares to enter interruptible wait.
+ *
+ * @param ctx an unused interruption context to prepare
  * @param cb callback to interrupt the wait (i.e. wake up the thread)
  * @param data opaque data pointer for the callback
+ *
  * @note Any <b>successful</b> call <b>must</b> be paired with a call to
  * vlc_interrupt_finish().
  */
