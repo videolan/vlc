@@ -2609,7 +2609,6 @@ static bool EsOutSelectMatchExplicitParams( const es_out_es_props_t *p_esprops,
  * \param out The es_out structure
  * \param es es_out_id structure
  * \param b_force ...
- * \return nothing
  */
 static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 {
@@ -3167,6 +3166,7 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
  * Control query handler
  *
  * \param out the es_out to control
+ * \param source the input source emitting the control request
  * \param i_query A es_out query as defined in include/ninput.h
  * \param args a variable list of arguments for the query
  * \return VLC_SUCCESS or an error code
