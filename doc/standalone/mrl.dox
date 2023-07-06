@@ -7,7 +7,7 @@
  *
  * \note \em MRLs are only used when an item is to be played by \em VLC,
  *       through a direct (or indirect) call to \ref input_Create and \ref
- *       input_CreatePreparser, which means that they are not handled by
+ *       vlc_preparser_Push, which means that they are not handled by
  *       functions such as \ref vlc_UrlParse and \ref vlc_stream_NewURL (as
  *       implied by their names).
  *
