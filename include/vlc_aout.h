@@ -501,13 +501,64 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 #define AOUT_VOLUME_DEFAULT             256
 #define AOUT_VOLUME_MAX                 512
 
+/**
+ * Gets the volume of the audio output stream (independent of mute).
+ * \return Current audio volume (0. = silent, 1. = nominal),
+ * or a strictly negative value if undefined.
+ */
 VLC_API float aout_VolumeGet (audio_output_t *);
+
+/**
+ * Sets the volume of the audio output stream.
+ * \note The mute status is not changed.
+ * \return 0 on success, -1 on failure.
+ */
 VLC_API int aout_VolumeSet (audio_output_t *, float);
+
+/**
+ * Raises the volume.
+ * \param value how much to increase (> 0) or decrease (< 0) the volume
+ * \param volp if non-NULL, will contain contain the resulting volume
+ */
 VLC_API int aout_VolumeUpdate (audio_output_t *, int, float *);
+
+/**
+ * Gets the audio output stream mute flag.
+ * \return 0 if not muted, 1 if muted, -1 if undefined.
+ */
 VLC_API int aout_MuteGet (audio_output_t *);
+
+/**
+ * Sets the audio output stream mute flag.
+ * \return 0 on success, -1 on failure.
+ */
 VLC_API int aout_MuteSet (audio_output_t *, bool);
+
+/**
+ * Gets the currently selected device.
+ * \return the selected device ID (caller must free() it)
+ *         NULL if no device is selected or in case of error.
+ */
 VLC_API char *aout_DeviceGet (audio_output_t *);
+
+/**
+ * Selects an audio output device.
+ * \param id device ID to select, or NULL for the default device
+ * \return zero on success, non-zero on error.
+ */
 VLC_API int aout_DeviceSet (audio_output_t *, const char *);
+
+/**
+ * Enumerates possible audio output devices.
+ *
+ * The function will heap-allocate two tables of heap-allocated strings;
+ * the caller is responsible for freeing all strings and both tables.
+ *
+ * \param ids pointer to a table of device identifiers [OUT]
+ * \param names pointer to a table of device human-readable descriptions [OUT]
+ * \return the number of devices, or negative on error.
+ * \note In case of error, *ids and *names are undefined.
+ */
 VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
 
 /** @} */
