@@ -102,7 +102,7 @@ static inline int vlc_ascii_strncasecmp( const char *psz1, const char *psz2, siz
  *
  * \param str null-terminated string [IN/OUT]
  */
-VLC_API void vlc_xml_decode(char *st);
+VLC_API void vlc_xml_decode(char *str);
 
 /**
  * Encodes XML entities.
