@@ -365,8 +365,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     BUTTONACT( ui.audioCDRadioButton, &DiscOpenPanel::updateButtons );
     BUTTONACT( ui.dvdsimple,          &DiscOpenPanel::updateButtons );
     BUTTONACT( ui.browseDiscButton,   &DiscOpenPanel::browseDevice );
-    BUTTON_SET_ACT( ui.ejectButton, "", qtr( "Eject the disc"), &DiscOpenPanel::eject );
-    ui.ejectButton->setIcon( QIcon( ":/menu/eject.svg") );
+    BUTTONACT( ui.ejectButton,  &DiscOpenPanel::eject );
 
     connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),

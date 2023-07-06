@@ -156,6 +156,13 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>Eject the disc</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../vlc.qrc">
+            <normaloff>:/menu/eject.svg</normaloff>:/menu/eject.svg</iconset>
+          </property>
          </widget>
         </item>
         <item>
@@ -393,6 +400,8 @@
   <tabstop>audioSpin</tabstop>
   <tabstop>subtitlesSpin</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../vlc.qrc"/>
+ </resources>
  <connections/>
 </ui>

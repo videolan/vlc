@@ -144,11 +144,6 @@ struct vlc_player_locker {
 
 #define BUTTONACT( b, a ) connect( b, &QAbstractButton::clicked, this, a )
 
-#define BUTTON_SET_ACT( button, text, tooltip, thisslot ) \
-    button->setText( text );       \
-    button->setToolTip( tooltip ); \
-    BUTTONACT( button, thisslot );
-
 #define getSettings() p_intf->mainSettings
 
 static inline QString QVLCUserDir( vlc_userdir_t type )

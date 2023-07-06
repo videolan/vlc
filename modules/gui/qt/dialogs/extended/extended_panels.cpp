@@ -1457,6 +1457,11 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
 
     updateButton = new QToolButton;
     updateButton->setAutoRaise( true );
+    updateButton->setText("");
+    updateButton->setToolTip(qtr( "Eject the disc" ));
+    updateButton->setIcon( QIcon( ":/menu/update.svg") );
+    BUTTONACT( updateButton, &SyncControls::update );
+
     mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
 
     /* Various Connects */
@@ -1483,9 +1488,6 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     });
     connect( THEMIM, &PlayerController::subtitleFPSChanged, subSpeedSpin, &QDoubleSpinBox::setValue );
     connect( &m_SubsDelayCfgFactor, &QVLCFloat::valueChanged, subDurationSpin, &QDoubleSpinBox::setValue);
-
-    BUTTON_SET_ACT( updateButton, "", qtr( "Eject the disc" ), &SyncControls::update );
-    updateButton->setIcon( QIcon( ":/menu/update.svg") );
 
     initSubsDuration();
 
