@@ -567,6 +567,7 @@ struct vlc_readdir_helper
  * Init a vlc_readdir_helper struct
  *
  * \param p_rdh need to be cleaned with vlc_readdir_helper_finish()
+ * \param p_obj the VLC object to use for logging
  * \param p_node node that will be used to add items
  */
 VLC_API void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
@@ -577,6 +578,7 @@ VLC_API void vlc_readdir_helper_init(struct vlc_readdir_helper *p_rdh,
 /**
  * Finish adding items to the node
  *
+ * \param p_rdh a readdir helper initialized with ::vlc_readdir_helper_init
  * \param b_success if true, items of the node will be sorted.
  */
 VLC_API void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success);
@@ -584,7 +586,7 @@ VLC_API void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_
 /**
  * Add a new input_item_t entry to the node of the vlc_readdir_helper struct.
  *
- * \param p_rdh previously inited vlc_readdir_helper struct
+ * \param p_rdh a readdir helper initialized with ::vlc_readdir_helper_init
  * \param psz_uri uri of the new item
  * \param psz_flatpath flattened path of the new item. If not NULL, this
  *        function will create an input item for each sub folders (separated
@@ -597,7 +599,7 @@ VLC_API void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_
  * \param i_net see \ref input_item_net_type
  * \param[out] created_item if an input item is created. The item should not be
  * released and is valid until vlc_readdir_helper_finish() is called.
- * \param status VLC_SUCCESS in case of success, an error otherwise. Parsing
+ * \returns status VLC_SUCCESS in case of success, an error otherwise. Parsing
  * should be aborted in case of error.
  */
 VLC_API int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
