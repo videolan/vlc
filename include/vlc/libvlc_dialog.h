@@ -165,6 +165,7 @@ typedef void (*libvlc_dialog_error_cbs)(void *p_data, const char *psz_title, con
  *
  * @version LibVLC 3.0.0 and later.
  *
+ * @param p_instance the libvlc instance to attach the dialog callbacks to
  * @param p_cbs a pointer to callbacks, or NULL to unregister callbacks.
  * @param p_data opaque pointer for the callback
  */
