@@ -192,26 +192,6 @@ void *vlc_module_map(vlc_logger_t *log, module_t *module)
     return vlc_plugin_Map(log, module->plugin) ? NULL : module->pf_activate;
 }
 
-/**
- * Finds and instantiates the best module of a certain type.
- * All candidates modules having the specified capability and name will be
- * sorted in decreasing order of priority. Then the probe callback will be
- * invoked for each module, until it succeeds (returns 0), or all candidate
- * module failed to initialize.
- *
- * The probe callback first parameter is the address of the module entry point.
- * Further parameters are passed as an argument list; it corresponds to the
- * variable arguments passed to this function. This scheme is meant to
- * support arbitrary prototypes for the module entry point.
- *
- * \param log logger (or NULL to ignore)
- * \param capability capability, i.e. class of module
- * \param name name of the module asked, if any
- * \param strict if true, do not fallback to plugin with a different name
- *                 but the same capability
- * \param probe module probe callback
- * \return the module or NULL in case of a failure
- */
 module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
                             const char *name, bool strict,
                             vlc_activate_t probe, ...)
