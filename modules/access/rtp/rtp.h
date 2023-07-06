@@ -325,7 +325,7 @@ extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
  *
  * \param obj VLC object for logging and configuration
  * \param pt RTP payload type
- * \param desc[in] SDP payload format description and type mapping
+ * \param[in] desc SDP payload format description and type mapping
  *
  * \return VLC_SUCCESS on success, an error code on failure.
  */
