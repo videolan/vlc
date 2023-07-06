@@ -45,6 +45,7 @@ class MLFoldersEditor;
 
 #include <QWidget>
 class QLineEdit;
+class QLabel;
 class QPushButton;
 class QAbstractButton;
 
@@ -117,7 +118,21 @@ private:
 
     int number;
 
-    QHash<QString, QWidget*> optionWidgets;
+    struct AudioControlGroup {
+        AudioControlGroup(QLabel* label, QWidget* widget, QPushButton* button = nullptr)
+            : label(label)
+            , widget(widget)
+            , button(button)
+        {
+        }
+
+        AudioControlGroup() {}
+
+        QLabel* label = nullptr;
+        QWidget* widget = nullptr;
+        QPushButton* button = nullptr;
+    };
+    QHash<QString, AudioControlGroup> audioControlGroups;
     QStringList qs_filter;
     QButtonGroup *radioGroup;
 

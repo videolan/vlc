@@ -479,8 +479,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 device->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred  );
                 outputAudioLayout->addWidget( device, outputAudioLayout->rowCount() - 1, 1, 1, -1 );
 
-                optionWidgets[key + "L" ] = label;
-                optionWidgets[key + "W" ] = device;
+                audioControlGroups[key] = AudioControlGroup(label, device);
                 configGenericNoUi<StringListConfigControl>(property, label, device);
             };
 
@@ -499,9 +498,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 hboxLayout->addWidget( browse );
                 outputAudioLayout->addLayout( hboxLayout, outputAudioLayout->rowCount() - 1, 1, 1, 1, Qt::AlignLeft );
 
-                optionWidgets[key + "L"] = label;
-                optionWidgets[key + "W"] = device;
-                optionWidgets[key + "B"] = browse;
+                audioControlGroups[key] = AudioControlGroup(label, device, browse);
                 configGenericFile<FileConfigControl>(property, label, device, browse);
             };
 #endif
@@ -1073,15 +1070,13 @@ void SPrefsPanel::updateAudioOptions( int number )
 {
 
     auto setAudioDeviceVisible = [this](QString key, bool visible) {
-        QWidget* widget = optionWidgets[key + "W"];
-        if (widget)
-            widget->setVisible( visible );
-        QWidget* label = optionWidgets[key + "L"];
-        if (label)
-            label->setVisible( visible );
-        QWidget* browse = optionWidgets[key + "B"];
-        if (browse)
-            browse->setVisible( visible );
+        const AudioControlGroup& ctrl = audioControlGroups[key];
+        if (ctrl.widget)
+            ctrl.widget->setVisible( visible );
+        if (ctrl.label)
+            ctrl.label->setVisible( visible );
+        if (ctrl.button)
+            ctrl.button->setVisible( visible );
     };
 
     QString value = m_audioUI.outputModule->itemData( number ).toString();
