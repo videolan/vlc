@@ -450,6 +450,7 @@ picture_AttachNewAncillary(picture_t *pic, vlc_ancillary_id id, size_t size);
 /**
  * Return the ancillary identified by an ID
  *
+ * @param pic the picture to get the ancillary from
  * @param id id of ancillary to request
  * @return the ancillary or NULL if the ancillary for that particular id is
  * not present
