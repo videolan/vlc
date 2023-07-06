@@ -180,7 +180,8 @@ static inline void services_discovery_AddItem(services_discovery_t *sd,
  * to alter the item later. However, if the caller will never remove nor alter
  * the item, it can drop its reference(s) immediately.
  *
- * @param sd services discoverer / services discovery module instance
+ * @param sd the service discovery instance exposing the item
+ * @param parent the parent to attach the item to
  * @param item input item to add
  */
 static inline void services_discovery_AddSubItem(services_discovery_t *sd,
@@ -193,6 +194,8 @@ static inline void services_discovery_AddSubItem(services_discovery_t *sd,
 /**
  * Added service backward compatibility callback.
  *
+ * @param sd the service discovery instance exposing the item
+ * @param item the item to expose from the service
  * @param category Optional name of a group that the item belongs in
  *                 (for backward compatibility with legacy modules)
  */
