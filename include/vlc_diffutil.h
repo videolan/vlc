@@ -81,11 +81,12 @@ enum vlc_diffutil_op_type {
  * The data positionned at newModel[ y ] is inserted at position index
  * in the current model.
  *
- * @example
+ * @code
  * model = "abcdefg"
  * newModel[3] = 'X'
  * after operation insert(y=3, index = 3), model will be
  * model = "abcXdefg"
+ * @endcode
  */
 struct vlc_diffutil_insert {
     /// data position in the old model
@@ -101,11 +102,12 @@ struct vlc_diffutil_insert {
  * The data positionned at oldModel[ y ] is removed at position index
  * in the current model.
  *
- * @example
+ * @code
  * model = "abCdefg"
  * oldModel[4] = 'C'
  * after operation remove(x=4, index = 2), model will be
  * model = "abdefg"
+ * @endcode
  */
 struct vlc_diffutil_remove {
     /// data position in the old model
@@ -123,10 +125,11 @@ struct vlc_diffutil_remove {
  *
  * the positions @a from and @a to are given in the referenrial before the operation
  *
- * @example
+ * @code
  * model = "aBCdefg"
  * after operation move(from=1, to=5, count=2), model will be
  * model = "adeCBfg"
+ * @endcode
  */
 struct vlc_diffutil_move {
     /// move origin
