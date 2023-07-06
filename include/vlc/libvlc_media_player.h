@@ -2513,7 +2513,7 @@ LIBVLC_API libvlc_audio_output_mixmode_t libvlc_audio_get_mixmode( libvlc_media_
 /**
  * Set current audio mix-mode.
  *
- * By default (libvlc_AudioMixMode_Unset), the audio output will keep its
+ * By default (::libvlc_AudioMixMode_Unset), the audio output will keep its
  * original channel configuration (play stereo as stereo, or 5.1 as 5.1). Yet,
  * the OS and Audio API might refuse a channel configuration and asks VLC to
  * adapt (Stereo played as 5.1 or vice-versa).
@@ -2521,10 +2521,10 @@ LIBVLC_API libvlc_audio_output_mixmode_t libvlc_audio_get_mixmode( libvlc_media_
  * This function allows to force a channel configuration, it will only work if
  * the OS and Audio API accept this configuration (otherwise, it won't have any
  * effects). Here are some examples:
- *  - Play multi-channels (5.1, 7.1...) as stereo (libvlc_AudioMixMode_Stereo)
- *  - Play Stereo or 5.1 as 7.1 (libvlc_AudioMixMode_7_1)
+ *  - Play multi-channels (5.1, 7.1...) as stereo (::libvlc_AudioMixMode_Stereo)
+ *  - Play Stereo or 5.1 as 7.1 (::libvlc_AudioMixMode_7_1)
  *  - Play multi-channels as stereo with a binaural effect
- *  (libvlc_AudioMixMode_Binaural). It might be selected automatically if the
+ *  (::libvlc_AudioMixMode_Binaural). It might be selected automatically if the
  *  OS and Audio API can detect if a headphone is plugged.
  *
  * \param p_mi media player
