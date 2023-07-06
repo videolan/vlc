@@ -346,6 +346,7 @@ static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 
 /**
  * Report audio policy status.
+ * \param aout the audio output instance reporting the cork policy
  * \param cork true to request a cork, false to undo any pending cork.
  */
 static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
@@ -363,6 +364,7 @@ static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
 
 /**
  * Report a device hot-plug event.
+ * @param aout the audio output instance reporting the new device
  * @param id device ID
  * @param name human-readable device name (NULL for hot unplug)
  */
@@ -374,6 +376,7 @@ static inline void aout_HotplugReport(audio_output_t *aout,
 
 /**
  * Request a change of software audio amplification.
+ * \param aout the audio output instance requesting software gain
  * \param gain linear amplitude gain (must be positive)
  * \warning Values in excess 1.0 may cause overflow and distorsion.
  */
@@ -443,7 +446,9 @@ VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
  * \param fourcc sample format (must be a linear sample format)
  * \note The samples must be naturally aligned in memory.
  */
-VLC_API void aout_ChannelReorder(void *, size_t, uint8_t, const uint8_t *, vlc_fourcc_t);
+VLC_API void aout_ChannelReorder(void *ptr, size_t bytes, uint8_t channels,
+                                 const uint8_t *chans_table,
+                                 vlc_fourcc_t fourcc);
 
 /**
  * This function will compute the extraction parameter into pi_selection to go
@@ -517,10 +522,12 @@ VLC_API int aout_VolumeSet (audio_output_t *, float);
 
 /**
  * Raises the volume.
+ * \param aout the audio output to update the volume for
  * \param value how much to increase (> 0) or decrease (< 0) the volume
  * \param volp if non-NULL, will contain contain the resulting volume
  */
-VLC_API int aout_VolumeUpdate (audio_output_t *, int, float *);
+VLC_API int aout_VolumeUpdate (audio_output_t *aout, int value,
+                               float *volp);
 
 /**
  * Gets the audio output stream mute flag.
@@ -543,10 +550,11 @@ VLC_API char *aout_DeviceGet (audio_output_t *);
 
 /**
  * Selects an audio output device.
+ * \param aout the audio output to set the device for
  * \param id device ID to select, or NULL for the default device
  * \return zero on success, non-zero on error.
  */
-VLC_API int aout_DeviceSet (audio_output_t *, const char *);
+VLC_API int aout_DeviceSet (audio_output_t *aout, const char *id);
 
 /**
  * Enumerates possible audio output devices.
@@ -554,12 +562,14 @@ VLC_API int aout_DeviceSet (audio_output_t *, const char *);
  * The function will heap-allocate two tables of heap-allocated strings;
  * the caller is responsible for freeing all strings and both tables.
  *
+ * \param aout the audio output to get the device list from
  * \param ids pointer to a table of device identifiers [OUT]
  * \param names pointer to a table of device human-readable descriptions [OUT]
  * \return the number of devices, or negative on error.
  * \note In case of error, *ids and *names are undefined.
  */
-VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
+VLC_API int aout_DevicesList (audio_output_t *aout, char ***ids,
+                              char ***names);
 
 /** @} */
 
