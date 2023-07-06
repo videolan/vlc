@@ -38,7 +38,7 @@
  * file name must be absolute.
  *
  * \param pid storage space for the child process identifier [OUT]
- * \param path executable file path [IN]
+ * \param file executable file path [IN]
  * \param fdv file descriptor array [IN]
  * \param argv NULL-terminated array of command line arguments [IN]
  *
