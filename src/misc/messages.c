@@ -545,8 +545,10 @@ vlc_LogExternalCreate(const struct vlc_logger_operations *ops, void *opaque)
 
 /**
  * Sets the message logging callback.
+ *
+ * \param vlc the libvlc private instance to replace the logger for
  * \param ops message callback, or NULL to clear
- * \param data data pointer for the message callback
+ * \param opaque data pointer for the message callback
  */
 void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
                 void *opaque)
