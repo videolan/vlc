@@ -103,9 +103,8 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
             duplicated_id_t *dup_id;
             vlc_vector_foreach_ref( dup_id, &id->dup_ids )
             {
-                if( dup_id->id != NULL )
-                    sout_StreamControl(
-                        dup_id->stream_owner, i_query, dup_id->id, spu_hl );
+                sout_StreamControl(
+                    dup_id->stream_owner, i_query, dup_id->id, spu_hl );
             }
             return VLC_SUCCESS;
         }
@@ -214,7 +213,6 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t  *id;
-    size_t i_valid_streams = 0;
 
     id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( !id )
@@ -228,19 +226,20 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     duplicated_stream_t *dup_stream;
     vlc_vector_foreach_ref( dup_stream, &p_sys->streams )
     {
-        duplicated_id_t dup_id = {.stream_owner = dup_stream->stream};
         const size_t idx = vlc_vector_idx_dup_stream;
 
         if( ESSelected(p_stream->obj.logger, p_fmt, dup_stream->select_chain) )
         {
             /* FIXME(Alaric): suffix the string id with the duplicated track
              * count. */
-            dup_id.id = sout_StreamIdAdd( dup_id.stream_owner,
-                                          p_fmt, es_id );
-            if( dup_id.id != NULL )
+            void *next_id = sout_StreamIdAdd( dup_stream->stream,
+                                              p_fmt, es_id );
+            if( next_id != NULL )
             {
                 msg_Dbg( p_stream, "    - added for output %zu", idx );
-                i_valid_streams++;
+                const duplicated_id_t dup_id = {
+                    .stream_owner = dup_stream->stream, .id = next_id};
+                vlc_vector_push( &id->dup_ids, dup_id );
             }
             else
             {
@@ -251,19 +250,12 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
         {
             msg_Dbg( p_stream, "    - ignored for output %zu", idx );
         }
-
-        /* Append failed attempts as well to keep track of which pp_id
-         * belongs to which duplicated stream */
-        vlc_vector_push( &id->dup_ids, dup_id );
     }
 
-    if( i_valid_streams <= 0 )
-    {
-        Del( p_stream, id );
-        return NULL;
-    }
-
-    return id;
+    if( id->dup_ids.size > 0 )
+        return id;
+    Del( p_stream, id );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -276,8 +268,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
     duplicated_id_t *dup_id;
     vlc_vector_foreach_ref( dup_id, &id->dup_ids )
     {
-        if( dup_id->id != NULL )
-            sout_StreamIdDel( dup_id->stream_owner, dup_id->id );
+        sout_StreamIdDel( dup_id->stream_owner, dup_id->id );
     }
     vlc_vector_destroy( &id->dup_ids );
 
@@ -290,7 +281,6 @@ static void Del( sout_stream_t *p_stream, void *_id )
  *****************************************************************************/
 static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
     /* Loop through the linked list of buffers */
@@ -307,29 +297,19 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         {
             duplicated_id_t *dup_id = &id->dup_ids.data[i];
 
-            if( dup_id->id != NULL )
-            {
-                block_t *p_dup = block_Duplicate( p_buffer );
-
-                if( p_dup )
-                    sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
-            }
+            block_t *p_dup = block_Duplicate( p_buffer );
+            if( p_dup )
+                sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
         }
 
         duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
-        if( last_dup_id != NULL )
-        {
-            sout_StreamIdSend(
-                last_dup_id->stream_owner, last_dup_id->id, p_buffer );
-        }
-        else
-        {
-            block_Release( p_buffer );
-        }
+        sout_StreamIdSend(
+            last_dup_id->stream_owner, last_dup_id->id, p_buffer );
 
         p_buffer = p_next;
     }
     return VLC_SUCCESS;
+    (void)p_stream;
 }
 
 static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
