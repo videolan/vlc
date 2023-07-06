@@ -173,14 +173,14 @@ static filter_t *TryFormat (vlc_object_t *obj, vlc_fourcc_t codec,
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *tab,
+static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *filters,
                                       unsigned *count, unsigned max,
                                  const audio_sample_format_t *restrict infmt,
                                  const audio_sample_format_t *restrict outfmt)
 {
     aout_FormatsPrint (obj, "conversion:", infmt, outfmt);
     max -= *count;
-    tab += *count;
+    filters += *count;
 
     /* There is a lot of second guessing on what the conversion plugins can
      * and cannot do. This seems hardly avoidable, the conversion problem need
@@ -212,7 +212,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *tab
                 goto error;
             }
 
-            aout_filter_Init(&tab[n++], f);
+            aout_filter_Init(&filters[n++], f);
         }
 
         if (n == max)
@@ -241,7 +241,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *tab
         }
 
         input = output;
-        aout_filter_Init(&tab[n++], f);
+        aout_filter_Init(&filters[n++], f);
     }
 
     /* Resample */
@@ -262,7 +262,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *tab
         }
 
         input = output;
-        aout_filter_Init(&tab[n++], f);
+        aout_filter_Init(&filters[n++], f);
     }
 
     /* Format */
@@ -278,7 +278,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *tab
                      "post-mix converter");
             goto error;
         }
-        aout_filter_Init(&tab[n++], f);
+        aout_filter_Init(&filters[n++], f);
     }
 
     msg_Dbg (obj, "conversion pipeline complete");
@@ -290,7 +290,7 @@ overflow:
     vlc_dialog_display_error (obj, _("Audio filtering failed"),
         _("The maximum number of filters (%u) was reached."), max);
 error:
-    aout_FiltersPipelineDestroy (tab, n);
+    aout_FiltersPipelineDestroy (filters, n);
     return -1;
 }
 
