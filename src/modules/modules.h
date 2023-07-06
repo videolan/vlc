@@ -167,7 +167,7 @@ int vlc_dlclose(void *);
  * normal symbols such as function or global variables cannot have NULL as
  * their address.
  */
-void *vlc_dlsym(void *handle, const char *) VLC_USED;
+void *vlc_dlsym(void *handle, const char *name) VLC_USED;
 
 /**
  * Formats an error message for vlc_dlopen() or vlc_dlsym().
