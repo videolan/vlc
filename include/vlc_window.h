@@ -544,7 +544,6 @@ static inline void vlc_window_SetTitle(vlc_window_t *window, const char *title)
  * while the window is enabled.
  *
  * \param window window to enable
- * \param cfg initial configuration for the window
  */
 VLC_API
 int vlc_window_Enable(vlc_window_t *window);
