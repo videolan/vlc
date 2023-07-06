@@ -107,10 +107,21 @@ void aout_volume_Delete(aout_volume_t *);
 audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
 
+/**
+ * Starts an audio output stream.
+ * \param output_codec codec accepted by the module, it can be different than
+ * the codec from the mixer_format in case of DTSHD/DTS or EAC3/AC3 fallback
+ * \warning The caller must NOT hold the audio output lock.
+ */
 int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
                    audio_sample_format_t *fmt, int input_profile,
                    audio_sample_format_t *filter_fmt,
                    aout_filters_cfg_t *filters_cfg);
+/**
+ * Stops the audio output stream (undoes aout_OutputNew()).
+ * \note This can only be called after a successful aout_OutputNew().
+ * \warning The caller must NOT hold the audio output lock.
+ */
 void aout_OutputDelete( audio_output_t * p_aout );
 
 vlc_audio_meter_plugin *

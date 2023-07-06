@@ -674,12 +674,6 @@ static void aout_UpdateMixMode(audio_output_t *aout, int mode,
     var_Change(aout, "mix-mode", VLC_VAR_SETVALUE, (vlc_value_t) { .i_int = mode});
 }
 
-/**
- * Starts an audio output stream.
- * \param output_codec codec accepted by the module, it can be different than
- * the codec from the mixer_format in case of DTSHD/DTS or EAC3/AC3 fallback
- * \warning The caller must NOT hold the audio output lock.
- */
 int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
                    audio_sample_format_t *fmt, int input_profile,
                    audio_sample_format_t *filter_fmt,
@@ -806,11 +800,6 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
     return 0;
 }
 
-/**
- * Stops the audio output stream (undoes aout_OutputNew()).
- * \note This can only be called after a successful aout_OutputNew().
- * \warning The caller must NOT hold the audio output lock.
- */
 void aout_OutputDelete (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner(aout);
