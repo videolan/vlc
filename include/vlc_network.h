@@ -89,6 +89,7 @@ VLC_API int vlc_socket(int pf, int type, int proto, bool nonblock) VLC_USED;
  * @param pf protocol family
  * @param type socket type
  * @param proto network protocol
+ * @param fds the output array storing the file descriptor pair
  * @param nonblock true to create non-blocking sockets
  * @retval 0 on success
  * @retval -1 on failure
@@ -304,8 +305,9 @@ VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, i
  * On failure, *res is undefined. On success, it must be freed with
  * freeaddrinfo().
  */
-VLC_API int vlc_getaddrinfo (const char *, unsigned,
-                             const struct addrinfo *, struct addrinfo **);
+VLC_API int vlc_getaddrinfo (const char *node, unsigned i_port,
+                             const struct addrinfo *p_hints,
+                             struct addrinfo **res);
 VLC_API int vlc_getaddrinfo_i11e(const char *, unsigned,
                                  const struct addrinfo *, struct addrinfo **);
 
