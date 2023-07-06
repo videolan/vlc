@@ -26,126 +26,17 @@ import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
-
 import "qrc:///playlist/" as PL
 
 Item {
-    id: g_mainInterface
 
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
-    BindingCompat {
-        target: VLCStyle
-        property: "appWidth"
-        value: g_mainInterface.width
-    }
-
-    BindingCompat {
-        target: VLCStyle
-        property: "appHeight"
-        value: g_mainInterface.height
-    }
-
-    Window.onWindowChanged: {
-        if (Window.window && !Qt.colorEqual(Window.window.color, "transparent")) {
-            Window.window.color = Qt.binding(function() { return theme.bg.primary })
-        }
-    }
-
-    ColorContext {
-        id: theme
-        palette: VLCStyle.palette
-        colorSet: ColorContext.View
-    }
-
-    Widgets.ToolTipExt {
-        id: attachedToolTip
-
-        parent: null
-        z: 99
-        colorContext.palette: parent && parent.colorContext ? parent.colorContext.palette
-                                                            : VLCStyle.palette
-
-        Component.onCompleted: {
-            MainCtx.setAttachedToolTip(this)
-        }
-    }
-
-    Loader {
-        id: playlistWindowLoader
-        asynchronous: true
-        active: !MainCtx.playlistDocked && MainCtx.playlistVisible
-        source: "qrc:///playlist/PlaylistDetachedWindow.qml"
-    }
-    Connections {
-        target: playlistWindowLoader.item
-        onClosing: MainCtx.playlistVisible = false
-    }
-
-    Connections {
-        target: MainPlaylistController
-
-        onPlaylistInitialized: {
-            g_mainInterface._playlistReady = true
-            if (g_mainInterface._interfaceReady)
-                setInitialView()
-        }
-    }
-
-    readonly property var pageModel: [
+    readonly property var _pageModel: [
         { name: "mc", url: "qrc:///main/MainDisplay.qml" },
         { name: "player", url:"qrc:///player/Player.qml" },
     ]
-
-    function loadCurrentHistoryView() {
-        const current = History.current
-        if ( !current || !current.name  || !current.properties ) {
-            console.warn("unable to load requested view, undefined")
-            return
-        }
-        stackView.loadView(g_mainInterface.pageModel, current.name, current.properties)
-
-        MainCtx.mediaLibraryVisible = (current.name !== "player")
-    }
-
-    Connections {
-        target: History
-        onCurrentChanged: loadCurrentHistoryView()
-    }
-
-    Connections {
-        target: MainCtx
-
-        onMediaLibraryVisibleChanged: {
-            if (MainCtx.mediaLibraryVisible) {
-                // NOTE: Useful when we started the application on the 'player' view.
-                if (History.previousEmpty) {
-                    if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                        MainPlaylistController.stop()
-
-                    _pushHome()
-
-                    return
-                }
-
-                if (History.current.name !== "player")
-                    return
-
-                if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                    MainPlaylistController.stop()
-
-                History.previous()
-            } else {
-                if (History.current.name === "player")
-                    return
-
-                stackView.currentItem._inhibitMiniPlayer = true
-
-                History.push(["player"])
-            }
-        }
-    }
 
     function setInitialView() {
         //set the initial view
@@ -169,87 +60,199 @@ Item {
             History.push(["mc", "home"])
     }
 
-    Component.onCompleted: {
-        g_mainInterface._interfaceReady = true;
-        if (g_mainInterface._playlistReady)
-            setInitialView()
+    function loadCurrentHistoryView() {
+        const current = History.current
+        if ( !current || !current.name  || !current.properties ) {
+            console.warn("unable to load requested view, undefined")
+            return
+        }
+        stackView.loadView(_pageModel, current.name, current.properties)
+
+        MainCtx.mediaLibraryVisible = (current.name !== "player")
     }
 
+    Item {
+        id: g_mainInterface
 
-    DropArea {
         anchors.fill: parent
-        onDropped: {
-            let urls = []
-            if (drop.hasUrls) {
 
-                for (let i = 0; i < drop.urls.length; i++)
-                    urls.push(drop.urls[i])
+        BindingCompat {
+            target: VLCStyle
+            property: "appWidth"
+            value: g_mainInterface.width
+        }
 
-            } else if (drop.hasText) {
-                /* Browsers give content as text if you dnd the addressbar,
-                   so check if mimedata has valid url in text and use it
-                   if we didn't get any normal Urls()*/
+        BindingCompat {
+            target: VLCStyle
+            property: "appHeight"
+            value: g_mainInterface.height
+        }
 
-                urls.push(drop.text)
+        Window.onWindowChanged: {
+            if (Window.window && !Qt.colorEqual(Window.window.color, "transparent")) {
+                Window.window.color = Qt.binding(function() { return theme.bg.primary })
             }
+        }
 
-            if (urls.length > 0) {
-                /* D&D of a subtitles file, add it on the fly */
-                if (Player.isPlaying && urls.length == 1) {
-                    if (Player.associateSubtitleFile(urls[0])) {
-                        drop.accept()
+        ColorContext {
+            id: theme
+            palette: VLCStyle.palette
+            colorSet: ColorContext.View
+        }
+
+        Widgets.ToolTipExt {
+            id: attachedToolTip
+
+            parent: null
+            z: 99
+            colorContext.palette: parent && parent.colorContext ? parent.colorContext.palette
+                                                                : VLCStyle.palette
+
+            Component.onCompleted: {
+                MainCtx.setAttachedToolTip(this)
+            }
+        }
+
+        Loader {
+            id: playlistWindowLoader
+            asynchronous: true
+            active: !MainCtx.playlistDocked && MainCtx.playlistVisible
+            source: "qrc:///playlist/PlaylistDetachedWindow.qml"
+        }
+        Connections {
+            target: playlistWindowLoader.item
+            onClosing: MainCtx.playlistVisible = false
+        }
+
+        Connections {
+            target: MainPlaylistController
+
+            onPlaylistInitialized: {
+                _playlistReady = true
+                if (_interfaceReady)
+                    setInitialView()
+            }
+        }
+
+        Connections {
+            target: History
+            onCurrentChanged: loadCurrentHistoryView()
+        }
+
+        Connections {
+            target: MainCtx
+
+            onMediaLibraryVisibleChanged: {
+                if (MainCtx.mediaLibraryVisible) {
+                    // NOTE: Useful when we started the application on the 'player' view.
+                    if (History.previousEmpty) {
+                        if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
+                            MainPlaylistController.stop()
+
+                        _pushHome()
+
                         return
                     }
-                }
 
-                MainPlaylistController.append(urls, true)
-                drop.accept()
+                    if (History.current.name !== "player")
+                        return
+
+                    if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
+                        MainPlaylistController.stop()
+
+                    History.previous()
+                } else {
+                    if (History.current.name === "player")
+                        return
+
+                    stackView.currentItem._inhibitMiniPlayer = true
+
+                    History.push(["player"])
+                }
             }
         }
 
-        Widgets.StackViewExt {
-            id: stackView
-            anchors.fill: parent
-            focus: true
+        Component.onCompleted: {
+            _interfaceReady = true;
+            if (_playlistReady)
+                setInitialView()
+        }
 
-            Connections {
-                target: Player
-                onPlayingStateChanged: {
-                    if (Player.playingState === Player.PLAYING_STATE_STOPPED
-                            && History.current.name === "player") {
-                        if (History.previousEmpty)
-                            _pushHome()
-                        else
-                            History.previous()
+
+        DropArea {
+            anchors.fill: parent
+            onDropped: {
+                let urls = []
+                if (drop.hasUrls) {
+
+                    for (let i = 0; i < drop.urls.length; i++)
+                        urls.push(drop.urls[i])
+
+                } else if (drop.hasText) {
+                    /* Browsers give content as text if you dnd the addressbar,
+                       so check if mimedata has valid url in text and use it
+                       if we didn't get any normal Urls()*/
+
+                    urls.push(drop.text)
+                }
+
+                if (urls.length > 0) {
+                    /* D&D of a subtitles file, add it on the fly */
+                    if (Player.isPlaying && urls.length == 1) {
+                        if (Player.associateSubtitleFile(urls[0])) {
+                            drop.accept()
+                            return
+                        }
+                    }
+
+                    MainPlaylistController.append(urls, true)
+                    drop.accept()
+                }
+            }
+
+            Widgets.StackViewExt {
+                id: stackView
+                anchors.fill: parent
+                focus: true
+
+                Connections {
+                    target: Player
+                    onPlayingStateChanged: {
+                        if (Player.playingState === Player.PLAYING_STATE_STOPPED
+                                && History.current.name === "player") {
+                            if (History.previousEmpty)
+                                _pushHome()
+                            else
+                                History.previous()
+                        }
                     }
                 }
             }
         }
-    }
 
-    Loader {
-        asynchronous: true
-        source: "qrc:///menus/GlobalShortcuts.qml"
-    }
-
-    MouseArea {
-        /// handles mouse navigation buttons
-        anchors.fill: parent
-        acceptedButtons: Qt.BackButton
-        cursorShape: undefined
-        onClicked: History.previous()
-    }
-
-    Loader {
-        active: {
-            const windowVisibility = MainCtx.intfMainWindow.visibility
-            return MainCtx.clientSideDecoration
-                    && (windowVisibility !== Window.Maximized)
-                    && (windowVisibility !== Window.FullScreen)
-
+        Loader {
+            asynchronous: true
+            source: "qrc:///menus/GlobalShortcuts.qml"
         }
 
-        source: "qrc:///widgets/CSDMouseStealer.qml"
-    }
+        MouseArea {
+            /// handles mouse navigation buttons
+            anchors.fill: parent
+            acceptedButtons: Qt.BackButton
+            cursorShape: undefined
+            onClicked: History.previous()
+        }
 
+        Loader {
+            active: {
+                const windowVisibility = MainCtx.intfMainWindow.visibility
+                return MainCtx.clientSideDecoration
+                        && (windowVisibility !== Window.Maximized)
+                        && (windowVisibility !== Window.FullScreen)
+
+            }
+
+            source: "qrc:///widgets/CSDMouseStealer.qml"
+        }
+    }
 }
