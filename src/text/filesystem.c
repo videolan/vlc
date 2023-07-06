@@ -177,9 +177,11 @@ error:
  * Selects file entries from a directory, as GNU C scandir().
  *
  * @param dirname UTF-8 directory path
- * @param pointer [OUT] pointer set, on successful completion, to the address
+ * @param namelist [OUT] pointer set, on successful completion, to the address
  * of a table of UTF-8 filenames. All filenames must be freed with free().
  * The table itself must be freed with free() as well.
+ * @param select a function filtering out elements where it returns 0
+ * @param compar a function ordering pair of filtered elements
  *
  * @return How many file names were selected (possibly 0),
  * or -1 in case of error.
