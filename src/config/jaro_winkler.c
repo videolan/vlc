@@ -143,21 +143,6 @@ static inline int jaro_inner(const char *a, const char *b, size_t *ret_prefix_cc
     return 0;
 }
 
-/**
- * Calculate a “Jaro Winkler” metric.
- *
- * Algorithm: <http://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance>
- *
- * Like “Jaro” but gives a boost to strings that have a common prefix.
- *
- * \note: This implementation does not place a limit on the common prefix
- * length adjusted for.
- *
- * \param a string A
- * \param b string B
- * \param res [OUT] a pointer to a float to receive the result
- * \return -1 on memory allocation failure, otherwise 0
- */
 int vlc_jaro_winkler(const char *a, const char *b, float* res) {
     size_t prefix_char_count = 0;
     float jaro_distance;
