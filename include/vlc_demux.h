@@ -648,9 +648,10 @@ VLC_API void vlc_demux_chained_Delete(vlc_demux_chained_t *);
  *
  * This queues data for a chained demuxer to consume.
  *
+ * \param demux the chained demuxer instance to send the block to
  * \param block data block to queue
  */
-VLC_API void vlc_demux_chained_Send(vlc_demux_chained_t *, block_t *block);
+VLC_API void vlc_demux_chained_Send(vlc_demux_chained_t *demux, block_t *block);
 
 /**
  * Controls a chained demuxer.
@@ -662,11 +663,12 @@ VLC_API void vlc_demux_chained_Send(vlc_demux_chained_t *, block_t *block);
  * \warning As per vlc_demux_chained_New(), most demux controls are not, and
  * cannot be, supported; VLC_EGENERIC is returned.
  *
+ * \param demux the chained demuxer instance to send the request to
  * \param query demux control (see \ref demux_query_e)
  * \param args variable arguments (depending on the query)
  */
-VLC_API int vlc_demux_chained_ControlVa(vlc_demux_chained_t *, int query,
-                                        va_list args);
+VLC_API int vlc_demux_chained_ControlVa(vlc_demux_chained_t *demux,
+                                        int query, va_list args);
 
 static inline int vlc_demux_chained_Control(vlc_demux_chained_t *dc, int query,
                                             ...)
