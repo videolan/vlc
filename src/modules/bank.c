@@ -798,7 +798,7 @@ void module_EndBank (bool b_plugins)
  * Loads module descriptions for all available plugins.
  * Fills the module bank structure with the plugin modules.
  *
- * \param p_this vlc object structure
+ * \param obj vlc object structure
  */
 void module_LoadPlugins(libvlc_int_t *obj)
 {
