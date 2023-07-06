@@ -430,7 +430,7 @@ VLC_API int vlc_vasprintf_c(char **restrict p, const char *restrict fmt,
  * \return number of bytes formatted (excluding the nul terminator)
  *        or -1 on error
  */
-VLC_API int vlc_asprintf_c( char **, const char *, ... ) VLC_USED;
+VLC_API int vlc_asprintf_c( char **p, const char *fmt, ... ) VLC_USED;
 
 int vlc_vsscanf_c(const char *, const char *, va_list) VLC_USED;
 int vlc_sscanf_c(const char*, const char*, ...) VLC_USED
