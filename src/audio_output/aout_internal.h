@@ -109,8 +109,14 @@ audio_output_t *aout_New (vlc_object_t *);
 
 /**
  * Starts an audio output stream.
- * \param output_codec codec accepted by the module, it can be different than
- * the codec from the mixer_format in case of DTSHD/DTS or EAC3/AC3 fallback
+ *
+ * \param aout the audio output instance to initialize from
+ * \param stream the audio output stream to initialize from
+ * \param fmt the format to request to the output
+ * \param input_profile the audio profile to request from the audio output
+ * \param filter_fmt the format requested from the filters
+ * \param filters_cfg the configuration to load the audio filters from
+ *
  * \warning The caller must NOT hold the audio output lock.
  */
 int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
