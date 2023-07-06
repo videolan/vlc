@@ -501,14 +501,14 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     return nil;
 }
 
-- (void)setArtworkMRL:(NSURL *)artworkMRL
+- (void)setArtworkURL:(NSURL *)artworkURL
 {
     if (!_vlcInputItem) {
         return;
     }
 
-    if (artworkMRL != nil) {
-        input_item_SetArtworkURL(_vlcInputItem, artworkMRL.absoluteString.UTF8String);
+    if (artworkURL != nil) {
+        input_item_SetArtworkURL(_vlcInputItem, artworkURL.absoluteString.UTF8String);
     } else {
         input_item_SetArtworkURL(_vlcInputItem, NULL);
     }
