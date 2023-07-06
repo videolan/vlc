@@ -293,6 +293,74 @@ void SPrefsCatList::switchPanel( int i )
 /*********************************************************************
  * The Panels
  *********************************************************************/
+
+template<typename ControlType, typename WidgetType>
+void SPrefsPanel::configGeneric(const char* option, QLabel* label, WidgetType* control)
+{
+    module_config_t* p_config =  config_FindConfig( option );
+    if( p_config )
+    {
+        auto configcontrol =  new ControlType(p_config, label, control );
+        controls.append( configcontrol );
+    }
+    else
+    {
+        control->setEnabled( false );
+        if( label )
+            label->setEnabled( false );
+    }
+}
+
+template<typename ControlType, typename WidgetType>
+void SPrefsPanel::configGenericNoUi(const char* option, QLabel* label, WidgetType* control)
+{
+    module_config_t* p_config =  config_FindConfig( option );
+    if( p_config )
+    {
+        auto configcontrol =  new ControlType(p_config, label, control );
+        controls.append( configcontrol );
+    }
+    else
+    {
+        control->setVisible( false );
+        if( label )
+            label->setEnabled( false );
+    }
+}
+
+template<typename ControlType>
+void SPrefsPanel::configGenericFile(const char* option, QLabel* label, QLineEdit* control, QPushButton* button)
+{
+    module_config_t* p_config =  config_FindConfig( option );
+    if( p_config )
+    {
+        auto configcontrol =  new ControlType(p_config, label, control, button );
+        controls.append( configcontrol );
+    }
+    else
+    {
+        control->setEnabled( false );
+        if( label )
+            label->setEnabled( false );
+        if( button )
+            button->setEnabled( false );
+    }
+}
+
+void SPrefsPanel::configBool(const char* option, QAbstractButton* control)
+{
+    module_config_t* p_config =  config_FindConfig( option );
+    if( p_config )
+    {
+        auto configcontrol =  new BoolConfigControl(p_config, nullptr, control );
+        controls.append( configcontrol );
+    }
+    else
+    {
+        control->setEnabled( false );
+    }
+}
+
 SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                           int _number ) : QWidget( _parent ), p_intf( _p_intf )
 {
@@ -301,58 +369,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     number = _number;
     lang = NULL;
     radioGroup = NULL;
-
-#define CONFIG_GENERIC( option, type, label, qcontrol )                   \
-            p_config =  config_FindConfig( option );                      \
-            if( p_config )                                                \
-            {                                                             \
-                control =  new type ## ConfigControl(                     \
-                           p_config, label, ui.qcontrol );                \
-                controls.append( control );                               \
-            }                                                             \
-            else {                                                        \
-                QWidget *label_ = label;                                  \
-                ui.qcontrol->setEnabled( false );                         \
-                if( label_ ) label_->setEnabled( false );                 \
-            }
-
-#define CONFIG_BOOL( option, qcontrol )                           \
-            p_config =  config_FindConfig( option );                      \
-            if( p_config )                                                \
-            {                                                             \
-                control =  new BoolConfigControl(                         \
-                           p_config, NULL, ui.qcontrol );                 \
-                controls.append( control );                               \
-            }                                                             \
-            else { ui.qcontrol->setEnabled( false ); }
-
-#define CONFIG_GENERIC_NO_UI( option, type, label, qcontrol )             \
-            p_config =  config_FindConfig( option );                      \
-            if( p_config )                                                \
-            {                                                             \
-                control =  new type ## ConfigControl(                     \
-                           p_config, label, qcontrol );                   \
-                controls.append( control );                               \
-            }                                                             \
-            else {                                                        \
-                QWidget *widget = label;                                  \
-                qcontrol->setVisible( false );                            \
-                if( widget ) widget->setEnabled( false );                 \
-            }
-
-#define CONFIG_GENERIC_FILE( option, type, label, qcontrol, qbutton )     \
-            p_config =  config_FindConfig( option );                      \
-            if( p_config )                                                \
-            {                                                             \
-                control =  new type ## ConfigControl(                     \
-                           p_config, label, qcontrol, qbutton );          \
-                controls.append( control );                               \
-            }                                                             \
-            else {                                                        \
-                qcontrol->setEnabled( false );                            \
-                if( label ) label->setEnabled( false );                   \
-                if( qbutton ) qbutton->setEnabled( false );               \
-            }
 
     QVBoxLayout *panel_layout = new QVBoxLayout();
     QWidget *panel = new QWidget();
@@ -383,14 +399,14 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.setupUi( panel );
             panel_label->setText( qtr("Video Settings") );
 
-            CONFIG_BOOL( "video", enableVideo );
+            configBool( "video", ui.enableVideo );
             ui.videoZone->setEnabled( ui.enableVideo->isChecked() );
             connect( ui.enableVideo, &QCheckBox::toggled,
                      ui.videoZone, &QWidget::setEnabled );
 
-            CONFIG_BOOL( "fullscreen", fullscreen );
-            CONFIG_BOOL( "video-deco", windowDecorations );
-            CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
+            configBool( "fullscreen", ui.fullscreen );
+            configBool( "video-deco", ui.windowDecorations );
+            configGeneric<StringListConfigControl>("vout", ui.voutLabel, ui.outputModule);
 
             optionWidgets["videoOutCoB"] = ui.outputModule;
 
@@ -413,30 +429,29 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             }
 
 #ifdef _WIN32
-            CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
+            configBool( "directx-hw-yuv", ui.hwYUVBox );
 #else
             ui.directXBox->setVisible( false );
 #endif
 
 #ifdef __OS2__
-            CONFIG_BOOL( "kva-fixt23", kvaFixT23 );
-            CONFIG_GENERIC( "kva-video-mode", StringList, ui.kvaVideoModeLabel,
-                            kvaVideoMode );
+            configBool( "kva-fixt23", ui.kvaFixT23 );
+            configGeneric<StringListConfigControl>( "kva-video-mode", ui.kvaVideoModeLabel,
+                            ui.kvaVideoMode );
 #else
             ui.kvaBox->setVisible( false );
 #endif
 
-            CONFIG_GENERIC( "deinterlace", IntegerList, ui.deinterLabel, deinterlaceBox );
-            CONFIG_GENERIC( "deinterlace-mode", StringList, ui.deinterModeLabel, deinterlaceModeBox );
-            CONFIG_GENERIC( "aspect-ratio", String, ui.arLabel, arLine );
+            configGeneric<IntegerListConfigControl>( "deinterlace",  ui.deinterLabel, ui.deinterlaceBox );
+            configGeneric<StringListConfigControl>( "deinterlace-mode", ui.deinterModeLabel, ui.deinterlaceModeBox );
+            configGeneric<StringConfigControl>( "aspect-ratio", ui.arLabel, ui.arLine );
 
-            CONFIG_GENERIC_FILE( "snapshot-path", Directory, ui.dirLabel,
+            configGenericFile<DirectoryConfigControl>( "snapshot-path",  ui.dirLabel,
                                  ui.snapshotsDirectory, ui.snapshotsDirectoryBrowse );
-            CONFIG_GENERIC( "snapshot-prefix", String, ui.prefixLabel, snapshotsPrefix );
-            CONFIG_BOOL( "snapshot-sequential",
-                            snapshotsSequentialNumbering );
-            CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
-                            snapshotsFormat );
+            configGeneric<StringConfigControl>( "snapshot-prefix", ui.prefixLabel, ui.snapshotsPrefix );
+            configBool( "snapshot-sequential", ui.snapshotsSequentialNumbering );
+            configGeneric<StringListConfigControl>( "snapshot-format", ui.arLabel, ui.snapshotsFormat );
+
             break;
         }
 
@@ -449,7 +464,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.setupUi( panel );
             panel_label->setText( qtr("Audio Settings") );
 
-            CONFIG_BOOL( "audio", enableAudio );
+            configBool( "audio", ui.enableAudio );
             ui.audioZone->setEnabled( ui.enableAudio->isChecked() );
             connect( ui.enableAudio, &QCheckBox::toggled,
                      ui.audioZone, &QWidget::setEnabled );
@@ -482,28 +497,27 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             audioControl( DirectX );
             optionWidgets["directxL" ] = DirectXLabel;
             optionWidgets["directxW" ] = DirectXDevice;
-            CONFIG_GENERIC_NO_UI( "directx-audio-device", StringList,
+            configGenericNoUi<StringListConfigControl>( "directx-audio-device",
                     DirectXLabel, DirectXDevice );
 
             audioControl( Waveout );
             optionWidgets["waveoutL" ] = WaveoutLabel;
             optionWidgets["waveoutW" ] = WaveoutDevice;
-            CONFIG_GENERIC_NO_UI( "waveout-audio-device", StringList,
+            configGenericNoUi<StringListConfigControl>( "waveout-audio-device",
                     WaveoutLabel, WaveoutDevice );
 
 #elif defined( __OS2__ )
             audioControl( kai );
             optionWidgets["kaiL"] = kaiLabel;
             optionWidgets["kaiW"] = kaiDevice;
-            CONFIG_GENERIC_NO_UI( "kai-audio-device", StringList, kaiLabel,
-                    kaiDevice );
+            configGenericNoUi<StringListConfigControl>( "kai-audio-device",  kaiLabel, kaiDevice );
 #else
             if( module_exists( "alsa" ) )
             {
                 audioControl( alsa );
                 optionWidgets["alsaL"] = alsaLabel;
                 optionWidgets["alsaW"] = alsaDevice;
-                CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, alsaLabel,
+                configGenericNoUi<StringListConfigControl>( "alsa-audio-device" ,  alsaLabel,
                                 alsaDevice );
             }
             if( module_exists( "oss" ) )
@@ -512,8 +526,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 optionWidgets["ossL"] = OSSLabel;
                 optionWidgets["ossW"] = OSSDevice;
                 optionWidgets["ossB"] = OSSBrowse;
-                CONFIG_GENERIC_FILE( "oss-audio-device" , File, OSSLabel, OSSDevice,
-                                 OSSBrowse );
+                configGenericFile<FileConfigControl>( "oss-audio-device" ,  OSSLabel, OSSDevice,
+                                                     OSSBrowse );
             }
 #endif
 
@@ -521,11 +535,11 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             audioControl( MMDevice );
             optionWidgets["mmdeviceL" ] = MMDeviceLabel;
             optionWidgets["mmdeviceW" ] = MMDeviceDevice;
-            CONFIG_GENERIC_NO_UI( "mmdevice-audio-device", StringList,
+            configGenericNoUi<StringListConfigControl>( "mmdevice-audio-device",
                                   MMDeviceLabel, MMDeviceDevice );
 
-            CONFIG_GENERIC( "mmdevice-passthrough", IntegerList,
-                            ui.mmdevicePassthroughLabel, mmdevicePassthroughBox );
+            configGeneric<IntegerListConfigControl>( "mmdevice-passthrough",
+                                                     ui.mmdevicePassthroughLabel, ui.mmdevicePassthroughBox );
             optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
             optionWidgets["mmdevicePassthroughB"] = ui.mmdevicePassthroughBox;
 #else
@@ -551,31 +565,30 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             connect( ui.resetVolumeCheckbox, &QCheckBox::toggled,
                      ui.defaultVolume_zone, &QWidget::setEnabled );
 
-            CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
-                            preferredAudioLanguage );
+            configGeneric<StringConfigControl>( "audio-language" , ui.langLabel, ui.preferredAudioLanguage );
 
-            CONFIG_BOOL( "spdif", spdifBox );
+            configBool( "spdif", ui.spdifBox );
 
             if( !module_exists( "normvol" ) )
                 ui.volNormBox->setEnabled( false );
             else
             {
-                CONFIG_GENERIC( "norm-max-level" , Float, nullptr, volNormSpin );
+                configGeneric<FloatConfigControl>( "norm-max-level" , nullptr, ui.volNormSpin );
             }
-            CONFIG_GENERIC( "audio-replay-gain-mode", StringList, ui.replayLabel,
-                            replayCombo );
-            CONFIG_GENERIC( "audio-visual" , StringList, ui.visuLabel,
-                            visualisation);
-            CONFIG_BOOL( "audio-time-stretch", autoscaleBox );
+            configGeneric<StringListConfigControl>( "audio-replay-gain-mode", ui.replayLabel,
+                            ui.replayCombo );
+            configGeneric<StringListConfigControl>( "audio-visual" , ui.visuLabel,
+                            ui.visualisation);
+            configBool( "audio-time-stretch", ui.autoscaleBox );
 
             /* Audio Output Specifics */
-            CONFIG_GENERIC( "aout", StringList, ui.outputLabel, outputModule );
+            configGeneric<StringListConfigControl>( "aout", ui.outputLabel, ui.outputModule );
 
             connect( ui.outputModule, QOverload<int>::of(&QComboBox::currentIndexChanged),
                      this, &SPrefsPanel::updateAudioOptions );
 
             /* File output exists on all platforms */
-            CONFIG_GENERIC_FILE( "audiofile-file", File, ui.fileLabel,
+            configGenericFile<FileConfigControl>( "audiofile-file",  ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
             optionWidgets["fileW"] = ui.fileControl;
@@ -590,10 +603,10 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             /* LastFM */
             if( module_exists( "audioscrobbler" ) )
             {
-                CONFIG_GENERIC( "lastfm-username", String, ui.lastfm_user_label,
-                        lastfm_user_edit );
-                CONFIG_GENERIC( "lastfm-password", String, ui.lastfm_pass_label,
-                        lastfm_pass_edit );
+                configGeneric<StringConfigControl>( "lastfm-username", ui.lastfm_user_label,
+                        ui.lastfm_user_edit );
+                configGeneric<StringConfigControl>( "lastfm-password", ui.lastfm_pass_label,
+                        ui.lastfm_pass_edit );
 
                 if( config_ExistIntf( "audioscrobbler" ) )
                     ui.lastfm->setChecked( true );
@@ -676,33 +689,33 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     .replaceInStrings( QRegExp("^"), "/dev/" )
             );
 #endif
-            CONFIG_GENERIC( "dvd", String, ui.DVDLabel,
-                            DVDDeviceComboBox->lineEdit() );
-            CONFIG_GENERIC_FILE( "input-record-path", Directory, ui.recordLabel,
+            configGeneric<StringConfigControl>( "dvd", ui.DVDLabel,
+                            ui.DVDDeviceComboBox->lineEdit() );
+            configGenericFile<DirectoryConfigControl>( "input-record-path",  ui.recordLabel,
                                  ui.recordPath, ui.recordBrowse );
 
-            CONFIG_GENERIC( "http-proxy", String , ui.httpProxyLabel, proxy );
-            CONFIG_GENERIC( "postproc-q", Integer, ui.ppLabel, PostProcLevel );
-            CONFIG_GENERIC( "avi-index", IntegerList, ui.aviLabel, AviRepair );
+            configGeneric<StringConfigControl>( "http-proxy", ui.httpProxyLabel, ui.proxy );
+            configGeneric<IntegerConfigControl>( "postproc-q", ui.ppLabel, ui.PostProcLevel );
+            configGeneric<IntegerListConfigControl>( "avi-index", ui.aviLabel, ui.AviRepair );
 
             /* live555 module prefs */
-            CONFIG_BOOL( "rtsp-tcp", live555TransportRTSP_TCPRadio );
+            configBool( "rtsp-tcp", ui.live555TransportRTSP_TCPRadio );
             if ( !module_exists( "live555" ) )
             {
                 ui.live555TransportRTSP_TCPRadio->hide();
                 ui.live555TransportHTTPRadio->hide();
                 ui.live555TransportLabel->hide();
             }
-            CONFIG_GENERIC( "dec-dev", StringList, ui.hwAccelLabel, hwAccelModule );
-            CONFIG_BOOL( "input-fast-seek", fastSeekBox );
+            configGeneric<StringListConfigControl>( "dec-dev", ui.hwAccelLabel, ui.hwAccelModule );
+            configBool( "input-fast-seek", ui.fastSeekBox );
             optionWidgets["inputLE"] = ui.DVDDeviceComboBox;
             optionWidgets["cachingCoB"] = ui.cachingCombo;
-            CONFIG_GENERIC( "avcodec-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
-            CONFIG_GENERIC( "sout-x264-tune", StringList, ui.x264Label, tuneBox );
-            CONFIG_GENERIC( "sout-x264-preset", StringList, ui.x264Label, presetBox );
-            CONFIG_GENERIC( "sout-x264-profile", StringList, ui.x264profileLabel, profileBox );
-            CONFIG_GENERIC( "sout-x264-level", String, ui.x264profileLabel, levelBox );
-            CONFIG_BOOL( "mkv-preload-local-dir", mkvPreloadBox );
+            configGeneric<IntegerListConfigControl>( "avcodec-skiploopfilter", ui.filterLabel, ui.loopFilterBox );
+            configGeneric<StringListConfigControl>( "sout-x264-tune", ui.x264Label, ui.tuneBox );
+            configGeneric<StringListConfigControl>( "sout-x264-preset", ui.x264Label, ui.presetBox );
+            configGeneric<StringListConfigControl>( "sout-x264-profile", ui.x264profileLabel, ui.profileBox );
+            configGeneric<StringConfigControl>( "sout-x264-level", ui.x264profileLabel, ui.levelBox );
+            configBool( "mkv-preload-local-dir", ui.mkvPreloadBox );
 
             /* Caching */
             /* Add the things to the ComboBox */
@@ -822,36 +835,36 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             connect( ui.minimalviewBox, &QCheckBox::toggled,
                      ui.mainPreview, &InterfacePreviewWidget::setNormalPreview );
-            CONFIG_BOOL( "qt-minimal-view", minimalviewBox );
+            configBool( "qt-minimal-view", ui.minimalviewBox );
             ui.mainPreview->setNormalPreview( ui.minimalviewBox->isChecked() );
             ui.skinsPreview->setPreview( InterfacePreviewWidget::SKINS );
 
-            CONFIG_BOOL( "embedded-video", embedVideo );
-            CONFIG_BOOL( "qt-video-autoresize", resizingBox );
+            configBool( "embedded-video", ui.embedVideo );
+            configBool( "qt-video-autoresize", ui.resizingBox );
             connect( ui.embedVideo, &QCheckBox::toggled, ui.resizingBox, &QCheckBox::setEnabled );
             ui.resizingBox->setEnabled( ui.embedVideo->isChecked() );
 
-            CONFIG_BOOL( "qt-fs-controller", fsController );
-            CONFIG_BOOL( "qt-system-tray", systrayBox );
-            CONFIG_GENERIC( "qt-notification", IntegerList, ui.notificationComboLabel,
-                                                      notificationCombo );
+            configBool( "qt-fs-controller", ui.fsController );
+            configBool( "qt-system-tray", ui.systrayBox );
+            configGeneric<IntegerListConfigControl>( "qt-notification", ui.notificationComboLabel,
+                                                      ui.notificationCombo );
             connect( ui.systrayBox, &QCheckBox::toggled, [=]( bool checked ) {
                 ui.notificationCombo->setEnabled( checked );
                 ui.notificationComboLabel->setEnabled( checked );
             } );
             ui.notificationCombo->setEnabled( ui.systrayBox->isChecked() );
 
-            CONFIG_BOOL( "qt-pause-minimized", pauseMinimizedBox );
-            CONFIG_BOOL( "playlist-tree", treePlaylist );
-            CONFIG_BOOL( "play-and-pause", playPauseBox );
-            CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
+            configBool( "qt-pause-minimized", ui.pauseMinimizedBox );
+            configBool( "playlist-tree", ui.treePlaylist );
+            configBool( "play-and-pause", ui.playPauseBox );
+            configGenericFile<FileConfigControl>( "skins2-last",  ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
 
-            CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
-            CONFIG_BOOL( "qt-menubar", menuBarCheck );
+            configBool( "metadata-network-access", ui.MetadataNetworkAccessMode );
+            configBool( "qt-menubar", ui.menuBarCheck );
 
 
-            CONFIG_BOOL( "qt-pin-controls", pinVideoControlsCheckbox );
+            configBool( "qt-pin-controls", ui.pinVideoControlsCheckbox );
             m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
             QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_mi, &MainCtx::setPinVideoControls );
 
@@ -892,15 +905,15 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                               , p_intf->p_mi , updateIntfUserScaleFactorFromControls );
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-            CONFIG_BOOL( "qt-titlebar", titleBarCheckBox );
+            configBool( "qt-titlebar", ui.titleBarCheckBox );
 #else
             ui.titleBarCheckBox->hide();
 #endif
 
             /* UPDATE options */
 #ifdef UPDATE_CHECK
-            CONFIG_BOOL( "qt-updates-notif", updatesBox );
-            CONFIG_GENERIC( "qt-updates-days", Integer, nullptr, updatesDays );
+            configBool( "qt-updates-notif", ui.updatesBox );
+            configGeneric<IntegerConfigControl>( "qt-updates-days", nullptr, ui.updatesDays );
             ui.updatesDays->setEnabled( ui.updatesBox->isChecked() );
             connect( ui.updatesBox, &QCheckBox::toggled,
                      ui.updatesDays, &QSpinBox::setEnabled );
@@ -919,15 +932,15 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             else
 #endif
             {
-                CONFIG_BOOL( "one-instance", OneInterfaceMode );
-                CONFIG_BOOL( "playlist-enqueue", EnqueueOneInterfaceMode );
+                configBool( "one-instance", ui.OneInterfaceMode );
+                configBool( "playlist-enqueue", ui.EnqueueOneInterfaceMode );
                 ui.EnqueueOneInterfaceMode->setEnabled( ui.OneInterfaceMode->isChecked() );
                 connect( ui.OneInterfaceMode, &QCheckBox::toggled,
                          ui.EnqueueOneInterfaceMode, &QCheckBox::setEnabled );
-                CONFIG_BOOL( "one-instance-when-started-from-file", oneInstanceFromFile );
+                configBool( "one-instance-when-started-from-file", ui.oneInstanceFromFile );
             }
 
-            CONFIG_GENERIC( "qt-auto-raise", IntegerList, ui.autoRaiseLabel, autoRaiseComboBox );
+            configGeneric<IntegerListConfigControl>( "qt-auto-raise", ui.autoRaiseLabel, ui.autoRaiseComboBox );
 
             /* RECENTLY PLAYED options */
 
@@ -941,8 +954,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             if ( hasMedialibrary )
             {
-                CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
-                CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
+                configGeneric<IntegerListConfigControl>( "restore-playback-pos", ui.continuePlaybackLabel, ui.continuePlaybackComboBox );
+                configBool( "save-recentplay", ui.saveRecentlyPlayed );
 
                 ui.clearRecentSpacer->changeSize( 1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum );
                 MLRecentsModel *recentsModel = new MLRecentsModel( ui.clearRecent );
@@ -962,31 +975,31 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.setupUi( panel );
             panel_label->setText( qtr("Subtitle & On Screen Display Settings") );
 
-            CONFIG_BOOL( "osd", OSDBox);
-            CONFIG_BOOL( "video-title-show", OSDTitleBox);
-            CONFIG_GENERIC( "video-title-position", IntegerList,
-                            ui.OSDTitlePosLabel, OSDTitlePos );
+            configBool( "osd", ui.OSDBox);
+            configBool( "video-title-show", ui.OSDTitleBox);
+            configGeneric<IntegerListConfigControl>( "video-title-position",
+                            ui.OSDTitlePosLabel, ui.OSDTitlePos );
 
-            CONFIG_BOOL( "spu", spuActiveBox);
+            configBool( "spu", ui.spuActiveBox);
             ui.spuZone->setEnabled( ui.spuActiveBox->isChecked() );
             connect( ui.spuActiveBox, &QCheckBox::toggled, ui.spuZone, &QWidget::setEnabled );
 
-            CONFIG_GENERIC( "subsdec-encoding", StringList, ui.encodLabel,
-                            encoding );
-            CONFIG_GENERIC( "sub-language", String, ui.subLangLabel,
-                            preferredLanguage );
+            configGeneric<StringListConfigControl>( "subsdec-encoding", ui.encodLabel,
+                            ui.encoding );
+            configGeneric<StringConfigControl>( "sub-language", ui.subLangLabel,
+                            ui.preferredLanguage );
 
-            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
-                            ui.fontSizeLabel, fontSize );
+            configGeneric<IntegerListConfigControl>( "freetype-rel-fontsize",
+                            ui.fontSizeLabel, ui.fontSize );
 
-            CONFIG_GENERIC( "freetype-font", Font, ui.fontLabel, font );
-            CONFIG_GENERIC( "freetype-color", Color, ui.fontColorLabel, fontColor );
-            CONFIG_GENERIC( "freetype-outline-thickness", IntegerList,
-                            ui.fontEffectLabel, effect );
-            CONFIG_GENERIC( "freetype-outline-color", Color, ui.outlineColorLabel,
-                            outlineColor );
+            configGeneric<FontConfigControl>( "freetype-font", ui.fontLabel, ui.font );
+            configGeneric<ColorConfigControl>( "freetype-color", ui.fontColorLabel, ui.fontColor );
+            configGeneric<IntegerListConfigControl>( "freetype-outline-thickness",
+                            ui.fontEffectLabel, ui.effect );
+            configGeneric<ColorConfigControl>( "freetype-outline-color", ui.outlineColorLabel,
+                            ui.outlineColor );
 
-            CONFIG_GENERIC( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
+            configGeneric<IntegerConfigControl>( "sub-margin", ui.subsPosLabel, ui.subsPosition );
 
             if( module_exists( "freetype" ) )
             {
@@ -1001,9 +1014,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             optionWidgets["shadowCB"] = ui.shadowCheck;
             optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
-            CONFIG_GENERIC( "secondary-sub-alignment", IntegerList,
-                            ui.secondarySubsAlignmentLabel, secondarySubsAlignment );
-            CONFIG_GENERIC( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
+            configGeneric<IntegerListConfigControl>( "secondary-sub-alignment",
+                            ui.secondarySubsAlignmentLabel, ui.secondarySubsAlignment );
+            configGeneric<IntegerConfigControl>( "secondary-sub-margin", ui.secondarySubsPosLabel, ui.secondarySubsPosition );
             break;
         }
 
@@ -1089,11 +1102,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     panel_layout->addWidget( scroller );
 
     setLayout( panel_layout );
-
-#undef CONFIG_GENERIC_FILE
-#undef CONFIG_GENERIC_NO_UI
-#undef CONFIG_GENERIC
-#undef CONFIG_BOOL
 }
 
 

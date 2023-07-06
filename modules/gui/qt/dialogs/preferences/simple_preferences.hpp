@@ -44,6 +44,9 @@ class MLFoldersEditor;
 #endif
 
 #include <QWidget>
+class QLineEdit;
+class QPushButton;
+class QAbstractButton;
 
 enum {
     SPrefsInterface = 0,
@@ -97,6 +100,16 @@ public:
 #ifdef _WIN32
     void cleanLang();
 #endif
+
+private:
+    template<typename ControlType, typename WidgetType>
+    void configGeneric(const char* option, QLabel* label, WidgetType* control);
+    template<typename ControlType, typename WidgetType>
+    void configGenericNoUi(const char* option, QLabel* label, WidgetType* control);
+    void configBool(const char* option, QAbstractButton* control);
+    template<typename T>
+    void configGenericFile(const char* option, QLabel* label, QLineEdit* control, QPushButton* button);
+
 
 private:
     qt_intf_t *p_intf;
