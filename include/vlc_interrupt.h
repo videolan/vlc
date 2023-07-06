@@ -211,6 +211,7 @@ VLC_API bool vlc_killed(void) VLC_USED;
  * If the calling thread has no interrupt context, this function does nothing.
  *
  * @param to context to forward to
+ * @param data opaque data pointer for the callback
  */
 VLC_API void vlc_interrupt_forward_start(vlc_interrupt_t *to,
                                          void *data[2]);
