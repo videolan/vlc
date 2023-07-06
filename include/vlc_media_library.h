@@ -655,10 +655,10 @@ enum vlc_ml_event_type
 {
     /**
      * Entity modification callbacks. The affected entity will be passed:
-     * - As a vlc_ml_<type>_t, depending on the type of the modified/inserted
-     * entity, in vlc_ml_event_t::modification::p_<type>
+     * - As a `vlc_ml_<type>_t`, depending on the type of the modified/inserted
+     * entity, in `vlc_ml_event_t::modification::p_<type>`
      * for ADDED and UPDATED variants.
-     * - as an id, in vlc_ml_event_t::deletion::i_entity_id
+     * - as an id, in ::vlc_ml_event_t::deletion::i_entity_id
      * When _DELETED callbacks get invoked, the entity will already have been
      * deleted from the database, and cannot be retrieved anymore
      */
@@ -916,12 +916,14 @@ vlc_ml_event_register_callback( vlc_medialibrary_t* p_ml, vlc_ml_callback_t cb, 
 
 /**
  * \brief Unregisters a medialibrary callback
- * \param p_handle The handled returned by vlc_ml_register_callback
+ * \param p_ml an initialized medialibrary instance
+ * \param p_callback The callback handle returned by vlc_ml_register_callback
  */
 VLC_API void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
                                                vlc_ml_event_callback_t* p_callback );
 /**
  * \brief Unregisters a medialibrary callback from the said callback.
+ * \param p_ml an initialized medialibrary instance
  * \param p_callback The handle returned by vlc_ml_register_callback
  *
  * This must only be called synchronously from the callback function provided to
@@ -1533,6 +1535,7 @@ static inline size_t vlc_ml_count_genres( vlc_medialibrary_t* p_ml, const vlc_ml
 
 /**
  * @brief vlc_ml_list_artists
+ * @param p_ml an initialized medialibrary instance
  * @param params Query parameters, or NULL for the default
  * @param b_include_all True if you wish to fetch artists without at least one album.
  * @return
