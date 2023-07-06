@@ -472,7 +472,7 @@ module_config_t *config_FindConfig(const char *name)
 
 /**
  * Destroys an array of configuration items.
- * \param config start of array of items
+ * \param tab start of array of items
  * \param confsize number of items in the array
  */
 void config_Free(struct vlc_param *tab, size_t confsize)
