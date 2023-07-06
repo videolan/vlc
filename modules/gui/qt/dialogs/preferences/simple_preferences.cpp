@@ -408,9 +408,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             configBool( "video-deco", ui.windowDecorations );
             configGeneric<StringListConfigControl>("vout", ui.voutLabel, ui.outputModule);
 
-            optionWidgets["videoOutCoB"] = ui.outputModule;
-
-            optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
             ui.fullscreenScreenBox->addItem( qtr("Automatic"), -1 );
             int i_screenCount = 0;
             foreach( QScreen* screen, QGuiApplication::screens() )
@@ -528,8 +525,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             configGeneric<IntegerListConfigControl>( "mmdevice-passthrough",
                                                      ui.mmdevicePassthroughLabel, ui.mmdevicePassthroughBox );
-            optionWidgets["mmdevicePassthroughL"] = ui.mmdevicePassthroughLabel;
-            optionWidgets["mmdevicePassthroughB"] = ui.mmdevicePassthroughBox;
 #else
             ui.mmdevicePassthroughLabel->setVisible( false );
             ui.mmdevicePassthroughBox->setVisible( false );
@@ -574,13 +569,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             configGenericFile<FileConfigControl>( "audiofile-file",  ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
-            optionWidgets["fileW"] = ui.fileControl;
-            optionWidgets["audioOutCoB"] = ui.outputModule;
-            optionWidgets["normalizerChB"] = ui.volNormBox;
-            optionWidgets["volLW"] = ui.volumeValue;
-            optionWidgets["spdifChB"] = ui.spdifBox;
-            optionWidgets["defaultVolume"] = ui.defaultVolume;
-            optionWidgets["resetVolumeCheckbox"] = ui.resetVolumeCheckbox;
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -691,8 +679,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             }
             configGeneric<StringListConfigControl>( "dec-dev", ui.hwAccelLabel, ui.hwAccelModule );
             configBool( "input-fast-seek", ui.fastSeekBox );
-            optionWidgets["inputLE"] = ui.DVDDeviceComboBox;
-            optionWidgets["cachingCoB"] = ui.cachingCombo;
             configGeneric<IntegerListConfigControl>( "avcodec-skiploopfilter", ui.filterLabel, ui.loopFilterBox );
             configGeneric<StringListConfigControl>( "sout-x264-tune", ui.x264Label, ui.tuneBox );
             configGeneric<StringListConfigControl>( "sout-x264-preset", ui.x264Label, ui.presetBox );
@@ -791,15 +777,12 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 free( psz_intf );
             }
 
-            optionWidgets["skinRB"] = ui.skins;
-            optionWidgets["qtRB"] = ui.qt;
 #if !defined( _WIN32)
             fillStylesCombo( ui.stylesCombo, getSettings()->value( "MainWindow/QtStyle", "" ).toString() );
             m_resetters.push_back( std::make_unique<PropertyResetter>( ui.stylesCombo, "currentIndex" ) );
 
             connect( ui.stylesCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
                      this, &SPrefsPanel::changeStyle );
-            optionWidgets["styleCB"] = ui.stylesCombo;
 #else
             ui.stylesCombo->hide();
             ui.stylesLabel->hide();
@@ -994,8 +977,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.shadowCheck->setEnabled( false );
                 ui.backgroundCheck->setEnabled( false );
             }
-            optionWidgets["shadowCB"] = ui.shadowCheck;
-            optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
             configGeneric<IntegerListConfigControl>( "secondary-sub-alignment",
                             ui.secondarySubsAlignmentLabel, ui.secondarySubsAlignment );
@@ -1103,14 +1084,13 @@ void SPrefsPanel::updateAudioOptions( int number )
             browse->setVisible( visible );
     };
 
-    QString value = qobject_cast<QComboBox *>(optionWidgets["audioOutCoB"])
-              ->itemData( number ).toString();
+    QString value = m_audioUI.outputModule->itemData( number ).toString();
 #ifdef _WIN32
     /* Since MMDevice is most likely to be used by default, we show MMDevice
      * options by default */
     const bool mmDeviceEnabled = value == "mmdevice" || value == "any";
-    optionWidgets["mmdevicePassthroughL"]->setVisible( mmDeviceEnabled );
-    optionWidgets["mmdevicePassthroughB"]->setVisible( mmDeviceEnabled );
+    m_audioUI.mmdevicePassthroughLabel->setVisible( mmDeviceEnabled );
+    m_audioUI.mmdevicePassthroughBox->setVisible( mmDeviceEnabled );
     setAudioDeviceVisible("mmdevice", mmDeviceEnabled);
 
     setAudioDeviceVisible("waveout", value == "waveout");
@@ -1121,8 +1101,8 @@ void SPrefsPanel::updateAudioOptions( int number )
     setAudioDeviceVisible("alsa", value == "alsa");
 
 #endif
-    optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
-    optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
+    m_audioUI.fileControl->setVisible( ( value == "afile" ) );
+    m_audioUI.spdifBox->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
                                              value == "waveout" ) );
 
     int volume = getDefaultAudioVolume(qtu(value));
@@ -1131,15 +1111,11 @@ void SPrefsPanel::updateAudioOptions( int number )
     if (volume >= 0)
         save = config_GetInt("volume-save");
 
-    QCheckBox *resetVolumeCheckBox =
-        qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"]);
-    resetVolumeCheckBox->setChecked(!save);
-    resetVolumeCheckBox->setEnabled(volume >= 0);
+    m_audioUI.resetVolumeCheckbox->setChecked(!save);
+    m_audioUI.resetVolumeCheckbox->setEnabled(volume >= 0);
 
-    QSlider *defaultVolume =
-        qobject_cast<QSlider *>(optionWidgets["defaultVolume"]);
-    defaultVolume->setValue((volume >= 0) ? volume : 100);
-    defaultVolume->setEnabled(volume >= 0);
+    m_audioUI.defaultVolume->setValue((volume >= 0) ? volume : 100);
+    m_audioUI.defaultVolume->setEnabled(volume >= 0);
 }
 
 
@@ -1154,8 +1130,7 @@ SPrefsPanel::~SPrefsPanel()
 
 void SPrefsPanel::updateAudioVolume( int volume )
 {
-    qobject_cast<QSpinBox *>(optionWidgets["volLW"])
-        ->setValue( volume );
+    m_audioUI.volumeValue->setValue( volume );
 }
 
 
@@ -1177,8 +1152,7 @@ void SPrefsPanel::apply()
     case SPrefsInputAndCodecs:
     {
         /* Device default selection */
-        QByteArray devicepath =
-            qobject_cast<QComboBox *>(optionWidgets["inputLE"])->currentText().toUtf8();
+        QByteArray devicepath = m_inputCodecUI.DVDDeviceComboBox->currentText().toUtf8();
         if( devicepath.size() > 0 )
         {
             config_PutPsz( "dvd", devicepath );
@@ -1189,7 +1163,7 @@ void SPrefsPanel::apply()
 
 #define CaC( name, factor ) config_PutInt( name, i_comboValue * factor )
         /* Caching */
-        QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets["cachingCoB"]);
+        QComboBox *cachingCombo = m_inputCodecUI.cachingCombo;
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
@@ -1205,13 +1179,15 @@ void SPrefsPanel::apply()
     /* Interfaces */
     case SPrefsInterface:
     {
-        if( qobject_cast<QRadioButton *>(optionWidgets["skinRB"])->isChecked() )
+        if( m_interfaceUI.skins->isChecked() )
             config_PutPsz( "intf", "skins2,any" );
         else
-        //if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
+        //if( m_interfaceUI.qt->isChecked() )
             config_PutPsz( "intf", "" );
-        if( auto stylesCombo = qobject_cast<QComboBox *>(optionWidgets["styleCB"]) )
-            getSettings()->setValue( "MainWindow/QtStyle", getQStyleKey(  stylesCombo , "" ) );
+#if !defined( _WIN32)
+        getSettings()->setValue( "MainWindow/QtStyle", getQStyleKey(  m_interfaceUI.stylesCombo , "" ) );
+#endif
+
 #ifdef _WIN32
     saveLang();
 #endif
@@ -1220,15 +1196,14 @@ void SPrefsPanel::apply()
 
     case SPrefsVideo:
     {
-        int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentData().toInt();
+        int i_fullscreenScreen =   m_videoUI.fullscreenScreenBox->currentData().toInt();
         config_PutInt( "qt-fullscreen-screennumber", i_fullscreenScreen );
         break;
     }
 
     case SPrefsAudio:
     {
-        bool b_checked =
-            qobject_cast<QCheckBox *>(optionWidgets["normalizerChB"])->isChecked();
+        bool b_checked = m_audioUI.volNormBox->isChecked();
         if( b_checked && !qs_filter.contains( "normvol" ) )
             qs_filter.append( "normvol" );
         if( !b_checked && qs_filter.contains( "normvol" ) )
@@ -1237,10 +1212,8 @@ void SPrefsPanel::apply()
         config_PutPsz( "audio-filter", qtu( qs_filter.join( ":" ) ) );
 
         /* Default volume */
-        int i_volume =
-            qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
-        bool b_reset_volume =
-            qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
+        int i_volume = m_audioUI.defaultVolume->value();
+        bool b_reset_volume = m_audioUI.resetVolumeCheckbox->isChecked();
         char *psz_aout = config_GetPsz( "aout" );
 
         float f_gain = powf( i_volume / 100.f, 3 );
@@ -1278,7 +1251,7 @@ void SPrefsPanel::apply()
     }
     case SPrefsSubtitles:
     {
-        bool b_checked = qobject_cast<QCheckBox *>(optionWidgets["shadowCB"])->isChecked();
+        bool b_checked = m_subtitlesUI.shadowCheck->isChecked();
         if( b_checked && config_GetInt( "freetype-shadow-opacity" ) == 0 ) {
             config_PutInt( "freetype-shadow-opacity", 128 );
         }
@@ -1286,7 +1259,7 @@ void SPrefsPanel::apply()
             config_PutInt( "freetype-shadow-opacity", 0 );
         }
 
-        b_checked = qobject_cast<QCheckBox *>(optionWidgets["backgroundCB"])->isChecked();
+        b_checked = m_subtitlesUI.backgroundCheck->isChecked();
         if( b_checked && config_GetInt( "freetype-background-opacity" ) == 0 ) {
             config_PutInt( "freetype-background-opacity", 128 );
         }
@@ -1320,7 +1293,7 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 
 void SPrefsPanel::changeStyle()
 {
-    QApplication::setStyle( getQStyleKey( qobject_cast<QComboBox *>( optionWidgets["styleCB"] )
+    QApplication::setStyle( getQStyleKey( m_interfaceUI.stylesCombo
                                         , qApp->property("initialStyle").toString() ) );
 
     /* force refresh on all widgets */
