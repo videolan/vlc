@@ -138,8 +138,13 @@ void vlc_clock_Delete(vlc_clock_t *clock);
 
 /**
  * This function will update the clock drift and returns the drift
+ *
+ * @param clock the clock setter to update
  * @param system_now valid system time or VLC_TICK_MAX is the updated point is
- * forced (when paused for example)
+ *        forced (when paused for example)
+ * @param ts the timestamp in media time for the updated point
+ * @param rate the current playback speed
+ *
  * @return a valid drift relative time, VLC_TICK_INVALID if there is no drift
  * (clock is master) or VLC_TICK_MAX if the clock is paused
  */
