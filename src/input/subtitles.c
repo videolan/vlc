@@ -213,7 +213,7 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
  * \param p_this the calling \ref input_thread_t
  * \param psz_path a list of subdirectories (separated by a ',') to look in.
  * \param psz_name_org the complete filename to base the search on.
- * \param pp_slaves an initialized input item slave list to append detected subtitles to
+ * \param ppp_slaves an initialized input item slave list to append detected subtitles to
  * \param p_slaves pointer to the size of the slave list
  * \return VLC_SUCCESS if ok
  */
