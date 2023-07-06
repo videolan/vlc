@@ -88,9 +88,6 @@ static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
 }
 
 #undef filter_chain_NewSPU
-/**
- * Filter chain initialisation
- */
 filter_chain_t *filter_chain_NewSPU( vlc_object_t *obj, const char *cap )
 {
     return filter_chain_NewInner( obj, cap, NULL, false, SPU_ES );
@@ -169,9 +166,6 @@ void filter_chain_Clear( filter_chain_t *p_chain )
         filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
 }
 
-/**
- * Filter chain destruction
- */
 void filter_chain_Delete( filter_chain_t *p_chain )
 {
     filter_chain_Clear( p_chain );
