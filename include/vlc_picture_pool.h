@@ -130,4 +130,3 @@ unsigned picture_pool_GetSize(const picture_pool_t *);
 
 
 #endif /* VLC_PICTURE_POOL_H */
-
