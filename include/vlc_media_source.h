@@ -359,4 +359,3 @@ vlc_media_source_meta_list_Delete(vlc_media_source_meta_list_t *);
 #endif
 
 #endif
-
