@@ -293,11 +293,12 @@ enum stream_query_e
  * If the buffer is NULL, data is skipped instead of read. This is effectively
  * a relative forward seek, but it works even on non-seekable streams.
  *
+ * \param s the stream object to read from
  * \param buf start of buffer to read data into [OUT]
  * \param len number of bytes to read
  * \return the number of bytes read or a negative value on error.
  */
-VLC_API ssize_t vlc_stream_Read(stream_t *, void *buf, size_t len) VLC_USED;
+VLC_API ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len) VLC_USED;
 
 /**
  * Reads partial data from a byte stream.
@@ -309,11 +310,12 @@ VLC_API ssize_t vlc_stream_Read(stream_t *, void *buf, size_t len) VLC_USED;
  * bytes count. It can return a short count even before the end of the stream
  * and in the absence of any error.
  *
+ * \param s the stream object to read from
  * \param buf start of buffer to read data into [OUT]
  * \param len buffer size (maximum number of bytes to read)
  * \return the number of bytes read, 0 on end of stream or -1 if no data available
  */
-VLC_API ssize_t vlc_stream_ReadPartial(stream_t *, void *buf, size_t len)
+VLC_API ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
 VLC_USED;
 
 /**
@@ -327,12 +329,14 @@ VLC_USED;
  * The buffer remains valid until the next read/peek or seek operation on the
  * same stream. In case of error, the buffer address is undefined.
  *
+ * \param s the stream object to peek from
  * \param bufp storage space for the buffer address [OUT]
  * \param len number of bytes to peek
  * \return the number of bytes actually available (shorter than requested if
  * the end-of-stream is reached), or a negative value on error.
  */
-VLC_API ssize_t vlc_stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
+VLC_API ssize_t vlc_stream_Peek(stream_t *s, const uint8_t **bufp, size_t len)
+VLC_USED;
 
 /**
  * Reads a data block from a byte stream.
@@ -394,10 +398,11 @@ VLC_API bool vlc_stream_Eof(const stream_t *) VLC_USED;
  *
  * @note It is possible (but not useful) to seek past the end of a stream.
  *
+ * \param s the stream object to seek from
  * @param offset byte offset from the beginning of the stream
  * @return zero on success, a negative value on error
  */
-VLC_API int vlc_stream_Seek(stream_t *, uint64_t offset) VLC_USED;
+VLC_API int vlc_stream_Seek(stream_t *s, uint64_t offset) VLC_USED;
 
 VLC_API int vlc_stream_vaControl(stream_t *s, int query, va_list args);
 
