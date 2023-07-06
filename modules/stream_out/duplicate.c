@@ -283,31 +283,22 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
-    /* Loop through the linked list of buffers */
-    while( p_buffer )
+    /* Should be ensured in `Add`. */
+    assert(id->dup_ids.size > 0);
+
+    for( size_t i = 0; i < id->dup_ids.size - 1; i++ )
     {
-        block_t *p_next = p_buffer->p_next;
+        duplicated_id_t *dup_id = &id->dup_ids.data[i];
 
-        p_buffer->p_next = NULL;
-
-        /* Should be ensured in `Add`. */
-        assert(id->dup_ids.size > 0);
-
-        for( size_t i = 0; i < id->dup_ids.size - 1; i++ )
-        {
-            duplicated_id_t *dup_id = &id->dup_ids.data[i];
-
-            block_t *p_dup = block_Duplicate( p_buffer );
-            if( p_dup )
-                sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
-        }
-
-        duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
-        sout_StreamIdSend(
-            last_dup_id->stream_owner, last_dup_id->id, p_buffer );
-
-        p_buffer = p_next;
+        block_t *p_dup = block_Duplicate( p_buffer );
+        if( p_dup )
+            sout_StreamIdSend( dup_id->stream_owner, dup_id->id, p_dup );
     }
+
+    duplicated_id_t *last_dup_id = vlc_vector_last_ref( &id->dup_ids );
+    sout_StreamIdSend(
+        last_dup_id->stream_owner, last_dup_id->id, p_buffer );
+
     return VLC_SUCCESS;
     (void)p_stream;
 }
