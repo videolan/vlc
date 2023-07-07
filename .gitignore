@@ -20,6 +20,7 @@
 .dirstamp
 ABOUT-NLS
 aclocal.m4
+Cargo.lock
 ChangeLog
 compile
 config.status
@@ -50,6 +51,8 @@ patches/*
 
 # Ignore build dirs
 build*/
+target*/
 contrib-*
 install-*
+!build.rs
 !extras/package/apple/build.sh
