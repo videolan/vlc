@@ -258,8 +258,8 @@ public:
      * If hold is false, then the caller transfers the ownership to this
      * wrapper.
      *
-     * \param ptr  the raw pointer (can be nullptr)
-     * \param hold whether the resource must be hold
+     * \param newptr  the raw pointer (can be nullptr)
+     * \param hold    whether the resource must be hold
      */
     void reset(T *newptr = nullptr, bool hold = true)
     {
