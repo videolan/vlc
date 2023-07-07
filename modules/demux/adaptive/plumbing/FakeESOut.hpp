@@ -89,6 +89,7 @@ namespace adaptive
             void resetTimestamps();
             size_t esCount() const;
             bool hasSelectedEs() const;
+            bool hasSelectedEs(const AbstractFakeESOutID *) const;
             bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );

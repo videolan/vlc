@@ -283,7 +283,7 @@ void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
                    Otherwise the es will select any other compatible track
                    and will end this in a activate/select loop when reactivating a track */
                 if( !b_select )
-                    es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, cand->realESID(), &b_select );
+                    b_select = hasSelectedEs( cand );
             }
             else /* replace format instead of new ES */
             {
@@ -435,19 +435,25 @@ void FakeESOut::gc()
 
 bool FakeESOut::hasSelectedEs() const
 {
-    bool b_selected = false;
     std::list<FakeESOutID *> const * lists[2] = {&declared, &fakeesidlist};
     std::list<FakeESOutID *>::const_iterator it;
     for(int i=0; i<2; i++)
+        for( it=lists[i]->begin(); it!=lists[i]->end(); ++it )
+            if( hasSelectedEs( *it ) )
+                return true;
+    return false;
+}
+
+bool FakeESOut::hasSelectedEs(const AbstractFakeESOutID *id) const
+{
+    if( id->realESID() )
     {
-        for( it=lists[i]->begin(); it!=lists[i]->end() && !b_selected; ++it )
-        {
-            FakeESOutID *esID = *it;
-            if( esID->realESID() )
-                es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, esID->realESID(), &b_selected );
-        }
+        bool b_selected;
+        return es_out_Control( real_es_out, ES_OUT_GET_ES_STATE,
+                               id->realESID(), &b_selected ) == VLC_SUCCESS
+               && b_selected;
     }
-    return b_selected;
+    return false;
 }
 
 bool FakeESOut::decodersDrained()
