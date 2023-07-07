@@ -104,6 +104,7 @@ Slider {
         signal pressControl(real position, bool forcePrecise)
         signal releaseControl(real position, bool forcePrecise)
         signal moveControl(real position, bool forcePrecise)
+        signal inputChanged()
 
         //each signal is associated to a key, when a signal is received,
         //transitions of active state for the given key are evaluated
@@ -111,10 +112,15 @@ Slider {
             "playerUpdatePosition": fsm.playerUpdatePosition,
             "pressControl": fsm.pressControl,
             "releaseControl": fsm.releaseControl,
-            "moveControl": fsm.moveControl
+            "moveControl": fsm.moveControl,
+            "inputChanged": fsm.inputChanged
         })
 
         initialState: fsmReleased
+
+        function _setPositionFromValue(position) {
+            control.value = position
+        }
 
         function _seekToPosition(position, threshold, forcePrecise) {
             position = Helpers.clamp(position, 0., 1.)
@@ -159,6 +165,26 @@ Slider {
                 },
                 "releaseControl": {
                     target: fsmReleased
+                },
+                "inputChanged": {
+                    target: fsmHeldWrongInput
+                }
+            })
+        }
+
+        Util.FSMState  {
+            id: fsmHeldWrongInput
+
+            function enter() {
+                fsm._setPositionFromValue(Player.position)
+            }
+
+            transitions: ({
+                "playerUpdatePosition": {
+                    action: fsm._setPositionFromValue
+                },
+                "releaseControl": {
+                    target: fsmReleased
                 }
             })
         }
@@ -167,6 +193,7 @@ Slider {
     Connections {
         target: Player
         onPositionChanged: fsm.playerUpdatePosition(Player.position)
+        onInputChanged: fsm.inputChanged()
     }
 
     Component.onCompleted: value = Player.position
