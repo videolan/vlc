@@ -100,6 +100,9 @@ if host_system == 'darwin'
     add_languages('objc', native: false)
 endif
 
+# Rust build system
+cargo_bin = find_program('cargo', required: get_option('rust'))
+
 #
 # General feature defines
 #
@@ -1023,6 +1026,13 @@ subdir('bin')
 
 # VLC plugins
 subdir('modules')
+
+if get_option('rust').allowed()
+    warning('''
+    The Rust module support is currently EXPERIMENTAL and INCOMPLETE.
+    Testing and reporting or contributing missing plugins and features is welcome!
+    ''')
+endif
 
 warning('''
     The Meson build system of VLC is currently EXPERIMENTAL and INCOMPLETE.
