@@ -27,7 +27,7 @@
  * C++ memory management helpers
  ******************************************************************************/
 
-#ifdef __cplusplus
+#if defined(__cplusplus) || defined(DOC)
 
 #include <memory>
 #include <utility>
@@ -276,7 +276,7 @@ public:
     ::vlc::vlc_shared_data_ptr<type, decltype(&hold), decltype(&release), \
                                &hold, &release>
 
-#ifdef VLC_THREADS_H_
+#if defined(VLC_THREADS_H_) || defined(DOC)
 
 namespace threads
 {
