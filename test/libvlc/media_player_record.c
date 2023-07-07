@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include "test.h"
+#include "media_player.h"
 #include <vlc_common.h>
 
 static void test_media_player_record(const char** argv, int argc)
@@ -46,11 +47,11 @@ static void test_media_player_record(const char** argv, int argc)
     libvlc_media_release (md);
 
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
-    struct event_ctx ctx;
-    event_ctx_init(&ctx);
+    struct mp_event_ctx ctx;
+    mp_event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerRecordChanged, event_ctx_on_event, &ctx);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerRecordChanged, mp_event_ctx_on_event, &ctx);
     assert(!res);
 
     libvlc_media_player_play (mp);
@@ -62,20 +63,20 @@ static void test_media_player_record(const char** argv, int argc)
 
     /* Enabling */
     {
-        const struct libvlc_event_t *ev = event_ctx_wait_event(&ctx);
+        const struct libvlc_event_t *ev = mp_event_ctx_wait_event(&ctx);
         assert(ev->u.media_player_record_changed.recording);
-        event_ctx_release(&ctx);
+        mp_event_ctx_release(&ctx);
     }
 
     /* Disabling */
     {
         libvlc_media_player_record(mp, false, path);
-        const struct libvlc_event_t *ev = event_ctx_wait_event(&ctx);
+        const struct libvlc_event_t *ev = mp_event_ctx_wait_event(&ctx);
         assert(!ev->u.media_player_record_changed.recording);
         assert(ev->u.media_player_record_changed.recorded_file_path != NULL);
         filepath = strdup(ev->u.media_player_record_changed.recorded_file_path);
         assert(filepath != NULL);
-        event_ctx_release(&ctx);
+        mp_event_ctx_release(&ctx);
     }
 
     libvlc_media_player_stop_async (mp);
