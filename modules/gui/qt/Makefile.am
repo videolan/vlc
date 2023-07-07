@@ -644,7 +644,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/atob.svg \
 	gui/qt/pixmaps/icons/audiosub.svg \
 	gui/qt/pixmaps/icons/back.svg \
-	gui/qt/pixmaps/icons/bookmark.svg \
+	gui/qt/pixmaps/icons/ic_fluent_bookmark.svg \
 	gui/qt/pixmaps/icons/breadcrumb_prev.svg \
 	gui/qt/pixmaps/icons/breadcrumb_sep.svg \
 	gui/qt/pixmaps/icons/check.svg \
@@ -694,7 +694,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_shuffle.svg \
 	gui/qt/pixmaps/icons/ic_fluent_skip_back_10.svg \
 	gui/qt/pixmaps/icons/ic_fluent_skip_forward_10.svg \
-	gui/qt/pixmaps/icons/snapshot.svg \
+	gui/qt/pixmaps/icons/ic_fluent_camera.svg \
 	gui/qt/pixmaps/icons/space.svg \
 	gui/qt/pixmaps/icons/ic_fluent_stop.svg \
 	gui/qt/pixmaps/icons/stream.svg \
