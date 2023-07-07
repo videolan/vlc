@@ -1,2 +1,4 @@
 [workspace]
-members = []
+members = [
+    "vlcrs-sys-generator"
+]
