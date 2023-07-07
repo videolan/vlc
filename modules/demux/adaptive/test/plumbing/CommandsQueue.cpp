@@ -75,7 +75,7 @@ class TestEsOutID : public AbstractFakeESOutID
     public:
         TestEsOutID(TestEsOut *out) { this->out = out; }
         virtual ~TestEsOutID() {}
-        virtual es_out_id_t * realESID() override { return nullptr; }
+        virtual es_out_id_t * realESID() const override { return nullptr; }
         virtual void create() override {}
         virtual void release() override {}
         virtual void sendData(block_t *b) override

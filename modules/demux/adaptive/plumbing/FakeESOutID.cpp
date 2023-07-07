@@ -70,7 +70,7 @@ void FakeESOutID::release()
     fakeesout->recycle( this );
 }
 
-es_out_id_t * FakeESOutID::realESID()
+es_out_id_t * FakeESOutID::realESID() const
 {
     return p_real_es_id;
 }

@@ -38,7 +38,7 @@ namespace adaptive
     {
         public:
             virtual ~AbstractFakeESOutID() = default;
-            virtual es_out_id_t * realESID() = 0;
+            virtual es_out_id_t * realESID() const = 0;
             virtual void create() = 0;
             virtual void release() = 0;
             virtual void sendData(block_t *) = 0;
@@ -51,7 +51,7 @@ namespace adaptive
             FakeESOutID( FakeESOut *, const es_format_t * );
             virtual ~FakeESOutID();
             void setRealESID( es_out_id_t * );
-            virtual es_out_id_t * realESID() override;
+            virtual es_out_id_t * realESID() const override;
             const es_format_t *getFmt() const;
             virtual void create() override;
             virtual void release() override;
