@@ -235,10 +235,10 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
  **/
 void VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
 {
-    addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/menu/settings.svg",
+    addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/menu/ic_fluent_options.svg",
             &DialogsProvider::extendedDialog, "Ctrl+E" );
 
-    addDPStaticEntry( menu, qtr( "&Track Synchronization"), ":/menu/setting.svgs",
+    addDPStaticEntry( menu, qtr( "&Track Synchronization"), ":/menu/ic_fluent_options.svg",
             &DialogsProvider::synchroDialog, "" );
 
     addDPStaticEntry( menu, qfut( I_MENU_INFO ) , ":/menu/info.svg",

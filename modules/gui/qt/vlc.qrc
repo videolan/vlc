@@ -43,7 +43,7 @@
         <file alias="ic_fluent_arrow_repeat_1.svg">pixmaps/menu/ic_fluent_arrow_repeat_1.svg</file>
         <file alias="ic_fluent_rewind.svg">pixmaps/menu/ic_fluent_rewind.svg</file>
         <file alias="search_clear.svg">pixmaps/menu/search_clear.svg</file>
-        <file alias="settings.svg">pixmaps/menu/settings.svg</file>
+        <file alias="ic_fluent_options.svg">pixmaps/menu/ic_fluent_options.svg</file>
         <file alias="ic_fluent_arrow_shuffle.svg">pixmaps/menu/ic_fluent_arrow_shuffle.svg</file>
         <file alias="ic_fluent_skip_back_10.svg">pixmaps/menu/ic_fluent_skip_back_10.svg</file>
         <file alias="ic_fluent_skip_forward_10.svg">pixmaps/menu/ic_fluent_skip_forward_10.svg</file>

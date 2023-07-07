@@ -458,7 +458,7 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
     objLayout->addWidget( time, 1, 3, 1, 2 );*/
 
     QToolButton *modifyButton = new QToolButton;
-    modifyButton->setIcon( QIcon( ":/menu/settings.svg" ) );
+    modifyButton->setIcon( QIcon( ":/menu/ic_fluent_options.svg" ) );
     modifyButton->setToolTip( qtr("Change") );
     objLayout->addWidget( modifyButton, 0, 5 );
 

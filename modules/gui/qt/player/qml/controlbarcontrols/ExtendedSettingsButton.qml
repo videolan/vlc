@@ -26,7 +26,7 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: extdSettingsBtn
 
-    iconText: VLCIcons.extended
+    iconText: VLCIcons.effect_filter
 
     text: I18n.qtr("Extended settings")
 
