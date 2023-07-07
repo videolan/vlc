@@ -94,7 +94,7 @@ Slider {
             return _text
         }
 
-        pos: Qt.point(sliderRectMouseArea.containsMouse ? sliderRectMouseArea.mouseX
+        pos: Qt.point(sliderRectMouseArea.containsMouse ? Helpers.clamp(sliderRectMouseArea.mouseX, 0, sliderRectMouseArea.width)
                                                         : (control.visualPosition * control.width), 0)
     }
 
