@@ -596,14 +596,6 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     case TONEMAP_SPLINE:    params->tone_mapping_function = &pl_tone_map_spline; break;
     }
 
-    switch (var_InheritInteger(obj, PREFIX("tone-mapping-mode"))) {
-    case TONEMAP_MODE_AUTO: break;
-    case TONEMAP_MODE_RGB:      params->tone_mapping_mode = PL_TONE_MAP_RGB; break;
-    case TONEMAP_MODE_MAX:      params->tone_mapping_mode = PL_TONE_MAP_MAX; break;
-    case TONEMAP_MODE_HYBRID:   params->tone_mapping_mode = PL_TONE_MAP_HYBRID; break;
-    case TONEMAP_MODE_LUMA:     params->tone_mapping_mode = PL_TONE_MAP_LUMA; break;
-    }
-
     switch (var_InheritInteger(obj, PREFIX("gamut-mode"))) {
     case GAMUT_MODE_CLIP:   params->gamut_mode = PL_GAMUT_CLIP; break;
     case GAMUT_MODE_WARN:   params->gamut_mode = PL_GAMUT_WARN; break;

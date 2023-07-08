@@ -76,9 +76,7 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
             change_integer_list(tone_values, tone_text) \
     add_float(prefix"-tone-mapping-param", pl_color_map_default_params.tone_mapping_param, \
             TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT) \
-    add_integer(prefix"-tone-mapping-mode", TONEMAP_MODE_AUTO, \
-            TONEMAP_MODE_TEXT, TONEMAP_MODE_LONGTEXT) \
-            change_integer_list(tone_mode_values, tone_mode_text) \
+    add_obsolete_integer(prefix"-tone-mapping-mode") /* since 4.0.0 */ \
     add_integer(prefix"-gamut-mode", GAMUT_MODE_CLIP, \
             GAMUT_MODE_TEXT, GAMUT_MODE_LONGTEXT) \
             change_integer_list(gamut_mode_values, gamut_mode_text) \
@@ -286,33 +284,6 @@ static const char * const tone_text[] = {
 
 #define TONEMAP_PARAM_TEXT "Tone-mapping parameter"
 #define TONEMAP_PARAM_LONGTEXT "This parameter can be used to tune the tone-mapping curve. Specifics depend on the curve used. If left as 0, the curve's preferred default is used."
-
-enum {
-    TONEMAP_MODE_AUTO,
-    TONEMAP_MODE_RGB,
-    TONEMAP_MODE_MAX,
-    TONEMAP_MODE_HYBRID,
-    TONEMAP_MODE_LUMA,
-};
-
-static const int tone_mode_values[] = {
-    TONEMAP_MODE_AUTO,
-    TONEMAP_MODE_RGB,
-    TONEMAP_MODE_MAX,
-    TONEMAP_MODE_HYBRID,
-    TONEMAP_MODE_LUMA,
-};
-
-static const char * const tone_mode_text[] = {
-    "Automatic selection (recommended)",
-    "Per-channel (RGB)",
-    "Maximum component",
-    "Hybrid luminance",
-    "ITU-R BT.2446a luminance",
-};
-
-#define TONEMAP_MODE_TEXT "Tone-mapping mode"
-#define TONEMAP_MODE_LONGTEXT "Determines what colorspace/component to apply the chosen tone-mapping curve to."
 
 enum {
     GAMUT_MODE_CLIP,
