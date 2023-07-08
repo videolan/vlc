@@ -725,6 +725,13 @@ vlc_module_begin ()
     add_float("pl-scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
             SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT)
 
+#if PL_API_VER >= 285
+    add_float_with_range("pl-contrast-recovery", pl_color_map_default_params.contrast_recovery,
+            0., 3., CONTRAST_RECOVERY_TEXT, CONTRAST_RECOVERY_LONGTEXT)
+    add_float_with_range("pl-contrast-smoothness", pl_color_map_default_params.contrast_smoothness,
+            0., 10., CONTRAST_SMOOTHNESS_TEXT, CONTRAST_SMOOTHNESS_LONGTEXT)
+#endif
+
     set_section("Dithering", NULL)
     add_integer("pl-dither", -1,
             DITHER_TEXT, DITHER_LONGTEXT)
@@ -829,6 +836,11 @@ static void UpdateParams(vout_display_t *vd)
 #endif
     if (sys->peak_detect.smoothing_period > 0.0)
         sys->params.peak_detect_params = &sys->peak_detect;
+
+#if PL_API_VER >= 285
+    sys->color_map.contrast_recovery = var_InheritFloat(vd, "pl-contrast-recovery");
+    sys->color_map.contrast_smoothness = var_InheritFloat(vd, "pl-contrast-smoothness");
+#endif
 
     int preset = var_InheritInteger(vd, "pl-upscaler-preset");
     sys->params.upscaler = scale_config[preset];

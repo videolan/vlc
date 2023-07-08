@@ -326,6 +326,12 @@ static const char * const gamut_text[] = {
 #define SCENE_THRESHOLD_HIGH_TEXT "Scene change upper threshold"
 #define SCENE_THRESHOLD_HIGH_LONGTEXT "This sets the upper boundary of a brightness change indicating a scene change. Brightness changes that exceed this value will instantly replace the detected peak, bypassing all smoothing. Setting this to a negative number disables this logic."
 
+#define CONTRAST_RECOVERY_TEXT "HDR contrast recovery strength"
+#define CONTRAST_RECOVERY_LONGTEXT "This sets the strength of the HDR contrast recovery algorithms. Higher values indicate more contrast boosting."
+
+#define CONTRAST_SMOOTHNESS_TEXT "HDR contrast recovery smoothness"
+#define CONTRAST_SMOOTHNESS_LONGTEXT "This sets the smoothness (lowpass frequency) of the HDR contrast recovery algorithm."
+
 #define DITHER_TEXT "Dithering algorithm"
 #define DITHER_LONGTEXT "The algorithm to use when dithering to a lower bit depth."
 
