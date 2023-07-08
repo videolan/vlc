@@ -33,6 +33,7 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/CompatibilityFixes.h"
+#import "main/VLCMain.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
@@ -270,9 +271,17 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == _groupsTableView) {
-        return 2;
+        const BOOL anyRecents = self.libraryModel.numberOfRecentMedia > 0;
+        return anyRecents ? 2 : 1;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
+        // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
+        // Additionally, we hide recents when there are no recent media items. Since the recent group
+        // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
+        // defined in the desired order.
+        const BOOL anyRecents = self.libraryModel.numberOfRecentMedia > 0;
+        const NSUInteger selectedRowAdjustment = anyRecents ? 1 : 2;
+        
+        switch(_groupsTableView.selectedRow + selectedRowAdjustment) {
             case VLCLibraryVideoRecentsGroup:
                 return _recentsArray.count;
             case VLCLibraryVideoLibraryGroup:
@@ -297,7 +306,14 @@
                                        forTableView:(NSTableView *)tableView
 {
     if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
+        // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
+        // Additionally, we hide recents when there are no recent media items. Since the recent group
+        // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
+        // defined in the desired order.
+        const BOOL anyRecents = self.libraryModel.numberOfRecentMedia > 0;
+        const NSUInteger rowAdjustment = anyRecents ? 1 : 2;
+
+        switch(_groupsTableView.selectedRow + rowAdjustment) {
             case VLCLibraryVideoRecentsGroup:
                 return _recentsArray[row];
             case VLCLibraryVideoLibraryGroup:
