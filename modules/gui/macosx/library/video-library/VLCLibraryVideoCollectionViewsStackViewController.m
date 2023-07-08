@@ -25,12 +25,15 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+
+#import "main/VLCMain.h"
 
 #import "views/VLCSubScrollView.h"
 
@@ -59,8 +62,11 @@
 - (void)generateCollectionViewContainers
 {
     NSMutableArray * const collectionViewContainers = [[NSMutableArray alloc] init];
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
+    const BOOL anyRecents = model.numberOfRecentMedia > 0;
+    NSUInteger i = anyRecents ? VLCLibraryVideoRecentsGroup : VLCLibraryVideoRecentsGroup + 1;
 
-    for (NSUInteger i = VLCLibraryVideoRecentsGroup; i < VLCLibraryVideoSentinel; ++i) {
+    for (; i < VLCLibraryVideoSentinel; ++i) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = i;
         [collectionViewContainers addObject:containerView];
