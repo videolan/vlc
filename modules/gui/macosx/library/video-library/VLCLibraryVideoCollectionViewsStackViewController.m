@@ -58,10 +58,10 @@
 
 - (void)generateCollectionViewContainers
 {
-    NSMutableArray *collectionViewContainers = [[NSMutableArray alloc] init];
+    NSMutableArray * const collectionViewContainers = [[NSMutableArray alloc] init];
 
     for (NSUInteger i = VLCLibraryVideoRecentsGroup; i < VLCLibraryVideoSentinel; ++i) {
-        VLCLibraryVideoCollectionViewContainerView *containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
+        VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = i;
         [collectionViewContainers addObject:containerView];
     }
