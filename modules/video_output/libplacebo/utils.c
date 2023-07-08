@@ -391,26 +391,25 @@ struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *fmt)
         [TRANSFER_FUNC_SMPTE_240]   = PL_COLOR_TRC_BT_1886,
     };
 
-    // Derive the signal peak/avg from the color light level metadata
-    float sig_peak = fmt->lighting.MaxCLL / PL_COLOR_REF_WHITE;
-    float sig_avg = fmt->lighting.MaxFALL / PL_COLOR_REF_WHITE;
-
-    // As a fallback value for the signal peak, we can also use the mastering
-    // metadata's luminance information
-    if (!sig_peak)
-        sig_peak = fmt->mastering.max_luminance / (10000.0 * PL_COLOR_REF_WHITE);
-
-    // Sanitize the sig_peak/sig_avg, because of buggy or low quality tagging
-    // that's sadly common in lots of typical sources
-    sig_peak = (sig_peak > 1.0 && sig_peak <= 100.0) ? sig_peak : 0.0;
-    sig_avg  = (sig_avg >= 0.0 && sig_avg <= 1.0) ? sig_avg : 0.0;
-
     return (struct pl_color_space) {
         .primaries = primaries[fmt->primaries],
         .transfer  = transfers[fmt->transfer],
-        .light     = PL_COLOR_LIGHT_UNKNOWN,
-        .sig_peak  = sig_peak,
-        .sig_avg   = sig_avg,
+        .hdr = {
+            .prim = {
+                .green.x = fmt->mastering.primaries[0],
+                .green.y = fmt->mastering.primaries[1],
+                .blue.x  = fmt->mastering.primaries[2],
+                .blue.y  = fmt->mastering.primaries[3],
+                .red.x   = fmt->mastering.primaries[4],
+                .red.y   = fmt->mastering.primaries[5],
+                .white.x = fmt->mastering.white_point[0],
+                .white.y = fmt->mastering.white_point[1],
+            },
+            .min_luma = fmt->mastering.min_luminance,
+            .max_luma = fmt->mastering.max_luminance,
+            .max_cll = fmt->lighting.MaxCLL,
+            .max_fall = fmt->lighting.MaxFALL,
+        },
     };
 }
 
