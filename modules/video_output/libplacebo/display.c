@@ -73,9 +73,7 @@ typedef struct vout_display_sys_t
     const struct pl_hook *hook;
     char *hook_path;
 
-#if PL_API_VER >= 185
     struct pl_dovi_metadata dovi_metadata;
-#endif
 } vout_display_sys_t;
 
 // Display callbacks
@@ -246,9 +244,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         },
     };
 
-#if PL_API_VER >= 185
     vlc_placebo_frame_DoviMetadata(&img, pic, &sys->dovi_metadata);
-#endif
 
     struct vlc_ancillary *iccp = picture_GetAncillary(pic, VLC_ANCILLARY_ID_ICC);
     if (iccp) {
@@ -316,7 +312,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         place.height = -place.height;
     }
 
-#if PL_API_VER >= 162
 #define SWAP(a, b) { float _tmp = (a); (a) = (b); (b) = _tmp; }
     switch (vd->fmt->orientation) {
     case ORIENT_HFLIPPED:
@@ -344,7 +339,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     default:
         break;
     }
-#endif
 
     target.crop = (struct pl_rect2df) {
         place.x, place.y, place.x + place.width, place.y + place.height,
@@ -353,12 +347,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     // Override the target colorimetry only if the user requests it
     if (sys->target.primaries)
         target.color.primaries = sys->target.primaries;
-    if (sys->target.transfer) {
+    if (sys->target.transfer)
         target.color.transfer = sys->target.transfer;
-#if PL_API_VER < 189
-        target.color.light = PL_COLOR_LIGHT_UNKNOWN; // re-infer
-#endif
-    }
     if (sys->dither_depth > 0) {
         // override the sample depth without affecting the color encoding
         struct pl_bit_encoding *bits = &target.repr.bits;
