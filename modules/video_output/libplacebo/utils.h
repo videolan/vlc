@@ -43,7 +43,6 @@ enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 void vlc_placebo_HdrMetadata(const vlc_video_hdr_dynamic_metadata_t *src,
                              struct pl_hdr_metadata *dst);
 
-#if PL_API_VER >= 185
 // Map raw dolby vision metadata struct
 void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
                               struct pl_dovi_metadata *dst);
@@ -51,7 +50,6 @@ void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
 // Map metadata from frame if present, using `data` as storage
 void vlc_placebo_frame_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
                                     struct pl_dovi_metadata *data);
-#endif
 
 int vlc_placebo_PlaneComponents(const video_format_t *, struct pl_plane[4]);
 
@@ -69,15 +67,11 @@ bool vlc_placebo_FormatSupported(pl_gpu, vlc_fourcc_t);
 void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
                                 struct pl_color_map_params *out_params);
 
-#if PL_API_VER >= 188
-# define add_placebo_extra_color_map_opts(prefix) \
+#define add_placebo_extra_color_map_opts(prefix) \
     add_bool(prefix"-inverse-tone-mapping", false, \
             INVERSE_TONEMAPPING_TEXT, INVERSE_TONEMAPPING_LONGTEXT) \
     add_float(prefix"-crosstalk", pl_color_map_default_params.tone_mapping_crosstalk, \
             CROSSTALK_TEXT, CROSSTALK_LONGTEXT)
-#else
-# define add_placebo_extra_color_map_opts(prefix)
-#endif
 
 #define add_placebo_color_map_opts(prefix) \
     add_integer(prefix"-rendering-intent", pl_color_map_default_params.intent, \
@@ -260,10 +254,8 @@ enum {
     TONEMAP_HABLE,
     TONEMAP_GAMMA,
     TONEMAP_LINEAR,
-#if PL_API_VER >= 188
     TONEMAP_BT2446A,
     TONEMAP_SPLINE,
-#endif
 };
 
 static const int tone_values[] = {
@@ -275,10 +267,8 @@ static const int tone_values[] = {
     TONEMAP_HABLE,
     TONEMAP_GAMMA,
     TONEMAP_LINEAR,
-#if PL_API_VER >= 188
     TONEMAP_BT2446A,
     TONEMAP_SPLINE,
-#endif
 };
 
 static const char * const tone_text[] = {
@@ -290,10 +280,8 @@ static const char * const tone_text[] = {
     "Hable (filmic mapping)",
     "Gamma-Power law",
     "Perceptually linear stretch",
-#if PL_API_VER >= 188
     "ITU-R BT.2446 method A",
     "Single-pivot spline",
-#endif
 };
 
 #define TONEMAP_FUNC_TEXT "Tone-mapping function"
@@ -307,9 +295,7 @@ enum {
     TONEMAP_MODE_RGB,
     TONEMAP_MODE_MAX,
     TONEMAP_MODE_HYBRID,
-#if PL_API_VER >= 188
     TONEMAP_MODE_LUMA,
-#endif
 };
 
 static const int tone_mode_values[] = {
@@ -317,9 +303,7 @@ static const int tone_mode_values[] = {
     TONEMAP_MODE_RGB,
     TONEMAP_MODE_MAX,
     TONEMAP_MODE_HYBRID,
-#if PL_API_VER >= 188
     TONEMAP_MODE_LUMA,
-#endif
 };
 
 static const char * const tone_mode_text[] = {
@@ -327,9 +311,7 @@ static const char * const tone_mode_text[] = {
     "Per-channel (RGB)",
     "Maximum component",
     "Hybrid luminance",
-#if PL_API_VER >= 188
     "ITU-R BT.2446a luminance",
-#endif
 };
 
 #define TONEMAP_MODE_TEXT "Tone-mapping mode"
@@ -339,27 +321,21 @@ enum {
     GAMUT_MODE_CLIP,
     GAMUT_MODE_WARN,
     GAMUT_MODE_DESAT,
-#if PL_API_VER >= 190
     GAMUT_MODE_DARKEN,
-#endif
 };
 
 static const int gamut_mode_values[] = {
     GAMUT_MODE_CLIP,
     GAMUT_MODE_WARN,
     GAMUT_MODE_DESAT,
-#if PL_API_VER >= 190
     GAMUT_MODE_DARKEN,
-#endif
 };
 
 static const char * const gamut_mode_text[] = {
     "Hard clip",
     "Highlight invalid pixels",
     "Colorimetrically desaturate",
-#if PL_API_VER >= 190
     "Darken image",
-#endif
 };
 
 #define GAMUT_MODE_TEXT "Out-of-gamut handling"

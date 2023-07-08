@@ -473,7 +473,6 @@ void vlc_placebo_HdrMetadata(const vlc_video_hdr_dynamic_metadata_t *src,
 #endif
 }
 
-#if PL_API_VER >= 185
 void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
                               struct pl_dovi_metadata *dst)
 {
@@ -542,7 +541,6 @@ void vlc_placebo_frame_DoviMetadata(struct pl_frame *frame, const picture_t *pic
     frame->color.hdr.max_luma = pl_hdr_rescale(PL_HDR_PQ, PL_HDR_NITS,
                                                scale * src->source_max_pq);
 }
-#endif
 
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *fmt)
 {
@@ -588,7 +586,6 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
 
     switch (var_InheritInteger(obj, PREFIX("tone-mapping-function"))) {
     case TONEMAP_AUTO:      break;
-#if PL_API_VER >= 188
     case TONEMAP_CLIP:      params->tone_mapping_function = &pl_tone_map_clip; break;
     case TONEMAP_BT2390:    params->tone_mapping_function = &pl_tone_map_bt2390; break;
     case TONEMAP_REINHARD:  params->tone_mapping_function = &pl_tone_map_reinhard; break;
@@ -598,53 +595,23 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     case TONEMAP_LINEAR:    params->tone_mapping_function = &pl_tone_map_linear; break;
     case TONEMAP_BT2446A:   params->tone_mapping_function = &pl_tone_map_bt2446a; break;
     case TONEMAP_SPLINE:    params->tone_mapping_function = &pl_tone_map_spline; break;
-#else
-    case TONEMAP_CLIP:      params->tone_mapping_algo = PL_TONE_MAPPING_CLIP; break;
-    case TONEMAP_BT2390:    params->tone_mapping_algo = PL_TONE_MAPPING_BT_2390; break;
-    case TONEMAP_REINHARD:  params->tone_mapping_algo = PL_TONE_MAPPING_REINHARD; break;
-    case TONEMAP_MOBIUS:    params->tone_mapping_algo = PL_TONE_MAPPING_MOBIUS; break;
-    case TONEMAP_HABLE:     params->tone_mapping_algo = PL_TONE_MAPPING_HABLE; break;
-    case TONEMAP_GAMMA:     params->tone_mapping_algo = PL_TONE_MAPPING_GAMMA; break;
-    case TONEMAP_LINEAR:    params->tone_mapping_algo = PL_TONE_MAPPING_LINEAR; break;
-#endif
     }
 
     switch (var_InheritInteger(obj, PREFIX("tone-mapping-mode"))) {
     case TONEMAP_MODE_AUTO: break;
-#if PL_API_VER >= 188
     case TONEMAP_MODE_RGB:      params->tone_mapping_mode = PL_TONE_MAP_RGB; break;
     case TONEMAP_MODE_MAX:      params->tone_mapping_mode = PL_TONE_MAP_MAX; break;
     case TONEMAP_MODE_HYBRID:   params->tone_mapping_mode = PL_TONE_MAP_HYBRID; break;
     case TONEMAP_MODE_LUMA:     params->tone_mapping_mode = PL_TONE_MAP_LUMA; break;
-#else
-    case TONEMAP_MODE_RGB:
-        params->desaturation_strength = 1.0f;
-        params->desaturation_exponent = 0.0f;
-        break;
-    case TONEMAP_MODE_HYBRID:
-        // Use default values
-        break;
-    case TONEMAP_MODE_MAX:
-        params->desaturation_strength = 0.0f;
-        break;
-#endif
     }
 
     switch (var_InheritInteger(obj, PREFIX("gamut-mode"))) {
-#if PL_API_VER >= 190
     case GAMUT_MODE_CLIP:   params->gamut_mode = PL_GAMUT_CLIP; break;
     case GAMUT_MODE_WARN:   params->gamut_mode = PL_GAMUT_WARN; break;
     case GAMUT_MODE_DESAT:  params->gamut_mode = PL_GAMUT_DESATURATE; break;
     case GAMUT_MODE_DARKEN: params->gamut_mode = PL_GAMUT_DARKEN; break;
-#else
-    case GAMUT_MODE_CLIP:   break;
-    case GAMUT_MODE_WARN:   params->gamut_warning = true; break;
-    case GAMUT_MODE_DESAT:  params->gamut_clipping = true; break;
-#endif
     }
 
-#if PL_API_VER >= 188
     params->inverse_tone_mapping = var_InheritBool(obj, PREFIX("inverse-tone-mapping"));
     params->tone_mapping_crosstalk = var_InheritFloat(obj, PREFIX("crosstalk"));
-#endif
 }
