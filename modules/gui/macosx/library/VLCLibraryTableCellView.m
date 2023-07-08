@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
@@ -106,8 +107,16 @@
 
 - (void)setRepresentedVideoLibrarySection:(NSUInteger)section
 {
+    // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
+    // Additionally, we hide recents when there are no recent media items. Since the recent group
+    // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
+    // defined in the desired order.
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
+    const BOOL anyRecents = model.numberOfRecentMedia > 0;
+    const NSUInteger sectionAdjustment = anyRecents ? 1 : 2;
+
     NSString *sectionString = @"";
-    switch(section + 1) { // Group 0 is Invalid, so add one
+    switch(section + sectionAdjustment) { // Group 0 is Invalid, so add one
         case VLCLibraryVideoRecentsGroup:
             sectionString = _NS("Recents");
             break;
