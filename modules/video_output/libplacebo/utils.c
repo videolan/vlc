@@ -604,5 +604,4 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     }
 
     params->inverse_tone_mapping = var_InheritBool(obj, PREFIX("inverse-tone-mapping"));
-    params->tone_mapping_crosstalk = var_InheritFloat(obj, PREFIX("crosstalk"));
 }

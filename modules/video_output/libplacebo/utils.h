@@ -82,8 +82,7 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
             change_integer_list(gamut_mode_values, gamut_mode_text) \
     add_bool(prefix"-inverse-tone-mapping", false, \
             INVERSE_TONEMAPPING_TEXT, INVERSE_TONEMAPPING_LONGTEXT) \
-    add_float(prefix"-crosstalk", pl_color_map_default_params.tone_mapping_crosstalk, \
-            CROSSTALK_TEXT, CROSSTALK_LONGTEXT)
+    add_obsolete_integer(prefix"-crosstalk") /* since 4.0.0 */
 
 // Shared options strings/structs for libplacebo options
 
@@ -311,9 +310,6 @@ static const char * const gamut_mode_text[] = {
 
 #define INVERSE_TONEMAPPING_TEXT "Inverse tone-mapping"
 #define INVERSE_TONEMAPPING_LONGTEXT "Expand SDR signals to HDR (only works for certain curves)."
-
-#define CROSSTALK_TEXT "Channel crosstalk"
-#define CROSSTALK_LONGTEXT "Extra channel crosstalk coefficient to apply while tone-mapping."
 
 #define PEAK_FRAMES_TEXT "HDR peak detection buffer size"
 #define PEAK_FRAMES_LONGTEXT "How many input frames to consider when determining the brightness of HDR signals. Higher values result in a slower/smoother response to brightness level changes. Setting this to 0 disables peak detection entirely."
