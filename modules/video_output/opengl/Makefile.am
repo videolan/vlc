@@ -160,7 +160,7 @@ noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
 
 if HAVE_LIBPLACEBO
-if HAVE_LIBPLACEBO_SCALE
+if HAVE_LIBPLACEBO_GL
 
 libpl_scale_plugin_la_SOURCES = video_output/opengl/pl_scale.c
 libpl_scale_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS)
