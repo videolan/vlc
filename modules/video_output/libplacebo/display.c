@@ -822,10 +822,13 @@ static void UpdateParams(vout_display_t *vd)
     sys->peak_detect.smoothing_period = var_InheritFloat(vd, "pl-peak-period");
     sys->peak_detect.scene_threshold_low = var_InheritFloat(vd, "pl-scene-threshold-low");
     sys->peak_detect.scene_threshold_high = var_InheritFloat(vd, "pl-scene-threshold-high");
-    if (sys->peak_detect.smoothing_period > 0.0) {
+#if PL_API_VER >= 254
+    sys->peak_detect.allow_delayed = var_InheritBool(vd, "pl-delayed-peak");
+#else
+    sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "pl-delayed-peak");
+#endif
+    if (sys->peak_detect.smoothing_period > 0.0)
         sys->params.peak_detect_params = &sys->peak_detect;
-        sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "pl-delayed-peak");
-    }
 
     int preset = var_InheritInteger(vd, "pl-upscaler-preset");
     sys->params.upscaler = scale_config[preset];
