@@ -68,40 +68,22 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
                                 struct pl_color_map_params *out_params);
 
 #define add_placebo_color_map_opts(prefix) \
-    add_integer(prefix"-rendering-intent", pl_color_map_default_params.intent, \
-            RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT) \
-            change_integer_list(intent_values, intent_text) \
+    add_integer(prefix"-gamut-mapping", GAMUT_AUTO, \
+            GAMUT_MAPPING_TEXT, GAMUT_MAPPING_LONGTEXT) \
+            change_integer_list(gamut_values, gamut_text) \
+    add_obsolete_integer(prefix"-gamut-mode") /* since 4.0.0 */ \
+    add_obsolete_integer(prefix"-rendering-intent") /* since 4.0.0 */ \
     add_integer(prefix"-tone-mapping-function", TONEMAP_AUTO, \
             TONEMAP_FUNC_TEXT, TONEMAP_FUNC_LONGTEXT) \
             change_integer_list(tone_values, tone_text) \
     add_float(prefix"-tone-mapping-param", pl_color_map_default_params.tone_mapping_param, \
             TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT) \
     add_obsolete_integer(prefix"-tone-mapping-mode") /* since 4.0.0 */ \
-    add_integer(prefix"-gamut-mode", GAMUT_MODE_CLIP, \
-            GAMUT_MODE_TEXT, GAMUT_MODE_LONGTEXT) \
-            change_integer_list(gamut_mode_values, gamut_mode_text) \
     add_bool(prefix"-inverse-tone-mapping", false, \
             INVERSE_TONEMAPPING_TEXT, INVERSE_TONEMAPPING_LONGTEXT) \
     add_obsolete_integer(prefix"-crosstalk") /* since 4.0.0 */
 
 // Shared options strings/structs for libplacebo options
-
-#define RENDER_INTENT_TEXT "Rendering intent for color conversion"
-#define RENDER_INTENT_LONGTEXT "The mapping type used to convert between color spaces."
-
-static const int intent_values[] = {
-    PL_INTENT_PERCEPTUAL,
-    PL_INTENT_RELATIVE_COLORIMETRIC,
-    PL_INTENT_SATURATION,
-    PL_INTENT_ABSOLUTE_COLORIMETRIC,
-};
-
-static const char * const intent_text[] = {
-    "Perceptual",
-    "Relative colorimetric",
-    "Absolute colorimetric",
-    "Saturation",
-};
 
 #define PRIM_TEXT "Override detected display primaries"
 #define PRIM_LONGTEXT "Override the auto-detected display primaries."
@@ -285,28 +267,46 @@ static const char * const tone_text[] = {
 #define TONEMAP_PARAM_LONGTEXT "This parameter can be used to tune the tone-mapping curve. Specifics depend on the curve used. If left as 0, the curve's preferred default is used."
 
 enum {
-    GAMUT_MODE_CLIP,
-    GAMUT_MODE_WARN,
-    GAMUT_MODE_DESAT,
-    GAMUT_MODE_DARKEN,
+    GAMUT_AUTO,
+    GAMUT_CLIP,
+    GAMUT_PERCEPTUAL,
+    GAMUT_RELATIVE,
+    GAMUT_SATURATION,
+    GAMUT_ABSOLUTE,
+    GAMUT_DESATURATE,
+    GAMUT_DARKEN,
+    GAMUT_WARN,
+    GAMUT_LINEAR,
 };
 
-static const int gamut_mode_values[] = {
-    GAMUT_MODE_CLIP,
-    GAMUT_MODE_WARN,
-    GAMUT_MODE_DESAT,
-    GAMUT_MODE_DARKEN,
+static const int gamut_values[] = {
+    GAMUT_AUTO,
+    GAMUT_CLIP,
+    GAMUT_PERCEPTUAL,
+    GAMUT_RELATIVE,
+    GAMUT_SATURATION,
+    GAMUT_ABSOLUTE,
+    GAMUT_DESATURATE,
+    GAMUT_DARKEN,
+    GAMUT_WARN,
+    GAMUT_LINEAR,
 };
 
-static const char * const gamut_mode_text[] = {
+static const char * const gamut_text[] = {
+    "Automatic selection",
     "Hard clip",
-    "Highlight invalid pixels",
+    "Perceptual soft-clip",
+    "Relative colorimetric",
+    "Saturation mapping",
+    "Absolute colorimetric",
     "Colorimetrically desaturate",
-    "Darken image",
+    "Darken and clip",
+    "Highlight invalid pixels",
+    "Linear desaturate",
 };
 
-#define GAMUT_MODE_TEXT "Out-of-gamut handling"
-#define GAMUT_MODE_LONGTEXT "How to handle out-of-gamut colors while tone mapping."
+#define GAMUT_MAPPING_TEXT "Out-of-gamut handling"
+#define GAMUT_MAPPING_LONGTEXT "How to handle out-of-gamut colors while tone mapping."
 
 #define INVERSE_TONEMAPPING_TEXT "Inverse tone-mapping"
 #define INVERSE_TONEMAPPING_LONGTEXT "Expand SDR signals to HDR (only works for certain curves)."

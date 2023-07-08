@@ -580,8 +580,31 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     char opt[64];
 
     *params = pl_color_map_default_params;
-    params->intent = var_InheritInteger(obj, PREFIX("rendering-intent"));
-    params->tone_mapping_param = var_InheritFloat(obj, PREFIX("tone-mapping-param"));
+
+    switch (var_InheritInteger(obj, PREFIX("gamut-mapping"))) {
+    case GAMUT_AUTO:        break;
+#if PL_API_VER >= 269
+    case GAMUT_CLIP:        params->gamut_mapping = &pl_gamut_map_clip; break;
+    case GAMUT_PERCEPTUAL:  params->gamut_mapping = &pl_gamut_map_perceptual; break;
+    case GAMUT_RELATIVE:    params->gamut_mapping = &pl_gamut_map_relative; break;
+    case GAMUT_SATURATION:  params->gamut_mapping = &pl_gamut_map_saturation; break;
+    case GAMUT_ABSOLUTE:    params->gamut_mapping = &pl_gamut_map_absolute; break;
+    case GAMUT_DESATURATE:  params->gamut_mapping = &pl_gamut_map_desaturate; break;
+    case GAMUT_DARKEN:      params->gamut_mapping = &pl_gamut_map_darken; break;
+    case GAMUT_WARN:        params->gamut_mapping = &pl_gamut_map_highlight; break;
+    case GAMUT_LINEAR:      params->gamut_mapping = &pl_gamut_map_linear; break;
+#else
+    case GAMUT_CLIP:        params->gamut_mode = PL_GAMUT_CLIP; break;
+    case GAMUT_PERCEPTUAL:  break; // unsupported
+    case GAMUT_RELATIVE:    params->intent = PL_INTENT_RELATIVE_COLORIMETRIC; break;
+    case GAMUT_SATURATION:  params->intent = PL_INTENT_SATURATION; break;
+    case GAMUT_ABSOLUTE:    params->intent = PL_INTENT_ABSOLUTE_COLORIMETRIC; break;
+    case GAMUT_DESATURATE:  params->gamut_mode = PL_GAMUT_DESATURATE;
+    case GAMUT_DARKEN:      params->gamut_mode = PL_GAMUT_DARKEN;
+    case GAMUT_WARN:        params->gamut_mode = PL_GAMUT_WARN;
+    case GAMUT_LINEAR:      break; // unsupported
+#endif
+    }
 
     switch (var_InheritInteger(obj, PREFIX("tone-mapping-function"))) {
     case TONEMAP_AUTO:      break;
@@ -596,12 +619,6 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     case TONEMAP_SPLINE:    params->tone_mapping_function = &pl_tone_map_spline; break;
     }
 
-    switch (var_InheritInteger(obj, PREFIX("gamut-mode"))) {
-    case GAMUT_MODE_CLIP:   params->gamut_mode = PL_GAMUT_CLIP; break;
-    case GAMUT_MODE_WARN:   params->gamut_mode = PL_GAMUT_WARN; break;
-    case GAMUT_MODE_DESAT:  params->gamut_mode = PL_GAMUT_DESATURATE; break;
-    case GAMUT_MODE_DARKEN: params->gamut_mode = PL_GAMUT_DARKEN; break;
-    }
-
+    params->tone_mapping_param = var_InheritFloat(obj, PREFIX("tone-mapping-param"));
     params->inverse_tone_mapping = var_InheritBool(obj, PREFIX("inverse-tone-mapping"));
 }
