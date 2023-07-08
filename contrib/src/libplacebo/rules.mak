@@ -16,7 +16,7 @@ DEPS_libplacebo = glad $(DEPS_glad) jinja $(DEPS_jinja) glslang $(DEPS_glslang) 
 ifndef HAVE_WINSTORE
 PKGS += libplacebo
 endif
-ifeq ($(call need_pkg,"libplacebo >= 4.157"),)
+ifeq ($(call need_pkg,"libplacebo >= 4.192"),)
 PKGS_FOUND += libplacebo
 endif
 
