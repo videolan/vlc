@@ -67,12 +67,6 @@ bool vlc_placebo_FormatSupported(pl_gpu, vlc_fourcc_t);
 void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
                                 struct pl_color_map_params *out_params);
 
-#define add_placebo_extra_color_map_opts(prefix) \
-    add_bool(prefix"-inverse-tone-mapping", false, \
-            INVERSE_TONEMAPPING_TEXT, INVERSE_TONEMAPPING_LONGTEXT) \
-    add_float(prefix"-crosstalk", pl_color_map_default_params.tone_mapping_crosstalk, \
-            CROSSTALK_TEXT, CROSSTALK_LONGTEXT)
-
 #define add_placebo_color_map_opts(prefix) \
     add_integer(prefix"-rendering-intent", pl_color_map_default_params.intent, \
             RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT) \
@@ -88,7 +82,10 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     add_integer(prefix"-gamut-mode", GAMUT_MODE_CLIP, \
             GAMUT_MODE_TEXT, GAMUT_MODE_LONGTEXT) \
             change_integer_list(gamut_mode_values, gamut_mode_text) \
-    add_placebo_extra_color_map_opts(prefix)
+    add_bool(prefix"-inverse-tone-mapping", false, \
+            INVERSE_TONEMAPPING_TEXT, INVERSE_TONEMAPPING_LONGTEXT) \
+    add_float(prefix"-crosstalk", pl_color_map_default_params.tone_mapping_crosstalk, \
+            CROSSTALK_TEXT, CROSSTALK_LONGTEXT)
 
 // Shared options strings/structs for libplacebo options
 
