@@ -1071,9 +1071,11 @@ playlist_on_items_added(vlc_playlist_t *playlist, size_t index,
                         void *data)
 {
     tracklist_append_event_t *append_event = tracklist_append_event_create(index, items, count);
-    add_event_signal(data,
+    bool added = add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_APPEND,
                                 .items_appended = append_event });
+    if (!added)
+        tracklist_append_event_destroy(append_event);
     (void) playlist;
 }
 
@@ -1082,9 +1084,11 @@ playlist_on_items_removed(vlc_playlist_t *playlist,
                           size_t index, size_t count, void *data)
 {
     tracklist_remove_event_t *remove_event = tracklist_remove_event_create(index, count);
-    add_event_signal(data,
+    bool added = add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_DELETED,
                                 .items_removed = remove_event });
+    if (!added)
+        tracklist_remove_event_destroy(remove_event);
     (void) playlist;
 }
 
