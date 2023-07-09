@@ -1030,8 +1030,18 @@ static bool add_event_locked( intf_thread_t *p_intf, const callback_info_t *p_in
     {
         callback_info_t *oldinfo =
             vlc_array_item_at_index( &p_intf->p_sys->events, i );
-        if( p_info->signal == oldinfo->signal )
-            return false;
+
+        switch (p_info->signal)
+        {
+            /* Those events are squashed afterwards and must be
+             * released appropriately. */
+            case SIGNAL_PLAYLIST_ITEM_APPEND:
+            case SIGNAL_PLAYLIST_ITEM_DELETED:
+                break;
+            default:
+                if (p_info->signal == oldinfo->signal)
+                    return false;
+        }
     }
 
     callback_info_t *p_dup = malloc( sizeof( *p_dup ) );
