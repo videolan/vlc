@@ -480,6 +480,33 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
     _saveMetaDataButton.enabled = settingsChanged;
 }
 
+- (void)reloadMediaLibraryFoldersForInputItems:(NSArray<VLCInputItem *> *)inputItems
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = libraryController.libraryModel.listOfMonitoredFolders;
+    NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
+    NSMutableSet<VLCInputItem *> * const checkedInputItems = NSMutableSet.set;
+
+    for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
+        for (VLCInputItem * const inputItem in inputItems) {
+            if ([checkedInputItems containsObject:inputItem]) {
+                continue;
+            }
+
+            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
+                [reloadMRLs addObject:entryPoint.MRL];
+                [checkedInputItems addObject:inputItem];
+                break;
+            }
+        }
+    }
+
+    for (NSString * const entryPointMRL in reloadMRLs) {
+        NSURL * const entryPointURL = [NSURL URLWithString:entryPointMRL];
+        [libraryController reloadFolderWithFileURL:entryPointURL];
+    }
+}
+
 - (void)saveInputItemsMetadata:(NSArray<VLCInputItem *> *)inputItems
 {
     NSParameterAssert(inputItems);
@@ -510,30 +537,7 @@ SET_INPUTITEM_PROP(field, field)                \
 #undef SET_INPUTITEM_PROP
     
     [self updateRepresentation];
-
-    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-    NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = libraryController.libraryModel.listOfMonitoredFolders;
-    NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
-    NSMutableSet<VLCInputItem *> * const checkedInputItems = NSMutableSet.set;
-
-    for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
-        for (VLCInputItem * const inputItem in inputItems) {
-            if ([checkedInputItems containsObject:inputItem]) {
-                continue;
-            }
-
-            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
-                [reloadMRLs addObject:entryPoint.MRL];
-                [checkedInputItems addObject:inputItem];
-                break;
-            }
-        }
-    }
-
-    for (NSString * const entryPointMRL in reloadMRLs) {
-        NSURL * const entryPointURL = [NSURL URLWithString:entryPointMRL];
-        [libraryController reloadFolderWithFileURL:entryPointURL];
-    }
+    [self reloadMediaLibraryFoldersForInputItems:inputItems];
 }
 
 - (IBAction)saveMetaData:(id)sender
