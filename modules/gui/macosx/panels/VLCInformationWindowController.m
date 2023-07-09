@@ -26,7 +26,9 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
 
 #import "main/VLCMain.h"
 
@@ -508,6 +510,24 @@ SET_INPUTITEM_PROP(field, field)                \
 #undef SET_INPUTITEM_PROP
     
     [self updateRepresentation];
+
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = libraryController.libraryModel.listOfMonitoredFolders;
+    NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
+
+    for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
+        for (VLCInputItem * const inputItem in inputItems) {
+            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
+                [reloadMRLs addObject:entryPoint.MRL];
+                break;
+            }
+        }
+    }
+
+    for (NSString * const entryPointMRL in reloadMRLs) {
+        NSURL * const entryPointURL = [NSURL URLWithString:entryPointMRL];
+        [libraryController reloadFolderWithFileURL:entryPointURL];
+    }
 }
 
 - (IBAction)saveMetaData:(id)sender
