@@ -514,11 +514,17 @@ SET_INPUTITEM_PROP(field, field)                \
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
     NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = libraryController.libraryModel.listOfMonitoredFolders;
     NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
+    NSMutableSet<VLCInputItem *> * const checkedInputItems = NSMutableSet.set;
 
     for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
         for (VLCInputItem * const inputItem in inputItems) {
+            if ([checkedInputItems containsObject:inputItem]) {
+                continue;
+            }
+
             if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
                 [reloadMRLs addObject:entryPoint.MRL];
+                [checkedInputItems addObject:inputItem];
                 break;
             }
         }
