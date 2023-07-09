@@ -620,7 +620,6 @@ int TrackListPropertiesChangedEmit( intf_thread_t    * p_intf,
                         added_tracks->items[i] );
             }
             tracklist_append_event_t *next = tracklist_append_event_next( added_tracks );
-            tracklist_append_event_destroy( added_tracks );
             added_tracks = next;
         }
     }
@@ -634,7 +633,6 @@ int TrackListPropertiesChangedEmit( intf_thread_t    * p_intf,
                 TrackRemovedSignal( p_intf, removed_tracks->change_ev.index + i );
             }
             tracklist_remove_event_t *next = tracklist_remove_event_next( removed_tracks );
-            tracklist_remove_event_destroy( removed_tracks );
             removed_tracks = next;
         }
 

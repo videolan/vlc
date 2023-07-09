@@ -750,7 +750,6 @@ static void ProcessEvents( intf_thread_t *p_intf,
         default:
             vlc_assert_unreachable();
         }
-        free( p_events[i] );
     }
 
     if( !vlc_dictionary_is_empty( &player_properties ) )
@@ -761,6 +760,23 @@ static void ProcessEvents( intf_thread_t *p_intf,
 
     if( !vlc_dictionary_is_empty( &root_properties ) )
         RootPropertiesChangedEmit( p_intf, &root_properties );
+
+
+    for (int i = 0; i < i_events; i++)
+    {
+        switch (p_events[i]->signal)
+        {
+        case SIGNAL_PLAYLIST_ITEM_APPEND:
+            tracklist_append_event_destroy(p_events[i]->items_appended);
+            break;
+        case SIGNAL_PLAYLIST_ITEM_DELETED:
+            tracklist_remove_event_destroy(p_events[i]->items_removed);
+            break;
+        default:
+            break;
+        }
+        free(p_events[i]);
+    }
 
     vlc_dictionary_clear( &player_properties,    NULL, NULL );
     vlc_dictionary_clear( &tracklist_properties, NULL, NULL );
