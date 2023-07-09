@@ -96,7 +96,7 @@
 
 + (NSColor *)VLCSubtleBorderColor
 {
-    return [NSColor colorWithWhite:0 alpha:0.1];
+    return [NSColor.textColor colorWithAlphaComponent:0.1];
 }
 
 @end
