@@ -213,6 +213,8 @@ static void test_opengl_offscreen(
 
     vlc_gl_ReleaseCurrent(gl);
     vlc_gl_Delete(gl);
+
+    picture_Release(picture);
 }
 
 int main( int argc, char **argv )
