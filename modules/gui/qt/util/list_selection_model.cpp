@@ -22,6 +22,28 @@
 ListSelectionModel::ListSelectionModel(QAbstractItemModel *model, QObject *parent)
     : QItemSelectionModel{model, parent}
 {
+    connect(this, &QItemSelectionModel::modelChanged, this, [this](const QAbstractItemModel * const model) {
+        if (m_oldModel)
+        {
+            m_oldModel->disconnect(this);
+        }
+
+        m_oldModel = model;
+
+        if (model)
+        {
+            // For some reason, even if QItemSelectionModel changes its selection based on the changes
+            // in the target model it does not emit changed signal itself.
+            connect(model, &QAbstractItemModel::rowsAboutToBeRemoved, this, &ListSelectionModel::invalidateCache);
+            connect(model, &QAbstractItemModel::rowsAboutToBeInserted, this, &ListSelectionModel::invalidateCache);
+            connect(model, &QAbstractItemModel::rowsAboutToBeMoved, this, &ListSelectionModel::invalidateCache);
+            connect(model, &QAbstractItemModel::layoutChanged, this, &ListSelectionModel::invalidateCache);
+            connect(model, &QAbstractItemModel::modelReset, this, &ListSelectionModel::invalidateCache);
+        }
+    });
+
+    connect(this, &QItemSelectionModel::selectionChanged, this, &ListSelectionModel::invalidateCache);
+
     connect(this, &QItemSelectionModel::selectionChanged, this, &ListSelectionModel::_selectionChanged);
     connect(this, &QItemSelectionModel::currentChanged, this, &ListSelectionModel::_currentChanged);
 }
@@ -48,22 +70,16 @@ QVector<int> ListSelectionModel::selectionFlat() const
 
 QVector<int> ListSelectionModel::selectedIndexesFlat() const
 {
-    QVector<int> list;
-
-    const auto& indexes = QItemSelectionModel::selectedIndexes();
-    for (const auto& i : indexes)
-    {
-        list.push_back(i.row());
-    }
-
-    return list;
+    if (!m_caching || (m_cache.status == Cache::Invalid))
+        updateSelectedIndexes();
+    return m_cache.selectedIndexes;
 }
 
 QVector<int> ListSelectionModel::sortedSelectedIndexesFlat() const
 {
-    QVector<int> list = selectedIndexesFlat();
-    std::sort(list.begin(), list.end());
-    return list;
+    if (!m_caching || (m_cache.status != Cache::Sorted))
+        updateSortedSelectedIndexes();
+    return m_cache.selectedIndexes;
 }
 
 bool ListSelectionModel::isSelected(int index) const
@@ -135,3 +151,31 @@ void ListSelectionModel::updateSelection(Qt::KeyboardModifiers modifiers, int ol
     }
 }
 
+void ListSelectionModel::updateSelectedIndexes() const
+{
+    const QModelIndexList& indexes = QItemSelectionModel::selectedIndexes();
+    m_cache.selectedIndexes = QVector<int>(indexes.size());
+    assert(m_cache.selectedIndexes.size() == indexes.size());
+
+    for (int i = 0; i < indexes.size(); ++i)
+    {
+        m_cache.selectedIndexes[i] = indexes[i].row();
+    }
+
+    m_cache.status = Cache::Unsorted;
+}
+
+void ListSelectionModel::updateSortedSelectedIndexes() const
+{
+    if (m_cache.status == Cache::Invalid)
+        updateSelectedIndexes();
+
+    std::sort(m_cache.selectedIndexes.begin(), m_cache.selectedIndexes.end());
+
+    m_cache.status = Cache::Sorted;
+}
+
+void ListSelectionModel::invalidateCache() const
+{
+    m_cache.status = Cache::Invalid;
+}

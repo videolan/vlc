@@ -20,6 +20,7 @@
 
 #include <QItemSelectionModel>
 #include <QVector>
+#include <QPointer>
 
 class ListSelectionModel : public QItemSelectionModel
 {
@@ -41,6 +42,8 @@ class ListSelectionModel : public QItemSelectionModel
     Q_PROPERTY(QVector<int> selectionFlat READ selectionFlat NOTIFY _selectionChanged STORED false DESIGNABLE false FINAL)
     // For convenience:
     Q_PROPERTY(QVector<int> sortedSelectedIndexesFlat READ sortedSelectedIndexesFlat NOTIFY _selectionChanged STORED false DESIGNABLE false FINAL)
+    
+    Q_PROPERTY(bool cache MEMBER m_caching NOTIFY cacheChanged FINAL)
     
 public:
     explicit ListSelectionModel(QAbstractItemModel *model = nullptr, QObject *parent = nullptr);
@@ -80,9 +83,31 @@ public slots:
 signals:
     void _selectionChanged();
     void _currentChanged();
+    void cacheChanged();
 
 private:
     int m_shiftIndex = -1;
+	
+    bool m_caching = true;
+
+    struct Cache
+    {
+        enum {
+            Invalid,
+            Unsorted,
+            Sorted
+        } status = Invalid;
+
+        QVector<int> selectedIndexes;
+    } mutable m_cache;
+
+    mutable QPointer<const QAbstractItemModel> m_oldModel;
+
+    void updateSelectedIndexes() const;
+    void updateSortedSelectedIndexes() const;
+
+private slots:
+    void invalidateCache() const;
 };
 
 #endif // LISTSELECTIONMODEL_HPP
