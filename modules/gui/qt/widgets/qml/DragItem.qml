@@ -138,9 +138,7 @@ Item {
 
     height: coverSize + VLCStyle.margin_small * 2
 
-    opacity: visible ? 0.90 : 0
-
-    enabled: visible
+    enabled: false
 
     function _setData(data) {
         console.assert(data.length === indexes.length)
@@ -253,13 +251,6 @@ Item {
         running: _pendingNativeDragStart
         onTriggered: {
             dragItem._startNativeDrag()
-        }
-    }
-
-    Behavior on opacity {
-        NumberAnimation {
-            easing.type: Easing.InOutSine
-            duration: VLCStyle.duration_short
         }
     }
 
@@ -412,14 +403,6 @@ Item {
         radius: VLCStyle.dp(6, VLCStyle.scale)
     }
 
-    RectangularGlow {
-        anchors.fill: parent
-        glowRadius: VLCStyle.dp(8, VLCStyle.scale)
-        color: theme.shadow
-        spread: 0.2
-        z: -1
-    }
-
     Repeater {
         id: coverRepeater
 
@@ -534,23 +517,13 @@ Item {
         width: parent.width - x - VLCStyle.margin_small
         spacing: VLCStyle.margin_xxxsmall
 
-        ScrollingText {
-            label: titleLabel
-            height: VLCStyle.fontHeight_large
-            width: parent.width
+        T.Label {
+            id: titleLabel
 
-            clip: scrolling
-            forceScroll: dragItem.visible
-            hoverScroll: false
-
-            T.Label {
-                id: titleLabel
-
-                text: dragItem._title
-                visible: text && text !== ""
-                font.pixelSize: VLCStyle.fontSize_large
-                color: theme.fg.primary
-            }
+            text: dragItem._title
+            visible: text && text !== ""
+            font.pixelSize: VLCStyle.fontSize_large
+            color: theme.fg.primary
         }
 
         MenuCaption {
