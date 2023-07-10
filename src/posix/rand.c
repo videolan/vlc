@@ -78,8 +78,9 @@ void vlc_rand_bytes (void *buf, size_t len)
 {
     static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
     static uint64_t counter = 0;
+    struct timespec ts;
 
-    uint64_t stamp = vlc_ntp_time ();
+    timespec_get(&ts, TIME_UTC);
 
     while (len > 0)
     {
@@ -100,7 +101,7 @@ void vlc_rand_bytes (void *buf, size_t len)
         vlc_hash_md5_Update (&mdo, okey, sizeof (okey));
         pthread_mutex_unlock (&lock);
 
-        vlc_hash_md5_Update (&mdi, &stamp, sizeof (stamp));
+        vlc_hash_md5_Update (&mdi, &ts, sizeof (ts));
         vlc_hash_md5_Update (&mdi, &val, sizeof (val));
         vlc_hash_md5_Finish (&mdi, mdi_buf, sizeof(mdi_buf));
         vlc_hash_md5_Update (&mdo, mdi_buf, sizeof(mdi_buf));
