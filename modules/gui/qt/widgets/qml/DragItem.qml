@@ -105,6 +105,10 @@ Item {
 
     property int _currentRequest: 0
 
+    property int _grabImageRequest: 0
+
+    property bool _pendingNativeDragStart: false
+
     property var _dropPromise: null
     property var _dropCallback: null
     property var _dropFailedCallback: null
@@ -112,6 +116,21 @@ Item {
     //---------------------------------------------------------------------------------------------
     // Implementation
     //---------------------------------------------------------------------------------------------
+
+    // always keep drag item out of view
+    z: -1
+
+    x: parent.width + VLCStyle.margin_large
+
+    y: parent.height + VLCStyle.margin_large
+
+    visible: false
+
+    Drag.dragType: Drag.None
+
+    Drag.hotSpot.x: - VLCStyle.dragDelta
+
+    Drag.hotSpot.y: - VLCStyle.dragDelta
 
     parent: g_mainDisplay
 
@@ -121,7 +140,6 @@ Item {
 
     opacity: visible ? 0.90 : 0
 
-    visible: Drag.active
     enabled: visible
 
     function _setData(data) {
@@ -180,6 +198,36 @@ Item {
             return data[dragItem.titleRole] || dragItem.defaultText
     }
 
+    function _startNativeDrag() {
+        if (!_pendingNativeDragStart)
+            return
+
+        _pendingNativeDragStart = false
+
+        const requestId = ++dragItem._grabImageRequest
+
+        visible = true
+
+        const s = dragItem.grabToImage(function (result) {
+            visible = false
+
+            if (requestId !== dragItem._grabImageRequest
+                    || fsmDragInactive.active)
+                return
+
+            dragItem.Drag.imageSource = result.url
+            dragItem.Drag.startDrag()
+        })
+
+        if (!s) {
+            // reject all pending requests
+            ++dragItem._grabImageRequest
+
+            dragItem.Drag.imageSource = ""
+            dragItem.Drag.startDrag()
+        }
+    }
+
     //NoRole because I'm not sure we need this to be accessible
     //can drag items be considered Tooltip ? or is another class better suited
     Accessible.role: Accessible.NoRole
@@ -187,9 +235,24 @@ Item {
 
     Drag.onActiveChanged: {
         if (Drag.active) {
+            // reject all pending requests
+            ++dragItem._grabImageRequest
+            _pendingNativeDragStart = true
+
             fsm.startDrag()
         } else {
             fsm.stopDrag()
+        }
+    }
+
+    Timer {
+        // used to start the drag if it's taking too much time to load data
+        id: nativeDragStarter
+
+        interval: 50
+        running: _pendingNativeDragStart
+        onTriggered: {
+            dragItem._startNativeDrag()
         }
     }
 
@@ -225,6 +288,8 @@ Item {
             id: fsmDragInactive
 
             function enter() {
+                _pendingNativeDragStart = false
+
                 _title = ""
                 _covers = []
                 _data = []
@@ -246,6 +311,9 @@ Item {
 
             function exit() {
                 MainCtx.restoreCursor()
+
+                _pendingNativeDragStart = false
+
                 if (dragItem._dropFailedCallback) {
                     dragItem._dropFailedCallback()
                 }
@@ -308,6 +376,8 @@ Item {
                 id: fsmLoadingDone
 
                 function enter() {
+                    dragItem._startNativeDrag()
+
                     if (dragItem._dropCallback) {
                         dragItem._dropCallback(dragItem._inputItems)
                     }
@@ -320,6 +390,8 @@ Item {
             Util.FSMState {
                 id: fsmLoadingFailed
                 function enter() {
+                    _pendingNativeDragStart = false
+
                     if (dragItem._dropFailedCallback) {
                         dragItem._dropFailedCallback()
                     }
