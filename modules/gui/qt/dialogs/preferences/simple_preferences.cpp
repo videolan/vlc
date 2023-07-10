@@ -758,8 +758,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             if( !module_exists( "skins2" ) )
             {
-                ui.LooknfeelSelection->hide();
-                ui.mainPreview->hide();
+                ui.skins->hide();
+                ui.skinImage->hide();
             }
             else
             {
@@ -769,9 +769,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 {
                     if( strstr( psz_intf, "skin" ) )
                         ui.skins->setChecked( true );
-                } else {
-                    /* defaults to qt */
-                    ui.qt->setChecked( true );
                 }
                 free( psz_intf );
             }
@@ -787,22 +784,35 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.stylesLabel->hide();
 #endif
             radioGroup = new QButtonGroup(this);
-            radioGroup->addButton( ui.qt, 0 );
-            radioGroup->addButton( ui.skins, 1 );
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-            connect( radioGroup, &QButtonGroup::idClicked,
-                     ui.styleStackedWidget, &QStackedWidget::setCurrentIndex );
-#else
-            connect( radioGroup, QOverload<int>::of(&QButtonGroup::buttonClicked),
-                     ui.styleStackedWidget, &QStackedWidget::setCurrentIndex );
-#endif
-            ui.styleStackedWidget->setCurrentIndex( radioGroup->checkedId() );
+            radioGroup->addButton( ui.modernButton, 0 );
+            radioGroup->addButton( ui.classicButton, 1 );
+            radioGroup->addButton( ui.skins, 2 );
 
-            connect( ui.minimalviewBox, &QCheckBox::toggled,
-                     ui.mainPreview, &InterfacePreviewWidget::setNormalPreview );
             configBool( "qt-minimal-view", ui.minimalviewBox );
-            ui.mainPreview->setNormalPreview( ui.minimalviewBox->isChecked() );
-            ui.skinsPreview->setPreview( InterfacePreviewWidget::SKINS );
+
+            /*Update layout radio buttons based on the checkState of the following checkboxes*/
+            connect(ui.menuBarCheck, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
+            connect(ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+            connect(ui.titleBarCheckBox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
+#endif
+
+            /*Clicking on image will check the corresponding layout radio button*/
+            layoutImages = new QButtonGroup( this );
+            layoutImages->addButton( ui.modernImage, 0 );
+            layoutImages->addButton( ui.classicImage, 1 );
+            layoutImages->addButton( ui.skinImage, 2 );
+
+            connect( layoutImages, qOverload<QAbstractButton*>( &QButtonGroup::buttonClicked ), this, &SPrefsPanel::imageLayoutClick );
+
+            /* Set checkboxes depending on the layout selected*/
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+            connect(radioGroup, &QButtonGroup::idClicked, this, &SPrefsPanel::handleLayoutChange);
+            connect(layoutImages, &QButtonGroup::idClicked, this, &SPrefsPanel::handleLayoutChange);
+#else
+            connect(radioGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &SPrefsPanel::handleLayoutChange);
+            connect(layoutImages, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &SPrefsPanel::handleLayoutChange);
+#endif
 
             configBool( "embedded-video", ui.embedVideo );
             configBool( "qt-video-autoresize", ui.resizingBox );
@@ -1123,6 +1133,68 @@ SPrefsPanel::~SPrefsPanel()
 
     qDeleteAll( controls ); controls.clear();
     free( lang );
+}
+
+/* Checks the layout radio button corresponding the image clicked */
+void SPrefsPanel::imageLayoutClick( QAbstractButton* btn )
+{
+    QAbstractButton* layoutBtn = radioGroup->buttons().at( layoutImages->id( btn ) );
+    assert( layoutBtn );
+    layoutBtn->setChecked( true );
+}
+
+/* Change configurations depending on the layout selected and set check states of radioGroup */
+void SPrefsPanel::handleLayoutChange( int id )
+{
+    auto ui = m_interfaceUI;
+    if (id == 0) {
+        // Modern layout selected
+        ui.styleStackedWidget->setCurrentIndex(0);
+        ui.menuBarCheck->setChecked(false);
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+        ui.titleBarCheckBox->setChecked(false);
+#endif
+        ui.pinVideoControlsCheckbox->setChecked(false);
+    }
+    else if (id == 1) {
+        // Classic layout selected
+        ui.styleStackedWidget->setCurrentIndex(0);
+        ui.menuBarCheck->setChecked(true);
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+        ui.titleBarCheckBox->setChecked(true);
+#endif
+        ui.pinVideoControlsCheckbox->setChecked(true);
+    }
+    else if (id == 2) {
+        ui.styleStackedWidget->setCurrentIndex(1);
+    }
+}
+
+void SPrefsPanel::updateLayoutSelection()
+{
+    auto ui = m_interfaceUI;
+    bool isModern = !ui.menuBarCheck->isChecked()
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+                    && !ui.titleBarCheckBox->isChecked()
+#endif
+                    && !ui.pinVideoControlsCheckbox->isChecked();
+
+    ui.modernButton->setChecked(isModern);
+
+    bool isClassic = ui.menuBarCheck->isChecked()
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+                     && ui.titleBarCheckBox->isChecked()
+#endif
+                     && ui.pinVideoControlsCheckbox->isChecked();
+
+    ui.classicButton->setChecked(isClassic);
+
+    if (!isModern && !isClassic) {
+        radioGroup->setExclusive(false);
+        ui.modernButton->setChecked(false);
+        ui.classicButton->setChecked(false);
+        radioGroup->setExclusive(true);
+    }
 }
 
 void SPrefsPanel::updateAudioVolume( int volume )

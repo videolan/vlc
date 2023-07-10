@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>808</height>
+    <width>1446</width>
+    <height>1378</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -67,66 +67,103 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="4">
-          <widget class="QRadioButton" name="skins">
-           <property name="text">
-            <string>Use custom skin</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+         <item row="0" column="3">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QPushButton" name="skinImage">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../../vlc.qrc">
+               <normaloff>:/prefsmenu/sample_skins.png</normaloff>:/prefsmenu/sample_skins.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>244</width>
+               <height>145</height>
+              </size>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QRadioButton" name="skins">
+             <property name="text">
+              <string>Use custom skin</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item row="0" column="1">
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QPushButton" name="modernImage">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../../vlc.qrc">
+               <normaloff>:/prefsmenu/sample_minimal.png</normaloff>:/prefsmenu/sample_minimal.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>244</width>
+               <height>145</height>
+              </size>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QRadioButton" name="modernButton">
+             <property name="text">
+              <string>Modern</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item row="0" column="2">
-          <widget class="QRadioButton" name="qt">
-           <property name="toolTip">
-            <string>This is VLC's default interface, with a native look and feel.</string>
-           </property>
-           <property name="text">
-            <string>Use native style</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QPushButton" name="classicImage">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../../vlc.qrc">
+               <normaloff>:/prefsmenu/sample_complete.png</normaloff>:/prefsmenu/sample_complete.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>244</width>
+               <height>145</height>
+              </size>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QRadioButton" name="classicButton">
+             <property name="text">
+              <string>Classic</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item row="0" column="3">
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="2" colspan="3">
+         <item row="1" column="1" colspan="2">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -149,28 +186,6 @@
           <property name="rightMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="InterfacePreviewWidget" name="mainPreview">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>122</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(192, 192, 192);</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignHCenter|Qt::AlignTop</set>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QWidget" name="native_zone" native="true">
             <property name="sizePolicy">
@@ -199,22 +214,48 @@
              <item row="6" column="2" colspan="2">
               <widget class="QComboBox" name="notificationCombo"/>
              </item>
-             <item row="10" column="2" colspan="2">
-              <widget class="QComboBox" name="stylesCombo"/>
+             <item row="1" column="4">
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
-             <item row="0" column="0" colspan="5">
-              <widget class="QCheckBox" name="fsController">
+             <item row="1" column="1">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="5" column="2">
+              <widget class="QCheckBox" name="titleBarCheckBox">
                <property name="text">
-                <string>Show controls in full screen mode</string>
+                <string>Enable window titlebar</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="2" colspan="2">
-              <widget class="QCheckBox" name="pauseMinimizedBox">
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="embedVideo">
                <property name="text">
-                <string>Pause playback when minimized</string>
+                <string>Integrate video in interface</string>
                </property>
               </widget>
+             </item>
+             <item row="12" column="2" colspan="2">
+              <widget class="QComboBox" name="autoRaiseComboBox"/>
              </item>
              <item row="6" column="0">
               <widget class="QLabel" name="notificationComboLabel">
@@ -226,10 +267,10 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="minimalviewBox">
+             <item row="4" column="0" colspan="2">
+              <widget class="QCheckBox" name="systrayBox">
                <property name="text">
-                <string>Start in minimal view mode</string>
+                <string>Show systray icon</string>
                </property>
               </widget>
              </item>
@@ -249,43 +290,30 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QCheckBox" name="embedVideo">
-               <property name="text">
-                <string>Integrate video in interface</string>
+             <item row="14" column="3">
+              <widget class="QSpinBox" name="intfScaleFactorSpinBox">
+               <property name="suffix">
+                <string> %</string>
+               </property>
+               <property name="singleStep">
+                <number>5</number>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="4">
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="4" column="0" colspan="2">
-              <widget class="QCheckBox" name="systrayBox">
+             <item row="13" column="0">
+              <widget class="QLabel" name="colorSchemeLabel">
                <property name="text">
-                <string>Show systray icon</string>
+                <string>Color scheme:</string>
+               </property>
+               <property name="buddy">
+                <cstring>colorSchemeComboBox</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="minimalviewBox">
+               <property name="text">
+                <string>Start in minimal view mode</string>
                </property>
               </widget>
              </item>
@@ -299,26 +327,23 @@
                </property>
               </widget>
              </item>
-             <item row="12" column="2" colspan="2">
-              <widget class="QComboBox" name="autoRaiseComboBox"/>
+             <item row="10" column="2" colspan="2">
+              <widget class="QComboBox" name="stylesCombo"/>
              </item>
-             <item row="13" column="0">
-              <widget class="QLabel" name="colorSchemeLabel">
-               <property name="text">
-                <string>Color scheme:</string>
+             <item row="14" column="2">
+              <widget class="QSlider" name="intfScaleFactorSlider">
+               <property name="tracking">
+                <bool>false</bool>
                </property>
-               <property name="buddy">
-                <cstring>colorSchemeComboBox</cstring>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
-             <item row="13" column="2" colspan="2">
-              <widget class="QComboBox" name="colorSchemeComboBox"/>
-             </item>
-             <item row="4" column="2">
-              <widget class="QCheckBox" name="menuBarCheck">
+             <item row="3" column="2" colspan="2">
+              <widget class="QCheckBox" name="pauseMinimizedBox">
                <property name="text">
-                <string>Show the menu bar</string>
+                <string>Pause playback when minimized</string>
                </property>
               </widget>
              </item>
@@ -332,25 +357,22 @@
                </property>
               </widget>
              </item>
-             <item row="14" column="2">
-              <widget class="QSlider" name="intfScaleFactorSlider">
-               <property name="tracking">
-                <bool>false</bool>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+             <item row="4" column="2">
+              <widget class="QCheckBox" name="menuBarCheck">
+               <property name="text">
+                <string>Show the menu bar</string>
                </property>
               </widget>
              </item>
-             <item row="14" column="3">
-              <widget class="QSpinBox" name="intfScaleFactorSpinBox">
-               <property name="suffix">
-                <string> %</string>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
+             <item row="0" column="0" colspan="5">
+              <widget class="QCheckBox" name="fsController">
+               <property name="text">
+                <string>Show controls in full screen mode</string>
                </property>
               </widget>
+             </item>
+             <item row="13" column="2" colspan="2">
+              <widget class="QComboBox" name="colorSchemeComboBox"/>
              </item>
              <item row="5" column="0" colspan="2">
               <widget class="QCheckBox" name="pinVideoControlsCheckbox">
@@ -359,13 +381,6 @@
                </property>
                <property name="text">
                 <string>Pin video controls</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QCheckBox" name="titleBarCheckBox">
-               <property name="text">
-                <string>Enable window titlebar</string>
                </property>
               </widget>
              </item>
@@ -382,28 +397,6 @@
           <property name="rightMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="InterfacePreviewWidget" name="skinsPreview">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>122</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(192, 192, 192);</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QWidget" name="skins_zone" native="true">
             <property name="enabled">
@@ -428,42 +421,6 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="1" column="1">
-              <widget class="QLabel" name="skinFileLabel">
-               <property name="text">
-                <string>Skin resource file:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>fileSkin</cstring>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QLineEdit" name="fileSkin">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QPushButton" name="skinBrowse">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Choose...</string>
-               </property>
-              </widget>
-             </item>
              <item row="2" column="1" colspan="3">
               <widget class="QLabel" name="skinsLabel">
                <property name="sizePolicy">
@@ -498,6 +455,42 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="3">
+              <widget class="QPushButton" name="skinBrowse">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Choose...</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLineEdit" name="fileSkin">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="skinFileLabel">
+               <property name="text">
+                <string>Skin resource file:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="buddy">
+                <cstring>fileSkin</cstring>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -514,10 +507,10 @@
       <string>Playlist and Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0" colspan="2">
-       <widget class="QCheckBox" name="oneInstanceFromFile">
-        <property name="text">
-         <string>Use only one instance when started from file manager</string>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="continuePlaybackComboBox">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -528,10 +521,17 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="playPauseBox">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="OneInterfaceMode">
         <property name="text">
-         <string>Pause on the last frame of a video</string>
+         <string>Allow only one instance</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="oneInstanceFromFile">
+        <property name="text">
+         <string>Use only one instance when started from file manager</string>
         </property>
        </widget>
       </item>
@@ -542,10 +542,10 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="continuePlaybackComboBox">
-        <property name="enabled">
-         <bool>true</bool>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="playPauseBox">
+        <property name="text">
+         <string>Pause on the last frame of a video</string>
         </property>
        </widget>
       </item>
@@ -559,13 +559,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="OneInterfaceMode">
-        <property name="text">
-         <string>Allow only one instance</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -575,27 +568,6 @@
       <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
-        <property name="text">
-         <string>Allow metadata network access</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="updatesBox">
-        <property name="text">
-         <string>Activate updates notifier</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="saveRecentlyPlayed">
-        <property name="text">
-         <string>Save recently played items</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2">
        <widget class="QSpinBox" name="updatesDays">
         <property name="alignment">
@@ -609,10 +581,24 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="saveRecentlyPlayed">
+        <property name="text">
+         <string>Save recently played items</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="clearRecent">
         <property name="text">
          <string>Clear Recently Played Items</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
+        <property name="text">
+         <string>Allow metadata network access</string>
         </property>
        </widget>
       </item>
@@ -628,6 +614,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="updatesBox">
+        <property name="text">
+         <string>Activate updates notifier</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -717,17 +710,8 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>InterfacePreviewWidget</class>
-   <extends>QLabel</extends>
-   <header>dialogs/preferences/preferences_widgets.hpp</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>langCombo</tabstop>
-  <tabstop>qt</tabstop>
-  <tabstop>skins</tabstop>
   <tabstop>fsController</tabstop>
   <tabstop>embedVideo</tabstop>
   <tabstop>resizingBox</tabstop>
@@ -758,6 +742,8 @@
   <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>assoButton</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../vlc.qrc"/>
+ </resources>
  <connections/>
 </ui>
