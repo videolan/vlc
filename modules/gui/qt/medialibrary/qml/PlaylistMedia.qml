@@ -142,13 +142,16 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Drop interface
 
-    function isDroppable(drop) {
-        // NOTE: Internal drop (intra-playlist).
-        return Helpers.isValidInstanceOf(drop.source, Widgets.DragItem);
+    function isDroppable(drop, index) {
+        if (drop.source === dragItem) {
+            return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
+        } else {
+            return Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)
+        }
     }
 
     function applyDrop(drop, index, delegate, before) {
-        if (root.isDroppable(drop) === false) {
+        if (root.isDroppable(drop, index + (before ? 0 : 1)) === false) {
             root.hideLine(delegate)
             return
         }
@@ -174,7 +177,7 @@ MainInterface.MainTableView {
     }
 
     function _dropUpdatePosition(drag, index, delegate, before) {
-        if (root.isDroppable(drag) === false) {
+        if (root.isDroppable(drag, index + (before ? 0 : 1)) === false) {
             root.hideLine(delegate)
             return
         }
