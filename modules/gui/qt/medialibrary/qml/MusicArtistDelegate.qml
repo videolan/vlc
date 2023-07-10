@@ -105,13 +105,6 @@ T.ItemDelegate {
             dragItem.Drag.active = drag.active;
         }
 
-        onPressed: {
-            const pos = mapToItem(drag.target.parent, mouseX, mouseY);
-
-            drag.target.x = pos.x + VLCStyle.dragDelta;
-            drag.target.y = pos.y + VLCStyle.dragDelta;
-        }
-
         onClicked: itemClicked(mouse)
 
         onDoubleClicked: itemDoubleClicked(mouse)

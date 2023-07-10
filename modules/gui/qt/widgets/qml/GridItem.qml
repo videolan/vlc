@@ -205,13 +205,6 @@ T.ItemDelegate {
 
         onPressed: {
             _modifiersOnLastPress = mouse.modifiers
-
-            if (!drag.target)
-                return
-
-            const pos = mapToItem(drag.target.parent, mouseX, mouseY)
-            drag.target.x = pos.x + VLCStyle.dragDelta
-            drag.target.y = pos.y + VLCStyle.dragDelta
         }
 
         drag.onActiveChanged: {
