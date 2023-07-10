@@ -33,7 +33,7 @@
 #undef VLC_DYNAMIC_PLUGIN
 
 #include "../../../libvlc/test.h"
-#include "../../../lib/libvlc_internal.h"
+#include "../../../../lib/libvlc_internal.h"
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -42,8 +42,8 @@
 #include <vlc_modules.h>
 #include <vlc_vout_display.h>
 
-#include "../../../modules/video_output/opengl/filters.h"
-#include "../../../modules/video_output/opengl/gl_api.h"
+#include "../../../../modules/video_output/opengl/filters.h"
+#include "../../../../modules/video_output/opengl/gl_api.h"
 
 static_assert(
     VLC_TEST_OPENGL_API == VLC_OPENGL ||
