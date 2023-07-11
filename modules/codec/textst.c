@@ -267,7 +267,7 @@ static int Open(vlc_object_t *object)
     decoder_sys_t *p_sys = vlc_obj_malloc(object, sizeof(decoder_sys_t));
     if(!p_sys)
         return VLC_ENOMEM;
-    memset(p_sys->palette, 0xFF, 256 * sizeof(uint32_t));
+    memset(p_sys->palette, 0xFF, sizeof(p_sys->palette));
 
     p_dec->p_sys = p_sys;
     p_dec->pf_decode = Decode;
