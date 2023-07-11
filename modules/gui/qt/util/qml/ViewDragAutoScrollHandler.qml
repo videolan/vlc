@@ -24,7 +24,17 @@ QtObject {
     id: root
 
     property Flickable view: null
+
+    // if 'dragItem' is null, user must override property 'dragging' and 'dragPosProvider'
     property Item dragItem: null
+
+    property bool dragging: !!dragItem && dragItem.visible
+
+    property var dragPosProvider: function () {
+        return root.view.mapFromItem(root.dragItem.parent,
+                                     root.dragItem.x,
+                                     root.dragItem.y)
+    }
 
     property int orientation: (view && view.orientation !== undefined) ? view.orientation
                                                                        : Qt.Vertical
@@ -61,15 +71,10 @@ QtObject {
                                                             : null
 
         readonly property int direction: {
-            if (!root.dragItem || !root.view)
+            if (!root.view || !root.view.visible || !root.dragging)
                 return ViewDragAutoScrollHandler.Direction.None
 
-            if (!root.dragItem.visible || !root.view.visible)
-                return ViewDragAutoScrollHandler.Direction.None
-
-            const pos = root.view.mapFromItem(root.dragItem.parent,
-                                            root.dragItem.x,
-                                            root.dragItem.y)
+            const pos = root.dragPosProvider()
 
             let size, mark, atBeginning, atEnd
             if (root.orientation === Qt.Vertical) {
