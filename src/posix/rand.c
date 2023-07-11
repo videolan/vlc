@@ -112,7 +112,7 @@ void vlc_rand_bytes (void *buf, size_t len)
         if (len < sizeof(mdo_buf))
             break;
 
-        len -= 16;
-        buf = ((uint8_t *)buf) + 16;
+        len -= sizeof(mdo_buf);
+        buf = ((uint8_t *)buf) + sizeof(mdo_buf);
     }
 }
