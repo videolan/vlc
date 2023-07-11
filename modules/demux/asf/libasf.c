@@ -1071,7 +1071,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 
     p_data = &p_peek[ASF_OBJECT_COMMON_SIZE];
 
-    if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
+    if( !ASF_HAVE( 16 + 2 + 2 ) ) /* at least one entry */
         return VLC_EGENERIC;
 
     if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_language ) )
@@ -1186,7 +1186,7 @@ static int ASF_ReadObject_bitrate_mutual_exclusion( stream_t *s, asf_object_t *p
 
     p_data = &p_peek[ASF_OBJECT_COMMON_SIZE];
 
-    if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
+    if( !ASF_HAVE( 16 + 2 + 2 ) ) /* at least one entry */
         return VLC_EGENERIC;
 
     if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_language ) )
