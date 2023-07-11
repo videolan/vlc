@@ -133,10 +133,10 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_totalframes = p_sys->i_datalength / p_sys->i_framelength +
                           ((p_sys->i_datalength % p_sys->i_framelength) != 0);
     p_sys->i_currentframe = 0;
-    if( (INT_MAX - 22 - 4) / sizeof(uint32_t) < p_sys->i_totalframes )
+    if( (INT_MAX - 22 - 4) / sizeof(*p_sys->pi_seektable) < p_sys->i_totalframes )
         goto error;
 
-    i_seektable_size = sizeof(uint32_t)*p_sys->i_totalframes;
+    i_seektable_size = sizeof(*p_sys->pi_seektable)*p_sys->i_totalframes;
 
     /* Store the header and Seektable for avcodec */
     fmt.i_extra = 22 + i_seektable_size + 4;
@@ -153,7 +153,7 @@ static int Open( vlc_object_t * p_this )
              != i_seektable_size )
         goto error;
 
-    p_sys->pi_seektable = calloc( p_sys->i_totalframes, sizeof(uint32_t) );
+    p_sys->pi_seektable = calloc( p_sys->i_totalframes, sizeof(*p_sys->pi_seektable) );
     if( !p_sys->pi_seektable )
         goto error;
     for( uint32_t i = 0; i < p_sys->i_totalframes; i++ )
