@@ -327,8 +327,13 @@ T.Pane {
             Util.ViewDragAutoScrollHandler {
                 id: autoScroller
 
-                dragItem: dragItem
                 view: listView
+                dragging: !!listView.itemContainsDrag && listView.itemContainsDrag !== listView.footerItem
+                dragPosProvider: function () {
+                    const source = listView.itemContainsDrag
+                    const point = source.drag
+                    return listView.mapFromItem(source, point.x, point.y)
+                }
             }
 
             footer: Item {
