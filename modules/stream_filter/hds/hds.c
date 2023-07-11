@@ -446,7 +446,7 @@ static uint8_t* parse_afrt( vlc_object_t* p_this,
     }
 
     uint32_t fragment_run_entry_count = U32_AT( data_p );
-    data_p += sizeof(uint32_t);
+    data_p += 4;
 
     while(fragment_run_entry_count-- > 0)
     {
