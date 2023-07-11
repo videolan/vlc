@@ -958,19 +958,22 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_SPU_CLUT_CHANGE:
     {
-        int i;
-
         msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
-        /* Update color lookup table (16 *uint32_t in packet) */
-        memcpy( p_sys->clut, packet, sizeof( p_sys->clut ) );
-
-        /* HACK to get the SPU tracks registered in the right order */
-        for( i = 0; i < 0x1f; i++ )
+        if ( unlikely( i_len < sizeof( p_sys->clut ) ) )
+            msg_Err(  p_demux, "invalid CLUT size %zu", i_len );
+        else
         {
-            if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
-                ESNew( p_demux, 0xbd20 + i );
+            /* Update color lookup table (16 *uint32_t in packet) */
+            memcpy( p_sys->clut, packet, sizeof( p_sys->clut ) );
+
+            /* HACK to get the SPU tracks registered in the right order */
+            for( int i = 0; i < 0x1f; i++ )
+            {
+                if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
+                    ESNew( p_demux, 0xbd20 + i );
+            }
+            /* END HACK */
         }
-        /* END HACK */
         break;
     }
 
