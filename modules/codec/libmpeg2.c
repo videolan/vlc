@@ -282,7 +282,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->p_info->user_data_len > 2 )
             {
                 free( p_sys->p_gop_user_data );
-                p_sys->p_gop_user_data = calloc( p_sys->p_info->user_data_len, sizeof(uint8_t) );
+                p_sys->p_gop_user_data = calloc( p_sys->p_info->user_data_len, 1 );
                 if( p_sys->p_gop_user_data )
                 {
                     p_sys->i_gop_user_data = p_sys->p_info->user_data_len;

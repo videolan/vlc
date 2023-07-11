@@ -155,7 +155,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
 
         if ( guidcmp( &p_ext->i_extension_id, &mfasf_sampleextension_outputcleanpoint_guid ) )
         {
-            if ( i_payload_extensions_size != sizeof(uint8_t) ) goto sizeerror;
+            if ( i_payload_extensions_size != 1 ) goto sizeerror;
             *b_keyframe |= *p_data;
         }
         else if ( guidcmp( &p_ext->i_extension_id, &asf_dvr_sampleextension_videoframe_guid ) )

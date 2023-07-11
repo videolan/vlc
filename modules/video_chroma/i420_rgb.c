@@ -236,7 +236,7 @@ static int Activate( filter_t *p_filter )
     switch( p_filter->fmt_out.video.i_chroma )
     {
     case VLC_CODEC_RGB8:
-        i_tables_size = sizeof( uint8_t ) * PALETTE_TABLE_SIZE;
+        i_tables_size = PALETTE_TABLE_SIZE;
         break;
     case VLC_CODEC_RGB15:
     case VLC_CODEC_RGB16:

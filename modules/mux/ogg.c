@@ -712,7 +712,7 @@ static block_t *OggStreamPageOut( sout_mux_t *p_mux,
 
 static void OggGetSkeletonIndex( uint8_t **pp_buffer, long *pi_size, ogg_stream_t *p_stream )
 {
-    uint8_t *p_buffer = calloc( INDEX_BASE_SIZE + p_stream->skeleton.i_index_size, sizeof(uint8_t) );
+    uint8_t *p_buffer = calloc( INDEX_BASE_SIZE + p_stream->skeleton.i_index_size, 1 );
     if ( !p_buffer ) return;
     *pp_buffer = p_buffer;
 
@@ -814,7 +814,7 @@ static void OggGetSkeletonFisbone( uint8_t **pp_buffer, long *pi_size,
         }
     }
 
-    *pp_buffer = calloc( FISBONE_BASE_SIZE + headers.i_size, sizeof(uint8_t) );
+    *pp_buffer = calloc( FISBONE_BASE_SIZE + headers.i_size, 1 );
     if ( !*pp_buffer ) return;
     p_buffer = *pp_buffer;
 
@@ -1475,7 +1475,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     i_size *= ( 8.0 / 7 ); /* 7bits encoding overhead */
     msg_Dbg( p_mux, "allocating %zu bytes for index", i_size );
-    p_stream->skeleton.p_index = calloc( i_size, sizeof(uint8_t) );
+    p_stream->skeleton.p_index = calloc( i_size, 1 );
     if ( !p_stream->skeleton.p_index ) return false;
     p_stream->skeleton.i_index_size = i_size;
     p_stream->skeleton.i_index_payload = 0;

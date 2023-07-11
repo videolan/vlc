@@ -470,8 +470,7 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
     p_grad = p_sys->p_buf32_bis;
 
     if( !p_sys->p_buf8 )
-        p_sys->p_buf8 =
-            vlc_alloc( i_num_lines * i_src_visible, sizeof(uint8_t));
+        p_sys->p_buf8 = vlc_alloc( i_num_lines * i_src_visible, 1);
     p_theta = p_sys->p_buf8;
 
     if( !p_smooth || !p_grad || !p_theta ) return;

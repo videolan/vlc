@@ -183,8 +183,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_sys->p_at = xrealloc( p_sys->p_at,
-                            i_lines * i_pitch * sizeof( uint8_t ) );
+    p_sys->p_at = xrealloc( p_sys->p_at, i_lines * i_pitch );
     p_at = p_sys->p_at;
 
     vlc_mutex_lock( &p_sys->lock );

@@ -488,7 +488,7 @@ static int vhs_sliding_effect_apply( filter_t *p_filter, picture_t *p_pic_out )
         uint8_t *p_temp_buf;
         if ( !p_sys->i_sliding_type_duplicate ) {
             p_temp_buf= calloc( p_pic_out->p[i_p].i_lines
-                                * p_pic_out->p[i_p].i_pitch, sizeof(uint8_t) );
+                                * p_pic_out->p[i_p].i_pitch, 1 );
             if ( unlikely( !p_temp_buf ) )
                 return VLC_ENOMEM;
             memcpy( p_temp_buf, p_pic_out->p[i_p].p_pixels,

@@ -371,7 +371,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     }
 
     if( p_sys->b_generate_iv )
-        vlc_rand_bytes( p_sys->aes_ivs, sizeof(uint8_t)*16);
+        vlc_rand_bytes( p_sys->aes_ivs, 16);
 
     return VLC_SUCCESS;
 }
@@ -451,7 +451,7 @@ static int CryptKey( sout_access_out_t *p_access, uint32_t i_segment )
     if( !p_sys->b_generate_iv )
     {
         /* Use segment number as IV if randomIV isn't selected*/
-        memset( p_sys->aes_ivs, 0, 16 * sizeof(uint8_t));
+        memset( p_sys->aes_ivs, 0, 16);
         p_sys->aes_ivs[15] = i_segment & 0xff;
         p_sys->aes_ivs[14] = (i_segment >> 8 ) & 0xff;
         p_sys->aes_ivs[13] = (i_segment >> 16 ) & 0xff;
@@ -888,7 +888,7 @@ static ssize_t openNextFile( sout_access_out_t *p_access, sout_access_out_sys_t 
         segment->psz_key_uri = strdup( p_sys->key_uri );
         CryptKey( p_access, i_newseg );
         if( p_sys->b_generate_iv )
-            memcpy( segment->aes_ivs, p_sys->aes_ivs, sizeof(uint8_t)*16 );
+            memcpy( segment->aes_ivs, p_sys->aes_ivs, 16 );
     }
     msg_Dbg( p_access, "Successfully opened livehttp file: %s (%"PRIu32")" , segment->psz_filename, i_newseg );
 

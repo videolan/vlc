@@ -482,7 +482,7 @@ static int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_o
     for ( size_t i_p = 0; i_p < i_planes; i_p++ ) {
         /* first allocate temporary buffer for swap operation */
         uint8_t *p_temp_buf = calloc( p_pic_out->p[i_p].i_lines * p_pic_out->p[i_p].i_pitch,
-                                      sizeof(uint8_t) );
+                                      1 );
         if ( unlikely( !p_temp_buf ) )
             return VLC_ENOMEM;
         memcpy( p_temp_buf,p_pic_out->p[i_p].p_pixels,
