@@ -730,7 +730,7 @@ static void ASF_fillup_es_priorities_ex( demux_sys_t *p_sys, void *p_hdr,
     if (! p_mutex ) return;
 
 #if ( UINT_MAX > SIZE_MAX / 2 )
-    if ( p_sys->i_track > (size_t)SIZE_MAX / sizeof(uint16_t) )
+    if ( p_sys->i_track > (size_t)SIZE_MAX / sizeof(*p_prios->pi_stream_numbers) )
         return;
 #endif
     p_prios->pi_stream_numbers = vlc_alloc( p_sys->i_track, sizeof(*p_prios->pi_stream_numbers) );
@@ -757,7 +757,7 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
     if (! p_bitrate_mutex ) return;
 
 #if ( UINT_MAX > SIZE_MAX / 2 )
-    if ( p_sys->i_track > (size_t)SIZE_MAX / sizeof(uint16_t) )
+    if ( p_sys->i_track > (size_t)SIZE_MAX / sizeof(*p_prios->pi_stream_numbers) )
         return;
 #endif
     p_prios->pi_stream_numbers = vlc_alloc( p_sys->i_track, sizeof(*p_prios->pi_stream_numbers) );
