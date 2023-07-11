@@ -96,7 +96,7 @@ static void CLUTIdxToYUV(const struct subs_format_t *subs,
 {
     for( int i = 0; i < 4 ; i++ )
     {
-        uint32_t i_ayvu = subs->spu.palette[1+idx[i]];
+        uint32_t i_ayvu = subs->spu.palette[idx[i]];
         /* FIXME: this job should be done sooner */
         yuv[3-i][0] = i_ayvu>>16;
         yuv[3-i][1] = i_ayvu;
@@ -119,7 +119,7 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
         if(p_palette->i_entries +4 >= VIDEO_PALETTE_COLORS_MAX)
             break;
 
-        if( p_dec->fmt_in->subs.spu.palette[0] == SPU_PALETTE_DEFINED )
+        if( p_dec->fmt_in->subs.spu.b_palette )
         {
             /* Lookup the CLUT palette for the YUV values */
             uint8_t idx[4];
@@ -437,7 +437,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
                 return VLC_EGENERIC;
             }
 
-            if( p_dec->fmt_in->subs.spu.palette[0] == SPU_PALETTE_DEFINED )
+            if( p_dec->fmt_in->subs.spu.b_palette )
             {
                 uint8_t idx[4];
 

@@ -553,19 +553,19 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     switch(p_track->fmt.i_codec)
     {
         case VLC_CODEC_SPU:
-            if(p_track->fmt.subs.spu.palette[0] == SPU_PALETTE_DEFINED)
+            if(p_track->fmt.subs.spu.b_palette)
             {
 #ifndef WORDS_BIGENDIAN
                 p_extradata = p_extradata_allocated = malloc(16*4);
                 if(p_extradata_allocated)
                 {
                     for(int i=0; i<16; i++)
-                        SetDWBE(&p_extradata_allocated[i*4], p_track->fmt.subs.spu.palette[i+1]);
+                        SetDWBE(&p_extradata_allocated[i*4], p_track->fmt.subs.spu.palette[i]);
                     i_extradata = 16*4;
                 }
 #else
-                p_extradata = (const uint8_t *) &p_track->fmt.subs.spu.palette[1];
-                i_extradata = 16 * sizeof(p_track->fmt.subs.spu.palette[1]);
+                p_extradata = (const uint8_t *) p_track->fmt.subs.spu.palette;
+                i_extradata = sizeof(p_track->fmt.subs.spu.palette);
 #endif
             }
             break;

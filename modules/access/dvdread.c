@@ -740,9 +740,10 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     else if( tk->fmt.i_cat == SPU_ES )
     {
         /* Palette */
-        tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
-        memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut,
-                16 * sizeof( uint32_t ) );
+        tk->fmt.subs.spu.b_palette = true;
+        static_assert(sizeof(tk->fmt.subs.spu.palette) == sizeof(p_sys->clut),
+                      "CLUT palette size mismatch");
+        memcpy( tk->fmt.subs.spu.palette, p_sys->clut, sizeof( p_sys->clut ) );
 
         if( psz_language[0] ) tk->fmt.psz_language = strdup( psz_language );
     }

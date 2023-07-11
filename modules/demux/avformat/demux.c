@@ -572,9 +572,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
 
                     psz_start = strstr( psz_buf, "palette:" );
                     if( psz_start &&
-                        vobsub_palette_parse( psz_start, &es_fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                        vobsub_palette_parse( psz_start, es_fmt.subs.spu.palette ) == VLC_SUCCESS )
                     {
-                        es_fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
+                        es_fmt.subs.spu.b_palette = true;
                         msg_Dbg( p_demux, "vobsub palette read" );
                     }
                     else

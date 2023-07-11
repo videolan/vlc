@@ -2288,9 +2288,9 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
                         psz_start = strstr( psz_buf, "palette:" );
                         if( psz_start &&
-                            vobsub_palette_parse( psz_start, &p_tk->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                            vobsub_palette_parse( psz_start, p_tk->fmt.subs.spu.palette ) == VLC_SUCCESS )
                         {
-                            p_tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
+                            p_tk->fmt.subs.spu.b_palette = true;
                             msg_Dbg( vars.p_demuxer, "vobsub palette read" );
                         }
                         else

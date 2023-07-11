@@ -573,13 +573,14 @@ struct subs_format_t
 
     struct
     {
-        /*  */
-        uint32_t palette[16+1]; /* CLUT Palette AYVU */
-
         /* the width of the original movie the spu was extracted from */
         int i_original_frame_width;
         /* the height of the original movie the spu was extracted from */
         int i_original_frame_height;
+
+        /*  */
+        uint32_t palette[16]; /* CLUT Palette AYVU */
+        bool b_palette;
     } spu;
 
     struct
@@ -598,8 +599,6 @@ struct subs_format_t
         int i_reorder_depth;
     } cc;
 };
-
-#define SPU_PALETTE_DEFINED  0xbeefbeef
 
 /**
  * ES language definition

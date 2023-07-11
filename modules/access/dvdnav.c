@@ -962,7 +962,7 @@ static int Demux( demux_t *p_demux )
 
         msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
         /* Update color lookup table (16 *uint32_t in packet) */
-        memcpy( p_sys->clut, packet, 16 * sizeof( uint32_t ) );
+        memcpy( p_sys->clut, packet, sizeof( p_sys->clut ) );
 
         /* HACK to get the SPU tracks registered in the right order */
         for( i = 0; i < 0x1f; i++ )
@@ -1631,9 +1631,10 @@ static void ESNew( demux_t *p_demux, int i_id )
         i_lang = dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f );
 
         /* Palette */
-        tk->fmt.subs.spu.palette[0] = SPU_PALETTE_DEFINED;
-        memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut,
-                16 * sizeof( uint32_t ) );
+        tk->fmt.subs.spu.b_palette = true;
+        static_assert(sizeof(tk->fmt.subs.spu.palette) == sizeof(p_sys->clut),
+                      "CLUT palette size mismatch");
+        memcpy( tk->fmt.subs.spu.palette, p_sys->clut, sizeof( p_sys->clut ) );
 
         /* We select only when we are not in the menu */
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part ) == DVDNAV_STATUS_OK &&

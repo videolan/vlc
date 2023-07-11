@@ -133,10 +133,9 @@ static void SetupESDS( demux_t *p_demux, const mp4_track_t *p_track,
     {
         for( int i = 0; i < 16; i++ )
         {
-            p_fmt->subs.spu.palette[1 + i] =
-                    GetDWBE((char*)p_fmt->p_extra + i * 4);
+            p_fmt->subs.spu.palette[i] = GetDWBE((char*)p_fmt->p_extra + i * 4);
         }
-        p_fmt->subs.spu.palette[0] = SPU_PALETTE_DEFINED;
+        p_fmt->subs.spu.b_palette = true;
     }
 }
 
