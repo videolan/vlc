@@ -175,7 +175,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
         else if ( guidcmp( &p_ext->i_extension_id, &mfasf_sampleextension_pixelaspectratio_guid ) &&
                   p_packetsys->pf_setaspectratio )
         {
-            if ( i_payload_extensions_size != sizeof(uint16_t) ) goto sizeerror;
+            if ( i_payload_extensions_size != 2U ) goto sizeerror;
 
             p_packetsys->pf_setaspectratio( p_packetsys, p_tkinfo->p_sp->i_stream_number,
                                             p_data[0], p_data[1] );
