@@ -432,9 +432,9 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                     break;
                 case ATOM_mdcv:
                     memcpy( fmt->video.mastering.primaries,
-                            p_prop->data.p_SmDm->primaries, sizeof(uint16_t) * 6 );
+                            p_prop->data.p_SmDm->primaries, sizeof(fmt->video.mastering.primaries) );
                     memcpy( fmt->video.mastering.white_point,
-                            p_prop->data.p_SmDm->white_point, sizeof(uint16_t) * 2 );
+                            p_prop->data.p_SmDm->white_point, sizeof(fmt->video.mastering.white_point) );
                     fmt->video.mastering.max_luminance = p_prop->data.p_SmDm->i_luminanceMax;
                     fmt->video.mastering.min_luminance = p_prop->data.p_SmDm->i_luminanceMin;
                     break;

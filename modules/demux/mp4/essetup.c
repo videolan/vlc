@@ -735,9 +735,9 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 if( p_SmDm && BOXDATA(p_SmDm) )
                 {
                     memcpy( p_fmt->video.mastering.primaries,
-                            BOXDATA(p_SmDm)->primaries, sizeof(uint16_t) * 6 );
+                            BOXDATA(p_SmDm)->primaries, sizeof(p_fmt->video.mastering.primaries) );
                     memcpy( p_fmt->video.mastering.white_point,
-                            BOXDATA(p_SmDm)->white_point, sizeof(uint16_t) * 2 );
+                            BOXDATA(p_SmDm)->white_point, sizeof(p_fmt->video.mastering.white_point) );
                     p_fmt->video.mastering.max_luminance = BOXDATA(p_SmDm)->i_luminanceMax;
                     p_fmt->video.mastering.min_luminance = BOXDATA(p_SmDm)->i_luminanceMin;
                 }
