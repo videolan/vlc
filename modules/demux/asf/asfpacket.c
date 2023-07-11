@@ -160,7 +160,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
         }
         else if ( guidcmp( &p_ext->i_extension_id, &asf_dvr_sampleextension_videoframe_guid ) )
         {
-            if ( i_payload_extensions_size != sizeof(uint32_t) ) goto sizeerror;
+            if ( i_payload_extensions_size != 4U ) goto sizeerror;
 
             uint32_t i_val = GetDWLE( p_data );
             /* Valid keyframe must be a split frame start fragment */
