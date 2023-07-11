@@ -243,7 +243,7 @@ static int Activate( filter_t *p_filter )
         i_tables_size = 2 * RGB_TABLE_SIZE;
         break;
     default: /* RV24, RV32 */
-        i_tables_size = sizeof( uint32_t ) * RGB_TABLE_SIZE;
+        i_tables_size = 4 * RGB_TABLE_SIZE;
         break;
     }
 
