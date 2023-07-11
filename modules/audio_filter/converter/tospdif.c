@@ -115,10 +115,9 @@ static void write_16( filter_t *p_filter, uint16_t i_val )
     filter_sys_t *p_sys = p_filter->p_sys;
     assert( p_sys->p_out_buf != NULL );
 
-    assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset
-            >= sizeof( uint16_t ) );
+    assert( p_sys->p_out_buf->i_buffer - p_sys->i_out_offset >= 2U );
     set_16( p_filter, &p_sys->p_out_buf->p_buffer[p_sys->i_out_offset], i_val );
-    p_sys->i_out_offset += sizeof( uint16_t );
+    p_sys->i_out_offset += 2U;
 }
 
 static void write_padding( filter_t *p_filter, size_t i_size )
