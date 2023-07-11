@@ -44,10 +44,6 @@
 
 #include "../codec/avcodec/chroma.h" // Chroma Avutil <-> VLC conversion
 
-/* Gruikkkkkkkkkk!!!!! */
-#undef AVPALETTE_SIZE
-#define AVPALETTE_SIZE (256 * sizeof(uint32_t))
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -628,10 +624,22 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
                p_src, i_plane_count, b_swap_uvi );
     if( p_filter->fmt_in.video.i_chroma == VLC_CODEC_RGBP )
     {
-        memset( palette, 0, sizeof(palette) );
         if( p_filter->fmt_in.video.p_palette )
-            memcpy( palette, p_filter->fmt_in.video.p_palette->palette,
-                    __MIN( sizeof(video_palette_t), AVPALETTE_SIZE ) );
+        {
+            const video_palette_t *p_palette = p_filter->fmt_in.video.p_palette;
+            static_assert(sizeof(p_palette->palette) == AVPALETTE_SIZE,
+                          "Palette size mismatch between vlc and libavutil");
+            uint8_t *dst = palette;
+            for (size_t i=0; i<sizeof(p_palette->palette[0]); i++)
+            {
+                memcpy(dst, p_palette->palette[i], ARRAY_SIZE(p_palette->palette));
+                dst += ARRAY_SIZE(p_palette->palette);
+            }
+        }
+        else
+        {
+            memset( &palette, 0, sizeof(palette) );
+        }
         src[1] = palette;
         src_stride[1] = 4;
     }
