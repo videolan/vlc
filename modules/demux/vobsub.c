@@ -152,7 +152,6 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_original_frame_width = -1;
     p_sys->i_original_frame_height = -1;
     p_sys->b_palette = false;
-    memset( p_sys->palette, 0, 16 * sizeof( uint32_t ) );
 
     /* Load the whole file */
     TextLoad( &p_sys->txt, p_demux->s );
