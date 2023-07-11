@@ -123,7 +123,7 @@ typedef struct
     /* Current title start/end blocks */
     int i_title_start_block;
     int i_title_end_block;
-    int i_title_blocks;
+    uint32_t i_title_blocks;
     int i_title_offset;
 
     int i_title_start_cell;
@@ -153,7 +153,7 @@ static void DemuxTitles( demux_t *, int * );
 static void ESNew( demux_t *, int, int );
 
 static int  DvdReadSetArea  ( demux_t *, int, int, int );
-static int  DvdReadSeek     ( demux_t *, int );
+static int  DvdReadSeek     ( demux_t *, uint32_t );
 static void DvdReadHandleDSI( demux_t *, uint8_t * );
 static void DvdReadFindCell ( demux_t * );
 
@@ -362,7 +362,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pf = va_arg( args, double * );
 
-            if( p_sys->i_title_blocks > 0 )
+            if( p_sys->i_title_blocks )
                 *pf = (double)p_sys->i_title_offset / p_sys->i_title_blocks;
             else
                 *pf = 0.0;
@@ -829,13 +829,13 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             const uint32_t cell_blocks = p_pgc->cell_playback[i].last_sector -
                                          p_pgc->cell_playback[i].first_sector + 1;
             if(unlikely( cell_blocks == 0 || cell_blocks > INT_MAX ||
-                 INT_MAX - p_sys->i_title_blocks < (int)cell_blocks ))
+                 INT_MAX - p_sys->i_title_blocks < cell_blocks ))
                 return VLC_EGENERIC;
             p_sys->i_title_blocks += cell_blocks;
         }
 
         msg_Dbg( p_demux, "title %d vts_title %d pgc %d pgn %d "
-                 "start %d end %d blocks: %d",
+                 "start %d end %d blocks: %u",
                  i_title + 1, p_sys->i_ttn, pgc_id, pgn,
                  p_sys->i_title_start_block, p_sys->i_title_end_block,
                  p_sys->i_title_blocks );
@@ -1090,12 +1090,12 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
  * This one is used by the input and translate chronological position from
  * input to logical position on the device.
  *****************************************************************************/
-static int DvdReadSeek( demux_t *p_demux, int i_block_offset )
+static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_chapter = 0;
     int i_cell = 0;
-    int i_block;
+    uint32_t i_block;
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
     const ifo_handle_t *p_vts = p_sys->p_vts_file;
 
@@ -1104,15 +1104,15 @@ static int DvdReadSeek( demux_t *p_demux, int i_block_offset )
     for( i_cell = p_sys->i_title_start_cell;
          i_cell <= p_sys->i_title_end_cell; i_cell++ )
     {
-        if( i_block < (int)p_pgc->cell_playback[i_cell].last_sector -
-            (int)p_pgc->cell_playback[i_cell].first_sector + 1 ) break;
+        if( i_block < p_pgc->cell_playback[i_cell].last_sector -
+            p_pgc->cell_playback[i_cell].first_sector + 1 ) break;
 
         i_block -= (p_pgc->cell_playback[i_cell].last_sector -
             p_pgc->cell_playback[i_cell].first_sector + 1);
     }
     if( i_cell > p_sys->i_title_end_cell )
     {
-        msg_Err( p_demux, "couldn't find cell for block %i", i_block_offset );
+        msg_Err( p_demux, "couldn't find cell for block %u", i_block_offset );
         return VLC_EGENERIC;
     }
     i_block += p_pgc->cell_playback[i_cell].first_sector;
@@ -1147,7 +1147,7 @@ static int DvdReadSeek( demux_t *p_demux, int i_block_offset )
             (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) / sizeof(uint32_t);
     for( size_t i=0; i<i_vobu_sect_index_count; i++ )
     {
-        if( p_vts->vts_vobu_admap->vobu_start_sectors[i] > (uint32_t) i_block )
+        if( p_vts->vts_vobu_admap->vobu_start_sectors[i] > i_block )
             break;
         i_vobu = i + 1;
     }
