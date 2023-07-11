@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util" as Util
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
@@ -284,10 +285,14 @@ T.Pane {
 
             model: root.model
 
-            dragAutoScrollDragItem: dragItem
 
             // NOTE: We want a gentle fade at the beginning / end of the playqueue.
             enableFade: true
+
+            enableBeginningFade: (autoScroller.scrollingDirection !== Util.ViewDragAutoScrollHandler.Direction.Backward)
+
+            enableEndFade: (autoScroller.scrollingDirection !== Util.ViewDragAutoScrollHandler.Direction.Forward)
+
 
             backgroundColor: root.background.usingAcrylic ? "transparent"
                                                           : listView.colorContext.bg.primary
@@ -317,6 +322,13 @@ T.Pane {
                     if (listView.currentIndex === -1 && root.model.count > 0)
                         listView.currentIndex = 0
                 }
+            }
+
+            Util.ViewDragAutoScrollHandler {
+                id: autoScroller
+
+                dragItem: dragItem
+                view: listView
             }
 
             footer: Item {

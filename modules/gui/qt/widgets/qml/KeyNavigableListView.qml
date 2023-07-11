@@ -53,10 +53,6 @@ FadingEdgeListView {
     property alias buttonLeft: buttonLeft
     property alias buttonRight: buttonRight
 
-    property alias dragAutoScrollDragItem: dragAutoScrollHandler.dragItem
-    property alias dragAutoScrollMargin: dragAutoScrollHandler.margin
-    property alias dragAutoScrolling: dragAutoScrollHandler.scrolling
-
     // Signals
 
     signal selectionUpdated(int keyModifiers, int oldIndex, int newIndex)
@@ -95,14 +91,6 @@ FadingEdgeListView {
     section.property: ""
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
-
-    enableBeginningFade: (enableFade && dragAutoScrollHandler.scrollingDirection
-                                        !==
-                                        Util.ViewDragAutoScrollHandler.Backward)
-
-    enableEndFade: (enableFade && dragAutoScrollHandler.scrollingDirection
-                                  !==
-                                  Util.ViewDragAutoScrollHandler.Forward)
 
     Accessible.role: Accessible.List
 
@@ -288,12 +276,6 @@ FadingEdgeListView {
                 color: theme.border
             }
         }
-    }
-
-    Util.ViewDragAutoScrollHandler {
-        id: dragAutoScrollHandler
-
-        view: root
     }
 
     Util.FlickableScrollHandler { }
