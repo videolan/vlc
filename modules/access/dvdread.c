@@ -1144,7 +1144,8 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     /* see ifo_read.c / ifoRead_VOBU_ADMAP_internal for index count */
     int i_vobu = 1;
     const size_t i_vobu_sect_index_count =
-            (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) / sizeof(uint32_t);
+            (p_vts->vts_vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE) /
+            sizeof(*p_vts->vts_vobu_admap->vobu_start_sectors);
     for( size_t i=0; i<i_vobu_sect_index_count; i++ )
     {
         if( p_vts->vts_vobu_admap->vobu_start_sectors[i] > i_block )
