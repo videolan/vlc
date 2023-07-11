@@ -3279,7 +3279,7 @@ static int MP4_ReadBox_stdp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GETVERSIONFLAGS( p_box->data.p_stdp );
 
     p_box->data.p_stdp->i_priority =
-        calloc( i_read / 2, sizeof(uint16_t) );
+        calloc( i_read / 2, sizeof(*p_box->data.p_stdp->i_priority) );
 
     if( unlikely( !p_box->data.p_stdp->i_priority ) )
         MP4_READBOX_EXIT( 0 );

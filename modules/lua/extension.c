@@ -678,8 +678,8 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
 
     /* Get table size */
     size_t i_size = lua_objlen( L, -1 );
-    *pppsz_titles = calloc(i_size+1, sizeof(char*));
-    *ppi_ids = calloc(i_size+1, sizeof(uint16_t));
+    *pppsz_titles = calloc(i_size+1, sizeof(**pppsz_titles));
+    *ppi_ids = calloc(i_size+1, sizeof(**ppi_ids));
 
     /* Walk table */
     size_t i_idx = 0;
