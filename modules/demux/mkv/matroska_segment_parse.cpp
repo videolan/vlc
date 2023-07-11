@@ -2261,43 +2261,10 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             p_tk->fmt.i_codec = VLC_CODEC_SPU;
             p_tk->b_no_duration = true;
             if( likely( p_tk->i_extra_data && p_tk->fmt.i_cat == SPU_ES ) )
-                {
-                    char *psz_start;
-                    char *psz_buf = (char *)malloc( p_tk->i_extra_data + 1);
-                    if( psz_buf != NULL )
-                    {
-                        memcpy( psz_buf, p_tk->p_extra_data , p_tk->i_extra_data );
-                        psz_buf[p_tk->i_extra_data] = '\0';
-
-                        psz_start = strstr( psz_buf, "size:" );
-                        if( psz_start &&
-                            vobsub_size_parse( psz_start,
-                                               &p_tk->fmt.subs.spu.i_original_frame_width,
-                                               &p_tk->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
-                        {
-                            msg_Dbg( vars.p_demuxer, "original frame size vobsubs: %dx%d",
-                                     p_tk->fmt.subs.spu.i_original_frame_width,
-                                     p_tk->fmt.subs.spu.i_original_frame_height );
-                        }
-                        else
-                        {
-                            msg_Warn( vars.p_demuxer, "reading original frame size for vobsub failed" );
-                        }
-
-                        psz_start = strstr( psz_buf, "palette:" );
-                        if( psz_start &&
-                            vobsub_palette_parse( psz_start, p_tk->fmt.subs.spu.palette ) == VLC_SUCCESS )
-                        {
-                            p_tk->fmt.subs.spu.b_palette = true;
-                            msg_Dbg( vars.p_demuxer, "vobsub palette read" );
-                        }
-                        else
-                        {
-                            msg_Warn( vars.p_demuxer, "reading original palette failed" );
-                        }
-                    }
-                    free( psz_buf );
-                }
+            {
+                vobsub_extra_parse( VLC_OBJECT(vars.p_demuxer), &p_tk->fmt.subs,
+                                    p_tk->p_extra_data, p_tk->i_extra_data );
+            }
         }
         S_CASE("S_DVBSUB")
         {

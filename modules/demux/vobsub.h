@@ -75,3 +75,42 @@ static inline int vobsub_size_parse( const char *psz_buf,
     }
 }
 
+static inline void vobsub_extra_parse(vlc_object_t *o, subs_format_t *subs,
+                                      const uint8_t *buf, size_t buf_size)
+{
+    char *psz_start;
+    char *psz_buf = (char*)malloc( buf_size + 1);
+    if( unlikely( psz_buf == NULL ) )
+        return;
+
+    memcpy( psz_buf, buf, buf_size );
+    psz_buf[buf_size] = '\0';
+
+    psz_start = strstr( psz_buf, "size:" );
+    if( psz_start &&
+        vobsub_size_parse( psz_start,
+                            &subs->spu.i_original_frame_width,
+                            &subs->spu.i_original_frame_height ) == VLC_SUCCESS )
+    {
+        msg_Dbg( o, "original frame size: %dx%d",
+                    subs->spu.i_original_frame_width,
+                    subs->spu.i_original_frame_height );
+    }
+    else
+    {
+        msg_Warn( o, "reading original frame size failed" );
+    }
+
+    psz_start = strstr( psz_buf, "palette:" );
+    if( psz_start &&
+        vobsub_palette_parse( psz_start, subs->spu.palette ) == VLC_SUCCESS )
+    {
+        subs->spu.b_palette = true;
+        msg_Dbg( o, "vobsub palette read" );
+    }
+    else
+    {
+        msg_Warn( o, "reading original palette failed" );
+    }
+    free( psz_buf );
+}
