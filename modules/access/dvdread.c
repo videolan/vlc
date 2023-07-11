@@ -142,7 +142,7 @@ typedef struct
     int i_sar_den;
 
     /* SPU */
-    uint32_t clut[16];
+    uint32_t clut[VIDEO_PALETTE_CLUT_COUNT];
 } demux_sys_t;
 
 static int Control   ( demux_t *, int, va_list );
@@ -987,7 +987,9 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
             }
         }
 
-        memcpy( p_sys->clut, p_pgc->palette, 16 * sizeof( uint32_t ) );
+        static_assert(sizeof(p_sys->clut) == sizeof(p_pgc->palette),
+                      "mismatch CLUT size");
+        memcpy( p_sys->clut, p_pgc->palette, sizeof( p_sys->clut ) );
 
         /* Sub Picture ES */
         for( int i = 1; i <= p_vts->vtsi_mat->nr_of_vts_subp_streams; i++ )

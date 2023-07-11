@@ -140,7 +140,7 @@ typedef struct
     es_out_id_t *spu_es;
 
     /* palette for menus */
-    uint32_t clut[16];
+    uint32_t clut[VIDEO_PALETTE_CLUT_COUNT];
     bool b_spu_change;
     struct
     {

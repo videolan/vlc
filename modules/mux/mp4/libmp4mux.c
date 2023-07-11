@@ -559,7 +559,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
                 p_extradata = p_extradata_allocated = malloc(16*4);
                 if(p_extradata_allocated)
                 {
-                    for(int i=0; i<16; i++)
+                    for(int i=0; i<ARRAY_SIZE(p_track->fmt.subs.spu.palette); i++)
                         SetDWBE(&p_extradata_allocated[i*4], p_track->fmt.subs.spu.palette[i]);
                     i_extradata = 16*4;
                 }

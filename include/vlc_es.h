@@ -38,6 +38,7 @@
  * \see subs_format_t
  */
 #define VIDEO_PALETTE_COLORS_MAX 256
+#define VIDEO_PALETTE_CLUT_COUNT 16
 
 struct video_palette_t
 {
@@ -579,7 +580,7 @@ struct subs_format_t
         int i_original_frame_height;
 
         /*  */
-        uint32_t palette[16]; /* CLUT Palette AYVU */
+        uint32_t palette[VIDEO_PALETTE_CLUT_COUNT]; /* CLUT Palette AYVU */
         bool b_palette;
     } spu;
 

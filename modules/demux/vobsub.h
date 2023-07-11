@@ -23,7 +23,7 @@
 static inline void vobsub_palette_argb2ayvu( const uint32_t *src, uint32_t *dst )
 {
     int i;
-    for( i = 0; i < 16; i++ )
+    for( i = 0; i < VIDEO_PALETTE_CLUT_COUNT; i++ )
     {
         uint8_t r, g, b, y, u, v;
         r = (src[i] >> 16) & 0xff;
@@ -38,7 +38,7 @@ static inline void vobsub_palette_argb2ayvu( const uint32_t *src, uint32_t *dst 
 
 static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palette )
 {
-    uint32_t palette[16];
+    uint32_t palette[VIDEO_PALETTE_CLUT_COUNT];
     if( sscanf( psz_buf, "palette: "
                 "%" SCNx32", %" SCNx32 ", %" SCNx32 ", %" SCNx32 ", "
                 "%" SCNx32", %" SCNx32 ", %" SCNx32 ", %" SCNx32 ", "
@@ -47,7 +47,7 @@ static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palett
                 &palette[0], &palette[1], &palette[2], &palette[3],
                 &palette[4], &palette[5], &palette[6], &palette[7],
                 &palette[8], &palette[9], &palette[10], &palette[11],
-                &palette[12], &palette[13], &palette[14], &palette[15] ) == 16 )
+                &palette[12], &palette[13], &palette[14], &palette[15] ) == ARRAY_SIZE(palette) )
     {
         vobsub_palette_argb2ayvu( palette, pu_palette );
         return VLC_SUCCESS;

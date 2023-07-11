@@ -100,7 +100,7 @@ typedef struct
     int            i_original_frame_width;
     int            i_original_frame_height;
     bool           b_palette;
-    uint32_t       palette[16];
+    uint32_t       palette[VIDEO_PALETTE_CLUT_COUNT];
 } demux_sys_t;
 
 
