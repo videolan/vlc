@@ -240,7 +240,7 @@ static int Activate( filter_t *p_filter )
         break;
     case VLC_CODEC_RGB15:
     case VLC_CODEC_RGB16:
-        i_tables_size = sizeof( uint16_t ) * RGB_TABLE_SIZE;
+        i_tables_size = 2 * RGB_TABLE_SIZE;
         break;
     default: /* RV24, RV32 */
         i_tables_size = sizeof( uint32_t ) * RGB_TABLE_SIZE;
