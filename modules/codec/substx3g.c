@@ -302,7 +302,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
 
     if( ( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) ) ||
-          p_block->i_buffer < sizeof(uint16_t) )
+          p_block->i_buffer < 2U )
     {
         block_Release( p_block );
         return VLCDEC_SUCCESS;
@@ -318,7 +318,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    const uint8_t *p_pszstart = p_block->p_buffer + sizeof(uint16_t);
+    const uint8_t *p_pszstart = p_block->p_buffer + 2U;
     char *psz_subtitle;
     if ( i_psz_bytelength > 2 &&
          ( !memcmp( p_pszstart, "\xFE\xFF", 2 ) || !memcmp( p_pszstart, "\xFF\xFE", 2 ) )
@@ -334,7 +334,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         if ( !psz_subtitle )
             return VLCDEC_SUCCESS;
     }
-    p_buf += i_psz_bytelength + sizeof(uint16_t);
+    p_buf += i_psz_bytelength + 2U;
 
     for( uint16_t i=0; i < i_psz_bytelength; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
