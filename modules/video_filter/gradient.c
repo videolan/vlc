@@ -337,7 +337,7 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
     uint32_t *p_smooth;
     if( !p_sys->p_buf32 )
         p_sys->p_buf32 =
-            vlc_alloc( i_num_lines * i_src_visible, sizeof(uint32_t));
+            vlc_alloc( i_num_lines * i_src_visible, sizeof(*p_sys->p_buf32));
     p_smooth = p_sys->p_buf32;
 
     if( !p_smooth ) return;
@@ -461,12 +461,12 @@ static void FilterEdge( filter_t *p_filter, picture_t *p_inpic,
 
     if( !p_sys->p_buf32 )
         p_sys->p_buf32 =
-            vlc_alloc( i_num_lines * i_src_visible, sizeof(uint32_t));
+            vlc_alloc( i_num_lines * i_src_visible, sizeof(*p_sys->p_buf32));
     p_smooth = p_sys->p_buf32;
 
     if( !p_sys->p_buf32_bis )
         p_sys->p_buf32_bis =
-            vlc_alloc( i_num_lines * i_src_visible, sizeof(uint32_t));
+            vlc_alloc( i_num_lines * i_src_visible, sizeof(*p_sys->p_buf32_bis));
     p_grad = p_sys->p_buf32_bis;
 
     if( !p_sys->p_buf8 )
@@ -624,7 +624,7 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
     int *p_hough = vlc_alloc( i_diag * i_nb_steps, sizeof(int) );
     if( ! p_hough ) return;
 
-    p_smooth = vlc_alloc( i_num_lines * i_src_visible, sizeof(uint32_t));
+    p_smooth = vlc_alloc( i_num_lines * i_src_visible, sizeof(*p_smooth));
     if( !p_smooth )
     {
         free( p_hough );
