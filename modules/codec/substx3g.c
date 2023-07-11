@@ -308,10 +308,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    uint8_t *p_buf = p_block->p_buffer;
-
     /* Read our raw string and create the styled segment for HTML */
-    uint16_t i_psz_bytelength = GetWBE( p_buf );
+    uint16_t i_psz_bytelength = GetWBE( p_block->p_buffer );
     if( p_block->i_buffer < i_psz_bytelength + 2U )
     {
         block_Release( p_block );
@@ -334,7 +332,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         if ( !psz_subtitle )
             return VLCDEC_SUCCESS;
     }
-    p_buf += i_psz_bytelength + 2U;
 
     for( uint16_t i=0; i < i_psz_bytelength; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
@@ -363,8 +360,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     const text_style_t *p_root_style = (text_style_t *) p_dec->p_sys;
 
     mp4_box_iterator_t it;
-    mp4_box_iterator_Init( &it, p_buf,
-                           p_block->i_buffer - (p_buf - p_block->p_buffer) );
+    mp4_box_iterator_Init( &it, p_block->p_buffer + 2U + i_psz_bytelength,
+                           p_block->i_buffer - (2U + i_psz_bytelength) );
     /* Parse our styles */
     if( p_dec->fmt_in->i_codec != VLC_CODEC_QTXT )
     while( mp4_box_iterator_Next( &it ) )
