@@ -1,3 +1,10 @@
+# RTP library
+libvlc_rtp_la_SOURCES = access/rtp/rtpfmt.c access/rtp/rtp.h \
+			access/rtp/session.c
+libvlc_rtp_la_CPPFLAGS = -I$(srcdir)/access/rtp
+libvlc_rtp_la_LDFLAGS = -no-undefined
+noinst_LTLIBRARIES += libvlc_rtp.la
+
 # RTP plugin
 access_LTLIBRARIES += librtp_plugin.la
 librtp_plugin_la_SOURCES = \
@@ -8,13 +15,6 @@ librtp_plugin_la_SOURCES = \
 librtp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
 librtp_plugin_la_LIBADD = libvlc_rtp.la $(SOCKET_LIBS)
-
-# RTP library
-libvlc_rtp_la_SOURCES = access/rtp/rtpfmt.c access/rtp/rtp.h \
-			access/rtp/session.c
-libvlc_rtp_la_CPPFLAGS = -I$(srcdir)/access/rtp
-libvlc_rtp_la_LDFLAGS = -no-undefined
-noinst_LTLIBRARIES += libvlc_rtp.la
 
 # Secure RTP library
 libvlc_srtp_la_SOURCES = access/rtp/srtp.c access/rtp/srtp.h
