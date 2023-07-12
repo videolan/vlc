@@ -1284,7 +1284,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 uint8_t *pal = av_packet_new_side_data(pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
                 if (pal) {
-                    memcpy(pal, p_dec->fmt_in->video.p_palette->palette, AVPALETTE_SIZE);
+                    const video_palette_t *p_palette = p_dec->fmt_in->video.p_palette;
+                    for (size_t i=0; i<sizeof(p_palette->palette[0]); i++)
+                    {
+                        memcpy(pal, p_palette->palette[i], ARRAY_SIZE(p_palette->palette));
+                        pal += ARRAY_SIZE(p_palette->palette);
+                    }
                     p_sys->palette_sent = true;
                 }
             }
@@ -1424,7 +1429,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             static_assert( sizeof(p_palette->palette) == AVPALETTE_SIZE,
                            "Palette size mismatch between vlc and libavutil" );
             assert( frame->data[1] != NULL );
-            memcpy( p_palette->palette, frame->data[1], AVPALETTE_SIZE );
+            const uint8_t *src = frame->data[1];
+            for (size_t i=0; i<sizeof(p_palette->palette[0]); i++)
+            {
+                memcpy(p_palette->palette[i], src, ARRAY_SIZE(p_palette->palette));
+                src += ARRAY_SIZE(p_palette->palette);
+            }
             p_palette->i_entries = AVPALETTE_COUNT;
             p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
             if( decoder_UpdateVideoFormat( p_dec ) )
