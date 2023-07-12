@@ -1872,7 +1872,6 @@ static void httpdLoop(httpd_host_t *host)
 
                     default: {
                         httpd_url_t *url;
-                        int i_msg = query->i_type;
                         bool b_auth_failed = false;
 
                         /* Search the url and trigger callbacks */
