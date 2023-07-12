@@ -740,15 +740,11 @@ int InitVideoHwDec( vlc_object_t *obj )
     if (res != VLC_SUCCESS)
         goto not_usable;
 
+    const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(p_context->sw_pix_fmt);
+
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
     {
-        enum AVPixelFormat hwfmt = hwfmts[i];
-
-        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
-        if (dsc == NULL)
-            continue;
-
-        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, p_context->sw_pix_fmt, dsc, NULL) == VLC_SUCCESS)
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], p_context->sw_pix_fmt, src_desc, NULL) == VLC_SUCCESS)
             // we have a matching hardware decoder
             return VLC_SUCCESS;
     }
