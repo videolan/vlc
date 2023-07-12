@@ -546,8 +546,8 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
 static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
 {
     bo_t *esds;
-    const uint8_t *p_extradata = NULL;
-    int i_extradata = 0;
+    const uint8_t *p_extradata = p_track->fmt.p_extra;
+    int i_extradata = p_track->fmt.i_extra;
     uint8_t *p_extradata_allocated = NULL;
 
     switch(p_track->fmt.i_codec)
@@ -568,10 +568,6 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
                 i_extradata = sizeof(p_track->fmt.subs.spu.palette);
 #endif
             }
-            break;
-        default:
-            p_extradata = p_track->fmt.p_extra;
-            i_extradata = p_track->fmt.i_extra;
             break;
     }
 
