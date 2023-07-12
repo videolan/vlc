@@ -39,7 +39,7 @@
 {
     self = [super initWithFrame:frameRect];
     if (self) {
-        [self setupLayer];
+        [self setup];
     }
     return self;
 }
@@ -48,19 +48,31 @@
 {
     self = [super initWithCoder:decoder];
     if (self) {
-        [self setupLayer];
+        [self setup];
     }
     return self;
 }
 
-- (void)setupLayer
+- (void)setup
 {
-    self.layer = [[CALayer alloc] init];
-    self.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
-    
-    self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.wantsLayer = YES;
-    [self setCropsImagesToRoundedCorners:YES];
+    self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawOnSetNeedsDisplay;
+    self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
+    self.cropsImagesToRoundedCorners = YES;
+    self.needsDisplay = YES;
+}
+
+- (void)updateLayer
+{
+    self.layer.borderColor = self.shouldShowDarkAppearance ? NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
+    [self updateLayerImageCornerCropping];
+    [self updateLayerContentGravity];
+    [self updateLayerImage];
+}
+
+- (BOOL)wantsUpdateLayer
+{
+    return YES;
 }
 
 - (void)updateLayerImageCornerCropping
