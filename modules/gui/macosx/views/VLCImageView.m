@@ -144,12 +144,12 @@
     }
 
     _currentArtworkURL = artworkURL;
-    [self setImage:image];
+    self.image = image;
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        NSImage *downloadedImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+        NSImage * const downloadedImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self setImage:downloadedImage];
+            self.image = downloadedImage;
         });
     });
 }
