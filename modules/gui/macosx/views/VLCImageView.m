@@ -63,17 +63,21 @@
     [self setCropsImagesToRoundedCorners:YES];
 }
 
-- (void)setCropsImagesToRoundedCorners:(BOOL)cropsImagesToRoundedCorners
+- (void)updateLayerImageCornerCropping
 {
-    if (cropsImagesToRoundedCorners) {
+    if (self.cropsImagesToRoundedCorners) {
         self.layer.cornerRadius = 5.;
-        self.layer.masksToBounds = YES;
         self.layer.borderWidth = 1.;
     } else {
         self.layer.cornerRadius = 0.;
-        self.layer.masksToBounds = NO;
         self.layer.borderWidth = 0.;
     }
+}
+
+- (void)setCropsImagesToRoundedCorners:(BOOL)cropsImagesToRoundedCorners
+{
+    self.layer.masksToBounds = cropsImagesToRoundedCorners;
+    [self updateLayerImageCornerCropping];
 }
 
 - (BOOL)cropsImagesToRoundedCorners
