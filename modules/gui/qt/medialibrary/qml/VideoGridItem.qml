@@ -85,7 +85,7 @@ Widgets.GridItem {
 
     onPlayClicked: root.play()
 
-    Image {
+    Widgets.ScaledImage {
         id: image
 
         anchors.right: parent.right
