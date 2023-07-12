@@ -84,8 +84,8 @@ FadingEdgeListView {
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
 
-    ScrollBar.vertical: ScrollBar { id: scroll_id; visible: root.contentHeight > root.height }
-    ScrollBar.horizontal: ScrollBar { visible: root.contentWidth > root.width }
+    ScrollBar.vertical: ScrollBar { id: scroll_id }
+    ScrollBar.horizontal: ScrollBar { }
 
     highlightMoveDuration: 300 //ms
     highlightMoveVelocity: 1000 //px/s
