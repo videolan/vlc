@@ -135,7 +135,7 @@ FocusScope {
             anchors.topMargin: root.topPadding
             anchors.bottomMargin: root.bottomPadding
 
-            ScrollBar.vertical: ScrollBar { id: scrollBar; active: true }
+            ScrollBar.vertical: ScrollBar { id: scrollBar }
 
             focus: true
 
