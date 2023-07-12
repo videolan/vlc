@@ -40,7 +40,7 @@ typedef NS_ENUM(NSInteger, VLCImageViewContentGravity) {
 @interface VLCImageView : NSView
 
 @property (readwrite, retain, nonatomic, nullable) NSImage *image;
-@property (readwrite) VLCImageViewContentGravity contentGravity;
+@property (readwrite, nonatomic) VLCImageViewContentGravity contentGravity;
 @property (readwrite) BOOL cropsImagesToRoundedCorners;
 
 - (void)setImageURL:(NSURL * _Nonnull)url placeholderImage:(NSImage * _Nullable)image;

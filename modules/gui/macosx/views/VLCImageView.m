@@ -94,7 +94,7 @@
     [self.layer setContentsScale:actualScaleFactor];
 }
 
-- (void)setCAContentGravity:(VLCImageViewContentGravity)contentGravity
+- (void)setContentGravity:(VLCImageViewContentGravity)contentGravity
 {
     switch (contentGravity) {
         case VLCImageViewContentGravityCenter:
