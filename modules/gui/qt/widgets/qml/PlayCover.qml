@@ -67,7 +67,7 @@ MouseArea {
 
     // Children
 
-    Image {
+    ScaledImage {
         anchors.centerIn: parent
 
         // NOTE: We round this to avoid blurry textures with the QML renderer.
