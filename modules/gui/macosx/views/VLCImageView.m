@@ -81,17 +81,22 @@
     return self.layer.masksToBounds;
 }
 
+- (void)updateImageLayer
+{
+    const CGFloat desiredScaleFactor = [self.window backingScaleFactor];
+    const CGFloat actualScaleFactor = [_image recommendedLayerContentsScale:desiredScaleFactor];
+
+    const id layerContents = [_image layerContentsForContentsScale:actualScaleFactor];
+
+    self.contentGravity = _contentGravity;
+    self.layer.contents = layerContents;
+    self.layer.contentsScale = actualScaleFactor;
+}
+
 - (void)setImage:(NSImage *)image
 {
     _image = image;
-    CGFloat desiredScaleFactor = [self.window backingScaleFactor];
-    CGFloat actualScaleFactor = [image recommendedLayerContentsScale:desiredScaleFactor];
-
-    id layerContents = [image layerContentsForContentsScale:actualScaleFactor];
-
-    [self setCAContentGravity:_contentGravity];
-    [self.layer setContents:layerContents];
-    [self.layer setContentsScale:actualScaleFactor];
+    [self updateImageLayer];
 }
 
 - (void)setContentGravity:(VLCImageViewContentGravity)contentGravity
