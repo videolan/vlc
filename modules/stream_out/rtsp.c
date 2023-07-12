@@ -973,7 +973,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
         case HTTPD_MSG_GETPARAMETER:
         {
-            if( query->i_body > 0 )
+            if( query->i_body != 0 )
             {
                 answer->i_status = 451;
                 break;
@@ -1036,7 +1036,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             httpd_MsgAdd( answer, "Session", "%s", psz_session );
     }
 
-    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
+    httpd_MsgAdd( answer, "Content-Length", "%zu", answer->i_body );
     httpd_MsgAdd( answer, "Cache-Control", "no-cache" );
 
     psz = httpd_MsgGet( query, "Cseq" );

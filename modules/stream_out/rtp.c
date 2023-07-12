@@ -1278,7 +1278,7 @@ static int FileSetup( sout_stream_t *p_stream )
  ****************************************************************************/
 static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *, uint8_t *p_request,
-                          uint8_t **pp_data, int *pi_data );
+                          uint8_t **pp_data, size_t *pi_data );
 
 static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t *url)
 {
@@ -1302,7 +1302,7 @@ static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t *url)
 
 static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *f, uint8_t *p_request,
-                          uint8_t **pp_data, int *pi_data )
+                          uint8_t **pp_data, size_t *pi_data )
 {
     VLC_UNUSED(f); VLC_UNUSED(p_request);
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)p_args;

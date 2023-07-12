@@ -327,7 +327,7 @@ httpd_FileCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 {
     httpd_file_t *file = (httpd_file_t*)p_sys;
     uint8_t **pp_body, *p_body = NULL;
-    int *pi_body, i_body;
+    size_t *pi_body, i_body;
 
     if (!answer || !query )
         return VLC_SUCCESS;
@@ -365,7 +365,7 @@ httpd_FileCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
     if (httpd_MsgGet(&cl->query, "Connection") != NULL)
         httpd_MsgAdd(answer, "Connection", "close");
 
-    httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
+    httpd_MsgAdd(answer, "Content-Length", "%zu", answer->i_body);
 
     return VLC_SUCCESS;
 }
@@ -578,7 +578,7 @@ static int httpd_RedirectCallBack(httpd_callback_sys_t *p_sys,
     /* XXX check if it's ok or we need to set an absolute url */
     httpd_MsgAdd(answer, "Location",  "%s", rdir->dst);
 
-    httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
+    httpd_MsgAdd(answer, "Content-Length", "%zu", answer->i_body);
 
     if (httpd_MsgGet(&cl->query, "Connection") != NULL)
         httpd_MsgAdd(answer, "Connection", "close");
@@ -1349,7 +1349,7 @@ static int httpd_ClientRecv(httpd_client_t *cl)
                 cl->query.i_type  = HTTPD_MSG_NONE;
             }
         }
-    } else if (cl->query.i_body > 0) {
+    } else if (cl->query.i_body != 0) {
         /* we are reading the body of a request or a channel */
         assert (cl->query.p_body != NULL);
         i_len = httpd_NetRecv(cl, &cl->query.p_body[cl->i_buffer],
@@ -1357,7 +1357,7 @@ static int httpd_ClientRecv(httpd_client_t *cl)
         if (i_len > 0)
             cl->i_buffer += i_len;
 
-        if (cl->i_buffer >= cl->query.i_body)
+        if ((size_t)cl->i_buffer >= cl->query.i_body)
             cl->i_state = HTTPD_CLIENT_RECEIVE_DONE;
     } else for (;;) { /* we are reading a header -> char by char */
         if (cl->i_buffer == cl->i_buffer_size) {
@@ -1539,7 +1539,7 @@ static int httpd_ClientRecv(httpd_client_t *cl)
                     }
                 }
             }
-            if (cl->query.i_body > 0) {
+            if (cl->query.i_body != 0) {
                 /* TODO Mhh, handle the case where the client only
                  * sends a request and closes the connection to
                  * mark the end of the body (probably only RTSP) */
@@ -1574,7 +1574,7 @@ static int httpd_ClientRecv(httpd_client_t *cl)
     if (i_len == 0) {
         if (cl->query.i_proto != HTTPD_PROTO_NONE && cl->query.i_type != HTTPD_MSG_NONE) {
             /* connection closed -> end of data */
-            if (cl->query.i_body > 0)
+            if (cl->query.i_body != 0)
                 cl->query.i_body = cl->i_buffer;
             cl->i_state = HTTPD_CLIENT_RECEIVE_DONE;
         }
@@ -1663,7 +1663,7 @@ static int httpd_ClientSend(httpd_client_t *cl)
             httpd_UrlCatchCall(cl->url, cl);
         }
 
-        if (cl->answer.i_body > 0) {
+        if (cl->answer.i_body != 0) {
             /* send the body data */
             free(cl->p_buffer);
             cl->p_buffer = cl->answer.p_body;
@@ -1862,7 +1862,7 @@ static void httpdLoop(httpd_host_t *host)
                             char *p;
                             answer->i_body = httpd_HtmlError (&p, 501, NULL);
                             answer->p_body = (uint8_t *)p;
-                            httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
+                            httpd_MsgAdd(answer, "Content-Length", "%zu", answer->i_body);
                             httpd_MsgAdd(answer, "Connection", "close");
 
                             cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
@@ -1920,7 +1920,7 @@ static void httpdLoop(httpd_host_t *host)
                             answer->p_body = (uint8_t *)p;
 
                             cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
-                            httpd_MsgAdd(answer, "Content-Length", "%d", answer->i_body);
+                            httpd_MsgAdd(answer, "Content-Length", "%zu", answer->i_body);
                             httpd_MsgAdd(answer, "Content-Type", "%s", "text/html");
                             if (httpd_MsgGet(&cl->query, "Connection") != NULL)
                                 httpd_MsgAdd(answer, "Connection", "close");

@@ -48,7 +48,7 @@
 #define PING_WAIT_RETRIES 1
 
 static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
-                          uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+                          uint8_t *psz_request, uint8_t **pp_data, size_t *pi_data );
 
 static const char* StateToStr( States s )
 {
@@ -284,7 +284,7 @@ int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *p
 }
 
 static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
-                          uint8_t *psz_request, uint8_t **pp_data, int *pi_data )
+                          uint8_t *psz_request, uint8_t **pp_data, size_t *pi_data )
 {
     (void) http_file;
     intf_sys_t *p_sys = static_cast<intf_sys_t*>((void *)data);

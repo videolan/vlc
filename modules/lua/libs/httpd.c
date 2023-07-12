@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static uint8_t *vlclua_todata( lua_State *L, int narg, int *i_data );
+static uint8_t *vlclua_todata( lua_State *L, int narg, size_t *i_data );
 
 static int vlclua_httpd_host_delete( lua_State * );
 static int vlclua_httpd_handler_new( lua_State * );
@@ -126,7 +126,7 @@ static int vlclua_httpd_handler_callback(
      void *opaque, httpd_handler_t *p_handler, char *psz_url,
      uint8_t *psz_request, int i_type, uint8_t *p_in, int i_in,
      char *psz_remote_addr, char *psz_remote_host,
-     uint8_t **pp_data, int *pi_data )
+     uint8_t **pp_data, size_t *pi_data )
 {
     VLC_UNUSED(p_handler);
     httpd_handler_lua_t *p_sys = opaque;
@@ -255,7 +255,7 @@ struct httpd_file_sys_t
 
 static int vlclua_httpd_file_callback(
     httpd_file_sys_t *p_sys, httpd_file_t *p_file, uint8_t *psz_request,
-    uint8_t **pp_data, int *pi_data )
+    uint8_t **pp_data, size_t *pi_data )
 {
     VLC_UNUSED(p_file);
     lua_State *L = p_sys->L;
@@ -380,18 +380,16 @@ static int vlclua_httpd_redirect_delete( lua_State *L )
 /*****************************************************************************
  * Utils
  *****************************************************************************/
-static uint8_t *vlclua_todata( lua_State *L, int narg, int *pi_data )
+static uint8_t *vlclua_todata( lua_State *L, int narg, size_t *pi_data )
 {
-    size_t i_data;
-    const char *psz_data = lua_tolstring( L, narg, &i_data );
-    uint8_t *p_data = malloc( i_data );
-    *pi_data = (int)i_data;
+    const char *psz_data = lua_tolstring( L, narg, pi_data );
+    uint8_t *p_data = malloc( *pi_data );
     if( !p_data )
     {
         luaL_error( L, "Error while allocating buffer." );
         return NULL; /* To please gcc even though luaL_error longjmp-ed out of here */
     }
-    memcpy( p_data, psz_data, i_data );
+    memcpy( p_data, psz_data, *pi_data );
     return p_data;
 }
 

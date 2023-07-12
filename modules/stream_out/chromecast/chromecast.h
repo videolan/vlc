@@ -191,7 +191,7 @@ struct intf_sys_t
     std::string getHttpStreamPath() const;
     std::string getHttpArtRoot() const;
 
-    int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+    int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, size_t *pi_data );
     void interrupt_wake_up();
 private:
     void reinit();
