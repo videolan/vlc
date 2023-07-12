@@ -74,6 +74,13 @@ public:
     {
     }
 
+    bool isValid() const override
+    {
+        if (m_window.isNull())
+            return false;
+        return QAccessibleObject::isValid();
+    }
+
     QAccessibleInterface* parent() const override
     {
         // we assume to be a top level window...
@@ -82,11 +89,12 @@ public:
 
     QList<QQuickItem *> rootItems() const
     {
+        if (m_window.isNull())
+            return {};
         if (QQuickItem *ci = m_window->contentItem())
             return accessibleUnignoredChildren(ci);
-        return QList<QQuickItem *>();
+        return {};
     }
-
 
     QAccessibleInterface* child(int index) const override
     {
@@ -166,7 +174,8 @@ public:
     }
 
 private:
-    QQuickWindow* m_window;
+    //use a QPointer here in case the underlying window get destroyed
+    QPointer<QQuickWindow> m_window;
 };
 
 
