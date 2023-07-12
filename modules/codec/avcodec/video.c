@@ -699,6 +699,65 @@ static const enum PixelFormat hwfmts[] =
     AV_PIX_FMT_NONE,
 };
 
+static int ExtractAV1Profile(AVCodecContext *p_context, const es_format_t *fmt_in, decoder_sys_t *p_sys)
+{
+    av1_OBU_sequence_header_t *sequence_hdr = NULL;
+    unsigned w, h;
+
+    if (fmt_in->i_extra > 4)
+    {
+        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
+        // and then one or more OBU
+        const uint8_t *obu_start = ((const uint8_t*) fmt_in->p_extra) + 4;
+        int obu_size = fmt_in->i_extra - 4;
+        if (AV1_OBUIsValid(obu_start, obu_size) && AV1_OBUGetType(obu_start) == AV1_OBU_SEQUENCE_HEADER)
+            sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
+    }
+
+    if (sequence_hdr == NULL)
+        return VLC_EGENERIC;
+
+    // fill the AVCodecContext with the values from the sequence header
+    // so we can create the expected VA right away:
+    // coded_width, coded_height, framerate, profile and sw_pix_fmt
+
+    vlc_fourcc_t chroma = AV1_get_chroma(sequence_hdr);
+    if (chroma == 0)
+    {
+        AV1_release_sequence_header(sequence_hdr);
+        return VLC_EGENERIC;
+    }
+    p_context->sw_pix_fmt = FindFfmpegChroma(chroma);
+
+    if (p_context->sw_pix_fmt == AV_PIX_FMT_NONE)
+    {
+        AV1_release_sequence_header(sequence_hdr);
+        return VLC_EGENERIC;
+    }
+
+    AV1_get_frame_max_dimensions(sequence_hdr, &w, &h);
+
+    p_context->coded_width  = p_context->width  = w;
+    p_context->coded_height = p_context->height = h;
+
+    if (!fmt_in->video.i_frame_rate || !fmt_in->video.i_frame_rate_base)
+    {
+        unsigned num, den;
+        if (AV1_get_frame_rate(sequence_hdr, &num, &den))
+        {
+            p_context->framerate.num = num;
+            p_context->framerate.den = den;
+        }
+    }
+
+    int tier;
+    AV1_get_profile_level(sequence_hdr, &p_sys->profile, &p_sys->level, &tier);
+
+    AV1_release_sequence_header(sequence_hdr);
+
+    return VLC_SUCCESS;
+}
+
 int InitVideoHwDec( vlc_object_t *obj )
 {
     decoder_t *p_dec = container_of(obj, decoder_t, obj);
@@ -718,59 +777,8 @@ int InitVideoHwDec( vlc_object_t *obj )
         return VLC_ENOMEM;
     }
 
-    av1_OBU_sequence_header_t *sequence_hdr = NULL;
-    unsigned w, h;
-
-    if (p_dec->fmt_in.i_extra > 4)
-    {
-        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
-        // and then one or more OBU
-        const uint8_t *obu_start = ((const uint8_t*) p_dec->fmt_in.p_extra) + 4;
-        int obu_size = p_dec->fmt_in.i_extra - 4;
-        if (AV1_OBUIsValid(obu_start, obu_size) && AV1_OBUGetType(obu_start) == AV1_OBU_SEQUENCE_HEADER)
-            sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
-    }
-
-    if (sequence_hdr == NULL)
+    if (ExtractAV1Profile(p_context, &p_dec->fmt_in, p_sys) != VLC_SUCCESS)
         goto failed;
-
-    // fill the AVCodecContext with the values from the sequence header
-    // so we can create the expected VA right away:
-    // coded_width, coded_height, framerate, profile and sw_pix_fmt
-
-    vlc_fourcc_t chroma = AV1_get_chroma(sequence_hdr);
-    if (chroma == 0)
-    {
-        AV1_release_sequence_header(sequence_hdr);
-        goto failed;
-    }
-    p_context->sw_pix_fmt = FindFfmpegChroma(chroma);
-
-    if (p_context->sw_pix_fmt == AV_PIX_FMT_NONE)
-    {
-        AV1_release_sequence_header(sequence_hdr);
-        goto failed;
-    }
-
-    AV1_get_frame_max_dimensions(sequence_hdr, &w, &h);
-
-    p_context->coded_width  = p_context->width  = w;
-    p_context->coded_height = p_context->height = h;
-
-    if (!p_dec->fmt_in.video.i_frame_rate || !p_dec->fmt_in.video.i_frame_rate_base)
-    {
-        unsigned num, den;
-        if (AV1_get_frame_rate(sequence_hdr, &num, &den))
-        {
-            p_context->framerate.num = num;
-            p_context->framerate.den = den;
-        }
-    }
-
-    int tier;
-    AV1_get_profile_level(sequence_hdr, &p_sys->profile, &p_sys->level, &tier);
-
-    AV1_release_sequence_header(sequence_hdr);
 
     p_dec->p_sys = p_sys;
     p_sys->p_context = p_context;
