@@ -43,7 +43,6 @@ ListView {
 
     ScrollBar.horizontal: ScrollBar {
         id: scrollBar
-        policy: playerBtnDND.contentWidth > playerBtnDND.width ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
     }
 
     remove: Transition {
