@@ -514,6 +514,8 @@ void CompositorX11RenderWindow::disableVideoWindow()
 
 QQuickWindow* CompositorX11RenderWindow::getOffscreenWindow() const
 {
+    if (!m_interfaceWindow)
+        return nullptr;
     return m_interfaceWindow->getOffscreenWindow();
 }
 
