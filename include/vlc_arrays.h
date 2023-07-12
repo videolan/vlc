@@ -162,7 +162,7 @@ static inline void *realloc_or_free( void *p, size_t sz )
 /* Internal functions */
 #define _ARRAY_ALLOC(array, newsize) {                                      \
     (array).i_alloc = newsize;                                              \
-    (array).p_elems = realloc( (array).p_elems, (array).i_alloc *           \
+    (array).p_elems = vlc_reallocarray( (array).p_elems, (array).i_alloc,   \
                                sizeof(*(array).p_elems) );                  \
     if( !(array).p_elems ) abort();                                         \
 }
