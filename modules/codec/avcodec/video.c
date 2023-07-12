@@ -944,7 +944,7 @@ static void map_dovi_metadata( vlc_video_dovi_metadata_t *out,
     static_assert(sizeof(out->nlq)    == sizeof(vdm->nlq),    "struct mismatch");
     memcpy(out->curves, vdm->curves, sizeof(out->curves));
     memcpy(out->nlq,    vdm->nlq,    sizeof(out->nlq));
-    for( int i = 0; i < ARRAY_SIZE( out->curves ); i++)
+    for( size_t i = 0; i < ARRAY_SIZE( out->curves ); i++)
         assert( out->curves[i].num_pivots <= ARRAY_SIZE( out->curves[i].pivots ));
 }
 #endif
