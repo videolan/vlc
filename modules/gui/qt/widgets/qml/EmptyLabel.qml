@@ -73,7 +73,7 @@ FocusScope {
                 width: VLCStyle.colWidth(1)
                 height: VLCStyle.colWidth(1)
 
-                Image {
+                ScaledImage {
                     id: cover
 
                     anchors.fill: parent
