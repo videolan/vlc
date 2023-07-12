@@ -103,9 +103,9 @@
     [self updateImageLayer];
 }
 
-- (void)setContentGravity:(VLCImageViewContentGravity)contentGravity
+- (void)updateLayerContentGravity
 {
-    switch (contentGravity) {
+    switch (_contentGravity) {
         case VLCImageViewContentGravityCenter:
             self.layer.contentsGravity = kCAGravityCenter;
             break;
@@ -144,6 +144,12 @@
             self.layer.contentsGravity = kCAGravityResizeAspectFill;
             break;
     }
+}
+
+- (void)setContentGravity:(VLCImageViewContentGravity)contentGravity
+{
+    _contentGravity = contentGravity;
+    [self updateLayerContentGravity];
 }
 
 - (void)setImageURL:(NSURL * _Nonnull)artworkURL placeholderImage:(NSImage * _Nullable)image
