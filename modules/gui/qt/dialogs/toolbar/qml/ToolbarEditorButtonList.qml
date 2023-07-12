@@ -32,7 +32,7 @@ GridView {
 
     clip: true
 
-    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+    ScrollBar.vertical: ScrollBar { }
     model: PlayerControlbarControls.controlList.length
 
     currentIndex: -1
