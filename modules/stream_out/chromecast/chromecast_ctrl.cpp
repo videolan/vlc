@@ -234,10 +234,8 @@ void intf_sys_t::reinit()
     }
 }
 
-int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data )
+int intf_sys_t::httpd_file_fill( uint8_t *, uint8_t **pp_data, size_t *pi_data )
 {
-    (void) psz_request;
-
     char *psz_art;
     {
         vlc::threads::mutex_locker lock( m_lock );
@@ -283,10 +281,9 @@ int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *p
     return VLC_SUCCESS;
 }
 
-static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *http_file,
+static int httpd_file_fill_cb( httpd_file_sys_t *data, httpd_file_t *,
                           uint8_t *psz_request, uint8_t **pp_data, size_t *pi_data )
 {
-    (void) http_file;
     intf_sys_t *p_sys = static_cast<intf_sys_t*>((void *)data);
     return p_sys->httpd_file_fill( psz_request, pp_data, pi_data );
 }
