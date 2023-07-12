@@ -543,12 +543,12 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
     return edts;
 }
 
-static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
+static bo_t *GetESDS(const mp4mux_trackinfo_t *p_track)
 {
     bo_t *esds;
     const uint8_t *p_extradata = p_track->fmt.p_extra;
     int i_extradata = p_track->fmt.i_extra;
-    uint8_t *p_extradata_allocated = NULL;
+    uint32_t local_palette[ARRAY_SIZE(p_track->fmt.subs.spu.palette)];
 
     switch(p_track->fmt.i_codec)
     {
@@ -556,17 +556,13 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
             if(p_track->fmt.subs.spu.b_palette)
             {
 #ifndef WORDS_BIGENDIAN
-                p_extradata = p_extradata_allocated = malloc(16*4);
-                if(p_extradata_allocated)
-                {
-                    for(int i=0; i<ARRAY_SIZE(p_track->fmt.subs.spu.palette); i++)
-                        SetDWBE(&p_extradata_allocated[i*4], p_track->fmt.subs.spu.palette[i]);
-                    i_extradata = 16*4;
-                }
+                for(size_t i=0; i<ARRAY_SIZE(p_track->fmt.subs.spu.palette); i++)
+                    SetDWBE(&local_palette[i], p_track->fmt.subs.spu.palette[i]);
+                p_extradata = (const uint8_t *) local_palette;
 #else
                 p_extradata = (const uint8_t *) p_track->fmt.subs.spu.palette;
-                i_extradata = sizeof(p_track->fmt.subs.spu.palette);
 #endif
+                i_extradata = sizeof(p_track->fmt.subs.spu.palette);
             }
             break;
     }
@@ -577,7 +573,6 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     esds = box_full_new("esds", 0, 0);
     if(!esds)
     {
-        free(p_extradata_allocated);
         return NULL;
     }
 
@@ -681,8 +676,6 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
 
         for (int i = 0; i < i_extradata; i++)
             bo_add_8(esds, p_extradata[i]);
-
-        free(p_extradata_allocated);
     }
 
     /* SL_Descr mandatory */
