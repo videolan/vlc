@@ -1757,8 +1757,18 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 
     /* Use the default fmt in priority of any sw fmt if the default fmt is a hw
      * one */
-    if (defaultfmt != AV_PIX_FMT_NONE && !p_sys->b_hardware_only)
+    if (defaultfmt != AV_PIX_FMT_NONE)
+    {
+        if (p_sys->b_hardware_only)
+        {
+            if (defaultfmt != p_context->sw_pix_fmt)
+            {
+                // the source format changed and we didn't detect it
+                vlc_assert_unreachable();
+            }
+        }
         swfmt = defaultfmt;
+    }
 
     if (p_sys->pix_fmt == AV_PIX_FMT_NONE)
         goto no_reuse;
