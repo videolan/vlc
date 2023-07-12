@@ -85,14 +85,14 @@
     return self.layer.masksToBounds;
 }
 
-- (void)updateImageLayer
+- (void)updateLayerImage
 {
     const CGFloat desiredScaleFactor = [self.window backingScaleFactor];
     const CGFloat actualScaleFactor = [_image recommendedLayerContentsScale:desiredScaleFactor];
 
     const id layerContents = [_image layerContentsForContentsScale:actualScaleFactor];
 
-    self.contentGravity = _contentGravity;
+    [self updateLayerContentGravity];
     self.layer.contents = layerContents;
     self.layer.contentsScale = actualScaleFactor;
 }
@@ -100,7 +100,7 @@
 - (void)setImage:(NSImage *)image
 {
     _image = image;
-    [self updateImageLayer];
+    [self updateLayerImage];
 }
 
 - (void)updateLayerContentGravity
