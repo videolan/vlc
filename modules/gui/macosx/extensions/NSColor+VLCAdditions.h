@@ -38,7 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) NSColor *VLCSliderFillColor;
 @property (class, readonly) NSColor *VLCSliderLightBackgroundColor;
 @property (class, readonly) NSColor *VLCSliderDarkBackgroundColor;
-@property (class, readonly) NSColor *VLCSubtleBorderColor;
+@property (class, readonly) NSColor *VLCLightSubtleBorderColor;
+@property (class, readonly) NSColor *VLCDarkSubtleBorderColor;
 
 @end
 
