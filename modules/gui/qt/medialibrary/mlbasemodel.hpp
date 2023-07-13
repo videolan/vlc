@@ -71,7 +71,10 @@ public:
 
     virtual ~MLBaseModel();
 
-public: // Interface
+
+    virtual QVariant itemRoleData(MLItem *item, int role) const = 0;
+
+
     Q_INVOKABLE void sortByColumn(QByteArray name, Qt::SortOrder order);
 
     Q_INVOKABLE virtual MLItemId getIdForIndex(QVariant index) const;
@@ -85,8 +88,31 @@ public: // Interface
     Q_INVOKABLE void getData(const QModelIndexList &indexes, QJSValue callback);
 
     QVariant data(const QModelIndex &index, int role) const override final;
+    int rowCount(const QModelIndex &parent = {}) const override;
 
-    virtual QVariant itemRoleData(MLItem *item, int role) const = 0;
+public:
+    // properties functions
+
+    MLItemId parentId() const;
+    void setParentId(MLItemId parentId);
+    void unsetParentId();
+
+    MediaLib* ml() const;
+    void setMl(MediaLib* ml);
+
+    const QString& searchPattern() const;
+    void setSearchPattern( const QString& pattern );
+
+    Qt::SortOrder getSortOrder() const;
+    void setSortOder(Qt::SortOrder order);
+    const QString getSortCriteria() const;
+    void setSortCriteria(const QString& criteria);
+    void unsetSortCriteria();
+
+    virtual unsigned int getCount() const;
+
+    bool loading() const;
+
 
 signals:
     void parentIdChanged();
@@ -97,12 +123,11 @@ signals:
     void countChanged(unsigned int) const;
     void loadingChanged() const;
 
+
 protected slots:
     void onResetRequested();
     void onLocalSizeChanged(size_t size);
 
-private:
-    static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
 protected:
     void classBegin() override;
@@ -164,29 +189,9 @@ protected:
 
     virtual std::unique_ptr<BaseLoader> createLoader() const = 0;
 
-public:
-    MLItemId parentId() const;
-    void setParentId(MLItemId parentId);
-    void unsetParentId();
-
-    MediaLib* ml() const;
-    void setMl(MediaLib* ml);
-
-    const QString& searchPattern() const;
-    void setSearchPattern( const QString& pattern );
-
-    Qt::SortOrder getSortOrder() const;
-    void setSortOder(Qt::SortOrder order);
-    const QString getSortCriteria() const;
-    void setSortCriteria(const QString& criteria);
-    void unsetSortCriteria();
-
-    int rowCount(const QModelIndex &parent = {}) const override;
-    virtual unsigned int getCount() const;
-
-    bool loading() const;
-
 private:
+    static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
+
     void onCacheDataChanged(int first, int last);
     void onCacheBeginInsertRows(int first, int last);
     void onCacheBeginRemoveRows(int first, int last);
