@@ -361,10 +361,8 @@ void MLBaseModel::unsetSortCriteria()
 
 int MLBaseModel::rowCount(const QModelIndex &parent) const
 {
-    if (!cachable() || parent.isValid())
+    if (!m_cache || parent.isValid())
         return 0;
-
-    validateCache();
 
     return m_cache->count();
 }
@@ -421,13 +419,9 @@ QVariantList MLBaseModel::getIdsForIndexes(const QVariantList & indexes) const
 
 unsigned MLBaseModel::getCount() const
 {
-    if (!cachable())
+    if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
         return 0;
 
-    validateCache();
-
-    if (m_cache->count() == COUNT_UNINITIALIZED)
-        return 0;
     return static_cast<unsigned>(m_cache->count());
 }
 
@@ -512,8 +506,6 @@ void MLBaseModel::invalidateCache()
 
 MLItem *MLBaseModel::item(int signedidx) const
 {
-    validateCache();
-
     if (!m_cache)
         return nullptr;
 
