@@ -53,7 +53,7 @@ class MLBaseModel : public QAbstractListModel, public QQmlParserStatus
 
     Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern FINAL)
 
-    Q_PROPERTY(Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged FINAL)
+    Q_PROPERTY(Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged FINAL)
 
     Q_PROPERTY(QString sortCriteria READ getSortCriteria WRITE setSortCriteria
                NOTIFY sortCriteriaChanged RESET unsetSortCriteria FINAL)
@@ -104,7 +104,7 @@ public:
     void setSearchPattern( const QString& pattern );
 
     Qt::SortOrder getSortOrder() const;
-    void setSortOder(Qt::SortOrder order);
+    void setSortOrder(Qt::SortOrder order);
     const QString getSortCriteria() const;
     void setSortCriteria(const QString& criteria);
     void unsetSortCriteria();

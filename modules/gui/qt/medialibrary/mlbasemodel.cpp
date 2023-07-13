@@ -324,7 +324,7 @@ Qt::SortOrder MLBaseModel::getSortOrder() const
     return m_sort_desc ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
 }
 
-void MLBaseModel::setSortOder(Qt::SortOrder order)
+void MLBaseModel::setSortOrder(Qt::SortOrder order)
 {
     bool desc = (order == Qt::SortOrder::DescendingOrder);
     if (m_sort_desc == desc)
