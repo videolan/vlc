@@ -32,11 +32,11 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <vlc_fs.h>
 
 #include <vlc_hash.h>
 #include <vlc_tick.h>
+#include <vlc_threads.h>
 
 /*
  * Pseudo-random number generator using a HMAC-MD5 in counter mode.
@@ -76,7 +76,7 @@ static void vlc_rand_init (void)
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static uint64_t counter = 0;
     struct timespec ts;
 
@@ -92,14 +92,14 @@ void vlc_rand_bytes (void *buf, size_t len)
         vlc_hash_md5_Init (&mdi);
         vlc_hash_md5_Init (&mdo);
 
-        pthread_mutex_lock (&lock);
+        vlc_mutex_lock (&lock);
         if (counter == 0)
             vlc_rand_init ();
         val = counter++;
 
         vlc_hash_md5_Update (&mdi, ikey, sizeof (ikey));
         vlc_hash_md5_Update (&mdo, okey, sizeof (okey));
-        pthread_mutex_unlock (&lock);
+        vlc_mutex_unlock (&lock);
 
         vlc_hash_md5_Update (&mdi, &ts, sizeof (ts));
         vlc_hash_md5_Update (&mdi, &val, sizeof (val));
