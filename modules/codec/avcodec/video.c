@@ -147,6 +147,33 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
  * Local Functions
  *****************************************************************************/
 
+static void lavc_Frame8PaletteCopy( video_palette_t *dst, const uint8_t *src )
+{
+    // (A << 24) | (R << 16) | (G << 8) | B
+    // stored in host endianness
+    const uint8_t *srcp = src;
+    for(size_t i=0; i<AVPALETTE_COUNT; i++)
+    {
+        // we want RGBA byte order storage
+#ifdef WORDS_BIGENDIAN
+        // AV mem is ARGB in byte order
+        dst->palette[i][0] = srcp[1];
+        dst->palette[i][1] = srcp[2];
+        dst->palette[i][2] = srcp[3];
+        dst->palette[i][3] = srcp[0];
+#else
+        // AV mem is BGRA in byte order
+        dst->palette[i][0] = srcp[2];
+        dst->palette[i][1] = srcp[1];
+        dst->palette[i][2] = srcp[0];
+        dst->palette[i][3] = srcp[3];
+#endif
+        srcp += sizeof(dst->palette[0]);
+    }
+
+    dst->i_entries = AVPALETTE_COUNT;
+}
+
 /**
  * Sets the decoder output format.
  */
@@ -1430,13 +1457,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             static_assert( sizeof(p_palette->palette) == AVPALETTE_SIZE,
                            "Palette size mismatch between vlc and libavutil" );
             assert( frame->data[1] != NULL );
-            const uint8_t *src = frame->data[1];
-            for (size_t i=0; i<ARRAY_SIZE(p_palette->palette); i++)
-            {
-                memcpy(p_palette->palette[i], src, sizeof(p_palette->palette[0]));
-                src += sizeof(p_palette->palette[0]);
-            }
-            p_palette->i_entries = AVPALETTE_COUNT;
+            lavc_Frame8PaletteCopy( p_palette, frame->data[1] );
             p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
             if( decoder_UpdateVideoFormat( p_dec ) )
             {
