@@ -1026,7 +1026,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/KeyNavigableTableView.qml \
 	gui/qt/widgets/qml/TableViewDelegate.qml \
 	gui/qt/widgets/qml/ListCoverShadow.qml \
-	gui/qt/widgets/qml/ListItem.qml \
 	gui/qt/widgets/qml/ListLabel.qml \
 	gui/qt/widgets/qml/LoaderFade.qml \
 	gui/qt/widgets/qml/LocalTabBar.qml \

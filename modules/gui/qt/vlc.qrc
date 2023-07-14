@@ -173,7 +173,6 @@
         <file alias="CSDMouseStealer.qml">widgets/qml/CSDMouseStealer.qml</file>
         <file alias="CurrentIndicator.qml">widgets/qml/CurrentIndicator.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
-        <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
         <file alias="LoaderFade.qml">widgets/qml/LoaderFade.qml</file>
         <file alias="DrawerExt.qml">widgets/qml/DrawerExt.qml</file>
         <file alias="KeyNavigableListView.qml">widgets/qml/KeyNavigableListView.qml</file>
