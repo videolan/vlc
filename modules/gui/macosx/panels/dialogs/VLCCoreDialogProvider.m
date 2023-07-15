@@ -31,6 +31,9 @@
 #import <vlc_dialog.h>
 
 @interface VLCCoreDialogProvider ()
+{
+    VLCErrorWindowController *_errorPanel;
+}
 
 - (void)displayErrorWithTitle:(NSString *)title
                          text:(NSString *)text;
@@ -357,6 +360,15 @@ static void updateProgressCallback(void *p_data,
         _progressIndicator.doubleValue = position;
         _progressDescriptionLabel.stringValue = text;
     }
+}
+
+- (VLCErrorWindowController *)errorPanel
+{
+    if (!_errorPanel) {
+        _errorPanel = [[VLCErrorWindowController alloc] init];
+    }
+
+    return _errorPanel;
 }
 
 - (IBAction)progressDialogAction:(id)sender
