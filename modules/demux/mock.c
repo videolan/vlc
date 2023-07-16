@@ -34,6 +34,68 @@
 #include <vlc_input.h>
 #include <vlc_vector.h>
 
+enum
+{
+    PALETTE_RED = 0,
+    PALETTE_GREEN,
+    PALETTE_BLUE,
+    PALETTE_BLACK,
+};
+
+const uint8_t rgbpal[4][4] = {[PALETTE_RED] =   { 0xFF, 0x00, 0x00, 0xFF },
+                              [PALETTE_GREEN] = { 0x00, 0xFF, 0x00, 0xFF },
+                              [PALETTE_BLUE] =  { 0x00, 0x00, 0xFF, 0xFF },
+                              [PALETTE_BLACK] = { 0x00, 0x00, 0x00, 0xFF }};
+
+const uint8_t yuvpal[4][4] = {[PALETTE_RED] =   { 0x4C, 0x54, 0xFF, 0xFF },
+                              [PALETTE_GREEN] = { 0x95, 0x2B, 0x15, 0xFF },
+                              [PALETTE_BLUE] =  { 0x1D, 0xFF, 0x6B, 0xFF },
+                              [PALETTE_BLACK] = { 0x00, 0x80, 0x80, 0xFF }};
+
+#define GLYPH_COLS 6
+#define GLYPH_ROWS 10
+
+static const uint8_t glyph10_bitmap[3][GLYPH_ROWS] =
+    {
+        [PALETTE_BLUE] = {
+            /*Unicode: U+0042 (B) , Width: 6 */
+        0xfc,  //%%%%%%
+        0xfc,  //%%%%%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xf0,  //%%%%..
+        0xf0,  //%%%%..
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xfc,  //%%%%%%
+        0xfc,  //%%%%%%
+        }, [PALETTE_GREEN] = {
+            /*Unicode: U+0047 (G) , Width: 6 */
+        0xfc,  //%%%%%%
+        0xfc,  //%%%%%%
+        0xc0,  //%%....
+        0xc0,  //%%....
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xfc,  //%%%%%%
+        0xfc,  //%%%%%%
+        }, [PALETTE_RED] = {
+            /*Unicode: U+0052 (R) , Width: 6 */
+        0xfc,  //%%%%%%
+        0xfc,  //%%%%%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xf0,  //%%%%..
+        0xf0,  //%%%%..
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        0xcc,  //%%..%%
+        }
+};
+
 static ssize_t
 var_InheritSsize(vlc_object_t *obj, const char *name)
 {
@@ -528,11 +590,40 @@ CreateVideoBlock(demux_t *demux, struct mock_track *track)
         .free = video_block_free_cb
     };
 
+    unsigned range = pic->format.p_palette ? 3 : 255;
+    unsigned delay = 2550 / range;
+
     size_t block_len = 0;
     for (int i = 0; i < pic->i_planes; ++i)
         block_len += pic->p[i].i_lines * pic->p[i].i_pitch;
-    memset(pic->p[0].p_pixels, (sys->video_pts / VLC_TICK_FROM_MS(10)) % 255,
-           block_len);
+
+    uint8_t pixel = (sys->video_pts / VLC_TICK_FROM_MS(delay)) % range;
+    memset(pic->p[0].p_pixels, pixel, block_len);
+
+    if(pic->format.p_palette && pixel < PALETTE_BLACK)
+    {
+        unsigned incx = pic->p[0].i_pitch / GLYPH_COLS / 2;
+        unsigned incy = pic->p[0].i_lines / GLYPH_ROWS / 2;
+        uint8_t *p = pic->p[0].p_pixels;
+        for(unsigned y=0; y<GLYPH_ROWS; y++)
+        {
+            for(unsigned yrepeat=0; yrepeat<incy; yrepeat++)
+            {
+                uint8_t *q = p;
+                for(unsigned x=0; x<GLYPH_COLS; x++)
+                {
+                    uint8_t mask = 0x80 >> x;
+                    if( glyph10_bitmap[pixel][y] & mask )
+                        memset(q, PALETTE_BLACK, incx);
+                    else
+                        memset(q, pixel, incx);
+                    q += incx;
+                }
+                p += pic->p[0].i_visible_pitch;
+            }
+        }
+    }
+
     return block_Init(&video->b, &cbs, pic->p[0].p_pixels, block_len);
     (void) demux;
 }
@@ -656,6 +747,17 @@ ConfigureVideoTrack(demux_t *demux,
     {
         msg_Err(demux, "Invalid orientation value %u", options->orientation);
         return VLC_EGENERIC;
+    }
+
+    if(chroma == VLC_CODEC_RGBP || chroma == VLC_CODEC_YUVP)
+    {
+        fmt->video.p_palette = malloc(sizeof(video_palette_t));
+        if(!fmt->video.p_palette)
+            return VLC_EGENERIC;
+        fmt->video.p_palette->i_entries = 4;
+        memcpy(fmt->video.p_palette->palette,
+               chroma == VLC_CODEC_RGBP ? rgbpal : yuvpal,
+               sizeof(rgbpal));
     }
 
     fmt->i_codec = chroma;
