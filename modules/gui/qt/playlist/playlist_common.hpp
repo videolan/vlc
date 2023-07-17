@@ -28,7 +28,9 @@ class PlaylistPtr
 {
 public:
     PlaylistPtr() = default;
-    explicit PlaylistPtr(vlc_playlist_t * const pl);
+    explicit PlaylistPtr(vlc_playlist_t * const playlist)
+        : m_playlist(playlist)
+    { };
 
     vlc_playlist_t * m_playlist = nullptr;
 };

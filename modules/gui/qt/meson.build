@@ -390,7 +390,6 @@ some_sources = files(
     'player/control_list_filter.cpp',
     'player/control_list_filter.hpp',
     'playlist/media.hpp',
-    'playlist/playlist_common.cpp',
     'playlist/playlist_common.hpp',
     'playlist/playlist_controller.cpp',
     'playlist/playlist_controller.hpp',

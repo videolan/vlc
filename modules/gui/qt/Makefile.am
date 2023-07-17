@@ -277,7 +277,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/player/control_list_filter.cpp \
 	gui/qt/player/control_list_filter.hpp \
 	gui/qt/playlist/media.hpp \
-	gui/qt/playlist/playlist_common.cpp \
 	gui/qt/playlist/playlist_common.hpp \
 	gui/qt/playlist/playlist_controller.cpp \
 	gui/qt/playlist/playlist_controller.hpp \
