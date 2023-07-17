@@ -44,6 +44,20 @@ function enforceFocus(item, reason) {
     item.forceActiveFocus(reason);
 }
 
+function applyVolume(player, delta) {
+    // Degrees to steps for standard mouse
+    delta = delta / 8 / 15
+
+    const steps = Math.ceil(Math.abs(delta))
+
+    player.muted = false
+
+    if (delta > 0)
+        player.setVolumeUp(steps)
+    else
+        player.setVolumeDown(steps)
+}
+
 function pointInRadius(x, y, radius) {
      return (x * x + y * y < radius * radius)
 }
