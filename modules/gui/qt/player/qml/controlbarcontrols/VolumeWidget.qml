@@ -23,6 +23,7 @@ import QtGraphicalEffects 1.12
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 T.Pane {
@@ -292,19 +293,8 @@ T.Pane {
 
                     if (fineControl)
                         volControl.value += 0.001 * delta
-                    else {
-                        // Degrees to steps for standard mouse
-                        delta = delta / 8 / 15
-
-                        const steps = Math.ceil(Math.abs(delta))
-
-                        Player.muted = false
-
-                        if (delta > 0)
-                            Player.setVolumeUp(steps)
-                        else
-                            Player.setVolumeDown(steps)
-                    }
+                    else
+                        Helpers.applyVolume(Player, delta)
 
                     wheel.accepted = true
                 }
