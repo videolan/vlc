@@ -151,9 +151,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (!newItemOnSameRow) {
         [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
     } else {
-        _animationIndex = kWrapAroundValue;
         _animationIsCollapse = NO;
-        _detailViewIsAnimating = NO;
     }
 }
 
