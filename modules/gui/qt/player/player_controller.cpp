@@ -48,9 +48,9 @@ using SharedEsId = vlc_shared_data_ptr_type(vlc_es_id_t,
                                             vlc_es_id_Hold,
                                             vlc_es_id_Release);
 
-using TitleListPtr = vlc_shared_data_ptr_type(vlc_player_title_list,
-                                              vlc_player_title_list_Hold,
-                                              vlc_player_title_list_Release);
+using SharedTitleList = vlc_shared_data_ptr_type(vlc_player_title_list,
+                                                 vlc_player_title_list_Hold,
+                                                 vlc_player_title_list_Release);
 
 PlayerControllerPrivate::~PlayerControllerPrivate()
 {
@@ -521,10 +521,10 @@ static void on_player_titles_changed(vlc_player_t *, struct vlc_player_title_lis
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_title_array_changed");
 
-    TitleListPtr titleListPtr = TitleListPtr(titles);
+    SharedTitleList sharedTitleList = SharedTitleList(titles);
 
-    that->callAsync([that,titleListPtr] (){
-        struct vlc_player_title_list *titles = titleListPtr.get();
+    that->callAsync([that,sharedTitleList] (){
+        struct vlc_player_title_list *titles = sharedTitleList.get();
         that->m_chapterList.resetTitle(nullptr);
         that->m_titleList.resetTitles(titles);
 
