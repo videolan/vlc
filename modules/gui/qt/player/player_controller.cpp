@@ -44,9 +44,9 @@
 
 //PlayerController private implementation
 
-using EsIdPtr = vlc_shared_data_ptr_type(vlc_es_id_t,
-                                         vlc_es_id_Hold,
-                                         vlc_es_id_Release);
+using SharedEsId = vlc_shared_data_ptr_type(vlc_es_id_t,
+                                            vlc_es_id_Hold,
+                                            vlc_es_id_Release);
 
 using TitleListPtr = vlc_shared_data_ptr_type(vlc_player_title_list,
                                               vlc_player_title_list_Hold,
@@ -479,8 +479,8 @@ static void on_player_track_selection_changed(vlc_player_t *, vlc_es_id_t * unse
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_track_selection_changed");
 
-    EsIdPtr unselectedPtr = EsIdPtr(unselected);
-    EsIdPtr selectedPtr = EsIdPtr(selected);
+    SharedEsId unselectedPtr = SharedEsId(unselected);
+    SharedEsId selectedPtr = SharedEsId(selected);
 
     that->callAsync([that,unselectedPtr,selectedPtr] () {
         if (unselectedPtr)
@@ -662,10 +662,10 @@ static void on_player_track_delay_changed(vlc_player_t *,
                                 void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
-    EsIdPtr esIdPtr = EsIdPtr(es_id);
+    SharedEsId sharedEsId = SharedEsId(es_id);
 
-    that->callAsync([that,esIdPtr,new_delay] (){
-        if (that->m_secondarySpuEsId == esIdPtr)
+    that->callAsync([that,sharedEsId,new_delay] (){
+        if (that->m_secondarySpuEsId == sharedEsId)
         {
             that->m_secondarySubtitleDelay = new_delay;
             emit that->q_func()->secondarySubtitleDelayChanged( new_delay );
@@ -812,9 +812,9 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
         }
         case SPU_ES:
         {
-            EsIdPtr esIdPtr = EsIdPtr(es_id);
-            that->callAsync([that,esIdPtr,order] () {
-                that->UpdateSpuOrder(esIdPtr.get(), order);
+            SharedEsId sharedEsId = SharedEsId(es_id);
+            that->callAsync([that,sharedEsId,order] () {
+                that->UpdateSpuOrder(sharedEsId.get(), order);
             });
             break;
         }
