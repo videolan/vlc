@@ -253,12 +253,12 @@ public:
 public:
     static void vout_Hold_fct( vout_thread_t* vout ) { vout_Hold(vout); }
     static void vout_Release_fct( vout_thread_t* vout ) { vout_Release(vout); }
-    typedef vlc_shared_data_ptr_type(vout_thread_t, PlayerController::vout_Hold_fct, PlayerController::vout_Release_fct) VoutPtr;
+    typedef vlc_shared_data_ptr_type(vout_thread_t, PlayerController::vout_Hold_fct, PlayerController::vout_Release_fct) SharedVOutThread;
 
     static void aout_Hold_fct( audio_output_t* aout ) { aout_Hold(aout); }
     static void aout_Release_fct( audio_output_t* aout ) { aout_Release(aout); }
     typedef vlc_shared_data_ptr_type(audio_output_t, PlayerController::aout_Hold_fct, PlayerController::aout_Release_fct) AoutPtr;
-    typedef QVector<VoutPtr> VoutPtrList;
+    typedef QVector<SharedVOutThread> VoutPtrList;
 
 
 public:
@@ -266,7 +266,7 @@ public:
 
     input_item_t *getInput();
 
-    VoutPtr getVout();
+    SharedVOutThread getVout();
     VoutPtrList getVouts() const;
     PlayerController::AoutPtr getAout();
     int AddAssociatedMedia(enum es_format_category_e cat, const QString& uri, bool select, bool notify, bool check_ext);

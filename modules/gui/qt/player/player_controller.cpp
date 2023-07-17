@@ -830,7 +830,7 @@ static void on_player_vout_fullscreen_changed(vout_thread_t* vout, bool is_fulls
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_fullscreen_changed %s", is_fullscreen ? "fullscreen" : "windowed");
 
-    PlayerController::VoutPtr voutPtr = PlayerController::VoutPtr(vout);
+    PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
     that->callAsync([that,voutPtr,is_fullscreen] () {
         PlayerController* q = that->q_func();
         const PlayerController::VoutPtrList voutList = q->getVouts();
@@ -848,7 +848,7 @@ static void on_player_vout_wallpaper_mode_changed(vout_thread_t* vout, bool enab
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_wallpaper_mode_changed %s", enabled ? "enabled" : "disabled");
 
-    PlayerController::VoutPtr voutPtr = PlayerController::VoutPtr(vout);
+    PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
     that->callAsync([that,voutPtr, enabled] () {
         PlayerController* q = that->q_func();
         const PlayerController::VoutPtrList voutList = q->getVouts();
@@ -1541,21 +1541,21 @@ PlayerController::VoutPtrList PlayerController::getVouts() const
     {
         assert( pp_vout[i] );
         //pass ownership
-        VoutList.append(VoutPtr(pp_vout[i], false));
+        VoutList.append(SharedVOutThread(pp_vout[i], false));
     }
     free( pp_vout );
 
     return VoutList;
 }
 
-PlayerController::VoutPtr PlayerController::getVout()
+PlayerController::SharedVOutThread PlayerController::getVout()
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
     vout_thread_t* vout = vlc_player_vout_Hold( d->m_player );
     if( vout == NULL )
-        return VoutPtr{};
-    return VoutPtr{vout, false};
+        return SharedVOutThread{};
+    return SharedVOutThread{vout, false};
 }
 
 void PlayerController::setFullscreen( bool new_val )
@@ -1827,7 +1827,7 @@ void PlayerController::setRecording( bool recording )
 
 void PlayerController::snapshot()
 {
-    VoutPtr vout = getVout();
+    SharedVOutThread vout = getVout();
     if (vout)
     {
         /* Passing a lambda directly would require Qt 5.15:
@@ -1835,8 +1835,8 @@ void PlayerController::snapshot()
          */
         struct SnapshotTask : public QRunnable
         {
-            VoutPtr vout;
-            SnapshotTask(VoutPtr vout) : vout(std::move(vout)) {}
+            SharedVOutThread vout;
+            SnapshotTask(SharedVOutThread vout) : vout(std::move(vout)) {}
             void run() override
             {
                 var_TriggerCallback(vout.get(), "video-snapshot");
