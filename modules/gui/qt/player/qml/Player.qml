@@ -117,6 +117,12 @@ FocusScope {
             toolbarAutoHide.setVisibleControlBar(true)
     }
 
+    Connections {
+        target: Player
+
+        onVolumeChanged: animationVolume.restart()
+    }
+
     // Functions
 
     function lockUnlockAutoHide(lock) {
@@ -344,7 +350,7 @@ FocusScope {
         }
     }
 
-    Item {
+    MouseArea {
         id: centerContent
 
         readonly property ColorContext colorContext: ColorContext {
@@ -359,6 +365,23 @@ FocusScope {
             bottom: controlBarView.top
             topMargin: VLCStyle.margin_xsmall
             bottomMargin: VLCStyle.margin_xsmall
+        }
+
+        onWheel: {
+            if (rootPlayer.hasEmbededVideo) {
+                wheel.accepted = false
+
+                return
+            }
+
+            wheel.accepted = true
+
+            var delta = wheel.angleDelta.y
+
+            if (delta === 0)
+                return
+
+            Helpers.applyVolume(Player, delta)
         }
 
         ColumnLayout {
@@ -496,6 +519,34 @@ FocusScope {
                         text: I18n.qtr("Step forward")
                     }
                 }
+            }
+        }
+
+        Widgets.SubtitleLabel {
+            id: labelVolume
+
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            anchors.rightMargin: VLCStyle.margin_normal
+            anchors.topMargin: VLCStyle.margin_xxsmall
+
+            visible: false
+
+            text: I18n.qtr("Volume %1%").arg(Math.round(Player.volume * 100))
+
+            color: centerTheme.fg.primary
+
+            font.weight: Font.Normal
+
+            SequentialAnimation {
+                id: animationVolume
+
+                PropertyAction { target: labelVolume; property: "visible"; value: true }
+
+                PauseAnimation { duration: VLCStyle.duration_humanMoment }
+
+                PropertyAction { target: labelVolume; property: "visible"; value: false }
             }
         }
     }
