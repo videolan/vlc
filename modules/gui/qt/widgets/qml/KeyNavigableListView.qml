@@ -294,7 +294,8 @@ FadingEdgeListView {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPressed: {
-            Helpers.enforceFocus(root, Qt.MouseFocusReason)
+            focus = true // Grab the focus from delegate
+            root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
 
             if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
                 root.deselectAll()
