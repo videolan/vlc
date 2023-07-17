@@ -38,6 +38,7 @@
 using vlc_player_locker = vlc_locker<vlc_player_t, vlc_player_Lock, vlc_player_Unlock>;
 
 using SharedVOutThread = vlc_shared_data_ptr_type(vout_thread_t, vout_Hold, vout_Release);
+using SharedAOut = vlc_shared_data_ptr_type(audio_output_t, aout_Hold, aout_Release);
 
 class QSignalMapper;
 
@@ -253,9 +254,6 @@ public:
     ~PlayerController();
 
 public:
-    static void aout_Hold_fct( audio_output_t* aout ) { aout_Hold(aout); }
-    static void aout_Release_fct( audio_output_t* aout ) { aout_Release(aout); }
-    typedef vlc_shared_data_ptr_type(audio_output_t, PlayerController::aout_Hold_fct, PlayerController::aout_Release_fct) SharedAOut;
     using VOutThreadList = QVector<SharedVOutThread>;
 
 
@@ -266,7 +264,7 @@ public:
 
     SharedVOutThread getVout();
     VOutThreadList getVouts() const;
-    PlayerController::SharedAOut getAout();
+    SharedAOut getAout();
     int AddAssociatedMedia(enum es_format_category_e cat, const QString& uri, bool select, bool notify, bool check_ext);
 
     void requestArtUpdate( input_item_t *p_item, bool b_forced );

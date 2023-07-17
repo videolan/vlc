@@ -866,7 +866,7 @@ void FilterSliderData::updateText( int i )
 
 float FilterSliderData::initialValue()
 {
-    PlayerController::SharedAOut p_aout = THEMIM->getAout();
+    SharedAOut p_aout = THEMIM->getAout();
     float f = p_data->f_value;
     if( p_aout )
     {
@@ -885,7 +885,7 @@ float FilterSliderData::initialValue()
 void FilterSliderData::onValueChanged( int i )
 {
     float f = ((float) i) * p_data->f_resolution;
-    PlayerController::SharedAOut p_aout = THEMIM->getAout();
+    SharedAOut p_aout = THEMIM->getAout();
     if ( p_aout )
     {
         var_SetFloat( p_aout.get(), qtu(p_data->name), f );
@@ -995,7 +995,7 @@ EqualizerSliderData::EqualizerSliderData( QObject *parent, qt_intf_t *_p_intf,
 
 QStringList EqualizerSliderData::getBandsFromAout() const
 {
-    PlayerController::SharedAOut p_aout = THEMIM->getAout();
+    SharedAOut p_aout = THEMIM->getAout();
     QStringList bands;
     if( p_aout )
     {
@@ -1056,7 +1056,7 @@ void EqualizerSliderData::onValueChanged( int i )
     {
         float f = ((float) i) * p_data->f_resolution;
         bands[ index ] = QLocale( QLocale::C ).toString( f );
-        PlayerController::SharedAOut p_aout = THEMIM->getAout();
+        SharedAOut p_aout = THEMIM->getAout();
         if ( p_aout )
         {
             var_SetString( p_aout.get(), qtu(p_data->name), qtu(bands.join( " " )) );
@@ -1185,7 +1185,7 @@ void Equalizer::build()
     connect( ui.presetsCombo, QOverload<int>::of(&QComboBox::activated), this, &Equalizer::setCorePreset );
 
     /* Set enable checkbox */
-    PlayerController::SharedAOut p_aout = THEMIM->getAout();
+    SharedAOut p_aout = THEMIM->getAout();
     char *psz_af;
     if( p_aout )
         psz_af = var_GetNonEmptyString( p_aout.get(), "audio-filter" );
@@ -1232,7 +1232,7 @@ void Equalizer::setCorePreset( int i_preset )
                             sliderDatas.count() ) ; i++ )
         sliderDatas[i]->setValue( eqz_preset_10b[i_preset].f_amp[i] );
     
-    PlayerController::SharedAOut p_aout = THEMIM->getAout();
+    SharedAOut p_aout = THEMIM->getAout();
     if( p_aout )
     {
         var_SetString( p_aout.get() , "equalizer-preset" , preset_list[i_preset] );
@@ -1243,7 +1243,7 @@ void Equalizer::setCorePreset( int i_preset )
 /* Function called when the set2Pass button is activated */
 void Equalizer::enable2Pass( bool b_enable )
 {
-    PlayerController::SharedAOut p_aout= THEMIM->getAout();
+    SharedAOut p_aout= THEMIM->getAout();
 
     if( p_aout )
     {
