@@ -830,12 +830,12 @@ static void on_player_vout_fullscreen_changed(vout_thread_t* vout, bool is_fulls
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_fullscreen_changed %s", is_fullscreen ? "fullscreen" : "windowed");
 
-    PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
-    that->callAsync([that,voutPtr,is_fullscreen] () {
+    SharedVOutThread vOutThread(vout);
+    that->callAsync([that,vOutThread,is_fullscreen] () {
         PlayerController* q = that->q_func();
         const PlayerController::VOutThreadList voutList = q->getVouts();
-        if (voutPtr == nullptr //property sets for all vout
-            || (voutList.size() == 1 && voutPtr.get() == voutList[0].get()) ) //on the only vout
+        if (vOutThread == nullptr //property sets for all vout
+            || (voutList.size() == 1 && vOutThread.get() == voutList[0].get()) ) //on the only vout
         {
             that->m_fullscreen = is_fullscreen;
             emit q->fullscreenChanged(is_fullscreen);
@@ -848,12 +848,12 @@ static void on_player_vout_wallpaper_mode_changed(vout_thread_t* vout, bool enab
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_vout_wallpaper_mode_changed %s", enabled ? "enabled" : "disabled");
 
-    PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
-    that->callAsync([that,voutPtr, enabled] () {
+    SharedVOutThread vOutThread(vout);
+    that->callAsync([that,vOutThread, enabled] () {
         PlayerController* q = that->q_func();
         const PlayerController::VOutThreadList voutList = q->getVouts();
-        if (voutPtr == nullptr  //property sets for all vout
-            || (voutList.size() == 1 && voutPtr.get() == voutList[0].get()) ) //on the only vout
+        if (vOutThread == nullptr  //property sets for all vout
+            || (voutList.size() == 1 && vOutThread.get() == voutList[0].get()) ) //on the only vout
         {
             that->m_wallpaperMode = enabled;
             emit q->wallpaperModeChanged(enabled);
@@ -1548,7 +1548,7 @@ PlayerController::VOutThreadList PlayerController::getVouts() const
     return VoutList;
 }
 
-PlayerController::SharedVOutThread PlayerController::getVout()
+SharedVOutThread PlayerController::getVout()
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };

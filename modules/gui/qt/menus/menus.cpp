@@ -746,7 +746,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     if( p_input )
     {
         QMenu *submenu;
-        PlayerController::SharedVOutThread p_vout = THEMIM->getVout();
+        SharedVOutThread p_vout = THEMIM->getVout();
 
         /* Add a fullscreen switch button, since it is the most used function */
         if( p_vout )
