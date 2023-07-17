@@ -930,7 +930,7 @@ void VLCMenuBar::updateAudioDevice( qt_intf_t * p_intf, QMenu *current )
         return;
 
     current->clear();
-    PlayerController::AoutPtr aout = THEMIM->getAout();
+    PlayerController::SharedAOut aout = THEMIM->getAout();
     if (!aout)
         return;
 

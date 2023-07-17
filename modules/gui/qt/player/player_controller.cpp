@@ -315,7 +315,7 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
         case VLC_PLAYER_STATE_PLAYING:
         {
             msg_Dbg( that->p_intf, "on_player_state_changed VLC_PLAYER_STATE_PLAYING");
-            PlayerController::AoutPtr aout = q->getAout();
+            PlayerController::SharedAOut aout = q->getAout();
             that->m_audioStereoMode.resetObject( aout.get() );
             that->m_audioMixMode.resetObject( aout.get() );
             that->m_audioVisualization.resetObject( aout.get() );
@@ -1593,11 +1593,11 @@ void PlayerController::setAutoscale( bool new_val )
 
 //AOUT PROPERTIES
 
-PlayerController::AoutPtr PlayerController::getAout()
+PlayerController::SharedAOut PlayerController::getAout()
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    return AoutPtr( vlc_player_aout_Hold( d->m_player ), false );
+    return SharedAOut( vlc_player_aout_Hold( d->m_player ), false );
 }
 
 void PlayerController::setVolume(float volume)
@@ -1645,7 +1645,7 @@ bool PlayerController::hasAudioVisualization() const
 
 void PlayerController::menusUpdateAudio( const QString& data )
 {
-    AoutPtr aout = getAout();
+    SharedAOut aout = getAout();
     if( aout )
         aout_DeviceSet( aout.get(), qtu(data) );
 }
