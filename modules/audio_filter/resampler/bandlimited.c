@@ -142,7 +142,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                                  p_filter->fmt_out.audio.i_bitspersample / 8;
     size_t i_out_size = i_bytes_per_frame * ( 1 + ( p_in_buf->i_nb_samples *
               p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate) )
-            + p_filter->p_sys->i_buf_size;
+            + p_sys->i_buf_size;
     block_t *p_out_buf = block_Alloc( i_out_size );
     if( !p_out_buf )
     {
@@ -300,7 +300,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = p_sys = malloc( sizeof(struct filter_sys_t) );
+    p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
@@ -330,8 +330,9 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseFilter( filter_t *p_filter )
 {
-    free( p_filter->p_sys->p_buf );
-    free( p_filter->p_sys );
+    filter_sys_t *p_sys = p_filter->p_sys;
+    free( p_sys->p_buf );
+    free( p_sys );
 }
 
 static void FilterFloatUP( const float Imp[], const float ImpD[], uint16_t Nwing, float *p_in,
