@@ -63,9 +63,9 @@ T.ItemDelegate {
 
     verticalPadding: VLCStyle.playlistDelegate_verticalPadding
 
-    leftPadding: VLCStyle.margin_xxsmall
+    leftPadding: VLCStyle.margin_normal
 
-    rightPadding: Math.max(view.scrollBarWidth, VLCStyle.margin_normal)
+    rightPadding: VLCStyle.margin_normal
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -121,20 +121,22 @@ T.ItemDelegate {
 
         activeBorderColor: theme.visualFocus
 
-        visible: animationRunning || active || selected || hovered
-    }
-
-    contentItem: RowLayout {
-        spacing: 0
-
         Widgets.CurrentIndicator {
             id: currentIndicator
+
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+                leftMargin: VLCStyle.margin_xxsmall
+                topMargin: VLCStyle.margin_xxsmall
+                bottomMargin: anchors.topMargin
+            }
 
             // disable positioning via CurrentIndicator, manually position according to RowLayout
             source: null
 
             implicitWidth: VLCStyle.heightBar_xxxsmall
-            Layout.fillHeight: true
 
             color: {
                 if (model.isCurrent)
@@ -147,6 +149,10 @@ T.ItemDelegate {
                 return theme.indicator
             }
         }
+    }
+
+    contentItem: RowLayout {
+        spacing: 0
 
         Item {
             id: artworkItem
@@ -154,7 +160,6 @@ T.ItemDelegate {
             Layout.preferredHeight: VLCStyle.icon_playlistArt
             Layout.preferredWidth: VLCStyle.icon_playlistArt
             Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: VLCStyle.margin_xsmall
 
             Accessible.role: Accessible.Graphic
             Accessible.name: I18n.qtr("Cover")
