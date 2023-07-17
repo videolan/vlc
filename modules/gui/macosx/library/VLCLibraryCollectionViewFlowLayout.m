@@ -138,8 +138,19 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         return;
     }
 
+    BOOL newItemOnSameRow = NO;
+    if (_selectedIndexPath != nil) {
+        NSCollectionViewItem * const oldSelectedItem = [self.collectionView itemAtIndexPath:_selectedIndexPath];
+        NSCollectionViewItem * const newSelectedItem = [self.collectionView itemAtIndexPath:indexPath];
+
+        newItemOnSameRow = oldSelectedItem.view.frame.origin.y == newSelectedItem.view.frame.origin.y;
+    }
+        
     _selectedIndexPath = indexPath;
-    [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
+
+    if (!newItemOnSameRow) {
+        [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
+    }
 }
 
 - (void)collapseDetailSectionAtIndex:(NSIndexPath *)indexPath
