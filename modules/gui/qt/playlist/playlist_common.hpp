@@ -24,10 +24,8 @@ extern "C" {
     typedef struct vlc_playlist vlc_playlist_t;
 }
 
-// QObject wrapper to carry playlist ptr through QML
 class PlaylistPtr
 {
-    Q_GADGET
 public:
     PlaylistPtr();
     PlaylistPtr(vlc_playlist_t* pl);
@@ -36,5 +34,7 @@ public:
 
     vlc_playlist_t* m_playlist = nullptr;
 };
+
+Q_DECLARE_METATYPE(PlaylistPtr)
 
 #endif // PLAYLIST_COMMON_HPP
