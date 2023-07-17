@@ -34,14 +34,14 @@
 //namespace vlc {
 //  namespace playlist {
 
-using PlaylistItemPtr = vlc_shared_data_ptr_type(vlc_playlist_item_t,
-                                                 vlc_playlist_item_Hold,
-                                                 vlc_playlist_item_Release);
+using SharedPlaylistItem = vlc_shared_data_ptr_type(vlc_playlist_item_t,
+                                                    vlc_playlist_item_Hold,
+                                                    vlc_playlist_item_Release);
 
 /**
  * Playlist item wrapper.
  *
- * It contains both the PlaylistItemPtr and cached data saved while the playlist
+ * It contains both the SharedPlaylistItem and cached data saved while the playlist
  * is locked, so that the fields may be read without synchronization or race
  * conditions.
  */
@@ -84,7 +84,7 @@ public:
 
 private:
     struct Data : public QSharedData {
-        PlaylistItemPtr item;
+        SharedPlaylistItem item;
 
         bool selected = false;
 
