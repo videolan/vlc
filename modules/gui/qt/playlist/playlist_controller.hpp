@@ -79,7 +79,7 @@ public:
 
     Q_PROPERTY(QVariantList sortKeyTitleList READ getSortKeyTitleList CONSTANT FINAL)
 
-    Q_PROPERTY(PlaylistPtr playlistPtr READ getPlaylistPtr WRITE setPlaylistPtr NOTIFY playlistPtrChanged FINAL)
+    Q_PROPERTY(Playlist playlist READ getPlaylist WRITE setPlaylist NOTIFY playlistChanged FINAL)
 
     Q_PROPERTY(PlaylistItem currentItem READ getCurrentItem NOTIFY currentItemChanged FINAL)
 
@@ -156,14 +156,14 @@ public slots:
     void switchSortOrder();
 
     QVariantList getSortKeyTitleList() const;
-    PlaylistPtr getPlaylistPtr() const;
-    void setPlaylistPtr(PlaylistPtr id);
-    void setPlaylistPtr(vlc_playlist_t* newPlaylist);
+    Playlist getPlaylist() const;
+    void setPlaylist(const Playlist& playlist);
+    void setPlaylist(vlc_playlist_t* newPlaylist);
 
     void resetSortKey();
 
 signals:
-    void playlistPtrChanged( PlaylistPtr );
+    void playlistChanged( Playlist );
 
     void currentItemChanged( );
 

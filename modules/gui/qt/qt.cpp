@@ -675,7 +675,7 @@ static inline void registerMetaTypes()
     qRegisterMetaType<VLCTick>();
     qRegisterMetaType<SharedInputItem>();
     qRegisterMetaType<NetworkTreeItem>();
-    qRegisterMetaType<PlaylistPtr>();
+    qRegisterMetaType<Playlist>();
     qRegisterMetaType<PlaylistItem>();
     qRegisterMetaType<DialogId>();
     qRegisterMetaType<MLItemId>();

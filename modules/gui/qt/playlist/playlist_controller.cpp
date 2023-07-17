@@ -353,7 +353,7 @@ PlaylistController::PlaylistController(vlc_playlist_t *playlist, QObject *parent
     : QObject(parent)
     , d_ptr( new PlaylistControllerPrivate(this) )
 {
-    setPlaylistPtr(playlist);
+    setPlaylist(playlist);
 }
 
 PlaylistController::~PlaylistController()
@@ -672,13 +672,13 @@ void PlaylistController::setRandom(bool random)
     vlc_playlist_SetPlaybackOrder( d->m_playlist, random ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL );
 }
 
-PlaylistPtr PlaylistController::getPlaylistPtr() const
+Playlist PlaylistController::getPlaylist() const
 {
     Q_D(const PlaylistController);
-    return PlaylistPtr(d->m_playlist);
+    return Playlist(d->m_playlist);
 }
 
-void PlaylistController::setPlaylistPtr(vlc_playlist_t* newPlaylist)
+void PlaylistController::setPlaylist(vlc_playlist_t* newPlaylist)
 {
     Q_D(PlaylistController);
     if (d->m_playlist && d->m_listener)
@@ -703,7 +703,7 @@ void PlaylistController::setPlaylistPtr(vlc_playlist_t* newPlaylist)
             emit playlistInitialized();
         });
     }
-    emit playlistPtrChanged( PlaylistPtr(newPlaylist) );
+    emit playlistChanged( Playlist(newPlaylist) );
 }
 
 void PlaylistController::resetSortKey()
@@ -713,9 +713,9 @@ void PlaylistController::resetSortKey()
     emit sortKeyChanged();
 }
 
-void PlaylistController::setPlaylistPtr(PlaylistPtr ptr)
+void PlaylistController::setPlaylist(const Playlist& playlist)
 {
-    setPlaylistPtr(ptr.m_playlist);
+    setPlaylist(playlist.m_playlist);
 }
 
 PlaylistController::PlaybackRepeat PlaylistController::getRepeatMode() const

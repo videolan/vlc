@@ -35,7 +35,7 @@ class PlaylistListModelPrivate;
 class PlaylistListModel : public SelectableListModel
 {
     Q_OBJECT
-    Q_PROPERTY(PlaylistPtr playlistId READ getPlaylistId WRITE setPlaylistId NOTIFY playlistIdChanged FINAL)
+    Q_PROPERTY(Playlist playlist READ getPlaylist WRITE setPlaylist NOTIFY playlistChanged FINAL)
     Q_PROPERTY(int currentIndex READ getCurrentIndex NOTIFY currentIndexChanged FINAL)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged FINAL)
     Q_PROPERTY(VLCTick duration READ getDuration NOTIFY countChanged FINAL)
@@ -79,12 +79,12 @@ protected:
     int getSelectedRole() const override;
 
 public slots:
-    PlaylistPtr getPlaylistId() const;
-    void setPlaylistId(PlaylistPtr id);
-    void setPlaylistId(vlc_playlist_t* playlist);
+    Playlist getPlaylist() const;
+    void setPlaylist(const Playlist& playlist);
+    void setPlaylist(vlc_playlist_t* playlist);
 
 signals:
-    void playlistIdChanged(const PlaylistPtr& );
+    void playlistChanged(const Playlist&);
     void currentIndexChanged( int );
     void countChanged(int);
 

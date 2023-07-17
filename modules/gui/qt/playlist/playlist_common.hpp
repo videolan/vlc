@@ -24,17 +24,17 @@ extern "C" {
     typedef struct vlc_playlist vlc_playlist_t;
 }
 
-class PlaylistPtr
+class Playlist
 {
 public:
-    PlaylistPtr() = default;
-    explicit PlaylistPtr(vlc_playlist_t * const playlist)
+    Playlist() = default;
+    explicit Playlist(vlc_playlist_t * const playlist)
         : m_playlist(playlist)
     { };
 
     vlc_playlist_t * m_playlist = nullptr;
 };
 
-Q_DECLARE_METATYPE(PlaylistPtr)
+Q_DECLARE_METATYPE(Playlist)
 
 #endif // PLAYLIST_COMMON_HPP

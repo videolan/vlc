@@ -269,7 +269,7 @@ PlaylistListModel::PlaylistListModel(vlc_playlist_t *raw_playlist, QObject *pare
     : SelectableListModel(parent)
     , d_ptr(new PlaylistListModelPrivate(this))
 {
-    setPlaylistId(PlaylistPtr(raw_playlist));
+    setPlaylist(Playlist(raw_playlist));
 }
 
 PlaylistListModel::~PlaylistListModel()
@@ -449,15 +449,15 @@ QVariantList PlaylistListModel::getItemsForIndexes(const QList<int> & indexes) c
     return items;
 }
 
-PlaylistPtr PlaylistListModel::getPlaylistId() const
+Playlist PlaylistListModel::getPlaylist() const
 {
     Q_D(const PlaylistListModel);
     if (!d->m_playlist)
         return {};
-    return PlaylistPtr(d->m_playlist);
+    return Playlist(d->m_playlist);
 }
 
-void PlaylistListModel::setPlaylistId(vlc_playlist_t* playlist)
+void PlaylistListModel::setPlaylist(vlc_playlist_t* playlist)
 {
     Q_D(PlaylistListModel);
     if (d->m_playlist && d->m_listener)
@@ -473,12 +473,12 @@ void PlaylistListModel::setPlaylistId(vlc_playlist_t* playlist)
         d->m_playlist = playlist;
         d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
     }
-    emit playlistIdChanged( PlaylistPtr(d->m_playlist) );
+    emit playlistChanged( Playlist(d->m_playlist) );
 }
 
-void PlaylistListModel::setPlaylistId(PlaylistPtr id)
+void PlaylistListModel::setPlaylist(const Playlist& playlist)
 {
-    setPlaylistId(id.m_playlist);
+    setPlaylist(playlist.m_playlist);
 }
 
 QVariant

@@ -277,7 +277,7 @@ Control {
             clip: true // else out of view items will overlap with surronding items
 
             model: PlaylistListModel {
-                playlistId: MainPlaylistController.playlistPtr
+                playlist: MainPlaylistController.playlist
             }
 
             dragAutoScrollDragItem: dragItem
