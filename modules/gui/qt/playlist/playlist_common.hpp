@@ -27,12 +27,10 @@ extern "C" {
 class PlaylistPtr
 {
 public:
-    PlaylistPtr();
-    PlaylistPtr(vlc_playlist_t* pl);
-    PlaylistPtr(const PlaylistPtr& ptr);
-    PlaylistPtr& operator=(const PlaylistPtr& ptr);
+    PlaylistPtr() = default;
+    explicit PlaylistPtr(vlc_playlist_t * const pl);
 
-    vlc_playlist_t* m_playlist = nullptr;
+    vlc_playlist_t * m_playlist = nullptr;
 };
 
 Q_DECLARE_METATYPE(PlaylistPtr)
