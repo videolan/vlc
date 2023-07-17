@@ -833,7 +833,7 @@ static void on_player_vout_fullscreen_changed(vout_thread_t* vout, bool is_fulls
     PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
     that->callAsync([that,voutPtr,is_fullscreen] () {
         PlayerController* q = that->q_func();
-        const PlayerController::VoutPtrList voutList = q->getVouts();
+        const PlayerController::VOutThreadList voutList = q->getVouts();
         if (voutPtr == nullptr //property sets for all vout
             || (voutList.size() == 1 && voutPtr.get() == voutList[0].get()) ) //on the only vout
         {
@@ -851,7 +851,7 @@ static void on_player_vout_wallpaper_mode_changed(vout_thread_t* vout, bool enab
     PlayerController::SharedVOutThread voutPtr = PlayerController::SharedVOutThread(vout);
     that->callAsync([that,voutPtr, enabled] () {
         PlayerController* q = that->q_func();
-        const PlayerController::VoutPtrList voutList = q->getVouts();
+        const PlayerController::VOutThreadList voutList = q->getVouts();
         if (voutPtr == nullptr  //property sets for all vout
             || (voutList.size() == 1 && voutPtr.get() == voutList[0].get()) ) //on the only vout
         {
@@ -1521,20 +1521,20 @@ void PlayerController::setTeletextTransparency( bool transparent )
 
 //VOUT PROPERTIES
 
-PlayerController::VoutPtrList PlayerController::getVouts() const
+PlayerController::VOutThreadList PlayerController::getVouts() const
 {
     Q_D(const PlayerController);
     vout_thread_t **pp_vout;
-    VoutPtrList VoutList;
+    VOutThreadList VoutList;
     size_t i_vout;
     {
         vlc_player_locker lock{ d->m_player };
         if( !vlc_player_IsStarted( d->m_player ) )
-            return VoutPtrList{};
+            return VOutThreadList{};
         i_vout = 0;
         pp_vout = vlc_player_vout_HoldAll( d->m_player, &i_vout );
         if ( i_vout <= 0 )
-            return VoutPtrList{};
+            return VOutThreadList{};
     }
     VoutList.reserve( i_vout );
     for( size_t i = 0; i < i_vout; i++ )

@@ -258,7 +258,7 @@ public:
     static void aout_Hold_fct( audio_output_t* aout ) { aout_Hold(aout); }
     static void aout_Release_fct( audio_output_t* aout ) { aout_Release(aout); }
     typedef vlc_shared_data_ptr_type(audio_output_t, PlayerController::aout_Hold_fct, PlayerController::aout_Release_fct) AoutPtr;
-    typedef QVector<SharedVOutThread> VoutPtrList;
+    typedef QVector<SharedVOutThread> VOutThreadList;
 
 
 public:
@@ -267,7 +267,7 @@ public:
     input_item_t *getInput();
 
     SharedVOutThread getVout();
-    VoutPtrList getVouts() const;
+    VOutThreadList getVouts() const;
     PlayerController::AoutPtr getAout();
     int AddAssociatedMedia(enum es_format_category_e cat, const QString& uri, bool select, bool notify, bool check_ext);
 

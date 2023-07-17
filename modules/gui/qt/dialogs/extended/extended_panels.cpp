@@ -282,8 +282,8 @@ void ExtVideo::cropChange()
         ui.cropBotPx->setValue( ui.cropTopPx->value() );
     if( ui.leftRightCropSync->isChecked() )
         ui.cropRightPx->setValue( ui.cropLeftPx->value() );
-
-    PlayerController::VoutPtrList p_vouts = THEMIM->getVouts();
+    
+    PlayerController::VOutThreadList p_vouts = THEMIM->getVouts();
     for( auto p_vout: p_vouts )
     {
         var_SetInteger( p_vout.get(), "crop-top", ui.cropTopPx->value() );
@@ -1601,7 +1601,7 @@ void SyncControls::subsdelayClean()
 
 void SyncControls::subsdelaySetFactor( double f_factor )
 {
-    PlayerController::VoutPtrList p_vouts = THEMIM->getVouts();
+    PlayerController::VOutThreadList p_vouts = THEMIM->getVouts();
     for( auto p_vout: p_vouts )
     {
         var_SetFloat( p_vout.get(), SUBSDELAY_CFG_FACTOR, f_factor );
