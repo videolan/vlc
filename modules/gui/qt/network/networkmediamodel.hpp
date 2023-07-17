@@ -99,8 +99,6 @@ private:
     const QString m_display;
 };
 
-Q_DECLARE_METATYPE(PathNode)
-
 class NetworkMediaModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -248,7 +246,5 @@ private:
     std::unique_ptr<MediaTreeListener> m_listener;
     QVariantList m_path;
 };
-
-Q_DECLARE_METATYPE(NetworkTreeItem)
 
 #endif // MLNETWORKMEDIAMODEL_HPP

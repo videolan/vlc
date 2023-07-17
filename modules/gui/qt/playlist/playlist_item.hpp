@@ -108,6 +108,4 @@ static_assert(sizeof(PlaylistItem) == sizeof(void *), "invalid size of PlaylistI
 //  } // namespace playlist
 //} // namespace vlc
 
-Q_DECLARE_METATYPE(PlaylistItem)
-
 #endif

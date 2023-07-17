@@ -52,8 +52,6 @@ public: // Variables
     vlc_dialog_id * m_id;
 };
 
-Q_DECLARE_METATYPE(DialogId)
-
 
 class DialogErrorModel : public QAbstractListModel, public Singleton<DialogErrorModel>
 {

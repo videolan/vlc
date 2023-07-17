@@ -75,6 +75,4 @@ private:
     vlc_tick_t m_ticks;
 };
 
-Q_DECLARE_METATYPE(VLCTick)
-
 #endif // VLCTICK_HPP

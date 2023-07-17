@@ -66,8 +66,6 @@ public:
     }
 };
 
-Q_DECLARE_METATYPE(MLItemId)
-
 class MLItem
 {
 public:

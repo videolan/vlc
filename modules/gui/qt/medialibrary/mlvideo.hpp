@@ -57,8 +57,6 @@ private:
     unsigned int m_fps;
 };
 
-Q_DECLARE_METATYPE(VideoDescription)
-
 class AudioDescription
 {
     Q_GADGET
@@ -84,8 +82,6 @@ private:
     unsigned int m_nbchannels;
     unsigned int m_sampleRate;
 };
-
-Q_DECLARE_METATYPE(AudioDescription)
 
 class MLVideo : public MLItem
 {
