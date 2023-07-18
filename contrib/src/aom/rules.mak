@@ -14,9 +14,7 @@ $(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
 
 aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	$(UNPACK)
-ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
-endif
+	$(APPLY) $(SRC)/aom/0001-Use-the-pthread-library-found-by-CMake-in-the-pkg-co.patch
 	$(MOVE)
 
 DEPS_aom =
