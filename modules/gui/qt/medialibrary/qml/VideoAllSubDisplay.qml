@@ -60,6 +60,8 @@ VideoAll {
 
     listLabels: !!_meta ? _meta.listLabels : root.getLabel
 
+    sectionProperty: !!_meta && !!_meta.sectionProperty ? _meta.sectionProperty : ""
+
     // Functions
 
     function _updateMetaModel(groupping) {
@@ -130,6 +132,15 @@ VideoAll {
 
             property var listLabels: root.getLabel
 
+            property string sectionProperty: {
+                switch (model.sortCriteria) {
+                case "title":
+                    return "title_first_symbol"
+                default:
+                    return ""
+                }
+            }
+
             function onAction(indexes) {
                 model.addAndPlay( indexes )
                 g_mainDisplay.showPlayer()
@@ -148,6 +159,15 @@ VideoAll {
             id: metaGroup
 
             property var model: MLVideoGroupsModel { ml: MediaLib }
+
+            property string sectionProperty: {
+                switch (model.sortCriteria) {
+                case "title":
+                    return "group_title_first_symbol"
+                default:
+                    return ""
+                }
+            }
 
             property var gridLabels: function (model) {
                 return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
@@ -195,6 +215,15 @@ VideoAll {
             id: metaFolder
 
             property var model: MLVideoFoldersModel { ml: MediaLib }
+
+            property string sectionProperty: {
+                switch (model.sortCriteria) {
+                case "title":
+                    return "title_first_symbol"
+                default:
+                    return ""
+                }
+            }
 
             property var gridLabels: function (model) {
                 return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
