@@ -36,6 +36,7 @@ public:
     {
         // NOTE: Group specific.
         GROUP_IS_VIDEO = VIDEO_TITLE_FIRST_SYMBOL + 1,
+        GROUP_TITLE_FIRST_SYMBOL,
         GROUP_DATE,
         GROUP_COUNT
     };

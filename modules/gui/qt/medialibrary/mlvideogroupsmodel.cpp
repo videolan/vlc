@@ -65,9 +65,20 @@ QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
 {
     QHash<int, QByteArray> hash = MLVideoModel::roleNames();
 
-    hash.insert(GROUP_IS_VIDEO, "isVideo");
-    hash.insert(GROUP_DATE,     "date");
-    hash.insert(GROUP_COUNT,    "count");
+    const QHash<int, QByteArray> groupRoles =
+    {
+        {GROUP_IS_VIDEO, "isVideo"},
+        {GROUP_TITLE_FIRST_SYMBOL, "group_title_first_symbol"},
+        {GROUP_DATE, "date"},
+        {GROUP_COUNT, "count"},
+    };
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    for (auto i = groupRoles.begin(); i != groupRoles.end(); ++i)
+        hash.insert(i.key(), i.value());
+#else
+    hash.insert(groupRoles);
+#endif
 
     return hash;
 }
@@ -103,6 +114,8 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
                 return QVariant::fromValue(group->getDuration());
             case GROUP_IS_VIDEO:
                 return false;
+            case GROUP_TITLE_FIRST_SYMBOL:
+                return QVariant::fromValue( getFirstSymbol(group->getTitle() ));
             case GROUP_DATE:
                 return QVariant::fromValue(group->getDate());
             case GROUP_COUNT:
@@ -119,6 +132,10 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
         {
             case Qt::DisplayRole:
                 return QVariant::fromValue(video->getTitle());
+            case GROUP_TITLE_FIRST_SYMBOL:
+                // videos and groups are shown mixed, force this item into a group
+                // for grouping the data must be sorted by title
+                return QVariant::fromValue( getFirstSymbol(video->getTitle() ));
             case GROUP_IS_VIDEO:
                 return true;
             case GROUP_DATE:
