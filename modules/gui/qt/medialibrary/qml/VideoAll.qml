@@ -44,6 +44,9 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
+    // 'role' used for tableview's section text
+    /* required */ property string sectionProperty
+
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
     /* required */ property var contextMenu
 
@@ -260,6 +263,8 @@ MainInterface.MainViewLoader {
             headerPositioning: ListView.InlineHeader
 
             activeFocusOnTab: true
+
+            section.property: root.sectionProperty
 
             // Navigation
 
