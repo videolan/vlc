@@ -83,6 +83,7 @@ typedef struct
     bool         can_pace;
     bool         can_pause;
     vlc_tick_t   pts_delay;
+    uint64_t     mtime;
 } stream_sys_t;
 
 extern char **environ;
@@ -213,6 +214,11 @@ static int Control (stream_t *stream, int query, va_list args)
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg (args, bool *)) = p_sys->can_pace;
             break;
+        case STREAM_GET_MTIME:
+            if (p_sys->mtime == (uint64_t)-1)
+                return VLC_EGENERIC;
+            *va_arg(args, uint64_t *) = p_sys->mtime;
+            break;
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = 0;
             break;
@@ -254,6 +260,9 @@ static int Open (stream_t *stream, const char *path)
     p_sys->can_pause = vlc_stream_CanPause(stream->s);
     p_sys->can_pace = vlc_stream_CanPace(stream->s);
     vlc_stream_GetPtsDelay(stream->s, &p_sys->pts_delay);
+
+    if (vlc_stream_GetMTime(stream->s, &p_sys->mtime) != VLC_SUCCESS)
+        p_sys->mtime = -1;
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
      * better here. There are too many failure cases. */
