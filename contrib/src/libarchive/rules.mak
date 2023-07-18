@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.6.2
+LIBARCHIVE_VERSION := 3.7.0
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -18,6 +18,9 @@ LIBARCHIVE_CONF := \
 # CNG enables bcrypt on Windows and useless otherwise, it's not used when building for XP
 LIBARCHIVE_CONF +=-DENABLE_CNG=ON
 
+# bsdunzip doesn't build on macos, android and emscripten and it's disabled on Windows
+LIBARCHIVE_CONF +=-DENABLE_UNZIP=OFF
+
 ifdef HAVE_WIN32
 LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
 endif
@@ -29,13 +32,6 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
-	$(APPLY) $(SRC)/libarchive/0001-Fix-compile-on-Android.patch
-	$(APPLY) $(SRC)/libarchive/0001-Fix-build-error-when-cross-compiling-for-Windows.patch
-	$(APPLY) $(SRC)/libarchive/0001-Fix-bcrypt-detection-on-UNIX-cross-compilation.patch
-	$(APPLY) $(SRC)/libarchive/0001-Use-the-common-CMake-BUILD_SHARED_LIBS-to-build-shar.patch
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/libarchive/winrt.patch
-endif
 	$(APPLY) $(SRC)/libarchive/0001-Fix-usage-of-GetVolumePathNameW-in-UWP-before-20H1.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
