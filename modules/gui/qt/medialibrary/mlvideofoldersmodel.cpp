@@ -59,9 +59,10 @@ QHash<int, QByteArray> MLVideoFoldersModel::roleNames() const /* override */
     return {
         { FOLDER_ID, "id" },
         { FOLDER_TITLE, "title" },
+        { FOLDER_TITLE_FIRST_SYMBOL, "title_first_symbol" },
         { FOLDER_THUMBNAIL, "thumbnail" },
         { FOLDER_DURATION, "duration" },
-        { FOLDER_COUNT, "count"},
+        { FOLDER_COUNT, "count" },
     };
 }
 
@@ -84,6 +85,8 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
             return QVariant::fromValue(folder->getId());
         case FOLDER_TITLE:
             return QVariant::fromValue(folder->getTitle());
+        case FOLDER_TITLE_FIRST_SYMBOL:
+            return QVariant::fromValue( getFirstSymbol(folder->getTitle()) );
         case FOLDER_THUMBNAIL:
         {
             return ml()->customCover()->get(folder->getId()

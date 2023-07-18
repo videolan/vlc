@@ -36,6 +36,7 @@ public:
     {
         FOLDER_ID = Qt::UserRole + 1,
         FOLDER_TITLE,
+        FOLDER_TITLE_FIRST_SYMBOL,
         FOLDER_THUMBNAIL,
         FOLDER_DURATION,
         FOLDER_COUNT
