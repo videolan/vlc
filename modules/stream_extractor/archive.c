@@ -514,6 +514,16 @@ static int Control( stream_extractor_t* p_extractor, int i_query, va_list args )
             *va_arg( args, uint64_t* ) = archive_entry_size( p_sys->p_entry );
             break;
 
+        case STREAM_GET_MTIME:
+            if( p_sys->p_entry == NULL )
+                return VLC_EGENERIC;
+
+            if( !archive_entry_mtime_is_set( p_sys->p_entry ) )
+                return VLC_EGENERIC;
+
+            *va_arg( args, uint64_t* ) = archive_entry_mtime( p_sys->p_entry );
+            break;
+
         default:
             return vlc_stream_vaControl( p_extractor->source, i_query, args );
     }
