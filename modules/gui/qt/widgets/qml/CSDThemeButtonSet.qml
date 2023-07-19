@@ -66,7 +66,7 @@ Rectangle {
                                 : CSDThemeImage.MAXIMIZE
 
                     case CSDButton.Close:
-                        return CSDThemeButton.CLOSE
+                        return CSDThemeImage.CLOSE
                     }
 
                     console.assert(false, "unreachable")
