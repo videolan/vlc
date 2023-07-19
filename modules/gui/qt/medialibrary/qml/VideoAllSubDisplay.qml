@@ -25,6 +25,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 VideoAll {
@@ -94,10 +95,8 @@ VideoAll {
     function setCurrentItemFocus(reason) {
         if (headerItem && headerItem.focus)
             headerItem.forceActiveFocus(reason) // continue watching section
-        else if (currentItem.setCurrentItemFocus)
-            currentItem.setCurrentItemFocus(reason) // grid or list view
         else
-            currentItem.forceActiveFocus(reason) // empty label
+            setCurrentItemFocusDefault(reason)
     }
 
     // VideoAll events reimplementation
