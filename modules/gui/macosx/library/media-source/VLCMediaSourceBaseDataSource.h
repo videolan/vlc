@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSLayoutConstraint *pathControlTopConstraint;
 @property (readwrite) NSLayoutConstraint *pathControlBottomTableViewScrollViewConstraint;
 @property (readwrite) NSLayoutConstraint *pathControlBottomCollectionViewScrollViewConstraint;
+@property (readwrite) NSLayoutConstraint *topTableViewScrollViewConstraint;
+@property (readwrite) NSLayoutConstraint *topCollectionViewScrollViewConstraint;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 

@@ -96,6 +96,8 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *mediaSourcePathControlTopConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *mediaSourcePathControlTableViewScrollViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *mediaSourcePathControlCollectionViewScrollViewBottomConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *mediaSourceTableViewScrollViewTopConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *mediaSourceCollectionViewScrollViewTopConstraint;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;

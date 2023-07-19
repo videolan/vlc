@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSLayoutConstraint *pathControlTopConstraint;
 @property (readonly) NSLayoutConstraint *pathControlBottomTableViewScrollViewConstraint;
 @property (readonly) NSLayoutConstraint *pathControlBottomCollectionViewScrollViewConstraint;
+@property (readonly) NSLayoutConstraint *topTableViewScrollViewConstraint;
+@property (readonly) NSLayoutConstraint *topCollectionViewScrollViewConstraint;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;

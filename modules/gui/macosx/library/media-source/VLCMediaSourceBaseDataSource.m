@@ -471,9 +471,14 @@ referenceSizeForHeaderInSection:(NSInteger)section
 {
     _homeButton.hidden = !visible;
     _pathControl.hidden = !visible;
-    _pathControlTopConstraint.constant = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
-    _pathControlBottomTableViewScrollViewConstraint.constant = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
-    _pathControlBottomCollectionViewScrollViewConstraint.constant = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
+
+    const CGFloat pathControlSpace = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
+
+    _pathControlTopConstraint.constant = pathControlSpace;
+    _pathControlBottomTableViewScrollViewConstraint.constant = pathControlSpace;
+    _pathControlBottomCollectionViewScrollViewConstraint.constant = pathControlSpace;
+    _topCollectionViewScrollViewConstraint.constant = pathControlSpace;
+    _topTableViewScrollViewConstraint.constant = pathControlSpace;
 }
 
 - (void)returnHome

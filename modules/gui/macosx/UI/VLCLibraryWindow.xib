@@ -773,6 +773,7 @@
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
                 <outlet property="mediaSourceCollectionView" destination="r7v-GI-W1U" id="3JJ-GU-o5o"/>
                 <outlet property="mediaSourceCollectionViewScrollView" destination="cFG-c9-cI9" id="QQq-Ql-uQ7"/>
+                <outlet property="mediaSourceCollectionViewScrollViewTopConstraint" destination="1h2-ln-GVY" id="orE-bG-zt4"/>
                 <outlet property="mediaSourceHomeButton" destination="jfA-Vr-sQc" id="oLM-NF-rqe"/>
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
                 <outlet property="mediaSourcePathControlCollectionViewScrollViewBottomConstraint" destination="Lji-yk-wiI" id="BxP-JG-rlP"/>
@@ -780,6 +781,7 @@
                 <outlet property="mediaSourcePathControlTopConstraint" destination="Sf6-jz-ool" id="lAK-GI-HNu"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceTableViewScrollView" destination="7WD-fy-WtJ" id="8As-1W-Af8"/>
+                <outlet property="mediaSourceTableViewScrollViewTopConstraint" destination="y4h-EN-rn0" id="8f7-8Y-Zeb"/>
                 <outlet property="mediaSourceView" destination="eHd-Q9-F8D" id="gfU-Jp-eFr"/>
                 <outlet property="mediaToolBar" destination="pr3-TD-J2z" id="Chi-03-Fgd"/>
                 <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
@@ -1121,6 +1123,7 @@
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="7WD-fy-WtJ" secondAttribute="bottom" id="05c-7d-nw6"/>
                 <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="1OY-9N-uuV"/>
+                <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="40" id="1h2-ln-GVY"/>
                 <constraint firstItem="7WD-fy-WtJ" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="233-Yb-V4O"/>
                 <constraint firstAttribute="bottom" secondItem="cFG-c9-cI9" secondAttribute="bottom" id="DjO-Ru-7sa"/>
                 <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="Lji-yk-wiI"/>
@@ -1132,6 +1135,7 @@
                 <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" constant="10" id="saP-eI-VDF"/>
                 <constraint firstAttribute="trailing" secondItem="cFG-c9-cI9" secondAttribute="trailing" id="vkQ-o0-jz4"/>
                 <constraint firstItem="cFG-c9-cI9" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="vq6-rW-p6Q"/>
+                <constraint firstItem="7WD-fy-WtJ" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="40" id="y4h-EN-rn0"/>
             </constraints>
             <point key="canvasLocation" x="144" y="197.5"/>
         </customView>
