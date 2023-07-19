@@ -224,8 +224,7 @@ static int Control (stream_t *stream, int query, va_list args)
             bool paused = va_arg (args, unsigned);
 
             vlc_mutex_lock (&p_sys->lock);
-            const int status =
-                vlc_stream_Control(stream->s, STREAM_SET_PAUSE_STATE, paused);
+            const int status = vlc_stream_SetPauseState(stream->s, paused);
             p_sys->paused = paused;
             vlc_cond_signal (&p_sys->wait);
             vlc_mutex_unlock (&p_sys->lock);
@@ -252,9 +251,9 @@ static int Open (stream_t *stream, const char *path)
     vlc_mutex_init (&p_sys->lock);
     p_sys->paused = false;
     p_sys->pid = -1;
-    vlc_stream_Control(stream->s, STREAM_CAN_PAUSE, &p_sys->can_pause);
-    vlc_stream_Control(stream->s, STREAM_CAN_CONTROL_PACE, &p_sys->can_pace);
-    vlc_stream_Control(stream->s, STREAM_GET_PTS_DELAY, &p_sys->pts_delay);
+    p_sys->can_pause = vlc_stream_CanPause(stream->s);
+    p_sys->can_pace = vlc_stream_CanPace(stream->s);
+    vlc_stream_GetPtsDelay(stream->s, &p_sys->pts_delay);
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
      * better here. There are too many failure cases. */
