@@ -149,9 +149,9 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
                 int i_index = VIDEO_PALETTE_COLORS_MAX;
                 for( int k = p_palette->i_entries; k > 0; k-- )
                 {
-                    if( !memcmp( &p_palette->palette[k], yuvaentry, sizeof(uint8_t [4]) ) )
+                    if( !memcmp( p_palette->palette[k], yuvaentry, sizeof(uint8_t [4]) ) )
                     {
-                        i_index = VIDEO_PALETTE_COLORS_MAX;
+                        i_index = i;
                         break;
                     }
                 }
