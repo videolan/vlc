@@ -394,18 +394,14 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][0] = 0;
         fmt.p_palette->palette[i][1] = 0x80;
         fmt.p_palette->palette[i][2] = 0x80;
-        fmt.p_palette->palette[i][3] = pi_gamma[i];
-        fmt.p_palette->palette[i][3] =
-            (int)fmt.p_palette->palette[i][3] * i_alpha / 255;
+        fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
     for( i = 8; i < fmt.p_palette->i_entries; i++ )
     {
         fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
         fmt.p_palette->palette[i][1] = i_u;
         fmt.p_palette->palette[i][2] = i_v;
-        fmt.p_palette->palette[i][3] = pi_gamma[i];
-        fmt.p_palette->palette[i][3] =
-            (int)fmt.p_palette->palette[i][3] * i_alpha / 255;
+        fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
 
     p_dst = p_region->p_picture->Y_PIXELS;
