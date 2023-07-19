@@ -71,6 +71,7 @@
     _baseDataSource.pathControl = _pathControl;
     _baseDataSource.pathControlVisualEffectView = _pathControlVisualEffectView;
     _baseDataSource.tableView = _tableView;
+    _baseDataSource.tableViewScrollView = _tableViewScrollView;
     [_baseDataSource setupViews];
 }
 

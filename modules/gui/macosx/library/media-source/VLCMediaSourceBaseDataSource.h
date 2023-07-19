@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSCollectionView *collectionView;
 @property (readwrite) NSScrollView *collectionViewScrollView;
 @property (readwrite) NSTableView *tableView;
+@property (readwrite) NSScrollView *tableViewScrollView;
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) VLCInputNodePathControl *pathControl;
 @property (readwrite) NSVisualEffectView *pathControlVisualEffectView;

@@ -133,11 +133,11 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         self.collectionViewScrollView.hidden = NO;
-        self.tableView.hidden = YES;
+        self.tableViewScrollView.hidden = YES;
         [self.collectionView reloadData];
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         self.collectionViewScrollView.hidden = YES;
-        self.tableView.hidden = NO;
+        self.tableViewScrollView.hidden = NO;
         [self.tableView reloadData];
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
