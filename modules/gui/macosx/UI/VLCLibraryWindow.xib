@@ -776,9 +776,6 @@
                 <outlet property="mediaSourceCollectionViewScrollViewTopConstraint" destination="1h2-ln-GVY" id="orE-bG-zt4"/>
                 <outlet property="mediaSourceHomeButton" destination="jfA-Vr-sQc" id="oLM-NF-rqe"/>
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
-                <outlet property="mediaSourcePathControlCollectionViewScrollViewBottomConstraint" destination="Lji-yk-wiI" id="BxP-JG-rlP"/>
-                <outlet property="mediaSourcePathControlTableViewScrollViewBottomConstraint" destination="Xao-NR-Utd" id="GYG-ye-2Rq"/>
-                <outlet property="mediaSourcePathControlTopConstraint" destination="Sf6-jz-ool" id="lAK-GI-HNu"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceTableViewScrollView" destination="7WD-fy-WtJ" id="8As-1W-Af8"/>
                 <outlet property="mediaSourceTableViewScrollViewTopConstraint" destination="y4h-EN-rn0" id="8f7-8Y-Zeb"/>
@@ -1102,40 +1099,51 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rjk-Q6-FYy" customClass="VLCInputNodePathControl">
-                    <rect key="frame" x="46" y="381" width="472" height="20"/>
-                    <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" alignment="left" id="kIb-Jz-eus">
-                        <font key="font" metaFont="message" size="11"/>
-                        <url key="url" string="file://localhost/Applications/"/>
-                    </pathCell>
-                </pathControl>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jfA-Vr-sQc">
-                    <rect key="frame" x="4" y="376" width="38" height="27"/>
+                <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="LIN-LZ-lhm">
+                    <rect key="frame" x="0.0" y="371" width="528" height="40"/>
+                    <subviews>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jfA-Vr-sQc">
+                            <rect key="frame" x="4" y="5" width="38" height="27"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="26" id="bRL-Fs-cKa"/>
+                            </constraints>
+                            <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSHomeTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OHf-j4-3In">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="message" size="11"/>
+                            </buttonCell>
+                        </button>
+                        <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rjk-Q6-FYy" customClass="VLCInputNodePathControl">
+                            <rect key="frame" x="46" y="10" width="200" height="20"/>
+                            <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" alignment="left" id="kIb-Jz-eus">
+                                <font key="font" metaFont="message" size="11"/>
+                                <url key="url" string="file://localhost/Applications/"/>
+                            </pathCell>
+                        </pathControl>
+                    </subviews>
                     <constraints>
-                        <constraint firstAttribute="width" constant="26" id="bRL-Fs-cKa"/>
+                        <constraint firstAttribute="bottom" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="3Mz-ox-bKx"/>
+                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="centerY" secondItem="Rjk-Q6-FYy" secondAttribute="centerY" id="8oA-Mf-ETE"/>
+                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jfA-Vr-sQc" secondAttribute="bottom" constant="10" id="9QR-39-n17"/>
+                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="LIN-LZ-lhm" secondAttribute="leading" constant="10" id="HIi-nl-quS"/>
+                        <constraint firstItem="jfA-Vr-sQc" firstAttribute="top" relation="greaterThanOrEqual" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="10" id="Yux-Fa-4q2"/>
+                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="afa-is-HaB"/>
+                        <constraint firstItem="Rjk-Q6-FYy" firstAttribute="top" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="10" id="dMk-ci-d2B"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Rjk-Q6-FYy" secondAttribute="trailing" constant="10" id="iDS-9I-EBt"/>
                     </constraints>
-                    <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSHomeTemplate" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OHf-j4-3In">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="message" size="11"/>
-                    </buttonCell>
-                </button>
+                </visualEffectView>
             </subviews>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="7WD-fy-WtJ" secondAttribute="bottom" id="05c-7d-nw6"/>
-                <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="1OY-9N-uuV"/>
-                <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="40" id="1h2-ln-GVY"/>
+                <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" id="1h2-ln-GVY"/>
                 <constraint firstItem="7WD-fy-WtJ" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="233-Yb-V4O"/>
                 <constraint firstAttribute="bottom" secondItem="cFG-c9-cI9" secondAttribute="bottom" id="DjO-Ru-7sa"/>
-                <constraint firstItem="cFG-c9-cI9" firstAttribute="top" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="Lji-yk-wiI"/>
+                <constraint firstAttribute="trailing" secondItem="LIN-LZ-lhm" secondAttribute="trailing" id="N1E-Sc-Vsq"/>
                 <constraint firstAttribute="trailing" secondItem="7WD-fy-WtJ" secondAttribute="trailing" id="PnR-KD-94A"/>
-                <constraint firstItem="Rjk-Q6-FYy" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="10" id="Sf6-jz-ool"/>
-                <constraint firstItem="7WD-fy-WtJ" firstAttribute="top" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="Xao-NR-Utd"/>
-                <constraint firstItem="jfA-Vr-sQc" firstAttribute="centerY" secondItem="Rjk-Q6-FYy" secondAttribute="centerY" id="aFD-99-R3a"/>
-                <constraint firstAttribute="trailing" secondItem="Rjk-Q6-FYy" secondAttribute="trailing" constant="10" id="c3j-mQ-afF"/>
-                <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" constant="10" id="saP-eI-VDF"/>
+                <constraint firstItem="LIN-LZ-lhm" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" id="jrw-S8-UBd"/>
+                <constraint firstItem="LIN-LZ-lhm" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="lO4-XK-Pts"/>
                 <constraint firstAttribute="trailing" secondItem="cFG-c9-cI9" secondAttribute="trailing" id="vkQ-o0-jz4"/>
                 <constraint firstItem="cFG-c9-cI9" firstAttribute="leading" secondItem="eHd-Q9-F8D" secondAttribute="leading" id="vq6-rW-p6Q"/>
-                <constraint firstItem="7WD-fy-WtJ" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" constant="40" id="y4h-EN-rn0"/>
+                <constraint firstItem="7WD-fy-WtJ" firstAttribute="top" secondItem="eHd-Q9-F8D" secondAttribute="top" id="y4h-EN-rn0"/>
             </constraints>
             <point key="canvasLocation" x="144" y="197.5"/>
         </customView>
