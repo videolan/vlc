@@ -1125,6 +1125,7 @@
                         <constraint firstAttribute="bottom" secondItem="Rjk-Q6-FYy" secondAttribute="bottom" constant="10" id="3Mz-ox-bKx"/>
                         <constraint firstItem="jfA-Vr-sQc" firstAttribute="centerY" secondItem="Rjk-Q6-FYy" secondAttribute="centerY" id="8oA-Mf-ETE"/>
                         <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jfA-Vr-sQc" secondAttribute="bottom" constant="10" id="9QR-39-n17"/>
+                        <constraint firstAttribute="height" constant="40" id="9YN-h6-4ls"/>
                         <constraint firstItem="jfA-Vr-sQc" firstAttribute="leading" secondItem="LIN-LZ-lhm" secondAttribute="leading" constant="10" id="HIi-nl-quS"/>
                         <constraint firstItem="jfA-Vr-sQc" firstAttribute="top" relation="greaterThanOrEqual" secondItem="LIN-LZ-lhm" secondAttribute="top" constant="10" id="Yux-Fa-4q2"/>
                         <constraint firstItem="Rjk-Q6-FYy" firstAttribute="leading" secondItem="jfA-Vr-sQc" secondAttribute="trailing" constant="10" id="afa-is-HaB"/>
