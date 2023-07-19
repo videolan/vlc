@@ -87,9 +87,12 @@ static void Run(intf_thread_t *p_intf)
 {
     CPSProcessSerNum PSN;
     @autoreleasepool {
-        NSApplication.sharedApplication;
+        NSApplication *application = NSApplication.sharedApplication;
         if (!CPSGetCurrentProcess(&PSN) && !CPSEnableForegroundOperation(&PSN,0x03,0x3C,0x2C,0x1103) && !CPSSetFrontProcess(&PSN)) {
-            NSApplication.sharedApplication;
+            application = NSApplication.sharedApplication;
+        } else {
+            msg_Err(p_intf, "Failed to start VLC interface");
+            return;
         }
     }
 }
