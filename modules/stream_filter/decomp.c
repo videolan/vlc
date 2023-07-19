@@ -224,11 +224,12 @@ static int Control (stream_t *stream, int query, va_list args)
             bool paused = va_arg (args, unsigned);
 
             vlc_mutex_lock (&p_sys->lock);
-            vlc_stream_Control(stream->s, STREAM_SET_PAUSE_STATE, paused);
+            const int status =
+                vlc_stream_Control(stream->s, STREAM_SET_PAUSE_STATE, paused);
             p_sys->paused = paused;
             vlc_cond_signal (&p_sys->wait);
             vlc_mutex_unlock (&p_sys->lock);
-            break;
+            return status;
         }
         default:
             return VLC_EGENERIC;
