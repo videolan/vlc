@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -952,6 +953,88 @@ static bool mlst_facts_iter(char **linep, const char **key, const char **val)
     return true;
 }
 
+/**
+ * Parse an RFC3659 Time value (Section 2.3)
+ * and return the seconds since UNIX epoch.
+ *
+ * \retval -1       The timeval could not be parsed
+ * \retval time_t   Time value in seconds since UNIX epoch
+ */
+static time_t ftp_mktime(const char *const timeval)
+{
+    #define RFC3659_TIMEVAL_MIN 14
+    // A time-val needs at least 14 digits to represent:
+    // - Year    (4)
+    // - Month   (2)
+    // - Day     (2)
+    // - Hour    (2)
+    // - Minutes (2)
+    // - Seconds (2)
+
+    char extra;
+    int len;
+    struct tm tm;
+    // The trailing char is used to check that there is
+    // no invalid trailing input after the parsed string
+    // or make sure that a potential 15th character is a dot
+    // for further parsing.
+    int ret = sscanf(timeval, "%4d%2d%2d%2d%2d%2d%n%c",
+                     &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+                     &tm.tm_hour, &tm.tm_min, &tm.tm_sec,
+                     &len, &extra);
+
+    // There are only two valid cases:
+    // - A time-val without any fraction of seconds, in which case
+    //   6 fields must be matched. There can be no trailing
+    //   characters and the length is explicitly required to be 14.
+    //   The last field is only present to make sure it does _not_ match-
+    //   anything as no other trailing characters are supposed to be found
+    //   after the time-val.
+    // - A time-val with fractions of seconds in which the string must be
+    //   strictly longer than 15 characters, all 7 fields must be set and the 7th
+    //   field must be a dot. There must be at least one digit afterward but
+    //   there is no other limitation to the number of digits after the dot.
+    //   After the dot the only valid characters are digits and nothing else.
+    if (len == RFC3659_TIMEVAL_MIN && (ret == 6 || (ret == 7 && extra == '.')))
+    {
+        
+        // The optional fractions of seconds are of no interest here
+        // as we can not represent them in time_t, but we still
+        // need to parse them to make sure that the time-val is valid.
+        if (ret == 7)
+        {
+            size_t i;
+            for (i = RFC3659_TIMEVAL_MIN + 1; timeval[i] != '\0'; i++)
+                if (!isdigit(timeval[i]))
+                    return (time_t) -1;
+
+            // We must have at least one digit
+            if (i == RFC3659_TIMEVAL_MIN + 1)
+                return (time_t) -1;
+        }
+
+        // Validate ranges according to RFC3659
+        if (tm.tm_year < 1000 || tm.tm_year > 9999 ||
+            tm.tm_mon  < 1    || tm.tm_mon  > 12   ||
+            tm.tm_mday < 1    || tm.tm_mday > 31   ||
+            tm.tm_hour < 0    || tm.tm_hour > 23   ||
+            tm.tm_min  < 0    || tm.tm_min  > 59   ||
+            tm.tm_sec  < 0    || tm.tm_sec  > 60)
+            return (time_t) -1;
+
+        // Year in tm starts from 1900
+        tm.tm_year -= 1900;
+        // Month in tm ranges from 0-11
+        tm.tm_mon -= 1;
+        // DST is unknown
+        tm.tm_isdst = -1;
+
+        return timegm(&tm);
+    }
+
+    return (time_t) -1;
+}
+
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
@@ -971,6 +1054,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         char *psz_file;
         int type = ITEM_TYPE_UNKNOWN;
         long long size = 0;
+        time_t mtime = (time_t)-1;
 
         char *psz_line = vlc_tls_GetLine( p_sys->data );
         if( psz_line == NULL )
@@ -1003,6 +1087,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                         type = ITEM_TYPE_FILE;
                 } else if (!vlc_ascii_strcasecmp( key, "size" )) {
                     size = atoll(val);
+                } else if (!vlc_ascii_strcasecmp( key, "modify" )) {
+                    mtime = ftp_mktime(val);
                 }
             }
         }
@@ -1064,8 +1150,11 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
             i_ret = vlc_readdir_helper_additem( &rdh, ms.ptr, NULL, psz_file,
                                                 type, ITEM_NET, &p_item );
 
-            if (i_ret == VLC_SUCCESS && p_item && size > 0) {
-                input_item_AddStat(p_item, "size", size);
+            if (i_ret == VLC_SUCCESS && p_item) {
+                if (size > 0)
+                    input_item_AddStat(p_item, "size", size);
+                if (mtime != (time_t)-1)
+                    input_item_AddStat(p_item, "mtime", mtime);
             }
             free(ms.ptr);
         }
