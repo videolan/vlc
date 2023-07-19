@@ -255,7 +255,7 @@ ListViewCompat {
                               varying highp float pos;
 
                               void main() {
-                                  lowp vec4 texel = texture2D(source, coord);
+                                  highp vec4 texel = texture2D(source, coord);
 
                                   // Note that the whole texel is multiplied instead
                                   // of only the alpha component because it must be
