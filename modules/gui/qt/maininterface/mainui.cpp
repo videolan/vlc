@@ -172,7 +172,7 @@ bool MainUI::setup(QQmlEngine* engine)
     }
 
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
-    engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider(m_intf));
+    engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())

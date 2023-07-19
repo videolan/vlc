@@ -189,12 +189,6 @@ private:
 };
 }
 
-SVGColorImageImageProvider::SVGColorImageImageProvider(qt_intf_t* p_intf)
-    : QQuickAsyncImageProvider()
-    , m_intf(p_intf)
-{
-}
-
 QQuickImageResponse* SVGColorImageImageProvider::requestImageResponse(const QString& id, const QSize& requestedSize)
 {
     QUrl url {id};

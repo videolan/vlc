@@ -24,17 +24,10 @@
 #include <QString>
 #include <QUrlQuery>
 
-struct qt_intf_t;
-
 class SVGColorImageImageProvider: public QQuickAsyncImageProvider
 {
 public:
-    SVGColorImageImageProvider(qt_intf_t *p_intf);
-
     QQuickImageResponse* requestImageResponse(const QString &id, const QSize &requestedSize) override;
-
-private:
-    qt_intf_t *m_intf = nullptr;
 };
 
 
