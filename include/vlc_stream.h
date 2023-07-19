@@ -46,7 +46,6 @@ struct vlc_stream_operations {
     bool (*can_pause)(stream_t *);
     bool (*can_control_pace)(stream_t *);
 
-    int (*get_pts_delay)(stream_t *, vlc_tick_t *);
     int (*get_signal)(stream_t *, double *, double *);
     int (*get_meta)(stream_t *, vlc_meta_t *);
     int (*get_type)(stream_t *, int *);
@@ -74,6 +73,7 @@ struct vlc_stream_operations {
             int (*get_content_type)(stream_t *, char **);
             int (*get_tags)(stream_t *, const block_t **);
             int (*get_private_id_state)(stream_t *, int, bool *);
+            vlc_tick_t (*get_pts_delay)(stream_t *);
 
             int (*set_record_state)(stream_t *, bool, const char *, const char *);
             int (*set_private_id_state)(stream_t *, int, bool);
@@ -97,6 +97,7 @@ struct vlc_stream_operations {
             int (*get_title_info)(demux_t *, input_title_t ***, int *, int *, int *);
             int (*get_fps)(demux_t *, double *);
             int (*get_attachments)(demux_t *, input_attachment_t ***);
+            int (*get_pts_delay)(stream_t *, vlc_tick_t *);
 
             int (*set_position)(demux_t *, double, bool);
             int (*set_time)(demux_t *, vlc_tick_t, bool);
@@ -462,9 +463,11 @@ VLC_USED static inline bool vlc_stream_CanPace(stream_t *s)
     return can_control_pace;
 }
 
-VLC_USED static inline int vlc_stream_GetPtsDelay(stream_t *s, vlc_tick_t *pts_delay)
+VLC_USED static inline vlc_tick_t vlc_stream_GetPtsDelay(stream_t *s)
 {
-    return vlc_stream_Control(s, STREAM_GET_PTS_DELAY, pts_delay);
+    vlc_tick_t pts_delay;
+    vlc_stream_Control(s, STREAM_GET_PTS_DELAY, &pts_delay);
+    return pts_delay;
 }
 
 VLC_USED static inline int vlc_stream_GetSeekpoint(stream_t *s, unsigned *seekpoint)

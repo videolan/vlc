@@ -802,11 +802,15 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
             }
             return VLC_EGENERIC;
         case STREAM_GET_PTS_DELAY:
-            if (s->ops->get_pts_delay != NULL) {
-                vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
-                return s->ops->get_pts_delay(s, pts_delay);
+        {
+            vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
+            if (s->ops->stream.get_pts_delay != NULL) {
+                *pts_delay = s->ops->stream.get_pts_delay(s);
+            } else {
+                *pts_delay = DEFAULT_PTS_DELAY;
             }
-            return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         case STREAM_GET_TITLE_INFO:
             if (s->ops->stream.get_title_info != NULL) {
                 input_title_t ***title_info = va_arg(args, input_title_t ***);

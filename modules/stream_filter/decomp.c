@@ -259,7 +259,7 @@ static int Open (stream_t *stream, const char *path)
     p_sys->pid = -1;
     p_sys->can_pause = vlc_stream_CanPause(stream->s);
     p_sys->can_pace = vlc_stream_CanPace(stream->s);
-    vlc_stream_GetPtsDelay(stream->s, &p_sys->pts_delay);
+    p_sys->pts_delay = vlc_stream_GetPtsDelay(stream->s);
 
     if (vlc_stream_GetMTime(stream->s, &p_sys->mtime) != VLC_SUCCESS)
         p_sys->mtime = -1;

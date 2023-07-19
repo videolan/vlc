@@ -460,7 +460,7 @@ static int Open(vlc_object_t *obj)
     if (vlc_stream_GetMTime(stream->s, &sys->mtime) != VLC_SUCCESS)
         sys->mtime = -1;
 
-    vlc_stream_GetPtsDelay(stream->s, &sys->pts_delay);
+    sys->pts_delay = vlc_stream_GetPtsDelay(stream->s);
     if (vlc_stream_GetContentType(stream->s, &sys->content_type) != VLC_SUCCESS)
         sys->content_type = NULL;
 

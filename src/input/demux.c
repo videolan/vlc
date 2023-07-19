@@ -308,9 +308,9 @@ int demux_vaControl( demux_t *demux, int query, va_list args )
             return VLC_SUCCESS;
         }
         case DEMUX_GET_PTS_DELAY:
-            if (demux->ops->get_pts_delay != NULL) {
+            if (demux->ops->demux.get_pts_delay != NULL) {
                 vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
-                return demux->ops->get_pts_delay(demux, pts_delay);
+                return demux->ops->demux.get_pts_delay(demux, pts_delay);
             }
             return VLC_EGENERIC;
         case DEMUX_GET_TITLE_INFO:
