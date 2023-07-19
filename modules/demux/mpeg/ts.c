@@ -1959,6 +1959,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
 
             pid->i_cc = 0xff;
             pid->i_dup = 0;
+            pid->prevpktbytes[0] = 0;
 
             if( pid->type != TYPE_STREAM )
                 continue;
