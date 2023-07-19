@@ -1956,16 +1956,18 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
         for( int j=0; j<p_pmt->e_streams.i_size; j++ )
         {
             ts_pid_t *pid = p_pmt->e_streams.p_elems[j];
-            ts_stream_t *p_pes = pid->u.p_stream;
+
+            pid->i_cc = 0xff;
+            pid->i_dup = 0;
 
             if( pid->type != TYPE_STREAM )
                 continue;
 
+            ts_stream_t *p_pes = pid->u.p_stream;
+
             for( ts_es_t *p_es = p_pes->p_es; p_es; p_es = p_es->p_next )
                 p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
 
-            pid->i_cc = 0xff;
-            pid->i_dup = 0;
             pid->u.p_stream->i_last_dts = -1;
 
             if( pid->u.p_stream->prepcr.p_head )
