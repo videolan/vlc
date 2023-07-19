@@ -471,12 +471,17 @@ referenceSizeForHeaderInSection:(NSInteger)section
 {
     _pathControlVisualEffectView.hidden = !visible;
 
-    static const CGFloat fallbackPathControlHeight = 20;
-    const CGFloat actualPathControlHeight = _pathControl.frame.size.height;
-    const CGFloat pathControlHeight = actualPathControlHeight == 0 ? VLCLibraryUIUnits.largeSpacing : actualPathControlHeight;
-
+    const CGFloat pathControlHeight = _pathControlVisualEffectView.frame.size.height;
     const CGFloat pathControlSpace = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
-    const CGFloat scrollViewsTopSpace = visible ? pathControlHeight + pathControlSpace * 2 : 0;
+    const CGFloat scrollViewsTopSpace = visible ? pathControlHeight + (pathControlSpace * 2) + VLCLibraryUIUnits.mediumSpacing : VLCLibraryUIUnits.mediumSpacing;
+    
+    NSEdgeInsets existingCollectionViewScrollViewInsets = _collectionViewScrollView.contentInsets;
+    existingCollectionViewScrollViewInsets.top = scrollViewsTopSpace;
+    _collectionViewScrollView.contentInsets = existingCollectionViewScrollViewInsets;
+
+    NSEdgeInsets existingTableViewScrollViewInsets = _tableViewScrollView.contentInsets;
+    existingTableViewScrollViewInsets.top = scrollViewsTopSpace;
+    _tableViewScrollView.contentInsets = existingTableViewScrollViewInsets;
 }
 
 - (void)returnHome
