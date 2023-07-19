@@ -67,7 +67,7 @@ Widgets.StackViewExt {
 
     // used in custom focus management for explicit "focusReason" transfer
     readonly property var setCurrentItemFocus: {
-        return Helpers.get(currentItem, "setCurrentItemFocus", _setCurrentItemFocusDefault)
+        return Helpers.get(currentItem, "setCurrentItemFocus", setCurrentItemFocusDefault)
     }
 
     // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
@@ -105,29 +105,6 @@ Widgets.StackViewExt {
         }
     }
 
-    function _updateView() {
-        // NOTE: When the currentItem is null we default to the StackView focusReason.
-        if (currentItem && currentItem.activeFocus)
-            _applyView(currentItem.focusReason)
-        else if (activeFocus)
-            _applyView(focusReason)
-        else
-            replace(null, currentComponent)
-    }
-
-    function _applyView(reason) {
-        replace(null, currentComponent)
-
-        setCurrentItemFocus(reason)
-    }
-
-    function _setCurrentItemFocusDefault(reason) {
-        if (currentItem)
-            currentItem.forceActiveFocus(reason)
-        else
-            Helpers.enforceFocus(root, reason)
-    }
-
     // makes the views currentIndex initial index and position view at that index
     function resetFocus() {
         if (!model || model.count === 0) return
@@ -144,6 +121,32 @@ Widgets.StackViewExt {
             if (!MainCtx.gridView)
                 currentItem.currentIndex = initialIndex
         }
+    }
+
+    function setCurrentItemFocusDefault(reason) {
+        if (currentItem) {
+            if (currentItem.setCurrentItemFocus)
+                currentItem.setCurrentItemFocus(reason)
+            else
+                currentItem.forceActiveFocus(reason)
+        } else
+            Helpers.enforceFocus(root, reason)
+    }
+
+    function _updateView() {
+        // NOTE: When the currentItem is null we default to the StackView focusReason.
+        if (currentItem && currentItem.activeFocus)
+            _applyView(currentItem.focusReason)
+        else if (activeFocus)
+            _applyView(focusReason)
+        else
+            replace(null, currentComponent)
+    }
+
+    function _applyView(reason) {
+        replace(null, currentComponent)
+
+        setCurrentItemFocus(reason)
     }
 
     // handle cancelAction, if currentIndex is set reset it to 0
