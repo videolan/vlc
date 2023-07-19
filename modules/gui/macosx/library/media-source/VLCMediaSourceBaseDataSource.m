@@ -469,8 +469,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)togglePathControlVisibility:(BOOL)visible
 {
-    _homeButton.hidden = !visible;
-    _pathControl.hidden = !visible;
+    _pathControlVisualEffectView.hidden = !visible;
 
     static const CGFloat fallbackPathControlHeight = 20;
     const CGFloat actualPathControlHeight = _pathControl.frame.size.height;
@@ -478,12 +477,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     const CGFloat pathControlSpace = visible ? VLCLibraryUIUnits.mediumSpacing : 0;
     const CGFloat scrollViewsTopSpace = visible ? pathControlHeight + pathControlSpace * 2 : 0;
-
-    _pathControlTopConstraint.constant = pathControlSpace;
-    _pathControlBottomTableViewScrollViewConstraint.constant = pathControlSpace;
-    _pathControlBottomCollectionViewScrollViewConstraint.constant = pathControlSpace;
-    _topCollectionViewScrollViewConstraint.constant = scrollViewsTopSpace;
-    _topTableViewScrollViewConstraint.constant = scrollViewsTopSpace;
 }
 
 - (void)returnHome

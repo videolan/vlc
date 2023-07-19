@@ -776,6 +776,7 @@
                 <outlet property="mediaSourceCollectionViewScrollViewTopConstraint" destination="1h2-ln-GVY" id="orE-bG-zt4"/>
                 <outlet property="mediaSourceHomeButton" destination="jfA-Vr-sQc" id="oLM-NF-rqe"/>
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
+                <outlet property="mediaSourcePathControlVisualEffectView" destination="LIN-LZ-lhm" id="gZZ-ov-qfP"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceTableViewScrollView" destination="7WD-fy-WtJ" id="8As-1W-Af8"/>
                 <outlet property="mediaSourceTableViewScrollViewTopConstraint" destination="y4h-EN-rn0" id="8f7-8Y-Zeb"/>
