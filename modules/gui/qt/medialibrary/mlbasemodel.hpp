@@ -197,6 +197,11 @@ private:
     void onCacheBeginRemoveRows(int first, int last);
     void onCacheBeginMoveRows(int first, int last, int destination);
 
+    using ItemCallback = std::function<void (quint64 requestID
+                                            , std::vector<std::unique_ptr<MLItem>> &items)>;
+
+    quint64 loadItems(const QVector<int> &index, ItemCallback cb);
+
     inline bool cachable() const { return m_mediaLib && !m_qmlInitializing; }
 
 protected:

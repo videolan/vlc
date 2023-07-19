@@ -79,28 +79,23 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
     return getDataAt(index(idx));
 }
 
-void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
+
+quint64 MLBaseModel::loadItems(const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
 {
-    if (!callback.isCallable()) // invalid argument
-        return;
-
-    QVector<int> indx;
-    std::transform(indexes.begin(), indexes.end(), std::back_inserter(indx),
-    [](const auto &index) {
-        return index.row();
-    });
-
     QSharedPointer<BaseLoader> loader{ createLoader().release() };
-    struct Ctx {
+
+    struct Ctx
+    {
         std::vector<std::unique_ptr<MLItem>> items;
     };
-    m_mediaLib->runOnMLThread<Ctx>(this,
-    //ML thread
-    [loader, indx](vlc_medialibrary_t* ml, Ctx& ctx){
-        if (indx.isEmpty())
+
+    const auto worker =
+    [loader, indexes](vlc_medialibrary_t* ml, Ctx& ctx)
+    {
+        if (indexes.isEmpty())
             return;
 
-        auto sortedIndexes = indx;
+        auto sortedIndexes = indexes;
         std::sort(sortedIndexes.begin(), sortedIndexes.end());
 
         struct Range
@@ -119,37 +114,56 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
                 ranges.push_back(Range {index, index});
         }
 
-        ctx.items.resize(indx.size());
+        ctx.items.resize(indexes.size());
         for (const auto range : ranges)
         {
             auto data = loader->load(ml, range.low, range.high - range.low + 1);
-            for (int i = 0; i < indx.size(); ++i)
+            for (int i = 0; i < indexes.size(); ++i)
             {
-                const auto targetIndex = indx[i];
+                const auto targetIndex = indexes[i];
                 if (targetIndex >= range.low && targetIndex <= range.high)
                 {
                     ctx.items.at(i) = std::move(data.at(targetIndex - range.low));
                 }
             }
         }
+    };
 
-    },
-    //UI thread
-    [this, indxSize = indx.size(), callback]
-    (quint64, Ctx& ctx) mutable
+    return m_mediaLib->runOnMLThread<Ctx>(this
+                                          //ML thread
+                                          , worker
+                                          // UI thread
+                                          , [cb](quint64 id, Ctx &ctx) { if (cb) cb(id, ctx.items); });
+}
+
+
+void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
+{
+    if (!callback.isCallable()) // invalid argument
+        return;
+
+    QVector<int> indx;
+    std::transform(indexes.begin(), indexes.end()
+                   , std::back_inserter(indx)
+                   , std::mem_fn(&QModelIndex::row));
+
+    std::shared_ptr<quint64> requestId = std::make_shared<quint64>();
+
+    ItemCallback cb = [this, indxSize = indx.size(), callback, requestId]
+    (quint64 id, std::vector<std::unique_ptr<MLItem>> &items) mutable
     {
         auto jsEngine = qjsEngine(this);
-        if (!jsEngine)
+         if (!jsEngine || *requestId != id)
             return;
 
-        assert((int)ctx.items.size() == indxSize);
+        assert((int)items.size() == indxSize);
 
         const QHash<int, QByteArray> roles = roleNames();
         auto jsArray = jsEngine->newArray(indxSize);
 
         for (int i = 0; i < indxSize; ++i)
         {
-            const auto &item = ctx.items[i];
+            const auto &item = items[i];
             QMap<QString, QVariant> dataDict;
 
             if (item) // item may fail to load
@@ -160,7 +174,9 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
         }
 
         callback.call({jsArray});
-    });
+    };
+
+    *requestId = loadItems(indx, cb);
 }
 
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const
