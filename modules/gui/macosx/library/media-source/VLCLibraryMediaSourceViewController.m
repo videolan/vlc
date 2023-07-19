@@ -58,6 +58,7 @@
     _tableViewScrollView = libraryWindow.mediaSourceTableViewScrollView;
     _homeButton = libraryWindow.mediaSourceHomeButton;
     _pathControl = libraryWindow.mediaSourcePathControl;
+    _pathControlTopConstraint = libraryWindow.mediaSourcePathControlTopConstraint;
     _pathControlBottomTableViewScrollViewConstraint = libraryWindow.mediaSourcePathControlTableViewScrollViewBottomConstraint;
     _pathControlBottomCollectionViewScrollViewConstraint = libraryWindow.mediaSourcePathControlCollectionViewScrollViewBottomConstraint;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
