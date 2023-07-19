@@ -139,7 +139,8 @@ ListViewCompat {
     ShaderEffectSource {
         id: proxyContentItem
 
-        visible: (root._beginningFade || root._endFade)
+        visible: (root._beginningFade || root._endFade) ||
+                 ((shaderEffect) && (shaderEffect.beginningFadeSize > 0 || shaderEffect.endFadeSize > 0))
 
         BindingCompat on visible {
             // Let's see if the effect is compatible...
@@ -149,6 +150,8 @@ ListViewCompat {
 
         readonly property bool effectCompatible: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
                                                  ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString)))
+
+        property ShaderEffect shaderEffect
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -190,6 +193,16 @@ ListViewCompat {
             property real beginningFadeSize: root._beginningFade ? normalFadeSize : 0
             property real endFadeSize: root._endFade ? normalFadeSize : 0
             readonly property real endFadePos: 1.0 - endFadeSize
+
+            Component.onCompleted: {
+                console.assert(proxyContentItem.shaderEffect == null)
+                proxyContentItem.shaderEffect = this
+            }
+
+            Component.onDestruction: {
+                console.assert(proxyContentItem.shaderEffect === this)
+                proxyContentItem.shaderEffect = null
+            }
 
             // TODO: Qt >= 5.15 use inline component
             Behavior on beginningFadeSize {
