@@ -28,6 +28,7 @@
 
 #include "simple_preferences.hpp"
 #include "preferences_widgets.hpp"
+#include "dialogs/dialogs_provider.hpp"
 #include "maininterface/mainctx.hpp"
 #include "util/color_scheme_model.hpp"
 #include "util/proxycolumnmodel.hpp"
@@ -878,6 +879,10 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                               , p_intf->p_mi , updateIntfUserScaleFactorFromControls );
             QObject::connect( ui.intfScaleFactorSpinBox, QOverload<int>::of(&QSpinBox::valueChanged)
                               , p_intf->p_mi , updateIntfUserScaleFactorFromControls );
+
+            DialogsProvider *provider = DialogsProvider::getInstance();
+
+            QObject::connect( ui.toolbarEditor, &QAbstractButton::clicked, provider, &DialogsProvider::showToolbarEditorDialog);
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
             configBool( "qt-titlebar", ui.titleBarCheckBox );
