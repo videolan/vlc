@@ -91,7 +91,7 @@ static void Run(intf_thread_t *p_intf)
         if (!CPSGetCurrentProcess(&PSN) && !CPSEnableForegroundOperation(&PSN,0x03,0x3C,0x2C,0x1103) && !CPSSetFrontProcess(&PSN)) {
             application = NSApplication.sharedApplication;
         } else {
-            msg_Err(p_intf, "Failed to start VLC interface");
+            msg_Err(p_intf, "Failed to start VLC minimal interface");
             return;
         }
     }
