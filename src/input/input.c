@@ -2841,7 +2841,9 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
             in->b_title_demux = true;
         }
 
-        demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
+        if ( demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY, &in->i_pts_delay )
+             != VLC_SUCCESS )
+            in->i_pts_delay = 0;
         if( in->i_pts_delay > INPUT_PTS_DELAY_MAX )
             in->i_pts_delay = INPUT_PTS_DELAY_MAX;
         else if( in->i_pts_delay < 0 )
