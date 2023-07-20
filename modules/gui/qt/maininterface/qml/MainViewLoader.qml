@@ -49,8 +49,11 @@ Widgets.StackViewExt {
     // view's model
     /* required */ property var model
 
-    // optional, loaded when model.loading is true
+    // optional, loaded when isLoading is true
     property Component loadingComponent: null
+
+    // NOTE: Sometimes the model has no 'loading' property.
+    readonly property bool isLoading: (model.loading) ? model.loading : false
 
     readonly property int count: model.count
 
@@ -75,11 +78,13 @@ Widgets.StackViewExt {
     // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
     //       gets called multiple times even when the currentComponent stays the same.
     property Component currentComponent: {
-        if (model.loading)
-            return loadingComponent
-        else if (count === 0)
+        if (isLoading) {
+            if (loadingComponent)
+                return loadingComponent
+        } else if (count === 0)
             return emptyLabel
-        else if (MainCtx.gridView)
+
+        if (MainCtx.gridView)
             return grid
         else
             return list
@@ -90,7 +95,7 @@ Widgets.StackViewExt {
     // handle cancelAction, if currentIndex is set reset it to 0
     // otherwise perform default Navigation action
     Navigation.cancelAction: function () {
-        if (count === 0 || currentItem === null || currentItem.currentIndex === 0)
+        if (isLoading || count === 0 || currentItem === null || currentItem.currentIndex === 0)
             return false // transfer cancel action to parent
 
         if (currentItem.hasOwnProperty("positionViewAtIndex"))
@@ -118,7 +123,7 @@ Widgets.StackViewExt {
         target: model
 
         onCountChanged: {
-            if (count === 0 || selectionModel.hasSelection)
+            if (selectionModel.hasSelection)
                 return
 
             resetFocus()
@@ -127,7 +132,7 @@ Widgets.StackViewExt {
 
     // makes the views currentIndex initial index and position view at that index
     function resetFocus() {
-        if (count === 0 || initialIndex === -1) return
+        if (isLoading || count === 0 || initialIndex === -1) return
 
         var index
 
