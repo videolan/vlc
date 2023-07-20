@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <vlc_image.h>
+#include <vlc_subpicture.h>
 
 #define RGB2YUV( R, G, B ) \
     ((0.257 * R) + (0.504 * G) + (0.098 * B) + 16), \
