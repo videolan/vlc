@@ -1061,16 +1061,14 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
         new_palette.i_entries = 4;
         for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 4; j++)
-                new_palette.palette[i][j] = sys->palette.palette[i][j];
+            memcpy(new_palette.palette[i], &sys->palette.palette[i], 4);
             b_opaque |= (new_palette.palette[i][3] > 0x00);
         }
 
         if (old_palette->i_entries == new_palette.i_entries) {
             for (int i = 0; i < old_palette->i_entries; i++)
             {
-                for (int j = 0; j < 4; j++)
-                    changed_palette |= old_palette->palette[i][j] != new_palette.palette[i][j];
+                changed_palette |= memcmp(old_palette->palette[i], new_palette.palette[i], 4);
                 b_old_opaque |= (old_palette->palette[i][3] > 0x00);
             }
         } else {

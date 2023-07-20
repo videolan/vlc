@@ -479,12 +479,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     fmt.p_palette = &palette;
     fmt.p_palette->i_entries = 4;
     for( i = 0; i < fmt.p_palette->i_entries; i++ )
-    {
-        fmt.p_palette->palette[i][0] = p_sys->p_palette[i][0];
-        fmt.p_palette->palette[i][1] = p_sys->p_palette[i][1];
-        fmt.p_palette->palette[i][2] = p_sys->p_palette[i][2];
-        fmt.p_palette->palette[i][3] = p_sys->p_palette[i][3];
-    }
+        memcpy( fmt.p_palette->palette[i], p_sys->p_palette[i], 4);
 
     p_region = subpicture_region_New( &fmt );
     fmt.p_palette = NULL;
