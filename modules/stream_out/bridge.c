@@ -40,7 +40,7 @@
  *****************************************************************************/
 #define ID_TEXT N_("ID")
 #define ID_LONGTEXT N_( \
-    "Integer identifier for this elementary stream. This will be used to " \
+    "String identifier for this elementary stream. This will be used to " \
     "\"find\" this stream later." )
 
 #define DEST_TEXT N_( "Destination bridge-in name" )
@@ -97,7 +97,7 @@ vlc_module_begin ()
     add_shortcut( "bridge-out" )
     /* Only usable with VLM. No category so not in gui preferences
     set_subcategory( SUBCAT_SOUT_STREAM )*/
-    add_integer( SOUT_CFG_PREFIX_OUT "id", 0, ID_TEXT, ID_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX_OUT "id", NULL, ID_TEXT, ID_LONGTEXT )
     add_string( SOUT_CFG_PREFIX_OUT "in-name", "default",
                 DEST_TEXT, DEST_LONGTEXT )
     set_callbacks( OpenOut, CloseOut )
@@ -145,6 +145,7 @@ typedef struct bridged_es_t
     block_t *p_block;
     block_t **pp_last;
     bool b_empty;
+    char *es_id;
 
     /* bridge in part */
     sout_stream_id_sys_t *id;
@@ -167,7 +168,7 @@ static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 typedef struct out_sout_stream_sys_t
 {
     bridged_es_t *p_es;
-    int i_id;
+    char *new_id;
     bool b_inited;
 
     char *psz_name;
@@ -208,6 +209,19 @@ static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
             break;
     }
 
+    char *bridged_es_id;
+    if ( p_sys->new_id != NULL )
+        bridged_es_id = strdup( p_sys->new_id );
+    else if ( asprintf(&bridged_es_id,
+                      "%s/%s/%d",
+                      "placeholder", /* Will be the es_id once added to `pf_add` */
+                      p_sys->psz_name,
+                      i) == -1 )
+        bridged_es_id = NULL;
+
+    if ( unlikely(bridged_es_id == NULL) )
+        return NULL;
+
     if ( i == p_bridge->i_es_num )
     {
         p_bridge->pp_es = xrealloc( p_bridge->pp_es,
@@ -219,7 +233,7 @@ static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
     p_sys->p_es = p_es = p_bridge->pp_es[i];
 
     p_es->fmt = *p_fmt;
-    p_es->fmt.i_id = p_sys->i_id;
+    p_es->es_id = bridged_es_id;
     p_es->p_block = NULL;
     p_es->pp_last = &p_es->p_block;
     p_es->b_empty = false;
@@ -252,6 +266,8 @@ static void DelOut( sout_stream_t *p_stream, void *id )
     p_es->b_empty = true;
     block_ChainRelease( p_es->p_block );
     p_es->p_block = NULL;
+
+    free( p_es->es_id );
 
     p_es->b_changed = true;
     vlc_mutex_unlock( &lock );
@@ -323,8 +339,7 @@ static int OpenOut( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->b_inited = false;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX_OUT "id", &val );
-    p_sys->i_id = val.i_int;
+    p_sys->new_id = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX_OUT "id" );
 
     var_Get( p_stream, SOUT_CFG_PREFIX_OUT "in-name", &val );
     if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
@@ -493,8 +508,10 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
                 p_bridge->pp_es[i]->fmt.i_id += p_sys->i_id_offset;
                 if( !p_sys->b_placeholder )
                 {
-                    p_bridge->pp_es[i]->id = sout_StreamIdAdd(
-                                p_stream->p_next, &p_bridge->pp_es[i]->fmt, NULL );
+                    p_bridge->pp_es[i]->id =
+                        sout_StreamIdAdd( p_stream->p_next,
+                                         &p_bridge->pp_es[i]->fmt,
+                                         p_bridge->pp_es[i]->es_id );
                     if ( p_bridge->pp_es[i]->id == NULL )
                     {
                         msg_Warn( p_stream, "couldn't create chain for id %d",
