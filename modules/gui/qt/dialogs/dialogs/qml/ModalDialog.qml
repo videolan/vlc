@@ -50,13 +50,21 @@ Dialog {
         colorSet: ColorContext.Window
     }
 
-    Overlay.modal: GaussianBlur {
-        source: ShaderEffectSource {
-            sourceItem: control.rootWindow
-            live: true
+    Overlay.modal: Item {
+        GaussianBlur {
+            anchors.fill: parent
+            anchors.topMargin: MainCtx.windowExtendedMargin
+            anchors.leftMargin: MainCtx.windowExtendedMargin
+            anchors.rightMargin: MainCtx.windowExtendedMargin
+            anchors.bottomMargin: MainCtx.windowExtendedMargin
+
+            source: ShaderEffectSource {
+                sourceItem: control.rootWindow
+                live: true
+            }
+            radius: 12
+            samples: 16
         }
-        radius: 12
-        samples: 16
     }
 
     background: Rectangle {
