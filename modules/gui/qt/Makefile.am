@@ -175,6 +175,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/interface_window_handler.hpp \
 	gui/qt/maininterface/mainctx.cpp \
 	gui/qt/maininterface/mainctx.hpp \
+	gui/qt/maininterface/mainctx_submodels.hpp \
 	gui/qt/maininterface/mainui.cpp \
 	gui/qt/maininterface/mainui.hpp \
 	gui/qt/maininterface/videosurface.cpp \
@@ -446,6 +447,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
 	gui/qt/maininterface/mainctx.moc.cpp \
+	gui/qt/maininterface/mainctx_submodels.moc.cpp \
 	gui/qt/maininterface/mainui.moc.cpp \
 	gui/qt/maininterface/videosurface.moc.cpp \
 	gui/qt/maininterface/video_window_handler.moc.cpp \

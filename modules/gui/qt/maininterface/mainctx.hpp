@@ -60,6 +60,8 @@ class StandardPLPanel;
 struct vlc_window;
 class VideoSurfaceProvider;
 class ControlbarProfileModel;
+class SearchCtx;
+
 namespace vlc {
 namespace playlist {
 }
@@ -142,7 +144,6 @@ public:
 
 };
 
-
 class MainCtx : public QObject
 {
     Q_OBJECT
@@ -191,6 +192,7 @@ class MainCtx : public QObject
 
     Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
+    Q_PROPERTY(SearchCtx* search MEMBER m_search CONSTANT FINAL)
 
 public:
     /* tors */
@@ -398,6 +400,8 @@ protected:
     unsigned m_windowExtendedMargin = 0;
 
     std::unique_ptr<CSDButtonModel> m_csdButtonModel;
+
+    SearchCtx* m_search = nullptr;
 
 public slots:
     void toggleUpdateSystrayMenu();

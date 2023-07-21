@@ -63,6 +63,8 @@
 #include "widgets/native/viewblockingrectangle.hpp"
 
 #include "videosurface.hpp"
+#include "mainctx.hpp"
+#include "mainctx_submodels.hpp"
 
 #include <QScreen>
 
@@ -228,6 +230,7 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 1;
 
         qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
+        qmlRegisterUncreatableType<SearchCtx>(uri, versionMajor, versionMinor, "SearchCtx", "");
 
         qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::callback);
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);

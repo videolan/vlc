@@ -28,7 +28,9 @@
 
 #include "qt.hpp"
 
-#include "maininterface/mainctx.hpp"
+#include "mainctx.hpp"
+#include "mainctx_submodels.hpp"
+
 #include "compositor.hpp"
 #include "util/renderer_manager.hpp"
 #include "util/csdbuttonmodel.hpp"
@@ -123,6 +125,8 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     settings = getSettings();
     m_colorScheme = new ColorSchemeModel(this);
+
+    m_search = new SearchCtx(this);
 
     loadPrefs(false);
     loadFromSettingsImpl(false);
