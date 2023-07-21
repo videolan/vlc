@@ -1926,12 +1926,7 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 
         /* pad palette */
         for( i = p_fmt->p_palette->i_entries; i < i_max_entries; i++ )
-        {
-            p_fmt->p_palette->palette[i][0] = 0;
-            p_fmt->p_palette->palette[i][1] = 0;
-            p_fmt->p_palette->palette[i][2] = 0;
-            p_fmt->p_palette->palette[i][3] = 0;
-        }
+            memset(p_fmt->p_palette->palette[i], 0, sizeof(p_fmt->p_palette->palette[i]));
         p_fmt->p_palette->i_entries = i_max_entries;
 #ifdef DEBUG_DVBSUB1
         /* p_enc not valid here */
@@ -2159,12 +2154,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     {
         pal.i_entries = 4;
         for( int i = 0; i < 4; i++ )
-        {
-            pal.palette[i][0] = 0;
-            pal.palette[i][1] = 0;
-            pal.palette[i][2] = 0;
-            pal.palette[i][3] = 0;
-        }
+            memset(pal.palette[i], 0, sizeof(pal.palette[i]));
         p_pal = &pal;
     }
 
