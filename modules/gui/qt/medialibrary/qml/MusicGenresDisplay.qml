@@ -68,6 +68,8 @@ Widgets.PageLoader {
         MusicGenres {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
 
+            searchPattern: MainCtx.search.pattern
+
             onShowAlbumView: History.push(["mc", "music", "genres", "albums",
                                            { parentId: id, genreName: name }], reason)
         }
@@ -92,6 +94,8 @@ Widgets.PageLoader {
                 width: root.width
                 color: colorContext.fg.primary
             }
+
+            searchPattern: MainCtx.search.pattern
 
             onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
             onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)

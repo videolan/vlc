@@ -50,6 +50,8 @@ FocusScope {
 
     property alias model: artistModel
 
+    property alias searchPattern: artistModel.searchPattern
+
     property alias currentIndex: artistList.currentIndex
     property alias currentAlbumIndex: albumSubView.currentIndex
 

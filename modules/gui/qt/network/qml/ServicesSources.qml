@@ -114,6 +114,8 @@ MainInterface.MainGridView {
         id: sourcesModel
 
         ctx: MainCtx
+
+        searchPattern: MainCtx.search.pattern
     }
 
     Util.SelectableDelegateModel {

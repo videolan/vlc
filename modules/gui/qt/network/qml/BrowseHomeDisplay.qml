@@ -150,6 +150,8 @@ FocusScope {
                 model: StandardPathModel {
                     //we only have a handfull of standard path (5 or 6)
                     //so we don't limit them
+
+                    searchPattern: MainCtx.search.pattern
                 }
 
                 title: I18n.qtr("My Folders")
@@ -189,7 +191,7 @@ FocusScope {
                     sd_source: NetworkDeviceModel.CAT_DEVICES
                     source_name: "*"
 
-                    searchPattern: foldersSection.model.searchPattern
+                    searchPattern: MainCtx.search.pattern
                     sortCriteria: foldersSection.model.sortCriteria
                     sortOrder: foldersSection.model.sortOrder
                     limit: deviceSection.maximumCount
@@ -237,10 +239,11 @@ FocusScope {
                     sd_source: NetworkDeviceModel.CAT_LAN
                     source_name: "*"
 
-                    searchPattern: foldersSection.model.searchPattern
                     sortCriteria: foldersSection.model.sortCriteria
                     sortOrder: foldersSection.model.sortOrder
                     limit: lanSection.maximumCount
+
+                    searchPattern: MainCtx.search.pattern
                 }
 
                 title: I18n.qtr("My LAN")

@@ -95,6 +95,8 @@ Widgets.PageLoader {
 
             onShowList: History.push(["mc", "music", "playlists", "list",
                                       { parentId: model.id, name: model.name }], reason)
+
+            searchPattern: MainCtx.search.pattern
         }
     }
 
@@ -105,6 +107,8 @@ Widgets.PageLoader {
             id: playlist
 
             isMusic: true
+
+            searchPattern: MainCtx.search.pattern
 
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)

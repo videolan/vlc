@@ -106,7 +106,9 @@ Widgets.PageLoader {
 
             displayMarginEnd: g_mainDisplay.displayMargin
 
-            model: StandardPathModel {}
+            model: StandardPathModel {
+                searchPattern: MainCtx.search.pattern
+            }
         }
     }
 
@@ -130,6 +132,8 @@ Widgets.PageLoader {
 
                 sd_source: viewDevice.sd_source
                 source_name: "*"
+
+                searchPattern: MainCtx.search.pattern
             }
         }
     }
@@ -140,7 +144,10 @@ Widgets.PageLoader {
         BrowseTreeDisplay {
             model: NetworkMediaModel {
                 id: mediaModel
+
                 ctx: MainCtx
+
+                searchPattern: MainCtx.search.pattern
             }
 
             contextMenu: NetworkMediaContextMenu {

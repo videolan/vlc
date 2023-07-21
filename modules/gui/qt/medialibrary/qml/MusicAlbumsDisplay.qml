@@ -29,4 +29,6 @@ MusicAlbums {
     onCurrentIndexChanged: {
         History.update(["mc","music", "albums", {"initialIndex": currentIndex}])
     }
+
+    searchPattern: MainCtx.search.pattern
 }

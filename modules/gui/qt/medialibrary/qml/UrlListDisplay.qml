@@ -33,6 +33,8 @@ Widgets.KeyNavigableTableView {
 
     readonly property bool isSearchable: false
 
+    property alias searchPattern: urlModel.searchPattern
+
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
                                        listView_id.availableRowWidth)
     property Component urlHeaderDelegate: Widgets.IconLabel {
@@ -83,7 +85,6 @@ Widgets.KeyNavigableTableView {
 
     MLUrlModel {
         id: urlModel
-
         ml: MediaLib
     }
 

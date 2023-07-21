@@ -34,6 +34,8 @@ Widgets.KeyNavigableTableView {
 
     readonly property bool isSearchable: true
 
+    property alias searchPattern: rootmodel.searchPattern
+
     // Private
     property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
 
@@ -200,6 +202,7 @@ Widgets.KeyNavigableTableView {
     MLAlbumTrackModel {
         id: rootmodel
         ml: MediaLib
+
         onSortCriteriaChanged: {
             switch (rootmodel.sortCriteria) {
             case "title":

@@ -34,12 +34,13 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
-    signal requestArtistAlbumView(int reason)
-
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name" },
         { text: I18n.qtr("Tracks Count"),   criteria: "nb_tracks" }
     ]
+    property alias searchPattern: artistModel.searchPattern
+
+    signal requestArtistAlbumView(int reason)
 
     isSearchable: true
 

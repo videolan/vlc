@@ -61,6 +61,9 @@ FocusScope {
         visible: model.count > 0
         focus: model.count > 0
         headerTopPadding: VLCStyle.margin_normal
+
+        searchPattern: MainCtx.search.pattern
+
         Navigation.parentItem: root
         Navigation.cancelAction: function() {
             if (tracklistdisplay_id.currentIndex <= 0)

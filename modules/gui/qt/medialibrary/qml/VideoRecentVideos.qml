@@ -57,6 +57,8 @@ FocusScope {
         limit: MainCtx.gridView ? view.currentItem.nbItemPerRow ?
                                               view.currentItem.nbItemPerRow : 0
                                 : 5
+
+        searchPattern: MainCtx.search.pattern
     }
 
     readonly property ColorContext colorContext: ColorContext {

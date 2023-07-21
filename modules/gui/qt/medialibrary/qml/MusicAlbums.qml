@@ -42,6 +42,8 @@ MainInterface.MainViewLoader {
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
+    property alias searchPattern: albumModelId.searchPattern
+
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"),  criteria: "title"},
         { text: I18n.qtr("Duration"),    criteria: "duration" },

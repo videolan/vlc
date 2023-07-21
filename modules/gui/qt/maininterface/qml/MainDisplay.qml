@@ -96,6 +96,7 @@ FocusScope {
         sourcesBanner.extraLocalActions = Qt.binding(function () { return item.extraLocalActions })
 
         MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)
+        MainCtx.search.available = Qt.binding(() => item.isSearchable !== undefined && item.isSearchable)
 
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
@@ -119,7 +120,7 @@ FocusScope {
 
     Keys.onPressed: {
         if (KeyHelper.matchSearch(event)) {
-            sourcesBanner.search()
+            MainCtx.search.askShow()
             event.accepted = true
         }
         //unhandled keys are forwarded as hotkeys

@@ -72,6 +72,8 @@ Widgets.PageLoader {
         MusicAllArtists {
             onCurrentIndexChanged: _updateArtistsAllHistory(currentIndex)
 
+            searchPattern: MainCtx.search.pattern
+
             onRequestArtistAlbumView: History.push(["mc", "music", "artists", "albums",
                                                     { initialIndex: currentIndex }], reason)
         }
@@ -83,6 +85,8 @@ Widgets.PageLoader {
         MusicArtistsAlbums {
 
             Navigation.parentItem: root
+
+            searchPattern: MainCtx.search.pattern
 
             onCurrentIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
             onCurrentAlbumIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)

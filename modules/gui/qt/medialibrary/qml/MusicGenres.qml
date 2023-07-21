@@ -40,6 +40,8 @@ MainInterface.MainViewLoader {
 
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
+    property alias searchPattern: genreModel.searchPattern
+
     // FIXME: remove this
     property var _currentView: currentItem
 

@@ -44,6 +44,8 @@ VideoAll {
     model: MLVideoModel {
         id: modelVideo
 
+        searchPattern: MainCtx.search.pattern
+
         ml: MediaLib
     }
 

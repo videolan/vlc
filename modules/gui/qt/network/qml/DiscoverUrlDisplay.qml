@@ -114,6 +114,8 @@ FocusScope {
 
                 item.Navigation.upItem = searchField
                 item.Navigation.parentItem =  root
+
+                item.searchPattern = Qt.binding(() => MainCtx.search.pattern)
             }
         }
     }

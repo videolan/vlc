@@ -58,6 +58,7 @@ FocusScope {
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: model.parentId
+    property alias searchPattern: model.searchPattern
 
     property alias model: model
 

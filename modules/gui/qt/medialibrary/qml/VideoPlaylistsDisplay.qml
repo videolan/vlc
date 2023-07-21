@@ -108,6 +108,8 @@ Widgets.PageLoader {
 
             isMusic: false
 
+            searchPattern: MainCtx.search.pattern
+
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)
             onNameChanged        : _updateHistoryPlaylist(playlist)

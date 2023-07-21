@@ -124,7 +124,10 @@ VideoAll {
         QtObject {
             id: metaVideo
 
-            property var model: MLVideoModel { ml: MediaLib }
+            property var model: MLVideoModel {
+                ml: MediaLib
+                searchPattern: MainCtx.search.pattern
+            }
 
             property var gridLabels: root.getLabel
 
@@ -159,7 +162,10 @@ VideoAll {
         QtObject {
             id: metaGroup
 
-            property var model: MLVideoGroupsModel { ml: MediaLib }
+            property var model: MLVideoGroupsModel {
+                ml: MediaLib
+                searchPattern: MainCtx.search.pattern
+            }
 
             property string sectionProperty: {
                 switch (model.sortCriteria) {
@@ -215,7 +221,10 @@ VideoAll {
         QtObject {
             id: metaFolder
 
-            property var model: MLVideoFoldersModel { ml: MediaLib }
+            property var model: MLVideoFoldersModel {
+                ml: MediaLib
+                searchPattern: MainCtx.search.pattern
+            }
 
             property string sectionProperty: {
                 switch (model.sortCriteria) {

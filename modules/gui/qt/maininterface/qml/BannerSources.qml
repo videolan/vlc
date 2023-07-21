@@ -75,9 +75,14 @@ FocusScope {
     }
 
     BindingCompat {
-        property: "searchPattern"
+        target: MainCtx.search
+        property: "pattern"
         value: searchBox.searchPattern
-        target: (contentModel instanceof QtObject) ? contentModel : null
+    }
+
+    Connections {
+        target: MainCtx.search
+        onAskShow: searchBox.state = "expanded"
     }
 
     Widgets.AcrylicBackground {
@@ -414,7 +419,7 @@ FocusScope {
 
                             Widgets.SearchBox {
                                 id: searchBox
-                                visible: !!root.contentModel
+                                visible: MainCtx.search.available
                                 height: VLCStyle.bannerButton_height
                                 buttonWidth: VLCStyle.bannerButton_width
                             }

@@ -32,7 +32,10 @@ Widgets.KeyNavigableListView {
 
     model: ServicesDiscoveryModel {
         id: discoveryModel
+
         ctx: MainCtx
+
+        searchPattern: MainCtx.search.pattern
     }
 
     topMargin: VLCStyle.margin_large
