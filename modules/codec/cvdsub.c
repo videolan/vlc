@@ -408,8 +408,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 #endif
 
             p_sys->p_palette[v][0] = p[1]; /* Y */
-            p_sys->p_palette[v][1] = p[3]; /* Cr / V */
-            p_sys->p_palette[v][2] = p[2]; /* Cb / U */
+            p_sys->p_palette[v][1] = p[2]; /* Cb / U */
+            p_sys->p_palette[v][2] = p[3]; /* Cr / V */
             break;
         }
 
@@ -428,8 +428,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 
             /* Highlight Palette */
             p_sys->p_palette_highlight[v][0] = p[1]; /* Y */
-            p_sys->p_palette_highlight[v][1] = p[3]; /* Cr / V */
-            p_sys->p_palette_highlight[v][2] = p[2]; /* Cb / U */
+            p_sys->p_palette_highlight[v][1] = p[2]; /* Cb / U */
+            p_sys->p_palette_highlight[v][2] = p[3]; /* Cr / V */
             break;
         }
 
