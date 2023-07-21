@@ -37,6 +37,8 @@ MainInterface.MainTableView {
 
     readonly property int columns: VLCStyle.gridColumnsForWidth(root.availableRowWidth)
 
+    property bool isMusic
+
     //---------------------------------------------------------------------------------------------
     // Private
 
@@ -215,9 +217,12 @@ MainInterface.MainTableView {
     Widgets.TableColumns {
         id: table
 
-        titleCover_width : VLCStyle.listAlbumCover_width
-        titleCover_height: VLCStyle.listAlbumCover_height
-        titleCover_radius: VLCStyle.listAlbumCover_radius
+        titleCover_width: isMusic ? VLCStyle.trackListAlbumCover_width
+                                  : VLCStyle.listAlbumCover_width
+        titleCover_height: isMusic ? VLCStyle.trackListAlbumCover_heigth
+                                   : VLCStyle.listAlbumCover_height
+        titleCover_radius: isMusic ? VLCStyle.trackListAlbumCover_radius
+                                   : VLCStyle.listAlbumCover_radius
 
         showTitleText: (root.sortModel === root._modelSmall)
         showCriterias: showTitleText

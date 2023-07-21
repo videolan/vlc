@@ -158,6 +158,8 @@ FocusScope {
 
         dragItem: root.dragItem
 
+        isMusic: root.isMusic
+
         header: Widgets.SubtitleLabel {
             id: label
 
