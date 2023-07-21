@@ -27,8 +27,11 @@ Item {
     property int csdSize: MainCtx.csdBorderSize
 
     //private
-    readonly property int _edgeVtHeight: g_mainInterface.height - root.csdSize * 2
-    readonly property int _edgeHzWidth: g_mainInterface.width - root.csdSize * 2
+    readonly property int _targetHeight: target ? target.height : 0
+    readonly property int _targetWidth: target ? target.width : 0
+
+    readonly property int _edgeVtHeight: target ? (target.height - root.csdSize * 2) : 0
+    readonly property int _edgeHzWidth:  target ? (target.width  - root.csdSize * 2) : 0
 
     Repeater {
         model: [
@@ -51,7 +54,7 @@ Item {
             },
             {
                 edge: Qt.RightEdge,
-                x: g_mainInterface.width - root.csdSize,
+                x: _targetWidth - root.csdSize,
                 y: root.csdSize,
                 width: root.csdSize,
                 height: root._edgeVtHeight,
@@ -60,7 +63,7 @@ Item {
             {
                 edge: Qt.BottomEdge,
                 x: root.csdSize,
-                y: g_mainInterface.height - root.csdSize,
+                y: _targetHeight - root.csdSize,
                 width: root._edgeHzWidth,
                 height: root.csdSize,
                 cursor: Qt.SizeVerCursor,
@@ -77,14 +80,14 @@ Item {
             {
                 edge: Qt.BottomEdge | Qt.LeftEdge,
                 x: 0,
-                y: g_mainInterface.height - root.csdSize,
+                y: _targetHeight - root.csdSize,
                 width: root.csdSize,
                 height: root.csdSize,
                 cursor: Qt.SizeBDiagCursor,
             },
             {
                 edge: Qt.TopEdge | Qt.RightEdge,
-                x: g_mainInterface.width - root.csdSize,
+                x: _targetWidth - root.csdSize,
                 y: 0,
                 width: root.csdSize,
                 height: root.csdSize,
@@ -92,8 +95,8 @@ Item {
             },
             {
                 edge: Qt.BottomEdge | Qt.RightEdge,
-                x: g_mainInterface.width - root.csdSize,
-                y: g_mainInterface.height - root.csdSize,
+                x: _targetWidth - root.csdSize,
+                y: _targetHeight - root.csdSize,
                 width: root.csdSize,
                 height: root.csdSize,
                 cursor: Qt.SizeFDiagCursor,

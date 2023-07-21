@@ -268,6 +268,10 @@ Item {
             }
 
             source: "qrc:///widgets/CSDMouseStealer.qml"
+
+            onLoaded: {
+                item.target = g_mainInterface
+            }
         }
     }
 
