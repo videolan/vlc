@@ -186,7 +186,8 @@ QSGGeometry* QSGRoundedRectangularImageNode::rebuildGeometry(const Shape& shape,
             painterPath.addRoundedRect(0, 0, key.first.first, key.first.second, key.second, key.second);
             painterPath = painterPath.simplified();
 
-            path = new QVector<QPointF>(painterPath.elementCount());
+            upPath = std::make_unique<QVector<QPointF>>(painterPath.elementCount());
+            path = upPath.get();
 
             const int elementCount = painterPath.elementCount();
             for (int i = 0; i < elementCount; ++i)
@@ -203,8 +204,7 @@ QSGGeometry* QSGRoundedRectangularImageNode::rebuildGeometry(const Shape& shape,
                                                             : (elementCount - i - 1)));
             }
 
-            if (!paths.insert(key, path))
-                upPath.reset(path); // Own the path so there is no leak
+            paths.insert(key, new QVector<QPointF>(*path));
         }
 
         vertexCount = path->count();
