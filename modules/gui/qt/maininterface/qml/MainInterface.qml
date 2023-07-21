@@ -20,6 +20,7 @@ import QtQuick 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Window 2.12
+import QtGraphicalEffects 1.12
 
 import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
@@ -32,6 +33,9 @@ Item {
 
     property bool _interfaceReady: false
     property bool _playlistReady: false
+    property bool _extendedFrameVisible: MainCtx.windowSuportExtendedFrame
+                                      && MainCtx.clientSideDecoration
+                                      && (MainCtx.intfMainWindow.visibility === Window.Windowed)
 
     readonly property var _pageModel: [
         { name: "mc", url: "qrc:///main/MainDisplay.qml" },
@@ -75,6 +79,10 @@ Item {
         id: g_mainInterface
 
         anchors.fill: parent
+        anchors.topMargin: MainCtx.windowExtendedMargin
+        anchors.leftMargin: MainCtx.windowExtendedMargin
+        anchors.rightMargin: MainCtx.windowExtendedMargin
+        anchors.bottomMargin: MainCtx.windowExtendedMargin
 
         BindingCompat {
             target: VLCStyle
@@ -86,6 +94,12 @@ Item {
             target: VLCStyle
             property: "appHeight"
             value: g_mainInterface.height
+        }
+
+        BindingCompat {
+            target: MainCtx
+            property: "windowExtendedMargin"
+            value: _extendedFrameVisible ? VLCStyle.dp(20, VLCStyle.scale) : 0
         }
 
         Window.onWindowChanged: {
@@ -214,6 +228,7 @@ Item {
                 id: stackView
                 anchors.fill: parent
                 focus: true
+                clip: _extendedFrameVisible
 
                 Connections {
                     target: Player
@@ -253,6 +268,40 @@ Item {
             }
 
             source: "qrc:///widgets/CSDMouseStealer.qml"
+        }
+    }
+
+    //draw the window drop shadow ourselve when the windowing system doesn't
+    //provide them but support extended frame
+    RectangularGlow {
+        id: effect
+        z: -1
+        visible: _extendedFrameVisible
+        anchors.fill: g_mainInterface
+        spread: 0.0
+        color: "black"
+        opacity:  0.5
+        cornerRadius: glowRadius
+        states: [
+            State {
+                when: MainCtx.intfMainWindow.active
+                PropertyChanges {
+                    target: effect
+                    glowRadius: MainCtx.windowExtendedMargin * 0.7
+                }
+            },
+            State {
+                when: !MainCtx.intfMainWindow.active
+                PropertyChanges {
+                    target: effect
+                    glowRadius: MainCtx.windowExtendedMargin * 0.5
+                }
+            }
+        ]
+        Behavior on  glowRadius {
+            NumberAnimation {
+                duration: VLCStyle.duration_veryShort
+            }
         }
     }
 }
