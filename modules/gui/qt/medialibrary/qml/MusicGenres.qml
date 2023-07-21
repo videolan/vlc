@@ -45,6 +45,7 @@ MainInterface.MainViewLoader {
 
     signal showAlbumView(var id, string name, int reason)
 
+    isSearchable: true
     model: genreModel
 
     list: tableComponent

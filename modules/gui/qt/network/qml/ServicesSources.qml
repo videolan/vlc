@@ -30,6 +30,7 @@ MainInterface.MainGridView {
     id: root
 
     readonly property bool hasGridListMode: false
+    readonly property bool isSearchable: true
 
     selectionDelegateModel: selectionModel
     model: sourcesModel

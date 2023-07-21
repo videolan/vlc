@@ -45,6 +45,7 @@ FocusScope {
     property alias leftPadding: tracklistdisplay_id.leftPadding
     property alias rightPadding: tracklistdisplay_id.rightPadding
 
+    property alias isSearchable: tracklistdisplay_id.isSearchable
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
 

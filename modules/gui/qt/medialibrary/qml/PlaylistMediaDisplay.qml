@@ -37,6 +37,7 @@ FocusScope {
     // Properties
 
     readonly property bool hasGridListMode: false
+    readonly property bool isSearchable: true
 
     property int leftPadding: 0
     property int rightPadding: 0

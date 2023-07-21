@@ -46,8 +46,7 @@ FocusScope {
     property int initialAlbumIndex: 0
 
     readonly property bool hasGridListMode: true
-
-    // Aliases
+    readonly property bool isSearchable: true
 
     property alias model: artistModel
 

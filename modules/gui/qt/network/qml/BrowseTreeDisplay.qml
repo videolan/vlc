@@ -53,6 +53,8 @@ MainInterface.MainViewLoader {
 
     // Settings
 
+    isSearchable: true
+
     grid: gridComponent
     list: tableComponent
 

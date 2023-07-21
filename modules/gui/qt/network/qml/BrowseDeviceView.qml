@@ -50,6 +50,8 @@ FocusScope {
 
     readonly property int nbItemPerRow: (_currentView) ? _currentView.nbItemPerRow : 1
 
+    property bool isSearchable: true
+
     property Component header: BrowseDeviceHeader {
         view: root
 

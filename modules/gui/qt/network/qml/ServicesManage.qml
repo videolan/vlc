@@ -28,6 +28,7 @@ Widgets.KeyNavigableListView {
 
     // required by g_root to indicate view with 'grid' or 'list' mode
     readonly property bool hasGridListMode: false
+    readonly property bool isSearchable: true
 
     model: ServicesDiscoveryModel {
         id: discoveryModel

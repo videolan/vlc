@@ -66,6 +66,7 @@ MainInterface.MainViewLoader {
 
     // Settings
 
+    isSearchable: true
     list: list
     grid: grid
     emptyLabel: emptylabel

@@ -32,12 +32,13 @@ Widgets.KeyNavigableTableView {
 
     // Properties
 
+    readonly property bool isSearchable: true
+
+    // Private
     property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
 
     readonly property int _sizeA: Math.floor((_nbCols - 3) / 3)
     readonly property int _sizeB: Math.floor((_nbCols - 2) / 2)
-
-    // Private
 
     property var _lineTitle: ({
         criteria: "title",

@@ -38,6 +38,10 @@ FocusScope {
                                             && stackView.currentItem.hasGridListMode !== undefined
                                             && stackView.currentItem.hasGridListMode)
 
+    readonly property bool isSearchable: (currentItem
+                                    && currentItem.isSearchable !== undefined
+                                    && currentItem.isSearchable)
+
     // Private
 
     property bool _ready: false

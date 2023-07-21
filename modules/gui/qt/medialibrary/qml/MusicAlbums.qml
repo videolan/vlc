@@ -51,6 +51,7 @@ MainInterface.MainViewLoader {
 
     property alias parentId: albumModelId.parentId
 
+    isSearchable: true
     model: albumModelId
 
     grid: gridComponent

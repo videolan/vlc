@@ -94,6 +94,8 @@ MainInterface.MainViewLoader {
     list: table
     emptyLabel: emptyLabel
 
+    isSearchable: true
+
     model: MLPlaylistListModel {
         ml: MediaLib
 

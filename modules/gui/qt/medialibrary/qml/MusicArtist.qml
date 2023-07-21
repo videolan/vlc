@@ -39,6 +39,8 @@ FocusScope {
 
     property Item headerItem: _currentView ? _currentView.headerItem : null
 
+    property bool isSearchable: true
+
     // current index of album model
     readonly property int currentIndex: {
         if (!_currentView)

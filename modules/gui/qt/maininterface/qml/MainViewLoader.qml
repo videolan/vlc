@@ -59,6 +59,8 @@ Widgets.StackViewExt {
 
     readonly property bool hasGridListMode: !!grid && !!list
 
+    property bool isSearchable: false
+
     property var selectionModel: Util.SelectableDelegateModel {
         model: root.model
     }

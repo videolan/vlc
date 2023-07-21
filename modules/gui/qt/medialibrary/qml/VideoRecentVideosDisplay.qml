@@ -36,6 +36,7 @@ VideoAll {
     sectionProperty: ""
 
     sortModel: []
+    isSearchable: false
 
     // Children
 

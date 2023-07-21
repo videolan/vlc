@@ -31,15 +31,17 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    // Aliases
+    // properties
+
+    readonly property bool isSearchable: true
 
     property alias subtitleText: subtitleLabel.text
-
-    // Settings
 
     property int bottomPadding: recentVideosColumn.bottomPadding
     property int leftPadding: VLCStyle.margin_xsmall
     property int rightPadding: VLCStyle.margin_xsmall
+
+    // Settings
 
     implicitHeight: recentVideosColumn.height
 

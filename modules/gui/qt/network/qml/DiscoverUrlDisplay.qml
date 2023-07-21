@@ -31,6 +31,9 @@ FocusScope {
     // Properties
 
     readonly property bool hasGridListMode: false
+    readonly property bool isSearchable: urlListDisplay.active
+                                    && urlListDisplay.item.isSearchable !== undefined
+                                    && urlListDisplay.item.isSearchable
 
     property int leftPadding: 0
     property int rightPadding: 0

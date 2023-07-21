@@ -31,6 +31,8 @@ import "qrc:///style/"
 Widgets.KeyNavigableTableView {
     id: listView_id
 
+    readonly property bool isSearchable: false
+
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
                                        listView_id.availableRowWidth)
     property Component urlHeaderDelegate: Widgets.IconLabel {

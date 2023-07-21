@@ -51,6 +51,7 @@ FocusScope {
     ]
 
     readonly property bool hasGridListMode: true
+    readonly property bool isSearchable: true
 
     // Aliases
 

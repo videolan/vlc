@@ -41,6 +41,8 @@ MainInterface.MainViewLoader {
         { text: I18n.qtr("Tracks Count"),   criteria: "nb_tracks" }
     ]
 
+    isSearchable: true
+
     model: MLArtistModel {
         id: artistModel
         ml: MediaLib
