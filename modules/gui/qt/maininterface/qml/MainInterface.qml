@@ -271,6 +271,7 @@ Item {
 
             onLoaded: {
                 item.target = g_mainInterface
+                item.anchorInside = Qt.binding(() => !_extendedFrameVisible)
             }
         }
     }
