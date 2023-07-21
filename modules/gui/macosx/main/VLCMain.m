@@ -145,8 +145,11 @@ int OpenIntf (vlc_object_t *p_this)
         msg_Dbg(p_intf, "Starting macosx interface");
 
         @try {
-            VLCApplication.sharedApplication;
-            VLCMain.sharedInstance;
+            VLCApplication * const application = VLCApplication.sharedApplication;
+            NSCAssert(application != nil, @"VLCApplication must not be nil");
+
+            VLCMain * const main = VLCMain.sharedInstance;
+            NSCAssert(main != nil, @"VLCMain must not be nil");
 
             msg_Dbg(p_intf, "Finished loading macosx interface");
             return VLC_SUCCESS;
