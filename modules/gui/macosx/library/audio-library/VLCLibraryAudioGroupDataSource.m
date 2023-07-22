@@ -26,9 +26,11 @@
 
 #import "main/VLCMain.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
@@ -135,6 +137,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         return albumSupplementaryDetailView;
 
+    } else if ([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryAudioGroupHeaderView * const headerView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier forIndexPath:indexPath];
+        headerView.representedItem = _representedAudioGroup;
+        return headerView;
     }
 
     return nil;

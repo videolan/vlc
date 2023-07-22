@@ -36,6 +36,7 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAudioTableViewDelegate.h"
 
@@ -203,8 +204,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     audioLibraryGridModeListSelectionCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     audioLibraryGridModeListSelectionCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryGridModeListSelectionCollectionViewLayout.sectionInset = collectionViewSectionInset;
+    audioLibraryGridModeListSelectionCollectionViewLayout.headerReferenceSize = VLCLibraryAudioGroupHeaderView.defaultHeaderSize;
 
     [VLCLibraryAudioDataSource setupCollectionView:_audioLibraryGridModeSplitViewListSelectionCollectionView];
+    [VLCLibraryAudioGroupDataSource setupCollectionView:_audioLibraryGridModeSplitViewListSelectionCollectionView];
 }
 
 - (void)setupAudioPlaceholderView
