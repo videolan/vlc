@@ -456,7 +456,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
 
     _gridModeListTableView.target = self;
-    _gridModeListTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
+    _gridModeListTableView.doubleAction = @selector(groupSelectionDoubleClickAction:);
 
     [self setupSongsTableView];
 }
@@ -758,6 +758,19 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 }
 
 #pragma mark - table view double click actions
+
+- (void)groupSelectionDoubleClickAction:(id)sender
+{
+    NSTableView * const tableView = (NSTableView *)sender;
+    NSParameterAssert(tableView != nil);
+
+    const NSInteger clickedRow = tableView.clickedRow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[clickedRow - 1];
+
+    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
+    }];
+}
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
 {
