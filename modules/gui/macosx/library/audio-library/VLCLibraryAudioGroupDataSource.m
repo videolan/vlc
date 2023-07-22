@@ -59,6 +59,32 @@
     }
 }
 
+- (void)updateRepresentedListOfAlbums
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+        if (self->_representedAudioGroup == nil) {
+            self->_representedListOfAlbums = libraryModel.listOfAlbums;
+        } else {
+            self->_representedListOfAlbums = self->_representedAudioGroup.albums;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self reloadViews];
+        });
+    });
+}
+
+- (void)setRepresentedAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)representedAudioGroup
+{
+    if (representedAudioGroup == _representedAudioGroup) {
+        return;
+    }
+
+    _representedAudioGroup = representedAudioGroup;
+    [self updateRepresentedListOfAlbums];
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (self.representedListOfAlbums != nil) {

@@ -687,7 +687,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
             break;
     }
 
-    _audioGroupDataSource.representedListOfAlbums = nil; // Clear whatever was being shown before
+    _audioGroupDataSource.representedAudioGroup = nil; // Clear whatever was being shown before
     [self reloadData];
 }
 
@@ -740,26 +740,11 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     const BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
     const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        if (libraryItemIndex < 0 && showingAllItemsEntry) {
-            self->_audioGroupDataSource.representedListOfAlbums = self->_libraryModel.listOfAlbums;
-        } else {
-            id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[libraryItemIndex];
-
-            if (self->_currentParentType == VLC_ML_PARENT_ALBUM) {
-                self->_audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
-            } else if(self->_currentParentType != VLC_ML_PARENT_UNKNOWN) {
-                self->_audioGroupDataSource.representedListOfAlbums = [self->_libraryModel listAlbumsOfParentType:self->_currentParentType forID:libraryItem.libraryID];
-            } else { // FIXME: we have nothing to show here
-                self->_audioGroupDataSource.representedListOfAlbums = nil;
-            }
-        }
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.groupSelectionTableView reloadData];
-            [self.gridModeListSelectionCollectionView reloadData];
-        });
-    });
+    if (libraryItemIndex < 0 && showingAllItemsEntry) {
+        _audioGroupDataSource.representedAudioGroup = nil;
+    } else {
+        _audioGroupDataSource.representedAudioGroup = self.displayedCollection[libraryItemIndex];
+    }
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
