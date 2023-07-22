@@ -26,4 +26,9 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 @implementation VLCLibraryAudioGroupHeaderView
 
++ (CGSize)defaultHeaderSize
+{
+    return CGSizeMake(690., 74.);
+}
+
 @end

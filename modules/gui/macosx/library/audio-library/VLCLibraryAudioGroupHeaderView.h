@@ -28,6 +28,8 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 
 @interface VLCLibraryAudioGroupHeaderView : NSView
 
+@property (class, readonly) const CGSize defaultHeaderSize;
+
 @end
 
 NS_ASSUME_NONNULL_END
