@@ -67,8 +67,8 @@ extern NSString * const VLCLibraryYearSortDescriptorKey;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
 
++ (void)setupCollectionView:(NSCollectionView *)collectionView;
 - (void)setup;
-- (void)setupCollectionView:(NSCollectionView *)collectionView;
 
 - (void)reloadData;
 - (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row;

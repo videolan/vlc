@@ -438,14 +438,14 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)setup
 {
-    [self setupCollectionView:_collectionView];
-    [self setupCollectionView:_gridModeListSelectionCollectionView];
+    [VLCLibraryAudioDataSource setupCollectionView:_collectionView];
+    [VLCLibraryAudioDataSource setupCollectionView:_gridModeListSelectionCollectionView];
     [self setupTableViews];
 
     _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
 }
 
-- (void)setupCollectionView:(NSCollectionView *)collectionView
++ (void)setupCollectionView:(NSCollectionView *)collectionView
 {
     [collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
