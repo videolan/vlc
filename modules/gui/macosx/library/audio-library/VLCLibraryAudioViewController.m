@@ -133,14 +133,14 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _audioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
-    _audioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _audioDataSource.songsTableView = _audioSongTableView;
     _audioDataSource.collectionView = _audioLibraryCollectionView;
     _audioDataSource.gridModeListTableView = _audioLibraryGridModeSplitViewListTableView;
-    _audioDataSource.gridModeListSelectionCollectionView = _audioLibraryGridModeSplitViewListSelectionCollectionView;
     [_audioDataSource setup];
 
     _audioGroupDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
+    _audioGroupDataSource.tableViews = @[_audioGroupSelectionTableView];
+    _audioGroupDataSource.collectionViews = @[_audioLibraryGridModeSplitViewListSelectionCollectionView];
     _audioDataSource.audioGroupDataSource = _audioGroupDataSource;
 }
 
@@ -204,6 +204,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     audioLibraryGridModeListSelectionCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryGridModeListSelectionCollectionViewLayout.sectionInset = collectionViewSectionInset;
 
+    [VLCLibraryAudioDataSource setupCollectionView:_audioLibraryGridModeSplitViewListSelectionCollectionView];
 }
 
 - (void)setupAudioPlaceholderView

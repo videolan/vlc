@@ -345,12 +345,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                                               forTableView:_collectionSelectionTableView];
     }
 
-    const NSInteger groupSelectionTableViewRow = _groupSelectionTableView.selectedRow;
-    if(groupSelectionTableViewRow >= 0 && !_groupSelectionTableView.hidden) {
-        _selectedGroupSelectionTableViewItem = [self libraryItemAtRow:groupSelectionTableViewRow
-                                                         forTableView:_groupSelectionTableView];
-    }
-
     const NSInteger songsTableViewRow = _songsTableView.selectedRow;
     if(songsTableViewRow >= 0 && !_songsTableView.hidden) {
         _selectedSongTableViewItem = [self libraryItemAtRow:songsTableViewRow
@@ -372,7 +366,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 {
     [self restoreCollectionViewSelectionState];
     [self restoreCollectionSelectionTableViewSelectionState];
-    [self restoreGroupSelectionTableViewSelectionState];
     [self restoreSongTableViewSelectionState];
 }
 
@@ -422,13 +415,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     _selectedCollectionSelectionTableViewItem = nil;
 }
 
-- (void)restoreGroupSelectionTableViewSelectionState
-{
-    [self restoreSelectionStateForTableView:_groupSelectionTableView
-                           withSelectedItem:_selectedGroupSelectionTableViewItem];
-    _selectedGroupSelectionTableViewItem = nil;
-}
-
 - (void)restoreSongTableViewSelectionState
 {
     [self restoreSelectionStateForTableView:_songsTableView
@@ -439,7 +425,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (void)setup
 {
     [VLCLibraryAudioDataSource setupCollectionView:_collectionView];
-    [VLCLibraryAudioDataSource setupCollectionView:_gridModeListSelectionCollectionView];
     [self setupTableViews];
 
     _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
@@ -467,9 +452,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)setupTableViews
 {
-    _groupSelectionTableView.target = self;
-    _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
-
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
 
@@ -568,11 +550,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [collectionViewFlowLayout resetLayout];
     }
 
-    VLCLibraryCollectionViewFlowLayout *gridModeListSelectionCollectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_gridModeListSelectionCollectionView.collectionViewLayout;
-    if (gridModeListSelectionCollectionViewFlowLayout) {
-        [gridModeListSelectionCollectionViewFlowLayout resetLayout];
-    }
-
     operation();
     [self setupExistingSortForTableView:_songsTableView];
 }
@@ -586,9 +563,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [self resetLayoutsForOperation:^{
             [self.collectionView reloadData];
             [self.gridModeListTableView reloadData];
-            [self.gridModeListSelectionCollectionView reloadData];
             [self.collectionSelectionTableView reloadData];
-            [self.groupSelectionTableView reloadData];
             [self.songsTableView reloadData];
         }];
         [self restoreSelectionState];
@@ -625,13 +600,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [self.songsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:songsTableColumnIndexSet];
 
         // Don't update gridModeListSelectionCollectionView, let its VLCLibraryAudioGroupDataSource do it.
-        // TODO: Stop splitting functionality for these audio source selection views between this data source
-        // TODO: and the VLCLibraryAudioGroupDataSource, it is super confusing
-
-        // Also don't update:
-        // - gridModeListTableView, as this will only show artists/genres
-        // - collectionSelectionTableView, as this will only show artists/genres/albums
-        // - groupSelectionTableView, as this shows cells for albums (and each cell has its own data source with media items)
+        // Also don't update collectionSelectionTableView, as this will only show artists/genres/albums
     }];
 }
 
@@ -728,7 +697,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 {
     NSParameterAssert(tableView);
     
-    if (tableView != _collectionSelectionTableView && tableView != _groupSelectionTableView && tableView != _gridModeListTableView) {
+    if (tableView != _collectionSelectionTableView && tableView != _gridModeListTableView) {
         return;
     }
 
@@ -789,20 +758,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 }
 
 #pragma mark - table view double click actions
-
-- (void)groubSelectionDoubleClickAction:(id)sender
-{
-    NSArray *listOfAlbums = _audioGroupDataSource.representedListOfAlbums;
-    NSUInteger albumCount = listOfAlbums.count;
-    NSInteger clickedRow = _groupSelectionTableView.clickedRow;
-
-    if (!listOfAlbums || albumCount == 0 || clickedRow > albumCount) {
-        return;
-    }
-
-    NSArray * const tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
-    [VLCMain.sharedInstance.libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
-}
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
 {

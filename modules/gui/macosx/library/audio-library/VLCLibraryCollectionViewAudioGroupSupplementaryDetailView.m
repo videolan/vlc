@@ -46,6 +46,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 - (void)awakeFromNib
 {
     _audioGroupAlbumsDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
+    _audioGroupAlbumsDataSource.tableViews = @[_audioGroupAlbumsTableView];
+    
     _audioGroupAlbumsTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
 
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
@@ -97,14 +99,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
     }
 
     _audioGroupNameTextField.stringValue = _representedAudioGroup.displayString;
-
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        self->_audioGroupAlbumsDataSource.representedListOfAlbums = self->_representedAudioGroup.albums;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_audioGroupAlbumsTableView reloadData];
-        });
-    });
+    _audioGroupAlbumsDataSource.representedAudioGroup = _representedAudioGroup;
 }
 
 @end
