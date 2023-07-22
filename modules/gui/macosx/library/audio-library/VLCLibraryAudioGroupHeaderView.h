@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
+
 @interface VLCLibraryAudioGroupHeaderView : NSView
 
 @end

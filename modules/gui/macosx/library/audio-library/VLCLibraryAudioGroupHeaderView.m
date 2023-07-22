@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAudioGroupHeaderView.h"
 
+NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
+
 @implementation VLCLibraryAudioGroupHeaderView
 
 @end
