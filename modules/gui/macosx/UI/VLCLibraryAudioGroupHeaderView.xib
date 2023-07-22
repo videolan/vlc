@@ -104,6 +104,12 @@
                 <constraint firstAttribute="bottom" secondItem="0Si-IF-hfH" secondAttribute="bottom" id="sUV-bu-8ug"/>
                 <constraint firstItem="0Si-IF-hfH" firstAttribute="leading" secondItem="E6K-GD-bgu" secondAttribute="leading" id="vM8-9F-b9Q"/>
             </constraints>
+            <connections>
+                <outlet property="detailTextField" destination="8Fd-yT-2AG" id="VVh-Xd-Ma1"/>
+                <outlet property="playButton" destination="UDD-gH-RDW" id="Cvj-Zy-lA5"/>
+                <outlet property="queueButton" destination="Baf-bX-D7M" id="LXJ-9K-2zU"/>
+                <outlet property="titleTextField" destination="VGp-RV-Jl4" id="G9K-eO-d5s"/>
+            </connections>
             <point key="canvasLocation" x="-588" y="-314"/>
         </customView>
     </objects>

@@ -30,6 +30,11 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 
 @property (class, readonly) const CGSize defaultHeaderSize;
 
+@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *detailTextField;
+@property (readwrite, weak) IBOutlet NSButton *playButton;
+@property (readwrite, weak) IBOutlet NSButton *queueButton;
+
 @end
 
 NS_ASSUME_NONNULL_END
