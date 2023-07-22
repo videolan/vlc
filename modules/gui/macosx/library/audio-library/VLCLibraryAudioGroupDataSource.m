@@ -32,11 +32,21 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
 #import "views/VLCSubScrollView.h"
 
 @implementation VLCLibraryAudioGroupDataSource
+
++ (void)setupCollectionView:(NSCollectionView *)collectionView
+{
+    NSNib * const audioGroupHeaderView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryAudioGroupHeaderView"
+                                                                  bundle:nil];
+    [collectionView registerNib:audioGroupHeaderView
+     forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                 withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
+}
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {

@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, atomic, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
++ (void)setupCollectionView:(NSCollectionView *)collectionView;
+
 @end
 
 NS_ASSUME_NONNULL_END
