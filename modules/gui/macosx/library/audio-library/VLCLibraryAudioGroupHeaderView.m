@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAudioGroupHeaderView.h"
 
+#import "library/VLCLibraryDataTypes.h"
+
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
 
 @implementation VLCLibraryAudioGroupHeaderView
@@ -29,6 +31,22 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 + (CGSize)defaultHeaderSize
 {
     return CGSizeMake(690., 74.);
+}
+
+- (void)updateRepresentation
+{
+    _titleTextField.stringValue = _representedItem.displayString;
+    _detailTextField.stringValue = _representedItem.detailString;
+}
+
+- (void)setRepresentedItem:(VLCAbstractMediaLibraryItem *)representedItem
+{
+    if (representedItem == _representedItem) {
+        return;
+    }
+
+    _representedItem = representedItem;
+    [self updateRepresentation];
 }
 
 @end
