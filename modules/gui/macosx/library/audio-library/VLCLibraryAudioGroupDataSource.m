@@ -48,6 +48,17 @@
                  withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
 }
 
+- (void)reloadViews
+{
+    for (NSTableView * const tableView in _tableViews) {
+        [tableView reloadData];
+    }
+
+    for (NSCollectionView * const collectionView in _collectionViews) {
+        [collectionView reloadData];
+    }
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (self.representedListOfAlbums != nil) {
