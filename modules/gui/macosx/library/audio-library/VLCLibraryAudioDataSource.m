@@ -712,7 +712,11 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         return;
     }
 
-    _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
+    if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+        _audioGroupDataSource.representedAudioGroup = nil;
+    } else {
+        _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
+    }
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
