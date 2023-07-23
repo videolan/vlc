@@ -39,6 +39,12 @@
 
 #import "views/VLCSubScrollView.h"
 
+@interface VLCLibraryAudioGroupDataSource ()
+
+@property (readwrite, atomic, strong) NSArray<VLCMediaLibraryAlbum *> *representedListOfAlbums;
+
+@end
+
 @implementation VLCLibraryAudioGroupDataSource
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
@@ -65,10 +71,10 @@
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-        if (self->_representedAudioGroup == nil) {
-            self->_representedListOfAlbums = libraryModel.listOfAlbums;
+        if (self.representedAudioGroup == nil) {
+            self.representedListOfAlbums = libraryModel.listOfAlbums;
         } else {
-            self->_representedListOfAlbums = self->_representedAudioGroup.albums;
+            self.representedListOfAlbums = self.representedAudioGroup.albums;
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
