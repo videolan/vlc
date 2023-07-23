@@ -105,6 +105,10 @@
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
+    if (row < 0 || row >= self.representedListOfAlbums.count) {
+        return nil;
+    }
+
     return self.representedListOfAlbums[row];
 }
 
@@ -162,7 +166,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
-    return self.representedListOfAlbums[indexPath.item];
+    const NSUInteger indexPathItem = indexPath.item;
+
+    if (indexPathItem < 0 || indexPathItem >= self.representedListOfAlbums.count) {
+        return nil;
+    }
+
+    return self.representedListOfAlbums[indexPathItem];
 }
 
 @end

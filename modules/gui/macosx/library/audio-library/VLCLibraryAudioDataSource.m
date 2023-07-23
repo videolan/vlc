@@ -692,6 +692,10 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
+    if (row < 0 || row >= self.displayedCollection.count) {
+        return nil;
+    }
+
     return self.displayedCollection[row];
 }
 
@@ -857,7 +861,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
-    return self.displayedCollection[indexPath.item];
+    const NSUInteger indexPathItem = indexPath.item;
+
+    if (indexPathItem < 0 || indexPathItem >= self.displayedCollection.count) {
+        return nil;
+    }
+
+    return self.displayedCollection[indexPathItem];
 }
 
 @end

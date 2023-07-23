@@ -297,6 +297,12 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
+    const NSUInteger indexPathItem = indexPath.item;
+
+    if (indexPathItem < 0 || indexPathItem >= self.collectionArray.count) {
+        return nil;
+    }
+
     return self.collectionArray[indexPath.item];
 }
 

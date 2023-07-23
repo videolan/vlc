@@ -82,6 +82,10 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
+    if (row < 0 || row >= self.tracks.count) {
+        return nil;
+    }
+
     return self.tracks[row];
 }
 
