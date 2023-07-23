@@ -651,28 +651,28 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     _audioLibrarySegment = audioLibrarySegment;
     switch (_audioLibrarySegment) {
         case VLCAudioLibraryArtistsSegment:
-            self.displayedCollection = [self.libraryModel listOfArtists];
             _currentParentType = VLC_ML_PARENT_ARTIST;
             break;
         case VLCAudioLibraryAlbumsSegment:
-            self.displayedCollection = [self.libraryModel listOfAlbums];
             _currentParentType = VLC_ML_PARENT_ALBUM;
             break;
         case VLCAudioLibrarySongsSegment:
-            self.displayedCollection = [self.libraryModel listOfAudioMedia];
             _currentParentType = VLC_ML_PARENT_UNKNOWN;
             break;
         case VLCAudioLibraryGenresSegment:
-            self.displayedCollection = [self.libraryModel listOfGenres];
             _currentParentType = VLC_ML_PARENT_GENRE;
             break;
-
         default:
             NSAssert(1, @"reached the unreachable");
             break;
     }
 
     _audioGroupDataSource.representedAudioGroup = nil; // Clear whatever was being shown before
+
+    [_songsTableView deselectAll:self];
+    [_collectionSelectionTableView deselectAll:self];
+    [_collectionView deselectAll:self];
+
     [self reloadData];
 }
 
