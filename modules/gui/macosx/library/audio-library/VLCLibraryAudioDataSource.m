@@ -708,11 +708,11 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     const NSInteger selectedRow = tableView.selectedRow;
-    if (selectedRow < 0 || selectedRow >= self.displayedCollection.count) {
+    if (selectedRow >= self.displayedCollection.count) {
         return;
     }
 
-    if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+    if (_currentParentType == VLC_ML_PARENT_UNKNOWN || selectedRow < 0) {
         _audioGroupDataSource.representedAudioGroup = nil;
     } else {
         _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
