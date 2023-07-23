@@ -80,6 +80,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 }
 
 @property (readwrite, atomic) NSArray *displayedCollection;
+@property (readonly) BOOL displayAllArtistsGenresTableEntry;
 
 @end
 
@@ -671,13 +672,13 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     const NSInteger numItems = self.displayedCollection.count;
-    return [self displayAllArtistsGenresTableEntry] ? numItems + 1 : numItems;
+    return self.displayAllArtistsGenresTableEntry ? numItems + 1 : numItems;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    BOOL viewDisplayingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
+    BOOL viewDisplayingAllItemsEntry = self.displayAllArtistsGenresTableEntry;
     BOOL provideAllItemsEntry = viewDisplayingAllItemsEntry && row == 0;
 
     if (provideAllItemsEntry && _currentParentType == VLC_ML_PARENT_GENRE) {
@@ -706,7 +707,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     const NSInteger selectedRow = tableView.selectedRow;
-    const BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
+    const BOOL showingAllItemsEntry = self.displayAllArtistsGenresTableEntry;
     const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
     if (libraryItemIndex < 0 && showingAllItemsEntry) {
