@@ -1177,7 +1177,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
-
 - (instancetype)initWithDisplayString:(NSString*)displayString
                      withDetailString:(NSString*)detailString
 {
@@ -1193,7 +1192,13 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return self;
 }
 
-- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock {
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
+{
+    return;
+}
+
+- (void)revealInFinder
+{
     return;
 }
 
