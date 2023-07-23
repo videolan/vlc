@@ -22,6 +22,7 @@
 
 #import "VLCLibraryAudioGroupHeaderView.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
 #import "library/VLCLibraryDataTypes.h"
 
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
@@ -31,6 +32,13 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 + (CGSize)defaultHeaderSize
 {
     return CGSizeMake(690., 74.);
+}
+
+- (void)awakeFromNib
+{
+    if (@available(macOS 10.14, *)) {
+        _playButton.bezelColor = NSColor.VLCAccentColor;
+    }
 }
 
 - (void)updateRepresentation
