@@ -509,12 +509,12 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)setupExistingSortForTableView:(NSTableView *)tableView
 {
-    const VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
     const vlc_ml_sorting_criteria_t existingSortCriteria = libraryController.lastSortingCriteria;
 
-    NSString *sortDescriptorKey = [self sortDescriptorKeyFromVlcMlSortingCriteria:existingSortCriteria];
-    const NSSortDescriptor * const sortDescriptor = [[NSSortDescriptor alloc] initWithKey:sortDescriptorKey
-                                                                                ascending:!libraryController.descendingLibrarySorting];
+    NSString * const sortDescriptorKey = [self sortDescriptorKeyFromVlcMlSortingCriteria:existingSortCriteria];
+    NSSortDescriptor * const sortDescriptor = [[NSSortDescriptor alloc] initWithKey:sortDescriptorKey
+                                                                          ascending:!libraryController.descendingLibrarySorting];
 
     tableView.sortDescriptors = @[sortDescriptor];
 }
