@@ -257,4 +257,10 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
+@interface VLCMediaLibraryAllItemsGroup : VLCMediaLibraryDummyItem<VLCMediaLibraryAudioGroupProtocol>
+
+- (nullable instancetype)initWithDisplayString:(NSString *)displayString;
+
+@end
+
 NS_ASSUME_NONNULL_END
