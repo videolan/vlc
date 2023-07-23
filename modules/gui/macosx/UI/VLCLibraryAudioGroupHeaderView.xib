@@ -36,6 +36,9 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <color key="bezelColor" name="VLCAccentColor"/>
+                                            <connections>
+                                                <action selector="play:" target="E6K-GD-bgu" id="vp4-Ar-psi"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Baf-bX-D7M">
                                             <rect key="frame" x="61" y="-3" width="74" height="32"/>
@@ -43,6 +46,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="enqueue:" target="E6K-GD-bgu" id="MmL-OA-W6A"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <constraints>

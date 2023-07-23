@@ -23,6 +23,8 @@
 #import "VLCLibraryAudioGroupHeaderView.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "main/VLCMain.h"
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
@@ -61,6 +63,31 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
     _representedItem = representedItem;
     [self updateRepresentation];
+}
+
+- (IBAction)play:(id)sender
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+
+    // We want to add all the tracks to the playlist but only play the first one immediately,
+    // otherwise we will skip straight to the last track of the last album from the artist
+    __block BOOL playImmediately = YES;
+    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+
+        if(playImmediately) {
+            playImmediately = NO;
+        }
+    }];
+}
+
+- (IBAction)enqueue:(id)sender
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+
+    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
+    }];
 }
 
 @end

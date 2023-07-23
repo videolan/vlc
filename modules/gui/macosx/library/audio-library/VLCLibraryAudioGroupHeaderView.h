@@ -39,6 +39,9 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 @property (readwrite, weak) IBOutlet NSButton *playButton;
 @property (readwrite, weak) IBOutlet NSButton *queueButton;
 
+- (IBAction)play:(id)sender;
+- (IBAction)enqueue:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END
