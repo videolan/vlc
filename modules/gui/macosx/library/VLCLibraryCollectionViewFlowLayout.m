@@ -231,7 +231,16 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     // Computed attributes from parent
     NSMutableArray<__kindof NSCollectionViewLayoutAttributes *> *layoutAttributesArray = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
     for (int i = 0; i < layoutAttributesArray.count; i++) {
-        NSCollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
+        NSCollectionViewLayoutAttributes * const attributes = layoutAttributesArray[i];
+        NSString * const elementKind = attributes.representedElementKind;
+        
+        if (@available(macOS 10.12, *)) {
+            if (([elementKind isEqualToString:NSCollectionElementKindSectionHeader] && self.sectionHeadersPinToVisibleBounds) || 
+                ([elementKind isEqualToString:NSCollectionElementKindSectionFooter] && self.sectionFootersPinToVisibleBounds)) {
+                continue;
+            }
+        }
+
         [attributes setFrame:[self frameForDisplacedAttributes:attributes]];
         layoutAttributesArray[i] = attributes;
     }
@@ -318,7 +327,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 # pragma mark - Calculation of displaced frame attributes
 
-- (NSRect)frameForDisplacedAttributes:(NSCollectionViewLayoutAttributes *)inAttributes {
+- (NSRect)frameForDisplacedAttributes:(NSCollectionViewLayoutAttributes *)inAttributes
+{
     if(inAttributes == nil) {
         return NSZeroRect;
     }
