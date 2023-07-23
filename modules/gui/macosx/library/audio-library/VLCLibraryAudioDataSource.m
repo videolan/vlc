@@ -561,6 +561,21 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [self retainSelectedMediaItem];
         self.displayedCollection = [self collectionToDisplay];
 
+        if (self.displayAllArtistsGenresTableEntry) {
+            NSMutableArray * const mutableCollectionCopy = self.displayedCollection.mutableCopy;
+            VLCMediaLibraryAllItemsGroup *group;
+
+            if (_currentParentType == VLC_ML_PARENT_GENRE) {
+                group = [[VLCMediaLibraryAllItemsGroup alloc] initWithDisplayString:_NS("All genres")];
+            } else if (_currentParentType == VLC_ML_PARENT_ARTIST) {
+                group = [[VLCMediaLibraryAllItemsGroup alloc] initWithDisplayString:_NS("All artists")];
+            }
+
+            NSAssert(group != nil, @"All items group should not be nil");
+            [mutableCollectionCopy insertObject:group atIndex:0];
+            self.displayedCollection = mutableCollectionCopy;
+        }
+
         [self resetLayoutsForOperation:^{
             [self.collectionView reloadData];
             [self.gridModeListTableView reloadData];
@@ -671,26 +686,12 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    const NSInteger numItems = self.displayedCollection.count;
-    return self.displayAllArtistsGenresTableEntry ? numItems + 1 : numItems;
+    return self.displayedCollection.count;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    BOOL viewDisplayingAllItemsEntry = self.displayAllArtistsGenresTableEntry;
-    BOOL provideAllItemsEntry = viewDisplayingAllItemsEntry && row == 0;
-
-    if (provideAllItemsEntry && _currentParentType == VLC_ML_PARENT_GENRE) {
-        return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All genres")
-                                                      withDetailString:@""];
-    } else if (provideAllItemsEntry && _currentParentType == VLC_ML_PARENT_ARTIST) {
-        return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All artists")
-                                                      withDetailString:@""];
-    } else if (viewDisplayingAllItemsEntry) {
-        return self.displayedCollection[row - 1];
-    }
-
     return self.displayedCollection[row];
 }
 
@@ -707,14 +708,11 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     const NSInteger selectedRow = tableView.selectedRow;
-    const BOOL showingAllItemsEntry = self.displayAllArtistsGenresTableEntry;
-    const NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
-
-    if (libraryItemIndex < 0 && showingAllItemsEntry) {
-        _audioGroupDataSource.representedAudioGroup = nil;
-    } else {
-        _audioGroupDataSource.representedAudioGroup = self.displayedCollection[libraryItemIndex];
+    if (selectedRow < 0 || selectedRow >= self.displayedCollection.count) {
+        return;
     }
+
+    _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
