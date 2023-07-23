@@ -29,11 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 @class VLCMediaLibraryAlbum;
-@class VLCAbstractMediaLibraryAudioGroup;
+@protocol VLCMediaLibraryAudioGroupProtocol;
 
 @interface VLCLibraryAudioGroupDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
-@property (readwrite, nonatomic, retain, nullable) VLCAbstractMediaLibraryAudioGroup *representedAudioGroup;
+@property (readwrite, nonatomic, retain, nullable) id<VLCMediaLibraryAudioGroupProtocol> representedAudioGroup;
 @property (readonly, atomic, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 @property (readwrite, atomic, retain) NSArray <NSTableView *> *tableViews;
 @property (readwrite, atomic, retain) NSArray <NSCollectionView *> *collectionViews;

@@ -39,7 +39,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
     _detailTextField.stringValue = _representedItem.detailString;
 }
 
-- (void)setRepresentedItem:(VLCAbstractMediaLibraryItem *)representedItem
+- (void)setRepresentedItem:(id<VLCMediaLibraryAudioGroupProtocol>)representedItem
 {
     if (representedItem == _representedItem) {
         return;
