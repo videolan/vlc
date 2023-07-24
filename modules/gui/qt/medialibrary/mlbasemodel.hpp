@@ -114,6 +114,8 @@ public:
     bool loading() const;
 
 
+    Q_INVOKABLE void addAndPlay(const QModelIndexList &list, const QStringList &options = {});
+
 signals:
     void parentIdChanged();
     void mlChanged();

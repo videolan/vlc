@@ -188,6 +188,27 @@ QVariant MLBaseModel::data(const QModelIndex &index, int role) const
     return {};
 }
 
+void MLBaseModel::addAndPlay(const QModelIndexList &list, const QStringList &options)
+{
+    QVector<int> indx;
+    std::transform(list.begin(), list.end(), std::back_inserter(indx), std::mem_fn(&QModelIndex::row));
+
+    ItemCallback play = [this, options](quint64, std::vector<std::unique_ptr<MLItem>> &items)
+    {
+        if (!m_mediaLib)
+            return;
+
+        QVariantList ids;
+        std::transform(items.begin(), items.end()
+                       , std::back_inserter(ids)
+                       , [](const std::unique_ptr<MLItem> &item) { return item ? QVariant::fromValue(item->getId()) : QVariant {}; });
+
+        m_mediaLib->addAndPlay(ids, options);
+    };
+
+    loadItems(indx, play);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 void MLBaseModel::onResetRequested()
