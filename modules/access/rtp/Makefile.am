@@ -29,7 +29,6 @@ noinst_LTLIBRARIES += libvlc_srtp.la
 librtp_plugin_la_CPPFLAGS += -DHAVE_SRTP
 librtp_plugin_la_CFLAGS += $(GCRYPT_CFLAGS)
 librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
-librtp_plugin_la_DEPENDENCIES = libvlc_srtp.la
 endif
 
 noinst_HEADERS += access/rtp/fmtp.h
