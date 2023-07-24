@@ -86,7 +86,7 @@ MainInterface.MainViewLoader {
     // Events
 
     function onAction(indexes) {
-        MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+        model.addAndPlay( indexes )
         g_mainDisplay.showPlayer()
     }
 

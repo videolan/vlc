@@ -52,6 +52,11 @@ FocusScope {
         g_mainDisplay.showPlayer()
     }
 
+    function _playIndex(idx) {
+        recentModel.addAndPlay( [idx], [":restore-playback-pos=2"] )
+        g_mainDisplay.showPlayer()
+    }
+
     // Childs
 
     Util.MLContextMenu {
@@ -109,6 +114,8 @@ FocusScope {
             visible: listView.count > 0
 
             model: MLRecentsVideoModel {
+                id: recentModel
+
                 ml: MediaLib
             }
 
@@ -165,7 +172,7 @@ FocusScope {
             }
 
             onActionAtIndex: {
-                root._play(model.getIdForIndex(index))
+                root._playIndex(index)
             }
         }
 

@@ -110,7 +110,7 @@ MainInterface.MainViewLoader {
 
     function _actionAtIndex() {
         if (root.selectionModel.selectedIndexes.length > 1) {
-            MediaLib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes));
+            model.addAndPlay( selectionModel.selectedIndexes );
         } else if (root.selectionModel.selectedIndexes.length === 1) {
             const index = selectionModel.selectedIndexes[0];
             showList(model.getDataAt(index), Qt.TabFocusReason);

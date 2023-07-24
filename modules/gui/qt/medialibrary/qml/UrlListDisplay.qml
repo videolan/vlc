@@ -74,8 +74,7 @@ Widgets.KeyNavigableTableView {
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
-    onActionForSelection: MediaLib.addAndPlay(model.getIdsForIndexes(
-                                                  selection))
+    onActionForSelection: model.addAndPlay( selection )
     onItemDoubleClicked: MediaLib.addAndPlay(model.id)
     onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)

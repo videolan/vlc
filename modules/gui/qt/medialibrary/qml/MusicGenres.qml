@@ -66,7 +66,7 @@ MainInterface.MainViewLoader {
 
     function _actionAtIndex(index) {
         if (selectionModel.selectedIndexes.length > 1) {
-            MediaLib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
+            model.addAndPlay( selectionModel.selectedIndexes )
         } else if (selectionModel.selectedIndexes.length === 1) {
             const sel = selectionModel.selectedIndexes[0]
             const model = genreModel.getDataAt(sel)

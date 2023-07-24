@@ -181,7 +181,7 @@ FocusScope {
 
                         onSelectAll: albumSelectionModel.selectAll()
                         onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-                        onActionAtIndex: MediaLib.addAndPlay( albumModel.getIdForIndex( index ) )
+                        onActionAtIndex: albumModel.addAndPlay( new Array(index) )
                     }
 
                     Widgets.SubtitleLabel {
@@ -236,9 +236,9 @@ FocusScope {
 
     function _actionAtIndex(index, model, selectionModel) {
         if (selectionModel.selectedIndexes.length > 1) {
-            MediaLib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
+            model.addAndPlay( selectionModel.selectedIndexes )
         } else {
-            MediaLib.addAndPlay( model.getIdForIndex(index) )
+            model.addAndPlay( new Array(index) )
         }
     }
 
@@ -407,7 +407,7 @@ FocusScope {
             model: trackModel
             selectionDelegateModel: trackSelectionModel
             onActionForSelection: {
-                MediaLib.addAndPlay( model.getIdsForIndexes( selection ) )
+                model.addAndPlay(selection)
             }
 
             header: root.header

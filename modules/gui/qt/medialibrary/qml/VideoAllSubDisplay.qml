@@ -132,7 +132,7 @@ VideoAll {
             property var listLabels: root.getLabel
 
             function onAction(indexes) {
-                MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+                model.addAndPlay( indexes )
                 g_mainDisplay.showPlayer()
             }
 
@@ -164,7 +164,7 @@ VideoAll {
                 const object = model.getDataAt(index);
 
                 if (object.isVideo) {
-                    MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+                    model.addAndPlay( indexes )
                     g_mainDisplay.showPlayer()
 
                     return

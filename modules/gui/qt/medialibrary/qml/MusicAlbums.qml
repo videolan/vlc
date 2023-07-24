@@ -61,9 +61,9 @@ MainInterface.MainViewLoader {
 
     function _actionAtIndex(index) {
         if (selectionModel.selectedIndexes.length > 1) {
-            MediaLib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
+            model.addAndPlay( selectionModel.selectedIndexes )
         } else {
-            MediaLib.addAndPlay( model.getIdForIndex(index) )
+            model.addAndPlay( new Array(index) )
         }
     }
 

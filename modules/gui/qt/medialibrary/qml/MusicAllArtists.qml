@@ -77,7 +77,7 @@ MainInterface.MainViewLoader {
 
             onActionAtIndex: {
                 if (selectionModel.selectedIndexes.length > 1) {
-                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
+                    artistModel.addAndPlay( selectionModel.selectedIndexes )
                 } else {
                     currentIndex = index
                     requestArtistAlbumView(Qt.TabFocusReason)
@@ -176,13 +176,9 @@ MainInterface.MainViewLoader {
             Navigation.parentItem: root
 
             onActionForSelection: {
-                if (selection.length > 1) {
-                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
-                } else if ( selection.length === 1) {
+                artistModel.addAndPlay( selection )
+                if ( selection.length === 1)
                     requestArtistAlbumView(Qt.TabFocusReason)
-                    // FIX ME - requestArtistAlbumView will destroy this view
-                    MediaLib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
-                }
             }
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
