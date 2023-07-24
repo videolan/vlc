@@ -985,7 +985,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* metadata object (part of header extension) */
     if( i_cm_size )
     {
-        unsigned int i_dst_num, i_dst_den;
+        unsigned int i_dst_num = 0, i_dst_den = 0;
 
         asf_track_t *tk = NULL;
         for( size_t i = 0; i < vlc_array_count( &p_sys->tracks ); i++ )
