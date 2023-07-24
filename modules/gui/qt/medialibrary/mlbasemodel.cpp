@@ -404,54 +404,6 @@ int MLBaseModel::rowCount(const QModelIndex &parent) const
     return m_cache->count();
 }
 
-MLItemId MLBaseModel::getIdForIndex(QVariant index) const
-{
-    MLItem* obj = nullptr;
-    if (index.canConvert<int>())
-        obj = item( index.toInt() );
-    else if ( index.canConvert<QModelIndex>() )
-        obj = item( index.value<QModelIndex>().row() );
-
-    if (!obj)
-        return {};
-
-    return obj->getId();
-}
-
-QVariantList MLBaseModel::getIdsForIndexes(const QModelIndexList & indexes) const
-{
-    QVariantList idList;
-    idList.reserve(indexes.length());
-    std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QModelIndex& index) -> QVariant {
-        MLItem* obj = item( index.row() );
-        if (!obj)
-            return {};
-        return QVariant::fromValue(obj->getId());
-    });
-    return idList;
-}
-
-QVariantList MLBaseModel::getIdsForIndexes(const QVariantList & indexes) const
-{
-    QVariantList idList;
-
-    idList.reserve(indexes.length());
-    std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList),
-                    [this](const QVariant& index) -> QVariant {
-        MLItem* obj = nullptr;
-        if (index.canConvert<int>())
-            obj = item( index.toInt() );
-        else if ( index.canConvert<QModelIndex>() )
-            obj = item( index.value<QModelIndex>().row() );
-
-        if (!obj)
-            return {};
-
-        return QVariant::fromValue(obj->getId());
-    });
-    return idList;
-}
-
 //-------------------------------------------------------------------------------------------------
 
 unsigned MLBaseModel::getCount() const
