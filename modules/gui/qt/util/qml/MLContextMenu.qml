@@ -84,10 +84,11 @@ NativeMenu {
         }, {
             "text": I18n.qtr("Media Information"),
             "action": function(dataList, options, indexes) {
-                DialogsProvider.mediaInfoDialog(model.getIdForIndex(indexes[0]))
+                DialogsProvider.mediaInfoDialog(dataList[0][idDataRole])
             },
-            "visible": function(options, indexes) {
-                return !(model.getIdForIndex(indexes[0]).hasParent())
+            "visible": function(dataList, options, indexes) {
+                return (dataList.length === 1)
+                        && !(dataList[0][idDataRole].hasParent())
             }
         }
     ]
@@ -144,71 +145,45 @@ NativeMenu {
         model.deleteStream(dataList[0][idDataRole])
     }
 
-    function showInformationAvailable(options, indexes) {
+    function showInformationAvailable(dataList, options, indexes) {
         return indexes.length === 1
                 && Helpers.isInteger(Helpers.get(options, "information", null))
     }
 
     // Private
 
-    function _showAddFavorite(options, indexes) {
-        if (indexes.length !== 1)
+    function _checkRole(dataList, role, expected) {
+        if (dataList.length !== 1)
             return false
 
-        const isFavorite = model.getDataAt(indexes[0]).isFavorite
+        if (!(role in dataList[0]))
+            return false
 
-        // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
-        return (isFavorite === false)
+        return (dataList[0][role] === expected)
     }
 
-    function _showRemoveFavorite(options, indexes) {
-        if (indexes.length !== 1)
-            return false
-
-        const isFavorite = model.getDataAt(indexes[0]).isFavorite
-
-        // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
-        return (isFavorite === true)
+    function _showAddFavorite(dataList, options, indexes) {
+        return _checkRole(dataList, "isFavorite", false)
     }
 
-    function _showSeen(options, indexes) {
-        if (indexes.length !== 1)
-            return false
-
-        const isNew = model.getDataAt(indexes[0]).isNew
-
-        // NOTE: Strictly comparing 'isNew' given it might be undefined.
-        return (isNew === true)
+    function _showRemoveFavorite(dataList, options, indexes) {
+        return _checkRole(dataList, "isFavorite", true)
     }
 
-    function _showUnseen(options, indexes) {
-        if (indexes.length !== 1)
-            return false
-
-        const isNew = model.getDataAt(indexes[0]).isNew
-
-        // NOTE: Strictly comparing 'isNew' given it might be undefined.
-        return (isNew === false)
+    function _showSeen(dataList, options, indexes) {
+        return _checkRole(dataList, "isNew", true)
     }
 
-    function _openContainingFolder(options, indexes) {
-        if (indexes.length !== 1)
-            return false
-
-        const isLocal = model.getDataAt(indexes[0]).isLocal
-
-        // NOTE: Strictly comparing 'isLocal' given it might be undefined.
-        return (isLocal === true)
+    function _showUnseen(dataList, options, indexes) {
+        return _checkRole(dataList, "isNew", false)
     }
 
-    function _deleteStream(options, indexes) {
-        if (indexes.length !== 1)
-            return false
+    function _openContainingFolder(dataList, options, indexes) {
+        return _checkRole(dataList, "isLocal", true)
+    }
 
-        const isDeletable = model.getDataAt(indexes[0]).isDeletable
-
-        // NOTE: Strictly comparing 'isDeletable' given it might be undefined.
-        return (isDeletable === true)
+    function _deleteStream(dataList,options, indexes) {
+        return _checkRole(dataList, "isDeletable", true)
     }
 
     function _signalShowInformation(dataList, options) {
