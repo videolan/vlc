@@ -171,7 +171,7 @@ typedef struct
 
 static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );
-static int DemuxBlock( demux_t *, const uint8_t *, int );
+static int DemuxBlock( demux_t *, const uint8_t *, int32_t );
 static void DemuxForceStill( demux_t * );
 
 static void DemuxTitles( demux_t * );
@@ -873,7 +873,7 @@ static int Demux( demux_t *p_demux )
     uint8_t buffer[DVD_VIDEO_LB_LEN];
     uint8_t *packet = buffer;
     int i_event;
-    int i_len;
+    int32_t i_len;
     dvdnav_status_t status;
 
     if( p_sys->b_readahead )
@@ -959,8 +959,8 @@ static int Demux( demux_t *p_demux )
     case DVDNAV_SPU_CLUT_CHANGE:
     {
         msg_Dbg( p_demux, "DVDNAV_SPU_CLUT_CHANGE" );
-        if ( unlikely( i_len < sizeof( p_sys->clut ) ) )
-            msg_Err(  p_demux, "invalid CLUT size %zu", i_len );
+        if ( unlikely( (size_t)i_len < sizeof( p_sys->clut ) ) )
+            msg_Err(  p_demux, "invalid CLUT size %d", i_len );
         else
         {
             /* Update color lookup table (16 *uint32_t in packet) */
@@ -1456,7 +1456,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
 /*****************************************************************************
  * DemuxBlock: demux a given block
  *****************************************************************************/
-static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
+static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int32_t len )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
