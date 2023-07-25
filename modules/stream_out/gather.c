@@ -61,6 +61,7 @@ typedef struct
 
     es_format_t fmt;
     void          *id;
+    char *es_id;
     struct vlc_list node;
 } sout_stream_id_sys_t;
 
@@ -155,6 +156,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         {
             sout_StreamIdDel( p_stream->p_next, id->id );
             es_format_Clean( &id->fmt );
+            free( id->es_id );
             free( id );
         }
 
@@ -162,12 +164,21 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id = malloc( sizeof( sout_stream_id_sys_t ) );
     if( id == NULL )
         return NULL;
+
+    id->es_id = strdup( "placeholder" /* Will be es_id once added to `pf_add` */ );
+    if( unlikely(id->es_id == NULL) )
+    {
+        free( id );
+        return NULL;
+    }
+
     es_format_Copy( &id->fmt, p_fmt );
     id->b_streamswap     = false;
     id->b_used           = true;
-    id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt, NULL );
+    id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt, id->es_id );
     if( id->id == NULL )
     {
+        free( id->es_id );
         free( id );
         return NULL;
     }
