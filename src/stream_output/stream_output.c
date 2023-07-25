@@ -169,8 +169,9 @@ static int sout_InputControlVa( sout_stream_t *p_sout,
 {
     if( i_query == SOUT_INPUT_SET_SPU_HIGHLIGHT )
     {
+        const vlc_spu_highlight_t *spu_hl = va_arg( args, const vlc_spu_highlight_t * );
         return sout_StreamControl( p_sout, SOUT_STREAM_ID_SPU_HIGHLIGHT,
-                                   p_input->id, va_arg(args, void *) );
+                                   p_input->id, spu_hl );
     }
     return VLC_EGENERIC;
 }

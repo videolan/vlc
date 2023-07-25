@@ -182,7 +182,7 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
         case SOUT_STREAM_ID_SPU_HIGHLIGHT:
         {
             sout_stream_id_sys_t *id = va_arg( args, void * );
-            void *spu_hl = va_arg( args, void * );
+            const vlc_spu_highlight_t *spu_hl = va_arg( args, const vlc_spu_highlight_t * );
             return vlc_input_decoder_SetSpuHighlight( id->dec, spu_hl );
         }
 

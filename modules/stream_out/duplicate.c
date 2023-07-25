@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_subpicture.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -93,7 +94,7 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
         case SOUT_STREAM_ID_SPU_HIGHLIGHT:
         {
             sout_stream_id_sys_t *id = va_arg(args, void *);
-            void *spu_hl = va_arg(args, void *);
+            const vlc_spu_highlight_t *spu_hl = va_arg(args, const vlc_spu_highlight_t *);
             for( int i = 0; i < id->i_nb_ids; i++ )
             {
                 if( id->pp_ids[i] )
