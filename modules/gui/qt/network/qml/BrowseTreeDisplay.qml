@@ -36,8 +36,6 @@ MainInterface.MainViewLoader {
 
     readonly property var currentIndex: _currentView.currentIndex
 
-    readonly property bool isViewMultiView: true
-
      // 'loading' property is not available with NetworkDevicesModel
     readonly property bool loading: Helpers.get(model, "loading", false)
 

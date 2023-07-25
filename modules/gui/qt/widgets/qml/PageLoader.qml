@@ -33,6 +33,11 @@ FocusScope {
     // one may use `loadPage(string pageName)` to load the page from 'pageModel'
     property var loadDefaultView: null
 
+    //indicates whether the subview support grid/list mode
+    readonly property bool isViewMultiView: (stackView.currentItem
+                                            && stackView.currentItem.isViewMultiView !== undefined
+                                            && stackView.currentItem.isViewMultiView)
+
     // Private
 
     property bool _ready: false

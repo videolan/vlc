@@ -33,9 +33,6 @@ Widgets.PageLoader {
     //---------------------------------------------------------------------------------------------
     // Properties
     //---------------------------------------------------------------------------------------------
-
-    property bool isViewMultiView: true
-
     property var contentModel
 
     property var sortMenu
@@ -89,10 +86,6 @@ Widgets.PageLoader {
     Accessible.name: I18n.qtr("Video view")
 
     onCurrentItemChanged: {
-        isViewMultiView = (currentItem.isViewMultiView === undefined
-                           ||
-                           currentItem.isViewMultiView);
-
         // NOTE: We need bindings because the VideoAll model can change over time.
         contentModel = Qt.binding(function () { return currentItem.model; })
         sortMenu     = Qt.binding(function () { return currentItem.sortMenu; })

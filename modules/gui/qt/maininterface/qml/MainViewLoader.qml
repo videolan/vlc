@@ -57,6 +57,8 @@ Widgets.StackViewExt {
 
     readonly property int count: model.count
 
+    readonly property bool isViewMultiView: !!grid && !!list
+
     property var selectionModel: Util.SelectableDelegateModel {
         model: root.model
     }

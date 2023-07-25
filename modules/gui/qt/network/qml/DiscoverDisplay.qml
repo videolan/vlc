@@ -31,7 +31,6 @@ Widgets.PageLoader {
 
     property var sortModel
     property var contentModel
-    property bool isViewMultiView: false
 
     pageModel: [{
             displayText: I18n.qtr("Services"),
@@ -56,7 +55,6 @@ Widgets.PageLoader {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model
         localMenuDelegate = !!currentItem.localMenuDelegate ? currentItem.localMenuDelegate : menuDelegate
-        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
 

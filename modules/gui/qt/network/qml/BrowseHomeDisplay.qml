@@ -50,6 +50,8 @@ FocusScope {
         { text: I18n.qtr("Url"),        criteria: "mrl" }
     ]
 
+    readonly property bool isViewMultiView: true
+
     // Aliases
 
     property alias model: foldersSection.model

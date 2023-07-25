@@ -33,7 +33,6 @@ Widgets.PageLoader {
 
     property var sortModel
     property var contentModel
-    property bool isViewMultiView: true
 
     property Component localMenuDelegate
 
@@ -67,9 +66,6 @@ Widgets.PageLoader {
         sortModel = currentItem.sortModel;
         contentModel = currentItem.model;
 
-        isViewMultiView = (currentItem.isViewMultiView === undefined
-                           ||
-                           currentItem.isViewMultiView);
 
         if (view.name === "home")
             localMenuDelegate = null

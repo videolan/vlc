@@ -34,7 +34,6 @@ Widgets.PageLoader {
     // Aliases
     //---------------------------------------------------------------------------------------------
 
-    property bool isViewMultiView: true
 
     property var model
     property var sortModel
@@ -63,10 +62,6 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         model     = currentItem.model;
         sortModel = currentItem.sortModel;
-
-        isViewMultiView = (currentItem.isViewMultiView === undefined
-                           ||
-                           currentItem.isViewMultiView);
     }
 
     //---------------------------------------------------------------------------------------------

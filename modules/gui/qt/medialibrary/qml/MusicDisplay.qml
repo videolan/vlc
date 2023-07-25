@@ -31,7 +31,6 @@ Widgets.PageLoader {
 
     property var sortModel
     property var contentModel
-    property bool isViewMultiView: true
 
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Music view")
@@ -67,7 +66,6 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model
-        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
     function loadIndex(index) {

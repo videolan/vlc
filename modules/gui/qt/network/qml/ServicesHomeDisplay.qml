@@ -30,7 +30,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property bool isViewMultiView: false
     property var sortModel
     property var model
     property Component localMenuDelegate: null
@@ -59,7 +58,6 @@ Widgets.PageLoader {
         sortModel = currentItem.sortModel
         model = currentItem.model
         localMenuDelegate = !!currentItem.addressBar ? currentItem.addressBar : null
-        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
     function setCurrentItemFocus(reason) {
