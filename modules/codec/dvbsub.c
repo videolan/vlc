@@ -78,6 +78,8 @@
 
 #include <vlc_bits.h>
 
+#include <limits.h>
+
 /* #define DEBUG_DVBSUB 1 */
 
 #define POSX_TEXT N_("Decoding X coordinate")
@@ -1754,10 +1756,10 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
         int *pi_delta;
 #endif
         int i_pixels = p_region->p_picture->p[0].i_visible_lines
-                        * p_region->p_picture->p[0].i_pitch;
+                        * p_region->p_picture->Y_PITCH;
         int i_iterator = p_region->p_picture->p[0].i_visible_lines * 3 / 4
-                            * p_region->p_picture->p[0].i_pitch
-                        + p_region->p_picture->p[0].i_pitch * 1 / 3;
+                            * p_region->p_picture->Y_PITCH
+                        + p_region->p_picture->Y_PITCH * 1 / 3;
         int i_tolerance = 0;
 
 #ifdef DEBUG_DVBSUB1
@@ -1798,10 +1800,10 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
             for( i = 0; i < i_pixels ; )
             {
                 uint8_t y, u, v, a;
-                y = p_region->p_picture->p[0].p_pixels[i];
-                u = p_region->p_picture->p[1].p_pixels[i];
-                v = p_region->p_picture->p[2].p_pixels[i];
-                a = p_region->p_picture->p[3].p_pixels[i];
+                y = p_region->p_picture->Y_PIXELS[i];
+                u = p_region->p_picture->U_PIXELS[i];
+                v = p_region->p_picture->V_PIXELS[i];
+                a = p_region->p_picture->A_PIXELS[i];
                 for( j = 0; j < p_fmt->p_palette->i_entries; j++ )
                 {
                     if( abs((int)p_fmt->p_palette->palette[j][0] - (int)y) <= i_tolerance &&
@@ -1854,16 +1856,16 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
         {
             int i_ydelta = 0, i_udelta = 0, i_vdelta = 0, i_adelta = 0;
 
-            for( n = 0; n < p_region->p_picture->p[0].i_pitch ; n++ )
+            for( n = 0; n < p_region->p_picture->Y_PITCH ; n++ )
             {
-                int i_offset = p * p_region->p_picture->p[0].i_pitch + n;
+                int i_offset = p * p_region->p_picture->Y_PITCH + n;
                 int y, u, v, a;
                 int i_mindist, i_best;
 
-                y = (int)p_region->p_picture->p[0].p_pixels[i_offset];
-                u = (int)p_region->p_picture->p[1].p_pixels[i_offset];
-                v = (int)p_region->p_picture->p[2].p_pixels[i_offset];
-                a = (int)p_region->p_picture->p[3].p_pixels[i_offset];
+                y = p_region->p_picture->Y_PIXELS[i_offset];
+                u = p_region->p_picture->U_PIXELS[i_offset];
+                v = p_region->p_picture->V_PIXELS[i_offset];
+                a = p_region->p_picture->A_PIXELS[i_offset];
 
                 /* Add dithering compensation */
 #ifdef RANDOM_DITHERING
@@ -1872,14 +1874,14 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
                 v += (((i_seed >> 16) & 0xff) - 0x80) * i_tolerance / 0x80;
                 a += (((i_seed >> 24) & 0xff) - 0x80) * i_tolerance / 0x80;
 #else
-                y += i_ydelta + pi_delta[ n * 4 ];
+                y += i_ydelta + pi_delta[ n * 4 + 0 ];
                 u += i_udelta + pi_delta[ n * 4 + 1 ];
                 v += i_vdelta + pi_delta[ n * 4 + 2 ];
                 a += i_adelta + pi_delta[ n * 4 + 3 ];
 #endif
 
                 /* Find best colour in palette */
-                for( i_mindist = 99999999, i_best = 0, j = 0; j < p_fmt->p_palette->i_entries; j++ )
+                for( i_mindist = INT_MAX, i_best = 0, j = 0; j < p_fmt->p_palette->i_entries; j++ )
                 {
                     int i_dist = 0;
 
@@ -1896,7 +1898,7 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
                 }
 
                 /* Set pixel to best color */
-                p_region->p_picture->p[0].p_pixels[i_offset] = i_best;
+                p_region->p_picture->Y_PIXELS[i_offset] = i_best;
 
                 /* Update dithering state */
 #ifdef RANDOM_DITHERING
@@ -1906,7 +1908,7 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
                 i_udelta = u - (int)p_fmt->p_palette->palette[i_best][1];
                 i_vdelta = v - (int)p_fmt->p_palette->palette[i_best][2];
                 i_adelta = a - (int)p_fmt->p_palette->palette[i_best][3];
-                pi_delta[ n * 4 ] = i_ydelta * 3 / 8;
+                pi_delta[ n * 4 + 0 ] = i_ydelta * 3 / 8;
                 pi_delta[ n * 4 + 1 ] = i_udelta * 3 / 8;
                 pi_delta[ n * 4 + 2 ] = i_vdelta * 3 / 8;
                 pi_delta[ n * 4 + 3 ] = i_adelta * 3 / 8;
