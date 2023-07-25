@@ -144,7 +144,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
 
     /* FIXME: what the, we shouldn’t need to allocate 64k of buffer --sam. */
-    p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, 65536 );
+    p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, sizeof(p_sys->buffer) );
     p_sys->i_pts = p_spu_block->i_pts;
     block_ChainRelease( p_spu_block );
 
