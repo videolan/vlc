@@ -671,6 +671,16 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
                                   vlc_tick_t audio_ts)
 {
     vlc_mutex_lock(&stream->timing.lock);
+
+    if (unlikely(stream->timing.first_pts == VLC_TICK_INVALID))
+    {
+        /* While closing the stream, it is possible (but unlikely) that the
+         * module updates a timing point just after the stream is reset, and
+         * just before the module is stopped. */
+        vlc_mutex_unlock(&stream->timing.lock);
+        return;
+    }
+
     vlc_tick_t rate_audio_ts = stream->timing.rate_audio_ts;
     vlc_tick_t rate_system_ts = stream->timing.rate_system_ts;
 
