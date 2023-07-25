@@ -41,7 +41,7 @@ typedef struct input_resource_t input_resource_t;
 /* */
 struct vlc_clock_t;
 VLC_API vlc_input_decoder_t *
-vlc_input_decoder_Create( vlc_object_t *, const es_format_t *,
+vlc_input_decoder_Create( vlc_object_t *, const es_format_t *, const char *es_id,
                           struct vlc_clock_t *, input_resource_t * ) VLC_USED;
 
 /**
