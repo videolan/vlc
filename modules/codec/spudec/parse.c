@@ -119,68 +119,66 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
         uint16_t i_color = GetWBE(&p_spu_data->p_pxctli[i*6 + 2]);
         uint16_t i_contrast = GetWBE(&p_spu_data->p_pxctli[i*6 + 4]);
 
+        /* Lookup the CLUT palette for the YUV values */
+        uint8_t idx[4];
+        uint8_t yuv[4][3];
+        uint8_t alpha[4];
+        idx[0] = (i_color >> 12)&0x0f;
+        idx[1] = (i_color >>  8)&0x0f;
+        idx[2] = (i_color >>  4)&0x0f;
+        idx[3] = i_color&0x0f;
+        CLUTIdxToYUV( &p_dec->fmt_in->subs, idx, yuv );
+
+        /* Process the contrast */
+        alpha[3] = (i_contrast >> 12)&0x0f;
+        alpha[2] = (i_contrast >>  8)&0x0f;
+        alpha[1] = (i_contrast >>  4)&0x0f;
+        alpha[0] = i_contrast&0x0f;
+
+        /* Create a new YUVA palette entries for the picture */
+        int index_map[4];
+        for( int j=0; j<4; j++ )
         {
-            /* Lookup the CLUT palette for the YUV values */
-            uint8_t idx[4];
-            uint8_t yuv[4][3];
-            uint8_t alpha[4];
-            idx[0] = (i_color >> 12)&0x0f;
-            idx[1] = (i_color >>  8)&0x0f;
-            idx[2] = (i_color >>  4)&0x0f;
-            idx[3] = i_color&0x0f;
-            CLUTIdxToYUV( &p_dec->fmt_in->subs, idx, yuv );
-
-            /* Process the contrast */
-            alpha[3] = (i_contrast >> 12)&0x0f;
-            alpha[2] = (i_contrast >>  8)&0x0f;
-            alpha[1] = (i_contrast >>  4)&0x0f;
-            alpha[0] = i_contrast&0x0f;
-
-            /* Create a new YUVA palette entries for the picture */
-            int index_map[4];
-            for( int j=0; j<4; j++ )
+            uint8_t yuvaentry[4];
+            yuvaentry[0] = yuv[j][0];
+            yuvaentry[1] = yuv[j][1];
+            yuvaentry[2] = yuv[j][2];
+            yuvaentry[3] = alpha[j] * 0x11;
+            int i_index = VIDEO_PALETTE_COLORS_MAX;
+            for( int k = p_palette->i_entries; k > 0; k-- )
             {
-                uint8_t yuvaentry[4];
-                yuvaentry[0] = yuv[j][0];
-                yuvaentry[1] = yuv[j][1];
-                yuvaentry[2] = yuv[j][2];
-                yuvaentry[3] = alpha[j] * 0x11;
-                int i_index = VIDEO_PALETTE_COLORS_MAX;
-                for( int k = p_palette->i_entries; k > 0; k-- )
+                if( !memcmp( p_palette->palette[k], yuvaentry, sizeof(uint8_t [4]) ) )
                 {
-                    if( !memcmp( p_palette->palette[k], yuvaentry, sizeof(uint8_t [4]) ) )
-                    {
-                        i_index = i;
-                        break;
-                    }
+                    i_index = i;
+                    break;
                 }
-
-                /* Add an entry in out palette */
-                if( i_index == VIDEO_PALETTE_COLORS_MAX )
-                {
-                    if(p_palette->i_entries == VIDEO_PALETTE_COLORS_MAX)
-                    {
-                        msg_Warn( p_dec, "Cannot create new color, skipping PXCTLI" );
-                        return;
-                    }
-                    i_index = p_palette->i_entries++;
-                    memcpy( p_palette->palette[ i_index ], yuvaentry, sizeof(uint8_t [4]) );
-                }
-                index_map[j] = i_index;
             }
 
-            if( p_spu->p_region->i_x >= i_col )
-                i_col -= p_spu->p_region->i_x;
-
-            for( int j=0; j<p_plane->i_visible_lines; j++ )
+            /* Add an entry in out palette */
+            if( i_index == VIDEO_PALETTE_COLORS_MAX )
             {
-                uint8_t *p_line = &p_plane->p_pixels[j * p_plane->i_pitch];
-                /* Extends to end of the line */
-                for( int k=i_col; k<p_plane->i_visible_pitch; k++ )
+                if(p_palette->i_entries == VIDEO_PALETTE_COLORS_MAX)
                 {
-                    if( p_line[k] < 4 ) /* can forge write-again */
-                        p_line[k] = index_map[ p_line[k] ];
+                    msg_Warn( p_dec, "Cannot create new color, skipping PXCTLI" );
+                    return;
                 }
+                i_index = p_palette->i_entries++;
+                memcpy( p_palette->palette[ i_index ], yuvaentry, sizeof(uint8_t [4]) );
+            }
+            index_map[j] = i_index;
+        }
+
+        if( p_spu->p_region->i_x >= i_col )
+            i_col -= p_spu->p_region->i_x;
+
+        for( int j=0; j<p_plane->i_visible_lines; j++ )
+        {
+            uint8_t *p_line = &p_plane->p_pixels[j * p_plane->i_pitch];
+            /* Extends to end of the line */
+            for( int k=i_col; k<p_plane->i_visible_pitch; k++ )
+            {
+                if( p_line[k] < 4 ) /* can forge write-again */
+                    p_line[k] = index_map[ p_line[k] ];
             }
         }
     }
