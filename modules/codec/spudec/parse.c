@@ -110,6 +110,9 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
     plane_t *p_plane = &p_spu->p_region->p_picture->p[0];
     video_palette_t *p_palette = p_spu->p_region->fmt.p_palette;
 
+    if( !p_dec->fmt_in->subs.spu.b_palette )
+        return;
+
     for( size_t i=0;i<p_spu_data->i_pxclti; i++ )
     {
         uint16_t i_col = GetWBE(&p_spu_data->p_pxctli[i*6 + 0]);
@@ -119,7 +122,6 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
         if(p_palette->i_entries +4 >= VIDEO_PALETTE_COLORS_MAX)
             break;
 
-        if( p_dec->fmt_in->subs.spu.b_palette )
         {
             /* Lookup the CLUT palette for the YUV values */
             uint8_t idx[4];
