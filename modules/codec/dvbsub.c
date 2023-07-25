@@ -1844,12 +1844,9 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 #endif
 
 #ifndef RANDOM_DITHERING
-        pi_delta = xmalloc( ( p_region->p_picture->p[0].i_pitch + 1 )
-                            * sizeof(int) * 4  );
-        for( i = 0; i < (p_region->p_picture->p[0].i_pitch + 1) * 4 ; i++ )
-        {
-            pi_delta[ i ] = 0;
-        }
+        pi_delta = calloc( ( p_region->p_picture->Y_PITCH + 1 ) * 4, sizeof(int) );
+        if (unlikely(pi_delta == NULL))
+            return;
 #endif
 
         /* Fill image with our new colours */
