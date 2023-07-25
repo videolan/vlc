@@ -2138,7 +2138,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region = p_subpic->p_region;
-    video_palette_t *p_pal, pal;
+    video_palette_t *p_pal, empty_palette = { .i_entries = 4 };
 
     /* Sanity check */
     if( !p_region ) return;
@@ -2148,12 +2148,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         p_pal = p_region->fmt.p_palette;
     }
     else
-    {
-        pal.i_entries = 4;
-        for( int i = 0; i < 4; i++ )
-            memset(pal.palette[i], 0, sizeof(pal.palette[i]));
-        p_pal = &pal;
-    }
+        p_pal = &empty_palette;
 
     bs_write( s, 8, 0x0f ); /* Sync byte */
     bs_write( s, 8, DVBSUB_ST_CLUT_DEFINITION ); /* Segment type */
