@@ -119,9 +119,6 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
         uint16_t i_color = GetWBE(&p_spu_data->p_pxctli[i*6 + 2]);
         uint16_t i_contrast = GetWBE(&p_spu_data->p_pxctli[i*6 + 4]);
 
-        if(p_palette->i_entries +4 >= VIDEO_PALETTE_COLORS_MAX)
-            break;
-
         {
             /* Lookup the CLUT palette for the YUV values */
             uint8_t idx[4];
