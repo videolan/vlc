@@ -1738,11 +1738,11 @@ static int OpenEncoder( vlc_object_t *p_this )
 /* FIXME: this routine is a hack to convert VLC_CODEC_YUVA
  *        into VLC_CODEC_YUVP
  */
-static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
+static void YuvaYuvp( subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
 
-    if( !p_subpic ) return NULL;
+    if( !p_subpic ) return;
 
     for( p_region = p_subpic->p_region; p_region; p_region = p_region->p_next )
     {
@@ -1932,7 +1932,6 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
     }
-    return p_subpic;
 } /* End of hack */
 
 /****************************************************************************
@@ -1940,7 +1939,6 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
  ****************************************************************************/
 static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
 {
-    subpicture_t *p_temp = NULL;
     subpicture_region_t *p_region = NULL;
     bs_t bits, *s = &bits;
     block_t *p_block;
@@ -1953,13 +1951,12 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     p_region = p_subpic->p_region;
     if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
     {
-        p_temp = YuvaYuvp( p_subpic );
-        if( !p_temp )
+        if( !p_subpic )
         {
             msg_Err( p_enc, "no picture in subpicture" );
             return NULL;
         }
-        p_region = p_subpic->p_region;
+        YuvaYuvp( p_subpic );
     }
 
     /* Sanity check */
