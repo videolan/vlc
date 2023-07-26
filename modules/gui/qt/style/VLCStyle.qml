@@ -99,6 +99,7 @@ QtObject {
     readonly property int icon_large: dp(64, scale);
     readonly property int icon_xlarge: dp(128, scale);
 
+    readonly property int icon_dragItem: dp(32, scale);
     readonly property int icon_topbar: icon_normal
     readonly property int icon_toolbar: icon_normal
     readonly property int icon_audioPlayerButton: dp(32, scale)
