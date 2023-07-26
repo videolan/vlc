@@ -26,6 +26,7 @@
         {"key":"eject", "path": "./icons/eject.svg"},
         {"key":"ellipsis", "path": "./icons/ellipsis.svg"},
         {"key":"enqueue", "path": "./icons/enqueue.svg"},
+        {"key":"expand_inverted", "path": "./icons/expand_inverted.svg"},
         {"key":"expand", "path": "./icons/expand.svg"},
         {"key":"extended", "path": "./icons/extended.svg"},
         {"key":"faster", "path": "./icons/faster.svg"},

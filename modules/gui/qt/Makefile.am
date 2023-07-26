@@ -663,6 +663,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/eject.svg \
 	gui/qt/pixmaps/icons/ellipsis.svg \
 	gui/qt/pixmaps/icons/enqueue.svg \
+	gui/qt/pixmaps/icons/expand_inverted.svg \
 	gui/qt/pixmaps/icons/expand.svg \
 	gui/qt/pixmaps/icons/extended.svg \
 	gui/qt/pixmaps/icons/faster.svg \
