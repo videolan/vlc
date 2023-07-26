@@ -19,6 +19,9 @@ AM_CFLAGS = $(CFLAGS_vlc)
 if HAVE_DBUS
 AM_CPPFLAGS += -DHAVE_DBUS
 endif
+if HAVE_EMSCRIPTEN
+AM_CFLAGS += -sMAIN_MODULE=1
+endif
 
 #
 # Main VLC executable

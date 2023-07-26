@@ -108,6 +108,11 @@ AM_CPPFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
 	-DTOP_BUILDDIR=\"$(abs_top_builddir)\" \
 	-DTOP_SRCDIR=\"$(abs_top_srcdir)\"
+
+if HAVE_EMSCRIPTEN
+AM_CFLAGS = -sMAIN_MODULE=1
+endif
+
 AM_LDFLAGS = -no-install $(LDFLAGS_vlc)
 LIBVLCCORE = -L../src/ -lvlccore
 LIBVLC = -L../lib -lvlc
