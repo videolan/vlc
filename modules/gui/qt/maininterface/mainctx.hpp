@@ -161,6 +161,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(MediaLib* mediaLibrary READ getMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged FINAL)
+    Q_PROPERTY(bool hasGridListMode MEMBER m_hasGridListMode NOTIFY hasGridListModeChanged FINAL)
     Q_PROPERTY(Grouping grouping READ grouping WRITE setGrouping NOTIFY groupingChanged FINAL)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT FINAL)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
@@ -357,6 +358,7 @@ protected:
     bool                 b_hasMedialibrary = false;
     MediaLib*            m_medialib = nullptr;
     bool                 m_gridView = false;
+    bool                 m_hasGridListMode = false;
     Grouping             m_grouping = GROUPING_NONE;
     ColorSchemeModel*    m_colorScheme = nullptr;
     bool                 m_windowTitlebar = true;
@@ -460,6 +462,7 @@ signals:
     void hasEmbededVideoChanged(bool);
     void showRemainingTimeChanged(bool);
     void gridViewChanged( bool );
+    void hasGridListModeChanged( bool );
     void groupingChanged( Grouping );
     void colorSchemeChanged( QString );
     void useClientSideDecorationChanged();
