@@ -44,6 +44,18 @@ T.ItemDelegate {
 
     readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
+    // drag -> point
+    // current drag pos inside the item
+    readonly property point drag: {
+        if (!containsDrag)
+            return Qt.point(0, 0)
+
+        const d = topContainsDrag ? higherDropArea : lowerDropArea
+        const p = d.drag
+        return mapFromItem(d, p.x, p.y)
+    }
+
+
     // Optional
     property var contextMenu
 

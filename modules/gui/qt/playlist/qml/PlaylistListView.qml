@@ -343,6 +343,8 @@ T.Pane {
 
                 readonly property bool containsDrag: dropArea.containsDrag
 
+                readonly property point drag: Qt.point(dropArea.drag.x, dropArea.drag.y)
+
                 onContainsDragChanged: {
                     if (root.model.count > 0) {
                         listView.updateItemContainsDrag(this, containsDrag)
