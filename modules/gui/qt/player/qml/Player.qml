@@ -188,7 +188,13 @@ FocusScope {
 
         onMouseMoved: {
             //short interval for mouse events
-            toolbarAutoHide.setVisible(1000)
+            if (Player.isInteractive)
+            {
+                toggleControlBarButtonAutoHide.restart()
+                videoSurface.cursorShape = Qt.ArrowCursor
+            }
+            else
+                toolbarAutoHide.setVisible(1000)
         }
     }
 
@@ -333,7 +339,10 @@ FocusScope {
             showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
             Navigation.parentItem: rootPlayer
-            Navigation.downItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
+            Navigation.downItem: playlistpopup.showPlaylist ?
+                                     playlistpopup : (audioControls.visible ?
+                                                          audioControls : (Player.isInteractive ?
+                                                                               toggleControlBarButton : controlBarView))
 
             onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
@@ -497,7 +506,7 @@ FocusScope {
                 spacing: VLCStyle.margin_xxsmall
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: topcontrolView
-                Navigation.downItem: controlBarView
+                Navigation.downItem: Player.isInteractive ? toggleControlBarButton : controlBarView
 
                 model: ObjectModel {
                     Widgets.IconToolButton {
@@ -600,7 +609,7 @@ FocusScope {
 
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: topcontrolView
-                Navigation.downItem: controlBarView
+                Navigation.downItem: Player.isInteractive ? toggleControlBarButton : controlBarView
                 Navigation.leftAction: closePlaylist
                 Navigation.cancelAction: closePlaylist
 
@@ -650,6 +659,44 @@ FocusScope {
         }
     }
 
+    Timer {
+        // toggleControlBarButton's visibility depends on this timer
+        id: toggleControlBarButtonAutoHide
+        running: true
+        repeat: false
+        interval: 3000
+
+        onTriggered: {
+            // Cursor hides when toggleControlBarButton is not visible
+            videoSurface.forceActiveFocus()
+            videoSurface.cursorShape = Qt.BlankCursor
+        }
+    }
+
+    Widgets.ButtonExt {
+        id: toggleControlBarButton
+        visible: Player.isInteractive
+                 && rootPlayer.hasEmbededVideo
+                 && !(MainCtx.pinVideoControls && !Player.fullscreen)
+                 && (toggleControlBarButtonAutoHide.running === true
+                     || controlBarView.state !== "hidden" || toggleControlBarButton.hovered)
+        focus: true
+        anchors {
+            bottom: controlBarView.state === "hidden" ? parent.bottom : controlBarView.top
+            horizontalCenter: parent.horizontalCenter
+        }
+        iconSize: VLCStyle.icon_large
+        iconTxt: controlBarView.state === "hidden" ? VLCIcons.expand_inverted : VLCIcons.expand
+
+        Navigation.parentItem: rootPlayer
+        Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
+        Navigation.downItem: controlBarView
+
+        onClicked: {
+            toolbarAutoHide.toggleForceVisible();
+        }
+    }
+
     Widgets.LoaderFade {
         id: controlBarView
 
@@ -684,7 +731,10 @@ FocusScope {
                           : ControlBar.TimeTextPosition.AboveSlider
 
             Navigation.parentItem: rootPlayer
-            Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
+            Navigation.upItem: playlistpopup.showPlaylist ?
+                                   playlistpopup : (Player.isInteractive ?
+                                                        toggleControlBarButton : (audioControls.visible ?
+                                                                                      audioControls : topcontrolView))
 
             onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
 
