@@ -328,7 +328,8 @@ PLAYER_ACTION_HANDLER(Position)
 {
     VLC_UNUSED(action_id); VLC_UNUSED(intf);
     vout_thread_t *vout = vlc_player_vout_Hold(player);
-    if (vout_OSDEpg(vout, vlc_player_GetCurrentMedia(player)))
+    input_item_t* item = vlc_player_GetCurrentMedia(player);
+    if (item && vout_OSDEpg(vout, item))
         vlc_player_DisplayPosition(player);
     vout_Release(vout);
 }
