@@ -196,12 +196,14 @@ enum sout_stream_query_e
      * the stream output.
      * This control should fail and do nothing if not implemented.
      *
+     * \param void* Stream ID
      * \param vlc_spu_highlight_t* Selected spu data.
      *
      * Usage:
      * \code{c}
+     * void *stream_id;
      * const vlc_spu_highlight_t hl_data = {... SPU infos...};
-     * sout_StreamControl(stream, SOUT_STREAM_ID_SPU_HIGHLIGHT, &hl_data);
+     * sout_StreamControl(stream, SOUT_STREAM_ID_SPU_HIGHLIGHT, stream_id, &hl_data);
      * \endcode
      */
     SOUT_STREAM_ID_SPU_HIGHLIGHT,
