@@ -244,11 +244,8 @@ static subpicture_region_t * vout_OSDImage( vlc_object_t *p_obj,
 
 static void vout_OSDRegionConstrain(subpicture_region_t *p_region, int w, int h)
 {
-    if( p_region )
-    {
-        p_region->i_max_width = w;
-        p_region->i_max_height = h;
-    }
+    p_region->i_max_width = w;
+    p_region->i_max_height = h;
 }
 
 static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
@@ -356,10 +353,12 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
                                      x,
                                      y + height * OSDEPG_ROW(2),
                                      height * EPGOSD_TEXTSIZE_PROG);
-        /* region rendering limits */
-        vout_OSDRegionConstrain(*last_ptr, width, 0);
         if(*last_ptr)
+        {
+            /* region rendering limits */
+            vout_OSDRegionConstrain(*last_ptr, width, 0);
             last_ptr = &(*last_ptr)->p_next;
+        }
     }
 
     /* NEXT EVENT */
@@ -369,10 +368,12 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
                                      x,
                                      y + height * OSDEPG_ROW(5),
                                      height * EPGOSD_TEXTSIZE_PROG);
-        /* region rendering limits */
-        vout_OSDRegionConstrain(*last_ptr, width, 0);
         if(*last_ptr)
+        {
+            /* region rendering limits */
+            vout_OSDRegionConstrain(*last_ptr, width, 0);
             last_ptr = &(*last_ptr)->p_next;
+        }
     }
 
     if(p_sys->time && p_sys->epg->p_current)
