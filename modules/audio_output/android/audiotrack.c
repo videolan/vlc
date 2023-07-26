@@ -1228,6 +1228,8 @@ AudioTrack_ReportTiming( JNIEnv *env, aout_stream_t *stream )
         vlc_tick_t frame_date_us =
             VLC_TICK_FROM_NS(JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ));
         jlong frame_post_last = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition );
+        if( frame_post_last == 0 )
+            return VLC_EGENERIC;
 
         /* the low-order 32 bits of position is in wrapping frame units
          * similar to AudioTrack#getPlaybackHeadPosition. */
