@@ -1210,7 +1210,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                 {
                     /* Blending failed, likely because the picture is opaque or
                      * read-only. Try to convert the opaque picture to a
-                     * software RGB32 one before blending it. */
+                     * software RGB32 to generate a snapshot. */
                     if (do_snapshot)
                     {
                         picture_t *copy = ConvertRGB32AndBlend(sys, blent, subpic);
