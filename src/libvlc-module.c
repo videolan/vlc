@@ -787,6 +787,10 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define SPU_LONGTEXT N_( \
     "You can completely disable the sub-picture processing.")
 
+#define SPU_FULL_TEXT N_("Display sub-pictures on full window")
+#define SPU_FULL_LONGTEXT N_( \
+    "It allows showing subtitles in black bars.")
+
 #define SECONDARY_SUB_POSITION_TEXT N_("Position of secondary subtitles")
 #define SECONDARY_SUB_POSITION_LONGTEXT N_( \
     "Place on video where to display secondary subtitles (default bottom center).")
@@ -1747,6 +1751,8 @@ vlc_module_begin ()
     add_category_hint(N_("Subpictures"), SUB_CAT_LONGTEXT)
 
     add_bool( "spu", true, SPU_TEXT, SPU_LONGTEXT )
+        change_safe ()
+    add_bool( "spu-fill", true, SPU_FULL_TEXT, SPU_FULL_LONGTEXT )
         change_safe ()
     add_bool( "osd", true, OSD_TEXT, OSD_LONGTEXT )
     add_module("text-renderer", "text renderer", "any",

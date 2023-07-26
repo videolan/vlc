@@ -703,6 +703,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     var_Create (mp, "osd", VLC_VAR_BOOL); // off
+    var_Create (mp, "spu-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     doinherit = module_exists("marq") ? VLC_VAR_DOINHERIT : 0;
     var_Create(mp, "marq-marquee", VLC_VAR_STRING);

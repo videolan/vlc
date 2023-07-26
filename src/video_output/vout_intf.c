@@ -298,6 +298,10 @@ void vout_CreateVars( vout_thread_t *p_vout )
     /* Viewpoint */
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
+
+    /* SPU in full window */
+    var_Create( p_vout, "spu-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
+                | VLC_VAR_ISCOMMAND );
 }
 
 void vout_IntfInit( vout_thread_t *p_vout )

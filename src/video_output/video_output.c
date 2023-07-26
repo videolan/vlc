@@ -682,6 +682,7 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
     const int display_height = var_GetInteger(vout, "height");
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
+    cfg->display.full_fill = var_GetBool(vout, "spu-fill");
     cfg->display.fitting = var_GetBool(vout, "autoscale")
         ? var_InheritFit(VLC_OBJECT(vout)) : VLC_VIDEO_FIT_NONE;
     unsigned msar_num, msar_den;

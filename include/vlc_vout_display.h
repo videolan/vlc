@@ -99,6 +99,7 @@ struct vout_display_placement {
     vlc_video_align_t align; /**< Alignment within the window */
     enum vlc_video_fitting fitting; /**< Scaling/fitting mode */
     vlc_rational_t zoom; /**< Zoom ratio (if fitting is disabled) */
+    bool full_fill; /**< whether the rendering will take the whole display */
 };
 
 /**
