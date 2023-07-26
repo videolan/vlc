@@ -38,7 +38,7 @@ Item {
     // Properties
     //---------------------------------------------------------------------------------------------
 
-    readonly property int coverSize: VLCStyle.icon_normal
+    readonly property int coverSize: VLCStyle.icon_dragItem
 
     property var indexes: []
 
@@ -58,6 +58,8 @@ Item {
     // string => role
     property string titleRole: "title"
 
+    property real padding: VLCStyle.margin_xsmall
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window
@@ -67,7 +69,7 @@ Item {
     signal requestInputItems(var indexes, var data, var resolve, var reject)
 
     function coversXPos(index) {
-        return VLCStyle.margin_small + (coverSize / 3) * index;
+        return VLCStyle.margin_small + (coverSize / 1.5) * index;
     }
 
     /**
@@ -89,7 +91,7 @@ Item {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    readonly property int _maxCovers: 3
+    readonly property int _maxCovers: 10
 
     readonly property int _indexesSize: !!indexes ? indexes.length : 0
 
@@ -134,9 +136,11 @@ Item {
 
     parent: g_mainDisplay
 
-    width: VLCStyle.colWidth(2)
+    width: padding * 2
+           + coversXPos(_displayedCoversCount - 1) + coverSize + VLCStyle.margin_small
+           + subtitleLabel.width
 
-    height: coverSize + VLCStyle.margin_small * 2
+    height: coverSize + padding * 2
 
     enabled: false
 
@@ -410,7 +414,7 @@ Item {
 
         Item {
             x: dragItem.coversXPos(index)
-            y: (dragItem.height - height) / 2
+            anchors.verticalCenter: parent.verticalCenter
             width: dragItem.coverSize
             height: dragItem.coverSize
 
@@ -477,7 +481,7 @@ Item {
         id: extraCovers
 
         x: dragItem.coversXPos(_maxCovers)
-        y: (dragItem.height - height) / 2
+        anchors.verticalCenter: parent.verticalCenter
         width: dragItem.coverSize
         height: dragItem.coverSize
         radius: dragItem.coverSize
@@ -487,8 +491,14 @@ Item {
         border.color: theme.border
 
         MenuLabel {
-            anchors.centerIn: parent
+            anchors.fill: parent
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: VLCStyle.fontSize_small
+
             color: theme.accent
+
             text: "+" + (dragItem._indexesSize - dragItem._maxCovers)
         }
 
@@ -509,31 +519,15 @@ Item {
     }
 
 
-    Column {
-        id: labelColumn
+    MenuCaption {
+        id: subtitleLabel
 
         anchors.verticalCenter: parent.verticalCenter
         x: dragItem.coversXPos(_displayedCoversCount - 1) + dragItem.coverSize + VLCStyle.margin_small
-        width: parent.width - x - VLCStyle.margin_small
-        spacing: VLCStyle.margin_xxxsmall
 
-        T.Label {
-            id: titleLabel
-
-            text: dragItem._title
-            visible: text && text !== ""
-            font.pixelSize: VLCStyle.fontSize_large
-            color: theme.fg.primary
-        }
-
-        MenuCaption {
-            id: subtitleLabel
-
-            visible: text && text !== ""
-            width: parent.width
-            text: I18n.qtr("%1 selected").arg(dragItem._indexesSize)
-            color: theme.fg.secondary
-        }
+        visible: text && text !== ""
+        text: I18n.qtr("%1 selected").arg(dragItem._indexesSize)
+        color: theme.fg.secondary
     }
 
     Component {
@@ -543,7 +537,6 @@ Item {
             fillMode: Image.PreserveAspectCrop
             width: coverSize
             height: coverSize
-            asynchronous: true
             cache: false
         }
     }
