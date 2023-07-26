@@ -365,7 +365,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     if (subpicture) {
         int num_regions = 0;
-        for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
+        subpicture_region_t *r;
+        vlc_list_foreach(r, &subpicture->regions, node)
             num_regions++;
 
         // Grow the overlays array if needed
@@ -386,8 +387,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         }
 
         // Upload all of the regions
-        subpicture_region_t *r = subpicture->p_region;
-        for (int i = 0; i < num_regions; i++, r = r->p_next) {
+        int i = 0;
+        vlc_list_foreach(r, &subpicture->regions, node) {
             assert(r->p_picture->i_planes == 1);
             struct pl_plane_data subdata[4];
             if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))
@@ -421,6 +422,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                     .y1 = place.y + (r->i_y + r->fmt.i_visible_height) * ysign,
                 },
             };
+            i++;
         }
 
         // Update the target information to reference the subpictures

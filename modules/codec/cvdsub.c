@@ -545,7 +545,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
         return NULL;
     }
 
-    p_spu->p_region = p_region;
+    vlc_list_append(&p_region->node, &p_spu->regions);
     p_region->i_x = p_sys->i_x_start;
     p_region->i_x = p_region->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
     p_region->i_y = p_sys->i_y_start;

@@ -873,7 +873,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
 
     size_t count = 0;
-    for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
+    subpicture_region_t *r;
+    vlc_list_foreach(r, &subpicture->regions, node)
         count++;
 
     *count_ptr = count;
@@ -884,7 +885,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
     }
 
     int i = 0;
-    for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
+    vlc_list_foreach(r, &subpicture->regions, node) {
         d3d_region_t *d3dr = &(*region)[i];
         HRESULT hr;
 
@@ -916,6 +917,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
                 d3dr->texture = NULL;
                 msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%lX)",
                         d3dr->width, d3dr->height, hr);
+                i++;
                 continue;
             }
 #ifndef NDEBUG
@@ -988,6 +990,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
                               &rect_in_display, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
+        i++;
     }
 }
 

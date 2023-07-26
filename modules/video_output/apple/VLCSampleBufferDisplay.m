@@ -432,7 +432,8 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
 
     NSMutableArray *regions = [NSMutableArray new];
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
-    for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next) {
+    subpicture_region_t *r;
+    vlc_list_foreach(r, &subpicture->regions, node) {
         CFIndex length = r->fmt.i_height * r->p_picture->p->i_pitch;
         const size_t pixels_offset =
                 r->fmt.i_y_offset * r->p_picture->p->i_pitch +
@@ -479,8 +480,8 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, subpicture_t *subpicture)
     }
 
     size_t count = 0;
-    for (subpicture_region_t *r = subpicture->p_region;
-         r != NULL; r = r->p_next)
+    subpicture_region_t *r;
+    vlc_list_foreach(r, &subpicture->regions, node)
         count++;
 
     if (!sys.subpicture || subpicture->i_order != sys.subpicture.order)
@@ -498,8 +499,7 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, subpicture_t *subpicture)
     if (count == sys.subpicture.regions.count)
     {
         size_t i = 0;
-        for (subpicture_region_t *r = subpicture->p_region;
-             r != NULL; r = r->p_next)
+        vlc_list_foreach(r, &subpicture->regions, node)
         {
             VLCSampleBufferSubpictureRegion *region =
                 sys.subpicture.regions[i++];

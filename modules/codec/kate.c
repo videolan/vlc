@@ -899,7 +899,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
     PROFILE_STOP( tiger_renderer_render );
 
     PostprocessTigerImage( p_plane, fmt.i_width );
-    p_subpic->p_region = p_r;
+    vlc_list_append( &p_r->node, &p_subpic->regions );
     p_sys->b_dirty = false;
 
     PROFILE_STOP( TigerUpdateSubpicture );
@@ -910,7 +910,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
 
 failure:
     vlc_mutex_unlock( &p_sys->lock );
-    subpicture_region_ChainDelete( p_r );
+    subpicture_region_ChainDelete( &p_subpic->regions );
 }
 
 static uint32_t GetTigerColor( decoder_t *p_dec, const char *psz_prefix )
@@ -1187,11 +1187,9 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     /* if we have a bitmap, chain it before the text */
     if (p_bitmap_region)
     {
-        p_spu->p_region = p_bitmap_region;
-        p_bitmap_region->p_next = p_region;
+        vlc_list_append(&p_bitmap_region->node, &p_spu->regions);
     }
-    else
-        p_spu->p_region = p_region;
+    vlc_list_append(&p_region->node, &p_spu->regions);
 
     return p_spu;
 }

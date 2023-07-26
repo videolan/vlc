@@ -409,7 +409,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
-    p_spu->p_region = region;
+    vlc_list_append( &region->node, &p_spu->regions );
 
     /* Generate the string that will be displayed. This string is supposed to
        be p_sys->i_length characters long. */
@@ -519,7 +519,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         {
             p_region->i_x = region->i_x;
             p_region->i_y = region->i_y;
-            region->p_next = p_region;
+            vlc_list_append( &p_region->node, &p_spu->regions );
 
             /* Offset text to display right next to the image */
             region->i_x += fmt_out.i_visible_width;

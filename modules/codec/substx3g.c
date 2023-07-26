@@ -702,7 +702,8 @@ static block_t *GetStylBlock( const text_segment_t *p_segment, size_t i_styles )
 static block_t * Encode( encoder_t *p_enc, subpicture_t *p_spu )
 {
     VLC_UNUSED(p_enc);
-    const subpicture_region_t *p_region = p_spu->p_region;
+    subpicture_region_t *p_region =
+        vlc_list_first_entry_or_null(&p_spu->regions, subpicture_region_t, node);
     const text_segment_t *p_segments = p_region ? p_region->p_text : NULL;
     size_t i_len = 0;
     size_t i_styles = 0;

@@ -1283,7 +1283,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         return VLC_EGENERIC;
 
     int count = 0;
-    for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
+    subpicture_region_t *r;
+    vlc_list_foreach(r, &subpicture->regions, node)
         count++;
 
     *region = static_cast<picture_t**>(calloc(count, sizeof(picture_t *)));
@@ -1292,9 +1293,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     *subpicture_region_count = count;
 
     int i = 0;
-    for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
+    vlc_list_foreach(r, &subpicture->regions, node) {
         if (!r->fmt.i_visible_width || !r->fmt.i_visible_height)
+        {
+            i++;
             continue; // won't render anything, keep the cache for later
+        }
 
         for (int j = 0; j < sys->d3dregion_count; j++) {
             picture_t *cache = sys->d3dregions[j];
@@ -1319,6 +1323,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         {
             d3d11_quad_t *d3dquad = new (std::nothrow) d3d11_quad_t;
             if (unlikely(d3dquad==NULL)) {
+                i++;
                 continue;
             }
             quad = d3dquad;
@@ -1330,6 +1335,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                     if (d3dquad->picSys.texture[j])
                         d3dquad->picSys.texture[j]->Release();
                 delete d3dquad;
+                i++;
                 continue;
             }
 
@@ -1339,6 +1345,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 delete d3dquad;
+                i++;
                 continue;
             }
             d3dquad->generic.i_width  = r->fmt.i_width;
@@ -1351,6 +1358,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 msg_Err(vd, "Failed to allocate %dx%d quad for OSD",
                              r->fmt.i_visible_width, r->fmt.i_visible_height);
                 delete d3dquad;
+                i++;
                 continue;
             }
 
@@ -1359,6 +1367,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 delete d3dquad;
+                i++;
                 continue;
             }
             const auto picres = [](picture_sys_d3d11_t * p_sys){
@@ -1372,6 +1381,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
                         r->fmt.i_width, r->fmt.i_height);
                 d3dquad->Reset();
+                i++;
                 continue;
             }
             quad_picture = (*region)[i];
@@ -1397,6 +1407,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             picture_Release(quad_picture);
             if ((*region)[i] == quad_picture)
                 (*region)[i] = NULL;
+            i++;
             continue;
         }
 
@@ -1435,6 +1446,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         quad->UpdateViewport( &spuViewport, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );
+        i++;
     }
     return VLC_SUCCESS;
 }

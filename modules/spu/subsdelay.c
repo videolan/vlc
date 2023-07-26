@@ -940,12 +940,14 @@ static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, 
 
     p_entry->b_last_region_saved = false;
 
-    if( p_subpic->p_region )
+    subpicture_region_t *p_region =
+        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+    if( p_region )
     {
         /* save copy */
-        p_entry->i_last_region_x = p_subpic->p_region->i_x;
-        p_entry->i_last_region_y = p_subpic->p_region->i_y;
-        p_entry->i_last_region_align = p_subpic->p_region->i_align;
+        p_entry->i_last_region_x = p_region->i_x;
+        p_entry->i_last_region_y = p_region->i_y;
+        p_entry->i_last_region_align = p_region->i_align;
 
         p_entry->b_last_region_saved = true;
     }
@@ -981,11 +983,11 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, const video_format_t *p
                    ( (double)( p_entry->p_source->i_stop - p_entry->p_source->i_start ) * ( i_ts - p_entry->p_source->i_start ) ) /
                    ( p_entry->i_new_stop - p_entry->p_source->i_start );
 
-        p_entry->p_source->p_region = p_entry->p_subpic->p_region;
+        p_entry->p_source->regions = p_entry->p_subpic->regions;
 
         p_entry->p_source->updater.pf_update( p_entry->p_source, p_fmt_src, p_fmt_dst, i_new_ts );
 
-        p_entry->p_subpic->p_region = p_entry->p_source->p_region;
+        p_entry->p_subpic->regions = p_entry->p_source->regions;
     }
 
     SubpicLocalUpdate( p_subpic, i_ts );
@@ -1042,9 +1044,11 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
     SubsdelayHeapLock( p_heap );
 
-    if( p_entry->b_check_empty && p_subpic->p_region )
+    subpicture_region_t *p_region =
+        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+    if( p_entry->b_check_empty && p_region )
     {
-        if( SubsdelayIsTextEmpty( p_subpic->p_region ) )
+        if( SubsdelayIsTextEmpty( p_region ) )
         {
             /* remove empty subtitle */
 
@@ -1077,11 +1081,11 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
     {
         p_subpic->b_absolute = false;
 
-        if( p_subpic->p_region )
+        if( p_region )
         {
-            p_subpic->p_region->i_x = 0;
-            p_subpic->p_region->i_y = 10;
-            p_subpic->p_region->i_align = ( p_subpic->p_region->i_align & ( ~SUBPICTURE_ALIGN_MASK ) )
+            p_region->i_x = 0;
+            p_region->i_y = 10;
+            p_region->i_align = ( p_region->i_align & ( ~SUBPICTURE_ALIGN_MASK ) )
                     | SUBPICTURE_ALIGN_BOTTOM;
         }
 
@@ -1091,11 +1095,11 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
     {
         p_subpic->b_absolute = true;
 
-        if( p_subpic->p_region )
+        if( p_region )
         {
-            p_subpic->p_region->i_x = p_entry->i_last_region_x;
-            p_subpic->p_region->i_y = p_entry->i_last_region_y;
-            p_subpic->p_region->i_align = p_entry->i_last_region_align;
+            p_region->i_x = p_entry->i_last_region_x;
+            p_region->i_y = p_entry->i_last_region_y;
+            p_region->i_align = p_entry->i_last_region_align;
         }
     }
 
@@ -1107,7 +1111,9 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
  *****************************************************************************/
 static bool SubpicIsEmpty( subpicture_t* p_subpic )
 {
-    return p_subpic->p_region != NULL && SubsdelayIsTextEmpty( p_subpic->p_region );
+    subpicture_region_t *p_region =
+        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+    return p_region != NULL && SubsdelayIsTextEmpty( p_region );
 }
 
 /*****************************************************************************
@@ -1146,7 +1152,7 @@ static subpicture_t *SubpicClone( subpicture_t *p_source, subpicture_updater_t *
  *****************************************************************************/
 static void SubpicDestroyClone( subpicture_t *p_subpic )
 {
-    p_subpic->p_region = NULL; /* don't destroy region */
+    vlc_list_init(&p_subpic->regions); /* don't destroy region */
     subpicture_Delete( p_subpic );
 }
 
@@ -1170,12 +1176,17 @@ static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_ent
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT )
     {
-        if( p_entry->p_subpic && p_entry->p_subpic->p_region && ( p_entry->p_subpic->p_region->p_text ) )
+        if( p_entry->p_subpic )
         {
+            subpicture_region_t *p_region =
+                vlc_list_first_entry_or_null( &p_entry->p_subpic->regions, subpicture_region_t, node );
+            if( p_region && ( p_region->p_text ) )
+            {
             //FIXME: We only use a single segment here
-            i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
+            i_rank = SubsdelayGetTextRank( p_region->p_text->psz_text );
 
             return vlc_tick_from_sec( p_sys->f_factor * i_rank );
+            }
         }
 
         /* content is unavailable, calculation mode should be based on source delay */

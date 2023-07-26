@@ -130,9 +130,9 @@ static bool subpicture_NeedDraw(vout_display_t *vd, subpicture_t *subpicture)
 
     sub->clear = true;
 
+    subpicture_region_t *r;
     size_t count = 0;
-    for (subpicture_region_t *r = subpicture->p_region;
-         r != NULL; r = r->p_next)
+    vlc_list_foreach(r, &subpicture->regions, node)
         count++;
 
     if (subpicture->i_order != sub->last_order)
@@ -147,8 +147,7 @@ static bool subpicture_NeedDraw(vout_display_t *vd, subpicture_t *subpicture)
     if (count == sub->regions.size)
     {
         size_t i = 0;
-        for (subpicture_region_t *r = subpicture->p_region;
-             r != NULL; r = r->p_next)
+        vlc_list_foreach(r, &subpicture->regions, node)
         {
             struct sub_region *cmp = &sub->regions.data[i++];
             if (cmp->x != r->i_x || cmp->y != r->i_y
@@ -178,8 +177,7 @@ end:
 
     sub->regions.size = 0;
 
-    for (subpicture_region_t *r = subpicture->p_region;
-         r != NULL; r = r->p_next)
+    vlc_list_foreach(r, &subpicture->regions, node)
     {
         struct sub_region reg = {
             .x = r->i_x,

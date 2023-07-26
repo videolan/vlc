@@ -83,7 +83,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
     if( p_spu == NULL )
         return NULL;
 
-    p_region = p_spu->p_region;
+    p_region = vlc_list_first_entry_or_null(&p_spu->regions, subpicture_region_t, node);
     if( ( p_region == NULL )
      || (!subpicture_region_IsText( p_region ))
      || ( p_region->p_text == NULL )

@@ -180,8 +180,6 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     }
 
     /* Allocate the regions and draw them */
-    subpicture_region_t **pp_region_last = &p_subpic->p_region;
-
     for (uint32_t i = 0; i < i_image_count; i++) {
         aribcc_image_t *image = &p_images[i];
         video_format_t  fmt_region = fmt;
@@ -203,8 +201,7 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
 
         CopyImageToRegion(region->p_picture, image);
 
-        *pp_region_last = region;
-        pp_region_last = &region->p_next;
+        vlc_list_append(&region->node, &p_subpic->regions);
     }
 
     aribcc_render_result_cleanup(&p_spusys->render_result);

@@ -340,8 +340,6 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, vlc_tick
             dec->fmt_in->subs.spu.i_original_frame_height;
     }
 
-    subpicture_region_t **region_next = &spu->p_region;
-
     for (unsigned i = 0; i < ffsub->num_rects; i++) {
         AVSubtitleRect *rec = ffsub->rects[i];
 
@@ -358,8 +356,7 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, vlc_tick
             break;
         }
         if (region) {
-            *region_next = region;
-            region_next = &region->p_next;
+            vlc_list_append(&region->node, &spu->regions);
         }
     }
     avsubtitle_free(ffsub);

@@ -30,6 +30,7 @@
 
 #include <vlc_picture.h>
 #include <vlc_text_style.h>
+#include <vlc_list.h>
 
 /**
  * \defgroup subpicture Video sub-pictures
@@ -83,9 +84,11 @@ struct subpicture_region_t
     vlc_rational_t  zoom_h;
     vlc_rational_t  zoom_v;
 
-    subpicture_region_t *p_next;                /**< next region in the list */
+    struct vlc_list node;             /**< for inclusion in a vlc_spu_regions */
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
+
+typedef struct vlc_list vlc_spu_regions;
 
 struct vlc_spu_highlight_t
 {
@@ -146,7 +149,7 @@ VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
  *
  * Provided for convenience.
  */
-VLC_API void subpicture_region_ChainDelete( subpicture_region_t *p_head );
+VLC_API void subpicture_region_ChainDelete( vlc_spu_regions * );
 
 /**
  * This function will copy a subpicture region to a new allocated one
@@ -216,7 +219,7 @@ struct subpicture_t
     subpicture_t *  p_next;               /**< next subtitle to be displayed */
     /**@}*/
 
-    subpicture_region_t *p_region;  /**< region list composing this subtitle */
+    vlc_spu_regions regions;        /**< region list composing this subtitle */
 
     /** \name Date properties */
     /**@{*/

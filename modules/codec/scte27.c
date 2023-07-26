@@ -391,7 +391,7 @@ static subpicture_t *DecodeSubtitleMessage(decoder_t *dec,
         sub->b_ephemer = true;
         sub->i_start = date;
         sub->i_stop = date + display_duration * frame_duration;
-        sub->p_region = region;
+        vlc_list_append(&region->node, &sub->regions);
 
         return sub;
     } else {

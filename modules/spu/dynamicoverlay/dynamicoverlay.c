@@ -351,7 +351,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
 
-    subpicture_region_t **pp_region = &p_spu->p_region;
     vlc_vector_foreach(p_overlay, &p_sys->overlays)
     {
         if (!p_overlay->b_active || p_overlay->format.i_chroma == 0)
@@ -365,7 +364,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             p_region = subpicture_region_ForPicture( &p_overlay->format, p_overlay->data.p_pic );
         if( unlikely(p_region == NULL) )
         {
-            *pp_region = NULL;
             break;
         }
 
@@ -383,7 +381,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         p_region->i_y = p_overlay->i_y;
         p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_region->i_alpha = p_overlay->i_alpha;
-        pp_region = &p_region->p_next;
+        vlc_list_append( &p_region->node, &p_spu->regions );
     }
 
     p_sys->b_updated = false;

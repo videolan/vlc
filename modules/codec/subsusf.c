@@ -104,7 +104,7 @@ static int           ParseImageAttachments( decoder_t *p_dec );
 
 static subpicture_t        *ParseText     ( decoder_t *, block_t * );
 static void                 ParseUSFHeader( decoder_t * );
-static void ParseUSFString( decoder_t *, char *, subpicture_region_t ** );
+static void ParseUSFString( decoder_t *, char *, vlc_spu_regions * );
 static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, const char *psz_filename, int i_transparent_color );
 
 /*****************************************************************************
@@ -258,7 +258,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode USF strings */
-    ParseUSFString( p_dec, psz_subtitle, &p_spu->p_region );
+    ParseUSFString( p_dec, psz_subtitle, &p_spu->regions );
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -807,11 +807,9 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 
 static void ParseUSFString( decoder_t *p_dec,
                             char *psz_subtitle,
-                            subpicture_region_t **regions )
+                            vlc_spu_regions *regions )
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
-    *regions = NULL;
-    subpicture_region_t *p_region_upto = NULL;
 
     while( *psz_subtitle )
     {
@@ -843,15 +841,7 @@ static void ParseUSFString( decoder_t *p_dec,
                                                               p_sys->i_align );
                             if( p_text_region )
                             {
-                                if( *regions == NULL)
-                                {
-                                    *regions = p_region_upto = p_text_region;
-                                }
-                                else
-                                {
-                                    p_region_upto->p_next = p_text_region;
-                                    p_region_upto = p_text_region;
-                                }
+                                vlc_list_append(&p_text_region->node, regions);
                             }
                             else free( psz_flat );
                         }
@@ -901,16 +891,7 @@ static void ParseUSFString( decoder_t *p_dec,
                 if( p_image_region )
                 {
                     SetupPositions( p_image_region, psz_subtitle );
-
-                    if( *regions == NULL)
-                    {
-                        *regions = p_region_upto = p_image_region;
-                    }
-                    else
-                    {
-                        p_region_upto->p_next = p_image_region;
-                        p_region_upto = p_image_region;
-                    }
+                    vlc_list_append(&p_image_region->node, regions);
                 }
             }
             else
@@ -928,15 +909,7 @@ static void ParseUSFString( decoder_t *p_dec,
                                                       p_sys->i_align );
                     if( p_text_region )
                     {
-                        if( *regions == NULL)
-                        {
-                            *regions = p_region_upto = p_text_region;
-                        }
-                        else
-                        {
-                            p_region_upto->p_next = p_text_region;
-                            p_region_upto = p_text_region;
-                        }
+                        vlc_list_append(&p_text_region->node, regions);
                     }
                     else free( psz_flat );
                 }

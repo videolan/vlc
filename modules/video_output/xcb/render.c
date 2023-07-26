@@ -234,9 +234,11 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     /* Blend subpictures */
     if (subpic != NULL)
-        for (subpicture_region_t *r = subpic->p_region; r != NULL;
-             r = r->p_next)
+    {
+        subpicture_region_t *r;
+        vlc_list_foreach(r, &subpic->regions, node)
             RenderRegion(vd, subpic, r);
+    }
 
     xcb_flush(conn);
     (void) date;

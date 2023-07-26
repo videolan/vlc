@@ -315,19 +315,20 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
                                 int x, int y,
                                 int width, int height,
                                 int rx, int ry,
-                                subpicture_region_t **last_ptr)
+                                vlc_spu_regions *regions)
 {
     float f_progress = 0;
     VLC_UNUSED(ry);
+    subpicture_region_t *last;
 
     /* Display the name of the channel. */
-    *last_ptr = vout_OSDEpgText(p_sys->epg->psz_name,
+    last = vout_OSDEpgText(p_sys->epg->psz_name,
                                 x,
                                 y,
                                 height * EPGOSD_TEXTSIZE_NAME,
                                 0x00ffffff);
-    if(*last_ptr)
-        last_ptr = &(*last_ptr)->p_next;
+    if(last)
+        vlc_list_append(&last->node, regions);
 
     const vlc_epg_event_t *p_current = p_sys->epg->p_current;
     vlc_epg_event_t *p_next = NULL;
@@ -346,30 +347,30 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
     /* Display the name of the current program. */
     if(p_current)
     {
-        *last_ptr = vout_OSDEpgEvent(p_current,
+        last = vout_OSDEpgEvent(p_current,
                                      x,
                                      y + height * OSDEPG_ROW(2),
                                      height * EPGOSD_TEXTSIZE_PROG);
-        if(*last_ptr)
+        if(last)
         {
             /* region rendering limits */
-            vout_OSDRegionConstrain(*last_ptr, width, 0);
-            last_ptr = &(*last_ptr)->p_next;
+            vout_OSDRegionConstrain(last, width, 0);
+            vlc_list_append(&last->node, regions);
         }
     }
 
     /* NEXT EVENT */
     if(p_next)
     {
-        *last_ptr = vout_OSDEpgEvent(p_next,
+        last = vout_OSDEpgEvent(p_next,
                                      x,
                                      y + height * OSDEPG_ROW(5),
                                      height * EPGOSD_TEXTSIZE_PROG);
-        if(*last_ptr)
+        if(last)
         {
             /* region rendering limits */
-            vout_OSDRegionConstrain(*last_ptr, width, 0);
-            last_ptr = &(*last_ptr)->p_next;
+            vout_OSDRegionConstrain(last, width, 0);
+            vlc_list_append(&last->node, regions);
         }
     }
 
@@ -380,13 +381,13 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
     }
 
     /* Display the current program time slider. */
-    *last_ptr = vout_OSDEpgSlider(x + width * 0.05,
+    last = vout_OSDEpgSlider(x + width * 0.05,
                                   y + height * OSDEPG_ROW(9),
                                   width  * 0.90,
                                   height * OSDEPG_ROWS(1),
                                   f_progress);
-    if (*last_ptr)
-        last_ptr = &(*last_ptr)->p_next;
+    if (last)
+        vlc_list_append(&last->node, regions);
 
     /* Format the hours */
     if(p_sys->time)
@@ -394,38 +395,38 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
         char *psz_network = vout_OSDPrintTime(p_sys->time);
         if(psz_network)
         {
-            *last_ptr = vout_OSDEpgText(psz_network,
+            last = vout_OSDEpgText(psz_network,
                                         rx,
                                         y + height * OSDEPG_ROW(0),
                                         height * EPGOSD_TEXTSIZE_NTWK,
                                         RGB_COLOR1);
             free(psz_network);
-            if(*last_ptr)
+            if(last)
             {
-                (*last_ptr)->i_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT;
-                last_ptr = &(*last_ptr)->p_next;
+                last->i_align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT;
+                vlc_list_append(&last->node, regions);
             }
         }
     }
 }
 
-static subpicture_region_t * vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
+static void vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
+                                              vlc_spu_regions *regions,
                                               int x, int y,
                                               int visible_width,
                                               int visible_height)
 {
-    subpicture_region_t *head;
-    subpicture_region_t **last_ptr = &head;
+    subpicture_region_t *last;
 
     const int i_padding = visible_height * (OSDEPG_HEIGHT * OSDEPG_PADDING);
 
-    *last_ptr = vout_OSDBackground(x + visible_width * OSDEPG_LEFT,
+    last = vout_OSDBackground(x + visible_width * OSDEPG_LEFT,
                                    y + visible_height * OSDEPG_TOP,
                                    visible_width  * OSDEPG_WIDTH,
                                    visible_height * OSDEPG_HEIGHT,
                                    ARGB_BGCOLOR);
-    if(*last_ptr)
-        last_ptr = &(*last_ptr)->p_next;
+    if(last)
+        vlc_list_append(&last->node, regions);
 
     struct
     {
@@ -460,23 +461,23 @@ static subpicture_region_t * vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
             panel.h,
         };
 
-        *last_ptr = vout_OSDBackground(logo.x,
+        last = vout_OSDBackground(logo.x,
                                        logo.y,
                                        logo.w,
                                        logo.h,
                                        0xFF000000 | RGB_COLOR1);
-        if(*last_ptr)
-            last_ptr = &(*last_ptr)->p_next;
+        if(last)
+            vlc_list_append(&last->node, regions);
 
         int logo_padding = visible_height * (OSDEPG_LOGO_SIZE * OSDEPG_PADDING);
-        *last_ptr = vout_OSDImage( p_sys->obj,
+        last = vout_OSDImage( p_sys->obj,
                                    logo.x + logo_padding,
                                    logo.y + logo_padding,
                                    logo.w - 2 * logo_padding,
                                    logo.h - 2 * logo_padding,
                                    p_sys->art );
-        if(*last_ptr)
-            last_ptr = &(*last_ptr)->p_next;
+        if(last)
+            vlc_list_append(&last->node, regions);
 
         /* shrink */
         panel.x += logo.w + i_padding;
@@ -490,9 +491,7 @@ static subpicture_region_t * vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
                          panel.h,
                          panel.rx,
                          panel.ry,
-                         last_ptr );
-
-    return head;
+                         regions );
 }
 
 static int OSDEpgValidate(subpicture_t *subpic,
@@ -525,7 +524,7 @@ static void OSDEpgUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = fmt.i_visible_width;
     subpic->i_original_picture_height = fmt.i_visible_height;
 
-    subpic->p_region = vout_BuildOSDEpg(sys,
+    vout_BuildOSDEpg(sys, &subpic->regions,
                                         fmt.i_x_offset,
                                         fmt.i_y_offset,
                                         fmt.i_visible_width,

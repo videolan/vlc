@@ -1471,7 +1471,6 @@ static subpicture_t *render( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu;
-    subpicture_region_t **pp_spu_region;
     int i, j;
     int i_base_x;
     int i_base_y;
@@ -1510,8 +1509,6 @@ static subpicture_t *render( decoder_t *p_dec )
         i_base_x += p_sys->display.i_x;
         i_base_y += p_sys->display.i_y;
     }
-
-    pp_spu_region = &p_spu->p_region;
 
     /* Loop on region definitions */
 #ifdef DEBUG_DVBSUB
@@ -1607,8 +1604,7 @@ static subpicture_t *render( decoder_t *p_dec )
         p_spu_region->i_x = i_base_x + p_regiondef->i_x;
         p_spu_region->i_y = i_base_y + p_regiondef->i_y;
         p_spu_region->i_align = p_sys->i_spu_position;
-        *pp_spu_region = p_spu_region;
-        pp_spu_region = &p_spu_region->p_next;
+        vlc_list_append(&p_spu_region->node, &p_spu->regions);
 
         p_src = p_region->p_pixbuf;
         p_dst = p_spu_region->p_picture->Y_PIXELS;
@@ -1648,8 +1644,7 @@ static subpicture_t *render( decoder_t *p_dec )
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
             p_spu_region->i_y = i_base_y + p_regiondef->i_y + p_object_def->i_y;
             p_spu_region->i_align = p_sys->i_spu_position;
-            *pp_spu_region = p_spu_region;
-            pp_spu_region = &p_spu_region->p_next;
+            vlc_list_append(&p_spu_region->node, &p_spu->regions);
         }
     }
 
@@ -1672,7 +1667,7 @@ typedef struct
     unsigned int i_region_ver;
     unsigned int i_clut_ver;
 
-    unsigned int i_regions;
+    size_t           i_regions;
     encoder_region_t *p_regions;
 
     vlc_tick_t i_pts;
@@ -1739,7 +1734,7 @@ static void YuvaYuvp( subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
 
-    for( p_region = p_subpic->p_region; p_region; p_region = p_region->p_next )
+    vlc_list_foreach(p_region, &p_subpic->regions, node)
     {
         video_format_t *p_fmt = &p_region->fmt;
         int i = 0, j = 0, n = 0, p = 0;
@@ -1938,12 +1933,12 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_t bits, *s = &bits;
     block_t *p_block;
 
-    if( !p_subpic || !p_subpic->p_region ) return NULL;
+    if( !p_subpic || !vlc_list_is_empty(&p_subpic->regions) ) return NULL;
 
     /* FIXME: this is a hack to convert VLC_CODEC_YUVA into
      *  VLC_CODEC_YUVP
      */
-    p_region = p_subpic->p_region;
+    p_region = vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
     if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
     {
         YuvaYuvp( p_subpic );
@@ -2054,8 +2049,9 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
     bs_write( s, 8, DVBSUB_ST_PAGE_COMPOSITION ); /* Segment type */
     bs_write( s, 16, 1 ); /* Page id */
 
-    for( i_regions = 0, p_region = p_subpic ? p_subpic->p_region : 0;
-         p_region; p_region = p_region->p_next, i_regions++ )
+    i_regions = 0;
+    if (p_subpic)
+    vlc_list_foreach(p_region, &p_subpic->regions, node)
     {
         if( i_regions >= p_sys->i_regions )
         {
@@ -2088,6 +2084,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
             p_sys->p_regions[i_regions].i_height =
                 p_region->fmt.i_visible_height;
         }
+        i_regions++;
     }
 
     bs_write( s, 16, i_regions * 6 + 2 ); /* Segment length */
@@ -2105,8 +2102,9 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
               DVBSUB_PCS_STATE_CHANGE : DVBSUB_PCS_STATE_ACQUISITION );
     bs_write( s, 2, 0 ); /* Reserved */
 
-    for( i_regions = 0, p_region = p_subpic ? p_subpic->p_region : 0;
-         p_region; p_region = p_region->p_next, i_regions++ )
+    i_regions = 0;
+    if (p_subpic)
+    vlc_list_foreach(p_region, &p_subpic->regions, node)
     {
         bs_write( s, 8, i_regions );
         bs_write( s, 8, 0 ); /* Reserved */
@@ -2120,6 +2118,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
             bs_write( s, 16, p_region->i_x );
             bs_write( s, 16, p_region->i_y );
         }
+        i_regions++;
     }
 }
 
@@ -2168,10 +2167,10 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region;
-    int i_region;
+    unsigned int i_region;
 
-    for( i_region = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_region++ )
+    i_region = 0;
+    vlc_list_foreach(p_region, &p_subpic->regions, node)
     {
         int i_entries = 4, i_depth = 0x1, i_bg = 0;
         bool b_text = subpicture_region_IsText( p_region );
@@ -2230,6 +2229,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
             bs_write( s, 8, 1 ); /* foreground pixel code */
             bs_write( s, 8, 0 ); /* background pixel code */
         }
+        i_region++;
     }
 }
 
@@ -2245,8 +2245,8 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
 
     int i_length_pos, i_update_pos, i_pixel_data_pos;
 
-    for( i_region = 0, p_region = p_subpic->p_region; p_region;
-         p_region = p_region->p_next, i_region++ )
+    i_region = 0;
+    vlc_list_foreach(p_region, &p_subpic->regions, node)
     {
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_OBJECT_DATA ); /* Segment type */
@@ -2266,6 +2266,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         {
             msg_Err( p_enc, "FOURCC %4.4s not supported by encoder.",
                      (const char*)&p_region->fmt.i_chroma );
+            i_region++;
             continue;
         }
 
@@ -2276,7 +2277,11 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         {
             int i_size, i;
 
-            if( !p_region->p_text ) continue;
+            if( !p_region->p_text )
+            {
+                i_region++;
+                continue;
+            }
 
             i_size = __MIN( strlen( p_region->p_text->psz_text ), 256 );
 
@@ -2289,6 +2294,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
             /* Update segment length */
             SetWBE( &s->p_start[i_length_pos/8],
                     (bs_pos(s) - i_length_pos)/8 -2 );
+            i_region++;
             continue;
         }
 
@@ -2315,6 +2321,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
 
         /* Update segment length */
         SetWBE( &s->p_start[i_length_pos/8], (bs_pos(s) - i_length_pos)/8 -2 );
+        i_region++;
     }
 }
 

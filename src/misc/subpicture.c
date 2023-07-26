@@ -51,7 +51,7 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
     p_subpic->b_fade     = false;
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
-    p_subpic->p_region   = NULL;
+    vlc_list_init(&p_subpic->regions);
 
     if( p_upd )
     {
@@ -81,8 +81,7 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
 
 void subpicture_Delete( subpicture_t *p_subpic )
 {
-    subpicture_region_ChainDelete( p_subpic->p_region );
-    p_subpic->p_region = NULL;
+    subpicture_region_ChainDelete( &p_subpic->regions );
 
     if( p_subpic->updater.pf_destroy )
         p_subpic->updater.pf_destroy( p_subpic );
@@ -121,7 +120,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
         return NULL;
 
     subpicture_t *p_subpic = subpicture_New( NULL );
-    if( !p_subpic )
+    if( unlikely(!p_subpic) )
     {
          picture_Release( p_pip );
          return NULL;
@@ -133,10 +132,10 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 0;
 
-    p_subpic->p_region = subpicture_region_ForPicture( &fmt_out, p_pip );
+    subpicture_region_t *p_region = subpicture_region_ForPicture( &fmt_out, p_pip );
     picture_Release( p_pip );
 
-    if (p_subpic->p_region == NULL)
+    if (likely(p_region == NULL))
     {
         subpicture_Delete(p_subpic);
         p_subpic = NULL;
@@ -163,8 +162,7 @@ void subpicture_Update( subpicture_t *p_subpicture,
                           i_ts ) )
         return;
 
-    subpicture_region_ChainDelete( p_subpicture->p_region );
-    p_subpicture->p_region = NULL;
+    subpicture_region_ChainDelete( &p_subpicture->regions );
 
     p_upd->pf_update( p_subpicture, p_fmt_src, p_fmt_dst, i_ts );
 
@@ -315,15 +313,13 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
     free( p_region );
 }
 
-void subpicture_region_ChainDelete( subpicture_region_t *p_head )
+void subpicture_region_ChainDelete( vlc_spu_regions *regions )
 {
-    while( p_head )
+    subpicture_region_t *p_head;
+    vlc_list_foreach(p_head, regions, node)
     {
-        subpicture_region_t *p_next = p_head->p_next;
-
+        vlc_list_remove( &p_head->node );
         subpicture_region_Delete( p_head );
-
-        p_head = p_next;
     }
 }
 
@@ -336,7 +332,8 @@ unsigned picture_BlendSubpicture(picture_t *dst,
 
     assert(src && !src->b_fade && src->b_absolute);
 
-    for (subpicture_region_t *r = src->p_region; r != NULL; r = r->p_next) {
+    subpicture_region_t *r;
+    vlc_list_foreach(r, &src->regions, node) {
         assert(r->p_picture && r->i_align == 0);
         if (filter_ConfigureBlend(blend, dst->format.i_width,
                                   dst->format.i_height,  &r->fmt)

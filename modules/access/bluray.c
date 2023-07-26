@@ -281,7 +281,7 @@ typedef struct bluray_overlay_t
     vlc_mutex_t         lock;
     bool                b_on_vout;
     OverlayStatus       status;
-    subpicture_region_t *p_regions;
+    vlc_spu_regions     regions;
     uint16_t            width, height;
 
     /* pointer to last subpicture updater.
@@ -1674,22 +1674,19 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
      * When this function is called, all p_subpic regions are gone.
      * We need to duplicate our regions (stored internally) to this subpic.
      */
-    subpicture_region_t *p_src = p_overlay->p_regions;
-    if (!p_src) {
+    subpicture_region_t *p_src;
+    if (vlc_list_is_empty(&p_overlay->regions)) {
         updater_unlock_overlay(p_upd_sys);
         return;
     }
 
-    subpicture_region_t **p_dst = &p_subpic->p_region;
-    while (p_src != NULL) {
-        *p_dst = subpicture_region_Copy(p_src);
-        if (*p_dst == NULL)
+    subpicture_region_t *p_dst;
+    vlc_list_foreach(p_src, &p_overlay->regions, node) {
+        p_dst = subpicture_region_Copy(p_src);
+        if (p_dst == NULL)
             break;
-        p_dst = &(*p_dst)->p_next;
-        p_src = p_src->p_next;
+        vlc_list_append(&p_dst->node, &p_subpic->regions);
     }
-    if (*p_dst != NULL)
-        (*p_dst)->p_next = NULL;
     p_overlay->status = Displayed;
 
     updater_unlock_overlay(p_upd_sys);
@@ -1792,7 +1789,7 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
         /* no references to this overlay exist in vo anymore */
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_DELETE_OVERLAY, plane);
 
-        subpicture_region_ChainDelete(ov->p_regions);
+        subpicture_region_ChainDelete(&ov->regions);
         free(ov);
 
         p_sys->bdj.p_overlays[plane] = NULL;
@@ -1852,8 +1849,7 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
 
     vlc_mutex_lock(&ov->lock);
 
-    subpicture_region_ChainDelete(ov->p_regions);
-    ov->p_regions = NULL;
+    subpicture_region_ChainDelete(&ov->regions);
     ov->status = Outdated;
 
     vlc_mutex_unlock(&ov->lock);
@@ -1878,6 +1874,7 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, uint16_t width, uint1
     ov->width = width;
     ov->height = height;
     ov->b_on_vout = false;
+    vlc_list_init(&ov->regions);
 
     vlc_mutex_init(&ov->lock);
 
@@ -1903,25 +1900,20 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
     vlc_mutex_lock(&ov->lock);
 
     /* Find a region to update */
-    subpicture_region_t **pp_reg = &ov->p_regions;
-    subpicture_region_t *p_reg = ov->p_regions;
-    subpicture_region_t *p_last = NULL;
-    while (p_reg != NULL) {
-        p_last = p_reg;
+    subpicture_region_t *p_reg;
+    vlc_list_foreach(p_reg, &ov->regions, node) {
         if (p_reg->i_x == eventov->x &&
             p_reg->i_y == eventov->y &&
             p_reg->fmt.i_width == eventov->w &&
             p_reg->fmt.i_height == eventov->h &&
             p_reg->fmt.i_chroma == VLC_CODEC_YUVP)
             break;
-        pp_reg = &p_reg->p_next;
-        p_reg = p_reg->p_next;
     }
 
     if (!eventov->img) {
         if (p_reg) {
             /* drop region */
-            *pp_reg = p_reg->p_next;
+            vlc_list_remove(&p_reg->node);
             subpicture_region_Delete(p_reg);
         }
         vlc_mutex_unlock(&ov->lock);
@@ -1939,10 +1931,7 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
             p_reg->i_x = eventov->x;
             p_reg->i_y = eventov->y;
             /* Append it to our list. */
-            if (p_last != NULL)
-                p_last->p_next = p_reg;
-            else /* If we don't have a last region, then our list empty */
-                ov->p_regions = p_reg;
+            vlc_list_append(&p_reg->node, &ov->regions);
         }
         else
         {
@@ -2045,7 +2034,8 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
 #else
     const vlc_fourcc_t rgbchroma = VLC_CODEC_BGRA;
 #endif
-    subpicture_region_t *p_reg = ov->p_regions;
+    subpicture_region_t *p_reg =
+        vlc_list_first_entry_or_null(&ov->regions, subpicture_region_t, node);
     if (!p_reg)
     {
         video_format_t fmt;
@@ -2059,7 +2049,7 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
             vlc_mutex_unlock(&ov->lock);
             return;
         }
-        ov->p_regions = p_reg;
+        vlc_list_append(&p_reg->node, &ov->regions);
     }
 
     /* Find a region to update */

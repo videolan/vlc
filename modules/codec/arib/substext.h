@@ -73,7 +73,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         return;
     }
 
-    subpicture_region_t *r, **last = &subpic->p_region;
+    subpicture_region_t *r;
     arib_text_region_t *p_region;
     for( p_region = sys->p_region; p_region; p_region = p_region->p_next )
     {
@@ -82,13 +82,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         {
             return;
         }
-        if (*last == NULL)
-            *last = r;
-        else
-        {
-            (*last)->p_next = r;
-            *last = r;
-        }
+        vlc_list_append(&r->node, &subpic->regions);
         r->fmt.i_sar_num = 1;
         r->fmt.i_sar_den = 1;
 

@@ -110,13 +110,14 @@ static int SubpictureTextValidate(subpicture_t *subpic,
     substext_updater_region_t *p_updtregion = &sys->region;
 
     if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE) &&
-        subpic->b_absolute && subpic->p_region &&
+        subpic->b_absolute && !vlc_list_is_empty(&subpic->regions) &&
         subpic->i_original_picture_width > 0 &&
         subpic->i_original_picture_height > 0)
     {
+        subpicture_region_t *p_region = vlc_list_first_entry_or_null(&subpic->regions, subpicture_region_t, node);
         p_updtregion->flags |= UPDT_REGION_FIXED_DONE;
-        p_updtregion->origin.x = subpic->p_region->i_x;
-        p_updtregion->origin.y = subpic->p_region->i_y;
+        p_updtregion->origin.x = p_region->i_x;
+        p_updtregion->origin.y = p_region->i_y;
         p_updtregion->extent.x = subpic->i_original_picture_width;
         p_updtregion->extent.y = subpic->i_original_picture_height;
         p_updtregion->flags &= ~(UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO|
@@ -163,15 +164,14 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
 
     bool b_schedule_blink_update = false;
-    subpicture_region_t **pp_last_region = &subpic->p_region;
 
     for( substext_updater_region_t *p_updtregion = &sys->region;
                                           p_updtregion; p_updtregion = p_updtregion->p_next )
     {
-        subpicture_region_t *r = *pp_last_region = subpicture_region_NewText();
+        subpicture_region_t *r = subpicture_region_NewText();
         if (!r)
             return;
-        pp_last_region = &r->p_next;
+        vlc_list_append(&r->node, &subpic->regions);
         video_format_Copy( &r->fmt, &fmt );
 
         r->p_text = text_segment_Copy( p_updtregion->p_segments );

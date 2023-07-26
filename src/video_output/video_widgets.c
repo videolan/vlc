@@ -273,6 +273,7 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
                           vlc_tick_t ts)
 {
     osdwidget_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    subpicture_region_t *p_region;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
     video_format_t fmt = *fmt_dst;
@@ -285,9 +286,11 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = fmt.i_visible_width;
     subpic->i_original_picture_height = fmt.i_visible_height;
     if (sys->type == OSD_HOR_SLIDER || sys->type == OSD_VERT_SLIDER)
-        subpic->p_region = OSDSlider(sys->type, sys->position, &fmt);
+        p_region = OSDSlider(sys->type, sys->position, &fmt);
     else
-        subpic->p_region = OSDIcon(sys->type, &fmt);
+        p_region = OSDIcon(sys->type, &fmt);
+    if (p_region)
+        vlc_list_append(&p_region->node, &subpic->regions);
 }
 
 static void OSDWidgetDestroy(subpicture_t *subpic)

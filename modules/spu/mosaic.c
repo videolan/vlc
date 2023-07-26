@@ -439,7 +439,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     unsigned int col_inner_width, row_inner_height;
 
     subpicture_region_t *p_region;
-    subpicture_region_t *p_region_prev = NULL;
 
     /* Allocate the subpicture internal data. */
     subpicture_t *p_spu = filter_NewSubpicture( p_filter );
@@ -710,19 +709,10 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         p_region->i_align = p_sys->i_align;
         p_region->i_alpha = p_es->i_alpha;
 
-        if( p_region_prev == NULL )
-        {
-            p_spu->p_region = p_region;
-        }
-        else
-        {
-            p_region_prev->p_next = p_region;
-        }
+        vlc_list_append(&p_region->node, &p_spu->regions);
 
         video_format_Clean( &fmt_in );
         video_format_Clean( &fmt_out );
-
-        p_region_prev = p_region;
     }
 
     vlc_global_unlock( VLC_MOSAIC_MUTEX );

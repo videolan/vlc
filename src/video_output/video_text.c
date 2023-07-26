@@ -66,9 +66,10 @@ static void OSDTextUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
     subpic->i_original_picture_height = fmt_dst->i_visible_height;
 
-    subpicture_region_t *r = subpic->p_region = subpicture_region_NewText();
+    subpicture_region_t *r = subpicture_region_NewText();
     if (!r)
         return;
+    vlc_list_append(&r->node, &subpic->regions);
 
     r->fmt.i_sar_num = 1;
     r->fmt.i_sar_den = 1;
