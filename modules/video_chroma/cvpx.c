@@ -673,11 +673,11 @@ Open_chain_CVPX(filter_t *filter)
 
     /* Append intermediate CVPX chroma */
     ret = filter_chain_AppendConverter(chain, &fmt_out);
-    if (ret != 0)
+    if (ret != VLC_SUCCESS)
         goto error;
     /* Append final chroma, either CVPX or software. */
     ret = filter_chain_AppendConverter(chain, NULL);
-    if (ret != 0)
+    if (ret != VLC_SUCCESS)
         goto error;
 
     struct vlc_video_context *vctx_out =

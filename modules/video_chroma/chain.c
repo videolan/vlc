@@ -428,7 +428,7 @@ static int BuildFilterChain( filter_t *p_filter )
         if( filter_chain_AppendConverter( p_sys->p_chain,
                                           &fmt_mid ) != VLC_SUCCESS )
             continue;
-        
+
         p_sys->p_video_filter =
             filter_chain_AppendFilter( p_sys->p_chain,
                                        p_filter->psz_name, p_filter->p_cfg,
@@ -461,10 +461,12 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
     filter_sys_t *p_sys = p_filter->p_sys;
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
-    if( filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid ) )
-        return VLC_EGENERIC;
+    int i_ret = filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid );
+    if ( i_ret != VLC_SUCCESS )
+        return i_ret;
 
-    if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
+    i_ret = filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out );
+    if ( i_ret != VLC_SUCCESS )
         goto error;
 
     p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );

@@ -305,7 +305,7 @@ int filter_chain_AppendConverter( filter_chain_t *chain,
     const es_format_t *fmt_out )
 {
     return filter_chain_AppendInner( chain, NULL, chain->conv_cap, NULL,
-                                     fmt_out ) != NULL ? 0 : -1;
+                                     fmt_out ) != NULL ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )

@@ -97,12 +97,12 @@ static int Open(filter_t *p_filter)
 
     int ret;
     ret = filter_chain_AppendConverter(p_chain, &fmt_intermediate);
-    if (ret != 0)
-        return VLC_EGENERIC;
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     ret = filter_chain_AppendConverter(p_chain, NULL);
-    if (ret != 0)
-        return VLC_EGENERIC;
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     p_filter->p_sys = p_chain;
     p_filter->ops = &chain_ops;

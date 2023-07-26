@@ -287,7 +287,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     osys->converters = filter_chain_NewVideo(vd, false, &owner);
     if (unlikely(osys->converters == NULL))
-        return -1;
+        return VLC_ENOMEM;
 
     video_format_t v_src = osys->source;
     v_src.i_sar_num = 0;
@@ -299,7 +299,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     const bool convert = memcmp(&v_src, &v_dst, sizeof(v_src)) != 0;
     if (!convert)
-        return 0;
+        return VLC_SUCCESS;
 
     msg_Dbg(vd, "A filter to adapt decoder %4.4s to display %4.4s is needed",
             (const char *)&v_src.i_chroma, (const char *)&v_dst.i_chroma);
@@ -317,7 +317,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     es_format_Clean(&dst);
     es_format_Clean(&src);
 
-    if (ret != 0) {
+    if (ret != VLC_SUCCESS) {
         msg_Err(vd, "Failed to adapt decoder format to display");
         filter_chain_Delete(osys->converters);
         osys->converters = NULL;

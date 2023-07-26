@@ -339,11 +339,12 @@ static int Activate( filter_t *p_filter )
 
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &fmt );
     /* Append scaling module */
-    if ( filter_chain_AppendConverter( p_sys->p_chain, NULL ) )
+    int ret = filter_chain_AppendConverter( p_sys->p_chain, NULL );
+    if ( ret != VLC_SUCCESS )
     {
         msg_Err( p_filter, "Could not append scaling filter" );
         free( p_sys );
-        return VLC_EGENERIC;
+        return ret;
     }
 
     /* Append croppadd module if we actually do cropping or padding instead of just scaling*/

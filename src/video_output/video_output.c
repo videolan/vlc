@@ -896,7 +896,7 @@ static void ChangeFilters(vout_thread_sys_t *vout)
         {
             msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
             if (filter_chain_AppendConverter(sys->filter.chain_interactive,
-                                             &fmt_target) != 0) {
+                                             &fmt_target) != VLC_SUCCESS) {
                 msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");
                 DelAllFilterCallbacks(vout);
                 filter_chain_Reset(sys->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
@@ -1053,7 +1053,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
                        NULL /* TODO output video context of blender */,
                        &dst);
 
-    if (filter_chain_AppendConverter(filterc, &dst) != 0)
+    if (filter_chain_AppendConverter(filterc, &dst) != VLC_SUCCESS)
     {
         filter_chain_Delete(filterc);
         return NULL;
