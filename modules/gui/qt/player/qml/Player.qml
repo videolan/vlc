@@ -367,6 +367,8 @@ FocusScope {
             bottomMargin: VLCStyle.margin_xsmall
         }
 
+        visible: !rootPlayer.hasEmbededVideo
+
         onWheel: {
             if (rootPlayer.hasEmbededVideo) {
                 wheel.accepted = false
@@ -387,7 +389,7 @@ FocusScope {
         ColumnLayout {
             anchors.centerIn: parent
             spacing: 0
-            visible: !rootPlayer.hasEmbededVideo
+
 
             Item {
                 id: coverItem
