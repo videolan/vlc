@@ -47,7 +47,6 @@ FocusScope {
     property alias sortModel: sortControl.model
     property var contentModel
     property alias model: pLBannerSources.model
-    property var extraLocalActions: undefined
     property alias localMenuDelegate: localMenuGroup.sourceComponent
 
     // For now, used for d&d functionality
@@ -270,10 +269,6 @@ FocusScope {
                         enabled: list_grid_btn.visible || sortControl.visible
 
                         model: ObjectModel {
-                            id: localContextModel
-
-                            property int countExtra: 0
-
                             Widgets.IconToolButton {
                                 id: list_grid_btn
 
@@ -315,23 +310,6 @@ FocusScope {
                                 onSortOrderSelected: {
                                     if (contentModel !== undefined)
                                         contentModel.sortOrder = type
-                                }
-                            }
-                        }
-
-                        Connections {
-                            target: root
-                            onExtraLocalActionsChanged : {
-                                for (let i = 0; i < localContextModel.countExtra; i++) {
-                                    localContextModel.remove(localContextModel.count - localContextModel.countExtra, localContextModel.countExtra)
-                                }
-
-                                if (root.extraLocalActions && root.extraLocalActions instanceof ObjectModel) {
-                                    for (let i = 0; i < root.extraLocalActions.count; i++)
-                                        localContextModel.append(root.extraLocalActions.get(i))
-                                    localContextModel.countExtra = root.extraLocalActions.count
-                                } else {
-                                    localContextModel.countExtra = 0
                                 }
                             }
                         }

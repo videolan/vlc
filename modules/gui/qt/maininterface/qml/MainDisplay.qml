@@ -93,8 +93,6 @@ FocusScope {
         sourcesBanner.sortModel = Qt.binding(function () { return item.sortModel })
         sourcesBanner.contentModel = Qt.binding(function () { return item.contentModel })
 
-        sourcesBanner.extraLocalActions = Qt.binding(function () { return item.extraLocalActions })
-
         MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)
         MainCtx.search.available = Qt.binding(() => item.isSearchable !== undefined && item.isSearchable)
 
