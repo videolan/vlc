@@ -47,6 +47,7 @@ struct sout_stream_id_sys_t
 {
     sout_stream_id_sys_t *id;
     es_format_t fmt;
+    const char *es_id;
     vlc_tick_t i_last;
     bool b_error;
     struct vlc_list node;
@@ -70,6 +71,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     p_es->id = NULL;
     p_es->i_last = VLC_TICK_INVALID;
+    p_es->es_id = NULL; /* Will be copied once added to `pf_add` */
     p_es->b_error = false;
     vlc_list_append(&p_es->node, &p_sys->ids);
     return p_es;
@@ -96,7 +98,7 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
                                                            : p_sys->last_pcr;
     if ( !p_es->id && !p_es->b_error )
     {
-        p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt, NULL );
+        p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt, p_es->es_id );
         if ( p_es->id == NULL )
         {
             p_es->b_error = true;
