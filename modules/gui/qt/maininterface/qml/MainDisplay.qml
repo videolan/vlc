@@ -95,9 +95,7 @@ FocusScope {
 
         sourcesBanner.extraLocalActions = Qt.binding(function () { return item.extraLocalActions })
 
-        sourcesBanner.hasGridListMode = Qt.binding(function () {
-            return item.hasGridListMode === undefined || item.hasGridListMode
-        })
+        MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)
 
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {

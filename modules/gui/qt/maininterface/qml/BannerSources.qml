@@ -46,7 +46,6 @@ FocusScope {
     property alias sortMenu: sortControl.menu
     property alias sortModel: sortControl.model
     property var contentModel
-    property alias hasGridListMode: list_grid_btn.visible
     property alias model: pLBannerSources.model
     property var extraLocalActions: undefined
     property alias localMenuDelegate: localMenuGroup.sourceComponent
@@ -273,6 +272,7 @@ FocusScope {
                             Widgets.IconToolButton {
                                 id: list_grid_btn
 
+                                visible: MainCtx.hasGridListMode
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 size: VLCStyle.icon_banner
