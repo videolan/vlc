@@ -259,10 +259,8 @@ static picture_t *VideoBufferNew(filter_t *filter)
            osys->display_fmt.i_width  == fmt->i_width  &&
            osys->display_fmt.i_height == fmt->i_height);
 
-    picture_pool_t *pool = vout_GetPool(vd, 3);
-    if (!pool)
-        return NULL;
-    return picture_pool_Get(pool);
+    assert(picture_pool_GetSize(osys->pool) >= 3);
+    return picture_pool_Get(osys->pool);
 }
 
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
