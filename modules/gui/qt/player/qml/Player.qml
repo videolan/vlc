@@ -694,7 +694,7 @@ FocusScope {
             background: Rectangle {
                 id: controlBarBackground
 
-                visible: !MainCtx.hasEmbededVideo
+                visible: !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls
 
                 opacity: MainCtx.pinVideoControls ? MainCtx.pinOpacity : 0.7
 
