@@ -95,8 +95,6 @@ MainInterface.MainViewLoader {
 
         indexes: selectionModel.selectedIndexes
 
-        titleRole: "name"
-
         defaultText:  I18n.qtr("Unknown Share")
 
         coverProvider: function(index, data) {

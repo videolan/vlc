@@ -494,8 +494,6 @@ FocusScope {
 
                 indexes: trackSelectionModel.selectedIndexes
 
-                titleRole: "name"
-
                 defaultCover: VLCStyle.noArtArtistCover
             }
 

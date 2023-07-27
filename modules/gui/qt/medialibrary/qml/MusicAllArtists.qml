@@ -61,7 +61,7 @@ MainInterface.MainViewLoader {
 
         mlModel: artistModel
         indexes: selectionModel.selectedIndexes
-        titleRole: "name"
+
         defaultCover: VLCStyle.noArtArtistSmall
     }
 

@@ -83,8 +83,6 @@ T.ItemDelegate {
         drag.target: Widgets.DragItem {
             indexes: [index]
 
-            titleRole: "name"
-
             onRequestData: {
                 console.assert(indexes[0] === index)
                 resolve([model])

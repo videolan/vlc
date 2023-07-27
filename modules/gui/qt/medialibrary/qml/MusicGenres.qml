@@ -80,8 +80,6 @@ MainInterface.MainViewLoader {
         mlModel: genreModel
 
         indexes: selectionModel.selectedIndexes
-
-        titleRole: "name"
     }
 
     /*

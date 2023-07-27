@@ -141,8 +141,6 @@ MainInterface.MainViewLoader {
         coverRole: "thumbnail"
 
         defaultCover: root._placeHolder
-
-        titleRole: "name"
     }
 
     PlaylistListContextMenu {

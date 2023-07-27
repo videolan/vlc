@@ -52,12 +52,6 @@ Item {
     // string => role
     property string coverRole: "cover"
 
-    // function(index, data) - returns title text for the index in the model i.e <string> title
-    property var titleProvider: null
-
-    // string => role
-    property string titleRole: "title"
-
     property real padding: VLCStyle.margin_xsmall
 
     readonly property ColorContext colorContext: ColorContext {
@@ -103,8 +97,6 @@ Item {
 
     property var _covers: []
 
-    property string _title: ""
-
     property int _currentRequest: 0
 
     property int _grabImageRequest: 0
@@ -149,29 +141,22 @@ Item {
         _data = data
 
         const covers = []
-        const titleList = []
 
         for (let i in indexes) {
             if (covers.length === _maxCovers)
                 break
 
             const cover = _getCover(indexes[i], data[i])
-            const itemTitle = _getTitle(indexes[i], data[i])
-            if (!cover || !itemTitle)
+            if (!cover)
                 continue
 
             covers.push(cover)
-            titleList.push(itemTitle)
         }
 
         if (covers.length === 0)
             covers.push({artwork: dragItem.defaultCover})
 
-        if (titleList.length === 0)
-            titleList.push(defaultText)
-
         _covers = covers
-        _title = titleList.join(",") + (indexes.length > _maxCovers ? "..." : "")
     }
 
     function _setInputItems(inputItems) {
@@ -190,14 +175,6 @@ Item {
             return dragItem.coverProvider(index, data)
         else
             return {artwork: data[dragItem.coverRole] || dragItem.defaultCover}
-    }
-
-    function _getTitle(index, data) {
-        console.assert(dragItem.titleRole)
-        if (!!dragItem.titleProvider)
-            return dragItem.titleProvider(index, data)
-        else
-            return data[dragItem.titleRole] || dragItem.defaultText
     }
 
     function _startNativeDrag() {
@@ -285,7 +262,6 @@ Item {
             function enter() {
                 _pendingNativeDragStart = false
 
-                _title = ""
                 _covers = []
                 _data = []
             }
