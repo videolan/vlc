@@ -222,6 +222,7 @@ struct vlc_input_decoder_t
         vlc_input_decoder_t *pp_decoder[MAX_CC_DECODERS];
         bool b_sout_created;
         sout_packetizer_input_t *p_sout_input;
+        char *sout_es_id;
     } cc;
 
     /* Mouse event */
@@ -1066,7 +1067,21 @@ static void DecoderSendSubstream(vlc_input_decoder_t *p_owner)
         es_format_Init(&ccfmt, SPU_ES, VLC_CODEC_CEA608);
         ccfmt.i_group = p_owner->fmt.i_group;
         ccfmt.subs.cc.i_reorder_depth = desc.i_reorder_depth;
-        p_owner->cc.p_sout_input = sout_InputNew( p_owner->p_sout, &ccfmt, NULL );
+
+        /* Create only one es ID since we simply send the CC whole side data
+         * un-decoded to the stream output.
+         * Specifying the owner's ID is important for the uniqueness for the ID.
+         */
+        if (asprintf(&p_owner->cc.sout_es_id, "%s/cc", p_owner->psz_id) == -1)
+        {
+            es_format_Clean(&ccfmt);
+            block_Release(p_cc);
+            return;
+        }
+
+        p_owner->cc.p_sout_input =
+            sout_InputNew(p_owner->p_sout, &ccfmt, p_owner->cc.sout_es_id);
+
         es_format_Clean(&ccfmt);
         p_owner->cc.b_sout_created = true;
     }
@@ -1988,6 +2003,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     for( unsigned i = 0; i < MAX_CC_DECODERS; i++ )
         p_owner->cc.pp_decoder[i] = NULL;
     p_owner->cc.p_sout_input = NULL;
+    p_owner->cc.sout_es_id = NULL;
     p_owner->cc.b_sout_created = false;
     return p_owner;
 }
@@ -2024,6 +2040,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
         sout_InputDelete( p_owner->p_sout, p_owner->p_sout_input );
         if( p_owner->cc.p_sout_input )
             sout_InputDelete( p_owner->p_sout, p_owner->cc.p_sout_input );
+        free( p_owner->cc.sout_es_id );
     }
 
     switch( i_cat )
