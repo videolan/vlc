@@ -504,7 +504,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         picture_t *p_pic = p_feed->p_pic;
         video_format_t fmt_out;
 
-        video_format_Init( &fmt_out, VLC_CODEC_YUVA );
+        video_format_Copy( &fmt_out, &p_pic->format );
 
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
         fmt_out.i_width =
@@ -526,6 +526,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             /* Offset text to display right next to the image */
             p_spu->p_region->i_x += fmt_out.i_visible_width;
         }
+        video_format_Clean(&fmt_out);
     }
 
     vlc_mutex_unlock( &p_sys->lock );
