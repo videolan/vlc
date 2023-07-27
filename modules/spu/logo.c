@@ -41,10 +41,6 @@
 #include <vlc_url.h>
 #include <vlc_image.h>
 
-#ifdef LoadImage
-#   undef LoadImage
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -579,7 +575,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
 /**
  * It loads the logo image into memory.
  */
-static picture_t *LoadImage( vlc_object_t *p_this, const char *psz_filename )
+static picture_t *LoadPicture( vlc_object_t *p_this, const char *psz_filename )
 {
     if( !psz_filename )
         return NULL;
@@ -668,7 +664,7 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 
         msg_Dbg( p_this, "logo file name %s, delay %d, alpha %d",
                  psz_list, p_logo[i].i_delay, p_logo[i].i_alpha );
-        p_logo[i].p_pic = LoadImage( p_this, psz_list );
+        p_logo[i].p_pic = LoadPicture( p_this, psz_list );
         if( !p_logo[i].p_pic )
         {
             msg_Warn( p_this, "error while loading logo %s, will be skipped",

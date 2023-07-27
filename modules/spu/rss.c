@@ -541,12 +541,10 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
  * functions
  ***************************************************************************/
 
-#undef LoadImage /* do not conflict with Win32 API */
-
 /****************************************************************************
  * download and resize image located at psz_url
  ***************************************************************************/
-static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
+static picture_t *LoadPicture( filter_t *p_filter, const char *psz_url )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     video_format_t fmt_out;
@@ -938,7 +936,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
         /* If we have a image: load it if required */
         if( b_images && p_feed->psz_image && !p_feed->p_pic )
         {
-            p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );
+            p_feed->p_pic = LoadPicture( p_filter, p_feed->psz_image );
         }
 
         msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
