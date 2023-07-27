@@ -338,10 +338,6 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
 
     p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );
 
-    //Palette is already copied by subpicture_region_New, we just have to duplicate p_pixels
-    for (int i = 0; i < p_region_src->p_picture->i_planes; i++)
-        memcpy(p_region_dst->p_picture->p[i].p_pixels,
-               p_region_src->p_picture->p[i].p_pixels,
-               p_region_src->p_picture->p[i].i_lines * p_region_src->p_picture->p[i].i_pitch);
+    picture_CopyPixels(p_region_dst->p_picture, p_region_src->p_picture);
     return p_region_dst;
 }
