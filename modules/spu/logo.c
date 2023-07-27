@@ -371,7 +371,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
     fmt.primaries   = p_pic->format.primaries;
     fmt.space       = p_pic->format.space;
     fmt.color_range = p_pic->format.color_range;
-    p_region = subpicture_region_New( &fmt );
+    p_region = subpicture_region_ForPicture( &fmt, p_pic );
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
@@ -379,9 +379,6 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
         p_spu = NULL;
         goto exit;
     }
-
-    /* */
-    picture_Copy( p_region->p_picture, p_pic );
 
     /*  where to locate the logo: */
     if( p_sys->i_pos < 0 )
