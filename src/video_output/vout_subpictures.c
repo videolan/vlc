@@ -1946,6 +1946,10 @@ subpicture_t *spu_Render(spu_t *spu,
         VLC_CODEC_YUVP,
         0,
     };
+    static_assert(ARRAY_SIZE(chroma_list_default_yuv) <= SPU_CHROMALIST_COUNT,
+                  "YUV chroma list too large");
+    static_assert(ARRAY_SIZE(chroma_list_default_rgb) <= SPU_CHROMALIST_COUNT,
+                  "RGB chroma list too large");
 
     if (!chroma_list || *chroma_list == 0)
         chroma_list = vlc_fourcc_IsYUV(fmt_dst->i_chroma) ? chroma_list_default_yuv
