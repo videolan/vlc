@@ -101,16 +101,9 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
     for(ttml_image_updater_region_t *p_updtregion = p_sys->p_regions;
                                      p_updtregion; p_updtregion = p_updtregion->p_next)
     {
-        subpicture_region_t *r = subpicture_region_New(&p_updtregion->p_pic->format);
-        if (!r)
+        subpicture_region_t *r = subpicture_region_ForPicture(&p_updtregion->p_pic->format, p_updtregion->p_pic);
+        if (unlikely(r == NULL))
             return;
-        picture_Release(r->p_picture);
-        r->p_picture = picture_Clone(p_updtregion->p_pic);
-        if(!r->p_picture)
-        {
-            subpicture_region_Delete(r);
-            return;
-        }
 
         r->i_align = SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_TOP;
 
