@@ -351,9 +351,15 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     {
         subpicture_region_t *p_region;
 
-        *pp_region = p_region = subpicture_region_New( &p_overlay->format );
-        if( !p_region )
+        if( p_overlay->format.i_chroma == VLC_CODEC_TEXT )
+            p_region = subpicture_region_New( &p_overlay->format );
+        else
+            p_region = subpicture_region_ForPicture( &p_overlay->format, p_overlay->data.p_pic );
+        if( unlikely(p_region == NULL) )
+        {
+            *pp_region = NULL;
             break;
+        }
 
         msg_Dbg( p_filter, "Displaying overlay: %4.4s, %d, %d, %d",
                  (char*)&p_overlay->format.i_chroma, p_overlay->i_x, p_overlay->i_y,
@@ -363,11 +369,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         {
             p_region->p_text = text_segment_New( p_overlay->data.p_text );
             p_region->p_text->style = text_style_Duplicate( p_overlay->p_fontstyle );
-        }
-        else
-        {
-            /* FIXME the copy is probably not needed anymore */
-            picture_Copy( p_region->p_picture, p_overlay->data.p_pic );
         }
         p_region->i_x = p_overlay->i_x;
         p_region->i_y = p_overlay->i_y;
