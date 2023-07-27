@@ -412,6 +412,7 @@ subpicture_region_ChainDelete
 subpicture_region_Copy
 subpicture_region_Delete
 subpicture_region_New
+subpicture_region_ForPicture
 text_segment_New
 text_segment_NewInheritStyle
 text_segment_Delete

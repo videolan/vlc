@@ -258,6 +258,20 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     return p_region;
 }
 
+subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic )
+{
+    if ( p_fmt->i_chroma != pic->format.i_chroma )
+        return NULL;
+
+    subpicture_region_t *p_region = subpicture_region_NewInternal( p_fmt );
+    if( !p_region )
+        return NULL;
+
+    p_region->p_picture = picture_Hold(pic);
+
+    return p_region;
+}
+
 void subpicture_region_Delete( subpicture_region_t *p_region )
 {
     if( !p_region )

@@ -105,6 +105,19 @@ struct vlc_spu_highlight_t
 VLC_API subpicture_region_t * subpicture_region_New( const video_format_t *p_fmt );
 
 /**
+ * Create a subpicture region containing the picture.
+ *
+ * A reference will be added to the picture on success.
+ *
+ * You must use subpicture_region_Delete to destroy it.
+ *
+ * The chroma of the format must match the one of the picture.
+ * The dimensions of the format should not exceed the ones of the picture. This
+ * is not checked explicitly in the function.
+ */
+VLC_API subpicture_region_t * subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic );
+
+/**
  * This function will destroy a subpicture region allocated by
  * subpicture_region_New.
  *
