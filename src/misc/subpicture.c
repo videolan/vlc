@@ -143,6 +143,13 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     {
         picture_Release( p_pip );
     }
+
+    if (p_subpic->p_region == NULL)
+    {
+        subpicture_Delete(p_subpic);
+        p_subpic = NULL;
+    }
+
     return p_subpic;
 }
 
