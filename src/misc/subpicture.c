@@ -133,16 +133,8 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 0;
 
-    p_subpic->p_region = subpicture_region_New( &fmt_out );
-    if( p_subpic->p_region )
-    {
-        picture_Release( p_subpic->p_region->p_picture );
-        p_subpic->p_region->p_picture = p_pip;
-    }
-    else
-    {
-        picture_Release( p_pip );
-    }
+    p_subpic->p_region = subpicture_region_ForPicture( &fmt_out, p_pip );
+    picture_Release( p_pip );
 
     if (p_subpic->p_region == NULL)
     {
