@@ -204,21 +204,19 @@ void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
 subpicture_region_t * subpicture_region_NewInternal( const video_format_t *p_fmt )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
-    if( !p_region )
+    if( unlikely(p_region == NULL) )
         return NULL;
 
-    p_region->zoom_h.den = p_region->zoom_h.num = 1;
-    p_region->zoom_v.den = p_region->zoom_v.num = 1;
-
-    if ( p_fmt->i_chroma == VLC_CODEC_YUVP )
+    video_format_Copy( &p_region->fmt, p_fmt );
+    if ( p_fmt->i_chroma == VLC_CODEC_YUVP || p_fmt->i_chroma == VLC_CODEC_RGBP )
     {
-        video_format_Copy( &p_region->fmt, p_fmt );
-        /* YUVP should have a palette */
+        /* YUVP/RGBP should have a palette */
         if( p_region->fmt.p_palette == NULL )
         {
             p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
             if( p_region->fmt.p_palette == NULL )
             {
+                video_format_Clean( &p_region->fmt );
                 free( p_region );
                 return NULL;
             }
@@ -226,10 +224,11 @@ subpicture_region_t * subpicture_region_NewInternal( const video_format_t *p_fmt
     }
     else
     {
-        p_region->fmt = *p_fmt;
-        p_region->fmt.p_palette = NULL;
+        assert(p_fmt->p_palette == NULL);
     }
 
+    p_region->zoom_h.den = p_region->zoom_h.num = 1;
+    p_region->zoom_v.den = p_region->zoom_v.num = 1;
     p_region->i_alpha = 0xff;
     p_region->b_balanced_text = true;
 
