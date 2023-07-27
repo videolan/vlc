@@ -1014,7 +1014,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     /* */
-    int rv = VLC_SUCCESS;
+    int rv;
     FT_BBox bbox;
     int i_max_face_height;
 
@@ -1036,7 +1036,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Don't attempt to render text that couldn't be laid out
      * properly. */
-    if( !rv && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
+    if( rv == VLC_SUCCESS && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
         const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
         const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
@@ -1143,9 +1143,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                             .blend =   BlendGlyphToARGB },
         };
 
+        rv = VLC_EGENERIC;
         for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
         {
-            rv = VLC_EGENERIC;
             if( *p_chroma == VLC_CODEC_YUVP )
                 rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox );
@@ -1169,8 +1169,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  *p_chroma,
                                  &p_region_out->fmt,
                                  drawfuncs[DRAW_ARGB] );
+            else
+                continue;
 
-            if( !rv )
+            if( rv == VLC_SUCCESS )
                 break;
         }
     }
