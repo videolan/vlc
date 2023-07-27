@@ -512,7 +512,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         fmt_out.i_height =
             fmt_out.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
 
-        p_region = subpicture_region_New( &fmt_out );
+        p_region = subpicture_region_ForPicture( &fmt_out, p_pic );
         if( !p_region )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );
@@ -521,8 +521,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         {
             p_region->i_x = p_spu->p_region->i_x;
             p_region->i_y = p_spu->p_region->i_y;
-            /* FIXME the copy is probably not needed anymore */
-            picture_Copy( p_region->p_picture, p_pic );
             p_spu->p_region->p_next = p_region;
 
             /* Offset text to display right next to the image */
