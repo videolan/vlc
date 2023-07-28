@@ -169,6 +169,7 @@ typedef struct vout_thread_sys_t
 
     vlc_atomic_rc_t rc;
 
+    picture_pool_t  *private_pool; // interactive + static filters & blending
 } vout_thread_sys_t;
 
 #define VOUT_THREAD_TO_SYS(vout) \
@@ -734,7 +735,7 @@ static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
 {
     vout_thread_sys_t *sys = filter->owner.sys;
 
-    picture_t *picture = picture_pool_Get(sys->private.private_pool);
+    picture_t *picture = picture_pool_Get(sys->private_pool);
     if (picture) {
         picture_Reset(picture);
         video_format_CopyCropAr(&picture->format, &filter->fmt_out.video);
@@ -1197,7 +1198,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     picture_t *snap_pic = todisplay;
     if (!vd_does_blending && blending_before_converter && subpic) {
         if (sys->spu_blend) {
-            picture_t *blent = picture_pool_Get(sys->private.private_pool);
+            picture_t *blent = picture_pool_Get(sys->private_pool);
             if (blent) {
                 video_format_CopyCropAr(&blent->format, &filtered->format);
                 picture_Copy(blent, filtered);
@@ -1663,7 +1664,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     vlc_mutex_unlock(&sys->window_lock);
 
     sys->decoder_fifo = picture_fifo_New();
-    sys->private.private_pool = NULL;
+    sys->private_pool = NULL;
 
     sys->filter.configuration = NULL;
     video_format_Copy(&sys->filter.src_fmt, &sys->original);
@@ -1722,15 +1723,15 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned kept_picture     = 1; /* last displayed picture */
 
-    sys->private.private_pool =
+    sys->private_pool =
         picture_pool_NewFromFormat(&sys->original,
                                    private_picture + kept_picture);
-    if (sys->private.private_pool == NULL) {
+    if (sys->private_pool == NULL) {
         vlc_queuedmutex_unlock(&sys->display_lock);
         goto error;
     }
 
-    sys->display = vout_OpenWrapper(&vout->obj, &sys->private, sys->splitter_name, &dcfg,
+    sys->display = vout_OpenWrapper(&vout->obj, sys->splitter_name, &dcfg,
                                     &sys->original, vctx);
     if (sys->display == NULL) {
         vlc_queuedmutex_unlock(&sys->display_lock);
@@ -1769,10 +1770,10 @@ error:
         filter_chain_Delete(ci);
     if (cs != NULL)
         filter_chain_Delete(cs);
-    if (sys->private.private_pool)
+    if (sys->private_pool)
     {
-        picture_pool_Release(sys->private.private_pool);
-        sys->private.private_pool = NULL;
+        picture_pool_Release(sys->private_pool);
+        sys->private_pool = NULL;
     }
     video_format_Clean(&sys->filter.src_fmt);
     if (sys->filter.src_vctx)
@@ -1840,16 +1841,16 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
         filter_DeleteBlend(sys->spu_blend);
 
     /* Destroy the rendering display */
-    if (sys->private.private_pool != NULL)
+    if (sys->private_pool != NULL)
     {
         vout_FlushUnlocked(vout, true, VLC_TICK_MAX);
 
-        picture_pool_Release(sys->private.private_pool);
-        sys->private.private_pool = NULL;
+        picture_pool_Release(sys->private_pool);
+        sys->private_pool = NULL;
     }
 
     vlc_queuedmutex_lock(&sys->display_lock);
-    vout_CloseWrapper(&vout->obj, &sys->private, sys->display);
+    vout_CloseWrapper(&vout->obj, sys->display);
     sys->display = NULL;
     vlc_queuedmutex_unlock(&sys->display_lock);
 
@@ -1876,7 +1877,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
         picture_fifo_Delete(sys->decoder_fifo);
         sys->decoder_fifo = NULL;
     }
-    assert(sys->private.private_pool == NULL);
+    assert(sys->private_pool == NULL);
 
     vlc_mutex_lock(&sys->window_lock);
     vout_display_window_SetMouseHandler(sys->display_cfg.window, NULL, NULL);
@@ -2054,6 +2055,8 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     sys->title.show     = var_InheritBool(vout, "video-title-show");
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
     sys->title.position = var_InheritInteger(vout, "video-title-position");
+
+    sys->private_pool = NULL;
 
     vout_InitInterlacingSupport(vout, &sys->private);
 

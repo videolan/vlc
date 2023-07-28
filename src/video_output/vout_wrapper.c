@@ -55,7 +55,7 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
 /*****************************************************************************
  *
  *****************************************************************************/
-vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys,
+vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
                      const char *splitter_name, const vout_display_cfg_t *cfg,
                      const video_format_t *fmt, vlc_video_context *vctx)
 {
@@ -116,7 +116,7 @@ error:
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout, vout_thread_private_t *sys, vout_display_t *vd)
+void vout_CloseWrapper(vout_thread_t *vout, vout_display_t *vd)
 {
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, vd);

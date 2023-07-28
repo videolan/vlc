@@ -38,14 +38,12 @@ struct vout_thread_private_t
         bool        has_deint;
         vlc_tick_t  date;
     } interlacing;
-
-    picture_pool_t  *private_pool;
 };
 
 /* */
-vout_display_t *vout_OpenWrapper(vout_thread_t *, vout_thread_private_t *, const char *,
+vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
                      const vout_display_cfg_t *, const video_format_t *, vlc_video_context *);
-void vout_CloseWrapper(vout_thread_t *, vout_thread_private_t *, vout_display_t *vd);
+void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 void vout_InitInterlacingSupport(vout_thread_t *, vout_thread_private_t *);
 void vout_ReinitInterlacingSupport(vout_thread_t *, vout_thread_private_t *);
