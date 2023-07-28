@@ -28,7 +28,6 @@
 /* XXX DO NOT use it outside the vout module wrapper XXX */
 struct vout_crop;
 
-bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_ConvertForDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
 

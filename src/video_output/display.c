@@ -289,12 +289,8 @@ static void VoutAllocConverterOutput(vout_display_priv_t *osys)
     assert(osys->converter_pool == NULL);
 
     unsigned reserved_picture;
-    if (!vout_IsDisplayFiltered(&osys->display)) {
-        reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture;
-    } else {
-        reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture
-                                                 + private_picture;
-    }
+    reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture
+                                             + private_picture;
     osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, reserved_picture);
 }
 
@@ -383,13 +379,6 @@ static void VoutDisplayCropRatio(unsigned *left, unsigned *top, unsigned *right,
         *right  = source->i_visible_width;
         *bottom = source->i_visible_height;
     }
-}
-
-bool vout_IsDisplayFiltered(vout_display_t *vd)
-{
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    return osys->converters == NULL || !filter_chain_IsEmpty(osys->converters);
 }
 
 picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
