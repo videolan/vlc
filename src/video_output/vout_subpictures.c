@@ -325,7 +325,7 @@ static int SpuRenderText(spu_t *spu,
 
     vlc_mutex_lock(&sys->textlock);
     filter_t *text = sys->text;
-    if(!text)
+    if(unlikely(text == NULL))
     {
         vlc_mutex_unlock(&sys->textlock);
         return VLC_EGENERIC;
