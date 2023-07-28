@@ -122,11 +122,4 @@ VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
 VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *pool, unsigned count)
 VLC_USED;
 
-/**
- * @return the total number of pictures in the given pool
- * @note This function is thread-safe.
- */
-unsigned picture_pool_GetSize(const picture_pool_t *);
-
-
 #endif /* VLC_PICTURE_POOL_H */

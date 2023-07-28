@@ -214,8 +214,3 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
 
     return picture_pool_ClonePicture(pool, i);
 }
-
-unsigned picture_pool_GetSize(const picture_pool_t *pool)
-{
-    return pool->picture_count;
-}
