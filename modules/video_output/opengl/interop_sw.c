@@ -436,8 +436,6 @@ static int
 interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma, const vlc_chroma_description_t *desc)
 {
-    struct priv *priv = interop->priv;
-
     (void) chroma;
 
     struct interop_formats
