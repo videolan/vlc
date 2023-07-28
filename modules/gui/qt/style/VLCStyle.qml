@@ -145,9 +145,6 @@ QtObject {
     readonly property int widthExtendedSpacer: dp(128, scale);
     readonly property int heightInput: dp(22, scale);
 
-    readonly property int scrollbarWidth: dp(4, scale);
-    readonly property int scrollbarHeight: dp(100, scale);
-
     readonly property real network_normal: dp(100, scale)
 
     readonly property int expandAlbumTracksHeight: dp(200, scale)
