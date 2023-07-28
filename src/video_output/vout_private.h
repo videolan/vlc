@@ -40,7 +40,6 @@ struct vout_thread_private_t
     } interlacing;
 
     picture_pool_t  *private_pool;
-    picture_pool_t  *display_pool;
 };
 
 /* */

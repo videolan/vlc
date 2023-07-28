@@ -81,8 +81,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
     if (vd == NULL)
         return NULL;
 
-    sys->display_pool = NULL;
-
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned kept_picture     = 1; /* last displayed picture */
     const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
@@ -105,7 +103,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
         picture_pool_Release(display_pool);
         goto error;
     }
-    sys->display_pool = display_pool;
 
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
@@ -125,10 +122,10 @@ error:
  *****************************************************************************/
 void vout_CloseWrapper(vout_thread_t *vout, vout_thread_private_t *sys, vout_display_t *vd)
 {
-    assert(sys->display_pool && sys->private_pool);
+    assert(sys->private_pool);
 
     picture_pool_Release(sys->private_pool);
-    sys->display_pool = NULL;
+    sys->private_pool = NULL;
 
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, vd);
