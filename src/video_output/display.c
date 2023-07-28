@@ -243,7 +243,7 @@ typedef struct {
      /* filters to convert the vout source to fmt, NULL means no conversion
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
-    picture_pool_t *pool;
+    picture_pool_t *converter_pool;
 } vout_display_priv_t;
 
 /*****************************************************************************
@@ -259,8 +259,8 @@ static picture_t *VideoBufferNew(filter_t *filter)
            osys->display_fmt.i_width  == fmt->i_width  &&
            osys->display_fmt.i_height == fmt->i_height);
 
-    assert(picture_pool_GetSize(osys->pool) >= 3);
-    return picture_pool_Get(osys->pool);
+    assert(picture_pool_GetSize(osys->converter_pool) >= 3);
+    return picture_pool_Get(osys->converter_pool);
 }
 
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
@@ -355,9 +355,9 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (osys->pool == NULL)
-        osys->pool = picture_pool_NewFromFormat(&osys->display_fmt, count);
-    return osys->pool;
+    if (osys->converter_pool == NULL)
+        osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, count);
+    return osys->converter_pool;
 }
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)
@@ -407,9 +407,9 @@ static void vout_display_Reset(vout_display_t *vd)
         osys->converters = NULL;
     }
 
-    if (osys->pool != NULL) {
-        picture_pool_Release(osys->pool);
-        osys->pool = NULL;
+    if (osys->converter_pool != NULL) {
+        picture_pool_Release(osys->converter_pool);
+        osys->converter_pool = NULL;
     }
 
     assert(vd->ops->reset_pictures);
@@ -691,7 +691,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                            source, &cfg->display);
     }
 
-    osys->pool = NULL;
+    osys->converter_pool = NULL;
 
     video_format_Copy(&osys->source, source);
     osys->crop.mode = VOUT_CROP_NONE;
@@ -767,8 +767,8 @@ void vout_display_Delete(vout_display_t *vd)
     if (osys->converters != NULL)
         filter_chain_Delete(osys->converters);
 
-    if (osys->pool != NULL)
-        picture_pool_Release(osys->pool);
+    if (osys->converter_pool != NULL)
+        picture_pool_Release(osys->converter_pool);
 
     if (vd->ops->close != NULL)
         vd->ops->close(vd);
