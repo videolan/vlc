@@ -261,10 +261,14 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         assert(priv->uloc.ConvMatrix != -1);
     }
 
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
+    const struct vlc_gl_format *glfmt = &sampler->glfmt;
+    /* To guarantee variable names length, we need to fix the number
+     * of texture from now on. */
+    const unsigned tex_count = glfmt->tex_count;
+    if (tex_count >= 10)
+        vlc_assert_unreachable();
 
-    assert(glfmt->tex_count < 10); /* to guarantee variable names length */
-    for (unsigned int i = 0; i < glfmt->tex_count; ++i)
+    for (unsigned i = 0; i < tex_count; ++i)
     {
         char name[sizeof("Textures[X]")];
 
