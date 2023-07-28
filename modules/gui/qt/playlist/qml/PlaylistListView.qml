@@ -292,6 +292,8 @@ T.Pane {
             backgroundColor: root.background.usingAcrylic ? "transparent"
                                                           : listView.colorContext.bg.primary
 
+            contentWidth: width
+
             property int shiftIndex: -1
             property Item itemContainsDrag: null
 
