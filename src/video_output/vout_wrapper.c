@@ -95,13 +95,13 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
     picture_pool_t *display_pool;
     if (!vout_IsDisplayFiltered(vd)) {
         const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
-                                          private_picture +
                                           kept_picture;
         display_pool = vout_GetPool(vd, reserved_picture);
         if (display_pool == NULL)
             goto error;
 
-        sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
+        sys->private_pool =
+            picture_pool_NewFromFormat(vd->source, private_picture);
     } else {
         const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                           private_picture +
