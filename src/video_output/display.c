@@ -275,6 +275,29 @@ static const struct filter_video_callbacks vout_display_filter_cbs = {
     VideoBufferNew, DisplayHoldDecoderDevice,
 };
 
+/* Minimum number of display picture */
+#define DISPLAY_PICTURE_COUNT (1)
+
+/**
+ * It retrieves a picture pool from the display
+ */
+static void VoutAllocConverterOutput(vout_display_priv_t *osys)
+{
+    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
+    const unsigned kept_picture     = 1; /* last displayed picture */
+
+    assert(osys->converter_pool == NULL);
+
+    unsigned reserved_picture;
+    if (!vout_IsDisplayFiltered(&osys->display)) {
+        reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture;
+    } else {
+        reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture
+                                                 + private_picture;
+    }
+    osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, reserved_picture);
+}
+
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
@@ -285,7 +308,18 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     osys->converters = filter_chain_NewVideo(vd, false, &owner);
     if (unlikely(osys->converters == NULL))
+    {
+        picture_pool_Release(osys->converter_pool);
+        osys->converter_pool = NULL;
         return VLC_ENOMEM;
+    }
+
+    VoutAllocConverterOutput(osys);
+    if (osys->converter_pool == NULL)
+    {
+        msg_Err(vd, "Failed to allocate converter pool");
+        return VLC_ENOMEM;
+    }
 
     video_format_t v_src = osys->source;
     v_src.i_sar_num = 0;
@@ -319,6 +353,9 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
         msg_Err(vd, "Failed to adapt decoder format to display");
         filter_chain_Delete(osys->converters);
         osys->converters = NULL;
+
+        picture_pool_Release(osys->converter_pool);
+        osys->converter_pool = NULL;
     }
     return ret;
 }
@@ -346,18 +383,6 @@ static void VoutDisplayCropRatio(unsigned *left, unsigned *top, unsigned *right,
         *right  = source->i_visible_width;
         *bottom = source->i_visible_height;
     }
-}
-
-/**
- * It retrieves a picture pool from the display
- */
-picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
-{
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    if (osys->converter_pool == NULL)
-        osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, count);
-    return osys->converter_pool;
 }
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)

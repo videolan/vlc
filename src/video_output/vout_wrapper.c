@@ -49,9 +49,6 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
     var_SetAddress(vout, "viewpoint-moved", (void*)vp);
 }
 
-/* Minimum number of display picture */
-#define DISPLAY_PICTURE_COUNT (1)
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -81,25 +78,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     if (vd == NULL)
         return NULL;
 
-    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-    const unsigned kept_picture     = 1; /* last displayed picture */
-
-    picture_pool_t *display_pool;
-    if (!vout_IsDisplayFiltered(vd)) {
-        const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
-                                          kept_picture;
-        display_pool = vout_GetPool(vd, reserved_picture);
-        if (display_pool == NULL)
-            goto error;
-    } else {
-        const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
-                                          private_picture +
-                                          kept_picture;
-        display_pool = vout_GetPool(vd, reserved_picture);
-        if (display_pool == NULL)
-            goto error;
-    }
-
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
     var_AddCallback(vout, "video-wallpaper", Forward, vd);
@@ -107,10 +85,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout,
     var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
                 vd->fmt->projection_mode != PROJECTION_MODE_RECTANGULAR);
     return vd;
-
-error:
-    vout_display_Delete(vd);
-    return NULL;
 }
 
 /*****************************************************************************
