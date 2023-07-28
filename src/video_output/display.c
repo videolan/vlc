@@ -259,7 +259,6 @@ static picture_t *VideoBufferNew(filter_t *filter)
            osys->display_fmt.i_width  == fmt->i_width  &&
            osys->display_fmt.i_height == fmt->i_height);
 
-    assert(picture_pool_GetSize(osys->converter_pool) >= 3);
     return picture_pool_Get(osys->converter_pool);
 }
 
@@ -274,25 +273,6 @@ static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 static const struct filter_video_callbacks vout_display_filter_cbs = {
     VideoBufferNew, DisplayHoldDecoderDevice,
 };
-
-/* Minimum number of display picture */
-#define DISPLAY_PICTURE_COUNT (1)
-
-/**
- * It retrieves a picture pool from the display
- */
-static void VoutAllocConverterOutput(vout_display_priv_t *osys)
-{
-    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-    const unsigned kept_picture     = 1; /* last displayed picture */
-
-    assert(osys->converter_pool == NULL);
-
-    unsigned reserved_picture;
-    reserved_picture = DISPLAY_PICTURE_COUNT + kept_picture
-                                             + private_picture;
-    osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, reserved_picture);
-}
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
@@ -314,7 +294,9 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     if (!convert)
         return VLC_SUCCESS;
 
-    VoutAllocConverterOutput(osys);
+    assert(osys->converter_pool == NULL);
+    // 1 for current converter + 1 for previously displayed
+    osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, 1+1);
     if (osys->converter_pool == NULL)
     {
         msg_Err(vd, "Failed to allocate converter pool");
