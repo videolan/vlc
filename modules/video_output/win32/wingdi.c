@@ -70,12 +70,15 @@ typedef struct vout_display_sys_t
     void    *p_pic_buffer;
     int     i_pic_pitch;
 
-    struct
-    {
-        BITMAPINFO bitmapinfo;
-        RGBQUAD    red;
-        RGBQUAD    green;
-        RGBQUAD    blue;
+    union {
+        BITMAPINFO bmiInfo;
+        struct
+        {
+            BITMAPINFOHEADER bmiHeader;
+            RGBQUAD          red;
+            RGBQUAD          green;
+            RGBQUAD          blue;
+        } bi_rgb;
     };
 } vout_display_sys_t;
 
@@ -248,31 +251,25 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     }
 
     /* Initialize offscreen bitmap */
-    BITMAPINFO *bi = &sys->bitmapinfo;
-    memset(bi, 0, sizeof(BITMAPINFO) + 3 * sizeof(RGBQUAD));
+    sys->bmiInfo.bmiHeader = (BITMAPINFOHEADER) {
+        .biSize         = sizeof(BITMAPINFOHEADER),
+        .biWidth        = fmt->i_width,
+        .biHeight       = -fmt->i_height,
+        .biPlanes       = 1,
+        .biBitCount     = sys->i_depth,
+        .biCompression  = (sys->i_depth == 15 ||
+                           sys->i_depth == 16) ? BI_BITFIELDS : BI_RGB,
+    };
+
     if (sys->i_depth > 8) {
-        ((DWORD*)bi->bmiColors)[0] = fmt->i_rmask;
-        ((DWORD*)bi->bmiColors)[1] = fmt->i_gmask;
-        ((DWORD*)bi->bmiColors)[2] = fmt->i_bmask;
+        *((DWORD*)&sys->bi_rgb.red)   = fmt->i_rmask;
+        *((DWORD*)&sys->bi_rgb.green) = fmt->i_gmask;
+        *((DWORD*)&sys->bi_rgb.blue)  = fmt->i_bmask;
     }
 
-    BITMAPINFOHEADER *bih = &sys->bitmapinfo.bmiHeader;
-    bih->biSize = sizeof(BITMAPINFOHEADER);
-    bih->biSizeImage     = 0;
-    bih->biPlanes        = 1;
-    bih->biCompression   = (sys->i_depth == 15 ||
-                            sys->i_depth == 16) ? BI_BITFIELDS : BI_RGB;
-    bih->biBitCount      = sys->i_depth;
-    bih->biWidth         = fmt->i_width;
-    bih->biHeight        = -fmt->i_height;
-    bih->biClrImportant  = 0;
-    bih->biClrUsed       = 0;
-    bih->biXPelsPerMeter = 0;
-    bih->biYPelsPerMeter = 0;
-
-    sys->i_pic_pitch = bih->biBitCount * bih->biWidth / 8;
+    sys->i_pic_pitch = sys->i_depth * fmt->i_width / 8;
     sys->off_bitmap = CreateDIBSection(window_dc,
-                                       (BITMAPINFO *)bih,
+                                       &sys->bmiInfo,
                                        DIB_RGB_COLORS,
                                        &sys->p_pic_buffer, NULL, 0);
 
