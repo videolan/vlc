@@ -52,14 +52,6 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
 /* Minimum number of display picture */
 #define DISPLAY_PICTURE_COUNT (1)
 
-/* It should be high enough to absorb jitter due to difficult picture(s)
- * to decode but not too high as memory is not that cheap.
- *
- * It can be made lower at compilation time if needed, but performance
- * may be degraded.
- */
-#define VOUT_MAX_PICTURES (20)
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -112,8 +104,7 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
 
         sys->private_pool =
             picture_pool_NewFromFormat(vd->source,
-                                       __MAX(VOUT_MAX_PICTURES,
-                                             private_picture + kept_picture));
+                                             private_picture + kept_picture);
     }
     if (sys->private_pool == NULL) {
         picture_pool_Release(display_pool);
