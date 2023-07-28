@@ -1479,8 +1479,8 @@ static void spu_PrerenderSync(spu_private_t *sys, const subpicture_t *p_subpic)
 }
 
 static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
-                              video_format_t *fmtsrc, video_format_t *fmtdst,
-                              vlc_fourcc_t *chroma_list)
+                              const video_format_t *fmtsrc, const video_format_t *fmtdst,
+                              const vlc_fourcc_t *chroma_list)
 {
     if (p_subpic->i_original_picture_width  == 0 ||
         p_subpic->i_original_picture_height == 0) {
