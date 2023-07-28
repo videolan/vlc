@@ -306,21 +306,6 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
         .sys = vd,
     };
 
-    osys->converters = filter_chain_NewVideo(vd, false, &owner);
-    if (unlikely(osys->converters == NULL))
-    {
-        picture_pool_Release(osys->converter_pool);
-        osys->converter_pool = NULL;
-        return VLC_ENOMEM;
-    }
-
-    VoutAllocConverterOutput(osys);
-    if (osys->converter_pool == NULL)
-    {
-        msg_Err(vd, "Failed to allocate converter pool");
-        return VLC_ENOMEM;
-    }
-
     video_format_t v_src = osys->source;
     v_src.i_sar_num = 0;
     v_src.i_sar_den = 0;
@@ -332,6 +317,21 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     const bool convert = memcmp(&v_src, &v_dst, sizeof(v_src)) != 0;
     if (!convert)
         return VLC_SUCCESS;
+
+    VoutAllocConverterOutput(osys);
+    if (osys->converter_pool == NULL)
+    {
+        msg_Err(vd, "Failed to allocate converter pool");
+        return VLC_ENOMEM;
+    }
+
+    osys->converters = filter_chain_NewVideo(vd, false, &owner);
+    if (unlikely(osys->converters == NULL))
+    {
+        picture_pool_Release(osys->converter_pool);
+        osys->converter_pool = NULL;
+        return VLC_ENOMEM;
+    }
 
     msg_Dbg(vd, "A filter to adapt decoder %4.4s to display %4.4s is needed",
             (const char *)&v_src.i_chroma, (const char *)&v_dst.i_chroma);
@@ -396,10 +396,8 @@ picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (osys->converters == NULL) {
-        picture_Release(picture);
-        return NULL;
-    }
+    if (osys->converters == NULL)
+        return picture;
 
     return filter_chain_VideoFilter(osys->converters, picture);
 }
@@ -689,7 +687,14 @@ int vout_SetDisplayFormat(vout_display_t *vd, const video_format_t *fmt,
 
     /* On update_format success, the vout display accepts the target format, so
      * no display converters are needed. */
-    filter_chain_Clear(osys->converters);
+    if (osys->converters != NULL)
+    {
+        filter_chain_Delete(osys->converters);
+        osys->converters = NULL;
+        assert(osys->converter_pool != NULL);
+        picture_pool_Release(osys->converter_pool);
+        osys->converter_pool = NULL;
+    }
 
     return VLC_SUCCESS;
 }
