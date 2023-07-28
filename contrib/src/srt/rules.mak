@@ -1,6 +1,6 @@
 # srt
 
-SRT_VERSION := 1.4.4
+SRT_VERSION := 1.5.2
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 # gnutls (nettle/gmp) can't be used with the LGPLv2 license
@@ -35,8 +35,6 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
-	$(APPLY) $(SRC)/srt/0001-core-remove-MSG_TRUNC-logging.patch
-	$(APPLY) $(SRC)/srt/0001-build-always-use-GNUInstallDirs.patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
