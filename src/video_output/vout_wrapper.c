@@ -91,9 +91,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
         display_pool = vout_GetPool(vd, reserved_picture);
         if (display_pool == NULL)
             goto error;
-
-        sys->private_pool =
-            picture_pool_NewFromFormat(vd->source, private_picture);
     } else {
         const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
                                           private_picture +
@@ -101,14 +98,6 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
         display_pool = vout_GetPool(vd, reserved_picture);
         if (display_pool == NULL)
             goto error;
-
-        sys->private_pool =
-            picture_pool_NewFromFormat(vd->source,
-                                             private_picture + kept_picture);
-    }
-    if (sys->private_pool == NULL) {
-        picture_pool_Release(display_pool);
-        goto error;
     }
 
 #ifdef _WIN32
@@ -129,11 +118,6 @@ error:
  *****************************************************************************/
 void vout_CloseWrapper(vout_thread_t *vout, vout_thread_private_t *sys, vout_display_t *vd)
 {
-    assert(sys->private_pool);
-
-    picture_pool_Release(sys->private_pool);
-    sys->private_pool = NULL;
-
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, vd);
 #else

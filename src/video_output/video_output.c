@@ -1719,6 +1719,17 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     dcfg.display.width = sys->window_width;
     dcfg.display.height = sys->window_height;
 
+    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
+    const unsigned kept_picture     = 1; /* last displayed picture */
+
+    sys->private.private_pool =
+        picture_pool_NewFromFormat(&sys->original,
+                                   private_picture + kept_picture);
+    if (sys->private.private_pool == NULL) {
+        vlc_queuedmutex_unlock(&sys->display_lock);
+        goto error;
+    }
+
     sys->display = vout_OpenWrapper(&vout->obj, &sys->private, sys->splitter_name, &dcfg,
                                     &sys->original, vctx);
     if (sys->display == NULL) {
@@ -1731,8 +1742,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(sys->display, num, den);
     vlc_queuedmutex_unlock(&sys->display_lock);
-
-    assert(sys->private.private_pool != NULL);
 
     sys->displayed.current       = NULL;
     sys->displayed.decoded       = NULL;
@@ -1760,6 +1769,11 @@ error:
         filter_chain_Delete(ci);
     if (cs != NULL)
         filter_chain_Delete(cs);
+    if (sys->private.private_pool)
+    {
+        picture_pool_Release(sys->private.private_pool);
+        sys->private.private_pool = NULL;
+    }
     video_format_Clean(&sys->filter.src_fmt);
     if (sys->filter.src_vctx)
     {
@@ -1827,7 +1841,12 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 
     /* Destroy the rendering display */
     if (sys->private.private_pool != NULL)
+    {
         vout_FlushUnlocked(vout, true, VLC_TICK_MAX);
+
+        picture_pool_Release(sys->private.private_pool);
+        sys->private.private_pool = NULL;
+    }
 
     vlc_queuedmutex_lock(&sys->display_lock);
     vout_CloseWrapper(&vout->obj, &sys->private, sys->display);
