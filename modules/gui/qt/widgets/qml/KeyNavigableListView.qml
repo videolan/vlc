@@ -90,6 +90,8 @@ FadingEdgeListView {
     ScrollBar.vertical: ScrollBar { id: scroll_id }
     ScrollBar.horizontal: ScrollBar { }
 
+    flickableDirection: Flickable.AutoFlickIfNeeded
+
     highlightMoveDuration: 300 //ms
     highlightMoveVelocity: 1000 //px/s
 
