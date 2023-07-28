@@ -101,14 +101,14 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
     FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
 
     BITMAPINFOHEADER *bih = &sys->bi_rgb.bmiHeader;
-    if (bih->biWidth  != (LONG)sys->area.src_fmt->i_width ||
-        bih->biHeight != -(LONG)sys->area.src_fmt->i_height)
+    if (bih->biWidth  != (LONG)sys->area.src_fmt->i_visible_width ||
+        bih->biHeight != -(LONG)sys->area.src_fmt->i_visible_height)
     {
         if (sys->off_bitmap)
             DeleteObject(sys->off_bitmap);
 
-        bih->biWidth     = sys->area.src_fmt->i_width;
-        bih->biHeight    = -(LONG)sys->area.src_fmt->i_height;
+        bih->biWidth     = sys->area.src_fmt->i_visible_width;
+        bih->biHeight    = -(LONG)sys->area.src_fmt->i_visible_height;
         sys->i_pic_pitch = bih->biBitCount * bih->biWidth / 8;
         sys->off_bitmap = CreateDIBSection(hdc,
                                            &sys->bmiInfo,
@@ -139,8 +139,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         sys->area.place_changed = false;
     }
 
-    assert((LONG)picture->format.i_width  == sys->bmiInfo.bmiHeader.biWidth &&
-           (LONG)picture->format.i_height == -sys->bmiInfo.bmiHeader.biHeight);
+    assert((LONG)picture->format.i_visible_width  == sys->bmiInfo.bmiHeader.biWidth &&
+           (LONG)picture->format.i_visible_height == -sys->bmiInfo.bmiHeader.biHeight);
 
     picture_t fake_pic = *picture;
     picture_UpdatePlanes(&fake_pic, sys->p_pic_buffer, sys->i_pic_pitch);
