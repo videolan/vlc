@@ -87,12 +87,61 @@ static void           Display(vout_display_t *, picture_t *);
 static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
 
+static int ChangeSize(vout_display_t *vd, HDC hdc)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    // clear the background, even if creating the writable buffer fails
+    RECT display = {
+        .left   = 0,
+        .right  = vd->cfg->display.width,
+        .top    = 0,
+        .bottom = vd->cfg->display.height,
+    };
+    FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
+
+    BITMAPINFOHEADER *bih = &sys->bi_rgb.bmiHeader;
+    if (bih->biWidth  != (LONG)sys->area.src_fmt->i_width ||
+        bih->biHeight != -(LONG)sys->area.src_fmt->i_height)
+    {
+        if (sys->off_bitmap)
+            DeleteObject(sys->off_bitmap);
+
+        bih->biWidth     = sys->area.src_fmt->i_width;
+        bih->biHeight    = -(LONG)sys->area.src_fmt->i_height;
+        sys->i_pic_pitch = bih->biBitCount * bih->biWidth / 8;
+        sys->off_bitmap = CreateDIBSection(hdc,
+                                           &sys->bmiInfo,
+                                           DIB_RGB_COLORS,
+                                           &sys->p_pic_buffer, NULL, 0);
+        if (unlikely(sys->off_bitmap == NULL))
+            return VLC_EINVAL;
+    }
+    return VLC_SUCCESS;
+}
+
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic,
                     vlc_tick_t date)
 {
     VLC_UNUSED(subpic);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
+
+    if (sys->area.place_changed)
+    {
+        HDC hdc = GetDC(CommonVideoHWND(&sys->area));
+        int err = ChangeSize(vd, hdc);
+        ReleaseDC(CommonVideoHWND(&sys->area), hdc);
+
+        if (unlikely(err != VLC_SUCCESS))
+            return;
+
+        sys->area.place_changed = false;
+    }
+
+    assert((LONG)picture->format.i_width  == sys->bmiInfo.bmiHeader.biWidth &&
+           (LONG)picture->format.i_height == -sys->bmiInfo.bmiHeader.biHeight);
+
     picture_t fake_pic = *picture;
     picture_UpdatePlanes(&fake_pic, sys->p_pic_buffer, sys->i_pic_pitch);
     picture_CopyPixels(&fake_pic, picture);
@@ -165,19 +214,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     HDC hdc = GetDC(CommonVideoHWND(&sys->area));
 
-    if (sys->area.place_changed)
-    {
-        /* clear the background */
-        RECT display = {
-            .left   = 0,
-            .right  = vd->cfg->display.width,
-            .top    = 0,
-            .bottom = vd->cfg->display.height,
-        };
-        FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
-        sys->area.place_changed = false;
-    }
-
     SelectObject(sys->off_dc, sys->off_bitmap);
 
     if (sys->area.place.width  != vd->source->i_visible_width ||
@@ -247,14 +283,13 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         break;
     default:
         msg_Err(vd, "screen depth %i not supported", sys->i_depth);
+        ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
         return VLC_EGENERIC;
     }
 
     /* Initialize offscreen bitmap */
     sys->bmiInfo.bmiHeader = (BITMAPINFOHEADER) {
         .biSize         = sizeof(BITMAPINFOHEADER),
-        .biWidth        = fmt->i_width,
-        .biHeight       = -fmt->i_height,
         .biPlanes       = 1,
         .biBitCount     = sys->i_depth,
         .biCompression  = (sys->i_depth == 15 ||
@@ -267,18 +302,15 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         *((DWORD*)&sys->bi_rgb.blue)  = fmt->i_bmask;
     }
 
-    sys->i_pic_pitch = sys->i_depth * fmt->i_width / 8;
-    sys->off_bitmap = CreateDIBSection(window_dc,
-                                       &sys->bmiInfo,
-                                       DIB_RGB_COLORS,
-                                       &sys->p_pic_buffer, NULL, 0);
-
     sys->off_dc = CreateCompatibleDC(window_dc);
 
-    SelectObject(sys->off_dc, sys->off_bitmap);
+    int err = ChangeSize(vd, window_dc);
+    if (err != VLC_SUCCESS)
+        DeleteDC(sys->off_dc);
+
     ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
 
-    return VLC_SUCCESS;
+    return err;
 }
 
 static void Clean(vout_display_t *vd)
