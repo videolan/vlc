@@ -52,6 +52,14 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
 /* Minimum number of display picture */
 #define DISPLAY_PICTURE_COUNT (1)
 
+/* It should be high enough to absorb jitter due to difficult picture(s)
+ * to decode but not too high as memory is not that cheap.
+ *
+ * It can be made lower at compilation time if needed, but performance
+ * may be degraded.
+ */
+#define VOUT_MAX_PICTURES (20)
+
 /*****************************************************************************
  *
  *****************************************************************************/
