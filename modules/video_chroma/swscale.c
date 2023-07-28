@@ -629,11 +629,11 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
             const video_palette_t *p_palette = p_filter->fmt_in.video.p_palette;
             static_assert(sizeof(p_palette->palette) == AVPALETTE_SIZE,
                           "Palette size mismatch between vlc and libavutil");
-            uint8_t *dst = palette;
+            uint8_t *cursor = palette;
             for (size_t i=0; i<sizeof(p_palette->palette[0]); i++)
             {
-                memcpy(dst, p_palette->palette[i], ARRAY_SIZE(p_palette->palette));
-                dst += ARRAY_SIZE(p_palette->palette);
+                memcpy(cursor, p_palette->palette[i], ARRAY_SIZE(p_palette->palette));
+                cursor += ARRAY_SIZE(p_palette->palette);
             }
         }
         else
