@@ -91,17 +91,25 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
 
     const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
     const unsigned kept_picture     = 1; /* last displayed picture */
-    const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
-                                      private_picture +
-                                      kept_picture;
 
-    picture_pool_t *display_pool = vout_GetPool(vd, reserved_picture);
-    if (display_pool == NULL)
-        goto error;
-
+    picture_pool_t *display_pool;
     if (!vout_IsDisplayFiltered(vd)) {
+        const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
+                                          private_picture +
+                                          kept_picture;
+        display_pool = vout_GetPool(vd, reserved_picture);
+        if (display_pool == NULL)
+            goto error;
+
         sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
     } else {
+        const unsigned reserved_picture = DISPLAY_PICTURE_COUNT +
+                                          private_picture +
+                                          kept_picture;
+        display_pool = vout_GetPool(vd, reserved_picture);
+        if (display_pool == NULL)
+            goto error;
+
         sys->private_pool =
             picture_pool_NewFromFormat(vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
