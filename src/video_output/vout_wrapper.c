@@ -93,14 +93,7 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
     if (display_pool == NULL)
         goto error;
 
-#ifndef NDEBUG
-    if ( picture_pool_GetSize(display_pool) < reserved_picture )
-        msg_Warn(vout, "Not enough display buffers in the pool, requested %u got %u",
-                 reserved_picture, picture_pool_GetSize(display_pool));
-#endif
-
-    if (!vout_IsDisplayFiltered(vd) &&
-        picture_pool_GetSize(display_pool) >= reserved_picture) {
+    if (!vout_IsDisplayFiltered(vd)) {
         sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
     } else {
         sys->private_pool =
