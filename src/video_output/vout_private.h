@@ -28,16 +28,14 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
 
-typedef struct vout_thread_private_t vout_thread_private_t;
+typedef struct vout_interlacing_state_t vout_interlacing_state_t;
 
 /* */
-struct vout_thread_private_t
+struct vout_interlacing_state_t
 {
-    struct {
-        bool        is_interlaced;
-        bool        has_deint;
-        vlc_tick_t  date;
-    } interlacing;
+    bool        is_interlaced;
+    bool        has_deint;
+    vlc_tick_t  date;
 };
 
 /* */
@@ -45,8 +43,8 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
                      const vout_display_cfg_t *, const video_format_t *, vlc_video_context *);
 void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
-void vout_InitInterlacingSupport(vout_thread_t *, vout_thread_private_t *);
-void vout_ReinitInterlacingSupport(vout_thread_t *, vout_thread_private_t *);
-void vout_SetInterlacingState(vout_thread_t *, vout_thread_private_t *, bool is_interlaced);
+void vout_InitInterlacingSupport(vout_thread_t *, vout_interlacing_state_t *);
+void vout_ReinitInterlacingSupport(vout_thread_t *, vout_interlacing_state_t *);
+void vout_SetInterlacingState(vout_thread_t *, vout_interlacing_state_t *, bool is_interlaced);
 
 #endif // LIBVLC_VOUT_PRIVATE_H

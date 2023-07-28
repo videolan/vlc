@@ -91,13 +91,13 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-void vout_InitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys)
+void vout_InitInterlacingSupport(vout_thread_t *vout, vout_interlacing_state_t *sys)
 {
     vlc_value_t val;
 
     msg_Dbg(vout, "Deinterlacing available");
 
-    sys->interlacing.has_deint = false;
+    sys->has_deint = false;
 
     /* Create the configuration variables */
     /* */
@@ -147,31 +147,31 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys
 
     var_Create(vout, "sout-deinterlace-mode", VLC_VAR_STRING);
 
-    sys->interlacing.is_interlaced = false;
+    sys->is_interlaced = false;
 }
 
-void vout_ReinitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys)
+void vout_ReinitInterlacingSupport(vout_thread_t *vout, vout_interlacing_state_t *sys)
 {
-    sys->interlacing.is_interlaced = false;
+    sys->is_interlaced = false;
     var_SetBool(vout, "deinterlace-needed", false);
 }
 
-void vout_SetInterlacingState(vout_thread_t *vout, vout_thread_private_t *sys, bool is_interlaced)
+void vout_SetInterlacingState(vout_thread_t *vout, vout_interlacing_state_t *sys, bool is_interlaced)
 {
     const bool interlacing_change =
-        is_interlaced != sys->interlacing.is_interlaced;
+        is_interlaced != sys->is_interlaced;
 
     /* Wait 30s before quitting interlacing mode */
     const bool is_after_deadline =
-        sys->interlacing.date + VLC_TICK_FROM_SEC(30) < vlc_tick_now();
+        sys->date + VLC_TICK_FROM_SEC(30) < vlc_tick_now();
 
     if (interlacing_change && (is_interlaced || is_after_deadline))
     {
         msg_Dbg(vout, "Detected %s video",
                  is_interlaced ? "interlaced" : "progressive");
         var_SetBool(vout, "deinterlace-needed", is_interlaced);
-        sys->interlacing.is_interlaced = is_interlaced;
+        sys->is_interlaced = is_interlaced;
     }
     if (is_interlaced)
-        sys->interlacing.date = vlc_tick_now();
+        sys->date = vlc_tick_now();
 }

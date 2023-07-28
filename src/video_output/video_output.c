@@ -69,7 +69,7 @@ typedef struct vout_thread_sys_t
 {
     struct vout_thread_t obj;
 
-    vout_thread_private_t private;
+    vout_interlacing_state_t interlacing;
 
     bool dummy;
 
@@ -790,7 +790,7 @@ static void ChangeFilters(vout_thread_sys_t *vout)
     vlc_array_init(&array_static);
     vlc_array_init(&array_interactive);
 
-    if (sys->private.interlacing.has_deint)
+    if (sys->interlacing.has_deint)
     {
         vout_filter_t *e = malloc(sizeof(*e));
 
@@ -1394,9 +1394,9 @@ static void UpdateDeinterlaceFilter(vout_thread_sys_t *sys)
 {
     vlc_mutex_lock(&sys->filter.lock);
     if (sys->filter.changed ||
-        sys->private.interlacing.has_deint != sys->filter.new_interlaced)
+        sys->interlacing.has_deint != sys->filter.new_interlaced)
     {
-        sys->private.interlacing.has_deint = sys->filter.new_interlaced;
+        sys->interlacing.has_deint = sys->filter.new_interlaced;
         ChangeFilters(sys);
     }
     vlc_mutex_unlock(&sys->filter.lock);
@@ -1825,7 +1825,7 @@ static void *Thread(void *object)
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
-        vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
+        vout_SetInterlacingState(&vout->obj, &sys->interlacing, picture_interlaced);
     }
     return NULL;
 }
@@ -2058,7 +2058,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     sys->private_pool = NULL;
 
-    vout_InitInterlacingSupport(vout, &sys->private);
+    vout_InitInterlacingSupport(vout, &sys->interlacing);
 
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
 
@@ -2205,7 +2205,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (sys->display != NULL)
         vout_StopDisplay(cfg->vout);
 
-    vout_ReinitInterlacingSupport(cfg->vout, &sys->private);
+    vout_ReinitInterlacingSupport(cfg->vout, &sys->interlacing);
 
     sys->delay = 0;
     sys->rate = 1.f;
