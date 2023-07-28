@@ -153,34 +153,6 @@ error:
     return NULL;
 }
 
-picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
-{
-    if (count == 0)
-        vlc_assert_unreachable();
-    if (unlikely(count > POOL_MAX))
-        return NULL;
-
-    picture_t *picture[POOL_MAX];
-    unsigned i;
-
-    for (i = 0; i < count; i++) {
-        picture[i] = picture_pool_Get(master);
-        if (picture[i] == NULL)
-            goto error;
-    }
-
-    picture_pool_t *pool = picture_pool_New(count, picture);
-    if (!pool)
-        goto error;
-
-    return pool;
-
-error:
-    while (i > 0)
-        picture_Release(picture[--i]);
-    return NULL;
-}
-
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
 
