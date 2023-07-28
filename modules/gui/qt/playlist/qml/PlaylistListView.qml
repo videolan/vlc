@@ -425,7 +425,7 @@ T.Pane {
             delegate: PlaylistDelegate {
                 id: delegate
 
-                width: listView.width
+                width: listView.contentWidth
                 rightPadding: Math.max(listView.ScrollBar.vertical.width, VLCStyle.margin_normal)
 
                 contextMenu: root.contextMenu
