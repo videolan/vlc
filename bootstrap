@@ -27,6 +27,10 @@ if test -d ${VLC_TOOLS}/bin; then
   VLC_TOOLS_PATH="$( cd "${VLC_TOOLS}/bin" ; pwd -P )"
   PATH="$VLC_TOOLS_PATH:$PATH"
 fi
+if test -d ${VLC_TOOLS}/share/aclocal; then
+  # https://www.gnu.org/software/automake/manual/html_node/Macro-Search-Path.html
+  ACLOCAL_ARGS="${ACLOCAL_ARGS} -I ${VLC_TOOLS}/share/aclocal/"
+fi
 
 ###
 ###  Get a sane environment, just in case
