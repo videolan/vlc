@@ -36,8 +36,6 @@ FadingEdgeListView {
     // NOTE: We want buttons to be centered vertically but configurable.
     property int buttonMargin: height / 2 - buttonLeft.height / 2
 
-    readonly property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
-
     property bool keyNavigationWraps: false
 
     // NOTE: Fading is disabled by default, 'enableBeginningFade' and 'enableEndFade' take
@@ -51,7 +49,6 @@ FadingEdgeListView {
     // Aliases
 
     //forward view properties
-    property alias listScrollBar: scroll_id
 
     property alias buttonLeft: buttonLeft
     property alias buttonRight: buttonRight
@@ -87,7 +84,7 @@ FadingEdgeListView {
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
 
-    ScrollBar.vertical: ScrollBar { id: scroll_id }
+    ScrollBar.vertical: ScrollBar { }
     ScrollBar.horizontal: ScrollBar { }
 
     flickableDirection: Flickable.AutoFlickIfNeeded

@@ -125,7 +125,6 @@ FocusScope {
     property alias add:       view.add
     property alias displaced: view.displaced
 
-    property alias listScrollBar: view.listScrollBar
     property alias listView: view
 
     property alias displayMarginEnd: view.displayMarginEnd

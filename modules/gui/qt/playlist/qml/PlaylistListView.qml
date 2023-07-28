@@ -213,7 +213,7 @@ T.Pane {
             Layout.topMargin: VLCStyle.margin_normal
             Layout.bottomMargin: VLCStyle.margin_xxsmall
             Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
+            Layout.rightMargin: Math.max(listView.ScrollBar.vertical.width, VLCStyle.margin_normal)
 
             spacing: VLCStyle.margin_large
 
