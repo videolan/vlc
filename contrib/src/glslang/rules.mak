@@ -1,6 +1,6 @@
 # glslang
 
-GLSLANG_VERSION := 11.10.0
+GLSLANG_VERSION := 12.3.1
 GLSLANG_URL := $(GITHUB)/KhronosGroup/glslang/archive/refs/tags/$(GLSLANG_VERSION).tar.gz
 
 # glslang doesn't export a pkg-config file, so we check the header manually
