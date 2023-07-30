@@ -1,7 +1,7 @@
 # libxml2
 
-LIBXML2_VERSION := 2.9.14
-LIBXML2_URL := https://download.gnome.org/sources/libxml2/2.9/libxml2-$(LIBXML2_VERSION).tar.xz
+LIBXML2_VERSION := 2.11.4
+LIBXML2_URL := https://download.gnome.org/sources/libxml2/2.11/libxml2-$(LIBXML2_VERSION).tar.xz
 
 PKGS += libxml2
 ifeq ($(call need_pkg,"libxml-2.0"),)
