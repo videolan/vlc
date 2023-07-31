@@ -256,6 +256,7 @@ endif
 # array is then iterated over and a library is defined for each
 # entry with the needed build definition for a VLC plugin.
 #
+vlc_plugins_targets = {}
 foreach module : vlc_modules
     if not module.has_key('name')
         error('Got invalid vlc_modules entry without \'name\' key')
@@ -290,7 +291,8 @@ foreach module : vlc_modules
         '-DVLC_DYNAMIC_PLUGIN'
     ]
 
-    library(module['name'] + '_plugin',
+    vlc_plugin = library(
+        module['name'] + '_plugin',
         module['sources'],
         link_with: [module.get('link_with', []), vlc_libcompat],
         link_args: module.get('link_args', []),
@@ -305,4 +307,7 @@ foreach module : vlc_modules
         install: true,
         install_dir: get_option('libdir') / 'vlc/plugins'
     )
+    vlc_plugins_targets += {
+        module['name']: vlc_plugin
+    }
 endforeach
