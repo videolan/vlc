@@ -229,6 +229,11 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
     *yp = y;
 }
 
+struct pooled_filter_chain {
+    filter_chain_t *filters;
+    picture_pool_t *pool;
+};
+
 typedef struct {
     vout_display_t  display;
 
@@ -240,10 +245,9 @@ typedef struct {
     video_format_t source;
     video_format_t display_fmt;
     vlc_video_context *src_vctx;
-     /* filters to convert the vout source to fmt, NULL means no conversion
-      * can be done and nothing will be displayed */
-    filter_chain_t *converters;
-    picture_pool_t *converter_pool;
+
+    // filters to convert the vout source to fmt, NULL means no conversion is needed
+    struct pooled_filter_chain *converter;
 } vout_display_priv_t;
 
 /*****************************************************************************
@@ -259,7 +263,7 @@ static picture_t *SourceConverterBuffer(filter_t *filter)
            osys->display_fmt.i_width  == fmt->i_width  &&
            osys->display_fmt.i_height == fmt->i_height);
 
-    return picture_pool_Get(osys->converter_pool);
+    return picture_pool_Get(osys->converter->pool);
 }
 
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
@@ -273,6 +277,63 @@ static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 static const struct filter_video_callbacks vout_display_filter_cbs = {
     SourceConverterBuffer, DisplayHoldDecoderDevice,
 };
+static void VoutConverterRelease(struct pooled_filter_chain *conv)
+{
+    filter_chain_Delete(conv->filters);
+    picture_pool_Release(conv->pool);
+    free(conv);
+}
+
+static struct pooled_filter_chain *VoutSetupConverter(vlc_object_t *o,
+                              filter_owner_t *owner,
+                              const video_format_t *fmt_in,
+                              vlc_video_context *vctx_in,
+                              const video_format_t *fmt_out)
+{
+    struct pooled_filter_chain *conv = malloc(sizeof(*conv));
+    if (unlikely(conv == NULL))
+        return NULL;
+
+    // 1 for current converter + 1 for previously displayed
+    conv->pool = picture_pool_NewFromFormat(fmt_out, 1+1);
+    if (unlikely(conv->pool == NULL))
+    {
+        msg_Err(o, "Failed to allocate converter pool");
+        free(conv);
+        return NULL;
+    }
+
+    conv->filters = filter_chain_NewVideo(o, false, owner);
+    if (unlikely(conv->filters == NULL))
+    {
+        msg_Err(o, "Failed to create converter filter chain");
+        picture_pool_Release(conv->pool);
+        free(conv);
+        return NULL;
+    }
+
+    /* */
+    es_format_t src;
+    es_format_InitFromVideo(&src, fmt_in);
+
+    /* */
+    es_format_t dst;
+    es_format_InitFromVideo(&dst, fmt_out);
+    dst.video.i_sar_num = 0;
+    dst.video.i_sar_den = 0;
+
+    filter_chain_Reset(conv->filters, &src, vctx_in, &dst);
+    int ret = filter_chain_AppendConverter(conv->filters, &dst);
+    es_format_Clean(&dst);
+    es_format_Clean(&src);
+
+    if (ret != VLC_SUCCESS)
+    {
+        VoutConverterRelease(conv);
+        return NULL;
+    }
+    return conv;
+}
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
@@ -294,48 +355,16 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     if (!convert)
         return VLC_SUCCESS;
 
-    assert(osys->converter_pool == NULL);
-    // 1 for current converter + 1 for previously displayed
-    osys->converter_pool = picture_pool_NewFromFormat(&osys->display_fmt, 1+1);
-    if (osys->converter_pool == NULL)
-    {
-        msg_Err(vd, "Failed to allocate converter pool");
-        return VLC_ENOMEM;
-    }
-
-    osys->converters = filter_chain_NewVideo(vd, false, &owner);
-    if (unlikely(osys->converters == NULL))
-    {
-        picture_pool_Release(osys->converter_pool);
-        osys->converter_pool = NULL;
-        return VLC_ENOMEM;
-    }
-
     msg_Dbg(vd, "A filter to adapt decoder %4.4s to display %4.4s is needed",
             (const char *)&v_src.i_chroma, (const char *)&v_dst.i_chroma);
 
-    /* */
-    es_format_t src;
-    es_format_InitFromVideo(&src, &v_src);
-
-    /* */
-    es_format_t dst;
-    es_format_InitFromVideo(&dst, &v_dst);
-
-    filter_chain_Reset(osys->converters, &src, osys->src_vctx, &dst);
-    int ret = filter_chain_AppendConverter(osys->converters, &dst);
-    es_format_Clean(&dst);
-    es_format_Clean(&src);
-
-    if (ret != VLC_SUCCESS) {
+    osys->converter = VoutSetupConverter(VLC_OBJECT(vd), &owner,
+                                 &v_src, osys->src_vctx, &osys->display_fmt);
+    if (osys->converter == NULL) {
         msg_Err(vd, "Failed to adapt decoder format to display");
-        filter_chain_Delete(osys->converters);
-        osys->converters = NULL;
-
-        picture_pool_Release(osys->converter_pool);
-        osys->converter_pool = NULL;
+        return VLC_ENOTSUP;
     }
-    return ret;
+    return VLC_SUCCESS;
 }
 
 static void VoutDisplayCropRatio(unsigned *left, unsigned *top, unsigned *right, unsigned *bottom,
@@ -367,10 +396,10 @@ picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (osys->converters == NULL)
+    if (osys->converter == NULL)
         return picture;
 
-    return filter_chain_VideoFilter(osys->converters, picture);
+    return filter_chain_VideoFilter(osys->converter->filters, picture);
 }
 
 picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
@@ -388,22 +417,18 @@ void vout_FilterFlush(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (osys->converters != NULL)
-        filter_chain_VideoFlush(osys->converters);
+    if (osys->converter != NULL)
+        filter_chain_VideoFlush(osys->converter->filters);
 }
 
 static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (osys->converters != NULL) {
-        filter_chain_Delete(osys->converters);
-        osys->converters = NULL;
-    }
-
-    if (osys->converter_pool != NULL) {
-        picture_pool_Release(osys->converter_pool);
-        osys->converter_pool = NULL;
+    if (osys->converter != NULL)
+    {
+        VoutConverterRelease(osys->converter);
+        osys->converter = NULL;
     }
 
     assert(vd->ops->reset_pictures);
@@ -658,13 +683,10 @@ int vout_SetDisplayFormat(vout_display_t *vd, const video_format_t *fmt,
 
     /* On update_format success, the vout display accepts the target format, so
      * no display converters are needed. */
-    if (osys->converters != NULL)
+    if (osys->converter != NULL)
     {
-        filter_chain_Delete(osys->converters);
-        osys->converters = NULL;
-        assert(osys->converter_pool != NULL);
-        picture_pool_Release(osys->converter_pool);
-        osys->converter_pool = NULL;
+        VoutConverterRelease(osys->converter);
+        osys->converter = NULL;
     }
 
     return VLC_SUCCESS;
@@ -692,7 +714,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                            source, &cfg->display);
     }
 
-    osys->converter_pool = NULL;
+    osys->converter = NULL;
 
     video_format_Copy(&osys->source, source);
     osys->crop.mode = VOUT_CROP_NONE;
@@ -765,11 +787,10 @@ void vout_display_Delete(vout_display_t *vd)
         osys->src_vctx = NULL;
     }
 
-    if (osys->converters != NULL)
-        filter_chain_Delete(osys->converters);
-
-    if (osys->converter_pool != NULL)
-        picture_pool_Release(osys->converter_pool);
+    if (osys->converter != NULL)
+    {
+        VoutConverterRelease(osys->converter);
+    }
 
     if (vd->ops->close != NULL)
         vd->ops->close(vd);
