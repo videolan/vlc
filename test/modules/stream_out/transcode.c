@@ -257,9 +257,10 @@ static int OutputCheckerSend(sout_stream_t *stream, void *id, vlc_frame_t *f)
     return VLC_SUCCESS;
 }
 
-static void *OutputCheckerAdd(sout_stream_t *stream, const es_format_t *fmt)
+static void *OutputCheckerAdd(sout_stream_t *stream, const es_format_t *fmt,
+                              const char *es_id)
 {
-    (void)stream; (void)fmt;
+    (void)stream; (void)fmt; (void)es_id;
     return (void*)0x42;
 }
 
