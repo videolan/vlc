@@ -599,9 +599,9 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
     case GAMUT_RELATIVE:    params->intent = PL_INTENT_RELATIVE_COLORIMETRIC; break;
     case GAMUT_SATURATION:  params->intent = PL_INTENT_SATURATION; break;
     case GAMUT_ABSOLUTE:    params->intent = PL_INTENT_ABSOLUTE_COLORIMETRIC; break;
-    case GAMUT_DESATURATE:  params->gamut_mode = PL_GAMUT_DESATURATE;
-    case GAMUT_DARKEN:      params->gamut_mode = PL_GAMUT_DARKEN;
-    case GAMUT_WARN:        params->gamut_mode = PL_GAMUT_WARN;
+    case GAMUT_DESATURATE:  params->gamut_mode = PL_GAMUT_DESATURATE; break;
+    case GAMUT_DARKEN:      params->gamut_mode = PL_GAMUT_DARKEN; break;
+    case GAMUT_WARN:        params->gamut_mode = PL_GAMUT_WARN; break;
     case GAMUT_LINEAR:      break; // unsupported
 #endif
     }
