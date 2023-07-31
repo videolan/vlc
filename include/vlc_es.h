@@ -575,9 +575,9 @@ struct subs_format_t
     struct
     {
         /* the width of the original movie the spu was extracted from */
-        int i_original_frame_width;
+        unsigned i_original_frame_width;
         /* the height of the original movie the spu was extracted from */
-        int i_original_frame_height;
+        unsigned i_original_frame_height;
 
         /*  */
         uint32_t palette[VIDEO_PALETTE_CLUT_COUNT]; /* CLUT Palette AYVU */

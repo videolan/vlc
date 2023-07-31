@@ -97,8 +97,8 @@ typedef struct
     int            i_tracks;
     vobsub_track_t *track;
 
-    int            i_original_frame_width;
-    int            i_original_frame_height;
+    unsigned       i_original_frame_width;
+    unsigned       i_original_frame_height;
     bool           b_palette;
     uint32_t       palette[VIDEO_PALETTE_CLUT_COUNT];
 } demux_sys_t;
@@ -149,8 +149,8 @@ static int Open ( vlc_object_t *p_this )
     p_sys->track = malloc( sizeof( vobsub_track_t ) );
     if( unlikely( !p_sys->track ) )
         goto error;
-    p_sys->i_original_frame_width = -1;
-    p_sys->i_original_frame_height = -1;
+    p_sys->i_original_frame_width = 0;
+    p_sys->i_original_frame_height = 0;
     p_sys->b_palette = false;
 
     /* Load the whole file */
@@ -480,7 +480,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             if( vobsub_size_parse( line, &p_sys->i_original_frame_width,
                                    &p_sys->i_original_frame_height ) == VLC_SUCCESS )
             {
-                msg_Dbg( p_demux, "original frame size: %dx%d", p_sys->i_original_frame_width, p_sys->i_original_frame_height );
+                msg_Dbg( p_demux, "original frame size: %ux%u", p_sys->i_original_frame_width, p_sys->i_original_frame_height );
             }
             else
             {

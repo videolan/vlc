@@ -182,7 +182,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE))
         {
             const float margin_ratio = sys->margin_ratio;
-            const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? (unsigned) subpic->i_original_picture_width
+            const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? subpic->i_original_picture_width
                                                                          : fmt_dst->i_visible_width );
             const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 

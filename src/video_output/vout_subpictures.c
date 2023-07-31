@@ -316,8 +316,8 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
 
 static int SpuRenderText(spu_t *spu,
                           subpicture_region_t *region,
-                          int i_original_width,
-                          int i_original_height,
+                          unsigned i_original_width,
+                          unsigned i_original_height,
                           const vlc_fourcc_t *chroma_list)
 {
     spu_private_t *sys = spu->p;
@@ -1183,11 +1183,11 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
         if (!subpic->p_region)
             continue;
 
-        if (subpic->i_original_picture_width  <= 0 ||
-            subpic->i_original_picture_height <= 0) {
+        if (subpic->i_original_picture_width  == 0 ||
+            subpic->i_original_picture_height == 0) {
             if (subpic->i_original_picture_width  > 0 ||
                 subpic->i_original_picture_height > 0)
-                msg_Err(spu, "original picture size %dx%d is unsupported",
+                msg_Err(spu, "original picture size %ux%u is unsupported",
                          subpic->i_original_picture_width,
                          subpic->i_original_picture_height);
             else
@@ -1197,8 +1197,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             subpic->i_original_picture_height = fmt_src->i_visible_height;
         }
 
-        const int i_original_width = subpic->i_original_picture_width;
-        const int i_original_height = subpic->i_original_picture_height;
+        const unsigned i_original_width = subpic->i_original_picture_width;
+        const unsigned i_original_height = subpic->i_original_picture_height;
 
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
@@ -1483,11 +1483,11 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
                               video_format_t *fmtsrc, video_format_t *fmtdst,
                               vlc_fourcc_t *chroma_list)
 {
-    if (p_subpic->i_original_picture_width  <= 0 ||
-        p_subpic->i_original_picture_height <= 0) {
+    if (p_subpic->i_original_picture_width  == 0 ||
+        p_subpic->i_original_picture_height == 0) {
         if (p_subpic->i_original_picture_width  > 0 ||
             p_subpic->i_original_picture_height > 0)
-            msg_Err(spu, "original picture size %dx%d is unsupported",
+            msg_Err(spu, "original picture size %ux%u is unsupported",
                      p_subpic->i_original_picture_width,
                      p_subpic->i_original_picture_height);
         else
@@ -1501,8 +1501,8 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
     subpicture_Update(p_subpic, fmtsrc, fmtdst,
                       p_subpic->b_subtitle ? p_subpic->i_start : vlc_tick_now());
 
-    const int i_original_picture_width = p_subpic->i_original_picture_width;
-    const int i_original_picture_height = p_subpic->i_original_picture_height;
+    const unsigned i_original_picture_width = p_subpic->i_original_picture_width;
+    const unsigned i_original_picture_height = p_subpic->i_original_picture_height;
 
     subpicture_region_t *region;
     for (region = p_subpic->p_region; region != NULL; region = region->p_next)

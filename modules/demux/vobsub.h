@@ -59,11 +59,11 @@ static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palett
 }
 
 static inline int vobsub_size_parse( const char *psz_buf,
-                                     int *pi_original_frame_width,
-                                     int *pi_original_frame_height )
+                                     unsigned *pi_original_frame_width,
+                                     unsigned *pi_original_frame_height )
 {
-    int w, h;
-    if( sscanf( psz_buf, "size: %dx%d", &w, &h ) == 2 )
+    unsigned w, h;
+    if( sscanf( psz_buf, "size: %ux%u", &w, &h ) == 2 )
     {
         *pi_original_frame_width = w;
         *pi_original_frame_height = h;
@@ -92,7 +92,7 @@ static inline void vobsub_extra_parse(vlc_object_t *o, subs_format_t *subs,
                             &subs->spu.i_original_frame_width,
                             &subs->spu.i_original_frame_height ) == VLC_SUCCESS )
     {
-        msg_Dbg( o, "original frame size: %dx%d",
+        msg_Dbg( o, "original frame size: %ux%u",
                     subs->spu.i_original_frame_width,
                     subs->spu.i_original_frame_height );
     }
