@@ -486,8 +486,11 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
         /* Maintain subtitle position */
         p_spu->p_region->i_y = i_first_row*10;
-        p_spu->i_original_picture_width = p_page.columns*12;
-        p_spu->i_original_picture_height = p_page.rows*10;
+        if (p_page.columns > 0 && p_page.rows > 0)
+        {
+            p_spu->i_original_picture_width = p_page.columns*12;
+            p_spu->i_original_picture_height = p_page.rows*10;
+        }
 
         vbi_draw_vt_page_region( &p_page, ZVBI_PIXFMT_RGBA32,
                           p_spu->p_region->p_picture->p->p_pixels, -1,
