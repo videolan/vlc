@@ -1143,12 +1143,12 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                                           bool external_scale)
 {
     /* Count the number of regions and subtitle regions */
-    unsigned int subtitle_region_count = 0;
-    unsigned int region_count          = 0;
-    for (unsigned i = 0; i < i_subpicture; i++) {
+    size_t subtitle_region_count = 0;
+    size_t region_count          = 0;
+    for (size_t i = 0; i < i_subpicture; i++) {
         const subpicture_t *subpic = p_entries[i].subpic;
 
-        unsigned count = 0;
+        size_t count = 0;
         for (subpicture_region_t *r = subpic->p_region; r != NULL; r = r->p_next)
             count++;
 
@@ -1156,7 +1156,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             subtitle_region_count += count;
         region_count += count;
     }
-    if (region_count <= 0)
+    if (region_count == 0)
         return NULL;
 
     /* Create the output subpicture */
