@@ -1230,8 +1230,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                                                   subpic->i_original_picture_height);
 
             /* Check scale validity */
-            if (scale.w <= 0 || scale.h <= 0)
-                continue;
+            assert(scale.w != 0 && scale.h != 0);
 
             const bool do_external_scale = external_scale && region->fmt.i_chroma != VLC_CODEC_TEXT;
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
