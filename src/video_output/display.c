@@ -59,11 +59,11 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
 {
     /* Use the original video size */
     if (source->i_sar_num >= source->i_sar_den) {
-        *width  = (int64_t)source->i_visible_width * source->i_sar_num * dp->sar.den / source->i_sar_den / dp->sar.num;
+        *width  = (uint64_t)source->i_visible_width * source->i_sar_num * dp->sar.den / source->i_sar_den / dp->sar.num;
         *height = source->i_visible_height;
     } else {
         *width  = source->i_visible_width;
-        *height = (int64_t)source->i_visible_height * source->i_sar_den * dp->sar.num / source->i_sar_num / dp->sar.den;
+        *height = (uint64_t)source->i_visible_height * source->i_sar_den * dp->sar.num / source->i_sar_num / dp->sar.den;
     }
 
     *width  = *width  * dp->zoom.num / dp->zoom.den;
