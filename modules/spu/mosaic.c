@@ -65,7 +65,7 @@ typedef struct
     int i_position;           /* Mosaic positioning method */
     bool b_ar;          /* Do we keep the aspect ratio ? */
     bool b_keep;        /* Do we keep the original picture format ? */
-    int i_width, i_height;    /* Mosaic height and width */
+    unsigned i_width, i_height; /* Mosaic height and width */
     int i_cols, i_rows;       /* Mosaic rows and cols */
     int i_align;              /* Mosaic alignment in background video */
     int i_xoffset, i_yoffset; /* Top left corner offset */
@@ -182,9 +182,9 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
                             ALPHA_TEXT, ALPHA_LONGTEXT )
 
-    add_integer_with_range( CFG_PREFIX "height", 100, 0, INT_MAX,
+    add_integer_with_range( CFG_PREFIX "height", 100, 0, UINT_MAX,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT )
-    add_integer_with_range( CFG_PREFIX "width", 100, 0, INT_MAX,
+    add_integer_with_range( CFG_PREFIX "width", 100, 0, UINT_MAX,
                  WIDTH_TEXT, WIDTH_LONGTEXT )
 
     add_integer_with_range( CFG_PREFIX "align", 5, 0, 10,
@@ -761,16 +761,16 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     else if( VAR_IS( "width" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing width from %dpx to %dpx",
-                         p_sys->i_width, (int)newval.i_int );
+        msg_Dbg( p_this, "changing width from %upx to %upx",
+                         p_sys->i_width, (unsigned)newval.i_int );
         p_sys->i_width = newval.i_int;
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( VAR_IS( "xoffset" ) )
     {
         vlc_mutex_lock( &p_sys->lock );
-        msg_Dbg( p_this, "changing x offset from %dpx to %dpx",
-                         p_sys->i_xoffset, (int)newval.i_int );
+        msg_Dbg( p_this, "changing x offset from %upx to %upx",
+                         p_sys->i_xoffset, (unsigned)newval.i_int );
         p_sys->i_xoffset = newval.i_int;
         vlc_mutex_unlock( &p_sys->lock );
     }
