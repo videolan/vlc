@@ -1138,8 +1138,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     //the source format.
     // In early SPU blending the blending is done into the source chroma,
     // otherwise it's done in the display chroma
-    const bool blending_before_converter = !vd_does_blending &&
-                                 vd->source->orientation == ORIENT_NORMAL;
+    const bool blending_before_converter = vd->source->orientation == ORIENT_NORMAL;
 
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
@@ -1199,7 +1198,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
      */
     picture_t *todisplay = filtered;
     picture_t *snap_pic = todisplay;
-    if (blending_before_converter && subpic) {
+    if (!vd_does_blending && blending_before_converter && subpic) {
         if (sys->spu_blend) {
             picture_t *blent = picture_pool_Get(sys->private.private_pool);
             if (blent) {
@@ -1248,7 +1247,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         return VLC_EGENERIC;
     }
 
-    if (!vd_does_blending && subpic)
+    if (!vd_does_blending && !blending_before_converter && subpic)
     {
         if (sys->spu_blend)
             picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
