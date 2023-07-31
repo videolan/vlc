@@ -281,7 +281,7 @@ typedef struct bluray_overlay_t
     bool                b_on_vout;
     OverlayStatus       status;
     subpicture_region_t *p_regions;
-    int                 width, height;
+    uint16_t            width, height;
 
     /* pointer to last subpicture updater.
      * used to disconnect this overlay from vout when:
@@ -1857,7 +1857,7 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
     vlc_mutex_unlock(&ov->lock);
 }
 
-static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height)
+static void blurayInitOverlay(demux_t *p_demux, int plane, uint16_t width, uint16_t height)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2023,7 +2023,7 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
 /*
  * ARGB overlay (BD-J)
  */
-static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int height)
+static void blurayInitArgbOverlay(demux_t *p_demux, int plane, uint16_t width, uint16_t height)
 {
     blurayInitOverlay(p_demux, plane, width, height);
 }
