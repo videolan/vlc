@@ -100,7 +100,9 @@ check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h libvlc/media_utils.h \
 
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
-AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
+AM_CPPFLAGS = \
+	-DSRCDIR=\"$(srcdir)\" \
+	-DTOP_BUILDDIR=\"$(abs_top_builddir)\"
 AM_LDFLAGS = -no-install $(LDFLAGS_vlc)
 LIBVLCCORE = -L../src/ -lvlccore
 LIBVLC = -L../lib -lvlc
