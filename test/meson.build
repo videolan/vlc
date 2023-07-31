@@ -15,6 +15,7 @@ foreach vlc_test: vlc_tests
         'name',
         'sources',
         'link_with',
+        'module_depends',
     ]
 
     foreach key : vlc_test.keys()
@@ -29,6 +30,15 @@ foreach vlc_test: vlc_tests
         '-DTOP_BUILDDIR="@0@"'.format(vlc_build_root),
     ]
 
+    test_modules_deps = []
+    foreach module_name : vlc_test.get('module_depends', [])
+        if module_name not in vlc_plugins_targets.keys()
+            error('Test entry \'@0@\' cannot depend on non-existant VLC plugin \'@1@\''
+                  .format(vlc_test['name'], module_name))
+        endif
+        test_modules_deps += vlc_plugins_targets[module_name]
+    endforeach
+
     test(vlc_test['name'],
         executable(vlc_test['name'], vlc_test['sources'],
             build_by_default: false,
@@ -40,8 +50,8 @@ foreach vlc_test: vlc_tests
                 libvlccore_deps],
             c_args: [vlc_test.get('c_args', []), common_args],
             cpp_args: [vlc_test.get('cpp_args', []), common_args],
-            objc_args: [vlc_test.get('objc_args', []), common_args],
-            ))
+            objc_args: [vlc_test.get('objc_args', []), common_args]),
+        depends: [test_modules_deps])
 endforeach
 
 
