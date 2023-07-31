@@ -180,8 +180,8 @@ typedef struct dvbsub_display_s
     uint8_t                 i_id;
     uint8_t                 i_version;
 
-    int                     i_width;
-    int                     i_height;
+    uint16_t                i_width_minus1;
+    uint16_t                i_height_minus1;
 
     bool                    b_windowed;
     /* these values are only relevant if windowed */
@@ -1012,8 +1012,8 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
     p_sys->display.i_version = i_version;
     p_sys->display.b_windowed = bs_read( s, 1 );
     bs_skip( s, 3 ); /* Reserved bits */
-    p_sys->display.i_width = bs_read( s, 16 )+1;
-    p_sys->display.i_height = bs_read( s, 16 )+1;
+    p_sys->display.i_width_minus1 = bs_read( s, 16 );
+    p_sys->display.i_height_minus1 = bs_read( s, 16 );
 
     if( p_sys->display.b_windowed )
     {
@@ -1032,9 +1032,9 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
         /* if not windowed, setup the window variables to good defaults */
         /* not necessary, but to avoid future confusion.. */
         p_sys->display.i_x     = 0;
-        p_sys->display.i_max_x = p_sys->display.i_width-1;
+        p_sys->display.i_max_x = p_sys->display.i_width_minus1;
         p_sys->display.i_y     = 0;
-        p_sys->display.i_max_y = p_sys->display.i_height-1;
+        p_sys->display.i_max_y = p_sys->display.i_height_minus1;
     }
 
     if( i_processed_length != i_segment_length*8 )
@@ -1045,7 +1045,7 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
 
 #ifdef DEBUG_DVBSUB
     msg_Dbg( p_dec, "version: %d, width: %d, height: %d",
-             p_sys->display.i_version, p_sys->display.i_width, p_sys->display.i_height );
+             p_sys->display.i_version, (int)p_sys->display.i_width_minus1+1, (int)p_sys->display.i_height_minus1+1 );
     if( p_sys->display.b_windowed )
         msg_Dbg( p_dec, "xmin: %d, xmax: %d, ymin: %d, ymax: %d",
                  p_sys->display.i_x, p_sys->display.i_max_x, p_sys->display.i_y, p_sys->display.i_max_y );
@@ -1494,8 +1494,8 @@ static subpicture_t *render( decoder_t *p_dec )
     i_base_x = p_sys->i_spu_x;
     i_base_y = p_sys->i_spu_y;
 
-    p_spu->i_original_picture_width = p_sys->display.i_width;
-    p_spu->i_original_picture_height = p_sys->display.i_height;
+    p_spu->i_original_picture_width = (unsigned)p_sys->display.i_width_minus1 + 1;
+    p_spu->i_original_picture_height = (unsigned)p_sys->display.i_height_minus1 + 1;
 
     if( p_sys->display.b_windowed )
     {
@@ -2633,8 +2633,8 @@ static void default_dds_init( decoder_t * p_dec )
 
     /* configure for SD res in case DDS is not present */
     p_sys->display.i_version = 0xff; /* an invalid version so it's always different */
-    p_sys->display.i_width = 720;
-    p_sys->display.i_height = 576;
+    p_sys->display.i_width_minus1 = 720-1;
+    p_sys->display.i_height_minus1 = 576-1;
     p_sys->display.b_windowed = false;
 }
 
