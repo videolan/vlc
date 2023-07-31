@@ -85,7 +85,12 @@ Widgets.PageLoader {
             currentView: root.view
             model: tabModel
 
-            onClicked: root.loadIndex(index)
+            onClicked: {
+                if (root.pageModel[index].name === currentView.name)
+                    return
+
+                root.loadIndex(index)
+            }
         }
     }
 }

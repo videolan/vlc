@@ -270,6 +270,9 @@ FocusScope {
                     plListView: playlist
 
                     onItemClicked: {
+                        if (selectedIndex === index)
+                            return
+
                         const name = g_mainDisplay.tabModel.get(index).name
                         selectedIndex = index
                         if (_oldViewProperties[name] === undefined)
