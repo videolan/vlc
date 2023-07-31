@@ -57,7 +57,6 @@ static int  DecoderOpen  ( vlc_object_t * );
 static void DecoderClose ( vlc_object_t * );
 static int DecodeBlock ( decoder_t *, block_t * );
 static void *DecoderThread( void * );
-static int  EncoderOpen  ( vlc_object_t * );
 static void EncoderClose ( encoder_t * );
 static block_t *EncodeBlock( encoder_t *, void * );
 
