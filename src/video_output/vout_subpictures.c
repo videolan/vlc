@@ -743,11 +743,11 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             }
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
-            const vlc_tick_t ephemer_date  = current->b_subtitle ? ephemer_subtitle_date  : ephemer_osd_date;
 
             /* Destroy late and obsolete ephemer subpictures */
             bool is_rejected = is_late && render_entry->stop <= stop_date;
             if (current->b_ephemer) {
+                const vlc_tick_t ephemer_date = current->b_subtitle ? ephemer_subtitle_date : ephemer_osd_date;
                 if (render_entry->start < ephemer_date)
                     is_rejected = true;
                 else if (render_entry->start == ephemer_date &&
