@@ -176,9 +176,10 @@ static int OpenWindow(vlc_window_t *wnd)
     return VLC_SUCCESS;
 }
 
-static void *SoutFilterAdd(sout_stream_t *stream, const es_format_t *fmt)
+static void *SoutFilterAdd(sout_stream_t *stream, const es_format_t *fmt,
+                           const char *es_id)
 {
-    (void)stream; (void)fmt;
+    (void)stream; (void)fmt; (void)es_id;
     void *id = malloc(1);
     assert(id != NULL);
     return id;
