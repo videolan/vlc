@@ -83,7 +83,6 @@
     return NSColor.VLCAccentColor;
 }
 
-
 + (NSColor *)VLCSliderLightBackgroundColor
 {
     return [NSColor colorWithCalibratedWhite:0.5 alpha:0.5];
@@ -102,6 +101,15 @@
 + (NSColor *)VLCDarkSubtleBorderColor
 {
     return [NSColor colorWithCalibratedWhite:1 alpha:0.2];
+}
+
++ (NSColor *)VLCSubtleBorderColor
+{
+    if (@available(macOS 10.13, *)) {
+        return [NSColor colorNamed:@"VLCSubtleBorderColor"];
+    }
+
+    return NSColor.VLCLightSubtleBorderColor;
 }
 
 @end
