@@ -970,6 +970,25 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 
+    int glsl_version;
+    if (api->is_gles) {
+        sampler->shader.precision = "precision highp float;\n";
+        if (api->glsl_version >= 300) {
+            sampler->shader.version = strdup("#version 300 es\n");
+            glsl_version = 300;
+        } else {
+            sampler->shader.version = strdup("#version 100\n");
+            glsl_version = 100;
+        }
+    } else {
+        sampler->shader.precision = "";
+        /* GLSL version 420+ breaks backwards compatibility with pre-GLSL 130
+         * syntax, which we use in our vertex/fragment shaders. */
+        glsl_version = __MIN(api->glsl_version, 410);
+        if (asprintf(&sampler->shader.version, "#version %d\n", glsl_version) < 0)
+            goto error;
+    }
+
 #ifdef HAVE_LIBPLACEBO_GL
     priv->uloc.pl_vars = NULL;
     priv->uloc.pl_descs = NULL;
@@ -1044,6 +1063,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 
     free(sampler->shader.extensions);
     free(sampler->shader.body);
+    free(sampler->shader.version);
 
     free(priv);
 }

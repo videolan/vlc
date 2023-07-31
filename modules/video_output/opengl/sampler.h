@@ -90,6 +90,16 @@ struct vlc_gl_sampler {
 
     struct {
         /**
+         * Version header that is appropriate for this shader.
+         */
+        char *version;
+
+        /**
+         * Precision preamble that is appropriate for this shader.
+         */
+        const char *precision;
+
+        /**
          * Piece of fragment shader code declaration OpenGL extensions.
          *
          * It is initialized by the sampler, and may be NULL if no extensions
