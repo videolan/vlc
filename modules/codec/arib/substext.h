@@ -99,8 +99,11 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->p_text = text_segment_New( p_region->psz_text );
         r->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
 
-        subpic->i_original_picture_width  = p_region->i_planewidth;
-        subpic->i_original_picture_height  = p_region->i_planeheight;
+        if (p_region->i_planewidth > 0 && p_region->i_planeheight > 0)
+        {
+            subpic->i_original_picture_width  = p_region->i_planewidth;
+            subpic->i_original_picture_height  = p_region->i_planeheight;
+        }
 
         r->i_x = p_region->i_charleft - (p_region->i_fontwidth + p_region->i_horint / 2) + p_region->i_charleft_adj;
         r->i_y = p_region->i_charbottom - (p_region->i_fontheight + p_region->i_verint / 2) + p_region->i_charbottom_adj;
