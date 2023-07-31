@@ -35,6 +35,9 @@
 struct vlc_gl_api {
     opengl_vtable_t vt;
 
+    /* Highest GLSL version supported by the API */
+    int glsl_version;
+
     /* True if the current API is OpenGL ES, set by the caller */
     bool is_gles;
 

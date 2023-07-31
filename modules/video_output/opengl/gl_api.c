@@ -157,8 +157,16 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
 
     GL_ASSERT_NOERROR(&api->vt);
     GLint version;
+    GLchar *glsl_version;
     api->vt.GetIntegerv(GL_MAJOR_VERSION, &version);
+    glsl_version = (GLchar *) api->vt.GetString(GL_SHADING_LANGUAGE_VERSION);
     GLenum error = api->vt.GetError();
+
+    if (glsl_version) {
+        int major = 0, minor = 0;
+        if (sscanf(glsl_version, "%d.%d", &major, &minor) == 2)
+            api->glsl_version = major * 100 + minor;
+    }
 
     /* OpenGL >= 3.0:
      *     https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glRenderbufferStorageMultisample.xhtml
@@ -180,12 +188,16 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
         /* OpenGL ES 2 includes support for non-power of 2 textures by specification
          * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
         api->supports_npot = true;
+        if (!api->glsl_version)
+            api->glsl_version = version >= 3 ? 300 : 100;
     }
     else
     {
         api->is_gles = false;
         api->supports_npot = vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_non_power_of_two") ||
                              vlc_gl_HasExtension(&extension_vt, "GL_APPLE_texture_2D_limited_npot");
+        if (!api->glsl_version)
+            api->glsl_version = 120;
     }
 
     return VLC_SUCCESS;
