@@ -954,8 +954,10 @@ static void *Run( void *data )
         /* Was the main loop woken up manually ? */
         if (fds[0].revents & POLLIN)
         {
-            char buf;
-            (void)read( fds[0].fd, &buf, 1 );
+            while (read(fds[0].fd, &(char){' '}, 1) == -1)
+            {
+                /* Only EINTR can happen here, so ignore the error. */
+            }
         }
 
         /* We need to lock the mutex while building lists of events,
