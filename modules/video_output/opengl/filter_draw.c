@@ -169,30 +169,17 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
-    const char *shader_version;
-    const char *shader_precision;
-    if (filter->api->is_gles)
-    {
-        shader_version = "#version 100\n";
-        shader_precision = "precision highp float;\n";
-    }
-    else
-    {
-        shader_version = "#version 120\n";
-        shader_precision = "";
-    }
-
     config_ChainParse(filter, DRAW_CFG_PREFIX, filter_options, config);
     sys->vflip = var_InheritBool(filter, DRAW_CFG_PREFIX "vflip");
 
     const char *vertex_shader[] = {
-        shader_version,
+        sampler->shader.version,
         VERTEX_SHADER_BODY,
     };
     const char *fragment_shader[] = {
-        shader_version,
+        sampler->shader.version,
         extensions,
-        shader_precision,
+        sampler->shader.precision,
         sampler->shader.body,
         FRAGMENT_SHADER_BODY,
     };

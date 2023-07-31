@@ -203,27 +203,14 @@ opengl_link_program(struct vlc_gl_filter *filter)
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
-    const char *shader_version;
-    const char *shader_precision;
-    if (filter->api->is_gles)
-    {
-        shader_version = "#version 100\n";
-        shader_precision = "precision highp float;\n";
-    }
-    else
-    {
-        shader_version = "#version 120\n";
-        shader_precision = "";
-    }
-
     const char *vertex_shader[] = {
-        shader_version,
+        sampler->shader.version,
         VERTEX_SHADER_BODY,
     };
     const char *fragment_shader[] = {
-        shader_version,
+        sampler->shader.version,
         extensions,
-        shader_precision,
+        sampler->shader.precision,
         sampler->shader.body,
         FRAGMENT_SHADER_BODY,
     };

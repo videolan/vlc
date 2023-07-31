@@ -188,29 +188,16 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "  gl_FragColor = (pix + pix_up) / 2.0;\n"
         "}\n";
 
-    const char *shader_version;
-    const char *shader_precision;
-    if (filter->api->is_gles)
-    {
-        shader_version = "#version 100\n";
-        shader_precision = "precision highp float;\n";
-    }
-    else
-    {
-        shader_version = "#version 120\n";
-        shader_precision = "";
-    }
-
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
-    const char *vertex_shader[] = { shader_version, VERTEX_SHADER };
+    const char *vertex_shader[] = { sampler->shader.version, VERTEX_SHADER };
     const char *fragment_shader[] = {
-        shader_version,
+        sampler->shader.version,
         extensions,
-        shader_precision,
+        sampler->shader.precision,
         sampler->shader.body,
         FRAGMENT_SHADER,
     };
