@@ -122,6 +122,7 @@
                 <constraint firstItem="0Si-IF-hfH" firstAttribute="leading" secondItem="E6K-GD-bgu" secondAttribute="leading" constant="10" id="vM8-9F-b9Q"/>
             </constraints>
             <connections>
+                <outlet property="backgroundBox" destination="dxP-Cv-lN2" id="pwz-KB-noB"/>
                 <outlet property="detailTextField" destination="8Fd-yT-2AG" id="VVh-Xd-Ma1"/>
                 <outlet property="playButton" destination="UDD-gH-RDW" id="Cvj-Zy-lA5"/>
                 <outlet property="queueButton" destination="Baf-bX-D7M" id="LXJ-9K-2zU"/>
