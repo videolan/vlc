@@ -458,7 +458,7 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     if ((unsigned)right > osys->source.i_visible_width)
         right = osys->source.i_visible_width;
     if ((unsigned)bottom > osys->source.i_visible_height)
-        right = osys->source.i_visible_height;
+        bottom = osys->source.i_visible_height;
 
     osys->source.i_x_offset += left;
     osys->source.i_y_offset += top;
