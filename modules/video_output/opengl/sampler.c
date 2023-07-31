@@ -1017,12 +1017,13 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     int ret = opengl_fragment_shader_init(sampler, expose_planes);
     if (ret != VLC_SUCCESS)
-    {
-        vlc_gl_sampler_Delete(sampler);
-        return NULL;
-    }
+        goto error;
 
     return sampler;
+
+error:
+    vlc_gl_sampler_Delete(sampler);
+    return NULL;
 }
 
 void
