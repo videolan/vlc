@@ -323,7 +323,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     return ret;
 }
 
-static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
+static void VoutDisplayCropRatio(unsigned *left, unsigned *top, unsigned *right, unsigned *bottom,
                                  const video_format_t *source,
                                  unsigned num, unsigned den)
 {
@@ -421,7 +421,7 @@ static void vout_display_Reset(vout_display_t *vd)
 static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    int left, top, right, bottom;
+    unsigned left, top, right, bottom;
 
     video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
 
@@ -456,13 +456,9 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
         left = right - 1;
     if (top >= bottom)
         top = bottom - 1;
-    if (left < 0)
-        left = 0;
-    if (top < 0)
-        top = 0;
-    if ((unsigned)right > osys->source.i_visible_width)
+    if (right > osys->source.i_visible_width)
         right = osys->source.i_visible_width;
-    if ((unsigned)bottom > osys->source.i_visible_height)
+    if (bottom > osys->source.i_visible_height)
         bottom = osys->source.i_visible_height;
 
     osys->source.i_x_offset += left;
