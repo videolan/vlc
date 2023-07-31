@@ -1161,7 +1161,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
 
     /* Create the output subpicture */
     subpicture_t *output = subpicture_New(NULL);
-    if (!output)
+    if (unlikely(output == NULL))
         return NULL;
     output->i_order = p_entries[i_subpicture - 1].subpic->i_order;
     output->i_original_picture_width  = fmt_dst->i_visible_width;
