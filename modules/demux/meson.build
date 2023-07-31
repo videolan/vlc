@@ -298,6 +298,11 @@ vlc_modules += {
     'dependencies' : [m_lib, z_dep]
 }
 
+# mock demux
+vlc_modules += {
+    'name' : 'demux_mock',
+    'sources' : files('mock.c')
+}
 
 # mpgv demux
 vlc_modules += {
