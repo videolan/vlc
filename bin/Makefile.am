@@ -57,8 +57,8 @@ vlc_osx_LDADD = ../lib/libvlc.la
 
 vlc_osx_static_SOURCES = $(vlc_osx_SOURCES)
 vlc_osx_static_OBJCFLAGS = $(AM_OBJCFLAGS) \
-	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
-	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\" \
+	-DTOP_BUILDDIR=\"$(abs_top_builddir)\" \
+	-DTOP_SRCDIR=\"$(abs_top_srcdir)\" \
 	$(NULL)
 vlc_osx_static_LDFLAGS = $(vlc_osx_LDFLAGS) -static
 vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../lib/.libs/"
@@ -77,8 +77,8 @@ endif
 #
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \
-	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
-	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\" \
+	-DTOP_BUILDDIR=\"$(abs_top_builddir)\" \
+	-DTOP_SRCDIR=\"$(abs_top_srcdir)\" \
 	$(NULL)
 vlc_static_CPPFLAGS = $(vlc_CPPFLAGS)
 vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
