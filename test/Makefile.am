@@ -102,7 +102,8 @@ TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
 AM_CPPFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
-	-DTOP_BUILDDIR=\"$(abs_top_builddir)\"
+	-DTOP_BUILDDIR=\"$(abs_top_builddir)\" \
+	-DTOP_SRCDIR=\"$(abs_top_srcdir)\"
 AM_LDFLAGS = -no-install $(LDFLAGS_vlc)
 LIBVLCCORE = -L../src/ -lvlccore
 LIBVLC = -L../lib -lvlc
@@ -260,9 +261,7 @@ FORCE:
 
 libvlc_demux_run_la_SOURCES = src/input/demux-run.c src/input/demux-run.h \
 	src/input/common.c src/input/common.h
-libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
-	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\"
+libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS)
 libvlc_demux_run_la_LDFLAGS = -no-install -static
 libvlc_demux_run_la_LIBADD = \
 	../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
@@ -390,9 +389,7 @@ noinst_PROGRAMS += vlccoreios
 endif
 
 vlc_window_SOURCES = vlc-window.c
-vlc_window_CPPFLAGS = $(AM_CPPFLAGS) -I../include/ \
-	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
-	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\"
+vlc_window_CPPFLAGS = $(AM_CPPFLAGS) -I../include/
 vlc_window_LDADD = ../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
 # Opt-out for building the test driver if there is no dynamic plugins, since we
 # cannot link static plugins currently anyway.
