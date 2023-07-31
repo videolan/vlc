@@ -1222,8 +1222,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                 }
             }
         }
-        subpicture_Delete(subpic);
-        subpic = NULL;
     }
 
     /*
@@ -1251,7 +1249,10 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     {
         if (sys->spu_blend)
             picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
+    }
 
+    if (subpic && !vd_does_blending)
+    {
         /* The subpic will not be used anymore */
         subpicture_Delete(subpic);
         subpic = NULL;
