@@ -96,7 +96,7 @@ static inline void test_init (void)
         alarm (alarm_timeout);
     }
 
-    setenv( "VLC_PLUGIN_PATH", "../modules", 1 );
+    setenv( "VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1 );
 }
 
 #endif /* TEST_H */
