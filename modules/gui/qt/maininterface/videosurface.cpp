@@ -355,8 +355,8 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
 
         connect(m_provider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &VideoSurface::onProviderVideoChanged);
 
-        updatePositionAndSize();
     }
+    updatePositionAndSize();
     return node;
 }
 
