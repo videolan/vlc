@@ -1,5 +1,7 @@
 vlc_tests = []
 
+subdir('libvlc')
+
 foreach vlc_test: vlc_tests
     if not vlc_test.has_key('name')
         error('Got invalid vlc_tests entry without \'name\' key')

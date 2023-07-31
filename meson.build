@@ -1027,6 +1027,10 @@ subdir('bin')
 # VLC plugins
 subdir('modules')
 
+# Integration and non-regression tests, some unittest are there too but the
+# modules/, src/ and lib/ folders should be favoured for those.
+subdir('test')
+
 if get_option('rust').allowed()
     warning('''
     The Rust module support is currently EXPERIMENTAL and INCOMPLETE.
