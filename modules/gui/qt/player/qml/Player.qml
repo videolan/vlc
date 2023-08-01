@@ -616,6 +616,8 @@ FocusScope {
                 Widgets.HorizontalResizeHandle {
                     id: resizeHandle
 
+                    parent: playlistView
+
                     anchors {
                         top: parent.top
                         bottom: parent.bottom
