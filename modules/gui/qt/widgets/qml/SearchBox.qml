@@ -56,8 +56,7 @@ FocusScope {
 
             PropertyChanges {
                 target: iconButton
-
-                highlighted: true
+                checked: true
             }
         },
         State {
@@ -67,6 +66,12 @@ FocusScope {
                 target: textField
                 text: ""
             }
+
+            PropertyChanges {
+                target: iconButton
+                focus: true
+                checked: false
+            }
         }
     ]
 
@@ -74,12 +79,9 @@ FocusScope {
         from: ""; to: "expanded"
         reversible: true
 
-        SequentialAnimation {
-            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
-            PropertyAction { property: "highlighted" }
-            PropertyAction { property: "focus" }
-        }
+        NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
     }
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
     }
@@ -101,7 +103,7 @@ FocusScope {
             iconText: VLCIcons.search
             text: I18n.qtr("Filter")
 
-            focus: root.state === ""
+            focus: true
 
             Navigation.parentItem: root
             Navigation.leftItem: textField
