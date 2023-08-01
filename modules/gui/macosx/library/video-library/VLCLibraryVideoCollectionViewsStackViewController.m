@@ -56,6 +56,16 @@
 
 - (void)setup
 {
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                            selector:@selector(recentsChanged:)
+                                name:VLCLibraryModelRecentsMediaListReset
+                                object:nil];
+    [notificationCenter addObserver:self
+                            selector:@selector(recentsChanged:)
+                                name:VLCLibraryModelRecentsMediaItemDeleted
+                                object:nil];
+
     [self generateCollectionViewContainers];
 }
 
@@ -63,6 +73,37 @@
 {
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     return model.numberOfRecentMedia > 0;
+}
+
+- (void)recentsChanged:(NSNotification *)notification
+{
+    const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
+    const NSUInteger recentsContainerIndex = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
+        return container.videoGroup == VLCLibraryVideoRecentsGroup;
+    }];
+    const BOOL recentsContainerPresent = recentsContainerIndex != NSNotFound;
+
+    if (recentsContainerPresent == shouldShowRecentsContainer) {
+        return;
+    }
+
+    NSMutableArray * const mutableContainers = _collectionViewContainers.mutableCopy;
+
+    if (shouldShowRecentsContainer) {
+        VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
+        containerView.videoGroup = VLCLibraryVideoRecentsGroup;
+        [mutableContainers insertObject:containerView atIndex:0];
+
+        [_collectionsStackView insertArrangedSubview:containerView atIndex:0];
+        [self setupContainerView:containerView forStackView:_collectionsStackView];
+    } else {
+        [mutableContainers removeObjectAtIndex:recentsContainerIndex];
+        VLCLibraryVideoCollectionViewContainerView * const existingContainer = [_collectionViewContainers objectAtIndex:recentsContainerIndex];
+        [_collectionsStackView removeConstraints:existingContainer.constraintsWithSuperview];
+        [_collectionsStackView removeArrangedSubview:existingContainer];
+    }
+
+    _collectionViewContainers = mutableContainers.copy;
 }
 
 - (void)generateCollectionViewContainers
