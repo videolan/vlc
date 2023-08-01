@@ -167,13 +167,10 @@ static bool av1_parse_color_config(bs_t *p_bs,
                                    obu_u3_t seq_profile)
 {
     p_cc->high_bitdepth = bs_read1(p_bs);
-    if(seq_profile <= 2)
-    {
-        if(p_cc->high_bitdepth)
-            p_cc->twelve_bit = bs_read1(p_bs);
-        if(seq_profile != 1)
-            p_cc->mono_chrome = bs_read1(p_bs);
-    }
+    if (seq_profile == 2 && p_cc->high_bitdepth)
+        p_cc->twelve_bit = bs_read1(p_bs);
+    if (seq_profile != 1)
+        p_cc->mono_chrome = bs_read1(p_bs);
     const uint8_t BitDepth = p_cc->twelve_bit ? 12 : ((p_cc->high_bitdepth) ? 10 : 8);
 
     p_cc->color_description_present_flag = bs_read1(p_bs);
