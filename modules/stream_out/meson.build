@@ -112,6 +112,12 @@ vlc_modules += {
     'dependencies' : [m_lib]
 }
 
+# trace
+vlc_modules += {
+    'name' : 'stream_out_trace',
+    'sources' : files('trace.c')
+}
+
 # UDP
 vlc_modules += {
     'name' : 'stream_out_udp',
