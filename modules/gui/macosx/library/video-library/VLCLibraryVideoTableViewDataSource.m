@@ -43,6 +43,7 @@
     NSArray *_recentsArray;
     NSArray *_libraryArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
+    NSUInteger _priorNumVideoSections;
 }
 
 @end
@@ -291,7 +292,8 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == _groupsTableView) {
-        return [self recentItemsPresent] ? 2 : 1;
+        _priorNumVideoSections = [self recentItemsPresent] ? 2 : 1;
+        return _priorNumVideoSections;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
         switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
             case VLCLibraryVideoRecentsGroup:
