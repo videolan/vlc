@@ -42,23 +42,33 @@ FocusScope {
             _widthOverridden = true
     }
 
-    states: State {
-        name: "expanded"
+    states: [
+        State {
+            name: "expanded"
 
-        PropertyChanges {
-            target: textField
+            PropertyChanges {
+                target: textField
 
-            focus: true
-            // Take care if SearchBox was set a specific width:
-            width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+                focus: true
+                // Take care if SearchBox was set a specific width:
+                width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+            }
+
+            PropertyChanges {
+                target: iconButton
+
+                highlighted: true
+            }
+        },
+        State {
+            name: ""
+
+            PropertyChanges {
+                target: textField
+                text: ""
+            }
         }
-
-        PropertyChanges {
-            target: iconButton
-
-            highlighted: true
-        }
-    }
+    ]
 
     transitions: Transition {
         from: ""; to: "expanded"
@@ -97,7 +107,6 @@ FocusScope {
             Navigation.leftItem: textField
 
             onClicked: {
-                textField.clear()
                 root.state = (root.state === "") ? "expanded" : ""
             }
         }
