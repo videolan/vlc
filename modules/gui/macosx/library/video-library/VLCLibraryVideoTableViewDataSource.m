@@ -273,19 +273,22 @@
     return self.libraryModel.numberOfRecentMedia > 0;
 }
 
+- (NSUInteger)rowToVideoGroupAdjustment
+{
+    // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
+    // Additionally, we hide recents when there are no recent media items. Since the recent group
+    // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
+    // defined in the desired order.
+    const BOOL anyRecents = [self recentItemsPresent];
+    return anyRecents ? 1 : 2;
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == _groupsTableView) {
-        const BOOL anyRecents = [self recentItemsPresent];
-        return anyRecents ? 2 : 1;
+        return [self recentItemsPresent] ? 2 : 1;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        const BOOL anyRecents = [self recentItemsPresent];
-
-        // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
-        // Additionally, we hide recents when there are no recent media items. Since the recent group
-        // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
-        // defined in the desired order.
-        const NSUInteger selectedRowAdjustment = anyRecents ? 1 : 2;
+        const NSUInteger selectedRowAdjustment = [self rowToVideoGroupAdjustment];
         
         switch(_groupsTableView.selectedRow + selectedRowAdjustment) {
             case VLCLibraryVideoRecentsGroup:
@@ -311,13 +314,7 @@
                                        forTableView:(NSTableView *)tableView
 {
     if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        const BOOL anyRecents = [self recentItemsPresent];
-
-        // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
-        // Additionally, we hide recents when there are no recent media items. Since the recent group
-        // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
-        // defined in the desired order.
-        const NSUInteger rowAdjustment = anyRecents ? 1 : 2;
+        const NSUInteger rowAdjustment = [self rowToVideoGroupAdjustment];
 
         switch(_groupsTableView.selectedRow + rowAdjustment) {
             case VLCLibraryVideoRecentsGroup:
