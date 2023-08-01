@@ -297,7 +297,7 @@ debian:
         VLC_TEST_TIMEOUT=60 DISTCHECK_CONFIGURE_FLAGS="CFLAGS='$LIBVLC_EXTRA_CFLAGS'" make -j$NCPU distcheck || ./test/dump_stacktraces.sh
     variables:
         <<: *variables-debian
-        LIBVLC_EXTRA_CFLAGS: -Werror=restrict
+        LIBVLC_EXTRA_CFLAGS: -Werror=restrict -Werror=incompatible-pointer-types
 
 nightly-debian:
     extends: debian
