@@ -1352,7 +1352,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         ADD_TEXTFIELD(o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
                       1, 49, toolTip, @"")
-        [o_textfield setIntValue: p_item->value.i];
+        [o_textfield setStringValue: @(p_item->value.i).stringValue];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(textfieldChanged:)
@@ -1382,12 +1382,12 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (IBAction)stepperChanged:(id)sender
 {
-    [o_textfield setIntValue: [o_stepper intValue]];
+    [o_textfield takeStringValueFrom:sender];
 }
 
 - (void)textfieldChanged:(NSNotification *)o_notification
 {
-    [o_stepper setIntValue: [o_textfield intValue]];
+    [o_stepper takeStringValueFrom:o_textfield];
 }
 
 - (int)intValue
@@ -1583,12 +1583,12 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (IBAction)sliderChanged:(id)sender
 {
-    [o_textfield setIntValue: [o_slider intValue]];
+    [o_textfield takeStringValueFrom:o_slider];
 }
 
 - (void)textfieldChanged:(NSNotification *)o_notification
 {
-    [o_slider setIntValue: [o_textfield intValue]];
+    [o_slider takeStringValueFrom:o_textfield];
 }
 
 - (int)intValue
