@@ -89,9 +89,13 @@
     });
 }
 
-- (void)addContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
-             toStackView:(NSStackView *)stackView
+- (void)setupContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
+              forStackView:(NSStackView *)stackView
 {
+    if (containerView == nil || stackView == nil) {
+        return;
+    }
+
     containerView.translatesAutoresizingMaskIntoConstraints = NO;
     NSArray<NSLayoutConstraint*> * const constraintsWithSuperview = @[
         [NSLayoutConstraint constraintWithItem:containerView
@@ -113,7 +117,17 @@
     ];
     containerView.constraintsWithSuperview = constraintsWithSuperview;
     [stackView addConstraints:constraintsWithSuperview];
+}
+
+- (void)addContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
+             toStackView:(NSStackView *)stackView
+{
+    if (containerView == nil || stackView == nil) {
+        return;
+    }
+    
     [stackView addArrangedSubview:containerView];
+    [self setupContainerView:containerView forStackView:stackView];
 }
 
 - (void)setCollectionsStackView:(NSStackView *)collectionsStackView
