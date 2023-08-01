@@ -153,6 +153,7 @@
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
 {
     _groupDescriptor = groupDescriptor;
+    _videoGroup = groupDescriptor.group;
     _dataSource.groupDescriptor = groupDescriptor;
 
     _collectionViewLayout.scrollDirection = _groupDescriptor.isHorizontalBarCollectionView ?
@@ -168,7 +169,7 @@
         return;
     }
 
-    VLCLibraryVideoCollectionViewGroupDescriptor *descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
 }
 
