@@ -174,9 +174,7 @@ T.Pane {
 
         readonly property ListView listView: listView
 
-        ColumnLayout {
-            id: headerTextLayout
-
+        Column {
             Layout.fillHeight: false
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
