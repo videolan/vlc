@@ -45,6 +45,16 @@
 
 using namespace vlc;
 
+namespace
+{
+
+void assertUint16Range(int value)
+{
+    assert(value >= 0 && value <= std::numeric_limits<uint16_t>::max());
+}
+
+}
+
 RenderTask::RenderTask(qt_intf_t *intf, xcb_connection_t* conn, xcb_drawable_t wid,
                        QMutex& pictureLock, QObject *parent)
     : QObject(parent)
@@ -80,7 +90,12 @@ void RenderTask::render(unsigned int requestId)
     {
         //clear screen
         xcb_render_color_t clear = { 0x0000, 0x0000, 0x0000, 0x0000 };
-        xcb_rectangle_t rect = {0, 0, 0xFFFF, 0xFFFF};
+
+
+        xcb_rectangle_t rect = {0, 0
+                                , static_cast<uint16_t>(m_renderSize.width())
+                                , static_cast<uint16_t>(m_renderSize.height())};
+
         xcb_render_fill_rectangles(m_conn, XCB_RENDER_PICT_OP_SRC, drawingarea,
                                    clear, 1, &rect);
     }
@@ -134,6 +149,11 @@ void RenderTask::onWindowSizeChanged(const QSize& newSize)
         m_renderSize.setWidth(vlc_align(newSize.width(), 128));
         m_renderSize.setHeight(vlc_align(newSize.height(), 128));
     }
+
+    // paint function takes uint16
+    assertUint16Range(m_renderSize.width());
+    assertUint16Range(m_renderSize.height());
+
     m_resizeRequested = true;
 }
 
