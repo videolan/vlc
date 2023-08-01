@@ -25,7 +25,7 @@ BUILT_SOURCES = $(BUILT_SOURCES_distclean)
 
 SUFFIXES =
 
-DISTCHECK_CONFIGURE_FLAGS = \
+AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
 	--disable-a52 \
 	--disable-alsa \
