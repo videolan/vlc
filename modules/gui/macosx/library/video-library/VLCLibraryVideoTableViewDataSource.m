@@ -137,6 +137,8 @@
 
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
+    [self checkRecentsSection];
+
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
 
@@ -164,6 +166,8 @@
 
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
 {
+    [self checkRecentsSection];
+
     if (_groupsTableView.selectedRow == -1 ||
         _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
 
@@ -274,6 +278,12 @@
     return self.libraryModel.numberOfRecentMedia > 0;
 }
 
+- (BOOL)recentsSectionPresent
+{
+    // We display Recents and/or Library. This will need to change if we add more sections.
+    return _priorNumVideoSections == 2;
+}
+
 - (NSUInteger)rowToVideoGroupAdjustment
 {
     // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
@@ -287,6 +297,19 @@
 - (NSInteger)rowToVideoGroup:(NSInteger)row
 {
     return row + [self rowToVideoGroupAdjustment];
+}
+
+- (void)checkRecentsSection
+{
+    const BOOL recentsPresent = [self recentItemsPresent];
+    const BOOL recentsVisible = [self recentsSectionPresent];
+
+    if (recentsPresent == recentsVisible) {
+        return;
+    }
+
+    [_groupsTableView reloadData];
+    [self reloadData];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
