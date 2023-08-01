@@ -283,14 +283,17 @@
     return anyRecents ? 1 : 2;
 }
 
+- (NSInteger)rowToVideoGroup:(NSInteger)row
+{
+    return row + [self rowToVideoGroupAdjustment];
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == _groupsTableView) {
         return [self recentItemsPresent] ? 2 : 1;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        const NSUInteger selectedRowAdjustment = [self rowToVideoGroupAdjustment];
-        
-        switch(_groupsTableView.selectedRow + selectedRowAdjustment) {
+        switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
             case VLCLibraryVideoRecentsGroup:
                 return _recentsArray.count;
             case VLCLibraryVideoLibraryGroup:
@@ -314,9 +317,7 @@
                                        forTableView:(NSTableView *)tableView
 {
     if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        const NSUInteger rowAdjustment = [self rowToVideoGroupAdjustment];
-
-        switch(_groupsTableView.selectedRow + rowAdjustment) {
+        switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
             case VLCLibraryVideoRecentsGroup:
                 return _recentsArray[row];
             case VLCLibraryVideoLibraryGroup:
