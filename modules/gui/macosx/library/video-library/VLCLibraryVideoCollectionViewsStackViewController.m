@@ -59,11 +59,16 @@
     [self generateCollectionViewContainers];
 }
 
+- (BOOL)recentMediaPresent
+{
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
+    return model.numberOfRecentMedia > 0;
+}
+
 - (void)generateCollectionViewContainers
 {
     NSMutableArray * const collectionViewContainers = [[NSMutableArray alloc] init];
-    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
-    const BOOL anyRecents = model.numberOfRecentMedia > 0;
+    const BOOL anyRecents = [self recentMediaPresent];
     NSUInteger i = anyRecents ? VLCLibraryVideoRecentsGroup : VLCLibraryVideoRecentsGroup + 1;
 
     for (; i < VLCLibraryVideoSentinel; ++i) {
