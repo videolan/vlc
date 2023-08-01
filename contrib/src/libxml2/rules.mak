@@ -39,8 +39,6 @@ ifdef WITH_OPTIMIZATION
 LIBXML2_CONF += -DLIBXML2_WITH_DEBUG=OFF
 endif
 
-XMLCONF += CFLAGS="$(CFLAGS) -DLIBXML_STATIC"
-
 libxml2: libxml2-$(LIBXML2_VERSION).tar.xz .sum-libxml2
 	$(UNPACK)
 	# fix pkg-config file using an unset variable
