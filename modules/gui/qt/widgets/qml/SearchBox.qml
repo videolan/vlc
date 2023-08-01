@@ -136,7 +136,7 @@ FocusScope {
 
             Navigation.parentItem: root
             Navigation.rightItem: clearButton.visible ? clearButton : iconButton
-            Navigation.cancelAction: function() { root.state = "" }
+            Navigation.cancelAction: function() { root.state = ""; iconButton.focusReason = Qt.ShortcutFocusReason }
 
             Accessible.searchEdit: true
 
