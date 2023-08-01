@@ -99,10 +99,11 @@ static void test_opengl_offscreen(
     GL_ASSERT_NOERROR(&api.vt);
 
     video_format_t fmt;
+    video_format_Init(&fmt, VLC_CODEC_RGBA);
     video_format_Setup(&fmt, VLC_CODEC_RGBA, 3, 3, 3, 3, 1, 1);
-    fmt.primaries = COLOR_PRIMARIES_SRGB;
-    fmt.space = COLOR_SPACE_SRGB;
-    fmt.transfer = TRANSFER_FUNC_SRGB;
+    fmt.primaries = COLOR_PRIMARIES_UNDEF;
+    fmt.space = COLOR_SPACE_UNDEF;
+    fmt.transfer = TRANSFER_FUNC_UNDEF;
     fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     struct vlc_gl_interop *interop =
