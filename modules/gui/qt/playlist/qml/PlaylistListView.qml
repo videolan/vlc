@@ -177,6 +177,7 @@ T.Pane {
         ColumnLayout {
             id: headerTextLayout
 
+            Layout.fillHeight: false
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
 
@@ -210,6 +211,7 @@ T.Pane {
         RowLayout {
             visible: model.count !== 0
 
+            Layout.fillHeight: false
             Layout.topMargin: VLCStyle.margin_normal
             Layout.bottomMargin: VLCStyle.margin_xxsmall
             Layout.leftMargin: VLCStyle.margin_normal
@@ -645,6 +647,7 @@ T.Pane {
         PlaylistToolbar {
             id: toolbar
 
+            Layout.fillHeight: false
             Layout.fillWidth: true
         }
     }
