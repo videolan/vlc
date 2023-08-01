@@ -676,7 +676,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&p_fmt->i_codec );
-        id->downstream_id = transcode_downstream_Add( p_stream, p_fmt, p_fmt, NULL );
+        id->downstream_id = transcode_downstream_Add( p_stream, p_fmt, p_fmt, es_id );
         id->b_transcode = false;
 
         success = id->downstream_id;
