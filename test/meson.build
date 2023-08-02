@@ -14,6 +14,7 @@ foreach vlc_test: vlc_tests
     valid_dict_keys = [
         'name',
         'sources',
+        'suite',
         'link_with',
         'module_depends',
     ]
@@ -51,7 +52,6 @@ foreach vlc_test: vlc_tests
             c_args: [vlc_test.get('c_args', []), common_args],
             cpp_args: [vlc_test.get('cpp_args', []), common_args],
             objc_args: [vlc_test.get('objc_args', []), common_args]),
+        suite: [vlc_test.get('suite', []), 'test'],
         depends: [test_modules_deps])
 endforeach
-
-
