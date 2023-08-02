@@ -100,10 +100,6 @@ Item {
             Layout.preferredHeight: root.titleCover_height
             Layout.preferredWidth: root.titleCover_width
 
-            ListCoverShadow {
-                anchors.fill: cover
-            }
-
             Widgets.MediaCover {
                 id: cover
 
@@ -143,6 +139,11 @@ Item {
 
                         labels: root.titlecoverLabels(titleDel.rowModel)
                     }
+                }
+
+                ListCoverShadow {
+                    anchors.fill: parent
+                    z: -1
                 }
             }
         }
