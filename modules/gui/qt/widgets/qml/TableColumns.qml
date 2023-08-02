@@ -96,55 +96,51 @@ Item {
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
 
-        Item {
+        Widgets.MediaCover {
+            id: cover
+
             Layout.preferredHeight: root.titleCover_height
             Layout.preferredWidth: root.titleCover_width
 
-            Widgets.MediaCover {
-                id: cover
+            source: {
+                let cover = null
+                if (!!titleDel.rowModel) {
+                    cover = titleDel.rowModel[root.criteriaCover]
+                }
+                return cover || ""
+            }
 
+            fallbackImageSource: titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
+
+            playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
+            playIconSize: VLCStyle.play_cover_small
+            onPlayIconClicked: {
+                MediaLib.addAndPlay(titleDel.rowModel.id)
+                History.push(["player"])
+            }
+            radius: root.titleCover_radius
+            color: titleDel.colorContext.bg.secondary
+
+            imageOverlay: Item {
+                width: cover.width
+                height: cover.height
+
+                Widgets.VideoQualityLabels {
+                    anchors {
+                        top: parent.top
+                        right: parent.right
+                        topMargin: VLCStyle.margin_xxsmall
+                        leftMargin: VLCStyle.margin_xxsmall
+                        rightMargin: VLCStyle.margin_xxsmall
+                    }
+
+                    labels: root.titlecoverLabels(titleDel.rowModel)
+                }
+            }
+
+            ListCoverShadow {
                 anchors.fill: parent
-
-                source: {
-                    let cover = null
-                    if (!!titleDel.rowModel) {
-                        cover = titleDel.rowModel[root.criteriaCover]
-                    }
-                    return cover || ""
-                }
-
-                fallbackImageSource: titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
-
-                playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
-                playIconSize: VLCStyle.play_cover_small
-                onPlayIconClicked: {
-                    MediaLib.addAndPlay(titleDel.rowModel.id)
-                    History.push(["player"])
-                }
-                radius: root.titleCover_radius
-                color: titleDel.colorContext.bg.secondary
-
-                imageOverlay: Item {
-                    width: cover.width
-                    height: cover.height
-
-                    Widgets.VideoQualityLabels {
-                        anchors {
-                            top: parent.top
-                            right: parent.right
-                            topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxsmall
-                            rightMargin: VLCStyle.margin_xxsmall
-                        }
-
-                        labels: root.titlecoverLabels(titleDel.rowModel)
-                    }
-                }
-
-                ListCoverShadow {
-                    anchors.fill: parent
-                    z: -1
-                }
+                z: -1
             }
         }
 
