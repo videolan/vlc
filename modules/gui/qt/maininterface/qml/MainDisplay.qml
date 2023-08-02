@@ -75,13 +75,7 @@ FocusScope {
 
         const item = stackView.currentItem
 
-        item.Navigation.parentItem = medialibId
-        item.Navigation.upItem = sourcesBanner
-        item.Navigation.rightItem = playlistColumn
-
-        item.Navigation.downItem = Qt.binding(function() {
-            return miniPlayer.visible ? miniPlayer : medialibId
-        })
+        item.Navigation.parentItem = stackView
 
         sourcesBanner.localMenuDelegate = Qt.binding(function () {
             return !!item.localMenuDelegate ? item.localMenuDelegate : null
@@ -315,6 +309,12 @@ FocusScope {
                         rightPadding: (MainCtx.playlistDocked && MainCtx.playlistVisible)
                                       ? 0
                                       : VLCStyle.applicationHorizontalMargin
+
+
+                        Navigation.parentItem: medialibId
+                        Navigation.upItem: sourcesBanner
+                        Navigation.rightItem: playlistColumn
+                        Navigation.downItem:  miniPlayer.visible ? miniPlayer : null
                     }
 
                     Rectangle {
