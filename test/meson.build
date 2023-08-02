@@ -1,5 +1,6 @@
 vlc_tests = []
 
+subdir('src')
 subdir('libvlc')
 
 foreach vlc_test: vlc_tests
