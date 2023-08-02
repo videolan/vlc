@@ -264,7 +264,6 @@ T.ItemDelegate {
 
         onClicked: {
             /* to receive keys events */
-            view.forceActiveFocus(Qt.MouseFocusReason)
             if (!(delegate.selected && mouse.button === Qt.RightButton)) {
                 view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
                 view.currentIndex = index
@@ -277,6 +276,10 @@ T.ItemDelegate {
         onDoubleClicked: {
             if (mouse.button !== Qt.RightButton)
                 MainPlaylistController.goTo(index, true)
+        }
+
+        onPressed: {
+            delegate.forceActiveFocus(Qt.MouseFocusReason)
         }
 
         drag.target: dragItem
