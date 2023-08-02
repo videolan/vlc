@@ -130,6 +130,7 @@ test_libvlc_slaves_SOURCES = libvlc/slaves.c
 test_libvlc_slaves_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_meta_SOURCES = libvlc/meta.c
 test_libvlc_meta_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
 test_src_misc_ancillary_SOURCES = src/misc/ancillary.c
 test_src_misc_ancillary_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_variables_SOURCES = src/misc/variables.c
@@ -162,6 +163,23 @@ test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_SOURCES = src/media_source/media_source.c
+
+test_src_video_output_SOURCES = \
+	src/video_output/video_output.c \
+	src/video_output/video_output.h \
+	src/video_output/video_output_scenarios.c
+test_src_video_output_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_video_output_opengl_SOURCES = src/video_output/opengl.c
+test_src_video_output_opengl_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_src_input_decoder_SOURCES = \
+	src/input/decoder/input_decoder.c \
+	src/input/decoder/input_decoder.h \
+	src/input/decoder/input_decoder_scenarios.c
+test_src_input_decoder_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_src_misc_image_SOURCES = src/misc/image.c
+test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_lua_extension_SOURCES = modules/lua/extension.c
 test_modules_lua_extension_LDADD = $(LIBVLCCORE) $(LIBVLC)
@@ -219,15 +237,6 @@ test_modules_video_output_opengl_es2_filters_SOURCES = $(test_modules_video_outp
 test_modules_video_output_opengl_es2_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_video_output_opengl_es2_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
 
-
-test_src_video_output_SOURCES = \
-	src/video_output/video_output.c \
-	src/video_output/video_output.h \
-	src/video_output/video_output_scenarios.c
-test_src_video_output_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_src_video_output_opengl_SOURCES = src/video_output/opengl.c
-test_src_video_output_opengl_LDADD = $(LIBVLCCORE) $(LIBVLC)
-
 test_modules_stream_out_transcode_SOURCES = \
 	modules/stream_out/transcode.c \
 	modules/stream_out/transcode.h \
@@ -240,15 +249,6 @@ test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_helper.h \
 	../modules/stream_out/transcode/pcr_helper.c
 test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
-
-test_src_input_decoder_SOURCES = \
-	src/input/decoder/input_decoder.c \
-	src/input/decoder/input_decoder.h \
-	src/input/decoder/input_decoder_scenarios.c
-test_src_input_decoder_LDADD = $(LIBVLCCORE) $(LIBVLC)
-
-test_src_misc_image_SOURCES = src/misc/image.c
-test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
