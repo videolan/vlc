@@ -114,7 +114,9 @@ AbstractButton {
             color: theme.bg.primary
 
             Widgets.DoubleShadow {
-                anchors.fill: parent
+                anchors.centerIn: cover
+                width: cover.paintedWidth
+                height: cover.paintedHeight
 
                 primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
                 primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
