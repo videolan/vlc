@@ -1155,7 +1155,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     // otherwise it's done in the display chroma
     const bool blending_before_converter = vd->source->orientation == ORIENT_NORMAL;
 
-    const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
     if (vd_does_blending) {
         vout_display_place_t place;
@@ -1170,7 +1169,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
             fmt_spu.i_height         =
             fmt_spu.i_visible_height = place.height;
         }
-        subpicture_chromas = vd->info.subpicture_chromas;
     } else {
         if (blending_before_converter) {
             fmt_spu = *vd->source;
@@ -1179,7 +1177,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
             fmt_spu.i_sar_num = vd->cfg->display.sar.num;
             fmt_spu.i_sar_den = vd->cfg->display.sar.den;
         }
-        subpicture_chromas = NULL;
 
         if (sys->spu_blend &&
             sys->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
@@ -1196,8 +1193,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     /* Get the subpicture to be displayed. */
     video_format_t fmt_spu_rot;
     video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
-    subpicture_t *subpic = RenderSPUs(sys, subpicture_chromas, &fmt_spu_rot,
-                                      system_now, render_subtitle_date, do_snapshot);
     /*
      * Perform rendering
      *
@@ -1207,8 +1202,11 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
      */
     picture_t *todisplay = filtered;
     picture_t *snap_pic = todisplay;
-    if (!vd_does_blending && blending_before_converter && subpic) {
-        if (sys->spu_blend) {
+    if (!vd_does_blending && blending_before_converter && sys->spu_blend) {
+        subpicture_t *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
+                                          system_now, render_subtitle_date,
+                                          do_snapshot);
+        if (subpic) {
             picture_t *blent = picture_pool_Get(sys->private_pool);
             if (blent) {
                 video_format_CopyCropAr(&blent->format, &filtered->format);
@@ -1230,6 +1228,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                     picture_Release(blent);
                 }
             }
+            subpicture_Delete(subpic);
         }
     }
 
@@ -1249,26 +1248,29 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
 
     todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {
-        if (subpic != NULL)
-            subpicture_Delete(subpic);
         return VLC_EGENERIC;
     }
 
-    if (!vd_does_blending && !blending_before_converter && subpic)
+    if (!vd_does_blending && !blending_before_converter && sys->spu_blend)
     {
-        if (sys->spu_blend)
+        subpicture_t *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
+                                          system_now, render_subtitle_date,
+                                          do_snapshot);
+        if (subpic)
+        {
             picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
-    }
-
-    if (subpic && !vd_does_blending)
-    {
-        /* The subpic will not be used anymore */
-        subpicture_Delete(subpic);
-        subpic = NULL;
+            subpicture_Delete(subpic);
+        }
     }
 
     *out_pic = todisplay;
-    *out_subpic = subpic;
+    if (vd_does_blending)
+        *out_subpic = RenderSPUs(sys, vd->info.subpicture_chromas, &fmt_spu_rot,
+                                 system_now, render_subtitle_date,
+                                 false);
+    else
+        *out_subpic = NULL;
+
     return VLC_SUCCESS;
 }
 
