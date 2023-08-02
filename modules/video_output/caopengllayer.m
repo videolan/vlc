@@ -841,6 +841,10 @@ shouldInheritContentsScale:(CGFloat)newScale
             sys->cfg.display.width = newSize.width;
             sys->cfg.display.height = newSize.height;
         }
+
+        /* Workaround: there's no window module, so signal the correct size to the core. */
+        vout_display_SendEventDisplaySize (_voutDisplay,
+            newSize.width, newSize.height);
     }
 }
 
