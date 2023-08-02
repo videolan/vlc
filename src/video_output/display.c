@@ -249,7 +249,7 @@ typedef struct {
 /*****************************************************************************
  * FIXME/TODO see how to have direct rendering here (interact with vout.c)
  *****************************************************************************/
-static picture_t *VideoBufferNew(filter_t *filter)
+static picture_t *SourceConverterBuffer(filter_t *filter)
 {
     vout_display_t *vd = filter->owner.sys;
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
@@ -271,7 +271,7 @@ static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 }
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
-    VideoBufferNew, DisplayHoldDecoderDevice,
+    SourceConverterBuffer, DisplayHoldDecoderDevice,
 };
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
