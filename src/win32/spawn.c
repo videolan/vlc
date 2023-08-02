@@ -73,15 +73,15 @@ error:
 
 static HANDLE dup_handle_from_fd(const int fd)
 {
-    HANDLE vlc_handle = (HANDLE)_get_osfhandle(fd);
-    if (vlc_handle == INVALID_HANDLE_VALUE)
-        return vlc_handle;
+    intptr_t vlc_handle = _get_osfhandle(fd);
+    if (vlc_handle == (intptr_t)INVALID_HANDLE_VALUE)
+        return INVALID_HANDLE_VALUE;
 
-    if (vlc_handle == (HANDLE)-2)
+    if (vlc_handle == -2)
         return INVALID_HANDLE_VALUE;
 
     HANDLE dup_inheritable_handle;
-    BOOL result = DuplicateHandle(GetCurrentProcess(), vlc_handle, GetCurrentProcess(),
+    BOOL result = DuplicateHandle(GetCurrentProcess(), (HANDLE)vlc_handle, GetCurrentProcess(),
                                   &dup_inheritable_handle, 0, TRUE, DUPLICATE_SAME_ACCESS);
     if (!result)
         return INVALID_HANDLE_VALUE;
