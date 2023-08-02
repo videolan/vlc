@@ -17,6 +17,10 @@ foreach vlc_test: vlc_tests
         'suite',
         'link_with',
         'module_depends',
+        'dependencies',
+        'c_args',
+        'cpp_args',
+        'objc_args',
     ]
 
     foreach key : vlc_test.keys()
