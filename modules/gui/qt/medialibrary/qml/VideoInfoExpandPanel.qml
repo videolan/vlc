@@ -116,10 +116,11 @@ FocusScope {
                             anchors.fill: parent
                             source: model.thumbnail || VLCStyle.noArtVideoCover
                             radius: VLCStyle.gridCover_radius
-                        }
 
-                        Widgets.ListCoverShadow {
-                            anchors.fill: expand_cover_id
+                            Widgets.ListCoverShadow {
+                                anchors.fill: parent
+                                z: -1
+                            }
                         }
                     }
 
