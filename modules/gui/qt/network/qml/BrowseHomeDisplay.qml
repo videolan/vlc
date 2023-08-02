@@ -50,7 +50,7 @@ FocusScope {
         { text: I18n.qtr("Url"),        criteria: "mrl" }
     ]
 
-    readonly property bool isViewMultiView: true
+    readonly property bool hasGridListMode: true
 
     // Aliases
 

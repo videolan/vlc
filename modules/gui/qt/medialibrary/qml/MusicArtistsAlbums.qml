@@ -45,7 +45,7 @@ FocusScope {
     property int initialIndex: 0
     property int initialAlbumIndex: 0
 
-    readonly property bool isViewMultiView: true
+    readonly property bool hasGridListMode: true
 
     // Aliases
 

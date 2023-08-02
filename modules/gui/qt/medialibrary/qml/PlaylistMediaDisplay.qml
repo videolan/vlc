@@ -36,7 +36,7 @@ FocusScope {
 
     // Properties
 
-    readonly property bool isViewMultiView: false
+    readonly property bool hasGridListMode: false
 
     property int leftPadding: 0
     property int rightPadding: 0

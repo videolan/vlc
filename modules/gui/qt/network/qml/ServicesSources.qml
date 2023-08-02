@@ -29,7 +29,7 @@ import "qrc:///style/"
 MainInterface.MainGridView {
     id: root
 
-    readonly property bool isViewMultiView: false
+    readonly property bool hasGridListMode: false
 
     selectionDelegateModel: selectionModel
     model: sourcesModel

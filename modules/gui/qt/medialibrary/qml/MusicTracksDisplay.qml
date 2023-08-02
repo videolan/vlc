@@ -29,7 +29,7 @@ FocusScope {
 
     // Properties
 
-    readonly property bool isViewMultiView: false
+    readonly property bool hasGridListMode: false
 
     property var sortModel: [
         { text: I18n.qtr("Title"),    criteria: "title"},

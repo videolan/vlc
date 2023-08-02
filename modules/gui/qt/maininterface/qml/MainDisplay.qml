@@ -95,8 +95,8 @@ FocusScope {
 
         sourcesBanner.extraLocalActions = Qt.binding(function () { return item.extraLocalActions })
 
-        sourcesBanner.isViewMultiView = Qt.binding(function () {
-            return item.isViewMultiView === undefined || item.isViewMultiView
+        sourcesBanner.hasGridListMode = Qt.binding(function () {
+            return item.hasGridListMode === undefined || item.hasGridListMode
         })
 
         // Restore sourcesBanner state

@@ -34,9 +34,9 @@ FocusScope {
     property var loadDefaultView: null
 
     //indicates whether the subview support grid/list mode
-    readonly property bool isViewMultiView: (stackView.currentItem
-                                            && stackView.currentItem.isViewMultiView !== undefined
-                                            && stackView.currentItem.isViewMultiView)
+    readonly property bool hasGridListMode: (stackView.currentItem
+                                            && stackView.currentItem.hasGridListMode !== undefined
+                                            && stackView.currentItem.hasGridListMode)
 
     // Private
 
