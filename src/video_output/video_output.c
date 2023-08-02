@@ -1093,6 +1093,21 @@ static picture_t *FilterPictureInteractive(vout_thread_sys_t *sys)
     return filtered;
 }
 
+static subpicture_t *RenderSPUs(vout_thread_sys_t *sys,
+                                const vlc_fourcc_t *subpicture_chromas,
+                                const video_format_t *spu_frame,
+                                vlc_tick_t system_now, vlc_tick_t render_subtitle_date,
+                                bool ignore_osd)
+{
+    if (unlikely(sys->spu == NULL))
+        return NULL;
+    return spu_Render(sys->spu,
+                      subpicture_chromas, spu_frame,
+                      sys->display->source,
+                      system_now, render_subtitle_date,
+                      ignore_osd, sys->display->info.can_scale_spu);
+}
+
 static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                             bool *render_now, picture_t **out_pic,
                             subpicture_t **out_subpic)
@@ -1181,12 +1196,8 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     /* Get the subpicture to be displayed. */
     video_format_t fmt_spu_rot;
     video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
-    subpicture_t *subpic = !sys->spu ? NULL :
-                           spu_Render(sys->spu,
-                                      subpicture_chromas, &fmt_spu_rot,
-                                      vd->source, system_now,
-                                      render_subtitle_date,
-                                      do_snapshot, vd->info.can_scale_spu);
+    subpicture_t *subpic = RenderSPUs(sys, subpicture_chromas, &fmt_spu_rot,
+                                      system_now, render_subtitle_date, do_snapshot);
     /*
      * Perform rendering
      *
