@@ -45,6 +45,7 @@ typedef struct vout_display_sys_t
     vlc_placebo_t *pl;
     pl_renderer renderer;
     pl_tex plane_tex[4];
+    pl_tex fbo;
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
@@ -225,6 +226,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         vlc_placebo_ReleaseCurrent(sys->pl);
         return; // Probably benign error, ignore it
     }
+    sys->fbo = frame.fbo;
 
 #if PL_API_VER >= 199
     bool need_vflip = false;
@@ -454,8 +456,7 @@ done:
     if (failed)
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 1.0, 0.0, 0.0, 1.0 });
 
-    if (!pl_swapchain_submit_frame(sys->pl->swapchain))
-        msg_Err(vd, "Failed rendering frame!");
+    pl_gpu_flush(gpu);
 
     vlc_placebo_ReleaseCurrent(sys->pl);
 }
@@ -464,7 +465,13 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 {
     VLC_UNUSED(pic);
     vout_display_sys_t *sys = vd->sys;
+    if (!sys->fbo)
+        return;
+
+    sys->fbo = NULL;
     if (vlc_placebo_MakeCurrent(sys->pl) == VLC_SUCCESS) {
+        if (!pl_swapchain_submit_frame(sys->pl->swapchain))
+            msg_Err(vd, "Failed rendering frame!");
         pl_swapchain_swap_buffers(sys->pl->swapchain);
         vlc_placebo_ReleaseCurrent(sys->pl);
     }
