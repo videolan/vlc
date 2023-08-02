@@ -41,8 +41,6 @@ endif
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.xz .sum-libxml2
 	$(UNPACK)
-	# fix pkg-config file using an unset variable
-	sed -e 's,"\\\$${pcfiledir}/$${PACKAGE_RELATIVE_PATH}","$${CMAKE_INSTALL_PREFIX}",' -i.orig  "$(UNPACK_DIR)/CMakeLists.txt"
 	$(call pkg_static,"libxml-2.0.pc.in")
 	$(MOVE)
 
