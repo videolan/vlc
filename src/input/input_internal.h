@@ -306,9 +306,21 @@ typedef void (*input_thread_events_cb)( input_thread_t *input,
                                         const struct vlc_input_event *event,
                                         void *userdata);
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
+/**
+ * Create a new input_thread_t.
+ *
+ * You need to call input_Start on it when you are done
+ * adding callback on the variables/events you want to monitor.
+ *
+ * \param p_parent a vlc_object
+ * \param events_cb the events virtual table
+ * \param events_data an opaque given to the events callbacks (\p events_cb)
+ * \param p_item an input item
+ * \param type the type of task the input is created for (thumbnailing, playback, ...)
+ * \param p_resource an optional input ressource
+ * \param p_renderer an optional renderer object to render the input to
+ * \return a pointer to the spawned input thread
+ */
 input_thread_t * input_Create( vlc_object_t *p_parent,
                                input_thread_events_cb event_cb, void *events_data,
                                input_item_t *, enum input_type type,
