@@ -288,7 +288,7 @@ FocusScope {
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
 
-                                iconSize: VLCStyle.icon_banner
+                                size: VLCStyle.icon_banner
 
                                 visible: root.sortModel !== undefined && root.sortModel.length > 1
 

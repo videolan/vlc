@@ -23,7 +23,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-FocusScope {
+Widgets.IconToolButton {
     id: root
 
     // Properties
@@ -50,13 +50,6 @@ FocusScope {
     property SortMenu _menu: (menu) ? menu
                                     : sortMenu
 
-    // Aliases
-
-    property alias colorContext: button.colorContext
-    property alias checked: button.checked
-    property alias focusPolicy: button.focusPolicy
-    property alias iconSize: button.size
-
     // Signals
 
     // sortSelected is triggered with new sorting key when a different sorting key is selected
@@ -65,18 +58,22 @@ FocusScope {
     signal sortSelected(var key)
     signal sortOrderSelected(int type)
 
-    // Settings
 
-    // when height/width is explicitly set (force size), implicit values will not be used.
-    // when height/width is not explicitly set, IconToolButton will set its ...
-    // height and width to these implicit counterparts because ...
-    // height and width will be set to implicit values when they are not ...
-    // explicitly set.
-    implicitWidth: button.implicitWidth
-    implicitHeight: button.implicitHeight
+    size: VLCStyle.icon_normal
+
+    focus: true
+
+    text: I18n.qtr("Sort")
+
+    iconText: VLCIcons.topbar_sort
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
+
 
     // Events
 
+    onClicked: root.show()
     onVisibleChanged: if (!visible) _menu.close()
     onEnabledChanged: if (!enabled) _menu.close()
 
@@ -125,27 +122,5 @@ FocusScope {
 
     SortMenu { id: sortMenu }
 
-    Widgets.IconToolButton {
-        id: button
-
-        // set height and width to root height and width so that ...
-        // we can forcefully set SortControl's width and height.
-        height: root.height
-        width: root.width
-
-        size: VLCStyle.icon_normal
-
-        focus: true
-
-        text: I18n.qtr("Sort")
-
-        iconText: VLCIcons.topbar_sort
-
-        Navigation.parentItem: root
-
-        Keys.priority: Keys.AfterItem
-        Keys.onPressed: Navigation.defaultKeyAction(event)
-
-        onClicked: root.show()
-    }
 }
+

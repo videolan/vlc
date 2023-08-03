@@ -85,7 +85,7 @@ RowLayout {
 
             anchors.centerIn: parent
 
-            iconSize: VLCStyle.icon_playlist
+            size: VLCStyle.icon_playlist
 
             enabled: MainPlaylistController.count > 1
 
