@@ -222,7 +222,7 @@ Widgets.OverlayMenu {
 
             onLoaded: {
                 item.text = modelData.title
-                item.key = modelData.key
+                item.key = modelData.criteria
                 overlayMenu.sortMenu.entries.push(item)
             }
         }

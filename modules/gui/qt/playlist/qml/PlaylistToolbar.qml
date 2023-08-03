@@ -97,7 +97,7 @@ RowLayout {
 
             model: MainPlaylistController.sortKeyTitleList
             textRole: "title"
-            criteriaRole: "key"
+            criteriaRole: "criteria"
 
             onSortSelected: {
                 MainPlaylistController.sortKey = key
