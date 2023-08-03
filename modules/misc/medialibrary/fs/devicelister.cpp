@@ -58,6 +58,9 @@ bool DeviceLister::start( ml::IDeviceListerCb* cb )
         &vlc_media_source_meta_list_Delete
     };
 
+    if (providerList.get() == nullptr)
+        return false;
+
     m_cb = cb;
 
     auto nbProviders = vlc_media_source_meta_list_Count( providerList.get() );
