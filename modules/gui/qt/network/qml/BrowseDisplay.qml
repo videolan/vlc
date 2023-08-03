@@ -31,7 +31,6 @@ Widgets.PageLoader {
 
     // Properties
 
-    property var sortModel
     property var contentModel
 
     property Component localMenuDelegate
@@ -63,9 +62,7 @@ Widgets.PageLoader {
 
     // Events
     onCurrentItemChanged: {
-        sortModel = currentItem.sortModel;
         contentModel = currentItem.model;
-
 
         if (view.name === "home")
             localMenuDelegate = null

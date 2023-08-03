@@ -42,19 +42,18 @@ MainInterface.MainViewLoader {
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
+    property alias parentId: albumModelId.parentId
     property alias searchPattern: albumModelId.searchPattern
 
-    property var sortModel: [
+    isSearchable: true
+    model: albumModelId
+
+    sortModel: [
         { text: I18n.qtr("Alphabetic"),  criteria: "title"},
         { text: I18n.qtr("Duration"),    criteria: "duration" },
         { text: I18n.qtr("Date"),        criteria: "release_year" },
         { text: I18n.qtr("Artist"),      criteria: "main_artist" },
     ]
-
-    property alias parentId: albumModelId.parentId
-
-    isSearchable: true
-    model: albumModelId
 
     grid: gridComponent
     list: tableComponent

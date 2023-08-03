@@ -43,8 +43,6 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
-    property var sortModel: [{ text: I18n.qtr("Alphabetic"), criteria: "title" }]
-
     property alias searchPattern: playlistModel.searchPattern
 
     //---------------------------------------------------------------------------------------------
@@ -97,6 +95,8 @@ MainInterface.MainViewLoader {
     emptyLabel: emptyLabel
 
     isSearchable: true
+    sortModel: [{ text: I18n.qtr("Alphabetic"), criteria: "title" }]
+
 
     model: MLPlaylistListModel {
         id: playlistModel
@@ -107,8 +107,6 @@ MainInterface.MainViewLoader {
 
         coverSize: (isMusic) ? Qt.size(512, 512)
                              : Qt.size(1024, 640)
-
-        searchPattern: MainCtx.search.pattern
 
         coverDefault: root._placeHolder
 

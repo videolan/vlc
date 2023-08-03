@@ -42,6 +42,9 @@ FocusScope {
                                     && currentItem.isSearchable !== undefined
                                     && currentItem.isSearchable)
 
+    readonly property var sortModel: (stackView.currentItem !== undefined
+                                    && stackView.currentItem.sortModel !== undefined) ? stackView.currentItem.sortModel : null
+
     // Private
 
     property bool _ready: false

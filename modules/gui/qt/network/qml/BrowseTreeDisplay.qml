@@ -39,13 +39,6 @@ MainInterface.MainViewLoader {
      // 'loading' property is not available with NetworkDevicesModel
     readonly property bool loading: Helpers.get(model, "loading", false)
 
-    property var sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name"},
-        { text: I18n.qtr("Url"), criteria: "mrl" },
-        { text: I18n.qtr("File size"), criteria: "fileSizeRaw64" },
-        { text: I18n.qtr("File modified"), criteria: "fileModified" }
-    ]
-
     // fixme remove this
     property Item _currentView: currentItem
 
@@ -54,6 +47,13 @@ MainInterface.MainViewLoader {
     // Settings
 
     isSearchable: true
+
+    sortModel: [
+        { text: I18n.qtr("Alphabetic"), criteria: "name"},
+        { text: I18n.qtr("Url"), criteria: "mrl" },
+        { text: I18n.qtr("File size"), criteria: "fileSizeRaw64" },
+        { text: I18n.qtr("File modified"), criteria: "fileModified" }
+    ]
 
     grid: gridComponent
     list: tableComponent

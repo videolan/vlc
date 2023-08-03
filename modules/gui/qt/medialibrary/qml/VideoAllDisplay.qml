@@ -34,7 +34,6 @@ Widgets.PageLoader {
 
     property var model
     property var sortMenu
-    property var sortModel
 
     // Settings
 
@@ -59,7 +58,6 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         model     = currentItem.model
         sortMenu  = currentItem.sortMenu
-        sortModel = currentItem.sortModel
     }
     // Functions private
 

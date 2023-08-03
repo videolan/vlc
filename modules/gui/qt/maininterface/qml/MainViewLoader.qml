@@ -61,6 +61,8 @@ Widgets.StackViewExt {
 
     property bool isSearchable: false
 
+    property var sortModel: []
+
     property var selectionModel: Util.SelectableDelegateModel {
         model: root.model
     }

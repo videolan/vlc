@@ -29,7 +29,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var sortModel
     property var contentModel
 
     Accessible.role: Accessible.Client
@@ -64,7 +63,6 @@ Widgets.PageLoader {
     }
 
     onCurrentItemChanged: {
-        sortModel = currentItem.sortModel
         contentModel = currentItem.model
     }
 

@@ -29,7 +29,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var sortModel
     property var contentModel
 
     pageModel: [{
@@ -52,7 +51,6 @@ Widgets.PageLoader {
     Accessible.name: I18n.qtr("Discover view")
 
     onCurrentItemChanged: {
-        sortModel = currentItem.sortModel
         contentModel = currentItem.model
         localMenuDelegate = !!currentItem.localMenuDelegate ? currentItem.localMenuDelegate : menuDelegate
     }

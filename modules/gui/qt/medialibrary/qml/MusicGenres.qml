@@ -33,11 +33,6 @@ MainInterface.MainViewLoader {
     id: root
 
     // Properties
-
-    property var sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name" }
-    ]
-
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
     property alias searchPattern: genreModel.searchPattern
@@ -49,6 +44,10 @@ MainInterface.MainViewLoader {
 
     isSearchable: true
     model: genreModel
+
+    sortModel: [
+        { text: I18n.qtr("Alphabetic"), criteria: "name" }
+    ]
 
     list: tableComponent
     grid: gridComponent

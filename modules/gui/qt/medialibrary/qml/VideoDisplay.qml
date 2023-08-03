@@ -36,7 +36,6 @@ Widgets.PageLoader {
     property var contentModel
 
     property var sortMenu
-    property var sortModel
 
     property ListModel tabModel: ListModel {
         Component.onCompleted: {
@@ -89,7 +88,6 @@ Widgets.PageLoader {
         // NOTE: We need bindings because the VideoAll model can change over time.
         contentModel = Qt.binding(function () { return currentItem.model; })
         sortMenu     = Qt.binding(function () { return currentItem.sortMenu; })
-        sortModel    = Qt.binding(function () { return currentItem.sortModel; })
     }
 
     //---------------------------------------------------------------------------------------------

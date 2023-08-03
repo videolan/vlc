@@ -50,11 +50,6 @@ MainInterface.MainViewLoader {
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
     /* required */ property var contextMenu
 
-    property var sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "title"    },
-        { text: I18n.qtr("Duration"),   criteria: "duration" }
-    ]
-
     // function(model) -> [strings....]
     // used to get grid labels per model item
     property var gridLabels: getLabel
@@ -70,6 +65,11 @@ MainInterface.MainViewLoader {
     list: list
     grid: grid
     emptyLabel: emptylabel
+
+    sortModel: [
+        { text: I18n.qtr("Alphabetic"), criteria: "title"    },
+        { text: I18n.qtr("Duration"),   criteria: "duration" }
+    ]
 
     // Functions
 

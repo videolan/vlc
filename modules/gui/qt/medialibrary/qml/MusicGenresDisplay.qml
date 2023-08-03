@@ -28,7 +28,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var sortModel
     property var model
 
     pageModel: [{
@@ -45,7 +44,6 @@ Widgets.PageLoader {
     }
 
     onCurrentItemChanged: {
-        sortModel = currentItem.sortModel
         model = currentItem.model
     }
 

@@ -35,7 +35,6 @@ Widgets.PageLoader {
     //---------------------------------------------------------------------------------------------
 
     property var model
-    property var sortModel
 
     //---------------------------------------------------------------------------------------------
     // Settings
@@ -60,7 +59,6 @@ Widgets.PageLoader {
 
     onCurrentItemChanged: {
         model     = currentItem.model;
-        sortModel = currentItem.sortModel;
     }
 
     //---------------------------------------------------------------------------------------------

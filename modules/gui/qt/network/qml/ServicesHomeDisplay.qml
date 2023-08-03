@@ -30,7 +30,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var sortModel
     property var model
     property Component localMenuDelegate: null
 
@@ -55,7 +54,6 @@ Widgets.PageLoader {
     }
 
     onCurrentItemChanged: {
-        sortModel = currentItem.sortModel
         model = currentItem.model
         localMenuDelegate = !!currentItem.addressBar ? currentItem.addressBar : null
     }
