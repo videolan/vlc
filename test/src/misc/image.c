@@ -129,8 +129,7 @@ vlc_module_begin()
     set_capability("image encoder", INT_MAX)
 
     add_submodule()
-        set_callback(OpenConverter)
-        set_capability("video converter", INT_MAX)
+        set_callback_video_converter(OpenConverter, INT_MAX)
 
     add_submodule()
         set_callback(OpenIntf)

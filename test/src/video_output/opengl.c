@@ -177,8 +177,7 @@ OpenOpenGLESOffscreen(vlc_gl_t *gl, unsigned width, unsigned height,
  *  - opengl offscreen for generating video context and using decoder device
  **/
 vlc_module_begin()
-    set_callback(OpenDecoderDevice)
-    set_capability("decoder device", 1000)
+    set_callback_dec_device(OpenDecoderDevice, 1000)
     add_shortcut("test_offscreen")
 
     add_submodule()

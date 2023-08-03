@@ -254,24 +254,20 @@ vlc_module_begin()
     set_capability("video decoder", INT_MAX)
 
     add_submodule()
-        set_callback(OpenDecoderDevice)
-        set_capability("decoder device", 0)
+        set_callback_dec_device(OpenDecoderDevice, 0)
 
     add_submodule()
-        set_callback(OpenFilter)
-        set_capability("video filter", 0)
+        set_callback_video_filter(OpenFilter)
 
     add_submodule()
-        set_callback(OpenConverter)
-        set_capability("video converter", INT_MAX)
+        set_callback_video_converter(OpenConverter, INT_MAX)
 
     add_submodule()
         set_callback(OpenWindow)
         set_capability("vout window", INT_MAX)
 
     add_submodule()
-        set_callback(OpenDisplay)
-        set_capability("vout display", 0)
+        set_callback_display(OpenDisplay, 0)
 
     /* Interface module to avoid casting libvlc_instance_t to object */
     add_submodule()

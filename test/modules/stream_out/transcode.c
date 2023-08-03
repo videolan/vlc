@@ -373,16 +373,13 @@ vlc_module_begin()
         add_shortcut("output_checker")
 
     add_submodule()
-        set_callback(OpenDecoderDevice)
-        set_capability("decoder device", 0)
+        set_callback_dec_device(OpenDecoderDevice, 0)
 
     add_submodule()
-        set_callback(OpenFilter)
-        set_capability("video filter", 0)
+        set_callback_video_filter(OpenFilter)
 
     add_submodule()
-        set_callback(OpenConverter)
-        set_capability("video converter", INT_MAX)
+        set_callback_video_converter(OpenConverter, INT_MAX)
 
     add_submodule()
         set_callback(OpenEncoder)

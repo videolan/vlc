@@ -305,8 +305,7 @@ vlc_module_begin()
 
 
     add_submodule()
-        set_callback(OpenDecoderDevice)
-        set_capability("decoder device", 0)
+        set_callback_dec_device(OpenDecoderDevice, 0)
 
     add_submodule()
         set_callbacks(OpenDecoder, CloseDecoder)
