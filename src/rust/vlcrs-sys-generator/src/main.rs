@@ -81,8 +81,17 @@ impl BindingsGenerator {
 }
 
 fn main() {
-    #[allow(unused)]
     let bindings_gen = BindingsGenerator {
         include_path: env::var("INCLUDE_PATH").unwrap_or_else(|_| "../../include".to_string()),
     };
+
+    bindings_gen.generate_bindings_for("vlcrs-messages", &["vlc_messages.h"], |builder| {
+        builder
+            .allowlist_function("vlc_Log")
+            .allowlist_type("vlc_logger")
+            .allowlist_type("vlc_log_type")
+            .default_enum_style(bindgen::EnumVariation::Rust {
+                non_exhaustive: true,
+            })
+    });
 }
