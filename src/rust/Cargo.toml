@@ -1,4 +1,5 @@
 [workspace]
 members = [
+    "vlcrs-messages",
     "vlcrs-sys-generator"
 ]
