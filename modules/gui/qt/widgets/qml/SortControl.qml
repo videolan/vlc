@@ -30,9 +30,6 @@ Widgets.IconToolButton {
 
     property var model: []
 
-    property string textRole
-    property string criteriaRole
-
     property bool popupAbove: false
 
     property real listWidth: VLCStyle.widthSortBox
@@ -83,7 +80,7 @@ Widgets.IconToolButton {
         target: (_menu) ? _menu : null
 
         onSelected: {
-            const selectedSortKey = root.model[index][root.criteriaRole]
+            const selectedSortKey = root.model[index].criteria
 
             if (root.sortKey !== selectedSortKey) {
                 root.sortSelected(selectedSortKey)
@@ -99,10 +96,10 @@ Widgets.IconToolButton {
 
     function show() {
         const model = root.model.map(function(modelData) {
-            const checked = modelData[root.criteriaRole] === sortKey
+            const checked = modelData.criteria === sortKey
             const order = checked ? root.sortOrder : undefined
             return {
-                "text": modelData[root.textRole],
+                "text": modelData.text,
                 "checked": checked,
                 "order": order
             }

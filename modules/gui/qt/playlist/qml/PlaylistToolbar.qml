@@ -96,8 +96,6 @@ RowLayout {
             focusPolicy: Qt.NoFocus
 
             model: MainPlaylistController.sortKeyTitleList
-            textRole: "title"
-            criteriaRole: "criteria"
 
             onSortSelected: {
                 MainPlaylistController.sortKey = key

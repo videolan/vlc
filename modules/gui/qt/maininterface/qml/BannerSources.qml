@@ -294,9 +294,6 @@ FocusScope {
 
                                 enabled: visible
 
-                                textRole: "text"
-                                criteriaRole: "criteria"
-
                                 sortKey: contentModel ? contentModel.sortCriteria
                                                       : PlaylistController.SORT_KEY_NONE
 
