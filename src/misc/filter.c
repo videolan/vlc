@@ -106,7 +106,7 @@ vlc_blender_t *filter_NewBlend( vlc_object_t *p_this,
                            const video_format_t *p_dst_chroma )
 {
     vlc_blender_t *p_blend = vlc_custom_create( p_this, sizeof(*p_blend), "blend" );
-    if( !p_blend )
+    if( unlikely( p_blend == NULL ) )
         return NULL;
 
     es_format_Init( &p_blend->fmt_in, VIDEO_ES, 0 );
