@@ -137,13 +137,16 @@ static bool isNodeValid(QVariant& value)
     return false;
 }
 
-static QString getViewPath(QVariantMap map)
+static QStringList getViewPath(QVariantMap map)
 {
-    QString r;
+    QStringList r;
     if (map.contains("view"))
-        r = getViewPath(map.value("view").toMap());
+        return getViewPath(map.value("view").toMap());
     else if (map.contains("name"))
-        r = "/" + map.value("name").toString() + getViewPath(map.value("properties").toMap());
+    {
+        r = QStringList( map.value("name").toString() );
+        r.append(std::move(getViewPath(map.value("properties").toMap())));
+    }
     return r;
 }
 
@@ -219,7 +222,7 @@ void NavigationHistory::updateViewPath()
     emit viewPathChanged( m_viewPath );
 }
 
-QString NavigationHistory::viewPath() const
+QStringList NavigationHistory::viewPath() const
 {
     return m_viewPath;
 }

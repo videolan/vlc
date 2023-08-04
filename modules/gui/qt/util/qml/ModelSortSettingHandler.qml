@@ -51,7 +51,7 @@ QtObject {
 
     function set(model, key) {
         _model = model
-        _key = key
+        _key = key.join("/")
 
         if (!_model)
             return

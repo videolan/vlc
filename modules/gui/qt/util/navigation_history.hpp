@@ -10,7 +10,7 @@ class NavigationHistory : public QObject
 public:
     Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged FINAL)
     Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged FINAL)
-    Q_PROPERTY(QString viewPath READ viewPath NOTIFY viewPathChanged FINAL)
+    Q_PROPERTY(QStringList viewPath READ viewPath NOTIFY viewPathChanged FINAL)
 
     enum class PostAction{
         Stay,
@@ -23,7 +23,7 @@ public:
 
     QVariant getCurrent();
     bool isPreviousEmpty();
-    QString viewPath() const;
+    QStringList viewPath() const;
 
     // NOTE: The first item to call this takes ownership over the focus reason.
     Q_INVOKABLE Qt::FocusReason takeFocusReason();
@@ -31,7 +31,7 @@ public:
 signals:
     void currentChanged(QVariant current);
     void previousEmptyChanged(bool empty);
-    void viewPathChanged(QString viewPath);
+    void viewPathChanged(const QStringList& viewPath);
 
 public slots:
     /**
@@ -102,7 +102,7 @@ private:
     void updateViewPath();
 
     QVariantList m_history;
-    QString m_viewPath;
+    QStringList m_viewPath;
 
     Qt::FocusReason m_reason;
 };
