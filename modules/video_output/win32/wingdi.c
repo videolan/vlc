@@ -61,8 +61,6 @@ typedef struct vout_display_sys_t
 {
     display_win32_area_t     area;
 
-    int  i_depth;
-
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
     HBITMAP    off_bitmap;
@@ -251,12 +249,12 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     HDC window_dc = GetDC(CommonVideoHWND(&sys->area));
 
     /* */
-    sys->i_depth = GetDeviceCaps(window_dc, PLANES) *
-                   GetDeviceCaps(window_dc, BITSPIXEL);
+    int i_depth = GetDeviceCaps(window_dc, PLANES) *
+                  GetDeviceCaps(window_dc, BITSPIXEL);
 
     /* */
-    msg_Dbg(vd, "GDI depth is %i", sys->i_depth);
-    switch (sys->i_depth) {
+    msg_Dbg(vd, "GDI depth is %i", i_depth);
+    switch (i_depth) {
     case 8:
         fmt->i_chroma = VLC_CODEC_RGB8;
         break;
@@ -285,7 +283,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         fmt->i_bmask  = 0x000000ff;
         break;
     default:
-        msg_Err(vd, "screen depth %i not supported", sys->i_depth);
+        msg_Err(vd, "screen depth %i not supported", i_depth);
         ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
         return VLC_EGENERIC;
     }
@@ -294,12 +292,12 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     sys->bmiInfo.bmiHeader = (BITMAPINFOHEADER) {
         .biSize         = sizeof(BITMAPINFOHEADER),
         .biPlanes       = 1,
-        .biBitCount     = sys->i_depth,
-        .biCompression  = (sys->i_depth == 15 ||
-                           sys->i_depth == 16) ? BI_BITFIELDS : BI_RGB,
+        .biBitCount     = i_depth,
+        .biCompression  = (i_depth == 15 ||
+                           i_depth == 16) ? BI_BITFIELDS : BI_RGB,
     };
 
-    if (sys->i_depth > 8) {
+    if (i_depth > 8) {
         *((DWORD*)&sys->bi_rgb.red)   = fmt->i_rmask;
         *((DWORD*)&sys->bi_rgb.green) = fmt->i_gmask;
         *((DWORD*)&sys->bi_rgb.blue)  = fmt->i_bmask;
