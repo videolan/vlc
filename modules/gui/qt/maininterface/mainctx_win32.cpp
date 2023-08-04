@@ -217,7 +217,6 @@ class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 public:
     CSDWin32EventHandler(MainCtx* mainctx, QWindow *window, QObject *parent)
         : QObject {parent}
-        , m_mainctx(mainctx)
         , m_useClientSideDecoration {mainctx->useClientSideDecoration()}
         , m_window {window}
         , m_buttonmodel {mainctx->csdButtonModel()}
@@ -525,7 +524,6 @@ private:
         }
     }
 
-    MainCtx* m_mainctx = nullptr;
     bool m_useClientSideDecoration;
     QWindow *m_window;
     CSDButtonModel *m_buttonmodel;
