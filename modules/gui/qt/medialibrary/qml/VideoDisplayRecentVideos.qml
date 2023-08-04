@@ -117,6 +117,7 @@ FocusScope {
                 id: recentModel
 
                 ml: MediaLib
+                limit: 10
             }
 
             delegate: VideoGridItem {

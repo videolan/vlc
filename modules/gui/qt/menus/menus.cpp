@@ -197,7 +197,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     {
         MLRecentsModel* recentModel = new MLRecentsModel(nullptr);
         recentModel->setMl(mi->getMediaLibrary());
-        recentModel->setNumberOfItemsToShow(10);
+        recentModel->setLimit(10);
         QMenu* recentsMenu = new RecentMenu(recentModel, mi->getMediaLibrary(), menu);
         recentsMenu->setTitle(qtr( "Open &Recent Media" ) );
         recentModel->setParent(recentsMenu);

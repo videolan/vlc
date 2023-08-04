@@ -25,7 +25,7 @@ Item {
 
     MLRecentModel {
         id: recentModel
-        numberOfItemsToShow: 10
+        limit: 10
         ml: MediaLib
     }
 
