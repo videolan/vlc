@@ -36,6 +36,8 @@ MainInterface.MainViewLoader {
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
     property alias searchPattern: genreModel.searchPattern
+    property alias sortOrder: genreModel.sortOrder
+    property alias sortCriteria: genreModel.sortCriteria
 
     // FIXME: remove this
     property var _currentView: currentItem

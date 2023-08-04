@@ -116,6 +116,8 @@ MainInterface.MainGridView {
         ctx: MainCtx
 
         searchPattern: MainCtx.search.pattern
+        sortOrder: MainCtx.sort.order
+        sortCriteria: MainCtx.sort.criteria
     }
 
     Util.SelectableDelegateModel {

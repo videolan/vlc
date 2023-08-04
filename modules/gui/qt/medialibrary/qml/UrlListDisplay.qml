@@ -34,6 +34,8 @@ Widgets.KeyNavigableTableView {
     readonly property bool isSearchable: false
 
     property alias searchPattern: urlModel.searchPattern
+    property alias sortOrder: urlModel.sortOrder
+    property alias sortCriteria: urlModel.sortCriteria
 
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
                                        listView_id.availableRowWidth)

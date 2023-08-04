@@ -151,6 +151,8 @@ FocusScope {
                     //we only have a handfull of standard path (5 or 6)
                     //so we don't limit them
 
+                    sortCriteria: MainCtx.sort.criteria
+                    sortOrder: MainCtx.sort.order
                     searchPattern: MainCtx.search.pattern
                 }
 
@@ -188,14 +190,16 @@ FocusScope {
                 model: NetworkDeviceModel {
                     ctx: MainCtx
 
+                    limit: deviceSection.maximumCount
+
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                    searchPattern: MainCtx.search.pattern
+
                     sd_source: NetworkDeviceModel.CAT_DEVICES
                     source_name: "*"
-
-                    searchPattern: MainCtx.search.pattern
-                    sortCriteria: foldersSection.model.sortCriteria
-                    sortOrder: foldersSection.model.sortOrder
-                    limit: deviceSection.maximumCount
                 }
+
 
                 title: I18n.qtr("My Machine")
 
@@ -239,10 +243,10 @@ FocusScope {
                     sd_source: NetworkDeviceModel.CAT_LAN
                     source_name: "*"
 
-                    sortCriteria: foldersSection.model.sortCriteria
-                    sortOrder: foldersSection.model.sortOrder
                     limit: lanSection.maximumCount
 
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
                     searchPattern: MainCtx.search.pattern
                 }
 

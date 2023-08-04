@@ -89,6 +89,10 @@ Widgets.PageLoader {
 
             isMusic: false
 
+            searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
+
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
             onShowList: {
@@ -107,6 +111,8 @@ Widgets.PageLoader {
             isMusic: false
 
             searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
 
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)

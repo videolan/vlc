@@ -62,7 +62,10 @@ FocusScope {
         focus: model.count > 0
         headerTopPadding: VLCStyle.margin_normal
 
+
         searchPattern: MainCtx.search.pattern
+        sortOrder: MainCtx.sort.order
+        sortCriteria: MainCtx.sort.criteria
 
         Navigation.parentItem: root
         Navigation.cancelAction: function() {

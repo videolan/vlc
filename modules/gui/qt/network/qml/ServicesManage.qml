@@ -36,6 +36,8 @@ Widgets.KeyNavigableListView {
         ctx: MainCtx
 
         searchPattern: MainCtx.search.pattern
+        sortOrder: MainCtx.sort.order
+        sortCriteria: MainCtx.sort.criteria
     }
 
     topMargin: VLCStyle.margin_large

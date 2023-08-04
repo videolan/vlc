@@ -34,7 +34,10 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
+    property alias parentId: artistModel.parentId
     property alias searchPattern: artistModel.searchPattern
+    property alias sortOrder: artistModel.sortOrder
+    property alias sortCriteria: artistModel.sortCriteria
 
     signal requestArtistAlbumView(int reason)
 

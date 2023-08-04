@@ -90,11 +90,10 @@ FocusScope {
                 return null
         })
 
-        sourcesBanner.sortModel = Qt.binding(function () { return item.sortModel })
-        sourcesBanner.contentModel = Qt.binding(function () { return item.contentModel })
-
         MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)
         MainCtx.search.available = Qt.binding(() => item.isSearchable !== undefined && item.isSearchable)
+        MainCtx.sort.model = Qt.binding(function () { return item.sortModel })
+        MainCtx.sort.available = Qt.binding(function () { return Array.isArray(item.sortModel) && item.sortModel.length > 0 })
 
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {

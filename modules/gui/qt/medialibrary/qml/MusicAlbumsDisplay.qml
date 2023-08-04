@@ -31,4 +31,6 @@ MusicAlbums {
     }
 
     searchPattern: MainCtx.search.pattern
+    sortCriteria: MainCtx.sort.criteria
+    sortOrder: MainCtx.sort.order
 }

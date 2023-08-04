@@ -44,6 +44,8 @@ MainInterface.MainViewLoader {
 
     property alias parentId: albumModelId.parentId
     property alias searchPattern: albumModelId.searchPattern
+    property alias sortOrder: albumModelId.sortOrder
+    property alias sortCriteria: albumModelId.sortCriteria
 
     isSearchable: true
     model: albumModelId

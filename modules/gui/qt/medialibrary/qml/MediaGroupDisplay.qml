@@ -20,6 +20,7 @@
 
 import QtQuick 2.12
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -45,6 +46,8 @@ VideoAll {
         id: modelVideo
 
         searchPattern: MainCtx.search.pattern
+        sortOrder: MainCtx.sort.order
+        sortCriteria: MainCtx.sort.criteria
 
         ml: MediaLib
     }

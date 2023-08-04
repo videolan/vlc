@@ -35,6 +35,9 @@ Widgets.KeyNavigableTableView {
     readonly property bool isSearchable: true
 
     property alias searchPattern: rootmodel.searchPattern
+    property alias sortOrder: rootmodel.sortOrder
+    property alias sortCriteria: rootmodel.sortCriteria
+    property alias parentId: rootmodel.parentId
 
     // Private
     property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
@@ -160,10 +163,6 @@ Widgets.KeyNavigableTableView {
             placeHolder: VLCStyle.noArtAlbumCover
         })
     }]
-
-    // Aliases
-
-    property alias parentId: rootmodel.parentId
 
     // Settings
 

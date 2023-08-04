@@ -42,6 +42,8 @@ FocusScope {
     property bool isSearchable: true
 
     property alias searchPattern: albumModel.searchPattern
+    property alias sortOrder: albumModel.sortOrder
+    property alias sortCriteria: albumModel.sortCriteria
 
     // current index of album model
     readonly property int currentIndex: {

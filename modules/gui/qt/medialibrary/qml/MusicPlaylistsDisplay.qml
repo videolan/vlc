@@ -94,6 +94,8 @@ Widgets.PageLoader {
                                       { parentId: model.id, name: model.name }], reason)
 
             searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
         }
     }
 
@@ -106,6 +108,8 @@ Widgets.PageLoader {
             isMusic: true
 
             searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
 
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)

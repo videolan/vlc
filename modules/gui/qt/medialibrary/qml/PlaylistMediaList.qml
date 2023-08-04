@@ -44,6 +44,8 @@ MainInterface.MainViewLoader {
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
     property alias searchPattern: playlistModel.searchPattern
+    property alias sortOrder: playlistModel.sortOrder
+    property alias sortCriteria: playlistModel.sortCriteria
 
     //---------------------------------------------------------------------------------------------
     // Private

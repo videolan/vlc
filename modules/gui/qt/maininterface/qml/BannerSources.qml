@@ -44,7 +44,6 @@ FocusScope {
     property int selectedIndex: 0
     property int subSelectedIndex: 0
     property alias sortMenu: sortControl.menu
-    property alias sortModel: sortControl.model
     property var contentModel
     property alias model: pLBannerSources.model
     property alias localMenuDelegate: localMenuGroup.sourceComponent
@@ -62,10 +61,6 @@ FocusScope {
     // Triggered when the toogleView button is selected
     function toggleView () {
         MainCtx.gridView = !MainCtx.gridView
-    }
-
-    function search() {
-        searchBox.state = "expanded"
     }
 
     ColorContext {
@@ -290,24 +285,19 @@ FocusScope {
 
                                 size: VLCStyle.icon_banner
 
-                                visible: root.sortModel !== undefined && root.sortModel.length > 1
+                                visible: MainCtx.sort.available
 
                                 enabled: visible
 
-                                sortKey: contentModel ? contentModel.sortCriteria
-                                                      : PlaylistController.SORT_KEY_NONE
+                                model: MainCtx.sort.model
 
-                                sortOrder: contentModel ? contentModel.sortOrder : undefined
+                                sortKey:  MainCtx.sort.criteria
+                                sortOrder: MainCtx.sort.order
 
                                 onSortSelected: {
-                                    if (contentModel !== undefined)
-                                        contentModel.sortCriteria = key
+                                    MainCtx.sort.criteria = key
                                 }
-
-                                onSortOrderSelected: {
-                                    if (contentModel !== undefined)
-                                        contentModel.sortOrder = type
-                                }
+                                onSortOrderSelected: MainCtx.sort.order = type
                             }
                         }
 

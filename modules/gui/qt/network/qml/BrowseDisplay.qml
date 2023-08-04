@@ -104,6 +104,8 @@ Widgets.PageLoader {
             displayMarginEnd: g_mainDisplay.displayMargin
 
             model: StandardPathModel {
+                sortCriteria: MainCtx.sort.criteria
+                sortOrder: MainCtx.sort.order
                 searchPattern: MainCtx.search.pattern
             }
         }
@@ -130,6 +132,8 @@ Widgets.PageLoader {
                 sd_source: viewDevice.sd_source
                 source_name: "*"
 
+                sortCriteria: MainCtx.sort.criteria
+                sortOrder: MainCtx.sort.order
                 searchPattern: MainCtx.search.pattern
             }
         }
@@ -144,6 +148,8 @@ Widgets.PageLoader {
 
                 ctx: MainCtx
 
+                sortCriteria: MainCtx.sort.criteria
+                sortOrder: MainCtx.sort.order
                 searchPattern: MainCtx.search.pattern
             }
 

@@ -127,6 +127,8 @@ VideoAll {
             property var model: MLVideoModel {
                 ml: MediaLib
                 searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
             }
 
             property var gridLabels: root.getLabel
@@ -165,6 +167,8 @@ VideoAll {
             property var model: MLVideoGroupsModel {
                 ml: MediaLib
                 searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
             }
 
             property string sectionProperty: {
@@ -224,6 +228,8 @@ VideoAll {
             property var model: MLVideoFoldersModel {
                 ml: MediaLib
                 searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
             }
 
             property string sectionProperty: {

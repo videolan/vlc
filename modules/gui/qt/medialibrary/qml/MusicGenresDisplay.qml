@@ -67,6 +67,8 @@ Widgets.PageLoader {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
 
             searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
 
             onShowAlbumView: History.push(["mc", "music", "genres", "albums",
                                            { parentId: id, genreName: name }], reason)
@@ -94,6 +96,8 @@ Widgets.PageLoader {
             }
 
             searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
 
             onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
             onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
