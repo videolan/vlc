@@ -47,12 +47,13 @@ endif
 # interop_sw
 if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.found()
     interop_sw_deps = [gl_common_dep, m_lib]
+    interop_sw_libs = []
     interop_sw_cargs = []
 
     if have_osx and opengl_dep.found()
-        interop_sw_deps += libvlc_opengl
+        interop_sw_libs += libvlc_opengl
     elif host_system in ['darwin', 'android'] and opengles2_dep.found()
-        interop_sw_deps += libvlc_opengles
+        interop_sw_libs += libvlc_opengles
     endif
 
     if opengles2_dep.found()
@@ -64,6 +65,7 @@ if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.f
         'sources' : files('interop_sw.c'),
         'dependencies' : interop_sw_deps,
         'c_args' : interop_sw_cargs,
+        'link_with' : interop_sw_libs,
     }
 endif
 
