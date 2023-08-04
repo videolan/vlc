@@ -1,6 +1,6 @@
 # ssh2
 
-LIBSSH2_VERSION := 1.10.0
+LIBSSH2_VERSION := 1.11.0
 LIBSSH2_URL := http://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -17,16 +17,16 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
-	$(APPLY) $(SRC)/ssh2/no-tests.patch
 	$(call pkg_static,"libssh2.pc.in")
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/ssh2/winrt-no-agent.patch
-endif
 	$(MOVE)
 
 DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
+ifdef HAVE_WINSTORE
+# uses SecureZeroMemory
+DEPS_ssh2 += alloweduwp $(DEPS_alloweduwp)
+endif
 
-SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
+SSH2_CONF := --disable-examples-build --disable-tests --with-crypto=libgcrypt
 
 .ssh2: ssh2
 	$(RECONF)
