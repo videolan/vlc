@@ -33,7 +33,7 @@ Widgets.IconControlButton {
 
     // Private
 
-    readonly property bool _isCurrentViewPlayer: (History.current.name === "player")
+    readonly property bool _isCurrentViewPlayer: History.match(History.viewPath, ["player"])
 
     // Aliases
 

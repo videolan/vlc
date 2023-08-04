@@ -194,7 +194,7 @@ FocusScope {
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
                                 showText: globalToolbar.colapseTabButtons
-                                selected: model.index === root.selectedIndex
+                                selected: History.match(History.viewPath, ["mc", model.name])
                                 onClicked: root.itemClicked(model.index)
                                 height: globalMenuGroup.height
                             }

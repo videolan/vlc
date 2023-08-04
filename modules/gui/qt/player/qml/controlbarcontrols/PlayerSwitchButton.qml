@@ -26,7 +26,7 @@ Widgets.IconControlButton {
     iconText: VLCIcons.fullscreen
 
     onClicked: {
-        if (History.current.view === "player")
+        if (History.match(History.viewPath, ["player"]))
             History.previous()
         else
             History.push(["player"])

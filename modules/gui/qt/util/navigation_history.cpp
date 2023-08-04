@@ -235,3 +235,27 @@ Qt::FocusReason NavigationHistory::takeFocusReason()
 
     return reason;
 }
+
+Q_INVOKABLE bool NavigationHistory::match(const QStringList& path,  const QStringList& pattern)
+{
+    if (pattern.length() > path.length())
+        return false;
+    for (qsizetype i = 0; i < pattern.length(); i++)
+    {
+        if (pattern[i] != path[i])
+            return false;
+    }
+    return true;
+}
+
+Q_INVOKABLE bool NavigationHistory::exactMatch(const QStringList& path,  const QStringList& pattern)
+{
+    if (pattern.length() != path.length())
+        return false;
+    for (qsizetype i = 0; i < pattern.length(); i++)
+    {
+        if (pattern[i] != path[i])
+            return false;
+    }
+    return true;
+}

@@ -72,7 +72,7 @@ Item {
         }
         stackView.loadView(_pageModel, current.name, current.properties)
 
-        MainCtx.mediaLibraryVisible = (current.name !== "player")
+        MainCtx.mediaLibraryVisible = !History.match(History.viewPath, ["player"])
     }
 
     Item {
@@ -168,7 +168,7 @@ Item {
                         return
                     }
 
-                    if (History.current.name !== "player")
+                    if (History.match(History.viewPath, ["player"]))
                         return
 
                     if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
@@ -176,7 +176,7 @@ Item {
 
                     History.previous()
                 } else {
-                    if (History.current.name === "player")
+                    if (History.match(History.viewPath, ["player"]))
                         return
 
                     History.push(["player"])
@@ -232,7 +232,7 @@ Item {
                     target: Player
                     onPlayingStateChanged: {
                         if (Player.playingState === Player.PLAYING_STATE_STOPPED
-                                && History.current.name === "player") {
+                                && History.match(History.viewPath, ["player"]) ) {
                             if (History.previousEmpty)
                                 _pushHome()
                             else

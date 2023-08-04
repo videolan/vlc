@@ -28,6 +28,9 @@ public:
     // NOTE: The first item to call this takes ownership over the focus reason.
     Q_INVOKABLE Qt::FocusReason takeFocusReason();
 
+    Q_INVOKABLE bool match(const QStringList& path,  const QStringList& pattern);
+    Q_INVOKABLE bool exactMatch(const QStringList& path,  const QStringList& pattern);
+
 signals:
     void currentChanged(QVariant current);
     void previousEmptyChanged(bool empty);

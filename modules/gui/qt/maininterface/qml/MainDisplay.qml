@@ -554,7 +554,7 @@ FocusScope {
             target: Player
             onHasVideoOutputChanged: {
                 if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
-                    if (History.current.view !== "player")
+                    if (!History.match(History.viewPath, ["player"]))
                         g_mainDisplay.showPlayer()
                         History.push(["player"])
                 } else {
