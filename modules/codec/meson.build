@@ -548,7 +548,7 @@ if host_system == 'darwin'
     vlc_modules += {
         'name' : 'videotoolbox',
         'sources' : files(
-            'videotoolbox.c',
+            'videotoolbox/decoder.c',
             'vt_utils.c',
             'hxxx_helper.c',
             '../packetizer/hxxx_nal.c',
