@@ -126,6 +126,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     settings = getSettings();
     m_colorScheme = new ColorSchemeModel(this);
 
+    m_sort = new SortCtx(this);
     m_search = new SearchCtx(this);
 
     loadPrefs(false);

@@ -61,6 +61,7 @@ struct vlc_window;
 class VideoSurfaceProvider;
 class ControlbarProfileModel;
 class SearchCtx;
+class SortCtx;
 
 namespace vlc {
 namespace playlist {
@@ -193,6 +194,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
     Q_PROPERTY(SearchCtx* search MEMBER m_search CONSTANT FINAL)
+    Q_PROPERTY(SortCtx* sort MEMBER m_sort CONSTANT FINAL)
 
 public:
     /* tors */
@@ -304,7 +306,7 @@ public:
 
     bool preferHotkeys() const;
     void setPreferHotkeys(bool enable);
-    
+
     QWindow *intfMainWindow() const;
 
     Q_INVOKABLE QVariant settingValue(const QString &key, const QVariant &defaultValue) const;
@@ -402,6 +404,7 @@ protected:
     std::unique_ptr<CSDButtonModel> m_csdButtonModel;
 
     SearchCtx* m_search = nullptr;
+    SortCtx* m_sort = nullptr;
 
 public slots:
     void toggleUpdateSystrayMenu();
@@ -495,7 +498,7 @@ signals:
     void screenChanged();
 
     void useGlobalShortcutsChanged( bool );
-    
+
     void maxVolumeChanged();
 
     void safeAreaChanged();

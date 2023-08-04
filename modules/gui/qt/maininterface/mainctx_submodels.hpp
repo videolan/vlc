@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QJSValue>
 
 class SearchCtx: public QObject
 {
@@ -39,6 +40,65 @@ signals:
 
 private:
     QString m_pattern;
+    bool m_available = false;
+};
+
+class SortCtx: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(bool available READ getAvailable WRITE setAvailable NOTIFY availableChanged FINAL)
+    Q_PROPERTY(QJSValue model READ getModel WRITE setModel NOTIFY modelChanged FINAL)
+    Q_PROPERTY(QString criteria READ getCriteria WRITE setCriteria NOTIFY criteriaChanged FINAL)
+    Q_PROPERTY(Qt::SortOrder order MEMBER m_order NOTIFY orderChanged FINAL)
+
+signals:
+    void askShow();
+
+public:
+    using QObject::QObject;
+
+    inline QJSValue getModel() const  {
+        return m_model;
+    }
+    inline  void setModel(const QJSValue& value) {
+        if (m_model.strictlyEquals(value))
+            return;
+        m_model = value;
+        emit modelChanged(m_model);
+
+        setAvailable(value.isArray()
+                     && value.property("length").toInt() > 0);
+    }
+
+    inline QString getCriteria() const  {
+        return m_criteria;
+    }
+    inline void setCriteria(const QString& value) {
+        if (m_criteria == value)
+            return;
+        emit criteriaChanged(m_criteria);
+    }
+
+    inline bool getAvailable() const  {
+        return m_available;
+    }
+    inline void setAvailable(bool value) {
+        if (m_available == value)
+            return;
+        m_available = value;
+        emit availableChanged(value);
+    }
+
+signals:
+    void availableChanged(bool available);
+    void modelChanged(const QJSValue& model);
+    void criteriaChanged(const QString& criteria);
+    void orderChanged(const Qt::SortOrder& criteria);
+
+private:
+    QJSValue m_model;
+    QString m_criteria;
+    Qt::SortOrder m_order = Qt::DescendingOrder;
     bool m_available = false;
 };
 
