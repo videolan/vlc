@@ -18,7 +18,6 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
 	$(APPLY) $(SRC)/ssh2/no-tests.patch
-	$(APPLY) $(SRC)/ssh2/0001-fix-gcrypt-linking.patch
 	$(call pkg_static,"libssh2.pc.in")
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/ssh2/winrt-no-agent.patch
