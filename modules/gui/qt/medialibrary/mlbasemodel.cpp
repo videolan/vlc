@@ -216,9 +216,10 @@ void MLBaseModel::onResetRequested()
     invalidateCache();
 }
 
-void MLBaseModel::onLocalSizeChanged(size_t size)
+void MLBaseModel::onLocalSizeChanged(size_t queryCount, size_t maximumCount)
 {
-    emit countChanged(size);
+    emit countChanged(queryCount);
+    emit maximumCountChanged(maximumCount);
 }
 
 void MLBaseModel::onVlcMlEvent(const MLEvent &event)
@@ -238,7 +239,7 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                 if (!m_cache)
                     break;
 
-                ssize_t stotal = m_cache->count();
+                ssize_t stotal = m_cache->queryCount();
                 if (stotal == COUNT_UNINITIALIZED)
                     break;
 
@@ -396,22 +397,60 @@ void MLBaseModel::unsetSortCriteria()
     emit sortCriteriaChanged();
 }
 
+
+unsigned int MLBaseModel::getLimit() const
+{
+    return m_limit;
+}
+
+void MLBaseModel::setLimit(unsigned int limit)
+{
+    if (m_limit == limit)
+        return;
+    m_limit = limit;
+    resetCache();
+    emit limitChanged();
+}
+
+unsigned int MLBaseModel::getOffset() const
+{
+    return m_offset;
+}
+
+void MLBaseModel::setOffset(unsigned int offset)
+{
+    if (m_offset == offset)
+        return;
+    m_offset = offset;
+    resetCache();
+    emit offsetChanged();
+}
+
+
 int MLBaseModel::rowCount(const QModelIndex &parent) const
 {
     if (!m_cache || parent.isValid())
         return 0;
 
-    return m_cache->count();
+    return m_cache->queryCount();
 }
 
 //-------------------------------------------------------------------------------------------------
 
 unsigned MLBaseModel::getCount() const
 {
-    if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
+    if (!m_cache || m_cache->queryCount() == COUNT_UNINITIALIZED)
         return 0;
 
-    return static_cast<unsigned>(m_cache->count());
+    return static_cast<unsigned>(m_cache->queryCount());
+}
+
+unsigned MLBaseModel::getMaximumCount() const
+{
+    if (!m_cache || m_cache->maximumCount() == COUNT_UNINITIALIZED)
+        return 0;
+
+    return static_cast<unsigned>(m_cache->maximumCount());
 }
 
 
@@ -444,7 +483,7 @@ void MLBaseModel::validateCache() const
         return;
 
     auto loader = createLoader();
-    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader), false);
+    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader), false, m_limit, m_offset);
     connect(m_cache.get(), &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
 
@@ -498,7 +537,7 @@ MLItem *MLBaseModel::item(int signedidx) const
     if (!m_cache)
         return nullptr;
 
-    ssize_t count = m_cache->count();
+    ssize_t count = m_cache->queryCount();
 
     if (count == 0 || signedidx < 0 || signedidx >= count)
         return nullptr;
@@ -628,5 +667,5 @@ MLQueryParams MLBaseModel::BaseLoader::getParams(size_t index, size_t count) con
 
 bool MLBaseModel::loading() const
 {
-    return !(m_mediaLib && m_cache && (m_cache->count() != COUNT_UNINITIALIZED));
+    return !(m_mediaLib && m_cache && (m_cache->queryCount() != COUNT_UNINITIALIZED));
 }

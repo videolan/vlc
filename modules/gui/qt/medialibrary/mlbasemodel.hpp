@@ -58,7 +58,17 @@ class MLBaseModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(QString sortCriteria READ getSortCriteria WRITE setSortCriteria
                NOTIFY sortCriteriaChanged RESET unsetSortCriteria FINAL)
 
+    //maximum number of element to load
+    //limit = 0 means all elements are loaded
+    Q_PROPERTY(unsigned int limit READ getLimit WRITE setLimit NOTIFY limitChanged FINAL)
+    //skip in N first elements
+    Q_PROPERTY(unsigned int offset READ getOffset WRITE setOffset NOTIFY offsetChanged FINAL)
+
+    //number of elements in the model (limit is accounted)
     Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged FINAL)
+
+    //number of elements in the model (limit not accounted)
+    Q_PROPERTY(unsigned int maximumCount READ getMaximumCount NOTIFY maximumCountChanged FINAL)
 
     /**
      * @brief loading
@@ -104,7 +114,14 @@ public:
     void setSortCriteria(const QString& criteria);
     void unsetSortCriteria();
 
+    unsigned int getLimit() const;
+    void setLimit(unsigned int limit);
+    unsigned int getOffset() const;
+    void setOffset(unsigned int offset);
+
     virtual unsigned int getCount() const;
+    virtual unsigned int getMaximumCount() const;
+
 
     bool loading() const;
 
@@ -117,13 +134,16 @@ signals:
     void resetRequested();
     void sortOrderChanged();
     void sortCriteriaChanged();
+    void limitChanged() const;
+    void offsetChanged() const;
     void countChanged(unsigned int) const;
+    void maximumCountChanged(unsigned int) const;
     void loadingChanged() const;
 
 
 protected slots:
     void onResetRequested();
-    void onLocalSizeChanged(size_t size);
+    void onLocalSizeChanged(size_t queryCount, size_t maximumCount);
 
 
 protected:
@@ -208,6 +228,8 @@ protected:
     QString m_search_pattern;
     vlc_ml_sorting_criteria_t m_sort = VLC_ML_SORTING_DEFAULT;
     bool m_sort_desc = false;
+    unsigned int m_limit = 0;
+    unsigned int m_offset = 0;
 
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;

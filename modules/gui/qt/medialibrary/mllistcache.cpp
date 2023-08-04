@@ -43,11 +43,13 @@ bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNe
 
 }
 
-MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t chunkSize)
+MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t limit, size_t offset, size_t chunkSize)
     : m_medialib(medialib)
     , m_useMove(useMove)
     , m_loader(loader.release())
     , m_chunkSize(chunkSize)
+    , m_limit(limit)
+    , m_offset(offset)
 {
     assert(medialib);
 }
@@ -123,7 +125,7 @@ const MLListCache::ItemType* MLListCache::get(size_t index) const
 const MLListCache::ItemType* MLListCache::find(const std::function<bool (const MLListCache::ItemType&)> &&f, int *index) const
 {
 
-    if (!m_cachedData || m_cachedData->totalCount == 0)
+    if (!m_cachedData || m_cachedData->queryCount == 0)
         return nullptr;
 
     auto it = std::find_if(m_cachedData->list.cbegin(), m_cachedData->list.cend(), f);
@@ -187,9 +189,10 @@ int MLListCache::deleteItem(const MLItemId& mlid)
     m_cachedData->list.erase(it, it+1);
     size_t delta = m_cachedData->loadedCount - m_cachedData->list.size();
     m_cachedData->loadedCount -= delta;
-    m_cachedData->totalCount -= delta;
+    m_cachedData->maximumCount -= delta;
+    m_cachedData->queryCount -= delta;
     emit endRemoveRows();
-    emit localSizeChanged(m_cachedData->totalCount);
+    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
 
     return pos;
 }
@@ -232,7 +235,7 @@ void MLListCache::deleteRange(int first, int last)
         return;
     assert(first <= last);
     assert(first >= 0);
-    assert(static_cast<size_t>(last) < m_cachedData->totalCount);
+    assert(static_cast<size_t>(last) < m_cachedData->queryCount);
     emit beginRemoveRows(first, last);
     if (static_cast<size_t>(first) < m_cachedData->loadedCount)
     {
@@ -249,17 +252,30 @@ void MLListCache::deleteRange(int first, int last)
     }
     //else data are not loaded, just mark them as deleted
 
-    m_cachedData->totalCount -= (last + 1) - first;
+    int rangeSize =  (last + 1) - first;
+    m_cachedData->queryCount -= rangeSize;
+    m_cachedData->maximumCount -= rangeSize;
     emit endRemoveRows();
-    emit localSizeChanged(m_cachedData->totalCount);
+    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
 }
 
-ssize_t MLListCache::count() const
+ssize_t MLListCache::queryCount() const
 {
     if (m_cachedData)
-        return m_cachedData->totalCount;
+        return m_cachedData->queryCount;
     else if (m_oldData)
-        return m_oldData->totalCount;
+        return m_oldData->queryCount;
+    else
+        return COUNT_UNINITIALIZED;
+}
+
+
+ssize_t MLListCache::maximumCount() const
+{
+    if (m_cachedData)
+        return m_cachedData->maximumCount;
+    else if (m_oldData)
+        return m_oldData->maximumCount;
     else
         return COUNT_UNINITIALIZED;
 }
@@ -278,7 +294,7 @@ void MLListCache::refer(size_t index)
     if (!m_cachedData)
         return;
 
-    if (index > m_cachedData->totalCount)
+    if (index > m_cachedData->queryCount)
         return;
 
    /* index is already in the list */
@@ -349,7 +365,8 @@ void MLListCache::partialUpdate()
 
     m_partialIndex = 0;
     m_partialLoadedCount = m_oldData->loadedCount;
-    size_t partialTotalCount = m_oldData->totalCount;
+    size_t partialQueryCount = m_oldData->queryCount;
+    size_t partialMaximumCount = m_oldData->maximumCount;
     for (size_t i = 0; i < changes->size; i++)
     {
         vlc_diffutil_change_t& op = changes->data[i];
@@ -363,9 +380,10 @@ void MLListCache::partialUpdate()
             emit beginInsertRows(op.op.insert.index, op.op.insert.index + op.count - 1);
             m_partialIndex += op.count;
             m_partialLoadedCount += op.count;
-            partialTotalCount += op.count;
+            partialQueryCount += op.count;
+            partialMaximumCount += op.count;
             emit endInsertRows();
-            emit localSizeChanged(partialTotalCount);
+            emit localSizeChanged(partialQueryCount, partialMaximumCount);
             break;
         case VLC_DIFFUTIL_OP_REMOVE:
             m_partialX = op.op.remove.x;
@@ -373,9 +391,10 @@ void MLListCache::partialUpdate()
             emit beginRemoveRows(op.op.remove.index, op.op.remove.index + op.count - 1);
             m_partialLoadedCount -= op.count;
             m_partialX += op.count;
-            partialTotalCount -= op.count;
+            partialQueryCount -= op.count;
+            partialMaximumCount -= op.count;
             emit endRemoveRows();
-            emit localSizeChanged(partialTotalCount);
+            emit localSizeChanged(partialQueryCount, partialMaximumCount);
             break;
         case VLC_DIFFUTIL_OP_MOVE:
             m_partialX = op.op.move.x;
@@ -408,19 +427,19 @@ void MLListCache::partialUpdate()
 
     //if we have change outside our cache
     //just notify for addition/removal at a the end of the list
-    if (partialTotalCount != m_cachedData->totalCount)
+    if (partialQueryCount != m_cachedData->queryCount)
     {
-        if (partialTotalCount > m_cachedData->totalCount)
+        if (partialQueryCount > m_cachedData->queryCount)
         {
-            emit beginRemoveRows(m_cachedData->totalCount - 1, partialTotalCount - 1);
+            emit beginRemoveRows(m_cachedData->queryCount - 1, partialQueryCount - 1);
             emit endRemoveRows();
-            emit localSizeChanged(m_cachedData->totalCount);
+            emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
         }
         else
         {
-            emit beginInsertRows(partialTotalCount - 1, m_cachedData->totalCount - 1);
+            emit beginInsertRows(partialQueryCount - 1, m_cachedData->queryCount - 1);
             emit endInsertRows();
-            emit localSizeChanged(m_cachedData->totalCount);
+            emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
         }
     }
 }
@@ -433,16 +452,16 @@ void MLListCache::asyncCountAndLoad()
     size_t count = std::max(m_maxReferedIndex, m_chunkSize);
 
     struct Ctx {
-        size_t totalCount;
+        size_t maximumCount;
         std::vector<ItemType> list;
     };
 
     m_countTask = m_medialib->runOnMLThread<Ctx>(this,
         //ML thread
-        [loader = m_loader, count = count](vlc_medialibrary_t* ml, Ctx& ctx)
+        [loader = m_loader, offset = m_offset, count = count](vlc_medialibrary_t* ml, Ctx& ctx)
         {
-            ctx.list = loader->load(ml, 0, count);
-            ctx.totalCount = loader->count(ml);
+            ctx.list = loader->load(ml, offset, count);
+            ctx.maximumCount = loader->count(ml);
         },
         //UI thread
         [this](quint64 taskId, Ctx& ctx)
@@ -451,13 +470,19 @@ void MLListCache::asyncCountAndLoad()
                 return;
 
             //quite unlikley but model may change between count and load
-            if (unlikely(ctx.list.size() > ctx.totalCount))
+            if (unlikely(ctx.list.size() > ctx.maximumCount))
             {
-                ctx.totalCount = ctx.list.size();
+                ctx.maximumCount = ctx.list.size();
                 m_needReload = true;
             }
 
-            m_cachedData = std::make_unique<CacheData>(std::move(ctx.list), ctx.totalCount);
+            size_t queryCount = (m_limit > 0)
+                ? std::min(m_limit, ctx.maximumCount)
+                : ctx.maximumCount;
+            //note: should we drop items past queryCount?
+            m_cachedData = std::make_unique<CacheData>(std::move(ctx.list),
+                                                       queryCount,
+                                                       ctx.maximumCount);
 
             if (m_oldData)
             {
@@ -465,15 +490,15 @@ void MLListCache::asyncCountAndLoad()
             }
             else
             {
-                if (m_cachedData->totalCount > 0)
+                if (m_cachedData->queryCount > 0)
                 {
                     //no previous data, we insert everything
-                    emit beginInsertRows(0, m_cachedData->totalCount - 1);
+                    emit beginInsertRows(0, m_cachedData->queryCount - 1);
                     emit endInsertRows();
-                    emit localSizeChanged(m_cachedData->totalCount);
+                    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
                 }
                 else
-                    emit localSizeChanged(0);
+                    emit localSizeChanged(0, m_cachedData->maximumCount);
             }
 
             m_countTask = 0;
@@ -489,7 +514,7 @@ void MLListCache::asyncCountAndLoad()
                 m_maxReferedIndex = m_cachedData->loadedCount;
             }
             else if (m_maxReferedIndex > m_cachedData->loadedCount
-                && m_maxReferedIndex <= m_cachedData->totalCount)
+                && m_maxReferedIndex <= m_cachedData->queryCount)
             {
                 asyncFetchMore();
             }
@@ -506,7 +531,7 @@ void MLListCache::asyncFetchMore()
     if (m_appendTask)
         m_medialib->cancelMLTask(this, m_appendTask);
 
-    m_maxReferedIndex = std::min(m_cachedData->totalCount, m_maxReferedIndex);
+    m_maxReferedIndex = std::min(m_cachedData->queryCount, m_maxReferedIndex);
     size_t count = ((m_maxReferedIndex - m_cachedData->loadedCount) / m_chunkSize + 1 ) * m_chunkSize;
 
     struct Ctx {
@@ -514,7 +539,7 @@ void MLListCache::asyncFetchMore()
     };
     m_appendTask = m_medialib->runOnMLThread<Ctx>(this,
         //ML thread
-        [loader = m_loader, offset = m_cachedData->loadedCount, count]
+        [loader = m_loader, offset = m_offset + m_cachedData->loadedCount, count]
         (vlc_medialibrary_t* ml, Ctx& ctx)
         {
             ctx.list = loader->load(ml, offset, count);

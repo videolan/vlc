@@ -124,7 +124,7 @@ public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
     MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
-        bool useMove, size_t chunkSize = 100);
+        bool useMove, size_t limit, size_t offset, size_t chunkSize = 100);
 
     /**
      * Return the item at specified index
@@ -170,12 +170,20 @@ public:
     void deleteRange(int first, int last);
 
     /**
-     * Return the number of items or `COUNT_UNINITIALIZED`
+     * @return the number of items or `COUNT_UNINITIALIZED`
      *
      * This returns the local count, and does not retrieve anything from the
      * loader.
      */
-    ssize_t count() const;
+    ssize_t queryCount() const;
+
+    /**
+     * @return the total number of elements in the list, without taking @ref m_limit in account.
+     * COUNT_UNINITIALIZED is returned if the list isn't initialized
+     *
+     * This may be usefull to know whether there are additionnal elements past the limit
+     */
+    ssize_t maximumCount() const;
 
     /**
      * Init the list size
@@ -196,7 +204,7 @@ public:
     void invalidate();
 
 signals:
-    void localSizeChanged(size_t size);
+    void localSizeChanged(size_t querySize, size_t maximumSize);
 
     void localDataChanged(int sourceFirst, int sourceLast);
 
@@ -224,6 +232,10 @@ private:
     QSharedPointer<ListCacheLoader<ItemType>> m_loader;
     size_t m_chunkSize;
 
+    //0 limit means no limit
+    size_t m_limit = 0;
+    size_t m_offset = 0;
+
     //highest index requested by the view (1 based, 0 is nothing referenced)
     size_t m_maxReferedIndex = 0;
 
@@ -233,15 +245,22 @@ private:
     uint64_t m_countTask = 0;
 
     struct CacheData {
-        explicit CacheData(std::vector<ItemType>&& list_, size_t totalCount_)
+        explicit CacheData(std::vector<ItemType>&& list_,
+                           size_t queryCount_,
+                           size_t maximumCount_)
             : list(std::move(list_))
-            , totalCount(totalCount_)
+            , queryCount(queryCount_)
+            , maximumCount(maximumCount_)
         {
             loadedCount = list.size();
         }
 
         std::vector<ItemType> list;
-        size_t totalCount = 0;
+        //How many items are does the query returns min(maximumCount - offset, limit)
+        size_t queryCount = 0;
+        //how many items in the table
+        size_t maximumCount = 0;
+        //how many items are loaded (list.size)
         size_t loadedCount = 0;
     };
 
