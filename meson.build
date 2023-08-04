@@ -1004,6 +1004,8 @@ if get_option('default_monospace_font_family') != ''
     cdata.set_quoted('DEFAULT_MONOSPACE_FAMILY', get_option('default_monospace_font_family'))
 endif
 
+gcrypt_dep = dependency('libgcrypt', required: get_option('libgcrypt'))
+
 # Generate config.h
 configure_file(input: 'config.h.meson',
   output: 'config.h',
