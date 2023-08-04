@@ -30,9 +30,6 @@ Widgets.PageLoader {
     id: root
 
     // Properties
-
-    property var contentModel
-
     property Component localMenuDelegate
 
     // Settings
@@ -62,8 +59,6 @@ Widgets.PageLoader {
 
     // Events
     onCurrentItemChanged: {
-        contentModel = currentItem.model;
-
         if (view.name === "home")
             localMenuDelegate = null
         else

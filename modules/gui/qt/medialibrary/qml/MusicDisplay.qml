@@ -29,8 +29,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var contentModel
-
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Music view")
 
@@ -60,10 +58,6 @@ Widgets.PageLoader {
     loadDefaultView: function () {
         History.update(["mc", "music", "artists"])
         loadPage("artists")
-    }
-
-    onCurrentItemChanged: {
-        contentModel = currentItem.model
     }
 
     function loadIndex(index) {

@@ -44,7 +44,6 @@ FocusScope {
     property int selectedIndex: 0
     property int subSelectedIndex: 0
     property alias sortMenu: sortControl.menu
-    property var contentModel
     property alias model: pLBannerSources.model
     property alias localMenuDelegate: localMenuGroup.sourceComponent
 
