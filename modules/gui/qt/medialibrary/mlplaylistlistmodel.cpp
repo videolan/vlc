@@ -478,19 +478,21 @@ MLPlaylistListModel::Loader::Loader(const MLPlaylistListModel & model, PlaylistT
 
 size_t MLPlaylistListModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
-    vlc_ml_query_params_t params = getParams().toCQueryParams();
+    MLQueryParams params = getParams();
+    vlc_ml_query_params_t queryParams = params.toCQueryParams();
     vlc_ml_playlist_type_t mlPlaylistType = qmlToMLPlaylistType(m_playlistType);
-    return vlc_ml_count_playlists(ml, &params, mlPlaylistType);
+    return vlc_ml_count_playlists(ml, &queryParams, mlPlaylistType);
 }
 
 std::vector<std::unique_ptr<MLItem>>
 MLPlaylistListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
 {
-    vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
+    MLQueryParams params = getParams(index, count);
+    vlc_ml_query_params_t queryParams = params.toCQueryParams();
 
     vlc_ml_playlist_type_t mlPlaylistType = qmlToMLPlaylistType(m_playlistType);
 
-    ml_unique_ptr<vlc_ml_playlist_list_t> list(vlc_ml_list_playlists(ml, &params, mlPlaylistType));
+    ml_unique_ptr<vlc_ml_playlist_list_t> list(vlc_ml_list_playlists(ml, &queryParams, mlPlaylistType));
 
     if (list == nullptr)
         return {};

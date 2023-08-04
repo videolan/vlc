@@ -223,18 +223,21 @@ MLVideoGroupsModel::Loader::Loader(const MLVideoGroupsModel & model)
 
 size_t MLVideoGroupsModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
-    vlc_ml_query_params_t params = getParams().toCQueryParams();
+    MLQueryParams params = getParams();
+    auto queryParams = params.toCQueryParams();
 
-    return vlc_ml_count_groups(ml, &params);
+    return vlc_ml_count_groups(ml, &queryParams);
 }
 
 std::vector<std::unique_ptr<MLItem>>
 MLVideoGroupsModel::Loader::load(vlc_medialibrary_t* ml,
                                  size_t index, size_t count) const /* override */
 {
-    vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
+    MLQueryParams params = getParams(index, count);
+    auto queryParams = params.toCQueryParams();
 
-    ml_unique_ptr<vlc_ml_group_list_t> list(vlc_ml_list_groups(ml, &params));
+
+    ml_unique_ptr<vlc_ml_group_list_t> list(vlc_ml_list_groups(ml, &queryParams));
 
     if (list == nullptr)
         return {};
