@@ -47,8 +47,6 @@ private:
 class MLRecentsModel : public MLBaseModel
 {
     Q_OBJECT
-    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow FINAL)
-
 public:
     enum Roles {
         RECENT_MEDIA_ID = Qt::UserRole + 1,
@@ -61,12 +59,8 @@ public:
     virtual ~MLRecentsModel() = default;
 
     QHash<int, QByteArray> roleNames() const override;
-    int m_numberOfItemsToShow = -1;
 
     Q_INVOKABLE void clearHistory();
-
-    void setNumberOfItemsToShow(int);
-    int getNumberOfItemsToShow() const;
 
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
@@ -84,13 +78,11 @@ private:
 
     struct Loader : public BaseLoader
     {
-        Loader(const MLRecentsModel &model, int numberOfItemsToShow);
+        Loader(const MLRecentsModel &model);
 
         size_t count(vlc_medialibrary_t* ml) const override;
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override;
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;
-    private:
-        int m_numberOfItemsToShow;
     };
 };
 

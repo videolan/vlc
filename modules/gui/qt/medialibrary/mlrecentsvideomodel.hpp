@@ -29,9 +29,6 @@ class MLRecentsVideoModel : public MLVideoModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow
-               WRITE setNumberOfItemsToShow FINAL)
-
 public:
     explicit MLRecentsVideoModel(QObject * parent = nullptr);
 
@@ -40,28 +37,19 @@ public:
 protected: // MLBaseModel implementation
     std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
 
-private: // Functions
-    int  getNumberOfItemsToShow();
-    void setNumberOfItemsToShow(int number);
-
 protected: // MLVideoModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;
-
-private: // Variables
-    int m_numberOfItemsToShow = 10;
 
 private:
     struct Loader : public BaseLoader
     {
-        Loader(const MLRecentsVideoModel & model, int numberOfItemsToShow);
+        Loader(const MLRecentsVideoModel & model);
 
         size_t count(vlc_medialibrary_t* ml) const override;
 
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override;
 
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;
-    private:
-        int m_numberOfItemsToShow;
     };
 };
 
