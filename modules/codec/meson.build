@@ -545,11 +545,16 @@ endif
 # VideoToolbox (Apples hardware-accelerated video decoder/encoder)
 # TODO: Set proper flags for minimum iOS/tvOS versions
 if host_system == 'darwin'
+
+    libvlc_vtutils = static_library('libvlc_vtutils',
+        files('vt_utils.c', 'vt_utils.h'),
+        include_directories : vlc_include_dirs,
+        dependencies : [corevideo_dep])
+
     vlc_modules += {
         'name' : 'videotoolbox',
         'sources' : files(
             'videotoolbox/decoder.c',
-            'vt_utils.c',
             'hxxx_helper.c',
             '../packetizer/hxxx_nal.c',
             '../packetizer/hxxx_sei.c',
@@ -557,7 +562,9 @@ if host_system == 'darwin'
             '../packetizer/h264_nal.c',
             '../packetizer/hevc_nal.c'
         ),
-        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep, corevideo_dep],
+        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep,
+                          corevideo_dep],
+        'link_with' : [libvlc_vtutils],
     }
 endif
 
