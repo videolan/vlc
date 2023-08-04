@@ -27,6 +27,8 @@
 #include <vlc_common.h>
 #include "../src/misc/update_crypto.c"
 
+const char vlc_module_name[] = "test_src_crypto_update";
+
 static const uint8_t key_longid[] = {
     0x9F, 0x8A, 0xB1, 0x13, 0x9F, 0x39, 0x9B, 0xEE
 };
