@@ -114,11 +114,11 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
         if (unlikely(sys->off_bitmap == NULL))
             return VLC_EINVAL;
         sys->pic_buf.p_pixels = p_pic_buffer;
+        sys->pic_buf.i_pixel_pitch = (bih->biBitCount + 7) / 8;
         sys->pic_buf.i_pitch = sys->pic_buf.i_visible_pitch =
-            bih->biBitCount * bih->biWidth / 8;
+            sys->area.src_fmt->i_visible_width * sys->pic_buf.i_pixel_pitch;
         sys->pic_buf.i_lines = sys->pic_buf.i_visible_lines =
             sys->area.src_fmt->i_visible_height;
-        sys->pic_buf.i_pixel_pitch = (bih->biBitCount + 7) / 8;
     }
     return VLC_SUCCESS;
 }
