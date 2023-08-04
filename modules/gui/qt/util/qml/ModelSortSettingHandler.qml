@@ -16,51 +16,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQml 2.11
+import QtQml 2.12
 
 import org.videolan.vlc 0.1
 
+/**
+  * save and restore global context properties when view is changing
+  */
 QtObject {
     id: root
 
-    property var _model: null
-    property string _key: ""
+    readonly property string _sortCriteriaKey: "sortCriteria"
+    readonly property string _sortOrderKey: "sortOrder"
 
-    readonly property string _sortCriteriaKey: "sortCriteria/" + _key
-    readonly property string _sortOrderKey: "sortOrder/" + _key
-
-    property var _sortCriteriaConnection: Connections {
-        target: !!root._model ? root._model : null
-
-        enabled: !!root._model && root._model.hasOwnProperty("sortCriteria")
-
-        onSortCriteriaChanged: {
-            MainCtx.setSettingValue(root._sortCriteriaKey, _model.sortCriteria)
+    function save(path) {
+        const orderKey = [_sortOrderKey, ...path].join("/")
+        const critKey = [_sortCriteriaKey, ...path].join("/")
+        if (MainCtx.sort.available) {
+            MainCtx.setSettingValue(orderKey, MainCtx.sort.order)
+            MainCtx.setSettingValue(critKey, MainCtx.sort.criteria)
         }
     }
 
-    property var _sortOrderConnection: Connections {
-        target: !!root._model ? root._model : null
+    function restore(path) {
+        const orderKey = [_sortOrderKey, ...path].join("/")
+        const critKey = [_sortCriteriaKey, ...path].join("/")
 
-        enabled: !!root._model && root._model.hasOwnProperty("sortOrder")
+        const criteria = MainCtx.settingValue(critKey, undefined)
+        if (criteria !== undefined)
+            MainCtx.sort.criteria = criteria
 
-        onSortOrderChanged: {
-            MainCtx.setSettingValue(root._sortOrderKey, root._model.sortOrder)
-        }
-    }
-
-    function set(model, key) {
-        _model = model
-        _key = key.join("/")
-
-        if (!_model)
-            return
-
-        if (_model.hasOwnProperty("sortCriteria"))
-            _model.sortCriteria = MainCtx.settingValue(_sortCriteriaKey, _model.sortCriteria)
-
-        // MainCtx.settingValue seems to change int -> string
-        if (_model.hasOwnProperty("sortOrder"))
-            _model.sortOrder = parseInt(MainCtx.settingValue(_sortOrderKey, _model.sortOrder))
+        const order = MainCtx.settingValue(orderKey, undefined)
+        if (order !== undefined)
+            MainCtx.sort.order = parseInt(order)
     }
 }

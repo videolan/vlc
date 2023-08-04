@@ -182,16 +182,6 @@ FocusScope {
         }
     }
 
-    Util.ModelSortSettingHandler {
-        id: modelSortSettingHandler
-    }
-
-    Connections {
-        target: sourcesBanner
-
-        onContentModelChanged: modelSortSettingHandler.set(sourcesBanner.contentModel, History.viewPath)
-    }
-
     ColorContext {
         id: theme
         palette: VLCStyle.palette

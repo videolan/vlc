@@ -27,6 +27,7 @@ import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/" as Util
 import "qrc:///playlist/" as PL
 
 Item {
@@ -41,6 +42,8 @@ Item {
         { name: "mc", url: "qrc:///main/MainDisplay.qml" },
         { name: "player", url:"qrc:///player/Player.qml" },
     ]
+
+    property var _oldHistoryPath: ([])
 
     function setInitialView() {
         //set the initial view
@@ -70,9 +73,18 @@ Item {
             console.warn("unable to load requested view, undefined")
             return
         }
+        contextSaver.save(_oldHistoryPath)
+
         stackView.loadView(_pageModel, current.name, current.properties)
 
+        contextSaver.restore(History.viewPath)
+        _oldHistoryPath = History.viewPath
+
         MainCtx.mediaLibraryVisible = !History.match(History.viewPath, ["player"])
+    }
+
+    Util.ModelSortSettingHandler {
+        id: contextSaver
     }
 
     Item {
