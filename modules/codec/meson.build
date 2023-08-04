@@ -566,6 +566,23 @@ if host_system == 'darwin'
                           corevideo_dep],
         'link_with' : [libvlc_vtutils],
     }
+
+    vlc_modules += {
+        'name' : 'videotoolbox_enc',
+        'sources' : files(
+            'videotoolbox/encoder.c',
+            'hxxx_helper.c',
+            '../packetizer/hxxx_nal.c',
+            '../packetizer/hxxx_sei.c',
+            '../packetizer/h264_slice.c',
+            '../packetizer/h264_nal.c',
+            '../packetizer/hevc_nal.c'
+        ),
+        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep,
+                          corevideo_dep],
+        'link_with' : [libvlc_vtutils],
+    }
+
 endif
 
 # FFmpeg common helper library
