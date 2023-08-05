@@ -242,6 +242,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.m \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.h \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.m \
+	gui/macosx/library/playlist-library/VLCLibraryPlaylistViewController.h \
+	gui/macosx/library/playlist-library/VLCLibraryPlaylistViewController.m \
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \
