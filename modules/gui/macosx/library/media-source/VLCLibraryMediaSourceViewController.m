@@ -96,15 +96,9 @@
 
 - (void)setupCollectionView
 {
-    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
-    const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
-    
-    NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     _collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
-    mediaSourceCollectionViewLayout.itemSize = [VLCLibraryCollectionViewItem defaultSize];
-    mediaSourceCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
-    mediaSourceCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
-    mediaSourceCollectionViewLayout.sectionInset = collectionViewSectionInset;
+    mediaSourceCollectionViewLayout.itemSize = VLCLibraryCollectionViewItem.defaultSize;
 }
 
 - (void)setupMediaSourceLibraryViews
