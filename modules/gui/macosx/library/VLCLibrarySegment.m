@@ -45,6 +45,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment]
@@ -189,6 +190,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Videos");
         case VLCLibraryShowsVideoSubSegment:
             return _NS("Shows");
+        case VLCLibraryPlaylistsSegment:
+            return _NS("Playlists");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -221,6 +224,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryVideoSegment:
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
+        case VLCLibraryPlaylistsSegment:
+            return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryBrowseSegment:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
@@ -263,6 +268,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageWithSystemSymbolName:@"tv"
                              accessibilityDescription:@"Shows icon"];
+        case VLCLibraryPlaylistsSegment:
+            return [NSImage imageWithSystemSymbolName:@"music.note.list"
+                             accessibilityDescription:@"Playlists icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];
