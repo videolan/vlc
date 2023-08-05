@@ -186,6 +186,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _sortCriteria = VLC_ML_SORTING_DEFAULT;
         _sortDescending = NO;
         _filterString = @"";
+        _recentMediaLimit = 20;
         _p_mediaLibrary = library;
         _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
 
@@ -211,7 +212,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialAlbumCount = vlc_ml_count_albums(self->_p_mediaLibrary, &queryParameters);
             self->_initialArtistCount = vlc_ml_count_artists(self->_p_mediaLibrary, &queryParameters, true);
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
-            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = 20 }), VLC_ML_MEDIA_TYPE_VIDEO);
+            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = self->_recentMediaLimit }), VLC_ML_MEDIA_TYPE_VIDEO);
         });
     }
     return self;
@@ -440,7 +441,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)resetCachedListOfRecentMedia
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParameters = { .i_nbResults = 20 };
+        const vlc_ml_query_params_t queryParameters = { .i_nbResults = self->_recentMediaLimit };
         // we don't set the sorting criteria here as they are not applicable to history
         // we only show videos for recents
         vlc_ml_media_list_t *p_media_list = vlc_ml_list_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_VIDEO);

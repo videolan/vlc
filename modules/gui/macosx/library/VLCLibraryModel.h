@@ -77,6 +77,7 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 @property (readonly) size_t numberOfVideoMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfVideoMedia;
 
+@property (readwrite) uint32_t recentMediaLimit;
 @property (readonly) size_t numberOfRecentMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentMedia;
 
