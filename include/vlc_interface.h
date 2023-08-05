@@ -162,7 +162,7 @@ typedef enum vlc_intf_dialog {
                              "m1v", "m2v", "m2t", "m2ts", "m4v", "mkv", "mov",\
                              "mp2", "mp2v", "mp4", "mp4v", "mpe", "mpeg", "mpeg1", \
                              "mpeg2", "mpeg4", "mpg", "mpv2", "mts", "mtv", "mxf", "mxg", "nsv", "nuv", \
-                             "ogg", "ogm", "ogv", "ogx", "ps", \
+                             "ogg", "ogm", "ogv", "ogx", "ps", "qt", \
                              "rec", "rm", "rmvb", "rpl", "thp", "tod", "ts", "tts", "txd", "vob", "vro", \
                              "webm", "wm", "wmv", "wtv", "xesc"
 
@@ -231,7 +231,7 @@ typedef enum vlc_intf_dialog {
 #define EXTENSIONS_VIDEO "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amrec;*.amv;*.asf;*.avi;*.bik;*.bin;*.crf;*.dav;*.divx;*.drc;*.dv;*.dvr-ms;*.evo;*.f4v;*.flv;*.gvi;*.gxf;*.iso;*.m1v;*.m2v;" \
                          "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpe;*.mpeg;*.mpeg1;" \
                          "*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mtv;*.mxf;*.mxg;*.nsv;*.nuv;" \
-                         "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;" \
+                         "*.ogg;*.ogm;*.ogv;*.ogx;*.ps;*.qt;" \
                          "*.rec;*.rm;*.rmvb;*.rpl;*.thp;*.tod;*.tp;*.ts;*.tts;*.txd;*.vob;*.vro;*.webm;*.wm;*.wmv;*.wtv;*.xesc"
 
 #define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.cue;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.wax;*.wpl;*.wvx;*.zip;*.conf"

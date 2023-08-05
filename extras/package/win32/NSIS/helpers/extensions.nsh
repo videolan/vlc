@@ -232,6 +232,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".ogm"
   !insertmacro ${_action} Video ".ogx"
   !insertmacro ${_action} Video ".ogv"
+  !insertmacro ${_action} Video ".qt"
   !insertmacro ${_action} Video ".rec"
   !insertmacro ${_action} Video ".rm"
   !insertmacro ${_action} Video ".rmvb"
