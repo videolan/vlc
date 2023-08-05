@@ -205,6 +205,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".flv"
   !insertmacro ${_action} Video ".gvi"
   !insertmacro ${_action} Video ".gxf"
+  !insertmacro ${_action} Video ".k3g"
   !insertmacro ${_action} Video ".m1v"
   !insertmacro ${_action} Video ".m2t"
   !insertmacro ${_action} Video ".m2v"
