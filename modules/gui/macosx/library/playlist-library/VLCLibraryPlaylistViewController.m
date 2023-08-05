@@ -52,14 +52,12 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow*)libraryWindow
 {
     NSParameterAssert(libraryWindow);
-
     _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
 }
 
 - (void)setupPlaylistCollectionView
 {
-    _collectionViewScrollView = [[NSScrollView alloc] initWithFrame:_libraryTargetView.frame];
+    _collectionViewScrollView = [[NSScrollView alloc] initWithFrame:_libraryWindow.libraryTargetView.frame];
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionView = [[NSCollectionView alloc] init];
 

@@ -29,8 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryPlaylistViewController : NSObject
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
-
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
 
