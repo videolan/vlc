@@ -806,6 +806,42 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
+@implementation VLCMediaLibraryPlaylist
+
+- (instancetype)initWithPlaylist:(struct vlc_ml_playlist_t *)p_playlist
+{
+    self = [super init];
+    if (self && p_playlist != NULL) {
+        self.libraryID = p_playlist->i_id;
+        self.smallArtworkMRL = toNSStr(p_playlist->psz_artwork_mrl);
+        self.displayString = toNSStr(p_playlist->psz_name);
+        self.primaryDetailString = [NSString stringWithFormat:@"%u items", p_playlist->i_nb_media];
+        self.durationString = [NSString stringWithTime:p_playlist->i_duration / VLCMediaLibraryMediaItemDurationDenominator];
+
+        _MRL = toNSStr(p_playlist->psz_mrl);
+
+        _numberOfMedia = p_playlist->i_nb_media;
+        _numberOfAudios = p_playlist->i_nb_audio;
+        _numberOfVideos = p_playlist->i_nb_video;
+        _numberOfUnknowns = p_playlist->i_nb_unknown;
+
+        _numberOfPresentMedia = p_playlist->i_nb_present_media;
+        _numberOfPresentAudios = p_playlist->i_nb_present_audio;
+        _numberOfPresentVideos = p_playlist->i_nb_present_video;
+        _numberOfPresentUnknowns = p_playlist->i_nb_present_unknown;
+
+        _creationDate = [NSDate dateWithTimeIntervalSince1970:p_playlist->i_creation_date];
+
+        _duration = p_playlist->i_duration;
+        _numberDurationUnknown = p_playlist->i_nb_duration_unknown;
+
+        _readOnly = p_playlist->b_is_read_only;
+    }
+    return self;
+}
+
+@end
+
 @interface VLCMediaLibraryMediaItem ()
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;

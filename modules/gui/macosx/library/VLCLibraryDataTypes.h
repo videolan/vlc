@@ -251,6 +251,31 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
+@interface VLCMediaLibraryPlaylist : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
+
+@property (readonly) NSString *MRL;
+
+@property (readonly) unsigned int numberOfMedia;
+@property (readonly) uint32_t numberOfVideos;
+@property (readonly) uint32_t numberOfAudios;
+@property (readonly) uint32_t numberOfUnknowns;
+
+@property (readonly) unsigned int numberOfPresentMedia;
+@property (readonly) uint32_t numberOfPresentVideos;
+@property (readonly) uint32_t numberOfPresentAudios;
+@property (readonly) uint32_t numberOfPresentUnknowns;
+
+@property (readonly) NSDate *creationDate;
+
+@property (readonly) int64_t duration;
+@property (readonly) uint32_t numberDurationUnknown;
+
+@property (readonly) BOOL readOnly;
+
+- (instancetype)initWithPlaylist:(struct vlc_ml_playlist_t *)p_playlist;
+
+@end
+
 @interface VLCMediaLibraryMediaItem : NSObject<VLCMediaLibraryItemProtocol>
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
