@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSView *libraryTargetView;
 
 @property (readonly) NSCollectionView *collectionView;
+@property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

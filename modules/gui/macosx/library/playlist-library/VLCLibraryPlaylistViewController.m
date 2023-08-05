@@ -43,6 +43,7 @@
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupPlaylistCollectionView];
+        [self setupPlaylistPlaceholderView];
     }
 
     return self;
@@ -74,6 +75,26 @@
     _collectionView.selectable = YES;
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.allowsEmptySelection = YES;
+}
+
+- (void)setupPlaylistPlaceholderView
+{
+    _placeholderImageViewConstraints = @[
+        [NSLayoutConstraint constraintWithItem:_libraryWindow.placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:149.f],
+        [NSLayoutConstraint constraintWithItem:_libraryWindow.placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:149.f],
+    ];
 }
 
 @end
