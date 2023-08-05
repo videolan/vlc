@@ -46,7 +46,7 @@
 {
     self = [super init];
 
-    if(self) {
+    if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupPlaylistCollectionView];
         [self setupPlaylistPlaceholderView];
@@ -75,7 +75,6 @@
 
     _collectionView.delegate = _collectionViewDelegate;
     _collectionView.collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
-
     _collectionView.selectable = YES;
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.allowsEmptySelection = YES;
@@ -124,6 +123,17 @@
 
     _libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
     _libraryWindow.placeholderLabel.stringValue = _NS("Your favorite playlists will appear here.\nGo to the Browse section to add playlists you love.");
+}
+
+- (void)presentPlaylistLibraryView
+{
+    _libraryWindow.libraryTargetView.subviews = @[_collectionViewScrollView];
+
+    NSDictionary * const dict = @{@"playlistLibraryView": _collectionViewScrollView};
+    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[playlistLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[playlistLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+
+    [_collectionView reloadData];
 }
 
 @end
