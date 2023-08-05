@@ -245,6 +245,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".ts"
   !insertmacro ${_action} Video ".tts"
   !insertmacro ${_action} Video ".vob"
+  !insertmacro ${_action} Video ".vp6"
   !insertmacro ${_action} Video ".vro"
   !insertmacro ${_action} Video ".webm"
   !insertmacro ${_action} Video ".wmv"
