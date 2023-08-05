@@ -42,6 +42,8 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
+#import "library/playlist-library/VLCLibraryPlaylistViewController.h"
+
 #import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
@@ -342,10 +344,13 @@
 
 - (void)presentPlaceholderVideoLibraryView
 {
-    for (NSLayoutConstraint *constraint in _libraryWindow.libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint *constraint in _videoPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryPlaylistViewController.placeholderImageViewConstraints) {
+        constraint.active = NO;
+    }
+    for (NSLayoutConstraint * const constraint in _videoPlaceholderImageViewSizeConstraints) {
         constraint.active = YES;
     }
 
