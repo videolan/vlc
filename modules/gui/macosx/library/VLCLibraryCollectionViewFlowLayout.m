@@ -79,6 +79,19 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 @implementation VLCLibraryCollectionViewFlowLayout
 
++ (instancetype)standardLayout
+{
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+
+    VLCLibraryCollectionViewFlowLayout * const collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    collectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    return collectionViewLayout;
+}
+
 - (instancetype)init
 {
     self = [super init];

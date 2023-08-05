@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryCollectionViewFlowLayout : NSCollectionViewFlowLayout
 
+/// Creates new layout with standard insets and spacing
+@property (class, readonly) VLCLibraryCollectionViewFlowLayout *standardLayout;
+
 - (void)expandDetailSectionAtIndex:(NSIndexPath *)indexPath;
 - (void)collapseDetailSectionAtIndex:(NSIndexPath *)indexPath;
 - (void)resetLayout;
