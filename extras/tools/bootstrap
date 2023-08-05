@@ -152,6 +152,7 @@ check gettext
 check help2man
 check meson 1.0.0
 check_ninja
+check gperf
 
 DEPS_ONLY="help2man"
 

@@ -57,3 +57,6 @@ MESON_URL=https://github.com/mesonbuild/meson/releases/download/$(MESON_VERSION)
 NINJA_VERSION=1.11.1
 NINJA_BUILD_NAME=$(NINJA_VERSION).g95dee.kitware.jobserver-1
 NINJA_URL=https://github.com/Kitware/ninja/archive/refs/tags/v$(NINJA_BUILD_NAME).tar.gz
+
+GPERF_VERSION=3.1
+GPERF_URL=$(GNU)/gperf/gperf-$(GPERF_VERSION).tar.gz

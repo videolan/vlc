@@ -389,6 +389,23 @@ CLEAN_PKG += ninja
 DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
 CLEAN_FILE += .buildninja
 
+# gperf
+
+gperf-$(GPERF_VERSION).tar.gz:
+	$(call download_pkg,$(GPERF_URL),gperf)
+
+gperf: gperf-$(GPERF_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.buildgperf: gperf
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += gperf
+DISTCLEAN_PKG += gperf-$(GPERF_VERSION).tar.gz
+CLEAN_FILE += .buildgperf
+
 #
 #
 #
