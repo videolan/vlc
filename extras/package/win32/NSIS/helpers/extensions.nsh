@@ -237,6 +237,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".rm"
   !insertmacro ${_action} Video ".rmvb"
   !insertmacro ${_action} Video ".rpl"
+  !insertmacro ${_action} Video ".skm"
   !insertmacro ${_action} Video ".thp"
   !insertmacro ${_action} Video ".tod"
   !insertmacro ${_action} Video ".tp"
