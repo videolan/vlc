@@ -22,10 +22,16 @@
 
 #import "VLCLibraryPlaylistViewController.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
+#import "library/audio-library/VLCLibraryAudioViewController.h"
+
+#import "library/video-library/VLCLibraryVideoViewController.h"
 
 @interface VLCLibraryPlaylistViewController ()
 
@@ -93,6 +99,31 @@
                                     multiplier:0.f
                                       constant:149.f],
     ];
+}
+
+// TODO: This is duplicated almost verbatim across all the library view
+// controllers. Ideally we should have the placeholder view handle this
+// itself, or move this into a common superclass
+- (void)presentPlaceholderPlaylistLibraryView
+{
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
+        constraint.active = NO;
+    }
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
+        constraint.active = NO;
+    }
+    for (NSLayoutConstraint * const constraint in _placeholderImageViewConstraints) {
+        constraint.active = YES;
+    }
+
+    _libraryWindow.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+    _libraryWindow.libraryTargetView.subviews = @[_libraryWindow.emptyLibraryView];
+    NSDictionary * const dict = @{@"emptyLibraryView": _libraryWindow.emptyLibraryView};
+    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+
+    _libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
+    _libraryWindow.placeholderLabel.stringValue = _NS("Your favorite playlists will appear here.\nGo to the Browse section to add playlists you love.");
 }
 
 @end
