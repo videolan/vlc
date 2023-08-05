@@ -567,9 +567,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedGenres = nil;
     _cachedArtists = nil;
     _cachedAudioMedia = nil;
+    _cachedRecentMedia = nil;
 
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId action:(void (^)(const NSMutableArray*, const NSUInteger, const NSMutableArray*, const NSUInteger))action
