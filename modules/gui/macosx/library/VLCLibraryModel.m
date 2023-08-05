@@ -30,6 +30,7 @@
 NSString * const VLCLibraryModelArtistListReset = @"VLCLibraryModelArtistListReset";
 NSString * const VLCLibraryModelAlbumListReset = @"VLCLibraryModelAlbumListReset";
 NSString * const VLCLibraryModelGenreListReset = @"VLCLibraryModelGenreListReset";
+NSString * const VLCLibraryModelPlaylistListReset = @"VLCLibraryModelPlaylistListReset";
 NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
 NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
@@ -91,6 +92,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 @property (readwrite, atomic) NSArray *cachedListOfGroups;
 @property (readwrite, atomic) NSArray *cachedRecentMedia;
 @property (readwrite, atomic) NSArray *cachedRecentAudioMedia;
+@property (readwrite, atomic) NSArray *cachedPlaylists;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
 
 - (void)resetCachedMediaItemLists;
@@ -651,6 +653,51 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self resetCachedListOfAudioMedia];
     [self resetCachedListOfVideoMedia];
     [self resetCachedListOfShows];
+}
+
+
+- (size_t)numberOfPlaylists
+{
+    if (!_cachedPlaylists) {
+        [self resetCachedListOfPlaylists];
+    }
+
+    return _cachedPlaylists.count;
+}
+
+- (NSArray<VLCMediaLibraryPlaylist *> *)listOfPlaylists
+{
+    if (!_cachedPlaylists) {
+        [self resetCachedListOfPlaylists];
+    }
+
+    return _cachedPlaylists;
+}
+
+- (void)resetCachedListOfPlaylists
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        const vlc_ml_query_params_t queryParameters = [self queryParams];
+        vlc_ml_playlist_list_t * const p_playlist_list = vlc_ml_list_playlists(self->_p_mediaLibrary, &queryParameters, VLC_ML_PLAYLIST_TYPE_ALL);
+        if (p_playlist_list == NULL) {
+            return;
+        }
+
+        NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_playlist_list->i_nb_items];
+        for (size_t x = 0; x < p_playlist_list->i_nb_items; x++) {
+            VLCMediaLibraryPlaylist * const playlist = [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&p_playlist_list->p_items[x]];
+            if (playlist != nil) {
+                [mutableArray addObject:playlist];
+            }
+        }
+
+        vlc_ml_playlist_list_release(p_playlist_list);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.cachedPlaylists = mutableArray.copy;
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistListReset object:self];
+        });
+    });
 }
 
 - (void)resetCachedListOfMonitoredFolders
