@@ -63,6 +63,10 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     
     size_t _initialVideoCount;
     size_t _initialAudioCount;
+    size_t _initialAlbumCount;
+    size_t _initialArtistCount;
+    size_t _initialGenreCount;
+    size_t _initialRecentsCount;
 
     dispatch_queue_t _mediaItemCacheModificationQueue;
     dispatch_queue_t _albumCacheModificationQueue;
@@ -204,6 +208,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             // Preload video and audio count for gui
             self->_initialVideoCount = vlc_ml_count_video_media(self->_p_mediaLibrary, &queryParameters);
             self->_initialAudioCount = vlc_ml_count_audio_media(self->_p_mediaLibrary, &queryParameters);
+            self->_initialAlbumCount = vlc_ml_count_albums(self->_p_mediaLibrary, &queryParameters);
+            self->_initialArtistCount = vlc_ml_count_artists(self->_p_mediaLibrary, &queryParameters, true);
+            self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
+            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = 20 }), VLC_ML_MEDIA_TYPE_VIDEO);
         });
     }
     return self;
@@ -281,6 +289,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedArtists) {
         [self resetCachedListOfArtists];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialArtistCount;
     }
     return _cachedArtists.count;
 }
@@ -317,6 +327,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedAlbums) {
         [self resetCachedListOfAlbums];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialAlbumCount;
     }
     return _cachedAlbums.count;
 }
@@ -351,6 +363,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedGenres) {
         [self resetCachedListOfGenres];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialGenreCount;
     }
     return _cachedGenres.count;
 }
@@ -451,9 +465,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (size_t)numberOfRecentMedia
 {
     if (!_cachedRecentMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfRecentMedia];
-        });
+        [self resetCachedListOfRecentMedia];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialRecentsCount;
     }
     return _cachedRecentMedia.count;
 }
@@ -461,9 +475,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentMedia
 {
     if (!_cachedRecentMedia) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self resetCachedListOfRecentMedia];
-        });
+        [self resetCachedListOfRecentMedia];
     }
     return _cachedRecentMedia;
 }
