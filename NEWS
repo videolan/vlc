@@ -10,30 +10,38 @@ Demux:
  * Fix AVI files with flipped RAW video planes
  * Fix duration on short and small Ogg/Opus files
  * Fix some HLS/TS streams with ID3 prefix
+ * Fix some HLS playlist refresh drift
  * Fix for GoPro MAX spatial metadata
  * Improve ffmpeg muxed MP4 chapters handling
- * Fix some HLS playlist refresh drift
+ * Improve playback for QNap-produced AVI files
+ * Improve playback of some old RealVideo files
 
 Decoders:
  * Multiple fixes on AAC handling
  * Activate hardware decoding of AV1 on Windows (DxVA)
  * Improve AV1 HDR support with software decoding
- * Fix some AV1 GBRP streams
- * Fix AV1 super-resolution streams
+ * Fix some AV1 GBRP streams, AV1 super-resolution streams and monochrome ones
  * Fix black screen on poorly edited MP4 files on Android Mediacodec
  * Fix rawvid video in NV12
+ * Fix several issues on Windows hardware decoding (including "too large resolution in DxVA")
+ * Improve crunchyroll-produced SSA rendering
 
 Video Output:
  * Super Resolution scaling with nVidia and Intel GPUs
  * Direct3D9 fix for cropping
  * Multiple fixes for hardware decoding on D3D11 and OpenGL interop
+ * Fix subtitles rendering blur on recent macOS
+
+Input:
+ * Improve SMB compatibility with Windows 11 hosts
 
 Contribs:
  * Update of fluidlite, fixing some MIDI rendering on Windows
  * Update of zlib to 1.2.13 (CVE-2022-37434)
- * Update of FFmpeg, vpx, ebml
+ * Update of FFmpeg, vpx, ebml, dav1d, libass
 
 Misc:
+ * Improve muxing timestamps in a few formats (reset to 0)
  * Fix some rendering issues on Linux with the fullscreen controller
  * Fix GOOM visualization
  * Fixes for Youtube playback
@@ -43,7 +51,8 @@ Misc:
  * Fix password search using the Kwallet backend
  * Fix some crashes on macOS when switching application
  * Fix 5.1/7.1 output on macOS and tvOS
- * Improve muxing timestamps in a few formats (reset to 0)
+ * Fix several crashes and bugs in the macOS preferences panel
+ * Improvements on the threading of the MMDevice audio output on Windows
 
 
 Changes between 3.0.18-rc2 and 3.0.18:
