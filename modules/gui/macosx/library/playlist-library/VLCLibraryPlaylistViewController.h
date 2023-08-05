@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
 
+@property (readonly) NSCollectionView *collectionView;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 @end

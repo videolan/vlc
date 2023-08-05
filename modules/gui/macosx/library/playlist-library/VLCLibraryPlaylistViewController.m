@@ -22,7 +22,17 @@
 
 #import "VLCLibraryPlaylistViewController.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
+@interface VLCLibraryPlaylistViewController ()
+
+@property (readonly) NSScrollView *collectionViewScrollView;
+@property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
+
+@end
 
 @implementation VLCLibraryPlaylistViewController
 
@@ -32,6 +42,7 @@
 
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupPlaylistCollectionView];
     }
 
     return self;
@@ -43,6 +54,26 @@
 
     _libraryWindow = libraryWindow;
     _libraryTargetView = libraryWindow.libraryTargetView;
+}
+
+- (void)setupPlaylistCollectionView
+{
+    _collectionViewScrollView = [[NSScrollView alloc] initWithFrame:_libraryTargetView.frame];
+    _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    _collectionView = [[NSCollectionView alloc] init];
+
+    _collectionViewScrollView.documentView = _collectionView;
+    _collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _collectionViewScrollView.contentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    _collectionViewScrollView.scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
+    _collectionView.delegate = _collectionViewDelegate;
+    _collectionView.collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
+
+    _collectionView.selectable = YES;
+    _collectionView.allowsMultipleSelection = NO;
+    _collectionView.allowsEmptySelection = YES;
 }
 
 @end
