@@ -22,6 +22,27 @@
 
 #import "VLCLibraryPlaylistViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryPlaylistViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+
+    if(self) {
+        [self setupPropertiesFromLibraryWindow:libraryWindow];
+    }
+
+    return self;
+}
+
+- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow*)libraryWindow
+{
+    NSParameterAssert(libraryWindow);
+
+    _libraryWindow = libraryWindow;
+    _libraryTargetView = libraryWindow.libraryTargetView;
+}
 
 @end

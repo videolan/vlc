@@ -20,11 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryWindow;
+
 @interface VLCLibraryPlaylistViewController : NSObject
+
+@property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readonly) NSView *libraryTargetView;
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 @end
 
