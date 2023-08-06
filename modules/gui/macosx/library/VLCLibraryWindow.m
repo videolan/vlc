@@ -62,6 +62,8 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 
+#import "library/playlist-library/VLCLibraryPlaylistViewController.h"
+
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
 
@@ -185,6 +187,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
     _libraryGroupsViewController = [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:self];
+    _libraryPlaylistViewController = [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:self];
 
     [self setViewForSelectedSegment];
 }

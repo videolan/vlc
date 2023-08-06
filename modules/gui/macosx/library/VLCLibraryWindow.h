@@ -30,9 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
 @class VLCInputNodePathControl;
-@class VLCLibraryNavigationStack;
 @class VLCLibraryAudioViewController;
 @class VLCLibraryMediaSourceViewController;
+@class VLCLibraryNavigationStack;
+@class VLCLibraryPlaylistViewController;
 @class VLCLibraryVideoViewController;
 @class VLCLibraryHomeViewController;
 @class VLCLibraryGroupsViewController;
@@ -126,6 +127,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryVideoViewController *libraryVideoViewController;
 @property (readonly) VLCLibraryHomeViewController *libraryHomeViewController;
 @property (readonly) VLCLibraryGroupsViewController *libraryGroupsViewController;
+@property (readonly) VLCLibraryPlaylistViewController *libraryPlaylistViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
 
