@@ -57,6 +57,7 @@ NSString * const VLCLibraryModelRecentAudioMediaItemUpdated = @"VLCLibraryModelR
 NSString * const VLCLibraryModelAlbumUpdated = @"VLCLibraryModelAlbumUpdated";
 NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
 NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
+NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdated";
 
 @interface VLCLibraryModel ()
 {
@@ -116,6 +117,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handlePlaylistUpdateEvent:(const vlc_ml_event_t * const)p_event;
 
 @end
 
@@ -184,6 +186,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel resetCachedListOfGroups]; // TODO: Handle each event granularly
         case VLC_ML_EVENT_PLAYLIST_ADDED:
             [libraryModel resetCachedListOfPlaylists];
+            break;
+        case VLC_ML_EVENT_PLAYLIST_UPDATED:
+            [libraryModel handlePlaylistUpdateEvent:p_event];
             break;
         case VLC_ML_EVENT_PLAYLIST_DELETED:
             [libraryModel handlePlaylistDeletionEvent:p_event];
@@ -1154,6 +1159,37 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                          usingSetter:@selector(setCachedGenres:)
                           usingQueue:_genreCacheModificationQueue
                 withNotificationName:VLCLibraryModelGenreDeleted];
+}
+
+- (void)handlePlaylistUpdateEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+    VLCMediaLibraryPlaylist * const playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:itemId];
+    if (playlist == nil) {
+        NSLog(@"Could not find a library playlist with this ID. Can't handle update.");
+        return;
+    }
+
+    dispatch_async(_mediaItemCacheModificationQueue, ^{
+        NSMutableArray * const mutablePlaylists = self.cachedPlaylists.mutableCopy;
+        const NSUInteger playlistIdx = [mutablePlaylists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryPlaylist * const playlist, const NSUInteger idx, BOOL * const stop) {
+            NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
+            return playlist.libraryID == itemId;
+        }];
+
+        if (playlistIdx == NSNotFound) {
+            NSLog(@"Could not handle deletion of playlist with id %lld in model", itemId);
+            return;
+        }
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [mutablePlaylists replaceObjectAtIndex:playlistIdx withObject:playlist];
+            self.cachedPlaylists = mutablePlaylists.copy;
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistDeleted object:playlist];
+        });
+    });
 }
 
 - (void)handlePlaylistDeletionEvent:(const vlc_ml_event_t * const)p_event
