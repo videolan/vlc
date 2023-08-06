@@ -74,6 +74,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     size_t _initialGenreCount;
     size_t _initialShowCount;
     size_t _initialGroupCount;
+    size_t _initialPlaylistCount;
     size_t _initialRecentsCount;
     size_t _initialRecentAudioCount;
 
@@ -238,6 +239,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
             self->_initialShowCount = vlc_ml_count_shows(self->_p_mediaLibrary, &queryParameters);
             self->_initialGroupCount = vlc_ml_count_groups(self->_p_mediaLibrary, &queryParameters);
+            self->_initialPlaylistCount =
+                vlc_ml_count_playlists(self->_p_mediaLibrary, &queryParameters, VLC_ML_PLAYLIST_TYPE_ALL);
 
             queryParameters.i_nbResults = self->_recentMediaLimit;
             self->_initialRecentsCount = vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
@@ -660,6 +663,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     if (!_cachedPlaylists) {
         [self resetCachedListOfPlaylists];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialPlaylistCount;
     }
 
     return _cachedPlaylists.count;
