@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment genreLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment songsLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment artistLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment playlistLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment browseLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment streamLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment groupsLibraryViewMode;
