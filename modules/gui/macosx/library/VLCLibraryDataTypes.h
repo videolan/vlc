@@ -272,6 +272,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @property (readonly) BOOL readOnly;
 
++ (instancetype)playlistForLibraryID:(int64_t)libraryID;
 - (instancetype)initWithPlaylist:(struct vlc_ml_playlist_t *)p_playlist;
 
 @end

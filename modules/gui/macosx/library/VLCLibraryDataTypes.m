@@ -808,6 +808,21 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryPlaylist
 
++ (instancetype)playlistForLibraryID:(int64_t)libraryID
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+
+    vlc_ml_playlist_t * const p_playlist = vlc_ml_get_playlist(p_mediaLibrary, libraryID);
+    if (p_playlist == NULL) {
+        return nil;
+    }
+
+    return [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:p_playlist];
+}
+
 - (instancetype)initWithPlaylist:(struct vlc_ml_playlist_t *)p_playlist
 {
     self = [super init];
