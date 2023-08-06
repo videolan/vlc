@@ -26,12 +26,16 @@
 
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
+
+#import "main/VLCMain.h"
 
 @interface VLCLibraryPlaylistViewController ()
 
@@ -134,6 +138,21 @@
     [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[playlistLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     [_collectionView reloadData];
+}
+
+- (void)updatePresentedView
+{
+    if (VLCMain.sharedInstance.libraryController.libraryModel.numberOfPlaylists <= 0) {
+        [self presentPlaceholderPlaylistLibraryView];
+    } else {
+        [self presentPlaylistLibraryView];
+    }
+}
+
+- (void)presentPlaylistsView
+{
+    _libraryWindow.libraryTargetView.subviews = @[];
+    [self updatePresentedView];
 }
 
 @end

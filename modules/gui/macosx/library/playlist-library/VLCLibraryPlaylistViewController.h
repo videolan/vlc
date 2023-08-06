@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (void)presentPlaylistsView;
+
 @end
 
 NS_ASSUME_NONNULL_END
