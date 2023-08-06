@@ -1998,6 +1998,21 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
+				<string>public.video</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>SKM File</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>skm</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
 				<string>public.audio</string>
 			</array>
 			<key>UTTypeDescription</key>
