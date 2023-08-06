@@ -395,6 +395,22 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
+			<string>Apple Lossless Audio Codec File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.alac-audio</string>
+			</array>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>aiff</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>audio.icns</string>
+			<key>CFBundleTypeName</key>
 			<string>Adaptive Multi-Rate Codec File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
