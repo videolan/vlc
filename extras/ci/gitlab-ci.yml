@@ -19,6 +19,7 @@ default:
         - amd64
 
 variables:
+    VLC_TEST_TIMEOUT: 60
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221214121630
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221214115142
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20221214101739
@@ -294,7 +295,7 @@ debian:
 
         # Build, check and distcheck VLC
         export XZ_OPT="-T 0"
-        VLC_TEST_TIMEOUT=60 DISTCHECK_CONFIGURE_FLAGS="CFLAGS='$LIBVLC_EXTRA_CFLAGS'" make -j$NCPU distcheck || ./test/dump_stacktraces.sh
+        DISTCHECK_CONFIGURE_FLAGS="CFLAGS='$LIBVLC_EXTRA_CFLAGS'" make -j$NCPU distcheck || ./test/dump_stacktraces.sh
     variables:
         <<: *variables-debian
         LIBVLC_EXTRA_CFLAGS: -Werror=restrict -Werror=incompatible-pointer-types
