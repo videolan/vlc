@@ -712,7 +712,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             if( p_track->p_es && (s->disposition & AV_DISPOSITION_DEFAULT) )
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, p_track->p_es );
 
-            msg_Dbg( p_demux, "adding es: %s codec = %4.4s (%d)",
+            msg_Dbg( p_demux, "adding es: %s codec = %4.4s (0x%x)",
                      psz_type, (char*)&fcc, cp->codec_id  );
         }
         es_format_Clean( &es_fmt );
