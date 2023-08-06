@@ -1696,6 +1696,8 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_ADPCM_EA_R1, "ADPCM Electronic Arts R1"),
 
+    B(VLC_CODEC_ADPCM_EA_R3, "ADPCM Electronic Arts R3"),
+
     B(VLC_CODEC_ADPCM_IMA_APC, "ADPCM APC"),
 
     B(VLC_CODEC_DSD_LSBF, "DSD (Direct Stream Digital) LSB first"),
