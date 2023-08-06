@@ -546,6 +546,18 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>vp6</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>video.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>VP6 File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>dat</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
