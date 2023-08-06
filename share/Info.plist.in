@@ -829,6 +829,18 @@
 			<string>Binary</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>3G2A Mobile Phone Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>k3g</string>
+			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>mxf</string>
