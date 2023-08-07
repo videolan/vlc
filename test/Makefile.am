@@ -87,6 +87,7 @@ EXTRA_PROGRAMS = \
 	$(NULL)
 
 EXTRA_DIST = \
+	modules/lua/extensions/extensions.lua \
 	samples/certs/certkey.pem \
 	samples/empty.voc \
 	samples/image.jpg \
