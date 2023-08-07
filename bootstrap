@@ -17,8 +17,6 @@ if test "$#" != "0"; then
   exit 1
 fi
 
-ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
-
 # Check for tools directory
 if test -z ${VLC_TOOLS}; then
   VLC_TOOLS=extras/tools/build
