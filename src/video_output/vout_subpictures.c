@@ -996,6 +996,7 @@ static void SpuRenderRegion(spu_t *spu,
 
                 scale_yuvp->fmt_out.video = region->fmt;
                 scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
+                scale_yuvp->fmt_out.video.p_palette = NULL;
 
                 picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
                 assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
