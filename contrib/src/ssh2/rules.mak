@@ -36,7 +36,6 @@ endif
 SSH2_CONF := --disable-examples-build --disable-tests --with-crypto=libgcrypt $(BROKEN_GCC_CFLAGS)
 
 .ssh2: ssh2
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SSH2_CONF)
 	+$(MAKEBUILD)
