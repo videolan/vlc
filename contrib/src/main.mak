@@ -220,10 +220,11 @@ HAVE_FPU = 1
 endif
 
 ifneq ($(wildcard $(VLC_TOOLS)/share/aclocal/*),)
-VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal:$(abspath $(VLC_TOOLS)/share/aclocal)
+VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal:$(abspath $(VLC_TOOLS)/share/aclocal):${ACLOCAL_PATH}
 else
-VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal
+VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal:${ACLOCAL_PATH}
 endif
+export ACLOCAL_PATH=${VLC_ACLOCAL_PATH}
 
 #########
 # Tools #
@@ -425,7 +426,7 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
-AUTORECONF = ACLOCAL_PATH="${VLC_ACLOCAL_PATH}:${ACLOCAL_PATH}" GTKDOCIZE=true autoreconf
+AUTORECONF = GTKDOCIZE=true autoreconf
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv
 
