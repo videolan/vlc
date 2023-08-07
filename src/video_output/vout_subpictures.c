@@ -999,6 +999,8 @@ static void SpuRenderRegion(spu_t *spu,
                 scale_yuvp->fmt_out.video.p_palette = NULL;
 
                 picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
+
+                scale_yuvp->fmt_in.video.p_palette = NULL;
                 assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
                 if (!picture) {
                     /* Well we will try conversion+scaling */
