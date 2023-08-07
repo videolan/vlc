@@ -67,6 +67,10 @@ process() {
         then
             # Ensure the file we're checking contains a prefix
             if grep -q '^prefix=' $file; then
+                # Skip .pc files with a relocatable prefix
+                if grep -q '${pcfiledir}' $file; then
+                    continue
+                fi
                 # And if it does, ensure it's correctly pointing to the configured one
                 if ! grep -q $old_prefix $file; then
                     echo "Can't find the old_prefix ($old_prefix) in file $file:"
