@@ -219,11 +219,11 @@ else ifneq ($(call cppcheck, __mips_hard_float),)
 HAVE_FPU = 1
 endif
 
-ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
 ifneq ($(wildcard $(VLC_TOOLS)/share/aclocal/*),)
-ACLOCAL_AMFLAGS += -I$(abspath $(VLC_TOOLS)/share/aclocal)
+VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal:$(abspath $(VLC_TOOLS)/share/aclocal)
+else
+VLC_ACLOCAL_PATH := $(PREFIX)/share/aclocal
 endif
-export ACLOCAL_AMFLAGS
 
 #########
 # Tools #
@@ -425,9 +425,9 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
-AUTORECONF = GTKDOCIZE=true autoreconf
+AUTORECONF = ACLOCAL_PATH="${VLC_ACLOCAL_PATH}:${ACLOCAL_PATH}" GTKDOCIZE=true autoreconf
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
-	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
+	cd $< && $(AUTORECONF) -fiv
 
 BUILD_DIR = $</vlc_build
 BUILD_SRC := ..
