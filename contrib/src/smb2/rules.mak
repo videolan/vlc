@@ -23,7 +23,8 @@ smb2: libsmb2-$(SMB2_VERSION).tar.gz .sum-smb2
 SMB2_CONF := --disable-examples --disable-werror --without-libkrb5
 
 .smb2: smb2
-	cd $< && ./bootstrap
+	mkdir -p $</m4
+	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SMB2_CONF)
 	+$(MAKEBUILD)
