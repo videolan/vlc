@@ -1,0 +1,7 @@
+[package]
+name = "vlcrs-utils"
+version = "0.0.0"
+edition = "2021"
+license = "LGPL-2.1-or-later"
+
+[dependencies]
