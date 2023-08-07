@@ -41,11 +41,14 @@ EmbeddedThumbnail::~EmbeddedThumbnail()
 
 bool EmbeddedThumbnail::save( const std::string& path )
 {
-    std::unique_ptr<FILE, decltype(&fclose)> f{ vlc_fopen( path.c_str(), "wb" ),
-                                                &fclose };
+    FILE* f = vlc_fopen( path.c_str(), "wb" );
+
     if ( f == nullptr )
         return false;
-    auto res = fwrite( m_attachment->p_data, m_attachment->i_data, 1, f.get() );
+    auto res = fwrite( m_attachment->p_data, m_attachment->i_data, 1, f );
+
+    if ( fclose( f ) != 0 )
+        return false;
     return res == 1;
 }
 
