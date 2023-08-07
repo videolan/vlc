@@ -28,7 +28,8 @@ DEPS_aribb24 = png $(DEPS_png)
 .aribb24: aribb24
 	$(REQUIRE_GPL)
 	$(REQUIRE_GNUV3)
-	cd $< && $(SHELL) ./bootstrap
+	mkdir -p $</m4
+	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)
