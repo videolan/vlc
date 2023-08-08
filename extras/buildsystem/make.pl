@@ -63,6 +63,7 @@ while(<STDIN>)
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2/g ||
           $line =~ s/^.*(lib.*\.lo)\s.*/ COMPILE : $1/g ||
+          $line =~ s/^.* (.*\.luac)\s.*/ COMPILE : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s`.*`(.*);\ \\/ COMPILE : $2/ ||
           $line =~ s/.*\-o\s([^\s]*)\s`.*`([^\s]*);.*/ COMPILE : $2/g ||
           $line =~ s/^[A-z0-9-]*ranlib\s(.*)/ RANLIB  : $1/g ||
