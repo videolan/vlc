@@ -22,6 +22,37 @@
 
 #import "VLCLibraryPlaylistDataSource.h"
 
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
+
+#import "main/VLCMain.h"
+
+@interface VLCLibraryPlaylistDataSource ()
+
+@property (readwrite, atomic) NSArray<VLCMediaLibraryPlaylist *> *playlists;
+
+@end
+
 @implementation VLCLibraryPlaylistDataSource
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    [self reloadPlaylists];
+}
+
+- (void)reloadPlaylists
+{
+    self.playlists = _libraryModel.listOfPlaylists;
+}
 
 @end

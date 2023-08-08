@@ -22,9 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
+
+@class VLCLibraryModel;
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryPlaylistDataSource : NSObject
+@interface VLCLibraryPlaylistDataSource : NSObject<VLCLibraryCollectionViewDataSource>
+
+@property (readonly) VLCLibraryModel *libraryModel;
 
 @end
 
