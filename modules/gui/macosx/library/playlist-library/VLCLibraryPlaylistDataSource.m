@@ -49,6 +49,18 @@
 {
     _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     [self reloadPlaylists];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(playlistsReset:)
+                               name:VLCLibraryModelPlaylistListReset
+                             object:nil];
+}
+
+- (void)playlistsReset:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    [self reloadPlaylists];
 }
 
 - (void)reloadPlaylists
