@@ -64,6 +64,10 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                            selector:@selector(playlistUpdated:)
                                name:VLCLibraryModelPlaylistUpdated
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playlistDeleted:)
+                               name:VLCLibraryModelPlaylistDeleted
+                             object:nil];
 }
 
 - (void)playlistsReset:(NSNotification *)notification
@@ -77,6 +81,13 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     NSParameterAssert(notification);
     VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)notification.object;
     [self cacheAction:VLCLibraryDataSourceCacheUpdateAction onPlaylist:playlist];
+}
+
+- (void)playlistDeleted:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)notification.object;
+    [self cacheAction:VLCLibraryDataSourceCacheDeleteAction onPlaylist:playlist];
 }
 
 - (void)reloadPlaylists
