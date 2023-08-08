@@ -23,6 +23,7 @@
 #import "VLCLibraryPlaylistDataSource.h"
 
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 
 #import "main/VLCMain.h"
@@ -63,4 +64,11 @@
     }
 }
 
+- (NSUInteger)indexForPlaylistWithId:(const int64_t)itemId
+{
+    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger idx, BOOL * const stop) {
+        NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
+        return playlist.libraryID == itemId;
+    }];
+}
 @end
