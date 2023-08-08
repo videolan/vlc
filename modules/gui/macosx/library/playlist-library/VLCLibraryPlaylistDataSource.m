@@ -55,12 +55,23 @@
                            selector:@selector(playlistsReset:)
                                name:VLCLibraryModelPlaylistListReset
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playlistUpdated:)
+                               name:VLCLibraryModelPlaylistUpdated
+                             object:nil];
 }
 
 - (void)playlistsReset:(NSNotification *)notification
 {
     NSParameterAssert(notification);
     [self reloadPlaylists];
+}
+
+- (void)playlistUpdated:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)notification.object;
+    [self reloadPlaylist:playlist];
 }
 
 - (void)reloadPlaylists
@@ -86,6 +97,8 @@
 
 - (void)reloadPlaylist:(VLCMediaLibraryPlaylist *)playlist
 {
+    NSParameterAssert(playlist != nil);
+
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const NSUInteger idx = [self indexForPlaylistWithId:playlist.libraryID];
         if (idx == NSNotFound) {
