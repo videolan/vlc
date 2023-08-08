@@ -22,6 +22,7 @@
 
 #import "VLCLibraryPlaylistDataSource.h"
 
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
@@ -160,6 +161,27 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
             [self reloadViewsAtIndex:idx dueToCacheAction:action];
         });
     });
+}
+
+#pragma mark - collection view data source
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    return self.playlists.count;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return 1;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    viewItem.representedItem = self.playlists[indexPath.item];
+    return viewItem;
 }
 
 @end
