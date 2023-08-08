@@ -1071,6 +1071,7 @@ static void Close (vlc_window_t *wnd)
     DeinitKeyboardExtension(wnd);
     xcb_disconnect (conn);
     free (wnd->display.x11);
+    free(p_sys->displays);
 }
 
 /*** Embedded drawable support ***/
