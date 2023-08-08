@@ -28,6 +28,11 @@
 
 #import "main/VLCMain.h"
 
+typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
+    VLCLibraryDataSourceCacheUpdateAction,
+    VLCLibraryDataSourceCacheDeleteAction,
+};
+
 @interface VLCLibraryPlaylistDataSource ()
 
 @property (readwrite, atomic) NSArray<VLCMediaLibraryPlaylist *> *playlists;
@@ -71,7 +76,7 @@
 {
     NSParameterAssert(notification);
     VLCMediaLibraryPlaylist * const playlist = (VLCMediaLibraryPlaylist *)notification.object;
-    [self reloadPlaylist:playlist];
+    [self cacheAction:VLCLibraryDataSourceCacheUpdateAction onPlaylist:playlist];
 }
 
 - (void)reloadPlaylists
@@ -95,7 +100,8 @@
     }];
 }
 
-- (void)reloadPlaylist:(VLCMediaLibraryPlaylist *)playlist
+- (void)cacheAction:(VLCLibraryDataSourceCacheAction)action
+         onPlaylist:(VLCMediaLibraryPlaylist * const)playlist
 {
     NSParameterAssert(playlist != nil);
 
@@ -106,10 +112,20 @@
         }
 
         NSMutableArray * const mutablePlaylists = self.playlists.mutableCopy;
-        [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+
+        switch (action) {
+            case VLCLibraryDataSourceCacheUpdateAction:
+                [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+                break;
+            case VLCLibraryDataSourceCacheDeleteAction:
+                [mutablePlaylists removeObjectAtIndex:idx];
+                break;
+            default:
+                return;
+        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.playlists = mutablePlaylists;
+            self.playlists = mutablePlaylists.copy;
         });
     });
 }
