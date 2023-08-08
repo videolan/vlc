@@ -71,4 +71,22 @@
         return playlist.libraryID == itemId;
     }];
 }
+
+- (void)reloadPlaylist:(VLCMediaLibraryPlaylist *)playlist
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        const NSUInteger idx = [self indexForPlaylistWithId:playlist.libraryID];
+        if (idx == NSNotFound) {
+            return;
+        }
+
+        NSMutableArray * const mutablePlaylists = self.playlists.mutableCopy;
+        [mutablePlaylists replaceObjectAtIndex:idx withObject:playlist];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.playlists = mutablePlaylists;
+        });
+    });
+}
+
 @end
