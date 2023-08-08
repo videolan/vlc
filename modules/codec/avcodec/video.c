@@ -181,6 +181,7 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
     {
         msg_Err(dec, "Invalid frame size %dx%d vsz %dx%d",
                      width, height, ctx->width, ctx->height );
+        video_format_Clean(fmt);
         return -1; /* invalid display size */
     }
 
