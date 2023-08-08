@@ -53,6 +53,14 @@
 - (void)reloadPlaylists
 {
     self.playlists = _libraryModel.listOfPlaylists;
+    [self reloadViews];
+}
+
+- (void)reloadViews
+{
+    for (NSCollectionView * const collectionView in self.collectionViews) {
+        [collectionView reloadData];
+    }
 }
 
 @end
