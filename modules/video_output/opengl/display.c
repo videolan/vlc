@@ -180,6 +180,8 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
         };
     }
     sys->place_changed = true;
+
+    video_format_Clean(&source);
 }
 
 /**
