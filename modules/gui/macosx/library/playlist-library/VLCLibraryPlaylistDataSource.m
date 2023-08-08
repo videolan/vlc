@@ -118,7 +118,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                 [collectionView deleteItemsAtIndexPaths:indexPathSet];
                 break;
             default:
-                return;
+                NSAssert(false, @"Invalid playlist cache action");
         }
     }
 }
@@ -152,7 +152,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                 [mutablePlaylists removeObjectAtIndex:idx];
                 break;
             default:
-                return;
+                NSAssert(false, @"Invalid playlist cache action");
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
