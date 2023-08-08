@@ -104,12 +104,22 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 }
 
 - (void)reloadViewsAtIndex:(NSUInteger)index
+          dueToCacheAction:(VLCLibraryDataSourceCacheAction)action
 {
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
     NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
 
     for (NSCollectionView * const collectionView in self.collectionViews) {
-        [collectionView reloadItemsAtIndexPaths:indexPathSet];
+        switch (action) {
+            case VLCLibraryDataSourceCacheUpdateAction:
+                [collectionView reloadItemsAtIndexPaths:indexPathSet];
+                break;
+            case VLCLibraryDataSourceCacheDeleteAction:
+                [collectionView deleteItemsAtIndexPaths:indexPathSet];
+                break;
+            default:
+                return;
+        }
     }
 }
 
@@ -147,7 +157,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.playlists = mutablePlaylists.copy;
-            [self reloadViewsAtIndex:idx];
+            [self reloadViewsAtIndex:idx dueToCacheAction:action];
         });
     });
 }
