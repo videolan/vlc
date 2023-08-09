@@ -108,7 +108,7 @@ static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
                 tf->sync.contiguous = tf->contiguous_last + prev->diff;
                 tf->sequence_offset = tf->sync.contiguous - tf->sync.stream;
 #ifdef DEBUG_TIMESTAMPS_FILTER
-                printf("%4.4s found offset of %ld\n", s, (prev->dts - i_dts));
+                printf("%4.4s found offset of %" PRId64 "\n", s, (prev->dts - i_dts));
 #endif
                 b_desync = true;
             }
@@ -189,7 +189,7 @@ static int timestamps_filter_es_out_Control(es_out_t *out, input_source_t *in, i
                     if(max)
                     {
 #ifdef DEBUG_TIMESTAMPS_FILTER
-                        printf("PCR  no previous value, using %ld\n", max);
+                        printf("PCR  no previous value, using %" PRId64 "\n", max);
 #endif
                         p_sys->pcrtf.sync.stream = pcr;
                         p_sys->pcrtf.sync.contiguous = max;
