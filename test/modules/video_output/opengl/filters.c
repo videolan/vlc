@@ -47,7 +47,8 @@
 
 static_assert(
     VLC_TEST_OPENGL_API == VLC_OPENGL ||
-    VLC_TEST_OPENGL_API == VLC_OPENGL_ES2);
+    VLC_TEST_OPENGL_API == VLC_OPENGL_ES2,
+    "VLC_TEST_OPENGL_API must be assigned to VLC_OPENGL or VLC_OPENGL_ES2");
 
 const char vlc_module_name[] = MODULE_STRING;
 static const uint8_t green[] = { 0x0, 0xff, 0x00, 0xff };
