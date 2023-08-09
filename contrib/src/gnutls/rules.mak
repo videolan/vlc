@@ -35,9 +35,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# backport gnulib patch
 	$(APPLY) $(SRC)/gnutls/0001-Don-t-assume-that-UNICODE-is-not-defined.patch
 
-	# forbidden RtlSecureZeroMemory call in winstore builds
-	$(APPLY) $(SRC)/gnutls/0001-explicit_bzero-Do-not-call-SecureZeroMemory-on-UWP-b.patch
-
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g $(UNPACK_DIR)/lib/includes/gnutls/gnutls.h.in
 
@@ -78,7 +75,7 @@ GNUTLS_CONF := \
 
 DEPS_gnutls = nettle $(DEPS_nettle)
 ifdef HAVE_WINSTORE
-# gnulib uses GetFileInformationByHandle
+# gnulib uses GetFileInformationByHandle / SecureZeroMemory
 DEPS_gnutls += alloweduwp $(DEPS_alloweduwp)
 endif
 
