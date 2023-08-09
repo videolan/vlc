@@ -7,7 +7,7 @@ qt5 = import('qt5')
 qt_include_dir = include_directories('.')
 
 qt_extra_deps = []
-qt_extra_flags = []
+qt_extra_flags = ['-DQT_STRICT_ITERATORS']
 qt_cppargs = []
 
 qt5_dep = dependency('qt5',
