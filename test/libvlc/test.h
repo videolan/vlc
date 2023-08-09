@@ -97,6 +97,7 @@ static inline void test_init (void)
     }
 
     setenv( "VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1 );
+    setenv( "VLC_LIB_PATH", TOP_BUILDDIR, 1 );
 }
 
 #endif /* TEST_H */
