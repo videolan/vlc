@@ -806,6 +806,12 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
+@interface VLCMediaLibraryPlaylist ()
+{
+    NSArray<VLCMediaLibraryMediaItem *> *_mediaItems;
+}
+@end
+
 @implementation VLCMediaLibraryPlaylist
 
 + (instancetype)playlistForLibraryID:(int64_t)libraryID
@@ -855,6 +861,28 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self;
 }
 
+- (void)fetchMediaItems
+{
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const fetchedMediaItems = NSMutableArray.array;
+    vlc_ml_media_list_t * const p_media_list = vlc_ml_list_playlist_media(getMediaLibrary(), NULL, self.libraryID);
+
+    for (NSUInteger i = 0; i < p_media_list->i_nb_items; ++i) {
+        vlc_ml_media_t p_media_item = p_media_list->p_items[i];
+        VLCMediaLibraryMediaItem * const item = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_item];
+        [fetchedMediaItems addObject:item];
+    }
+
+    vlc_ml_media_list_release(p_media_list);
+    _mediaItems = fetchedMediaItems.copy;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    if (_mediaItems == nil) {
+        [self fetchMediaItems];
+    }
+    return _mediaItems;
+}
 - (void)moveToTrash
 {
     NSFileManager * const fileManager = NSFileManager.defaultManager;

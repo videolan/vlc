@@ -255,6 +255,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @property (readonly) NSString *MRL;
 
+@property (readonly) NSArray<VLCMediaLibraryMediaItem *> *mediaItems;
+
 @property (readonly) unsigned int numberOfMedia;
 @property (readonly) uint32_t numberOfVideos;
 @property (readonly) uint32_t numberOfAudios;
