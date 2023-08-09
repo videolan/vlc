@@ -202,4 +202,17 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     return viewItem;
 }
 
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
+{
+    const NSUInteger indexPathItem = indexPath.item;
+
+    if (indexPathItem < 0 || indexPathItem >= self.playlists.count) {
+        return nil;
+    }
+
+    return self.playlists[indexPathItem];
+}
+
+
 @end
