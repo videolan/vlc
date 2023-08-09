@@ -165,6 +165,24 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 #pragma mark - collection view data source
 
+- (void)setCollectionViews:(NSArray<NSCollectionView *> *)collectionViews
+{
+    _collectionViews = collectionViews;
+    for (NSCollectionView * const collectionView in self.collectionViews) {
+        [self setupCollectionView:collectionView];
+    }
+}
+
+- (void)setupCollectionView:(NSCollectionView *)collectionView
+{
+    [collectionView registerClass:VLCLibraryCollectionViewItem.class
+            forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    collectionView.dataSource = self;
+
+    [collectionView reloadData];
+}
+
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {

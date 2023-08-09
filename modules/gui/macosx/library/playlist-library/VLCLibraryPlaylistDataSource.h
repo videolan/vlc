@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryPlaylistDataSource : NSObject<VLCLibraryCollectionViewDataSource>
 
 @property (readonly) VLCLibraryModel *libraryModel;
-@property (readwrite, atomic) NSArray<NSCollectionView *> *collectionViews;
+@property (readwrite, nonatomic) NSArray<NSCollectionView *> *collectionViews;
 
 @end
 
