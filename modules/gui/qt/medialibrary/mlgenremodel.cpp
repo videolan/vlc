@@ -161,22 +161,16 @@ MLGenreModel::createLoader() const
     return std::make_unique<Loader>(*this);
 }
 
-size_t MLGenreModel::Loader::count(vlc_medialibrary_t* ml) const
+size_t MLGenreModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
-    return vlc_ml_count_genres( ml, &queryParams );
+    return vlc_ml_count_genres( ml, queryParams );
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLGenreModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const
+MLGenreModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_genre_list_t> genre_list(
-        vlc_ml_list_genres(ml, &queryParams)
+        vlc_ml_list_genres(ml, queryParams)
     );
     if ( genre_list == nullptr )
         return {};

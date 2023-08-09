@@ -195,7 +195,23 @@ protected:
 
         MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
 
+        virtual size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* params) const = 0;
+        virtual std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* params) const = 0;
         virtual std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const = 0;
+
+        inline size_t count(vlc_medialibrary_t* ml) const override
+        {
+            MLQueryParams queryParams = getParams();
+            vlc_ml_query_params_t queryParamsC = queryParams.toCQueryParams();
+            return count(ml, &queryParamsC);
+        }
+
+        inline std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override
+        {
+            MLQueryParams queryParams = getParams(index, count);
+            vlc_ml_query_params_t queryParamsC = queryParams.toCQueryParams();
+            return load(ml, &queryParamsC);
+        }
 
     protected:
         MLItemId m_parent;

@@ -54,22 +54,16 @@ MLRecentsVideoModel::Loader::Loader(const MLRecentsVideoModel & model)
     : MLBaseModel::BaseLoader(model)
 {}
 
-size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
+size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams();
-
-    auto queryParams = params.toCQueryParams();
-    return vlc_ml_count_history_by_type(ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
+    return vlc_ml_count_history_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
+MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_media_list_t> media_list {
-        vlc_ml_list_history_by_type(ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO)
+        vlc_ml_list_history_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO)
     };
 
     if (media_list == nullptr)

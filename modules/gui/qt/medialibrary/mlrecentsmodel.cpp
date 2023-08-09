@@ -105,23 +105,16 @@ MLRecentsModel::Loader::Loader(const MLRecentsModel &model)
     : BaseLoader(model)
 {
 }
-
-size_t MLRecentsModel::Loader::count(vlc_medialibrary_t* ml) const
+size_t MLRecentsModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
-    return vlc_ml_count_history( ml, &queryParams );
+    return vlc_ml_count_history( ml, queryParams );
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const
+MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                ml, &queryParams ) };
+                ml, queryParams ) };
     if ( media_list == nullptr )
         return {};
 

@@ -163,28 +163,22 @@ MLAlbumTrackModel::createLoader() const
     return std::make_unique<Loader>(*this);
 }
 
-size_t MLAlbumTrackModel::Loader::count(vlc_medialibrary_t* ml) const
+size_t MLAlbumTrackModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
     if ( m_parent.id <= 0 )
-        return vlc_ml_count_audio_media(ml, &queryParams);
-    return vlc_ml_count_media_of(ml, &queryParams, m_parent.type, m_parent.id );
+        return vlc_ml_count_audio_media(ml, queryParams);
+    return vlc_ml_count_media_of(ml, queryParams, m_parent.type, m_parent.id );
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLAlbumTrackModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const
+MLAlbumTrackModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
 
     if ( m_parent.id <= 0 )
-        media_list.reset( vlc_ml_list_audio_media(ml, &queryParams) );
+        media_list.reset( vlc_ml_list_audio_media(ml, queryParams) );
     else
-        media_list.reset( vlc_ml_list_media_of(ml, &queryParams, m_parent.type, m_parent.id ) );
+        media_list.reset( vlc_ml_list_media_of(ml, queryParams, m_parent.type, m_parent.id ) );
     if ( media_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLItem>> res;

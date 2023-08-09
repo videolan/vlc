@@ -259,33 +259,27 @@ MLVideoModel::createLoader() const
     return std::make_unique<Loader>(*this);
 }
 
-size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
+size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
     int64_t id = m_parent.id;
 
     if (id <= 0)
-        return vlc_ml_count_video_media(ml, &queryParams);
+        return vlc_ml_count_video_media(ml, queryParams);
     else
-        return vlc_ml_count_video_of(ml, &queryParams, m_parent.type, id);
+        return vlc_ml_count_video_of(ml, queryParams, m_parent.type, id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
+MLVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_media_list_t> list;
 
     int64_t id = m_parent.id;
 
     if (id <= 0)
-        list.reset(vlc_ml_list_video_media(ml, &queryParams));
+        list.reset(vlc_ml_list_video_media(ml, queryParams));
     else
-        list.reset(vlc_ml_list_video_of(ml, &queryParams, m_parent.type, id));
+        list.reset(vlc_ml_list_video_of(ml, queryParams, m_parent.type, id));
 
     if (list == nullptr)
         return {};

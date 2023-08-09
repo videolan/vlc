@@ -165,26 +165,19 @@ void MLVideoFoldersModel::onVlcMlEvent(const MLEvent & event) /* override */
 }
 
 // Loader
-
 MLVideoFoldersModel::Loader::Loader(const MLVideoFoldersModel & model)
     : MLBaseModel::BaseLoader(model) {}
 
-size_t MLVideoFoldersModel::Loader::count(vlc_medialibrary_t * ml) const /* override */
+size_t MLVideoFoldersModel::Loader::count(vlc_medialibrary_t * ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
-    return vlc_ml_count_folders_by_type(ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
+    return vlc_ml_count_folders_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
 }
 
 std::vector<std::unique_ptr<MLItem>>
 MLVideoFoldersModel::Loader::load(vlc_medialibrary_t * ml,
-                                  size_t index, size_t count) const /* override */
+                                  const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
-    ml_unique_ptr<vlc_ml_folder_list_t> list(vlc_ml_list_folders_by_type(ml, &queryParams,
+    ml_unique_ptr<vlc_ml_folder_list_t> list(vlc_ml_list_folders_by_type(ml, queryParams,
                                                                          VLC_ML_MEDIA_TYPE_VIDEO));
 
     if (list == nullptr)

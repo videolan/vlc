@@ -510,22 +510,16 @@ void MLPlaylistModel::generateThumbnail(const MLItemId& itemid) const
 
 MLPlaylistModel::Loader::Loader(const MLPlaylistModel & model) : MLBaseModel::BaseLoader(model) {}
 
-size_t MLPlaylistModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
+size_t MLPlaylistModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams();
-    auto queryParams = params.toCQueryParams();
-
-    return vlc_ml_count_playlist_media(ml, &queryParams, m_parent.id);
+    return vlc_ml_count_playlist_media(ml, queryParams, m_parent.id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLPlaylistModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
+MLPlaylistModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    MLQueryParams params = getParams(index, count);
-    auto queryParams = params.toCQueryParams();
-
     ml_unique_ptr<vlc_ml_media_list_t> list {
-        vlc_ml_list_playlist_media(ml, &queryParams, m_parent.id)
+        vlc_ml_list_playlist_media(ml, queryParams, m_parent.id)
     };
 
     if (list == nullptr)
