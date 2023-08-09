@@ -883,6 +883,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
     return _mediaItems;
 }
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    if (self.mediaItems == nil) {
+        [self fetchMediaItems];
+    }
+    return self.mediaItems.firstObject;
+}
+
 - (void)moveToTrash
 {
     NSFileManager * const fileManager = NSFileManager.defaultManager;
@@ -897,6 +906,17 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     NSURL * const URL = [NSURL URLWithString:_MRL];
     if (URL) {
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
+    }
+}
+
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
+{
+    if (self.mediaItems == nil) {
+        [self fetchMediaItems];
+    }
+
+    for(VLCMediaLibraryMediaItem * const item in self.mediaItems) {
+        mediaItemBlock(item);
     }
 }
 
