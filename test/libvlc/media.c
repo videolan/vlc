@@ -1,5 +1,5 @@
 /*
- * media_player.c - libvlc smoke test
+ * media.c - libvlc media smoke test
  *
  */
 
