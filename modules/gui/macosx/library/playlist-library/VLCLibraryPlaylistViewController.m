@@ -33,6 +33,8 @@
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
+#import "library/playlist-library/VLCLibraryPlaylistDataSource.h"
+
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
 #import "main/VLCMain.h"
@@ -54,6 +56,7 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupPlaylistCollectionView];
         [self setupPlaylistPlaceholderView];
+        [self setupPlaylistDataSource];
     }
 
     return self;
@@ -102,6 +105,12 @@
                                     multiplier:0.f
                                       constant:149.f],
     ];
+}
+
+- (void)setupPlaylistDataSource
+{
+    _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
+    _dataSource.collectionViews = @[_collectionView];
 }
 
 // TODO: This is duplicated almost verbatim across all the library view
