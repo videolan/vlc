@@ -253,10 +253,10 @@ void MLVideoModel::generateThumbnail(uint64_t id) const
     });
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLVideoModel::createLoader() const
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLVideoModel::Loader>(*this));
 }
 
 size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */

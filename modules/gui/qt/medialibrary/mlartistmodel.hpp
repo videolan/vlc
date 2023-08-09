@@ -49,7 +49,7 @@ public:
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
-    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -59,9 +59,9 @@ private:
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
 
-    struct Loader : public BaseLoader
+    struct Loader : public MLListCacheLoader::MLOp
     {
-        Loader(const MLArtistModel &model) : BaseLoader(model) {}
+        using MLListCacheLoader::MLOp::MLOp;
         size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParam) const override;
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParam) const override;
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;

@@ -84,7 +84,7 @@ protected: // MLBaseModel implementation
 
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
 
-    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createLoader() const override;
 
 private: // Functions
     QString getCover(MLPlaylist * playlist) const;
@@ -123,7 +123,7 @@ private: // Variables
     bool m_resetAfterTransaction = false;
 
 private:
-    struct Loader : public MLBaseModel::BaseLoader
+    struct Loader : public MLListCacheLoader::MLOp
     {
         Loader(const MLPlaylistListModel & model, PlaylistType playlistType);
 

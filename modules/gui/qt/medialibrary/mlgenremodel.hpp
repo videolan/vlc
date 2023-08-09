@@ -61,7 +61,7 @@ signals:
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
-    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createLoader() const override;
 
 private:
     void onVlcMlEvent(const MLEvent &event) override;
@@ -74,9 +74,9 @@ private:
     QString m_coverDefault;
 
 private:
-    struct Loader : public BaseLoader
+    struct Loader : public MLListCacheLoader::MLOp
     {
-        Loader(const MLGenreModel &model) : BaseLoader(model) {}
+        using MLListCacheLoader::MLOp::MLOp;
         size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;

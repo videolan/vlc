@@ -40,6 +40,7 @@
 // Fordward declarations
 class MLListCache;
 class MediaLib;
+class MLListCacheLoader;
 
 class MLBaseModel : public QAbstractListModel, public QQmlParserStatus
 {
@@ -186,41 +187,7 @@ protected:
 
     virtual void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t )  {}
 
-    /* Data loader for the cache */
-    struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
-    {
-        BaseLoader(MLItemId parent, QString searchPattern,
-                   vlc_ml_sorting_criteria_t sort, bool sort_desc);
-        BaseLoader(const MLBaseModel &model);
-
-        MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
-
-        virtual size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* params) const = 0;
-        virtual std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* params) const = 0;
-        virtual std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const = 0;
-
-        inline size_t count(vlc_medialibrary_t* ml) const override
-        {
-            MLQueryParams queryParams = getParams();
-            vlc_ml_query_params_t queryParamsC = queryParams.toCQueryParams();
-            return count(ml, &queryParamsC);
-        }
-
-        inline std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override
-        {
-            MLQueryParams queryParams = getParams(index, count);
-            vlc_ml_query_params_t queryParamsC = queryParams.toCQueryParams();
-            return load(ml, &queryParamsC);
-        }
-
-    protected:
-        MLItemId m_parent;
-        QString m_searchPattern;
-        vlc_ml_sorting_criteria_t m_sort;
-        bool m_sort_desc;
-    };
-
-    virtual std::unique_ptr<BaseLoader> createLoader() const = 0;
+    virtual std::unique_ptr<MLListCacheLoader> createLoader() const = 0;
 
 private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
@@ -254,9 +221,62 @@ protected:
     mutable std::unique_ptr<MLListCache> m_cache;
 
     //loader used to load single items
-    std::shared_ptr<BaseLoader> m_itemLoader;
+    std::shared_ptr<MLListCacheLoader> m_itemLoader;
 
     bool m_qmlInitializing = false;
+
+    friend class MLListCacheLoader;
 };
+
+/* Medialib data loader for the cache */
+struct MLListCacheLoader:
+    public QObject,
+    public ListCacheLoader<std::unique_ptr<MLItem>>
+{
+    Q_OBJECT
+public:
+    using ItemType = std::unique_ptr<MLItem>;
+
+    struct MLOp {
+    public:
+        MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc);
+        inline MLOp(const MLBaseModel& model)
+            : MLOp(model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
+        {}
+        virtual ~MLOp() = default;
+
+        vlc_ml_query_params_t getQueryParams(size_t index = 0, size_t count = 0) const;
+
+        virtual ItemType loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const = 0;
+        virtual size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const = 0;
+        virtual std::vector<ItemType> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const = 0;
+    protected:
+        MLItemId m_parent;
+        QByteArray m_searchPattern;
+        vlc_ml_sorting_criteria_t m_sort;
+        bool m_sortDesc;
+    };
+
+public:
+    MLListCacheLoader(MediaLib* medialib, std::shared_ptr<MLOp> op, QObject* parent = nullptr);
+    ~MLListCacheLoader() = default;
+
+    virtual void cancelTask(size_t taskId) override;
+    virtual size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override;
+    virtual size_t loadTask(size_t offset, size_t limit,
+                            std::function<void(size_t taskId, std::vector<ItemType>& data)> cb) override;
+    virtual size_t countAndLoadTask(size_t offset, size_t limit,
+                                    std::function<void (size_t, size_t, std::vector<ItemType>&)> cb) override;
+
+
+    //ML specific operations
+    quint64 loadItemsTask(const QVector<int> &indexes, MLBaseModel::ItemCallback cb);
+    size_t loadItemByIdTask(MLItemId itemId, std::function<void (size_t, ItemType&&)> cb) const;
+
+protected:
+    MediaLib* m_medialib = nullptr;
+    std::shared_ptr<MLOp> m_op;
+};
+
 
 #endif // MLBASEMODEL_HPP

@@ -43,15 +43,14 @@ bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNe
 
 }
 
-MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t limit, size_t offset, size_t chunkSize)
-    : m_medialib(medialib)
-    , m_useMove(useMove)
+MLListCache::MLListCache(std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t limit, size_t offset, size_t chunkSize)
+    : m_useMove(useMove)
     , m_loader(loader.release())
     , m_chunkSize(chunkSize)
     , m_limit(limit)
     , m_offset(offset)
 {
-    assert(medialib);
+    assert(m_loader);
 }
 
 size_t MLListCache::fixupIndexForMove(size_t index) const
@@ -138,7 +137,7 @@ const MLListCache::ItemType* MLListCache::find(const std::function<bool (const M
     return &(*it);
 }
 
-int MLListCache::updateItem(std::unique_ptr<MLItem>&& newItem)
+int MLListCache::updateItem(ItemType&& newItem)
 {
     //we can't update an item locally while the model has pending updates
     //no worry, we'll receive the update once the actual model notifies us
@@ -329,7 +328,7 @@ void MLListCache::invalidate()
 
     if (m_appendTask)
     {
-        m_medialib->cancelMLTask(this, m_appendTask);
+        m_loader->cancelTask(m_appendTask);
         m_appendTask = 0;
     }
 
@@ -447,42 +446,31 @@ void MLListCache::partialUpdate()
 void MLListCache::asyncCountAndLoad()
 {
     if (m_countTask)
-        m_medialib->cancelMLTask(this, m_countTask);
+        m_loader->cancelTask(m_countTask);
 
     size_t count = std::max(m_maxReferedIndex, m_chunkSize);
 
-    struct Ctx {
-        size_t maximumCount;
-        std::vector<ItemType> list;
-    };
-
-    m_countTask = m_medialib->runOnMLThread<Ctx>(this,
-        //ML thread
-        [loader = m_loader, offset = m_offset, count = count](vlc_medialibrary_t* ml, Ctx& ctx)
-        {
-            ctx.list = loader->load(ml, offset, count);
-            ctx.maximumCount = loader->count(ml);
-        },
+    m_countTask = m_loader->countAndLoadTask(m_offset, count,
         //UI thread
-        [this](quint64 taskId, Ctx& ctx)
+        [this](quint64 taskId, size_t maximumCount, std::vector<ItemType>& list)
         {
             if (m_countTask != taskId)
                 return;
 
             //quite unlikley but model may change between count and load
-            if (unlikely(ctx.list.size() > ctx.maximumCount))
+            if (unlikely(list.size() > maximumCount))
             {
-                ctx.maximumCount = ctx.list.size();
+                maximumCount = list.size();
                 m_needReload = true;
             }
 
             size_t queryCount = (m_limit > 0)
-                ? std::min(m_limit, ctx.maximumCount)
-                : ctx.maximumCount;
+                ? std::min(m_limit, maximumCount)
+                : maximumCount;
             //note: should we drop items past queryCount?
-            m_cachedData = std::make_unique<CacheData>(std::move(ctx.list),
+            m_cachedData = std::make_unique<CacheData>(std::move(list),
                                                        queryCount,
-                                                       ctx.maximumCount);
+                                                       maximumCount);
 
             if (m_oldData)
             {
@@ -529,34 +517,25 @@ void MLListCache::asyncFetchMore()
 
     assert(m_cachedData);
     if (m_appendTask)
-        m_medialib->cancelMLTask(this, m_appendTask);
+        m_loader->cancelTask(m_appendTask);
 
     m_maxReferedIndex = std::min(m_cachedData->queryCount, m_maxReferedIndex);
     size_t count = ((m_maxReferedIndex - m_cachedData->loadedCount) / m_chunkSize + 1 ) * m_chunkSize;
 
-    struct Ctx {
-        std::vector<ItemType> list;
-    };
-    m_appendTask = m_medialib->runOnMLThread<Ctx>(this,
-        //ML thread
-        [loader = m_loader, offset = m_offset + m_cachedData->loadedCount, count]
-        (vlc_medialibrary_t* ml, Ctx& ctx)
-        {
-            ctx.list = loader->load(ml, offset, count);
-        },
-        //UI thread
-        [this](quint64 taskId, Ctx& ctx)
+    m_appendTask = m_loader->loadTask(
+        m_offset + m_cachedData->loadedCount, count,
+        [this](size_t taskId, std::vector<ItemType>& list)
         {
             if (taskId != m_appendTask)
                 return;
 
             assert(m_cachedData);
 
-            int updatedCount = ctx.list.size();
+            int updatedCount = list.size();
             if (updatedCount >= 0)
             {
                 int updatedOffset = m_cachedData->loadedCount;
-                std::move(ctx.list.begin(), ctx.list.end(), std::back_inserter(m_cachedData->list));
+                std::move(list.begin(), list.end(), std::back_inserter(m_cachedData->list));
                 m_cachedData->loadedCount += updatedCount;
                 emit localDataChanged(updatedOffset, updatedOffset + updatedCount - 1);
             }
@@ -566,6 +545,5 @@ void MLListCache::asyncFetchMore()
             {
                 asyncFetchMore();
             }
-        }
-    );
+        });
 }

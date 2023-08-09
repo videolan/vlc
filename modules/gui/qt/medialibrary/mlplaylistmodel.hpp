@@ -67,7 +67,7 @@ protected: // MLBaseModel implementation
 
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
-    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createLoader() const override;
 
 protected: // MLBaseModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;
@@ -101,9 +101,9 @@ private: // Functions
     bool m_resetAfterTransaction = false;
 
 private:
-    struct Loader : public MLBaseModel::BaseLoader
+    struct Loader : public MLListCacheLoader::MLOp
     {
-        Loader(const MLPlaylistModel & model);
+        using MLListCacheLoader::MLOp::MLOp;
 
         size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;
 

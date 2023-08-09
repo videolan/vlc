@@ -79,7 +79,7 @@ protected:
 
     void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t ) override;
 
-    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createLoader() const override;
 
 protected: // MLBaseModel reimplementation
     virtual void onVlcMlEvent( const MLEvent &event ) override;
@@ -93,9 +93,9 @@ private:
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
-    struct Loader : public BaseLoader
+    struct Loader : public MLListCacheLoader::MLOp
     {
-        Loader(const MLVideoModel &model) : BaseLoader(model) {}
+        using MLListCacheLoader::MLOp::MLOp;
 
         size_t count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;

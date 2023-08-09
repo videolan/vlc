@@ -25,11 +25,11 @@ MLRecentsVideoModel::MLRecentsVideoModel(QObject * parent) : MLVideoModel(parent
 
 // Protected MLBaseModel implementation
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLRecentsVideoModel::createLoader() const
 /* override */
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsVideoModel::Loader>(*this));
 }
 
 // Private MLVideoModel reimplementation
@@ -49,10 +49,6 @@ void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
 }
 
 // Loader
-
-MLRecentsVideoModel::Loader::Loader(const MLRecentsVideoModel & model)
-    : MLBaseModel::BaseLoader(model)
-{}
 
 size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {

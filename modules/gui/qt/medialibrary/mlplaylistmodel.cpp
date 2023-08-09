@@ -401,10 +401,10 @@ QByteArray MLPlaylistModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) c
 
 //-------------------------------------------------------------------------------------------------
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLPlaylistModel::createLoader() const /* override */
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLPlaylistModel::Loader>(*this));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -507,8 +507,6 @@ void MLPlaylistModel::generateThumbnail(const MLItemId& itemid) const
 //=================================================================================================
 // Loader
 //=================================================================================================
-
-MLPlaylistModel::Loader::Loader(const MLPlaylistModel & model) : MLBaseModel::BaseLoader(model) {}
 
 size_t MLPlaylistModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {

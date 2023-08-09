@@ -95,16 +95,12 @@ void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
     MLBaseModel::onVlcMlEvent( event );
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLRecentsModel::createLoader() const
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsModel::Loader>(*this));
 }
 
-MLRecentsModel::Loader::Loader(const MLRecentsModel &model)
-    : BaseLoader(model)
-{
-}
 size_t MLRecentsModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     return vlc_ml_count_history( ml, queryParams );

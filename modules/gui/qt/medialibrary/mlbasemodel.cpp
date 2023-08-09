@@ -82,58 +82,10 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 
 quint64 MLBaseModel::loadItems(const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
 {
-    QSharedPointer<BaseLoader> loader{ createLoader().release() };
+    if (!m_itemLoader)
+        m_itemLoader = createLoader();
 
-    struct Ctx
-    {
-        std::vector<std::unique_ptr<MLItem>> items;
-    };
-
-    const auto worker =
-    [loader, indexes](vlc_medialibrary_t* ml, Ctx& ctx)
-    {
-        if (indexes.isEmpty())
-            return;
-
-        auto sortedIndexes = indexes;
-        std::sort(sortedIndexes.begin(), sortedIndexes.end());
-
-        struct Range
-        {
-            int low, high; // [low, high] (all inclusive)
-        };
-
-        QVector<Range> ranges;
-        ranges.push_back(Range {sortedIndexes[0], sortedIndexes[0]});
-        const int MAX_DIFFERENCE = 4;
-        for (const auto index : sortedIndexes)
-        {
-            if ((index - ranges.back().high) < MAX_DIFFERENCE)
-                ranges.back().high = index;
-            else
-                ranges.push_back(Range {index, index});
-        }
-
-        ctx.items.resize(indexes.size());
-        for (const auto range : ranges)
-        {
-            auto data = loader->load(ml, range.low, range.high - range.low + 1);
-            for (int i = 0; i < indexes.size(); ++i)
-            {
-                const auto targetIndex = indexes[i];
-                if (targetIndex >= range.low && targetIndex <= range.high)
-                {
-                    ctx.items.at(i) = std::move(data.at(targetIndex - range.low));
-                }
-            }
-        }
-    };
-
-    return m_mediaLib->runOnMLThread<Ctx>(this
-                                          //ML thread
-                                          , worker
-                                          // UI thread
-                                          , [cb](quint64 id, Ctx &ctx) { if (cb) cb(id, ctx.items); });
+    return m_itemLoader->loadItemsTask(indexes, cb);
 }
 
 
@@ -483,7 +435,7 @@ void MLBaseModel::validateCache() const
         return;
 
     auto loader = createLoader();
-    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader), false, m_limit, m_offset);
+    m_cache = std::make_unique<MLListCache>(std::move(loader), false, m_limit, m_offset);
     connect(m_cache.get(), &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
 
@@ -596,20 +548,9 @@ void MLBaseModel::updateItemInCache(const MLItemId& mlid)
 
     if (!m_itemLoader)
         m_itemLoader = createLoader();
-    struct Ctx {
-        std::unique_ptr<MLItem> item;
-    };
-    m_mediaLib->runOnMLThread<Ctx>(this,
-    //ML thread
-    [mlid, itemLoader = m_itemLoader](vlc_medialibrary_t* ml, Ctx& ctx){
-        ctx.item = itemLoader->loadItemById(ml, mlid);
-    },
-    //UI thread
-    [this](qint64, Ctx& ctx) {
-        if (!ctx.item)
-            return;
-
-        m_cache->updateItem(std::move(ctx.item));
+    m_itemLoader->loadItemByIdTask(mlid,
+        [this](qint64, std::unique_ptr<MLItem>&& item) {
+            m_cache->updateItem(std::move(item));
     });
 }
 
@@ -644,28 +585,184 @@ void MLBaseModel::deleteRangeInCache(int first, int last)
     m_cache->deleteRange(first, last);
 }
 
-//-------------------------------------------------------------------------------------------------
-
-MLBaseModel::BaseLoader::BaseLoader(MLItemId parent, QString searchPattern,
-                                    vlc_ml_sorting_criteria_t sort, bool sort_desc)
-    : m_parent(parent)
-    , m_searchPattern(searchPattern)
-    , m_sort(sort)
-    , m_sort_desc(sort_desc)
-{
-}
-
-MLBaseModel::BaseLoader::BaseLoader(const MLBaseModel &model)
-    : BaseLoader(model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
-{
-}
-
-MLQueryParams MLBaseModel::BaseLoader::getParams(size_t index, size_t count) const
-{
-    return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
-}
 
 bool MLBaseModel::loading() const
+
 {
     return !(m_mediaLib && m_cache && (m_cache->queryCount() != COUNT_UNINITIALIZED));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+MLListCacheLoader::MLListCacheLoader(MediaLib* medialib, std::shared_ptr<MLListCacheLoader::MLOp> op, QObject* parent)
+    : QObject(parent)
+    , m_medialib(medialib)
+    , m_op(op)
+{
+}
+
+void MLListCacheLoader::cancelTask(size_t taskId)
+{
+    m_medialib->cancelMLTask(this, taskId);
+}
+
+size_t MLListCacheLoader::countTask(std::function<void(size_t taskId, size_t count)> cb)
+{
+    struct Ctx {
+        size_t count;
+    };
+
+    return m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [op = m_op]
+        (vlc_medialibrary_t* ml, Ctx& ctx) {
+            auto query = op->getQueryParams();
+            ctx.count = op->count(ml, &query);
+        },
+        //UI thread
+        [this, cb](quint64 taskId, Ctx& ctx)
+        {
+            cb(taskId,  ctx.count);
+        });
+}
+
+size_t MLListCacheLoader::loadTask(size_t offset, size_t limit,
+    std::function<void (size_t, std::vector<ItemType>&)> cb)
+{
+    struct Ctx {
+        std::vector<MLListCacheLoader::ItemType> list;
+    };
+
+    return m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [op = m_op, offset, limit]
+        (vlc_medialibrary_t* ml, Ctx& ctx)
+        {
+            auto query = op->getQueryParams(offset, limit);
+            ctx.list = op->load(ml, &query);
+        },
+        //UI thread
+        [this, cb](quint64 taskId, Ctx& ctx)
+        {
+            cb(taskId, ctx.list);
+        });
+}
+
+size_t MLListCacheLoader::countAndLoadTask(size_t offset, size_t limit,
+    std::function<void (size_t, size_t, std::vector<ItemType>&)> cb)
+{
+    struct Ctx {
+        size_t maximumCount;
+        std::vector<ItemType> list;
+    };
+
+    return m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [this, offset, limit, op = m_op]
+        (vlc_medialibrary_t* ml, Ctx& ctx) {
+            auto query = op->getQueryParams(offset, limit);
+            ctx.list = op->load(ml, &query);
+            ctx.maximumCount = op->count(ml, &query);
+        },
+        //UI thread
+        [this, cb](quint64 taskId, Ctx& ctx) {
+            cb(taskId,  ctx.maximumCount, ctx.list);
+        });
+}
+
+quint64 MLListCacheLoader::loadItemsTask(const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
+{
+    struct Ctx
+    {
+        std::vector<std::unique_ptr<MLItem>> items;
+    };
+
+    return m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [op = m_op, indexes](vlc_medialibrary_t* ml, Ctx& ctx)
+        {
+            if (indexes.isEmpty())
+                return;
+
+            auto sortedIndexes = indexes;
+            std::sort(sortedIndexes.begin(), sortedIndexes.end());
+
+            struct Range
+            {
+                int low, high; // [low, high] (all inclusive)
+            };
+
+            QVector<Range> ranges;
+            ranges.push_back(Range {sortedIndexes[0], sortedIndexes[0]});
+            const int MAX_DIFFERENCE = 4;
+            for (const auto index : sortedIndexes)
+            {
+                if ((index - ranges.back().high) < MAX_DIFFERENCE)
+                    ranges.back().high = index;
+                else
+                    ranges.push_back(Range {index, index});
+            }
+
+            ctx.items.resize(indexes.size());
+
+            vlc_ml_query_params_t queryParam = op->getQueryParams();
+            for (const auto range : ranges)
+            {
+                queryParam.i_offset = range.low;
+                queryParam.i_nbResults = range.high - range.low + 1;
+                auto data = op->load(ml, &queryParam);
+                for (int i = 0; i < indexes.size(); ++i)
+                {
+                    const auto targetIndex = indexes[i];
+                    if (targetIndex >= range.low && targetIndex <= range.high)
+                    {
+                        ctx.items.at(i) = std::move(data.at(targetIndex - range.low));
+                    }
+                }
+            }
+        },
+        // UI thread
+        [cb](quint64 id, Ctx &ctx) {
+            cb(id, ctx.items);
+        });
+}
+
+
+size_t MLListCacheLoader::loadItemByIdTask(MLItemId itemId, std::function<void (size_t, ItemType&&)> cb) const
+{
+    struct Ctx {
+        ItemType item;
+    };
+    return m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [itemId, op = m_op](vlc_medialibrary_t* ml, Ctx& ctx) {
+            ctx.item = op->loadItemById(ml, itemId);
+        },
+        //UI thread
+        [this, cb](qint64 taskId, Ctx& ctx) {
+            if (!ctx.item)
+                return;
+            cb(taskId, std::move(ctx.item));
+        });
+}
+
+MLListCacheLoader::MLOp::MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc)
+    : m_parent(parentId)
+    , m_searchPattern(searchPattern.toUtf8())
+    , m_sort(sort)
+    , m_sortDesc(sort_desc)
+{
+}
+
+vlc_ml_query_params_t MLListCacheLoader::MLOp::getQueryParams(size_t offset, size_t limit) const
+{
+    vlc_ml_query_params_t params;
+    params.psz_pattern = m_searchPattern.isNull()
+                             ? nullptr
+                             : m_searchPattern.constData();
+    params.i_nbResults = limit;
+    params.i_offset = offset;
+    params.i_sort = m_sort;
+    params.b_desc = m_sortDesc;
+    return params;
 }

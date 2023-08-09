@@ -147,10 +147,10 @@ QVariant MLAlbumModel::itemRoleData(MLItem *item, const int role) const
     }
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLAlbumModel::createLoader() const
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLAlbumModel::Loader>(*this));
 }
 
 size_t MLAlbumModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* query) const

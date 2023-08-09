@@ -321,9 +321,9 @@ vlc_ml_sorting_criteria_t MLPlaylistListModel::roleToCriteria(int role) const /*
         return VLC_ML_SORTING_DEFAULT;
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader> MLPlaylistListModel::createLoader() const /* override */
+std::unique_ptr<MLListCacheLoader> MLPlaylistListModel::createLoader() const /* override */
 {
-    return std::make_unique<Loader>(*this, m_playlistType);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLPlaylistListModel::Loader>(*this, m_playlistType));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -472,7 +472,7 @@ static inline vlc_ml_playlist_type_t qmlToMLPlaylistType(MLPlaylistListModel::Pl
 }
 
 MLPlaylistListModel::Loader::Loader(const MLPlaylistListModel & model, PlaylistType playlistType)
-    : MLBaseModel::BaseLoader(model)
+    : MLListCacheLoader::MLOp(model)
     , m_playlistType(playlistType)
 {}
 

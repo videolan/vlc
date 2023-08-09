@@ -143,7 +143,7 @@ public:
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
-    MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
+    MLListCache(std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
         bool useMove, size_t limit, size_t offset, size_t chunkSize = 100);
 
     /**
@@ -167,7 +167,7 @@ public:
      *
      * this returns the index of the replaced item, or -1 if the item is not in the cache
      */
-    int updateItem(std::unique_ptr<MLItem>&& newItem);
+    int updateItem(ItemType&& newItem);
 
     /**
      * Removes from the cache list given its item id
@@ -242,8 +242,6 @@ private:
     void asyncCountAndLoad();
     void partialUpdate();
     size_t fixupIndexForMove(size_t index) const;
-
-    MediaLib* m_medialib = nullptr;
 
     bool m_useMove = false;
 

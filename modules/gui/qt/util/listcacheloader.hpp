@@ -19,14 +19,21 @@
 #ifndef LISTCACHELOADER_HPP
 #define LISTCACHELOADER_HPP
 
-struct vlc_medialibrary_t;
+#include <functional>
 
 template <typename T>
 struct ListCacheLoader
 {
     virtual ~ListCacheLoader() = default;
-    virtual size_t count(vlc_medialibrary_t* ml) const = 0;
-    virtual std::vector<T> load(vlc_medialibrary_t* ml, size_t index, size_t count) const = 0;
+
+    virtual void cancelTask(size_t taskId) = 0;
+    virtual size_t countTask(std::function<void(size_t taskId, size_t count)> cb) = 0;
+    virtual size_t loadTask(
+        size_t offset, size_t limit,
+        std::function<void(size_t taskId, std::vector<T>& data)>) = 0;
+    virtual size_t countAndLoadTask(
+        size_t offset, size_t limit,
+        std::function<void(size_t taskId, size_t count, std::vector<T>& data)> cb) = 0;
 };
 
 #endif

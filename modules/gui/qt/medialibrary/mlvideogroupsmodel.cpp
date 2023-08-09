@@ -175,9 +175,9 @@ QByteArray MLVideoGroupsModel::criteriaToName(vlc_ml_sorting_criteria_t criteria
     return criterias.key(criteria, "");
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader> MLVideoGroupsModel::createLoader() const /* override */
+std::unique_ptr<MLListCacheLoader> MLVideoGroupsModel::createLoader() const /* override */
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLVideoGroupsModel::Loader>(*this));
 }
 
 void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
@@ -234,9 +234,6 @@ void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
 //=================================================================================================
 // Loader
 //=================================================================================================
-
-MLVideoGroupsModel::Loader::Loader(const MLVideoGroupsModel & model)
-    : MLBaseModel::BaseLoader(model) {}
 
 size_t MLVideoGroupsModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {

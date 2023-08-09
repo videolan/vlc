@@ -126,10 +126,10 @@ QByteArray MLVideoFoldersModel::criteriaToName(vlc_ml_sorting_criteria_t criteri
     return criterias.key(criteria, "");
 }
 
-std::unique_ptr<MLBaseModel::BaseLoader>
+std::unique_ptr<MLListCacheLoader>
 MLVideoFoldersModel::createLoader() const /* override */
 {
-    return std::make_unique<Loader>(*this);
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLVideoFoldersModel::Loader>(*this));
 }
 
 // Protected MLBaseModel reimplementation
@@ -165,9 +165,6 @@ void MLVideoFoldersModel::onVlcMlEvent(const MLEvent & event) /* override */
 }
 
 // Loader
-MLVideoFoldersModel::Loader::Loader(const MLVideoFoldersModel & model)
-    : MLBaseModel::BaseLoader(model) {}
-
 size_t MLVideoFoldersModel::Loader::count(vlc_medialibrary_t * ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
     return vlc_ml_count_folders_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
