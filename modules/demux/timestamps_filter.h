@@ -189,11 +189,11 @@ static int timestamps_filter_es_out_Control(es_out_t *out, input_source_t *in, i
                     if(max)
                     {
 #ifdef DEBUG_TIMESTAMPS_FILTER
-                    printf("PCR  no previous value, using %ld\n", max);
+                        printf("PCR  no previous value, using %ld\n", max);
 #endif
-                    p_sys->pcrtf.sync.stream = pcr;
-                    p_sys->pcrtf.sync.contiguous = max;
-                    p_sys->pcrtf.sequence_offset = max - pcr;
+                        p_sys->pcrtf.sync.stream = pcr;
+                        p_sys->pcrtf.sync.contiguous = max;
+                        p_sys->pcrtf.sequence_offset = max - pcr;
                     }
                 }
             }
