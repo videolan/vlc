@@ -22,7 +22,10 @@
 
 #import "VLCLibraryPlaylistDataSource.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
@@ -177,9 +180,14 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 {
     [collectionView registerClass:VLCLibraryCollectionViewItem.class
             forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
+       forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                   withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSCollectionViewFlowLayout * const layout = collectionView.collectionViewLayout;
+    layout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
 
     collectionView.dataSource = self;
-
     [collectionView reloadData];
 }
 
@@ -200,6 +208,21 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     viewItem.representedItem = self.playlists[indexPath.item];
     return viewItem;
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryCollectionViewSupplementaryElementView * const sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibrarySupplementaryElementViewIdentifier forIndexPath:indexPath];
+
+        sectionHeadingView.stringValue = _NS("Playlists");
+        return sectionHeadingView;
+
+    }
+
+    return nil;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
