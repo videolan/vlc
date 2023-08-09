@@ -855,6 +855,23 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self;
 }
 
+- (void)moveToTrash
+{
+    NSFileManager * const fileManager = NSFileManager.defaultManager;
+    NSURL * const URL = [NSURL URLWithString:_MRL];
+    [fileManager trashItemAtURL:URL
+               resultingItemURL:nil
+                          error:nil];
+}
+
+- (void)revealInFinder
+{
+    NSURL * const URL = [NSURL URLWithString:_MRL];
+    if (URL) {
+        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
+    }
+}
+
 @end
 
 @interface VLCMediaLibraryMediaItem ()
