@@ -39,6 +39,8 @@
 
 #import "main/VLCMain.h"
 
+#import "windows/video/VLCMainVideoViewController.h"
+
 @interface VLCLibraryPlaylistViewController ()
 
 @property (readonly) NSScrollView *collectionViewScrollView;
@@ -57,6 +59,16 @@
         [self setupPlaylistCollectionView];
         [self setupPlaylistPlaceholderView];
         [self setupPlaylistDataSource];
+
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelPlaylistListReset
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelPlaylistDeleted
+                                 object:nil];
     }
 
     return self;
@@ -162,6 +174,21 @@
 {
     _libraryWindow.libraryTargetView.subviews = @[];
     [self updatePresentedView];
+}
+
+- (void)libraryModelUpdated:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCLibraryModel * const model = (VLCLibraryModel *)notification.object;
+    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+
+    if (_libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegment &&
+        ((model.numberOfPlaylists == 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_libraryWindow.emptyLibraryView]) ||
+         (model.numberOfPlaylists > 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
+        _libraryWindow.videoViewController.view.hidden) {
+
+        [self updatePresentedView];
+    }
 }
 
 @end
