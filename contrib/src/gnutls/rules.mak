@@ -35,9 +35,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# backport gnulib patch
 	$(APPLY) $(SRC)/gnutls/0001-Don-t-assume-that-UNICODE-is-not-defined.patch
 
-	# forbidden RtlSecureZeroMemory call in winstore builds
-	$(APPLY) $(SRC)/gnutls/0001-explicit_bzero-Do-not-call-SecureZeroMemory-on-UWP-b.patch
-
 	# Don't use functions available starting with windows vista
 	$(APPLY) $(SRC)/gnutls/0001-stat-fstat-Fix-when-compiling-for-versions-older-tha.patch
 
@@ -83,7 +80,7 @@ GNUTLS_CONF := \
 
 DEPS_gnutls = nettle $(DEPS_nettle)
 ifdef HAVE_WINSTORE
-# gnulib uses GetFileInformationByHandle
+# gnulib uses GetFileInformationByHandle / SecureZeroMemory
 DEPS_gnutls += alloweduwp $(DEPS_alloweduwp)
 endif
 
