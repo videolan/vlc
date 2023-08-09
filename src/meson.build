@@ -291,8 +291,11 @@ libvlccore_vlm_sources = [
 libvlccore_sources = [
     libvlccore_sources_base,
     libvlccore_sout_sources,
-    libvlccore_vlm_sources
 ]
+
+if get_option('videolan_manager')
+    libvlccore_sources += libvlccore_vlm_sources
+endif
 
 libvlccore_link_args = []
 
