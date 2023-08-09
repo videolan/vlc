@@ -42,6 +42,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_spu.h>
+#include <vlc_subpicture.h>
 #include "vout_internal.h"
 #include "snapshot.h"
 

@@ -27,6 +27,7 @@
 
 #include <vlc_actions.h>
 #include <vlc_threads.h>
+#include <vlc_subpicture.h> // vlc_spu_highlight_t
 
 #include <algorithm>
 

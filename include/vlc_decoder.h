@@ -29,9 +29,10 @@
  * @{
  */
 
-#include <vlc_subpicture.h>
+#include <vlc_tick.h>
 
 typedef struct vlc_input_decoder_t vlc_input_decoder_t;
+typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 
 /**
  * This defines an opaque input resource handler.

@@ -35,6 +35,7 @@
 #include <vlc_demux.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
+#include <vlc_subpicture.h>
 #include <vlc_actions.h>
 #include <vlc_modules.h>
 

@@ -39,6 +39,7 @@
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
+#include <vlc_subpicture.h>
 
 #include "pictures.h"
 #include "events.h"

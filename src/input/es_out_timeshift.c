@@ -43,6 +43,7 @@
 #include <vlc_mouse.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>
+#include <vlc_subpicture.h> // vlc_spu_highlight_t
 #include "input_internal.h"
 #ifdef _WIN32
 #  include <vlc_charset.h> // FromWide

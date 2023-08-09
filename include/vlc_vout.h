@@ -27,7 +27,6 @@
 
 #include <vlc_es.h>
 #include <vlc_picture.h>
-#include <vlc_subpicture.h>
 
 /**
  * \defgroup output Output

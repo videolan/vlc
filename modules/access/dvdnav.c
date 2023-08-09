@@ -54,6 +54,7 @@
 #include <vlc_mouse.h>
 #include <vlc_dialog.h>
 #include <vlc_iso_lang.h>
+#include <vlc_subpicture.h> // vlc_spu_highlight_t
 
 #include <dvdnav/dvdnav.h>
 /* Expose without patching headers */

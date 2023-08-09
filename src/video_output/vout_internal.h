@@ -28,6 +28,7 @@
 #include <vlc_clock.h>
 
 typedef struct input_thread_t input_thread_t;
+typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 
 /**
  * Vout configuration

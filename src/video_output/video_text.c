@@ -30,6 +30,7 @@
 #include <vlc_threads.h>
 #include <vlc_vout.h>
 #include <vlc_vout_osd.h>
+#include <vlc_subpicture.h>
 
 typedef struct {
     int  position;
