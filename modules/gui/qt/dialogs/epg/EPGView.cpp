@@ -158,7 +158,7 @@ bool EPGView::updateEPG( const vlc_epg_t * const *pp_epg, size_t i_epg )
 void EPGView::reset()
 {
     /* clean our items storage and remove them from the scene */
-    qDeleteAll(programs.values());
+    qDeleteAll(programs);
     programs.clear();
     m_startTime = m_maxTime = QDateTime();
 }
