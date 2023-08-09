@@ -1137,7 +1137,7 @@ void SPrefsPanel::apply()
 
     /* Generic save for ever panel */
     QList<ConfigControl *>::const_iterator i;
-    for( i = controls.begin() ; i != controls.end() ; ++i )
+    for( i = controls.cbegin() ; i != controls.cend() ; ++i )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
         c->doApply();
