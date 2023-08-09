@@ -102,7 +102,6 @@ typedef struct vout_thread_sys_t
 
     /* Subpicture unit */
     spu_t           *spu;
-    vlc_fourcc_t    spu_blend_chroma;
     vlc_blender_t   *spu_blend;
 
     /* Thread & synchronization */
@@ -1170,10 +1169,8 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
             sys->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
             filter_DeleteBlend(sys->spu_blend);
             sys->spu_blend = NULL;
-            sys->spu_blend_chroma = 0;
         }
-        if (!sys->spu_blend && sys->spu_blend_chroma != fmt_spu.i_chroma) {
-            sys->spu_blend_chroma = fmt_spu.i_chroma;
+        if (!sys->spu_blend) {
             sys->spu_blend = filter_NewBlend(VLC_OBJECT(&sys->obj), &fmt_spu);
             if (!sys->spu_blend)
                 msg_Err(&sys->obj, "Failed to create blending filter, OSD/Subtitles will not work");
@@ -1746,7 +1743,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     sys->pause.is_on = false;
     sys->pause.date  = VLC_TICK_INVALID;
 
-    sys->spu_blend_chroma        = 0;
     sys->spu_blend               = NULL;
 
     video_format_Print(VLC_OBJECT(&vout->obj), "original format", &sys->original);
