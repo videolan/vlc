@@ -1,0 +1,46 @@
+From e810b0d5c51842a1cda4376dad7209458ad8fee0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 9 Aug 2023 10:57:25 +0200
+Subject: [PATCH 19/19] headers: use inline version of RtlSecureZeroMemory for
+ UCRT builds
+
+There's an intrinsic version in the kernel32 library. But it's not supposed
+to be used with UCRT builds.
+
+RtlSecureZeroMemory is not found in -O0 + UCRT builds without this fix.
+
+In the Windows SDK it's a forced inline version no matter what.
+(and there's an ARM version)
+---
+ mingw-w64-headers/include/winnt.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mingw-w64-headers/include/winnt.h b/mingw-w64-headers/include/winnt.h
+index a49dd6ab8..7bd6d4bfe 100644
+--- a/mingw-w64-headers/include/winnt.h
++++ b/mingw-w64-headers/include/winnt.h
+@@ -8929,10 +8929,8 @@ typedef DWORD (WINAPI *PRTL_RUN_ONCE_INIT_FN)(PRTL_RUN_ONCE, PVOID, PVOID *);
+ #define HEAP_PSEUDO_TAG_FLAG 0x8000
+ #define HEAP_TAG_SHIFT 18
+ 
+-    PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt);
+-
+-#if !defined (__CRT__NO_INLINE) && !defined (__WIDL__)
+-    __CRT_INLINE PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt) {
++#if (!defined (__CRT__NO_INLINE) || defined(_UCRT)) && !defined (__WIDL__)
++    __forceinline PVOID RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt) {
+       volatile char *vptr =(volatile char *)ptr;
+ #ifdef __x86_64
+       __stosb((PBYTE)((DWORD64)vptr),0,cnt);
+@@ -8944,6 +8942,8 @@ typedef DWORD (WINAPI *PRTL_RUN_ONCE_INIT_FN)(PRTL_RUN_ONCE, PVOID, PVOID *);
+ #endif /* __x86_64 */
+       return ptr;
+     }
++#else // intrinsic in kernel32
++    PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt);
+ #endif /* !__CRT__NO_INLINE // !__WIDL__ */
+ 
+ /* Let this macro fail for non-desktop mode.  AFAIU this should be better an inline-function ... */
+-- 
+2.37.3.windows.1
+

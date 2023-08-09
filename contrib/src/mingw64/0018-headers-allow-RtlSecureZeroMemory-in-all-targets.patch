@@ -1,0 +1,67 @@
+From 600b99cc479aa3086ab51c52e333671bab89bbb7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 9 Aug 2023 08:35:59 +0200
+Subject: [PATCH 18/19] headers: allow RtlSecureZeroMemory in all targets
+
+It's usually an inline function doing native CPU calls. It's also unrestricted
+in the Windows SDK since Windows 8, as well as SecureZeroMemory.
+---
+ mingw-w64-headers/include/winnt.h | 35 ++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
+
+diff --git a/mingw-w64-headers/include/winnt.h b/mingw-w64-headers/include/winnt.h
+index 257efdc1b..a49dd6ab8 100644
+--- a/mingw-w64-headers/include/winnt.h
++++ b/mingw-w64-headers/include/winnt.h
+@@ -8928,6 +8928,24 @@ typedef DWORD (WINAPI *PRTL_RUN_ONCE_INIT_FN)(PRTL_RUN_ONCE, PVOID, PVOID *);
+ #define HEAP_MAXIMUM_TAG 0x0FFF
+ #define HEAP_PSEUDO_TAG_FLAG 0x8000
+ #define HEAP_TAG_SHIFT 18
++
++    PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt);
++
++#if !defined (__CRT__NO_INLINE) && !defined (__WIDL__)
++    __CRT_INLINE PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt) {
++      volatile char *vptr =(volatile char *)ptr;
++#ifdef __x86_64
++      __stosb((PBYTE)((DWORD64)vptr),0,cnt);
++#else
++      while(cnt) {
++	*vptr++ = 0;
++	cnt--;
++      }
++#endif /* __x86_64 */
++      return ptr;
++    }
++#endif /* !__CRT__NO_INLINE // !__WIDL__ */
++
+ /* Let this macro fail for non-desktop mode.  AFAIU this should be better an inline-function ... */
+ #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ #define HEAP_MAKE_TAG_FLAGS(b,o) ((DWORD)((b) + ((o) << 18)))
+@@ -8983,23 +9001,6 @@ typedef DWORD (WINAPI *PRTL_RUN_ONCE_INIT_FN)(PRTL_RUN_ONCE, PVOID, PVOID *);
+ #define RtlFillMemory(Destination,Length,Fill) memset((Destination),(Fill),(Length))
+ #define RtlZeroMemory(Destination,Length) memset((Destination),0,(Length))
+ 
+-    PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt);
+-
+-#if !defined (__CRT__NO_INLINE) && !defined (__WIDL__)
+-    __CRT_INLINE PVOID WINAPI RtlSecureZeroMemory(PVOID ptr,SIZE_T cnt) {
+-      volatile char *vptr =(volatile char *)ptr;
+-#ifdef __x86_64
+-      __stosb((PBYTE)((DWORD64)vptr),0,cnt);
+-#else
+-      while(cnt) {
+-	*vptr++ = 0;
+-	cnt--;
+-      }
+-#endif /* __x86_64 */
+-      return ptr;
+-    }
+-#endif /* !__CRT__NO_INLINE // !__WIDL__ */
+-
+     typedef struct _MESSAGE_RESOURCE_ENTRY {
+       WORD Length;
+       WORD Flags;
+-- 
+2.37.3.windows.1
+
