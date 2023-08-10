@@ -104,5 +104,20 @@ libvlc.pc: libvlc.pc.in $(top_builddir)/config.status
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlc.dll.manifest
 	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
+checkheader_verbose = $(checkheader_verbose_$(V))
+checkheader_verbose_ = $(checkheader_verbose_$(AM_DEFAULT_VERBOSITY))
+checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%_h=vlc/%.h)";
+checkheader_verbose__0 = $(checkheader_verbose_0)
+nodist_check_SCRIPTS = $(pkginclude_HEADERS:../include/vlc/%.h=checkheader_%_h)
+MOSTLYCLEANFILES = \
+	$(pkginclude_HEADERS:../include/vlc/%.h=checkheader_%_h.c) \
+	$(pkginclude_HEADERS:../include/vlc/%.h=checkheader_%_h.lo)
+
+checkheader_%_h:
+	@echo "#include <stdbool.h>" > $@.c
+	@echo "#include <vlc/libvlc.h>" >> $@.c
+	@echo "#include <vlc/$*.h>" >> $@.c
+	$(checkheader_verbose)$(LTCOMPILE) -c $@.c -o $@.lo
+
 check-local:
 	$(SHELL) $(top_srcdir)/src/check_headers $(pkginclude_HEADERS)
