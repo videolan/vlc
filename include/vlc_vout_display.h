@@ -325,6 +325,18 @@ struct vlc_display_operations
                          vlc_video_context *ctx);
 };
 
+/**
+ * Video placement.
+ *
+ * This structure stores the result of a vout_display_PlacePicture() call.
+ */
+typedef struct vout_display_place_t {
+    int x; /*< Relative pixel offset from the display left edge */
+    int y; /*< Relative pixel offset from the display top edge */
+    unsigned width; /*< Picture pixel width */
+    unsigned height; /*< Picture pixel height */
+} vout_display_place_t;
+
 struct vout_display_t {
     struct vlc_object_t obj;
 
@@ -345,6 +357,14 @@ struct vout_display_t {
      * Cropping is not requested while in the open function.
      */
     const video_format_t *source;
+
+    /**
+     * Placement of the source picture in the display. (cannot be NULL)
+     *
+     * This cannot be modified directly and cannot be NULL.
+     * It reflects the current values.
+     */
+    const vout_display_place_t *place;
 
     /**
      * Picture format.
@@ -482,18 +502,6 @@ VLC_API
 void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
                                         const struct vout_display_placement *);
-
-/**
- * Video placement.
- *
- * This structure stores the result of a vout_display_PlacePicture() call.
- */
-typedef struct vout_display_place_t {
-    int x; /*< Relative pixel offset from the display left edge */
-    int y; /*< Relative pixel offset from the display top edge */
-    unsigned width; /*< Picture pixel width */
-    unsigned height; /*< Picture pixel height */
-} vout_display_place_t;
 
 /**
  * Compares two \ref vout_display_place_t.

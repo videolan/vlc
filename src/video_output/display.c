@@ -810,6 +810,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         vd->owner = *owner;
 
     PlaceVideoInDisplay(osys);
+    vd->place = &osys->src_place;
 
     if (module == NULL || module[0] == '\0')
         module = "any";
