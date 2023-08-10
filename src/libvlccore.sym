@@ -532,6 +532,12 @@ vlc_cond_init
 vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait
+vlc_config_cat_Count
+vlc_config_cat_Find
+vlc_config_cat_GetAt
+vlc_config_subcat_Count
+vlc_config_subcat_Find
+vlc_config_subcat_GetAt
 vlc_credential_init
 vlc_credential_clean
 vlc_credential_get

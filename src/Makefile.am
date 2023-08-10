@@ -215,6 +215,7 @@ libvlccore_la_SOURCES = \
 	version.c \
 	config/ansi_term.h \
 	config/configuration.h \
+	config/cat.c \
 	config/core.c \
 	config/chain.c \
 	config/dirs.c \

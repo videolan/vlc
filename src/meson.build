@@ -74,6 +74,7 @@ libvlccore_sources_base = files(
     'libvlc-module.c',
     'missing.c',
     'version.c',
+    'config/cat.c',
     'config/configuration.h',
     'config/core.c',
     'config/chain.c',
