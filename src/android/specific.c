@@ -270,7 +270,7 @@ error:
     return psz_ret;
 }
 
-char *config_GetUserDir (vlc_userdir_t type)
+char *platform_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {

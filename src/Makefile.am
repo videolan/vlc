@@ -217,6 +217,7 @@ libvlccore_la_SOURCES = \
 	config/configuration.h \
 	config/core.c \
 	config/chain.c \
+	config/dirs.c \
 	config/file.c \
 	config/help.c \
 	config/intf.c \

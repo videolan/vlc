@@ -265,7 +265,7 @@ static char *config_GetTypeDir (const char *xdg_name)
 }
 
 
-char *config_GetUserDir (vlc_userdir_t type)
+char *platform_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {

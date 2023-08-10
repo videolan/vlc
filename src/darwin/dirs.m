@@ -198,7 +198,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
     return strdup(result.UTF8String);
 }
 
-char *config_GetUserDir (vlc_userdir_t type)
+char *platform_GetUserDir (vlc_userdir_t type)
 {
     const char *psz_path;
     switch (type) {

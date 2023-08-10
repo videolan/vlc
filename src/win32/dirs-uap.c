@@ -319,7 +319,7 @@ static inline char *config_GetCacheDir(void)
 }
 #endif // HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
 
-char *config_GetUserDir (vlc_userdir_t type)
+char *platform_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {
