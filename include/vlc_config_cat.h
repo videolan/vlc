@@ -2,9 +2,11 @@
  * vlc_config_cat.h : Definition of configuration categories
  *****************************************************************************
  * Copyright (C) 2003 VLC authors and VideoLAN
+ * Copyright (C) 2023 Videolabs
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -246,6 +248,28 @@ static inline int vlc_config_subcat_IndexOf( enum vlc_config_subcat subcat )
         }
     }
     return index;
+}
+
+VLC_USED static inline const struct config_category_t *
+vlc_config_cat_Find(enum vlc_config_cat cat)
+{
+    for (size_t i=0; i < ARRAY_SIZE(categories_array); i++ )
+    {
+        if( categories_array[i].id == cat )
+            return &categories_array[i];
+    }
+    return NULL;
+}
+
+VLC_USED static inline const struct config_subcategory_t *
+vlc_config_subcat_Find(enum vlc_config_subcat subcat)
+{
+    for (size_t i=0; i < ARRAY_SIZE(subcategories_array); i++)
+    {
+        if (subcategories_array[i].id == subcat)
+            return &subcategories_array[i];
+    }
+    return NULL;
 }
 
 /** Get the "general" subcategory for a given category.
