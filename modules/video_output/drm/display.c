@@ -201,7 +201,7 @@ static int Open(vout_display_t *vd,
 
     if (drm_fourcc == 0) {
         drm_fourcc = vlc_drm_find_best_format(fd, sys->plane_id, nfmt,
-                                              vd->fmt->i_chroma);
+                                              vd->source->i_chroma);
         if (drm_fourcc == 0) {
             msg_Err(vd, "DRM plane format error: %s", vlc_strerror_c(errno));
             return -errno;
