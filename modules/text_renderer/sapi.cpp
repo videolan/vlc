@@ -48,12 +48,14 @@
 // not available in standard libraries and used in inline functions without __uuidof()
 DEFINE_GUID(CLSID_SpObjectTokenCategory, 0xa910187f, 0x0c7a, 0x45ac, 0x92,0xcc, 0x59,0xed,0xaf,0xb7,0x7b,0x53);
 
+extern "C" {
 static int Create (filter_t *);
 static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
                       subpicture_region_t *,
                       const vlc_fourcc_t *);
+}
 
 vlc_module_begin ()
  set_description(N_("Speech synthesis for Windows"))
@@ -65,11 +67,13 @@ vlc_module_begin ()
  add_integer("sapi-voice", -1, "Voice Index", nullptr)
 vlc_module_end ()
 
+namespace {
 struct filter_sys_t
 {
     ISpVoice* cpVoice;
     char* lastString;
 };
+}
 
 /* MTA functions */
 static int TryEnterMTA(vlc_object_t *obj)
