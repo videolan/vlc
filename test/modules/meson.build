@@ -3,8 +3,6 @@ vlc_tests += {
     'sources' : files('lua/extension.c'),
     'suite' : ['modules', 'test_modules'],
     'link_with' : [libvlc, libvlccore],
-    'c_args' : ['-DLUA_EXTENSION_DIR="@0@"'.format(
-                vlc_src_root + '/test/modules/')],
     'module_depends' : vlc_plugins_targets.keys()
 }
 

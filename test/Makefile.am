@@ -184,8 +184,7 @@ test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_lua_extension_SOURCES = modules/lua/extension.c
 test_modules_lua_extension_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_modules_lua_extension_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DLUA_EXTENSION_DIR=\"$(srcdir)/modules/\"
+test_modules_lua_extension_CPPFLAGS = $(AM_CPPFLAGS)
 test_modules_misc_medialibrary_SOURCES = modules/misc/medialibrary.c
 test_modules_misc_medialibrary_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_helpers_SOURCES = modules/packetizer/helpers.c

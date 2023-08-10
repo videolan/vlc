@@ -68,9 +68,7 @@ static int OpenIntf(vlc_object_t *root)
         vlc_object_create(root, sizeof *mgr);
     assert(mgr);
 
-    setenv("XDG_DATA_HOME", LUA_EXTENSION_DIR, 1);
-    setenv("VLC_DATA_PATH", LUA_EXTENSION_DIR, 1);
-    setenv("VLC_LIB_PATH", LUA_EXTENSION_DIR, 1);
+    setenv("VLC_USERDATA_PATH", TOP_SRCDIR "/test/modules/", 1);
 
     vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
