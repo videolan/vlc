@@ -113,10 +113,8 @@ static picture_t *ConvertVideo(filter_t *filter, picture_t *pic)
     return picture_NewFromFormat(&filter->fmt_out.video);
 }
 
-static int OpenConverter(vlc_object_t *obj)
+static int OpenConverter(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)obj;
-
     static const struct vlc_filter_operations ops =
     {
         .filter_video = ConvertVideo,
