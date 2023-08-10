@@ -290,24 +290,30 @@ vlc_config_subcat_Find(enum vlc_config_subcat subcat)
 VLC_USED
 static inline enum vlc_config_subcat vlc_config_cat_GetGeneralSubcat( enum vlc_config_cat cat )
 {
-    int i = vlc_config_cat_IndexOf( cat );
-    return (i != -1) ? categories_array[i].general_subcat : SUBCAT_UNKNOWN;
+    const struct config_category_t *c = vlc_config_cat_Find(cat);
+    if (c == NULL)
+        return SUBCAT_UNKNOWN;
+    return c->general_subcat;
 }
 
 /** Get the name for a subcategory. */
 VLC_USED
 static inline const char *vlc_config_subcat_GetName( enum vlc_config_subcat subcat )
 {
-    int i = vlc_config_subcat_IndexOf( subcat );
-    return (i != -1) ? vlc_gettext(subcategories_array[i].name) : NULL;
+    const struct config_subcategory_t *s = vlc_config_subcat_Find(subcat);
+    if (s == NULL)
+        return NULL;
+    return vlc_gettext(s->name);
 }
 
 /** Get the help text for a subcategory. */
 VLC_USED
 static inline const char *vlc_config_subcat_GetHelp( enum vlc_config_subcat subcat )
 {
-    int i = vlc_config_subcat_IndexOf( subcat );
-    return (i != -1) ? vlc_gettext(subcategories_array[i].help) : NULL;
+    const struct config_subcategory_t *s = vlc_config_subcat_Find(subcat);
+    if (s == NULL)
+        return NULL;
+    return vlc_gettext(s->help);
 }
 
 /** Get the name for a category. */
@@ -322,16 +328,20 @@ static inline const char *vlc_config_cat_GetName( enum vlc_config_cat cat )
 VLC_USED
 static inline const char *vlc_config_cat_GetHelp( enum vlc_config_cat cat )
 {
-    int i = vlc_config_cat_IndexOf( cat );
-    return (i != -1) ? vlc_gettext(categories_array[i].help) : NULL;
+    const struct config_category_t *c = vlc_config_cat_Find(cat);
+    if (c == NULL)
+        return NULL;
+    return vlc_gettext(c->help);
 }
 
 /** Get the parent category for the given subcategory. */
 VLC_USED
 static inline enum vlc_config_cat vlc_config_cat_FromSubcat( enum vlc_config_subcat subcat )
 {
-    int i = vlc_config_subcat_IndexOf( subcat );
-    return (i != -1) ? subcategories_array[i].cat : CAT_UNKNOWN;
+    const struct config_subcategory_t *s = vlc_config_subcat_Find(subcat);
+    if (s == NULL)
+        return CAT_UNKNOWN;
+    return s->cat;
 }
 
 /** Check if the given subcategory is a "general" one. */
