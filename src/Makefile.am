@@ -714,6 +714,24 @@ stamp-revision:
 # Unit/regression test
 ###############################################################################
 
+checkheader_verbose = $(checkheader_verbose_$(V))
+checkheader_verbose_ = $(checkheader_verbose_$(AM_DEFAULT_VERBOSITY))
+checkheader_verbose_0 = @echo "  CHECK  $(@:checkheader_%_h=%.h)";
+checkheader_verbose__0 = $(checkheader_verbose_0)
+nodist_check_SCRIPTS = $(pluginsinclude_HEADERS:../include/%.h=checkheader_%_h)
+MOSTLYCLEANFILES += \
+	$(pluginsinclude_HEADERS:../include/%.h=checkheader_%_h.c) \
+	$(pluginsinclude_HEADERS:../include/%.h=checkheader_%_h.lo)
+
+checkheader_%_h:
+	@echo "#include <stdbool.h>" > $@.c
+	@echo "#include <vlc_common.h>" >> $@.c
+	@echo "#include <$*.h>" >> $@.c
+	$(checkheader_verbose)$(LTCOMPILE) $(CHECK_CFLAGS) -c $@.c -o $@.lo
+
+# Some exceptions for headers depending on other libraries
+checkheader_vlc_gcrypt_h: CHECK_CFLAGS = "-Dgcry_check_version(x)="
+
 dist_check_SCRIPTS = check_headers check_symbols
 
 check-local:
