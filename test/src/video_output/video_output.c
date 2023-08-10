@@ -115,10 +115,8 @@ static int OpenDecoder(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static int OpenFilter(vlc_object_t *obj)
+static int OpenFilter(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     static const struct vlc_filter_operations ops = {
         .filter_video = NULL,
         .close = NULL,
@@ -135,11 +133,9 @@ static picture_t *ConverterFilter(filter_t *filter, picture_t *input)
     return input;
 }
 
-static int OpenConverter(vlc_object_t *obj)
+static int OpenConverter(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
-    msg_Dbg(obj, "converter chroma %4.4s -> %4.4s size %ux%u -> %ux%u",
+    msg_Dbg(filter, "converter chroma %4.4s -> %4.4s size %ux%u -> %ux%u",
             (const char *)&filter->fmt_in.i_codec,
             (const char *)&filter->fmt_out.i_codec,
             filter->fmt_in.video.i_width, filter->fmt_in.video.i_height,
