@@ -113,8 +113,8 @@ int main()
         assert(tempdir != NULL);
         return -1;
     }
-    fprintf(stderr, "Using XDG_DATA_HOME directory %s\n", tempdir);
-    setenv("XDG_DATA_HOME", tempdir, 1);
+    fprintf(stderr, "Using VLC_USERDATA_PATH directory %s\n", tempdir);
+    setenv("VLC_USERDATA_PATH", tempdir, 1);
 
     test_init();
 
