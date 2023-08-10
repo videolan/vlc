@@ -92,14 +92,12 @@ struct MTAGuard
 };
 }
 
-static const struct FilterOperationInitializer {
+static const struct vlc_filter_operations filter_ops = []{
     struct vlc_filter_operations ops {};
-    FilterOperationInitializer()
-    {
-        ops.render = RenderText;
-        ops.close  = Destroy;
-    };
-} filter_ops;
+    ops.render = RenderText;
+    ops.close  = Destroy;
+    return ops;
+}();
 
 static int Create (filter_t *p_filter)
 {
@@ -163,7 +161,7 @@ static int Create (filter_t *p_filter)
         goto error;
     }
 
-    p_filter->ops = &filter_ops.ops;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 
