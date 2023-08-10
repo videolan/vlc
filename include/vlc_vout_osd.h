@@ -25,6 +25,8 @@
 #ifndef VLC_VOUT_OSD_H
 #define VLC_VOUT_OSD_H 1
 
+#include <vlc_tick.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
