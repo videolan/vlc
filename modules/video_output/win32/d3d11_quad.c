@@ -269,7 +269,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         top    =  (src_width  - MidX) / (output->right - MidX);
         bottom = -MidY / (MidY - output->top);
         left   = -MidX / (MidX - output->left);
-        right  =  (src_height - MidY) / (output->bottom - MidY);
+        right  =  (src_height - MidX) / (output->bottom - MidX);
         break;
     case ORIENT_ANTI_TRANSPOSED:
         MidY = (output->left + output->right) / 2.f;
