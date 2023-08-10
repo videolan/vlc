@@ -1210,12 +1210,10 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     // otherwise it's done in the display chroma
     const bool blending_before_converter = vd->source->orientation == ORIENT_NORMAL;
 
-    vout_display_place_t place;
     const vout_display_place_t *video_place = NULL; // default to fit the video
     video_format_t fmt_spu;
     if (vd_does_blending) {
-        video_place = &place;
-        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
+        video_place = vd->place;
 
         fmt_spu = *vd->source;
         fmt_spu.i_sar_num = vd->cfg->display.sar.num;
