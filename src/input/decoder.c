@@ -2313,9 +2313,8 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
 
 void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 {
-    enum es_format_category_e cat = p_owner->dec.fmt_in->i_cat;
-
     vlc_fifo_Lock( p_owner->p_fifo );
+    enum es_format_category_e cat = p_owner->dec.fmt_in->i_cat;
 
     /* Empty the fifo */
     block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
