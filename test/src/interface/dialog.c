@@ -24,6 +24,7 @@
 #include <vlc/vlc.h>
 
 #include "../../../lib/libvlc_internal.h"
+#include "../../libvlc/test.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -282,12 +283,10 @@ int
 main(int i_argc, char *ppsz_argv[])
 {
     bool b_test_all = i_argc > 1 && strcmp(ppsz_argv[1], "-a") == 0;
+    if (b_test_all)
+        setenv("VLC_TEST_TIMEOUT", "0", 1);
 
-    if (!b_test_all)
-        alarm(10);
-
-    setenv("VLC_PLUGIN_PATH", "../modules", 1);
-    setenv("VLC_LIB_PATH", "../modules", 1);
+    test_init();
 
     libvlc_instance_t *p_libvlc = libvlc_new(0, NULL);
     assert(p_libvlc != NULL);
