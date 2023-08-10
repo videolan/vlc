@@ -124,6 +124,48 @@ struct MTAGuard
 };
 }
 
+static int RenderTextMTA(filter_t *p_filter,
+        subpicture_region_t * p_region_in)
+{
+    struct filter_sapi *p_sys = static_cast<struct filter_sapi *>( p_filter->p_sys );
+    text_segment_t *p_segment = p_region_in->p_text;
+
+    if (!p_segment)
+        return VLC_EGENERIC;
+
+    for (const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
+        if (!s->psz_text)
+            continue;
+
+        if (strlen(s->psz_text) == 0)
+            continue;
+
+        if (p_sys->lastString && !strcmp(p_sys->lastString, s->psz_text))
+            continue;
+
+        if (!strcmp(s->psz_text, "\n"))
+            continue;
+
+        /* */
+        free(p_sys->lastString);
+        p_sys->lastString = strdup(s->psz_text);
+
+        /* */
+        if (p_sys->lastString == nullptr)
+            continue;
+
+        msg_Dbg(p_filter, "Speaking '%s'", s->psz_text);
+
+        wchar_t* wideText = ToWide(s->psz_text);
+        HRESULT hr = p_sys->cpVoice->Speak(wideText, SPF_ASYNC, NULL);
+        free(wideText);
+        if (!SUCCEEDED(hr))
+            msg_Err(p_filter, "Speak() error");
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int SelectVoice(filter_t *filter, ISpVoice* cpVoice)
 {
     HRESULT hr;
@@ -289,47 +331,4 @@ static void Destroy(filter_t *p_filter)
     sys->cmd.query = FilterCommand::CMD_EXIT;
     sys->cmd_available.post();
     vlc_join(sys->thread, NULL);
-}
-
-static int RenderTextMTA(filter_t *p_filter,
-        subpicture_region_t * p_region_in)
-{
-    struct filter_sapi *p_sys = reinterpret_cast<struct filter_sapi *>( p_filter->p_sys );
-    text_segment_t *p_segment = p_region_in->p_text;
-
-    if (!p_segment)
-        return VLC_EGENERIC;
-
-    for (const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
-        if (!s->psz_text)
-            continue;
-
-        if (strlen(s->psz_text) == 0)
-            continue;
-
-        if (p_sys->lastString && !strcmp(p_sys->lastString, s->psz_text))
-            continue;
-
-        if (!strcmp(s->psz_text, "\n"))
-            continue;
-
-        /* */
-        free(p_sys->lastString);
-        p_sys->lastString = strdup(s->psz_text);
-
-        /* */
-        if (p_sys->lastString) {
-            msg_Dbg(p_filter, "Speaking '%s'", s->psz_text);
-
-            wchar_t* wideText = ToWide(s->psz_text);
-            HRESULT hr = p_sys->cpVoice->Speak(wideText, SPF_ASYNC, NULL);
-            free(wideText);
-            if (!SUCCEEDED(hr)) {
-                msg_Err(p_filter, "Speak() error");
-            }
-        }
-    }
-
-    /* Return an error since we won't render the subtitle into pixmap. */
-    return VLC_ENOTSUP;
 }
