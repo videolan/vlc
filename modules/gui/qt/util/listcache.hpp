@@ -33,32 +33,6 @@
 #include <QSharedPointer>
 #include "listcacheloader.hpp"
 
-/**
- * `MLListCache` represents a cache for a (constant) list of items.
- *
- * The caller must provide a `ListCacheLoader<T>`, defining the following
- * methods:
- *  - `count()` returns the number of items in the list;
- *  - `load(index, count)` returning the items for the requested interval.
- *
- * These functions are assumed to be long-running, so they executed from a
- * separate thread, not to block the UI thread.
- *
- * The precise cache strategy is unspecified (it may change in the future), but
- * the general principle is to keep locally only a part of the whole data.
- *
- * The list of items it represents is assumed constant:
- *  1. the list size will never change once initialized,
- *  2. the items retrieved by several calls at a specific location should be
- *     "the same".
- *
- * Note that (2.) might not always be respected in practice, for example if the
- * data is retrieved from a database where content changes between calls. The
- * cache does not really care, the data will just be inconsistent for the user.
- *
- * All its public methods must be called from the UI thread.
- */
-
 struct MLRange
 {
     size_t offset = 0;
@@ -130,7 +104,17 @@ signals:
     void endMoveRows();
 };
 
-
+/**
+ * `ListCache` represents a cache for a (constant) list of items.
+ *
+ * The caller must provide a `ListCacheLoader<T>` to load and count data
+ *
+ * The cache will load data by chunk.
+ * When data is invalidated, it will use a differentiation algorithm to provide
+ * update events on data that changes
+ *
+ * All its public methods must be called from the UI thread.
+ */
 template<typename T>
 class ListCache : public ListCacheBase
 {

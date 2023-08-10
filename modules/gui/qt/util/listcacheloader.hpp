@@ -21,6 +21,14 @@
 
 #include <functional>
 
+/**
+ * Provide operations for the list cache to load an count data
+ *
+ * These functions are assumed to be long-running, so they may be executed from a
+ * separate thread, not to block the UI thread.
+ *
+ * The callbacks are expected to run on the UI thread
+ */
 template <typename T>
 struct ListCacheLoader
 {
