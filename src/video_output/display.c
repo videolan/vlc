@@ -253,9 +253,19 @@ typedef struct {
     video_format_t display_fmt;
     vlc_video_context *src_vctx;
 
+    vout_display_place_t src_place;
+
     // filters to convert the vout source to fmt, NULL means no conversion is needed
     struct pooled_filter_chain *converter;
 } vout_display_priv_t;
+
+static bool PlaceVideoInDisplay(vout_display_priv_t *osys)
+{
+    struct vout_display_placement place_cfg = osys->cfg.display;
+    vout_display_place_t prev_place = osys->src_place;
+    vout_display_PlacePicture(&osys->src_place, &osys->source, &place_cfg);
+    return vout_display_PlaceEquals(&prev_place, &osys->src_place);
+}
 
 /*****************************************************************************
  * FIXME/TODO see how to have direct rendering here (interact with vout.c)
@@ -493,6 +503,8 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     osys->source.i_visible_height = bottom - top;
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
+    PlaceVideoInDisplay(osys);
+
     return vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
 }
 
@@ -506,6 +518,8 @@ static int vout_SetSourceAspect(vout_display_t *vd,
         osys->source.i_sar_num = sar_num;
         osys->source.i_sar_den = sar_den;
     }
+
+    PlaceVideoInDisplay(osys);
 
     err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
 
@@ -569,6 +583,9 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
+
+    PlaceVideoInDisplay(osys);
+
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE) != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
@@ -581,6 +598,9 @@ void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
         return; /* nothing to do */
 
     osys->cfg.display.fitting = fit;
+
+    PlaceVideoInDisplay(osys);
+
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED) != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
@@ -598,6 +618,9 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         return; /* zoom has no effects */
     if (onum * den == num * oden)
         return; /* zoom has not changed */
+
+    PlaceVideoInDisplay(osys);
+
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM) != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
@@ -738,6 +761,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vd->sys = NULL;
     if (owner)
         vd->owner = *owner;
+
+    PlaceVideoInDisplay(osys);
 
     if (module == NULL || module[0] == '\0')
         module = "any";
