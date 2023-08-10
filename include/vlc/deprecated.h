@@ -28,6 +28,8 @@
 extern "C" {
 # endif
 
+typedef struct libvlc_media_player_t libvlc_media_player_t;
+
 /**
  * \ingroup libvlc_media_player
  * @{
