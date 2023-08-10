@@ -35,6 +35,7 @@ foreach vlc_test: vlc_tests
     common_args = [
         '-DSRCDIR="@0@"'.format(vlc_src_root + '/test/'),
         '-DTOP_BUILDDIR="@0@"'.format(vlc_build_root),
+        '-DTOP_SRCDIR="@0@"'.format(vlc_src_root),
     ]
 
     test_modules_deps = []
