@@ -23,6 +23,10 @@
 #ifndef VLC_OBJECTS_H
 #define VLC_OBJECTS_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \defgroup vlc_object VLC objects
  * \ingroup vlc
@@ -60,6 +64,10 @@ struct vlc_object_t
      */
     bool force;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * Type-safe vlc_object_t cast
