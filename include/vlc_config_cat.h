@@ -28,6 +28,8 @@
 
 # include <vlc_plugin.h>
 
+# include <assert.h>
+
 #define MAIN_TITLE N_( "VLC preferences" )
 
 /*  - Titles -
@@ -261,6 +263,13 @@ vlc_config_cat_Find(enum vlc_config_cat cat)
     return NULL;
 }
 
+VLC_USED static inline const struct config_category_t *
+vlc_config_cat_GetAt(size_t index)
+{
+    assert(index < ARRAY_SIZE(categories_array));
+    return &categories_array[index];
+}
+
 VLC_USED static inline const struct config_subcategory_t *
 vlc_config_subcat_Find(enum vlc_config_subcat subcat)
 {
@@ -270,6 +279,25 @@ vlc_config_subcat_Find(enum vlc_config_subcat subcat)
             return &subcategories_array[i];
     }
     return NULL;
+}
+
+VLC_USED static inline const struct config_subcategory_t *
+vlc_config_subcat_GetAt(size_t index)
+{
+    assert(index < ARRAY_SIZE(subcategories_array));
+    return &subcategories_array[index];
+}
+
+VLC_USED static inline size_t
+vlc_config_cat_Count(void)
+{
+    return ARRAY_SIZE(categories_array);
+}
+
+VLC_USED static inline size_t
+vlc_config_subcat_Count(void)
+{
+    return ARRAY_SIZE(subcategories_array);
 }
 
 /** Get the "general" subcategory for a given category.
