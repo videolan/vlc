@@ -45,6 +45,9 @@
 #include <sphelper.h>
 
 #include <initguid.h>
+
+#include <memory>
+
 // not available in standard libraries and used in inline functions without __uuidof()
 DEFINE_GUID(CLSID_SpObjectTokenCategory, 0xa910187f, 0x0c7a, 0x45ac, 0x92,0xcc, 0x59,0xed,0xaf,0xb7,0x7b,0x53);
 
@@ -148,25 +151,24 @@ static const struct vlc_filter_operations filter_ops = []{
 
 static int Create (filter_t *p_filter)
 {
-    struct filter_sapi *p_sys;
     HRESULT hr;
 
     MTAGuard guard {};
     if (FAILED(guard.result_mta))
         return VLC_EGENERIC;
 
-    p_filter->p_sys = p_sys = static_cast<decltype(p_sys)>(malloc(sizeof(*p_sys)));
+
+    std::unique_ptr<filter_sapi> p_sys {
+        new (std::nothrow) filter_sapi {}
+    };
+
     if (!p_sys)
         return VLC_ENOMEM;
-
-    p_sys->cpVoice = NULL;
-    p_sys->lastString = NULL;
 
     hr = CoCreateInstance(__uuidof(SpVoice), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_sys->cpVoice));
     if (!SUCCEEDED(hr))
     {
         msg_Err(p_filter, "Could not create SpVoice");
-        free(p_sys);
         return VLC_ENOTSUP;
     }
 
@@ -174,19 +176,21 @@ static int Create (filter_t *p_filter)
     (void) ret; /* TODO: we can detect whether we set the voice or not */
 
     p_filter->ops = &filter_ops;
+    p_filter->p_sys = p_sys.release();
 
     return VLC_SUCCESS;
 }
 
 static void Destroy(filter_t *p_filter)
 {
-    struct filter_sapi *p_sys = reinterpret_cast<struct filter_sapi *>( p_filter->p_sys );
+    std::unique_ptr<filter_sapi> p_sys {
+        static_cast<filter_sapi *>(p_filter->p_sys)
+    };
 
     if (p_sys->cpVoice)
         p_sys->cpVoice->Release();
 
     free(p_sys->lastString);
-    free(p_sys);
 }
 
 static int RenderText(filter_t *p_filter,
