@@ -24,15 +24,14 @@
 #endif
 
 #include <vlc_common.h>
+
 #include <cassert>
 #include <memory>
 #include <vector>
 #include <set>
 #include <QObject>
 #include <QSharedPointer>
-#include "util/listcacheloader.hpp"
-
-#include "medialib.hpp"
+#include "listcacheloader.hpp"
 
 /**
  * `MLListCache` represents a cache for a (constant) list of items.
@@ -113,12 +112,30 @@ struct MLRange
     }
 };
 
-class MLListCache : public QObject
+class ListCacheBase : public QObject
 {
     Q_OBJECT
+signals:
+    void localSizeChanged(size_t querySize, size_t maximumSize);
 
+    void localDataChanged(int sourceFirst, int sourceLast);
+
+    void beginInsertRows(int sourceFirst, int sourceLast);
+    void endInsertRows();
+
+    void beginRemoveRows(int sourceFirst, int sourceLast);
+    void endRemoveRows();
+
+    void beginMoveRows(int sourceFirst, int sourceLast, int destination);
+    void endMoveRows();
+};
+
+
+template<typename T>
+class ListCache : public ListCacheBase
+{
 public:
-    typedef std::unique_ptr<MLItem> ItemType;
+    using ItemType = T;
 
     struct CacheData {
         explicit CacheData(std::vector<ItemType>&& list_,
@@ -143,7 +160,7 @@ public:
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
-    MLListCache(std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
+    ListCache(std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
         bool useMove, size_t limit, size_t offset, size_t chunkSize = 100);
 
     /**
@@ -174,7 +191,7 @@ public:
      *
      * it returns the index row when the id is found and removed, -1 otherwise
      */
-    int deleteItem(const MLItemId& mlid);
+    int deleteItem(const std::function<bool (const ItemType&)> &&f);
 
 
     /**
@@ -223,21 +240,14 @@ public:
      */
     void invalidate();
 
-signals:
-    void localSizeChanged(size_t querySize, size_t maximumSize);
 
-    void localDataChanged(int sourceFirst, int sourceLast);
-
-    void beginInsertRows(int sourceFirst, int sourceLast);
-    void endInsertRows();
-
-    void beginRemoveRows(int sourceFirst, int sourceLast);
-    void endRemoveRows();
-
-    void beginMoveRows(int sourceFirst, int sourceLast, int destination);
-    void endMoveRows();
 
 private:
+    static uint32_t cacheDataLength(const void* data);
+    static bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNew,  uint32_t newIndex);
+    //this function must be specialized
+    static bool compareItems(const ItemType& a, const ItemType& b);
+
     void asyncFetchMore();
     void asyncCountAndLoad();
     void partialUpdate();
@@ -312,5 +322,7 @@ private:
     //store index redirection keeping index order
     std::set<PartialIndexRedirect> m_partialIndexRedirect;
 };
+
+#include "listcache.hxx"
 
 #endif

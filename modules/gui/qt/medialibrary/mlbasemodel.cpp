@@ -20,13 +20,21 @@
 #include "medialib.hpp"
 #include <vlc_cxx_helpers.hpp>
 
-#include "mllistcache.hpp"
+#include "util/listcache.hpp"
 
 // MediaLibrary includes
 #include "mlbasemodel.hpp"
 #include "mlhelper.hpp"
 
 #include "util/asynctask.hpp"
+
+using MLListCache = ListCache<std::unique_ptr<MLItem>>;
+
+template<>
+bool MLListCache::compareItems(const ItemType& a, const ItemType& b)
+{
+    return a->getId() == b->getId();
+}
 
 static constexpr ssize_t COUNT_UNINITIALIZED = MLListCache::COUNT_UNINITIALIZED;
 
@@ -561,7 +569,9 @@ void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
         emit resetRequested();
         return;
     }
-    m_cache->deleteItem(mlid);
+    m_cache->deleteItem([mlid](const MLListCache::ItemType& item){
+        return item->getId() == mlid;
+    });
 }
 
 

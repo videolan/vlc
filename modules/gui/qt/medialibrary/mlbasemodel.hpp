@@ -38,8 +38,10 @@
 #include "util/listcacheloader.hpp"
 
 // Fordward declarations
-class MLListCache;
 class MediaLib;
+template<typename T>
+class ListCache;
+using MLListCache = ListCache<std::unique_ptr<MLItem>>;
 class MLListCacheLoader;
 
 class MLBaseModel : public QAbstractListModel, public QQmlParserStatus

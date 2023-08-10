@@ -16,34 +16,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mllistcache.hpp"
-#include <vlc_diffutil.h>
+#ifndef LISTCACHE_HXX
+#define LISTCACHE_HXX
 
-namespace {
+#include "listcache.hpp"
+#include <vlc_diffutil.h>
 
 //callbacks for the diff algorithm to access the data
 
-uint32_t cacheDataLength(const void* data)
+template<typename T>
+uint32_t ListCache<T>::cacheDataLength(const void* data)
 {
-    auto cache = static_cast<const MLListCache::CacheData*>(data);
+    auto cache = static_cast<const ListCache<T>::CacheData*>(data);
     assert(cache);
     return std::min(cache->loadedCount, cache->queryCount);
 }
 
-bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNew,  uint32_t newIndex)
+template<typename T>
+bool ListCache<T>::cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNew,  uint32_t newIndex)
 {
-    auto cacheOld = static_cast<const MLListCache::CacheData*>(dataOld);
-    auto cacheNew = static_cast<const MLListCache::CacheData*>(dataNew);
+    auto cacheOld = static_cast<const ListCache<T>::CacheData*>(dataOld);
+    auto cacheNew = static_cast<const ListCache<T>::CacheData*>(dataNew);
     assert(cacheOld);
     assert(cacheNew);
     assert(oldIndex < cacheOld->list.size());
     assert(newIndex < cacheNew->list.size());
-    return cacheNew->list[newIndex]->getId() == cacheOld->list[oldIndex]->getId();
+    return compareItems(cacheNew->list[newIndex], cacheOld->list[oldIndex]);
 }
 
-}
-
-MLListCache::MLListCache(std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t limit, size_t offset, size_t chunkSize)
+template<typename T>
+ListCache<T>::ListCache(std::unique_ptr<ListCacheLoader<ListCache<T>::ItemType>>&& loader, bool useMove, size_t limit, size_t offset, size_t chunkSize)
     : m_useMove(useMove)
     , m_loader(loader.release())
     , m_chunkSize(chunkSize)
@@ -53,7 +55,8 @@ MLListCache::MLListCache(std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>
     assert(m_loader);
 }
 
-size_t MLListCache::fixupIndexForMove(size_t index) const
+template<typename T>
+size_t ListCache<T>::fixupIndexForMove(size_t index) const
 {
     //theses elements have already been moved
     for (const PartialIndexRedirect& hole : m_partialIndexRedirect)
@@ -81,7 +84,8 @@ size_t MLListCache::fixupIndexForMove(size_t index) const
     return index;
 }
 
-const MLListCache::ItemType* MLListCache::get(size_t index) const
+template<typename T>
+const typename ListCache<T>::ItemType* ListCache<T>::get(size_t index) const
 {
     //the view may access the model while we're updating it
     //everything before m_partialIndex is updated in the new model,
@@ -121,7 +125,8 @@ const MLListCache::ItemType* MLListCache::get(size_t index) const
     return &m_cachedData->list.at(index);
 }
 
-const MLListCache::ItemType* MLListCache::find(const std::function<bool (const MLListCache::ItemType&)> &&f, int *index) const
+template<typename T>
+const typename ListCache<T>::ItemType* ListCache<T>::find(const std::function<bool (const ListCache<T>::ItemType&)> &&f, int *index) const
 {
 
     if (!m_cachedData || m_cachedData->queryCount == 0)
@@ -137,7 +142,8 @@ const MLListCache::ItemType* MLListCache::find(const std::function<bool (const M
     return &(*it);
 }
 
-int MLListCache::updateItem(ItemType&& newItem)
+template<typename T>
+int ListCache<T>::updateItem(ItemType&& newItem)
 {
     //we can't update an item locally while the model has pending updates
     //no worry, we'll receive the update once the actual model notifies us
@@ -148,10 +154,9 @@ int MLListCache::updateItem(ItemType&& newItem)
     if (unlikely(!m_cachedData))
         return -1;
 
-    MLItemId mlid = newItem->getId();
     //this may be inneficient to look at every items, maybe we can have a hashmap to access the items by id
-    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
-        return (item->getId() == mlid);
+    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [&newItem](const ItemType& item) {
+        return compareItems(item, newItem);
     });
     //item not found
     if (it == m_cachedData->list.end())
@@ -163,7 +168,8 @@ int MLListCache::updateItem(ItemType&& newItem)
     return pos;
 }
 
-int MLListCache::deleteItem(const MLItemId& mlid)
+template<typename T>
+int ListCache<T>::deleteItem(const std::function<bool (const ItemType&)>&& f)
 {
     //we can't update an item locally while the model has pending updates
     //no worry, we'll receive the update once the actual model notifies us
@@ -174,9 +180,7 @@ int MLListCache::deleteItem(const MLItemId& mlid)
     if (unlikely(!m_cachedData))
         return -1;
 
-    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
-        return (item->getId() == mlid);
-    });
+    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), f);
 
     //item not found
     if (it == m_cachedData->list.end())
@@ -196,7 +200,8 @@ int MLListCache::deleteItem(const MLItemId& mlid)
     return pos;
 }
 
-void MLListCache::moveRange(int first, int last, int to)
+template<typename T>
+void ListCache<T>::moveRange(int first, int last, int to)
 {
     assert(first <= last);
     if (first <= to && to <= last)
@@ -228,7 +233,8 @@ void MLListCache::moveRange(int first, int last, int to)
     emit endMoveRows();
 }
 
-void MLListCache::deleteRange(int first, int last)
+template<typename T>
+void ListCache<T>::deleteRange(int first, int last)
 {
     if (unlikely(!m_cachedData))
         return;
@@ -258,7 +264,8 @@ void MLListCache::deleteRange(int first, int last)
     emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
 }
 
-ssize_t MLListCache::queryCount() const
+template<typename T>
+ssize_t ListCache<T>::queryCount() const
 {
     if (m_cachedData)
         return m_cachedData->queryCount;
@@ -268,8 +275,8 @@ ssize_t MLListCache::queryCount() const
         return COUNT_UNINITIALIZED;
 }
 
-
-ssize_t MLListCache::maximumCount() const
+template<typename T>
+ssize_t ListCache<T>::maximumCount() const
 {
     if (m_cachedData)
         return m_cachedData->maximumCount;
@@ -279,13 +286,15 @@ ssize_t MLListCache::maximumCount() const
         return COUNT_UNINITIALIZED;
 }
 
-void MLListCache::initCount()
+template<typename T>
+void ListCache<T>::initCount()
 {
     assert(!m_cachedData);
     asyncCountAndLoad();
 }
 
-void MLListCache::refer(size_t index)
+template<typename T>
+void ListCache<T>::refer(size_t index)
 {
     //m_maxReferedIndex is in terms of number of item, not the index
     index++;
@@ -313,7 +322,8 @@ void MLListCache::refer(size_t index)
     }
 }
 
-void MLListCache::invalidate()
+template<typename T>
+void ListCache<T>::invalidate()
 {
     if (m_cachedData)
     {
@@ -342,7 +352,8 @@ void MLListCache::invalidate()
     }
 }
 
-void MLListCache::partialUpdate()
+template<typename T>
+void ListCache<T>::partialUpdate()
 {
     //compare the model the user have and the updated model
     //and notify for changes
@@ -443,7 +454,8 @@ void MLListCache::partialUpdate()
     }
 }
 
-void MLListCache::asyncCountAndLoad()
+template<typename T>
+void ListCache<T>::asyncCountAndLoad()
 {
     if (m_countTask)
         m_loader->cancelTask(m_countTask);
@@ -510,7 +522,8 @@ void MLListCache::asyncCountAndLoad()
     );
 }
 
-void MLListCache::asyncFetchMore()
+template<typename T>
+void ListCache<T>::asyncFetchMore()
 {
     if (m_maxReferedIndex <= m_cachedData->loadedCount)
         return;
@@ -547,3 +560,5 @@ void MLListCache::asyncFetchMore()
             }
         });
 }
+
+#endif /* LISTCACHE_HXX */
