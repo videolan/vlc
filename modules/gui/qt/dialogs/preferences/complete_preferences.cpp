@@ -160,9 +160,10 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     // the top-level cat nodes into a preferred order.
     sortItems( 0, Qt::AscendingOrder );
     unsigned index = 0;
-    for (unsigned i = 0; i < ARRAY_SIZE(categories_array); i++)
+    for (unsigned i = 0; i < vlc_config_cat_Count(); i++)
     {
-        cat_item = findCatItem( categories_array[i].id );
+        const config_category_t *cat = vlc_config_cat_GetAt(i);
+        cat_item = findCatItem(cat->id);
         if ( cat_item == NULL )
             continue;
         unsigned cur_index = (unsigned)indexOfTopLevelItem( cat_item );
@@ -209,10 +210,8 @@ QTreeWidgetItem *PrefsTree::createCatNode( enum vlc_config_cat cat )
     item->setIcon( 0, icon );
     //current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
 
-    int cat_index = (int) vlc_config_cat_IndexOf( cat );
-    int general_subcat_index = (int) vlc_config_subcat_IndexOf( general_subcat );
-    this->catMap[cat_index] = item;
-    this->subcatMap[general_subcat_index] = item;
+    this->catMap[cat] = item;
+    this->subcatMap[general_subcat] = item;
 
     addTopLevelItem( item );
     expandItem( item );
@@ -235,8 +234,7 @@ QTreeWidgetItem *PrefsTree::createSubcatNode( QTreeWidgetItem * cat, enum vlc_co
     item->setText( 0, item->name );
     //item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
 
-    int subcat_index = (int) vlc_config_subcat_IndexOf( subcat );
-    this->subcatMap[subcat_index] = item;
+    this->subcatMap[subcat] = item;
 
     cat->addChild( item );
 
@@ -269,14 +267,12 @@ void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
 
 QTreeWidgetItem *PrefsTree::findCatItem( enum vlc_config_cat cat )
 {
-    int cat_index = vlc_config_cat_IndexOf( cat );
-    return this->catMap[cat_index];
+    return this->catMap[cat];
 }
 
 QTreeWidgetItem *PrefsTree::findSubcatItem( enum vlc_config_subcat subcat )
 {
-    int subcat_index = vlc_config_subcat_IndexOf( subcat );
-    return this->subcatMap[subcat_index];
+    return this->subcatMap[subcat];
 }
 
 void PrefsTree::applyAll()
