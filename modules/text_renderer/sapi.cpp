@@ -92,6 +92,47 @@ struct MTAGuard
 };
 }
 
+static int SelectVoice(filter_t *filter, ISpVoice* cpVoice)
+{
+    HRESULT hr;
+    ISpObjectToken*        cpVoiceToken = NULL;
+    IEnumSpObjectTokens*   cpEnum = NULL;
+    ULONG ulCount = 0;
+
+    hr = SpEnumTokens(SPCAT_VOICES, NULL, NULL, &cpEnum);
+    if (SUCCEEDED(hr))
+    {
+        // Get the number of voices.
+        hr = cpEnum->GetCount(&ulCount);
+        if (SUCCEEDED (hr))
+        {
+            int voiceIndex = var_InheritInteger(filter, "sapi-voice");
+            if (voiceIndex > -1)
+            {
+                if ((unsigned)voiceIndex < ulCount) {
+                    hr = cpEnum->Item(voiceIndex, &cpVoiceToken);
+                    if (SUCCEEDED(hr)) {
+                        hr = cpVoice->SetVoice(cpVoiceToken);
+                        if (SUCCEEDED(hr)) {
+                            msg_Dbg(filter, "Selected voice %d", voiceIndex);
+                        }
+                        else {
+                            msg_Err(filter, "Failed to set voice %d", voiceIndex);
+                        }
+                        cpVoiceToken->Release();
+                        cpVoiceToken = NULL;
+                    }
+                }
+                else
+                    msg_Err(filter, "Voice index exceeds available count");
+            }
+        }
+        cpEnum->Release();
+    }
+
+    return 0;
+}
+
 static const struct vlc_filter_operations filter_ops = []{
     struct vlc_filter_operations ops {};
     ops.render = RenderText;
@@ -123,43 +164,8 @@ static int Create (filter_t *p_filter)
         return VLC_ENOTSUP;
     }
 
-        ISpObjectToken*        cpVoiceToken = NULL;
-        IEnumSpObjectTokens*   cpEnum = NULL;
-        ULONG ulCount = 0;
-
-        hr = SpEnumTokens(SPCAT_VOICES, NULL, NULL, &cpEnum);
-        if (SUCCEEDED(hr))
-        {
-            // Get the number of voices.
-            hr = cpEnum->GetCount(&ulCount);
-            if (SUCCEEDED (hr))
-            {
-                int voiceIndex = var_InheritInteger(p_filter, "sapi-voice");
-                if (voiceIndex > -1)
-                {
-                    if ((unsigned)voiceIndex < ulCount) {
-                        hr = cpEnum->Item(voiceIndex, &cpVoiceToken);
-                        if (SUCCEEDED(hr)) {
-                            hr = p_sys->cpVoice->SetVoice(cpVoiceToken);
-                            if (SUCCEEDED(hr)) {
-                                msg_Dbg(p_filter, "Selected voice %d", voiceIndex);
-                            }
-                            else {
-                                msg_Err(p_filter, "Failed to set voice %d", voiceIndex);
-                            }
-                            cpVoiceToken->Release();
-                            cpVoiceToken = NULL;
-                        }
-                    }
-                    else
-                        msg_Err(p_filter, "Voice index exceeds available count");
-                }
-            }
-            cpEnum->Release();
-
-            /* Set Output */
-            hr = p_sys->cpVoice->SetOutput(NULL, TRUE);
-        }
+    int ret = SelectVoice(p_filter, p_sys->cpVoice);
+    (void) ret; /* TODO: we can detect whether we set the voice or not */
 
     p_filter->ops = &filter_ops;
 
