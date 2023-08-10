@@ -4,11 +4,6 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-extra_check_verbose = $(extra_check_verbose_$(V))
-extra_check_verbose_ = $(extra_check_flags__$(AM_DEFAULT_VERBOSITY))
-extra_check_verbose_0 = @echo TEST $@
-extra_check_verbose__0 = $(extra_check_verbose_0)
-
 ###############################################################################
 # Unit/regression test
 ###############################################################################
