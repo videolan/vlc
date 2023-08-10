@@ -267,12 +267,18 @@ void PrefsTree::createPluginNode( QTreeWidgetItem * parent, module_t *mod )
 
 QTreeWidgetItem *PrefsTree::findCatItem( enum vlc_config_cat cat )
 {
-    return this->catMap[cat];
+    auto it = this->catMap.find(cat);
+    if (it == std::end(this->catMap))
+        return NULL;
+    return it->second;
 }
 
 QTreeWidgetItem *PrefsTree::findSubcatItem( enum vlc_config_subcat subcat )
 {
-    return this->subcatMap[subcat];
+    auto it = this->subcatMap.find(subcat);
+    if (it == std::end(this->subcatMap))
+        return NULL;
+    return it->second;
 }
 
 void PrefsTree::applyAll()
