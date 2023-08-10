@@ -93,7 +93,7 @@ quint64 MLBaseModel::loadItems(const QVector<int> &indexes, MLBaseModel::ItemCal
     if (!m_itemLoader)
         m_itemLoader = createLoader();
 
-    return m_itemLoader->loadItemsTask(indexes, cb);
+    return m_itemLoader->loadItemsTask(m_offset, indexes, cb);
 }
 
 
@@ -680,7 +680,7 @@ size_t MLListCacheLoader::countAndLoadTask(size_t offset, size_t limit,
         });
 }
 
-quint64 MLListCacheLoader::loadItemsTask(const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
+quint64 MLListCacheLoader::loadItemsTask(size_t offset, const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
 {
     struct Ctx
     {
@@ -689,7 +689,7 @@ quint64 MLListCacheLoader::loadItemsTask(const QVector<int> &indexes, MLBaseMode
 
     return m_medialib->runOnMLThread<Ctx>(this,
         //ML thread
-        [op = m_op, indexes](vlc_medialibrary_t* ml, Ctx& ctx)
+        [offset, op = m_op, indexes](vlc_medialibrary_t* ml, Ctx& ctx)
         {
             if (indexes.isEmpty())
                 return;
@@ -718,8 +718,8 @@ quint64 MLListCacheLoader::loadItemsTask(const QVector<int> &indexes, MLBaseMode
             vlc_ml_query_params_t queryParam = op->getQueryParams();
             for (const auto range : ranges)
             {
-                queryParam.i_offset = range.low;
-                queryParam.i_nbResults = range.high - range.low + 1;
+                queryParam.i_offset = offset + range.low;
+                queryParam.i_nbResults = offset + range.high - range.low + 1;
                 auto data = op->load(ml, &queryParam);
                 for (int i = 0; i < indexes.size(); ++i)
                 {

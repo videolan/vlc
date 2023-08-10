@@ -272,7 +272,7 @@ public:
 
 
     //ML specific operations
-    quint64 loadItemsTask(const QVector<int> &indexes, MLBaseModel::ItemCallback cb);
+    quint64 loadItemsTask(size_t offset, const QVector<int> &indexes, MLBaseModel::ItemCallback cb);
     size_t loadItemByIdTask(MLItemId itemId, std::function<void (size_t, ItemType&&)> cb) const;
 
 protected:
