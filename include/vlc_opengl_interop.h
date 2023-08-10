@@ -24,6 +24,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 
+typedef struct vlc_gl_t vlc_gl_t;
 struct vlc_gl_interop;
 struct vlc_video_context;
 
