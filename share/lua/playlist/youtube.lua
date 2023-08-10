@@ -542,7 +542,7 @@ function sig_descramble( sig, js )
     end
 
     -- Get the name of the helper object providing transformation definitions
-    local helper = string.match( rules, ";(..)%...%(" )
+    local helper = string.match( rules, ";(...?)%...%(" )
     if not helper then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature transformation helper name" )
         return nil
