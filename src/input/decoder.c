@@ -364,11 +364,8 @@ static void Decoder_UpdateOutState(vlc_input_decoder_t *owner)
 /**
  * Load a decoder module
  */
-static int LoadDecoder( decoder_t *p_dec, bool b_packetizer, es_format_t *fmt_in,
-                        const es_format_t *restrict p_fmt )
+static int LoadDecoder(decoder_t *p_dec, bool b_packetizer, es_format_t *fmt_in)
 {
-    decoder_Init( p_dec, fmt_in, p_fmt );
-
     p_dec->b_frame_drop_allowed = true;
 
     /* Find a suitable decoder/packetizer module */
@@ -428,7 +425,8 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
         }
     }
 
-    if( LoadDecoder( p_dec, false, &p_owner->dec_fmt_in, &fmt_in ) )
+    decoder_Init(p_dec, &p_owner->dec_fmt_in, &fmt_in);
+    if (LoadDecoder(p_dec, false, &p_owner->dec_fmt_in))
     {
         p_owner->error = true;
         es_format_Clean( &fmt_in );
@@ -1937,7 +1935,8 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
         if( p_owner->p_packetizer )
         {
-            if( LoadDecoder( p_owner->p_packetizer, true, &p_owner->pktz_fmt_in, fmt ) )
+            decoder_Init(p_owner->p_packetizer, &p_owner->pktz_fmt_in, fmt);
+            if (LoadDecoder(p_owner->p_packetizer, true, &p_owner->pktz_fmt_in))
             {
                 vlc_object_delete(p_owner->p_packetizer);
                 p_owner->p_packetizer = NULL;
@@ -1970,7 +1969,8 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     }
 
     /* Find a suitable decoder/packetizer module */
-    if( LoadDecoder( p_dec, cfg->sout != NULL, &p_owner->dec_fmt_in, fmt ) )
+    decoder_Init(p_dec, &p_owner->dec_fmt_in, fmt);
+    if (LoadDecoder(p_dec, cfg->sout != NULL, &p_owner->dec_fmt_in))
         return p_owner;
 
     assert( p_dec->fmt_in->i_cat == p_dec->fmt_out.i_cat && fmt->i_cat == p_dec->fmt_in->i_cat);
