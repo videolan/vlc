@@ -32,6 +32,8 @@
 template <typename T>
 struct ListCacheLoader
 {
+    using ItemType = T;
+
     virtual ~ListCacheLoader() = default;
 
     virtual void cancelTask(size_t taskId) = 0;
