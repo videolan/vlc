@@ -7,7 +7,6 @@ AUTOMAKE_OPTIONS = subdir-objects
 NULL =
 EXTRA_DIST = \
 	vlc-plugin.pc.in \
-	libvlccore.sym \
 	revision.txt
 
 BUILT_SOURCES = $(nodist_pluginsinclude_HEADERS)
@@ -556,7 +555,10 @@ libvlccore_la_LDFLAGS = \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 9:0:0
-libvlccore_la_DEPENDENCIES = libvlccore.sym
+libvlccore_la_SOURCES += libvlccore.sym
+EXTRA_libvlccore_la_DEPENDENCIES = libvlccore.sym
+
+libvlccore_la_DEPENDENCIES =
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlccore_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlccore_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
