@@ -34,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryVideoViewController;
 @class VLCLibraryHomeViewController;
 @class VLCLibrarySortingMenuController;
-@class VLCRendererMenuController;
 @class VLCPlaylistDataSource;
 @class VLCPlaylistController;
 @class VLCPlaylistSortingMenuController;
@@ -151,7 +150,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryVideoViewController *libraryVideoViewController;
 @property (readonly) VLCLibraryHomeViewController *libraryHomeViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
-@property (readonly) VLCRendererMenuController *rendererMenuController;
 @property (readonly) VLCPlaylistDataSource *playlistDataSource;
 @property (readonly) VLCPlaylistSortingMenuController *playlistSortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;

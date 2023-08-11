@@ -32,6 +32,7 @@
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "main/VLCMain.h"
+#import "menus/VLCMainMenu.h"
 
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
@@ -269,9 +270,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
 
+    // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
+    // renderers being added or removed to keep hidden or show depending on outcome
     [self hideToolbarItem:_renderersToolbarItem];
-    _rendererMenuController = [[VLCRendererMenuController alloc] init];
-    [_rendererMenuController startRendererDiscoveries];
+    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
 
     // HACK: The size of the segmented title buttons is not always correctly calculated
     // especially when the text we are setting differs from what is set in the storyboard.
@@ -1057,7 +1059,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)renderersChanged:(NSNotification *)notification
 {
-    const NSUInteger rendererCount = _rendererMenuController.rendererItems.count;
+    const NSUInteger rendererCount = VLCMain.sharedInstance.mainMenu.rendererMenuController.rendererItems.count;
     const BOOL rendererToolbarItemVisible = [self.toolbar.items containsObject:_renderersToolbarItem];
 
     if (rendererCount > 0 && !rendererToolbarItemVisible) {
@@ -1070,7 +1072,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)rendererControlAction:(id)sender
 {
-    [NSMenu popUpContextMenu:_rendererMenuController.rendererMenu
+    [NSMenu popUpContextMenu:VLCMain.sharedInstance.mainMenu.rendererMenu
                    withEvent:NSApp.currentEvent
                      forView:sender];
 }
