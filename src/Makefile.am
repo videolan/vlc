@@ -560,7 +560,7 @@ EXTRA_libvlccore_la_DEPENDENCIES = libvlccore.sym
 
 libvlccore_la_DEPENDENCIES =
 if HAVE_WIN32
-libvlccore_la_DEPENDENCIES += libvlccore_win32_rc.$(OBJEXT)
+EXTRA_libvlccore_la_DEPENDENCIES += libvlccore_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlccore_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
 endif
 if HAVE_OS2
