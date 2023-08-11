@@ -103,7 +103,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCAddonsWindowController *_addonsController;
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
-    NSTimer *_cancelRendererDiscoveryTimer;
     VLCPlaylistSortingMenuController *_playlistSortingController;
     VLCInformationWindowController *_infoWindowController;
 
@@ -1890,8 +1889,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)menuWillOpen:(NSMenu *)menu
 {
-    [_cancelRendererDiscoveryTimer invalidate];
-    [_rendererMenuController startRendererDiscoveries];
+    [_rendererMenuController startRendererDiscoveriesWithTimeout:20.];
 
     if (@available(macOS 10.16, *)) {
 
@@ -1920,20 +1918,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             }
         });
     }
-}
-
-- (void)menuDidClose:(NSMenu *)menu
-{
-    _cancelRendererDiscoveryTimer = [NSTimer scheduledTimerWithTimeInterval:20.
-                                                                     target:self
-                                                                   selector:@selector(cancelRendererDiscovery)
-                                                                   userInfo:nil
-                                                                    repeats:NO];
-}
-
-- (void)cancelRendererDiscovery
-{
-    [_rendererMenuController stopRendererDiscoveries];
 }
 
 @end
