@@ -25,6 +25,8 @@
 #import <vlc_common.h>
 #import <vlc_interface.h>
 
+@class VLCRendererMenuController;
+
 @interface VLCMainMenu : NSObject
 
 /* main menu */
@@ -222,6 +224,8 @@
 @property (readwrite, strong) IBOutlet NSView *playlistSaveAccessoryView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;
 @property (readwrite, weak) IBOutlet NSTextField *playlistSaveAccessoryText;
+
+@property (readonly, strong) VLCRendererMenuController *rendererMenuController;
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu;
 

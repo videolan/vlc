@@ -101,7 +101,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
-    VLCRendererMenuController *_rendererMenuController;
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
     NSTimer *_cancelRendererDiscoveryTimer;
