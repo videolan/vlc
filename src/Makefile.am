@@ -677,7 +677,6 @@ test_media_source_SOURCES = media_source/test.c \
 	media_source/media_tree.c
 test_thread_SOURCES = test/thread.c
 
-AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \
 	../compat/libcompat.la
 
