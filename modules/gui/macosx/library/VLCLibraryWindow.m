@@ -63,6 +63,8 @@
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
 
+#import "menus/renderers/VLCRendererMenuController.h"
+
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
@@ -258,6 +260,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setViewForSelectedSegment];
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
+
+    _rendererMenuController = [[VLCRendererMenuController alloc] init];
+    [_rendererMenuController startRendererDiscoveries];
 
     // HACK: The size of the segmented title buttons is not always correctly calculated
     // especially when the text we are setting differs from what is set in the storyboard.
