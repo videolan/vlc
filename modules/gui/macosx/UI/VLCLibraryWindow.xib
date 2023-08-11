@@ -706,9 +706,12 @@
                                 <constraint firstAttribute="width" constant="30" id="ann-oP-TCW"/>
                             </constraints>
                             <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="videoprojector.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CH2-Lq-KIb">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
+                            <connections>
+                                <action selector="rendererControlAction:" target="QvC-M9-y7g" id="M1O-u2-5FO"/>
+                            </connections>
                         </button>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
@@ -859,6 +862,7 @@
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
                 <outlet property="playlistViewTitleTopConstraint" destination="5b2-gJ-uva" id="qoh-ro-EIN"/>
+                <outlet property="renderersButton" destination="ffS-QP-Om3" id="rOM-No-rd0"/>
                 <outlet property="renderersToolbarItem" destination="YEO-08-Qzi" id="mwx-8t-5o7"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>

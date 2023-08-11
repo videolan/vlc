@@ -1068,4 +1068,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
+- (void)rendererControlAction:(id)sender
+{
+    [NSMenu popUpContextMenu:_rendererMenuController.rendererMenu
+                   withEvent:NSApp.currentEvent
+                     forView:sender];
+}
+
 @end

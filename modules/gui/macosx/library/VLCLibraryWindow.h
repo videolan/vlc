@@ -123,6 +123,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
 @property (readwrite, weak) IBOutlet NSToolbarItem *toggleNavSidebarToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *trackingSeparatorToolbarItem;
+@property (readwrite, weak) IBOutlet NSButton *renderersButton;
 @property (readwrite, weak) IBOutlet NSToolbarItem *backwardsToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *forwardsToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *libraryViewModeToolbarItem;
@@ -174,6 +175,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)backwardsNavigationAction:(id)sender;
 - (IBAction)forwardsNavigationAction:(id)sender;
 - (IBAction)gridVsListSegmentedControlAction:(id)sender;
+- (IBAction)rendererControlAction:(id)sender;
 
 @end
 
