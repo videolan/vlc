@@ -2218,8 +2218,6 @@ vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const 
 
 void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
 {
-    decoder_t *p_dec = &p_owner->dec;
-
     vlc_fifo_Lock( p_owner->p_fifo );
     p_owner->aborting = true;
     p_owner->b_waiting = false;
@@ -2239,7 +2237,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     }
 
     /* Delete decoder */
-    DeleteDecoder( p_owner, p_dec->fmt_in->i_cat );
+    DeleteDecoder(p_owner, p_owner->dec_fmt_in.i_cat);
 }
 
 void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
