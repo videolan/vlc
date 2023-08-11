@@ -200,6 +200,7 @@
 - (void)shouldHideControls:(id)sender
 {
     [self hideControls];
+    [NSCursor setHiddenUntilMouseMoves: YES];
 }
 
 - (void)hideControls
