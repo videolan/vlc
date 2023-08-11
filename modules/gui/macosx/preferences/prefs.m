@@ -565,11 +565,11 @@ enum VLCTreeBranchType {
     // Sort the top-level cat items into preferred order
     NSUInteger index = 0;
     NSUInteger childrenCount = [[self children] count];
-    for (unsigned i = 0; i < ARRAY_SIZE(categories_array); i++) {
+    for (unsigned i = 0; i < vlc_config_cat_Count(); i++) {
         // Try to find index of current cat
         for (NSUInteger j = index; j < childrenCount; j++) {
             VLCTreeBranchItem * item = [[self children] objectAtIndex:j];
-            if ([item category] == categories_array[i].id) {
+            if ([item category] == vlc_config_cat_GetAt(i)->id) {
                 if (j != index) {
                     [[self children] exchangeObjectAtIndex:j withObjectAtIndex:index];
                 }
