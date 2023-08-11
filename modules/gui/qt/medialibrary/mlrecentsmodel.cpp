@@ -96,7 +96,7 @@ void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLRecentsModel::createLoader() const
+MLRecentsModel::createMLLoader() const
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsModel::Loader>(*this));
 }

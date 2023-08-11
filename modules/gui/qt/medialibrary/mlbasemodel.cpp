@@ -91,7 +91,7 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 quint64 MLBaseModel::loadItems(const QVector<int> &indexes, MLBaseModel::ItemCallback cb)
 {
     if (!m_itemLoader)
-        m_itemLoader = createLoader();
+        m_itemLoader = createMLLoader();
 
     return m_itemLoader->loadItemsTask(m_offset, indexes, cb);
 }

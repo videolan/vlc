@@ -321,7 +321,7 @@ vlc_ml_sorting_criteria_t MLPlaylistListModel::roleToCriteria(int role) const /*
         return VLC_ML_SORTING_DEFAULT;
 }
 
-std::unique_ptr<MLListCacheLoader> MLPlaylistListModel::createLoader() const /* override */
+std::unique_ptr<MLListCacheLoader> MLPlaylistListModel::createMLLoader() const /* override */
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLPlaylistListModel::Loader>(*this, m_playlistType));
 }

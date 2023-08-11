@@ -127,7 +127,7 @@ QByteArray MLVideoFoldersModel::criteriaToName(vlc_ml_sorting_criteria_t criteri
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLVideoFoldersModel::createLoader() const /* override */
+MLVideoFoldersModel::createMLLoader() const /* override */
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLVideoFoldersModel::Loader>(*this));
 }

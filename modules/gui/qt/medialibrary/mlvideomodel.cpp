@@ -254,7 +254,7 @@ void MLVideoModel::generateThumbnail(uint64_t id) const
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLVideoModel::createLoader() const
+MLVideoModel::createMLLoader() const
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLVideoModel::Loader>(*this));
 }

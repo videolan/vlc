@@ -148,7 +148,7 @@ QVariant MLAlbumModel::itemRoleData(MLItem *item, const int role) const
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLAlbumModel::createLoader() const
+MLAlbumModel::createMLLoader() const
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLAlbumModel::Loader>(*this));
 }

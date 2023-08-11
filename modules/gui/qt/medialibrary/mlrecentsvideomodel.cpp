@@ -26,7 +26,7 @@ MLRecentsVideoModel::MLRecentsVideoModel(QObject * parent) : MLVideoModel(parent
 // Protected MLBaseModel implementation
 
 std::unique_ptr<MLListCacheLoader>
-MLRecentsVideoModel::createLoader() const
+MLRecentsVideoModel::createMLLoader() const
 /* override */
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsVideoModel::Loader>(*this));

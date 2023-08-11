@@ -79,7 +79,7 @@ protected:
 
     void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t ) override;
 
-    std::unique_ptr<MLListCacheLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 protected: // MLBaseModel reimplementation
     virtual void onVlcMlEvent( const MLEvent &event ) override;

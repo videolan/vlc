@@ -402,7 +402,7 @@ QByteArray MLPlaylistModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) c
 //-------------------------------------------------------------------------------------------------
 
 std::unique_ptr<MLListCacheLoader>
-MLPlaylistModel::createLoader() const /* override */
+MLPlaylistModel::createMLLoader() const /* override */
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLPlaylistModel::Loader>(*this));
 }

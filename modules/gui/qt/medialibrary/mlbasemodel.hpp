@@ -152,6 +152,7 @@ protected slots:
 protected:
     void classBegin() override;
     void componentComplete() override;
+    virtual std::unique_ptr<MLListCacheLoader> createMLLoader() const  = 0;
 
     virtual vlc_ml_sorting_criteria_t roleToCriteria(int role) const = 0;
     static QString getFirstSymbol(QString str);
@@ -188,8 +189,6 @@ protected:
 
 
     virtual void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t )  {}
-
-    virtual std::unique_ptr<MLListCacheLoader> createLoader() const = 0;
 
 private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );

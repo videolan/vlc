@@ -158,7 +158,7 @@ void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLAlbumTrackModel::createLoader() const
+MLAlbumTrackModel::createMLLoader() const
 {
     return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLAlbumTrackModel::Loader>(*this));
 }

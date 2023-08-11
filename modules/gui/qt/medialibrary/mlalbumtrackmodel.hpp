@@ -59,7 +59,7 @@ public:
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
-    std::unique_ptr<MLListCacheLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;

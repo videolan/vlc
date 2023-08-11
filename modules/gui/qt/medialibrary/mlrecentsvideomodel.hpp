@@ -35,7 +35,7 @@ public:
     virtual ~MLRecentsVideoModel() = default;
 
 protected: // MLBaseModel implementation
-    std::unique_ptr<MLListCacheLoader> createLoader() const override;
+    std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 protected: // MLVideoModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;
