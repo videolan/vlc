@@ -29,6 +29,7 @@
 
 @property (readwrite, weak) NSMenu *rendererMenu;
 @property (readwrite, weak) NSMenuItem *rendererNoneItem;
+@property (readonly, strong) NSArray<VLCRendererItem *> *rendererItems;
 
 - (void)startRendererDiscoveries;
 - (void)stopRendererDiscoveries;
