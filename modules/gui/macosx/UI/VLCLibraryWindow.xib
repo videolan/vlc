@@ -859,6 +859,7 @@
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
                 <outlet property="playlistViewTitleTopConstraint" destination="5b2-gJ-uva" id="qoh-ro-EIN"/>
+                <outlet property="renderersToolbarItem" destination="YEO-08-Qzi" id="mwx-8t-5o7"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>
                 <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="098-yp-97f"/>
