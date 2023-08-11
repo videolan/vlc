@@ -558,7 +558,6 @@ libvlccore_la_LDFLAGS = \
 libvlccore_la_SOURCES += libvlccore.sym
 EXTRA_libvlccore_la_DEPENDENCIES = libvlccore.sym
 
-libvlccore_la_DEPENDENCIES =
 if HAVE_WIN32
 EXTRA_libvlccore_la_DEPENDENCIES += libvlccore_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlccore_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
@@ -570,7 +569,6 @@ if HAVE_DBUS
 libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
 if HAVE_DARWIN
-$(libvlccore_la_OBJECTS): libvlccore_objc.la
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la
