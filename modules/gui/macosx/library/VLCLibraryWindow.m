@@ -212,6 +212,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(renderersChanged:)
+                               name:VLCRendererAddedNotification
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(renderersChanged:)
+                               name:VLCRendererRemovedNotification
+                             object:nil];
 
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication addObserver:self
@@ -261,6 +269,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
 
+    [self hideToolbarItem:_renderersToolbarItem];
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     [_rendererMenuController startRendererDiscoveries];
 
@@ -1040,6 +1049,22 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [super windowDidEnterFullScreen:notification];
     if (!self.videoViewController.view.hidden) {
         [self showControlsBar];
+    }
+}
+
+#pragma mark -
+#pragma mark respond to renderers
+
+- (void)renderersChanged:(NSNotification *)notification
+{
+    const NSUInteger rendererCount = _rendererMenuController.rendererItems.count;
+    const BOOL rendererToolbarItemVisible = [self.toolbar.items containsObject:_renderersToolbarItem];
+
+    if (rendererCount > 0 && !rendererToolbarItemVisible) {
+        [self insertToolbarItem:_renderersToolbarItem
+                      inFrontOf:@[_sortOrderToolbarItem, _libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem]];
+    } else if (rendererCount == 0 && rendererToolbarItemVisible) {
+        [self hideToolbarItem:_renderersToolbarItem];
     }
 }
 
