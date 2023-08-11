@@ -32,6 +32,7 @@
 @property (readonly, strong) NSArray<VLCRendererItem *> *rendererItems;
 
 - (void)startRendererDiscoveries;
+- (void)startRendererDiscoveriesWithTimeout:(NSTimeInterval)interval;
 - (void)stopRendererDiscoveries;
 - (void)selectRenderer:(NSMenuItem *)sender;
 

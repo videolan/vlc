@@ -35,6 +35,7 @@
     NSMutableArray              *_rendererDiscoveries;
     BOOL                         _isDiscoveryEnabled;
     NSMenuItem                  *_selectedItem;
+    NSTimer                     *_discoveryTimeout;
 
     intf_thread_t               *p_intf;
     vlc_renderer_discovery_t    *p_rd;
@@ -163,12 +164,29 @@
     }
 }
 
+- (void)startRendererDiscoveriesWithTimeout:(NSTimeInterval)interval
+{
+    [self startRendererDiscoveries];
+    [_discoveryTimeout invalidate];
+    _discoveryTimeout = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                         target:self
+                                                       selector:@selector(discoveryTimeout:)
+                                                       userInfo:nil
+                                                        repeats:NO];
+}
+
+- (void)discoveryTimeout:(NSTimer *)timer
+{
+    [self stopRendererDiscoveries];
+}
+
 - (void)stopRendererDiscoveries
 {
     _isDiscoveryEnabled = NO;
     for (VLCRendererDiscovery *dc in _rendererDiscoveries) {
         [dc stopDiscovery];
     }
+    [_discoveryTimeout invalidate];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
