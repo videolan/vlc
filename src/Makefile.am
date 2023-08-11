@@ -634,8 +634,6 @@ TESTS = $(check_PROGRAMS) check_symbols
 
 test_block_SOURCES = test/block_test.c
 test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
-test_block_DEPENDENCIES =
-
 test_dictionary_SOURCES = test/dictionary.c
 test_executor_SOURCES = test/executor.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
