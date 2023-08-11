@@ -697,6 +697,20 @@
                             </connections>
                         </button>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="C0F3283F-472F-46A6-910B-44EE5602E3D2" label="Renderers" paletteLabel="Renderers" image="videoprojector.fill" catalog="system" bordered="YES" sizingBehavior="auto" id="YEO-08-Qzi">
+                        <nil key="toolTip"/>
+                        <button key="view" wantsLayer="YES" verticalHuggingPriority="750" misplaced="YES" id="ffS-QP-Om3">
+                            <rect key="frame" x="15" y="14" width="32" height="19"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="30" id="ann-oP-TCW"/>
+                            </constraints>
+                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="videoprojector.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CH2-Lq-KIb">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <font key="font" metaFont="systemBold" size="12"/>
+                            </buttonCell>
+                        </button>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
                     <toolbarItem implicitItemIdentifier="85037E27-D263-490C-B4B2-0EFE5B5837AA" label="Library View Type" paletteLabel="Library View Type" sizingBehavior="auto" id="kBa-MC-Mdq">
                         <nil key="toolTip"/>
@@ -1886,5 +1900,6 @@
         <image name="shuffleOn" width="24" height="24"/>
         <image name="sidebar.left" catalog="system" width="18" height="14"/>
         <image name="trash" catalog="system" width="15" height="17"/>
+        <image name="videoprojector.fill" catalog="system" width="22" height="11"/>
     </resources>
 </document>
