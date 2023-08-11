@@ -319,7 +319,6 @@ libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids $(LIBCOM) -luuid
 noinst_LTLIBRARIES += libbda.la
 
-libdtv_plugin_la_DEPENDENCIES = libbda.la
 libdtv_plugin_la_LIBADD = libbda.la -lstdc++
 access_LTLIBRARIES += libdtv_plugin.la
 endif
