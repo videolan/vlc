@@ -27,6 +27,9 @@
 
 #import "main/VLCMain.h"
 
+NSString * const VLCRendererAddedNotification = @"VLCRendererAddedNotification";
+NSString * const VLCRendererRemovedNotification = @"VLCRendererRemovedNotification";
+
 @interface VLCRendererDiscovery ()
 {
     intf_thread_t               *p_intf;
@@ -36,6 +39,7 @@
 
 - (void)handleItemAdded:(vlc_renderer_item_t *)item;
 - (void)handleItemRemoved:(const vlc_renderer_item_t *)item;
+
 @end
 
 // C callback event handler functions
@@ -119,6 +123,9 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
     [_rendererItems addObject:item];
     if (_delegate)
         [_delegate addedRendererItem:item from:self];
+
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererAddedNotification
+                                                      object:item];
 }
 
 - (void)handleItemRemoved:(const vlc_renderer_item_t *)base_item
@@ -134,6 +141,8 @@ static void renderer_event_item_removed(vlc_renderer_discovery_t *rd,
         if (_delegate)
             [_delegate removedRendererItem:result_item from:self];
         [_rendererItems removeObject:result_item];
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCRendererRemovedNotification
+                                                          object:result_item];
     } else {
         msg_Err(p_intf, "VLCRendererDiscovery could not find item to remove!");
     }

@@ -24,6 +24,9 @@
 
 #import "menus/renderers/VLCRendererItem.h"
 
+extern NSString * const VLCRendererAddedNotification;
+extern NSString * const VLCRendererRemovedNotification;
+
 @protocol VLCRendererDiscoveryDelegate;
 
 /**
