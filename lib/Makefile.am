@@ -49,8 +49,10 @@ libvlc_la_SOURCES = \
 	media_list_player.c \
 	media_discoverer.c \
 	picture.c \
+	libvlc.pc.in \
+	libvlc.sym \
 	../src/revision.c
-EXTRA_DIST = libvlc.pc.in libvlc.sym
+EXTRA_DIST =
 
 if HAVE_WIN32
 noinst_DATA = libvlc_win32_rc.rc
