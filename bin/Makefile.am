@@ -30,7 +30,7 @@ vlc_SOURCES = vlc.c override.c
 vlc_LDADD += $(LIBDL)
 else
 vlc_SOURCES = winvlc.c
-vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
+EXTRA_vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 vlc_LDFLAGS = -mwindows -Wc,-static
 vlc_LDADD += vlc_win32_rc.$(OBJEXT)
 libbreakpad_wrapper_la_SOURCES = breakpad.cpp
@@ -40,7 +40,7 @@ libbreakpad_wrapper_la_CXXFLAGS = $(AM_CXXFLAGS) $(BREAKPAD_CFLAGS) -DBREAKPAD_U
 if HAVE_BREAKPAD
 noinst_LTLIBRARIES = libbreakpad_wrapper.la
 vlc_LDADD += libbreakpad_wrapper.la -lstdc++ -lwininet
-vlc_DEPENDENCIES += libbreakpad_wrapper.la
+EXTRA_vlc_DEPENDENCIES += libbreakpad_wrapper.la
 vlc_CPPFLAGS += -DHAVE_BREAKPAD
 endif
 endif
@@ -81,7 +81,7 @@ vlc_static_CFLAGS = $(AM_CFLAGS) \
 	-DTOP_SRCDIR=\"$(abs_top_srcdir)\" \
 	$(NULL)
 vlc_static_CPPFLAGS = $(vlc_CPPFLAGS)
-vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
+EXTRA_vlc_static_DEPENDENCIES = $(EXTRA_vlc_DEPENDENCIES)
 vlc_static_LDADD = $(vlc_LDADD)
 vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 
@@ -119,7 +119,7 @@ vlc_cache_gen_LDADD = \
 if HAVE_WIN32
 vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_LDFLAGS = -Wc,-static
-vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
+EXTRA_vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 endif
 
 #
