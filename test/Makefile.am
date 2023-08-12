@@ -12,6 +12,7 @@ check_PROGRAMS = \
 	test_libvlc_core \
 	test_libvlc_equalizer \
 	test_libvlc_media \
+	test_libvlc_media_callback \
 	test_libvlc_media_thumbnail_argb \
 	test_libvlc_media_thumbnail_jpeg \
 	test_libvlc_media_thumbnail_png \
@@ -123,6 +124,8 @@ test_libvlc_equalizer_SOURCES = libvlc/equalizer.c
 test_libvlc_equalizer_LDADD = $(LIBVLC)
 test_libvlc_media_SOURCES = libvlc/media.c
 test_libvlc_media_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_callback_SOURCES = libvlc/media_callback.c
+test_libvlc_media_callback_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_argb_SOURCES = libvlc/media_thumbnail.c
 test_libvlc_media_thumbnail_argb_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_argb_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Argb -DTEST_REQUIRED_MODULES=\"avcodec\"

@@ -20,6 +20,13 @@ vlc_tests += {
     'module_depends': vlc_plugins_targets.keys()
 }
 
+vlc_tests += {
+    'name' : 'test_libvlc_media_callback',
+    'sources' : files('media_callback.c'),
+    'link_with' : [libvlc, libvlccore],
+    'module_depends': ['imem'],
+}
+
 test_libvlc_media_thumbnail_modules = ['demux_mock']
 if avcodec_dep.found()
     test_libvlc_media_thumbnail_modules += ['avcodec']
