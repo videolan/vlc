@@ -231,11 +231,11 @@
 {
     NSParameterAssert(aNotification);
     VLCLibraryModel *model = VLCMain.sharedInstance.libraryController.libraryModel;
-    NSArray<VLCMediaLibraryMediaItem *> * videoList = model.listOfVideoMedia;
+    const NSUInteger videoCount = model.numberOfVideoMedia;
 
     if (_segmentedTitleControl.selectedSegment == VLCLibraryVideoSegment &&
-        ((videoList.count == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
-         (videoList.count > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+        ((videoCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
+         (videoCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
         _libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
