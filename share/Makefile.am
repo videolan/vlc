@@ -34,8 +34,6 @@ LUA_MODULES = \
 	lua/playlist/katsomo.lua \
 	lua/playlist/koreus.lua \
 	lua/playlist/lelombrik.lua \
-	lua/playlist/liveleak.lua \
-	lua/playlist/metacafe.lua \
 	lua/playlist/mpora.lua \
 	lua/playlist/newgrounds.lua \
 	lua/playlist/pinkbike.lua \
@@ -195,7 +193,6 @@ nobase_doc_DATA = \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
-	lua/playlist/liveleak.lua \
 	lua/playlist/youtube.lua \
 	lua/sd/README.txt \
 	$(LUA_MODULES_DOC) \
