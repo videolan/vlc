@@ -500,7 +500,7 @@ void VoutFixFormatAR(video_format_t *fmt)
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source, const vlc_rational_t *forced_dar)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    int err1 = 0, err2 = 0;
+    int err1 = VLC_SUCCESS, err2 = VLC_SUCCESS;
 
     video_format_t fixed_src = *source;
     VoutFixFormatAR( &fixed_src );
@@ -508,11 +508,11 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
         fixed_src.i_sar_den * osys->source.i_sar_num) {
 
         if (forced_dar->num == 0) {
-        osys->source.i_sar_num = fixed_src.i_sar_num;
-        osys->source.i_sar_den = fixed_src.i_sar_den;
+            osys->source.i_sar_num = fixed_src.i_sar_num;
+            osys->source.i_sar_den = fixed_src.i_sar_den;
 
-        err1 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
-                                    osys->source.i_sar_den);
+            err1 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
+                                        osys->source.i_sar_den);
         }
     }
     if (source->i_x_offset       != osys->source.i_x_offset ||
