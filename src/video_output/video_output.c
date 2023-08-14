@@ -1173,7 +1173,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         }
         if (!sys->spu_blend) {
             sys->spu_blend = filter_NewBlend(VLC_OBJECT(&sys->obj), &fmt_spu);
-            if (!sys->spu_blend)
+            if (unlikely(sys->spu_blend == NULL))
                 msg_Err(&sys->obj, "Failed to create blending filter, OSD/Subtitles will not work");
         }
     }
