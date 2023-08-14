@@ -1227,14 +1227,25 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                             i_sar_num, i_sar_den, 65536);
             }
 
-            /* Compute scaling from original size to destination size
-             * FIXME The current scaling ensure that the heights match, the width being
-             * cropped.
-             */
-            spu_scale_t scale = spu_scale_createq((uint64_t)fmt_dst->i_visible_height         * fmt_dst->i_sar_den * region_fmt.i_sar_num,
+            /* Compute scaling from original size to destination size */
+            // ensures that the heights match, the width being cropped.
+            spu_scale_t scale_h = spu_scale_createq((uint64_t)fmt_dst->i_visible_height         * fmt_dst->i_sar_den * region_fmt.i_sar_num,
                                                   (uint64_t)subpic->i_original_picture_height * fmt_dst->i_sar_num * region_fmt.i_sar_den,
                                                   fmt_dst->i_visible_height,
                                                   subpic->i_original_picture_height);
+
+            // ensures that the widths match, the height being cropped.
+            spu_scale_t scale_w = spu_scale_createq((uint64_t)fmt_dst->i_visible_width         * fmt_dst->i_sar_den * region_fmt.i_sar_num,
+                                      (uint64_t)subpic->i_original_picture_width * fmt_dst->i_sar_num * region_fmt.i_sar_den,
+                                      fmt_dst->i_visible_width,
+                                      subpic->i_original_picture_width);
+
+            // take the scale that will crop the least
+            spu_scale_t scale;
+            if (scale_h.h * scale_h.w > scale_w.h * scale_w.w)
+                scale = scale_w;
+            else
+                scale = scale_h;
 
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
