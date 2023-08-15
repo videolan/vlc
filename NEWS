@@ -12,9 +12,10 @@ Demux:
  * Fix some HLS/TS streams with ID3 prefix
  * Fix some HLS playlist refresh drift
  * Fix for GoPro MAX spatial metadata
- * Improve ffmpeg muxed MP4 chapters handling
+ * Improve FFmpeg-muxed MP4 chapters handling
  * Improve playback for QNap-produced AVI files
  * Improve playback of some old RealVideo files
+ * Fix duration probing on some MP4 with missing information
 
 Decoders:
  * Multiple fixes on AAC handling
@@ -28,8 +29,9 @@ Decoders:
 
 Video Output:
  * Super Resolution scaling with nVidia and Intel GPUs
- * Direct3D9 fix for cropping
+ * Fix for an issue when cropping on Direct3D9
  * Multiple fixes for hardware decoding on D3D11 and OpenGL interop
+ * Fix an issue when playing -90°rotated video
  * Fix subtitles rendering blur on recent macOS
 
 Input:
