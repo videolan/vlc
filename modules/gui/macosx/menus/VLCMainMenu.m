@@ -1889,7 +1889,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)menuWillOpen:(NSMenu *)menu
 {
-    [_rendererMenuController startRendererDiscoveriesWithTimeout:20.];
+    [_rendererMenuController startRendererDiscoveries];
 
     if (@available(macOS 10.16, *)) {
 

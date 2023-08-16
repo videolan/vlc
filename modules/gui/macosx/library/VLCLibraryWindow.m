@@ -96,8 +96,6 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 
     NSInteger _librarySegmentType;
     NSInteger _currentSelectedViewModeSegment;
-
-    NSTimer *_rendererDiscoveryTimer;
 }
 
 @property NSTimer *searchInputTimer;
@@ -275,12 +273,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
     [self hideToolbarItem:_renderersToolbarItem];
-    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveriesWithTimeout:20.];
-    _rendererDiscoveryTimer = [NSTimer scheduledTimerWithTimeInterval:60 * 2
-                                                               target:self
-                                                             selector:@selector(discoveryTimeout:)
-                                                             userInfo:nil
-                                                              repeats:YES];
+    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
 
     // HACK: The size of the segmented title buttons is not always correctly calculated
     // especially when the text we are setting differs from what is set in the storyboard.
@@ -1082,11 +1075,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [NSMenu popUpContextMenu:VLCMain.sharedInstance.mainMenu.rendererMenu
                    withEvent:NSApp.currentEvent
                      forView:sender];
-}
-
-- (void)discoveryTimeout:(NSTimer *)timer
-{
-    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveriesWithTimeout:20.];
 }
 
 @end
