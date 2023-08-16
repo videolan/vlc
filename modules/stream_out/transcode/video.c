@@ -567,11 +567,11 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     vlc_fifo_Lock( id->output_fifo );
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
-        msg_Dbg( p_stream, "Flushing thread and waiting that");
+        msg_Dbg( p_stream, "Draining thread and waiting for that");
         if( transcode_encoder_drain( id->encoder, out ) == VLC_SUCCESS )
-            msg_Dbg( p_stream, "Flushing done");
+            msg_Dbg( p_stream, "Draining done");
         else
-            msg_Warn( p_stream, "Flushing failed");
+            msg_Warn( p_stream, "Draining failed");
     }
     bool has_error = id->b_error;
     if( !has_error )
