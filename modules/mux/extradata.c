@@ -182,6 +182,7 @@ static void hxxx_extradata_builder_Feed(mux_extradata_builder_t *m,
         m->p_extra = config->p_buffer;
         m->priv = config;
     }
+    hxxx_helper_clean(&hh);
 }
 
 static void hxxx_extradata_builder_Deinit(mux_extradata_builder_t *m)
