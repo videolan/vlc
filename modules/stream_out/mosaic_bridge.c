@@ -185,8 +185,19 @@ static int Control(sout_stream_t *stream, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static void Flush( sout_stream_t *stream, void *id)
+{
+    sout_stream_sys_t *p_sys = stream->p_sys;
+
+    if ( p_sys == (sout_stream_sys_t *)id )
+    {
+        if (p_sys->p_vf2 != NULL)
+            filter_chain_VideoFlush(p_sys->p_vf2);
+    }
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, NULL, NULL,
+    Add, Del, Send, Control, Flush, NULL,
 };
 
 static const char *const ppsz_sout_options[] = {
