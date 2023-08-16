@@ -395,6 +395,16 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
+void transcode_video_flush( sout_stream_id_sys_t *id )
+{
+    if ( id->p_f_chain != NULL )
+        filter_chain_VideoFlush( id->p_f_chain );
+    if ( id->p_uf_chain != NULL )
+        filter_chain_VideoFlush( id->p_uf_chain );
+    if ( id->p_final_conv_static != NULL )
+        filter_chain_VideoFlush( id->p_final_conv_static );
+}
+
 void transcode_video_clean( sout_stream_id_sys_t *id )
 {
     /* Close encoder, but only if one was opened. */
