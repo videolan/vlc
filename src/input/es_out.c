@@ -4322,8 +4322,14 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     case AUDIO_ES:
         info_category_AddInfo( p_cat, _("Type"), _("Audio") );
 
+        if( p_fmt_es->audio.i_channels || p_fmt_es->audio.i_physical_channels )
+            info_category_AddInfo( p_cat, _("Channels"), "%u",
+                                  p_fmt_es->audio.i_channels ?
+                                  p_fmt_es->audio.i_channels :
+                                  vlc_popcount( p_fmt_es->audio.i_physical_channels ) );
+
         if( p_fmt_es->audio.i_physical_channels )
-            info_category_AddInfo( p_cat, _("Channels"), "%s",
+            info_category_AddInfo( p_cat, _("Channel Layout"), "%s",
                 vlc_gettext( aout_FormatPrintChannels( &p_fmt_es->audio ) ) );
 
         if( p_fmt_es->audio.i_rate )
