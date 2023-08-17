@@ -59,7 +59,6 @@ const char *DxgiFormatToStr(DXGI_FORMAT format);
 vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format);
 const d3d_format_t *DxgiGetRenderFormatList(void);
 void DxgiFormatMask(DXGI_FORMAT format, video_format_t *);
-DXGI_FORMAT DxgiFourccFormat(vlc_fourcc_t fcc);
 const char *DxgiVendorStr(unsigned int gpu_vendor);
 UINT DxgiResourceCount(const d3d_format_t *);
 
