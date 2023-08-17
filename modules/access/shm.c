@@ -231,13 +231,9 @@ static int Open (vlc_object_t *obj)
 
     es_format_t fmt;
     es_format_Init (&fmt, VIDEO_ES, chroma);
-    fmt.video.i_chroma = chroma;
-    fmt.video.i_bits_per_pixel = bpp;
-    fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
+    video_format_Setup(&fmt.video, chroma, width, height, width, height, 1, 1);
     fmt.video.i_frame_rate = 1000 * rate;
     fmt.video.i_frame_rate_base = 1000;
-    fmt.video.i_visible_width = fmt.video.i_width = width;
-    fmt.video.i_visible_height = fmt.video.i_height = height;
 
     sys->es = es_out_Add (demux->out, &fmt);
 
