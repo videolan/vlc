@@ -199,16 +199,6 @@ FocusScope {
     focus: true
 
     onInitialIndexChanged: resetFocus()
-    onActiveFocusChanged: {
-        if (activeFocus && albumModel.count > 0 && !albumSelectionModel.hasSelection) {
-            let initialIndex = 0
-            const albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
-            if (albumsListView.currentIndex !== -1)
-                initialIndex = albumsListView.currentIndex
-            albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            albumsListView.currentIndex = initialIndex
-        }
-    }
 
     function setCurrentItemFocus(reason) {
         if (view.currentItem === null) {
