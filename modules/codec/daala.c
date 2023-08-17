@@ -608,7 +608,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
     char *psz_tmp = var_GetString( p_enc, ENC_CFG_PREFIX "chroma-fmt" );
-    uint32_t i_codec;
+    vlc_fourcc_t i_codec;
     if( !psz_tmp ) {
         free(p_sys);
         return VLC_ENOMEM;
