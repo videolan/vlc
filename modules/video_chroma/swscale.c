@@ -315,8 +315,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
 {
-    enum AVPixelFormat i_fmti = AV_PIX_FMT_NONE;
-    enum AVPixelFormat i_fmto = AV_PIX_FMT_NONE;
+    enum AVPixelFormat i_fmti;
+    enum AVPixelFormat i_fmto;
 
     bool b_has_ai = false;
     bool b_has_ao = false;
@@ -324,8 +324,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     bool b_swap_uvi = false;
     bool b_swap_uvo = false;
 
-    GetFfmpegChroma( &i_fmti, p_fmti );
-    GetFfmpegChroma( &i_fmto, p_fmto );
+    i_fmti = GetFfmpegChroma( p_fmti );
+    i_fmto = GetFfmpegChroma( p_fmto );
 
     if( p_fmti->i_chroma == p_fmto->i_chroma )
     {

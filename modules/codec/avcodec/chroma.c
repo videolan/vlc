@@ -215,7 +215,7 @@ static const struct
 };
 
 /* FIXME special case the RGB formats */
-int GetFfmpegChroma( enum AVPixelFormat *restrict i_ffmpeg_chroma, const video_format_t *fmt )
+enum AVPixelFormat GetFfmpegChroma( const video_format_t *fmt )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
@@ -228,12 +228,11 @@ int GetFfmpegChroma( enum AVPixelFormat *restrict i_ffmpeg_chroma, const video_f
                   chroma_table[i].i_gmask == fmt->i_gmask &&
                   chroma_table[i].i_bmask == fmt->i_bmask ) )
             {
-                *i_ffmpeg_chroma = chroma_table[i].i_chroma_id;
-                return VLC_SUCCESS;
+                return chroma_table[i].i_chroma_id;
             }
         }
     }
-    return VLC_EGENERIC;
+    return AV_PIX_FMT_NONE;
 }
 
 vlc_fourcc_t FindVlcChroma( enum AVPixelFormat i_ffmpeg_id )
