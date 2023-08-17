@@ -259,13 +259,9 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
         goto error;
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, p_data->output_format->fourcc );
-    p_sys->fmt.video.i_visible_width    =
-    p_sys->fmt.video.i_width            = outDesc.ModeDesc.Width;
-    p_sys->fmt.video.i_visible_height   =
-    p_sys->fmt.video.i_height           = outDesc.ModeDesc.Height;
-    p_sys->fmt.video.i_bits_per_pixel   = 4 * p_data->output_format->bitsPerChannel; /* FIXME */
-    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
-    p_sys->fmt.video.i_chroma           = p_sys->fmt.i_codec;
+    video_format_Setup( &p_sys->fmt.video, p_sys->fmt.i_codec,
+                        outDesc.ModeDesc.Width, outDesc.ModeDesc.Height,
+                        outDesc.ModeDesc.Width, outDesc.ModeDesc.Height, 1, 1);
     p_sys->fmt.video.color_range        = COLOR_RANGE_FULL;
     p_sys->fmt.video.i_frame_rate       = outDesc.ModeDesc.RefreshRate.Numerator;
     p_sys->fmt.video.i_frame_rate_base  = outDesc.ModeDesc.RefreshRate.Denominator;
