@@ -121,7 +121,7 @@ FocusScope {
 
                         focus: true
 
-                        height: VLCStyle.gridItem_music_height + VLCStyle.margin_normal
+                        height: VLCStyle.gridItem_music_height + topMargin + bottomMargin
                         width: root.width - root.rightPadding
 
                         leftMargin: VLCStyle.margin_xlarge
