@@ -409,22 +409,10 @@ FocusScope {
             index < 0 || index >= _count)
             return
 
-        const itemTopY = getItemPos(index)[1]
-        const itemBottomY = itemTopY + rowHeight
-
-        const viewTopY = flickable.contentY
-        const viewBottomY = viewTopY + flickable.height
-
-        let newContentY
-
-        if (itemTopY < viewTopY)
-             //item above view
-            newContentY = itemTopY - topMargin
-        else if (itemBottomY > viewBottomY)
-             //item below view
-            newContentY = itemBottomY + bottomMargin - flickable.height
-        else
-            newContentY = flickable.contentY
+        const newContentY = Helpers.flickablePositionContaining(flickable,
+                                                                getItemPos(index)[1]
+                                                                , rowHeight
+                                                                , topMargin, bottomMargin)
 
         if (newContentY !== flickable.contentY)
             animateFlickableContentY(newContentY)

@@ -107,3 +107,33 @@ function itemsMovable(sortedItemIndexes, targetIndex) {
             (targetIndex > (sortedItemIndexes[sortedItemIndexes.length - 1] + 1) ||
              targetIndex < sortedItemIndexes[0])
 }
+
+/**
+ * calculate content y for flickable such that item with given param will be fully visible
+ * @param type:Flickable flickable
+ * @param type:real y
+ * @param type:real height
+ * @param type:real topMargin
+ * @param type:real bottomMargin
+ * @return type:real appropriate contentY for flickable
+ */
+function flickablePositionContaining(flickable, y, height, topMargin, bottomMargin) {
+    const itemTopY = flickable.originY + y
+    const itemBottomY = itemTopY + height
+
+    const viewTopY = flickable.contentY
+    const viewBottomY = viewTopY + flickable.height
+
+    let newContentY
+
+    if (itemTopY < viewTopY)
+         //item above view
+        newContentY = itemTopY - topMargin
+    else if (itemBottomY > viewBottomY)
+         //item below view
+        newContentY = itemBottomY + bottomMargin - flickable.height
+    else
+        newContentY = flickable.contentY
+
+    return newContentY
+}
