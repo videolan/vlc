@@ -24,6 +24,7 @@ import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
@@ -51,6 +52,13 @@ FocusScope {
     property alias rightPadding: view.rightPadding
 
     property alias _currentView: view.currentItem
+
+    function navigationShowHeader(y, height) {
+        const newContentY = Helpers.flickablePositionContaining(_currentView, y, height, 0, 0)
+
+        if (newContentY !== _currentView.contentY)
+            _currentView.contentY = newContentY
+    }
 
     property Component header: FocusScope {
         id: headerFs
@@ -84,6 +92,13 @@ FocusScope {
                 rightPadding: root.rightPadding
 
                 artist: root.artist
+
+                onActiveFocusChanged: {
+                    // make sure content is visible with activeFocus
+                    if (activeFocus)
+                        root.navigationShowHeader(0, height)
+                }
+
                 Navigation.parentItem: root
                 Navigation.downAction: function() {
                     if (albumsListView)
@@ -99,6 +114,13 @@ FocusScope {
 
                 active: !MainCtx.gridView
                 focus: true
+
+                onActiveFocusChanged: {
+                    // make sure content is visible with activeFocus
+                    if (activeFocus)
+                        root.navigationShowHeader(y, height)
+                }
+
                 sourceComponent: Column {
                     property alias albumsListView: albumsList
 
