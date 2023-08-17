@@ -506,6 +506,7 @@ video_format_TransformBy
 video_format_TransformTo
 video_format_GetTransform
 video_format_IsSimilar
+video_format_IsSameChroma
 video_format_Setup
 video_format_Print
 vlc_actions_get_id
