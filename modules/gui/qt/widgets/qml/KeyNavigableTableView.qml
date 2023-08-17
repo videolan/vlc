@@ -103,6 +103,9 @@ FocusScope {
     property alias contentY     : view.contentY
     property alias contentHeight: view.contentHeight
 
+    property alias originX: view.originX
+    property alias originY: view.originY
+
     property alias interactive: view.interactive
 
     property alias section: view.section
