@@ -56,7 +56,6 @@ FocusScope {
         id: headerFs
 
         property Item albumsListView: albumsLoader.status === Loader.Ready ? albumsLoader.item.albumsListView: null
-        property Item focusItem: albumsLoader.active ? albumsLoader.item.albumsListView : artistBanner
 
         focus: true
         height: col.height
