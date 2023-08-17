@@ -143,38 +143,13 @@ int screen_InitCaptureGDI( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
+    int screen_width  = GetSystemMetrics( SM_CXVIRTUALSCREEN );
+    int screen_height = GetSystemMetrics( SM_CYVIRTUALSCREEN );
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
-    p_sys->fmt.video.i_visible_width  =
-    p_sys->fmt.video.i_width          = GetSystemMetrics( SM_CXVIRTUALSCREEN );
-    p_sys->fmt.video.i_visible_height =
-    p_sys->fmt.video.i_height         = GetSystemMetrics( SM_CYVIRTUALSCREEN );
-    p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
-    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
-    p_sys->fmt.video.i_chroma         = i_chroma;
+    video_format_Setup( &p_sys->fmt.video, i_chroma, screen_width, screen_height,
+                        screen_width, screen_width, 1, 1 );
     p_sys->fmt.video.transfer         = TRANSFER_FUNC_SRGB;
     p_sys->fmt.video.color_range      = COLOR_RANGE_FULL;
-
-    switch( i_chroma )
-    {
-    case VLC_CODEC_RGB15:
-        p_sys->fmt.video.i_rmask = 0x7c00;
-        p_sys->fmt.video.i_gmask = 0x03e0;
-        p_sys->fmt.video.i_bmask = 0x001f;
-        break;
-    case VLC_CODEC_RGB24:
-        p_sys->fmt.video.i_rmask = 0x00ff0000;
-        p_sys->fmt.video.i_gmask = 0x0000ff00;
-        p_sys->fmt.video.i_bmask = 0x000000ff;
-        break;
-    case VLC_CODEC_RGB32:
-        p_sys->fmt.video.i_rmask = 0x00ff0000;
-        p_sys->fmt.video.i_gmask = 0x0000ff00;
-        p_sys->fmt.video.i_bmask = 0x000000ff;
-        break;
-    default:
-        msg_Warn( p_demux, "Unknown RGB masks" );
-        break;
-    }
 
     p_data->ptl.x = - GetSystemMetrics( SM_XVIRTUALSCREEN );
     p_data->ptl.y = - GetSystemMetrics( SM_YVIRTUALSCREEN );
