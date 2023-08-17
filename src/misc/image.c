@@ -244,14 +244,14 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         p_fmt_out->space = p_image->p_dec->fmt_out.video.space;
 
     /* Check if we need chroma conversion or resizing */
-    if( p_image->p_dec->fmt_out.video.i_chroma != p_fmt_out->i_chroma ||
+    if( !video_format_IsSameChroma( &p_image->p_dec->fmt_out.video, p_fmt_out ) ||
         p_image->p_dec->fmt_out.video.i_width != p_fmt_out->i_width ||
         p_image->p_dec->fmt_out.video.i_height != p_fmt_out->i_height )
     {
         if( p_image->p_converter &&
-            ( p_image->p_converter->fmt_in.video.i_chroma !=
-              p_image->p_dec->fmt_out.video.i_chroma ||
-              p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma ) )
+            ( !video_format_IsSameChroma( &p_image->p_converter->fmt_in.video,
+                                          &p_image->p_dec->fmt_out.video ) ||
+              !video_format_IsSameChroma( &p_image->p_converter->fmt_out.video, p_fmt_out ) ) )
         {
             /* We need to restart a new filter */
             DeleteConverter( p_image->p_converter );
@@ -346,29 +346,6 @@ error:
     return NULL;
 }
 
-/* FIXME: refactor by splitting video_format_IsSimilar() API */
-static bool BitMapFormatIsSimilar( const video_format_t *f1,
-                                   const video_format_t *f2 )
-{
-    if( f1->i_chroma == VLC_CODEC_RGB15 ||
-        f1->i_chroma == VLC_CODEC_RGB16 ||
-        f1->i_chroma == VLC_CODEC_RGB24 ||
-        f1->i_chroma == VLC_CODEC_RGB32 )
-    {
-        video_format_t v1 = *f1;
-        video_format_t v2 = *f2;
-
-        video_format_FixRgb( &v1 );
-        video_format_FixRgb( &v2 );
-
-        if( v1.i_rmask != v2.i_rmask ||
-            v1.i_gmask != v2.i_gmask ||
-            v1.i_bmask != v2.i_bmask )
-            return false;
-    }
-    return true;
-}
-
 /**
  * Write an image
  *
@@ -400,17 +377,15 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     picture_Hold(p_pic);
 
     /* Check if we need chroma conversion or resizing */
-    if( p_image->p_enc->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+    if( !video_format_IsSameChroma(&p_image->p_enc->fmt_in.video, p_fmt_in) ||
         p_image->p_enc->fmt_in.video.i_width != p_fmt_in->i_width ||
-        p_image->p_enc->fmt_in.video.i_height != p_fmt_in->i_height ||
-       !BitMapFormatIsSimilar( &p_image->p_enc->fmt_in.video, p_fmt_in ) )
+        p_image->p_enc->fmt_in.video.i_height != p_fmt_in->i_height )
     {
 
         if( p_image->p_converter &&
-            ( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-              p_image->p_converter->fmt_out.video.i_chroma !=
-              p_image->p_enc->fmt_in.video.i_chroma ||
-             !BitMapFormatIsSimilar( &p_image->p_converter->fmt_in.video, p_fmt_in ) ) )
+            ( !video_format_IsSameChroma( &p_image->p_converter->fmt_in.video, p_fmt_in ) ||
+              !video_format_IsSameChroma( &p_image->p_converter->fmt_out.video,
+                                          &p_image->p_enc->fmt_in.video ) ) )
         {
             /* We need to restart a new filter */
             DeleteConverter( p_image->p_converter );
@@ -540,8 +515,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     if( !p_fmt_out->i_sar_den ) p_fmt_out->i_sar_den = p_fmt_in->i_sar_den;
 
     if( p_image->p_converter &&
-        ( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-          p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma ) )
+        ( !video_format_IsSameChroma( &p_image->p_converter->fmt_in.video, p_fmt_in ) ||
+          !video_format_IsSameChroma( &p_image->p_converter->fmt_out.video, p_fmt_out ) ) )
     {
         /* We need to restart a new filter */
         DeleteConverter( p_image->p_converter );
