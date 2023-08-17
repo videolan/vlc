@@ -22,6 +22,17 @@
 
 #import "VLCLibraryWindowNavigationSidebarController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryWindowNavigationSidebarController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+    if (self) {
+        _libraryWindow = libraryWindow;
+    }
+    return self;
+}
 
 @end
