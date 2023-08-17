@@ -259,7 +259,7 @@ static picture_t *SourceConverterBuffer(filter_t *filter)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     const video_format_t *fmt = &filter->fmt_out.video;
 
-    assert(osys->display_fmt.i_chroma == fmt->i_chroma &&
+    assert( video_format_IsSameChroma( &osys->display_fmt, fmt) &&
            osys->display_fmt.i_width  == fmt->i_width  &&
            osys->display_fmt.i_height == fmt->i_height);
 
