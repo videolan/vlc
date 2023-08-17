@@ -97,15 +97,18 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
     };
     FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
 
+    video_format_t fmt_rot;
+    video_format_ApplyRotation(&fmt_rot, vd->source);
+
     BITMAPINFOHEADER *bih = &sys->bi_rgb.bmiHeader;
-    if (bih->biWidth  != (LONG)sys->area.src_fmt->i_visible_width ||
-        bih->biHeight != -(LONG)sys->area.src_fmt->i_visible_height)
+    if (bih->biWidth  != (LONG)fmt_rot.i_visible_width ||
+        bih->biHeight != -(LONG)fmt_rot.i_visible_height)
     {
         if (sys->off_bitmap)
             DeleteObject(sys->off_bitmap);
 
-        bih->biWidth     = sys->area.src_fmt->i_visible_width;
-        bih->biHeight    = -(LONG)sys->area.src_fmt->i_visible_height;
+        bih->biWidth     = fmt_rot.i_visible_width;
+        bih->biHeight    = -(LONG)fmt_rot.i_visible_height;
         void *p_pic_buffer;
         sys->off_bitmap = CreateDIBSection(hdc,
                                            &sys->bmiInfo,
@@ -116,9 +119,9 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
         sys->pic_buf.p_pixels = p_pic_buffer;
         sys->pic_buf.i_pixel_pitch = (bih->biBitCount + 7) / 8;
         sys->pic_buf.i_pitch = sys->pic_buf.i_visible_pitch =
-            sys->area.src_fmt->i_visible_width * sys->pic_buf.i_pixel_pitch;
+            fmt_rot.i_visible_width * sys->pic_buf.i_pixel_pitch;
         sys->pic_buf.i_lines = sys->pic_buf.i_visible_lines =
-            sys->area.src_fmt->i_visible_height;
+            fmt_rot.i_visible_height;
     }
     return VLC_SUCCESS;
 }
@@ -217,22 +220,25 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     SelectObject(sys->off_dc, sys->off_bitmap);
 
-    if (sys->area.place.width  != vd->source->i_visible_width ||
-        sys->area.place.height != vd->source->i_visible_height) {
+    video_format_t fmt_rot;
+    video_format_ApplyRotation(&fmt_rot, vd->source);
+
+    if (sys->area.place.width  != fmt_rot.i_visible_width ||
+        sys->area.place.height != fmt_rot.i_visible_height) {
         SetStretchBltMode(hdc, COLORONCOLOR);
 
         StretchBlt(hdc, sys->area.place.x, sys->area.place.y,
                    sys->area.place.width, sys->area.place.height,
                    sys->off_dc,
-                   vd->source->i_x_offset, vd->source->i_y_offset,
-                   vd->source->i_x_offset + vd->source->i_visible_width,
-                   vd->source->i_y_offset + vd->source->i_visible_height,
+                   fmt_rot.i_x_offset, fmt_rot.i_y_offset,
+                   fmt_rot.i_x_offset + fmt_rot.i_visible_width,
+                   fmt_rot.i_y_offset + fmt_rot.i_visible_height,
                    SRCCOPY);
     } else {
         BitBlt(hdc, sys->area.place.x, sys->area.place.y,
                sys->area.place.width, sys->area.place.height,
                sys->off_dc,
-               vd->source->i_x_offset, vd->source->i_y_offset,
+               fmt_rot.i_x_offset, fmt_rot.i_y_offset,
                SRCCOPY);
     }
 
@@ -251,6 +257,8 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     /* */
     int i_depth = GetDeviceCaps(window_dc, PLANES) *
                   GetDeviceCaps(window_dc, BITSPIXEL);
+
+    video_format_TransformTo(fmt, ORIENT_NORMAL);
 
     /* */
     msg_Dbg(vd, "GDI depth is %i", i_depth);
