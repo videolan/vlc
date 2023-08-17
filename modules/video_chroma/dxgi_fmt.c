@@ -132,11 +132,18 @@ const d3d_format_t *DxgiGetRenderFormatList(void)
 
 void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
 {
-    if (format == DXGI_FORMAT_B8G8R8X8_UNORM || format == DXGI_FORMAT_B8G8R8A8_UNORM)
+    switch(format)
     {
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
         fmt->i_rmask = 0x0000ff00;
         fmt->i_gmask = 0x00ff0000;
         fmt->i_bmask = 0xff000000;
+        break;
+    case DXGI_FORMAT_B5G6R5_UNORM:
+        fmt->i_bmask  = 0xf800;
+        fmt->i_gmask  = 0x07e0;
+        fmt->i_rmask  = 0x001f;
+        break;
     }
 }
 
