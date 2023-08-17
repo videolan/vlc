@@ -519,7 +519,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
 {
     demux_sys_t *p_sys = demux->p_sys;
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
-    uint32_t chroma = 0;
+    vlc_fourcc_t chroma = 0;
 
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
