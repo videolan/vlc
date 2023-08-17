@@ -147,6 +147,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarController.h \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarController.m \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.h \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h \
