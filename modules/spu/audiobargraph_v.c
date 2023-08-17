@@ -239,7 +239,7 @@ static void Draw(BarGraph_t *b)
 
     if (b->p_pic)
         picture_Release(b->p_pic);
-    b->p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), w, h, 1, 1);
+    b->p_pic = picture_New(VLC_CODEC_YUVA, w, h, 1, 1);
     if (!b->p_pic)
         return;
     picture_t *p_pic = b->p_pic;
