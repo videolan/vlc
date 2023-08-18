@@ -477,7 +477,7 @@ raspbian-arm:
         fi
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
-        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH
+        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
 
 macos-x86_64:
     extends: .macos-common
