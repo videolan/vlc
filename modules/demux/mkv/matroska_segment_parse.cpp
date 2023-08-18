@@ -740,13 +740,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             ONLY_FMT(VIDEO);
             if ( colourspace.ValidateSize() )
             {
-                char clrspc[5];
-
                 vars.tk->fmt.i_codec = GetFOURCC( colourspace.GetBuffer() );
-
-                vlc_fourcc_to_char( vars.tk->fmt.i_codec, clrspc );
-                clrspc[4]  = '\0';
-                debug( vars, "Colour Space=%s", clrspc );
+                debug( vars, "Colour Space=%4.4s", (const char*)&vars.tk->fmt.i_codec );
             }
         }
 #if LIBMATROSKA_VERSION >= 0x010405
