@@ -256,6 +256,8 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
     vlc_mutex_init(&sys->lock);
     video_format_Copy(&splitter->fmt, vd->source);
+    splitter->fmt.orientation = ORIENT_NORMAL;
+    fmtp->orientation = ORIENT_NORMAL;
 
     splitter->p_module = module_need(splitter, "video splitter", name, true);
     free(name);
@@ -324,7 +326,6 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     }
 
     vd->ops = &ops;
-    (void) fmtp;
     return VLC_SUCCESS;
 }
 
