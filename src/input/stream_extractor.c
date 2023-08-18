@@ -106,7 +106,8 @@ StreamExtractorCreateMRL( char const* base, char const* subentry )
     if( !strstr( base, "#" ) )
         vlc_memstream_putc( &buffer, '#' );
 
-    vlc_memstream_printf( &buffer, "!/%s", escaped );
+    vlc_memstream_puts( &buffer, "!/" );
+    vlc_memstream_puts( &buffer, escaped );
 
     free( escaped );
     return vlc_memstream_close( &buffer ) ? NULL : buffer.ptr;
