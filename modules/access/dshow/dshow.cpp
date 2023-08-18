@@ -626,16 +626,6 @@ static void SetRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
 {
     switch( i_fourcc )
     {
-        case VLC_CODEC_RGB15:
-            fmt->i_rmask = 0x7c00;
-            fmt->i_gmask = 0x03e0;
-            fmt->i_bmask = 0x001f;
-            break;
-        case VLC_CODEC_RGB16:
-            fmt->i_rmask = 0xf800;
-            fmt->i_gmask = 0x07e0;
-            fmt->i_bmask = 0x001f;
-            break;
         case VLC_CODEC_RGB24:
             /* This is in BGR format */
             fmt->i_bmask = 0x00ff0000;
