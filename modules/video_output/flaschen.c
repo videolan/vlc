@@ -124,6 +124,7 @@ static int Open(vout_display_t *vd,
     fmt.i_height = var_InheritInteger(vd, "flaschen-height");
     fmt.i_visible_width = fmt.i_width;
     fmt.i_visible_height = fmt.i_height;
+    fmt.orientation = ORIENT_NORMAL;
 
     /* p_vd->info is not modified */
 
