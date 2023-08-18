@@ -1179,7 +1179,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         }
 
         if (sys->spu_blend &&
-            sys->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
+            video_format_IsSameChroma(&sys->spu_blend->fmt_out.video, &fmt_spu)) {
             filter_DeleteBlend(sys->spu_blend);
             sys->spu_blend = NULL;
         }
