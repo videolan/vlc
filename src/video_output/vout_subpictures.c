@@ -948,7 +948,10 @@ static void SpuRenderRegion(spu_t *spu,
 
     bool convert_chroma = true;
     for (int i = 0; chroma_list[i] && convert_chroma; i++) {
-        if (region_fmt.i_chroma == chroma_list[i])
+        if (region_fmt.i_chroma == chroma_list[i] &&
+            region_fmt.i_rmask == 0 &&
+            region_fmt.i_gmask == 0 &&
+            region_fmt.i_bmask == 0)
             convert_chroma = false;
     }
 
@@ -996,6 +999,9 @@ static void SpuRenderRegion(spu_t *spu,
 
                 scale_yuvp->fmt_out.video = region->fmt;
                 scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
+                scale_yuvp->fmt_out.video.i_rmask =
+                scale_yuvp->fmt_out.video.i_gmask =
+                scale_yuvp->fmt_out.video.i_bmask = 0;
                 scale_yuvp->fmt_out.video.p_palette = NULL;
 
                 picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
@@ -1019,10 +1025,20 @@ static void SpuRenderRegion(spu_t *spu,
                 scale->fmt_in.video  = picture->format;
                 scale->fmt_out.video = picture->format;
                 if (using_palette)
+                {
                     scale->fmt_in.video.i_chroma = chroma_list[0];
+                    scale->fmt_in.video.i_rmask =
+                    scale->fmt_in.video.i_gmask =
+                    scale->fmt_in.video.i_bmask = 0;
+                }
                 if (convert_chroma)
+                {
                     scale->fmt_out.i_codec        =
                     scale->fmt_out.video.i_chroma = chroma_list[0];
+                    scale->fmt_out.video.i_rmask =
+                    scale->fmt_out.video.i_gmask =
+                    scale->fmt_out.video.i_bmask = 0;
+                }
 
                 scale->fmt_out.video.i_width  = dst_width;
                 scale->fmt_out.video.i_height = dst_height;
