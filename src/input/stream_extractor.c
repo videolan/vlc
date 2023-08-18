@@ -349,7 +349,10 @@ stream_extractor_AttachParsed( stream_t** source, char const* data,
 
     vlc_array_init( &identifiers );
     if( mrl_FragmentSplit( &identifiers, out_extra, data ) )
+    {
+        vlc_array_clear( &identifiers );
         return VLC_EGENERIC;
+    }
 
     size_t count = vlc_array_count( &identifiers );
     size_t idx = 0;
