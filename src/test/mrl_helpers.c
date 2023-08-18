@@ -72,6 +72,7 @@ int main (void)
     for (size_t i = 0; i < ARRAY_SIZE(testcase); ++i)
     {
         vlc_array_t out;
+        vlc_array_init(&out);
         const char *extra = NULL;
         int ret = mrl_FragmentSplit(&out, &extra, testcase[i].payload);
         if (testcase[i].success)
@@ -99,12 +100,12 @@ int main (void)
                 free(res_escaped);
                 free(res);
             }
-            vlc_array_clear(&out);
         }
         else
         {
             assert(ret != VLC_SUCCESS);
         }
+        vlc_array_clear(&out);
     }
     return 0;
 }

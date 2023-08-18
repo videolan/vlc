@@ -346,6 +346,7 @@ stream_extractor_AttachParsed( stream_t** source, char const* data,
 {
     vlc_array_t identifiers;
 
+    vlc_array_init( &identifiers );
     if( mrl_FragmentSplit( &identifiers, out_extra, data ) )
         return VLC_EGENERIC;
 

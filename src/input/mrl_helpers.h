@@ -118,8 +118,6 @@ mrl_FragmentSplit( vlc_array_t* out_items,
 {
     char const* extra = NULL;
 
-    vlc_array_init( out_items );
-
     while( strncmp( payload, "!/", 2 ) == 0 )
     {
         payload += 2;
