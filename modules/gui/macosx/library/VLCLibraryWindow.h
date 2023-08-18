@@ -41,14 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCMediaLibraryItemProtocol;
 
-typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
-    VLCLibraryHomeSegment = 0,
-    VLCLibraryVideoSegment,
-    VLCLibraryMusicSegment,
-    VLCLibraryBrowseSegment,
-    VLCLibraryStreamsSegment
-};
-
 typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
     VLCLibrarySmallestSentinelViewModeSegment = -1,
     VLCLibraryGridViewModeSegment,

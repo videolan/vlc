@@ -20,8 +20,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibrarySection.h"
+#import "VLCLibrarySegment.h"
 
-@implementation VLCLibrarySection
+@implementation VLCLibrarySegment
+
+- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
+{
+    self = [super init];
+    if (self) {
+        _segmentType = segmentType;
+    }
+    return self;
+}
 
 @end

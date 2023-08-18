@@ -38,10 +38,11 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
-#import "library/VLCLibrarySortingMenuController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/VLCLibrarySegment.h"
+#import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
@@ -373,7 +374,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updateGridVsListViewModeSegmentedControl
 {
-    const VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
+    const VLCLibrarySegmentType selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (selectedLibrarySegment) {
@@ -458,7 +459,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
-    const VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
+    const VLCLibrarySegmentType selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (selectedLibrarySegment) {
@@ -635,7 +636,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_libraryAudioViewController presentAudioView];
 }
 
-- (void)showMediaSourceLibraryWithSegment:(VLCLibrarySegment)segment
+- (void)showMediaSourceLibraryWithSegment:(VLCLibrarySegmentType)segment
 {
     NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
 

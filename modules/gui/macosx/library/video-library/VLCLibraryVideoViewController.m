@@ -30,6 +30,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"

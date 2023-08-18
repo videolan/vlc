@@ -24,7 +24,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibrarySection : NSObject
+typedef NS_ENUM(NSUInteger, VLCLibrarySegmentType) {
+    VLCLibraryHomeSegment = 0,
+    VLCLibraryVideoSegment,
+    VLCLibraryMusicSegment,
+    VLCLibraryBrowseSegment,
+    VLCLibraryStreamsSegment
+};
+
+@interface VLCLibrarySegment : NSObject
+
+@property (readonly) VLCLibrarySegmentType segmentType;
+
+- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
 @end
 

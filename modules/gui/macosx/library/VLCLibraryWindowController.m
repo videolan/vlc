@@ -23,6 +23,7 @@
 #import "VLCLibraryWindowController.h"
 
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 #import "main/VLCMain.h"

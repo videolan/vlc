@@ -31,6 +31,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
@@ -157,7 +158,7 @@
     [self presentMediaSourceView:VLCLibraryStreamsSegment];
 }
 
-- (void)presentMediaSourceView:(VLCLibrarySegment)viewSegment
+- (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
 {
     _libraryTargetView.subviews = @[];
 

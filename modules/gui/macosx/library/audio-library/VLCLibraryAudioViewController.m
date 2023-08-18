@@ -30,6 +30,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
