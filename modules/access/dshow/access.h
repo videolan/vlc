@@ -81,7 +81,7 @@ struct access_sys_t
     /* misc properties */
     int            i_width;
     int            i_height;
-    int            i_chroma;
+    vlc_fourcc_t   i_chroma;
     vlc_tick_t     i_start;
 };
 
