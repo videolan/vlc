@@ -44,6 +44,7 @@ OPTIONS:
                      g: GPLv3 (default)
                      l: LGPLv3 + ad-clauses
                      a: LGPLv2 + ad-clauses
+   -x            Add extra checks when compiling
 EOF
 
 }
@@ -58,7 +59,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "qhvrcdpi:k:a:j:C:b:g:" OPTION
+while getopts "qhvrcdpi:k:a:j:C:b:g:x" OPTION
 do
      case $OPTION in
          h)
@@ -101,6 +102,9 @@ do
          ;;
          g)
              LICENSE=$OPTARG
+         ;;
+         x)
+             EXTRA_CHECKS="yes"
          ;;
          *)
              usage
@@ -247,6 +251,13 @@ fi
 if [ "$NODEBUG" = "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
 fi
+if [ -n "$EXTRA_CHECKS" ]; then
+    CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
+    CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
+fi
+
+export CFLAGS
+export CXXFLAGS
 
 if [ "${vlcroot}/configure" -nt Makefile ]; then
 
