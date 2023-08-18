@@ -622,37 +622,37 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     return VLC_SUCCESS;
 }
 
-static void SetRGBMasks( vlc_fourcc_t i_fourcc, es_format_t *fmt )
+static void SetRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
 {
     switch( i_fourcc )
     {
         case VLC_CODEC_RGB15:
-            fmt->video.i_rmask = 0x7c00;
-            fmt->video.i_gmask = 0x03e0;
-            fmt->video.i_bmask = 0x001f;
+            fmt->i_rmask = 0x7c00;
+            fmt->i_gmask = 0x03e0;
+            fmt->i_bmask = 0x001f;
             break;
         case VLC_CODEC_RGB16:
-            fmt->video.i_rmask = 0xf800;
-            fmt->video.i_gmask = 0x07e0;
-            fmt->video.i_bmask = 0x001f;
+            fmt->i_rmask = 0xf800;
+            fmt->i_gmask = 0x07e0;
+            fmt->i_bmask = 0x001f;
             break;
         case VLC_CODEC_RGB24:
             /* This is in BGR format */
-            fmt->video.i_bmask = 0x00ff0000;
-            fmt->video.i_gmask = 0x0000ff00;
-            fmt->video.i_rmask = 0x000000ff;
+            fmt->i_bmask = 0x00ff0000;
+            fmt->i_gmask = 0x0000ff00;
+            fmt->i_rmask = 0x000000ff;
             break;
         case VLC_CODEC_RGB32:
             /* This is in BGRx format */
-            fmt->video.i_bmask = 0xff000000;
-            fmt->video.i_gmask = 0x00ff0000;
-            fmt->video.i_rmask = 0x0000ff00;
+            fmt->i_bmask = 0xff000000;
+            fmt->i_gmask = 0x00ff0000;
+            fmt->i_rmask = 0x0000ff00;
             break;
         default:
             return;
     }
-    fmt->video.i_chroma = i_fourcc;
-    video_format_FixRgb( &fmt->video );
+    fmt->i_chroma = i_fourcc;
+    video_format_FixRgb( fmt );
 }
 
 /*****************************************************************************
@@ -733,7 +733,7 @@ static int DemuxOpen( vlc_object_t *p_this )
             }
 
             /* Setup rgb mask for RGB formats */
-            SetRGBMasks( p_stream->i_fourcc, &fmt );
+            SetRGBMasks( p_stream->i_fourcc, &fmt.video );
 
             if( p_stream->header.video.AvgTimePerFrame )
             {
