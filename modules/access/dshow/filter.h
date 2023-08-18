@@ -40,7 +40,7 @@ void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt );
 HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
                               const AM_MEDIA_TYPE *pmtSource );
 
-int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type);
+vlc_fourcc_t GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type);
 
 /****************************************************************************
  * Declaration of our dummy directshow filter pin class

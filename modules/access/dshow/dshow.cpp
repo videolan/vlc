@@ -68,7 +68,7 @@ static int OpenDevice( vlc_object_t *, access_sys_t *, std::string, bool );
 static ComPtr<IBaseFilter> FindCaptureDevice( vlc_object_t *, std::string *,
                                        std::list<std::string> *, bool );
 static size_t EnumDeviceCaps( vlc_object_t *, ComPtr<IBaseFilter> &,
-                              int, int, int, int, int, int,
+                              vlc_fourcc_t, int, int, int, int, int,
                               AM_MEDIA_TYPE *mt, size_t, bool );
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             ComPtr<IBaseFilter> &, ComPtr<CaptureFilter> & );
@@ -299,7 +299,7 @@ struct dshow_stream_t
 
     } header;
 
-    int             i_fourcc;
+    vlc_fourcc_t    i_fourcc;
     es_out_id_t     *p_es;
 
     bool      b_pts;
@@ -946,7 +946,7 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
 /*
  * get fourcc priority from arbitrary preference, the higher the better
  */
-static int GetFourCCPriority( int i_fourcc )
+static int GetFourCCPriority( vlc_fourcc_t i_fourcc )
 {
     switch( i_fourcc )
     {
@@ -1317,7 +1317,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
 }
 
 static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filter,
-                              int i_fourcc, int i_width, int i_height,
+                              vlc_fourcc_t i_fourcc, int i_width, int i_height,
                               int i_channels, int i_samplespersec,
                               int i_bitspersample, AM_MEDIA_TYPE *mt,
                               size_t mt_max, bool b_audio )
@@ -1385,7 +1385,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
                     {
                         if( SUCCEEDED(pSC->GetStreamCaps(i, &p_mt, static_cast<BYTE*>(pSCC))) )
                         {
-                            int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
+                            vlc_fourcc_t i_current_fourcc = GetFourCCFromMediaType( *p_mt );
                             int i_current_priority = GetFourCCPriority(i_current_fourcc);
 
                             if( (i_fourcc && (i_current_fourcc != i_fourcc))
@@ -1578,7 +1578,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
 
         while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
         {
-            int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
+            vlc_fourcc_t i_current_fourcc = GetFourCCFromMediaType( *p_mt );
             if( !b_audio && i_current_fourcc && p_mt->majortype == MEDIATYPE_Video
                 && p_mt->formattype == FORMAT_VideoInfo )
             {

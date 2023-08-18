@@ -95,9 +95,9 @@ HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
     return S_OK;
 }
 
-int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
+vlc_fourcc_t GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
 {
-    int i_fourcc = 0;
+    vlc_fourcc_t i_fourcc = 0;
 
     if( media_type.majortype == MEDIATYPE_Video )
     {
@@ -505,7 +505,7 @@ STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
         return S_FALSE;
     }
 
-    int i_fourcc = GetFourCCFromMediaType(*pmt);
+    vlc_fourcc_t i_fourcc = GetFourCCFromMediaType(*pmt);
     if( !i_fourcc )
     {
         msg_Dbg( p_input, "CapturePin::QueryAccept "
