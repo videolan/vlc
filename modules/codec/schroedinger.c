@@ -1450,14 +1450,12 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         date_t date;
 
         if( p_pic->format.i_chroma != p_enc->fmt_in.i_codec ) {
-            char chroma_in[5], chroma_out[5];
-            vlc_fourcc_to_char( p_pic->format.i_chroma, chroma_in );
-            chroma_in[4]  = '\0';
-            chroma_out[4] = '\0';
-            vlc_fourcc_to_char( p_enc->fmt_in.i_codec, chroma_out );
-            msg_Warn( p_enc, "Resetting chroma from %s to %s", chroma_out, chroma_in );
+            msg_Warn( p_enc, "Resetting chroma from %4.4s to %4.4s",
+                      (const char*)&p_enc->fmt_in.i_codec,
+                      (const char*)&p_pic->format.i_chroma );
             if( !SetEncChromaFormat( p_enc, p_pic->format.i_chroma ) ) {
-                msg_Err( p_enc, "Could not reset chroma format to %s", chroma_in );
+                msg_Err( p_enc, "Could not reset chroma format to %4.4s",
+                         (const char*)&p_pic->format.i_chroma );
                 return NULL;
             }
         }
