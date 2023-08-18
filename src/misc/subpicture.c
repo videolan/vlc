@@ -258,7 +258,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
 
 subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic )
 {
-    if ( p_fmt->i_chroma != pic->format.i_chroma )
+    if ( !video_format_IsSameChroma( p_fmt, &pic->format ) )
         return NULL;
 
     subpicture_region_t *p_region = subpicture_region_NewInternal( p_fmt );
