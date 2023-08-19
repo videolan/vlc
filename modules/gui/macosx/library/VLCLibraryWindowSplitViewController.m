@@ -20,17 +20,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryWindowSplitViewManager.h"
+#import "VLCLibraryWindowSplitViewController.h"
 
-@implementation VLCLibraryWindowSplitViewManager
+#import "library/VLCLibraryWindow.h"
 
-- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+// Make sure these match the identifiers in the XIB
+static NSString * const VLCLibraryWindowNavigationSidebarIdentifier = @"VLCLibraryWindowNavigationSidebarIdentifier";
+static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibraryWindowPlaylistSidebarIdentifier";
+
+@implementation VLCLibraryWindowSplitViewController
+
+- (void)viewDidLoad
 {
-    self = [super init];
-    if (self) {
-        _libraryWindow = libraryWindow;
+    [super viewDidLoad];
+
+    self.splitView.wantsLayer = YES;
+
+    NSSplitViewItem * const navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
+    NSSplitViewItem * const libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
+    NSSplitViewItem * const playlistSidebarItem = [NSSplitViewItem sidebarWithViewController:self.playlistSidebarViewController];
+
+    if (@available(macOS 11.0, *)) {
+        navSidebarItem.allowsFullHeightLayout = YES;
     }
-    return self;
+
+    self.splitViewItems = @[navSidebarItem, libraryTargetViewItem, playlistSidebarItem];
 }
 
 @end

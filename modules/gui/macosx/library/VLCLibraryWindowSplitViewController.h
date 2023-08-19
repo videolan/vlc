@@ -26,11 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 
-@interface VLCLibraryWindowSplitViewManager : NSObject
+@interface VLCLibraryWindowSplitViewController : NSSplitViewController
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-
-- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+@property (readwrite, strong) IBOutlet NSViewController *navSidebarViewController;
+@property (readwrite, strong) IBOutlet NSViewController *libraryTargetViewController;
+@property (readwrite, strong) IBOutlet NSViewController *playlistSidebarViewController;
 
 @end
 
