@@ -22,6 +22,8 @@
 
 #import "VLCLibrarySegment.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCLibrarySegment
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
@@ -29,8 +31,30 @@
     self = [super init];
     if (self) {
         _segmentType = segmentType;
+        [self updateSegmentTypeRepresentation];
     }
     return self;
+}
+
+- (NSString *)displayStringForType:(VLCLibrarySegmentType)segmentType
+{
+    switch (segmentType) {
+        case VLCLibraryMusicSegment:
+            return _NS("Music");
+        case VLCLibraryVideoSegment:
+            return _NS("Videos");
+        case VLCLibraryBrowseSegment:
+            return _NS("Browse");
+        case VLCLibraryStreamsSegment:
+            return _NS("Streams");
+        default:
+            NSAssert(true, @"Unreachable segment");
+    }
+}
+
+- (void)updateSegmentTypeRepresentation
+{
+    _displayString = [self displayStringForType:_segmentType];
 }
 
 @end

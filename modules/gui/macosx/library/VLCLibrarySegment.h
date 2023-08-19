@@ -35,6 +35,7 @@ typedef NS_ENUM(NSUInteger, VLCLibrarySegmentType) {
 @interface VLCLibrarySegment : NSObject
 
 @property (readonly) VLCLibrarySegmentType segmentType;
+@property (readonly) NSString *displayString;
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
