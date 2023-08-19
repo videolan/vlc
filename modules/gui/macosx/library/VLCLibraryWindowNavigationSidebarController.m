@@ -23,6 +23,7 @@
 #import "VLCLibraryWindowNavigationSidebarController.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibrarySegment.h"
 
 @implementation VLCLibraryWindowNavigationSidebarController
 
@@ -31,8 +32,20 @@
     self = [super init];
     if (self) {
         _libraryWindow = libraryWindow;
+        _segments = VLCLibrarySegment.librarySegments;
+        [self setupOutlineView];
     }
     return self;
+}
+
+- (void)setupOutlineView
+{
+    _treeController = [[NSTreeController alloc] init];
+    _treeController.objectClass = VLCLibrarySegment.class;
+    _treeController.countKeyPath = @"childCount";
+    _treeController.childrenKeyPath = @"childNodes";
+    _treeController.leafKeyPath = @"leaf";
+    [_treeController bind:@"contentArray" toObject:self withKeyPath:@"segments" options:nil];
 }
 
 @end

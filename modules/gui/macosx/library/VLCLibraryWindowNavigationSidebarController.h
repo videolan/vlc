@@ -25,10 +25,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
+@class VLCLibrarySegment;
 
 @interface VLCLibraryWindowNavigationSidebarController : NSObject
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readonly) NSArray<VLCLibrarySegment *> *segments;
+@property (readonly) NSTreeController *treeController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
