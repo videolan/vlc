@@ -44,6 +44,7 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowNavigationSidebarController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
@@ -201,6 +202,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
         _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
     }
+
+    _navSidebarController = [[VLCLibraryWindowNavigationSidebarController alloc] initWithLibraryWindow:self];
 
     _currentSelectedSegment = -1; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 5;
