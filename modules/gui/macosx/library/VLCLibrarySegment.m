@@ -26,6 +26,21 @@
 
 @implementation VLCLibrarySegment
 
++ (NSArray<VLCLibrarySegment *> *)librarySegments
+{
+    return @[
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
+    ];
+}
+
++ (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType
+{
+    return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
+}
+
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
 {
     self = [super init];
