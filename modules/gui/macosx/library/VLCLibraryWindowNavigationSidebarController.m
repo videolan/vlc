@@ -25,6 +25,9 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibrarySegment.h"
 
+// This needs to match whatever identifier has been set in the library window XIB
+static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
+
 @implementation VLCLibraryWindowNavigationSidebarController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -46,6 +49,16 @@
     _treeController.childrenKeyPath = @"childNodes";
     _treeController.leafKeyPath = @"leaf";
     [_treeController bind:@"contentArray" toObject:self withKeyPath:@"segments" options:nil];
+
+    _outlineView = _libraryWindow.navSidebarOutlineView;
+    _outlineView.delegate = self;
+    _outlineView.rowSizeStyle = NSTableViewRowSizeStyleMedium;
+    [_outlineView bind:@"content"
+              toObject:_treeController
+           withKeyPath:@"arrangedObjects"
+               options:nil];
+
+    [_outlineView reloadData];
 }
 
 @end
