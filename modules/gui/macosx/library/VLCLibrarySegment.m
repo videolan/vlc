@@ -43,9 +43,21 @@
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
 {
-    self = [super init];
+    return [VLCLibrarySegment treeNodeWithRepresentedObject:@(segmentType)];
+}
+
+- (instancetype)initWithRepresentedObject:(id)modelObject
+{
+    NSNumber * const segmentNumber = (NSNumber *)modelObject;
+    const NSInteger segmentValue = segmentNumber.integerValue;
+    NSAssert(segmentNumber != nil &&
+             segmentValue > VLCLibraryLowSentinelSegment &&
+             segmentValue < VLCLibraryHighSentinelSegment,
+             @"VLCLibrarySegment represented object must be a library segment type value!");
+
+    self = [super initWithRepresentedObject:modelObject];
     if (self) {
-        _segmentType = segmentType;
+        _segmentType = segmentValue;
         [self updateSegmentTypeRepresentation];
     }
     return self;
@@ -62,9 +74,12 @@
             return _NS("Browse");
         case VLCLibraryStreamsSegment:
             return _NS("Streams");
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
         default:
-            NSAssert(true, @"Unreachable segment");
+            NSAssert(true, @"Invalid segment value");
     }
+    return nil;
 }
 
 - (void)updateSegmentTypeRepresentation

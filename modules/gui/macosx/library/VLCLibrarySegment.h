@@ -24,15 +24,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, VLCLibrarySegmentType) {
-    VLCLibraryHomeSegment = 0,
+typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
+    VLCLibraryLowSentinelSegment = -1,
+    VLCLibraryHomeSegment,
     VLCLibraryVideoSegment,
     VLCLibraryMusicSegment,
     VLCLibraryBrowseSegment,
-    VLCLibraryStreamsSegment
+    VLCLibraryStreamsSegment,
+    VLCLibraryHighSentinelSegment,
 };
 
-@interface VLCLibrarySegment : NSObject
+@interface VLCLibrarySegment : NSTreeNode
 
 @property (class, readonly) NSArray<VLCLibrarySegment*> *librarySegments;
 @property (readonly) VLCLibrarySegmentType segmentType;
