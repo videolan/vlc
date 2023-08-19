@@ -246,7 +246,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self updateColorsBasedOnAppearance:self.effectiveAppearance];
 
-    _mainSplitView.delegate = self;
+    //_mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
 
     [self setViewForSelectedSegment];
