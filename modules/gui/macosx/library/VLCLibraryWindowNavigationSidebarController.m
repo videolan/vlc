@@ -61,4 +61,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [_outlineView reloadData];
 }
 
+# pragma mark - NSOutlineView delegation
+
+- (NSView *)outlineView:(NSOutlineView *)outlineView
+     viewForTableColumn:(NSTableColumn *)tableColumn
+                   item:(id)item
+{
+    NSAssert(outlineView == _outlineView, @"VLCLibraryWindowNavigationSidebarController should only be a delegate for the libraryWindow nav sidebar outline view!");
+
+    NSTableCellView * const cellView = [outlineView makeViewWithIdentifier:@"VLCLibrarySegmentCellIdentifier" owner:self];
+    NSAssert(cellView != nil, @"Provided cell view for navigation outline view should be valid!");
+    [cellView.textField bind:NSValueBinding toObject:cellView withKeyPath:@"objectValue.displayString" options:nil];
+    return cellView;
+}
+
 @end
