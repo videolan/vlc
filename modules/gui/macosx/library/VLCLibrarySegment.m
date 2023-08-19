@@ -82,28 +82,58 @@
     return nil;
 }
 
+- (NSImage *)oldIconImageForType:(VLCLibrarySegmentType)segmentType
+{
+    switch (segmentType) {
+        case VLCLibraryMusicSegment:
+            return [NSImage imageNamed:@"sidebar-music"];
+        case VLCLibraryVideoSegment:
+            return [NSImage imageNamed:@"sidebar-movie"];
+        case VLCLibraryBrowseSegment:
+            return [NSImage imageNamed:@"NSFolder"];
+        case VLCLibraryStreamsSegment:
+            return [NSImage imageNamed:@"NSActionTemplate"];
+        default:
+            NSAssert(true, @"Invalid segment value");
+            return nil;
+    }
+}
+
+- (NSImage *)newIconImageForType:(VLCLibrarySegmentType)segmentType
+{
+    if (@available(macOS 11.0, *)) {
+        switch (segmentType) {
+            case VLCLibraryMusicSegment:
+                return [NSImage imageWithSystemSymbolName:@"music.note"
+                                 accessibilityDescription:@"Music icon"];
+            case VLCLibraryVideoSegment:
+                return [NSImage imageWithSystemSymbolName:@"film.stack"
+                                 accessibilityDescription:@"Video icon"];
+            case VLCLibraryBrowseSegment:
+                return [NSImage imageWithSystemSymbolName:@"folder"
+                                 accessibilityDescription:@"Browse icon"];
+            case VLCLibraryStreamsSegment:
+                return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
+                                 accessibilityDescription:@"Streams icon"];
+            default:
+                NSAssert(true, @"Invalid segment value");
+                return nil;
+        }
+    } else {
+        return nil;
+    }
+}
+
 - (NSImage *)iconForType:(VLCLibrarySegmentType)segmentType
 {
     NSImage *iconImage;
-    switch (segmentType) {
-        case VLCLibraryMusicSegment:
-            iconImage = [NSImage imageNamed:@"sidebar-music"];
-            break;
-        case VLCLibraryVideoSegment:
-            iconImage = [NSImage imageNamed:@"sidebar-movie"];
-            break;
-        case VLCLibraryBrowseSegment:
-            iconImage = [NSImage imageNamed:@"NSFolder"];
-            break;
-        case VLCLibraryStreamsSegment:
-            iconImage = [NSImage imageNamed:@"NSActionTemplate"];
-            break;
-        case VLCLibraryLowSentinelSegment:
-        case VLCLibraryHighSentinelSegment:
-        default:
-            NSAssert(true, @"Invalid segment value");
+    if (@available(macOS 11.0, *)) {
+        iconImage = [self newIconImageForType:segmentType];
+    } else {
+        iconImage = [self oldIconImageForType:segmentType];
+        iconImage.template = YES;
     }
-    iconImage.template = YES;
+
     return iconImage;
 }
 
