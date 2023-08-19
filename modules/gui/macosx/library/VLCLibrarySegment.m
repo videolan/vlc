@@ -82,9 +82,35 @@
     return nil;
 }
 
+- (NSImage *)iconForType:(VLCLibrarySegmentType)segmentType
+{
+    NSImage *iconImage;
+    switch (segmentType) {
+        case VLCLibraryMusicSegment:
+            iconImage = [NSImage imageNamed:@"sidebar-music"];
+            break;
+        case VLCLibraryVideoSegment:
+            iconImage = [NSImage imageNamed:@"sidebar-movie"];
+            break;
+        case VLCLibraryBrowseSegment:
+            iconImage = [NSImage imageNamed:@"NSFolder"];
+            break;
+        case VLCLibraryStreamsSegment:
+            iconImage = [NSImage imageNamed:@"NSActionTemplate"];
+            break;
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
+        default:
+            NSAssert(true, @"Invalid segment value");
+    }
+    iconImage.template = YES;
+    return iconImage;
+}
+
 - (void)updateSegmentTypeRepresentation
 {
     _displayString = [self displayStringForType:_segmentType];
+    _displayImage = [self iconForType:_segmentType];
 }
 
 @end
