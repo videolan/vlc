@@ -23,6 +23,8 @@
 #import "VLCLibraryWindowSplitViewController.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "main/VLCMain.h"
+#import "windows/video/VLCMainVideoViewController.h"
 
 // Make sure these match the identifiers in the XIB
 static NSString * const VLCLibraryWindowNavigationSidebarIdentifier = @"VLCLibraryWindowNavigationSidebarIdentifier";
@@ -50,7 +52,9 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
 - (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
 {
     [super splitView:splitView shouldHideDividerAtIndex:dividerIndex];
-    return dividerIndex == VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex;
+    return dividerIndex == VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex ||
+           (dividerIndex == VLCLibraryWindowNavigationSidebarSplitViewDividerIndex &&
+            !VLCMain.sharedInstance.libraryWindow.videoViewController.view.hidden);
 }
 
 @end
