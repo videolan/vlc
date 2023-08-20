@@ -135,6 +135,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
 @property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
 
+@property (readwrite, nonatomic) NSInteger librarySegmentType;
 @property (readwrite) BOOL nonembedded;
 @property (readonly) VLCLibraryWindowNavigationSidebarController *navSidebarController;
 @property (readonly) VLCLibraryWindowToolbarDelegate *toolbarDelegate;

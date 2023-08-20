@@ -90,7 +90,7 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 {
     CGFloat _lastPlaylistWidthBeforeCollaps;
 
-    NSInteger _currentSelectedSegment;
+    NSInteger _librarySegmentType;
     NSInteger _currentSelectedViewModeSegment;
 }
 
@@ -211,7 +211,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _navSidebarController = [[VLCLibraryWindowNavigationSidebarController alloc] initWithLibraryWindow:self];
 
-    _currentSelectedSegment = -1; // To enforce action on the selected segment
+    _librarySegmentType = -1; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 5;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setLabel:_NS("Home") forSegment:VLCLibraryHomeSegment];
@@ -429,7 +429,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)setViewForSelectedSegment
 {
-    switch (_currentSelectedSegment) {
+    switch (_librarySegmentType) {
     case VLCLibraryHomeSegment:
         [self showHomeLibrary];
         break;
@@ -441,7 +441,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         break;
     case VLCLibraryBrowseSegment:
     case VLCLibraryStreamsSegment:
-        [self showMediaSourceLibraryWithSegment:_currentSelectedSegment];
+        [self showMediaSourceLibraryWithSegment:_librarySegmentType];
         break;
     default:
         break;
@@ -450,13 +450,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self invalidateRestorableState];
 }
 
-- (IBAction)segmentedTitleControlAction:(id)sender
+- (void)setLibrarySegmentType:(NSInteger)segmentType
 {
-    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment) {
+    if (segmentType == _librarySegmentType) {
         return;
     }
 
-    _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
+    _librarySegmentType = segmentType;
     [self setViewForSelectedSegment];
     [self updateGridVsListViewModeSegmentedControl];
 }
