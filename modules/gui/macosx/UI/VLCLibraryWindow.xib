@@ -889,6 +889,7 @@
                 <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
+                <outlet property="playlistViewTitleTopConstraint" destination="5b2-gJ-uva" id="qoh-ro-EIN"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="segmentedTitleControl" destination="W1M-0o-qYG" id="Gw1-T6-78k"/>
                 <outlet property="segmentedTitleControlToolbarItem" destination="KnW-Lr-R1d" id="Wg1-Y2-34a"/>

@@ -29,6 +29,8 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
+#import "extensions/NSWindow+VLCAdditions.h"
+
 #import "main/VLCMain.h"
 
 #import "playlist/VLCPlayerController.h"
@@ -219,6 +221,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_segmentedTitleControl setLabel:_NS("Streams") forSegment:VLCLibraryStreamsSegment];
     [_segmentedTitleControl sizeToFit];
 
+    _playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
     _playlistCounterTextField.font = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];

@@ -100,6 +100,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSView *libraryTargetView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *playlistViewTitleTopConstraint;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
 @property (readwrite, weak) IBOutlet NSView *mediaOptionBar;
 @property (readwrite, weak) IBOutlet NSToolbar *mediaToolBar;
