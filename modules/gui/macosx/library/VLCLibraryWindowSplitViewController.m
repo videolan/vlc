@@ -47,4 +47,10 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     self.splitViewItems = @[navSidebarItem, libraryTargetViewItem, playlistSidebarItem];
 }
 
+- (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
+{
+    [super splitView:splitView shouldHideDividerAtIndex:dividerIndex];
+    return dividerIndex == VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex;
+}
+
 @end
