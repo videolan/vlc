@@ -1023,6 +1023,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self enableVideoTitleBarMode];
     [self hideControlsBarImmediately];
     [self.videoViewController showControls];
+
+    self.playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing;
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -1047,6 +1049,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
+    self.playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
