@@ -148,7 +148,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         self.tabbingMode = NSWindowTabbingModeDisallowed;
     }
 
+    _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
+    self.toolbar.delegate = _toolbarDelegate;
     self.toolbar.allowsUserCustomization = NO;
+    [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier atIndex:0];
 
     VLCMain *mainInstance = VLCMain.sharedInstance;
     _playlistController = [mainInstance playlistController];
@@ -260,10 +263,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // of the buttons to be correctly recalculated, working around this issue
     [self toggleToolbarShown:self];
     [self toggleToolbarShown:self];
-
-    _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
-    self.toolbar.delegate = _toolbarDelegate;
-    [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier atIndex:0];
 
     [self updatePlayqueueToggleState];
 }
