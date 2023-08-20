@@ -26,6 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 
+typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
+    VLCLibraryWindowNavigationSidebarSplitViewDividerIndex = 0,
+    VLCLibraryWindowLibraryTargetViewSplitViewDividerIndex,
+    VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex,
+};
+
 @interface VLCLibraryWindowSplitViewController : NSSplitViewController
 
 @property (readwrite, strong) IBOutlet NSViewController *navSidebarViewController;
