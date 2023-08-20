@@ -206,4 +206,14 @@
     return 48.;
 }
 
++ (const CGFloat)libraryWindowNavSidebarMaxWidth
+{
+    return 200.;
+}
+
++ (const CGFloat)libraryWindowPlaylistSidebarMaxWidth
+{
+    return 400.;
+}
+
 @end

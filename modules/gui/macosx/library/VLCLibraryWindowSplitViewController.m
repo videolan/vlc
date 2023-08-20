@@ -22,8 +22,11 @@
 
 #import "VLCLibraryWindowSplitViewController.h"
 
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
 #import "main/VLCMain.h"
+
 #import "windows/video/VLCMainVideoViewController.h"
 
 // Make sure these match the identifiers in the XIB
@@ -50,6 +53,12 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     if (@available(macOS 11.0, *)) {
         _navSidebarItem.allowsFullHeightLayout = YES;
     }
+
+    _navSidebarItem.preferredThicknessFraction = 0.2;
+    _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
+    _playlistSidebarItem.preferredThicknessFraction = 0.2;
+    _playlistSidebarItem.canCollapse = YES;
+    _playlistSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
 
     self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
 }
