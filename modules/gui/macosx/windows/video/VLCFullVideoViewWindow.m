@@ -53,6 +53,7 @@
                              object:nil];
 
     self.titleVisibility = NSWindowTitleHidden;
+    self.styleMask |= NSWindowStyleMaskFullSizeContentView;
     self.ignoresMouseEvents = NO;
     self.acceptsMouseMovedEvents = YES;
 }
@@ -125,7 +126,6 @@
 - (void)enableVideoTitleBarMode
 {
     self.toolbar.visible = NO;
-    self.styleMask |= NSWindowStyleMaskFullSizeContentView;
     self.titlebarAppearsTransparent = YES;
 
     _autohideTitlebar = YES;
@@ -135,7 +135,6 @@
 - (void)disableVideoTitleBarMode
 {
     self.toolbar.visible = YES;
-    self.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
     self.titlebarAppearsTransparent = NO;
 
     _autohideTitlebar = NO;
