@@ -52,7 +52,13 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
     _outlineView = _libraryWindow.navSidebarOutlineView;
     _outlineView.delegate = self;
+
     _outlineView.rowSizeStyle = NSTableViewRowSizeStyleMedium;
+    _outlineView.allowsMultipleSelection = NO;
+    _outlineView.allowsEmptySelection = NO;
+    _outlineView.allowsColumnSelection = NO;
+    _outlineView.allowsColumnReordering = NO;
+
     [_outlineView bind:@"content"
               toObject:_treeController
            withKeyPath:@"arrangedObjects"
@@ -74,6 +80,14 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [cellView.textField bind:NSValueBinding toObject:cellView withKeyPath:@"objectValue.displayString" options:nil];
     [cellView.imageView bind:NSImageBinding toObject:cellView withKeyPath:@"objectValue.displayImage" options:nil];
     return cellView;
+}
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+    NSTreeNode * const node = (NSTreeNode *)[_outlineView itemAtRow:_outlineView.selectedRow];
+    NSParameterAssert(node != nil);
+    VLCLibrarySegment * const segment = (VLCLibrarySegment *)node.representedObject;
+    _libraryWindow.librarySegmentType = segment.segmentType;
 }
 
 @end
