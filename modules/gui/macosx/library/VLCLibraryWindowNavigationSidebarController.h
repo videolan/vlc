@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSOutlineView *outlineView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+- (void)selectSegment:(NSInteger)segmentType;
 
 @end
 

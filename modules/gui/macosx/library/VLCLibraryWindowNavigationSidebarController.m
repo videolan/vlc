@@ -67,6 +67,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [_outlineView reloadData];
 }
 
+- (void)selectSegment:(NSInteger)segmentType
+{
+    [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentType] byExtendingSelection:NO];
+}
+
 # pragma mark - NSOutlineView delegation
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView
