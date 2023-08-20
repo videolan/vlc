@@ -630,7 +630,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:YES];
-    _optionBarView.hidden = YES;
 
     [_libraryVideoViewController presentVideoView];
 }
@@ -641,7 +640,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:YES];
-    _optionBarView.hidden = NO;
 
     [_libraryAudioViewController presentAudioView];
 }
@@ -655,7 +653,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:NO];
     [self setLibrarySearchToolbarItemVisible:NO];
     [self setViewModeToolbarItemVisible:YES];
-    _optionBarView.hidden = YES;
 
     if (segment == VLCLibraryBrowseSegment) {
         [_libraryMediaSourceViewController presentBrowseView];

@@ -139,9 +139,9 @@
                                     </visualEffectView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="iSp-bV-w6B" secondAttribute="top" id="PVP-aF-QGp"/>
-                                    <constraint firstAttribute="trailing" secondItem="6gW-0d-ymm" secondAttribute="trailing" id="ec8-Zs-m1k"/>
-                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="leading" secondItem="iSp-bV-w6B" secondAttribute="leading" id="i9H-Zv-ueN"/>
+                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="leading" secondItem="iSp-bV-w6B" secondAttribute="leading" id="Lud-a9-9OB"/>
+                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="iSp-bV-w6B" secondAttribute="top" id="Lwi-r4-Src"/>
+                                    <constraint firstAttribute="trailing" secondItem="6gW-0d-ymm" secondAttribute="trailing" id="WCu-Ne-7Oz"/>
                                 </constraints>
                             </customView>
                             <customView identifier="VLCLibraryWindowPlaylistSidebarIdentifier" id="dus-WQ-AmE">
@@ -310,7 +310,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="244-FS-P3T">
-                                                <rect key="frame" x="277" y="13" width="24" height="10"/>
+                                                <rect key="frame" x="277" y="-2" width="24" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="qG4-YK-N3D"/>
                                                     <constraint firstAttribute="width" constant="24" id="sRU-lh-Frf"/>

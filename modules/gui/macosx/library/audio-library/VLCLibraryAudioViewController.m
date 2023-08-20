@@ -23,6 +23,7 @@
 #import "VLCLibraryAudioViewController.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -305,6 +306,34 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 }
 
+- (void)presentOptionBar
+{
+    _libraryTargetView.subviews = [_libraryTargetView.subviews arrayByAddingObject:_optionBarView];
+    [_libraryTargetView addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:_optionBarView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1
+                                      constant:_libraryWindow.titlebarHeight],
+        [NSLayoutConstraint constraintWithItem:_optionBarView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:_optionBarView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1
+                                      constant:0],
+    ]];
+}
+
 - (void)presentPlaceholderAudioView
 {
     for (NSLayoutConstraint * const constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
@@ -412,6 +441,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
         [VLCMain.sharedInstance.libraryWindow updateGridVsListViewModeSegmentedControl];
     }
+
+    [self presentOptionBar];
 }
 
 - (IBAction)segmentedControlAction:(id)sender
