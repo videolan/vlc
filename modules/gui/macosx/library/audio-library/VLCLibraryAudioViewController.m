@@ -127,7 +127,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
 
     _audioSegmentedControl = libraryWindow.audioSegmentedControl;
-    _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
@@ -558,7 +557,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSAssert(model, @"Notification object should be a VLCLibraryModel");
     const NSUInteger audioCount = model.numberOfAudioMedia;
 
-    if (_segmentedTitleControl.selectedSegment == VLCLibraryMusicSegment &&
+    if (_libraryWindow.librarySegmentType == VLCLibraryMusicSegment &&
         ((audioCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
          (audioCount > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView])) &&
         _libraryWindow.videoViewController.view.hidden) {

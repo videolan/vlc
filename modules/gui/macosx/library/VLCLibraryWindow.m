@@ -205,21 +205,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                             forKeyPath:@"effectiveAppearance"
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];
-
-        _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
     }
 
     _navSidebarController = [[VLCLibraryWindowNavigationSidebarController alloc] initWithLibraryWindow:self];
-
-    _librarySegmentType = -1; // To enforce action on the selected segment
-    _segmentedTitleControl.segmentCount = 5;
-    [_segmentedTitleControl setTarget:self];
-    [_segmentedTitleControl setLabel:_NS("Home") forSegment:VLCLibraryHomeSegment];
-    [_segmentedTitleControl setLabel:_NS("Video") forSegment:VLCLibraryVideoSegment];
-    [_segmentedTitleControl setLabel:_NS("Music") forSegment:VLCLibraryMusicSegment];
-    [_segmentedTitleControl setLabel:_NS("Browse") forSegment:VLCLibraryBrowseSegment];
-    [_segmentedTitleControl setLabel:_NS("Streams") forSegment:VLCLibraryStreamsSegment];
-    [_segmentedTitleControl sizeToFit];
 
     _playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
     _playlistDragDropView.dropTarget = self;
@@ -285,7 +273,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super encodeRestorableStateWithCoder:coder];
-    [coder encodeInteger:_segmentedTitleControl.selectedSegment forKey:@"macosx-library-selected-segment"];
+    [coder encodeInteger:_librarySegmentType forKey:@"macosx-library-selected-segment"];
     [coder encodeInteger:_audioSegmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
 }
 
@@ -384,10 +372,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updateGridVsListViewModeSegmentedControl
 {
-    const VLCLibrarySegmentType selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
-    switch (selectedLibrarySegment) {
+    switch (_librarySegmentType) {
     case VLCLibraryHomeSegment:
         _currentSelectedViewModeSegment = preferences.homeLibraryViewMode;
     case VLCLibraryVideoSegment:
@@ -469,10 +456,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
-    const VLCLibrarySegmentType selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
-    switch (selectedLibrarySegment) {
+    switch (_librarySegmentType) {
     case VLCLibraryHomeSegment:
         preferences.homeLibraryViewMode = _currentSelectedViewModeSegment;
         break;
@@ -791,8 +777,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)goToBrowseSection:(id)sender
 {
-    [_segmentedTitleControl setSelected:YES forSegment:2];
-    [self segmentedTitleControlAction:_segmentedTitleControl];
+    [_navSidebarController selectSegment:VLCLibraryBrowseSegment];
 }
 
 #pragma mark - split view delegation
@@ -1004,7 +989,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self presentVideoView];
 
-    [self.segmentedTitleControl setHidden:YES];
     [self.optionBarView setHidden:YES];
     [self.forwardsNavigationButton setHidden:YES];
     [self.gridVsListSegmentedControl setHidden:YES];
@@ -1033,7 +1017,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setAlphaValue:1.0];
     self.videoViewController.view.hidden = YES;
 
-    [self.segmentedTitleControl setHidden:NO];
     [self.forwardsNavigationButton setHidden:NO];
     [self.gridVsListSegmentedControl setHidden:NO];
     [self.librarySortButton setHidden:NO];

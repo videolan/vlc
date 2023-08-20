@@ -105,7 +105,6 @@
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
 
-    _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
@@ -265,7 +264,7 @@
     VLCLibraryModel *model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger videoCount = model.numberOfVideoMedia;
 
-    if (_segmentedTitleControl.selectedSegment == VLCLibraryVideoSegment &&
+    if (_libraryWindow.librarySegmentType == VLCLibraryVideoSegment &&
         ((videoCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
          (videoCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
         _libraryWindow.videoViewController.view.hidden) {

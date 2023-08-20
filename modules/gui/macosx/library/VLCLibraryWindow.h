@@ -59,6 +59,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
 @property (readwrite, strong) IBOutlet NSOutlineView *navSidebarOutlineView;
@@ -125,7 +126,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSToolbarItem *libraryViewModeToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *sortOrderToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *flexibleSpaceToolbarItem;
-@property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *togglePlaylistToolbarItem;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *splitViewBottomConstraintToBottomBar;
@@ -169,7 +169,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)showAndHidePlaylist:(id)sender;
 - (IBAction)backwardsNavigationAction:(id)sender;
 - (IBAction)forwardsNavigationAction:(id)sender;
-- (IBAction)segmentedTitleControlAction:(id)sender;
 - (IBAction)gridVsListSegmentedControlAction:(id)sender;
 
 @end

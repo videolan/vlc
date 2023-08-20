@@ -25,7 +25,10 @@
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowNavigationSidebarController.h"
+
 #import "library/audio-library/VLCLibraryAudioViewController.h"
+
 #import "main/VLCMain.h"
 
 @implementation VLCLibraryWindowController
@@ -71,10 +74,9 @@
     NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
     NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
 
-    [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
+    [libraryWindow.navSidebarController selectSegment:rememberedSelectedLibrarySegment];
     [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
-    [libraryWindow segmentedTitleControlAction:self];
     if (rememberedSelectedLibrarySegment == VLCLibraryMusicSegment) {
         [libraryWindow.libraryAudioViewController segmentedControlAction:self];
     }
