@@ -46,6 +46,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowNavigationSidebarController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryWindowToolbarDelegate.h"
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
 
@@ -260,6 +261,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self toggleToolbarShown:self];
     [self toggleToolbarShown:self];
 
+    _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
+    self.toolbar.delegate = _toolbarDelegate;
     [self updatePlayqueueToggleState];
 }
 
