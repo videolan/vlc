@@ -22,6 +22,16 @@
 
 #import "VLCLibraryWindowToolbarDelegate.h"
 
+#import "library/VLCLibraryWindow.h"
 @implementation VLCLibraryWindowToolbarDelegate
+
+- (nonnull instancetype)initWithLibraryWindow:(nonnull VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+    if (self) {
+        _libraryWindow = libraryWindow;
+    }
+    return self;
+}
 
 @end
