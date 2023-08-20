@@ -36,17 +36,22 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
 {
     [super viewDidLoad];
 
+    [VLCMain.sharedInstance.libraryWindow.videoViewController.view addObserver:self
+                                                                    forKeyPath:@"hidden"
+                                                                       options:0
+                                                                       context:nil];
+
     self.splitView.wantsLayer = YES;
 
-    NSSplitViewItem * const navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
-    NSSplitViewItem * const libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
-    NSSplitViewItem * const playlistSidebarItem = [NSSplitViewItem sidebarWithViewController:self.playlistSidebarViewController];
+    _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
+    _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
+    _playlistSidebarItem = [NSSplitViewItem sidebarWithViewController:self.playlistSidebarViewController];
 
     if (@available(macOS 11.0, *)) {
-        navSidebarItem.allowsFullHeightLayout = YES;
+        _navSidebarItem.allowsFullHeightLayout = YES;
     }
 
-    self.splitViewItems = @[navSidebarItem, libraryTargetViewItem, playlistSidebarItem];
+    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
 }
 
 - (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
@@ -55,6 +60,19 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     return dividerIndex == VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex ||
            (dividerIndex == VLCLibraryWindowNavigationSidebarSplitViewDividerIndex &&
             !VLCMain.sharedInstance.libraryWindow.videoViewController.view.hidden);
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+
+{
+    if([keyPath isEqualToString:@"hidden"]) {
+        VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+        const BOOL videoViewClosed = libraryWindow.videoViewController.view.hidden;
+        _navSidebarItem.collapsed = !videoViewClosed;
+    }
 }
 
 @end
