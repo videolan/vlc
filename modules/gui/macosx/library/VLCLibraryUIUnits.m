@@ -22,8 +22,17 @@
 
 #import "VLCLibraryUIUnits.h"
 
+#import "extensions/NSWindow+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryWindow.h"
+
+#import "main/VLCMain.h"
+
+#import "views/VLCBottomBarView.h"
+
+#import "windows/mainwindow/VLCControlsBarCommon.h"
 
 @implementation VLCLibraryUIUnits
 
@@ -161,7 +170,10 @@
 
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets
 {
-    return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing,
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    const CGFloat toolbarHeight = libraryWindow.titlebarHeight;
+
+    return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing + toolbarHeight,
                             VLCLibraryUIUnits.mediumSpacing,
                             VLCLibraryUIUnits.mediumSpacing,
                             VLCLibraryUIUnits.mediumSpacing);
@@ -169,8 +181,11 @@
 
 + (const NSEdgeInsets)libraryViewScrollViewScrollerInsets
 {
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    const CGFloat toolbarHeight = libraryWindow.titlebarHeight;
+
     const NSEdgeInsets contentInsets = [self libraryViewScrollViewContentInsets];
-    return NSEdgeInsetsMake(-contentInsets.top,
+    return NSEdgeInsetsMake(-contentInsets.top + toolbarHeight,
                             -contentInsets.left,
                             -contentInsets.bottom,
                             -contentInsets.right);
