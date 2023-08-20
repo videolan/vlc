@@ -1,4 +1,4 @@
-# VLC media player
+# VLC media player by ramesh
 
 **VLC** is a libre and open source **media player** and **multimedia engine**,
 focused on **playing everything**, and **running everywhere**.
