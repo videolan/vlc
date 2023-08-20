@@ -263,6 +263,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
     self.toolbar.delegate = _toolbarDelegate;
+    [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier atIndex:0];
+
     [self updatePlayqueueToggleState];
 }
 

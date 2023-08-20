@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 
+extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
+
 @interface VLCLibraryWindowToolbarDelegate : NSObject<NSToolbarDelegate>
 
 @property (readonly) VLCLibraryWindow *libraryWindow;

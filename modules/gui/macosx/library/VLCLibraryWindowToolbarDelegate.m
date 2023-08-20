@@ -23,6 +23,10 @@
 #import "VLCLibraryWindowToolbarDelegate.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
+
+NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
+
 @implementation VLCLibraryWindowToolbarDelegate
 
 - (nonnull instancetype)initWithLibraryWindow:(nonnull VLCLibraryWindow *)libraryWindow
@@ -32,6 +36,19 @@
         _libraryWindow = libraryWindow;
     }
     return self;
+}
+
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
+     itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier
+ willBeInsertedIntoToolbar:(BOOL)flag
+{
+    if ([itemIdentifier isEqualToString:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier]) {
+        if (@available(macOS 11.0, *)) {
+            return [NSTrackingSeparatorToolbarItem trackingSeparatorToolbarItemWithIdentifier:itemIdentifier splitView:_libraryWindow.mainSplitView dividerIndex:VLCLibraryWindowNavigationSidebarSplitViewDividerIndex];
+        }
+    }
+
+    return nil;
 }
 
 @end
