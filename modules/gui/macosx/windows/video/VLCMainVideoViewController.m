@@ -25,8 +25,9 @@
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
 
@@ -365,9 +366,9 @@
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
+    VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil) {
-        [libraryWindow togglePlaylist];
+        [libraryWindow.splitViewController togglePlaylistSidebar:self];
     }
 }
 

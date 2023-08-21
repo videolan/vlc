@@ -48,6 +48,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowNavigationSidebarController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
@@ -825,26 +826,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else {
         _playQueueToggle.state = NSControlStateValueOff;
     }
-}
-
-- (void)togglePlaylist
-{
-    [_mainSplitView adjustSubviews];
-    CGFloat splitViewWidth = _mainSplitView.frame.size.width;
-    if ([_mainSplitView isSubviewCollapsed:_playlistView]) {
-        [_mainSplitView setPosition:splitViewWidth - _lastPlaylistWidthBeforeCollaps ofDividerAtIndex:0];
-        _playQueueToggle.state = NSControlStateValueOn;
-        self.videoViewController.playlistButton.state = NSControlStateValueOn;
-    } else {
-        [_mainSplitView setPosition:splitViewWidth ofDividerAtIndex:0];
-        _playQueueToggle.state = NSControlStateValueOff;
-        self.videoViewController.playlistButton.state = NSControlStateValueOff;
-    }
-}
-
-- (IBAction)showAndHidePlaylist:(id)sender
-{
-    [self togglePlaylist];
 }
 
 - (IBAction)backwardsNavigationAction:(id)sender

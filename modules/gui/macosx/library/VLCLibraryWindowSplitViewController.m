@@ -57,18 +57,11 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     _navSidebarItem.preferredThicknessFraction = 0.2;
     _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
     _playlistSidebarItem.preferredThicknessFraction = 0.2;
-    _playlistSidebarItem.canCollapse = YES;
     _playlistSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
+    _playlistSidebarItem.canCollapse = YES;
+    _playlistSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
 
     self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
-}
-
-- (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
-{
-    [super splitView:splitView shouldHideDividerAtIndex:dividerIndex];
-    return dividerIndex == VLCLibraryWindowPlaylistSidebarSplitViewDividerIndex ||
-           (dividerIndex == VLCLibraryWindowNavigationSidebarSplitViewDividerIndex &&
-            !VLCMain.sharedInstance.libraryWindow.videoViewController.view.hidden);
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -82,6 +75,16 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
         const BOOL videoViewClosed = libraryWindow.videoViewController.view.hidden;
         _navSidebarItem.collapsed = !videoViewClosed;
     }
+}
+
+- (void)togglePlaylistSidebar:(id)sender
+{
+    const BOOL playlistSidebarCollapsed = self.playlistSidebarItem.isCollapsed;
+    self.playlistSidebarItem.animator.collapsed = !playlistSidebarCollapsed;
+
+    const NSControlStateValue controlState = self.playlistSidebarItem.isCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
+    self.libraryWindow.playQueueToggle.state = controlState;
+    self.libraryWindow.videoViewController.playlistButton.state = controlState;
 }
 
 @end

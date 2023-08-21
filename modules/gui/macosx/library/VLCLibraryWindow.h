@@ -154,7 +154,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 - (void)reopenVideoView;
 - (void)disableVideoPlaybackAppearance;
-- (void)togglePlaylist;
 - (void)hideControlsBar;
 - (void)showControlsBar;
 - (void)updateGridVsListViewModeSegmentedControl;
@@ -169,7 +168,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)sortLibrary:(id)sender;
 - (IBAction)filterLibrary:(id)sender;
 - (IBAction)openMedia:(id)sender;
-- (IBAction)showAndHidePlaylist:(id)sender;
 - (IBAction)backwardsNavigationAction:(id)sender;
 - (IBAction)forwardsNavigationAction:(id)sender;
 - (IBAction)gridVsListSegmentedControlAction:(id)sender;

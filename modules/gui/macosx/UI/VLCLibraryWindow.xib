@@ -719,15 +719,12 @@
                         <button key="view" wantsLayer="YES" verticalHuggingPriority="750" id="IaO-se-D0g">
                             <rect key="frame" x="29" y="14" width="26" height="19"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="26" id="3VZ-cS-NXX"/>
-                            </constraints>
                             <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="music.note.list" catalog="system" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YeZ-La-h4h">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
                             <connections>
-                                <action selector="showAndHidePlaylist:" target="QvC-M9-y7g" id="1LE-KG-zjk"/>
+                                <action selector="togglePlaylistSidebar:" target="Kkr-kI-gpb" id="Xgc-1s-bBZ"/>
                             </connections>
                         </button>
                     </toolbarItem>

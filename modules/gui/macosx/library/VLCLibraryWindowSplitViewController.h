@@ -44,6 +44,8 @@ typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
 @property (readonly) NSSplitViewItem *libraryTargetViewItem;
 @property (readonly) NSSplitViewItem *playlistSidebarItem;
 
+- (IBAction)togglePlaylistSidebar:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END

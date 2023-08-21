@@ -46,15 +46,6 @@
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
     [window setContentMinSize:NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight)];
-
-    // HACK: On initialisation, the window refuses to accept any border resizing. It seems the split view
-    // holds a monopoly on the edges of the window (which can be seen as the right-side of the split view
-    // lets you resize the playlist, and after doing so the window becomes resizeable.
-
-    // This can be worked around by maximizing the window, or toggling the playlist.
-    // Toggling the playlist is simplest.
-    [window togglePlaylist];
-    [window togglePlaylist];
 }
 
 + (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier
