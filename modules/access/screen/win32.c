@@ -134,7 +134,7 @@ int screen_InitCaptureGDI( demux_t *p_demux )
     case 24:
         i_chroma = VLC_CODEC_RGB24; break;
     case 32:
-        i_chroma = VLC_CODEC_RGB32; break;
+        i_chroma = VLC_CODEC_BGRX; break;
     default:
         msg_Err( p_demux, "unknown screen depth %i", i_bits_per_pixel );
         DeleteDC( p_data->hdc_dst );
