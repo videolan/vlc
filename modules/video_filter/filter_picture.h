@@ -91,10 +91,62 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
 }
 
 static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_index,
-                                      int *i_g_index, int *i_b_index )
+                                       int *i_g_index, int *i_b_index, int *i_a_index )
 {
     switch(p_fmt->i_chroma)
     {
+        case VLC_CODEC_RGBA:
+#ifdef WORDS_BIGENDIAN
+            *i_r_index = 0;
+            *i_g_index = 1;
+            *i_b_index = 2;
+            *i_a_index = 3;
+#else
+            *i_r_index = 3;
+            *i_g_index = 2;
+            *i_b_index = 1;
+            *i_a_index = 0;
+#endif
+            break;
+        case VLC_CODEC_ARGB:
+#ifdef WORDS_BIGENDIAN
+            *i_a_index = 0;
+            *i_r_index = 1;
+            *i_g_index = 2;
+            *i_b_index = 3;
+#else
+            *i_a_index = 3;
+            *i_r_index = 2;
+            *i_g_index = 1;
+            *i_b_index = 0;
+#endif
+            break;
+        case VLC_CODEC_BGRA:
+#ifdef WORDS_BIGENDIAN
+            *i_b_index = 0;
+            *i_g_index = 1;
+            *i_r_index = 2;
+            *i_a_index = 3;
+#else
+            *i_b_index = 3;
+            *i_g_index = 2;
+            *i_r_index = 1;
+            *i_a_index = 0;
+#endif
+            break;
+        case VLC_CODEC_ABGR:
+#ifdef WORDS_BIGENDIAN
+            *i_a_index = 0;
+            *i_b_index = 1;
+            *i_g_index = 2;
+            *i_r_index = 3;
+#else
+            *i_a_index = 3;
+            *i_b_index = 2;
+            *i_g_index = 1;
+            *i_r_index = 0;
+#endif
+            break;
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGB24:
 #ifdef WORDS_BIGENDIAN
@@ -109,6 +161,7 @@ static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_ind
             *i_g_index = vlc_ctz(p_fmt->i_gmask) / 8;
             *i_b_index = vlc_ctz(p_fmt->i_bmask) / 8;
 #endif
+            *i_a_index = -1; // unused
             break;
         default:
             return VLC_EGENERIC;

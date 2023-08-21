@@ -262,29 +262,17 @@ private:
     uint8_t *data;
 };
 
-template <unsigned bytes, bool has_alpha>
+template <unsigned bytes>
 class CPictureRGBX : public CPicture {
 public:
     CPictureRGBX(const CPicture &cfg) : CPicture(cfg)
     {
-        if (has_alpha) {
-            if (fmt->i_chroma == VLC_CODEC_BGRA) {
-                offset_r = 2;
-                offset_g = 1;
-                offset_b = 0;
-            } else {
-                offset_r = 0;
-                offset_g = 1;
-                offset_b = 2;
-            }
-            offset_a = 3;
-        } else {
-            if (GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b) != VLC_SUCCESS) {
-                /* at least init to something on error to silence compiler warnings */
-                offset_r = 0;
-                offset_g = 1;
-                offset_b = 2;
-            }
+        if (GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b, &offset_a) != VLC_SUCCESS) {
+            /* at least init to something on error to silence compiler warnings */
+            offset_r = 0;
+            offset_g = 1;
+            offset_b = 2;
+            offset_a = -1;
         }
         data = CPicture::getLine<1>(0);
     }
@@ -294,13 +282,13 @@ public:
         px->i = src[offset_r];
         px->j = src[offset_g];
         px->k = src[offset_b];
-        if (has_alpha)
+        if (offset_a != -1)
             px->a = src[offset_a];
     }
     void merge(unsigned dx, const CPixel &spx, unsigned a, bool)
     {
         uint8_t *dst = getPointer(dx);
-        if (has_alpha) {
+        if (offset_a != -1) {
             // Handle different cases of existing alpha in the
             // destination buffer. If the existing alpha is 0,
             // the RGB components should be copied as is and
@@ -337,7 +325,7 @@ private:
     int offset_r;
     int offset_g;
     int offset_b;
-    unsigned offset_a;
+    int offset_a;
     uint8_t *data;
 };
 
@@ -410,10 +398,10 @@ typedef CPictureYUVPacked<1, 0, 2> CPictureUYVY;
 typedef CPictureYUVPacked<0, 3, 1> CPictureYVYU;
 typedef CPictureYUVPacked<1, 2, 0> CPictureVYUY;
 
-typedef CPictureRGBX<4, true>  CPictureRGBA;
-typedef CPictureRGBX<4, true>  CPictureBGRA;
-typedef CPictureRGBX<4, false> CPictureRGB32;
-typedef CPictureRGBX<3, false> CPictureRGB24;
+typedef CPictureRGBX<4> CPictureRGBA;
+typedef CPictureRGBX<4> CPictureBGRA;
+typedef CPictureRGBX<4> CPictureRGB32;
+typedef CPictureRGBX<3> CPictureRGB24;
 
 struct convertNone {
     convertNone(const video_format_t *, const video_format_t *) {}
