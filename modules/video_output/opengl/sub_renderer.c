@@ -37,9 +37,9 @@
 #include <vlc_arrays.h>
 #include <vlc_es.h>
 #include <vlc_subpicture.h>
+#include <vlc_opengl_interop.h>
 
 #include "gl_util.h"
-#include "interop.h"
 
 typedef struct {
     GLuint   texture;
