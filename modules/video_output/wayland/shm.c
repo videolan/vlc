@@ -336,7 +336,10 @@ static int Open(vout_display_t *vd,
         video_format_ApplyRotation(fmtp, &fmt);
     }
 
-    fmtp->i_chroma = VLC_CODEC_RGB32;
+    fmtp->i_chroma = VLC_CODEC_BGRX;
+    fmtp->i_rmask = 0;
+    fmtp->i_gmask = 0;
+    fmtp->i_bmask = 0;
 
     vd->ops = &ops;
 
