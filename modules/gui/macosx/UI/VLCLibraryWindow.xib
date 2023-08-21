@@ -310,7 +310,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="244-FS-P3T">
-                                                <rect key="frame" x="277" y="-2" width="24" height="25"/>
+                                                <rect key="frame" x="277" y="13" width="24" height="10"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="qG4-YK-N3D"/>
                                                     <constraint firstAttribute="width" constant="24" id="sRU-lh-Frf"/>
@@ -763,7 +763,7 @@
                             </connections>
                         </searchField>
                     </searchToolbarItem>
-                    <toolbarItem implicitItemIdentifier="6FF10B75-9BCD-4E38-BBD1-FC28CD0651F8" label="Back" paletteLabel="Back" image="NSLeftFacingTriangleTemplate" sizingBehavior="auto" navigational="YES" id="6Ie-eu-GDn">
+                    <toolbarItem implicitItemIdentifier="6FF10B75-9BCD-4E38-BBD1-FC28CD0651F8" label="Back" paletteLabel="Back" image="NSLeftFacingTriangleTemplate" sizingBehavior="auto" id="6Ie-eu-GDn">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="Bzq-ZV-i8j">
                             <rect key="frame" x="7" y="14" width="20" height="19"/>
@@ -777,7 +777,7 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="8EEF1426-308A-446D-AD89-6E8C7A2327AB" label="Forward" paletteLabel="Forward" image="NSRightFacingTriangleTemplate" sizingBehavior="auto" navigational="YES" id="g2e-7o-Qet">
+                    <toolbarItem implicitItemIdentifier="8EEF1426-308A-446D-AD89-6E8C7A2327AB" label="Forward" paletteLabel="Forward" image="NSRightFacingTriangleTemplate" sizingBehavior="auto" id="g2e-7o-Qet">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="jzy-je-h2k">
                             <rect key="frame" x="15" y="14" width="20" height="19"/>
@@ -791,7 +791,7 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="9DC0CEB1-0B25-4E16-A29A-80312998F9BD" label="Toggle Navigation Sidebar" paletteLabel="Toggle Navigation Sidebar" image="sidebar.left" catalog="system" bordered="YES" sizingBehavior="auto" navigational="YES" id="5oK-0W-JJh">
+                    <toolbarItem implicitItemIdentifier="9DC0CEB1-0B25-4E16-A29A-80312998F9BD" label="Toggle Navigation Sidebar" paletteLabel="Toggle Navigation Sidebar" image="sidebar.left" catalog="system" bordered="YES" sizingBehavior="auto" id="5oK-0W-JJh">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="wIS-zz-2YE">
                             <rect key="frame" x="59" y="14" width="27" height="17"/>

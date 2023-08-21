@@ -154,7 +154,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
     self.toolbar.delegate = _toolbarDelegate;
     self.toolbar.allowsUserCustomization = NO;
-    [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier atIndex:0];
+
+    if (@available(macOS 11.0, *)) {
+        const NSInteger navSidebarToggleToolbarItemIndex = [self.toolbar.items indexOfObject:self.toggleNavSidebarToolbarItem];
+        NSAssert(navSidebarToggleToolbarItemIndex != NSNotFound, @"Could not find navigation sidebar toggle toolbar item!");
+
+        const NSInteger trackingSeparatorItemIndex = navSidebarToggleToolbarItemIndex + 1;
+        [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier
+                                           atIndex:trackingSeparatorItemIndex];
+        self.trackingSeparatorToolbarItem = [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
+    }
+
 
     VLCMain *mainInstance = VLCMain.sharedInstance;
     _playlistController = [mainInstance playlistController];
@@ -548,8 +558,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
-    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_toggleNavSidebarToolbarItem]];
-    [self insertToolbarItem:_forwardsToolbarItem inFrontOf:@[_backwardsToolbarItem, _toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_trackingSeparatorToolbarItem,
+                                                              _toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:_forwardsToolbarItem inFrontOf:@[_backwardsToolbarItem,
+                                                             _trackingSeparatorToolbarItem,
+                                                             _toggleNavSidebarToolbarItem]];
 }
 
 - (void)setSortOrderToolbarItemVisible:(BOOL)visible
@@ -560,7 +573,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [self insertToolbarItem:_sortOrderToolbarItem
-                  inFrontOf:@[_libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem, _toggleNavSidebarToolbarItem]];
+                  inFrontOf:@[_libraryViewModeToolbarItem,
+                              _forwardsToolbarItem,
+                              _backwardsToolbarItem,
+                              _trackingSeparatorToolbarItem,
+                              _toggleNavSidebarToolbarItem]];
 }
 
 - (void)setLibrarySearchToolbarItemVisible:(BOOL)visible
@@ -978,7 +995,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self clearLibraryFilterString];
 
     // Make sure the back button is visible...
-    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_trackingSeparatorToolbarItem, _toggleNavSidebarToolbarItem]];
     // And repurpose it to hide the video view
     [self.backwardsNavigationButton setEnabled:YES];
 

@@ -123,6 +123,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
 @property (readwrite, weak) IBOutlet NSToolbarItem *toggleNavSidebarToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *trackingSeparatorToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *backwardsToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *forwardsToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *libraryViewModeToolbarItem;
