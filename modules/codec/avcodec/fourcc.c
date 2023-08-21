@@ -594,10 +594,10 @@ bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
 
 vlc_fourcc_t GetVlcFourcc( enum AVCodecID i_ffmpeg_codec )
 {
+    if( i_ffmpeg_codec == AV_CODEC_ID_RAWVIDEO )
+        return VLC_CODEC_UNKNOWN;
     for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
     {
-        if( i_ffmpeg_codec == AV_CODEC_ID_RAWVIDEO )
-            return VLC_CODEC_UNKNOWN;
         if( video_codecs[i].i_codec == i_ffmpeg_codec )
             return video_codecs[i].i_fourcc;
     }
