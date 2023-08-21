@@ -77,7 +77,7 @@ static int Decode (decoder_t *dec, block_t *block)
         case 24:
             switch (ntohl(hdr->bits_per_pixel))
             {
-                case 32: chroma = VLC_CODEC_RGB32; break;
+                case 32: chroma = VLC_CODEC_XRGB; break;
                 case 24: chroma = VLC_CODEC_RGB24; break;
             }
             break;
@@ -126,7 +126,7 @@ static int Open(vlc_object_t *obj)
 
     dec->pf_decode = Decode;
     es_format_Copy(&dec->fmt_out, dec->fmt_in);
-    dec->fmt_out.i_codec = VLC_CODEC_RGB32;
+    dec->fmt_out.i_codec = VLC_CODEC_XRGB;
     return VLC_SUCCESS;
 }
 
