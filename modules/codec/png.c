@@ -428,7 +428,10 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width *
         p_enc->fmt_in.video.i_visible_height;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_RGB24;
+    p_enc->fmt_in.i_codec =
+    p_enc->fmt_in.video.i_chroma =  VLC_CODEC_RGB24;
+    p_enc->fmt_in.video.i_rmask = 0;
+    p_enc->fmt_in.video.i_gmask = 0;
     p_enc->fmt_in.video.i_bmask = 0;
     video_format_FixRgb( &p_enc->fmt_in.video );
 

@@ -1459,6 +1459,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             assert( frame->data[1] != NULL );
             lavc_Frame8PaletteCopy( p_palette, frame->data[1] );
             p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBP;
+            p_dec->fmt_out.video.i_rmask = 0;
+            p_dec->fmt_out.video.i_gmask = 0;
+            p_dec->fmt_out.video.i_bmask = 0;
             if( decoder_UpdateVideoFormat( p_dec ) )
             {
                 vlc_mutex_unlock(&p_sys->lock);

@@ -1000,6 +1000,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     for (chroma_idx = 0; output_chromas[chroma_idx] != 0; chroma_idx++)
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma = output_chromas[chroma_idx];
+        p_dec->fmt_out.video.i_rmask = 0;
+        p_dec->fmt_out.video.i_gmask = 0;
+        p_dec->fmt_out.video.i_bmask = 0;
         result = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
         if (result == 0)
         {

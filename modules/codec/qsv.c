@@ -617,8 +617,11 @@ static int Open(vlc_object_t *this)
     sys->async_depth = sys->params.AsyncDepth;
 
     /* Vlc module configuration */
-    enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
-    enc->fmt_in.video.i_chroma         = VLC_CODEC_NV12;
+    enc->fmt_in.i_codec =
+    enc->fmt_in.video.i_chroma  = VLC_CODEC_NV12; // Intel Media SDK requirement
+    enc->fmt_in.video.i_rmask = 0;
+    enc->fmt_in.video.i_gmask = 0;
+    enc->fmt_in.video.i_bmask = 0;
     enc->fmt_in.video.i_bits_per_pixel = 12;
     // require aligned pictures on input, a filter may be added before the encoder
     enc->fmt_in.video.i_width          = sys->params.mfx.FrameInfo.Width;

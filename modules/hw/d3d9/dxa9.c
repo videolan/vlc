@@ -212,6 +212,9 @@ static filter_t *CreateFilter( filter_t *p_this, const es_format_t *p_fmt_in,
     es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
     es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = dst_chroma;
+    p_filter->fmt_out.video.i_rmask = 0;
+    p_filter->fmt_out.video.i_gmask = 0;
+    p_filter->fmt_out.video.i_bmask = 0;
     p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
 
     if( !p_filter->p_module )
@@ -350,6 +353,7 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
 
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = format;
+    fmt_staging.i_rmask = fmt_staging.i_gmask = fmt_staging.i_bmask = 0;
 
     picture_resource_t dummy_res = { .p_sys = NULL };
     picture_t *p_dst = picture_NewFromResource(&fmt_staging, &dummy_res);

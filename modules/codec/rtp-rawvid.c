@@ -839,6 +839,9 @@ static int Open(vlc_object_t *obj)
     es_format_Copy(&dec->fmt_out, dec->fmt_in);
     dec->fmt_out.i_codec = format->fourcc;
     dec->fmt_out.video.i_chroma = format->fourcc;
+    dec->fmt_out.video.i_rmask = 0;
+    dec->fmt_out.video.i_gmask = 0;
+    dec->fmt_out.video.i_bmask = 0;
 
     int ret = decoder_UpdateVideoFormat(dec);
     if (ret != VLC_SUCCESS)

@@ -354,9 +354,15 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     es_format_t fmt_in = *p_dec->fmt_in;
     if ( !memcmp(&p_block->p_buffer[4], "PNG", 3) ) {
         fmt_in.video.i_chroma = VLC_CODEC_PNG;
+        fmt_in.video.i_rmask = 0;
+        fmt_in.video.i_gmask = 0;
+        fmt_in.video.i_bmask = 0;
     }
     else if ( !memcmp(&p_block->p_buffer[4], "JPEG", 4) ) {
         fmt_in.video.i_chroma = VLC_CODEC_JPEG;
+        fmt_in.video.i_rmask = 0;
+        fmt_in.video.i_gmask = 0;
+        fmt_in.video.i_bmask = 0;
     }
     else {
         char psz_image_type[8+1];
