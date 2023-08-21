@@ -282,7 +282,7 @@
                                         <rect key="frame" x="20" y="16" width="440" height="22"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jg5-33-vH0">
-                                                <rect key="frame" x="0.0" y="-2" width="24" height="24"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="24" id="Cic-j1-unZ"/>
                                                     <constraint firstAttribute="height" constant="24" id="Qin-jg-9yG"/>
@@ -296,7 +296,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8zF-Wo-H79">
-                                                <rect key="frame" x="139" y="-2" width="24" height="24"/>
+                                                <rect key="frame" x="139" y="0.0" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="5EA-By-QRs"/>
                                                     <constraint firstAttribute="width" constant="24" id="Ret-GG-LH3"/>
@@ -324,7 +324,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cih-xp-HmY">
-                                                <rect key="frame" x="416" y="-5" width="24.5" height="32"/>
+                                                <rect key="frame" x="416" y="-3" width="24.5" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="24" id="WSD-xV-QBG"/>
                                                     <constraint firstAttribute="height" constant="24" id="k87-0Q-0AA"/>
@@ -791,13 +791,24 @@
                             </connections>
                         </button>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="9DC0CEB1-0B25-4E16-A29A-80312998F9BD" label="Toggle Navigation Sidebar" paletteLabel="Toggle Navigation Sidebar" image="sidebar.left" catalog="system" bordered="YES" visibilityPriority="1001" sizingBehavior="auto" navigational="YES" id="5oK-0W-JJh">
+                        <nil key="toolTip"/>
+                        <button key="view" verticalHuggingPriority="750" id="wIS-zz-2YE">
+                            <rect key="frame" x="59" y="14" width="27" height="17"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="sidebar.left" catalog="system" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="w8H-4z-Zg6">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <font key="font" metaFont="systemBold" size="12"/>
+                            </buttonCell>
+                        </button>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
+                    <toolbarItem reference="5oK-0W-JJh"/>
                     <toolbarItem reference="6Ie-eu-GDn"/>
                     <toolbarItem reference="g2e-7o-Qet"/>
                     <toolbarItem reference="kBa-MC-Mdq"/>
                     <toolbarItem reference="Tbc-Ik-FaO"/>
-                    <toolbarItem reference="89f-AL-zuU"/>
                     <toolbarItem reference="89f-AL-zuU"/>
                     <searchToolbarItem reference="dv4-Il-y8X"/>
                     <toolbarItem reference="Lf2-ec-tHh"/>
@@ -1878,10 +1889,6 @@
                 <outlet property="view" destination="u8g-jy-S4e" id="Fci-X8-wHU"/>
             </connections>
         </viewController>
-        <toolbarItem implicitItemIdentifier="97090EAA-0A04-42C8-A0EF-26D0A5600BE8" label="Toolbar Item" paletteLabel="Toolbar Item" tag="-1" bordered="YES" id="Fy4-g4-Kd7">
-            <size key="minSize" width="24" height="25"/>
-            <size key="maxSize" width="24" height="25"/>
-        </toolbarItem>
     </objects>
     <resources>
         <image name="NSActionTemplate" width="20" height="20"/>
@@ -1905,6 +1912,7 @@
         <image name="music.note.list" catalog="system" width="16" height="15"/>
         <image name="repeatOff" width="24" height="24"/>
         <image name="shuffleOn" width="24" height="24"/>
+        <image name="sidebar.left" catalog="system" width="18" height="14"/>
         <image name="trash" catalog="system" width="15" height="17"/>
     </resources>
 </document>
