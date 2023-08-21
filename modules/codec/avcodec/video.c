@@ -198,7 +198,10 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
          * are waiting for a valid palette. Indeed, fmt_out.video.p_palette
          * doesn't trigger a new vout request, but a new chroma yes. */
         if (pix_fmt == AV_PIX_FMT_PAL8 && !dec->fmt_out.video.p_palette)
+        {
             fmt->i_chroma = VLC_CODEC_RGB32;
+            video_format_FixRgb( fmt );
+        }
 
         avcodec_align_dimensions2(ctx, &width, &height, aligns);
     }
