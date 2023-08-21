@@ -40,7 +40,6 @@
 
 #include "gl_util.h"
 #include "interop.h"
-#include "vout_helper.h"
 
 typedef struct {
     GLuint   texture;
