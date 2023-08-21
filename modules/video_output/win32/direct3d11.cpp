@@ -324,7 +324,10 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
         texture_fmt.i_width  = sys->picQuad.generic.i_width;
         texture_fmt.i_height = sys->picQuad.generic.i_height;
         if (!is_d3d11_opaque(fmt->i_chroma))
+        {
             texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
+            DxgiFormatMask(sys->picQuad.generic.textureFormat->formatTexture, &texture_fmt);
+        }
 
         if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt,
                              false, textures, sys->stagingPlanes))
@@ -829,7 +832,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
     if (!is_d3d11_opaque(fmt.i_chroma))
+    {
         sys->picQuad.quad_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
+        DxgiFormatMask(sys->picQuad.generic.textureFormat->formatTexture, &sys->picQuad.quad_fmt);
+    }
 
     /* adjust the decoder sizes to have proper padding */
     if ( sys->picQuad.generic.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
