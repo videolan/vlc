@@ -86,6 +86,10 @@ static const struct
     { VLC_CODEC_I420, PlanarI420Sepia },
     { VLC_CODEC_RGB24, RVSepia },
     { VLC_CODEC_RGB32, RVSepia },
+    { VLC_CODEC_BGRA, RVSepia },
+    { VLC_CODEC_RGBA, RVSepia },
+    { VLC_CODEC_ARGB, RVSepia },
+    { VLC_CODEC_ABGR, RVSepia },
     { VLC_CODEC_UYVY, PackedYUVSepia },
     { VLC_CODEC_VYUY, PackedYUVSepia },
     { VLC_CODEC_YUYV, PackedYUVSepia },
@@ -437,12 +441,16 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
             p_out[i_rindex] = vlc_uint8(i_y + r_intensity);
             p_out[i_gindex] = vlc_uint8(i_y + g_intensity);
             p_out[i_bindex] = vlc_uint8(i_y + b_intensity);
-            p_in += 3;
-            p_out += 3;
             /* for rv32 we take 4 chunks at the time */
             if (b_isRV32) {
-            /* alpha channel stays the same */
-            *p_out++ = *p_in++;
+                if (i_aindex != -1)
+                    /* alpha channel stays the same */
+                    p_out[i_aindex] = p_in[i_aindex];
+                p_in += 4;
+                p_out += 4;
+            } else {
+                p_in += 3;
+                p_out += 3;
             }
         }
 
