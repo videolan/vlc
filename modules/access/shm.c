@@ -152,7 +152,7 @@ static int Open (vlc_object_t *obj)
     switch (var_InheritInteger (demux, "shm-depth"))
     {
         case 32:
-            chroma = VLC_CODEC_RGB32; bpp = 32;
+            chroma = VLC_CODEC_XRGB; bpp = 32;
             break;
         case 24:
             chroma = VLC_CODEC_RGB24; bpp = 24;
