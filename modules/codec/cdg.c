@@ -110,14 +110,15 @@ static int Open( vlc_object_t *p_this )
 
     /* Set output properties
      * TODO maybe it would be better to use RV16 or RV24 ? */
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
+    p_dec->fmt_out.i_codec =
+    p_dec->fmt_out.video.i_chroma = VLC_CODEC_XBGR;
     p_dec->fmt_out.video.i_width = CDG_DISPLAY_WIDTH;
     p_dec->fmt_out.video.i_height = CDG_DISPLAY_HEIGHT;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
-    p_dec->fmt_out.video.i_rmask = 0xff << CDG_COLOR_R_SHIFT;
-    p_dec->fmt_out.video.i_gmask = 0xff << CDG_COLOR_G_SHIFT;
-    p_dec->fmt_out.video.i_bmask = 0xff << CDG_COLOR_B_SHIFT;
+    p_dec->fmt_out.video.i_rmask = 0;
+    p_dec->fmt_out.video.i_gmask = 0;
+    p_dec->fmt_out.video.i_bmask = 0;
 
     /* Set callbacks */
     p_dec->pf_decode = Decode;
