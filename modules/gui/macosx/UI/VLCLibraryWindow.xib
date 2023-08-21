@@ -1874,6 +1874,7 @@
         <viewController id="Kkr-kI-gpb" customClass="VLCLibraryWindowSplitViewController">
             <connections>
                 <outlet property="libraryTargetViewController" destination="DOd-Va-C3u" id="DXT-Ps-hGl"/>
+                <outlet property="libraryWindow" destination="QvC-M9-y7g" id="wFD-Rc-i8w"/>
                 <outlet property="navSidebarViewController" destination="RvP-q1-YBn" id="egg-pP-2iD"/>
                 <outlet property="playlistSidebarViewController" destination="wmX-6v-aru" id="rR2-CG-huN"/>
                 <outlet property="splitView" destination="u8g-jy-S4e" id="xzl-7u-6nR"/>
