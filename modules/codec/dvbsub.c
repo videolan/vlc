@@ -2273,7 +2273,8 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
             bs_write( s, 2, 1 );
             break;
         default:
-            msg_Err( p_enc, "FOURCC %d not supported by encoder.", p_region->fmt.i_chroma );
+            msg_Err( p_enc, "FOURCC %4.4s not supported by encoder.",
+                     (const char*)&p_region->fmt.i_chroma );
             continue;
         }
 
