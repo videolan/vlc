@@ -344,26 +344,102 @@ vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
     vt->ActiveTexture(GL_TEXTURE0 + 0);
     for (unsigned i = 0; i < sr->region_count; i++) {
         gl_region_t *glr = &sr->regions[i];
-        const GLfloat vertexCoord[] = {
-            glr->left,  glr->top,
-            glr->left,  glr->bottom,
-            glr->right, glr->top,
-            glr->right, glr->bottom,
-        };
-        const GLfloat textureCoord[] = {
+
+        GLfloat textureCoordNormal[] = {
             0.0, 0.0,
             0.0, glr->tex_height,
             glr->tex_width, 0.0,
             glr->tex_width, glr->tex_height,
         };
 
-        assert(glr->texture != 0);
+        const GLfloat textureCoord90[] = {
+            0.0, glr->tex_height,
+            glr->tex_width, glr->tex_height,
+            0.0, 0.0,
+            glr->tex_width, 0.0,
+        };
+
+        GLfloat left, right, top, bottom;
+        const GLfloat *textureCoord;
+        switch (sr->gl->orientation)
+        {
+            case ORIENT_TOP_LEFT:
+            case ORIENT_TOP_RIGHT:
+                left = glr->left;
+                right = glr->right;
+                top = glr->top;
+                bottom = glr->bottom;
+                textureCoord = textureCoordNormal;
+                break;
+
+            case ORIENT_LEFT_TOP:
+            case ORIENT_LEFT_BOTTOM:
+                left = glr->bottom;
+                right = glr->top;
+                top = -glr->left;
+                bottom = -glr->right;
+                textureCoord = textureCoord90;
+                break;
+
+            case ORIENT_BOTTOM_LEFT:
+            case ORIENT_BOTTOM_RIGHT:
+                left = -glr->left;
+                right = -glr->right;
+                top = -glr->top;
+                bottom = -glr->bottom;
+                textureCoord = textureCoordNormal;
+                break;
+
+            case ORIENT_RIGHT_TOP:
+            case ORIENT_RIGHT_BOTTOM:
+                left = - glr->bottom;
+                right = - glr->top;
+                top = glr->left;
+                bottom = glr->right;
+                textureCoord = textureCoord90;
+                break;
+            default:
+                vlc_assert_unreachable();
+        }
+
+        if (ORIENT_IS_MIRROR(sr->gl->orientation))
+        {
+            switch (sr->gl->orientation)
+            {
+                case ORIENT_TOP_RIGHT:
+                case ORIENT_BOTTOM_LEFT:
+                    left  = -left;
+                    right = -right;
+                    break;
+
+                case ORIENT_LEFT_TOP:
+                case ORIENT_RIGHT_BOTTOM:
+                    top    = -top;
+                    bottom = -bottom;
+                    break;
+
+                default:
+                    vlc_assert_unreachable();
+            }
+        }
+
+
+        const GLfloat vertexCoord[] = {
+            left,  top,
+            left,  bottom,
+            right, top,
+            right, bottom,
+        };
+
+                assert(glr->texture != 0);
         vt->BindTexture(interop->tex_target, glr->texture);
 
         vt->Uniform1f(sr->uloc.alpha, glr->alpha);
 
         vt->BindBuffer(GL_ARRAY_BUFFER, sr->buffer_objects[2 * i]);
-        vt->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
+        static_assert(sizeof(textureCoordNormal) == sizeof(textureCoord90),
+                      "textureCoordNormal != textureCoord90");
+        vt->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoordNormal), textureCoord, GL_STATIC_DRAW);
         vt->EnableVertexAttribArray(sr->aloc.tex_coords_in);
         vt->VertexAttribPointer(sr->aloc.tex_coords_in, 2, GL_FLOAT, 0, 0, 0);
 
