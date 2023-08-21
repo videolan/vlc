@@ -548,8 +548,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
-    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[]];
-    [self insertToolbarItem:_forwardsToolbarItem inFrontOf:@[_backwardsToolbarItem]];
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:_forwardsToolbarItem inFrontOf:@[_backwardsToolbarItem, _toggleNavSidebarToolbarItem]];
 }
 
 - (void)setSortOrderToolbarItemVisible:(BOOL)visible
@@ -560,7 +560,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [self insertToolbarItem:_sortOrderToolbarItem
-                  inFrontOf:@[_libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem]];
+                  inFrontOf:@[_libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem, _toggleNavSidebarToolbarItem]];
 }
 
 - (void)setLibrarySearchToolbarItemVisible:(BOOL)visible
@@ -978,7 +978,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self clearLibraryFilterString];
 
     // Make sure the back button is visible...
-    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[]];
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[_toggleNavSidebarToolbarItem]];
     // And repurpose it to hide the video view
     [self.backwardsNavigationButton setEnabled:YES];
 

@@ -791,7 +791,7 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="9DC0CEB1-0B25-4E16-A29A-80312998F9BD" label="Toggle Navigation Sidebar" paletteLabel="Toggle Navigation Sidebar" image="sidebar.left" catalog="system" bordered="YES" visibilityPriority="1001" sizingBehavior="auto" navigational="YES" id="5oK-0W-JJh">
+                    <toolbarItem implicitItemIdentifier="9DC0CEB1-0B25-4E16-A29A-80312998F9BD" label="Toggle Navigation Sidebar" paletteLabel="Toggle Navigation Sidebar" image="sidebar.left" catalog="system" bordered="YES" sizingBehavior="auto" navigational="YES" id="5oK-0W-JJh">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="wIS-zz-2YE">
                             <rect key="frame" x="59" y="14" width="27" height="17"/>
@@ -882,6 +882,8 @@
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>
                 <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="098-yp-97f"/>
                 <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
+                <outlet property="splitViewBottomConstraintToSuperView" destination="DQQ-ji-YSy" id="b0t-C0-5uP"/>
+                <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="To1-7k-AJF"/>
                 <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="gtf-cd-765"/>
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
