@@ -93,19 +93,26 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
 static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_index,
                                       int *i_g_index, int *i_b_index )
 {
-    if( p_fmt->i_chroma != VLC_CODEC_RGB24 && p_fmt->i_chroma != VLC_CODEC_RGB32 )
-        return VLC_EGENERIC;
-
+    switch(p_fmt->i_chroma)
+    {
+        case VLC_CODEC_RGB32:
+        case VLC_CODEC_RGB24:
 #ifdef WORDS_BIGENDIAN
-    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 16 : 24;
-    *i_r_index = (i_mask_bits - vlc_ctz(p_fmt->i_rmask)) / 8;
-    *i_g_index = (i_mask_bits - vlc_ctz(p_fmt->i_gmask)) / 8;
-    *i_b_index = (i_mask_bits - vlc_ctz(p_fmt->i_bmask)) / 8;
+        {
+            const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 16 : 24;
+            *i_r_index = (i_mask_bits - vlc_ctz(p_fmt->i_rmask)) / 8;
+            *i_g_index = (i_mask_bits - vlc_ctz(p_fmt->i_gmask)) / 8;
+            *i_b_index = (i_mask_bits - vlc_ctz(p_fmt->i_bmask)) / 8;
+        }
 #else
-    *i_r_index = vlc_ctz(p_fmt->i_rmask) / 8;
-    *i_g_index = vlc_ctz(p_fmt->i_gmask) / 8;
-    *i_b_index = vlc_ctz(p_fmt->i_bmask) / 8;
+            *i_r_index = vlc_ctz(p_fmt->i_rmask) / 8;
+            *i_g_index = vlc_ctz(p_fmt->i_gmask) / 8;
+            *i_b_index = vlc_ctz(p_fmt->i_bmask) / 8;
 #endif
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
