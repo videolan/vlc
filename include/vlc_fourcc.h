@@ -356,6 +356,15 @@
 /* 24-bit RGB padded to 32 bits (using explicit masks) */
 #define VLC_CODEC_RGB32           VLC_FOURCC('R','V','3','2')
 
+/* 32-bit RGB, in memory address order: "XRGB" ignoring the x component */
+#define VLC_CODEC_XRGB            VLC_FOURCC('X','R','G','B')
+/* 32-bit RGB, in memory address order: "RGBX" ignoring the x component */
+#define VLC_CODEC_RGBX            VLC_FOURCC('R','G','B','X')
+/* 32-bit BGR, in memory address order: "BGRX" ignoring the x component */
+#define VLC_CODEC_BGRX            VLC_FOURCC('B','G','R','X')
+/* 32-bit BGR, in memory address order: "XBGR" ignoring the x component */
+#define VLC_CODEC_XBGR            VLC_FOURCC('X','B','G','R')
+
 /* 32-bit RGBA, in memory address order: "RGBA" */
 #define VLC_CODEC_RGBA            VLC_FOURCC('R','G','B','A')
 /* 32-bit ARGB, in memory address order: "ARGB" */
