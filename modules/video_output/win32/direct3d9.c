@@ -1341,7 +1341,7 @@ static const d3d9_format_t d3d_formats[] = {
     { "DXA9_10_444", MAKEFOURCC('Y','4','1','0'),   VLC_CODEC_D3D9_OPAQUE_10B, 0,0,0 },
     { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY,  0,0,0 },
     { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV,  0,0,0 },
-    { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_RGB32, 0xff0000, 0x00ff00, 0x0000ff },
+    { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_BGRX,  0,0,0 },
     { "A8R8G8B8",   D3DFMT_A8R8G8B8,VLC_CODEC_BGRA,  0,0,0 },
     { "8G8B8",      D3DFMT_R8G8B8,  VLC_CODEC_RGB24, 0xff0000, 0x00ff00, 0x0000ff },
     { "R5G6B5",     D3DFMT_R5G6B5,  VLC_CODEC_RGB16, 0x1f<<11, 0x3f<<5,  0x1f<<0 },
