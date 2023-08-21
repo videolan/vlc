@@ -72,6 +72,50 @@ void video_format_FixRgb( video_format_t *p_fmt )
             return;
         }
     }
+
+    // turn known masks into proper chromas
+    if ( p_fmt->i_chroma == VLC_CODEC_RGB32 )
+    {
+        if ( p_fmt->i_rmask == 0x00ff0000 &&
+             p_fmt->i_gmask == 0x0000ff00 &&
+             p_fmt->i_bmask == 0x000000ff )
+        {
+            p_fmt->i_chroma = VLC_CODEC_XRGB;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+        else
+        if ( p_fmt->i_rmask == 0x000000ff &&
+             p_fmt->i_gmask == 0x0000ff00 &&
+             p_fmt->i_bmask == 0x00ff0000 )
+        {
+            p_fmt->i_chroma = VLC_CODEC_XBGR;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+        else
+        if ( p_fmt->i_rmask == 0xff000000 &&
+             p_fmt->i_gmask == 0x00ff0000 &&
+             p_fmt->i_bmask == 0x0000ff00 )
+        {
+            p_fmt->i_chroma = VLC_CODEC_RGBX;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+        else
+        if ( p_fmt->i_rmask == 0x0000ff00 &&
+             p_fmt->i_gmask == 0x00ff0000 &&
+             p_fmt->i_bmask == 0xff000000 )
+        {
+            p_fmt->i_chroma = VLC_CODEC_BGRX;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+    }
 }
 
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
