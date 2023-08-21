@@ -1,5 +1,5 @@
 /*****************************************************************************
- * opengl.c: test for the OpenGL client code
+ * filters.c: test for the OpenGL filter client code
  *****************************************************************************
  * Copyright (C) 2023 VideoLabs
  *
