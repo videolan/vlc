@@ -56,11 +56,15 @@ check_PROGRAMS = \
 	$(NULL)
 
 if HAVE_GL
-check_PROGRAMS += test_modules_video_output_opengl_filters
+check_PROGRAMS += \
+	test_modules_video_output_opengl_filters \
+	test_modules_video_output_opengl_sub_renderer
 endif
 
 if HAVE_GLES2
-check_PROGRAMS += test_modules_video_output_opengl_es2_filters
+check_PROGRAMS += \
+	test_modules_video_output_opengl_es2_filters \
+	test_modules_video_output_opengl_es2_sub_renderer
 endif
 
 if HAVE_DARWIN
@@ -247,6 +251,23 @@ test_modules_video_output_opengl_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OP
 test_modules_video_output_opengl_es2_filters_SOURCES = $(test_modules_video_output_opengl_filters_SOURCES)
 test_modules_video_output_opengl_es2_filters_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_video_output_opengl_es2_filters_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
+
+test_modules_video_output_opengl_sub_renderer_SOURCES = \
+	modules/video_output/opengl/sub_renderer.c \
+	../modules/video_output/opengl/sub_renderer.c \
+	../modules/video_output/opengl/sub_renderer.h \
+	../modules/video_output/opengl/filter.c \
+	../modules/video_output/opengl/gl_api.c \
+	../modules/video_output/opengl/gl_api.h \
+	../modules/video_output/opengl/gl_util.c \
+	../modules/video_output/opengl/gl_util.h \
+	../modules/video_output/opengl/interop.c \
+	../modules/video_output/opengl/interop.h
+test_modules_video_output_opengl_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS)
+test_modules_video_output_opengl_sub_renderer_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL
+test_modules_video_output_opengl_es2_sub_renderer_SOURCES = $(test_modules_video_output_opengl_sub_renderer_SOURCES)
+test_modules_video_output_opengl_es2_sub_renderer_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBPLACEBO_LIBS)
+test_modules_video_output_opengl_es2_sub_renderer_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_TEST_OPENGL_API=VLC_OPENGL_ES2
 
 test_modules_stream_out_transcode_SOURCES = \
 	modules/stream_out/transcode.c \
