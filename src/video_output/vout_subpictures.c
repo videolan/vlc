@@ -75,7 +75,7 @@ struct spu_channel {
 
 typedef struct VLC_VECTOR(struct spu_channel) spu_channel_vector;
 typedef struct VLC_VECTOR(subpicture_t *) spu_prerender_vector;
-#define SPU_CHROMALIST_COUNT 8
+#define SPU_CHROMALIST_COUNT 10
 
 struct spu_private_t {
     vlc_mutex_t  lock;            /* lock to protect all following fields */
