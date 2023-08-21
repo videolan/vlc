@@ -125,15 +125,12 @@ int screen_InitCapture(demux_t *p_demux)
     }
 
     /* setup format */
-    es_format_Init(&p_sys->fmt, VIDEO_ES, VLC_CODEC_RGB32);
+    es_format_Init(&p_sys->fmt, VIDEO_ES, VLC_CODEC_XRGB);
     p_sys->fmt.video.i_visible_width   =
     p_sys->fmt.video.i_width           = rect.size.width;
     p_sys->fmt.video.i_visible_height  =
     p_sys->fmt.video.i_height          = rect.size.height;
-    p_sys->fmt.video.i_chroma          = VLC_CODEC_RGB32;
-    p_sys->fmt.video.i_rmask           = 0x00ff0000;
-    p_sys->fmt.video.i_gmask           = 0x0000ff00;
-    p_sys->fmt.video.i_bmask           = 0x000000ff;
+    p_sys->fmt.video.i_chroma          = VLC_CODEC_XRGB;
     p_sys->fmt.video.i_sar_num         =
     p_sys->fmt.video.i_sar_den         = 1;
     p_sys->fmt.video.i_frame_rate      = 1000 * p_data->rate;
