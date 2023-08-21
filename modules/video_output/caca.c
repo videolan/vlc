@@ -139,9 +139,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                                             vd->source->i_visible_width,
                                             vd->source->i_visible_height,
                                             picture->p[0].i_pitch,
-                                            picture->format.i_rmask,
-                                            picture->format.i_gmask,
-                                            picture->format.i_bmask,
+                                            0x00ff0000,
+                                            0x0000ff00,
+                                            0x000000ff,
                                             0x00000000);
 
         if (!sys->dither) {
@@ -487,13 +487,8 @@ static int Open(vout_display_t *vd,
     sys->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(vd, "mouse-hide-timeout") );
     sys->cursor_deadline = INVALID_DEADLINE;
 
-    /* Fix format */
-    if (fmtp->i_chroma != VLC_CODEC_RGB32) {
-        fmtp->i_chroma = VLC_CODEC_RGB32;
-        fmtp->i_rmask = 0x00ff0000;
-        fmtp->i_gmask = 0x0000ff00;
-        fmtp->i_bmask = 0x000000ff;
-    }
+    fmtp->i_chroma = VLC_CODEC_XRGB;
+    fmtp->i_rmask = fmtp->i_gmask = fmtp->i_bmask = 0;
 
     /* Setup vout_display now that everything is fine */
     vd->ops = &ops;
