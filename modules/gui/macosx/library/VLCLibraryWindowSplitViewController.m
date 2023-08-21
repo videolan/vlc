@@ -77,7 +77,13 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     }
 }
 
-- (void)togglePlaylistSidebar:(id)sender
+- (IBAction)toggleNavigationSidebar:(id)sender
+{
+    const BOOL navigationSidebarCollapsed = self.navSidebarItem.isCollapsed;
+    self.navSidebarItem.animator.collapsed = !navigationSidebarCollapsed;
+}
+
+- (IBAction)togglePlaylistSidebar:(id)sender
 {
     const BOOL playlistSidebarCollapsed = self.playlistSidebarItem.isCollapsed;
     self.playlistSidebarItem.animator.collapsed = !playlistSidebarCollapsed;

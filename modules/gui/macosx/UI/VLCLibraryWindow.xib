@@ -282,7 +282,7 @@
                                         <rect key="frame" x="20" y="16" width="440" height="22"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jg5-33-vH0">
-                                                <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
+                                                <rect key="frame" x="0.0" y="-2" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="24" id="Cic-j1-unZ"/>
                                                     <constraint firstAttribute="height" constant="24" id="Qin-jg-9yG"/>
@@ -296,7 +296,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8zF-Wo-H79">
-                                                <rect key="frame" x="139" y="0.0" width="24" height="24"/>
+                                                <rect key="frame" x="139" y="-2" width="24" height="24"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="5EA-By-QRs"/>
                                                     <constraint firstAttribute="width" constant="24" id="Ret-GG-LH3"/>
@@ -310,7 +310,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="244-FS-P3T">
-                                                <rect key="frame" x="277" y="13" width="24" height="10"/>
+                                                <rect key="frame" x="277" y="-2" width="24" height="25"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="24" id="qG4-YK-N3D"/>
                                                     <constraint firstAttribute="width" constant="24" id="sRU-lh-Frf"/>
@@ -324,7 +324,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cih-xp-HmY">
-                                                <rect key="frame" x="416" y="-3" width="24.5" height="32"/>
+                                                <rect key="frame" x="416" y="-5" width="24.5" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="24" id="WSD-xV-QBG"/>
                                                     <constraint firstAttribute="height" constant="24" id="k87-0Q-0AA"/>
@@ -797,9 +797,12 @@
                             <rect key="frame" x="59" y="14" width="27" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="sidebar.left" catalog="system" imagePosition="only" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="w8H-4z-Zg6">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
+                            <connections>
+                                <action selector="toggleNavigationSidebar:" target="Kkr-kI-gpb" id="zWd-wa-UkO"/>
+                            </connections>
                         </button>
                     </toolbarItem>
                 </allowedToolbarItems>
