@@ -660,6 +660,7 @@ ConfigureVideoTrack(demux_t *demux,
 
     fmt->i_codec = chroma;
     fmt->video.i_chroma = chroma;
+    video_format_FixRgb( &fmt->video );
     fmt->video.i_width = fmt->video.i_visible_width = options->width;
     fmt->video.i_height = fmt->video.i_visible_height = options->height;
     fmt->video.i_frame_rate = options->frame_rate;
