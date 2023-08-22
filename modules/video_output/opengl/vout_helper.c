@@ -294,7 +294,7 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
         return VLC_EGENERIC;
     }
 
-    if (in_fmt.i_chroma != fmt->i_chroma)
+    if ( !video_format_IsSameChroma( &in_fmt, fmt ) )
     {
         msg_Warn(gl, "Could not update format, the interop changed the "
                      "requested chroma from %4.4s to %4.4s\n",
