@@ -244,7 +244,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
 
 static int ActivateConverter( filter_t *p_filter )
 {
-    const bool b_chroma = p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma;
+    const bool b_chroma = !video_format_IsSameChroma( &p_filter->fmt_in.video, &p_filter->fmt_out.video);
     const bool b_resize = p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
                           p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;
 
