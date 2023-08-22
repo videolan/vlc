@@ -537,7 +537,7 @@ filter_chain_t * VideoDecodedStream::VideoFilterCreate(const es_format_t *p_srcf
         return NULL;
     filter_chain_Reset(p_chain, p_srcfmt, vctx, &requestedoutput);
 
-    if(p_srcfmt->video.i_chroma != requestedoutput.video.i_chroma)
+    if(!video_format_IsSameChroma( &p_srcfmt->video, &requestedoutput.video))
     {
         if(filter_chain_AppendConverter(p_chain, &requestedoutput) != VLC_SUCCESS)
         {
