@@ -122,7 +122,8 @@ static int OpenPostproc( filter_t *p_filter )
     const char *desc;
     int i_flags = PP_CPU_CAPS_AUTO;
 
-    if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma ||
+    if( !video_format_IsSameChroma( &p_filter->fmt_in.video,
+                                    &p_filter->fmt_out.video ) ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
         p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width )
     {

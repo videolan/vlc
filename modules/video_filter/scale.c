@@ -62,7 +62,8 @@ static int OpenFilter( filter_t *p_filter )
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRA &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_ABGR ) ||
-        p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
+        !video_format_IsSameChroma( &p_filter->fmt_in.video,
+                                    &p_filter->fmt_out.video ) )
     {
         return VLC_EGENERIC;
     }

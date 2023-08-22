@@ -165,7 +165,8 @@ static int Open( filter_t *p_filter )
     filter_sys_t *p_sys;
 
     /* This filter cannot change the format. */
-    if( p_filter->fmt_out.video.i_chroma != p_filter->fmt_in.video.i_chroma )
+    if( !video_format_IsSameChroma( &p_filter->fmt_in.video,
+                                    &p_filter->fmt_out.video ) )
         return VLC_EGENERIC;
 
     p_sys = p_filter->p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( *p_sys ) );

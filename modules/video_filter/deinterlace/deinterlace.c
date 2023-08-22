@@ -620,7 +620,7 @@ notsupp:
     free( psz_mode );
 
     if( !p_filter->b_allow_fmt_out_change &&
-        ( fmt.i_chroma != p_filter->fmt_in.video.i_chroma ||
+        ( !video_format_IsSameChroma( &fmt, &p_filter->fmt_in.video ) ||
           fmt.i_height != p_filter->fmt_in.video.i_height ) )
     {
         Close( p_filter );
