@@ -504,8 +504,8 @@ static bool DecodePageHeaderPacket( decoder_t *p_dec, const uint8_t *packet,
     /* replace the row if it's different */
     if ( strcmp(psz_line, p_sys->ppsz_lines[0]) )
     {
-        strncpy( p_sys->ppsz_lines[0], psz_line,
-                 sizeof(p_sys->ppsz_lines[0]) - 1);
+        strlcpy( p_sys->ppsz_lines[0], psz_line,
+                 sizeof(p_sys->ppsz_lines[0]) );
     }
 
     return true;
@@ -538,8 +538,8 @@ static bool DecodePacketX1_X23( decoder_t *p_dec, const uint8_t *packet,
     /* replace the row if it's different */
     if ( strcmp( t, p_sys->ppsz_lines[row] ) )
     {
-        strncpy( p_sys->ppsz_lines[row], t,
-                 sizeof(p_sys->ppsz_lines[row]) - 1 );
+        strlcpy( p_sys->ppsz_lines[row], t,
+                 sizeof(p_sys->ppsz_lines[row]) );
         b_update = true;
     }
 
@@ -586,8 +586,8 @@ static bool DecodePacketX25( decoder_t *p_dec, const uint8_t *packet,
     /* replace the row if it's different */
     if ( strcmp( psz_line, p_sys->ppsz_lines[0] ) )
     {
-        strncpy( p_sys->ppsz_lines[0], psz_line,
-                 sizeof(p_sys->ppsz_lines[0]) - 1 );
+        strlcpy( p_sys->ppsz_lines[0], psz_line,
+                 sizeof(p_sys->ppsz_lines[0]) );
         /* return true; */
     }
 
