@@ -325,6 +325,11 @@ static void to_utf8( char * res, uint16_t ch )
     }
 }
 
+/**
+ * Decode a packet, potentially decoding strings from utc-2 to utf-8.
+ *
+ * Decoding a packet of size \p len will write at most `len * 3 + 1`.
+ */
 static void decode_string( char * res, int res_len,
                            decoder_sys_t *p_sys, int magazine,
                            const uint8_t * packet, int len )
@@ -410,6 +415,7 @@ static void decode_string( char * res, int res_len,
         /* convert to utf-8 */
         to_utf8( utf8, out );
         l = strlen( utf8 );
+        assert(l < 4);
         if ( pt + l < res + res_len - 1 )
         {
             strcpy(pt, utf8);
@@ -428,7 +434,6 @@ static bool DecodePageHeaderPacket( decoder_t *p_dec, const uint8_t *packet,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     int flag = 0;
-    char psz_line[256];
 
     for ( int a = 0; a < 6; a++ )
     {
@@ -442,6 +447,7 @@ static bool DecodePageHeaderPacket( decoder_t *p_dec, const uint8_t *packet,
     p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) | /* tens */
                               (0x0F & (bytereverse( hamming_8_4(packet[6]) ) >> 4) ); /* units */
 
+    char psz_line[(40 - 14) * 3 + 1];
     decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
                    packet + 14, 40 - 14 );
 
@@ -511,13 +517,13 @@ static bool DecodePacketX1_X23( decoder_t *p_dec, const uint8_t *packet,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     bool b_update = false;
-    char psz_line[256];
     char * t;
     int i;
 
     if ( p_sys->i_wanted_page == -1 && p_sys->i_page[magazine] > 0x99)
         return false;
 
+    char psz_line[40 * 3 + 1];
     decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
                    packet + 6, 40 );
     t = psz_line;
@@ -573,7 +579,7 @@ static bool DecodePacketX25( decoder_t *p_dec, const uint8_t *packet,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* row 25 : alternate header line */
-    char psz_line[256];
+    char psz_line[40 * 3 + 1];
     decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
                    packet + 6, 40 );
 
