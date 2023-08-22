@@ -410,6 +410,14 @@ struct convertNone {
     }
 };
 
+struct convertAddOpaque {
+    convertAddOpaque(const video_format_t *, const video_format_t *) {}
+    void operator()(CPixel &p)
+    {
+        p.a = 0xFF;
+    }
+};
+
 template <unsigned dst, unsigned src>
 struct convertBits {
     convertBits(const video_format_t *, const video_format_t *) {}
@@ -574,6 +582,10 @@ static const struct {
     RGB(VLC_CODEC_ARGB,     CPictureRGBA,     convertNone),
     RGB(VLC_CODEC_BGRA,     CPictureBGRA,     convertNone),
     RGB(VLC_CODEC_ABGR,     CPictureBGRA,     convertNone),
+    RGB(VLC_CODEC_RGBX,     CPictureRGB32,    convertAddOpaque),
+    RGB(VLC_CODEC_XRGB,     CPictureRGB32,    convertAddOpaque),
+    RGB(VLC_CODEC_BGRX,     CPictureRGB32,    convertAddOpaque),
+    RGB(VLC_CODEC_XBGR,     CPictureRGB32,    convertAddOpaque),
 
     YUV(VLC_CODEC_YV9,      CPictureYV9,      convertNone),
     YUV(VLC_CODEC_I410,     CPictureI410_8,   convertNone),
