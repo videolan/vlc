@@ -22,6 +22,9 @@ case "$HOST" in
 	powerpc64-*|ppc64-*)
 		ARCH="ppc64"
 		;;
+	powerpc64le-*|ppc64le-*)
+		ARCH="ppc64le"
+		;;
 	*-*)
 		ARCH="${HOST%%-*}"
 		;;

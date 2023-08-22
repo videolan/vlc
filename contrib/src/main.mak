@@ -202,7 +202,7 @@ BUILDLDFLAGS ?= $(BUILDCFLAGS)
 # Do not export variables above! Use HOSTVARS or BUILDVARS.
 
 # Do the FPU detection, after we have figured out our compilers and flags.
-ifneq ($(findstring $(ARCH),aarch64 i386 ppc ppc64 sparc sparc64 x86_64),)
+ifneq ($(findstring $(ARCH),aarch64 i386 ppc ppc64 ppc64le sparc sparc64 x86_64),)
 # This should be consistent with include/vlc_cpu.h
 HAVE_FPU = 1
 else ifneq ($(findstring $(ARCH),arm),)
