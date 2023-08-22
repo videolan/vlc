@@ -234,7 +234,7 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
         case VLC_CODEC_RGBA:
         case VLC_CODEC_ARGB:
             biBitCount = 32;
-            biCompression = MatchBitmapRGBMasks( fmt ) ? BI_RGB : BI_BITFIELDS;
+            biCompression = BI_BITFIELDS;
             b_has_alpha = true;
             break;
         case VLC_CODEC_RGB24:
