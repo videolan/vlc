@@ -932,10 +932,18 @@ static int Open(vlc_object_t *this)
         if (status != VLC_SUCCESS)
             goto error;
     }
-    else
+    else if (sys->config.outdir != NULL)
     {
         sys->http_host = NULL;
         sys->http_manifest = NULL;
+    }
+    else
+    {
+        msg_Err(stream,
+                "No output directory specified."
+                " See \"" SOUT_CFG_PREFIX "out-dir\"");
+        status = VLC_EINVAL;
+        goto error;
     }
 
     sys->manifest = NULL;
