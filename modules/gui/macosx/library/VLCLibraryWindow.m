@@ -87,7 +87,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-@interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
+@interface VLCLibraryWindow () <VLCDragDropTarget>
 {
     CGFloat _lastPlaylistWidthBeforeCollaps;
 
@@ -796,53 +796,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (IBAction)goToBrowseSection:(id)sender
 {
     [_navSidebarController selectSegment:VLCLibraryBrowseSegment];
-}
-
-#pragma mark - split view delegation
-
-- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
-{
-    switch (dividerIndex) {
-        case 0:
-            return VLCLibraryWindowMinimalWidth;
-        default:
-            break;
-    }
-
-    return proposedMinimumPosition;
-}
-
-- (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex
-{
-    switch (dividerIndex) {
-        case 0:
-            return splitView.frame.size.width - VLCLibraryWindowMinimalPlaylistWidth;
-        default:
-            break;
-    }
-
-    return proposedMaximumPosition;
-}
-
-- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
-{
-    return [subview isEqual:_playlistView];
-}
-
-- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex
-{
-    return [subview isEqual:_playlistView];
-}
-
-- (void)splitViewDidResizeSubviews:(NSNotification *)notification
-{
-    _lastPlaylistWidthBeforeCollaps = [_playlistView frame].size.width;
-
-    if (![_mainSplitView isSubviewCollapsed:_playlistView]) {
-        _playQueueToggle.state = NSControlStateValueOn;
-    } else {
-        _playQueueToggle.state = NSControlStateValueOff;
-    }
 }
 
 - (IBAction)backwardsNavigationAction:(id)sender
