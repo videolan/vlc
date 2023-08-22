@@ -769,7 +769,6 @@ interop_init:
     /* We found a chroma with matching parameters for OpenGL. The interop can
      * be created. */
 
-    // TODO: video_format_FixRgb is not fixing the mask we assign here
     if (i_chroma == VLC_CODEC_RGB32)
     {
 #if defined(WORDS_BIGENDIAN)
@@ -781,7 +780,6 @@ interop_init:
         interop->fmt_out.i_gmask  = 0x0000ff00;
         interop->fmt_out.i_bmask  = 0x00ff0000;
 #endif
-        video_format_FixRgb(&interop->fmt_out);
     }
 
     static const struct vlc_gl_interop_ops ops = {
