@@ -622,17 +622,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     return VLC_SUCCESS;
 }
 
-static void SetRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
-{
-    switch( i_fourcc )
-    {
-        default:
-            return;
-    }
-    fmt->i_chroma = i_fourcc;
-    video_format_FixRgb( fmt );
-}
-
 /*****************************************************************************
  * DemuxOpen: open direct show device as an access_demux module
  *****************************************************************************/
@@ -709,9 +698,6 @@ static int DemuxOpen( vlc_object_t *p_this )
                 /* RGB DIB are coded from bottom to top */
                 fmt.video.orientation = ORIENT_BOTTOM_LEFT;
             }
-
-            /* Setup rgb mask for RGB formats */
-            SetRGBMasks( p_stream->i_fourcc, &fmt.video );
 
             if( p_stream->header.video.AvgTimePerFrame )
             {
