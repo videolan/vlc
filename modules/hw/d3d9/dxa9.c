@@ -523,7 +523,7 @@ int D3D9OpenCPUConverter( filter_t *p_filter )
     d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( p_filter->vctx_out );
     vctx_sys->format = p_dst->format.i_chroma;
 
-    if ( p_filter->fmt_in.video.i_chroma != p_dst->format.i_chroma )
+    if ( !video_format_IsSameChroma( &p_filter->fmt_in.video, &p_dst->format ) )
     {
         p_sys->filter = CreateFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
         if (!p_sys->filter)
