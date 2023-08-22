@@ -38,10 +38,10 @@
 #include <windows.h>
 
 
-static void screen_CloseCapture(screen_data_t *);
+static void screen_CloseCapture(void *);
 static block_t *screen_Capture(demux_t *);
 
-struct screen_data_t
+typedef struct
 {
     HDC hdc_src;
     HDC hdc_dst;
@@ -57,7 +57,7 @@ struct screen_data_t
 #ifdef SCREEN_MOUSE
     filter_t *p_blend;
 #endif
-};
+} screen_data_t;
 
 #if defined(SCREEN_SUBSCREEN) || defined(SCREEN_MOUSE)
 /*
@@ -162,8 +162,9 @@ int screen_InitCaptureGDI( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
-void screen_CloseCapture( screen_data_t *p_data )
+void screen_CloseCapture( void *opaque )
 {
+    screen_data_t *p_data = opaque;
     if( p_data->p_block ) block_Release( p_data->p_block );
 
     if( p_data->hgdi_backup)

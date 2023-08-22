@@ -42,11 +42,11 @@
 extern int CGSMainConnectionID();
 extern CGImageRef CGSCreateRegisteredCursorImage(int, char*, CGPoint*);
 
-static void screen_CloseCapture(screen_data_t *);
+static void screen_CloseCapture(void *);
 static block_t *screen_Capture(demux_t *);
 
 
-struct screen_data_t
+typedef struct
 {
     block_t *p_block;
 
@@ -66,7 +66,7 @@ struct screen_data_t
     CGRect offscreen_rect;
     void *offscreen_bitmap;
     size_t offscreen_bitmap_size;
-};
+} screen_data_t;
 
 int screen_InitCapture(demux_t *p_demux)
 {
@@ -148,8 +148,9 @@ int screen_InitCapture(demux_t *p_demux)
     return VLC_SUCCESS;
 }
 
-static void screen_CloseCapture(screen_data_t *p_data)
+static void screen_CloseCapture(void *opaque)
 {
+    screen_data_t *p_data = opaque;
     if (p_data->offscreen_context)
         CFRelease(p_data->offscreen_context);
 

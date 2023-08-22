@@ -37,7 +37,8 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
-struct screen_data_t
+namespace {
+struct dxgi_screen
 {
     const d3d_format_t             *output_format = nullptr;
     vlc_video_context              *vctx = nullptr;
@@ -47,12 +48,13 @@ struct screen_data_t
 
     ComPtr<IDXGIOutputDuplication> duplication;
 
-    ~screen_data_t()
+    ~dxgi_screen()
     {
         if (vctx)
             vlc_video_context_Release(vctx);
     }
 };
+} // namespace
 
 static void CaptureBlockRelease( block_t *p_block )
 {
@@ -64,7 +66,7 @@ static void CaptureBlockRelease( block_t *p_block )
 static block_t *screen_Capture(demux_t *p_demux)
 {
     demux_sys_t *p_sys = static_cast<demux_sys_t*>(p_demux->p_sys);
-    screen_data_t *p_data = p_sys->p_data;
+    dxgi_screen *p_data = static_cast<dxgi_screen *>(p_sys->p_data);
     block_sys_d3d11_t *d3d11_block = new (std::nothrow) block_sys_d3d11_t();
     ComPtr<IDXGIResource> resource;
     ComPtr<ID3D11Resource> d3d11res;
@@ -151,15 +153,16 @@ error:
     return nullptr;
 }
 
-static void screen_CloseCapture(screen_data_t *p_data)
+static void screen_CloseCapture(void *opaque)
 {
+    dxgi_screen *p_data = static_cast<dxgi_screen*>(opaque);
     delete p_data;
 }
 
 int screen_InitCaptureDXGI(demux_t *p_demux)
 {
     demux_sys_t *p_sys = static_cast<demux_sys_t*>(p_demux->p_sys);
-    screen_data_t *p_data;
+    dxgi_screen *p_data;
     vlc_decoder_device *dec_dev;
     HRESULT hr;
 
@@ -185,7 +188,7 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
     }
 #endif // !WINAPI_PARTITION_DESKTOP
 
-    p_data = new (std::nothrow) screen_data_t();
+    p_data = new (std::nothrow) dxgi_screen();
     if (unlikely(p_data == nullptr))
         return VLC_ENOMEM;
 
