@@ -73,11 +73,12 @@ static inline void vlc_seekpoint_Delete( seekpoint_t *point )
 static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
 {
     seekpoint_t *point = vlc_seekpoint_New();
-    if( likely(point) )
-    {
-        if( src->psz_name ) point->psz_name = strdup( src->psz_name );
-        point->i_time_offset = src->i_time_offset;
-    }
+    if (unlikely(point == NULL))
+        return NULL;
+
+    if (src->psz_name)
+        point->psz_name = strdup(src->psz_name);
+    point->i_time_offset = src->i_time_offset;
     return point;
 }
 
