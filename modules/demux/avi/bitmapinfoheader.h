@@ -310,14 +310,41 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     p_bih->biClrUsed = 0;
     if( biCompression == BI_BITFIELDS )
     {
-        SetDWBE( &p_bmiColors[0], fmt->video.i_rmask );
-        SetDWBE( &p_bmiColors[4], fmt->video.i_gmask );
-        SetDWBE( &p_bmiColors[8], fmt->video.i_bmask );
+        uint32_t i_rmask,i_gmask,i_bmask;
+        switch( fmt->i_codec )
+        {
+            case VLC_CODEC_ABGR:
+                i_rmask = hton32(0x000000ff);
+                i_gmask = hton32(0x0000ff00);
+                i_bmask = hton32(0x00ff0000);
+                break;
+            case VLC_CODEC_ARGB:
+                i_rmask = hton32(0x00ff0000);
+                i_gmask = hton32(0x0000ff00);
+                i_bmask = hton32(0x000000ff);
+                break;
+            case VLC_CODEC_RGBA:
+                i_rmask = hton32(0xff000000);
+                i_gmask = hton32(0x00ff0000);
+                i_bmask = hton32(0x0000ff00);
+                break;
+            case VLC_CODEC_BGRA:
+                i_rmask = hton32(0x0000ff00);
+                i_gmask = hton32(0x00ff0000);
+                i_bmask = hton32(0xff000000);
+                break;
+            default:
+                i_rmask = fmt->video.i_rmask;
+                i_gmask = fmt->video.i_gmask;
+                i_bmask = fmt->video.i_bmask;
+                break;
+        }
+        SetDWBE( &p_bmiColors[0], i_rmask );
+        SetDWBE( &p_bmiColors[4], i_gmask );
+        SetDWBE( &p_bmiColors[8], i_bmask );
         if( b_has_alpha )
         {
-            SetDWBE( &p_bmiColors[12], ~(fmt->video.i_rmask |
-                                         fmt->video.i_gmask |
-                                         fmt->video.i_bmask) );
+            SetDWBE( &p_bmiColors[12], ~(i_rmask | i_gmask | i_bmask) );
         }
     }
     else if( fmt->i_codec == VLC_CODEC_RGBP )
