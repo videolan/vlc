@@ -225,7 +225,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         }
 
         /* Shitty VLC muxed files storing chroma in biCompression */
-        SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+        if (p_bih->biCompression == VLC_FOURCC('R','V','3','2'))
+            fmt->i_codec = VLC_CODEC_BGRX;
+        else
+            SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
     }
 
     video_format_Setup( &fmt->video, fmt->i_codec,
