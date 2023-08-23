@@ -2457,7 +2457,10 @@ static void LoadChapterGpac( demux_t  *p_demux, MP4_Box_t *p_chpl )
         return;
 
     p_sys->p_title = vlc_input_title_New();
-    for( int i = 0; i < BOXDATA(p_chpl)->i_chapter && p_sys->p_title; i++ )
+    if (p_sys->p_title == NULL)
+        return;
+
+    for( int i = 0; i < BOXDATA(p_chpl)->i_chapter; i++ )
     {
         seekpoint_t *s = vlc_seekpoint_New();
         if( s == NULL) continue;
