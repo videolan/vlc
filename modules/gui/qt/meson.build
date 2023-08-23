@@ -604,6 +604,7 @@ if qt5_dep.found()
 
     if host_system == 'windows'
         qt_extra_deps += [
+            cc.find_library('dwmapi'),
             cc.find_library('comctl32'),
             cc.find_library('d3d11'),
         ]
