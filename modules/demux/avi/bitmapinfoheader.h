@@ -146,16 +146,37 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
                 fmt->video.i_rmask = GetDWLE( &p_bihextra[0] );
                 fmt->video.i_gmask = GetDWLE( &p_bihextra[4] );
                 fmt->video.i_bmask = GetDWLE( &p_bihextra[8] );
+                video_format_FixRgb( &fmt->video );
                 if( i_bihextra >= 4 * sizeof(uint32_t) ) /* Alpha channel ? */
                 {
                     uint32_t i_alpha = GetDWLE( &p_bihextra[8] );
-                    if( fmt->i_codec == VLC_CODEC_RGB32 && i_alpha == 0xFF )
-                        fmt->i_codec = VLC_CODEC_BGRA;
+                    if( i_alpha == 0xFF )
+                    {
+                        switch (fmt->i_codec)
+                        {
+                            case VLC_CODEC_RGB32: // unknown mask
+                            case VLC_CODEC_BGRX:
+                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_BGRA;
+                                break;
+                            case VLC_CODEC_RGBX:
+                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_RGBA;
+                                break;
+                            case VLC_CODEC_XBGR:
+                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_ABGR;
+                                break;
+                            case VLC_CODEC_XRGB:
+                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_ARGB;
+                                break;
+                        }
+                    }
                 }
             }
             else
             {
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+                if (p_bih->biBitCount == 32)
+                    fmt->i_codec = VLC_CODEC_BGRX;
+                else
+                    SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
             }
         }
         else if( fmt->i_codec == VLC_CODEC_RGBP )
@@ -175,7 +196,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         }
         else
         {
-            SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+            if (p_bih->biBitCount == 32)
+                fmt->i_codec = VLC_CODEC_BGRX;
+            else
+                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
         }
 
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
