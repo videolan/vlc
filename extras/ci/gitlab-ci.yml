@@ -253,7 +253,7 @@ nightly-win64-arm-llvm:
 #
 # Debian
 #
-debian:
+debian-contrib:
     extends: .base-template
     image:
         name: $VLC_DEBIAN_IMAGE
@@ -284,7 +284,16 @@ debian:
         else
             make -j$NCPU --output-sync=recurse tools
         fi
-        cd ../../
+    variables:
+        <<: *variables-debian
+
+debian:
+    extends: .base-template
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    script: |
+        export NCPU=$(getconf _NPROCESSORS_ONLN)
+        echo "Building branch '${CI_COMMIT_BRANCH}' (default: '${CI_DEFAULT_BRANCH}')"
 
         # Configure VLC
         ./bootstrap
