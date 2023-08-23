@@ -263,6 +263,7 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
         case VLC_CODEC_BGRA:
         case VLC_CODEC_RGBA:
         case VLC_CODEC_ARGB:
+        case VLC_CODEC_ABGR:
             biBitCount = 32;
             biCompression = BI_BITFIELDS;
             b_has_alpha = true;
