@@ -191,7 +191,7 @@ FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
 ifdef HAVE_EMSCRIPTEN
-FFMPEGCONF+= --arch=wasm32 --target-os=emscripten
+FFMPEGCONF+= --arch=wasm32 --target-os=emscripten --enable-pic
 endif
 
 # Build

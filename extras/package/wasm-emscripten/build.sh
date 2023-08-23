@@ -169,11 +169,9 @@ echo "$BUILD_PATH";
 
 if [ "$VLC_COMPILE_SHARED" -eq "1" ]; then
 #enable shared, while disabling some of the incompatible dependencies
-    SHARED_CONFIGURE_FLAGS=" --enable-shared --disable-avcodec --disable-avformat \
-                             --disable-swscale --disable-postproc "
+    SHARED_CONFIGURE_FLAGS="--enable-shared"
 else
-    SHARED_CONFIGURE_FLAGS=" --disable-shared --enable-avcodec --enable-avformat \
-                             --enable-swscale --enable-postproc "
+    SHARED_CONFIGURE_FLAGS="--disable-shared"
 fi
 
 cd "$BUILD_PATH"
@@ -194,6 +192,7 @@ if [ $BUILD_MODE -eq 1 ]; then
     fi
     emconfigure "$VLC_SRCPATH"/configure --host=wasm32-unknown-emscripten --enable-debug \
                         $SHARED_CONFIGURE_FLAGS --disable-vlc \
+                        --enable-avcodec --enable-avformat --enable-swscale --enable-postproc \
                         --disable-sout --disable-vlm --disable-a52 --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
                         --enable-gles2 \
