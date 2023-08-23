@@ -121,9 +121,6 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     if (!sr)
         return NULL;
 
-    video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_RGB32);
-
     /* Allocates our textures */
     assert(!interop->handle_texs_gen);
 
