@@ -697,15 +697,15 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="C0F3283F-472F-46A6-910B-44EE5602E3D2" label="Renderers" paletteLabel="Renderers" image="videoprojector.fill" catalog="system" bordered="YES" sizingBehavior="auto" id="YEO-08-Qzi">
+                    <toolbarItem implicitItemIdentifier="C0F3283F-472F-46A6-910B-44EE5602E3D2" label="Renderers" paletteLabel="Renderers" image="antenna.radiowaves.left.and.right" catalog="system" bordered="YES" sizingBehavior="auto" id="YEO-08-Qzi">
                         <nil key="toolTip"/>
                         <button key="view" wantsLayer="YES" verticalHuggingPriority="750" misplaced="YES" id="ffS-QP-Om3">
-                            <rect key="frame" x="15" y="14" width="32" height="19"/>
+                            <rect key="frame" x="18" y="14" width="26" height="19"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="30" id="ann-oP-TCW"/>
                             </constraints>
-                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="videoprojector.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CH2-Lq-KIb">
+                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="antenna.radiowaves.left.and.right" catalog="system" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CH2-Lq-KIb">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
@@ -1895,6 +1895,7 @@
         <image name="VLCVolumeOffTemplate" width="128" height="128"/>
         <image name="VLCVolumeOnTemplate" width="128" height="128"/>
         <image name="arrow.up.arrow.down" catalog="system" width="18" height="15"/>
+        <image name="antenna.radiowaves.left.and.right" catalog="system" width="16" height="14"/>
         <image name="dropzone" width="112" height="112"/>
         <image name="fullscreen-one-button" width="29" height="23"/>
         <image name="fullscreen-one-button-pressed" width="29" height="23"/>
@@ -1905,6 +1906,5 @@
         <image name="shuffleOn" width="24" height="24"/>
         <image name="sidebar.left" catalog="system" width="18" height="14"/>
         <image name="trash" catalog="system" width="15" height="17"/>
-        <image name="videoprojector.fill" catalog="system" width="22" height="11"/>
     </resources>
 </document>
