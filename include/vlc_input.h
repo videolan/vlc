@@ -77,7 +77,14 @@ static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
         return NULL;
 
     if (src->psz_name)
+    {
         point->psz_name = strdup(src->psz_name);
+        if (point->psz_name == NULL)
+        {
+            vlc_seekpoint_Delete(point);
+            return NULL;
+        }
+    }
     point->i_time_offset = src->i_time_offset;
     return point;
 }
