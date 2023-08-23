@@ -1089,17 +1089,27 @@ static picture_t *pic_new_unaligned(const video_format_t *fmt)
 {
     /* Allocate a no-aligned picture in order to ease buffer overflow detection
      * from the source picture */
+    unsigned i = 0;
     const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
     assert(dsc);
     picture_resource_t rsc = { .pf_destroy = pic_rsc_destroy };
-    for (unsigned i = 0; i < dsc->plane_count; i++)
+    for (; i < dsc->plane_count; i++)
     {
         rsc.p[i].i_lines = ((fmt->i_visible_height + (dsc->p[i].h.den - 1)) / dsc->p[i].h.den) * dsc->p[i].h.num;
         rsc.p[i].i_pitch = ((fmt->i_visible_width + (dsc->p[i].w.den - 1)) / dsc->p[i].w.den) * dsc->p[i].w.num * dsc->pixel_size;
         rsc.p[i].p_pixels = malloc(rsc.p[i].i_lines * rsc.p[i].i_pitch);
-        assert(rsc.p[i].p_pixels);
+        if (rsc.p[i].p_pixels == NULL)
+            goto cleanup;
     }
-    return picture_NewFromResource(fmt, &rsc);
+    picture_t *pic = picture_NewFromResource(fmt, &rsc);
+    if (pic == NULL)
+        goto cleanup;
+    return pic;
+
+cleanup:
+    while (i != 0)
+        free(rsc.p[--i].p_pixels);
+    return NULL;
 }
 
 int main(void)
