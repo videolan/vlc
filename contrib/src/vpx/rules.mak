@@ -53,14 +53,10 @@ else ifeq ($(ARCH),mips)
 VPX_ARCH := mips32
 else ifeq ($(ARCH),ppc)
 VPX_ARCH := ppc32
-else ifeq ($(ARCH),ppc64)
-VPX_ARCH := ppc64
-else ifeq ($(ARCH),sparc)
-VPX_ARCH := sparc
-else ifeq ($(ARCH),x86_64)
-VPX_ARCH := x86_64
 else ifeq ($(ARCH),aarch64)
 VPX_ARCH := arm64
+else
+VPX_ARCH := $(ARCH)
 endif
 
 ifdef HAVE_ANDROID
