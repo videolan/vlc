@@ -1312,6 +1312,11 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
     {
         *pi_data = strlen( p_sys->psz_sdp );
         *pp_data = malloc( *pi_data );
+        if (*pp_data == NULL)
+        {
+            vlc_mutex_unlock(&p_sys->lock_sdp);
+            return VLC_ENOMEM;
+        }
         memcpy( *pp_data, p_sys->psz_sdp, *pi_data );
     }
     else
