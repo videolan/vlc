@@ -183,11 +183,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
                         fmt->i_format = VLC_CODEC_S32N;
                         break;
                     case 24:
-#ifdef WORDS_BIGENDIAN
-                        fmt->i_format = VLC_CODEC_S24B32;
-#else
                         fmt->i_format = VLC_CODEC_S24L32;
-#endif
                         break;
                     default:
                         return -1;
