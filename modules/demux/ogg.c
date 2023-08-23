@@ -855,22 +855,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int *pi_title_offset = va_arg( args, int* );
             int *pi_seekpoint_offset = va_arg( args, int* );
 
-            if( p_sys->i_seekpoints > 0 )
+            if( p_sys->i_seekpoints == 0 )
+                return VLC_EGENERIC;
+
+            *pi_int = 1;
+            *ppp_title = malloc( sizeof( input_title_t* ) );
+            input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
+            for( int i = 0; i < p_sys->i_seekpoints; i++ )
             {
-                *pi_int = 1;
-                *ppp_title = malloc( sizeof( input_title_t* ) );
-                input_title_t *p_title = (*ppp_title)[0] = vlc_input_title_New();
-                for( int i = 0; i < p_sys->i_seekpoints; i++ )
-                {
-                    seekpoint_t *p_seekpoint_copy = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[i] );
-                    if ( likely( p_seekpoint_copy ) )
-                        TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_seekpoint_copy );
-                }
-                *pi_title_offset = 0;
-                *pi_seekpoint_offset = 0;
-                return VLC_SUCCESS;
+                seekpoint_t *p_seekpoint_copy = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[i] );
+                if ( likely( p_seekpoint_copy ) )
+                    TAB_APPEND( titles[0]->i_seekpoint, titles[0]->seekpoint, p_seekpoint_copy );
             }
-            return VLC_EGENERIC;
+            *ppp_title = titles;
+            *pi_title_offset = 0;
+            *pi_seekpoint_offset = 0;
+            return VLC_SUCCESS;
         }
         case DEMUX_SET_TITLE:
         {
