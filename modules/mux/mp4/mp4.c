@@ -604,11 +604,16 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
     return mp4mux_track_AddEdit(p_stream->tinfo, &newedit);
 }
 
-static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
+static int BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream, block_t **out)
 {
+    assert(out);
+
     block_t *p_block = block_FifoGet(p_input->p_fifo);
     if(unlikely(!p_block))
-        return NULL;
+    {
+        *out = NULL;
+        return VLC_SUCCESS;
+    }
 
     /* Create on the fly extradata as packetizer is not in the loop */
     if(p_stream->extrabuilder && !mp4mux_track_HasSamplePriv(p_stream->tinfo))
@@ -637,7 +642,8 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
             break;
     }
 
-    return p_block;
+    *out = p_block;
+    return VLC_SUCCESS;
 }
 
 static inline vlc_tick_t dts_fb_pts( const block_t *p_data )
@@ -1455,7 +1461,12 @@ static int MuxFrag(sout_mux_t *p_mux)
 
     sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
     mp4_stream_t *p_stream = (mp4_stream_t*) p_input->p_sys;
-    block_t *p_currentblock = BlockDequeue(p_input, p_stream);
+
+    block_t *p_currentblock;
+    int ret = BlockDequeue(p_input, p_stream, &p_currentblock);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
     if( !p_currentblock )
         return VLC_SUCCESS;
 
