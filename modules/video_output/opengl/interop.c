@@ -215,7 +215,7 @@ vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl)
     interop->ops = NULL;
     interop->gl = gl;
 
-    video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
+    video_format_Init(&interop->fmt_in, VLC_CODEC_RGBA);
     interop->fmt_out = interop->fmt_in;
 
 #define LOAD_SYMBOL(type, name) \
