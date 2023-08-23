@@ -113,33 +113,33 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         switch( p_bih->biBitCount )
         {
             case 32:
-                fmt->i_codec = VLC_CODEC_RGB32;
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
                 SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 24:
-                fmt->i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
                 SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 16:
-                fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
                 SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 15: /* RGB (B least 5 bits) */
-                fmt->i_codec = VLC_CODEC_RGB15;
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB15;
                 SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 9: /* <- TODO check that */
-                fmt->i_codec = VLC_CODEC_I410;
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_I410;
                 break;
             case 8:
                 if ( p_bih->biClrUsed )
-                    fmt->i_codec = VLC_CODEC_RGBP;
+                    fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGBP;
                 else
-                    fmt->i_codec = VLC_CODEC_GREY;
+                    fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_GREY;
                 break;
             default:
                 if( p_bih->biClrUsed < 8 )
-                    fmt->i_codec = VLC_CODEC_RGBP;
+                    fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGBP;
                 break;
         }
 
