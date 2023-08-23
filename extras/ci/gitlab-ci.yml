@@ -354,7 +354,7 @@ debian-meson:
         - |
             echo -e "\e[0Ksection_start:$(date +%s):setup_meson_section\r\e[0KMeson setup"
             # Setup meson build dir
-            meson setup build-meson || (echo "ERROR: Meson setup failed!" >&2 ; cat build-meson/meson-logs/meson-log.txt >&2 ; exit 1)
+            meson setup -Db_coverage=true build-meson || (echo "ERROR: Meson setup failed!" >&2 ; cat build-meson/meson-logs/meson-log.txt >&2 ; exit 1)
             echo -e "\e[0Ksection_end:$(date +%s):setup_meson_section\r\e[0K"
 
         - |
@@ -368,8 +368,29 @@ debian-meson:
             # Run tests
             meson test -C build-meson || (echo "ERROR: Tests failed!" >&2 ; cat build-meson/meson-logs/testlog.txt >&2 ; exit 3)
             echo -e "\e[0Ksection_end:$(date +%s):tests_meson_section\r\e[0K"
+
+        - |
+            # We split in two different commands to handle the case where
+            # the coverage will be generated on different jobs later.
+            mkdir html-coverage
+            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j4
+        - >
+            gcovr --add-tracefile "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json"
+            --xml="cobertura.xml"
+            --html="html-coverage/vlc.html"
+            --html-details -s
+
     allow_failure: true
     variables: *variables-debian
+    artifacts:
+        reports:
+            junit: build-meson/meson-logs/testlog.junit.xml
+            coverage_report:
+                coverage_format: cobertura
+                path: cobertura.xml
+        paths:
+            - html-coverage/
+            - ${CI_PROJECT_DIR}/build-meson/meson-logs/testlog.junit.xml
 
 #
 # Snap builds
