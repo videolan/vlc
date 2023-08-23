@@ -114,19 +114,15 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
         {
             case 32:
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 24:
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 16:
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 15: /* RGB (B least 5 bits) */
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB15;
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
                 break;
             case 9: /* <- TODO check that */
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_I410;
@@ -157,7 +153,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
                         fmt->i_codec = VLC_CODEC_BGRA;
                 }
             }
-            SetBitmapRGBMasks( fmt->i_codec, &fmt->video ); /* override default masks shifts */
+            else
+            {
+                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+            }
         }
         else if( fmt->i_codec == VLC_CODEC_RGBP )
         {
@@ -173,6 +172,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
                         fmt->video.p_palette->palette[k][j] = p_bihextra[4*k+j];
                 }
             }
+        }
+        else
+        {
+            SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
         }
 
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
