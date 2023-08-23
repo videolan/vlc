@@ -260,6 +260,12 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
             biBitCount = 32;
             biCompression = BI_RGB;
             break;
+        case VLC_CODEC_XBGR:
+        case VLC_CODEC_XRGB:
+        case VLC_CODEC_RGBX:
+            biBitCount = 32;
+            biCompression = BI_BITFIELDS;
+            break;
         case VLC_CODEC_RGB32:
             biBitCount = 32;
             biCompression = MatchBitmapRGBMasks( fmt ) ? BI_RGB : BI_BITFIELDS;
@@ -318,16 +324,19 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
         switch( fmt->i_codec )
         {
             case VLC_CODEC_ABGR:
+            case VLC_CODEC_XBGR:
                 i_rmask = hton32(0x000000ff);
                 i_gmask = hton32(0x0000ff00);
                 i_bmask = hton32(0x00ff0000);
                 break;
             case VLC_CODEC_ARGB:
+            case VLC_CODEC_XRGB:
                 i_rmask = hton32(0x00ff0000);
                 i_gmask = hton32(0x0000ff00);
                 i_bmask = hton32(0x000000ff);
                 break;
             case VLC_CODEC_RGBA:
+            case VLC_CODEC_RGBX:
                 i_rmask = hton32(0xff000000);
                 i_gmask = hton32(0x00ff0000);
                 i_bmask = hton32(0x0000ff00);
