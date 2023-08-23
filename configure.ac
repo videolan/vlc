@@ -2523,20 +2523,10 @@ AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default dis
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
-AC_ARG_ENABLE([avcodec],
-AS_HELP_STRING([--enable-avcodec], [libavcodec codec (default enabled)]))
-AS_IF([test "${enable_avcodec}" != "no"], [
-  dnl We need >=57.37.100 from ffmpeg
-  dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 57.37.100 libavutil >= 55.22.101], [
-    have_avcodec="yes"
-  ],[
-    AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
-  ])
-], [
-  have_avcodec="no"
-])
-AM_CONDITIONAL([HAVE_AVCODEC], [test "${have_avcodec}" != "no"])
+dnl We need >=57.37.100 from ffmpeg
+dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
+PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 57.37.100 libavutil >= 55.22.101],
+                       [libavcodec codec (default enabled)], [yes])
 
 dnl
 dnl libva needs avcodec
