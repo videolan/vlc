@@ -13,10 +13,12 @@
 
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 
+vlc_qt_libs = $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS) $(QT5_XCB_PLUGINS_LIBS) $(QT5_WAYLAND_PLUGINS_LIBS) $(QT_LIBS) $(LIBS_qt)
+
 vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp gui/qt/plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
 vlc_qt_check_CPPFLAGS = $(AM_CPPFLAGS)
-vlc_qt_check_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS) $(QT5_XCB_PLUGINS_LIBS) $(QT5_WAYLAND_PLUGINS_LIBS)
+vlc_qt_check_LDADD = $(vlc_qt_libs)
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ \
@@ -33,8 +35,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DQPNI_HEADER=\<$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h\>
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
-libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM) \
-                         $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS)
+libqt_plugin_la_LIBADD = $(vlc_qt_libs)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_DARWIN
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
@@ -1152,7 +1153,7 @@ if HAVE_QMLCACHE
 nodist_qml_test_SOURCES += gui/qt/qmlcache_loader.cpp $(libqt_plugin_la_QML)
 endif
 qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT5_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/gui/qt/tests\""
-qml_test_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS}
+qml_test_LDADD = $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
 check_PROGRAMS += qml_test
 EXTRA_DIST += gui/qt/tests/tst_FSM.qml
 

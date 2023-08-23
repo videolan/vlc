@@ -689,7 +689,7 @@ if qt5_dep.found()
     vlc_modules += {
         'name' : 'qt',
         'sources' : [qt5pre_files, qt5pre_qrc, qt_sources, some_sources],
-        'dependencies' : [qt5_dep, qt_extra_deps],
+        'dependencies' : [qt_extra_deps, qt5_dep],
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
         'cpp_args' : [qt_extra_flags, qt_cppargs]
