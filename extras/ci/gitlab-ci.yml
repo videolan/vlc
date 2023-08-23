@@ -335,31 +335,6 @@ debian-meson:
             ( cd extras/tools && make -j$NCPU .buildmeson )
             export PATH="$(pwd)/extras/tools/build/bin:$PATH"
             echo -e "\e[0Ksection_end:$(date +%s):build_tools_section\r\e[0K"
-
-        - |
-            echo -e "\e[0Ksection_start:$(date +%s):build_contribs_section\r\e[0KContribs build"
-            # Build contribs
-            mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-            ../bootstrap --enable-x262
-            if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-                echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-                make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
-            else
-                PREBUILT_FAILED=yes
-            fi
-            if [ -n "$PREBUILT_FAILED" ]; then
-                make list
-                make -j$NCPU --output-sync=recurse fetch
-                make -j$NCPU --output-sync=recurse
-                if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
-                    make package
-                fi
-            else
-                make -j$NCPU --output-sync=recurse tools
-            fi
-            cd ../../
-            echo -e "\e[0Ksection_end:$(date +%s):build_contribs_section\r\e[0K"
-
         - |
             echo -e "\e[0Ksection_start:$(date +%s):setup_meson_section\r\e[0KMeson setup"
             # Setup meson build dir
