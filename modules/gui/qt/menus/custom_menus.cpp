@@ -546,7 +546,7 @@ void RecentMenu::onModelReset()
     m_actions.clear();
 
     int nb_rows = m_model->rowCount();
-    if (nb_rows == 0)
+    if (nb_rows == 0 || nb_rows == -1)
         setEnabled(false);
     else
         onRowInserted({}, 0, nb_rows - 1);
