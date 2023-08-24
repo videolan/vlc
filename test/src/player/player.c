@@ -36,6 +36,19 @@
 # define TELETEXT_DECODER ""
 #endif
 
+static const char *state_to_string(enum vlc_player_state state)
+{
+    switch (state)
+    {
+        case VLC_PLAYER_STATE_STOPPED:      return "stopped";
+        case VLC_PLAYER_STATE_STARTED:      return "started";
+        case VLC_PLAYER_STATE_PLAYING:      return "playing";
+        case VLC_PLAYER_STATE_PAUSED:       return "paused";
+        case VLC_PLAYER_STATE_STOPPING:     return "stopping";
+    }
+    vlc_assert_unreachable();
+};
+
 struct report_capabilities
 {
     int old_caps;
