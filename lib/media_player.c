@@ -79,6 +79,24 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
     libvlc_event_send(&mp->event_manager, &event);
 }
 
+static libvlc_event_type_t
+PlayerStateToLibvlcEventType(enum vlc_player_state new_state)
+{
+    switch (new_state) {
+        case VLC_PLAYER_STATE_STOPPED:
+            return libvlc_MediaPlayerStopped;
+        case VLC_PLAYER_STATE_STOPPING:
+            return libvlc_MediaPlayerStopping;
+        case VLC_PLAYER_STATE_STARTED:
+            return libvlc_MediaPlayerOpening;
+        case VLC_PLAYER_STATE_PLAYING:
+            return libvlc_MediaPlayerPlaying;
+        case VLC_PLAYER_STATE_PAUSED:
+            return libvlc_MediaPlayerPaused;
+    }
+    vlc_assert_unreachable();
+}
+
 static void
 on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
                  void *data)
@@ -87,27 +105,9 @@ on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
 
     libvlc_media_player_t *mp = data;
 
-    libvlc_event_t event;
-    switch (new_state) {
-        case VLC_PLAYER_STATE_STOPPED:
-            event.type = libvlc_MediaPlayerStopped;
-            break;
-        case VLC_PLAYER_STATE_STOPPING:
-            event.type = libvlc_MediaPlayerStopping;
-            break;
-        case VLC_PLAYER_STATE_STARTED:
-            event.type = libvlc_MediaPlayerOpening;
-            break;
-        case VLC_PLAYER_STATE_PLAYING:
-            event.type = libvlc_MediaPlayerPlaying;
-            break;
-        case VLC_PLAYER_STATE_PAUSED:
-            event.type = libvlc_MediaPlayerPaused;
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-
+    libvlc_event_t event = {
+        .type = PlayerStateToLibvlcEventType(new_state)
+    };
     libvlc_event_send(&mp->event_manager, &event);
 }
 
