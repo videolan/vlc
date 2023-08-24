@@ -729,8 +729,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     }
     else if (interop->fmt_in.i_chroma == VLC_CODEC_XYZ12)
     {
-        static const vlc_fourcc_t xyz12_list[] = { VLC_CODEC_XYZ12, 0 };
-        list = xyz12_list;
+        list = NULL;
         space = COLOR_SPACE_UNDEF;
     }
     else
@@ -755,6 +754,9 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         if (ret == VLC_SUCCESS)
             goto interop_init;
     }
+
+    if (list == NULL)
+        goto error;
 
     /* Check whether any fallback for the chroma is translatable to OpenGL. */
     while (*list)
