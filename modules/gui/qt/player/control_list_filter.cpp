@@ -28,15 +28,21 @@
 // Ctor / dtor
 
 /* explicit */ ControlListFilter::ControlListFilter(QObject * parent)
-    : QSortFilterProxyModel(parent) {}
+    : QSortFilterProxyModel(parent)
+{
+    connect(this, &QAbstractProxyModel::sourceModelChanged, this, &ControlListFilter::sourceModelChanged1);
+}
 
 // QAbstractProxyModel reimplementation
 
-void ControlListFilter::setSourceModel(QAbstractItemModel * sourceModel) /* override */
+void ControlListFilter::setSourceModel(ControlListModel* sourceModel)
 {
-    assert(sourceModel->inherits("ControlListModel"));
-
     QSortFilterProxyModel::setSourceModel(sourceModel);
+}
+
+ControlListModel *ControlListFilter::sourceModel() const
+{
+    return qobject_cast<ControlListModel*>(QSortFilterProxyModel::sourceModel());
 }
 
 // Protected QSortFilterProxyModel reimplementation
