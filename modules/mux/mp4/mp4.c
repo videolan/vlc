@@ -623,7 +623,14 @@ static int BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream, block_t *
         const uint8_t *p_extra;
         size_t i_extra = mux_extradata_builder_Get(p_stream->extrabuilder, &p_extra);
         if (i_extra)
-            mp4mux_track_SetSamplePriv(p_stream->tinfo, p_extra, i_extra);
+        {
+            int ret = mp4mux_track_SetSamplePriv(p_stream->tinfo, p_extra, i_extra);
+            if (ret != VLC_SUCCESS)
+            {
+                block_Release(p_block);
+                return ret;
+            }
+        }
     }
 
     switch(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec)

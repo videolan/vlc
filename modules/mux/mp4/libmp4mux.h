@@ -59,7 +59,7 @@ enum mp4mux_interlacing
 };
 void       mp4mux_track_SetInterlacing(mp4mux_trackinfo_t *, enum mp4mux_interlacing);
 enum mp4mux_interlacing mp4mux_track_GetInterlacing(const mp4mux_trackinfo_t *);
-void       mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *, const uint8_t *, size_t);
+int        mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *, const uint8_t *, size_t);
 bool       mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *);
 vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *);
 uint32_t   mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *);
@@ -103,4 +103,3 @@ void  box_fix     (bo_t *box, uint32_t);
 void  box_gather  (bo_t *box, bo_t *box2);
 
 bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
-

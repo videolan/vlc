@@ -134,7 +134,9 @@ static bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
 static void mp4mux_trackinfo_Clear(mp4mux_trackinfo_t *p_stream)
 {
     es_format_Clean(&p_stream->fmt);
-    mp4mux_track_SetSamplePriv(p_stream, NULL, 0);
+    int ret = mp4mux_track_SetSamplePriv(p_stream, NULL, 0);
+    assert(ret == VLC_SUCCESS);
+
     free(p_stream->samples);
     free(p_stream->p_edits);
 }
@@ -295,8 +297,8 @@ enum mp4mux_interlacing mp4mux_track_GetInterlacing(const mp4mux_trackinfo_t *t)
     return t->e_interlace;
 }
 
-void mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *t,
-                                const uint8_t *p_data, size_t i_data)
+int mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *t,
+                               const uint8_t *p_data, size_t i_data)
 {
     if(t->sample_priv.p_data)
     {
@@ -308,12 +310,12 @@ void mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *t,
     if(p_data && i_data)
     {
         t->sample_priv.p_data = malloc(i_data);
-        if(i_data)
-        {
-            memcpy(t->sample_priv.p_data, p_data, i_data);
-            t->sample_priv.i_data = i_data;
-        }
+        if (t->sample_priv.p_data == NULL)
+            return VLC_ENOMEM;
+        memcpy(t->sample_priv.p_data, p_data, i_data);
+        t->sample_priv.i_data = i_data;
     }
+    return VLC_SUCCESS;
 }
 
 bool mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *t)
