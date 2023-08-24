@@ -864,6 +864,11 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
                     {
                         psz_vcdfile = malloc( strlen(filename) +
                                       (p_pos - psz_cuefile + 1) + 1 );
+                        if (psz_vcdfile == NULL)
+                        {
+                            i_ret = VLC_ENOMEM;
+                            goto error;
+                        }
                         strncpy( psz_vcdfile, psz_cuefile, (p_pos - psz_cuefile + 1) );
                         strcpy( psz_vcdfile + (p_pos - psz_cuefile + 1), filename );
                     } else psz_vcdfile = strdup( filename );
@@ -1685,4 +1690,3 @@ int ioctl_GetCdText( vlc_object_t *p_object, const vcddev_t *p_vcddev,
     free( p_text );
     return 0;
 }
-
