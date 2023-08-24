@@ -131,7 +131,7 @@
 - (void)removeRendererItem:(VLCRendererItem *)item
 {
     NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
-    if (index != NSNotFound) {
+    if (index >= 0) {
         NSMenuItem *menuItem = [_rendererMenu itemAtIndex:index];
         // Don't remove selected item
         if (menuItem != _selectedItem)
