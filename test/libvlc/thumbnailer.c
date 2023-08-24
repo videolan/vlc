@@ -1,5 +1,5 @@
 /*****************************************************************************
- * media_thumbnail.c - libvlc thumbnailing smoke test
+ * thumbnailer.c - libvlc thumbnailing smoke test
  *****************************************************************************
  * Copyright (C) 2023 VideoLabs
  *

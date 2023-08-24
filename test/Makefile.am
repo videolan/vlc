@@ -165,19 +165,19 @@ test_libvlc_media_SOURCES = libvlc/media.c
 test_libvlc_media_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_callback_SOURCES = libvlc/media_callback.c
 test_libvlc_media_callback_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_libvlc_media_thumbnail_argb_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_argb_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_argb_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_argb_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Argb -DTEST_REQUIRED_MODULES=\"avcodec\"
-test_libvlc_media_thumbnail_rgba_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_rgba_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_rgba_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_rgba_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Rgba -DTEST_REQUIRED_MODULES=\"avcodec\"
-test_libvlc_media_thumbnail_png_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_png_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_png_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_png_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Png -DTEST_REQUIRED_MODULES=\"png\"
-test_libvlc_media_thumbnail_jpeg_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_jpeg_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_jpeg_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_jpeg_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Jpg -DTEST_REQUIRED_MODULES=\"jpeg\"
-test_libvlc_media_thumbnail_webp_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_webp_SOURCES = libvlc/thumbnailer.c
 test_libvlc_media_thumbnail_webp_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_thumbnail_webp_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_WebP -DTEST_REQUIRED_MODULES=\"vpx\"
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
