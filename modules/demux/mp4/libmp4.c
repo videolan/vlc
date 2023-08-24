@@ -3497,6 +3497,7 @@ static int MP4_ReadBox_cmvd( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
 {
 #ifndef HAVE_ZLIB
+    (void)p_box;
     msg_Dbg( p_stream, "read box: \"cmov\" zlib unsupported" );
     return 0;
 #else
