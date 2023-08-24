@@ -1025,11 +1025,11 @@ static const struct filter_video_callbacks vout_video_cbs = {
     NULL, VoutHoldDecoderDevice,
 };
 
-static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
-                                     subpicture_t *subpic)
+static picture_t *ConvertRGBAAndBlend(vout_thread_sys_t *vout, picture_t *pic,
+                                      subpicture_t *subpic)
 {
     vout_thread_sys_t *sys = vout;
-    /* This function will convert the pic to RGB32 and blend the subpic to it.
+    /* This function will convert the pic to RGBA and blend the subpic to it.
      * The returned pic can't be used to display since the chroma will be
      * different than the "vout display" one, but it can be used for snapshots.
      * */
@@ -1046,8 +1046,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
 
     es_format_t src = sys->spu_blend->fmt_out;
     es_format_t dst = src;
-    dst.video.i_chroma = VLC_CODEC_RGB32;
-    video_format_FixRgb(&dst.video);
+    dst.video.i_chroma = VLC_CODEC_RGBA;
 
     filter_chain_Reset(filterc, &src,
                        NULL /* TODO output video context of blender */,
@@ -1221,7 +1220,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                      * software RGB32 to generate a snapshot. */
                     if (do_snapshot)
                     {
-                        picture_t *copy = ConvertRGB32AndBlend(sys, blent, subpic);
+                        picture_t *copy = ConvertRGBAAndBlend(sys, blent, subpic);
                         if (copy)
                             snap_pic = copy;
                     }
