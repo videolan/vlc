@@ -613,11 +613,11 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
     /* Create on the fly extradata as packetizer is not in the loop */
     if(p_stream->extrabuilder && !mp4mux_track_HasSamplePriv(p_stream->tinfo))
     {
-         mux_extradata_builder_Feed(p_stream->extrabuilder,
-                                    p_block->p_buffer, p_block->i_buffer);
-         const uint8_t *p_extra;
-         size_t i_extra = mux_extradata_builder_Get(p_stream->extrabuilder, &p_extra);
-         if(i_extra)
+        mux_extradata_builder_Feed(p_stream->extrabuilder,
+                                   p_block->p_buffer, p_block->i_buffer);
+        const uint8_t *p_extra;
+        size_t i_extra = mux_extradata_builder_Get(p_stream->extrabuilder, &p_extra);
+        if (i_extra)
             mp4mux_track_SetSamplePriv(p_stream->tinfo, p_extra, i_extra);
     }
 
