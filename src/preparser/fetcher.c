@@ -303,6 +303,7 @@ static void RunDownloader(void *userdata)
 {
     vlc_thread_set_name("vlc-run-fetcher");
 
+    bool fetched = true;
     struct task *task = userdata;
     input_fetcher_t *fetcher = task->fetcher;
 
@@ -355,26 +356,18 @@ static void RunDownloader(void *userdata)
     free( output_stream.ptr );
     AddAlbumCache( fetcher, task->item, true );
 
+error:
+    fetched = false;
 out:
     vlc_interrupt_set(NULL);
 
-    if( psz_arturl )
+    if( fetched )
     {
         var_SetAddress( fetcher->owner, "item-change", task->item );
         input_item_SetArtFetched( task->item, true );
     }
-
     free( psz_arturl );
-    NotifyArtFetchEnded(task, psz_arturl != NULL);
-    FetcherRemoveTask(fetcher, task);
-    TaskDelete(task);
-    return;
-
-error:
-    vlc_interrupt_set(NULL);
-
-    FREENULL( psz_arturl );
-    NotifyArtFetchEnded(task, false);
+    NotifyArtFetchEnded(task, fetched);
     FetcherRemoveTask(fetcher, task);
     TaskDelete(task);
 }
