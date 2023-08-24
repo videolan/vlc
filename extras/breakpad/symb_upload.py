@@ -24,7 +24,7 @@ class Dumper:
         meta = {}
         dest = io.StringIO()
         if not source.startswith("MODULE"):
-            logging.error("file doesn't starst with MODULE")
+            logging.error("file doesn't start with MODULE")
             return None, None
         for line in source.split("\n"):
             if line.startswith("MODULE"):
