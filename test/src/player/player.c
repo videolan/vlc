@@ -619,14 +619,30 @@ static inline void state_list_dump(vec_on_state_changed *vec)
                 i, state_to_string(vec->data[i]));
 }
 
+static inline bool
+state_equal(vec_on_state_changed *vec, int location, enum vlc_player_state state)
+{
+    assert(location < (int)vec->size && -location < (int)(vec->size + 1));
+    size_t index = location < 0 ? vec->size + location : (size_t)location;
+    const char *str_state_vec = state_to_string(vec->data[index]);
+    const char *str_state_check = state_to_string(state);
+
+    fprintf(stderr, "Checking state[%d] == '%s', is '%s'\n",
+            location, str_state_vec, str_state_check);
+    return vec->data[index] == state;
+}
+
+#define state_equal(ctx, index, state) \
+    (state_equal)(&ctx->report.on_state_changed, index, state)
+
 #define assert_normal_state(ctx) do { \
     vec_on_state_changed *vec = &ctx->report.on_state_changed; \
     state_list_dump(vec); \
     assert(vec->size >= 4); \
-    assert(vec->data[vec->size - 4] == VLC_PLAYER_STATE_STARTED); \
-    assert(vec->data[vec->size - 3] == VLC_PLAYER_STATE_PLAYING); \
-    assert(vec->data[vec->size - 2] == VLC_PLAYER_STATE_STOPPING); \
-    assert(vec->data[vec->size - 1] == VLC_PLAYER_STATE_STOPPED); \
+    assert(state_equal(ctx, -4, VLC_PLAYER_STATE_STARTED)); \
+    assert(state_equal(ctx, -3, VLC_PLAYER_STATE_PLAYING)); \
+    assert(state_equal(ctx, -2, VLC_PLAYER_STATE_STOPPING)); \
+    assert(state_equal(ctx, -1, VLC_PLAYER_STATE_STOPPED)); \
 } while(0)
 
 static void
