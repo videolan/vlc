@@ -1025,7 +1025,8 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_subitems_changed,
     on_player_vout_changed,
     on_player_corks_changed,
-    on_player_playback_restore_queried
+    on_player_playback_restore_queried,
+    nullptr, // on_stopping_current_media: not used
 };
 
 static const vlc_player_vout_cbs player_vout_cbs = []{

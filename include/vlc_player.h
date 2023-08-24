@@ -3221,6 +3221,23 @@ struct vlc_player_cbs
      * @param data opaque pointer set by vlc_player_AddListener()
      */
     void (*on_playback_restore_queried)(vlc_player_t *player, void *data);
+
+    /**
+     * Called when the player will stop the current media.
+     *
+     * @note This can be called from the PLAYING state, before the
+     * player requests the next media, or from the STOPPING state, ie.
+     * when the player is stopping.
+     *
+     * @see vlc_player_SetCurrentMedia()
+     * @see vlc_player_Stop()
+     *
+     * @param player locked player instance
+     * @param prev_media media currently stopping
+     * @param data opaque pointer set by vlc_player_AddListener()
+     */
+    void (*on_stopping_current_media)(vlc_player_t *player,
+            input_item_t *current_media, void *data);
 };
 
 /**
