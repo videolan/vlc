@@ -538,11 +538,7 @@ void RecentMenu::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
 
 void RecentMenu::onModelReset()
 {
-    for (QAction * action : m_actions)
-    {
-        delete action;
-    }
-
+    qDeleteAll(m_actions);
     m_actions.clear();
 
     int nb_rows = m_model->rowCount();
