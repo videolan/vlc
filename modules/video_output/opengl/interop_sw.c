@@ -436,8 +436,6 @@ static int
 interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma, const vlc_chroma_description_t *desc)
 {
-    (void) chroma;
-
     struct interop_formats
     {
         GLint intfmt;
@@ -606,8 +604,6 @@ static int
 interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma)
 {
-    (void) tex_target;
-
     switch (chroma)
     {
         case VLC_CODEC_RGB24:
