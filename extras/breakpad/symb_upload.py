@@ -9,6 +9,7 @@ import io
 import shutil
 import typing
 
+
 class Dumper:
     def __init__(self, strip_path: str = None):
         self.strip_path = strip_path
@@ -17,35 +18,35 @@ class Dumper:
         return False
 
     def dump(self, fpath: str):
-        assert(False)
+        assert (False)
 
     def _preparse_dump(self, source: str):
         meta = {}
         dest = io.StringIO()
-        if  not source.startswith("MODULE"):
+        if not source.startswith("MODULE"):
             logging.error("file doesn't starst with MODULE")
             return None, None
         for line in source.split("\n"):
             if line.startswith("MODULE"):
-                #MODULE <os> <arch> <buildid> <filename>
+                # MODULE <os> <arch> <buildid> <filename>
                 line_split = line.split(" ")
                 if len(line_split) != 5:
                     logging.error("malformed MODULE entry")
                     return None, None
-                _, _os, cpu, buildid, filename  =  line_split
+                _, _os, cpu, buildid, filename = line_split
                 if filename.endswith(".dbg"):
                     filename = filename[:-4]
                 meta["os"] = _os
                 meta["cpu"] = cpu
                 meta["debug_file"] = filename
                 meta["code_file"] = filename
-                #see CompactIdentifier in symbol_upload.cc
+                # see CompactIdentifier in symbol_upload.cc
                 meta["debug_identifier"] = buildid.replace("-", "")
                 dest.write("MODULE {} {} {} {}".format(_os, cpu, buildid, filename))
                 dest.write("\n")
             elif line.startswith("FILE"):
-                #FILE <LINE> <PATH>
-                _, line, *path_split =  line.split(" ")
+                # FILE <LINE> <PATH>
+                _, line, *path_split = line.split(" ")
                 path = " ".join(path_split)
                 path = os.path.normpath(path)
 
@@ -58,6 +59,7 @@ class Dumper:
                 dest.write("\n")
         dest.seek(0)
         return meta, dest
+
 
 class WindowDumper(Dumper):
     def __init__(self, *args, **kwargs):
@@ -72,11 +74,12 @@ class WindowDumper(Dumper):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        if  proc.returncode != 0:
+        if proc.returncode != 0:
             logging.error("unable to extract symbols from {}".format(fpath))
             logging.error(proc.stderr)
             return None, None
         return self._preparse_dump(proc.stdout.decode("utf8"))
+
 
 class MacDumper(Dumper):
     def __init__(self, *args, **kwargs):
@@ -111,14 +114,14 @@ class MacDumper(Dumper):
         if os.path.exists(dsymbundle):
             shutil.rmtree(dsymbundle)
 
-        #generate symbols file
+        # generate symbols file
         proc = subprocess.run(
             ["dsymutil", fpath],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             check=True
         )
-        if  proc.returncode != 0:
+        if proc.returncode != 0:
             logging.error("unable to run dsymutil on {}:".format(fpath))
             logging.error(proc.stderr)
             return None, None
@@ -135,7 +138,7 @@ class MacDumper(Dumper):
         # Cleanup dsymbundle file
         shutil.rmtree(dsymbundle)
 
-        if  proc.returncode != 0:
+        if proc.returncode != 0:
             logging.error("unable to extract symbols from {}:".format(fpath))
             logging.error(proc.stderr)
             return None, None
@@ -145,10 +148,11 @@ class MacDumper(Dumper):
 
 class OutputStore:
     def store(self, dump: typing.io.TextIO, meta):
-        assert(False)
+        assert (False)
+
 
 class HTTPOutputStore(OutputStore):
-    def __init__(self, url : str, version = None, prod = None):
+    def __init__(self, url: str, version=None, prod=None):
         super().__init__()
         self.url = url
         self.extra_args = {}
@@ -164,6 +168,7 @@ class HTTPOutputStore(OutputStore):
             logging.error("Unable to perform request, ret {}".format(r.status_code))
             r.raise_for_status()
 
+
 class LocalDirOutputStore(OutputStore):
     def __init__(self, rootdir: str):
         super().__init__()
@@ -175,6 +180,7 @@ class LocalDirOutputStore(OutputStore):
             os.makedirs(basepath)
         with open(os.path.join(basepath, meta["debug_file"] + ".sym"), "w+") as fd:
             shutil.copyfileobj(dump, fd)
+
 
 def process_dir(sourcedir, dumper, store):
     for root, dirnames, filenames, in os.walk(sourcedir):
@@ -194,10 +200,11 @@ def main():
     parser.add_argument("sourcedir", help="source directory")
     parser.add_argument("--upload-url", metavar="URL", dest="uploadurl", type=str, help="upload url")
     parser.add_argument("--strip-path", metavar="PATH", dest="strippath", type=str, help="strip path prefix")
-    parser.add_argument("-p","--platform",metavar="OS", dest="platform",
+    parser.add_argument("-p", "--platform", metavar="OS", dest="platform",
                         choices=["mac", "linux", "win"], required=True, help="symbol platform (mac, linux, win)")
     parser.add_argument("--output-dir", metavar="DIRECTORY", dest="outdir", type=str, help="output directory")
-    parser.add_argument("--version", metavar="VERSION", dest="version", type=str, help="specify symbol version for uploading")
+    parser.add_argument("--version", metavar="VERSION", dest="version", type=str,
+                        help="specify symbol version for uploading")
     parser.add_argument("--prod", metavar="PRODUCT", dest="prod", type=str, help="specify product name for uploading")
     parser.add_argument("--log", metavar="LOGLEVEL", dest="log", type=str, help="log level (INFO, WARNING, ERROR)")
     args = parser.parse_args()
@@ -208,7 +215,6 @@ def main():
             raise ValueError("Invalid log level: {}".format(loglevel))
         logging.basicConfig(format='%(levelname)s: %(message)s', level=numeric_level)
 
-
     if args.platform == "win":
         dumper = WindowDumper(strip_path=args.strippath)
     elif args.platform == "mac":
@@ -218,9 +224,9 @@ def main():
         exit(1)
 
     if args.uploadurl:
-        store=HTTPOutputStore(args.uploadurl, version=args.version, prod=args.prod)
+        store = HTTPOutputStore(args.uploadurl, version=args.version, prod=args.prod)
     elif args.outdir:
-        store=LocalDirOutputStore(args.outdir)
+        store = LocalDirOutputStore(args.outdir)
     else:
         logging.error("You must chose either --output-dir or --upload-url")
         exit(1)
@@ -229,5 +235,5 @@ def main():
 
 
 if __name__ == "__main__":
-    assert(sys.version_info >= (3,5))
+    assert (sys.version_info >= (3, 5))
     main()
