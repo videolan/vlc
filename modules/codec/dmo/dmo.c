@@ -302,6 +302,8 @@ static int DecOpen( decoder_t *p_dec )
     VIDEOINFOHEADER *p_vih = NULL;
     WAVEFORMATEX *p_wf = NULL;
 
+    int i_ret = VLC_EGENERIC;
+
     /* Initialize OLE/COM */
     if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
         vlc_assert_unreachable();
@@ -323,6 +325,8 @@ static int DecOpen( decoder_t *p_dec )
         uint16_t i_tag;
         int i_size = sizeof(WAVEFORMATEX) + p_dec->fmt_in->i_extra;
         p_wf = malloc( i_size );
+        if (p_wf == NULL)
+            goto allocation_failure;
 
         memset( p_wf, 0, sizeof(WAVEFORMATEX) );
         if( p_dec->fmt_in->i_extra )
@@ -356,6 +360,8 @@ static int DecOpen( decoder_t *p_dec )
 
         int i_size = sizeof(VIDEOINFOHEADER) + p_dec->fmt_in->i_extra;
         p_vih = malloc( i_size );
+        if (p_vih == NULL)
+            goto allocation_failure;
 
         memset( p_vih, 0, sizeof(VIDEOINFOHEADER) );
         if( p_dec->fmt_in->i_extra )
@@ -571,8 +577,10 @@ static int DecOpen( decoder_t *p_dec )
 
     return VLC_SUCCESS;
 
- error:
+allocation_failure:
+    i_ret = VLC_ENOMEM;
 
+error:
     if( p_dmo ) IMediaObject_Release( p_dmo );
     if( hmsdmo_dll ) FreeLibrary( hmsdmo_dll );
 
@@ -586,7 +594,7 @@ static int DecOpen( decoder_t *p_dec )
     p_sys->b_ready = true;
     vlc_cond_signal( &p_sys->wait_output );
     vlc_mutex_unlock( &p_sys->lock );
-    return VLC_EGENERIC;
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -1179,6 +1187,11 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         }
 
         p_data = malloc( i_data );
+        if (p_data == NULL)
+        {
+            DMOFreeMediaType( &dmo_type );
+            return VLC_ENOMEM;
+        }
         i_err = p_privdata->vt->GetPrivateData( p_privdata, p_data, &i_data );
 
         /* Update the media type with the private data */
