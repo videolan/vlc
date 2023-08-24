@@ -715,8 +715,9 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 
     video_color_space_t space;
     const vlc_fourcc_t *list;
+    const bool is_yup = vlc_fourcc_IsYUV(interop->fmt_in.i_chroma);
 
-    if (vlc_fourcc_IsYUV(interop->fmt_in.i_chroma))
+    if (is_yup)
     {
         GLint max_texture_units = 0;
         priv->gl.GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
@@ -746,6 +747,14 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
     if (ret == VLC_SUCCESS)
         goto interop_init;
+
+    if (!is_yup)
+    {
+        i_chroma = VLC_CODEC_RGBA;
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
+        if (ret == VLC_SUCCESS)
+            goto interop_init;
+    }
 
     /* Check whether any fallback for the chroma is translatable to OpenGL. */
     while (*list)
