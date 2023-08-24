@@ -212,7 +212,7 @@ def main():
     if args.log:
         numeric_level = getattr(logging, args.log.upper(), None)
         if not isinstance(numeric_level, int):
-            raise ValueError("Invalid log level: {}".format(loglevel))
+            raise ValueError("Invalid log level: {}".format(numeric_level))
         logging.basicConfig(format='%(levelname)s: %(message)s', level=numeric_level)
 
     if args.platform == "win":
