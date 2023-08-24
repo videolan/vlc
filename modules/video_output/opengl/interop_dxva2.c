@@ -481,7 +481,7 @@ GLConvOpen(vlc_object_t *obj)
     if (!priv)
         return VLC_ENOMEM;
     interop->priv = priv;
-    priv->OutputFormat = D3DFMT_X8R8G8B8;
+    priv->OutputFormat = D3DFMT_A8R8G8B8;
     priv->vt = vt;
 
     HRESULT hr;
@@ -551,7 +551,7 @@ GLConvOpen(vlc_object_t *obj)
         .w = {1, 1},
         .h = {1, 1},
         .internal = GL_RGBA,
-        .format = GL_RGBA,
+        .format = GL_BGRA,
         .type = GL_UNSIGNED_BYTE,
     };
 
