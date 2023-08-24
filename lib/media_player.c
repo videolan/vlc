@@ -1659,9 +1659,8 @@ libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
             return libvlc_Playing;
         case VLC_PLAYER_STATE_PAUSED:
             return libvlc_Paused;
-        default:
-            vlc_assert_unreachable();
     }
+    vlc_assert_unreachable();
 }
 
 bool libvlc_media_player_is_seekable(libvlc_media_player_t *p_mi)
