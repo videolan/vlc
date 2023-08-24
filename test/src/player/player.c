@@ -611,8 +611,17 @@ wait_state(struct ctx *ctx, enum vlc_player_state state)
     assert(VEC_LAST(vec) == state); \
 } while(0)
 
+static inline void state_list_dump(vec_on_state_changed *vec)
+{
+    fprintf(stderr, "Dumping state:\n");
+    for (size_t i = 0; i < vec->size; ++i)
+        fprintf(stderr, "state[%zu] = %s\n",
+                i, state_to_string(vec->data[i]));
+}
+
 #define assert_normal_state(ctx) do { \
     vec_on_state_changed *vec = &ctx->report.on_state_changed; \
+    state_list_dump(vec); \
     assert(vec->size >= 4); \
     assert(vec->data[vec->size - 4] == VLC_PLAYER_STATE_STARTED); \
     assert(vec->data[vec->size - 3] == VLC_PLAYER_STATE_PLAYING); \
