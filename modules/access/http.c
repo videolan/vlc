@@ -475,6 +475,9 @@ static int ReadICYMeta( stream_t *p_access )
     /* msg_Dbg( p_access, "ICY meta size=%u", i_size); */
 
     psz_meta = malloc( i_size + 1 );
+    if (psz_meta == NULL)
+        return VLC_ENOMEM;
+
     for( i_read = 0; i_read < i_size; )
     {
         int i_tmp;
