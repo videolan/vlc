@@ -1,4 +1,4 @@
-# VLC media player by ramu
+# VLC media player by ramu rr
 
 hi ramut add 
 **VLC** is a libre and open source **media player** and **multimedia engine**,
