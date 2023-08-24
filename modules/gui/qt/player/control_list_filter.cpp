@@ -99,10 +99,13 @@ void ControlListFilter::setPlayer(PlayerController * player)
 
     m_player = player;
 
-    connect(player, &PlayerController::teletextAvailableChanged, this, &ControlListFilter::invalidateFilter);
-    connect(player, &PlayerController::hasMenuChanged,           this, &ControlListFilter::invalidateFilter);
-    connect(player, &PlayerController::hasChaptersChanged,       this, &ControlListFilter::invalidateFilter);
-    connect(player, &PlayerController::hasTitlesChanged,         this, &ControlListFilter::invalidateFilter);
+    if (player)
+    {
+        connect(player, &PlayerController::teletextAvailableChanged, this, &ControlListFilter::invalidateFilter);
+        connect(player, &PlayerController::hasMenuChanged,           this, &ControlListFilter::invalidateFilter);
+        connect(player, &PlayerController::hasChaptersChanged,       this, &ControlListFilter::invalidateFilter);
+        connect(player, &PlayerController::hasTitlesChanged,         this, &ControlListFilter::invalidateFilter);
+    }
 
     invalidate();
 
