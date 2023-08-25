@@ -1131,17 +1131,21 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
  * Parses SubRip timing value.
  */
 static int subtitle_ParseSubRipTimingValue(int64_t *timing_value,
-                                           const char *s)
+                                           const char *s, size_t length)
 {
     int h1, m1, s1, d1 = 0;
 
-    if ( sscanf( s, "%d:%d:%d,%d",
-                 &h1, &m1, &s1, &d1 ) == 4 ||
-         sscanf( s, "%d:%d:%d.%d",
-                 &h1, &m1, &s1, &d1 ) == 4 ||
-         sscanf( s, "%d:%d:%d",
-                 &h1, &m1, &s1) == 3 )
+    int count;
+    if ( sscanf( s, "%d:%d:%d,%d%n",
+                 &h1, &m1, &s1, &d1, &count ) == 4 ||
+         sscanf( s, "%d:%d:%d.%d%n",
+                 &h1, &m1, &s1, &d1, &count ) == 4 ||
+         sscanf( s, "%d:%d:%d%n",
+                 &h1, &m1, &s1, &count) == 3 )
     {
+        if ((size_t)count > length)
+            return VLC_EGENERIC;
+
         (*timing_value) = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
                           VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
 
@@ -1157,23 +1161,18 @@ static int subtitle_ParseSubRipTimingValue(int64_t *timing_value,
 static int subtitle_ParseSubRipTiming( subtitle_t *p_subtitle,
                                        const char *s )
 {
-    int i_result = VLC_EGENERIC;
-    char *psz_start, *psz_stop;
-    psz_start = malloc( strlen(s) + 1 );
-    psz_stop = malloc( strlen(s) + 1 );
+    const char *delimiter = strstr(s, " --> ");
+    if (delimiter == NULL || delimiter == s)
+        return VLC_EGENERIC;
 
-    if( sscanf( s, "%s --> %s", psz_start, psz_stop) == 2 &&
-        subtitle_ParseSubRipTimingValue( &p_subtitle->i_start, psz_start ) == VLC_SUCCESS &&
-        subtitle_ParseSubRipTimingValue( &p_subtitle->i_stop,  psz_stop ) == VLC_SUCCESS )
-    {
-        i_result = VLC_SUCCESS;
-    }
+    int ret = subtitle_ParseSubRipTimingValue(&p_subtitle->i_start, s, (size_t)(delimiter - s));
+    if (ret != VLC_SUCCESS)
+        return ret;
 
-    free(psz_start);
-    free(psz_stop);
-
-    return i_result;
+    const char *right = delimiter + strlen(" --> ");
+    return subtitle_ParseSubRipTimingValue(&p_subtitle->i_stop, right, strlen(right));
 }
+
 /* ParseSubRip
  */
 static int  ParseSubRip( vlc_object_t *p_obj, subs_properties_t *p_props,
