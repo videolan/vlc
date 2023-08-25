@@ -817,7 +817,7 @@ AC_SUBST([SOCKET_LIBS])
 
 dnl Check for socklen_t
 AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
-AC_CACHE_CHECK([for socklen_t in sys/socket.h], dnl ` (fix VIM syntax highlight
+AC_CACHE_CHECK([for socklen_t in sys/socket.h],
 ac_cv_type_socklen_t,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <sys/types.h>
