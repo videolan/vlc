@@ -71,6 +71,12 @@ libsubtitle_plugin_la_SOURCES = demux/subtitle.c
 libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 
+subtitle_plugin_test_SOURCES = demux/subtitle.c
+subtitle_plugin_test_CPPFLAGS = $(AM_CPPFLAGS) -DENABLE_TEST
+subtitle_plugin_test_LDADD = $(LIBM)
+check_PROGRAMS += subtitle_plugin_test
+TESTS += subtitle_plugin_test
+
 libty_plugin_la_SOURCES = demux/ty.c codec/cc.h \
                           demux/mpeg/pes.h demux/mpeg/timestamps.h
 demux_LTLIBRARIES += libty_plugin.la
