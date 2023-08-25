@@ -415,6 +415,9 @@ static int Init( filter_t *p_filter )
     if( p_sys->desc_in == NULL || p_sys->desc_out == NULL )
         return VLC_EGENERIC;
 
+    if( p_sys->desc_in->plane_count == 0 || p_sys->desc_out->plane_count == 0 )
+        return VLC_EGENERIC;
+
     /* swscale does not like too small width */
     p_sys->i_extend_factor = 1;
     while( __MIN( p_fmti->i_visible_width, p_fmto->i_visible_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
