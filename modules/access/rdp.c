@@ -160,7 +160,7 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
     es_format_t fmt;
     es_format_Init( &fmt, VIDEO_ES, i_chroma );
     video_format_Setup( &fmt.video, i_chroma, p_gdi->width, p_gdi->height,
-                        p_gdi->width, p_gdi->height, 1, 1)
+                        p_gdi->width, p_gdi->height, 1, 1);
 
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
