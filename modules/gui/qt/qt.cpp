@@ -847,7 +847,7 @@ static void *Thread( void *obj )
         const QString& platform = app.platformName();
         if( platform == QLatin1String("xcb") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_XID;
-        else if( platform == QLatin1String("wayland") || platform == QLatin1String("wayland-egl") ) {
+        else if( platform.startsWith( QLatin1String("wayland") ) ) {
             p_intf->voutWindowType = VLC_WINDOW_TYPE_WAYLAND;
 
             // Workaround for popup widgets not closing on mouse press on wayland:
