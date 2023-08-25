@@ -50,7 +50,7 @@ static const dxgi_format_t dxgi_formats[] = {
     { "AI44",        DXGI_FORMAT_AI44,                0                  },
     { "P8",          DXGI_FORMAT_P8,                  0                  },
     { "A8P8",        DXGI_FORMAT_A8P8,                0                  },
-    { "B5G6R5",      DXGI_FORMAT_B5G6R5_UNORM,        VLC_CODEC_RGB16    },
+    { "B5G6R5",      DXGI_FORMAT_B5G6R5_UNORM,        VLC_CODEC_BGR565LE },
     { "Y416",        DXGI_FORMAT_Y416,                0                  },
     { "P010",        DXGI_FORMAT_P010,                VLC_CODEC_P010     },
     { "P016",        DXGI_FORMAT_P016,                VLC_CODEC_P016     },
@@ -99,7 +99,7 @@ static const d3d_format_t d3d_formats[] = {
     { "RGB10A2",  DXGI_FORMAT_R10G10B10A2_UNORM, VLC_CODEC_RGBA10,    10, 1, 1, 1, { DXGI_FORMAT_R10G10B10A2_UNORM } },
     { "VA_RGB10", DXGI_FORMAT_R10G10B10A2_UNORM, VLC_CODEC_D3D11_OPAQUE_RGBA, 10, 1, 1, 1, { DXGI_FORMAT_R10G10B10A2_UNORM } },
     { "AYUV",     DXGI_FORMAT_AYUV,           VLC_CODEC_VUYA,          8, 1, 1, 1, { DXGI_FORMAT_R8G8B8A8_UNORM } },
-    { "B5G6R5",   DXGI_FORMAT_B5G6R5_UNORM,   VLC_CODEC_RGB16,         5, 1, 1, 1, { DXGI_FORMAT_B5G6R5_UNORM } },
+    { "B5G6R5",   DXGI_FORMAT_B5G6R5_UNORM,   VLC_CODEC_RGB565LE,      5, 1, 1, 1, { DXGI_FORMAT_B5G6R5_UNORM } },
     { "I420_OPAQUE", DXGI_FORMAT_420_OPAQUE,  VLC_CODEC_D3D11_OPAQUE,  8, 2, 2, 1, { DXGI_FORMAT_UNKNOWN } },
 
     { NULL, 0, 0, 0, 0, 0, 0, { DXGI_FORMAT_UNKNOWN } }
@@ -134,11 +134,6 @@ void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
 {
     switch(format)
     {
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        fmt->i_bmask  = 0xf800;
-        fmt->i_gmask  = 0x07e0;
-        fmt->i_rmask  = 0x001f;
-        break;
     }
 }
 
