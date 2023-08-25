@@ -130,13 +130,6 @@ const d3d_format_t *DxgiGetRenderFormatList(void)
     return d3d_formats;
 }
 
-void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
-{
-    switch(format)
-    {
-    }
-}
-
 const char *DxgiVendorStr(unsigned int gpu_vendor)
 {
     static const struct {

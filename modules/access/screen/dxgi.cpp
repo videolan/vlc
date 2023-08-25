@@ -268,7 +268,6 @@ int screen_InitCaptureDXGI(demux_t *p_demux)
     p_sys->fmt.video.color_range        = COLOR_RANGE_FULL;
     p_sys->fmt.video.i_frame_rate       = outDesc.ModeDesc.RefreshRate.Numerator;
     p_sys->fmt.video.i_frame_rate_base  = outDesc.ModeDesc.RefreshRate.Denominator;
-    DxgiFormatMask( outDesc.ModeDesc.Format, &p_sys->fmt.video );
 
     p_sys->p_data = p_data;
     static const screen_capture_operations ops = {
