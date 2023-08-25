@@ -34,6 +34,10 @@ Widgets.PageLoader {
 
     property MLModel model
 
+    property var sortModel: !!stackViewItem && ("sortModel" in stackViewItem)
+                            ? stackViewItem.sortModel
+                            : null
+
     pageModel: [{
         name: "all",
         component: allArtistsComponent

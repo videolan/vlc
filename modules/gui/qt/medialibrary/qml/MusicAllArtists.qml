@@ -36,6 +36,11 @@ MainInterface.MainViewLoader {
 
     signal requestArtistAlbumView(int reason)
 
+    property var sortModel: [
+        { text: I18n.qtr("Alphabetic"), criteria: "name" },
+        { text: I18n.qtr("Tracks Count"),   criteria: "nb_tracks" }
+    ]
+
     model: MLArtistModel {
         id: artistModel
         ml: MediaLib
