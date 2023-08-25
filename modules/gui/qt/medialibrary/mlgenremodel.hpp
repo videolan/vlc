@@ -67,6 +67,7 @@ private:
     void onVlcMlEvent(const MLEvent &event) override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
+    QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
     QString getCover(MLGenre * genre) const;
 

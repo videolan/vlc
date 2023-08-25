@@ -35,7 +35,7 @@ MainInterface.MainViewLoader {
     // Properties
 
     property var sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "title" }
+        { text: I18n.qtr("Alphabetic"), criteria: "name" }
     ]
 
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
