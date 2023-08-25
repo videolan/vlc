@@ -1136,23 +1136,28 @@ static int subtitle_ParseSubRipTimingValue(int64_t *timing_value,
     int h1, m1, s1, d1 = 0;
 
     int count;
-    if ( sscanf( s, "%d:%d:%d,%d%n",
-                 &h1, &m1, &s1, &d1, &count ) == 4 ||
-         sscanf( s, "%d:%d:%d.%d%n",
-                 &h1, &m1, &s1, &d1, &count ) == 4 ||
-         sscanf( s, "%d:%d:%d%n",
-                 &h1, &m1, &s1, &count) == 3 )
-    {
-        if ((size_t)count > length)
-            return VLC_EGENERIC;
+    if (sscanf(s, "%d:%d:%d,%d%n", &h1, &m1, &s1, &d1, &count) == 4
+        && (size_t)count <= length)
+        goto success;
 
-        (*timing_value) = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
-                          VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+    if (sscanf(s, "%d:%d:%d.%d%n", &h1, &m1, &s1, &d1, &count) == 4
+        && (size_t)count <= length)
+        goto success;
 
-        return VLC_SUCCESS;
-    }
+    d1 = 0;
+    if (sscanf(s, "%d:%d:%d%n", &h1, &m1, &s1, &count) == 3
+        && (size_t)count <= length)
+        goto success;
 
     return VLC_EGENERIC;
+
+success:
+    (*timing_value) = VLC_TICK_0
+        + vlc_tick_from_sec(h1 * 3600 + m1 * 60 + s1)
+        + VLC_TICK_FROM_MS(d1);
+
+    return VLC_SUCCESS;
+
 }
 
 /* subtitle_ParseSubRipTiming
