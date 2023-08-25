@@ -1126,23 +1126,28 @@ static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
     int h1, m1, s1, d1 = 0;
 
     int count;
-    if ( sscanf( s, "%d:%d:%d,%d%n",
-                 &h1, &m1, &s1, &d1, &count ) == 4 ||
-         sscanf( s, "%d:%d:%d.%d%n",
-                 &h1, &m1, &s1, &d1, &count ) == 4 ||
-         sscanf( s, "%d:%d:%d%n",
-                 &h1, &m1, &s1, &count) == 3 )
-    {
-        if ((size_t)count > length)
-            return VLC_EGENERIC;
+    if (sscanf(s, "%d:%d:%d,%d%n", &h1, &m1, &s1, &d1, &count) == 4
+        && (size_t)count <= length)
+        goto success;
 
-        (*timing_value) = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
-                          VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+    if (sscanf(s, "%d:%d:%d.%d%n", &h1, &m1, &s1, &d1, &count) == 4
+        && (size_t)count <= length)
+        goto success;
 
-        return VLC_SUCCESS;
-    }
+    d1 = 0;
+    if (sscanf(s, "%d:%d:%d%n", &h1, &m1, &s1, &count) == 3
+        && (size_t)count <= length)
+        goto success;
 
     return VLC_EGENERIC;
+
+success:
+    (*timing_value) = VLC_TICK_0
+        + vlc_tick_from_sec(h1 * 3600 + m1 * 60 + s1)
+        + VLC_TICK_FROM_MS(d1);
+
+    return VLC_SUCCESS;
+
 }
 
 /* subtitle_ParseSubRipTiming
@@ -2492,6 +2497,19 @@ static void test_subtitle_ParseSubRipTimingValue(void)
         { "0:0:0",          VLC_TICK_0 },
     };
 
+    struct test_sized_timing_value
+    {
+        const char *str;
+        vlc_tick_t value;
+        size_t length;
+    };
+
+    static const struct test_sized_timing_value sized_timing_values_success[] =
+    {
+        { "0:0:0,1",        VLC_TICK_0, strlen("0:0:0") },
+        { "0:0:0.1",        VLC_TICK_0, strlen("0:0:0") },
+    };
+
     static const char *timing_values_fail[] =
     {
         "0:0",
@@ -2510,6 +2528,33 @@ static void test_subtitle_ParseSubRipTimingValue(void)
         fprintf(stderr, " -> %" PRId64 "\n", value);
         assert(ret == VLC_SUCCESS);
         assert(value == timing_values_success[i].value);
+    }
+
+    for (size_t i=0; i<ARRAY_SIZE(sized_timing_values_success); ++i)
+    {
+        fprintf(stderr, "Checking that %s (length=%zu) parses into %" PRId64 "\n",
+                sized_timing_values_success[i].str,
+                sized_timing_values_success[i].length,
+                sized_timing_values_success[i].value);
+
+        vlc_tick_t value;
+        int ret = subtitle_ParseSubRipTimingValue(&value,
+                sized_timing_values_success[i].str,
+                sized_timing_values_success[i].length);
+        assert(ret == VLC_SUCCESS);
+        fprintf(stderr, " -> %" PRId64 "\n", value);
+        assert(value == sized_timing_values_success[i].value);
+    }
+
+    for (size_t i=0; i<ARRAY_SIZE(timing_values_fail); ++i)
+    {
+        fprintf(stderr, "Checking that %s fails to parse\n",
+                timing_values_fail[i]);
+        vlc_tick_t value;
+        int ret = subtitle_ParseSubRipTimingValue(&value,
+                timing_values_fail[i], strlen(timing_values_fail[i]));
+        (void)value;
+        assert(ret != VLC_SUCCESS);
     }
 
     for (size_t i=0; i<ARRAY_SIZE(timing_values_fail); ++i)
