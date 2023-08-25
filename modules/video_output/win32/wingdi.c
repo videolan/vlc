@@ -268,21 +268,12 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         break;
     case 15:
         fmt->i_chroma = VLC_CODEC_RGB15;
-        fmt->i_rmask  = 0x7c00;
-        fmt->i_gmask  = 0x03e0;
-        fmt->i_bmask  = 0x001f;
         break;
     case 16:
         fmt->i_chroma = VLC_CODEC_RGB16;
-        fmt->i_rmask  = 0xf800;
-        fmt->i_gmask  = 0x07e0;
-        fmt->i_bmask  = 0x001f;
         break;
     case 24:
         fmt->i_chroma = VLC_CODEC_RGB24;
-        fmt->i_rmask  = 0x00ff0000;
-        fmt->i_gmask  = 0x0000ff00;
-        fmt->i_bmask  = 0x000000ff;
         break;
     case 32: // BGRX
         fmt->i_chroma = VLC_CODEC_BGRA;
@@ -292,6 +283,10 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
         return VLC_EGENERIC;
     }
+    fmt->i_rmask  = 0;
+    fmt->i_gmask  = 0;
+    fmt->i_bmask  = 0;
+    video_format_FixRgb(fmt);
 
     /* Initialize offscreen bitmap */
     sys->bmiInfo.bmiHeader = (BITMAPINFOHEADER) {
