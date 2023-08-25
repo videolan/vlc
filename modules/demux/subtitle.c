@@ -2,10 +2,12 @@
  * subtitle.c: Demux for subtitle text files.
  *****************************************************************************
  * Copyright (C) 1999-2007 VLC authors and VideoLAN
+ * Copyright (C) 2023      Videolabs
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -1131,7 +1133,7 @@ static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
                  &h1, &m1, &s1) == 3 )
     {
         (*timing_value) = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
-                          VLC_TICK_FROM_MS( d1 );
+                          VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
 
         return VLC_SUCCESS;
     }
