@@ -20,6 +20,7 @@
 
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLArtistModel::M_names_to_criteria = {
     {"title", VLC_ML_SORTING_ALPHA},
+    {"nb_tracks", VLC_ML_SORTING_TRACKNUMBER},
 };
 
 MLArtistModel::MLArtistModel(QObject *parent)
