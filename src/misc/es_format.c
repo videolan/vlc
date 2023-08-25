@@ -65,6 +65,10 @@ void video_format_FixRgb( video_format_t *p_fmt )
             break;
 
         default:
+            // assert(!"a bogus mask was set on a chroma");
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
             return;
         }
     }
