@@ -2577,29 +2577,24 @@ AC_ARG_ENABLE([dxva2],
 
 have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
-  if test "${SYS}" = "mingw32"; then
-  AS_IF([test "${have_avcodec}" = "yes"], [
-    AC_CHECK_HEADERS([dxva2api.h],
-      [
+  AS_IF([test "${SYS}" = "mingw32"], [
+    AS_IF([test "${have_avcodec}" = "yes"], [
         AC_CHECK_HEADERS([libavcodec/dxva2.h], [
-           AC_MSG_NOTICE([DxVA2 acceleration activated])
-           have_avcodec_dxva2="yes"
+            AC_MSG_NOTICE([DxVA2 acceleration activated])
+            have_avcodec_dxva2="yes"
         ],[
-    AS_IF([test "${enable_dxva2}" = "yes"],
-          [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
-              [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
-        ], [])
-      ],[
-    AS_IF([test "${enable_dxva2}" = "yes"],
-              [AC_MSG_ERROR([Could not find required dxva2api.h])],
-              [AC_MSG_WARN([dxva2api.h not found])])
-      ],[#include <d3d9.h>])
-  ],[
-    AS_IF([test "x${enable_dxva2}" != "x"], [
-      AC_MSG_ERROR([--enable-dxva2 and --disable-avcodec options are mutually exclusive.])
+            AS_IF([test "${enable_dxva2}" = "yes"],[
+                AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])
+            ],[
+                AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])
+            ])
+        ])
+    ],[
+        AS_IF([test "x${enable_dxva2}" != "x"], [
+            AC_MSG_ERROR([--enable-dxva2 and --disable-avcodec options are mutually exclusive.])
+        ])
     ])
   ])
-  fi
 ])
 AM_CONDITIONAL([HAVE_AVCODEC_DXVA2], [test "${have_avcodec_dxva2}" = "yes"])
 
@@ -2611,37 +2606,24 @@ AC_ARG_ENABLE([d3d11va],
 
 have_avcodec_d3d11va="no"
 AS_IF([test "${enable_d3d11va}" != "no"], [
-  if test "${SYS}" = "mingw32"; then
-  AS_IF([test "${have_avcodec}" = "yes"], [
-        AC_CHECK_TYPES([ID3D11VideoDecoder],
-          [
-            AC_CHECK_HEADERS([dxva2api.h],
-              [
-                AC_CHECK_HEADERS([libavcodec/d3d11va.h], [
-                   AC_MSG_NOTICE([D3D11 acceleration activated])
-                   AC_DEFINE([HAVE_AVCODEC_D3D11VA], [1], [Define if the d3d11va module is built])
-                   have_avcodec_d3d11va="yes"
-                ],[
-                  AS_IF([test "${enable_d3d11va}" = "yes"],
-                    [AC_MSG_ERROR([d3d11va is present but libavcodec/d3d11va.h is missing])],
-                        [AC_MSG_WARN([d3d11va is present but libavcodec/d3d11va.h is missing ])])
-                  ], [])
-                  ],[
-                    AS_IF([test "${enable_d3d11va}" = "yes"],
-                          [AC_MSG_ERROR([Could not find required dxva2api.h])],
-                          [AC_MSG_WARN([dxva2api.h not found])])
-                  ],[#include <d3d9.h>])
-          ],[
-            AS_IF([test "${enable_d3d11va}" = "yes"],
-                  [AC_MSG_ERROR([Could not find required ID3D11VideoDecoder in d3d11.h])],
-                  [AC_MSG_WARN([ID3D11VideoDecoder not found])])
-          ], [#include <d3d11.h>])
+  AS_IF([test "${SYS}" = "mingw32"], [
+    AS_IF([test "${have_avcodec}" = "yes"], [
+        AC_CHECK_HEADERS([libavcodec/d3d11va.h], [
+            AC_MSG_NOTICE([D3D11 acceleration activated])
+            have_avcodec_d3d11va="yes"
+        ],[
+            AS_IF([test "${enable_d3d11va}" = "yes"], [
+                AC_MSG_ERROR([d3d11va is present but libavcodec/d3d11va.h is missing])
+            ],[
+                AC_MSG_WARN([d3d11va is present but libavcodec/d3d11va.h is missing ])
+            ])
+        ])
+    ])
   ],[
     AS_IF([test "x${enable_d3d11va}" != "x"], [
       AC_MSG_ERROR([--enable-d3d11va and --disable-avcodec options are mutually exclusive.])
     ])
   ])
-  fi
 ])
 AM_CONDITIONAL([HAVE_AVCODEC_D3D11VA], [test "${have_avcodec_d3d11va}" = "yes"])
 
@@ -3603,22 +3585,8 @@ AS_IF([test "${enable_directx}" != "no"], [
 
   dnl Direct3D9
   AC_CHECK_HEADERS([d3d9.h], [
-    VLC_ADD_PLUGIN([direct3d9])
+    VLC_ADD_PLUGIN([direct3d9 direct3d9_filters])
     AC_CHECK_HEADERS([d3dx9effect.h])
-
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
-        [[#define COBJMACROS
-          #include <d3d9.h>
-          #include <dxva2api.h>
-          #ifndef IDirectXVideoProcessorService_GetVideoProcessorDeviceGuids
-          # error dxva2 too old
-          #endif
-        ]],[[;]])
-      ],[
-        VLC_ADD_PLUGIN([direct3d9_filters])
-      ],
-      [AC_MSG_WARN([Could not find required IDirectXVideoDecoder in dxva2api.h])])
-
   ])
 ])
 

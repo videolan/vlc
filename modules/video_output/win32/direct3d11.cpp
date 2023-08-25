@@ -316,7 +316,6 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
 static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-#ifdef HAVE_ID3D11VIDEODECODER
     if (sys->legacy_shader)
     {
         /* we need a staging texture */
@@ -344,7 +343,6 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
         for (unsigned plane = 0; plane < DXGI_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
     }
-#endif
     return VLC_SUCCESS;
 }
 
@@ -1022,10 +1020,6 @@ static bool CanUseTextureArray(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
-#ifndef HAVE_ID3D11VIDEODECODER
-    (void) vd;
-    return false;
-#else
     // 15.200.1062.1004 is wrong - 2015/08/03 - 15.7.1 WHQL
     // 21.19.144.1281 is wrong   -
     // 22.19.165.3 is good       - 2017/05/04 - ReLive Edition 17.5.1
@@ -1053,7 +1047,6 @@ static bool CanUseTextureArray(vout_display_t *vd)
     }
 
     return true;
-#endif
 }
 
 static bool BogusZeroCopy(const vout_display_t *vd)

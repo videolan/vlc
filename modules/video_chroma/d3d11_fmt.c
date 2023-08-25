@@ -364,13 +364,11 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
         ID3D11Device_Release(d3d_dev->d3ddevice);
         d3d_dev->d3ddevice = NULL;
     }
-#if defined(HAVE_ID3D11VIDEODECODER)
     if( d3d_dev->mutex_owner && d3d_dev->context_mutex != INVALID_HANDLE_VALUE )
     {
         CloseHandle( d3d_dev->context_mutex );
         d3d_dev->context_mutex = INVALID_HANDLE_VALUE;
     }
-#endif
 
     if ( sys->external.cleanupDeviceCb )
         sys->external.cleanupDeviceCb( sys->external.opaque );
