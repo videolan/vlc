@@ -366,6 +366,15 @@
 /* 24-bit BGR, in memory address order: "BGR" */
 #define VLC_CODEC_BGR24           VLC_FOURCC('B','G','R','3')
 
+/* 16-bit RGB Big-Endian: "R5G6B5" */
+#define VLC_CODEC_RGB565BE          VLC_FOURCC('R','B','1','6')
+/* 16-bit RGB Little-Endian: "g3B5 R5G3" */
+#define VLC_CODEC_RGB565LE          VLC_FOURCC('R','L','1','6')
+/* 16-bit BGR Big-Endian: "B5G6R5" */
+#define VLC_CODEC_BGR565BE          VLC_FOURCC('B','B','1','6')
+/* 16-bit BGR Little-Endian: "g3R5 B5G3" */
+#define VLC_CODEC_BGR565LE          VLC_FOURCC('B','L','1','6')
+
 /* 8-bit RGB "R3G3B2" */
 #define VLC_CODEC_RGB332           VLC_FOURCC('R','3','3','2')
 /* 8-bit RGB "R2G3B3" */
