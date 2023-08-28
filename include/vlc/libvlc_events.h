@@ -241,6 +241,18 @@ enum libvlc_event_e {
      * The renderer item is no longer valid.
      */
     libvlc_RendererDiscovererItemDeleted,
+
+    /**
+     * The current media set into the \ref libvlc_media_player_t is stopping.
+     *
+     * This event can be used to notify when the media callbacks, initialized
+     * from \ref libvlc_media_new_callbacks, should be interrupted, and in
+     * particular the \ref libvlc_media_read_cb. It can also be used to signal
+     * the application state that any input resource (webserver, file mounting,
+     * etc) can be discarded. Output resources still need to be active until
+     * the player switches to the \ref libvlc_Stopped state.
+     */
+    libvlc_MediaPlayerMediaStopping,
 };
 
 /**
@@ -370,6 +382,12 @@ typedef struct libvlc_event_t
         {
             libvlc_media_t * new_media;
         } media_player_media_changed;
+
+        struct
+        {
+            libvlc_media_t * media;
+        } media_player_media_stopping;
+
 
         /* ESAdded, ESDeleted, ESUpdated */
         struct
