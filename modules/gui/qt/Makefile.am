@@ -303,6 +303,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/keyhelper.cpp gui/qt/util/keyhelper.hpp \
 	gui/qt/util/listcache.hxx gui/qt/util/listcache.hpp \
 	gui/qt/util/listcacheloader.hpp \
+	gui/qt/util/locallistcacheloader.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
 	gui/qt/util/item_key_event_filter.cpp \
 	gui/qt/util/item_key_event_filter.hpp \
@@ -504,6 +505,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/i18n.moc.cpp \
 	gui/qt/util/keyhelper.moc.cpp \
 	gui/qt/util/listcache.moc.cpp \
+	gui/qt/util/locallistcacheloader.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/item_key_event_filter.moc.cpp \
 	gui/qt/util/effects_image_provider.moc.cpp \
