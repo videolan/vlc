@@ -344,6 +344,7 @@
         <file alias="LangButton.qml">player/qml/controlbarcontrols/LangButton.qml</file>
         <file alias="LoopButton.qml">player/qml/controlbarcontrols/LoopButton.qml</file>
         <file alias="MenuButton.qml">player/qml/controlbarcontrols/MenuButton.qml</file>
+        <file alias="NavigationBoxButton.qml">player/qml/controlbarcontrols/NavigationBoxButton.qml</file>
         <file alias="NavigationWidget.qml">player/qml/controlbarcontrols/NavigationWidget.qml</file>
         <file alias="NextButton.qml">player/qml/controlbarcontrols/NextButton.qml</file>
         <file alias="OpenButton.qml">player/qml/controlbarcontrols/OpenButton.qml</file>

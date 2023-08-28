@@ -960,6 +960,7 @@ libqt_plugin_la_QML = \
 	player/qml/controlbarcontrols/LangButton.qml \
 	player/qml/controlbarcontrols/LoopButton.qml \
 	player/qml/controlbarcontrols/MenuButton.qml \
+	player/qml/controlbarcontrols/NavigationBoxButton.qml \
 	player/qml/controlbarcontrols/NavigationWidget.qml \
 	player/qml/controlbarcontrols/NextButton.qml \
 	player/qml/controlbarcontrols/OpenButton.qml \

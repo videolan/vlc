@@ -77,11 +77,12 @@ public:
         RENDERER_BUTTON,
         NAVIGATION_BUTTONS,
         PROGRAM_BUTTON,
+        NAVIGATION_BOX,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,
         WIDGET_SPACER_EXTEND,
-        WIDGET_MAX
+        WIDGET_MAX,
     };
     Q_ENUM(ControlType)
 

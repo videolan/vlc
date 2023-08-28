@@ -56,6 +56,7 @@ QtObject {
         { id: ControlListModel.CHAPTER_PREVIOUS_BUTTON, file: "ChapterPreviousButton.qml", label: VLCIcons.dvd_prev, text: I18n.qtr("Previous chapter") },
         { id: ControlListModel.CHAPTER_NEXT_BUTTON, file: "ChapterNextButton.qml", label: VLCIcons.dvd_next, text: I18n.qtr("Next chapter") },
         { id: ControlListModel.VOLUME, file: "VolumeWidget.qml", label: VLCIcons.volume_high, text: I18n.qtr("Volume Widget") },
+        { id: ControlListModel.NAVIGATION_BOX, file: "NavigationBoxButton.qml", label: VLCIcons.ic_fluent_arrow_move, text: I18n.qtr("Navigation Box") },
         { id: ControlListModel.NAVIGATION_BUTTONS, file: "NavigationWidget.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("Navigation") },
         { id: ControlListModel.DVD_MENUS_BUTTON, file: "DvdMenuButton.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("DVD menus") },
         { id: ControlListModel.PROGRAM_BUTTON, file: "ProgramButton.qml", label: VLCIcons.tv, text: I18n.qtr("Program Button") },
@@ -77,7 +78,7 @@ QtObject {
             console.log("control delegate id " + id +  " doesn't exist")
             return { source: controlPath + "Fallback.qml" }
         }
-        
+
         entry.source = controlPath + entry.file
 
         return entry

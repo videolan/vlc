@@ -432,6 +432,8 @@ signals:
 
     void safeAreaChanged();
 
+    void navBoxToggled();
+
     void windowSuportExtendedFrameChanged();
     void windowExtendedMarginChanged(unsigned margin);
 

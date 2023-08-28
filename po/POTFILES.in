@@ -865,6 +865,7 @@ modules/gui/qt/player/qml/controlbarcontrols/InfoButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/LangButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/LoopButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/MenuButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/NavigationBoxButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/NextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/OpenButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml

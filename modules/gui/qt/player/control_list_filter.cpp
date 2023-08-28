@@ -67,6 +67,10 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
     {
         return (m_player->hasMenu() || m_player->hasPrograms() || m_player->isTeletextAvailable());
     }
+    else if (type == ControlListModel::NAVIGATION_BOX)
+    {
+        return (m_player->isInteractive());
+    }
     else if (type == ControlListModel::BOOKMARK_BUTTON)
     {
         return (m_ctx->hasMediaLibrary() || m_player->hasChapters() || m_player->hasTitles());
