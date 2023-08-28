@@ -170,6 +170,8 @@ QtObject {
     readonly property int checkButton_margins: dp(4, scale)
     readonly property int checkButton_handle_margins: dp(2, scale)
 
+    readonly property int navBoxButton_radius: dp(8, scale)
+
     readonly property int table_section_width: dp(32, scale)
     readonly property int table_section_text_margin: dp(10, scale)
 

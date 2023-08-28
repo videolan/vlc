@@ -942,6 +942,7 @@ libqt_plugin_la_QML = \
 	player/qml/TracksListPage.qml \
 	player/qml/ControlLayout.qml \
 	player/qml/ControlRepeater.qml \
+	player/qml/NavigationBox.qml \
 	player/qml/controlbarcontrols/HighResolutionTimeWidget.qml \
 	player/qml/controlbarcontrols/ArtworkInfoWidget.qml \
 	player/qml/controlbarcontrols/AspectRatioWidget.qml \

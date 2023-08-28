@@ -704,7 +704,45 @@ FocusScope {
         }
     }
 
-    Widgets.ButtonExt {
+    NavigationBox {
+        id: navBox
+        visible: Player.isInteractive && navBox.show
+                    && (toggleControlBarButtonAutoHide.running
+                    || navBox.hovered || !rootPlayer.hasEmbededVideo)
+
+        x: rootPlayer.x + VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
+        y: controlBarView.y - navBox.height - VLCStyle.margin_normal
+
+        dragXMin: 0
+        dragXMax: rootPlayer.width - navBox.width
+        dragYMin: 0
+        dragYMax: rootPlayer.height - navBox.height
+
+        Drag.onDragStarted: {
+            navBox.x = drag.x
+            navBox.y = drag.y
+        }
+    }
+
+    // NavigationBox's visibility depends on this timer
+    Connections {
+        target: MainCtx
+        onNavBoxToggled: toggleControlBarButtonAutoHide.restart()
+    }
+
+    Connections {
+           target: rootPlayer
+           onWidthChanged: {
+               if (navBox.x > navBox.dragXMax)
+                   navBox.x = navBox.dragXMax
+           }
+           onHeightChanged: {
+               if (navBox.y > navBox.dragYMax)
+                   navBox.y = navBox.dragYMax
+           }
+    }
+
+   Widgets.ButtonExt {
         id: toggleControlBarButton
         visible: Player.isInteractive
                  && rootPlayer.hasEmbededVideo
