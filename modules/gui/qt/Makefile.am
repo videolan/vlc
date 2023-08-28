@@ -683,6 +683,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_fluent_apps_list.svg \
 	pixmaps/icons/ic_fluent_more_vertical.svg \
 	pixmaps/icons/multiselect.svg \
+	pixmaps/icons/ok.svg \
 	pixmaps/icons/ic_fluent_next.svg \
 	pixmaps/icons/ic_pause_filled.svg \
 	pixmaps/icons/pip.svg \
@@ -690,6 +691,11 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/ic_playlist.svg \
 	pixmaps/icons/ic_fluent_play.svg \
 	pixmaps/icons/play_reverse.svg \
+	pixmaps/icons/ic_fluent_arrow_move.svg \
+	pixmaps/icons/ic_fluent_chevron_down_24.svg \
+	pixmaps/icons/ic_fluent_chevron_left_24.svg \
+	pixmaps/icons/ic_fluent_chevron_right_24.svg \
+	pixmaps/icons/ic_fluent_chevron_up_24.svg \
 	pixmaps/icons/ic_fluent_play_filled.svg \
 	pixmaps/icons/podcast.svg \
 	pixmaps/icons/ic_fluent_previous.svg \
