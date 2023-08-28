@@ -231,6 +231,13 @@ public slots:
     //programs
     void changeProgram( int );
 
+    //menu navigation
+    Q_INVOKABLE void navigateUp( );
+    Q_INVOKABLE void navigateDown( );
+    Q_INVOKABLE void navigateLeft( );
+    Q_INVOKABLE void navigateRight( );
+    Q_INVOKABLE void navigateActivate( );
+
     //vout properties
     void toggleFullscreen();
 

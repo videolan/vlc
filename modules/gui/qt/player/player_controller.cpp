@@ -1437,6 +1437,56 @@ void PlayerController::sectionMenu()
         vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_MENU );
 }
 
+void PlayerController::navigateUp()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !isCurrentItemSynced() )
+        return;
+    if( vlc_player_IsStarted( d->m_player ) )
+        vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_UP);
+}
+
+void PlayerController::navigateDown()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !isCurrentItemSynced() )
+        return;
+    if( vlc_player_IsStarted( d->m_player ) )
+        vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_DOWN);
+}
+
+void PlayerController::navigateLeft()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !isCurrentItemSynced() )
+        return;
+    if( vlc_player_IsStarted( d->m_player ) )
+        vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_LEFT);
+}
+
+void PlayerController::navigateRight()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !isCurrentItemSynced() )
+        return;
+    if( vlc_player_IsStarted( d->m_player ) )
+        vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_RIGHT);
+}
+
+void PlayerController::navigateActivate()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    if( !isCurrentItemSynced() )
+        return;
+    if( vlc_player_IsStarted( d->m_player ) )
+        vlc_player_Navigate( d->m_player, VLC_PLAYER_NAV_ACTIVATE);
+}
+
 void PlayerController::chapterNext()
 {
     Q_D(PlayerController);
