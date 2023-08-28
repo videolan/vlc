@@ -79,6 +79,25 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
     libvlc_event_send(&mp->event_manager, &event);
 }
 
+static void
+on_stopping_current_media(vlc_player_t *player, input_item_t *media,
+                         void *data)
+{
+    assert(media != NULL);
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+
+    libvlc_media_t *libmedia = media->libvlc_owner;
+    assert(libmedia != NULL);
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerMediaStopping;
+    event.u.media_player_media_stopping.media = libmedia;
+    libvlc_event_send(&mp->event_manager, &event);
+}
+
+
 static libvlc_event_type_t
 PlayerStateToLibvlcEventType(enum vlc_player_state new_state)
 {
@@ -508,6 +527,7 @@ on_audio_device_changed(audio_output_t *aout, const char *device, void *data)
 
 static const struct vlc_player_cbs vlc_player_cbs = {
     .on_current_media_changed = on_current_media_changed,
+    .on_stopping_current_media = on_stopping_current_media,
     .on_state_changed = on_state_changed,
     .on_error_changed = on_error_changed,
     .on_buffering_changed = on_buffering_changed,
