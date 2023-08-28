@@ -223,7 +223,12 @@ vlc_player_destructor_Thread(void *data)
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(player, input);
 
+            /* Note: no need to hold the media here, it will be valid
+             * until input_Close() and the event is sent from the thread
+             * that will call this function. */
+            input_item_t *media = input_GetItem(input->thread);
             input_Stop(input->thread);
+            vlc_player_SendEvent(player, on_stopping_current_media, media);
         }
 
         bool keep_sout = true;
