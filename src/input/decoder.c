@@ -1227,7 +1227,10 @@ static void PacketizerGetCc( vlc_input_decoder_t *p_owner, decoder_t *p_dec_cc )
     p_cc = p_dec_cc->pf_get_cc( p_dec_cc, &desc );
     if( !p_cc )
         return;
+
+    vlc_fifo_Unlock(p_owner->p_fifo);
     DecoderPlayCc( p_owner, p_cc, &desc );
+    vlc_fifo_Lock(p_owner->p_fifo);
 }
 
 static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
