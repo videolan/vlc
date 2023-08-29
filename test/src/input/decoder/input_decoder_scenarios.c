@@ -351,7 +351,21 @@ static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
     return f;
 }
 
-const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
+static void on_track_list_changed_check_cea608(
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track)
+{
+    if (action != VLC_PLAYER_LIST_ADDED)
+        return;
+
+    if (strcmp(vlc_es_id_GetStrId(track->es_id), "video/0/cc/spu/auto/0") != 0)
+        return;
+
+    assert(track->fmt.i_codec == VLC_CODEC_CEA608);
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
+#define source_800_600 "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600"
 struct input_decoder_scenario input_decoder_scenarios[] =
 {{
     .source = source_800_600,
@@ -406,6 +420,13 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .sout_filter_send = sout_filter_wait_cc,
     .sout_filter_flush = sout_filter_flush,
     .interface_setup = interface_setup_check_flush,
+},
+{
+    .source = source_800_600 ";video_packetized=false",
+    .packetizer_getcc = packetizer_getcc,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_drop,
+    .on_track_list_changed = on_track_list_changed_check_cea608,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 

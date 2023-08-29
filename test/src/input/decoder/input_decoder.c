@@ -271,6 +271,17 @@ static void on_state_changed(vlc_player_t *player, enum vlc_player_state state, 
     vlc_cond_signal(&player_cond);
 }
 
+static void on_track_list_changed(vlc_player_t *player,
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track,
+        void *data)
+{
+    (void)player; (void)data;
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->on_track_list_changed != NULL)
+        scenario->on_track_list_changed(action, track);
+}
+
 static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *scenario)
 {
     input_decoder_scenario_init();
@@ -296,6 +307,7 @@ static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *sc
 
     static const struct vlc_player_cbs player_cbs = {
         .on_state_changed = on_state_changed,
+        .on_track_list_changed = on_track_list_changed,
     };
 
     vlc_player_Lock(player);
