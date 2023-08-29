@@ -28,17 +28,15 @@
 
 #include <vlc_media_source.h>
 
-#include "mediatreelistener.hpp"
-#include "util/cliplistmodel.hpp"
+#include "util/base_model.hpp"
 #include "util/shared_input_item.hpp"
 
 #include <memory>
 
 class MainCtx;
 
-struct NetworkDeviceItem;
-
-class NetworkDeviceModel : public ClipListModel<NetworkDeviceItem>
+class NetworkDeviceModelPrivate;
+class NetworkDeviceModel : public BaseModel
 {
     Q_OBJECT
 
@@ -90,7 +88,11 @@ public: // Declarations
                                                   vlc_media_tree_Release);
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
+    virtual ~NetworkDeviceModel() = default;
+protected:
+    NetworkDeviceModel( NetworkDeviceModelPrivate* priv, QObject* parent = nullptr);
 
+public:
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
@@ -98,84 +100,40 @@ public:
     void setSdSource(SDCatType s);
     void setSourceName(const QString& sourceName);
 
-    inline MainCtx* getCtx() { return m_ctx; }
-    inline SDCatType getSdSource() { return m_sdSource; }
-    inline QString getName() { return m_name; }
-    inline QString getSourceName() { return m_sourceName; }
+    inline MainCtx* getCtx() const { return m_ctx; }
+    inline SDCatType getSdSource() const { return m_sdSource; }
+    inline QString getName() const { return m_name; }
+    inline QString getSourceName() const { return m_sourceName; }
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
-    Q_INVOKABLE bool addToPlaylist( int index );
+    Q_INVOKABLE bool addToPlaylist(int row );
     Q_INVOKABLE bool addToPlaylist(const QVariantList& itemIdList);
     Q_INVOKABLE bool addToPlaylist(const QModelIndexList& itemIdList);
-    Q_INVOKABLE bool addAndPlay( int index );
+    Q_INVOKABLE bool addAndPlay(int row );
     Q_INVOKABLE bool addAndPlay(const QVariantList& itemIdList);
     Q_INVOKABLE bool addAndPlay(const QModelIndexList& itemIdList);
 
-    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
-
     Q_INVOKABLE QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
-
-protected: // ClipListModel implementation
-    void onUpdateSort(const QString & criteria, Qt::SortOrder order) override;
 
 signals:
     void ctxChanged();
     void sdSourceChanged();
     void sourceNameChanged();
     void nameChanged();
+    void itemsUpdated();
 
 private:
+    void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
     bool initializeMediaSources();
 
-    void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
-
-    void addItems(const std::vector<SharedInputItem> & inputList, const MediaSourcePtr & mediaSource);
-
-    void eraseItem(std::vector<NetworkDeviceItem>::iterator & it, int index, int count);
-
-private: // Static functions
-    static bool matchItem(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
-
-    static bool ascendingName(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
-    static bool ascendingMrl (const NetworkDeviceItem & a, const NetworkDeviceItem & b);
-
-    static bool descendingName(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
-    static bool descendingMrl (const NetworkDeviceItem & a, const NetworkDeviceItem & b);
-
 private:
-    struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
-        ListenerCb(NetworkDeviceModel *model, MediaSourcePtr mediaSource)
-            : model(model)
-            , mediaSource(std::move(mediaSource))
-        {}
-
-        void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override;
-        void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
-        void onItemRemoved( MediaTreePtr tree, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
-        inline void onItemPreparseEnded( MediaTreePtr, input_item_node_t *, enum input_item_preparse_status ) override {}
-
-        NetworkDeviceModel *model;
-        MediaSourcePtr mediaSource;
-    };
-
     MainCtx* m_ctx = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
 
-    std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
-};
-
-struct NetworkDeviceItem
-{
-    QString name;
-    QUrl mainMrl;
-    std::vector<QUrl> mrls;
-    QString protocol;
-    NetworkDeviceModel::ItemType type;
-    NetworkDeviceModel::MediaSourcePtr mediaSource;
-    SharedInputItem inputItem;
-    QString artwork;
+    class ListenerCb;
+    Q_DECLARE_PRIVATE(NetworkDeviceModel)
 };
 
 #endif // MLNETWORKDEVICEMODEL_HPP
