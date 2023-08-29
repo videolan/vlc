@@ -502,6 +502,12 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
         UpdateGenericFromDemux( p_input );
     }
 
+    /* If the input is stopped, we don't signal anything to the es_out and
+     * ignore the previous results from the demux, and we need to stop
+     * demuxing to let the input close as fast as possible. */
+    if (input_Stopped(p_input))
+        return;
+
     if( i_ret == VLC_DEMUXER_EOF )
     {
         msg_Dbg( p_input, "EOF reached" );
