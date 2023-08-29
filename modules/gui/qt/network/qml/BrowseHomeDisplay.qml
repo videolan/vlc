@@ -36,7 +36,14 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
-    property int maximumRows: (MainCtx.gridView) ? 2 : 5
+    property int maximumRows: {
+        if (model.searchPattern !== "")
+            return -1
+        else if (MainCtx.gridView)
+            return 2
+        else
+            return 5
+    }
 
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name"},
@@ -135,14 +142,11 @@ FocusScope {
                 width: root.width
                 height: contentHeight
 
-                // NOTE: We are not capping the list when filtering.
-                maximumRows: (model.searchPattern === "") ? root.maximumRows : -1
-
                 visible: (model.count !== 0)
 
-                model: StandardPathModel
-                {
-                    maximumCount: foldersSection.maximumCount
+                model: StandardPathModel {
+                    //we only have a handfull of standard path (5 or 6)
+                    //so we don't limit them
                 }
 
                 title: I18n.qtr("My Folders")
@@ -172,7 +176,7 @@ FocusScope {
                 width: root.width
                 height: contentHeight
 
-                maximumRows: foldersSection.maximumRows
+                maximumRows: root.maximumRows
 
                 visible: (model.count !== 0)
 
@@ -182,12 +186,13 @@ FocusScope {
                     sd_source: NetworkDeviceModel.CAT_DEVICES
                     source_name: "*"
 
-                    maximumCount: deviceSection.maximumCount
+                    searchPattern: foldersSection.model.searchPattern
+                    sortCriteria: foldersSection.model.sortCriteria
+                    sortOrder: foldersSection.model.sortOrder
+                    limit: deviceSection.maximumCount
                 }
 
                 title: I18n.qtr("My Machine")
-
-                parentFilter: foldersSection.model
 
                 Navigation.parentItem: root
 
@@ -219,7 +224,7 @@ FocusScope {
                 width: root.width
                 height: contentHeight
 
-                maximumRows: foldersSection.maximumRows
+                maximumRows: root.maximumRows
 
                 visible: (model.count !== 0)
 
@@ -229,12 +234,13 @@ FocusScope {
                     sd_source: NetworkDeviceModel.CAT_LAN
                     source_name: "*"
 
-                    maximumCount: lanSection.maximumCount
+                    searchPattern: foldersSection.model.searchPattern
+                    sortCriteria: foldersSection.model.sortCriteria
+                    sortOrder: foldersSection.model.sortOrder
+                    limit: lanSection.maximumCount
                 }
 
                 title: I18n.qtr("My LAN")
-
-                parentFilter: foldersSection.model
 
                 Navigation.parentItem: root
 

@@ -110,9 +110,7 @@ Widgets.PageLoader {
 
             displayMarginEnd: g_mainDisplay.displayMargin
 
-            model: modelFilter
-
-            sourceModel: StandardPathModel {}
+            model: StandardPathModel {}
         }
     }
 
@@ -131,9 +129,7 @@ Widgets.PageLoader {
 
             displayMarginEnd: g_mainDisplay.displayMargin
 
-            model: modelFilter
-
-            sourceModel: NetworkDeviceModel {
+            model: NetworkDeviceModel {
                 ctx: MainCtx
 
                 sd_source: viewDevice.sd_source
@@ -164,7 +160,7 @@ Widgets.PageLoader {
         id: componentBar
 
         NetworkAddressbar {
-            path: view.name === "browse" ? root.stackViewItem.providerModel.path : []
+            path: view.name === "browse" ? root.stackViewItem.model.path : []
 
             onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
 

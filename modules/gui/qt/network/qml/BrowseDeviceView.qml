@@ -34,8 +34,6 @@ FocusScope {
 
     /* required */ property var model
 
-    property var parentFilter: null
-
     readonly property int rowHeight: (_currentView) ? _currentView.rowHeight : 0
 
     readonly property int contentHeight: (_currentView) ? _currentView.contentHeight : 0
@@ -57,7 +55,7 @@ FocusScope {
 
         text: root.title
 
-        button.visible: root.sourceModel.hasMoreItems
+        button.visible: root.model.count < root.model.maximumCount
 
         Navigation.parentItem: root
 
@@ -74,10 +72,6 @@ FocusScope {
 
     property alias leftPadding: view.leftPadding
     property alias rightPadding: view.rightPadding
-
-    property alias modelFilter: modelFilter
-
-    property alias sourceModel: modelFilter.sourceModel
 
     // Private
 
@@ -98,19 +92,6 @@ FocusScope {
         model.currentIndex = 0
     }
 
-    onParentFilterChanged: {
-        if (parentFilter === null || sourceModel === null)
-            return
-
-        sourceModel.searchRole = parentFilter.searchRole
-
-        sourceModel.searchPattern = parentFilter.searchPattern
-
-        sourceModel.sortCriteria = parentFilter.sortCriteria
-
-        sourceModel.sortOrder = parentFilter.sortOrder
-    }
-
     // Connections
 
     Connections {
@@ -122,23 +103,10 @@ FocusScope {
         }
     }
 
-    // NOTE: If it exists, we're applying 'parentFilter' properties to fit the sorting options.
-    Connections {
-        target: parentFilter
-
-        onSearchRoleChanged: sourceModel.searchRole = parentFilter.searchRole
-
-        onSearchPatternChanged: sourceModel.searchPattern = parentFilter.searchPattern
-
-        onSortCriteriaChanged: sourceModel.sortCriteria = parentFilter.sortCriteria
-
-        onSortOrderChanged: sourceModel.sortOrder = parentFilter.sortOrder
-    }
-
     // Functions
 
     function playAt(index) {
-        model.addAndPlay(modelFilter.mapIndexToSource(index))
+        model.addAndPlay(index)
     }
 
     function setCurrentItemFocus(reason) {
@@ -158,12 +126,12 @@ FocusScope {
         const indexes = modelSelect.selectedIndexes
 
         if (indexes.length > 1) {
-            model.addAndPlay(modelFilter.mapIndexesToSource(indexes))
+            model.addAndPlay(indexes)
 
             return
         }
 
-        const data = modelFilter.getDataAt(index)
+        const data = model.getDataAt(index)
 
         const type = data.type
 
@@ -195,17 +163,7 @@ FocusScope {
     Util.SelectableDelegateModel {
         id: modelSelect
 
-        model: modelFilter
-    }
-
-    SortFilterProxyModel {
-        id: modelFilter
-
-        sourceModel: root.model
-
-        searchRole: "name"
-
-        searchPattern: (sourceModel) ? sourceModel.searchPattern : ""
+        model: root.model
     }
 
     Widgets.StackViewExt {
@@ -233,7 +191,7 @@ FocusScope {
 
             displayMarginEnd: root.displayMarginEnd
 
-            model: modelFilter
+            model: root.model
 
             headerDelegate: root.header
 
@@ -325,7 +283,7 @@ FocusScope {
 
             displayMarginEnd: root.displayMarginEnd
 
-            model: modelFilter
+            model: root.model
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
