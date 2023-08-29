@@ -77,6 +77,36 @@ CVPixelBufferPoolRef cvpxpool_create(const video_format_t *fmt, unsigned count);
  */
 CVPixelBufferRef cvpxpool_new_cvpx(CVPixelBufferPoolRef pool);
 
+/**
+ * @brief Get a kCVImageBufferYCbCrMatrix_X value corresponding 
+ * to a video_color_space_t
+ * 
+ * @param color_space a video format color space value
+ * @return a CFStringRef or NULL if there's no value match
+ */
+CFStringRef 
+cvpx_map_YCbCrMatrix_from_vcs(video_color_space_t color_space);
+
+/**
+ * @brief Get a kCVImageBufferColorPrimaries_X value corresponding 
+ * to a video_color_primaries_t
+ * 
+ * @param color_primaries a video format color primaries value
+ * @return a CFStringRef or NULL if there's no value match
+ */
+CFStringRef 
+cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries);
+
+/**
+ * @brief Get a kCVImageBufferTransferFunction_X value corresponding 
+ * to a video_transfer_func_t
+ * 
+ * @param transfer_func a video format transfer func value
+ * @return a CFStringRef or NULL if there's no value match
+ */
+CFStringRef 
+cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func);
+
 enum cvpx_video_context_type
 {
     CVPX_VIDEO_CONTEXT_DEFAULT,

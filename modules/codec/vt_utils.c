@@ -25,6 +25,7 @@
 #include <vlc_atomic.h>
 
 #include "vt_utils.h"
+#include "../packetizer/iso_color_tables.h"
 
 CFMutableDictionaryRef
 cfdict_create(CFIndex capacity)
@@ -313,6 +314,92 @@ cvpxpool_new_cvpx(CVPixelBufferPoolRef pool)
         return NULL;
 
     return cvpx;
+}
+
+CFStringRef 
+cvpx_map_YCbCrMatrix_from_vcs(video_color_space_t color_space)
+{
+    switch (color_space) {
+    case COLOR_SPACE_BT601:
+        return kCVImageBufferYCbCrMatrix_ITU_R_601_4;
+    case COLOR_SPACE_BT2020:
+        if (__builtin_available(macOS 10.11, iOS 9, *))
+            return kCVImageBufferYCbCrMatrix_ITU_R_2020;
+        break;
+    case COLOR_SPACE_BT709:
+        return kCVImageBufferYCbCrMatrix_ITU_R_709_2;
+    case COLOR_SPACE_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_mc mc_cicp = 
+                vlc_coeffs_to_iso_23001_8_mc(color_space);
+            return CVYCbCrMatrixGetStringForIntegerCodePoint(mc_cicp);
+        }
+    }
+    return NULL;
+}
+
+CFStringRef 
+cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries)
+{
+    switch (color_primaries) {
+    case COLOR_PRIMARIES_BT2020:
+        return kCVImageBufferColorPrimaries_ITU_R_2020;
+    case COLOR_PRIMARIES_BT709:
+        return kCVImageBufferColorPrimaries_ITU_R_709_2;
+    case COLOR_PRIMARIES_SMTPE_170:
+        return kCVImageBufferColorPrimaries_SMPTE_C;
+    case COLOR_PRIMARIES_EBU_3213:
+        return kCVImageBufferColorPrimaries_EBU_3213;
+    case COLOR_PRIMARIES_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_cp cp_cicp = 
+                vlc_primaries_to_iso_23001_8_cp(color_primaries);
+            return CVColorPrimariesGetStringForIntegerCodePoint(cp_cicp);
+        }
+    }
+    return NULL;
+}
+
+CFStringRef 
+cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
+{
+    switch (transfer_func) {
+    case TRANSFER_FUNC_SMPTE_ST2084:
+        if (__builtin_available(macOS 10.13, iOS 11, *))
+            return kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
+        break;
+    case TRANSFER_FUNC_BT709:
+    /* note: as stated by CVImageBuffer.h, 
+       kCVImageBufferTransferFunction_ITU_R_709_2 is equivalent to
+       kCVImageBufferTransferFunction_ITU_R_2020 and preferred
+    */
+        return kCVImageBufferTransferFunction_ITU_R_709_2;
+    case TRANSFER_FUNC_SMPTE_240:
+        return kCVImageBufferTransferFunction_SMPTE_240M_1995;
+    case TRANSFER_FUNC_HLG:
+        if (__builtin_available(macOS 10.13, iOS 11, *))
+            return kCVImageBufferTransferFunction_ITU_R_2100_HLG;
+        break;
+    case TRANSFER_FUNC_LINEAR:
+        if (__builtin_available(macOS 10.14, iOS 12, *))
+            return kCVImageBufferTransferFunction_Linear;
+        break;
+    case TRANSFER_FUNC_SRGB:
+        return kCVImageBufferTransferFunction_UseGamma;
+    case TRANSFER_FUNC_UNDEF:
+        break;
+    default:
+        if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *)) {
+            enum iso_23001_8_tc tc_cicp =
+                vlc_xfer_to_iso_23001_8_tc(transfer_func);
+            return CVTransferFunctionGetStringForIntegerCodePoint(tc_cicp);
+        }
+    }
+    return NULL;
 }
 
 struct cvpx_video_context
