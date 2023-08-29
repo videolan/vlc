@@ -1235,14 +1235,17 @@ static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_videodec );
 
-    if( unlikely( p_cc != NULL ) )
+    if (likely(p_cc == NULL))
+        return;
+
+    if (!p_owner->cc.b_supported ||
+       (p_owner->p_packetizer != NULL && p_owner->p_packetizer->pf_get_cc == NULL))
     {
-        if( p_owner->cc.b_supported &&
-           ( !p_owner->p_packetizer || !p_owner->p_packetizer->pf_get_cc ) )
-            DecoderPlayCc( p_owner, p_cc, p_desc );
-        else
-            block_Release( p_cc );
+        block_Release(p_cc);
+        return;
     }
+
+    DecoderPlayCc(p_owner, p_cc, p_desc);
 }
 
 static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_picture )
