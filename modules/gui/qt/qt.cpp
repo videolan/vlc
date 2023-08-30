@@ -755,6 +755,7 @@ static void *Thread( void *obj )
 
 #ifdef QT_STATIC
     Q_INIT_RESOURCE( vlc );
+    Q_INIT_RESOURCE( shaders );
 
     Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
     Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );

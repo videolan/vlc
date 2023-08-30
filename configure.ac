@@ -4019,12 +4019,16 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_VERSION_QML="$(eval $PKG_CONFIG --modversion Qt6Qml)"
       QT_VERSION_QUICK="$(eval $PKG_CONFIG --modversion Qt6Quick)"
 
+      QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
+      QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
+
       AC_PATH_PROGS(QMAKE, [qmake], qmake, ["${QT_BIN_DIRECTORY}"])
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
+      AC_PATH_PROGS(QSB, [qsb], qsb, ["${QT_SHADERTOOLS_BIN_DIRECTORY}"])
 
-      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], no, ["${QT_LIBEXEC_DIRECTORY}"])
+      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], no, ["${QT_QML_LIBEXEC_DIRECTORY}"])
       AS_IF([test "${QMLCACHEGEN}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
@@ -4730,6 +4734,7 @@ AC_SUBST([ASM])
 AC_SUBST([MOC])
 AC_SUBST([RCC])
 AC_SUBST([UIC])
+AC_SUBST([QSB])
 AC_SUBST([WINDRES])
 AC_SUBST([LIBEXT])
 AC_SUBST([AM_CPPFLAGS])

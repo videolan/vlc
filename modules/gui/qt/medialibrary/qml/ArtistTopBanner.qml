@@ -64,26 +64,19 @@ FocusScope {
                                  : undefined
         mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
-        visible: !blurLoader.active
+        visible: layer.enabled
         cache: (source === VLCStyle.noArtArtist)
 
         // Single pass linear filtering, in case the effect is not available:
-        layer.enabled: visible
+        layer.enabled: (GraphicsInfo.shaderType === GraphicsInfo.UnknownShadingLanguage)
         layer.smooth: true
         layer.textureSize: Qt.size(width * .75, height * .75)
     }
 
-    Loader {
-        id: blurLoader
+    FastBlur {
         anchors.fill: background
-
-        // Don't care Qt 6 Qt5Compat RHI compatible graphical effects for now
-        active: (GraphicsInfo.api === GraphicsInfo.OpenGL)
-
-        sourceComponent: FastBlur {
-            source: background
-            radius: VLCStyle.dp(4, VLCStyle.scale)
-        }
+        source: background
+        radius: VLCStyle.dp(4, VLCStyle.scale)
     }
 
     Rectangle {

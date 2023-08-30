@@ -1,5 +1,6 @@
+#version 440
 /*****************************************************************************
- * Copyright (C) 2022 VLC authors and VideoLAN
+ * Copyright (C) 2024 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,11 +59,15 @@
 
 //blending formulas are taken from Qt's Blend.qml implementation
 
-varying mediump vec2 qt_TexCoord0;
-uniform highp float qt_Opacity;
-uniform lowp sampler2D backgroundSource;
-uniform lowp vec4 screenColor;
-uniform lowp vec4 overlayColor;
+layout(location = 0) in vec2 qt_TexCoord0;
+layout(location = 0) out vec4 fragColor;
+layout(std140, binding = 0) uniform buf {
+    mat4 qt_Matrix;
+    float qt_Opacity;
+    vec4 screenColor;
+    vec4 overlayColor;
+};
+layout(binding = 1) uniform sampler2D backgroundSource;
 
 lowp vec4 fromPremult(lowp vec4 color) {
     lowp vec4 result = vec4(0.0);
@@ -108,7 +113,7 @@ lowp vec4 normal(lowp vec4 color1, lowp vec4 color2) {
 
 void main() {
     lowp vec4 result = vec4(0.0);
-    lowp vec4 colorP = fromPremult(texture2D(backgroundSource, qt_TexCoord0));
+    lowp vec4 colorP = fromPremult(texture(backgroundSource, qt_TexCoord0));
     lowp vec4 screenColorP = fromPremult(screenColor);
     lowp vec4 overlayColorP = fromPremult(overlayColor);
 
@@ -116,5 +121,5 @@ void main() {
     result = multiply(result, screenColorP);
     result = normal(result, overlayColorP);
 
-    gl_FragColor = vec4(result.rgb, 1.0) * qt_Opacity;
+    fragColor = vec4(result.rgb, 1.0) * qt_Opacity;
 }

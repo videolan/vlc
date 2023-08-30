@@ -1,3 +1,5 @@
+#version 440
+
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -16,36 +18,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick
-import Qt5Compat.GraphicalEffects
+layout(location = 0) in vec2 coord;
+layout(location = 0) out vec4 fragColor;
+layout(std140, binding = 0) uniform buf {
+    mat4 qt_Matrix;
+    float qt_Opacity;
+    float beginningFadeSize;
+    float endFadePos;
+};
+layout(binding = 1) uniform sampler2D source;
+layout(location = 1) in float pos;
 
-import "qrc:///style/"
+void main() {
+  lowp vec4 texel = texture(source, coord);
 
-// This item can be used as a layer effect.
-// Make sure that the sampler name is set to "source" (default).
-FastBlur {
-    id: root
+  // Note that the whole texel is multiplied instead
+  // of only the alpha component because it must be
+  // in premultiplied alpha format.
+  texel *= (1.0 - smoothstep(endFadePos, 1.0, pos));
+  texel *= (smoothstep(0.0, beginningFadeSize, pos));
 
-    radius: 64
-
-    property bool blending: false
-
-    property color tint: "transparent"
-    property real tintStrength: Qt.colorEqual(tint, "transparent") ? 0.0 : 0.7
-    property real noiseStrength: 0.02
-    property real exclusionStrength: 0.09
-
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        readonly property color tint: root.tint
-        readonly property real tintStrength: root.tintStrength
-        readonly property real noiseStrength: root.noiseStrength
-        readonly property real exclusionStrength: root.exclusionStrength
-
-        cullMode: ShaderEffect.BackFaceCulling
-
-        blending: root.blending
-
-        fragmentShader: "qrc:///shaders/FrostedGlass.frag.qsb"
-    }
+  // We still need to respect the accumulated scene graph opacity:
+  fragColor = texel * qt_Opacity;
 }

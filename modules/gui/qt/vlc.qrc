@@ -318,7 +318,6 @@
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
         <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>
         <file alias="PlayerBlurredBackground.qml">player/qml/PlayerBlurredBackground.qml</file>
-        <file alias="PlayerBlurredBackground.frag">player/qml/PlayerBlurredBackground.frag</file>
         <file alias="Bookmarks.qml">player/qml/Bookmarks.qml</file>
         <file alias="NavigationBox.qml">player/qml/NavigationBox.qml</file>
     </qresource>

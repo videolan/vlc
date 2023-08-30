@@ -83,6 +83,6 @@ Item {
         blending: false
         cullMode: ShaderEffect.BackFaceCulling
 
-        fragmentShader: "qrc:///player/PlayerBlurredBackground.frag"
+        fragmentShader: "qrc:///shaders/PlayerBlurredBackground.frag.qsb"
     }
 }

@@ -72,22 +72,8 @@ Item {
         // We do not want the source to be rendered below the frosted glass effect.
         // NOTE: It might be a better idea to enable this at all times if texture sampling
         //       is costlier than branching.
-        fragmentShader: blending ? "
-                varying highp vec2 qt_TexCoord0;
 
-                uniform lowp sampler2D source;
-                uniform lowp float qt_Opacity;
-                uniform highp vec4 discardRect;
-
-                void main() {
-                    if (((qt_TexCoord0.x >= discardRect.x && qt_TexCoord0.x <= discardRect.w) &&
-                        (qt_TexCoord0.y >= discardRect.y && qt_TexCoord0.y <= discardRect.z)))
-                      discard;
-
-                    highp vec4 texel = texture2D(source, qt_TexCoord0);
-
-                    gl_FragColor = texel * qt_Opacity;
-                }" : ""
+        fragmentShader: blending ? "qrc:///shaders/RectFilter.frag.qsb" : ""
     }
 
     // This item represents the region where the effect is applied.
@@ -114,24 +100,12 @@ Item {
 
         property alias source: root.source
 
-        readonly property rect normalEffectRect: Qt.rect(effectRect.x / root.width,
-                                                         effectRect.y / root.height,
-                                                         effectRect.width / root.width,
-                                                         effectRect.height / root.height)
+        readonly property rect normalRect: Qt.rect(effectRect.x / root.width,
+                                                   effectRect.y / root.height,
+                                                   effectRect.width / root.width,
+                                                   effectRect.height / root.height)
 
-        vertexShader: "
-            uniform highp mat4 qt_Matrix;
-            uniform highp vec4 normalEffectRect;
-
-            attribute highp vec4 qt_Vertex;
-            attribute highp vec2 qt_MultiTexCoord0;
-
-            varying highp vec2 qt_TexCoord0;
-
-            void main() {
-                qt_TexCoord0 = normalEffectRect.xy + normalEffectRect.zw * qt_MultiTexCoord0;
-                gl_Position = qt_Matrix * qt_Vertex;
-            }"
+        vertexShader: "qrc:///shaders/SubTexture.vert.qsb"
 
         layer.enabled: layer.effect
     }

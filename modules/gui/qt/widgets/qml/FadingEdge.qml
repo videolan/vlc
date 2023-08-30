@@ -46,8 +46,7 @@ Item {
 
     property real fadeSize: VLCStyle.margin_normal
 
-    readonly property bool effectCompatible: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
-                                             ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString)))
+    readonly property bool effectCompatible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
     Rectangle {
         id: backgroundRect
@@ -169,43 +168,8 @@ Item {
 
             // cullMode: ShaderEffect.BackFaceCulling // Does not work sometimes. Qt bug?
 
-            vertexShader: " uniform highp mat4 qt_Matrix;
-
-                            attribute highp vec4 qt_Vertex;
-                            attribute highp vec2 qt_MultiTexCoord0;
-
-                            varying highp vec2 coord;
-                            varying highp float pos; // x or y component of coord depending on orientation
-
-                            void main() {
-                                coord = qt_MultiTexCoord0;
-
-                                pos = qt_MultiTexCoord0.%1;
-
-                                gl_Position = qt_Matrix * qt_Vertex;
-                            } ".arg(vertical ? "y" : "x")
-
-            fragmentShader: " uniform lowp sampler2D source;
-                              uniform lowp float qt_Opacity;
-
-                              uniform highp float beginningFadeSize;
-                              uniform highp float endFadePos;
-
-                              varying highp vec2 coord;
-                              varying highp float pos;
-
-                              void main() {
-                                  highp vec4 texel = texture2D(source, coord);
-
-                                  // Note that the whole texel is multiplied instead
-                                  // of only the alpha component because it must be
-                                  // in premultiplied alpha format.
-                                  texel *= (1.0 - smoothstep(endFadePos, 1.0, pos));
-                                  texel *= (smoothstep(0.0, beginningFadeSize, pos));
-
-                                  // We still need to respect the accumulated scene graph opacity:
-                                  gl_FragColor = texel * qt_Opacity;
-                              } "
+            vertexShader: "qrc:///shaders/FadingEdge%1.vert.qsb".arg(vertical ? "Y" : "X")
+            fragmentShader: "qrc:///shaders/FadingEdge.frag.qsb"
         }
     }
 }

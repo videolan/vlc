@@ -1,3 +1,5 @@
+#version 440
+
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -16,36 +18,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick
-import Qt5Compat.GraphicalEffects
+layout(location = 0) in vec4 qt_Vertex;
+layout(location = 1) in vec2 qt_MultiTexCoord0;
+layout(location = 0) out vec2 coord;
+layout(std140, binding = 0) uniform buf {
+    mat4 qt_Matrix;
+    float qt_Opacity;
+};
 
-import "qrc:///style/"
+layout(location = 1) out float pos;
 
-// This item can be used as a layer effect.
-// Make sure that the sampler name is set to "source" (default).
-FastBlur {
-    id: root
-
-    radius: 64
-
-    property bool blending: false
-
-    property color tint: "transparent"
-    property real tintStrength: Qt.colorEqual(tint, "transparent") ? 0.0 : 0.7
-    property real noiseStrength: 0.02
-    property real exclusionStrength: 0.09
-
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        readonly property color tint: root.tint
-        readonly property real tintStrength: root.tintStrength
-        readonly property real noiseStrength: root.noiseStrength
-        readonly property real exclusionStrength: root.exclusionStrength
-
-        cullMode: ShaderEffect.BackFaceCulling
-
-        blending: root.blending
-
-        fragmentShader: "qrc:///shaders/FrostedGlass.frag.qsb"
-    }
+void main() {
+  coord = qt_MultiTexCoord0;
+  pos = qt_MultiTexCoord0.y;
+  gl_Position = qt_Matrix * qt_Vertex;
 }

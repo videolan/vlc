@@ -955,7 +955,6 @@ libqt_plugin_la_QML = \
 	player/qml/PIPPlayer.qml \
 	player/qml/Player.qml \
 	player/qml/PlayerBlurredBackground.qml \
-	player/qml/PlayerBlurredBackground.frag \
 	player/qml/PlayerControlLayout.qml \
 	player/qml/PlayerPlaylistVisibilityFSM.qml \
 	player/qml/ResumeDialog.qml \
@@ -1108,15 +1107,45 @@ libqt_plugin_la_QML = \
         widgets/qml/PartialEffect.qml \
         widgets/qml/ViewHeader.qml
 
+
+# Shaders:
+libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
+                          shaders/FadingEdgeX.vert \
+                          shaders/FadingEdgeY.vert \
+                          shaders/FrostedGlass.frag \
+                          shaders/RectFilter.frag \
+                          shaders/SubTexture.vert \
+                          shaders/PlayerBlurredBackground.frag
+
+QSB_PARAMS = --glsl="100 es,120,150" --batchable -O
+if HAVE_WIN32
+QSB_PARAMS += --hlsl=50 -c
+endif
+if HAVE_DARWIN
+QSB_PARAMS += --msl=12
+endif
+
+%.frag.qsb: %.frag
+	$(AM_V_GEN) $(QSB) $(QSB_PARAMS) -o $@ $<
+
+%.vert.qsb: %.vert
+	$(AM_V_GEN) $(QSB) $(QSB_PARAMS) -o $@ $<
+
+shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.frag=.frag.qsb) $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
+	$(AM_V_GEN) cp -f $(filter %.qrc, $^) $(builddir)/shaders/shaders.qrc || true
+	$(AM_V_GEN) $(RCC) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
+
+libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
+
 lib_qt_plugin_la_QRC = vlc.qrc
 
 if HAVE_WIN32
 lib_qt_plugin_la_QRC += windows.qrc
 endif
 
-EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES)
+EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_SHADER)
 
-nodist_libqt_plugin_la_SOURCES += resources.cpp
+nodist_libqt_plugin_la_SOURCES += resources.cpp shaders/shaders.cpp
 
 if ENABLE_VLM
 nodist_libqt_plugin_la_SOURCES += dialogs/vlm/vlm.moc.cpp

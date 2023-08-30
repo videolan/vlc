@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file alias="FadingEdge.frag.qsb">FadingEdge.frag.qsb</file>
+        <file alias="FadingEdgeX.vert.qsb">FadingEdgeX.vert.qsb</file>
+        <file alias="FadingEdgeY.vert.qsb">FadingEdgeY.vert.qsb</file>
+        <file alias="FrostedGlass.frag.qsb">FrostedGlass.frag.qsb</file>
+        <file alias="RectFilter.frag.qsb">RectFilter.frag.qsb</file>
+        <file alias="SubTexture.vert.qsb">SubTexture.vert.qsb</file>
+        <file alias="PlayerBlurredBackground.frag.qsb">PlayerBlurredBackground.frag.qsb</file>
+    </qresource>
+</RCC>

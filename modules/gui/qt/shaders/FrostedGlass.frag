@@ -1,3 +1,5 @@
+#version 440
+
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -16,36 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick
-import Qt5Compat.GraphicalEffects
+layout(location = 0) in vec2 qt_TexCoord0;
+layout(location = 0) out vec4 fragColor;
+layout(std140, binding = 0) uniform buf {
+  mat4 qt_Matrix;
+  float qt_Opacity;
+  vec4 tint;
+  float exclusionStrength;
+  float noiseStrength;
+  float tintStrength;
+};
+layout(binding = 1) uniform sampler2D source;
 
-import "qrc:///style/"
+float rand(vec2 co){
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
 
-// This item can be used as a layer effect.
-// Make sure that the sampler name is set to "source" (default).
-FastBlur {
-    id: root
+vec4 exclude(vec4 src, vec4 dst)
+{
+    return src + dst - 2.0 * src * dst;
+}
 
-    radius: 64
+void main() {
+   float r = rand(qt_TexCoord0) - 0.5;
+   vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+   vec4 blurred  = texture(source, qt_TexCoord0);
 
-    property bool blending: false
+   vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
 
-    property color tint: "transparent"
-    property real tintStrength: Qt.colorEqual(tint, "transparent") ? 0.0 : 0.7
-    property real noiseStrength: 0.02
-    property real exclusionStrength: 0.09
+   blurred = exclude(blurred, exclColor);
 
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        readonly property color tint: root.tint
-        readonly property real tintStrength: root.tintStrength
-        readonly property real noiseStrength: root.noiseStrength
-        readonly property real exclusionStrength: root.exclusionStrength
-
-        cullMode: ShaderEffect.BackFaceCulling
-
-        blending: root.blending
-
-        fragmentShader: "qrc:///shaders/FrostedGlass.frag.qsb"
-    }
+   fragColor = (mix(blurred, tint, tintStrength) + noise) * qt_Opacity;
 }

@@ -226,8 +226,7 @@ FocusScope {
 
                 color: theme.bg.primary
 
-                layer.enabled: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
-                               ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString))) &&
+                layer.enabled: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
                                (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
 
                 layer.effect: Widgets.PartialEffect {
