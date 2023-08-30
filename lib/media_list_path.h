@@ -123,6 +123,9 @@ get_path_rec( const libvlc_media_list_path_t path, libvlc_media_list_t * p_curre
     {
         libvlc_media_t * p_md = libvlc_media_list_item_at_index( p_current_mlist, i );
 
+        if( !p_md )
+            return NULL;
+
         if( p_md == p_searched_md )
             return libvlc_media_list_path_copy_by_appending( path, i ); /* Found! */
 
@@ -167,6 +170,9 @@ libvlc_media_list_item_at_path( libvlc_media_list_t * p_mlist, const libvlc_medi
     {
         libvlc_media_t* p_md = libvlc_media_list_item_at_index( p_current_mlist, path[i] );
 
+        if( !p_md )
+            return NULL;
+
         if( p_current_mlist != p_mlist )
             libvlc_media_list_release( p_current_mlist );
 
@@ -207,6 +213,9 @@ libvlc_media_list_parentlist_at_path( libvlc_media_list_t * p_mlist, const libvl
         }
 
         libvlc_media_t* p_md = libvlc_media_list_item_at_index( p_current_mlist, path[i] );
+
+        if( !p_md )
+            return NULL;
 
         p_current_mlist = libvlc_media_subitems( p_md );
         libvlc_media_release( p_md );

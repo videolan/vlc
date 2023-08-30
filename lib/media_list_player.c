@@ -826,9 +826,12 @@ static int set_relative_playlist_position_and_play(
     libvlc_media_list_unlock(p_mlp->p_mlist);
 
     /* Send the next item event */
+    libvlc_media_t * p_md;
+    p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
+    if (!p_md)
+        return -1;
     libvlc_event_t event;
     event.type = libvlc_MediaListPlayerNextItemSet;
-    libvlc_media_t * p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
     event.u.media_list_player_next_item_set.item = p_md;
     libvlc_event_send(&p_mlp->event_manager, &event);
     libvlc_media_release(p_md);
