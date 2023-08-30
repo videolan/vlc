@@ -54,12 +54,7 @@
         return [super tableView:tableView viewForTableColumn:tableColumn row:row];
     }
 
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
-
-    if (!cellView) {
-        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
-        cellView.identifier = @"VLCVideoLibraryTableViewCellIdentifier";
-    }
+    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryVideoTableViewDataSource class]]) {
         VLCLibraryVideoTableViewDataSource * const videoTableViewDataSource = (VLCLibraryVideoTableViewDataSource *)vlcDataSource;
