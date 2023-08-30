@@ -219,6 +219,17 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
 
     /* Fill input format */
     fmt.video.i_chroma = i_chroma;
+    switch( i_chroma )
+    {
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_RGB32:
+            fmt.video.i_rmask = p_client->format.redMax   << p_client->format.redShift;
+            fmt.video.i_gmask = p_client->format.greenMax << p_client->format.greenShift;
+            fmt.video.i_bmask = p_client->format.blueMax  << p_client->format.blueShift;
+            break;
+    }
+
     fmt.video.i_visible_width =
             fmt.video.i_width = i_width;
 
@@ -229,10 +240,6 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
 
     fmt.video.i_bits_per_pixel = i_bits_per_pixel;
-    fmt.video.i_rmask = p_client->format.redMax << p_client->format.redShift;
-    fmt.video.i_gmask = p_client->format.greenMax << p_client->format.greenShift;
-    fmt.video.i_bmask = p_client->format.blueMax << p_client->format.blueShift;
-
     fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
 
     /* declare the new es */
