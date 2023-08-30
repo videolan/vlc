@@ -1682,7 +1682,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
             {
                 // the first four bytes of subtype GUID contains the codec FOURCC
                 const char *pfcc = (char *)&p_mt->subtype;
-                int i_current_fourcc = VLC_FOURCC(pfcc[0], pfcc[1], pfcc[2], pfcc[3]);
+                vlc_fourcc_t i_current_fourcc = VLC_FOURCC(pfcc[0], pfcc[1], pfcc[2], pfcc[3]);
                 if( VLC_FOURCC('H','C','W','2') == i_current_fourcc
                  && p_mt->majortype == MEDIATYPE_Video && !b_audio )
                 {
