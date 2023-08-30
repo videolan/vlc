@@ -26,19 +26,10 @@
 #endif
 
 // VLC includes
-#include <vlc_media_source.h>
-#include "networkdevicemodel.hpp"
-#include "util/cliplistmodel.hpp"
-#include "util/shared_input_item.hpp"
+#include "util/base_model.hpp"
 
-// Qt includes
-#include <QAbstractListModel>
-#include <QStandardPaths>
-#include <QUrl>
-
-struct StandardPathItem;
-
-class StandardPathModel : public ClipListModel<StandardPathItem>
+class StandardPathModelPrivate;
+class StandardPathModel : public BaseModel
 {
     Q_OBJECT
 
@@ -55,11 +46,6 @@ public: // Enums
         PATH_ARTWORK
     };
 
-public: // Declarations
-    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                                  vlc_media_tree_Hold,
-                                                  vlc_media_tree_Release);
-
 public:
     StandardPathModel(QObject * parent = nullptr);
 
@@ -68,33 +54,7 @@ public: // QAbstractItemModel implementation
 
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 
-protected: // ClipListModel implementation
-    void onUpdateSort(const QString & criteria, Qt::SortOrder order) override;
-
-private: // Static functions
-    static bool ascendingName(const StandardPathItem & a, const StandardPathItem & b);
-    static bool ascendingMrl (const StandardPathItem & a, const StandardPathItem & b);
-
-    static bool descendingName(const StandardPathItem & a, const StandardPathItem & b);
-    static bool descendingMrl (const StandardPathItem & a, const StandardPathItem & b);
-
-private: // Functions
-    void addItem(const QString & path, const QString & name, const QUrl & artwork);
-};
-
-struct StandardPathItem
-{
-    QString name;
-    QUrl    mrl;
-
-    QString protocol;
-
-    NetworkDeviceModel::ItemType type;
-
-    SharedInputItem inputItem;
-    StandardPathModel::MediaTreePtr tree;
-
-    QUrl artwork;
+    Q_DECLARE_PRIVATE(StandardPathModel)
 };
 
 #endif // STANDARDPATHMODEL_HPP
