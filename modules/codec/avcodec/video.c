@@ -651,6 +651,9 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
         vlc_mutex_unlock(open_lock);
 
     p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
+    p_dec->fmt_out.video.i_rmask = 0;
+    p_dec->fmt_out.video.i_gmask = 0;
+    p_dec->fmt_out.video.i_bmask = 0;
     vlc_video_context *vctx_out;
     vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt, src_desc,
                                 p_dec->fmt_in, init_device,
