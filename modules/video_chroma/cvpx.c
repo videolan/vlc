@@ -198,6 +198,8 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
         return NULL;
     }
 
+    cvpx_attach_mapped_color_properties(cvpx, &p_sys->sw.fmt);
+
     /* Allocate a CPVX backed picture mapped for read/write */
     picture_t *mapped_dst =
         cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, p_filter->vctx_out, false);
