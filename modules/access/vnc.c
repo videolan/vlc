@@ -222,11 +222,15 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     switch( i_chroma )
     {
         case VLC_CODEC_RGB16:
+            fmt.video.i_rmask = 0x1f << 11;
+            fmt.video.i_gmask = 0x3f << 5;
+            fmt.video.i_bmask = 0x1f << 0;
+            break;
         case VLC_CODEC_RGB24:
         case VLC_CODEC_RGB32:
-            fmt.video.i_rmask = p_client->format.redMax   << p_client->format.redShift;
-            fmt.video.i_gmask = p_client->format.greenMax << p_client->format.greenShift;
-            fmt.video.i_bmask = p_client->format.blueMax  << p_client->format.blueShift;
+            fmt.video.i_rmask = 0xff << 16;
+            fmt.video.i_gmask = 0xff << 8;
+            fmt.video.i_bmask = 0xff << 0;
             break;
     }
 
