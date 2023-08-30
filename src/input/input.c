@@ -3237,6 +3237,10 @@ static void InputGetExtraFiles( input_thread_t *p_input,
     if( **ppsz_access && strcmp( *ppsz_access, "file" ) )
         return;
 
+    /* reject files with anchor data from stream extractor */
+    if( strpbrk( mrl, "#?" ) )
+        return;
+
     const size_t i_path = strlen(mrl);
 
     for( size_t i = 0; i < ARRAY_SIZE( patterns ); ++i )
