@@ -2618,10 +2618,10 @@ AS_IF([test "${enable_d3d11va}" != "no"], [
                 AC_MSG_WARN([d3d11va is present but libavcodec/d3d11va.h is missing ])
             ])
         ])
-    ])
-  ],[
-    AS_IF([test "x${enable_d3d11va}" != "x"], [
-      AC_MSG_ERROR([--enable-d3d11va and --disable-avcodec options are mutually exclusive.])
+    ],[
+        AS_IF([test "x${enable_d3d11va}" != "x"], [
+          AC_MSG_ERROR([--enable-d3d11va and --disable-avcodec options are mutually exclusive.])
+        ])
     ])
   ])
 ])
