@@ -776,12 +776,9 @@ static void Del(sout_stream_t *stream, void *id)
         if (map != NULL)
             map->playlist_ref = NULL;
 
-        hls_playlist_t *playlist;
-        hls_playlists_foreach (playlist)
-            ExtractAndAddSegment(playlist, sys->config.segment_length);
-
-        playlist->ended = true;
-        UpdatePlaylistManifest(playlist);
+        track->playlist_ref->ended = true;
+        ExtractAndAddSegment(track->playlist_ref, sys->config.segment_length);
+        UpdatePlaylistManifest(track->playlist_ref);
 
         DeletePlaylist(track->playlist_ref);
     }
