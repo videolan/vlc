@@ -468,6 +468,7 @@ static vlc_fourcc_t ParseFormat(const xcb_setup_t *setup,
 #endif
             }
             break;
+#if 0
         /* TODO 30 bits HDR */
         case 24:
             if (bpp == 32 && d->red_mask == 0xff && d->green_mask == 0xff
@@ -487,6 +488,7 @@ static vlc_fourcc_t ParseFormat(const xcb_setup_t *setup,
              && d->blue_mask == 0x1f && d->alpha_mask == 0x00)
                 return VLC_CODEC_RGB15;
             break;
+#endif
     }
 
     return 0;
