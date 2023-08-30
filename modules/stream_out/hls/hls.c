@@ -261,10 +261,10 @@ static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
         return NULL;
     return out.ptr;
 error:
+    vlc_vector_destroy(&already_described);
     if (vlc_memstream_close(&out) != 0)
         return NULL;
     free(out.ptr);
-    vlc_vector_destroy(&already_described);
     return NULL;
 }
 
