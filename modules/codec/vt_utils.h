@@ -107,6 +107,29 @@ cvpx_map_ColorPrimaries_from_vcp(video_color_primaries_t color_primaries);
 CFStringRef 
 cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func);
 
+/**
+ * @brief Check if an image buffer has an attachment corresponding to the key 
+ * parameter
+ * 
+ * @param pixelBuffer the image buffer where attachment is searched
+ * @param key the attachment's key to search
+ * @return true if attachment is present
+ * @return false if key didn't match any attachment
+ */
+bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key);
+
+/**
+ * @brief Try to map and attach kCVImageBufferYCbCrMatrixKey, 
+ * kCVImageBufferColorPrimariesKey, kCVImageBufferTransferFunctionKey and 
+ * kCVImageBufferGammaLevelKey if correspondance is found from a video_format_t.
+ * Attachments can be optionally kept if already present or overwritten
+ * 
+ * @param cvpx The image buffer where properties will be attached
+ * @param fmt The video format that contains the source color properties
+ */
+void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx, 
+                                         const video_format_t *fmt);
+
 enum cvpx_video_context_type
 {
     CVPX_VIDEO_CONTEXT_DEFAULT,

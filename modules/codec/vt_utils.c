@@ -402,6 +402,83 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
     return NULL;
 }
 
+bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key) {
+    if (__builtin_available(macOS 10.12, iOS 15, *)) {
+        return CVBufferHasAttachment(pixelBuffer, key);
+    }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return CVBufferGetAttachment(pixelBuffer, key, NULL) != NULL;
+#pragma clang diagnostic pop
+}
+
+
+
+void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx, 
+                                         const video_format_t *fmt)
+{
+    if (!cvpx_has_attachment(cvpx, kCVImageBufferYCbCrMatrixKey))
+    {
+        CFStringRef color_matrix = 
+            cvpx_map_YCbCrMatrix_from_vcs(fmt->space);
+        if (color_matrix) {
+            CVBufferSetAttachment(
+                cvpx,
+                kCVImageBufferYCbCrMatrixKey,
+                color_matrix,
+                kCVAttachmentMode_ShouldPropagate
+            );
+        }
+    }
+
+    if (!cvpx_has_attachment(cvpx, kCVImageBufferColorPrimariesKey))
+    {
+        CFStringRef color_primaries = 
+            cvpx_map_ColorPrimaries_from_vcp(fmt->primaries);
+        if (color_primaries) {
+            CVBufferSetAttachment(
+                cvpx,
+                kCVImageBufferColorPrimariesKey,
+                color_primaries,
+                kCVAttachmentMode_ShouldPropagate
+            );
+        }
+    }
+
+    if (!cvpx_has_attachment(cvpx, kCVImageBufferTransferFunctionKey))
+    {
+        CFStringRef color_transfer_func = 
+            cvpx_map_TransferFunction_from_vtf(fmt->transfer);
+        if (color_transfer_func) {
+            CVBufferSetAttachment(
+                cvpx,
+                kCVImageBufferTransferFunctionKey,
+                color_transfer_func,
+                kCVAttachmentMode_ShouldPropagate
+            );
+        }
+    }
+    
+    if (!cvpx_has_attachment(cvpx, kCVImageBufferGammaLevelKey))
+    {
+        Float32 gamma = 0;
+        if (fmt->transfer == TRANSFER_FUNC_SRGB)
+            gamma = 2.2;
+
+        if (gamma != 0) {
+            CFNumberRef value =
+                CFNumberCreate(NULL, kCFNumberFloat32Type, &gamma);
+            CVBufferSetAttachment(
+                cvpx,
+                kCVImageBufferGammaLevelKey,
+                value,
+                kCVAttachmentMode_ShouldPropagate
+            );
+            CFRelease(value);
+        }
+    }    
+}
+
 struct cvpx_video_context
 {
     const struct vlc_video_context_operations *ops;
