@@ -2578,7 +2578,7 @@ AC_ARG_ENABLE([dxva2],
 have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
   AS_IF([test "${SYS}" = "mingw32"], [
-    AS_IF([test "${have_avcodec}" = "yes"], [
+    AS_IF([test "${enable_avcodec}" != "no"], [
         AC_CHECK_HEADERS([libavcodec/dxva2.h], [
             AC_MSG_NOTICE([DxVA2 acceleration activated])
             have_avcodec_dxva2="yes"
@@ -2607,7 +2607,7 @@ AC_ARG_ENABLE([d3d11va],
 have_avcodec_d3d11va="no"
 AS_IF([test "${enable_d3d11va}" != "no"], [
   AS_IF([test "${SYS}" = "mingw32"], [
-    AS_IF([test "${have_avcodec}" = "yes"], [
+    AS_IF([test "${enable_avcodec}" != "no"], [
         AC_CHECK_HEADERS([libavcodec/d3d11va.h], [
             AC_MSG_NOTICE([D3D11 acceleration activated])
             have_avcodec_d3d11va="yes"
@@ -2681,7 +2681,7 @@ dnl
 
 AC_ARG_ENABLE([avformat],
 AS_HELP_STRING([--enable-avformat], [libavformat containers (default enabled)]),, [
-  enable_avformat="${have_avcodec}"
+  enable_avformat="${enable_avcodec}"
 ])
 have_avformat="no"
 AS_IF([test "${enable_avformat}" != "no"], [
@@ -3368,7 +3368,7 @@ AS_IF([test "${enable_vdpau}" != "no"], [
 AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
 
 have_avcodec_vdpau="no"
-AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
+AS_IF([test "${have_vdpau}" = "yes" -a "${enable_avcodec}" != "no"], [
   PKG_CHECK_EXISTS([libavcodec >= 56.19.100], [
     have_avcodec_vdpau="yes"
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
