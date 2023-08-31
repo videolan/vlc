@@ -320,6 +320,26 @@ vlc_vector_growsize_(size_t value)
 )
 
 /**
+ * Push a hole at the end of the vector.
+ *
+ * The amortized complexity is O(1). The items in the hole are left
+ * uninitialized and can be accessed in the range [size-count; size-1].
+ *
+ * \param pv a pointer to the vector
+ * \param count the number of items in the hole
+ * \retval true if no allocation failed
+ * \retval false on allocation failure (the vector is left untouched)
+ */
+#define vlc_vector_push_hole(pv, count) \
+( \
+    vlc_vector_reserve(pv, (pv)->size + vlc_vector_enforce_size_t_(count)) && \
+    ( \
+        (pv)->size += vlc_vector_enforce_size_t_(count), \
+        true \
+    ) \
+)
+
+/**
  * Append `count` items at the end of the vector.
  *
  * \param pv a pointer to the vector

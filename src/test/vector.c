@@ -87,9 +87,15 @@ static void test_vector_push_array(void)
 
     int items[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
     ok = vlc_vector_push_all(&vec, items, 8);
-
     assert(ok);
-    assert(vec.size == 13);
+
+    int items_hole[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
+    ok = vlc_vector_push_hole(&vec, 8);
+    assert(ok);
+    for (size_t i = 0; i < 8; ++i)
+        vec.data[vec.size-8+i] = items_hole[i];
+
+    assert(vec.size == 21);
     assert(vec.data[0] == 3);
     assert(vec.data[1] == 14);
     assert(vec.data[2] == 15);
@@ -103,6 +109,14 @@ static void test_vector_push_array(void)
     assert(vec.data[10] == 6);
     assert(vec.data[11] == 7);
     assert(vec.data[12] == 8);
+    assert(vec.data[13] == 7);
+    assert(vec.data[14] == 6);
+    assert(vec.data[15] == 5);
+    assert(vec.data[16] == 4);
+    assert(vec.data[17] == 3);
+    assert(vec.data[18] == 2);
+    assert(vec.data[19] == 1);
+    assert(vec.data[20] == 0);
 
     vlc_vector_destroy(&vec);
 }
