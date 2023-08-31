@@ -367,8 +367,8 @@ FocusScope {
 
                         on_AlignHCenterChanged: {
                             if (_alignHCenter) {
-                                anchors.horizontalCenter = localToolbarContent.horizontalCenter
                                 anchors.right = undefined
+                                anchors.horizontalCenter = parent.horizontalCenter
                             } else {
                                 anchors.horizontalCenter = undefined
                                 anchors.right = playlistGroup.left
