@@ -100,6 +100,8 @@ MMAL_FOURCC_T vlc_to_mmal_video_fourcc(const video_frame_format_t * const vf_vlc
                 return MMAL_ENCODING_ARGB;
             break;
         }
+        case VLC_CODEC_RGB565BE:
+            return MMAL_ENCODING_RGB16;
         case VLC_CODEC_RGB16:
         {
             // VLC RGB16 aka RV16 means we have to look at the mask values
