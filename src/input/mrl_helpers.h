@@ -92,6 +92,7 @@ mrl_EscapeFragmentIdentifier( char const* payload )
 struct mrl_info
 {
     vlc_array_t identifiers;
+    vlc_array_t volumes;
     char const *extra;
 };
 
@@ -101,12 +102,16 @@ mrl_info_Clean( struct mrl_info *mrli )
     for( size_t i = 0; i < vlc_array_count( &mrli->identifiers ); ++i )
         free( vlc_array_item_at_index( &mrli->identifiers, i ) );
     vlc_array_clear( &mrli->identifiers );
+    for( size_t i = 0; i < vlc_array_count( &mrli->volumes ); ++i )
+        free( vlc_array_item_at_index( &mrli->volumes, i ) );
+    vlc_array_clear( &mrli->volumes );
 }
 
 static inline void
 mrl_info_Init( struct mrl_info *mrli )
 {
     vlc_array_init( &mrli->identifiers );
+    vlc_array_init( &mrli->volumes );
     mrli->extra = NULL;
 }
 
@@ -144,6 +149,24 @@ mrl_FragmentSplit( struct mrl_info *mrli,
             goto error;
 
         if( vlc_array_append( &mrli->identifiers, decoded ) )
+        {
+            free( decoded );
+            goto error;
+        }
+        payload += len;
+    }
+
+    while( strncmp( payload, "!+", 2 ) == 0 )
+    {
+        payload += 2;
+
+        int len = strcspn( payload, "!?" );
+        char* decoded = strndup( payload, len );
+
+        if( unlikely( !decoded ) || !vlc_uri_decode( decoded ) )
+            goto error;
+
+        if( vlc_array_append( &mrli->volumes, decoded ) )
         {
             free( decoded );
             goto error;

@@ -87,7 +87,8 @@ struct stream_extractor_private {
  **/
 
 VLC_MALLOC static char*
-StreamExtractorCreateMRL( char const* base, char const* subentry )
+StreamExtractorCreateMRL( char const* base, char const* subentry,
+                          char const** volumes, size_t volumes_count )
 {
     struct vlc_memstream buffer;
     char* escaped;
@@ -109,6 +110,12 @@ StreamExtractorCreateMRL( char const* base, char const* subentry )
 
     vlc_memstream_puts( &buffer, "!/" );
     vlc_memstream_puts( &buffer, escaped );
+
+    for( size_t i=0; i<volumes_count; i++ )
+    {
+        vlc_memstream_puts( &buffer, "!+" );
+        vlc_memstream_puts( &buffer, volumes[i] );
+    }
 
     free( escaped );
     return vlc_memstream_close( &buffer ) ? NULL : buffer.ptr;
@@ -210,7 +217,8 @@ se_InitStream( struct stream_extractor_private* priv, stream_t* s )
     s->pf_seek = se_StreamSeek;
     s->pf_control = se_StreamControl;
     s->psz_url = StreamExtractorCreateMRL( priv->extractor.source->psz_url,
-                                           priv->extractor.identifier );
+                                           priv->extractor.identifier,
+                                           NULL, 0 );
     if( unlikely( !s->psz_url ) )
         return VLC_ENOMEM;
 
@@ -362,9 +370,11 @@ stream_extractor_AttachParsed( stream_t** source, const struct mrl_info *mrli )
 
 char*
 vlc_stream_extractor_CreateMRL( stream_directory_t* directory,
-                                char const* subentry )
+                                char const* subentry,
+                                char const **volumes, size_t volumes_count )
 {
-    return StreamExtractorCreateMRL( directory->source->psz_url, subentry );
+    return StreamExtractorCreateMRL( directory->source->psz_url, subentry,
+                                     volumes, volumes_count );
 }
 
 /**

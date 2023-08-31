@@ -123,11 +123,14 @@ VLC_USED;
  *
  * \param extractor the stream_directory_t for which the entity belongs
  * \param subentry the name of the entity in question
+ * \param volumes media additional volumes MRLs
+ * \param volumes_count number of additional volumes
  *
  * \return a pointer to the resulting MRL on success, NULL on failure
  **/
 VLC_API char* vlc_stream_extractor_CreateMRL( stream_directory_t *extractor,
-                                              char const* subentry );
+                                              char const* subentry,
+                                              char const **volumes, size_t volumes_count );
 
 /**
  * \name Attach a stream-extractor to the passed stream

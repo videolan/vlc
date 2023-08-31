@@ -551,7 +551,7 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
         if( unlikely( !path ) )
             break;
 
-        char*       mrl  = vlc_stream_extractor_CreateMRL( p_directory, path );
+        char* mrl = vlc_stream_extractor_CreateMRL( p_directory, path, NULL, 0 );
 
         if( unlikely( !mrl ) )
             break;
