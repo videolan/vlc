@@ -530,42 +530,12 @@ void MLBookmarkModel::setMl(MediaLib* medialib)
 
 void MLBookmarkModel::initModel()
 {
-    static const vlc_player_cbs cbs {
-        &onCurrentMediaChanged,
-        &onPlaybackStateChanged,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-    };
+    static const vlc_player_cbs cbs = []{
+        vlc_player_cbs cbs {};
+        cbs.on_current_media_changed = &onCurrentMediaChanged;
+        cbs.on_state_changed = &onPlaybackStateChanged;
+        return cbs;
+    }();
     QString uri;
     {
         vlc_player_locker lock{ m_player };
