@@ -504,6 +504,7 @@ void input_item_Release( input_item_t *p_item )
     {
         struct input_item_es *item_es = &p_item->es_vec.data[i];
         es_format_Clean( &item_es->es );
+        free( item_es->id );
     }
     vlc_vector_destroy( &p_item->es_vec );
 
@@ -1320,14 +1321,16 @@ void input_item_node_RemoveNode( input_item_node_t *parent,
 }
 
 /* Called by es_out when a new Elementary Stream is added or updated. */
-void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
+void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt,
+                                 const char *es_id)
 {
+    assert( es_id != NULL );
     vlc_mutex_lock( &item->lock );
 
     for( size_t i = 0; i < item->es_vec.size; ++i )
     {
         struct input_item_es *item_es = &item->es_vec.data[i];
-        if (item_es->es.i_id != fmt->i_id)
+        if (strcmp(item_es->id, es_id) != 0)
             continue;
 
         /* We've found the right ES, replace it */
@@ -1337,12 +1340,23 @@ void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
         return;
     }
 
+    char *es_id_dup = strdup( es_id );
+    if( es_id_dup == NULL )
+    {
+        vlc_mutex_unlock( &item->lock );
+        return;
+    }
+
     /* ES not found, insert it */
     if (vlc_vector_push_hole( &item->es_vec, 1 ))
     {
         struct input_item_es *item_es = &item->es_vec.data[item->es_vec.size - 1];
+        item_es->id = es_id_dup;
         es_format_Copy( &item_es->es, fmt );
     }
+    else
+        free( es_id_dup );
+
     vlc_mutex_unlock( &item->lock );
 }
 

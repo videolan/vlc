@@ -86,6 +86,7 @@ enum input_item_type_e
 struct input_item_es
 {
     es_format_t es;
+    char *id;
 };
 typedef struct VLC_VECTOR(struct input_item_es) input_item_es_vector;
 
