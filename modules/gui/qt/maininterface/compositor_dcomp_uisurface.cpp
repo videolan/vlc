@@ -255,7 +255,9 @@ bool CompositorDCompositionUISurface::init()
     connect(m_uiRenderControl, &QQuickRenderControl::renderRequested, this, &CompositorDCompositionUISurface::requestUpdate);
     connect(m_uiRenderControl, &QQuickRenderControl::sceneChanged, this, &CompositorDCompositionUISurface::requestUpdate);
 
+#if !defined(QT_NO_ACCESSIBILITY) && defined(QT5_DECLARATIVE_PRIVATE)
     QAccessible::installFactory(&compositionAccessibleFactory);
+#endif
 
     m_renderWindow->installEventFilter(this);
     return true;
