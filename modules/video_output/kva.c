@@ -483,6 +483,29 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     i_chroma_shift = 2;
                     break;
 
+                case VLC_CODEC_RGB565:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
+                        sys->kvac.ulRMask == 0xf800 &&
+                        sys->kvac.ulGMask == 0x07e0 &&
+                        sys->kvac.ulBMask == 0x001f)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_R565;
+                    }
+                    break;
+                case VLC_CODEC_BGR565:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
+                        sys->kvac.ulRMask == 0x001f &&
+                        sys->kvac.ulGMask == 0x07e0 &&
+                        sys->kvac.ulBMask == 0xf800)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_R565;
+                    }
+                    break;
+
                 case VLC_CODEC_RGB16:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR16;
                     i_kva_fourcc = FOURCC_R565;
