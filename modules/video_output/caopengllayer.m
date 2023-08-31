@@ -119,6 +119,68 @@ typedef struct vout_display_sys_t {
 #pragma mark -
 #pragma mark OpenGL context helpers
 
+// kCGLRenderer* enum value define card value, but familly is enough here.
+// However they follow some pattern by familly.
+#define kCGLRendererIntelFamilly 0x00024000
+
+/*
+ * GL API does not provide a way to know if a device is a lowpower one.
+ * We could make some guess here:
+ * On a MacBookPro (intel):
+ *   - GeForce and Radeon card could be discrete or external.
+ *   - Intel could be integrated or external.
+ * To be check MacPro or MacMini or ARM ones.
+ */
+static bool vlc_IsLowPowerDevice(GLint renderer_id) {
+    int renderer_vendor = renderer_id & kCGLRendererIDMatchingMask;
+    // Consider Intel familly card as low power devices.
+    return (renderer_vendor & kCGLRendererIntelFamilly) ==
+           kCGLRendererIntelFamilly;
+}
+
+/*
+ * Search for a low power device.
+ * Without proper API (like Metal), here we try to look on all the available
+ * renderer and filter them.
+ * We are looking for the one attached to the main display, accelerated, and
+ * with low power consumption.
+ * Without any match, we let CGLChoosePixelFormat/CGLCreateContext do as before.
+ */
+static GLint vlc_SearchGLRendererId() {
+    CGLRendererInfoObj rendered_info = NULL;
+    GLint renderer_count = 0;
+    if (CGLQueryRendererInfo((GLuint)-1, &rendered_info, &renderer_count) !=
+        kCGLNoError)
+      return -1;
+
+    CGDirectDisplayID main_display_id = CGMainDisplayID();
+
+    GLint best_match = -1;
+    for (GLint i = 0; i < renderer_count /*&& best_match == -1*/; ++i) {
+      GLint renderer_id = -1;
+      if (CGLDescribeRenderer(rendered_info, i, kCGLRPRendererID,
+                              &renderer_id) != kCGLNoError)
+        break;
+      GLint accelerated = 0;
+      if (CGLDescribeRenderer(rendered_info, i, kCGLRPAccelerated,
+                              &accelerated) != kCGLNoError)
+        break;
+      if (!accelerated)
+        continue; // avoid not accelerated device
+      GLint display = -1;
+      if (CGLDescribeRenderer(rendered_info, i, kCGLRPDisplayMask, &display) !=
+          kCGLNoError)
+        break;
+      CGDirectDisplayID display_id = CGOpenGLDisplayMaskToDisplayID(display);
+      if (display_id != main_display_id)
+        continue;
+      if (vlc_IsLowPowerDevice(renderer_id))
+        best_match = renderer_id;
+    }
+    CGLDestroyRendererInfo(rendered_info);
+    return best_match;
+}
+
 /**
  * Create a new CGLContextObj for use by VLC
  * This function may try various pixel formats until it finds a suitable/compatible
@@ -132,7 +194,10 @@ CGLContextObj vlc_CreateCGLContext()
     CGLPixelFormatObj pix;
     CGLContextObj ctx;
 
-    CGLPixelFormatAttribute attribs[12] = {
+    GLint renderer_id = vlc_SearchGLRendererId();
+
+    CGLPixelFormatAttribute attribs[15] = {
+        kCGLPFAAllRenderers,
         kCGLPFAAllowOfflineRenderers,
         kCGLPFADoubleBuffer,
         kCGLPFAAccelerated,
@@ -148,6 +213,12 @@ CGLContextObj vlc_CreateCGLContext()
         0
     };
 
+    // A low power renderer was found, ask to use it.
+    if (renderer_id != -1) {
+        attribs[12] = kCGLPFARendererID;
+        attribs[13] = renderer_id;
+        attribs[14] = 0;
+    }
     err = CGLChoosePixelFormat(attribs, &pix, &npix);
     if (err != kCGLNoError || pix == NULL) {
         return NULL;
