@@ -120,6 +120,26 @@ class MLListCache : public QObject
 public:
     typedef std::unique_ptr<MLItem> ItemType;
 
+    struct CacheData {
+        explicit CacheData(std::vector<ItemType>&& list_,
+                           size_t queryCount_,
+                           size_t maximumCount_)
+            : list(std::move(list_))
+            , queryCount(queryCount_)
+            , maximumCount(maximumCount_)
+        {
+            loadedCount = list.size();
+        }
+
+        std::vector<ItemType> list;
+        //How many items are does the query returns min(maximumCount - offset, limit)
+        size_t queryCount = 0;
+        //how many items in the table
+        size_t maximumCount = 0;
+        //how many items are loaded (list.size)
+        size_t loadedCount = 0;
+    };
+
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
@@ -243,26 +263,6 @@ private:
 
     uint64_t m_appendTask = 0;
     uint64_t m_countTask = 0;
-
-    struct CacheData {
-        explicit CacheData(std::vector<ItemType>&& list_,
-                           size_t queryCount_,
-                           size_t maximumCount_)
-            : list(std::move(list_))
-            , queryCount(queryCount_)
-            , maximumCount(maximumCount_)
-        {
-            loadedCount = list.size();
-        }
-
-        std::vector<ItemType> list;
-        //How many items are does the query returns min(maximumCount - offset, limit)
-        size_t queryCount = 0;
-        //how many items in the table
-        size_t maximumCount = 0;
-        //how many items are loaded (list.size)
-        size_t loadedCount = 0;
-    };
 
     std::unique_ptr<CacheData> m_cachedData;
     std::unique_ptr<CacheData> m_oldData;

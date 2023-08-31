@@ -25,20 +25,20 @@ namespace {
 
 uint32_t cacheDataLength(const void* data)
 {
-    auto list = static_cast<const std::vector<MLListCache::ItemType>*>(data);
-    assert(list);
-    return list->size();
+    auto cache = static_cast<const MLListCache::CacheData*>(data);
+    assert(cache);
+    return std::min(cache->loadedCount, cache->queryCount);
 }
 
 bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNew,  uint32_t newIndex)
 {
-    auto listOld = static_cast<const std::vector<MLListCache::ItemType>*>(dataOld);
-    auto listNew = static_cast<const std::vector<MLListCache::ItemType>*>(dataNew);
-    assert(listOld);
-    assert(listNew);
-    assert(oldIndex < listOld->size());
-    assert(newIndex < listNew->size());
-    return listOld->at(oldIndex)->getId() == listNew->at(newIndex)->getId();
+    auto cacheOld = static_cast<const MLListCache::CacheData*>(dataOld);
+    auto cacheNew = static_cast<const MLListCache::CacheData*>(dataNew);
+    assert(cacheOld);
+    assert(cacheNew);
+    assert(oldIndex < cacheOld->list.size());
+    assert(newIndex < cacheNew->list.size());
+    return cacheNew->list[newIndex]->getId() == cacheOld->list[oldIndex]->getId();
 }
 
 }
@@ -354,13 +354,13 @@ void MLListCache::partialUpdate()
         cacheDataCompare
     };
 
-    diffutil_snake_t* snake = vlc_diffutil_build_snake(&diffOp, &m_oldData->list, &m_cachedData->list);
+    diffutil_snake_t* snake = vlc_diffutil_build_snake(&diffOp, m_oldData.get(), m_cachedData.get());
     int diffutilFlags = VLC_DIFFUTIL_RESULT_AGGREGATE;
     if (m_useMove)
         diffutilFlags |= VLC_DIFFUTIL_RESULT_MOVE;
 
     vlc_diffutil_changelist_t* changes = vlc_diffutil_build_change_list(
-        snake, &diffOp, &m_oldData->list, &m_cachedData->list,
+        snake, &diffOp, m_oldData.get(), m_cachedData.get(),
         diffutilFlags);
 
     m_partialIndex = 0;
