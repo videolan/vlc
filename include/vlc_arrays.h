@@ -271,7 +271,7 @@ static inline void vlc_array_clear( vlc_array_t * p_array )
 }
 
 /* Read */
-static inline size_t vlc_array_count( vlc_array_t * p_array )
+static inline size_t vlc_array_count( const vlc_array_t * p_array )
 {
     return p_array->i_count;
 }
