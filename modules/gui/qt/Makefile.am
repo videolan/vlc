@@ -491,7 +491,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/player/player_controlbar_model.moc.cpp \
 	gui/qt/player/control_list_model.moc.cpp \
 	gui/qt/player/control_list_filter.moc.cpp \
-	gui/qt/playlist/playlist_common.moc.cpp \
 	gui/qt/playlist/playlist_controller.moc.cpp \
 	gui/qt/playlist/playlist_item.moc.cpp \
 	gui/qt/playlist/playlist_model.moc.cpp \
@@ -515,7 +514,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
-	gui/qt/util/qsgroundedrectangularimagenode.moc.cpp \
 	gui/qt/util/dismiss_popup_event_filter.moc.cpp \
 	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/widgets/native/csdthemeimage.moc.cpp \
