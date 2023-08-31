@@ -185,16 +185,15 @@ libvlc_media_tracklist_alloc( size_t count )
 }
 
 libvlc_media_tracklist_t *
-libvlc_media_tracklist_from_es_array( es_format_t **es_array,
-                                      size_t es_count,
-                                      libvlc_track_type_t type )
+libvlc_media_tracklist_from_item( input_item_t *item, libvlc_track_type_t type )
 {
     size_t count = 0;
     const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
 
-    for( size_t i = 0; i < es_count; ++i )
+    for( size_t i = 0; i < item->es_vec.size; ++i )
     {
-        if( es_array[i]->i_cat == cat )
+        const es_format_t *es_fmt = &item->es_vec.data[i].es;
+        if( es_fmt->i_cat == cat )
             count++;
     }
 
@@ -203,9 +202,11 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
     if( count == 0 || list == NULL )
         return list;
 
-    for( size_t i = 0; i < es_count; ++i )
+    for( size_t i = 0; i < item->es_vec.size; ++i )
     {
-        if( es_array[i]->i_cat == cat )
+        const struct input_item_es *item_es = &item->es_vec.data[i];
+        const es_format_t *es_fmt = &item_es->es;
+        if( es_fmt->i_cat == cat )
         {
             libvlc_media_trackpriv_t *trackpriv = libvlc_media_trackpriv_new();
             if( trackpriv == NULL )
@@ -214,7 +215,7 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
                 return NULL;
             }
             list->tracks[list->count++] = trackpriv;
-            libvlc_media_trackpriv_from_es( trackpriv, es_array[i] );
+            libvlc_media_trackpriv_from_es( trackpriv, es_fmt );
         }
     }
 

@@ -688,9 +688,9 @@ static int DrawStats(intf_thread_t *intf)
     vlc_mutex_lock(&item->lock);
     p_stats = item->p_stats;
 
-    for (int i = 0; i < item->i_es ; i++) {
-        i_audio += (item->es[i]->i_cat == AUDIO_ES);
-        i_video += (item->es[i]->i_cat == VIDEO_ES);
+    for (int i = 0; i < item->es_vec.size ; i++) {
+        i_audio += (item->es_vec.data[i].es.i_cat == AUDIO_ES);
+        i_video += (item->es_vec.data[i].es.i_cat == VIDEO_ES);
     }
 
     /* Input */

@@ -500,12 +500,12 @@ void input_item_Release( input_item_t *p_item )
     TAB_CLEAN( p_item->i_options, p_item->ppsz_options );
     free( p_item->optflagv );
 
-    for( int i = 0; i < p_item->i_es; i++ )
+    for( size_t i = 0; i < p_item->es_vec.size; ++i )
     {
-        es_format_Clean( p_item->es[i] );
-        free( p_item->es[i] );
+        struct input_item_es *item_es = &p_item->es_vec.data[i];
+        es_format_Clean( &item_es->es );
     }
-    TAB_CLEAN( p_item->i_es, p_item->es );
+    vlc_vector_destroy( &p_item->es_vec );
 
     for( int i = 0; i < p_item->i_epg; i++ )
         vlc_epg_Delete( p_item->pp_epg[i] );
@@ -1100,7 +1100,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
 
     p_input->i_duration = duration;
     vlc_list_init( &p_input->categories );
-    TAB_INIT( p_input->i_es, p_input->es );
+    vlc_vector_init( &p_input->es_vec );
     p_input->p_stats = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );
     TAB_INIT( p_input->i_slaves, p_input->pp_slaves );
@@ -1322,30 +1322,27 @@ void input_item_node_RemoveNode( input_item_node_t *parent,
 /* Called by es_out when a new Elementary Stream is added or updated. */
 void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt)
 {
-    int i;
-    es_format_t *fmt_copy = malloc(sizeof *fmt_copy);
-    if (!fmt_copy)
-        return;
-
-    es_format_Copy(fmt_copy, fmt);
-
     vlc_mutex_lock( &item->lock );
 
-    for( i = 0; i < item->i_es; i++ )
+    for( size_t i = 0; i < item->es_vec.size; ++i )
     {
-        if (item->es[i]->i_id != fmt->i_id)
+        struct input_item_es *item_es = &item->es_vec.data[i];
+        if (item_es->es.i_id != fmt->i_id)
             continue;
 
         /* We've found the right ES, replace it */
-        es_format_Clean(item->es[i]);
-        free(item->es[i]);
-        item->es[i] = fmt_copy;
+        es_format_Clean(&item_es->es);
+        es_format_Copy(&item_es->es, fmt);
         vlc_mutex_unlock( &item->lock );
         return;
     }
 
     /* ES not found, insert it */
-    TAB_APPEND(item->i_es, item->es, fmt_copy);
+    if (vlc_vector_push_hole( &item->es_vec, 1 ))
+    {
+        struct input_item_es *item_es = &item->es_vec.data[item->es_vec.size - 1];
+        es_format_Copy( &item_es->es, fmt );
+    }
     vlc_mutex_unlock( &item->lock );
 }
 

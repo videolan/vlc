@@ -33,7 +33,9 @@
 #include <vlc_epg.h>
 #include <vlc_events.h>
 #include <vlc_list.h>
+#include <vlc_vector.h>
 #include <vlc_threads.h>
+#include <vlc_es.h>
 
 #include <string.h>
 
@@ -81,6 +83,12 @@ enum input_item_type_e
     ITEM_TYPE_NUMBER
 };
 
+struct input_item_es
+{
+    es_format_t es;
+};
+typedef struct VLC_VECTOR(struct input_item_es) input_item_es_vector;
+
 /**
  * Describes an input and is used to spawn input_thread_t objects.
  */
@@ -100,8 +108,7 @@ struct input_item_t
 
     struct vlc_list categories;      /**< List of categories */
 
-    int         i_es;                /**< Number of es format descriptions */
-    es_format_t **es;                /**< Es formats */
+    input_item_es_vector es_vec;     /**< ES formats */
 
     input_stats_t *p_stats;          /**< Statistics */
 

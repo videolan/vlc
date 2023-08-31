@@ -100,9 +100,7 @@ libvlc_media_track_t *
 libvlc_media_track_create_from_player_track( const struct vlc_player_track *track );
 
 libvlc_media_tracklist_t *
-libvlc_media_tracklist_from_es_array( es_format_t **es_array,
-                                      size_t es_count,
-                                      libvlc_track_type_t type );
+libvlc_media_tracklist_from_item( input_item_t *item, libvlc_track_type_t type );
 
 libvlc_media_tracklist_t *
 libvlc_media_tracklist_from_player( vlc_player_t *player,

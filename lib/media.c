@@ -950,8 +950,7 @@ libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type )
 
     vlc_mutex_lock( &p_input_item->lock );
     libvlc_media_tracklist_t *list =
-        libvlc_media_tracklist_from_es_array( p_input_item->es,
-                                              p_input_item->i_es, type );
+        libvlc_media_tracklist_from_item( p_input_item, type );
     vlc_mutex_unlock( &p_input_item->lock );
 
     return list;
