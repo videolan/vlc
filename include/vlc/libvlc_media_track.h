@@ -114,8 +114,7 @@ typedef struct libvlc_media_track_t
      * from an other LibVLC run */
     const char *psz_id;
     /** A string identifier is stable when it is certified to be the same
-     * across different playback instances for the same track, only valid when
-     * the track is fetch from a media_player */
+     * across different playback instances for the same track. */
     bool id_stable;
     /** Name of the track, only valid when the track is fetch from a
      * media_player */

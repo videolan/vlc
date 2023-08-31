@@ -226,6 +226,7 @@ libvlc_media_tracklist_from_item( input_item_t *item, libvlc_track_type_t type )
                 return NULL;
             }
             trackpriv->t.psz_id = trackpriv->item_str_id;
+            trackpriv->t.id_stable = item_es->id_stable;
         }
     }
 
