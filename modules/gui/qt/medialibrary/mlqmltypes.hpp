@@ -33,11 +33,11 @@ class MLItemId
 public:
     MLItemId() : id(0), type( VLC_ML_PARENT_UNKNOWN ) {}
     MLItemId( int64_t i, vlc_ml_parent_type t ) : id( i ), type( t ) {}
-    bool operator==( const MLItemId& other )
+    bool operator==( const MLItemId& other ) const
     {
         return id == other.id && type == other.type;
     }
-    bool operator!=( const MLItemId& other )
+    bool operator!=( const MLItemId& other ) const
     {
         return !(*this == other);
     }
