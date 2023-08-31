@@ -31,7 +31,6 @@ MainInterface.MainViewLoader {
 
     // Properties
 
-    property var providerModel
     property var contextMenu
     property var tree
 
@@ -40,7 +39,7 @@ MainInterface.MainViewLoader {
     readonly property bool isViewMultiView: true
 
      // 'loading' property is not available with NetworkDevicesModel
-    readonly property bool loading: Helpers.get(providerModel, "loading", false)
+    readonly property bool loading: Helpers.get(model, "loading", false)
 
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name"},
@@ -56,13 +55,6 @@ MainInterface.MainViewLoader {
 
     // Settings
 
-    model: SortFilterProxyModel {
-        id: filterModel
-
-        sourceModel: providerModel
-        searchRole: "name"
-    }
-
     grid: gridComponent
     list: tableComponent
 
@@ -74,21 +66,21 @@ MainInterface.MainViewLoader {
         History.previous(Qt.BacktabFocusReason)
     }
 
-    onTreeChanged: providerModel.tree = tree
+    onTreeChanged: model.tree = tree
 
     function playSelected() {
-        providerModel.addAndPlay(filterModel.mapIndexesToSource(selectionModel.selectedIndexes))
+        model.addAndPlay(selectionModel.selectedIndexes)
     }
 
     function playAt(index) {
-        providerModel.addAndPlay(filterModel.mapIndexToSource(index))
+        model.addAndPlay(index)
     }
 
     function _actionAtIndex(index) {
         if ( selectionModel.selectedIndexes.length > 1 ) {
             playSelected()
         } else {
-            const data = filterModel.getDataAt(index)
+            const data = model.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
                 browse(data.tree, Qt.TabFocusReason)
@@ -116,13 +108,13 @@ MainInterface.MainViewLoader {
 
         onRequestData: {
             resolve(
-                indexes.map(x => filterModel.getDataAt(x.row))
+                indexes.map(x => model.getDataAt(x.row))
             )
         }
 
         onRequestInputItems: {
             resolve(
-                providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(indexes))
+                model.getItemsForIndexes(indexes)
             )
         }
 
@@ -153,10 +145,10 @@ MainInterface.MainViewLoader {
             id: gridView
 
             selectionDelegateModel: selectionModel
-            model: filterModel
+            model: root.model
 
             headerDelegate: BrowseTreeHeader {
-                providerModel: root.providerModel
+                providerModel: root.model
 
                 // align header content with grid content
                 leftPadding: gridView.rowX
@@ -192,7 +184,7 @@ MainInterface.MainViewLoader {
 
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index)
-                    contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
             }
 
@@ -275,7 +267,7 @@ MainInterface.MainViewLoader {
 
             dragItem: networkDragItem
 
-            model: filterModel
+            model: root.model
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
@@ -289,7 +281,7 @@ MainInterface.MainViewLoader {
             rowHeight: VLCStyle.tableCoverRow_height
 
             header: BrowseTreeHeader {
-                providerModel: root.providerModel
+                providerModel: root.model
 
                 width: tableView.width
 
@@ -302,8 +294,8 @@ MainInterface.MainViewLoader {
 
             onActionForSelection: _actionAtIndex(selection[0].row)
             onItemDoubleClicked: _actionAtIndex(index)
-            onContextMenuButtonClicked: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
-            onRightClick: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
         }
     }
 
@@ -341,7 +333,7 @@ MainInterface.MainViewLoader {
 
                     focus: true
 
-                    providerModel: root.providerModel
+                    providerModel: root.model
 
                     Layout.fillWidth: true
 

@@ -78,7 +78,7 @@ Widgets.PageLoader {
                 onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
             }
 
-            providerModel: deviceModel
+            model: deviceModel
             contextMenu: contextMenu
 
             onBrowse: History.push(["mc", "discover", "services", "source_browse",
@@ -109,7 +109,7 @@ Widgets.PageLoader {
 
             property Component addressBar: NetworkAddressbar {
                 path: {
-                    const _path = providerModel.path
+                    const _path = mediaModel.path
                     _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
                     return _path
                 }
@@ -129,12 +129,13 @@ Widgets.PageLoader {
             onBrowse: History.push(["mc", "discover", "services", "source_browse",
                                     { tree: tree, "root": root_name }], reason)
 
-            providerModel: NetworkMediaModel {
+            model: NetworkMediaModel {
+                id: mediaModel
                 ctx: MainCtx
             }
 
             contextMenu: NetworkMediaContextMenu {
-                model: providerModel
+                model: mediaModel
             }
         }
     }

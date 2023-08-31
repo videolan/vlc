@@ -142,12 +142,13 @@ Widgets.PageLoader {
         id: browseComponent
 
         BrowseTreeDisplay {
-            providerModel: NetworkMediaModel {
+            model: NetworkMediaModel {
+                id: mediaModel
                 ctx: MainCtx
             }
 
             contextMenu: NetworkMediaContextMenu {
-                model: providerModel
+                model: mediaModel
             }
 
             Navigation.cancelAction: function() {
