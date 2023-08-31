@@ -28,7 +28,7 @@
 #include <vlc_common.h>
 
 #include "../libvlc.h"
-#include "config/configuration.h"
+#include "../config/configuration.h"
 
 #include <unistd.h>
 #include <pwd.h>

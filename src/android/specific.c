@@ -29,7 +29,7 @@
 #include <vlc_network.h>
 #include <vlc_fs.h>
 #include "../libvlc.h"
-#include "config/configuration.h"
+#include "../config/configuration.h"
 
 #include <string.h>
 #include <jni.h>

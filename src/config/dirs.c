@@ -26,14 +26,12 @@
 
 #include <vlc_common.h>
 #include <vlc_configuration.h>
+#include "configuration.h"
 
 static const char *userdir_to_env[] =
 {
     [VLC_USERDATA_DIR] = "VLC_USERDATA_PATH",
 };
-
-/* Platforms must implement this function */
-char *platform_GetUserDir( vlc_userdir_t ) VLC_USED VLC_MALLOC;
 
 char *config_GetUserDir (vlc_userdir_t type)
 {

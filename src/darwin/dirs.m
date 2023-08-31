@@ -31,6 +31,7 @@
 #include <vlc_configuration.h>
 #include <vlc_charset.h>
 #include "../libvlc.h"
+#include "../config/configuration.h"
 
 #include <libgen.h>
 #include <dlfcn.h>

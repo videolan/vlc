@@ -33,6 +33,7 @@
 #endif
 #include <vlc_common.h>
 #include <vlc_configuration.h>
+#include "../config/configuration.h"
 
 #include <vlc_charset.h>
 
