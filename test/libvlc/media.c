@@ -175,6 +175,10 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         assert(track->video != NULL);
         assert(track->video->i_width == 100);
         assert(track->video->i_height == 50);
+
+        char buf[] = "video/4";
+        sprintf(buf, "video/%zu", i);
+        assert(strcmp(track->psz_id, buf) == 0);
     }
     libvlc_media_tracklist_delete(tracklist);
 
@@ -188,6 +192,10 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         assert(track->audio != NULL);
         assert(track->audio->i_channels == 2);
         assert(track->audio->i_rate == 48000);
+
+        char buf[] = "audio/42";
+        sprintf(buf, "audio/%zu", i);
+        assert(strcmp(track->psz_id, buf) == 0);
     }
     libvlc_media_tracklist_delete(tracklist);
 
