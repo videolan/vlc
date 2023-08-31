@@ -176,16 +176,27 @@ stream_t *(vlc_stream_NewMRL)(vlc_object_t* parent, const char* mrl )
     if( anchor == NULL )
         return stream;
 
-    char const* extra;
-    if( stream_extractor_AttachParsed( &stream, anchor + 1, &extra ) )
+    struct mrl_info mrli;
+    mrl_info_Init( &mrli );
+    if( mrl_FragmentSplit( &mrli, anchor + 1 ) )
     {
-        msg_Err( parent, "unable to open %s", mrl );
         vlc_stream_Delete( stream );
+        mrl_info_Clean( &mrli );
         return NULL;
     }
 
-    if( extra && *extra )
-        msg_Warn( parent, "ignoring extra fragment data: %s", extra );
+    if( stream_extractor_AttachParsed( &stream, &mrli ) )
+    {
+        msg_Err( parent, "unable to open %s", mrl );
+        vlc_stream_Delete( stream );
+        mrl_info_Clean( &mrli );
+        return NULL;
+    }
+
+    if( mrli.extra && *mrli.extra )
+        msg_Warn( parent, "ignoring extra fragment data: %s", mrli.extra );
+
+    mrl_info_Clean( &mrli );
 
     return stream;
 }

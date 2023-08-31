@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_stream.h>
 #include "input_internal.h"
+#include "mrl_helpers.h"
 
 stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
                                void (*destroy)(stream_t *), size_t extra_size,
@@ -123,8 +124,7 @@ stream_t *stream_FilterChainNew( stream_t *source, const char *list ) VLC_USED;
  *             in `psz_data` that does not specify an entity (if any).
  * \return VLC_SUCCESS on success, an error-code on failure
  **/
-int stream_extractor_AttachParsed( stream_t** stream, const char* data,
-                                   char const** out_extra );
+int stream_extractor_AttachParsed( stream_t** stream, const struct mrl_info * );
 
 /**
  * @}

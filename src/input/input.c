@@ -44,6 +44,7 @@
 #include "resource.h"
 #include "stream.h"
 #include "stream_output/stream_output.h"
+#include "mrl_helpers.h"
 
 #include <vlc_aout.h>
 #include <vlc_dialog.h>
@@ -2535,12 +2536,19 @@ static int
 InputStreamHandleAnchor( input_thread_t *p_input, input_source_t *source,
                          stream_t **stream, char const *anchor )
 {
-    char const* extra;
-    if( stream_extractor_AttachParsed( stream, anchor, &extra ) )
+    struct mrl_info mrli;
+    mrl_info_Init( &mrli );
+    if( mrl_FragmentSplit( &mrli, anchor ) )
+    {
+        mrl_info_Clean( &mrli );
+        return VLC_EGENERIC;
+    }
+
+    if( stream_extractor_AttachParsed( stream, &mrli ) )
     {
         msg_Err( p_input, "unable to attach stream-extractors for %s",
             (*stream)->psz_url );
-
+        mrl_info_Clean( &mrli );
         return VLC_EGENERIC;
     }
 
@@ -2548,9 +2556,11 @@ InputStreamHandleAnchor( input_thread_t *p_input, input_source_t *source,
         msg_Dbg( p_input, "attachment of directory-extractor failed for %s",
             (*stream)->psz_url );
 
-    MRLSections( extra ? extra : "",
+    MRLSections( mrli.extra ? mrli.extra : "",
         &source->i_title_start, &source->i_title_end,
         &source->i_seekpoint_start, &source->i_seekpoint_end );
+
+    mrl_info_Clean( &mrli );
 
     return VLC_SUCCESS;
 }

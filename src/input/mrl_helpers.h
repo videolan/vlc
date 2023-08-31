@@ -89,6 +89,27 @@ mrl_EscapeFragmentIdentifier( char const* payload )
     return mstream.ptr;
 }
 
+struct mrl_info
+{
+    vlc_array_t identifiers;
+    char const *extra;
+};
+
+static inline void
+mrl_info_Clean( struct mrl_info *mrli )
+{
+    for( size_t i = 0; i < vlc_array_count( &mrli->identifiers ); ++i )
+        free( vlc_array_item_at_index( &mrli->identifiers, i ) );
+    vlc_array_clear( &mrli->identifiers );
+}
+
+static inline void
+mrl_info_Init( struct mrl_info *mrli )
+{
+    vlc_array_init( &mrli->identifiers );
+    mrli->extra = NULL;
+}
+
 /**
  * Split an \link mrl_technical_fragment MRL-fragment\endlink into identifiers
  *
@@ -109,12 +130,9 @@ mrl_EscapeFragmentIdentifier( char const* payload )
  * \return VLC_SUCCESS on success, an error-code on failure
  **/
 static inline int
-mrl_FragmentSplit( vlc_array_t* out_items,
-                   char const** out_extra,
+mrl_FragmentSplit( struct mrl_info *mrli,
                    char const* payload )
 {
-    char const* extra = NULL;
-
     while( strncmp( payload, "!/", 2 ) == 0 )
     {
         payload += 2;
@@ -125,7 +143,7 @@ mrl_FragmentSplit( vlc_array_t* out_items,
         if( unlikely( !decoded ) || !vlc_uri_decode( decoded ) )
             goto error;
 
-        if( vlc_array_append( out_items, decoded ) )
+        if( vlc_array_append( &mrli->identifiers, decoded ) )
         {
             free( decoded );
             goto error;
@@ -138,19 +156,15 @@ mrl_FragmentSplit( vlc_array_t* out_items,
         if( *payload == '!' )
             goto error;
 
-        if( *payload == '?' && vlc_array_count( out_items ) )
+        if( *payload == '?' && vlc_array_count( &mrli->identifiers ) )
             ++payload;
 
-        extra = payload;
+        mrli->extra = payload;
     }
 
-    *out_extra = extra;
     return VLC_SUCCESS;
 
 error:
-    for( size_t i = 0; i < vlc_array_count( out_items ); ++i )
-        free( vlc_array_item_at_index( out_items, i ) );
-    vlc_array_clear( out_items );
     return VLC_EGENERIC;
 }
 
