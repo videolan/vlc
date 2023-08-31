@@ -404,10 +404,10 @@ static int archive_extractor_reset( stream_extractor_t* p_extractor )
 
 /* ------------------------------------------------------------------------- */
 
-static private_sys_t* setup( vlc_object_t* obj, stream_t* source )
+static private_sys_t* setup( vlc_object_t* obj, stream_t* source,
+                             char **volumes, size_t volumes_count )
 {
     private_sys_t* p_sys  = calloc( 1, sizeof( *p_sys ) );
-    char* psz_files = var_InheritString( obj, "concat-list" );
 
     if( unlikely( !p_sys ) )
         goto error;
@@ -415,20 +415,11 @@ static private_sys_t* setup( vlc_object_t* obj, stream_t* source )
     if( archive_push_resource( p_sys, source, NULL ) )
         goto error;
 
-    if( psz_files )
+
+    for( size_t i=0; i<volumes_count; i++ )
     {
-        for( char* state,
-                 * path = strtok_r( psz_files, ",", &state );
-             path; path = strtok_r(     NULL, ",", &state ) )
-        {
-            if( path == psz_files )
-                continue;
-
-            if( archive_push_resource( p_sys, NULL, path ) )
-                goto error;
-        }
-
-        free( psz_files );
+        if( archive_push_resource( p_sys, NULL, volumes[i] ) )
+            goto error;
     }
 
     p_sys->source = source;
@@ -437,7 +428,6 @@ static private_sys_t* setup( vlc_object_t* obj, stream_t* source )
     return p_sys;
 
 error:
-    free( psz_files );
     free( p_sys );
     return NULL;
 }
@@ -551,7 +541,9 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
         if( unlikely( !path ) )
             break;
 
-        char* mrl = vlc_stream_extractor_CreateMRL( p_directory, path, NULL, 0 );
+        char* mrl = vlc_stream_extractor_CreateMRL( p_directory, path,
+                                                   (char const**) p_directory->volumes,
+                                                   p_directory->volumes_count );
 
         if( unlikely( !mrl ) )
             break;
@@ -721,12 +713,13 @@ static void ExtractorClose( vlc_object_t* p_obj )
     return CommonClose( p_extractor->p_sys );
 }
 
-static private_sys_t* CommonOpen( vlc_object_t* p_obj, stream_t* source  )
+static private_sys_t* CommonOpen( vlc_object_t* p_obj, stream_t* source,
+                                  char **volumes, size_t volumes_count  )
 {
     if( probe( source ) )
         return NULL;
 
-    private_sys_t* p_sys = setup( p_obj, source );
+    private_sys_t* p_sys = setup( p_obj, source, volumes, volumes_count );
 
     if( p_sys == NULL )
         return NULL;
@@ -743,7 +736,8 @@ static private_sys_t* CommonOpen( vlc_object_t* p_obj, stream_t* source  )
 static int DirectoryOpen( vlc_object_t* p_obj )
 {
     stream_directory_t* p_directory = (void*)p_obj;
-    private_sys_t* p_sys = CommonOpen( p_obj, p_directory->source );
+    private_sys_t* p_sys = CommonOpen( p_obj, p_directory->source,
+                                       p_directory->volumes, p_directory->volumes_count );
 
     if( p_sys == NULL )
         return VLC_EGENERIC;
@@ -757,7 +751,8 @@ static int DirectoryOpen( vlc_object_t* p_obj )
 static int ExtractorOpen( vlc_object_t* p_obj )
 {
     stream_extractor_t* p_extractor = (void*)p_obj;
-    private_sys_t* p_sys = CommonOpen( p_obj, p_extractor->source );
+    private_sys_t* p_sys = CommonOpen( p_obj, p_extractor->source,
+                                       p_extractor->volumes, p_extractor->volumes_count );
 
     if( p_sys == NULL )
         return VLC_EGENERIC;
