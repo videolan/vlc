@@ -41,6 +41,11 @@ public:
     {
         return !(*this == other);
     }
+    bool operator<( const MLItemId& other ) const
+    {
+        return id < other.id;
+    }
+
     int64_t id;
     vlc_ml_parent_type type;
 
