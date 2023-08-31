@@ -1146,7 +1146,7 @@ vlc_player_GetSelectedChapter(vlc_player_t *player)
  * Select a chapter index for the current media
  *
  * @note A successful call will trigger the
- * vlc_player_cbs.on_chaper_selection_changed event.
+ * vlc_player_cbs.on_chapter_selection_changed event.
  *
  * @see vlc_player_title.chapters
  *
