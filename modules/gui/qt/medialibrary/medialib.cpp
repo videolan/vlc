@@ -270,7 +270,7 @@ void MediaLib::reload()
     });
 }
 
-void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
+void MediaLib::mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callback)
 {
     if (!callback.isCallable()) // invalid argument
     {
@@ -278,17 +278,11 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
         return;
     }
 
-    std::vector<MLItemId> mlIdList;
-    for (const auto& variant : variantList)
-    {
-        if (variant.canConvert<MLItemId>())
-            mlIdList.push_back(variant.value<MLItemId>());
-    }
     struct Ctx {
         std::vector<SharedInputItem> items;
     };
 
-    if (mlIdList.empty())
+    if (itemIdVector.empty())
     {
         //call the callback with and empty list
         auto jsEngine = qjsEngine(this);
@@ -299,11 +293,11 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
         return;
     }
 
-    auto it = m_inputItemQuery.find(variantList);
+    auto it = m_inputItemQuery.find(itemIdVector);
 
     if (it == m_inputItemQuery.end())
     {
-        it = m_inputItemQuery.insert(variantList, {callback});
+        it = m_inputItemQuery.insert(itemIdVector, {callback});
     }
     else
     {
@@ -321,8 +315,8 @@ void MediaLib::mlInputItem(const QVariantList& variantList, QJSValue callback)
 
     runOnMLThread<Ctx>(this,
     //ML thread
-    [mlIdList](vlc_medialibrary_t* ml, Ctx& ctx){
-        for (auto mlId : mlIdList)
+    [itemIdVector](vlc_medialibrary_t* ml, Ctx& ctx){
+        for (auto mlId : itemIdVector)
         {
             // NOTE: When we have a parent it's a collection of media(s).
             if (mlId.type == VLC_ML_PARENT_UNKNOWN)

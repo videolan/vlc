@@ -679,6 +679,7 @@ static inline void registerMetaTypes()
     qRegisterMetaType<PlaylistItem>();
     qRegisterMetaType<DialogId>();
     qRegisterMetaType<MLItemId>();
+    qRegisterMetaType<QVector<MLItemId>>();
 }
 
 static void *Thread( void *obj )

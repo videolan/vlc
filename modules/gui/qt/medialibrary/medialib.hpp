@@ -73,7 +73,7 @@ public:
 
     Q_INVOKABLE void reload();
 
-    Q_INVOKABLE void mlInputItem(const QVariantList& variantList, QJSValue callback);
+    Q_INVOKABLE void mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callback);
 
     inline bool idle() const { return m_idle; }
     inline int discoveryPending() const { return m_discoveryPending; }
@@ -218,7 +218,7 @@ private:
     QMap<quint64, RunOnMLThreadBaseRunner*> m_runningTasks;
     QMultiMap<const QObject*, quint64> m_objectTasks;
 
-    QMap<QVariantList, QVector<QJSValue>> m_inputItemQuery;
+    QMap<QVector<MLItemId>, QVector<QJSValue>> m_inputItemQuery;
 };
 
 class RunOnMLThreadBaseRunner : public QObject, public QRunnable
