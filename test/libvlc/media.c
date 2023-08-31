@@ -179,6 +179,7 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         char buf[] = "video/4";
         sprintf(buf, "video/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
+        assert(track->id_stable);
     }
     libvlc_media_tracklist_delete(tracklist);
 
@@ -196,6 +197,7 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         char buf[] = "audio/42";
         sprintf(buf, "audio/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
+        assert(track->id_stable);
     }
     libvlc_media_tracklist_delete(tracklist);
 
