@@ -1322,7 +1322,7 @@ void input_item_node_RemoveNode( input_item_node_t *parent,
 
 /* Called by es_out when a new Elementary Stream is added or updated. */
 void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt,
-                                 const char *es_id)
+                                 const char *es_id, bool es_id_stable)
 {
     assert( es_id != NULL );
     vlc_mutex_lock( &item->lock );
@@ -1352,6 +1352,7 @@ void input_item_UpdateTracksInfo(input_item_t *item, const es_format_t *fmt,
     {
         struct input_item_es *item_es = &item->es_vec.data[item->es_vec.size - 1];
         item_es->id = es_id_dup;
+        item_es->id_stable = es_id_stable;
         es_format_Copy( &item_es->es, fmt );
     }
     else

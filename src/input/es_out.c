@@ -4252,7 +4252,7 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     {
         EsOutUpdateEsLanguageTitle(es, &es->fmt_out);
         input_item_UpdateTracksInfo(input_GetItem(p_input), &es->fmt_out,
-                                    es->id.str_id);
+                                    es->id.str_id, es->id.stable);
     }
 
     return ret;
@@ -4282,7 +4282,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     const es_format_t *p_fmt_es = &es->fmt;
     const es_format_t *fmt = es->fmt_out.i_cat != UNKNOWN_ES ? &es->fmt_out : &es->fmt;
 
-    input_item_UpdateTracksInfo( p_item , fmt, es->id.str_id );
+    input_item_UpdateTracksInfo( p_item , fmt, es->id.str_id, es->id.stable );
 
     /* Create category */
     char* psz_cat = EsInfoCategoryName( es );
