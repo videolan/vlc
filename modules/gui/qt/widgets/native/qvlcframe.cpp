@@ -23,7 +23,6 @@
 #include <QWindow>
 #include <QScreen>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QKeyEvent>
 #include <QStyle>
 

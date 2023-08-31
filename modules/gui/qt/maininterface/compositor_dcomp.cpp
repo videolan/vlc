@@ -29,7 +29,6 @@
 #include <vlc_window.h>
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QQuickWidget>
 #include <QLibrary>
 #include <QScreen>
