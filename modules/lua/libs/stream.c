@@ -110,7 +110,7 @@ static int vlclua_directory_stream_new( lua_State *L )
     stream_t *p_stream = vlc_stream_NewURL( p_this, psz_url );
     if( !p_stream )
         return vlclua_error( L );
-    if( vlc_stream_directory_Attach( &p_stream, NULL ) != VLC_SUCCESS )
+    if( vlc_stream_directory_Attach( &p_stream, NULL, NULL, 0 ) != VLC_SUCCESS )
     {
         vlc_stream_Delete( p_stream );
         return vlclua_error( L );

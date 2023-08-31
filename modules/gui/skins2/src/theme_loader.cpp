@@ -227,7 +227,7 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
     }
 
     stream_t* stream = input.get();
-    if( vlc_stream_directory_Attach( &stream, NULL ) )
+    if( vlc_stream_directory_Attach( &stream, NULL, NULL, 0 ) )
     {
         msg_Err( getIntf(), "unable to attach stream_directory, treat as XML!" );
     }

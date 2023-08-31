@@ -2552,7 +2552,9 @@ InputStreamHandleAnchor( input_thread_t *p_input, input_source_t *source,
         return VLC_EGENERIC;
     }
 
-    if( vlc_stream_directory_Attach( stream, NULL ) )
+    if( vlc_stream_directory_Attach( stream, NULL,
+                                    (const char **) mrli.volumes.pp_elems,
+                                    mrli.volumes.i_count ) )
         msg_Dbg( p_input, "attachment of directory-extractor failed for %s",
             (*stream)->psz_url );
 
@@ -2701,6 +2703,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
         }
     }
 
+    char *psz_newanchor = NULL;
     if( strcasecmp( psz_access, "concat" ) )
     {   /* Autodetect extra files if none specified */
         int count;
@@ -2708,28 +2711,16 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
 
         TAB_INIT( count, tab );
         InputGetExtraFiles( p_input, &count, &tab, &psz_access, psz_mrl );
-        if( count > 0 )
+
+        for( int i = 0; i < count; i++ )
         {
-            char *list = NULL;
-
-            for( int i = 0; i < count; i++ )
+            char *psz = mrl_AppendAnchorFragment( psz_newanchor ? psz_newanchor : psz_anchor, tab[i] );
+            if( psz )
             {
-                char *str;
-                if( asprintf( &str, "%s,%s", list ? list : psz_mrl,
-                              tab[i] ) < 0 )
-                    break;
-
-                free( tab[i] );
-                free( list );
-                list = str;
+                 free( psz_newanchor );
+                 psz_newanchor = psz;
             }
-
-            var_Create( p_input, "concat-list", VLC_VAR_STRING );
-            if( likely(list != NULL) )
-            {
-                var_SetString( p_input, "concat-list", list );
-                free( list );
-            }
+            free( tab[i] );
         }
         TAB_CLEAN( count, tab );
     }
@@ -2746,12 +2737,13 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
 
         if( es_out )
             in->p_demux = InputDemuxNew( p_input, es_out, in, url,
-                                         psz_demux, psz_anchor );
+                                         psz_demux, psz_newanchor ? psz_newanchor : psz_anchor );
         free( url );
     }
     else
         in->p_demux = NULL;
 
+    free( psz_newanchor );
     free( psz_demux_var );
     free( psz_dup );
 

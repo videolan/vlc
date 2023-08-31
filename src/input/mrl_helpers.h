@@ -89,6 +89,36 @@ mrl_EscapeFragmentIdentifier( char const* payload )
     return mstream.ptr;
 }
 
+static inline char *
+mrl_AppendAnchorFragment( const char *anchor, char const *payload )
+{
+    struct vlc_memstream mstream;
+    if( vlc_memstream_open( &mstream ) )
+        return NULL;
+
+    if( anchor )
+        vlc_memstream_puts( &mstream, anchor );
+    else
+        vlc_memstream_putc( &mstream, '#' );
+
+    char *escaped = mrl_EscapeFragmentIdentifier( payload );
+    if( escaped == NULL )
+    {
+        if( !vlc_memstream_close( &mstream ) )
+            free( mstream.ptr );
+        return NULL;
+    }
+
+    vlc_memstream_puts( &mstream, "!+" );
+    vlc_memstream_puts( &mstream, escaped );
+    free( escaped );
+
+    if( vlc_memstream_close( &mstream ) )
+        return NULL;
+
+    return mstream.ptr;
+}
+
 struct mrl_info
 {
     vlc_array_t identifiers;
