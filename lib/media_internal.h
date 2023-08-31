@@ -83,6 +83,7 @@ typedef struct libvlc_media_trackpriv_t
         libvlc_subtitle_track_t subtitle;
     };
     vlc_es_id_t *es_id;
+    char *item_str_id;
     vlc_atomic_rc_t rc;
 } libvlc_media_trackpriv_t;
 

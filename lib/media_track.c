@@ -119,6 +119,7 @@ libvlc_media_trackpriv_new( void )
         return NULL;
 
     trackpriv->es_id = NULL;
+    trackpriv->item_str_id = NULL;
     vlc_atomic_rc_init( &trackpriv->rc );
     return trackpriv;
 }
@@ -163,6 +164,7 @@ libvlc_media_track_release( libvlc_media_track_t *track )
         libvlc_media_track_clean( track );
         if( trackpriv->es_id )
             vlc_es_id_Release( trackpriv->es_id );
+        free( trackpriv->item_str_id );
         free( trackpriv );
     }
 }
@@ -216,6 +218,14 @@ libvlc_media_tracklist_from_item( input_item_t *item, libvlc_track_type_t type )
             }
             list->tracks[list->count++] = trackpriv;
             libvlc_media_trackpriv_from_es( trackpriv, es_fmt );
+
+            trackpriv->item_str_id = strdup( item_es->id );
+            if( trackpriv->item_str_id == NULL )
+            {
+                libvlc_media_tracklist_delete( list );
+                return NULL;
+            }
+            trackpriv->t.psz_id = trackpriv->item_str_id;
         }
     }
 
