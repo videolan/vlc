@@ -143,6 +143,7 @@ static int Open (filter_t *filter)
 
     switch (filter->fmt_out.video.i_chroma)
     {
+        case VLC_CODEC_RGB565LE:
         case VLC_CODEC_RGB16:
             switch (filter->fmt_in.video.i_chroma)
             {
