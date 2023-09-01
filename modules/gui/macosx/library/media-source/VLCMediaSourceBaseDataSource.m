@@ -110,7 +110,6 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    self.tableView.hidden = YES;
     
     [self reloadViews];
 }
