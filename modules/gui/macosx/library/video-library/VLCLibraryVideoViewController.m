@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -108,7 +109,7 @@
     _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
 
-    NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+    NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
     [_videoLibraryGroupSelectionTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
 }

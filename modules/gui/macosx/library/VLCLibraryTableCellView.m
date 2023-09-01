@@ -45,7 +45,7 @@
 
 + (instancetype)fromNibWithOwner:(id)owner
 {
-    return (VLCLibraryTableCellView*)[NSView fromNibNamed:@"VLCLibraryTableCellView"
+    return (VLCLibraryTableCellView*)[NSView fromNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
                                                 withClass:[VLCLibraryTableCellView class]
                                                 withOwner:owner];
 }
