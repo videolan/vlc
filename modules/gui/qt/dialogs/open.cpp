@@ -29,7 +29,7 @@
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QMenu>
 
 #ifndef NDEBUG
@@ -476,7 +476,7 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
     int index = 0;
     while( index < entries.count() )
     {
-        int delim_pos = entries.indexOf( QRegExp( "\\s+|\"" ), index );
+        int delim_pos = entries.indexOf( QRegularExpression( "\\s+|\"" ), index );
         if( delim_pos < 0 ) delim_pos = entries.count() - 1;
         entry += entries.mid( index, delim_pos - index + 1 );
         index = delim_pos + 1;

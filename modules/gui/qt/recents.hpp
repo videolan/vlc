@@ -30,7 +30,7 @@
 
 #include <QObject>
 #include <QStringList>
-class QRegExp;
+class QRegularExpression;
 class QSignalMapper;
 
 #define RECENTS_LIST_SIZE 30
@@ -72,7 +72,7 @@ private:
 
     QStringList   recents;
     QStringList   times;
-    QRegExp       *filter;
+    QRegularExpression *filter;
     bool          isActive;
 
     void load();

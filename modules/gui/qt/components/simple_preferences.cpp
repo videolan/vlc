@@ -661,7 +661,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     << "dvd*" << "scd*" << "sr*" << "sg*" << "cd*";
             ui.DVDDeviceComboBox->addItems( QDir( "/dev/" )
                     .entryList( DVDDeviceComboBoxStringList, QDir::System )
-                    .replaceInStrings( QRegExp("^"), "/dev/" )
+                    .replaceInStrings( QRegularExpression("^"), "/dev/" )
             );
 #endif
             CONFIG_GENERIC( "dvd", String, ui.DVDLabel,
@@ -779,10 +779,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 /* defaults to qt */
                 ui.qt->setChecked( true );
             }
-            
+
             if ( var_InheritBool( p_intf, "qt-dark-palette" ) )
                 ui.qtdark->setChecked( true ); /*dark palette*/
-            
+
             free( psz_intf );
 
             optionWidgets["skinRB"] = ui.skins;

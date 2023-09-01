@@ -46,6 +46,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QTextEdit>
+#include <QRegularExpression>
 
 /************************************************************************
  * Single panels
@@ -254,7 +255,7 @@ void MetaPanel::update( input_item_t *p_item )
         {
             currentURL = newURL;
             lblURL->setText( "<a href='" + currentURL + "'>" +
-                             currentURL.remove( QRegExp( ".*://") ) + "</a>" );
+                             currentURL.remove( QRegularExpression( ".*://") ) + "</a>" );
         }
     }
     free( psz_meta );

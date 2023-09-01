@@ -52,6 +52,7 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QDropEvent>
+#include <QRegularExpression>
 
 #define I_DEVICE_TOOLTIP \
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
@@ -67,7 +68,7 @@
         targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
     targetCombo->addItems( QDir( "/dev/" )\
         .entryList( targetCombo ## StringList, QDir::System )\
-        .replaceInStrings( QRegExp("^"), "/dev/" ) \
+        .replaceInStrings( QRegularExpression("^"), "/dev/" ) \
     );
 
 static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv",
@@ -838,9 +839,9 @@ void CaptureOpenPanel::initialize()
 
         QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
                                                           QDir::System );
-        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
-                                 .replaceInStrings( QRegExp("c$"), "" )
-                                 .replaceInStrings( QRegExp("D"), "," );
+        QStringList names = nodes.replaceInStrings( QRegularExpression("^pcmC"), "hw:" )
+                                 .replaceInStrings( QRegularExpression("c$"), "" )
+                                 .replaceInStrings( QRegularExpression("D"), "," );
         v4l2AudioDevice->addItems( names );
     }
     v4l2AudioDevice->clearEditText();
@@ -1059,9 +1060,9 @@ void CaptureOpenPanel::initialize()
 
         QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
                                                           QDir::System );
-        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
-                                 .replaceInStrings( QRegExp("c$"), "" )
-                                 .replaceInStrings( QRegExp("D"), "," );
+        QStringList names = nodes.replaceInStrings( QRegularExpression("^pcmC"), "hw:" )
+                                 .replaceInStrings( QRegularExpression("c$"), "" )
+                                 .replaceInStrings( QRegularExpression("D"), "," );
         pvrAudioDevice->addItems( names );
     }
     pvrAudioDevice->clearEditText();

@@ -29,7 +29,7 @@
 #include "util/qt_dirs.hpp"
 
 #include <QStringList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSignalMapper>
 
 #ifdef _WIN32
@@ -65,7 +65,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
     /* Load the filter psz */
     char* psz_tmp = var_InheritString( p_intf, "qt-recentplay-filter" );
     if( psz_tmp && *psz_tmp )
-        filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
+        filter = new QRegularExpression( psz_tmp, QRegularExpression::CaseInsensitiveOption );
     else
         filter = NULL;
     free( psz_tmp );
@@ -83,7 +83,7 @@ RecentsMRL::~RecentsMRL()
 
 void RecentsMRL::addRecent( const QString &mrl )
 {
-    if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
+    if ( !isActive || ( filter && filter->match( mrl ).hasMatch() ) )
         return;
 
 #ifdef _WIN32
@@ -143,7 +143,7 @@ void RecentsMRL::load()
     /* And filter the regexp on the list */
     for( int i = 0; i < list.count(); ++i )
     {
-        if ( !filter || filter->indexIn( list.at(i) ) == -1 ) {
+        if ( !filter || !filter->match( list.at(i) ).hasMatch() ) {
             recents.append( list.at(i) );
             times.append( list2.value(i, "-1" ) );
         }
