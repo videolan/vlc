@@ -418,7 +418,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
         ctx->coded_height = p_dec->fmt_in->video.i_height;
     }
 
-    ctx->bits_per_coded_sample = p_dec->fmt_in->video.i_bits_per_pixel;
+    ctx->bits_per_coded_sample = vlc_fourcc_GetChromaBPP(p_dec->fmt_in->video.i_chroma);
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
     cc_Init( &p_sys->cc );
 
