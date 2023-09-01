@@ -1088,7 +1088,7 @@ MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc,
         // ?? Round start offset as well as length
         const video_format_t *const fmt = &pic->format;
 
-        const unsigned int bpp = (fmt->i_bits_per_pixel + 7) >> 3;
+        const unsigned int bpp = (vlc_fourcc_GetChromaBPP(fmt->i_chroma) + 7) >> 3;
         const unsigned int xl = (fmt->i_x_offset & ~15);
         const unsigned int xr = (fmt->i_x_offset + fmt->i_visible_width + 15) & ~15;
         const size_t dst_stride = (xr - xl) * bpp;

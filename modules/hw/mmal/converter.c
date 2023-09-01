@@ -197,7 +197,7 @@ static void cma_buf_pool_deletez(cma_buf_pool_t ** const pp)
 
 static MMAL_STATUS_T pic_to_format(MMAL_ES_FORMAT_T * const es_fmt, const picture_t * const pic)
 {
-    unsigned int bpp = (pic->format.i_bits_per_pixel + 7) >> 3;
+    unsigned int bpp = (vlc_fourcc_GetChromaBPP(pic->format.i_chroma) + 7) >> 3;
     MMAL_VIDEO_FORMAT_T * const v_fmt = &es_fmt->es->video;
 
     es_fmt->type = MMAL_ES_TYPE_VIDEO;
@@ -484,7 +484,7 @@ static MMAL_STATUS_T conv_set_output(filter_t * const p_filter, converter_sys_t 
         // Override default format width/height if we have a pic we need to match
         if ((status = pic_to_format(sys->output->format, pic)) != MMAL_SUCCESS)
         {
-            msg_Err(p_filter, "Bad format desc: %4.4s, pic=%p, bits=%d", (const char*)&pic->format.i_chroma, (void*)pic, pic->format.i_bits_per_pixel);
+            msg_Err(p_filter, "Bad format desc: %4.4s, pic=%p, bits=%d", (const char*)&pic->format.i_chroma, (void*)pic, vlc_fourcc_GetChromaBPP(pic->format.i_chroma));
             return status;
         }
     }
