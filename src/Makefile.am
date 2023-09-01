@@ -731,6 +731,7 @@ checkheader_%_h:
 
 # Some exceptions for headers depending on other libraries
 checkheader_vlc_gcrypt_h: CHECK_CFLAGS = "-Dgcry_check_version(x)="
+checkheader_vlc_xlib_h: CHECK_CFLAGS = $(X_CFLAGS)
 
 dist_check_SCRIPTS = check_headers check_symbols
 
