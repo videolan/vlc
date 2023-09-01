@@ -190,7 +190,7 @@ libvlc_picture_type_t libvlc_picture_type( const libvlc_picture_t* pic )
 unsigned int libvlc_picture_get_stride( const libvlc_picture_t *pic )
 {
     assert( pic->type == libvlc_picture_Argb );
-    return pic->fmt.i_width * pic->fmt.i_bits_per_pixel / 8;
+    return pic->fmt.i_width * 4;
 }
 
 unsigned int libvlc_picture_get_width( const libvlc_picture_t* pic )
