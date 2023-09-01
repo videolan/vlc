@@ -21,6 +21,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Templates 2.12 as T
 import org.videolan.vlc 0.1
 
+import "."
 import "qrc:///style/"
 
 T.ItemDelegate {
