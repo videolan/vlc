@@ -1454,31 +1454,32 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     if( p_enc->fmt_out.i_cat == VIDEO_ES )
     {
         /* Get picture data */
-        int i_plane, i_line, i_width, i_src_stride;
         picture_t *p_pic = (picture_t *)p_data;
         uint8_t *p_dst;
 
-        int i_buffer = p_enc->fmt_in.video.i_visible_width *
-            p_enc->fmt_in.video.i_visible_height *
-            p_enc->fmt_in.video.i_bits_per_pixel / 8;
+        const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(p_pic->format.i_chroma);
+        assert(dsc != NULL);
+        size_t i_buffer = 0;
+        plane_t dst_planes[PICTURE_PLANE_MAX];
+        for (unsigned plane=0; plane < dsc->plane_count; plane++)
+        {
+            dst_planes[plane].i_pitch = dst_planes[plane].i_visible_pitch =
+                (p_enc->fmt_in.video.i_visible_width * dsc->pixel_size *
+                 dsc->p[plane].w.num * dsc->p[plane].h.num) /
+                (dsc->p[plane].w.den * dsc->p[plane].h.den);
+            dst_planes[plane].i_lines = dst_planes[plane].i_visible_lines = p_enc->fmt_in.video.i_visible_height;
+            i_buffer += dst_planes[plane].i_pitch * dst_planes[plane].i_lines;
+        }
 
         p_block_in = block_Alloc( i_buffer );
 
         /* Copy picture stride by stride */
         p_dst = p_block_in->p_buffer;
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        for(int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            uint8_t *p_src = p_pic->p[i_plane].p_pixels;
-            i_width = p_pic->p[i_plane].i_visible_pitch;
-            i_src_stride = p_pic->p[i_plane].i_pitch;
-
-            for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines;
-                 i_line++ )
-            {
-                memcpy( p_dst, p_src, i_width );
-                p_dst += i_width;
-                p_src += i_src_stride;
-            }
+            dst_planes[i_plane].p_pixels = p_dst;
+            plane_CopyPixels(&dst_planes[i_plane], &p_pic->p[i_plane]);
+            p_dst += dst_planes[i_plane].i_pitch * dst_planes[i_plane].i_lines;
         }
 
         i_pts = p_pic->date;
