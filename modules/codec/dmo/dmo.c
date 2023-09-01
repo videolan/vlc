@@ -361,9 +361,11 @@ static int DecOpen( decoder_t *p_dec )
         if( p_dec->fmt_in->i_extra )
             memcpy( &p_vih[1], p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra );
 
+        vlc_fourcc_t fcc = p_dec->fmt_in->i_original_fourcc ?
+                           p_dec->fmt_in->i_original_fourcc : p_dec->fmt_in->i_codec;
+
         p_bih = &p_vih->bmiHeader;
-        p_bih->biCompression = p_dec->fmt_in->i_original_fourcc ?
-                            p_dec->fmt_in->i_original_fourcc : p_dec->fmt_in->i_codec;
+        p_bih->biCompression = fcc;
         p_bih->biWidth = p_dec->fmt_in->video.i_width;
         p_bih->biHeight = p_dec->fmt_in->video.i_height;
         p_bih->biBitCount = p_dec->fmt_in->video.i_bits_per_pixel;
@@ -377,8 +379,7 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_input_type.majortype  = MEDIATYPE_Video;
         dmo_input_type.subtype    = dmo_input_type.majortype;
-        dmo_input_type.subtype.Data1 = p_dec->fmt_in->i_original_fourcc ?
-                                p_dec->fmt_in->i_original_fourcc: p_dec->fmt_in->i_codec;
+        dmo_input_type.subtype.Data1 = fcc;
         dmo_input_type.formattype = FORMAT_VideoInfo;
         dmo_input_type.bFixedSizeSamples = 0;
         dmo_input_type.bTemporalCompression = 1;
