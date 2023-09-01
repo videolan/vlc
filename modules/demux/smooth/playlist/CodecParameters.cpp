@@ -120,7 +120,6 @@ void CodecParameters::initAndFillEsFmt(es_format_t *fmt) const
             else if( fmt->i_codec == VLC_FOURCC( 'W', 'V', 'C', '1' ) )
             {
                 fmt->i_codec = VLC_CODEC_VC1;
-//                fmt->video.i_bits_per_pixel = 0x18; // No clue why this was set in smooth streamfilter
             }
 
             FillExtradata(fmt, extradata);

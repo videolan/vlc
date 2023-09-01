@@ -130,7 +130,6 @@ int screen_InitCapture(demux_t *p_demux)
     p_sys->fmt.video.i_width           = rect.size.width;
     p_sys->fmt.video.i_visible_height  =
     p_sys->fmt.video.i_height          = rect.size.height;
-    p_sys->fmt.video.i_bits_per_pixel  = 32;
     p_sys->fmt.video.i_chroma          = VLC_CODEC_RGB32;
     p_sys->fmt.video.i_rmask           = 0x00ff0000;
     p_sys->fmt.video.i_gmask           = 0x0000ff00;

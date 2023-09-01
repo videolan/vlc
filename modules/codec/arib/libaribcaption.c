@@ -167,7 +167,6 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     fmt.i_rmask          = 0;
     fmt.i_gmask          = 0;
     fmt.i_bmask          = 0;
-    fmt.i_bits_per_pixel = 0;
     fmt.i_x_offset       = 0;
     fmt.i_y_offset       = 0;
 

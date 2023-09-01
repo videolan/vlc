@@ -433,7 +433,6 @@ static int SubpictureValidate( subpicture_t *p_subpic,
 
     video_format_t fmt = *p_fmt_dst;
     fmt.i_chroma         = VLC_CODEC_RGBA;
-    fmt.i_bits_per_pixel = 0;
     fmt.i_x_offset       = 0;
     fmt.i_y_offset       = 0;
     if( b_fmt_src || b_fmt_dst )

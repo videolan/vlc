@@ -123,7 +123,6 @@ static void output_mode_cb(void *data, struct wl_output *output,
 
     es_format_Init(&fmt, VIDEO_ES, VLC_CODEC_RGB32);
     fmt.video.i_chroma = VLC_CODEC_RGB32;
-    fmt.video.i_bits_per_pixel = 32;
     fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
     fmt.video.i_frame_rate = lroundf(1000.f * sys->rate);
     fmt.video.i_frame_rate_base = 1000;

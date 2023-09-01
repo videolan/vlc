@@ -458,7 +458,6 @@ static int DecOpen( decoder_t *p_dec )
         p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ? VLC_CODEC_I420 : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in->video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in->video.i_height;
-        p_dec->fmt_out.video.i_bits_per_pixel = vlc_fourcc_GetChromaBPP(i_chroma);
 
         /* If an aspect-ratio was specified in the input format then force it */
         if( p_dec->fmt_in->video.i_sar_num > 0 &&
@@ -1059,10 +1058,6 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     DMO_MEDIA_TYPE dmo_type;
     VIDEOINFOHEADER vih, *p_vih;
     BITMAPINFOHEADER *p_bih;
-
-    /* FIXME */
-    p_enc->fmt_in.video.i_bits_per_pixel =
-        p_enc->fmt_out.video.i_bits_per_pixel = 12;
 
     /* Enumerate input format (for debug output) */
     i = 0;

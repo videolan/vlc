@@ -622,7 +622,6 @@ static int Open(vlc_object_t *this)
     enc->fmt_in.video.i_rmask = 0;
     enc->fmt_in.video.i_gmask = 0;
     enc->fmt_in.video.i_bmask = 0;
-    enc->fmt_in.video.i_bits_per_pixel = 12;
     // require aligned pictures on input, a filter may be added before the encoder
     enc->fmt_in.video.i_width          = sys->params.mfx.FrameInfo.Width;
     enc->fmt_in.video.i_height         = sys->params.mfx.FrameInfo.Height;

@@ -245,7 +245,6 @@ static int CUtoFMT(video_format_t *fmt, const CUVIDEOFORMAT *p_format)
     // frame rate
     fmt->i_frame_rate = p_format->frame_rate.numerator;
     fmt->i_frame_rate_base = p_format->frame_rate.denominator;
-    fmt->i_bits_per_pixel = i_bpp;
     return VLC_SUCCESS;
 }
 
@@ -964,7 +963,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.video.i_sar_num = i_sar_num;
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 #undef ALIGN
-    p_dec->fmt_out.video.i_bits_per_pixel = i_depth_luma;
     p_dec->fmt_out.video.i_frame_rate = p_dec->fmt_in->video.i_frame_rate;
     p_dec->fmt_out.video.i_frame_rate_base = p_dec->fmt_in->video.i_frame_rate_base;
 

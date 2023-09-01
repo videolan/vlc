@@ -1866,11 +1866,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.video.i_frame_rate = num;
                         p_stream->fmt.video.i_frame_rate_base = den;
                         date_Init( &p_stream->dts, num, den );
-                        p_stream->fmt.video.i_bits_per_pixel =
-                            GetWLE((oggpacket.packet+182));
-                        if( !p_stream->fmt.video.i_bits_per_pixel )
-                            /* hack, FIXME */
-                            p_stream->fmt.video.i_bits_per_pixel = 24;
+                        unsigned bpp = GetWLE((oggpacket.packet+182));
                         p_stream->fmt.video.i_width =
                             GetDWLE((oggpacket.packet+176));
                         p_stream->fmt.video.i_height =
@@ -1886,7 +1882,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                                  p_stream->fmt.video.i_frame_rate_base,
                                  p_stream->fmt.video.i_width,
                                  p_stream->fmt.video.i_height,
-                                 p_stream->fmt.video.i_bits_per_pixel);
+                                 bpp);
 
                         if ( !p_stream->fmt.video.i_frame_rate ||
                              !p_stream->fmt.video.i_frame_rate_base )
@@ -2018,7 +2014,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         date_Init( &p_stream->dts, num, den );
                         p_stream->fmt.video.i_frame_rate = num;
                         p_stream->fmt.video.i_frame_rate_base = den;
-                        p_stream->fmt.video.i_bits_per_pixel = st->bits_per_sample;
                         p_stream->fmt.video.i_width = st->sh.video.width;
                         p_stream->fmt.video.i_height = st->sh.video.height;
                         p_stream->fmt.video.i_visible_width =
@@ -2032,7 +2027,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                                  p_stream->fmt.video.i_frame_rate_base,
                                  p_stream->fmt.video.i_width,
                                  p_stream->fmt.video.i_height,
-                                 p_stream->fmt.video.i_bits_per_pixel );
+                                 st->bits_per_sample );
                     }
                     /* Check for audio header (new format) */
                     else if( !strncmp( st->streamtype, "audio", 5 ) &&

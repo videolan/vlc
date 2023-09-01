@@ -290,7 +290,6 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
 
     p_fmt->video.i_width = p_vide->i_width;
     p_fmt->video.i_height = p_vide->i_height;
-    p_fmt->video.i_bits_per_pixel = p_vide->i_depth;
 
     /* fall on display size */
     if( p_fmt->video.i_width <= 0 )
@@ -722,7 +721,6 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 }
 
                 p_fmt->video.color_range = p_data->i_fullrange ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
-                p_fmt->video.i_bits_per_pixel = p_data->i_bit_depth;
 
                 CopyExtradata( p_data->p_codec_init_data,
                                p_data->i_codec_init_datasize,
@@ -766,7 +764,6 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 p_fmt->video.i_visible_width = p_fmt->video.i_width;
                 p_fmt->video.i_height = BOXDATA(p_strf)->bmiHeader.biHeight;
                 p_fmt->video.i_visible_height =p_fmt->video.i_height;
-                p_fmt->video.i_bits_per_pixel = BOXDATA(p_strf)->bmiHeader.biBitCount;
                 CopyExtradata( BOXDATA(p_strf)->p_extra,
                                BOXDATA(p_strf)->i_extra,
                                p_fmt );

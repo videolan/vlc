@@ -495,7 +495,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             es_format_Init( &es_fmt, VIDEO_ES, fcc );
             es_fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
 
-            es_fmt.video.i_bits_per_pixel = cp->bits_per_coded_sample;
             /* Special case for raw video data */
             if( cp->codec_id == AV_CODEC_ID_RAWVIDEO )
             {

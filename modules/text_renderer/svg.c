@@ -252,7 +252,6 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
     /* Create a new subpicture region */
     video_format_t fmt;
     video_format_Init( &fmt, VLC_CODEC_BGRA ); /* CAIRO_FORMAT_ARGB32 == VLC_CODEC_BGRA, go figure */
-    fmt.i_bits_per_pixel = 32;
     fmt.i_chroma = VLC_CODEC_BGRA;
     fmt.i_width = fmt.i_visible_width = dim.width;
     fmt.i_height = fmt.i_visible_height = dim.height;

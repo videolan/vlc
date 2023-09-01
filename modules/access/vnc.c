@@ -230,7 +230,6 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
 
-    fmt.video.i_bits_per_pixel = i_bits_per_pixel;
     fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
 
     /* declare the new es */

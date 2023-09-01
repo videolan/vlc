@@ -859,7 +859,6 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
     /* create a full frame region - this will also tell Tiger the size of the frame */
     video_format_t fmt = *p_fmt_dst;
     fmt.i_chroma         = VLC_CODEC_RGBA;
-    fmt.i_bits_per_pixel = 0;
     fmt.i_width          =
     fmt.i_visible_width  = p_fmt_src->i_width;
     fmt.i_height         =
