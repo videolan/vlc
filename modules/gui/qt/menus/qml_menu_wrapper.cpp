@@ -40,7 +40,7 @@ namespace
         assert(order == Qt::AscendingOrder || order == Qt::DescendingOrder);
 
         QStyleOptionHeader headerOption;
-        headerOption.init(widget);
+        headerOption.initFrom(widget);
         headerOption.sortIndicator = (order == Qt::AscendingOrder)
                 ? QStyleOptionHeader::SortDown
                 : QStyleOptionHeader::SortUp;
