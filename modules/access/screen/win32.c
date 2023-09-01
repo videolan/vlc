@@ -49,6 +49,7 @@ typedef struct
     HGDIOBJ hgdi_backup;
     POINT ptl;             /* Coordinates of the primary display's top left, when the origin
                             * is taken to be the top left of the entire virtual screen */
+    size_t pitch;
 
     int i_fragment_size;
     int i_fragment;
@@ -151,6 +152,8 @@ int screen_InitCaptureGDI( demux_t *p_demux )
     p_sys->fmt.video.transfer         = TRANSFER_FUNC_SRGB;
     p_sys->fmt.video.color_range      = COLOR_RANGE_FULL;
 
+    p_data->pitch = ( ( ( screen_width * i_bits_per_pixel ) + 31 ) & ~31 ) >> 3;
+
     p_data->ptl.x = - GetSystemMetrics( SM_XVIRTUALSCREEN );
     p_data->ptl.y = - GetSystemMetrics( SM_YVIRTUALSCREEN );
 
@@ -193,7 +196,8 @@ struct block_sys_t
 
 static void CaptureBlockRelease( block_t *p_block )
 {
-    DeleteObject( ((struct block_sys_t *)p_block)->hbmp );
+    struct block_sys_t *p_sys = container_of(p_block, struct block_sys_t, self);
+    DeleteObject( p_sys->hbmp );
     free( p_block );
 }
 
@@ -219,7 +223,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         p_data->bmi.bmiHeader.biWidth         = p_sys->fmt.video.i_width;
         p_data->bmi.bmiHeader.biHeight        = - p_sys->fmt.video.i_height;
         p_data->bmi.bmiHeader.biPlanes        = 1;
-        p_data->bmi.bmiHeader.biBitCount      = p_sys->fmt.video.i_bits_per_pixel;
+        p_data->bmi.bmiHeader.biBitCount      = p_data->pitch * 8 / p_sys->fmt.video.i_width;
         p_data->bmi.bmiHeader.biCompression   = BI_RGB;
         p_data->bmi.bmiHeader.biSizeImage     = 0;
         p_data->bmi.bmiHeader.biXPelsPerMeter = 0;
@@ -265,9 +269,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         goto error;
 
     /* Fill all fields */
-    int i_stride =
-        ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
-    i_buffer = i_stride * p_sys->fmt.video.i_height;
+    i_buffer = p_data->pitch * p_sys->fmt.video.i_height;
     block_Init( &p_block->self, &CaptureBlockCallbacks, p_buffer, i_buffer );
     p_block->hbmp            = hbmp;
 
@@ -291,8 +293,7 @@ static void RenderCursor( demux_t *p_demux, int i_x, int i_y,
         return;
 
     /* Bitmaps here created by CreateDIBSection: stride rounded up to the nearest DWORD */
-    p_sys->dst.p[ 0 ].i_pitch = p_sys->dst.p[ 0 ].i_visible_pitch =
-        ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
+    p_sys->dst.p[ 0 ].i_pitch = p_sys->dst.p[ 0 ].i_visible_pitch = p_data->pitch;
 
     if( !p_data->p_blend )
     {
