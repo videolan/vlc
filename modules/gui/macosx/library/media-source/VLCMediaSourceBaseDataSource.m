@@ -110,7 +110,10 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    
+
+    NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+    [self.tableView registerNib:tableCellViewNib forIdentifier:VLCMediaSourceTableViewCellIdentifier];
+
     [self reloadViews];
 }
 
@@ -355,13 +358,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCMediaSourceTableViewCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCMediaSourceTableViewCellIdentifier;
-    }
-
+    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:VLCMediaSourceTableViewCellIdentifier owner:self];
     cellView.primaryTitleTextField.hidden = YES;
     cellView.secondaryTitleTextField.hidden = YES;
     cellView.singlePrimaryTitleTextField.hidden = NO;
