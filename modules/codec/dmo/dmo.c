@@ -368,7 +368,7 @@ static int DecOpen( decoder_t *p_dec )
         p_bih->biCompression = fcc;
         p_bih->biWidth = p_dec->fmt_in->video.i_width;
         p_bih->biHeight = p_dec->fmt_in->video.i_height;
-        p_bih->biBitCount = p_dec->fmt_in->video.i_bits_per_pixel;
+        p_bih->biBitCount = vlc_fourcc_GetChromaBPP(fcc);
         p_bih->biPlanes = 1;
         p_bih->biSize = i_size - sizeof(VIDEOINFOHEADER) + sizeof(*p_bih);
 
@@ -434,7 +434,6 @@ static int DecOpen( decoder_t *p_dec )
         BITMAPINFOHEADER *p_bih;
         DMO_MEDIA_TYPE mt;
         unsigned i_chroma = VLC_CODEC_YUYV;
-        int i_bpp = 16;
         int i = 0;
 
         /* Find out which chroma to use */
@@ -443,7 +442,6 @@ static int DecOpen( decoder_t *p_dec )
             if( mt.subtype.Data1 == VLC_CODEC_YV12 )
             {
                 i_chroma = mt.subtype.Data1;
-                i_bpp = 12;
                 DMOFreeMediaType( &mt );
                 break;
             }
@@ -452,7 +450,6 @@ static int DecOpen( decoder_t *p_dec )
                       IsEqualGUID( &mt.subtype, &MEDIASUBTYPE_RGB24 ) )
             {
                 i_chroma = VLC_CODEC_RGB24;
-                i_bpp = 24;
             }
 
             DMOFreeMediaType( &mt );
@@ -461,7 +458,7 @@ static int DecOpen( decoder_t *p_dec )
         p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ? VLC_CODEC_I420 : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in->video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in->video.i_height;
-        p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
+        p_dec->fmt_out.video.i_bits_per_pixel = vlc_fourcc_GetChromaBPP(i_chroma);
 
         /* If an aspect-ratio was specified in the input format then force it */
         if( p_dec->fmt_in->video.i_sar_num > 0 &&
@@ -479,7 +476,7 @@ static int DecOpen( decoder_t *p_dec )
         p_bih = &p_vih->bmiHeader;
         p_bih->biCompression = i_chroma == VLC_CODEC_RGB24 ? BI_RGB : i_chroma;
         p_bih->biHeight *= -1;
-        p_bih->biBitCount = p_dec->fmt_out.video.i_bits_per_pixel;
+        p_bih->biBitCount = vlc_fourcc_GetChromaBPP(i_chroma);
         p_bih->biSizeImage = p_dec->fmt_in->video.i_width *
             p_dec->fmt_in->video.i_height *
             ((p_bih->biBitCount + 7) / 8);
@@ -1091,7 +1088,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     p_bih->biCompression = VLC_CODEC_I420;
     p_bih->biWidth = p_enc->fmt_in.video.i_visible_width;
     p_bih->biHeight = p_enc->fmt_in.video.i_visible_height;
-    p_bih->biBitCount = p_enc->fmt_in.video.i_bits_per_pixel;
+    p_bih->biBitCount = vlc_fourcc_GetChromaBPP(VLC_CODEC_I420);
     p_bih->biSizeImage = p_enc->fmt_in.video.i_visible_width *
         p_enc->fmt_in.video.i_visible_height * ((p_bih->biBitCount + 7) /8);
     p_bih->biPlanes = 3;
