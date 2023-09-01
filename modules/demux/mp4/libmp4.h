@@ -809,6 +809,7 @@ typedef struct
     int16_t  i_depth;
 
     int16_t  i_qt_color_table;
+    video_palette_t *p_palette;
 
     /* XXX hack ImageDescription */
     int     i_qt_image_description;

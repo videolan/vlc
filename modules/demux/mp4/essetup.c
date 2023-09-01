@@ -29,6 +29,7 @@
 #include "../xiph.h"
 #include "../../packetizer/iso_color_tables.h"
 #include "mpeg4.h"
+#include "qt_palette.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
@@ -790,6 +791,22 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 p_fmt->p_extra =
                         AVCi_create_AnnexB( p_fmt->video.i_width,
                                             !!BOXDATA(p_fiel)->i_flags, &p_fmt->i_extra );
+            }
+            break;
+        }
+
+        case VLC_FOURCC('s','m','c',' '):
+        case VLC_FOURCC('8','B','P','S'):
+        {
+            if( p_sample->data.p_sample_vide->p_palette )
+            {
+                p_fmt->video.p_palette = malloc(sizeof(video_palette_t));
+                if( p_fmt->video.p_palette )
+                    *p_fmt->video.p_palette = *p_sample->data.p_sample_vide->p_palette;
+            }
+            else if(qt_palette_depth_has_default(p_sample->data.p_sample_vide->i_depth))
+            {
+                p_fmt->video.p_palette = qt_make_palette(p_sample->data.p_sample_vide->i_depth);
             }
             break;
         }

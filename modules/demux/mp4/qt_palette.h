@@ -337,16 +337,16 @@ static const uint8_t * qt_get_default_palette(uint8_t depth)
     }
 }
 
-static void qt_upload_palette(const uint8_t *srcpal, uint8_t depth,
+static void qt_upload_palette(const uint8_t *srcpal, unsigned colors,
                               video_palette_t *palette)
 {
-    for(int i=0; i<depth; i++)
+    for(unsigned i=0; i<colors; i++)
     {
-        for(int j=0;j<3; j++)
+        for(unsigned j=0;j<3; j++)
             palette->palette[i][j] = *(srcpal++);
         palette->palette[i][3] = 0xff;
     }
-    palette->i_entries = 1 << depth;
+    palette->i_entries = colors;
 }
 
 static video_palette_t * qt_make_palette(uint8_t depth)
@@ -356,7 +356,7 @@ static video_palette_t * qt_make_palette(uint8_t depth)
         return NULL;
     video_palette_t *palette = malloc(sizeof(*palette));
     if(palette)
-        qt_upload_palette(srcpal, depth, palette);
+        qt_upload_palette(srcpal, 1 << depth, palette);
     return palette;
 }
 

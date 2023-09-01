@@ -147,6 +147,39 @@ static inline void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
     memcpy( p_uuid, p_buff, 16 );
 }
 
+static video_palette_t * ReadQuicktimePalette( uint8_t **pp_peek, uint64_t *pi_read )
+{
+    uint8_t *p_peek = *pp_peek;
+    uint64_t i_read = *pi_read;
+    uint32_t v;
+    MP4_GET4BYTES(v);
+    if( v != 0 )
+        return NULL;
+    MP4_GET2BYTES(v); // should be == 0x8000, but does not in the wild
+    uint16_t i_colors_count;
+    MP4_GET2BYTES(i_colors_count);
+    if( i_colors_count == UINT16_MAX ||
+        ++i_colors_count > VIDEO_PALETTE_COLORS_MAX ||
+        i_read < i_colors_count * 8U)
+        return NULL;
+    video_palette_t *p_palette = malloc( sizeof(video_palette_t) );
+    if( p_palette == NULL )
+        return NULL;
+    for( uint16_t i=0; i<i_colors_count; i++ )
+    {
+        uint16_t dummy;
+        MP4_GET2BYTES(dummy); VLC_UNUSED(dummy);
+        MP4_GET2BYTES(p_palette->palette[i][0]);
+        MP4_GET2BYTES(p_palette->palette[i][1]);
+        MP4_GET2BYTES(p_palette->palette[i][2]);
+        p_palette->palette[i][3] = 0xFF;
+    }
+    p_palette->i_entries = i_colors_count;
+    *pp_peek = p_peek;
+    *pi_read = i_read;
+    return p_palette;
+}
+
 static uint8_t *mp4_readbox_enter_common( stream_t *s, MP4_Box_t *box,
                                           size_t typesize,
                                           void (*release)( MP4_Box_t * ),
@@ -2710,6 +2743,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 static void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 {
     free( p_box->data.p_sample_vide->p_qt_image_description );
+    free( p_box->data.p_sample_vide->p_palette );
 }
 
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2766,6 +2800,14 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_color_table );
+
+    if( p_box->data.p_sample_vide->i_depth == 8 &&
+        p_box->data.p_sample_vide->i_qt_color_table == 0 )
+    {
+        p_box->data.p_sample_vide->p_palette = ReadQuicktimePalette( &p_peek, &i_read );
+        if( p_box->data.p_sample_vide->p_palette == NULL )
+            MP4_READBOX_EXIT( 0 );
+    }
 
     if( p_box->i_type == ATOM_drmi )
     {
