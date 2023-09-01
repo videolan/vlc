@@ -137,6 +137,7 @@ static int SendAudio( sout_stream_t *p_stream, void *id, block_t *p_buffer );
 typedef struct
 {
     es_format_t format;
+    unsigned i_bitspersample;
     void *p_data;
 } sout_stream_id_sys_t;
 
@@ -284,39 +285,6 @@ static void *AddVideo( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     char* psz_tmp;
     sout_stream_id_sys_t    *id;
-    int i_bits_per_pixel;
-
-    switch( p_fmt->i_codec )
-    {
-        case VLC_CODEC_RGB32:
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-        case VLC_CODEC_BGRA:
-        case VLC_CODEC_ABGR:
-            i_bits_per_pixel = 32;
-            break;
-        case VLC_CODEC_I444:
-        case VLC_CODEC_RGB24:
-            i_bits_per_pixel = 24;
-            break;
-        case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB15:
-        case VLC_CODEC_RGB8:
-        case VLC_CODEC_I422:
-            i_bits_per_pixel = 16;
-            break;
-        case VLC_CODEC_YV12:
-        case VLC_CODEC_I420:
-            i_bits_per_pixel = 12;
-            break;
-        case VLC_CODEC_RGBP:
-            i_bits_per_pixel = 8;
-            break;
-        default:
-            i_bits_per_pixel = 0;
-            msg_Dbg( p_stream, "non raw video format detected (%4.4s), buffers will contain compressed video", (char *)&p_fmt->i_codec );
-            break;
-    }
 
     id = calloc( 1, sizeof( sout_stream_id_sys_t ) );
     if( !id )
@@ -327,7 +295,9 @@ static void *AddVideo( sout_stream_t *p_stream, const es_format_t *p_fmt )
     free( psz_tmp );
 
     es_format_Copy( &id->format, p_fmt );
-    id->format.video.i_bits_per_pixel = i_bits_per_pixel;
+    id->i_bitspersample = vlc_fourcc_GetChromaBPP(id->format.video.i_chroma);
+    if (id->i_bitspersample == 0)
+        msg_Dbg( p_stream, "non raw video format detected (%4.4s), buffers will contain compressed video", (char *)&p_fmt->i_codec );
     return id;
 }
 
@@ -396,7 +366,8 @@ static int SendVideo( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_video_postrender_callback( id->p_data, p_pixels,
                                          id->format.video.i_width, id->format.video.i_height,
-                                         id->format.video.i_bits_per_pixel, i_size, p_buffer->i_pts );
+                                         id->i_bitspersample,
+                                         i_size, p_buffer->i_pts );
     block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
 }
