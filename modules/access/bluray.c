@@ -591,12 +591,12 @@ static void FindMountPoint(char **file)
 static void bluraySendBackgroundImage(vlc_object_t *p_obj,
                                       es_out_t *p_dst_out,
                                       es_out_id_t *p_es,
-                                      const es_format_t *p_fmt)
+                                      const video_format_t *p_fmt)
 {
     msg_Info(p_obj, "Start background");
 
-    block_t *p_block = block_Alloc(p_fmt->video.i_width * p_fmt->video.i_height *
-                                   p_fmt->video.i_bits_per_pixel / 8);
+    assert(p_fmt->i_chroma == VLC_CODEC_I420);
+    block_t *p_block = block_Alloc(p_fmt->i_width * p_fmt->i_height * 3 / 2);
     if (!p_block) {
         msg_Err(p_obj, "Error allocating block for background video");
         return;
@@ -606,9 +606,10 @@ static void bluraySendBackgroundImage(vlc_object_t *p_obj,
     p_block->i_dts = p_block->i_pts = vlc_tick_now() + VLC_TICK_FROM_MS(40);
 
     uint8_t *p = p_block->p_buffer;
-    memset(p, 0, p_fmt->video.i_width * p_fmt->video.i_height);
-    p += p_fmt->video.i_width * p_fmt->video.i_height;
-    memset(p, 0x80, p_fmt->video.i_width * p_fmt->video.i_height / 2);
+    // Set I420 black
+    memset(p, 0, p_fmt->i_width * p_fmt->i_height);
+    p += p_fmt->i_width * p_fmt->i_height;
+    memset(p, 0x80, p_fmt->i_width * p_fmt->i_height / 2);
 
     es_out_SetPCR(p_dst_out, p_block->i_dts - VLC_TICK_FROM_MS(40));
     es_out_Control(p_dst_out, ES_OUT_SET_ES, p_es);
@@ -1498,7 +1499,7 @@ static int bluray_esOutControl(es_out_t *p_out, input_source_t *in, int i_query,
                     bluraySendBackgroundImage(esout_priv->p_obj,
                                               esout_priv->p_dst_out,
                                               esout_priv->overlay.p_video_es,
-                                              &fmt);
+                                              &fmt.video);
                 }
                 es_format_Clean(&fmt);
             }
