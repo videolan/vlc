@@ -38,6 +38,8 @@ using std::memory_order_acq_rel;
 # include <vlc_common.h>
 # include <vlc_tick.h>
 
+#include <time.h> /* vlc_atomic_timedwait_daytime */
+
 #define VLC_STATIC_RC { \
     .refs = ATOMIC_VAR_INIT(0) \
 }
