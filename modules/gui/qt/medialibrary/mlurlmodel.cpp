@@ -19,6 +19,7 @@
 #include "mlurlmodel.hpp"
 
 #include <QDateTime>
+#include <QTimeZone>
 
 MLUrlModel::MLUrlModel(QObject *parent)
     : MLBaseModel(parent)
@@ -133,7 +134,7 @@ MLUrl::MLUrl(const vlc_ml_media_t *_data)
     : MLItem( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_url( _data->p_files->i_nb_items > 0 ? _data->p_files->p_items[0].psz_mrl : "" )
     , m_lastPlayedDate(
-          QDateTime::fromSecsSinceEpoch( _data->i_last_played_date ).toString( QLocale::system().dateFormat( QLocale::ShortFormat ) )
+          QDateTime::fromSecsSinceEpoch( _data->i_last_played_date, QTimeZone::utc() ).toString( QLocale::system().dateFormat( QLocale::ShortFormat ) )
           )
 {
 }

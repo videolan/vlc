@@ -18,6 +18,8 @@
 
 #include "networkmediamodel.hpp"
 
+#include <QTimeZone>
+
 #include "medialibrary/mlhelper.hpp"
 
 #include "playlist/media.hpp"
@@ -601,7 +603,7 @@ void NetworkMediaModel::refreshMediaList( MediaTreePtr tree,
             free(str);
 
             if (ok)
-                item.fileModified = QDateTime::fromSecsSinceEpoch(time);
+                item.fileModified = QDateTime::fromSecsSinceEpoch(time, QTimeZone::utc());
         }
 
         if ( m_mediaLib && item.canBeIndexed == true )

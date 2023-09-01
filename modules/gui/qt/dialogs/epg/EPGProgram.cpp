@@ -21,6 +21,8 @@
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
 
+#include <QTimeZone>
+
 EPGProgram::EPGProgram( EPGView *view_, const vlc_epg_t *p_epg ) : QObject( view_ )
 {
     name = QString(p_epg->psz_name);
@@ -96,7 +98,7 @@ void EPGProgram::updateEvents( const vlc_epg_event_t * const * pp_events, size_t
     for( size_t i=0; i<i_events; i++ )
     {
         const vlc_epg_event_t *p_event = pp_events[i];
-        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start );
+        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::utc() );
         if( !mindate->isValid() || eventStart < *mindate )
             *mindate = eventStart;
 
