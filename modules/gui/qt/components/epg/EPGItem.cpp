@@ -29,6 +29,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneHoverEvent>
 #include <QStyle>
+#include <QTimeZone>
 
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
@@ -153,7 +154,7 @@ uint16_t EPGItem::eventID() const
 bool EPGItem::setData( const vlc_epg_event_t *data )
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
-    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start );
+    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::utc() );
 #else
     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
 #endif
