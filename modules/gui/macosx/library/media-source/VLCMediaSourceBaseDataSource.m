@@ -44,9 +44,6 @@
 
 #import "views/VLCImageView.h"
 
-
-NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellIdentifier";
-
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
@@ -112,7 +109,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.tableView.delegate = self;
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
-    [self.tableView registerNib:tableCellViewNib forIdentifier:VLCMediaSourceTableViewCellIdentifier];
+    [self.tableView registerNib:tableCellViewNib forIdentifier:VLCLibraryTableCellViewIdentifier];
 
     [self reloadViews];
 }
@@ -358,7 +355,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:VLCMediaSourceTableViewCellIdentifier owner:self];
+    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
     cellView.primaryTitleTextField.hidden = YES;
     cellView.secondaryTitleTextField.hidden = YES;
     cellView.singlePrimaryTitleTextField.hidden = NO;

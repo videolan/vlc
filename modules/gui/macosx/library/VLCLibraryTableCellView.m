@@ -41,6 +41,8 @@
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 
+NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewIdentifier";
+
 @implementation VLCLibraryTableCellView
 
 + (instancetype)fromNibWithOwner:(id)owner

@@ -131,7 +131,7 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:@"VLCMediaSourceTableViewCellIdentifier" owner:self];
+    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
     cellView.representedInputItem = [self mediaSourceInputItemAtRow:row];
     return cellView;
 }
