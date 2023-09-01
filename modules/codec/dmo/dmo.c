@@ -481,7 +481,7 @@ static int DecOpen( decoder_t *p_dec )
         p_bih->biBitCount = p_dec->fmt_out.video.i_bits_per_pixel;
         p_bih->biSizeImage = p_dec->fmt_in->video.i_width *
             p_dec->fmt_in->video.i_height *
-            (p_dec->fmt_in->video.i_bits_per_pixel + 7) / 8;
+            ((p_bih->biBitCount + 7) / 8);
 
         p_bih->biPlanes = 1; /* http://msdn.microsoft.com/en-us/library/dd183376%28v=vs.85%29.aspx */
         p_bih->biSize = sizeof(*p_bih);
@@ -1092,7 +1092,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     p_bih->biHeight = p_enc->fmt_in.video.i_visible_height;
     p_bih->biBitCount = p_enc->fmt_in.video.i_bits_per_pixel;
     p_bih->biSizeImage = p_enc->fmt_in.video.i_visible_width *
-        p_enc->fmt_in.video.i_visible_height * p_enc->fmt_in.video.i_bits_per_pixel /8;
+        p_enc->fmt_in.video.i_visible_height * ((p_bih->biBitCount + 7) /8);
     p_bih->biPlanes = 3;
     p_bih->biSize = sizeof(*p_bih);
 
