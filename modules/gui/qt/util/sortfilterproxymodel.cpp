@@ -18,7 +18,10 @@
 
 #include "sortfilterproxymodel.hpp"
 
+#include <QRegularExpression>
+
 #include <cassert>
+
 
 SortFilterProxyModel::SortFilterProxyModel( QObject *parent )
     : QSortFilterProxyModel( parent )
@@ -36,12 +39,12 @@ SortFilterProxyModel::SortFilterProxyModel( QObject *parent )
 
 QString SortFilterProxyModel::searchPattern() const
 {
-    return filterRegExp().pattern();
+    return filterRegularExpression().pattern();
 }
 
 void SortFilterProxyModel::setSearchPattern( const QString &searchPattern )
 {
-    setFilterRegExp(searchPattern);
+    setFilterRegularExpression(searchPattern);
 }
 
 QByteArray SortFilterProxyModel::searchRole() const

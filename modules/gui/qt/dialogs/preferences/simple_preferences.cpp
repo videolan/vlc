@@ -60,6 +60,7 @@
 #include <QFileDialog>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QRegularExpression>
 
 #include <cassert>
 #include <math.h>
@@ -655,7 +656,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     << "dvd*" << "scd*" << "sr*" << "sg*" << "cd*";
             ui.DVDDeviceComboBox->addItems( QDir( "/dev/" )
                     .entryList( DVDDeviceComboBoxStringList, QDir::System )
-                    .replaceInStrings( QRegExp("^"), "/dev/" )
+                    .replaceInStrings( QRegularExpression("^"), "/dev/" )
             );
 #endif
             configGeneric<StringConfigControl>( "dvd", ui.DVDLabel,

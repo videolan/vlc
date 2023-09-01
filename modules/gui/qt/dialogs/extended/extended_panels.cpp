@@ -40,7 +40,7 @@
 #include <QFileDialog>
 #include <QGraphicsScene>
 #include <QPainter>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QApplication>
 #include <QScreen>
 
@@ -112,8 +112,8 @@ static QString OptionFromWidgetName( QObject *obj )
 {
     /* Gruik ? ... nah */
     return obj->objectName()
-        .remove( QRegExp( "Slider|Combo|Dial|Check|Spin|Text" ) )
-        .replace( QRegExp( "([A-Z])" ), "-\\1" )
+        .remove( QRegularExpression( "Slider|Combo|Dial|Check|Spin|Text" ) )
+        .replace( QRegularExpression( "([A-Z])" ), "-\\1" )
         .toLower();
 }
 

@@ -36,6 +36,7 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QUrl>
+#include <QRegularExpression>
 
 #define I_FILE_SLASH_DIR \
     I_DIR_OR_FOLDER( N_("File/Directory"), N_("File/Folder") )
@@ -148,11 +149,11 @@ QString FileDestBox::getMRL( const QString& mux )
     QString outputfile = fileEdit->text();
     if( !mux.isEmpty() )
     {
-        if( outputfile.contains( QRegExp("\\..{2,4}$")) &&
+        if( outputfile.contains( QRegularExpression("\\..{2,4}$")) &&
             !outputfile.endsWith(mux) )
         {
            /* Replace the extension according to muxer */
-           outputfile.replace(QRegExp("\\..{2,4}$"),"."+mux);
+           outputfile.replace(QRegularExpression("\\..{2,4}$"),"."+mux);
         } else if (!outputfile.endsWith( mux ) )
         {
            m.option( "mux", mux );
@@ -218,7 +219,7 @@ QString HTTPDestBox::getMRL( const QString& mux )
     /* Path-extension is primary muxer to use if possible,
        otherwise check for mux-choise and see that it isn't mp4
        then fallback to flv*/
-    if ( !path.contains(QRegExp("\\..{2,3}$") ) )
+    if ( !path.contains(QRegularExpression("\\..{2,3}$") ) )
     {
         if( !mux.isEmpty() && mux.compare("mp4") )
            m.option( "mux", mux );

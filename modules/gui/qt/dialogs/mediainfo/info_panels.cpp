@@ -48,6 +48,7 @@
 #include <QTextEdit>
 #include <QApplication>
 #include <QPushButton>
+#include <QRegularExpression>
 
 /************************************************************************
  * Single panels
@@ -258,7 +259,7 @@ void MetaPanel::update( const SharedInputItem& p_item )
         {
             currentURL = newURL;
             lblURL->setText( "<a href='" + currentURL + "'>" +
-                             currentURL.remove( QRegExp( ".*://") ) + "</a>" );
+                             currentURL.remove( QRegularExpression( ".*://") ) + "</a>" );
         }
     }
     free( psz_meta );

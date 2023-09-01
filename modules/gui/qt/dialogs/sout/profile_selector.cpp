@@ -31,7 +31,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QRadioButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QButtonGroup>
 #include <QSpinBox>
 #include <QUrl>
@@ -200,9 +200,9 @@ void VLCProfileSelector::saveProfiles()
 void VLCProfileSelector::updateOptions( int i )
 {
     QString options = profileBox->itemData( i ).toString();
-    QRegExp rx(OLDFORMAT);
+    QRegularExpression rx(OLDFORMAT);
     if ( !options.contains( ";" ) ) return;
-    if ( rx.indexIn( options ) != -1 )
+    if ( rx.match( options ).hasMatch() )
         return updateOptionsOldFormat( i );
 
     transcode.clear();
@@ -655,8 +655,8 @@ void VLCProfileEditor::codecSelected()
 
 void VLCProfileEditor::fillProfile( const QString& qs )
 {
-    QRegExp rx(OLDFORMAT);
-    if ( rx.indexIn( qs ) != -1 ) return fillProfileOldFormat( qs );
+    QRegularExpression rx(OLDFORMAT);
+    if ( rx.match( qs ).hasMatch() ) return fillProfileOldFormat( qs );
 
     QStringList tuples = qs.split( ";" );
     foreach ( const QString &tuple, tuples )
