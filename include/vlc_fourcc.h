@@ -782,5 +782,25 @@ typedef struct {
  */
 VLC_API const vlc_chroma_description_t * vlc_fourcc_GetChromaDescription( vlc_fourcc_t fourcc ) VLC_USED;
 
+/**
+ * Get the average usable bits per pixel for a chroma.
+ * \note it may return 0 for opaque or compressed vlc_fourcc_t
+ */
+static inline unsigned vlc_fourcc_GetChromaBPP( vlc_fourcc_t fourcc )
+{
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription( fourcc );
+    if (desc == NULL || desc->plane_count == 0)
+        return 0;
+
+    unsigned bpp = 0;
+    for (size_t plane=0; plane < desc->plane_count; plane++)
+    {
+        bpp += 2 * desc->pixel_bits * desc->p[plane].h.num * desc->p[plane].w.num /
+                                        (desc->p[plane].h.den * desc->p[plane].w.den);
+    }
+    bpp /= 2; // for chromas that might have 4*4 denominators
+    return bpp;
+}
+
 #endif /* _VLC_FOURCC_H */
 
