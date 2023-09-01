@@ -362,8 +362,6 @@ struct video_format_t
     unsigned int i_visible_width;                 /**< width of visible area */
     unsigned int i_visible_height;               /**< height of visible area */
 
-    unsigned int i_bits_per_pixel;             /**< number of bits per pixel */
-
     unsigned int i_sar_num;                   /**< sample/pixel aspect ratio */
     unsigned int i_sar_den;
 
