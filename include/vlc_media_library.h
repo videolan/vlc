@@ -30,6 +30,8 @@
 #include <assert.h>
 #include <vlc_common.h>
 
+#include <time.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
