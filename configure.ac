@@ -3267,6 +3267,7 @@ dnl  Xlib
 dnl
 
 AC_PATH_XTRA()
+AM_CONDITIONAL([HAVE_X], [test "$no_x" != "yes"])
 
 dnl
 dnl  X C Bindings modules
