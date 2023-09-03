@@ -119,9 +119,9 @@ typedef struct vout_display_sys_t {
 #pragma mark -
 #pragma mark OpenGL context helpers
 
-// kCGLRenderer* enum value define card value, but familly is enough here.
+// kCGLRenderer* enum value define card value, but family is enough here.
 // However they follow some pattern by familly.
-#define kRendererIntelFamillyMask 0x00024000
+#define kRendererIntelFamilyMask 0x00024000
 
 /*
  * GL API does not provide a way to know if a device is a lowpower one.
@@ -134,8 +134,8 @@ typedef struct vout_display_sys_t {
 static bool vlc_IsLowPowerDevice(GLint renderer_id) {
     int renderer_vendor = renderer_id & kCGLRendererIDMatchingMask;
     // Consider Intel familly card as low power devices.
-    return (renderer_vendor & kRendererIntelFamillyMask) ==
-           kRendererIntelFamillyMask;
+    return (renderer_vendor & kRendererIntelFamilyMask) ==
+           kRendererIntelFamilyMask;
 }
 
 /*
