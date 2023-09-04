@@ -200,7 +200,7 @@ void VLCProfileSelector::saveProfiles()
 void VLCProfileSelector::updateOptions( int i )
 {
     QString options = profileBox->itemData( i ).toString();
-    QRegularExpression rx(OLDFORMAT);
+    QRegularExpression rx(QStringLiteral(OLDFORMAT));
     if ( !options.contains( ";" ) ) return;
     if ( rx.match( options ).hasMatch() )
         return updateOptionsOldFormat( i );
@@ -655,7 +655,7 @@ void VLCProfileEditor::codecSelected()
 
 void VLCProfileEditor::fillProfile( const QString& qs )
 {
-    QRegularExpression rx(OLDFORMAT);
+    QRegularExpression rx(QStringLiteral(OLDFORMAT));
     if ( rx.match( qs ).hasMatch() ) return fillProfileOldFormat( qs );
 
     QStringList tuples = qs.split( ";" );

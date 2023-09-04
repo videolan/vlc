@@ -259,7 +259,7 @@ void MetaPanel::update( const SharedInputItem& p_item )
         {
             currentURL = newURL;
             lblURL->setText( "<a href='" + currentURL + "'>" +
-                             currentURL.remove( QRegularExpression( ".*://") ) + "</a>" );
+                             currentURL.remove( QRegularExpression( QStringLiteral( ".*://" ) ) ) + "</a>" );
         }
     }
     free( psz_meta );

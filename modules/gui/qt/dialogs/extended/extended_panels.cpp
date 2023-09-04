@@ -112,8 +112,8 @@ static QString OptionFromWidgetName( QObject *obj )
 {
     /* Gruik ? ... nah */
     return obj->objectName()
-        .remove( QRegularExpression( "Slider|Combo|Dial|Check|Spin|Text" ) )
-        .replace( QRegularExpression( "([A-Z])" ), "-\\1" )
+        .remove( QRegularExpression( QStringLiteral( "Slider|Combo|Dial|Check|Spin|Text" ) ) )
+        .replace( QRegularExpression( QStringLiteral( "([A-Z])" ) ), QStringLiteral( "-\\1" ) )
         .toLower();
 }
 

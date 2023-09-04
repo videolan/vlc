@@ -656,7 +656,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     << "dvd*" << "scd*" << "sr*" << "sg*" << "cd*";
             ui.DVDDeviceComboBox->addItems( QDir( "/dev/" )
                     .entryList( DVDDeviceComboBoxStringList, QDir::System )
-                    .replaceInStrings( QRegularExpression("^"), "/dev/" )
+                    .replaceInStrings( QRegularExpression(QStringLiteral("^")), "/dev/" )
             );
 #endif
             configGeneric<StringConfigControl>( "dvd", ui.DVDLabel,

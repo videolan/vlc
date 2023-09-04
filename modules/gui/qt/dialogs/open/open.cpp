@@ -473,7 +473,7 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
     int index = 0;
     while( index < entries.count() )
     {
-        int delim_pos = entries.indexOf( QRegularExpression( "\\s+|\"" ), index );
+        int delim_pos = entries.indexOf( QRegularExpression( QStringLiteral( "\\s+|\"" ) ), index );
         if( delim_pos < 0 ) delim_pos = entries.count() - 1;
         entry += entries.mid( index, delim_pos - index + 1 );
         index = delim_pos + 1;
