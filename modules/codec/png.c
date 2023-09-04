@@ -345,7 +345,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
     else if( !(i_color_type & PNG_COLOR_MASK_ALPHA) )
     {
-        p_dec->fmt_out.i_codec = VLC_CODEC_RGB24M;
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
     }
 
     /* Get a new picture */
