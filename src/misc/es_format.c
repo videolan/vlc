@@ -41,12 +41,6 @@ void video_format_FixRgb( video_format_t *p_fmt )
     {
         switch( p_fmt->i_chroma )
         {
-        case VLC_CODEC_RGB16:
-            p_fmt->i_rmask = 0xf800;
-            p_fmt->i_gmask = 0x07e0;
-            p_fmt->i_bmask = 0x001f;
-            break;
-
         default:
             // assert(!"a bogus mask was set on a chroma");
             p_fmt->i_rmask = 0;
@@ -237,19 +231,6 @@ bool video_format_IsSameChroma( const video_format_t *f1,
     if( f1->i_chroma != f2->i_chroma )
         return false;
 
-    if( f1->i_chroma == VLC_CODEC_RGB16 )
-    {
-        video_format_t v1 = *f1;
-        video_format_t v2 = *f2;
-
-        video_format_FixRgb( &v1 );
-        video_format_FixRgb( &v2 );
-
-        if( v1.i_rmask != v2.i_rmask ||
-            v1.i_gmask != v2.i_gmask ||
-            v1.i_bmask != v2.i_bmask )
-            return false;
-    }
     return true;
 }
 

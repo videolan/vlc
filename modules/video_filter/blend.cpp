@@ -359,11 +359,6 @@ public:
             gmask = 0x03e0;
             rmask = 0x001f;
             break;
-        case VLC_CODEC_RGB16:
-            rmask = fmt->i_rmask;
-            gmask = fmt->i_gmask;
-            bmask = fmt->i_bmask;
-            break;
         default:
             vlc_assert_unreachable();
         }
@@ -513,11 +508,6 @@ struct convertRgbToRgbSmall {
             gmask = 0x03e0;
             rmask = 0x001f;
             break;
-        case VLC_CODEC_RGB16:
-            rmask = dst->i_rmask;
-            gmask = dst->i_gmask;
-            bmask = dst->i_bmask;
-            break;
         default:
             vlc_assert_unreachable();
         }
@@ -638,7 +628,6 @@ static const struct {
 
     RGB(VLC_CODEC_RGB555,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_BGR555,   CPictureRGB16,    convertRgbToRgbSmall),
-    RGB(VLC_CODEC_RGB16,    CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB565,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_BGR565,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB24,    CPictureRGB24,    convertNone),

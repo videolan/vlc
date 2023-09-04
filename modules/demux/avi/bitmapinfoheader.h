@@ -45,9 +45,6 @@ static const struct
     uint32_t i_rmask, i_gmask, i_bmask, i_amask;
     uint8_t depth;
 } bitmap_rgb_masks[] = {
-    { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
-                            0x07e0,
-                            0x001f, 0x0000, 16 },
     { VLC_CODEC_XRGB,       0x00ff0000,
                             0x0000ff00,
                             0x000000ff,
@@ -323,10 +320,6 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
             break;
         case VLC_CODEC_BGR555LE:
             biBitCount = 16;
-            break;
-        case VLC_CODEC_RGB16:
-            biBitCount = 16;
-            biCompression = BI_BITFIELDS;
             break;
         case VLC_CODEC_RGBP:
         case VLC_CODEC_GREY:

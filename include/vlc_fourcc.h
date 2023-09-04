@@ -343,8 +343,6 @@
 
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
-/* 16-bit RGB (using explicit masks) */
-#define VLC_CODEC_RGB16           VLC_FOURCC('R','_','1','6')
 
 /* 32-bit RGB, in memory address order: "XRGB" ignoring the x component */
 #define VLC_CODEC_XRGB            VLC_FOURCC('R','V','3','2')
