@@ -569,7 +569,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         if( p_enc->fmt_out.i_codec == VLC_CODEC_TIFF )
         {
             p_enc->fmt_in.i_codec =
-            p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24M;
+            p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24;
         }
 
         p_context->pix_fmt = GetFfmpegChroma( &p_enc->fmt_in.video );
