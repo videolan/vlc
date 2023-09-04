@@ -65,6 +65,7 @@ static int rtp_packetize_vp8 (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_jpeg (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_r420 (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_rgb24 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_bgr24 (sout_stream_id_sys_t *, block_t *);
 
 #define XIPH_IDENT (0)
 
@@ -660,10 +661,24 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
             }
             break;
         case VLC_CODEC_RGB24M:
+        case VLC_CODEC_RGB24:
             rtp_fmt->ptname = "raw";
             rtp_fmt->pf_packetize = rtp_packetize_rgb24;
             if( asprintf( &rtp_fmt->fmtp,
                     "sampling=RGB; width=%d; height=%d; "
+                    "depth=8; colorimetry=SMPTE240M",
+                    p_fmt->video.i_visible_width,
+                    p_fmt->video.i_visible_height ) == -1 )
+            {
+                rtp_fmt->fmtp = NULL;
+                return VLC_ENOMEM;
+            }
+            break;
+        case VLC_CODEC_BGR24:
+            rtp_fmt->ptname = "raw";
+            rtp_fmt->pf_packetize = rtp_packetize_bgr24;
+            if( asprintf( &rtp_fmt->fmtp,
+                    "sampling=BGR; width=%d; height=%d; "
                     "depth=8; colorimetry=SMPTE240M",
                     p_fmt->video.i_visible_width,
                     p_fmt->video.i_visible_height ) == -1 )
@@ -1733,7 +1748,8 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
     int i_xdec, i_ydec; /* sub-sampling factor in x and y */
     switch( i_format )
     {
-        case VLC_CODEC_RGB24M:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_BGR24:
             i_pgroup = 3;
             i_xdec = i_ydec = 1;
             break;
@@ -1832,7 +1848,7 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
             uint16_t i_offs = GetWBE( p_headers + 4 ) & 0x7fff;
             i_cont = p_headers[4] & 0x80;
 
-            if( i_format == VLC_CODEC_RGB24M )
+            if( i_format == VLC_CODEC_RGB24  || i_format == VLC_CODEC_BGR24 )
             {
                 const int i_ystride = i_width * i_pgroup;
                 i_offs /= i_xdec;
@@ -1869,7 +1885,12 @@ static int rtp_packetize_r420( sout_stream_id_sys_t *id, block_t *in )
 
 static int rtp_packetize_rgb24( sout_stream_id_sys_t *id, block_t *in )
 {
-    return rtp_packetize_rawvideo( id, in, VLC_CODEC_RGB24M );
+    return rtp_packetize_rawvideo( id, in, VLC_CODEC_RGB24  );
+}
+
+static int rtp_packetize_bgr24( sout_stream_id_sys_t *id, block_t *in )
+{
+    return rtp_packetize_rawvideo( id, in, VLC_CODEC_BGR24 );
 }
 
 static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
