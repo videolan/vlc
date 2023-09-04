@@ -132,7 +132,7 @@ int screen_InitCaptureGDI( demux_t *p_demux )
     case 16:    /* Yes it is really 15 bits (when using BI_RGB) */
         i_chroma = VLC_CODEC_RGB15; break;
     case 24:
-        i_chroma = VLC_CODEC_RGB24M; break;
+        i_chroma = VLC_CODEC_RGB24; break;
     case 32:
         i_chroma = VLC_CODEC_BGRX; break;
     default:
