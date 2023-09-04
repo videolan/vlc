@@ -626,12 +626,6 @@ static void SetRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
 {
     switch( i_fourcc )
     {
-        case VLC_CODEC_RGB24M:
-            /* This is in BGR format */
-            fmt->i_bmask = 0x00ff0000;
-            fmt->i_gmask = 0x0000ff00;
-            fmt->i_rmask = 0x000000ff;
-            break;
         default:
             return;
     }
@@ -940,7 +934,7 @@ static int GetFourCCPriority( vlc_fourcc_t i_fourcc )
     case VLC_CODEC_YV12:
     case VLC_FOURCC('a','r','a','w'):
         return 8;
-    case VLC_CODEC_RGB24M:
+    case VLC_CODEC_BGR24:
         return 7;
     case VLC_CODEC_YUYV:
     case VLC_CODEC_BGRX:
