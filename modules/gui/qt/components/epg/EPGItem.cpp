@@ -154,7 +154,7 @@ uint16_t EPGItem::eventID() const
 bool EPGItem::setData( const vlc_epg_event_t *data )
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
-    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::utc() );
+    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::systemTimeZone() );
 #else
     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
 #endif

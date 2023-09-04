@@ -99,7 +99,7 @@ void EPGProgram::updateEvents( const vlc_epg_event_t * const * pp_events, size_t
     {
         const vlc_epg_event_t *p_event = pp_events[i];
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
-        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::utc() );
+        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::systemTimeZone() );
 #else
         QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
 #endif
