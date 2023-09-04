@@ -2,7 +2,7 @@
 
 option('vlc',
     type : 'boolean',
-    value : 'true',
+    value : true,
     description : 'Build the VLC executable program.')
 
 option('nls',
@@ -52,7 +52,7 @@ option('ssp',
 
 option('winstore_app',
     type : 'boolean',
-    value : 'false',
+    value : false,
     description : 'Build targeted for Windows Store apps')
 
 option('rust',
