@@ -115,11 +115,9 @@ static int Open(vout_display_t *vd,
 
     /* */
     video_format_t fmt = *fmtp;
-    fmt.i_chroma = VLC_CODEC_RGB24M;
     /* TODO: check if this works on big-endian systems */
-    fmt.i_rmask = 0xff0000;
-    fmt.i_gmask = 0x00ff00;
-    fmt.i_bmask = 0x0000ff;
+    fmt.i_chroma = VLC_CODEC_RGB24;
+    fmt.i_rmask = fmt.i_gmask = fmt.i_bmask = 0;
     fmt.i_width  = var_InheritInteger(vd, "flaschen-width");
     fmt.i_height = var_InheritInteger(vd, "flaschen-height");
     fmt.i_visible_width = fmt.i_width;
