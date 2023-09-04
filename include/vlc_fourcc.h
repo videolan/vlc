@@ -361,6 +361,11 @@
 /* 32-bit BGR, in memory address order: "XBGR" ignoring the x component */
 #define VLC_CODEC_XBGR            VLC_FOURCC('X','B','G','R')
 
+/* 24-bit RGB, in memory address order: "RGB" */
+#define VLC_CODEC_RGB24           VLC_FOURCC('R','G','B','3')
+/* 24-bit BGR, in memory address order: "BGR" */
+#define VLC_CODEC_BGR24           VLC_FOURCC('B','G','R','3')
+
 /* 8-bit RGB "R3G3B2" */
 #define VLC_CODEC_RGB332           VLC_FOURCC('R','3','3','2')
 /* 8-bit RGB "R2G3B3" */
