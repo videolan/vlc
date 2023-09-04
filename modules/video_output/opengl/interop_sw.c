@@ -602,17 +602,31 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
 static int
 interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                      vlc_fourcc_t chroma)
+                      vlc_fourcc_t chroma, bool fallback_masks)
 {
     switch (chroma)
     {
         case VLC_CODEC_RGB24:
+            if(!interop->fmt_in.i_rmask && !fallback_masks)
+                return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE
+                { 1, 1 }, { 1, 1 }, GL_RGB,
+#ifdef GL_BGR
+                                    interop->fmt_in.i_rmask == 0x0000ff ? GL_BGR :
+#endif
+                                    GL_RGB,
+                                    GL_UNSIGNED_BYTE
             };
             break;
 
         case VLC_CODEC_RGB32:
+            if(!interop->fmt_in.i_rmask && !fallback_masks)
+                return VLC_EGENERIC;
+            if(interop->fmt_in.i_rmask == 0x0000ff00)
+                return interop_rgb_base_init(interop, tex_target, VLC_CODEC_BGRA, fallback_masks);
+            else
+                return interop_rgb_base_init(interop, tex_target, VLC_CODEC_RGBA, fallback_masks);
+
         case VLC_CODEC_RGBA:
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
@@ -646,7 +660,8 @@ interop_xyz12_init(struct vlc_gl_interop *interop)
 
 static int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                    vlc_fourcc_t chroma, video_color_space_t yuv_space)
+                    vlc_fourcc_t chroma, video_color_space_t yuv_space,
+                    bool fallback_masks)
 {
     bool is_yuv = vlc_fourcc_IsYUV(chroma);
     const vlc_chroma_description_t *desc =
@@ -656,6 +671,8 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
     assert(!interop->fmt_out.p_palette);
     interop->fmt_out.i_chroma = chroma;
+    if(fallback_masks && !is_yuv)
+        video_format_FixRgb(&interop->fmt_out);
     interop->fmt_out.space = yuv_space;
     interop->tex_target = tex_target;
 
@@ -668,7 +685,7 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
     if (is_yuv)
         return interop_yuv_base_init(interop, tex_target, chroma, desc);
 
-    return interop_rgb_base_init(interop, tex_target, chroma);
+    return interop_rgb_base_init(interop, tex_target, chroma, fallback_masks);
 }
 
 static void
@@ -743,14 +760,14 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 
     /* Check whether the given chroma is translatable to OpenGL. */
     vlc_fourcc_t i_chroma = interop->fmt_in.i_chroma;
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space, false);
     if (ret == VLC_SUCCESS)
         goto interop_init;
 
     if (!is_yup)
     {
         i_chroma = VLC_CODEC_RGBA;
-        ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space, false);
         if (ret == VLC_SUCCESS)
             goto interop_init;
     }
@@ -761,7 +778,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     /* Check whether any fallback for the chroma is translatable to OpenGL. */
     while (*list)
     {
-        ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space, true);
         if (ret == VLC_SUCCESS)
         {
             i_chroma = *list;
@@ -776,17 +793,38 @@ interop_init:
     /* We found a chroma with matching parameters for OpenGL. The interop can
      * be created. */
 
-    if (i_chroma == VLC_CODEC_RGB32)
+    interop->fmt_in.i_chroma = i_chroma;
+
+    switch(i_chroma)
     {
-#if defined(WORDS_BIGENDIAN)
-        interop->fmt_out.i_rmask  = 0xff000000;
-        interop->fmt_out.i_gmask  = 0x00ff0000;
-        interop->fmt_out.i_bmask  = 0x0000ff00;
-#else
-        interop->fmt_out.i_rmask  = 0x000000ff;
-        interop->fmt_out.i_gmask  = 0x0000ff00;
-        interop->fmt_out.i_bmask  = 0x00ff0000;
+        case VLC_CODEC_RGB32:
+            /* Ensure we only request and forward RGBX or BGRX in memory order */
+            if(interop->fmt_in.i_rmask != 0xff000000 && // RGBX
+               interop->fmt_in.i_rmask != 0x0000ff00)   // BGRX
+            {
+                interop->fmt_in.i_rmask = 0xff000000;
+                interop->fmt_in.i_gmask = 0x00ff0000;
+                interop->fmt_in.i_bmask = 0x0000ff00;
+            }
+            break;
+        case VLC_CODEC_RGB24:
+            /* Ensure we only request and forward RGB or BGR in memory order */
+            if(interop->fmt_in.i_rmask != 0xff0000
+#ifdef GL_BGR
+               && interop->fmt_in.i_rmask != 0x0000ff
 #endif
+              )
+            {
+                interop->fmt_in.i_rmask = 0xff0000;
+                interop->fmt_in.i_gmask = 0x00ff00;
+                interop->fmt_in.i_bmask = 0x0000ff;
+            }
+            break;
+        default:
+            interop->fmt_in.i_rmask = 0;
+            interop->fmt_in.i_gmask = 0;
+            interop->fmt_in.i_bmask = 0;
+            break;
     }
 
     static const struct vlc_gl_interop_ops ops = {
@@ -795,7 +833,6 @@ interop_init:
         .close = opengl_interop_generic_deinit,
     };
     interop->ops = &ops;
-    interop->fmt_in.i_chroma = i_chroma;
 
     if (allow_dr && priv->has_unpack_subimage)
     {
