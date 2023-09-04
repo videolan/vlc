@@ -782,25 +782,25 @@ endif
 # VP8/VP9 encoder/decoder (libvpx)
 vpx_dep = dependency('vpx', version: '>= 1.5.0', required: get_option('vpx'))
 if vpx_dep.found()
-  vpx_cpp_args = []
+  vpx_c_args = []
 
   if cc.has_function('vpx_codec_vp8_dx', dependencies: [vpx_dep])
-    vpx_cpp_args += '-DENABLE_VP8_DECODER'
+    vpx_c_args += '-DENABLE_VP8_DECODER'
   endif
   if cc.has_function('vpx_codec_vp9_dx', dependencies: [vpx_dep])
-    vpx_cpp_args += '-DENABLE_VP9_DECODER'
+    vpx_c_args += '-DENABLE_VP9_DECODER'
   endif
   if cc.has_function('vpx_codec_vp8_cx', dependencies: [vpx_dep])
-    vpx_cpp_args += '-DENABLE_VP8_ENCODER'
+    vpx_c_args += '-DENABLE_VP8_ENCODER'
   endif
   if cc.has_function('vpx_codec_vp9_cx', dependencies: [vpx_dep])
-    vpx_cpp_args += '-DENABLE_VP9_ENCODER'
+    vpx_c_args += '-DENABLE_VP9_ENCODER'
   endif
 
   vlc_modules += {
       'name' : 'vpx',
       'sources' : files('vpx.c'),
-      'cpp_args' : vpx_cpp_args,
+      'c_args' : vpx_c_args,
       'dependencies' : [vpx_dep]
   }
 endif
