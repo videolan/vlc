@@ -187,11 +187,10 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->pf_decode = DecodeBlock;
 
     p_dec->fmt_out.i_codec =
-    p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGB24M;
+    p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGB24;
     p_dec->fmt_out.video.i_rmask = 0;
     p_dec->fmt_out.video.i_gmask = 0;
     p_dec->fmt_out.video.i_bmask = 0;
-    video_format_FixRgb(&p_dec->fmt_out.video);
     p_dec->fmt_out.video.transfer  = TRANSFER_FUNC_SRGB;
     p_dec->fmt_out.video.space     = COLOR_SPACE_SRGB;
     p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_SRGB;
