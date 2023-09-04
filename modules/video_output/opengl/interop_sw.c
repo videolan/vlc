@@ -606,18 +606,6 @@ interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 {
     switch (chroma)
     {
-        case VLC_CODEC_RGB24M:
-            if(!interop->fmt_in.i_rmask && !fallback_masks)
-                return VLC_EGENERIC;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, GL_RGB,
-#ifdef GL_BGR
-                                    interop->fmt_in.i_rmask == 0x0000ff ? GL_BGR :
-#endif
-                                    GL_RGB,
-                                    GL_UNSIGNED_BYTE
-            };
-            break;
         case VLC_CODEC_RGB24:
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE
@@ -819,19 +807,6 @@ interop_init:
                 interop->fmt_in.i_rmask = 0xff000000;
                 interop->fmt_in.i_gmask = 0x00ff0000;
                 interop->fmt_in.i_bmask = 0x0000ff00;
-            }
-            break;
-        case VLC_CODEC_RGB24M:
-            /* Ensure we only request and forward RGB or BGR in memory order */
-            if(interop->fmt_in.i_rmask != 0xff0000
-#ifdef GL_BGR
-               && interop->fmt_in.i_rmask != 0x0000ff
-#endif
-              )
-            {
-                interop->fmt_in.i_rmask = 0xff0000;
-                interop->fmt_in.i_gmask = 0x00ff00;
-                interop->fmt_in.i_bmask = 0x0000ff;
             }
             break;
         default:

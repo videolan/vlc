@@ -249,7 +249,6 @@ QImage ExternalPaletteImpl::getCSDImage(vlc_qt_theme_csd_button_type type, vlc_q
         format = QImage::Format_RGBA8888_Premultiplied;
         break;
     case VLC_CODEC_RGB24:
-    case VLC_CODEC_RGB24M:
         format = QImage::Format_RGB888;
         break;
     default:

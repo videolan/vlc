@@ -243,7 +243,6 @@ static int Create( filter_t *p_filter )
                                  &p_sys->i_v_offset );
             break;
         case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB24M:
             p_sys->drawingPixelFunction = drawPixelRGB24;
             COLORS_RGB
             break;
@@ -534,7 +533,6 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB24M:
         CASE_PACKED_YUV_422
             video_format_Init( &fmt_comp, VLC_CODEC_GREY );
             fmt_comp.i_width = p_filter->fmt_in.video.i_width;
@@ -774,7 +772,6 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB24M:
         CASE_PACKED_YUV_422
             picture_Release( p_converted );
         default:

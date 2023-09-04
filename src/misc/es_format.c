@@ -53,11 +53,6 @@ void video_format_FixRgb( video_format_t *p_fmt )
             p_fmt->i_bmask = 0x001f;
             break;
 
-        case VLC_CODEC_RGB24M:
-            p_fmt->i_rmask = 0xff0000;
-            p_fmt->i_gmask = 0x00ff00;
-            p_fmt->i_bmask = 0x0000ff;
-            break;
         case VLC_CODEC_RGB32:
             p_fmt->i_rmask = 0x00ff0000;
             p_fmt->i_gmask = 0x0000ff00;
@@ -111,29 +106,6 @@ void video_format_FixRgb( video_format_t *p_fmt )
              p_fmt->i_bmask == 0xff000000 )
         {
             p_fmt->i_chroma = VLC_CODEC_BGRX;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-        }
-    }
-
-    if ( p_fmt->i_chroma == VLC_CODEC_RGB24M )
-    {
-        if ( p_fmt->i_rmask == 0xff0000 &&
-             p_fmt->i_gmask == 0x00ff00 &&
-             p_fmt->i_bmask == 0x0000ff )
-        {
-            p_fmt->i_chroma = VLC_CODEC_RGB24;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-        }
-        else
-        if ( p_fmt->i_rmask == 0x0000ff &&
-             p_fmt->i_gmask == 0x00ff00 &&
-             p_fmt->i_bmask == 0xff0000 )
-        {
-            p_fmt->i_chroma = VLC_CODEC_BGR24;
             p_fmt->i_rmask = 0;
             p_fmt->i_gmask = 0;
             p_fmt->i_bmask = 0;
@@ -323,7 +295,6 @@ bool video_format_IsSameChroma( const video_format_t *f1,
 
     if( f1->i_chroma == VLC_CODEC_RGB15 ||
         f1->i_chroma == VLC_CODEC_RGB16 ||
-        f1->i_chroma == VLC_CODEC_RGB24M ||
         f1->i_chroma == VLC_CODEC_RGB32 )
     {
         video_format_t v1 = *f1;

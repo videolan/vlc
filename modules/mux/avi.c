@@ -482,29 +482,6 @@ static int PrepareSamples( const avi_stream_t *p_stream,
        }
     }
 
-    /* RV24 is only BGR in AVI, and we can't use BI_BITFIELD */
-    if( p_stream->i_cat == VIDEO_ES &&
-        p_stream->bih.biCompression == BI_RGB &&
-        p_stream->bih.biBitCount == 24 &&
-        (p_fmt->video.i_bmask != 0xFF0000 ||
-         p_fmt->video.i_rmask != 0x0000FF) )
-    {
-        unsigned rshift = ctz(p_fmt->video.i_rmask);
-        unsigned gshift = ctz(p_fmt->video.i_gmask);
-        unsigned bshift = ctz(p_fmt->video.i_bmask);
-
-        uint8_t *p_data = (*pp_block)->p_buffer;
-        for( size_t i=0; i<(*pp_block)->i_buffer / 3; i++ )
-        {
-            uint8_t *p = &p_data[i*3];
-            /* reorder as BGR using shift value (done by FixRGB) */
-            uint32_t v = (p[0] << 16) | (p[1] << 8) | p[2];
-            p[0] = (v & p_fmt->video.i_bmask) >> bshift;
-            p[1] = (v & p_fmt->video.i_gmask) >> gshift;
-            p[2] = (v & p_fmt->video.i_rmask) >> rshift;
-        }
-    }
-
     return VLC_SUCCESS;
 }
 

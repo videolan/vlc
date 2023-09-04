@@ -815,8 +815,6 @@ static const staticentry_t p_list_video[] = {
         A("RV15"),
     B(VLC_CODEC_RGB16, "16 bits RGB"),
         A("RV16"),
-    B(VLC_CODEC_RGB24M, "24 bits RGB"),
-        A("R_24"),
     B(VLC_CODEC_RGB32, "32 bits RGB"),
         A("RV32"),
     B(VLC_CODEC_RGBA, "32 bits RGBA"),

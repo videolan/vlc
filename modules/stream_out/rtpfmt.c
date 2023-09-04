@@ -660,7 +660,6 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                 return VLC_ENOMEM;
             }
             break;
-        case VLC_CODEC_RGB24M:
         case VLC_CODEC_RGB24:
             rtp_fmt->ptname = "raw";
             rtp_fmt->pf_packetize = rtp_packetize_rgb24;

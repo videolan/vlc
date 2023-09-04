@@ -576,7 +576,6 @@ static const struct {
 
     RGB(VLC_CODEC_RGB15,    CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB16,    CPictureRGB16,    convertRgbToRgbSmall),
-    RGB(VLC_CODEC_RGB24M,   CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_RGB24,    CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_BGR24,    CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_RGB32,    CPictureRGB32,    convertNone),

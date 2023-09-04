@@ -84,7 +84,6 @@ static const struct
     SepiaFunction pf_sepia;
 } p_sepia_cfg[] = {
     { VLC_CODEC_I420, PlanarI420Sepia },
-    { VLC_CODEC_RGB24M, RVSepia },
     { VLC_CODEC_RGB24, RVSepia },
     { VLC_CODEC_BGR24, RVSepia },
     { VLC_CODEC_RGB32, RVSepia },
@@ -408,8 +407,7 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
 #define ONE_HALF  (1 << (SCALEBITS - 1))
 #define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
     uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
-    bool b_isRV32 = p_pic->format.i_chroma != VLC_CODEC_RGB24M &&
-                    p_pic->format.i_chroma != VLC_CODEC_RGB24  &&
+    bool b_isRV32 = p_pic->format.i_chroma != VLC_CODEC_RGB24  &&
                     p_pic->format.i_chroma != VLC_CODEC_BGR24;
     int i_rindex = 0, i_gindex = 1, i_bindex = 2, i_aindex = -1;
 

@@ -50,9 +50,6 @@ static const struct
     { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
                             0x07e0,
                             0x001f, },
-    { VLC_CODEC_RGB24M,     0x000000ff, /* BGR (see biBitCount) */
-                            0x0000ff00,
-                            0x00ff0000, },
     { VLC_CODEC_RGB32,      0x00ff0000, /* This is in XRGB format */
                             0x0000ff00,
                             0x000000ff, },
@@ -293,7 +290,6 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
             biCompression = BI_BITFIELDS;
             b_has_alpha = true;
             break;
-        case VLC_CODEC_RGB24M:
         case VLC_CODEC_BGR24:
             biBitCount = 24;
             break;
