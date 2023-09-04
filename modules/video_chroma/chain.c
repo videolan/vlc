@@ -78,7 +78,8 @@ static const vlc_fourcc_t pi_allowed_chromas_yuv[] = {
     VLC_CODEC_XRGB,
     VLC_CODEC_BGRX,
     VLC_CODEC_RGB32,
-    VLC_CODEC_RGB24M,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_BGR24,
     VLC_CODEC_BGRA,
     0
 };
@@ -90,7 +91,8 @@ static const vlc_fourcc_t pi_allowed_chromas_yuv10[] = {
     VLC_CODEC_XRGB,
     VLC_CODEC_BGRX,
     VLC_CODEC_RGB32,
-    VLC_CODEC_RGB24M,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_BGR24,
     VLC_CODEC_BGRA,
     0
 };
