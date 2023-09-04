@@ -27,7 +27,7 @@
 MLRecentMedia::MLRecentMedia( const vlc_ml_media_t *media )
     : MLItem( MLItemId( media->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_url ( media->p_files->i_nb_items > 0 ? media->p_files->p_items[0].psz_mrl : "" )
-    , m_lastPlayedDate(QDateTime::fromSecsSinceEpoch( media->i_last_played_date, QTimeZone::utc() ))
+    , m_lastPlayedDate(QDateTime::fromSecsSinceEpoch( media->i_last_played_date, QTimeZone::systemTimeZone() ))
 {
 }
 

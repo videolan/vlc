@@ -603,7 +603,7 @@ void NetworkMediaModel::refreshMediaList( MediaTreePtr tree,
             free(str);
 
             if (ok)
-                item.fileModified = QDateTime::fromSecsSinceEpoch(time, QTimeZone::utc());
+                item.fileModified = QDateTime::fromSecsSinceEpoch(time, QTimeZone::systemTimeZone());
         }
 
         if ( m_mediaLib && item.canBeIndexed == true )
