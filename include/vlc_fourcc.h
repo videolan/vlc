@@ -375,6 +375,15 @@
 /* 16-bit BGR Little-Endian: "g3R5 B5G3" */
 #define VLC_CODEC_BGR565LE          VLC_FOURCC('B','L','1','6')
 
+/* 15-bit RGB Big-Endian: "0R5G5B5" */
+#define VLC_CODEC_RGB555BE          VLC_FOURCC('R','B','1','5')
+/* 15-bit RGB Little-Endian: "g3B5 0R5G2" */
+#define VLC_CODEC_RGB555LE          VLC_FOURCC('R','L','1','5')
+/* 15-bit BGR Big-Endian: "0B5G5R5" */
+#define VLC_CODEC_BGR555BE          VLC_FOURCC('B','B','1','5')
+/* 15-bit BGR Little-Endian: "g3R5 0B5G2" */
+#define VLC_CODEC_BGR555LE          VLC_FOURCC('B','L','1','5')
+
 /* 8-bit RGB "R3G3B2" */
 #define VLC_CODEC_RGB332           VLC_FOURCC('R','3','3','2')
 /* 8-bit RGB "R2G3B3" */
