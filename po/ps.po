@@ -1,26 +1,26 @@
-# Pashto translation
-# Copyright (C) 2021 VideoLAN
-# This file is distributed under the same license as the VLC package.
+# Pashto translations for vlc package.
+# Copyright (C) 2023 VideoLAN
+# This file is distributed under the same license as the vlc package.
+# $Id$
 #
-# Translators:
-# Said Marjan Zazai <said@afghanan.net>, 2005
-# Simos Xenitellis <simos74@gmx.net>, 2005
+# Said Marjan Zazai <said@afghanan.net>, 2005.
+# Simos Xenitellis <simos74@gmx.net>, 2005.
 # Zabeeh Khan <zabeehkhan@gmail.com>, 2009
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2022-10-04 08:28+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
-"Language-Team: Pushto (https://www.transifex.com/yaron/teams/16553/ps/)\n"
+"POT-Creation-Date: 2023-09-05 23:12+0200\n"
+"PO-Revision-Date: 2017-12-10 22:48+0000\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2017\n"
+"Language-Team: Pashto (https://app.transifex.com/yaron/teams/16553/ps/)\n"
 "Language: ps\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/vlc_common.h:1044
+#: include/vlc_common.h:1048
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Hotkeys settings"
 msgstr ""
 
-#: include/vlc_config_cat.h:53 src/input/es_out.c:3148 src/libvlc-module.c:1492
+#: include/vlc_config_cat.h:53 src/input/es_out.c:3160 src/libvlc-module.c:1492
 #: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
@@ -136,7 +136,7 @@ msgstr "ګډوډ"
 msgid "Miscellaneous audio settings and modules."
 msgstr ""
 
-#: include/vlc_config_cat.h:73 src/input/es_out.c:3192 src/libvlc-module.c:142
+#: include/vlc_config_cat.h:73 src/input/es_out.c:3204 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
@@ -570,7 +570,7 @@ msgstr "د غږيز چاڼونه پاتې راغله"
 msgid "The maximum number of filters (%u) was reached."
 msgstr ""
 
-#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:955
+#: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:936
 #: src/libvlc-module.c:540 modules/demux/adaptive/adaptive.cpp:124
 #: modules/gui/macosx/VLCMainMenu.m:243
 #: modules/gui/macosx/VLCSidebarDataSource.m:211
@@ -627,7 +627,7 @@ msgstr ""
 msgid "Stereo"
 msgstr ""
 
-#: src/audio_output/output.c:445 src/input/es_out.c:3289
+#: src/audio_output/output.c:445 src/input/es_out.c:3301
 #: src/libvlc-module.c:197 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: src/misc/actions.c:81 modules/audio_filter/channel_mixer/mono.c:89
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
@@ -845,51 +845,51 @@ msgstr ""
 msgid "VLC could not open the decoder module."
 msgstr ""
 
-#: src/input/es_out.c:975 src/input/es_out.c:980 src/libvlc-module.c:239
+#: src/input/es_out.c:956 src/input/es_out.c:961 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
 msgstr "پلنيوی"
 
-#: src/input/es_out.c:1198
+#: src/input/es_out.c:1179
 #, c-format
 msgid "%s [%s %d]"
 msgstr "%s [%s %d]"
 
-#: src/input/es_out.c:1199 src/input/es_out.c:1204 src/input/es_out.c:1219
+#: src/input/es_out.c:1180 src/input/es_out.c:1185 src/input/es_out.c:1200
 #: src/input/var.c:160 src/libvlc-module.c:564
 #: modules/gui/macosx/VLCMainMenu.m:407 modules/gui/macosx/VLCMainMenu.m:408
 msgid "Program"
 msgstr "کاريال"
 
-#: src/input/es_out.c:1229
+#: src/input/es_out.c:1210
 #, c-format
 msgid "Stream %d"
 msgstr ""
 
-#: src/input/es_out.c:1482 src/input/es_out.c:1484
+#: src/input/es_out.c:1463 src/input/es_out.c:1465
 msgid "Scrambled"
 msgstr ""
 
-#: src/input/es_out.c:1482 modules/keystore/keychain.m:41
+#: src/input/es_out.c:1463 modules/keystore/keychain.m:41
 #: modules/lua/extension.c:1193
 msgid "Yes"
 msgstr "هو"
 
-#: src/input/es_out.c:2167
+#: src/input/es_out.c:2159
 #, c-format
 msgid "DTVCC Closed captions %u"
 msgstr ""
 
-#: src/input/es_out.c:2169
+#: src/input/es_out.c:2161
 #, c-format
 msgid "Closed captions %u"
 msgstr ""
 
-#: src/input/es_out.c:3124
+#: src/input/es_out.c:3136
 msgid "Original ID"
 msgstr "ار پېژند"
 
-#: src/input/es_out.c:3132 src/input/es_out.c:3135 modules/access/imem.c:67
+#: src/input/es_out.c:3144 src/input/es_out.c:3147 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:173
 #: modules/gui/qt/ui/profiles.h:726 modules/gui/qt/ui/profiles.h:752
@@ -897,48 +897,48 @@ msgstr "ار پېژند"
 msgid "Codec"
 msgstr "کوډېک"
 
-#: src/input/es_out.c:3139 src/input/meta.c:66 modules/access/imem.c:71
+#: src/input/es_out.c:3151 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:98
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:527
 msgid "Language"
 msgstr "ژبه"
 
-#: src/input/es_out.c:3142 src/input/meta.c:61
+#: src/input/es_out.c:3154 src/input/meta.c:61
 #: modules/gui/macosx/VLCBookmarksWindowController.m:80
 #: modules/gui/macosx/VLCPlaylist.m:96 modules/gui/qt/dialogs/bookmarks.cpp:75
 #: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
 msgstr "سپړاوی"
 
-#: src/input/es_out.c:3148 src/input/es_out.c:3192 src/input/es_out.c:3382
+#: src/input/es_out.c:3160 src/input/es_out.c:3204 src/input/es_out.c:3394
 #: modules/gui/macosx/VLCAddonsWindowController.m:133
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
-#: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1488
+#: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1495
 msgid "Type"
 msgstr "ډول"
 
-#: src/input/es_out.c:3151
+#: src/input/es_out.c:3163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
 #: modules/gui/macosx/VLCOutput.m:98 modules/gui/qt/ui/profiles.h:754
 msgid "Channels"
 msgstr "چېنلونه"
 
-#: src/input/es_out.c:3156 modules/access/alsa.c:39 modules/access/imem.c:75
+#: src/input/es_out.c:3168 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
 msgstr ""
 
-#: src/input/es_out.c:3156
+#: src/input/es_out.c:3168
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:3166
+#: src/input/es_out.c:3178
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:3171 modules/access_output/shout.c:92
+#: src/input/es_out.c:3183 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:163
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
@@ -946,33 +946,33 @@ msgstr ""
 msgid "Bitrate"
 msgstr ""
 
-#: src/input/es_out.c:3171
+#: src/input/es_out.c:3183
 #, c-format
 msgid "%u kb/s"
 msgstr "kb/s %u"
 
-#: src/input/es_out.c:3183
+#: src/input/es_out.c:3195
 msgid "Track replay gain"
 msgstr ""
 
-#: src/input/es_out.c:3185
+#: src/input/es_out.c:3197
 msgid "Album replay gain"
 msgstr ""
 
-#: src/input/es_out.c:3186
+#: src/input/es_out.c:3198
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:3196
+#: src/input/es_out.c:3208
 msgid "Video resolution"
 msgstr ""
 
-#: src/input/es_out.c:3201
+#: src/input/es_out.c:3213
 msgid "Buffer dimensions"
 msgstr ""
 
-#: src/input/es_out.c:3211 src/input/es_out.c:3214 modules/access/imem.c:93
+#: src/input/es_out.c:3223 src/input/es_out.c:3226 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
 #: modules/access/screen/xcb.c:39 modules/access/shm.c:42
 #: modules/access/timecode.c:34 modules/access/v4l2/v4l2.c:70
@@ -982,91 +982,91 @@ msgstr ""
 msgid "Frame rate"
 msgstr "چوکاټ چټکتيا"
 
-#: src/input/es_out.c:3222
+#: src/input/es_out.c:3234
 msgid "Decoded format"
 msgstr ""
 
-#: src/input/es_out.c:3227
+#: src/input/es_out.c:3239
 msgid "Top left"
 msgstr ""
 
-#: src/input/es_out.c:3227
+#: src/input/es_out.c:3239
 msgid "Left top"
 msgstr ""
 
-#: src/input/es_out.c:3228
+#: src/input/es_out.c:3240
 msgid "Right bottom"
 msgstr ""
 
-#: src/input/es_out.c:3228
+#: src/input/es_out.c:3240
 msgid "Top right"
 msgstr ""
 
-#: src/input/es_out.c:3229
+#: src/input/es_out.c:3241
 msgid "Bottom left"
 msgstr ""
 
-#: src/input/es_out.c:3229
+#: src/input/es_out.c:3241
 msgid "Bottom right"
 msgstr ""
 
-#: src/input/es_out.c:3230
+#: src/input/es_out.c:3242
 msgid "Left bottom"
 msgstr ""
 
-#: src/input/es_out.c:3230
+#: src/input/es_out.c:3242
 msgid "Right top"
 msgstr ""
 
-#: src/input/es_out.c:3232
+#: src/input/es_out.c:3244
 msgid "Orientation"
 msgstr ""
 
-#: src/input/es_out.c:3238 src/input/es_out.c:3256 src/input/es_out.c:3274
-#: src/input/es_out.c:3288 src/playlist/tree.c:67
+#: src/input/es_out.c:3250 src/input/es_out.c:3268 src/input/es_out.c:3286
+#: src/input/es_out.c:3300 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr ""
 
-#: src/input/es_out.c:3240
+#: src/input/es_out.c:3252
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3242
+#: src/input/es_out.c:3254
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr ""
 
-#: src/input/es_out.c:3250
+#: src/input/es_out.c:3262
 msgid "Color primaries"
 msgstr ""
 
-#: src/input/es_out.c:3257 src/libvlc-module.c:362
+#: src/input/es_out.c:3269 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
 msgstr ""
 
-#: src/input/es_out.c:3264
+#: src/input/es_out.c:3276
 msgid "Hybrid Log-Gamma"
 msgstr ""
 
-#: src/input/es_out.c:3268
+#: src/input/es_out.c:3280
 msgid "Color transfer function"
 msgstr ""
 
-#: src/input/es_out.c:3281
+#: src/input/es_out.c:3293
 msgid "Color space"
 msgstr ""
 
-#: src/input/es_out.c:3281
+#: src/input/es_out.c:3293
 #, c-format
 msgid "%s Range"
 msgstr ""
 
-#: src/input/es_out.c:3283
+#: src/input/es_out.c:3295
 msgid "Full"
 msgstr ""
 
-#: src/input/es_out.c:3290 src/libvlc-module.c:295 src/libvlc-module.c:368
+#: src/input/es_out.c:3302 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
 #: modules/audio_filter/channel_mixer/remap.c:61 modules/codec/dvbsub.c:102
 #: modules/codec/subsdec.c:167 modules/codec/zvbi.c:83
@@ -1077,100 +1077,100 @@ msgstr ""
 msgid "Center"
 msgstr "منځ"
 
-#: src/input/es_out.c:3291
+#: src/input/es_out.c:3303
 msgid "Top Left"
 msgstr ""
 
-#: src/input/es_out.c:3292
+#: src/input/es_out.c:3304
 msgid "Top Center"
 msgstr ""
 
-#: src/input/es_out.c:3293
+#: src/input/es_out.c:3305
 msgid "Bottom Left"
 msgstr ""
 
-#: src/input/es_out.c:3294
+#: src/input/es_out.c:3306
 msgid "Bottom Center"
 msgstr ""
 
-#: src/input/es_out.c:3298
+#: src/input/es_out.c:3310
 msgid "Chroma location"
 msgstr ""
 
-#: src/input/es_out.c:3307
+#: src/input/es_out.c:3319
 msgid "Rectangular"
 msgstr ""
 
-#: src/input/es_out.c:3310
+#: src/input/es_out.c:3322
 msgid "Equirectangular"
 msgstr ""
 
-#: src/input/es_out.c:3313
+#: src/input/es_out.c:3325
 msgid "Cubemap"
 msgstr ""
 
-#: src/input/es_out.c:3319
+#: src/input/es_out.c:3331
 msgid "Projection"
 msgstr ""
 
-#: src/input/es_out.c:3321
+#: src/input/es_out.c:3333
 msgctxt "ViewPoint"
 msgid "Yaw"
 msgstr ""
 
-#: src/input/es_out.c:3323
+#: src/input/es_out.c:3335
 msgctxt "ViewPoint"
 msgid "Pitch"
 msgstr ""
 
-#: src/input/es_out.c:3325
+#: src/input/es_out.c:3337
 msgctxt "ViewPoint"
 msgid "Roll"
 msgstr ""
 
-#: src/input/es_out.c:3328
+#: src/input/es_out.c:3340
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr ""
 
-#: src/input/es_out.c:3333
+#: src/input/es_out.c:3345
 msgid "Max. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3338
+#: src/input/es_out.c:3350
 msgid "Min. luminance"
 msgstr ""
 
-#: src/input/es_out.c:3346
+#: src/input/es_out.c:3358
 msgid "Primary R"
 msgstr ""
 
-#: src/input/es_out.c:3353
+#: src/input/es_out.c:3365
 msgid "Primary G"
 msgstr ""
 
-#: src/input/es_out.c:3360
+#: src/input/es_out.c:3372
 msgid "Primary B"
 msgstr ""
 
-#: src/input/es_out.c:3367
+#: src/input/es_out.c:3379
 msgid "White point"
 msgstr ""
 
-#: src/input/es_out.c:3382 modules/access/imem.c:64
+#: src/input/es_out.c:3394 modules/access/imem.c:64
 msgid "Subtitle"
 msgstr "څېرمه سرليک"
 
-#: src/input/input.c:1846 modules/control/hotkeys.c:1512
+#: src/input/input.c:1858 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
 msgstr ""
 
-#: src/input/input.c:2750
+#: src/input/input.c:2763
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2751
+#: src/input/input.c:2764
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
@@ -2315,8 +2315,8 @@ msgstr ""
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
-#: modules/audio_output/directsound.c:1048 modules/audio_output/mmdevice.c:1286
-#: modules/audio_output/mmdevice.c:1425 modules/audio_output/winstore.c:591
+#: modules/audio_output/directsound.c:1048 modules/audio_output/mmdevice.c:1316
+#: modules/audio_output/mmdevice.c:1445 modules/audio_output/winstore.c:594
 #: modules/codec/avcodec/avcodec.c:50 modules/demux/adaptive/adaptive.cpp:106
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:322
@@ -2324,8 +2324,8 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:661
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:388
-#: modules/gui/macosx/prefs_widgets.m:1215
-#: modules/gui/macosx/prefs_widgets.m:1272
+#: modules/gui/macosx/prefs_widgets.m:1219
+#: modules/gui/macosx/prefs_widgets.m:1276
 #: modules/gui/qt/components/preferences_widgets.cpp:546
 #: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
 #: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1492
@@ -4827,7 +4827,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr ""
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2775
+#: modules/demux/avi/avi.c:2827
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:854
@@ -5709,9 +5709,8 @@ msgid "AVFoundation Audio Capture"
 msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "غږيز وتۍ رغبېلګه"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6884,7 +6883,7 @@ msgstr "دوتنه ننوتۍ"
 #: modules/audio_output/file.c:113
 #: modules/gui/macosx/VLCOpenWindowController.m:140
 #: modules/gui/macosx/VLCOutput.m:64 modules/gui/macosx/VLCOutput.m:175
-#: modules/gui/macosx/VLCOutput.m:301 modules/gui/qt/dialogs/plugins.cpp:1422
+#: modules/gui/macosx/VLCOutput.m:301 modules/gui/qt/dialogs/plugins.cpp:1429
 #: modules/gui/qt/dialogs/sout.cpp:69 modules/gui/qt/dialogs/sout.cpp:121
 #: share/lua/http/dialogs/create_stream.html:204
 #: share/lua/http/dialogs/stream_config_window.html:36
@@ -7525,9 +7524,8 @@ msgid "RDP Remote Desktop"
 msgstr ""
 
 #: modules/access/rist.c:65
-#, fuzzy
 msgid "Range"
-msgstr "بدلول"
+msgstr ""
 
 #: modules/access/rist.c:65
 msgid "Bitmask"
@@ -7538,9 +7536,8 @@ msgid "RIST"
 msgstr ""
 
 #: modules/access/rist.c:1128
-#, fuzzy
 msgid "RIST input"
-msgstr "ننوتۍ RTMP"
+msgstr ""
 
 #: modules/access/rist.c:1133
 msgid "RIST maximum packet size (bytes)"
@@ -7817,8 +7814,8 @@ msgstr "پرده ننوتۍ"
 #: modules/gui/macosx/VLCMainMenu.m:610
 #: modules/gui/macosx/VLCOpenWindowController.m:207
 #: modules/gui/macosx/VLCOpenWindowController.m:209
-#: modules/gui/macosx/VLCOpenWindowController.m:488
-#: modules/gui/macosx/VLCOpenWindowController.m:1117
+#: modules/gui/macosx/VLCOpenWindowController.m:489
+#: modules/gui/macosx/VLCOpenWindowController.m:1118
 #: modules/gui/macosx/VLCSimplePrefsController.m:666
 msgid "Screen"
 msgstr "پرده"
@@ -8377,7 +8374,7 @@ msgid "Vivid"
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:169 modules/audio_output/auhal.c:43
-#: modules/audio_output/directsound.c:69 modules/audio_output/mmdevice.c:1469
+#: modules/audio_output/directsound.c:69 modules/audio_output/mmdevice.c:1489
 #: modules/audio_output/waveout.c:145
 msgid "Audio volume"
 msgstr ""
@@ -8439,7 +8436,7 @@ msgstr ""
 #: modules/control/hotkeys.c:395
 #: modules/gui/macosx/VLCAddonsWindowController.m:100
 #: modules/gui/qt/dialogs/convert.cpp:164
-#: modules/gui/qt/dialogs/plugins.cpp:376
+#: modules/gui/qt/dialogs/plugins.cpp:383
 #: modules/gui/qt/dialogs/preferences.cpp:79
 msgid "All"
 msgstr "ټول"
@@ -8879,9 +8876,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:850
-#, fuzzy
 msgid "RIST stream output"
-msgstr "د سملاسي انځور وتۍ"
+msgstr ""
 
 #: modules/access_output/rist.c:855
 msgid "RIST target packet size (bytes)"
@@ -9232,7 +9228,7 @@ msgid "Sound Delay"
 msgstr ""
 
 #: modules/audio_filter/chorus_flanger.c:75
-#: modules/gui/macosx/VLCOpenWindowController.m:354 modules/spu/mosaic.c:154
+#: modules/gui/macosx/VLCOpenWindowController.m:355 modules/spu/mosaic.c:154
 #: modules/stream_out/bridge.c:51 modules/stream_out/delay.c:54
 msgid "Delay"
 msgstr ""
@@ -9933,11 +9929,11 @@ msgid ""
 "The selected audio output device is exclusively in use by another program."
 msgstr ""
 
-#: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1466
+#: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1486
 msgid "Output device"
 msgstr "وتۍ وزله"
 
-#: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1467
+#: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1487
 msgid "Select your audio output device"
 msgstr ""
 
@@ -9951,7 +9947,7 @@ msgid ""
 "NO e.g. Stereo -> 5.1 conversion."
 msgstr ""
 
-#: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1470
+#: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1490
 msgid "Audio volume in hundredths of decibels (dB)."
 msgstr ""
 
@@ -10044,37 +10040,37 @@ msgstr ""
 msgid "K Audio Interface audio output"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1452 modules/gui/qt/ui/sprefs_audio.h:416
+#: modules/audio_output/mmdevice.c:1472 modules/gui/qt/ui/sprefs_audio.h:416
 msgid "HDMI/SPDIF audio passthrough"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1454
+#: modules/audio_output/mmdevice.c:1474
 msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1461
+#: modules/audio_output/mmdevice.c:1481
 msgid "Disabled"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1462
+#: modules/audio_output/mmdevice.c:1482
 msgid "Enabled (AC3/DTS only)"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1463
+#: modules/audio_output/mmdevice.c:1483
 msgid "Enabled"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1474
+#: modules/audio_output/mmdevice.c:1494
 msgid "Windows Multimedia Device output"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1480
+#: modules/audio_output/mmdevice.c:1500
 msgid "Output back-end"
 msgstr ""
 
-#: modules/audio_output/mmdevice.c:1480
+#: modules/audio_output/mmdevice.c:1500
 msgid "Audio output back-end interface."
 msgstr ""
 
@@ -10255,33 +10251,33 @@ msgstr ""
 msgid "Decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:147 modules/codec/jpeg.c:119
+#: modules/codec/avcodec/avcodec.c:152 modules/codec/jpeg.c:119
 #: modules/codec/omxil/omxil.c:171 modules/codec/png.c:99
 #: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.c:148
+#: modules/codec/avcodec/avcodec.c:153
 msgid "FFmpeg audio/video encoder"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:56
+#: modules/codec/avcodec/avcodec.h:57
 msgid "Direct rendering"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:59
+#: modules/codec/avcodec/avcodec.h:60
 msgid "Show corrupted frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:60
+#: modules/codec/avcodec/avcodec.h:61
 msgid "Prefer visual artifacts instead of missing frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:62
+#: modules/codec/avcodec/avcodec.h:63
 msgid "Error resilience"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:64
+#: modules/codec/avcodec/avcodec.h:65
 msgid ""
 "libavcodec can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -10289,11 +10285,11 @@ msgid ""
 "Valid values range from 0 to 4 (0 disables all errors resilience)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:69
+#: modules/codec/avcodec/avcodec.h:70
 msgid "Workaround bugs"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:71
+#: modules/codec/avcodec/avcodec.h:72
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -10307,199 +10303,199 @@ msgid ""
 "\"ump4\", enter 40."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:82 modules/codec/avcodec/avcodec.h:177
+#: modules/codec/avcodec/avcodec.h:83 modules/codec/avcodec/avcodec.h:178
 #: modules/demux/rawdv.c:42
 msgid "Hurry up"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:84
+#: modules/codec/avcodec/avcodec.h:85
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:88
+#: modules/codec/avcodec/avcodec.h:89
 msgid "Allow speed tricks"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:90
+#: modules/codec/avcodec/avcodec.h:91
 msgid ""
 "Allow non specification compliant speedup tricks. Faster but error-prone."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:92
+#: modules/codec/avcodec/avcodec.h:93
 msgid "Skip frame (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:94
+#: modules/codec/avcodec/avcodec.h:95
 msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:97
+#: modules/codec/avcodec/avcodec.h:98
 msgid "Skip idct (default=0)"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:99
+#: modules/codec/avcodec/avcodec.h:100
 msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:102
+#: modules/codec/avcodec/avcodec.h:103
 msgid "Debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:103
+#: modules/codec/avcodec/avcodec.h:104
 msgid "Set FFmpeg debug mask"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:105
+#: modules/codec/avcodec/avcodec.h:106
 msgid "Codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:106
+#: modules/codec/avcodec/avcodec.h:107
 msgid "Internal libavcodec codec name"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:108
+#: modules/codec/avcodec/avcodec.h:109
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Skip the loop filter for H.264 decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:109
+#: modules/codec/avcodec/avcodec.h:110
 msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:113
+#: modules/codec/avcodec/avcodec.h:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
 msgid "Hardware decoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:114
+#: modules/codec/avcodec/avcodec.h:115
 msgid "This allows hardware decoding when available."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:116
+#: modules/codec/avcodec/avcodec.h:117
 msgid "Threads"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:117
+#: modules/codec/avcodec/avcodec.h:118
 msgid "Number of threads used for decoding, 0 meaning auto"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:124
+#: modules/codec/avcodec/avcodec.h:125
 msgid "Ratio of key frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:125
+#: modules/codec/avcodec/avcodec.h:126
 msgid "Number of frames that will be coded for one key frame."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:128
+#: modules/codec/avcodec/avcodec.h:129
 msgid "Ratio of B frames"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:129
+#: modules/codec/avcodec/avcodec.h:130
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:132
+#: modules/codec/avcodec/avcodec.h:133
 msgid "Video bitrate tolerance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:133
+#: modules/codec/avcodec/avcodec.h:134
 msgid "Video bitrate tolerance in kbit/s."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:135
+#: modules/codec/avcodec/avcodec.h:136
 msgid "Interlaced encoding"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:136
+#: modules/codec/avcodec/avcodec.h:137
 msgid "Enable dedicated algorithms for interlaced frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:139
+#: modules/codec/avcodec/avcodec.h:140
 msgid "Interlaced motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:140
+#: modules/codec/avcodec/avcodec.h:141
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:143
+#: modules/codec/avcodec/avcodec.h:144
 msgid "Pre-motion estimation"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:144
+#: modules/codec/avcodec/avcodec.h:145
 msgid "Enable the pre-motion estimation algorithm."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:147
+#: modules/codec/avcodec/avcodec.h:148
 msgid "Rate control buffer size"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:148
+#: modules/codec/avcodec/avcodec.h:149
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:152
+#: modules/codec/avcodec/avcodec.h:153
 msgid "Rate control buffer aggressiveness"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:153
+#: modules/codec/avcodec/avcodec.h:154
 msgid "Rate control buffer aggressiveness."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:156
+#: modules/codec/avcodec/avcodec.h:157
 msgid "I quantization factor"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:158
+#: modules/codec/avcodec/avcodec.h:159
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:363
+#: modules/codec/avcodec/avcodec.h:162 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
 msgid "Noise reduction"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:162
+#: modules/codec/avcodec/avcodec.h:163
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:166
+#: modules/codec/avcodec/avcodec.h:167
 msgid "MPEG4 quantization matrix"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:167
+#: modules/codec/avcodec/avcodec.h:168
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
 "standard MPEG2 decoders."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:172 modules/codec/jpeg.c:51
+#: modules/codec/avcodec/avcodec.h:173 modules/codec/jpeg.c:51
 msgid "Quality level"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:173
+#: modules/codec/avcodec/avcodec.h:174
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:178
+#: modules/codec/avcodec/avcodec.h:179
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -10507,110 +10503,110 @@ msgid ""
 "to ease the encoder's task."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:184
+#: modules/codec/avcodec/avcodec.h:185
 msgid "Minimum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:185
+#: modules/codec/avcodec/avcodec.h:186
 msgid "Minimum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:188
+#: modules/codec/avcodec/avcodec.h:189
 msgid "Maximum video quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:189
+#: modules/codec/avcodec/avcodec.h:190
 msgid "Maximum video quantizer scale."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:192
+#: modules/codec/avcodec/avcodec.h:193
 msgid "Trellis quantization"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:193
+#: modules/codec/avcodec/avcodec.h:194
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:196
+#: modules/codec/avcodec/avcodec.h:197
 msgid "Fixed quantizer scale"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:197
+#: modules/codec/avcodec/avcodec.h:198
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:200
+#: modules/codec/avcodec/avcodec.h:201
 msgid "Strict standard compliance"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:201
+#: modules/codec/avcodec/avcodec.h:202
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -2 to 2)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:204
+#: modules/codec/avcodec/avcodec.h:205
 msgid "Luminance masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:205
+#: modules/codec/avcodec/avcodec.h:206
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:208
+#: modules/codec/avcodec/avcodec.h:209
 msgid "Darkness masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:209
+#: modules/codec/avcodec/avcodec.h:210
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:212
+#: modules/codec/avcodec/avcodec.h:213
 msgid "Motion masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:213
+#: modules/codec/avcodec/avcodec.h:214
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:216
+#: modules/codec/avcodec/avcodec.h:217
 msgid "Border masking"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:217
+#: modules/codec/avcodec/avcodec.h:218
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:220
+#: modules/codec/avcodec/avcodec.h:221
 msgid "Luminance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:221
+#: modules/codec/avcodec/avcodec.h:222
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:225
+#: modules/codec/avcodec/avcodec.h:226
 msgid "Chrominance elimination"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:226
+#: modules/codec/avcodec/avcodec.h:227
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:230
+#: modules/codec/avcodec/avcodec.h:231
 msgid "Specify AAC audio profile to use"
 msgstr ""
 
-#: modules/codec/avcodec/avcodec.h:231
+#: modules/codec/avcodec/avcodec.h:232
 msgid ""
 "Specify the AAC audio profile to use for encoding the audio bitstream. It "
 "takes the following options: main, low, ssr (not supported),ltp, hev1, hev2 "
@@ -10659,11 +10655,11 @@ msgstr ""
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr ""
 
-#: modules/codec/avcodec/vaapi.c:352
+#: modules/codec/avcodec/vaapi.c:354
 msgid "VA-API video decoder via DRM"
 msgstr ""
 
-#: modules/codec/avcodec/vaapi.c:357
+#: modules/codec/avcodec/vaapi.c:359
 msgid "VA-API video decoder"
 msgstr ""
 
@@ -10745,9 +10741,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/dav1d.c:52
-#, fuzzy
 msgid "Frames Threads"
-msgstr "چوکاټ چټکتيا"
+msgstr ""
 
 #: modules/codec/dav1d.c:53
 msgid "Max number of threads used for frame decoding, default 0=auto"
@@ -10863,7 +10858,7 @@ msgstr ""
 msgid "AAC audio decoder (using libfaad2)"
 msgstr ""
 
-#: modules/codec/faad.c:434
+#: modules/codec/faad.c:448
 msgid "AAC extension"
 msgstr ""
 
@@ -11262,25 +11257,24 @@ msgstr ""
 msgid "Kate text subtitles packetizer"
 msgstr ""
 
-#: modules/codec/libass.c:59
-#, fuzzy
+#: modules/codec/libass.c:60
 msgid "Additional fonts directory"
-msgstr "پوښۍ ډېرول..."
-
-#: modules/codec/libass.c:62
-msgid "Subtitles (advanced)"
 msgstr ""
 
 #: modules/codec/libass.c:63
+msgid "Subtitles (advanced)"
+msgstr ""
+
+#: modules/codec/libass.c:64
 msgid "Subtitle renderers using libass"
 msgstr ""
 
-#: modules/codec/libass.c:259
+#: modules/codec/libass.c:261
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
 msgid "Building font cache"
 msgstr ""
 
-#: modules/codec/libass.c:260
+#: modules/codec/libass.c:262
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
@@ -12298,7 +12292,7 @@ msgstr ""
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:97
+#: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:98
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr ""
@@ -13422,11 +13416,11 @@ msgstr ""
 msgid "VBI & Teletext"
 msgstr ""
 
-#: modules/control/dbus/dbus.c:137
+#: modules/control/dbus/dbus.c:141
 msgid "DBus"
 msgstr ""
 
-#: modules/control/dbus/dbus.c:139
+#: modules/control/dbus/dbus.c:143
 msgid "D-Bus control interface"
 msgstr ""
 
@@ -14171,9 +14165,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "چوکاټ په چوکاټ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
@@ -14296,41 +14289,41 @@ msgstr ""
 msgid "Internal libavcodec format name"
 msgstr ""
 
-#: modules/demux/avi/avi.c:54
+#: modules/demux/avi/avi.c:55
 msgid "Force interleaved method"
 msgstr ""
 
-#: modules/demux/avi/avi.c:56
+#: modules/demux/avi/avi.c:57
 msgid "Force index creation"
 msgstr ""
 
-#: modules/demux/avi/avi.c:58
+#: modules/demux/avi/avi.c:59
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
 msgstr ""
 
-#: modules/demux/avi/avi.c:66
+#: modules/demux/avi/avi.c:67
 msgid "Ask for action"
 msgstr ""
 
-#: modules/demux/avi/avi.c:67
+#: modules/demux/avi/avi.c:68
 msgid "Always fix"
 msgstr ""
 
-#: modules/demux/avi/avi.c:68
+#: modules/demux/avi/avi.c:69
 msgid "Never fix"
 msgstr ""
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "Fix when necessary"
 msgstr ""
 
-#: modules/demux/avi/avi.c:73
+#: modules/demux/avi/avi.c:74
 msgid "AVI demuxer"
 msgstr ""
 
-#: modules/demux/avi/avi.c:878 modules/demux/mp4/mp4.c:4306
+#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4307
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -14340,27 +14333,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:886
+#: modules/demux/avi/avi.c:910
 msgid "Do not play"
 msgstr ""
 
-#: modules/demux/avi/avi.c:887
+#: modules/demux/avi/avi.c:911
 msgid "Build index then play"
 msgstr ""
 
-#: modules/demux/avi/avi.c:888
+#: modules/demux/avi/avi.c:912
 msgid "Play as is"
 msgstr ""
 
-#: modules/demux/avi/avi.c:889 modules/demux/mp4/mp4.c:4317
+#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4318
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2776
+#: modules/demux/avi/avi.c:2828
 msgid "Broken or missing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2777
+#: modules/demux/avi/avi.c:2829
 msgid "Fixing AVI Index..."
 msgstr ""
 
@@ -14783,11 +14776,11 @@ msgstr ""
 msgid "MP4"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4314
+#: modules/demux/mp4/mp4.c:4315
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4315
+#: modules/demux/mp4/mp4.c:4316
 msgid "Build index"
 msgstr ""
 
@@ -15412,26 +15405,26 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
-#: modules/gui/qt/dialogs/plugins.cpp:382
+#: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:107
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
-#: modules/gui/qt/dialogs/plugins.cpp:386
+#: modules/gui/qt/dialogs/plugins.cpp:393
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:109
-#: modules/gui/qt/dialogs/plugins.cpp:390
+#: modules/gui/qt/dialogs/plugins.cpp:397
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:111
-#: modules/gui/qt/dialogs/plugins.cpp:393
+#: modules/gui/qt/dialogs/plugins.cpp:400
 #: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr ""
@@ -15439,7 +15432,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:113
 #: modules/gui/macosx/VLCAddonsWindowController.m:361
 #: modules/gui/macosx/VLCMainMenu.m:343 modules/gui/macosx/VLCMainMenu.m:344
-#: modules/gui/qt/dialogs/plugins.cpp:396
+#: modules/gui/qt/dialogs/plugins.cpp:403
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr ""
@@ -15449,7 +15442,7 @@ msgid "Show Installed Only"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
-#: modules/gui/qt/dialogs/plugins.cpp:424
+#: modules/gui/qt/dialogs/plugins.cpp:431
 msgid "Find more addons online"
 msgstr ""
 
@@ -15459,8 +15452,8 @@ msgid "Addons Manager"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
-#: modules/gui/qt/dialogs/plugins.cpp:1166
-#: modules/gui/qt/dialogs/plugins.cpp:1179
+#: modules/gui/qt/dialogs/plugins.cpp:1173
+#: modules/gui/qt/dialogs/plugins.cpp:1186
 msgid "Installed"
 msgstr ""
 
@@ -15471,8 +15464,8 @@ msgid "Name"
 msgstr "نوم"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
-#: modules/gui/macosx/VLCPlaylist.m:92 modules/gui/qt/dialogs/plugins.cpp:1398
-#: modules/gui/qt/dialogs/plugins.cpp:1503 modules/mux/asf.c:58
+#: modules/gui/macosx/VLCPlaylist.m:92 modules/gui/qt/dialogs/plugins.cpp:1405
+#: modules/gui/qt/dialogs/plugins.cpp:1510 modules/mux/asf.c:58
 msgid "Author"
 msgstr "ليکوال"
 
@@ -15481,7 +15474,7 @@ msgid "Uninstall"
 msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
-#: modules/gui/qt/dialogs/plugins.cpp:378
+#: modules/gui/qt/dialogs/plugins.cpp:385
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
 msgid "Skins"
@@ -15676,7 +15669,7 @@ msgstr "مهال"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:559
 #: modules/gui/macosx/VLCCoreDialogProvider.m:194
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
-#: modules/gui/macosx/VLCOpenWindowController.m:364
+#: modules/gui/macosx/VLCOpenWindowController.m:365
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:337
 #: modules/gui/macosx/VLCSimplePrefsController.m:287
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
@@ -15789,11 +15782,11 @@ msgstr ""
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:145
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:197
 #: modules/gui/macosx/VLCOpenWindowController.m:147
-#: modules/gui/macosx/VLCOpenWindowController.m:351
+#: modules/gui/macosx/VLCOpenWindowController.m:352
 #: modules/gui/macosx/VLCOutput.m:67
 #: modules/gui/macosx/VLCSimplePrefsController.m:295
 #: modules/gui/macosx/VLCSimplePrefsController.m:373
-#: modules/gui/macosx/prefs_widgets.m:1122
+#: modules/gui/macosx/prefs_widgets.m:1126
 #: modules/gui/qt/components/preferences_widgets.cpp:264
 #: modules/gui/qt/components/simple_preferences.cpp:463
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
@@ -16062,9 +16055,8 @@ msgid "Volume: %i %%"
 msgstr ""
 
 #: modules/gui/macosx/VLCHelpWindowController.m:47
-#, fuzzy
 msgid "VLC media player Help"
-msgstr "رسنۍ کتابتون کارول"
+msgstr ""
 
 #: modules/gui/macosx/VLCHelpWindowController.m:50
 #: modules/gui/macosx/VLCMainMenu.m:467 modules/gui/macosx/VLCMainMenu.m:1101
@@ -16073,9 +16065,8 @@ msgstr "لړيال"
 
 #: modules/gui/macosx/VLCInputManager.m:478
 #: modules/gui/macosx/VLCInputManager.m:505
-#, fuzzy
 msgid "VLC media playback"
-msgstr "رسنۍ کتابتون کارول"
+msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:94
 #: modules/gui/qt/dialogs/messages.cpp:80
@@ -16085,36 +16076,32 @@ msgid "Messages"
 msgstr "استوزې"
 
 #: modules/gui/macosx/VLCLogWindowController.m:104
-#, fuzzy
 msgid "Save log"
-msgstr "ساتل"
+msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:105
 msgid "Save the debug log to a file"
 msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:107
-#, fuzzy
 msgid "Refresh log"
-msgstr "لړ تاندول"
+msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:108
 msgid "Refresh the log output"
 msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:110
-#, fuzzy
 msgid "Clear log"
-msgstr "پاکول"
+msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:111
 msgid "Clear the log output"
 msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:113
-#, fuzzy
 msgid "Toggle details"
-msgstr "سپړاوي ښودل"
+msgstr ""
 
 #: modules/gui/macosx/VLCLogWindowController.m:114
 msgid "Show/hide details about a log message"
@@ -16594,10 +16581,10 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:133
 #: modules/gui/macosx/VLCOpenWindowController.m:193
-#: modules/gui/macosx/VLCOpenWindowController.m:583
-#: modules/gui/macosx/VLCOpenWindowController.m:669
-#: modules/gui/macosx/VLCOpenWindowController.m:901
-#: modules/gui/macosx/VLCOpenWindowController.m:1285
+#: modules/gui/macosx/VLCOpenWindowController.m:584
+#: modules/gui/macosx/VLCOpenWindowController.m:670
+#: modules/gui/macosx/VLCOpenWindowController.m:902
+#: modules/gui/macosx/VLCOpenWindowController.m:1286
 #: modules/gui/qt/components/controller.hpp:107
 msgid "Open"
 msgstr "پرانيستل"
@@ -16629,12 +16616,12 @@ msgid "Capture"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:145
-#: modules/gui/macosx/VLCOpenWindowController.m:345
+#: modules/gui/macosx/VLCOpenWindowController.m:346
 msgid "Choose a file"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
-#: modules/gui/macosx/VLCOpenWindowController.m:350
+#: modules/gui/macosx/VLCOpenWindowController.m:351
 msgid "Select a file for playback"
 msgstr ""
 
@@ -16647,7 +16634,7 @@ msgid "Play another media synchronously"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
-#: modules/gui/macosx/VLCOpenWindowController.m:348
+#: modules/gui/macosx/VLCOpenWindowController.m:349
 #: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Choose..."
@@ -16716,20 +16703,20 @@ msgid "Protocol"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:199
-#: modules/gui/macosx/VLCOpenWindowController.m:1016
-#: modules/gui/macosx/VLCOpenWindowController.m:1076
+#: modules/gui/macosx/VLCOpenWindowController.m:1017
+#: modules/gui/macosx/VLCOpenWindowController.m:1077
 msgid "Unicast"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:200
-#: modules/gui/macosx/VLCOpenWindowController.m:1029
-#: modules/gui/macosx/VLCOpenWindowController.m:1089
+#: modules/gui/macosx/VLCOpenWindowController.m:1030
+#: modules/gui/macosx/VLCOpenWindowController.m:1090
 msgid "Multicast"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:206
-#: modules/gui/macosx/VLCOpenWindowController.m:506
-#: modules/gui/macosx/VLCOpenWindowController.m:1167
+#: modules/gui/macosx/VLCOpenWindowController.m:507
+#: modules/gui/macosx/VLCOpenWindowController.m:1168
 msgid "Input Devices"
 msgstr ""
 
@@ -16753,71 +16740,71 @@ msgstr ""
 msgid "Capture Audio"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:344
+#: modules/gui/macosx/VLCOpenWindowController.m:345
 msgid "Add Subtitle File:"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:349
+#: modules/gui/macosx/VLCOpenWindowController.m:350
 msgid "Setup subtitle playback details"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:352
+#: modules/gui/macosx/VLCOpenWindowController.m:353
 msgid "Select a subtitle file"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:353
+#: modules/gui/macosx/VLCOpenWindowController.m:354
 msgid "Override parameters"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:356
+#: modules/gui/macosx/VLCOpenWindowController.m:357
 msgid "FPS"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:358
+#: modules/gui/macosx/VLCOpenWindowController.m:359
 msgid "Subtitle encoding"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:360
+#: modules/gui/macosx/VLCOpenWindowController.m:361
 #: modules/gui/macosx/VLCSimplePrefsController.m:347
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Font size"
 msgstr "د ليکبڼې کچ"
 
-#: modules/gui/macosx/VLCOpenWindowController.m:362
+#: modules/gui/macosx/VLCOpenWindowController.m:363
 msgid "Subtitle alignment"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:365
+#: modules/gui/macosx/VLCOpenWindowController.m:366
 msgid "Dismiss the subtitle setup dialog"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:366
+#: modules/gui/macosx/VLCOpenWindowController.m:367
 msgid "Font Properties"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:367
+#: modules/gui/macosx/VLCOpenWindowController.m:368
 msgid "Subtitle File"
 msgstr "د څېرمه سرليک دوتنه"
 
-#: modules/gui/macosx/VLCOpenWindowController.m:369
+#: modules/gui/macosx/VLCOpenWindowController.m:370
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:52
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:56
 msgid "s"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:370
+#: modules/gui/macosx/VLCOpenWindowController.m:371
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:59
 msgid "fps"
 msgstr ""
 
-#: modules/gui/macosx/VLCOpenWindowController.m:582
-#: modules/gui/macosx/VLCOpenWindowController.m:668
-#: modules/gui/macosx/VLCOpenWindowController.m:1284
+#: modules/gui/macosx/VLCOpenWindowController.m:583
+#: modules/gui/macosx/VLCOpenWindowController.m:669
+#: modules/gui/macosx/VLCOpenWindowController.m:1285
 #: modules/gui/qt/ui/open_file.h:141
 msgid "Open File"
 msgstr "دوتنه پرانيستل"
 
-#: modules/gui/macosx/VLCOpenWindowController.m:767
+#: modules/gui/macosx/VLCOpenWindowController.m:768
 #, c-format
 msgid "%i tracks"
 msgstr ""
@@ -17002,7 +16989,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:239
 #: modules/gui/qt/components/simple_preferences.cpp:719
-#: modules/gui/qt/dialogs/plugins.cpp:376
+#: modules/gui/qt/dialogs/plugins.cpp:383
 msgid "Interface Settings"
 msgstr "د برسېر امستنې"
 
@@ -17997,15 +17984,15 @@ msgstr ""
 msgid "Show Basic"
 msgstr ""
 
-#: modules/gui/macosx/prefs_widgets.m:1147
+#: modules/gui/macosx/prefs_widgets.m:1151
 msgid "Select a directory"
 msgstr "يوه پوښۍ وټاکئ"
 
-#: modules/gui/macosx/prefs_widgets.m:1147
+#: modules/gui/macosx/prefs_widgets.m:1151
 msgid "Select a file"
 msgstr "دوتنه ټاکل"
 
-#: modules/gui/macosx/prefs_widgets.m:1148
+#: modules/gui/macosx/prefs_widgets.m:1152
 msgid "Select"
 msgstr "ټاکل"
 
@@ -19274,8 +19261,8 @@ msgstr "ويستل"
 #: modules/gui/qt/dialogs/help.cpp:66 modules/gui/qt/dialogs/help.cpp:212
 #: modules/gui/qt/dialogs/mediainfo.cpp:80
 #: modules/gui/qt/dialogs/messages.cpp:84 modules/gui/qt/dialogs/plugins.cpp:94
-#: modules/gui/qt/dialogs/plugins.cpp:1431
-#: modules/gui/qt/dialogs/plugins.cpp:1544
+#: modules/gui/qt/dialogs/plugins.cpp:1438
+#: modules/gui/qt/dialogs/plugins.cpp:1551
 #: modules/gui/qt/dialogs/podcast_configuration.cpp:36
 #: modules/gui/qt/dialogs/vlm.cpp:136
 msgid "&Close"
@@ -19426,8 +19413,8 @@ msgstr ""
 msgid "Go to time"
 msgstr ""
 
-#: modules/gui/qt/dialogs/help.cpp:86 modules/gui/qt/dialogs/plugins.cpp:1369
-#: modules/gui/qt/dialogs/plugins.cpp:1452
+#: modules/gui/qt/dialogs/help.cpp:86 modules/gui/qt/dialogs/plugins.cpp:1376
+#: modules/gui/qt/dialogs/plugins.cpp:1459
 msgid "About"
 msgstr "په اړه"
 
@@ -19615,85 +19602,85 @@ msgstr ""
 msgid "&Search:"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:252
-#: modules/gui/qt/dialogs/plugins.cpp:1285
+#: modules/gui/qt/dialogs/plugins.cpp:259
+#: modules/gui/qt/dialogs/plugins.cpp:1292
 msgid "More information..."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:260
+#: modules/gui/qt/dialogs/plugins.cpp:267
 msgid "Reload extensions"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:379
+#: modules/gui/qt/dialogs/plugins.cpp:386
 msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:383
+#: modules/gui/qt/dialogs/plugins.cpp:390
 msgid ""
 "Playlist parsers add new capabilities to read internet streams or extract "
 "meta data."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:387
+#: modules/gui/qt/dialogs/plugins.cpp:394
 msgid ""
 "Service discoveries adds new sources to your playlist such as web radios, "
 "video websites, ..."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:394
+#: modules/gui/qt/dialogs/plugins.cpp:401
 msgid "Retrieves extra info and art for playlist items"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:397
+#: modules/gui/qt/dialogs/plugins.cpp:404
 msgid ""
 "Extensions brings various enhancements. Check descriptions for more details"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:418
+#: modules/gui/qt/dialogs/plugins.cpp:425
 msgid "Only installed"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:524
+#: modules/gui/qt/dialogs/plugins.cpp:531
 msgid "Retrieving addons..."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:535
+#: modules/gui/qt/dialogs/plugins.cpp:542
 msgid "No addons found"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:814
+#: modules/gui/qt/dialogs/plugins.cpp:821
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1197
+#: modules/gui/qt/dialogs/plugins.cpp:1204
 msgid "Version %1"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1225
+#: modules/gui/qt/dialogs/plugins.cpp:1232
 msgid "%1 downloads"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1294
+#: modules/gui/qt/dialogs/plugins.cpp:1301
 msgid "&Uninstall"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1297
+#: modules/gui/qt/dialogs/plugins.cpp:1304
 msgid "&Install"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1392
-#: modules/gui/qt/dialogs/plugins.cpp:1495
+#: modules/gui/qt/dialogs/plugins.cpp:1399
+#: modules/gui/qt/dialogs/plugins.cpp:1502
 msgid "Version"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1412
-#: modules/gui/qt/dialogs/plugins.cpp:1522
+#: modules/gui/qt/dialogs/plugins.cpp:1419
+#: modules/gui/qt/dialogs/plugins.cpp:1529
 msgid "Website"
 msgstr ""
 
-#: modules/gui/qt/dialogs/plugins.cpp:1534 modules/gui/qt/ui/sprefs_input.h:363
+#: modules/gui/qt/dialogs/plugins.cpp:1541 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Files"
 msgstr "دوتنې"
 
@@ -20825,7 +20812,7 @@ msgstr ""
 msgid "VDPAU adjust video filter"
 msgstr ""
 
-#: modules/hw/vdpau/avcodec.c:220
+#: modules/hw/vdpau/avcodec.c:222
 msgid "VDPAU video decoder"
 msgstr ""
 
@@ -21989,15 +21976,15 @@ msgstr ""
 msgid "GNU TLS server"
 msgstr ""
 
-#: modules/misc/inhibit/dbus.c:129
+#: modules/misc/inhibit/dbus.c:136
 msgid "Playing some media."
 msgstr ""
 
-#: modules/misc/inhibit/dbus.c:232
+#: modules/misc/inhibit/dbus.c:239
 msgid "D-Bus screensaver"
 msgstr ""
 
-#: modules/misc/inhibit/dbus.c:233
+#: modules/misc/inhibit/dbus.c:240
 msgid "D-Bus screen saver inhibition"
 msgstr ""
 
@@ -22489,7 +22476,7 @@ msgstr ""
 msgid "avparser packetizer"
 msgstr ""
 
-#: modules/packetizer/av1.c:557
+#: modules/packetizer/av1.c:580
 msgid "AV1 video packetizer"
 msgstr ""
 
@@ -22564,9 +22551,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "پالنې"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:45
 #: modules/services_discovery/bonjour.m:63
@@ -22797,7 +22783,7 @@ msgid "Applications"
 msgstr ""
 
 #: modules/services_discovery/xcb_apps.c:361
-#: modules/video_output/win32/direct3d9.c:355
+#: modules/video_output/win32/direct3d9.c:325
 msgid "Desktop"
 msgstr ""
 
@@ -23519,31 +23505,31 @@ msgstr ""
 msgid "Zlib decompression filter"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:531
+#: modules/stream_filter/prefetch.c:532
 msgid "Stream prefetch filter"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:534
+#: modules/stream_filter/prefetch.c:535
 msgid "Buffer size"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:535
+#: modules/stream_filter/prefetch.c:536
 msgid "Prefetch buffer size (KiB)"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:537
+#: modules/stream_filter/prefetch.c:538
 msgid "Read size"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:538
+#: modules/stream_filter/prefetch.c:539
 msgid "Prefetch background read size (bytes)"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:540
+#: modules/stream_filter/prefetch.c:541
 msgid "Seek threshold"
 msgstr ""
 
-#: modules/stream_filter/prefetch.c:541
+#: modules/stream_filter/prefetch.c:542
 msgid "Prefetch forward seek threshold (bytes)"
 msgstr ""
 
@@ -25956,7 +25942,7 @@ msgstr ""
 msgid "Color ASCII art video output"
 msgstr ""
 
-#: modules/video_output/caopengllayer.m:953
+#: modules/video_output/caopengllayer.m:957
 msgid "Core Animation OpenGL Layer (Mac OS X)"
 msgstr ""
 
@@ -26213,53 +26199,80 @@ msgstr ""
 msgid "EGL extension for OpenGL"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:77
+#: modules/video_output/win32/direct3d9.c:74
 msgid "The desktop mode allows you to display the video on the desktop."
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:79
-#: modules/video_output/win32/direct3d11.c:68
+#: modules/video_output/win32/direct3d9.c:76
+#: modules/video_output/win32/direct3d11.c:69
 msgid "Use hardware blending support"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:81
-#: modules/video_output/win32/direct3d11.c:70
+#: modules/video_output/win32/direct3d9.c:78
+#: modules/video_output/win32/direct3d11.c:71
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:83
+#: modules/video_output/win32/direct3d9.c:80
 msgid "Pixel Shader"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:85
+#: modules/video_output/win32/direct3d9.c:82
 msgid "Choose a pixel shader to apply."
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:86
+#: modules/video_output/win32/direct3d9.c:83
 msgid "Path to HLSL file"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:87
+#: modules/video_output/win32/direct3d9.c:84
 msgid "Path to an HLSL file containing a single pixel shader."
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:89
+#: modules/video_output/win32/direct3d9.c:86
 msgid "HLSL File"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:91
+#: modules/video_output/win32/direct3d9.c:88
 msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
-#: modules/video_output/win32/direct3d9.c:98
+#: modules/video_output/win32/direct3d9.c:95
 msgid "Direct3D9 video output"
 msgstr ""
 
-#: modules/video_output/win32/direct3d11.c:67
+#: modules/video_output/win32/direct3d11.c:68
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
+#: modules/video_output/win32/direct3d11.c:73
+#, fuzzy
+msgid "Video Upscaling Mode"
+msgstr "د ويډيو مېچل"
+
 #: modules/video_output/win32/direct3d11.c:74
+msgid "Select the upscaling mode for video."
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:79
+msgid "Linear Sampler"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:79
+msgid "Point Sampler"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:79
+#, fuzzy
+msgid "Video Processor"
+msgstr "ويډيو کوډېکونه"
+
+#: modules/video_output/win32/direct3d11.c:79
+#, fuzzy
+msgid "Super Resolution"
+msgstr "ژورکوت"
+
+#: modules/video_output/win32/direct3d11.c:83
 msgid "Direct3D11 video output"
 msgstr ""
 
@@ -28129,1717 +28142,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr ""
-
-#~ msgid "Renderer discovery off"
-#~ msgstr "پالنې"
-
-#, fuzzy
-#~ msgid "Disable renderer discovery"
-#~ msgstr "پرده ساتونکی ناتوانول"
-
-#, fuzzy
-#~ msgid "Direct3D11 filter"
-#~ msgstr "د ويډيو امستنې ونه ساتل شوې"
-
-#, fuzzy
-#~ msgid "Screen capture (with Wayland)"
-#~ msgstr "پرده ننوتۍ"
-
-#, fuzzy
-#~ msgid "Sent"
-#~ msgstr "ټاکل"
-
-#, fuzzy
-#~ msgid "packets"
-#~ msgstr "تشه"
-
-#, fuzzy
-#~ msgid "Upstream rate"
-#~ msgstr "چوکاټ چټکتيا"
-
-#~ msgid "Display device"
-#~ msgstr "ښوون وزله"
-
-#, fuzzy
-#~ msgid "Capture region heigh"
-#~ msgstr "د څېرمه پردې اوږدوالی"
-
-#, fuzzy
-#~ msgid "Always &on Top"
-#~ msgstr "تل پر سر"
-
-#, fuzzy
-#~ msgid "Sox Resampling quality"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "High quality"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Very high quality"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "YouTube Start Time"
-#~ msgstr "پېل مهال"
-
-#, fuzzy
-#~ msgid "Disable lua"
-#~ msgstr "ناتوانول"
-
-#~ msgid "Display resolution"
-#~ msgstr "ښوون ژورکوت"
-
-#~ msgid "Navigation"
-#~ msgstr "چلونه"
-
-#~ msgid "%ld B"
-#~ msgstr "ب %ld"
-
-#~ msgid "Downloading ..."
-#~ msgstr "رالېښل کيږي ..."
-
-#~ msgid "BD"
-#~ msgstr "BD"
-
-#~ msgid "Configure"
-#~ msgstr "سازول"
-
-#~ msgid "EyeTV input"
-#~ msgstr "ننوتۍ EyeTV"
-
-#, fuzzy
-#~ msgid "Directory sort order"
-#~ msgstr "ننوتۍ DirectShow"
-
-#~ msgid "FTP user name"
-#~ msgstr "کارن نوم FTP"
-
-#~ msgid "FTP password"
-#~ msgstr "تېرنويې FTP"
-
-#~ msgid "Your password was rejected."
-#~ msgstr "ستاسو تېرنويې ونه منل شوه."
-
-#~ msgid "GnomeVFS input"
-#~ msgstr "ننوتۍ GnomeVFS"
-
-#, fuzzy
-#~ msgid "HTTP referer value"
-#~ msgstr "کارن نوم HTTP"
-
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\": %s"
-#~ msgstr "دوتنه ونه شوه لوستلی. VLC"
-
-#, fuzzy
-#~ msgid "Video Capture width"
-#~ msgstr "ويډيو درشل"
-
-#, fuzzy
-#~ msgid "Video Capture height"
-#~ msgstr "د ويډيو اوږدوالی"
-
-#, fuzzy
-#~ msgid "RDP auth username"
-#~ msgstr "کارن نوم FTP"
-
-#, fuzzy
-#~ msgid "RDP Password"
-#~ msgstr "تېرنويې"
-
-#~ msgid "SMB user name"
-#~ msgstr "کارن نوم SMB"
-
-#~ msgid "SMB password"
-#~ msgstr "تېرنويې SMB"
-
-#~ msgid "Segments"
-#~ msgstr "برخې"
-
-#~ msgid "Segment"
-#~ msgstr "برخه"
-
-#~ msgid "LID"
-#~ msgstr "LID"
-
-#~ msgid "VCD Format"
-#~ msgstr "وي سي ډي بڼه"
-
-#~ msgid "Vol #"
-#~ msgstr "واليم شمېره"
-
-#~ msgid "System Id"
-#~ msgstr "غونډال پېژند"
-
-#~ msgid "Entries"
-#~ msgstr "ننوتنې"
-
-#~ msgid "Audio Channels"
-#~ msgstr "غږيز چېنلونه"
-
-#~ msgid "type"
-#~ msgstr "ډول"
-
-#~ msgid "end"
-#~ msgstr "پای"
-
-#~ msgid "play list"
-#~ msgstr "غږون لړ"
-
-#~ msgid "selection list"
-#~ msgstr "د ټاکنې لړ"
-
-#~ msgid "unknown type"
-#~ msgstr "ناپېژندلی ډول"
-
-#~ msgid "List ID"
-#~ msgstr "لړ پېژند"
-
-#, fuzzy
-#~ msgid "Zip files filter"
-#~ msgstr "د دوتنې ساتل پاتې راغلل"
-
-#, fuzzy
-#~ msgid "Android AudioTrack audio output"
-#~ msgstr "د ويډيو ياد وتۍ"
-
-#, fuzzy
-#~ msgid "AudioUnit output for iOS"
-#~ msgstr "د غږيز وتۍ پاتې راغله"
-
-#, fuzzy
-#~ msgid "OpenSLES audio output"
-#~ msgstr "السا غږيز وتۍ"
-
-#, fuzzy
-#~ msgid "OpenSLES"
-#~ msgstr "پرانيستل"
-
-#, fuzzy
-#~ msgid "VDA output pixel format"
-#~ msgstr "وتۍ بڼه"
-
-#, fuzzy
-#~ msgid "Video decoder using Android MediaCodec"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "ZPL playlist import"
-#~ msgstr "غږون لړ ويستل M3U د"
-
-#~ msgid "Invalid selection"
-#~ msgstr "ناسمه ټاکنه"
-
-#~ msgid "No input found"
-#~ msgstr "کوم ننوتۍ ونه موندل شوه"
-
-#~ msgid "Send"
-#~ msgstr "لېږل"
-
-#~ msgid "User name"
-#~ msgstr "کارن نوم"
-
-#~ msgid "Current channel:"
-#~ msgstr "اوسنی چېنل:"
-
-#~ msgid "Previous Channel"
-#~ msgstr "مخکنی چېنل"
-
-#~ msgid "Next Channel"
-#~ msgstr "راتلونکی چېنل"
-
-#~ msgid "Download Plugin"
-#~ msgstr "لګون رالېښل"
-
-#, fuzzy
-#~ msgid "Click to select a subtitle file."
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Always continue"
-#~ msgstr "تل پر سر"
-
-#, fuzzy
-#~ msgid "Hardware Acceleration"
-#~ msgstr "_نويكيد"
-
-#~ msgid "Show Fullscreen Controller"
-#~ msgstr "د ټولې پردې مهاروونکی ښودل"
-
-#~ msgid "Existing playlist item"
-#~ msgstr "د غږون لړ شته توکی"
-
-#~ msgid "From"
-#~ msgstr "له اړخه"
-
-#~ msgid "To"
-#~ msgstr "ته"
-
-#~ msgid "Select the file to save to"
-#~ msgstr "هغه دوتنه وټاکئ چې ساتل يې په کې غواړﺉ"
-
-#~ msgid "Save file to"
-#~ msgstr "دوتنه ساتل په"
-
-#~ msgid "Select the directory to save to"
-#~ msgstr "هغه پوښۍ وټاکئ چې ساتل يې په کې غواړﺉ"
-
-#~ msgid "%i items"
-#~ msgstr "توکي %i"
-
-#~ msgid "yes"
-#~ msgstr "هو"
-
-#~ msgid "no"
-#~ msgstr "نه"
-
-#, fuzzy
-#~ msgid "&Write changes to config"
-#~ msgstr "د ټيکلي ټاکنه"
-
-#, fuzzy
-#~ msgid "T&ools"
-#~ msgstr "توکی"
-
-#, fuzzy
-#~ msgid "&Decrease Volume"
-#~ msgstr "غږ ټيټول"
-
-#, fuzzy
-#~ msgid "&Save To Playlist"
-#~ msgstr "غږون لړ ساتل"
-
-#, fuzzy
-#~ msgid "&Post processing"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Power"
-#~ msgstr "ورو"
-
-#, fuzzy
-#~ msgid "Preferred Width"
-#~ msgstr "د غږيز غوره ژبه"
-
-#, fuzzy
-#~ msgid "Smooth Streaming"
-#~ msgstr "د وزلې ټاکنه"
-
-#~ msgid "Page"
-#~ msgstr "مخ"
-
-#, fuzzy
-#~ msgid "Row"
-#~ msgstr "کيلونه"
-
-#, fuzzy
-#~ msgid "Password file"
-#~ msgstr "تېرنويې"
-
-#~ msgid "RAOP"
-#~ msgstr "RAOP"
-
-#~ msgid "Session phone number"
-#~ msgstr "د ناستې د ټيليفون شمېره"
-
-#~ msgid "OSD menu"
-#~ msgstr "غورنۍ OSD"
-
-#, fuzzy
-#~ msgid "Device type"
-#~ msgstr "وزله"
-
-#, fuzzy
-#~ msgid "Classic AtmoLight"
-#~ msgstr "AtmoLight"
-
-#, fuzzy
-#~ msgid "Quattro AtmoLight"
-#~ msgstr "AtmoLight"
-
-#, fuzzy
-#~ msgid "MoMoLight"
-#~ msgstr "AtmoLight"
-
-#, fuzzy
-#~ msgid "Count of channels"
-#~ msgstr "د چېنلونو شمېر"
-
-#, fuzzy
-#~ msgid "Count of fnordlicht's"
-#~ msgstr "د چېنلونو شمېر"
-
-#~ msgid "Pause-Red"
-#~ msgstr "ځنډول-سور"
-
-#~ msgid "Pause-Green"
-#~ msgstr "ځنډول-شين"
-
-#~ msgid "Pause-Blue"
-#~ msgstr "ځنډول-نيل"
-
-#~ msgid "End-Red"
-#~ msgstr "پايول-سور"
-
-#~ msgid "End-Green"
-#~ msgstr "پايول-شين"
-
-#~ msgid "End-Blue"
-#~ msgstr "پايول-نيل"
-
-#, fuzzy
-#~ msgid "Number of zones on top"
-#~ msgstr "د کيلونو شمېر"
-
-#, fuzzy
-#~ msgid "Number of zones on bottom"
-#~ msgstr "د ستنو شمېر"
-
-#~ msgid "White Red"
-#~ msgstr "سپين سور"
-
-#~ msgid "White Blue"
-#~ msgstr "سپين نيل"
-
-#, fuzzy
-#~ msgid "Filter smoothness (%)"
-#~ msgstr "د چاڼ اکر"
-
-#, fuzzy
-#~ msgid "Output Color filter mode"
-#~ msgstr "وتۍ دوتنه"
-
-#~ msgid "No Filtering"
-#~ msgstr "هېڅ چاڼونه"
-
-#~ msgid "Percent"
-#~ msgstr "سلنه"
-
-#, fuzzy
-#~ msgid "Channel 0: summary"
-#~ msgstr "د چېنل لنډيز"
-
-#, fuzzy
-#~ msgid "Channel 1: left"
-#~ msgstr "چېنل کيڼ"
-
-#, fuzzy
-#~ msgid "Channel 2: right"
-#~ msgstr "چېنل ښي"
-
-#, fuzzy
-#~ msgid "Channel 3: top"
-#~ msgstr "چېنل بره"
-
-#, fuzzy
-#~ msgid "Channel 4: bottom"
-#~ msgstr "چېنل لاندې"
-
-#, fuzzy
-#~ msgid "Zone 4:summary"
-#~ msgstr "د چېنل لنډيز"
-
-#, fuzzy
-#~ msgid "Zone 3:left"
-#~ msgstr "چېنل کيڼ"
-
-#, fuzzy
-#~ msgid "Zone 1:right"
-#~ msgstr "چېنل ښي"
-
-#, fuzzy
-#~ msgid "Zone 2:bottom"
-#~ msgstr "چېنل لاندې"
-
-#~ msgid "AtmoLight Filter"
-#~ msgstr "چاڼ AtmoLight"
-
-#~ msgid "AtmoLight"
-#~ msgstr "AtmoLight"
-
-#, fuzzy
-#~ msgid "DMX options"
-#~ msgstr "غوراوي"
-
-#, fuzzy
-#~ msgid "MoMoLight options"
-#~ msgstr "د سازونې غوراوي"
-
-#, fuzzy
-#~ msgid "fnordlicht options"
-#~ msgstr "د سازونې غوراوي"
-
-#, fuzzy
-#~ msgid "ANativeWindow"
-#~ msgstr "چارنده کړکۍ"
-
-#, fuzzy
-#~ msgid "Android MediaCodec direct rendering video output"
-#~ msgstr "د ويډيو ياد وتۍ"
-
-#, fuzzy
-#~ msgid "Android Surface video output"
-#~ msgstr "د ويډيو ياد وتۍ"
-
-#, fuzzy
-#~ msgid "OpenGL ES extension"
-#~ msgstr "پرېښودل شوي شاتاړي"
-
-#, fuzzy
-#~ msgid "OpenGL ES"
-#~ msgstr "پرانيستل"
-
-#, fuzzy
-#~ msgid "OpenGL for Embedded Systems video output"
-#~ msgstr "ويډيو وتۍ OpenGL"
-
-#, fuzzy
-#~ msgid "OpenGL video output (experimental)"
-#~ msgstr "ويډيو وتۍ OpenGL"
-
-#, fuzzy
-#~ msgid "iOS OpenGL video output"
-#~ msgstr "ويډيو وتۍ OpenGL"
-
-#, fuzzy
-#~ msgid "Direct2D video output"
-#~ msgstr "ويډيو وتۍ DirectX"
-
-#, fuzzy
-#~ msgid "OpenGL GLX video output (XCB)"
-#~ msgstr "ويډيو وتۍ OpenGL"
-
-#, fuzzy
-#~ msgid "Black Slot"
-#~ msgstr "تور کچ"
-
-#, fuzzy
-#~ msgid "Output Color Filtermode"
-#~ msgstr "وتۍ دوتنه"
-
-#, fuzzy
-#~ msgid "Brightness (%)"
-#~ msgstr "روڼتيا"
-
-#, fuzzy
-#~ msgid "Filter threshold (%)"
-#~ msgstr "د چاڼ اکر"
-
-#~ msgid "Video Manager"
-#~ msgstr "ويډيو سمبالګر"
-
-#~ msgid "----- Title"
-#~ msgstr "----- سرليک"
-
-#, fuzzy
-#~ msgid "Video acceleration not available"
-#~ msgstr "د ويډيو امستنې ونه ساتل شوې"
-
-#, fuzzy
-#~ msgid "Subtitle track added"
-#~ msgstr "د څېرمه سرليک پلنيوی"
-
-#, fuzzy
-#~ msgid "Media in Zip"
-#~ msgstr "رسنۍ دوتنې"
-
-#, fuzzy
-#~ msgid "Windows Store audio output"
-#~ msgstr "غږيز وتۍ رغبېلګه"
-
-#~ msgid "Save this Log..."
-#~ msgstr "...دا خبرال ساتل"
-
-#, fuzzy
-#~ msgid "VLC media player - Flash Viewer"
-#~ msgstr "رسنۍ کتابتون کارول"
-
-#~ msgid "Manual download only"
-#~ msgstr "يوازې لاسي رالېښنه"
-
-#, fuzzy
-#~ msgid "Load Media Library"
-#~ msgstr "رسنۍ کتابتون"
-
-#~ msgid "main program"
-#~ msgstr "ار کاريال"
-
-#, fuzzy
-#~ msgid "VLC could not open the file \"%s\". (%m)"
-#~ msgstr "دوتنه ونه شوه لوستلی. VLC"
-
-#, fuzzy
-#~ msgid "Discard cropping information"
-#~ msgstr "د نسخې خبرتياوې چاپول"
-
-#~ msgid "Don't Send"
-#~ msgstr "نه لېږل"
-
-#, fuzzy
-#~ msgid "Pause iTunes during VLC playback"
-#~ msgstr "بيا غږول"
-
-#, fuzzy
-#~ msgid "Open BDMV folder"
-#~ msgstr "پوښۍ پرانيستل..."
-
-#~ msgid "Output module"
-#~ msgstr "وتۍ رغبېلګه"
-
-#, fuzzy
-#~ msgid "Get more extensions from"
-#~ msgstr "پرېښودل شوي شاتاړي"
-
-#~ msgid "&Help..."
-#~ msgstr "مرسته...&"
-
-#, fuzzy
-#~ msgid "Value of the audio channels levels"
-#~ msgstr "د غږيزو چېنلونو شمېر"
-
-#, fuzzy
-#~ msgid "Alarm"
-#~ msgstr "السا"
-
-#, fuzzy
-#~ msgid "iOS OpenGL ES video output (requires UIView)"
-#~ msgstr "ويډيو وتۍ OpenGL"
-
-#, fuzzy
-#~ msgid "Add a subtitle file"
-#~ msgstr "څېرمه سرلیک دوتنه ډېرول"
-
-#, fuzzy
-#~ msgid "Album art download policy:"
-#~ msgstr "يوازې لاسي رالېښنه"
-
-#, fuzzy
-#~ msgid "Configure Media Library"
-#~ msgstr "رسنۍ کتابتون"
-
-#~ msgid "General Input"
-#~ msgstr "ټولګړې ننوتۍ"
-
-#~ msgid "Quick &Open File..."
-#~ msgstr "زر دوتنه &پرانيستل..."
-
-#~ msgid "&Bookmarks"
-#~ msgstr "ليکنښې&"
-
-#~ msgid "Fetch Information"
-#~ msgstr "خبرتياوې راټلول"
-
-#~ msgid "Sort"
-#~ msgstr "اڼل"
-
-#, fuzzy
-#~ msgid "Add to Media Library"
-#~ msgstr "رسنۍ کتابتون کې ډېرول"
-
-#, fuzzy
-#~ msgid "Advanced Open..."
-#~ msgstr "بريونلې پرانيستنه...&"
-
-#~ msgid "Open Play&list..."
-#~ msgstr "غږون &لړ پرانيستل..."
-
-#~ msgid "CPU"
-#~ msgstr "CPU"
-
-#, fuzzy
-#~ msgid "Capture format (default s16l)"
-#~ msgstr "انځور بڼه"
-
-#, fuzzy
-#~ msgid "GSM Audio"
-#~ msgstr "غږيز"
-
-#~ msgid "dc1394 input"
-#~ msgstr "ننوتۍ dc1394"
-
-#, fuzzy
-#~ msgid "Coffee pot control"
-#~ msgstr "ژور مهارونه"
-
-#~ msgid "RTMP"
-#~ msgstr "RTMP"
-
-#~ msgid "PVR radio device"
-#~ msgstr "رېډيو وزله PVR"
-
-#~ msgid "Framerate"
-#~ msgstr "چوکاټ چټکتيا"
-
-#~ msgid "B Frames"
-#~ msgstr "ب چوکاټه"
-
-#~ msgid "SECAM"
-#~ msgstr "SECAM"
-
-#~ msgid "PAL"
-#~ msgstr "PAL"
-
-#~ msgid "NTSC"
-#~ msgstr "NTSC"
-
-#~ msgid "vbr"
-#~ msgstr "vbr"
-
-#~ msgid "cbr"
-#~ msgstr "cbr"
-
-#~ msgid "PVR"
-#~ msgstr "PVR"
-
-#, fuzzy
-#~ msgid "SFTP user name"
-#~ msgstr "کارن نوم FTP"
-
-#, fuzzy
-#~ msgid "SFTP password"
-#~ msgstr "تېرنويې FTP"
-
-#~ msgid "Video4Linux2"
-#~ msgstr "Video4Linux2"
-
-#~ msgid "Video4Linux2 input"
-#~ msgstr "ننوتۍ Video4Linux2"
-
-#, fuzzy
-#~ msgid "Open Sound System"
-#~ msgstr "سرچينه پرانيستی"
-
-#~ msgid "OSS DSP device"
-#~ msgstr "وزله OSS DSP"
-
-#~ msgid "5.1"
-#~ msgstr "۵.۱"
-
-#~ msgid "Default Audio Device"
-#~ msgstr "د غږيز تلواله وزله"
-
-#~ msgid "fast"
-#~ msgstr "ګړندی"
-
-#~ msgid "normal"
-#~ msgstr "لېوی"
-
-#~ msgid "slow"
-#~ msgstr "ورو"
-
-#~ msgid "all"
-#~ msgstr "ټول"
-
-#~ msgid "Commands"
-#~ msgstr "بولۍ"
-
-#~ msgid "Subscreen height:"
-#~ msgstr "د څېرمه پردې اوږدوالی:"
-
-#, fuzzy
-#~ msgid "Image width:"
-#~ msgstr "د انځور پلنوالی"
-
-#, fuzzy
-#~ msgid "Image height:"
-#~ msgstr "د انځور لوړوالی"
-
-#~ msgid "Load subtitles file:"
-#~ msgstr "د څېرمه سرليک دوتنه لېښل"
-
-#, fuzzy
-#~ msgid "HTML Playlist"
-#~ msgstr "غږون لړ Lua"
-
-#~ msgid "General Audio Settings"
-#~ msgstr "د غږيز ټولګړې امستنې"
-
-#~ msgid "General Video Settings"
-#~ msgstr "د ويډيو ټولګړې امستنې"
-
-#~ msgid "Preferred Subtitle Language"
-#~ msgstr "د څېرمه سرليکونو غوره ژبه"
-
-#, fuzzy
-#~ msgid "Outline Color"
-#~ msgstr "بهرليکه"
-
-#, fuzzy
-#~ msgid "  [Video Decoding]"
-#~ msgstr "د ويډيو سکڼنه"
-
-#, fuzzy
-#~ msgid "  [Audio Decoding]"
-#~ msgstr "د غږيز امستنې"
-
-#~ msgid "Show playlist"
-#~ msgstr "غږون لړ ښودل"
-
-#, fuzzy
-#~ msgid " dB"
-#~ msgstr "%.2f dB"
-
-#~ msgid "Add to playlist"
-#~ msgstr "غږون لړ کې ډېرول"
-
-#, fuzzy
-#~ msgid "Icon View"
-#~ msgstr "کوت"
-
-#, fuzzy
-#~ msgid "List View"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Allow downloading media information"
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Save and Continue"
-#~ msgstr "پرمختلل"
-
-#, fuzzy
-#~ msgid "&Codec"
-#~ msgstr "کوډېک"
-
-#, fuzzy
-#~ msgid "&Open (advanced)..."
-#~ msgstr "دوتنه پرانيستل...&"
-
-#~ msgid "Audio &Channels"
-#~ msgstr "غږيز &چېنلونه"
-
-#~ msgid "&Navigation"
-#~ msgstr "چلونه&"
-
-#, fuzzy
-#~ msgid "Ignored extensions in the media library"
-#~ msgstr "پرېښودل شوي شاتاړي"
-
-#, fuzzy
-#~ msgid "Disable ES id"
-#~ msgstr "ناتوانول"
-
-#, fuzzy
-#~ msgid "Enable ES id"
-#~ msgstr "ويډيو توانول"
-
-#~ msgid "Sizes"
-#~ msgstr "کچې"
-
-#~ msgid "GOP size"
-#~ msgstr "کچ GOP"
-
-#, fuzzy
-#~ msgid "Audio Language"
-#~ msgstr "غږيز ژبه"
-
-#~ msgid "Configuration file"
-#~ msgstr "د سازونې دوتنه"
-
-#, fuzzy
-#~ msgid "Enable desktop mode "
-#~ msgstr "ويډيو توانول"
-
-#, fuzzy
-#~ msgid "Video Codec"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Audio Codec"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Subtitle Codec"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Video Bit Rate"
-#~ msgstr "د ويډيو سرليک"
-
-#, fuzzy
-#~ msgid "Audio Bit Rate"
-#~ msgstr "غږيز چاڼ"
-
-#, fuzzy
-#~ msgid "MUX Options"
-#~ msgstr "غوراوي"
-
-#, fuzzy
-#~ msgid "Output Destination"
-#~ msgstr "موخه"
-
-#, fuzzy
-#~ msgid "Output File"
-#~ msgstr "وتۍ دوتنه"
-
-#, fuzzy
-#~ msgid "File Name"
-#~ msgstr "دوتنې نوم"
-
-#, fuzzy
-#~ msgid "Rows:"
-#~ msgstr "کيلونه"
-
-#, fuzzy
-#~ msgid "width"
-#~ msgstr "پلنوالی"
-
-#, fuzzy
-#~ msgid "Columns:"
-#~ msgstr "ستنې"
-
-#, fuzzy
-#~ msgid "height"
-#~ msgstr "لوړوالی"
-
-#, fuzzy
-#~ msgid "Licence"
-#~ msgstr "منښتليک"
-
-#, fuzzy
-#~ msgid "00000; "
-#~ msgstr "۰۰:۰۰:۰۰"
-
-#~ msgid "Destinations"
-#~ msgstr "موخې"
-
-#~ msgid "Group name"
-#~ msgstr "د ډلې نوم"
-
-#, fuzzy
-#~ msgid "Instances"
-#~ msgstr "برسېر"
-
-#~ msgid "Subtitles Language"
-#~ msgstr "د څېرمه سرليکونو ژبه"
-
-#, fuzzy
-#~ msgid "Black slot"
-#~ msgstr "تور کچ"
-
-#, fuzzy
-#~ msgid "Low Pass Ffilter"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Duration in second"
-#~ msgstr "موده"
-
-#, fuzzy
-#~ msgid "Previous/Backward"
-#~ msgstr "مخکنی څپرکی"
-
-#, fuzzy
-#~ msgid "Video Filters..."
-#~ msgstr "ويډيو چاڼ"
-
-#~ msgid "Speed of the subtitles:"
-#~ msgstr "د څېرمه سرليکونو چټکتيا:"
-
-#, fuzzy
-#~ msgid "Use systems codecs if available, for WMV codecs"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Front speakers"
-#~ msgstr "د ليکبڼې کچ"
-
-#, fuzzy
-#~ msgid "ALSA device"
-#~ msgstr "السا وزلې نوم"
-
-#~ msgid "Default Volume"
-#~ msgstr "تلواله ډکون"
-
-#, fuzzy
-#~ msgid "Open a Media"
-#~ msgstr "رسنۍ پرانيستل"
-
-#, fuzzy
-#~ msgid "&Open a Media"
-#~ msgstr "رسنۍ پرانيستل"
-
-#, fuzzy
-#~ msgid "Live Update"
-#~ msgstr "نېټه"
-
-#, fuzzy
-#~ msgid "Display on &Desktop"
-#~ msgstr "ښوون ژورکوت"
-
-#, fuzzy
-#~ msgid "Elasped time"
-#~ msgstr "دنده کولپول"
-
-#~ msgid "Clear Menu"
-#~ msgstr "غورنۍ پاکول"
-
-#, fuzzy
-#~ msgid "Viewer"
-#~ msgstr "وكو_ره"
-
-#, fuzzy
-#~ msgid "Library"
-#~ msgstr "رسنۍ کتابتون"
-
-#, fuzzy
-#~ msgid "Full Screen"
-#~ msgstr "ټوله پرده"
-
-#, fuzzy
-#~ msgid "Easy Stream"
-#~ msgstr "ښوون اکر"
-
-#, fuzzy
-#~ msgid "Seek Time"
-#~ msgstr "پېل مهال"
-
-#, fuzzy
-#~ msgid "Graphical Equalizer"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Capture Screen"
-#~ msgstr "تشه پوښۍ"
-
-#~ msgid "Close"
-#~ msgstr "بندول"
-
-#, fuzzy
-#~ msgid "Error!"
-#~ msgstr "تېروتنه"
-
-#, fuzzy
-#~ msgid "Create Mosaic"
-#~ msgstr "جوړول"
-
-#, fuzzy
-#~ msgid "Stream Input Configuration"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Create New Stream"
-#~ msgstr "پوښۍ ټاکل"
-
-#, fuzzy
-#~ msgid "Delete All Streams"
-#~ msgstr "ښوون اکر"
-
-#, fuzzy
-#~ msgid "Configure Stream Defaults"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Refresh Streams"
-#~ msgstr "لړ تاندول"
-
-#, fuzzy
-#~ msgid "Motion blue"
-#~ msgstr "_وديو"
-
-#~ msgid "Effect"
-#~ msgstr "اغېزه"
-
-#, fuzzy
-#~ msgid "Zoom playlist"
-#~ msgstr "غږون لړ ښودل"
-
-#~ msgid "key"
-#~ msgstr "کيلۍ"
-
-#~ msgid "UDP port"
-#~ msgstr "درشل UDP"
-
-#~ msgid "Alsa"
-#~ msgstr "السا"
-
-#~ msgid "QAM16"
-#~ msgstr "QAM16"
-
-#~ msgid "QAM32"
-#~ msgstr "QAM32"
-
-#~ msgid "QAM64"
-#~ msgstr "QAM64"
-
-#~ msgid "QAM128"
-#~ msgstr "QAM128"
-
-#~ msgid "QAM256"
-#~ msgstr "QAM256"
-
-#~ msgid "BPSK"
-#~ msgstr "BPSK"
-
-#~ msgid "QPSK"
-#~ msgstr "QPSK"
-
-#~ msgid "8VSB"
-#~ msgstr "۸VSB"
-
-#~ msgid "16VSB"
-#~ msgstr "۱۶VSB"
-
-#~ msgid "2/3"
-#~ msgstr "۲/۳"
-
-#~ msgid "3/4"
-#~ msgstr "۳/۴"
-
-#~ msgid "5/6"
-#~ msgstr "۵/۶"
-
-#~ msgid "7/8"
-#~ msgstr "۷/۸"
-
-#~ msgid "1/4"
-#~ msgstr "۱/۴"
-
-#~ msgid "1/8"
-#~ msgstr "۱/۸"
-
-#~ msgid "1/16"
-#~ msgstr "۱/۱۶"
-
-#~ msgid "1/32"
-#~ msgstr "۱/۳۲"
-
-#~ msgid "2k"
-#~ msgstr "۲k"
-
-#~ msgid "8k"
-#~ msgstr "۸k"
-
-#~ msgid "HTTP password"
-#~ msgstr "تېرنويې HTTP"
-
-#~ msgid "HTTP ACL"
-#~ msgstr "HTTP ACL"
-
-#~ msgid "Audio Channel"
-#~ msgstr "غږيز چېنل"
-
-#~ msgid "Video4Linux"
-#~ msgstr "Video4Linux"
-
-#~ msgid "READ"
-#~ msgstr "READ"
-
-#~ msgid "MMAP"
-#~ msgstr "MMAP"
-
-#~ msgid "USERPTR"
-#~ msgstr "USERPTR"
-
-#~ msgid "default"
-#~ msgstr "تلواله"
-
-#~ msgid "No Audio Device"
-#~ msgstr "غږيز وزله نشته"
-
-#~ msgid "Reload image file"
-#~ msgstr "د انځور دوتنه بيا لېښل"
-
-#~ msgid "Subpage"
-#~ msgstr "څېرمه مخ"
-
-#~ msgid "Host address"
-#~ msgstr "د کوربه پته"
-
-#~ msgid "Image cropping"
-#~ msgstr "انځور سکڼنه"
-
-#~ msgid "Adjust Image"
-#~ msgstr "انځور برابرول"
-
-#~ msgid "Audio Filter"
-#~ msgstr "غږيز چاڼ"
-
-#~ msgid "Controller..."
-#~ msgstr "مهاروونکی..."
-
-#~ msgid "Extended Controls..."
-#~ msgstr "ژور مهارونه..."
-
-#~ msgid "Add Folder to Playlist"
-#~ msgstr "پوښۍ غږون لړ کې ډېرول"
-
-#~ msgid "1 item"
-#~ msgstr "۱ توکی"
-
-#~ msgid "Empty Folder"
-#~ msgstr "تشه پوښۍ"
-
-#~ msgid "Interface Settings not saved"
-#~ msgstr "د برسېر امستنې ونه ساتل شوې"
-
-#~ msgid "Audio Settings not saved"
-#~ msgstr "د غږيز امستنې ونه ساتل شوې"
-
-#~ msgid " Help "
-#~ msgstr "مرسته"
-
-#~ msgid " Logs "
-#~ msgstr "خبرالونه "
-
-#~ msgid "C&lear"
-#~ msgstr "پ&اکول"
-
-#, fuzzy
-#~ msgid "Message filter"
-#~ msgstr "انځور دوتنه"
-
-#, fuzzy
-#~ msgid "XSPF playlist (*.xspf)"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "M3U8 playlist (*.m3u8)"
-#~ msgstr "غږون لړ ويستل M3U د"
-
-#, fuzzy
-#~ msgid "M3U playlist (*.m3u)"
-#~ msgstr "غږون لړ ويستل M3U د"
-
-#~ msgid "Font Effect"
-#~ msgstr "د ليکبڼې اغېزې"
-
-#, fuzzy
-#~ msgid "OSSO"
-#~ msgstr "OSS"
-
-#, fuzzy
-#~ msgid "Lua Interface Module (shortcuts)"
-#~ msgstr "برسېر رغبېلګه"
-
-#~ msgid "IPv4 SAP"
-#~ msgstr "IPv4 SAP"
-
-#~ msgid "IPv6 SAP"
-#~ msgstr "IPv6 SAP"
-
-#~ msgid "IPv6 SAP scope"
-#~ msgstr "سيمه IPv6 SAP"
-
-#, fuzzy
-#~ msgid "Font size:"
-#~ msgstr "د ليکبڼې کچ"
-
-#, fuzzy
-#~ msgid "Text alignment:"
-#~ msgstr "د اومتوک لورموندنه"
-
-#, fuzzy
-#~ msgid "Color fun"
-#~ msgstr "رنګ"
-
-#, fuzzy
-#~ msgid "Subpicture filters"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Video filters"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Advanced video filter controls"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "SessionManager"
-#~ msgstr "د ناستې نومونه"
-
-#~ msgid "title"
-#~ msgstr "سرليک"
-
-#~ msgid "Key"
-#~ msgstr "کيلۍ"
-
-#~ msgid "Set"
-#~ msgstr "ټاکل"
-
-#, fuzzy
-#~ msgid "SDL video driver name"
-#~ msgstr "د ويډيو وزلې نوم"
-
-#, fuzzy
-#~ msgid "Select the protocol for the URL."
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Select the port used"
-#~ msgstr "_وديو"
-
-#~ msgid "Other codecs"
-#~ msgstr "نور کوډېکونه"
-
-#~ msgid "Advanced open..."
-#~ msgstr "بريونلې پرانيستنه..."
-
-#, fuzzy
-#~ msgid "Fullscreen-only"
-#~ msgstr "يوازې ټوله پرده"
-
-#~ msgid "%.1f kB"
-#~ msgstr "ک ب %.1f"
-
-#~ msgid "CD reading failed"
-#~ msgstr "د سي ډي لوستنه پاتې راغله"
-
-#~ msgid "CDDB"
-#~ msgstr "CDDB"
-
-#~ msgid "CDDB server"
-#~ msgstr "پالنګر CDDB"
-
-#~ msgid "Track %i"
-#~ msgstr "پلنيوی %i"
-
-#~ msgid "Prev Title"
-#~ msgstr "مخکنی سرليک"
-
-#~ msgid "Next Title"
-#~ msgstr "راتلونکی سرليک"
-
-#~ msgid "Go to Chapter"
-#~ msgstr "څپرکي ته تلل"
-
-#~ msgid "Speed"
-#~ msgstr "چټکتيا"
-
-#~ msgid "Select None"
-#~ msgstr "هېڅ ټاکل"
-
-#~ msgid "Remove All"
-#~ msgstr "ټول ړنګول"
-
-#~ msgid "50%"
-#~ msgstr "۵۰٪"
-
-#~ msgid "100%"
-#~ msgstr "۱۰۰٪"
-
-#~ msgid "200%"
-#~ msgstr "۲۰۰٪"
-
-#~ msgid "Check for Updates"
-#~ msgstr "اوسمهالونې کتل"
-
-#~ msgid "Download now"
-#~ msgstr "اوس رالېښل"
-
-#~ msgid "Permissions"
-#~ msgstr "رښتې"
-
-#~ msgid "00:00:00"
-#~ msgstr "۰۰:۰۰:۰۰"
-
-#~ msgid "Port:"
-#~ msgstr "درشل:"
-
-#~ msgid "Address:"
-#~ msgstr "پته:"
-
-#~ msgid "Network: "
-#~ msgstr "ځال:"
-
-#~ msgid "Video:"
-#~ msgstr "ويډيو:"
-
-#~ msgid "Audio:"
-#~ msgstr "غږيز:"
-
-#~ msgid "Channel:"
-#~ msgstr "چېنل:"
-
-#~ msgid "Size:"
-#~ msgstr "کچ:"
-
-#~ msgid "127.0.0.1"
-#~ msgstr "127.0.0.1"
-
-#~ msgid "239.0.0.42"
-#~ msgstr "239.0.0.42"
-
-#~ msgid " Apply "
-#~ msgstr "کارول"
-
-#~ msgid " Cancel "
-#~ msgstr "بندول"
-
-#~ msgid "Preference"
-#~ msgstr "غوراوی"
-
-#, fuzzy
-#~ msgid "Audio Port"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Video Port"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Select play mode"
-#~ msgstr "_وديو"
-
-#~ msgid "Alignment:"
-#~ msgstr "لورموندنه"
-
-#~ msgid "Default volume"
-#~ msgstr "تلواله ډکون"
-
-#~ msgid "Disc Devices"
-#~ msgstr "ټيکلي وزلې"
-
-#~ msgid ""
-#~ "(c) 1996-2008 - the VideoLAN Team\n"
-#~ "\n"
-#~ msgstr ""
-#~ "ډله VideoLAN چاپرښتې ۱۹۹۶-۲۰۰۸ - د\n"
-#~ "\n"
-
-#~ msgid "Open:"
-#~ msgstr "پرانيستل:"
-
-#~ msgid "Choose directory"
-#~ msgstr "پوښۍ ټاکل"
-
-#~ msgid "Old playlist export"
-#~ msgstr "د زوړ غږون لړ ويستل"
-
-#~ msgid "summary"
-#~ msgstr "لنډيز"
-
-#~ msgid "XCB"
-#~ msgstr "XCB"
-
-#, fuzzy
-#~ msgid "Autodetect"
-#~ msgstr "خپلکاری"
-
-#, fuzzy
-#~ msgid "An error occured while saving your settings via SimplePrefs."
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Use a sub&amp;titles file"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "textFormat"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Media &Information..."
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "&Extended Settings..."
-#~ msgstr "_صحيح"
-
-#, fuzzy
-#~ msgid "&About..."
-#~ msgstr "_هكله..."
-
-#, fuzzy
-#~ msgid "&Load Playlist File..."
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Cancelled"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Illegal Polarization"
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Audio method"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "16:9 subtitles"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "2.21:1 subtitles"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Quick Open File..."
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Save As:"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Open playlist file"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Open a VLM Configuration File"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Show P&laylist"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Play&list..."
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "&Preferences..."
-#~ msgstr "_برفرنسس..."
-
-#, fuzzy
-#~ msgid "Point of view x-coordinate"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Point of view y-coordinate"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Point of view z-coordinate"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Quartz video"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Audio CD - Track "
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Seam Carving"
-#~ msgstr "_صحيح"
-
-#, fuzzy
-#~ msgid "A to B"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "&Title"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Undock from Interface"
-#~ msgstr "_صحيح"
-
-#, fuzzy
-#~ msgid "Subscreen height."
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Check for updates..."
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Disk Device"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Skip Frames"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Display Device"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Open..."
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "File:"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Title number."
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "&Simple Add File..."
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "&Add URL..."
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "&Selection"
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "&View items"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "More Information"
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Playing"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Quick &Open File...\tCtrl-O"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Open &File...\tCtrl-F"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Open Dir&ectory...\tCtrl-E"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Open &Disc...\tCtrl-D"
-#~ msgstr "_برفرنسس..."
-
-#, fuzzy
-#~ msgid "&Playlist...\tCtrl-P"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "VideoLAN's Website"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Play faster"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Preference&s...\tCtrl-S"
-#~ msgstr "_برفرنسس..."
-
-#, fuzzy
-#~ msgid "About %s"
-#~ msgstr "_هكله..."
-
-#, fuzzy
-#~ msgid "Media &Info..."
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Distortion"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Video canvas width"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Video canvas height"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Video canvas aspect ratio"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Security options"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Advanced Information"
-#~ msgstr "_نويكيد"
-
-#, fuzzy
-#~ msgid "Find a name"
-#~ msgstr "_فايل"
-
-#, fuzzy
-#~ msgid "Distribution License"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Subtitles preferred language"
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Video Device Name "
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Audio Device Name "
-#~ msgstr "_غر"
-
-#, fuzzy
-#~ msgid "Video Adjustments and Effects"
-#~ msgstr "_وديو"
-
-#, fuzzy
-#~ msgid "Video Monitor"
-#~ msgstr "_وديو"
-
-#~ msgid "_About..."
-#~ msgstr "_هكله..."
-
-#, fuzzy
-#~ msgid "Muxing application"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Choose the program"
-#~ msgstr "د بروكرام وتل"
-
-#, fuzzy
-#~ msgid "_Title"
-#~ msgstr "_فايل"
-
-#~ msgid "_Audio"
-#~ msgstr "_غر"
-
-#~ msgid "_Video"
-#~ msgstr "_وديو"
-
-#~ msgid "_Navigation"
-#~ msgstr "_نويكيد"
-
-#~ msgid "_File"
-#~ msgstr "_فايل"
-
-#~ msgid "Exit the program"
-#~ msgstr "د بروكرام وتل"
-
-#~ msgid "_View"
-#~ msgstr "وكو_ره"
-
-#~ msgid "_Settings"
-#~ msgstr "_صحيح"
-
-#~ msgid "_Preferences..."
-#~ msgstr "_برفرنسس..."
-
-#~ msgid "_Help"
-#~ msgstr "_مرسته"
-
-#~ msgid "About this application"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Quits the application"
-#~ msgstr "د بروكرام به هكله"
-
-#, fuzzy
-#~ msgid "Choose a VLM configuration file to open..."
-#~ msgstr "د بروكرام به هكله"
-
-#~ msgid "Open Subtitles"
-#~ msgstr "څېرمه سرليکونه پرانيستل"
-
-#, fuzzy
-#~ msgid "&Save Playlist..."
-#~ msgstr "_فايل"
