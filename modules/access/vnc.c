@@ -43,6 +43,7 @@
 #include <vlc_meta.h>
 #include <vlc_fourcc.h>
 
+#include <rfb/rfbconfig.h>
 #include <rfb/rfbclient.h>
 
 #define RFB_USER N_("Username")
