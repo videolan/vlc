@@ -76,6 +76,7 @@ static struct {
     { "bn",    "বাংলা" },
     { "pt_BR", "Português Brasileiro" },
     { "en_GB", "British English" },
+    { "my",    "မြန်မာစာ" },
     { "el",    "Νέα Ελληνικά" },
     { "bg",    "български език" },
     { "ca",    "Català" },

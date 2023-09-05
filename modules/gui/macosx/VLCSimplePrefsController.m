@@ -62,6 +62,7 @@ static struct {
     { "bn",    "বাংলা",                   NO },
     { "pt_BR", "Português Brasileiro",  NO },
     { "en_GB", "British English",       NO },
+    { "my",    "မြန်မာစာ",                NO },
     { "el",    "Νέα Ελληνικά",          NO },
     { "bg",    "български език",        NO },
     { "ca",    "Català",                NO },
