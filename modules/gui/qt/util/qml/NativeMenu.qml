@@ -56,7 +56,7 @@ VanillaObject {
 
     property var _effectiveActions: null
 
-    property point _popupPoint: null
+    property point _popupPoint
 
 
     function popup(_indexes, point, _options) {
