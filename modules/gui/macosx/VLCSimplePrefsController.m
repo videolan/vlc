@@ -90,6 +90,7 @@ static struct {
     { "is",    "íslenska",              NO },
     { "id",    "Bahasa Indonesia",      NO },
     { "it",    "Italiano",              NO },
+    { "ie",    "Interlingue",           NO },
     { "ja",    "日本語",                 NO },
     { "ko",    "한국어",                  NO },
     { "lt",    "lietuvių",              NO },

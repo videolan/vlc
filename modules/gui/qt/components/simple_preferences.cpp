@@ -104,6 +104,7 @@ static struct {
     { "is",    "íslenska" },
     { "id",    "Bahasa Indonesia" },
     { "it",    "Italiano" },
+    { "ie",    "Interlingue" },
     { "ja",    "日本語" },
     { "ko",    "한국어" },
     { "lt",    "lietuvių" },
