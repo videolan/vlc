@@ -104,6 +104,7 @@ static struct {
     { "km",    "ភាសាខ្មែរ",                NO },
     { "ne",    "नेपाली",                  NO },
     { "oc",    "Occitan",               NO },
+    { "or_IN", "ଓଡ଼ିଆ",                  NO },
     { "pl",    "Polski",                NO },
     { "pt_PT", "Português",             NO },
     { "pa",    "ਪੰਜਾਬੀ",                  NO },

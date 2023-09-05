@@ -118,6 +118,7 @@ static struct {
     { "km",    "ភាសាខ្មែរ" },
     { "ne",    "नेपाली" },
     { "oc",    "Occitan" },
+    { "or_IN", "ଓଡ଼ିଆ" },
     { "pl",    "Polski" },
     { "pt_PT", "Português" },
     { "pa",    "ਪੰਜਾਬੀ" },
