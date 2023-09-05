@@ -95,6 +95,7 @@ static struct {
     { "ko",    "한국어",                  NO },
     { "lt",    "lietuvių",              NO },
     { "lo",    "ລາວ",                   NO },
+    { "mk",    "македонски",            NO },
     { "ms",    "Melayu",                NO },
     { "nb",    "Bokmål",                NO },
     { "nn",    "Nynorsk",               NO },
