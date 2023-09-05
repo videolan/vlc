@@ -134,8 +134,11 @@ typedef struct vout_display_sys_t {
 static bool vlc_IsLowPowerDevice(GLint renderer_id) {
     int renderer_vendor = renderer_id & kCGLRendererIDMatchingMask;
     // Consider Intel familly card as low power devices.
-    return (renderer_vendor & kRendererIntelFamilyMask) ==
-           kRendererIntelFamilyMask;
+    return renderer_vendor == kCGLRendererIntel900ID ||
+           renderer_vendor == kCGLRendererIntelX3100ID ||
+           renderer_vendor == kCGLRendererIntelHDID ||
+           renderer_vendor == kCGLRendererIntelHD4000ID ||
+           renderer_vendor == kCGLRendererIntelHD5000ID;
 }
 
 /*
