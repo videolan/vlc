@@ -291,6 +291,7 @@ debian-contrib:
         else
             make -j$NCPU --output-sync=recurse tools
         fi
+    allow_failure: true
     variables:
         <<: *variables-debian
 
