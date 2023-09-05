@@ -51,6 +51,8 @@ extern "C" char **environ;
 #include <QMutex>
 #include <QtQuickControls2/QQuickStyle>
 #include <QLoggingCategory>
+#include <QQmlError>
+#include <QList>
 
 #include "qt.hpp"
 
@@ -437,6 +439,8 @@ vlc_module_end ()
 
 /*****************************************/
 
+Q_DECLARE_METATYPE(QQmlError)
+
 /* Ugly, but the Qt interface assumes single instance anyway */
 static qt_intf_t* g_qtIntf = nullptr;
 static vlc::threads::condition_variable wait_ready;
@@ -680,6 +684,7 @@ static inline void registerMetaTypes()
     qRegisterMetaType<DialogId>();
     qRegisterMetaType<MLItemId>();
     qRegisterMetaType<QVector<MLItemId>>();
+    qRegisterMetaType<QList<QQmlError>>();
 }
 
 static void *Thread( void *obj )
