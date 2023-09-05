@@ -1,11 +1,93 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11134" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11134"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LPV-K6-7AE">
+            <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4i7-vw-mgS">
+                    <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="noart" id="QG1-Nw-zvJ"/>
+                </imageView>
+                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" id="U3j-Zx-fFf">
+                    <rect key="frame" x="20" y="20" width="250" height="87"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <subviews>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="kFW-i6-3hg">
+                            <rect key="frame" x="-2" y="59" width="103" height="28"/>
+                            <shadow key="shadow" blurRadius="20">
+                                <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </shadow>
+                            <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Item title" id="0Cs-Ex-sMn">
+                                <font key="font" metaFont="systemBold" size="24"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="aVp-p4-DHX">
+                            <rect key="frame" x="-2" y="34" width="139" height="20"/>
+                            <shadow key="shadow" blurRadius="20">
+                                <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </shadow>
+                            <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Item detail string" id="P7c-bg-dPX">
+                                <font key="font" metaFont="systemSemibold" size="17"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5zZ-VM-Lb9">
+                            <rect key="frame" x="-3" y="-4" width="256" height="36"/>
+                            <buttonCell key="cell" type="bevel" title=" Resume playing" bezelStyle="regularSquare" image="play.circle.fill" catalog="system" imagePosition="leading" alignment="left" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="639-6i-zsD">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="systemMedium" size="17"/>
+                            </buttonCell>
+                            <color key="bezelColor" name="VLCAccentColor"/>
+                            <color key="contentTintColor" name="VLCAccentColor"/>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="5zZ-VM-Lb9" secondAttribute="trailing" id="2eF-oY-rR1"/>
+                        <constraint firstItem="5zZ-VM-Lb9" firstAttribute="leading" secondItem="U3j-Zx-fFf" secondAttribute="leading" id="8fY-R2-NIT"/>
+                        <constraint firstAttribute="bottom" secondItem="5zZ-VM-Lb9" secondAttribute="bottom" id="yDI-oU-4c7"/>
+                    </constraints>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="width" secondItem="LPV-K6-7AE" secondAttribute="height" multiplier="21:9" id="2HS-zo-d22"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" id="6V4-23-2nu"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" id="7RZ-4u-Dvx"/>
+                <constraint firstItem="U3j-Zx-fFf" firstAttribute="width" secondItem="4i7-vw-mgS" secondAttribute="width" multiplier="0.3" id="Q8f-fz-S0F"/>
+                <constraint firstAttribute="right" secondItem="4i7-vw-mgS" secondAttribute="right" id="bzL-Cs-La7"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="top" relation="greaterThanOrEqual" secondItem="U3j-Zx-fFf" secondAttribute="top" priority="999" constant="20" id="cho-bE-TzG"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="leading" secondItem="U3j-Zx-fFf" secondAttribute="leading" priority="999" constant="20" id="e6e-pV-pUJ"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="bottom" secondItem="LPV-K6-7AE" secondAttribute="bottom" priority="999" id="r6b-1g-CZ4"/>
+                <constraint firstItem="4i7-vw-mgS" firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" priority="999" constant="20" id="si2-q6-ran"/>
+            </constraints>
+            <point key="canvasLocation" x="260" y="95"/>
+        </customView>
     </objects>
+    <resources>
+        <image name="noart" width="128" height="128"/>
+        <image name="play.circle.fill" catalog="system" width="15" height="15"/>
+        <namedColor name="VLCAccentColor">
+            <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
 </document>
