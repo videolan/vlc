@@ -1,0 +1,170 @@
+From ed84d209bae973cd29b94f111749b1c003e05601 Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+Date: Sat, 21 Feb 2026 15:17:26 +0100
+Subject: [PATCH] CMake: use Requires: for .pc generation (don't parse link
+ flags)
+
+Instead of trying to translate/parse the INTERFACE link flags from CMake
+to the .pc file, make use of the more native-to-pkg-config "Requires"
+and "Requires.private", so that we can refer to the whole dependent .pc
+pacakge name.
+
+This fixes static linking when the dependencies of static libraries are
+also static, and allows for using pkg-config all the way down.
+
+When sasl and zlib are found, Rfb public headers also include headers
+from these libraries so they are the only ones listed in "Requires".
+The others can be in "Requires.private".
+
+Signed-off-by: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+---
+ CMakeLists.txt                           | 36 ++++++++----------------
+ src/libvncclient/libvncclient.pc.cmakein |  6 ++--
+ src/libvncserver/libvncserver.pc.cmakein |  5 ++--
+ 3 files changed, 15 insertions(+), 32 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d9cbfda7..c86fb6fa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -281,6 +281,7 @@ if(SYSTEMD_FOUND)
+   add_definitions(-DLIBVNCSERVER_WITH_SYSTEMD)
+   include_directories(${SYSTEMD_INCLUDE_DIRS})
+   set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${SYSTEMD_LIBRARIES})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE libsystemd)
+ endif(SYSTEMD_FOUND)
+ 
+ # common crypto used by both libvncserver and libvncclient
+@@ -288,6 +289,7 @@ if(WITH_GCRYPT AND LIBGCRYPT_LIBRARIES)
+   message(STATUS "Building crypto with Libgcrypt")
+   set(CRYPTO_LIBRARIES ${LIBGCRYPT_LIBRARIES})
+   set(CRYPTO_SOURCES ${COMMON_DIR}/crypto_libgcrypt.c)
++  list(APPEND LIBVNC_REQUIRES_PRIVATE libgcrypt)
+ elseif(OPENSSL_FOUND)
+   message(STATUS "Building crypto with OpenSSL")
+   set(CRYPTO_LIBRARIES ${OPENSSL_LIBRARIES})
+@@ -378,6 +380,7 @@ if(WITH_SASL AND LIBSASL2_LIBRARIES AND SASL2_INCLUDE_DIR)
+   set(LIBVNCSERVER_HAVE_SASL 1)
+   set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${LIBSASL2_LIBRARIES})
+   include_directories(${SASL2_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES sasl)
+ endif(WITH_SASL AND LIBSASL2_LIBRARIES AND SASL2_INCLUDE_DIR)
+ 
+ # TODO:
+@@ -439,6 +442,7 @@ if(GNUTLS_FOUND)
+     ${LIBVNCSERVER_DIR}/rfbssl_gnutls.c
+     )
+   include_directories(${GNUTLS_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE gnutls)
+ elseif(OPENSSL_FOUND)
+   message(STATUS "Building TLS with OpenSSL")
+   set(LIBVNCCLIENT_SOURCES
+@@ -450,6 +454,7 @@ elseif(OPENSSL_FOUND)
+     ${LIBVNCSERVER_DIR}/rfbssl_openssl.c
+   )
+   include_directories(${OPENSSL_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE openssl)
+ else()
+   message(STATUS "Building without TLS")
+   set(LIBVNCCLIENT_SOURCES
+@@ -472,6 +477,7 @@ endif()
+ if(ZLIB_FOUND)
+   add_definitions(-DLIBVNCSERVER_HAVE_LIBZ)
+   include_directories(${ZLIB_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES zlib)
+   set(LIBVNCSERVER_SOURCES
+     ${LIBVNCSERVER_SOURCES}
+     ${LIBVNCSERVER_DIR}/zlib.c
+@@ -484,6 +490,7 @@ endif(ZLIB_FOUND)
+ if(LZO_FOUND)
+   add_definitions(-DLIBVNCSERVER_HAVE_LZO)
+   include_directories(${LZO_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE lzo2)
+ else()
+   set(LIBVNCSERVER_SOURCES
+     ${LIBVNCSERVER_SOURCES}
+@@ -498,6 +505,7 @@ endif()
+ if(JPEG_FOUND)
+   add_definitions(-DLIBVNCSERVER_HAVE_LIBJPEG)
+   include_directories(${JPEG_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE libjpeg)
+   if(PNG_FOUND OR ZLIB_FOUND)
+     set(TIGHT_C ${LIBVNCSERVER_DIR}/tight.c ${COMMON_DIR}/turbojpeg.c)
+   endif(PNG_FOUND OR ZLIB_FOUND)
+@@ -506,6 +514,7 @@ endif(JPEG_FOUND)
+ if(PNG_FOUND)
+   add_definitions(-DLIBVNCSERVER_HAVE_LIBPNG)
+   include_directories(${PNG_INCLUDE_DIR})
++  list(APPEND LIBVNC_REQUIRES_PRIVATE libpng)
+ endif(PNG_FOUND)
+ 
+ set(LIBVNCSERVER_SOURCES
+@@ -768,32 +777,9 @@ endif(LIBVNCSERVER_WITH_WEBSOCKETS)
+ 
+ endif(WITH_TESTS)
+ 
+-#
+-# this gets the libraries needed by TARGET in "-libx -liby ..." form
+-#
+-function(get_link_libraries OUT TARGET)
+-    set(RESULT "")
+-    get_target_property(LIBRARIES ${TARGET} INTERFACE_LINK_LIBRARIES)
+-    foreach(LIB ${LIBRARIES})
+-	if("${LIB}" MATCHES ".*NOTFOUND.*")
+-	    continue()
+-	endif()
+-	string(REGEX REPLACE "^.*/lib" "" LIB ${LIB}) # remove leading path and "lib" name prefix
+-	string(REGEX REPLACE "-l" "" LIB ${LIB}) # remove leading -l
+-	string(REGEX REPLACE "\\.so$" "" LIB ${LIB}) # remove trailing .so
+-	list(APPEND RESULT "-l${LIB}")
+-    endforeach()
+-    list(REMOVE_DUPLICATES RESULT)
+-    string(CONCAT RESULT ${RESULT}) # back to string
+-    if(RESULT)
+-	string(REPLACE "-l" " -l" RESULT ${RESULT}) # re-add separators
+-    endif(RESULT)
+-    set(${OUT} ${RESULT} PARENT_SCOPE)
+-endfunction()
+-
+-get_link_libraries(PRIVATE_LIBS vncserver)
++string(REPLACE ";" " " LIBVNC_REQUIRES "${LIBVNC_REQUIRES}")
++string(REPLACE ";" " " LIBVNC_REQUIRES_PRIVATE "${LIBVNC_REQUIRES_PRIVATE}")
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libvncserver/libvncserver.pc.cmakein ${CMAKE_CURRENT_BINARY_DIR}/libvncserver.pc @ONLY)
+-get_link_libraries(PRIVATE_LIBS vncclient)
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libvncclient/libvncclient.pc.cmakein ${CMAKE_CURRENT_BINARY_DIR}/libvncclient.pc @ONLY)
+ 
+ if(LIBVNCSERVER_INSTALL)
+diff --git a/src/libvncclient/libvncclient.pc.cmakein b/src/libvncclient/libvncclient.pc.cmakein
+index ceeda39d..3f121d71 100644
+--- a/src/libvncclient/libvncclient.pc.cmakein
++++ b/src/libvncclient/libvncclient.pc.cmakein
+@@ -6,9 +6,7 @@ includedir=@CMAKE_INSTALL_PREFIX@/include
+ Name: LibVNCClient
+ Description: A library for easy implementation of a VNC client.
+ Version: @LibVNCServer_VERSION@
+-Requires:
+-Requires.private:
++Requires: @LIBVNC_REQUIRES@
++Requires.private: @LIBVNC_REQUIRES_PRIVATE@
+ Libs: -L${libdir} -lvncclient
+-Libs.private: @PRIVATE_LIBS@
+ Cflags: -I${includedir}
+-
+diff --git a/src/libvncserver/libvncserver.pc.cmakein b/src/libvncserver/libvncserver.pc.cmakein
+index 33ec6685..b491240f 100644
+--- a/src/libvncserver/libvncserver.pc.cmakein
++++ b/src/libvncserver/libvncserver.pc.cmakein
+@@ -6,8 +6,7 @@ includedir=@CMAKE_INSTALL_PREFIX@/include
+ Name: LibVNCServer
+ Description: A library for easy implementation of a VNC server.
+ Version: @LibVNCServer_VERSION@
+-Requires:
+-Requires.private:
++Requires: @LIBVNC_REQUIRES@
++Requires.private: @LIBVNC_REQUIRES_PRIVATE@
+ Libs: -L${libdir} -lvncserver
+-Libs.private: @PRIVATE_LIBS@
+ Cflags: -I${includedir}
+-- 
+2.43.0
+
