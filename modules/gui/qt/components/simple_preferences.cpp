@@ -125,6 +125,7 @@ static struct {
     { "ro",    "Română" },
     { "ru",    "Русский" },
     { "zh_CN", "简体中文" },
+    { "sm",    "Gagana Sāmoa" },
     { "si",    "සිංහල" },
     { "sr",    "српски" },
     { "sk",    "Slovensky" },

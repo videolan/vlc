@@ -111,6 +111,7 @@ static struct {
     { "ro",    "Română",                NO },
     { "ru",    "Русский",               NO },
     { "zh_CN", "简体中文",                NO },
+    { "sm",    "Gagana Sāmoa",          NO },
     { "si",    "සිංහල",                   NO },
     { "sr",    "српски",                NO },
     { "sk",    "Slovensky",             NO },
