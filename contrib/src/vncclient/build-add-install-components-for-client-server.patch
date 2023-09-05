@@ -1,0 +1,91 @@
+From f1c9d1d63455e18f2c74eb95ed6c2f9003239d83 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Tue, 5 Sep 2023 03:12:16 +0200
+Subject: [PATCH] build: add install components for client/server
+
+This allows to install only the client or only
+the server.
+---
+ CMakeLists.txt | 54 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 39 insertions(+), 15 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ab5c34f4..53ab9352 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -761,25 +761,44 @@ if(LIBVNCSERVER_INSTALL)
+     
+     set_property(TARGET vncclient PROPERTY PUBLIC_HEADER ${INSTALL_HEADER_FILES})
+     set_property(TARGET vncserver PROPERTY PUBLIC_HEADER ${INSTALL_HEADER_FILES})
+-    if(WIN32)
+-        INSTALL(TARGETS vncclient vncserver
++
++    INSTALL(TARGETS vncclient
+             EXPORT LibVNCServerTargets
+-            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+-            LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
+-            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rfb
+-            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++            RUNTIME
++              DESTINATION "${CMAKE_INSTALL_BINDIR}"
++              COMPONENT vncclient
++            LIBRARY
++              DESTINATION "$<IF:${WIN32},${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}>"
++              COMPONENT vncclient
++            ARCHIVE
++              DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++              COMPONENT vncclient
++            PUBLIC_HEADER
++              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rfb
++              COMPONENT vncclient
++            INCLUDES
++              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++              COMPONENT vncclient
+             )
+-    else()
+-        INSTALL(TARGETS vncclient vncserver
++
++    INSTALL(TARGETS vncserver
+             EXPORT LibVNCServerTargets
+-            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+-            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rfb
+-            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++            RUNTIME
++              DESTINATION "${CMAKE_INSTALL_BINDIR}"
++              COMPONENT vncserver
++            LIBRARY
++              DESTINATION "$<IF:${WIN32},${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}>"
++              COMPONENT vncserver
++            ARCHIVE
++              DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++              COMPONENT vncserver
++            PUBLIC_HEADER
++              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rfb
++              COMPONENT vncserver
++            INCLUDES
++              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++              COMPONENT vncserver
+             )
+-    endif()
+     
+     # Install cmake configure files
+     install(EXPORT LibVNCServerTargets
+@@ -807,7 +826,12 @@ if(LIBVNCSERVER_INSTALL)
+   
+     install(FILES
+         ${CMAKE_CURRENT_BINARY_DIR}/libvncserver.pc
++        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
++        COMPONENT vncserver
++        )
++    install(FILES
+         ${CMAKE_CURRENT_BINARY_DIR}/libvncclient.pc
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
++        COMPONENT vncclient
+         )
+ endif()
+-- 
+2.39.2
+
