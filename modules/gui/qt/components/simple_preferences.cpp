@@ -86,6 +86,7 @@ static struct {
     { "da",    "Dansk" },
     { "nl",    "Nederlands" },
     { "fi",    "Suomi" },
+    { "eo",    "Esperanto" },
     { "et",    "eesti keel" },
     { "eu",    "Euskara" },
     { "fr",    "Français" },

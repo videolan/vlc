@@ -72,6 +72,7 @@ static struct {
     { "da",    "Dansk",                 NO },
     { "nl",    "Nederlands",            NO },
     { "fi",    "Suomi",                 NO },
+    { "eo",    "Esperanto",             NO },
     { "et",    "eesti keel",            NO },
     { "eu",    "Euskara",               NO },
     { "fr",    "Français",              NO },
