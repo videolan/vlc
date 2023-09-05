@@ -257,6 +257,13 @@ debian-contrib:
     extends: .base-template
     image:
         name: $VLC_DEBIAN_IMAGE
+    rules:
+      - changes:
+        # should match get-contrib-sha.sh
+        - contrib/**/*
+        - contrib/*
+        - extras/tools/*
+        - extras/ci/*
     script: |
         export NCPU=$(getconf _NPROCESSORS_ONLN)
         echo "Building branch '${CI_COMMIT_BRANCH}' (default: '${CI_DEFAULT_BRANCH}')"
