@@ -56,6 +56,9 @@ Misc:
  * Fix several crashes and bugs in the macOS preferences panel
  * Improvements on the threading of the MMDevice audio output on Windows
 
+Translations:
+ * Update of most translations
+ * New translations to Esperanto, Interlingue, Lao, Macedonian, Burmese, Odia, Samoan and Swahili
 
 Changes between 3.0.18-rc2 and 3.0.18:
 --------------------------------------
