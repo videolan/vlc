@@ -331,6 +331,7 @@
 		539F116A29F9756000F13460 /* VLCMainVideoViewAudioMediaDecorativeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMainVideoViewAudioMediaDecorativeView.xib; sourceTree = "<group>"; };
 		539F116B29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainVideoViewAudioMediaDecorativeView.h; sourceTree = "<group>"; };
 		539F116C29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainVideoViewAudioMediaDecorativeView.m; sourceTree = "<group>"; };
+		53B40FD42AA7618000C814E4 /* VLCLibraryHeroView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryHeroView.xib; sourceTree = "<group>"; };
 		53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySongsTableViewSongPlayingTableCellView.h; sourceTree = "<group>"; };
 		53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySongsTableViewSongPlayingTableCellView.m; sourceTree = "<group>"; };
 		53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewContainerView.m; sourceTree = "<group>"; };
@@ -1843,6 +1844,7 @@
 				536283FB2911476A00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib */,
 				7D0F64052202047900FDB91F /* VLCLibraryCollectionViewItem.xib */,
 				536283FC2911476A00640C15 /* VLCLibraryCollectionViewMediaItemSupplementaryDetailView.xib */,
+				53B40FD42AA7618000C814E4 /* VLCLibraryHeroView.xib */,
 				536283FA2911476A00640C15 /* VLCLibrarySongTableCellView.xib */,
 				7DE2F0482282D7980040DD0A /* VLCLibraryTableCellView.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,

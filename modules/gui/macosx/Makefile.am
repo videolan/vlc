@@ -410,6 +410,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.xib \
+	gui/macosx/UI/VLCLibraryHeroView.xib \
 	gui/macosx/UI/VLCLibrarySongTableCellView.xib \
 	gui/macosx/UI/VLCMainVideoView.xib \
 	gui/macosx/UI/VLCMainVideoViewAudioMediaDecorativeView.xib \
