@@ -339,6 +339,16 @@ public:
         data = CPicture::getLine<1>(0);
         switch (fmt->i_chroma)
         {
+        case VLC_CODEC_RGB565:
+            rmask = 0xf800;
+            gmask = 0x07e0;
+            bmask = 0x001f;
+            break;
+        case VLC_CODEC_BGR565:
+            bmask = 0xf800;
+            gmask = 0x07e0;
+            rmask = 0x001f;
+            break;
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB15:
             rmask = fmt->i_rmask;
@@ -474,6 +484,16 @@ struct convertRgbToRgbSmall {
         uint32_t rmask, gmask, bmask;
         switch (dst->i_chroma)
         {
+        case VLC_CODEC_RGB565:
+            rmask = 0xf800;
+            gmask = 0x07e0;
+            bmask = 0x001f;
+            break;
+        case VLC_CODEC_BGR565:
+            bmask = 0xf800;
+            gmask = 0x07e0;
+            rmask = 0x001f;
+            break;
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB15:
             rmask = dst->i_rmask;
@@ -600,6 +620,8 @@ static const struct {
 
     RGB(VLC_CODEC_RGB15,    CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB16,    CPictureRGB16,    convertRgbToRgbSmall),
+    RGB(VLC_CODEC_RGB565,   CPictureRGB16,    convertRgbToRgbSmall),
+    RGB(VLC_CODEC_BGR565,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB24,    CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_BGR24,    CPictureRGB24,    convertNone),
     RGB(VLC_CODEC_RGBA,     CPictureRGBA,     convertNone),
