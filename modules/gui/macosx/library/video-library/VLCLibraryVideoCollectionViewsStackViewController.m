@@ -40,6 +40,7 @@
 @interface VLCLibraryVideoCollectionViewsStackViewController()
 {
     NSArray *_collectionViewContainers;
+    NSUInteger _leadingContainerCount;
 }
 @end
 
@@ -66,6 +67,7 @@
                                 name:VLCLibraryModelRecentsMediaItemDeleted
                                 object:nil];
 
+    _leadingContainerCount = 0;
     [self generateCollectionViewContainers];
 }
 
@@ -92,9 +94,10 @@
     if (shouldShowRecentsContainer) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = VLCLibraryVideoRecentsGroup;
-        [mutableContainers insertObject:containerView atIndex:0];
+        // Insert at top after leading containers, hence _leadingContainerCount
+        [mutableContainers insertObject:containerView atIndex:_leadingContainerCount];
 
-        [_collectionsStackView insertArrangedSubview:containerView atIndex:0];
+        [_collectionsStackView insertArrangedSubview:containerView atIndex:_leadingContainerCount];
         [self setupContainerView:containerView forStackView:_collectionsStackView];
     } else {
         [mutableContainers removeObjectAtIndex:recentsContainerIndex];
