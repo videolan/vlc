@@ -303,7 +303,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, con
         final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE_10B;
     else
         final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE;
-    final_fmt.i_rmask = final_fmt.i_gmask = final_fmt.i_bmask = 0;
     err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &final_fmt, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
