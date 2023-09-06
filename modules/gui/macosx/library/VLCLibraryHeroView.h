@@ -24,12 +24,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol VLCMediaLibraryItemProtocol;
+
 @interface VLCLibraryHeroView : NSView
 
 @property (readwrite) IBOutlet NSImageView *largeImageView;
 @property (readwrite) IBOutlet NSTextField *titleTextField;
 @property (readwrite) IBOutlet NSTextField *detailTextField;
 @property (readwrite) IBOutlet NSButton *playButton;
+
+@property (readwrite, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 
 + (instancetype)fromNibWithOwner:(id)owner;
 

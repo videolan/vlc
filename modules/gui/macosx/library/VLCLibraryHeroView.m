@@ -24,6 +24,9 @@
 
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
+
 @implementation VLCLibraryHeroView
 
 + (instancetype)fromNibWithOwner:(id)owner
@@ -31,6 +34,25 @@
     return (VLCLibraryHeroView*)[NSView fromNibNamed:@"VLCLibraryHeroView"
                                                      withClass:VLCLibraryHeroView.class
                                                      withOwner:owner];
+}
+
+- (void)updateRepresentedItem
+{
+    NSAssert(self.representedItem != nil, @"Should not update nil represented item!");
+    self.largeImageView.image = [VLCLibraryImageCache thumbnailForLibraryItem:self.representedItem];
+    self.titleTextField.stringValue = self.representedItem.displayString;
+    self.detailTextField.stringValue = self.representedItem.detailString;
+}
+
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
+{
+    NSParameterAssert(representedItem != nil);
+    if (representedItem == self.representedItem) {
+        return;
+    }
+
+    _representedItem = representedItem;
+    [self updateRepresentedItem];
 }
 
 @end
