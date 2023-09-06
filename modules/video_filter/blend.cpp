@@ -331,21 +331,33 @@ private:
 
 class CPictureRGB16 : public CPicture {
 private:
+    uint32_t rmask, gmask, bmask;
     unsigned rshift, gshift, bshift;
 public:
     CPictureRGB16(const CPicture &cfg) : CPicture(cfg)
     {
         data = CPicture::getLine<1>(0);
-        rshift = vlc_ctz(fmt->i_rmask);
-        gshift = vlc_ctz(fmt->i_gmask);
-        bshift = vlc_ctz(fmt->i_bmask);
+        switch (fmt->i_chroma)
+        {
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB15:
+            rmask = fmt->i_rmask;
+            gmask = fmt->i_gmask;
+            bmask = fmt->i_bmask;
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+        rshift = vlc_ctz(rmask);
+        gshift = vlc_ctz(gmask);
+        bshift = vlc_ctz(bmask);
     }
     void get(CPixel *px, unsigned dx, bool = true) const
     {
         const uint16_t data = *getPointer(dx);
-        px->i = (data & fmt->i_rmask) >> rshift;
-        px->j = (data & fmt->i_gmask) >> gshift;
-        px->k = (data & fmt->i_bmask) >> bshift;
+        px->i = (data & rmask) >> rshift;
+        px->j = (data & gmask) >> gshift;
+        px->k = (data & bmask) >> bshift;
     }
     void merge(unsigned dx, const CPixel &spx, unsigned a, bool full)
     {
