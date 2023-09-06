@@ -808,9 +808,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 #endif
                 )
         {
-            const vlc_fourcc_t *list = vlc_fourcc_IsYUV(vd->source->i_chroma) ?
-                        vlc_fourcc_GetYUVFallback(vd->source->i_chroma) :
-                        vlc_fourcc_GetRGBFallback(vd->source->i_chroma);
+            const vlc_fourcc_t *list = vlc_fourcc_GetFallback(vd->source->i_chroma);
             for (unsigned i = 0; list[i] != 0; i++) {
                 fmt.i_chroma = list[i];
                 if (fmt.i_chroma == vd->source->i_chroma)
