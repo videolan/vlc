@@ -570,9 +570,6 @@ typedef struct
     uint32_t v4l2;
     vlc_fourcc_t vlc; /**< VLC FOURCC, 0 if muxed bitstream */
     uint8_t bpp; /**< Bytes per pixel (first plane) */
-    uint32_t red;
-    uint32_t green;
-    uint32_t blue;
 } vlc_v4l2_fmt_t;
 
 /* NOTE: Currently vlc_v4l2_fmt_rank() assumes format are sorted in order of
@@ -580,26 +577,26 @@ typedef struct
 static const vlc_v4l2_fmt_t v4l2_fmts[] =
 {
     /* Planar YUV 4:2:0 */
-    { V4L2_PIX_FMT_YUV420,  VLC_CODEC_I420, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_YVU420,  VLC_CODEC_YV12, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_YUV422P, VLC_CODEC_I422, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV420,  VLC_CODEC_I420, 1 },
+    { V4L2_PIX_FMT_YVU420,  VLC_CODEC_YV12, 1 },
+    { V4L2_PIX_FMT_YUV422P, VLC_CODEC_I422, 1 },
     /* Packed YUV 4:2:2 */
-    { V4L2_PIX_FMT_YUYV,    VLC_CODEC_YUYV, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_UYVY,    VLC_CODEC_UYVY, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_YVYU,    VLC_CODEC_YVYU, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_VYUY,    VLC_CODEC_VYUY, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUYV,    VLC_CODEC_YUYV, 2 },
+    { V4L2_PIX_FMT_UYVY,    VLC_CODEC_UYVY, 2 },
+    { V4L2_PIX_FMT_YVYU,    VLC_CODEC_YVYU, 2 },
+    { V4L2_PIX_FMT_VYUY,    VLC_CODEC_VYUY, 2 },
 
-    { V4L2_PIX_FMT_YUV411P, VLC_CODEC_I411, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV411P, VLC_CODEC_I411, 1 },
 
-    { V4L2_PIX_FMT_YUV410,  VLC_CODEC_I410, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_YUV410,  VLC_CODEC_I410, 1 },
 //  { V4L2_PIX_FMT_YVU410     },
 
-    { V4L2_PIX_FMT_NV24,    VLC_CODEC_NV24, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_NV42,    VLC_CODEC_NV42, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_NV16,    VLC_CODEC_NV16, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_NV61,    VLC_CODEC_NV61, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_NV12,    VLC_CODEC_NV12, 1, 0, 0, 0 },
-    { V4L2_PIX_FMT_NV21,    VLC_CODEC_NV21, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV24,    VLC_CODEC_NV24, 1 },
+    { V4L2_PIX_FMT_NV42,    VLC_CODEC_NV42, 1 },
+    { V4L2_PIX_FMT_NV16,    VLC_CODEC_NV16, 1 },
+    { V4L2_PIX_FMT_NV61,    VLC_CODEC_NV61, 1 },
+    { V4L2_PIX_FMT_NV12,    VLC_CODEC_NV12, 1 },
+    { V4L2_PIX_FMT_NV21,    VLC_CODEC_NV21, 1 },
 
     /* V4L2-documented but VLC-unsupported misc. YUV formats */
 //  { V4L2_PIX_FMT_Y41P       },
@@ -607,28 +604,28 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
 //  { V4L2_PIX_FMT_M420,      },
 
     /* Packed RGB */
-    { V4L2_PIX_FMT_ABGR32,   VLC_CODEC_BGRA, 4, 0, 0, 0 },
-    { V4L2_PIX_FMT_ARGB32,   VLC_CODEC_ARGB, 4, 0, 0, 0 },
+    { V4L2_PIX_FMT_ABGR32,   VLC_CODEC_BGRA, 4 },
+    { V4L2_PIX_FMT_ARGB32,   VLC_CODEC_ARGB, 4 },
 
-    { V4L2_PIX_FMT_XBGR32,   VLC_CODEC_BGRX, 4, 0, 0, 0 },
-    { V4L2_PIX_FMT_XRGB32,   VLC_CODEC_XRGB, 4, 0, 0, 0 },
+    { V4L2_PIX_FMT_XBGR32,   VLC_CODEC_BGRX, 4 },
+    { V4L2_PIX_FMT_XRGB32,   VLC_CODEC_XRGB, 4 },
 
-    { V4L2_PIX_FMT_RGB24,   VLC_CODEC_RGB24, 3, 0, 0, 0 },
-    { V4L2_PIX_FMT_BGR24,   VLC_CODEC_BGR24, 3, 0, 0, 0 },
+    { V4L2_PIX_FMT_RGB24,   VLC_CODEC_RGB24, 3 },
+    { V4L2_PIX_FMT_BGR24,   VLC_CODEC_BGR24, 3 },
 
-    { V4L2_PIX_FMT_RGB565,   VLC_CODEC_RGB565LE, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_RGB565X,  VLC_CODEC_RGB565BE, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_RGB565,   VLC_CODEC_RGB565LE, 2 },
+    { V4L2_PIX_FMT_RGB565X,  VLC_CODEC_RGB565BE, 2 },
 
-    { V4L2_PIX_FMT_XRGB555,  VLC_CODEC_RGB555LE, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_XRGB555X, VLC_CODEC_RGB555BE, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_XRGB555,  VLC_CODEC_RGB555LE, 2 },
+    { V4L2_PIX_FMT_XRGB555X, VLC_CODEC_RGB555BE, 2  },
 
-    // { V4L2_PIX_FMT_ARGB555,  VLC_CODEC_RGB555LE, 2, 0, 0, 0 },
-    // { V4L2_PIX_FMT_ARGB555X, VLC_CODEC_RGB555BE, 2, 0, 0, 0 },
+    // { V4L2_PIX_FMT_ARGB555,  VLC_CODEC_RGB555LE, 2 },
+    // { V4L2_PIX_FMT_ARGB555X, VLC_CODEC_RGB555BE, 2 },
 
-    // { V4L2_PIX_FMT_RGB555,   VLC_CODEC_RGB555LE, 2, 0, 0, 0 },
-    // { V4L2_PIX_FMT_RGB555X,  VLC_CODEC_RGB555BE, 2, 0, 0, 0 },
+    // { V4L2_PIX_FMT_RGB555,   VLC_CODEC_RGB555LE, 2 },
+    // { V4L2_PIX_FMT_RGB555X,  VLC_CODEC_RGB555BE, 2 },
 
-    { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB332,  1, 0, 0, 0 },
+    { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB332,  1 },
 
     /* Bayer (sub-sampled RGB). Not supported. */
 //  { V4L2_PIX_FMT_SBGGR16,  }
@@ -646,29 +643,29 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
 //  { V4L2_PIX_FMT_SRGGB8,   }
 
     /* Compressed data types */
-    { V4L2_PIX_FMT_JPEG,    VLC_CODEC_MJPG, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_H264,    VLC_CODEC_H264, 0, 0, 0, 0 },
+    { V4L2_PIX_FMT_JPEG,    VLC_CODEC_MJPG, 0 },
+    { V4L2_PIX_FMT_H264,    VLC_CODEC_H264, 0 },
     /* FIXME: fill p_extra for avc1... */
-//  { V4L2_PIX_FMT_H264_NO_SC, VLC_FOURCC('a','v','c','1'), 0, 0, 0, 0 }
-    { V4L2_PIX_FMT_MPEG4,   VLC_CODEC_MP4V, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_XVID,    VLC_CODEC_MP4V, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_H263,    VLC_CODEC_H263, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_MPEG2,   VLC_CODEC_MPGV, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_MPEG1,   VLC_CODEC_MPGV, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_VC1_ANNEX_G, VLC_CODEC_VC1, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_VC1_ANNEX_L, VLC_CODEC_VC1, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_MPEG,    0,              0, 0, 0, 0 },
+//  { V4L2_PIX_FMT_H264_NO_SC, VLC_FOURCC('a','v','c','1'), 0 }
+    { V4L2_PIX_FMT_MPEG4,   VLC_CODEC_MP4V, 0 },
+    { V4L2_PIX_FMT_XVID,    VLC_CODEC_MP4V, 0 },
+    { V4L2_PIX_FMT_H263,    VLC_CODEC_H263, 0 },
+    { V4L2_PIX_FMT_MPEG2,   VLC_CODEC_MPGV, 0 },
+    { V4L2_PIX_FMT_MPEG1,   VLC_CODEC_MPGV, 0 },
+    { V4L2_PIX_FMT_VC1_ANNEX_G, VLC_CODEC_VC1, 0 },
+    { V4L2_PIX_FMT_VC1_ANNEX_L, VLC_CODEC_VC1, 0 },
+    { V4L2_PIX_FMT_MPEG,    0,              0 },
 
     /* Reserved formats */
-    { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0, 0, 0, 0 },
-    { V4L2_PIX_FMT_DV,      0,              0, 0, 0, 0 },
+    { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0 },
+    { V4L2_PIX_FMT_DV,      0,              0 },
 
     /* Grey scale */
-    { V4L2_PIX_FMT_Y16,     VLC_CODEC_GREY_16L, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_Y12,     VLC_CODEC_GREY_12L, 2, 0, 0, 0 },
-    { V4L2_PIX_FMT_Y10,     VLC_CODEC_GREY_10L, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_Y16,     VLC_CODEC_GREY_16L, 2 },
+    { V4L2_PIX_FMT_Y12,     VLC_CODEC_GREY_12L, 2 },
+    { V4L2_PIX_FMT_Y10,     VLC_CODEC_GREY_10L, 2 },
 //  { V4L2_PIX_FMT_Y10BPACK,  },
-    { V4L2_PIX_FMT_GREY,    VLC_CODEC_GREY, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_GREY,    VLC_CODEC_GREY, 1 },
 };
 
 static const vlc_v4l2_fmt_t *vlc_from_v4l2_fourcc (uint32_t fourcc)
@@ -843,9 +840,9 @@ int SetupVideo(vlc_object_t *obj, int fd, uint32_t caps,
     /* Setup our unique elementary (video) stream format */
     es_format_Init(es_fmt, VIDEO_ES, selected->vlc);
     es_fmt->video.i_chroma = selected->vlc;
-    es_fmt->video.i_rmask = selected->red;
-    es_fmt->video.i_gmask = selected->green;
-    es_fmt->video.i_bmask = selected->blue;
+    es_fmt->video.i_rmask = 0;
+    es_fmt->video.i_gmask = 0;
+    es_fmt->video.i_bmask = 0;
     es_fmt->video.i_visible_width = fmt.fmt.pix.width;
     if (fmt.fmt.pix.bytesperline != 0 && selected->bpp != 0)
         es_fmt->video.i_width = fmt.fmt.pix.bytesperline / selected->bpp;
