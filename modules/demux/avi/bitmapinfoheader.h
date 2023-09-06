@@ -222,7 +222,13 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
     }
     else /* Compressed codecs */
     {
-        fmt->i_codec = vlc_fourcc_GetCodec( VIDEO_ES, p_bih->biCompression );
+        vlc_fourcc_t fcc;
+        /* Shitty VLC muxed files storing chroma in biCompression */
+        if (p_bih->biCompression == VLC_FOURCC('R','V','3','2'))
+            fcc = VLC_CODEC_XRGB;
+        else
+            fcc = p_bih->biCompression;
+        fmt->i_codec = vlc_fourcc_GetCodec( VIDEO_ES, fcc );
 
         /* Copy extradata if any */
         if( i_bihextra > 0 )
@@ -234,11 +240,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
             memcpy( fmt->p_extra, p_bihextra, i_bihextra );
         }
 
-        /* Shitty VLC muxed files storing chroma in biCompression */
-        if (p_bih->biCompression == VLC_FOURCC('R','V','3','2'))
-            fmt->i_codec = VLC_CODEC_BGRX;
-        else
-            SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+        SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
     }
 
     video_format_Setup( &fmt->video, fmt->i_codec,
