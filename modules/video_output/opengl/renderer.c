@@ -180,9 +180,15 @@ opengl_link_program(struct vlc_gl_filter *filter)
     const opengl_vtable_t *vt = renderer->vt;
 
     static const char *const VERTEX_SHADER_BODY =
-        "attribute vec2 PicCoordsIn;\n"
-        "varying vec2 PicCoords;\n"
-        "attribute vec3 VertexPosition;\n"
+        "#if __VERSION__ < 300\n"
+          "attribute vec2 PicCoordsIn;\n"
+          "varying vec2 PicCoords;\n"
+          "attribute vec3 VertexPosition;\n"
+        "#else\n"
+          "in vec2 PicCoordsIn;\n"
+          "out vec2 PicCoords;\n"
+          "in vec3 VertexPosition;\n"
+        "#endif\n"
         "uniform mat3 StereoMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
@@ -195,9 +201,15 @@ opengl_link_program(struct vlc_gl_filter *filter)
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
-        "attribute vec2 PicCoords;\n"
+        "#if __VERSION__ < 300\n"
+          "#define FragColor gl_FragColor\n"
+          "attribute vec2 PicCoords;\n"
+        "#else\n"
+          "in vec2 PicCoords;\n"
+          "out vec4 FragColor;\n"
+        "#endif\n"
         "void main() {\n"
-        " gl_FragColor = vlc_texture(PicCoords);\n"
+        " FragColor = vlc_texture(PicCoords);\n"
         "}\n";
 
     const char *extensions = sampler->shader.extensions
