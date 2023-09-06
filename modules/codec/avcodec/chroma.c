@@ -75,7 +75,6 @@ static const struct
 
     {VLC_CODEC_I420, AV_PIX_FMT_YUV420P, 0, 0, 0 },
     {VLC_CODEC_YV12, AV_PIX_FMT_YUV420P, 0, 0, 0 },
-    {VLC_FOURCC('I','Y','U','V'), AV_PIX_FMT_YUV420P, 0, 0, 0 },
     {VLC_CODEC_J420, AV_PIX_FMT_YUVJ420P, 0, 0, 0 },
     {VLC_CODEC_I411, AV_PIX_FMT_YUV411P, 0, 0, 0 },
     {VLC_CODEC_I410, AV_PIX_FMT_YUV410P, 0, 0, 0 },
@@ -137,13 +136,10 @@ static const struct
 
     /* Packed YUV formats */
     {VLC_CODEC_YUYV, AV_PIX_FMT_YUYV422, 0, 0, 0 },
-    {VLC_FOURCC('Y','U','Y','V'), AV_PIX_FMT_YUYV422, 0, 0, 0 },
     {VLC_CODEC_UYVY, AV_PIX_FMT_UYVY422, 0, 0, 0 },
     {VLC_CODEC_YVYU, AV_PIX_FMT_YVYU422, 0, 0, 0 },
-    {VLC_FOURCC('Y','4','1','1'), AV_PIX_FMT_UYYVYY411, 0, 0, 0 },
 
     /* Packed RGB formats */
-    VLC_RGB( VLC_FOURCC('R','G','B','4'), AV_PIX_FMT_RGB4, AV_PIX_FMT_BGR4, 0x10, 0x06, 0x01 )
     VLC_RGB( VLC_CODEC_RGB8, AV_PIX_FMT_RGB8, AV_PIX_FMT_BGR8, 0xC0, 0x38, 0x07 )
 
     VLC_RGB( VLC_CODEC_RGB15, AV_PIX_FMT_RGB555, AV_PIX_FMT_BGR555, 0x7c00, 0x03e0, 0x001f )
