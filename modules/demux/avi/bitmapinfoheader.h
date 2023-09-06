@@ -195,8 +195,19 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
         }
         if (biCompression == BI_RGB)
         {
-            if (p_bih->biBitCount == 32)
-                fmt->i_codec = VLC_CODEC_BGRX;
+            vlc_fourcc_t bi_rgb_chroma;
+            switch (p_bih->biBitCount)
+            {
+                case 32: bi_rgb_chroma = VLC_CODEC_XBGR; break;
+                default: bi_rgb_chroma = 0; break;
+            }
+            if (bi_rgb_chroma != 0)
+            {
+                fmt->video.i_chroma = fmt->i_codec = bi_rgb_chroma;
+                fmt->video.i_rmask = 0;
+                fmt->video.i_gmask = 0;
+                fmt->video.i_bmask = 0;
+            }
             else
                 SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
         }
