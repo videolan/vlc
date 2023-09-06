@@ -344,7 +344,7 @@
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
 /* 15-bit RGB padded to 16 bits (using explicit masks) */
-#define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
+#define VLC_CODEC_RGB15           VLC_FOURCC('R','_','1','5')
 /* 16-bit RGB (using explicit masks) */
 #define VLC_CODEC_RGB16           VLC_FOURCC('R','V','1','6')
 
@@ -386,7 +386,7 @@
 /* 15-bit RGB Big-Endian: "0R5G5B5" */
 #define VLC_CODEC_RGB555BE          VLC_FOURCC('R','B','1','5')
 /* 15-bit RGB Little-Endian: "g3B5 0R5G2" */
-#define VLC_CODEC_RGB555LE          VLC_FOURCC('R','L','1','5')
+#define VLC_CODEC_RGB555LE          VLC_FOURCC('R','V','1','5')
 /* 15-bit BGR Big-Endian: "0B5G5R5" */
 #define VLC_CODEC_BGR555BE          VLC_FOURCC('B','B','1','5')
 /* 15-bit BGR Little-Endian: "g3R5 0B5G2" */
