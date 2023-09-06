@@ -511,6 +511,29 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     i_kva_fourcc = FOURCC_R565;
                     break;
 
+                case VLC_CODEC_RGB555:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
+                        sys->kvac.ulRMask == 0x7c00 &&
+                        sys->kvac.ulGMask == 0x03e0 &&
+                        sys->kvac.ulBMask == 0x001f)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_R555;
+                    }
+                    break;
+                case VLC_CODEC_BGR555:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
+                        sys->kvac.ulRMask == 0x001f &&
+                        sys->kvac.ulGMask == 0x03e0 &&
+                        sys->kvac.ulBMask == 0x7c00)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_R555;
+                    }
+                    break;
+
                 case VLC_CODEC_RGB15:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR15;
                     i_kva_fourcc = FOURCC_R555;
