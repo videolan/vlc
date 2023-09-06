@@ -176,6 +176,17 @@
     containerView.constraintsWithSuperview = constraintsWithSuperview;
 }
 
+- (void)addView:(NSView *)view
+    toStackView:(NSStackView *)stackView
+{
+    if (view == nil || stackView == nil) {
+        return;
+    }
+
+    [stackView addArrangedSubview:view];
+    [self setupViewConstraints:view forStackView:stackView];
+}
+
 - (void)addContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
              toStackView:(NSStackView *)stackView
 {
