@@ -158,10 +158,10 @@ static int Open (vlc_object_t *obj)
             chroma = VLC_CODEC_RGB24; bpp = 24;
             break;
         case 16:
-            chroma = VLC_CODEC_RGB16; bpp = 16;
+            chroma = VLC_CODEC_RGB565; bpp = 16;
             break;
         case 15:
-            chroma = VLC_CODEC_RGB15; bpp = 16;
+            chroma = VLC_CODEC_RGB555; bpp = 16;
             break;
         case 8:
             chroma = VLC_CODEC_RGB233; bpp = 8;
