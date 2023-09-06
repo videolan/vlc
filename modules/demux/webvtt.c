@@ -740,5 +740,8 @@ void webvtt_CloseDemux( vlc_object_t *p_this )
         webvtt_text_parser_Delete( p_sys->p_streamparser );
     }
 
+    free( p_sys->regions_headers.p_data );
+    free( p_sys->styles_headers.p_data );
+
     free( p_sys );
 }
