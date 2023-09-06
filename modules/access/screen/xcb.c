@@ -545,7 +545,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
                 break;
             case 15:
                 if (fmt->bits_per_pixel == 16)
-                    chroma = VLC_CODEC_RGB15;
+                    chroma = VLC_CODEC_RGB555;
                 break;
             case 8: /* XXX: screw grey scale! */
                 if (fmt->bits_per_pixel == 8)
