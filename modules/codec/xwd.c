@@ -68,7 +68,8 @@ static int Decode (decoder_t *dec, block_t *block)
             break;
         case 15:
             if (ntohl(hdr->bits_per_pixel) == 16)
-                chroma = VLC_CODEC_RGB15;
+                chroma = ntohl(hdr->byte_order) == 0 /* LSBFirst */ ?
+                    VLC_CODEC_RGB555LE : VLC_CODEC_RGB555BE;
             break;
         case 16:
             if (ntohl(hdr->bits_per_pixel) == 16)
