@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHeroView : NSView
 
++ (instancetype)fromNibWithOwner:(id)owner;
+
 @end
 
 NS_ASSUME_NONNULL_END

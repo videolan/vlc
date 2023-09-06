@@ -22,6 +22,15 @@
 
 #import "VLCLibraryHeroView.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 @implementation VLCLibraryHeroView
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCLibraryHeroView*)[NSView fromNibNamed:@"VLCLibraryHeroView"
+                                                     withClass:VLCLibraryHeroView.class
+                                                     withOwner:owner];
+}
 
 @end
