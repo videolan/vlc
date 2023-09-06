@@ -133,16 +133,17 @@
     });
 }
 
-- (void)setupContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
-              forStackView:(NSStackView *)stackView
+- (NSArray<NSLayoutConstraint*> *)setupViewConstraints:(NSView *)view
+                                          forStackView:(NSStackView *)stackView
 {
-    if (containerView == nil || stackView == nil) {
-        return;
+    if (view == nil || stackView == nil) {
+        return @[];
     }
 
-    containerView.translatesAutoresizingMaskIntoConstraints = NO;
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+
     NSArray<NSLayoutConstraint*> * const constraintsWithSuperview = @[
-        [NSLayoutConstraint constraintWithItem:containerView
+        [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeLeft
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:stackView
@@ -150,7 +151,7 @@
                                     multiplier:1
                                       constant:0
         ],
-        [NSLayoutConstraint constraintWithItem:containerView
+        [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeRight
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:stackView
@@ -159,8 +160,20 @@
                                       constant:0
         ],
     ];
-    containerView.constraintsWithSuperview = constraintsWithSuperview;
     [stackView addConstraints:constraintsWithSuperview];
+
+    return constraintsWithSuperview;
+}
+
+- (void)setupContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
+              forStackView:(NSStackView *)stackView
+{
+    if (containerView == nil || stackView == nil) {
+        return;
+    }
+
+    NSArray<NSLayoutConstraint*> * const constraintsWithSuperview = [self setupViewConstraints:containerView forStackView:stackView];
+    containerView.constraintsWithSuperview = constraintsWithSuperview;
 }
 
 - (void)addContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
@@ -238,7 +251,7 @@
     }
 }
 
-- (void) setCollectionViewMinimumInteritemSpacing:(CGFloat)collectionViewMinimumInteritemSpacing
+- (void)setCollectionViewMinimumInteritemSpacing:(CGFloat)collectionViewMinimumInteritemSpacing
 {
     _collectionViewMinimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
 
