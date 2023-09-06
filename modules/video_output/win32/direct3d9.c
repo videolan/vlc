@@ -1345,7 +1345,7 @@ static const d3d9_format_t d3d_formats[] = {
     { "A8R8G8B8",   D3DFMT_A8R8G8B8,VLC_CODEC_BGRA,  0,0,0 },
     { "R8G8B8",     D3DFMT_R8G8B8,  VLC_CODEC_BGR24, 0,0,0 },
     { "R5G6B5",     D3DFMT_R5G6B5,  VLC_CODEC_RGB565LE, 0,0,0 },
-    { "X1R5G5B5",   D3DFMT_X1R5G5B5,VLC_CODEC_RGB15, 0x1f<<10, 0x1f<<5,  0x1f<<0 },
+    { "X1R5G5B5",   D3DFMT_X1R5G5B5,VLC_CODEC_RGB555LE, 0,0,0 },
 
     { NULL, 0, 0, 0,0,0}
 };
