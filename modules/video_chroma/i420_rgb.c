@@ -91,10 +91,6 @@ VIDEO_FILTER_WRAPPER_CLOSE_EXT( I420_RGB32, Deactivate )
  *****************************************************************************/
 static int Activate( filter_t *p_filter )
 {
-#ifdef PLUGIN_PLAIN
-    size_t i_tables_size;
-#endif
-
     if( !vlc_CPU_capable() )
         return VLC_EGENERIC;
     if( p_filter->fmt_out.video.i_width & 1
@@ -233,21 +229,7 @@ static int Activate( filter_t *p_filter )
     }
 
 #ifdef PLUGIN_PLAIN
-    switch( p_filter->fmt_out.video.i_chroma )
-    {
-    case VLC_CODEC_RGB8:
-        i_tables_size = PALETTE_TABLE_SIZE;
-        break;
-    case VLC_CODEC_RGB15:
-    case VLC_CODEC_RGB16:
-        i_tables_size = 2 * RGB_TABLE_SIZE;
-        break;
-    default: /* RV24, RV32 */
-        i_tables_size = 4 * RGB_TABLE_SIZE;
-        break;
-    }
-
-    p_sys->p_base = malloc( i_tables_size );
+    p_sys->p_base = malloc( p_sys->i_bytespp * RGB_TABLE_SIZE );
     if( p_sys->p_base == NULL )
     {
         free( p_sys->p_offset );
