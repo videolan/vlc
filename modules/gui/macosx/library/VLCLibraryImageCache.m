@@ -64,12 +64,12 @@ float kVLCDefaultThumbnailPosition = .15;
     return sharedImageCache;
 }
 
-+ (NSImage *)thumbnailForLibraryItem:(VLCAbstractMediaLibraryItem*)libraryItem
++ (NSImage *)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     return [[VLCLibraryImageCache sharedImageCache] imageForLibraryItem:libraryItem];
 }
 
-- (NSImage *)imageForLibraryItem:(VLCAbstractMediaLibraryItem*)libraryItem
+- (NSImage *)imageForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     NSImage *cachedImage = [_imageCache objectForKey:libraryItem.smallArtworkMRL];
     if (cachedImage) {
@@ -78,7 +78,7 @@ float kVLCDefaultThumbnailPosition = .15;
     return [self smallThumbnailForLibraryItem:libraryItem];
 }
 
-- (NSImage *)smallThumbnailForLibraryItem:(VLCAbstractMediaLibraryItem*)libraryItem
+- (NSImage *)smallThumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     NSImage *image;
     NSString * const artworkMRL = libraryItem.smallArtworkMRL;
@@ -157,7 +157,7 @@ float kVLCDefaultThumbnailPosition = .15;
     return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem];
 }
 
-+ (void)thumbnailForLibraryItem:(VLCAbstractMediaLibraryItem *)libraryItem
++ (void)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
                withCompletion:(void(^)(const NSImage *))completionHandler
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
