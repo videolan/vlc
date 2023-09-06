@@ -80,6 +80,12 @@
                 <constraint firstItem="4i7-vw-mgS" firstAttribute="bottom" secondItem="LPV-K6-7AE" secondAttribute="bottom" priority="999" id="r6b-1g-CZ4"/>
                 <constraint firstItem="4i7-vw-mgS" firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" priority="999" constant="20" id="si2-q6-ran"/>
             </constraints>
+            <connections>
+                <outlet property="detailTextField" destination="aVp-p4-DHX" id="OZu-HX-Re8"/>
+                <outlet property="largeImageView" destination="4i7-vw-mgS" id="971-JR-ZSl"/>
+                <outlet property="playButton" destination="5zZ-VM-Lb9" id="quv-CP-87R"/>
+                <outlet property="titleTextField" destination="kFW-i6-3hg" id="TXW-Kf-ZRh"/>
+            </connections>
             <point key="canvasLocation" x="260" y="95"/>
         </customView>
     </objects>
