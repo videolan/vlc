@@ -26,6 +26,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryHeroView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
@@ -68,7 +69,15 @@
                                 object:nil];
 
     _leadingContainerCount = 0;
+    [self generateCustomContainers];
     [self generateCollectionViewContainers];
+}
+
+- (void)generateCustomContainers
+{
+    _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
+    _leadingContainerCount += 1;
+    [self addView:self.heroView toStackView:self.collectionsStackView];
 }
 
 - (BOOL)recentMediaPresent
@@ -94,9 +103,9 @@
     if (shouldShowRecentsContainer) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = VLCLibraryVideoRecentsGroup;
-        // Insert at top after leading containers, hence _leadingContainerCount
-        [mutableContainers insertObject:containerView atIndex:_leadingContainerCount];
+        [mutableContainers insertObject:containerView atIndex:0];
 
+        // Insert at top after leading containers, hence _leadingContainerCount
         [_collectionsStackView insertArrangedSubview:containerView atIndex:_leadingContainerCount];
         [self setupContainerView:containerView forStackView:_collectionsStackView];
     } else {
@@ -218,6 +227,8 @@
     [_collectionsStackView setHuggingPriority:NSLayoutPriorityDefaultHigh
                                forOrientation:NSLayoutConstraintOrientationVertical];
 
+
+    [self addView:self.heroView toStackView:_collectionsStackView];
 
     for (VLCLibraryVideoCollectionViewContainerView * const containerView in _collectionViewContainers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];

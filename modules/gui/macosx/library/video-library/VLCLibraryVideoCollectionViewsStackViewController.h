@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryHeroView;
+
 @interface VLCLibraryVideoCollectionViewsStackViewController : NSObject
 
 @property (readwrite, assign, nonatomic) NSSize collectionViewItemSize;
@@ -33,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, assign, nonatomic) NSStackView *collectionsStackView;
 @property (readwrite, assign, nonatomic) NSScrollView *collectionsStackViewScrollView;
+
+@property (readonly) VLCLibraryHeroView *heroView;
 
 - (void)reloadData;
 
