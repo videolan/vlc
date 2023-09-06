@@ -153,43 +153,6 @@ static int Activate( filter_t *p_filter )
                     msg_Dbg(p_filter, "RGB pixel format is XBGR");
                     p_filter->ops = &I420_A8B8G8R8_ops;
                     break;
-                case VLC_CODEC_RGB32:
-                    /* If we don't have support for the bitmasks, bail out */
-                    if( p_filter->fmt_out.video.i_rmask == 0x00ff0000
-                     && p_filter->fmt_out.video.i_gmask == 0x0000ff00
-                     && p_filter->fmt_out.video.i_bmask == 0x000000ff )
-                    {
-                        /* A8R8G8B8 pixel format */
-                        msg_Dbg(p_filter, "RGB pixel format is A8R8G8B8");
-                        p_filter->ops = &I420_A8R8G8B8_ops;
-                    }
-                    else if( p_filter->fmt_out.video.i_rmask == 0xff000000
-                          && p_filter->fmt_out.video.i_gmask == 0x00ff0000
-                          && p_filter->fmt_out.video.i_bmask == 0x0000ff00 )
-                    {
-                        /* R8G8B8A8 pixel format */
-                        msg_Dbg(p_filter, "RGB pixel format is R8G8B8A8");
-                        p_filter->ops = &I420_R8G8B8A8_ops;
-                    }
-                    else if( p_filter->fmt_out.video.i_rmask == 0x0000ff00
-                          && p_filter->fmt_out.video.i_gmask == 0x00ff0000
-                          && p_filter->fmt_out.video.i_bmask == 0xff000000 )
-                    {
-                        /* B8G8R8A8 pixel format */
-                        msg_Dbg(p_filter, "RGB pixel format is B8G8R8A8");
-                        p_filter->ops = &I420_B8G8R8A8_ops;
-                    }
-                    else if( p_filter->fmt_out.video.i_rmask == 0x000000ff
-                          && p_filter->fmt_out.video.i_gmask == 0x0000ff00
-                          && p_filter->fmt_out.video.i_bmask == 0x00ff0000 )
-                    {
-                        /* A8B8G8R8 pixel format */
-                        msg_Dbg(p_filter, "RGB pixel format is A8B8G8R8");
-                        p_filter->ops = &I420_A8B8G8R8_ops;
-                    }
-                    else
-                        return VLC_EGENERIC;
-                    break;
 #else
                 case VLC_CODEC_RGB233:
                 case VLC_CODEC_RGB332:
@@ -204,7 +167,6 @@ static int Activate( filter_t *p_filter )
                 case VLC_CODEC_XBGR:
                 case VLC_CODEC_RGBX:
                 case VLC_CODEC_BGRX:
-                case VLC_CODEC_RGB32:
                     p_filter->ops = &I420_RGB32_ops;
                     break;
 #endif
@@ -243,7 +205,6 @@ static int Activate( filter_t *p_filter )
         case VLC_CODEC_BGRX:
         case VLC_CODEC_RGB24:
         case VLC_CODEC_BGR24:
-        case VLC_CODEC_RGB32:
             p_sys->i_bytespp = 4;
             break;
         default:
@@ -390,7 +351,6 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     case VLC_CODEC_BGRX:
     case VLC_CODEC_RGB24:
     case VLC_CODEC_BGR24:
-    case VLC_CODEC_RGB32:
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
         for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {

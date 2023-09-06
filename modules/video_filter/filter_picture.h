@@ -155,18 +155,6 @@ static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_ind
             *i_r_index = 2;
             *i_a_index = -1;
             break;
-        case VLC_CODEC_RGB32:
-#ifdef WORDS_BIGENDIAN
-            *i_r_index = (24 - vlc_ctz(p_fmt->i_rmask)) / 8;
-            *i_g_index = (24 - vlc_ctz(p_fmt->i_gmask)) / 8;
-            *i_b_index = (24 - vlc_ctz(p_fmt->i_bmask)) / 8;
-#else
-            *i_r_index = vlc_ctz(p_fmt->i_rmask) / 8;
-            *i_g_index = vlc_ctz(p_fmt->i_gmask) / 8;
-            *i_b_index = vlc_ctz(p_fmt->i_bmask) / 8;
-#endif
-            *i_a_index = -1; // unused
-            break;
         default:
             return VLC_EGENERIC;
     }

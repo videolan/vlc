@@ -84,22 +84,6 @@ MMAL_FOURCC_T vlc_to_mmal_video_fourcc(const video_frame_format_t * const vf_vlc
             return MMAL_ENCODING_ABGR;
         case VLC_CODEC_XRGB:
             return MMAL_ENCODING_ARGB;
-        case VLC_CODEC_RGB32:
-        {
-            // VLC RGB32 aka RV32 means we have to look at the mask values
-            const uint32_t r = vf_vlc->i_rmask;
-            const uint32_t g = vf_vlc->i_gmask;
-            const uint32_t b = vf_vlc->i_bmask;
-            if (r == 0xff0000 && g == 0xff00 && b == 0xff)
-                return MMAL_ENCODING_BGRA;
-            if (r == 0xff && g == 0xff00 && b == 0xff0000)
-                return MMAL_ENCODING_RGBA;
-            if (r == 0xff000000 && g == 0xff0000 && b == 0xff00)
-                return MMAL_ENCODING_ABGR;
-            if (r == 0xff00 && g == 0xff0000 && b == 0xff000000)
-                return MMAL_ENCODING_ARGB;
-            break;
-        }
         case VLC_CODEC_RGB565BE:
             return MMAL_ENCODING_RGB16;
         case VLC_CODEC_RGB16:

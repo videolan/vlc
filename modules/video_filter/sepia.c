@@ -86,7 +86,6 @@ static const struct
     { VLC_CODEC_I420, PlanarI420Sepia },
     { VLC_CODEC_RGB24, RVSepia },
     { VLC_CODEC_BGR24, RVSepia },
-    { VLC_CODEC_RGB32, RVSepia },
     { VLC_CODEC_BGRA, RVSepia },
     { VLC_CODEC_RGBA, RVSepia },
     { VLC_CODEC_ARGB, RVSepia },

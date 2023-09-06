@@ -53,62 +53,12 @@ void video_format_FixRgb( video_format_t *p_fmt )
             p_fmt->i_bmask = 0x001f;
             break;
 
-        case VLC_CODEC_RGB32:
-            p_fmt->i_rmask = 0x00ff0000;
-            p_fmt->i_gmask = 0x0000ff00;
-            p_fmt->i_bmask = 0x000000ff;
-            break;
-
         default:
             // assert(!"a bogus mask was set on a chroma");
             p_fmt->i_rmask = 0;
             p_fmt->i_gmask = 0;
             p_fmt->i_bmask = 0;
             return;
-        }
-    }
-
-    // turn known masks into proper chromas
-    if ( p_fmt->i_chroma == VLC_CODEC_RGB32 )
-    {
-        if ( p_fmt->i_rmask == 0x00ff0000 &&
-             p_fmt->i_gmask == 0x0000ff00 &&
-             p_fmt->i_bmask == 0x000000ff )
-        {
-            p_fmt->i_chroma = VLC_CODEC_XRGB;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-        }
-        else
-        if ( p_fmt->i_rmask == 0x000000ff &&
-             p_fmt->i_gmask == 0x0000ff00 &&
-             p_fmt->i_bmask == 0x00ff0000 )
-        {
-            p_fmt->i_chroma = VLC_CODEC_XBGR;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-        }
-        else
-        if ( p_fmt->i_rmask == 0xff000000 &&
-             p_fmt->i_gmask == 0x00ff0000 &&
-             p_fmt->i_bmask == 0x0000ff00 )
-        {
-            p_fmt->i_chroma = VLC_CODEC_RGBX;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-        }
-        else
-        if ( p_fmt->i_rmask == 0x0000ff00 &&
-             p_fmt->i_gmask == 0x00ff0000 &&
-             p_fmt->i_bmask == 0xff000000 )
-        {
-            p_fmt->i_chroma = VLC_CODEC_BGRX;
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
         }
     }
 }
@@ -294,8 +244,7 @@ bool video_format_IsSameChroma( const video_format_t *f1,
         return false;
 
     if( f1->i_chroma == VLC_CODEC_RGB15 ||
-        f1->i_chroma == VLC_CODEC_RGB16 ||
-        f1->i_chroma == VLC_CODEC_RGB32 )
+        f1->i_chroma == VLC_CODEC_RGB16 )
     {
         video_format_t v1 = *f1;
         video_format_t v2 = *f2;

@@ -202,9 +202,6 @@ static int Open(vout_display_t *vd,
         fmt.i_gmask = 0x07e0;
         fmt.i_bmask = 0xf800;
         break;
-    case VLC_CODEC_RGB32:
-        fmt.i_chroma = VLC_CODEC_XRGB;
-        /* fallthrough */
     default:
         fmt.i_rmask = 0;
         fmt.i_gmask = 0;

@@ -619,14 +619,6 @@ interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
             break;
 #endif
 
-        case VLC_CODEC_RGB32:
-            if(!interop->fmt_in.i_rmask && !fallback_masks)
-                return VLC_EGENERIC;
-            if(interop->fmt_in.i_rmask == 0x0000ff00)
-                return interop_rgb_base_init(interop, tex_target, VLC_CODEC_BGRA, fallback_masks);
-            else
-                return interop_rgb_base_init(interop, tex_target, VLC_CODEC_RGBA, fallback_masks);
-
         case VLC_CODEC_XRGB:
         case VLC_CODEC_RGBA:
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -796,25 +788,9 @@ interop_init:
      * be created. */
 
     interop->fmt_in.i_chroma = i_chroma;
-
-    switch(i_chroma)
-    {
-        case VLC_CODEC_RGB32:
-            /* Ensure we only request and forward RGBX or BGRX in memory order */
-            if(interop->fmt_in.i_rmask != 0xff000000 && // RGBX
-               interop->fmt_in.i_rmask != 0x0000ff00)   // BGRX
-            {
-                interop->fmt_in.i_rmask = 0xff000000;
-                interop->fmt_in.i_gmask = 0x00ff0000;
-                interop->fmt_in.i_bmask = 0x0000ff00;
-            }
-            break;
-        default:
-            interop->fmt_in.i_rmask = 0;
-            interop->fmt_in.i_gmask = 0;
-            interop->fmt_in.i_bmask = 0;
-            break;
-    }
+    interop->fmt_in.i_rmask = 0;
+    interop->fmt_in.i_gmask = 0;
+    interop->fmt_in.i_bmask = 0;
 
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_common_allocate_textures,

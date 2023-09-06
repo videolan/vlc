@@ -347,8 +347,6 @@
 #define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
 /* 16-bit RGB (using explicit masks) */
 #define VLC_CODEC_RGB16           VLC_FOURCC('R','V','1','6')
-/* 24-bit RGB padded to 32 bits (using explicit masks) */
-#define VLC_CODEC_RGB32           VLC_FOURCC('R','_','3','2')
 
 /* 32-bit RGB, in memory address order: "XRGB" ignoring the x component */
 #define VLC_CODEC_XRGB            VLC_FOURCC('R','V','3','2')

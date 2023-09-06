@@ -50,9 +50,6 @@ static const struct
     { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
                             0x07e0,
                             0x001f, },
-    { VLC_CODEC_RGB32,      0x00ff0000, /* This is in XRGB format */
-                            0x0000ff00,
-                            0x000000ff, },
 };
 
 static inline void SetBitmapRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
@@ -343,11 +340,6 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
         case VLC_CODEC_RGBX:
             biBitCount = 32;
             biCompression = BI_BITFIELDS;
-            break;
-        case VLC_CODEC_RGB32:
-            biBitCount = 32;
-            if ( !MatchBitmapRGBMasks( fmt ) )
-                biCompression = BI_BITFIELDS;
             break;
         case VLC_CODEC_BGRA:
         case VLC_CODEC_RGBA:

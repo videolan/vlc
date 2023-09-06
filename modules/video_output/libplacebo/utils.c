@@ -200,7 +200,6 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_RGB16,          {PACKED(3, 5, 1)} },
     { VLC_CODEC_RGB24,          {PACKED(3, 8, 0)} },
     { VLC_CODEC_BGR24,          {PACKED(3, 8, 0)} },
-    { VLC_CODEC_RGB32,          {PACKED(3, 8, 8)} },
     { VLC_CODEC_RGBA,           {PACKED(4, 8, 0)} },
     { VLC_CODEC_BGRX,           {PACKED(3, 8, 8)} },
     { VLC_CODEC_BGRA,           {PACKED(4, 8, 0)} },
@@ -269,14 +268,6 @@ static void FillDesc(vlc_fourcc_t fcc, const struct fmt_desc *desc,
         // Planar Y:V:U
         data[1].component_map[0] = 2;
         data[2].component_map[0] = 1;
-        break;
-
-    case VLC_CODEC_RGB32:
-        // XRGB instead of RGBX
-        data[0].component_map[0] = -1;
-        data[1].component_map[0] = 0;
-        data[2].component_map[0] = 1;
-        data[3].component_map[0] = 2;
         break;
 
     case VLC_CODEC_BGRX:
