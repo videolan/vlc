@@ -195,7 +195,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
-        "varying vec2 PicCoords;\n"
+        "attribute vec2 PicCoords;\n"
         "void main() {\n"
         " gl_FragColor = vlc_texture(PicCoords);\n"
         "}\n";
