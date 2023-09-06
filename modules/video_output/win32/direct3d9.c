@@ -124,9 +124,6 @@ typedef struct
     const char   *name;
     D3DFORMAT    format;    /* D3D format */
     vlc_fourcc_t fourcc;    /* VLC fourcc */
-    uint32_t     rmask;
-    uint32_t     gmask;
-    uint32_t     bmask;
 } d3d9_format_t;
 
 typedef struct vout_display_sys_t
@@ -1329,25 +1326,25 @@ static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
 
 static const d3d9_format_t d3d_formats[] = {
     /* YV12 is always used for planar 420, the planes are then swapped in Lock() */
-    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12,  0,0,0 },
-    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_I420,  0,0,0 },
-    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_J420,  0,0,0 },
-    { "NV12",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12,  0,0,0 },
-    { "DXA9",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_D3D9_OPAQUE,  0,0,0 },
-    { "DXA9_422",   MAKEFOURCC('Y','U','Y','2'),    VLC_CODEC_D3D9_OPAQUE,  0,0,0 },
-    { "DXA9_444",   MAKEFOURCC('A','Y','U','V'),    VLC_CODEC_D3D9_OPAQUE,  0,0,0 },
-    { "DXA9_10",    MAKEFOURCC('P','0','1','0'),    VLC_CODEC_D3D9_OPAQUE_10B, 0,0,0 },
-    { "DXA9_10_422", MAKEFOURCC('Y','2','1','0'),   VLC_CODEC_D3D9_OPAQUE_10B, 0,0,0 },
-    { "DXA9_10_444", MAKEFOURCC('Y','4','1','0'),   VLC_CODEC_D3D9_OPAQUE_10B, 0,0,0 },
-    { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY,  0,0,0 },
-    { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV,  0,0,0 },
-    { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_BGRX,  0,0,0 },
-    { "A8R8G8B8",   D3DFMT_A8R8G8B8,VLC_CODEC_BGRA,  0,0,0 },
-    { "R8G8B8",     D3DFMT_R8G8B8,  VLC_CODEC_BGR24, 0,0,0 },
-    { "R5G6B5",     D3DFMT_R5G6B5,  VLC_CODEC_RGB565LE, 0,0,0 },
-    { "X1R5G5B5",   D3DFMT_X1R5G5B5,VLC_CODEC_RGB555LE, 0,0,0 },
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_I420 },
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_J420 },
+    { "NV12",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
+    { "DXA9",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_D3D9_OPAQUE },
+    { "DXA9_422",   MAKEFOURCC('Y','U','Y','2'),    VLC_CODEC_D3D9_OPAQUE },
+    { "DXA9_444",   MAKEFOURCC('A','Y','U','V'),    VLC_CODEC_D3D9_OPAQUE },
+    { "DXA9_10",    MAKEFOURCC('P','0','1','0'),    VLC_CODEC_D3D9_OPAQUE_10B },
+    { "DXA9_10_422", MAKEFOURCC('Y','2','1','0'),   VLC_CODEC_D3D9_OPAQUE_10B },
+    { "DXA9_10_444", MAKEFOURCC('Y','4','1','0'),   VLC_CODEC_D3D9_OPAQUE_10B },
+    { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY },
+    { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV },
+    { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_BGRX },
+    { "A8R8G8B8",   D3DFMT_A8R8G8B8,VLC_CODEC_BGRA },
+    { "R8G8B8",     D3DFMT_R8G8B8,  VLC_CODEC_BGR24 },
+    { "R5G6B5",     D3DFMT_R5G6B5,  VLC_CODEC_RGB565LE },
+    { "X1R5G5B5",   D3DFMT_X1R5G5B5,VLC_CODEC_RGB555LE },
 
-    { NULL, 0, 0, 0,0,0}
+    { NULL, 0, 0 }
 };
 
 static const d3d9_format_t *FindBufferFormat(D3DFORMAT fmt)
@@ -1660,9 +1657,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     /* */
     *fmt = *vd->source;
     fmt->i_chroma = d3dfmt->fourcc;
-    fmt->i_rmask  = d3dfmt->rmask;
-    fmt->i_gmask  = d3dfmt->gmask;
-    fmt->i_bmask  = d3dfmt->bmask;
+    fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
     sys->sw_texture_fmt = d3dfmt;
 
     if (Direct3D9CreateResources(vd, fmt)) {
