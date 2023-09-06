@@ -157,7 +157,7 @@ static int Open(vout_display_t *vd,
     static const vlc_fourcc_t subfmts[] = {
         VLC_CODEC_RGBA,
         VLC_CODEC_BGRA,
-        VLC_CODEC_RGB15,
+        VLC_CODEC_RGB555LE,
         VLC_CODEC_RGB565LE,
         VLC_CODEC_RGB24,
         VLC_CODEC_XRGB,
