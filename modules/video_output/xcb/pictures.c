@@ -167,8 +167,26 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
         case 16:
             if (fmt->bits_per_pixel != 16)
                 return false;
-            f->i_chroma = VLC_CODEC_RGB16;
-            use_masks = true;
+            if (vt->red_mask   == 0xf800 &&
+                vt->green_mask == 0x07e0 &&
+                vt->blue_mask  == 0x001f)
+            {
+                f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                              VLC_CODEC_RGB565BE : VLC_CODEC_RGB565LE;
+            }
+            else
+            if (vt->red_mask   == 0x001f &&
+                vt->green_mask == 0x07e0 &&
+                vt->blue_mask  == 0xf800)
+            {
+                f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                              VLC_CODEC_BGR565BE : VLC_CODEC_BGR565LE;
+            }
+            else
+            {
+                f->i_chroma = VLC_CODEC_RGB16;
+                use_masks = true;
+            }
             break;
         case 15:
             if (fmt->bits_per_pixel != 16)
