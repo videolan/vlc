@@ -126,7 +126,7 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             if (fmt->bits_per_pixel != 8)
                 return false;
             if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
-                f->i_chroma = VLC_CODEC_RGB8;
+                f->i_chroma = VLC_CODEC_RGB233;
             else
                 f->i_chroma = VLC_CODEC_GREY;
             break;
