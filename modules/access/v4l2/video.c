@@ -626,7 +626,7 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_RGB555,  VLC_CODEC_RGB15, 2,   0x001F,   0x03E0,   0x7C00 },
 //  { V4L2_PIX_FMT_RGB555X,   },
 #endif
-//  { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB8,  1,      0xC0,     0x38,     0x07 },
+    { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB332,  1, 0, 0, 0 },
 
     /* Bayer (sub-sampled RGB). Not supported. */
 //  { V4L2_PIX_FMT_SBGGR16,  }
