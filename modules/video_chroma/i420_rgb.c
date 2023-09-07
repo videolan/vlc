@@ -171,6 +171,9 @@ static int Activate( filter_t *p_filter )
                         return VLC_EGENERIC;
                     break;
 #else
+                case VLC_CODEC_RGB233:
+                case VLC_CODEC_RGB332:
+                case VLC_CODEC_BGR233:
                 case VLC_CODEC_RGB8:
                     p_filter->ops = &I420_RGB8_ops;
                     break;
@@ -201,6 +204,9 @@ static int Activate( filter_t *p_filter )
     switch( p_filter->fmt_out.video.i_chroma )
     {
 #ifdef PLUGIN_PLAIN
+        case VLC_CODEC_RGB233:
+        case VLC_CODEC_RGB332:
+        case VLC_CODEC_BGR233:
         case VLC_CODEC_RGB8:
             p_sys->i_bytespp = 1;
             break;
@@ -282,6 +288,36 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     unsigned i_rgshift = 8 - vlc_popcount(vfmt->i_gmask);
     unsigned i_rbshift = 8 - vlc_popcount(vfmt->i_bmask);
 
+    switch (p_filter->fmt_out.video.i_chroma)
+    {
+        case VLC_CODEC_RGB233:
+            i_lrshift = 6;
+            i_lgshift = 3;
+            i_lbshift = 0;
+            i_rrshift = 6;
+            i_rgshift = 5;
+            i_rbshift = 5;
+            break;
+        case VLC_CODEC_BGR233:
+            i_lbshift = 6;
+            i_lgshift = 3;
+            i_lrshift = 0;
+            i_rbshift = 6;
+            i_rgshift = 5;
+            i_rrshift = 5;
+            break;
+        case VLC_CODEC_RGB332:
+            i_lrshift = 5;
+            i_lgshift = 2;
+            i_lbshift = 0;
+            i_rrshift = 5;
+            i_rgshift = 5;
+            i_rbshift = 6;
+            break;
+        default:
+            break;
+    }
+
     /*
      * Set pointers and build YUV tables
      */
@@ -289,6 +325,9 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     /* Color: build red, green and blue tables */
     switch( p_filter->fmt_out.video.i_chroma )
     {
+    case VLC_CODEC_RGB233:
+    case VLC_CODEC_RGB332:
+    case VLC_CODEC_BGR233:
     case VLC_CODEC_RGB8:
         p_sys->p_rgb8 = (uint8_t *)p_sys->p_base;
         Set8bppPalette( p_filter, p_sys->p_rgb8 );
