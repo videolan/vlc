@@ -264,7 +264,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     msg_Dbg(vd, "GDI depth is %i", i_depth);
     switch (i_depth) {
     case 8:
-        fmt->i_chroma = VLC_CODEC_RGB8;
+        fmt->i_chroma = VLC_CODEC_RGB233;
         break;
     case 15:
         fmt->i_chroma = VLC_CODEC_RGB15;
