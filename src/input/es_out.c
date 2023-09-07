@@ -5,6 +5,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -1186,15 +1187,15 @@ static vlc_tick_t EsOutGetBuffering( es_out_t *out )
 
     if( !p_sys->p_pgrm )
         return 0;
-    else
-    {
-        vlc_tick_t i_stream_start, i_system_duration;
 
-        if( input_clock_GetState( p_sys->p_pgrm->p_input_clock,
-                                  &i_stream_start, &i_system_start,
-                                  &i_stream_duration, &i_system_duration ) )
-            return 0;
-    }
+    vlc_tick_t i_stream_start, i_system_duration;
+
+    /* If the input_clock is not ready, we don't have a reference point
+     * which means that buffering has not started, continue waiting. */
+    if (input_clock_GetState(p_sys->p_pgrm->p_input_clock,
+                             &i_stream_start, &i_system_start,
+                             &i_stream_duration, &i_system_duration))
+        return 0;
 
     vlc_tick_t i_delay;
 
@@ -1204,8 +1205,6 @@ static vlc_tick_t EsOutGetBuffering( es_out_t *out )
     }
     else
     {
-        vlc_tick_t i_system_duration;
-
         if( p_sys->b_paused )
         {
             i_system_duration = p_sys->i_pause_date  - i_system_start;
