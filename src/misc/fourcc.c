@@ -573,7 +573,9 @@ static const vlc_fourcc_t p_RGB32_fallback[] = {
     VLC_CODEC_RGB24,
     VLC_CODEC_RGB16,
     VLC_CODEC_RGB15,
-    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB233,
+    VLC_CODEC_BGR233,
+    VLC_CODEC_RGB332,
     0,
 };
 static const vlc_fourcc_t p_RGB24_fallback[] = {
@@ -581,7 +583,9 @@ static const vlc_fourcc_t p_RGB24_fallback[] = {
     VLC_CODEC_RGB32,
     VLC_CODEC_RGB16,
     VLC_CODEC_RGB15,
-    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB233,
+    VLC_CODEC_BGR233,
+    VLC_CODEC_RGB332,
     0,
 };
 static const vlc_fourcc_t p_RGB16_fallback[] = {
@@ -589,7 +593,9 @@ static const vlc_fourcc_t p_RGB16_fallback[] = {
     VLC_CODEC_RGB24,
     VLC_CODEC_RGB32,
     VLC_CODEC_RGB15,
-    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB233,
+    VLC_CODEC_BGR233,
+    VLC_CODEC_RGB332,
     0,
 };
 static const vlc_fourcc_t p_RGB15_fallback[] = {
@@ -597,11 +603,15 @@ static const vlc_fourcc_t p_RGB15_fallback[] = {
     VLC_CODEC_RGB16,
     VLC_CODEC_RGB24,
     VLC_CODEC_RGB32,
-    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB233,
+    VLC_CODEC_BGR233,
+    VLC_CODEC_RGB332,
     0,
 };
 static const vlc_fourcc_t p_RGB8_fallback[] = {
-    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB233,
+    VLC_CODEC_BGR233,
+    VLC_CODEC_RGB332,
     VLC_CODEC_RGB15,
     VLC_CODEC_RGB16,
     VLC_CODEC_RGB24,
