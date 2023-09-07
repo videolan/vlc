@@ -191,7 +191,9 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_NV24,           {SEMIPLANAR(2,  8, _444)} },
     { VLC_CODEC_NV42,           {SEMIPLANAR(2,  8, _444)} },
 
-    { VLC_CODEC_RGB8,           {PACKED(3, 2, 2)} },
+    { VLC_CODEC_RGB233,         {PACKED(3, 2, 2)} },
+    { VLC_CODEC_BGR233,         {PACKED(3, 2, 2)} },
+    { VLC_CODEC_RGB332,         {PACKED(3, 2, 2)} },
     { VLC_CODEC_RGB15,          {PACKED(3, 5, 1)} },
     { VLC_CODEC_RGB16,          {PACKED(3, 5, 1)} },
     { VLC_CODEC_RGB24,          {PACKED(3, 8, 0)} },
@@ -298,7 +300,23 @@ static void FillDesc(vlc_fourcc_t fcc, const struct fmt_desc *desc,
         data[0].component_size[1] += 1;
         break;
 
-    case VLC_CODEC_RGB8:
+    case VLC_CODEC_RGB233:
+        // 2:3:3 instead of 2:2:2
+        data[0].component_size[1] += 1;
+        data[0].component_size[2] += 1;
+        break;
+
+    case VLC_CODEC_BGR233:
+        // 2:3:3 instead of 2:2:2
+        data[0].component_size[1] += 1;
+        data[0].component_size[2] += 1;
+        // Packed BGR
+        data[0].component_map[0] = 2;
+        data[0].component_map[1] = 1;
+        data[0].component_map[2] = 0;
+        break;
+
+    case VLC_CODEC_RGB332:
         // 3:3:2 instead of 2:2:2
         data[0].component_size[0] += 1;
         data[0].component_size[1] += 1;
