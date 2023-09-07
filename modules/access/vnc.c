@@ -158,7 +158,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     switch( i_bits_per_pixel )
     {
         case 8:
-            i_chroma = VLC_CODEC_RGB8;
+            i_chroma = VLC_CODEC_RGB233;
             break;
         default:
         case 16:
