@@ -3122,15 +3122,15 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
     es_out_id_t *es;
     foreach_es_then_es_slaves(es)
     {
-        if (es->p_dec)
-        {
-            if (es->delay != VLC_TICK_MAX)
-                tracks_delay = __MIN(tracks_delay, es->delay);
-            else if (es->fmt.i_cat == AUDIO_ES)
-                has_audio = true;
-            else if (es->fmt.i_cat == SPU_ES)
-                has_spu = true;
-        }
+        if (es->p_dec == NULL)
+            continue;
+
+        if (es->delay != VLC_TICK_MAX)
+            tracks_delay = __MIN(tracks_delay, es->delay);
+        else if (es->fmt.i_cat == AUDIO_ES)
+            has_audio = true;
+        else if (es->fmt.i_cat == SPU_ES)
+            has_spu = true;
     }
     if (has_audio)
         tracks_delay = __MIN(tracks_delay, p_sys->i_audio_delay);
