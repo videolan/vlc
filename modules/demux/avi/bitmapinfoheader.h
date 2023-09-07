@@ -297,6 +297,8 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
         case VLC_CODEC_BGR24:
             biBitCount = 24;
             break;
+        case VLC_CODEC_RGB24:
+            return VLC_EINVAL;
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB15:
             biBitCount = 16;
