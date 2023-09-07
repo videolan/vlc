@@ -118,9 +118,6 @@ static const struct {
     uint32_t green; /**< Little endian green mask */
     uint32_t blue; /**< Little endian blue mask */
 } rgb_fourcc_list[] = {
-    /* 8-bit RGB */
-    { DRM_FORMAT_RGB332,   VLC_CODEC_RGB8, 0xD0, 0x16, 0x03 },
-    { DRM_FORMAT_BGR233,   VLC_CODEC_RGB8, 0x07, 0x28, 0xC0 },
 #ifdef WORDS_BIGENDIAN
     /* 24-bit RGB */
     { DRM_FORMAT_RGB888,   VLC_CODEC_RGB24, 0x0000FF, 0x00FF00, 0xFF0000 },
@@ -171,6 +168,10 @@ static const struct {
 #ifndef WORDS_BIGENDIAN
     { DRM_FORMAT_ABGR2101010, VLC_CODEC_RGBA10 },
 #endif
+
+    /* 8-bit RGB */
+    { DRM_FORMAT_RGB332,   VLC_CODEC_RGB332 },
+    { DRM_FORMAT_BGR233,   VLC_CODEC_BGR233 },
 
     /* Packed YUV formats */
     /* DRM uses big-endian for YUY2, otherwise little endian. */
