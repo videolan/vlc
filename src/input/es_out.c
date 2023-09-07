@@ -2525,15 +2525,10 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
 static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
                                          const es_out_id_t *es )
 {
-    /* Otherwise, fallback by priority */
     if( p_esprops->p_main_es != NULL )
-    {
-        return ( es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority );
-    }
-    else
-    {
-        return ( es->fmt.i_priority > ES_PRIORITY_NOT_DEFAULTABLE );
-    }
+        return es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority;
+
+    return es->fmt.i_priority > ES_PRIORITY_NOT_DEFAULTABLE;
 }
 
 static bool EsOutSelectHasExplicitParams( const es_out_es_props_t *p_esprops )
