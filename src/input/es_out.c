@@ -3959,16 +3959,15 @@ static int EsOutVaPrivControlLocked( es_out_t *out, input_source_t *source,
         p_sys->i_cr_average = i_cr_average;
         p_sys->i_tracks_pts_delay = i_tracks_pts_delay;
 
-        if (b_change_clock)
-        {
-            i_pts_delay += i_pts_jitter + i_tracks_pts_delay;
+        if (!b_change_clock)
+            return VLC_SUCCESS;
 
-            vlc_list_foreach(pgrm, &p_sys->programs, node)
-            {
-                input_clock_SetJitter(pgrm->p_input_clock, i_pts_delay,
-                                      i_cr_average);
-                vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
-            }
+        i_pts_delay += i_pts_jitter + i_tracks_pts_delay;
+        vlc_list_foreach(pgrm, &p_sys->programs, node)
+        {
+            input_clock_SetJitter(pgrm->p_input_clock,
+                                  i_pts_delay, i_cr_average);
+            vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
         }
         return VLC_SUCCESS;
     }
