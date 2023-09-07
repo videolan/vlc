@@ -441,13 +441,13 @@ void ListCache<T>::partialUpdate()
     {
         if (partialQueryCount > m_cachedData->queryCount)
         {
-            emit beginRemoveRows(m_cachedData->queryCount - 1, partialQueryCount - 1);
+            emit beginRemoveRows(m_cachedData->queryCount, partialQueryCount - 1);
             emit endRemoveRows();
             emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
         }
         else
         {
-            emit beginInsertRows(partialQueryCount - 1, m_cachedData->queryCount - 1);
+            emit beginInsertRows(partialQueryCount, m_cachedData->queryCount - 1);
             emit endInsertRows();
             emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
         }
