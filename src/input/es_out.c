@@ -548,31 +548,23 @@ static char *EsGetTitle( es_out_id_t *es )
     /* Take care of the ES description */
     if( fmt->psz_description && *fmt->psz_description )
     {
-        if( es->psz_language && *es->psz_language )
-        {
-            if( asprintf( &title, "%s - [%s]", fmt->psz_description,
-                          es->psz_language ) == -1 )
-                title = NULL;
-        }
-        else
-            title = strdup( fmt->psz_description );
-    }
-    else
-    {
-        if( es->psz_language && *es->psz_language )
-        {
-            if( asprintf( &title, "%s %zu - [%s]", _("Track"),
-                          es->i_pos, es->psz_language ) == -1 )
-                title = NULL;
-        }
-        else
-        {
-            if( asprintf( &title, "%s %zu", _("Track"), es->i_pos ) == -1 )
-                title = NULL;
-        }
-    }
+        if (es->psz_language == NULL || *es->psz_language == '\0')
+            return strdup(fmt->psz_description);
 
-    return title;
+        if (asprintf(&title, "%s - [%s]", fmt->psz_description,
+                     es->psz_language) != -1)
+            return title;
+    }
+    else if (es->psz_language && *es->psz_language)
+    {
+        if (asprintf(&title, "%s %zu - [%s]", _("Track"),
+                     es->i_pos, es->psz_language ) != -1 )
+            return title;
+    }
+    else if (asprintf(&title, "%s %zu", _("Track"), es->i_pos) != -1)
+        return title;
+
+    return NULL;
 }
 
 static void EsRelease(es_out_id_t *es)
