@@ -3162,14 +3162,15 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
     case ES_OUT_SET_ES_STATE:
     {
         es_out_id_t *es = va_arg( args, es_out_id_t * );
-        bool b = va_arg( args, int );
-        if( b && !EsIsSelected( es ) )
+        bool request_select = va_arg(args, int);
+        bool is_selected = EsIsSelected(es);
+        if(request_select && !is_selected)
         {
             EsOutSelectEs( out, es, true );
             return EsIsSelected( es ) ? VLC_SUCCESS : VLC_EGENERIC;
         }
 
-        if(!b && EsIsSelected(es))
+        if(!request_select && is_selected)
             EsOutUnselectEs( out, es, es->p_pgrm == p_sys->p_pgrm );
 
         return VLC_SUCCESS;
