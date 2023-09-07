@@ -2794,16 +2794,17 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
     /* Now, select all ES from es_id_list */
     foreach_es_then_es_slaves(other)
     {
-        if( other->fmt.i_cat != cat )
-            continue;
-
-        if( EsOutIdMatchEsList( other, es_id_list ) && !EsIsSelected( other ) )
+        if (other->fmt.i_cat != cat ||
+            !EsOutIdMatchEsList(other, es_id_list) ||
+            EsIsSelected(other))
         {
-            EsOutSelectEs( out, other, true );
-
-            if( p_esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
-                break;
+            continue;
         }
+
+        EsOutSelectEs(out, other, true);
+
+        if (p_esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE)
+            break;
     }
 }
 
