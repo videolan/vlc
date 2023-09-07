@@ -3905,37 +3905,38 @@ static int EsOutVaPrivControlLocked( es_out_t *out, input_source_t *source,
         if( source != p_sys->main_source )
             return VLC_SUCCESS;
 
-        if( !p_sys->b_buffering )
+        if (p_sys->b_buffering)
         {
-            vlc_tick_t i_delay;
-
-            /* Fix for buffering delay */
-            if( !input_priv(p_sys->p_input)->p_sout ||
-                !input_priv(p_sys->p_input)->b_out_pace_control )
-                i_delay = EsOutGetBuffering( out );
-            else
-                i_delay = 0;
-
-            if( i_time != VLC_TICK_INVALID )
-            {
-                i_time -= i_delay;
-                if( i_time < VLC_TICK_0 )
-                    i_time = VLC_TICK_0;
-            }
-
-            if( i_length != 0 )
-                f_position -= (double)i_delay / i_length;
-            if( f_position < 0 )
-                f_position = 0;
-
-            assert( i_normal_time >= VLC_TICK_0 );
-
-            input_SendEventTimes( p_sys->p_input, f_position, i_time,
-                                  i_normal_time, i_length );
+            input_SendEventTimes(p_sys->p_input, 0.0, VLC_TICK_INVALID,
+                                 i_normal_time, i_length);
+            return VLC_SUCCESS;
         }
+
+        vlc_tick_t i_delay;
+
+        /* Fix for buffering delay */
+        if (!input_priv(p_sys->p_input)->p_sout ||
+            !input_priv(p_sys->p_input)->b_out_pace_control)
+            i_delay = EsOutGetBuffering(out);
         else
-            input_SendEventTimes( p_sys->p_input, 0.0, VLC_TICK_INVALID,
-                                  i_normal_time, i_length );
+            i_delay = 0;
+
+        if (i_time != VLC_TICK_INVALID)
+        {
+            i_time -= i_delay;
+            if (i_time < VLC_TICK_0)
+                i_time = VLC_TICK_0;
+        }
+
+        if (i_length != 0)
+            f_position -= (double)i_delay / i_length;
+        if (f_position < 0)
+            f_position = 0;
+
+        assert(i_normal_time >= VLC_TICK_0);
+
+        input_SendEventTimes(p_sys->p_input, f_position, i_time,
+                             i_normal_time, i_length);
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_JITTER:
