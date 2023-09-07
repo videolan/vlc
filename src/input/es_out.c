@@ -3190,11 +3190,10 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
             EsOutSelectEs( out, es, true );
             return EsIsSelected( es ) ? VLC_SUCCESS : VLC_EGENERIC;
         }
-        else if( !b && EsIsSelected( es ) )
-        {
+
+        if(!b && EsIsSelected(es))
             EsOutUnselectEs( out, es, es->p_pgrm == p_sys->p_pgrm );
-            return VLC_SUCCESS;
-        }
+
         return VLC_SUCCESS;
     }
 
