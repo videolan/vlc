@@ -1567,16 +1567,13 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
     char *psz = NULL;
     if( p_pgrm->p_meta && vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ) )
     {
-        if( asprintf( &psz, _("%s [%s %d]"), vlc_meta_Get( p_pgrm->p_meta, vlc_meta_Title ),
-                      _("Program"), p_pgrm->i_id ) == -1 )
-            return NULL;
+        if (asprintf(&psz, _("%s [%s %d]"), vlc_meta_Get(p_pgrm->p_meta, vlc_meta_Title),
+                     _("Program"), p_pgrm->i_id) != -1)
+            return psz;
     }
-    else
-    {
-        if( asprintf( &psz, "%s %d", _("Program"), p_pgrm->i_id ) == -1 )
-            return NULL;
-    }
-    return psz;
+    else if (asprintf(&psz, "%s %d", _("Program"), p_pgrm->i_id) != -1)
+        return psz;
+    return NULL;
 }
 
 static char *EsOutProgramGetProgramName( es_out_pgrm_t *p_pgrm )
