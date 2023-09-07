@@ -2207,21 +2207,21 @@ static es_out_id_t *EsOutAdd( es_out_t *out, input_source_t *source, const es_fo
 
 static bool EsIsSelected( es_out_id_t *es )
 {
-    if( es->p_master )
-    {
-        bool b_decode = false;
-        if( es->p_master->p_dec )
-        {
-            int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-            vlc_input_decoder_GetCcState( es->p_master->p_dec, es->fmt.i_codec,
-                                          i_channel, &b_decode );
-        }
-        return b_decode;
-    }
-    else
-    {
+    /* Some tracks, especially closed-captions, are extracted from an
+     * existing elementary stream through the packetizer or the decoder,
+     * which must be selected for the extracted track to be selected.
+     * In every other cases, we don't need to consider that. */
+    if (es->p_master == NULL)
         return es->p_dec != NULL;
+
+    bool b_decode = false;
+    if( es->p_master->p_dec )
+    {
+        int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
+        vlc_input_decoder_GetCcState( es->p_master->p_dec, es->fmt.i_codec,
+                                      i_channel, &b_decode );
     }
+    return b_decode;
 }
 
 static void ClockUpdate(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
