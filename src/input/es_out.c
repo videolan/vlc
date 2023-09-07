@@ -3220,21 +3220,18 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
 
         foreach_es_then_es_slaves(other)
         {
-            if( i_cat == IGNORE_ES )
+            if (i_cat == IGNORE_ES && es == other)
             {
-                if (es == other)
+                if (i_query == ES_OUT_RESTART_ES && es->p_dec != NULL)
                 {
-                    if (i_query == ES_OUT_RESTART_ES && es->p_dec != NULL)
-                    {
-                        EsOutDestroyDecoder(out, es);
-                        EsOutCreateDecoder(out, es);
-                    }
-                    else if( i_query == ES_OUT_SET_ES )
-                    {
-                        EsOutSelect(out, es, true);
-                    }
-                    break;
+                    EsOutDestroyDecoder(out, es);
+                    EsOutCreateDecoder(out, es);
                 }
+                else if (i_query == ES_OUT_SET_ES)
+                {
+                    EsOutSelect(out, es, true);
+                }
+                break;
             }
             else if (i_cat == UNKNOWN_ES || other->fmt.i_cat == i_cat)
             {
