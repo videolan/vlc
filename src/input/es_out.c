@@ -747,90 +747,89 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
 
     assert( ( b_record && !p_sys->p_sout_record ) || ( !b_record && p_sys->p_sout_record ) );
 
-    if( b_record )
+    if (!b_record)
     {
-        char *psz_path = NULL;
-        if( dir_path == NULL )
+        vlc_list_foreach (p_es, &p_sys->es, node) /* Only master es */
         {
-            psz_path = var_CreateGetNonEmptyString( p_input, "input-record-path" );
-            if( psz_path == NULL )
-            {
-                if( var_CountChoices( p_input, "video-es" ) )
-                    psz_path = config_GetUserDir( VLC_VIDEOS_DIR );
-                else if( var_CountChoices( p_input, "audio-es" ) )
-                    psz_path = config_GetUserDir( VLC_MUSIC_DIR );
-                else
-                    psz_path = config_GetUserDir( VLC_DOWNLOAD_DIR );
-            }
-
-            dir_path = psz_path;
-        }
-
-        char *psz_sout = NULL;  // TODO conf
-
-        if( !psz_sout && dir_path )
-        {
-            char *psz_file = input_item_CreateFilename( input_GetItem(p_input),
-                                                        dir_path,
-                                                        INPUT_RECORD_PREFIX, NULL );
-            if( psz_file )
-            {
-                char* psz_file_esc = config_StringEscape( psz_file );
-                if ( psz_file_esc )
-                {
-                    if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file_esc ) < 0 )
-                        psz_sout = NULL;
-                    free( psz_file_esc );
-                }
-                free( psz_file );
-            }
-        }
-        free( psz_path );
-
-        if( !psz_sout )
-            return VLC_EGENERIC;
-
-        p_sys->p_sout_record = sout_NewInstance( p_input, psz_sout );
-        free( psz_sout );
-
-        if( !p_sys->p_sout_record )
-            return VLC_EGENERIC;
-
-        vlc_list_foreach( p_es, &p_sys->es, node ) /* Only master es */
-        {
-            if( !p_es->p_dec )
-                continue;
-
-            const struct vlc_input_decoder_cfg cfg = {
-                .fmt = &p_es->fmt,
-                .str_id = p_es->id.str_id,
-                .clock = NULL,
-                .resource = input_priv(p_input)->p_resource,
-                .sout = p_sys->p_sout_record,
-                .input_type = INPUT_TYPE_NONE,
-                .cbs = &decoder_cbs,
-                .cbs_data = p_es,
-            };
-
-            p_es->p_dec_record = vlc_input_decoder_New( VLC_OBJECT(p_input), &cfg );
-
-            if( p_es->p_dec_record && p_sys->b_buffering )
-                vlc_input_decoder_StartWait( p_es->p_dec_record );
-        }
-    }
-    else
-    {
-        vlc_list_foreach( p_es, &p_sys->es, node ) /* Only master es */
-        {
-            if( !p_es->p_dec_record )
+            if (!p_es->p_dec_record)
                 continue;
 
             vlc_input_decoder_Flush(p_es->p_dec_record);
-            vlc_input_decoder_Delete( p_es->p_dec_record );
+            vlc_input_decoder_Delete(p_es->p_dec_record);
             p_es->p_dec_record = NULL;
         }
-        sout_StreamChainDelete( p_sys->p_sout_record, NULL );
+        sout_StreamChainDelete(p_sys->p_sout_record, NULL);
         p_sys->p_sout_record = NULL;
+        return VLC_SUCCESS;
+    }
+
+    char *psz_path = NULL;
+    if (dir_path == NULL)
+    {
+        psz_path = var_CreateGetNonEmptyString(p_input, "input-record-path");
+        if (psz_path == NULL)
+        {
+            if (var_CountChoices(p_input, "video-es"))
+                psz_path = config_GetUserDir(VLC_VIDEOS_DIR);
+            else if (var_CountChoices(p_input, "audio-es"))
+                psz_path = config_GetUserDir(VLC_MUSIC_DIR);
+            else
+                psz_path = config_GetUserDir(VLC_DOWNLOAD_DIR);
+        }
+
+        dir_path = psz_path;
+    }
+
+    char *psz_sout = NULL;  // TODO conf
+
+    if (!psz_sout && dir_path)
+    {
+        char *psz_file = input_item_CreateFilename(input_GetItem(p_input),
+                                                   dir_path,
+                                                   INPUT_RECORD_PREFIX, NULL);
+        if (psz_file)
+        {
+            char* psz_file_esc = config_StringEscape(psz_file);
+            if (psz_file_esc)
+            {
+                if (asprintf(&psz_sout, "#record{dst-prefix='%s'}", psz_file_esc) < 0)
+                    psz_sout = NULL;
+                free(psz_file_esc);
+            }
+            free(psz_file);
+        }
+    }
+    free(psz_path);
+
+    if (!psz_sout)
+        return VLC_EGENERIC;
+
+    p_sys->p_sout_record = sout_NewInstance(p_input, psz_sout);
+    free(psz_sout);
+
+    if (!p_sys->p_sout_record)
+        return VLC_EGENERIC;
+
+    vlc_list_foreach (p_es, &p_sys->es, node) /* Only master es */
+    {
+        if (p_es->p_dec == NULL)
+            continue;
+
+        const struct vlc_input_decoder_cfg cfg = {
+            .fmt = &p_es->fmt,
+            .str_id = p_es->id.str_id,
+            .clock = NULL,
+            .resource = input_priv(p_input)->p_resource,
+            .sout = p_sys->p_sout_record,
+            .input_type = INPUT_TYPE_NONE,
+            .cbs = &decoder_cbs,
+            .cbs_data = p_es,
+        };
+
+        p_es->p_dec_record = vlc_input_decoder_New(VLC_OBJECT(p_input), &cfg);
+
+        if (p_es->p_dec_record != NULL && p_sys->b_buffering)
+            vlc_input_decoder_StartWait(p_es->p_dec_record);
     }
 
     return VLC_SUCCESS;
