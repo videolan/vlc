@@ -225,8 +225,7 @@ static int Activate( filter_t *p_filter )
     }
 
     p_sys->p_offset = malloc( p_filter->fmt_out.video.i_width
-                    * ( ( p_filter->fmt_out.video.i_chroma
-                           == VLC_CODEC_RGB8 ) ? 2 : 1 )
+                    * ( ( p_sys->i_bytespp == 1 ) ? 2 : 1 )
                     * sizeof( int ) );
     if( p_sys->p_offset == NULL )
     {
