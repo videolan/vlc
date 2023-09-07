@@ -174,7 +174,6 @@ static int Activate( filter_t *p_filter )
                 case VLC_CODEC_RGB233:
                 case VLC_CODEC_RGB332:
                 case VLC_CODEC_BGR233:
-                case VLC_CODEC_RGB8:
                     p_filter->ops = &I420_RGB8_ops;
                     break;
                 case VLC_CODEC_RGB15:
@@ -207,7 +206,6 @@ static int Activate( filter_t *p_filter )
         case VLC_CODEC_RGB233:
         case VLC_CODEC_RGB332:
         case VLC_CODEC_BGR233:
-        case VLC_CODEC_RGB8:
             p_sys->i_bytespp = 1;
             break;
 #endif
@@ -327,7 +325,6 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     case VLC_CODEC_RGB233:
     case VLC_CODEC_RGB332:
     case VLC_CODEC_BGR233:
-    case VLC_CODEC_RGB8:
         p_sys->p_rgb8 = (uint8_t *)p_sys->p_base;
         Set8bppPalette( p_filter, p_sys->p_rgb8 );
         break;
