@@ -3399,68 +3399,75 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         {
             /* Check buffering state on master clock update */
             EsOutDecodersStopBuffering( out, false );
+            return VLC_SUCCESS;
         }
-        else if( p_pgrm == p_sys->p_pgrm )
+
+        if (p_pgrm != p_sys->p_pgrm || p_sys->p_next_frame_es != NULL)
+            return VLC_SUCCESS;
+
+        /* The PCR is not considered late, there is no compensation needed. */
+        if (i_late <= 0)
+            return VLC_SUCCESS;
+
+        /* The output is paced by another client, there is no clock
+         * compensation possible. */
+        if (priv->p_sout != NULL && priv->b_out_pace_control)
+            return VLC_SUCCESS;
+
+        /* Last pcr/clock update was late. We need to compensate by offsetting
+         * from the clock the rendering dates. */
+
+        /* input_clock_GetJitter returns compound delay:
+         * - initial pts delay (buffering/caching)
+         * - jitter compensation
+         * - track offset pts delay
+         * updated on input_clock_Update
+         * Late/jitter amount is updated from median of late values */
+        vlc_tick_t i_clock_total_delay = input_clock_GetJitter(p_pgrm->p_input_clock);
+
+        /* Current jitter */
+        vlc_tick_t i_new_jitter = i_clock_total_delay
+                                - p_sys->i_tracks_pts_delay
+                                - p_sys->i_pts_delay;
+
+        /* If the clock update is late, we have 2 possibilities:
+         *  - offset rendering a bit more by increasing the total pts-delay
+         *  - ignore, set clock to a new reference ahead of previous one
+         *    and flush buffers (because all previous pts will now be late) */
+
+        /* Avoid dangerously high value */
+        /* If the jitter increase is over our max or the total hits the maximum */
+        if (i_new_jitter > priv->i_jitter_max ||
+            i_clock_total_delay > INPUT_PTS_DELAY_MAX ||
+            /* jitter is always 0 due to median calculation first output
+               and low delay can't allow non reversible jitter increase
+               in branch below */
+            (b_low_delay && i_late > priv->i_jitter_max))
         {
-            if( p_sys->p_next_frame_es != NULL )
-                return VLC_SUCCESS;
 
-            /* Last pcr/clock update was late. We need to compensate by offsetting
-               from the clock the rendering dates */
-            if( i_late > 0 && ( !priv->p_sout ||
-                            !priv->b_out_pace_control ) )
-            {
-                /* input_clock_GetJitter returns compound delay:
-                 * - initial pts delay (buffering/caching)
-                 * - jitter compensation
-                 * - track offset pts delay
-                 * updated on input_clock_Update
-                 * Late/jitter amount is updated from median of late values */
-                vlc_tick_t i_clock_total_delay = input_clock_GetJitter( p_pgrm->p_input_clock );
+            msg_Err(p_sys->p_input,
+                    "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",
+                    (int)MS_FROM_VLC_TICK(i_late),
+                    (int)MS_FROM_VLC_TICK(i_new_jitter));
 
-                /* Current jitter */
-                vlc_tick_t i_new_jitter = i_clock_total_delay
-                                        - p_sys->i_tracks_pts_delay
-                                        - p_sys->i_pts_delay;
-
-                /* If the clock update is late, we have 2 possibilities:
-                 *  - offset rendering a bit more by increasing the total pts-delay
-                 *  - ignore, set clock to a new reference ahead of previous one
-                 *    and flush buffers (because all previous pts will now be late) */
-
-                /* Avoid dangerously high value */
-                /* If the jitter increase is over our max or the total hits the maximum */
-                if( i_new_jitter > priv->i_jitter_max ||
-                    i_clock_total_delay > INPUT_PTS_DELAY_MAX ||
-                    /* jitter is always 0 due to median calculation first output
-                       and low delay can't allow non reversible jitter increase
-                       in branch below */
-                    (b_low_delay && i_late > priv->i_jitter_max) )
-                {
-                    msg_Err( p_sys->p_input,
-                             "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",
-                             (int)MS_FROM_VLC_TICK(i_late),
-                             (int)MS_FROM_VLC_TICK(i_new_jitter) );
-
-                    /* don't change the current jitter */
-                    i_new_jitter = p_sys->i_pts_jitter;
-                }
-                else
-                {
-                    msg_Err( p_sys->p_input,
-                             "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (pts_delay increased to %d ms)",
-                             (int)MS_FROM_VLC_TICK(i_late),
-                             (int)MS_FROM_VLC_TICK(i_clock_total_delay) );
-                }
-
-                /* Force a rebufferization when we are too late */
-                EsOutControlLocked( out, source, ES_OUT_RESET_PCR );
-
-                EsOutPrivControlLocked( out, source, ES_OUT_PRIV_SET_JITTER,
-                                        p_sys->i_pts_delay, i_new_jitter,
-                                        p_sys->i_cr_average );
-            }
+            /* don't change the current jitter */
+            i_new_jitter = p_sys->i_pts_jitter;
         }
+        else
+        {
+            msg_Err(p_sys->p_input,
+                    "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (pts_delay increased to %d ms)",
+                    (int)MS_FROM_VLC_TICK(i_late),
+                    (int)MS_FROM_VLC_TICK(i_clock_total_delay));
+        }
+
+        /* Force a rebufferization when we are too late */
+        EsOutControlLocked(out, source, ES_OUT_RESET_PCR);
+
+        EsOutPrivControlLocked(out, source, ES_OUT_PRIV_SET_JITTER,
+                               p_sys->i_pts_delay, i_new_jitter,
+                               p_sys->i_cr_average);
+
         return VLC_SUCCESS;
     }
 
