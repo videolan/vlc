@@ -317,14 +317,11 @@ default_val:
 
 static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
 {
-    int i_channel;
-    if( p_fmt->i_codec == VLC_CODEC_CEA608 && p_fmt->subs.cc.i_channel < 4 )
-        i_channel = p_fmt->subs.cc.i_channel;
-    else if( p_fmt->i_codec == VLC_CODEC_CEA708 && p_fmt->subs.cc.i_channel < 64 )
-        i_channel = p_fmt->subs.cc.i_channel;
-    else
-        i_channel = -1;
-    return i_channel;
+    if ((p_fmt->i_codec == VLC_CODEC_CEA608 && p_fmt->subs.cc.i_channel < 4)
+     || (p_fmt->i_codec == VLC_CODEC_CEA708 && p_fmt->subs.cc.i_channel < 64))
+        return p_fmt->subs.cc.i_channel;
+
+    return -1;
 }
 
 #define foreach_es_then_es_slaves( pos ) \
