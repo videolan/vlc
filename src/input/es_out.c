@@ -3270,16 +3270,16 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
             return VLC_EGENERIC;
         foreach_es_then_es_slaves(other)
         {
-            if (es == other)
+            if (es != other)
+                continue;
+
+            if (EsIsSelected(other))
             {
-                if (EsIsSelected(other))
-                {
-                    EsOutUnselectEs(out, other, other->p_pgrm == p_sys->p_pgrm);
-                    EsOutStopFreeVout( out );
-                    return VLC_SUCCESS;
-                }
-                break;
+                EsOutUnselectEs(out, other, other->p_pgrm == p_sys->p_pgrm);
+                EsOutStopFreeVout(out);
+                return VLC_SUCCESS;
             }
+            break;
         }
         return VLC_EGENERIC;
     }
