@@ -569,16 +569,16 @@ static char *EsGetTitle( es_out_id_t *es )
 
 static void EsRelease(es_out_id_t *es)
 {
-    if (vlc_atomic_rc_dec(&es->rc))
-    {
-        free(es->psz_title);
-        free(es->psz_language);
-        free(es->psz_language_code);
-        es_format_Clean(&es->fmt);
-        input_source_Release(es->id.source);
-        free(es->id.str_id);
-        free(es);
-    }
+    if (!vlc_atomic_rc_dec(&es->rc))
+        return;
+
+    free(es->psz_title);
+    free(es->psz_language);
+    free(es->psz_language_code);
+    es_format_Clean(&es->fmt);
+    input_source_Release(es->id.source);
+    free(es->id.str_id);
+    free(es);
 }
 
 static void EsHold(es_out_id_t *es)
