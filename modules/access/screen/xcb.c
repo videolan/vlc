@@ -549,7 +549,7 @@ static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
                 break;
             case 8: /* XXX: screw grey scale! */
                 if (fmt->bits_per_pixel == 8)
-                    chroma = VLC_CODEC_RGB8;
+                    chroma = VLC_CODEC_RGB233;
                 break;
         }
         if (chroma != 0)
