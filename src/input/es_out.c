@@ -4625,16 +4625,15 @@ static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
     input_item_t   *p_item = input_priv(p_input)->p_item;
-    char* psz_info_category;
+    char* psz_info_category = EsInfoCategoryName(es);
+    if (unlikely(psz_info_category == NULL))
+        return;
 
-    if( likely( psz_info_category = EsInfoCategoryName( es ) ) )
-    {
-        int ret = input_item_DelInfo( p_item, psz_info_category, NULL );
-        free( psz_info_category );
+    int ret = input_item_DelInfo(p_item, psz_info_category, NULL);
+    free(psz_info_category);
 
-        if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING )
-            input_SendEventMetaInfo( p_input );
-    }
+    if (ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING)
+        input_SendEventMetaInfo(p_input);
 }
 
 es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id)
