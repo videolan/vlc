@@ -987,8 +987,16 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
     vlc_tick_t i_system_start;
     vlc_tick_t i_stream_duration;
     vlc_tick_t i_system_duration;
-    if (input_clock_GetState( p_sys->p_pgrm->p_input_clock,
-                                  &i_stream_start, &i_system_start,
+
+    /* TODO: We still need input_clock_GetState for the preroll computation
+     *       for now. */
+    if (input_clock_GetState(p_sys->p_pgrm->p_input_clock,
+                             &i_stream_start, &i_system_start,
+                             &i_stream_duration, &i_system_duration))
+        return;
+    (void)i_system_start;
+
+    if (input_clock_GetBufferingDuration( p_sys->p_pgrm->p_input_clock,
                                   &i_stream_duration, &i_system_duration ))
         return;
 
@@ -1217,18 +1225,15 @@ static void EsOutFrameNext(es_out_sys_t *p_sys)
 }
 static vlc_tick_t EsOutGetBuffering(es_out_sys_t *p_sys)
 {
-    vlc_tick_t i_stream_duration, i_system_start;
-
     if( !p_sys->p_pgrm )
         return 0;
 
-    vlc_tick_t i_stream_start, i_system_duration;
+    vlc_tick_t i_stream_duration, i_system_duration;
 
     /* If the input_clock is not ready, we don't have a reference point
      * which means that buffering has not started, continue waiting. */
-    if (input_clock_GetState(p_sys->p_pgrm->p_input_clock,
-                             &i_stream_start, &i_system_start,
-                             &i_stream_duration, &i_system_duration))
+    if (input_clock_GetBufferingDuration(p_sys->p_pgrm->p_input_clock,
+                                         &i_stream_duration, &i_system_duration))
         return 0;
 
     vlc_tick_t i_delay;
@@ -1241,13 +1246,16 @@ static vlc_tick_t EsOutGetBuffering(es_out_sys_t *p_sys)
     {
         if( p_sys->b_paused )
         {
-            i_system_duration = p_sys->i_pause_date  - i_system_start;
+            i_system_duration = input_clock_GetSystemDuration(p_sys->p_pgrm->p_input_clock,
+                                          p_sys->i_pause_date);
             if( p_sys->i_buffering_extra_initial > 0 )
                 i_system_duration += p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
         }
         else
         {
-            i_system_duration = vlc_tick_now() - i_system_start;
+            i_system_duration = input_clock_GetSystemDuration(p_sys->p_pgrm->p_input_clock,
+                                          vlc_tick_now());
+
         }
 
         const vlc_tick_t i_consumed = i_system_duration * p_sys->rate - i_stream_duration;
