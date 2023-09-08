@@ -23,21 +23,16 @@
 #include "config.h"
 #endif
 
-#include <QAbstractListModel>
 
-#include <vlc_media_source.h>
-#include <vlc_cxx_helpers.hpp>
+#include "util/base_model.hpp"
+#include "maininterface/mainctx.hpp"
 
-#include <maininterface/mainctx.hpp>
-
-#include <memory>
-
-class NetworkSourcesModel : public QAbstractListModel
+class NetworkSourcesModelPrivate;
+class NetworkSourcesModel : public BaseModel
 {
     Q_OBJECT
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     enum Role {
@@ -58,34 +53,18 @@ public:
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex& parent = {}) const override;
 
+public: // properties
     void setCtx(MainCtx* ctx);
-
     inline MainCtx* getCtx() { return m_ctx; }
-
-    int getCount() const;
-
-    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
 
 signals:
     void ctxChanged();
-    void countChanged();
 
 private:
-    struct Item
-    {
-        QString name;
-        QString longName;
-        QUrl artworkUrl;
-    };
-
-    bool initializeMediaTree();
-
-private:
-    std::vector<Item> m_items;
     MainCtx* m_ctx = nullptr;
-    services_discovery_category_e m_sdSource = services_discovery_category_e::SD_CAT_INTERNET;
+
+    Q_DECLARE_PRIVATE(NetworkSourcesModel);
 };
 
 #endif // MLNetworkSourcesModel_HPP
