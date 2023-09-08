@@ -90,10 +90,10 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
     }
 }
 
-static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_index,
+static inline int GetPackedRgbIndexes( vlc_fourcc_t fcc, int *i_r_index,
                                        int *i_g_index, int *i_b_index, int *i_a_index )
 {
-    switch(p_fmt->i_chroma)
+    switch(fcc)
     {
         case VLC_CODEC_RGBA:
             *i_r_index = 0;

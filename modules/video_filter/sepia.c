@@ -410,7 +410,7 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
                     p_pic->format.i_chroma != VLC_CODEC_BGR24;
     int i_rindex = 0, i_gindex = 1, i_bindex = 2, i_aindex = -1;
 
-    GetPackedRgbIndexes( &p_outpic->format, &i_rindex, &i_gindex, &i_bindex, &i_aindex );
+    GetPackedRgbIndexes( p_outpic->format.i_chroma, &i_rindex, &i_gindex, &i_bindex, &i_aindex );
 
     p_in = p_pic->p[0].p_pixels;
     p_in_end = p_in + p_pic->p[0].i_visible_lines

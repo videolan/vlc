@@ -267,7 +267,7 @@ class CPictureRGBX : public CPicture {
 public:
     CPictureRGBX(const CPicture &cfg) : CPicture(cfg)
     {
-        if (GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b, &offset_a) != VLC_SUCCESS) {
+        if (GetPackedRgbIndexes(fmt->i_chroma, &offset_r, &offset_g, &offset_b, &offset_a) != VLC_SUCCESS) {
             /* at least init to something on error to silence compiler warnings */
             offset_r = 0;
             offset_g = 1;
