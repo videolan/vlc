@@ -31,6 +31,12 @@
 
 #import "main/VLCMain.h"
 
+@interface VLCLibraryHeroView ()
+
+@property (readonly) VLCMediaLibraryMediaItem *randomItem;
+
+@end
+
 @implementation VLCLibraryHeroView
 
 + (instancetype)fromNibWithOwner:(id)owner
@@ -59,16 +65,12 @@
     [self updateRepresentedItem];
 }
 
-- (void)setRandomItem
+- (VLCMediaLibraryMediaItem *)randomItem
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     const size_t videoCount = libraryModel.numberOfVideoMedia;
     const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
-
-    VLCMediaLibraryMediaItem * const item = [libraryModel.listOfVideoMedia objectAtIndex:randIdx];
-    if (item != nil) {
-        self.representedItem = item;
-    }
+    return [libraryModel.listOfVideoMedia objectAtIndex:randIdx];
 }
 
 @end
