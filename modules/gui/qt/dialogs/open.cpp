@@ -32,6 +32,8 @@
 #include <QRegularExpression>
 #include <QMenu>
 
+#include <cstddef>
+
 #ifndef NDEBUG
 # define DEBUG_QT 1
 #endif
@@ -411,7 +413,7 @@ void OpenDialog::stream( bool b_transcode_only )
     toggleVisible();
 
     /* Dbg and send :D */
-    msg_Dbg( p_intf, "MRL(s) passed to the Sout: %i", soutMRLS.length() );
+    msg_Dbg( p_intf, "MRL(s) passed to the Sout: %zu", static_cast<size_t>( soutMRLS.length() ) );
     for(int i = 0; i < soutMRLS.length(); i++)
     {
         msg_Dbg( p_intf, "MRL(s) passed to the Sout: %s", qtu( soutMRLS[i] ) );
