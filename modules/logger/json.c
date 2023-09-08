@@ -200,7 +200,7 @@ static void TraceJson(void *opaque, vlc_tick_t ts, va_list entries)
 static void Close(void *opaque)
 {
     vlc_tracer_sys_t *sys = opaque;
-
+    fclose(sys->stream);
     free(sys);
 }
 
