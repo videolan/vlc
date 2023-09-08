@@ -23,25 +23,17 @@
 #include "config.h"
 #endif
 
-#include <QAbstractListModel>
+#include "util/base_model.hpp"
+#include "maininterface/mainctx.hpp"
 
-#include <vlc_media_source.h>
-#include <vlc_addons.h>
-#include <vlc_cxx_helpers.hpp>
-
-#include <maininterface/mainctx.hpp>
-
-#include <memory>
-
-class ServicesDiscoveryModel : public QAbstractListModel
+struct ServicesDiscoveryModelPrivate;
+class ServicesDiscoveryModel : public BaseModel
 {
     Q_OBJECT
 
 public:
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged FINAL)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
     enum State // equivalent to addon_state_t
     {
@@ -65,58 +57,26 @@ public:
     Q_ENUM(Role)
 
     explicit ServicesDiscoveryModel(QObject* parent = nullptr);
-    ~ServicesDiscoveryModel() override;
 
+public: //QAbstractListModel override
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex& parent = {}) const override;
 
-    void setCtx(MainCtx* ctx);
-
-    inline MainCtx* getCtx() const { return m_ctx; }
-    inline bool isLoading() const { return m_loading; }
-    int getCount() const;
-
-    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
+public: //invokable functions
     Q_INVOKABLE void installService(int idx);
     Q_INVOKABLE void removeService(int idx);
 
+public: // properties
+    void setCtx(MainCtx* ctx);
+    inline MainCtx* getCtx() const { return m_ctx; }
+
 signals:
-    void loadingChanged();
-    void countChanged();
     void ctxChanged();
 
 private:
-    using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
-                                addon_entry_Hold, addon_entry_Release);
-
-    void initializeManager();
-    static void addonFoundCallback( addons_manager_t *, struct addon_entry_t * );
-    static void addonsDiscoveryEndedCallback( addons_manager_t * );
-    static void addonChangedCallback( addons_manager_t *, struct addon_entry_t * );
-
-    void addonFound( AddonPtr addon );
-    void addonChanged( AddonPtr addon );
-    void discoveryEnded();
-
-    struct Item
-    {
-        QString name;
-        QString summery;
-        QString description;
-        QString author;
-        QUrl sourceUrl;
-        QUrl artworkUrl;
-        AddonPtr entry;
-
-        Item( AddonPtr addon );
-        Item& operator =( AddonPtr addon );
-    };
-
-    std::vector<Item> m_items;
     MainCtx* m_ctx = nullptr;
-    addons_manager_t* m_manager = nullptr;
-    bool m_loading = false;
+
+    Q_DECLARE_PRIVATE(ServicesDiscoveryModel);
 };
 
 #endif // MLServicesDiscoveryModel_HPP

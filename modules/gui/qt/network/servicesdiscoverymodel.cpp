@@ -17,54 +17,224 @@
  *****************************************************************************/
 
 #include "servicesdiscoverymodel.hpp"
-#include <vlc_addons.h>
+
+#include "util/base_model_p.hpp"
+#include "util/locallistcacheloader.hpp"
 
 #include "medialibrary/mlhelper.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
 
+#include <memory>
 #include <QPixmap>
 
-ServicesDiscoveryModel::ServicesDiscoveryModel( QObject* parent )
-    : QAbstractListModel( parent )
+#include <vlc_media_source.h>
+#include <vlc_addons.h>
+#include <vlc_cxx_helpers.hpp>
+#include <vlc_addons.h>
+
+namespace {
+
+using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
+                                          addon_entry_Hold, addon_entry_Release);
+
+class SDItem {
+public:
+    SDItem( AddonPtr addon )
+    {
+        name = qfu( addon->psz_name );
+        summery = qfu( addon->psz_summary ).trimmed();
+        description = qfu( addon->psz_description ).trimmed();
+        author = qfu( addon->psz_author );
+        sourceUrl = QUrl( addon->psz_source_uri );
+        entry = addon;
+
+        if ( addon->psz_image_data ) {
+            char *cDir = config_GetUserDir( VLC_CACHE_DIR );
+            if (likely(cDir != nullptr))
+            {
+                QDir dir( cDir );
+                free(cDir);
+                dir.mkdir("art");
+                dir.cd("art");
+                dir.mkdir("qt-addon-covers");
+                dir.cd("qt-addon-covers");
+
+                QString id = addons_uuid_to_psz( &addon->uuid );
+                QString filename = QString("addon_thumbnail_%1.png").arg(id);
+                QString absoluteFilePath =  dir.absoluteFilePath(filename);
+
+                if ( !QFileInfo::exists( absoluteFilePath )) {
+                    QPixmap pixmap;
+                    pixmap.loadFromData( QByteArray::fromBase64( QByteArray( addon->psz_image_data ) ),
+                                        0,
+                                        Qt::AutoColor
+                                        );
+                    pixmap.save(absoluteFilePath);
+                }
+                artworkUrl = QUrl::fromLocalFile( absoluteFilePath );
+            }
+        }
+        else if ( addon->e_flags & ADDON_BROKEN )
+            artworkUrl = QUrl( ":/addons/addon_broken.svg" );
+        else
+            artworkUrl = QUrl( ":/addons/addon_default.svg" );
+    }
+
+public:
+    QString name;
+    QString summery;
+    QString description;
+    QString author;
+    QUrl sourceUrl;
+    QUrl artworkUrl;
+    AddonPtr entry;
+};
+
+} //namespace
+
+using SDItemPtr = std::shared_ptr<SDItem> ;
+using SDItemList = std::vector<SDItemPtr> ;
+
+// ListCache specialisation
+
+template<>
+bool ListCache<SDItemPtr>::compareItems(const SDItemPtr& a, const SDItemPtr& b)
 {
+    //just compare the pointers here
+    return a == b;
 }
 
-ServicesDiscoveryModel::~ServicesDiscoveryModel()
+// ServicesDiscoveryModelPrivate
+
+class ServicesDiscoveryModelPrivate
+    : public BaseModelPrivateT<SDItemPtr>
+    , public LocalListCacheLoader<SDItemPtr>::ModelSource
 {
-    if ( m_manager )
+public:
+    Q_DECLARE_PUBLIC(ServicesDiscoveryModel)
+
+public: //ctor/dtor
+    ServicesDiscoveryModelPrivate(ServicesDiscoveryModel* pub)
+        : BaseModelPrivateT<SDItemPtr>(pub)
     {
-        addons_manager_Delete( m_manager );
     }
+
+    ~ServicesDiscoveryModelPrivate()
+    {
+        if ( m_manager )
+            addons_manager_Delete( m_manager );
+    }
+
+public:
+    const SDItem* getItemForRow(int row) const
+    {
+        const SDItemPtr* ref = item(row);
+        if (ref)
+            return ref->get();
+        return nullptr;
+    }
+
+public: //BaseModelPrivateT implementation
+    bool initializeModel() override;
+
+    bool loading() const override
+    {
+        return m_loading || BaseModelPrivateT<SDItemPtr>::loading();
+    }
+
+    std::unique_ptr<ListCacheLoader<SDItemPtr>> createLoader() const override
+    {
+        return std::make_unique<LocalListCacheLoader<SDItemPtr>>(
+            this, m_searchPattern,
+            getSortFunction()
+            );
+    }
+
+    LocalListCacheLoader<SDItemPtr>::ItemCompare getSortFunction() const
+    {
+        if (m_sortOrder == Qt::SortOrder::DescendingOrder)
+            return [](const SDItemPtr& a, const SDItemPtr& b){
+                return QString::compare(a->name, b->name) > 0;
+            };
+        else
+            return [](const SDItemPtr& a, const SDItemPtr& b) {
+                return QString::compare(a->name, b->name) < 0;
+            };
+    }
+
+
+
+public: //discovery callbacks
+    void addonFound( AddonPtr addon );
+    void addonChanged( AddonPtr addon );
+    void discoveryEnded();
+
+public: //LocalListCacheLoader implementation
+
+    virtual size_t getModelRevision() const override
+    {
+        return m_revision;
+    }
+
+    //return the data matching the pattern
+    virtual SDItemList getModelData(const QString& pattern) const override
+    {
+        if (pattern.isEmpty())
+            return m_items;
+
+        SDItemList items;
+        std::copy_if(
+            m_items.cbegin(), m_items.cend(),
+            std::back_inserter(items),
+            [&pattern](const SDItemPtr& item) {
+                return item->name.contains(pattern, Qt::CaseInsensitive);
+            });
+        return items;
+    }
+
+public: // data
+    bool m_loading = true;
+    addons_manager_t* m_manager = nullptr;
+
+    size_t m_revision = 0;
+    SDItemList m_items;
+};
+
+ServicesDiscoveryModel::ServicesDiscoveryModel( QObject* parent )
+    : BaseModel( new ServicesDiscoveryModelPrivate(this), parent )
+{
 }
 
 QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) const
 {
+    Q_D(const ServicesDiscoveryModel);
     if (!m_ctx)
         return {};
-    auto idx = index.row();
-    if ( idx < 0 || (size_t)idx >= m_items.size() )
+
+    const SDItem* item = d->getItemForRow(index.row());
+    if (!item)
         return {};
-    const auto& item = m_items[idx];
+
     switch ( role )
     {
         case Role::SERVICE_NAME:
-            return item.name;
+            return item->name;
         case Role::SERVICE_AUTHOR:
-            return item.author;
+            return item->author;
         case Role::SERVICE_SUMMARY:
-            return item.summery;
+            return item->summery;
         case Role::SERVICE_DESCRIPTION:
-            return item.description;
+            return item->description;
         case Role::SERVICE_DOWNLOADS:
-            return QVariant::fromValue( item.entry->i_downloads );
+            return QVariant::fromValue( item->entry->i_downloads );
         case Role::SERVICE_SCORE:
-            return item.entry->i_score / 100;
+            return item->entry->i_score / 100;
         case Role::SERVICE_STATE:
-            return item.entry->e_state;
+            return item->entry->e_state;
         case Role::SERVICE_ARTWORK:
-            return item.artworkUrl;
+            return item->artworkUrl;
         default:
             return {};
     }
@@ -84,62 +254,83 @@ QHash<int, QByteArray> ServicesDiscoveryModel::roleNames() const
     };
 }
 
-QMap<QString, QVariant> ServicesDiscoveryModel::getDataAt(int idx)
-{
-    QMap<QString, QVariant> dataDict;
-    QHash<int,QByteArray> roles = roleNames();
-    for (auto role: roles.keys()) {
-        dataDict[roles[role]] = data(index(idx), role);
-    }
-    return dataDict;
-}
-
 void ServicesDiscoveryModel::installService(int idx)
 {
-    if ( idx < 0 || idx >= (int)m_items.size() )
+    Q_D(ServicesDiscoveryModel);
+
+    const SDItem* item = d->getItemForRow(idx);
+    if (!item)
         return;
 
     addon_uuid_t uuid;
-    memcpy( uuid, m_items[idx].entry->uuid, sizeof( uuid ) );
-    addons_manager_Install( m_manager, uuid );
+    memcpy( uuid, item->entry->uuid, sizeof( uuid ) );
+    addons_manager_Install( d->m_manager, uuid );
 }
 
 void ServicesDiscoveryModel::removeService(int idx)
 {
-    if ( idx < 0 || idx >= (int)m_items.size() )
+    Q_D(ServicesDiscoveryModel);
+
+    const SDItem* item = d->getItemForRow(idx);
+    if (!item)
         return;
 
     addon_uuid_t uuid;
-    memcpy( uuid, m_items[idx].entry->uuid, sizeof( uuid ) );
-    addons_manager_Remove( m_manager, uuid );
+    memcpy( uuid, item->entry->uuid, sizeof( uuid ) );
+    addons_manager_Remove( d->m_manager, uuid );
 }
 
-int ServicesDiscoveryModel::rowCount(const QModelIndex& parent) const
-{
-    if ( parent.isValid() )
-        return 0;
-    return getCount();
-}
-
-int ServicesDiscoveryModel::getCount() const
-{
-    assert( m_items.size() < INT32_MAX );
-    return static_cast<int>( m_items.size() );
-}
 
 void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
 {
-    if (ctx) {
-        m_ctx = ctx;
-    }
-    if (m_ctx) {
-        initializeManager();
-    }
+    Q_D(ServicesDiscoveryModel);
+
+    if (ctx == m_ctx)
+        return;
+
+    assert(ctx);
+    m_ctx = ctx;
+    d->initializeModel();
     emit ctxChanged();
 }
 
-void ServicesDiscoveryModel::initializeManager()
+static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry )
 {
+    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
+        return;
+    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
+        {
+            d->addonFound( std::move( entryPtr ) );
+        }, Qt::QueuedConnection);
+}
+
+static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
+{
+    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    QMetaObject::invokeMethod( d->q_func(), [d]()
+        {
+            d->discoveryEnded();
+        }, Qt::QueuedConnection);
+}
+
+static void addonChangedCallback( addons_manager_t *manager, addon_entry_t *entry )
+{
+    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
+        return;
+    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
+        {
+            d->addonChanged( std::move( entryPtr ) );
+        }, Qt::QueuedConnection);
+}
+
+bool ServicesDiscoveryModelPrivate::initializeModel()
+{
+    Q_Q(ServicesDiscoveryModel);
+    if (m_qmlInitializing || !q->m_ctx)
+        return false;
+
     if ( m_manager )
         addons_manager_Delete( m_manager );
 
@@ -151,119 +342,42 @@ void ServicesDiscoveryModel::initializeManager()
         addonChangedCallback,
     };
 
-    m_manager = addons_manager_New( VLC_OBJECT( m_ctx->getIntf() ), &owner );
+    m_manager = addons_manager_New( VLC_OBJECT( q->m_ctx->getIntf() ), &owner );
     assert( m_manager );
 
     m_loading = true;
-    emit loadingChanged();
+    emit q->loadingChanged();
     addons_manager_LoadCatalog( m_manager );
     addons_manager_Gather( m_manager, "repo://" );
+    return true;
 }
 
-void ServicesDiscoveryModel::addonFoundCallback( addons_manager_t *manager,
-                                        addon_entry_t *entry )
+
+void ServicesDiscoveryModelPrivate::addonFound( AddonPtr addon )
 {
-    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
-        return;
-    ServicesDiscoveryModel *me = (ServicesDiscoveryModel *) manager->owner.sys;
-    QMetaObject::invokeMethod( me, [me, entryPtr = AddonPtr(entry)]()
+    m_items.emplace_back(std::make_shared<SDItem>(addon));
+    m_revision++;
+    invalidateCache();
+}
+
+void ServicesDiscoveryModelPrivate::addonChanged( AddonPtr addon )
+{
+    for ( size_t r = 0; r < m_items.size(); ++r )
     {
-        me->addonFound( std::move( entryPtr ) );
-    }, Qt::QueuedConnection);
-}
-
-void ServicesDiscoveryModel::addonsDiscoveryEndedCallback( addons_manager_t *manager )
-{
-    ServicesDiscoveryModel *me = (ServicesDiscoveryModel *) manager->owner.sys;
-    QMetaObject::invokeMethod( me, [me]()
-    {
-        me->discoveryEnded();
-    }, Qt::QueuedConnection);
-}
-
-void ServicesDiscoveryModel::addonChangedCallback( addons_manager_t *manager,
-                                          addon_entry_t *entry )
-{
-    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
-        return;
-    ServicesDiscoveryModel *me = (ServicesDiscoveryModel *) manager->owner.sys;
-    QMetaObject::invokeMethod( me, [me, entryPtr = AddonPtr(entry)]()
-    {
-        me->addonChanged( std::move( entryPtr ) );
-    }, Qt::QueuedConnection);
-}
-
-void ServicesDiscoveryModel::addonFound( ServicesDiscoveryModel::AddonPtr addon )
-{
-    beginInsertRows( QModelIndex(), getCount(), getCount() );
-    m_items.emplace_back(addon);
-    endInsertRows();
-    emit countChanged();
-}
-
-void ServicesDiscoveryModel::addonChanged( ServicesDiscoveryModel::AddonPtr addon )
-{
-    for ( int r = 0; r < getCount(); ++r )
-    {
-        if ( memcmp( m_items[r].entry->uuid, addon->uuid, sizeof( addon->uuid ) ) )
+        if ( memcmp( m_items[r]->entry->uuid, addon->uuid, sizeof( addon->uuid ) ) )
             continue;
 
-        m_items[r] = addon;
-        emit dataChanged( index( r, 0 ), index( r, 0 ) );
+        m_items[r] = std::make_shared<SDItem>(addon);
+        break;
     }
+    m_revision++;
+    invalidateCache();
 }
 
-void ServicesDiscoveryModel::discoveryEnded()
+void ServicesDiscoveryModelPrivate::discoveryEnded()
 {
+    Q_Q(ServicesDiscoveryModel);
     assert( m_loading );
     m_loading = false;
-    emit loadingChanged();
-}
-
-ServicesDiscoveryModel::Item::Item( ServicesDiscoveryModel::AddonPtr addon )
-{
-    *this = addon;
-}
-
-ServicesDiscoveryModel::Item &ServicesDiscoveryModel::Item::operator=( ServicesDiscoveryModel::AddonPtr addon )
-{
-    name = qfu( addon->psz_name );
-    summery = qfu( addon->psz_summary ).trimmed();
-    description = qfu( addon->psz_description ).trimmed();
-    author = qfu( addon->psz_author );
-    sourceUrl = QUrl( addon->psz_source_uri );
-    entry = addon;
-
-    if ( addon->psz_image_data ) {
-        char *cDir = config_GetUserDir( VLC_CACHE_DIR );
-        if (likely(cDir != nullptr))
-        {
-            QDir dir( cDir );
-            free(cDir);
-            dir.mkdir("art");
-            dir.cd("art");
-            dir.mkdir("qt-addon-covers");
-            dir.cd("qt-addon-covers");
-
-            QString id = addons_uuid_to_psz( &addon->uuid );
-            QString filename = QString("addon_thumbnail_%1.png").arg(id);
-            QString absoluteFilePath =  dir.absoluteFilePath(filename);
-
-            if ( !QFileInfo::exists( absoluteFilePath )) {
-                QPixmap pixmap;
-                pixmap.loadFromData( QByteArray::fromBase64( QByteArray( addon->psz_image_data ) ),
-                    0,
-                    Qt::AutoColor
-                );
-                pixmap.save(absoluteFilePath);
-            }
-            artworkUrl = QUrl::fromLocalFile( absoluteFilePath );
-        }
-    }
-    else if ( addon->e_flags & ADDON_BROKEN )
-        artworkUrl = QUrl( ":/addons/addon_broken.svg" );
-    else
-        artworkUrl = QUrl( ":/addons/addon_default.svg" );
-
-    return *this;
+    emit q->loadingChanged();
 }
