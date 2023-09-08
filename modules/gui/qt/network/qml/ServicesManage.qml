@@ -117,7 +117,7 @@ Widgets.KeyNavigableListView {
                             if (model.state === ServicesDiscoveryModel.NOTINSTALLED)
                                 discoveryModel.installService(discoveryFilterModel.mapIndexToSource(index))
                             else if (model.state === ServicesDiscoveryModel.INSTALLED)
-                                discoveryModel.installService(discoveryFilterModel.mapIndexToSource(index))
+                                discoveryModel.removeService(discoveryFilterModel.mapIndexToSource(index))
                         }
                     }
                 }
