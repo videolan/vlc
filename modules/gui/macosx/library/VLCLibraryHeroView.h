@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 
 + (instancetype)fromNibWithOwner:(id)owner;
+- (void)setOptimalRepresentedItem;
 
 @end
 

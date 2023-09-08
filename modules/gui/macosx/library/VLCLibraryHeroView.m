@@ -90,4 +90,21 @@
     return [recentMedia objectAtIndex:firstPartialPlayItemIdx];
 }
 
+- (void)setOptimalRepresentedItem
+{
+    VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
+    if (latestPartialPlayItem != nil) {
+        self.representedItem = latestPartialPlayItem;
+        return;
+    }
+
+    VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
+    if (randomItem != nil) {
+        self.representedItem = randomItem;
+        return;
+    }
+
+    NSLog(@"Could not find a food media item for hero view!");
+}
+
 @end
