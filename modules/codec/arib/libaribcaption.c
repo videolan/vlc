@@ -166,9 +166,6 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
 
     video_format_t  fmt = *p_dst_format;
     fmt.i_chroma         = VLC_CODEC_RGBA;
-    fmt.i_rmask          = 0;
-    fmt.i_gmask          = 0;
-    fmt.i_bmask          = 0;
     fmt.i_x_offset       = 0;
     fmt.i_y_offset       = 0;
 

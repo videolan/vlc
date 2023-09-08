@@ -602,10 +602,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         return VLC_EGENERIC;
     }
 
-    fmt->i_rmask = 0;
-    fmt->i_gmask = 0;
-    fmt->i_bmask = 0;
-
     msg_Dbg( vd, "output chroma = %4.4s", ( const char * )&fmt->i_chroma );
     msg_Dbg( vd, "KVA chroma = %4.4s", ( const char * )&i_kva_fourcc );
 

@@ -430,9 +430,6 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     p_enc->fmt_in.i_codec =
     p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24;
-    p_enc->fmt_in.video.i_rmask = 0;
-    p_enc->fmt_in.video.i_gmask = 0;
-    p_enc->fmt_in.video.i_bmask = 0;
 
     static const struct vlc_encoder_operations ops =
         { .encode_video = EncodeBlock };

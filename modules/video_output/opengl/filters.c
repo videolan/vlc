@@ -243,12 +243,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
 
         video_format_t *fmt = &glfmt->fmt;
         video_format_Init(fmt, chroma);
-        if (prev_filter->filter.config.filter_planes)
-        {
-            fmt->i_rmask = prev_filter->glfmt_in.fmt.i_rmask;
-            fmt->i_gmask = prev_filter->glfmt_in.fmt.i_gmask;
-            fmt->i_bmask = prev_filter->glfmt_in.fmt.i_bmask;
-        }
         fmt->i_width = fmt->i_visible_width = prev_filter->size_out.width;
         fmt->i_height = fmt->i_visible_height = prev_filter->size_out.height;
 

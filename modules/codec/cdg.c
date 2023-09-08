@@ -116,9 +116,6 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.video.i_height = CDG_DISPLAY_HEIGHT;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
-    p_dec->fmt_out.video.i_rmask = 0;
-    p_dec->fmt_out.video.i_gmask = 0;
-    p_dec->fmt_out.video.i_bmask = 0;
 
     /* Set callbacks */
     p_dec->pf_decode = Decode;

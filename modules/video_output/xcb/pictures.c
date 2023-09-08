@@ -211,9 +211,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             vlc_assert_unreachable();
     }
 
-    f->i_rmask = 0;
-    f->i_gmask = 0;
-    f->i_bmask = 0;
     return true;
 }
 

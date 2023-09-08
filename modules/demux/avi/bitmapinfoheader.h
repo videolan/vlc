@@ -177,9 +177,6 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 if (known_chroma != 0)
                 {
                     fmt->video.i_chroma = fmt->i_codec = known_chroma;
-                    fmt->video.i_rmask = 0;
-                    fmt->video.i_gmask = 0;
-                    fmt->video.i_bmask = 0;
                 }
                 else
                 {
@@ -220,9 +217,6 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 default: return VLC_EINVAL;
             }
             fmt->video.i_chroma = fmt->i_codec = bi_rgb_chroma;
-            fmt->video.i_rmask = 0;
-            fmt->video.i_gmask = 0;
-            fmt->video.i_bmask = 0;
         }
 
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
@@ -344,13 +338,6 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
                 i_amask = bitmap_rgb_masks[i].i_amask;
                 break;
             }
-        }
-        if (i_rmask == 0)
-        {
-            i_rmask = fmt->video.i_rmask;
-            i_gmask = fmt->video.i_gmask;
-            i_bmask = fmt->video.i_bmask;
-            i_amask = 0;
         }
         SetDWLE( &p_bmiColors[0], i_rmask );
         SetDWLE( &p_bmiColors[4], i_gmask );

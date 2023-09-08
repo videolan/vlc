@@ -641,7 +641,6 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
             if( p_sys->i_chroma )
             {
                 fmt.video.i_chroma = p_sys->i_chroma;
-                fmt.video.i_rmask = fmt.video.i_gmask = fmt.video.i_bmask = 0;
                 vctx = NULL; // CPU chroma, no video context
             }
             filter_chain_Reset( p_sys->p_vf2, &fmt, vctx, &fmt );

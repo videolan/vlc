@@ -225,23 +225,9 @@ enum AVPixelFormat GetFfmpegChroma( const video_format_t *fmt )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
-        if( chroma_table[i].i_chroma == fmt->i_chroma &&
-            0 == fmt->i_rmask &&
-            0 == fmt->i_gmask &&
-            0 == fmt->i_bmask )
+        if( chroma_table[i].i_chroma == fmt->i_chroma )
         {
             return chroma_table[i].i_chroma_id;
-        }
-    }
-    // try again without the mask as they may not correspond exactly
-    if (fmt->i_rmask || fmt->i_gmask || fmt->i_bmask)
-    {
-        for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
-        {
-            if( chroma_table[i].i_chroma == fmt->i_chroma )
-            {
-                return chroma_table[i].i_chroma_id;
-            }
         }
     }
     return AV_PIX_FMT_NONE;
@@ -261,7 +247,6 @@ int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
     {
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
         {
-            fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
             fmt->i_chroma = chroma_table[i].i_chroma;
             return VLC_SUCCESS;
         }

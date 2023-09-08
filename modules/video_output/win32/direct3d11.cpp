@@ -326,9 +326,6 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
         if (!is_d3d11_opaque(fmt->i_chroma))
         {
             texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
-            texture_fmt.i_rmask = 0;
-            texture_fmt.i_gmask = 0;
-            texture_fmt.i_bmask = 0;
         }
 
         if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt,
@@ -813,7 +810,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
             const vlc_fourcc_t *list = vlc_fourcc_GetFallback(vd->source->i_chroma);
             for (unsigned i = 0; list[i] != 0; i++) {
                 fmt.i_chroma = list[i];
-                fmt.i_rmask = fmt.i_gmask = fmt.i_bmask = 0;
                 if (fmt.i_chroma == vd->source->i_chroma)
                     continue;
                 err = SetupOutputFormat(vd, &fmt, NULL);
@@ -835,9 +831,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     if (!is_d3d11_opaque(fmt.i_chroma))
     {
         sys->picQuad.quad_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
-        sys->picQuad.quad_fmt.i_rmask = 0;
-        sys->picQuad.quad_fmt.i_gmask = 0;
-        sys->picQuad.quad_fmt.i_bmask = 0;
     }
 
     /* adjust the decoder sizes to have proper padding */
@@ -998,7 +991,6 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
                  (char *)&fmt->i_chroma );
 
     fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.generic.textureFormat->fourcc;
-    fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
 
     /* check the region pixel format */
     sys->regionQuad.generic.textureFormat = GetBlendableFormat(vd, VLC_CODEC_RGBA);

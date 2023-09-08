@@ -782,9 +782,6 @@ interop_init:
      * be created. */
 
     interop->fmt_in.i_chroma = i_chroma;
-    interop->fmt_in.i_rmask = 0;
-    interop->fmt_in.i_gmask = 0;
-    interop->fmt_in.i_bmask = 0;
 
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_common_allocate_textures,

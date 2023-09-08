@@ -561,9 +561,6 @@ int InitVideoEnc( vlc_object_t *p_this )
 
         p_enc->fmt_in.i_codec =
         p_enc->fmt_in.video.i_chroma = VLC_CODEC_I420;
-        p_enc->fmt_in.video.i_rmask = 0;
-        p_enc->fmt_in.video.i_gmask = 0;
-        p_enc->fmt_in.video.i_bmask = 0;
 
         /* Very few application support YUV in TIFF, not even VLC */
         if( p_enc->fmt_out.i_codec == VLC_CODEC_TIFF )

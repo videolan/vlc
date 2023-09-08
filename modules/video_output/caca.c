@@ -488,7 +488,6 @@ static int Open(vout_display_t *vd,
     sys->cursor_deadline = INVALID_DEADLINE;
 
     fmtp->i_chroma = VLC_CODEC_XRGB;
-    fmtp->i_rmask = fmtp->i_gmask = fmtp->i_bmask = 0;
 
     /* Setup vout_display now that everything is fine */
     vd->ops = &ops;

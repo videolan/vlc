@@ -256,30 +256,18 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     switch (i_depth) {
     case 8:
         fmt->i_chroma = VLC_CODEC_RGB233;
-        fmt->i_rmask  = 0;
-        fmt->i_gmask  = 0;
-        fmt->i_bmask  = 0;
         break;
     case 16:
         fmt->i_chroma = VLC_CODEC_RGB555LE;
-        fmt->i_rmask  = 0;
-        fmt->i_gmask  = 0;
-        fmt->i_bmask  = 0;
         break;
     case 24:
         fmt->i_chroma = VLC_CODEC_RGB24;
-        fmt->i_rmask  = 0;
-        fmt->i_gmask  = 0;
-        fmt->i_bmask  = 0;
         break;
     case 32:
         if (vd->source->i_chroma == VLC_CODEC_BGRA)
             fmt->i_chroma = VLC_CODEC_BGRA;
         else
             fmt->i_chroma = VLC_CODEC_BGRX;
-        fmt->i_rmask  = 0;
-        fmt->i_gmask  = 0;
-        fmt->i_bmask  = 0;
         break;
     default:
         msg_Err(vd, "screen depth %i not supported", i_depth);

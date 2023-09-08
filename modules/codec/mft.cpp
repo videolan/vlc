@@ -930,9 +930,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
                             p_dec->fmt_out.i_codec = p_sys->cfg->fourcc;
                             p_dec->fmt_out.video.i_chroma = p_sys->cfg->fourcc;
-                            p_dec->fmt_out.video.i_rmask = 0;
-                            p_dec->fmt_out.video.i_gmask = 0;
-                            p_dec->fmt_out.video.i_bmask = 0;
 
                             // pre allocate all the SRV for that texture
                             for (size_t slice=0; slice < desc.ArraySize; slice++)

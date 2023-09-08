@@ -290,9 +290,6 @@ static int Open(vlc_object_t *obj)
     }
 
     interop->fmt_out.i_chroma = render_chroma;
-    interop->fmt_out.i_rmask = 0;
-    interop->fmt_out.i_gmask = 0;
-    interop->fmt_out.i_bmask = 0;
     interop->fmt_out.space = interop->fmt_in.space;
 
     static const struct vlc_gl_interop_ops ops = {

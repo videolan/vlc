@@ -114,7 +114,6 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
                 es_format_InitFromVideo( &fmt, p_vid );
                 fmt.i_codec =
                 fmt.video.i_chroma = VLC_CODEC_I420;
-                fmt.video.i_rmask = fmt.video.i_gmask = fmt.video.i_bmask = 0;
 
                 /* Test the maximum size/fps we will encode */
                 fmt.video.i_visible_width = fmt.video.i_width = 1920;

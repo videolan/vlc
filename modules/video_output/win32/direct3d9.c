@@ -1657,7 +1657,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     /* */
     *fmt = *vd->source;
     fmt->i_chroma = d3dfmt->fourcc;
-    fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
     sys->sw_texture_fmt = d3dfmt;
 
     if (Direct3D9CreateResources(vd, fmt)) {

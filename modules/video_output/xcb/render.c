@@ -625,12 +625,6 @@ static int Open(vout_display_t *vd,
             continue;
 
         fmtp->i_chroma = chroma;
-        fmtp->i_rmask = fmtp->i_gmask = fmtp->i_bmask = 0;
-#if 0
-        fmtp->i_rmask = ((uint32_t)d->red_mask) << d->red_shift;
-        fmtp->i_gmask = ((uint32_t)d->green_mask) << d->green_shift;
-        fmtp->i_bmask = ((uint32_t)d->blue_mask) << d->blue_shift;
-#endif
         sys->format.argb = pic_fmt->id;
         visual = vid;
     }

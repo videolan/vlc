@@ -189,16 +189,6 @@ static int Open(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
-    /* Define the bitmasks */
-    switch (fmt.i_chroma)
-    {
-    default:
-        break;
-    }
-    fmt.i_rmask = 0;
-    fmt.i_gmask = 0;
-    fmt.i_bmask = 0;
-
     /* */
     *fmtp = fmt;
 

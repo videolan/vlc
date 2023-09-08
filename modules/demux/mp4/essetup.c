@@ -426,15 +426,9 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
             break;
         case VLC_FOURCC('A','B','G','R'):
             p_fmt->i_codec = VLC_CODEC_ARGB;
-            p_fmt->video.i_rmask = 0;
-            p_fmt->video.i_gmask = 0;
-            p_fmt->video.i_bmask = 0;
             break;
         case VLC_FOURCC('2','4','B','G'):
             p_fmt->i_codec = VLC_CODEC_BGR24;
-            p_fmt->video.i_rmask = 0;
-            p_fmt->video.i_gmask = 0;
-            p_fmt->video.i_bmask = 0;
             break;
         case VLC_FOURCC('r','a','w',' '):
             switch( p_vide->i_depth ) {

@@ -192,9 +192,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     p_dec->fmt_out.video.i_visible_height = i_height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
-    p_dec->fmt_out.video.i_rmask = 0;
-    p_dec->fmt_out.video.i_gmask = 0;
-    p_dec->fmt_out.video.i_bmask = 0;
 
     /* Get a new picture */
     if( decoder_UpdateVideoFormat( p_dec ) )

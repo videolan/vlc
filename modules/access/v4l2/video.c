@@ -840,9 +840,6 @@ int SetupVideo(vlc_object_t *obj, int fd, uint32_t caps,
     /* Setup our unique elementary (video) stream format */
     es_format_Init(es_fmt, VIDEO_ES, selected->vlc);
     es_fmt->video.i_chroma = selected->vlc;
-    es_fmt->video.i_rmask = 0;
-    es_fmt->video.i_gmask = 0;
-    es_fmt->video.i_bmask = 0;
     es_fmt->video.i_visible_width = fmt.fmt.pix.width;
     if (fmt.fmt.pix.bytesperline != 0 && selected->bpp != 0)
         es_fmt->video.i_width = fmt.fmt.pix.bytesperline / selected->bpp;
