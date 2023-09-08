@@ -106,6 +106,11 @@ static int Control(sout_stream_t *stream, int query, va_list args)
 static void Flush(sout_stream_t *stream, void *id)
 {
     sout_stream_id_sys_t *sys_id = id;
+    struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(stream));
+    if (tracer != NULL)
+    {
+        vlc_tracer_TraceEvent(tracer, stream->p_sys, sys_id->es_id, "FLUSH");
+    }
     sout_StreamFlush(stream->p_next, sys_id->next_id);
 }
 
