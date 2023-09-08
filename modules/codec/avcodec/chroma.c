@@ -212,7 +212,7 @@ static const struct
     {VLC_CODEC_GBRA_PLANAR_16B, AV_PIX_FMT_GBRAP16BE, 0, 0, 0 },
 
     /* XYZ */
-    {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12, 0xfff0, 0xfff0, 0xfff0},
+    {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12BE, 0, 0, 0 },
     { 0, 0, 0, 0, 0 }
 };
 
