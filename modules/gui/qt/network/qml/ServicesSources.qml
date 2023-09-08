@@ -32,7 +32,7 @@ MainInterface.MainGridView {
     readonly property bool isViewMultiView: false
 
     selectionDelegateModel: selectionModel
-    model: sourcesFilterModel
+    model: sourcesModel
     topMargin: VLCStyle.margin_large
     cellWidth: VLCStyle.gridItem_network_width
     cellHeight: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
@@ -96,7 +96,7 @@ MainInterface.MainGridView {
     }
 
     onActionAtIndex: {
-        const itemData = sourcesFilterModel.getDataAt(index);
+        const itemData = sourcesModel.getDataAt(index);
 
         if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
             History.push(["mc", "discover", "services", "services_manage"], Qt.TabFocusReason)
@@ -120,13 +120,6 @@ MainInterface.MainGridView {
     Util.SelectableDelegateModel {
         id: selectionModel
 
-        model: sourcesFilterModel
-    }
-
-    SortFilterProxyModel {
-        id: sourcesFilterModel
-
-        sourceModel: sourcesModel
-        searchRole: "name"
+        model: sourcesModel
     }
 }
