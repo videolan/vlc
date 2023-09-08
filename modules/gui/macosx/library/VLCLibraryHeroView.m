@@ -34,6 +34,7 @@
 @interface VLCLibraryHeroView ()
 
 @property (readonly) VLCMediaLibraryMediaItem *randomItem;
+@property (readonly) VLCMediaLibraryMediaItem *latestPartiallyPlayedItem;
 
 @end
 
@@ -71,6 +72,22 @@
     const size_t videoCount = libraryModel.numberOfVideoMedia;
     const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
     return [libraryModel.listOfVideoMedia objectAtIndex:randIdx];
+}
+
+- (VLCMediaLibraryMediaItem *)latestPartiallyPlayedItem
+{
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    NSArray<VLCMediaLibraryMediaItem *> * const recentMedia = libraryModel.listOfRecentMedia;
+    const NSUInteger firstPartialPlayItemIdx = [recentMedia indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *testedItem, NSUInteger idx, BOOL *stop) {
+        const float playProgress = testedItem.progress;
+        return playProgress > 0 && playProgress < 100;
+    }];
+
+    if (firstPartialPlayItemIdx == NSNotFound) {
+        return nil;
+    }
+
+    return [recentMedia objectAtIndex:firstPartialPlayItemIdx];
 }
 
 @end

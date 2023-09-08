@@ -78,6 +78,7 @@
     _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
     _leadingContainerCount += 1;
     [self addView:self.heroView toStackView:self.collectionsStackView];
+    [self.heroView setOptimalRepresentedItem];
 }
 
 - (BOOL)recentMediaPresent
@@ -229,6 +230,7 @@
 
 
     [self addView:self.heroView toStackView:_collectionsStackView];
+    [self.heroView setOptimalRepresentedItem];
 
     for (VLCLibraryVideoCollectionViewContainerView * const containerView in _collectionViewContainers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];
