@@ -39,6 +39,8 @@ public:
     virtual unsigned int getCount() const = 0;
     virtual unsigned int getMaximumCount() const = 0;
 
+    virtual bool initializeModel() = 0;
+
 protected:
     virtual bool cachable() const
     {

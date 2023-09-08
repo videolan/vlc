@@ -43,7 +43,8 @@ void BaseModel::componentComplete()
 {
     Q_D(BaseModel);
     d->m_qmlInitializing = false;
-    d->validateCache();
+    if (d->initializeModel())
+        d->validateCache();
 }
 
 int BaseModel::rowCount(const QModelIndex &parent) const

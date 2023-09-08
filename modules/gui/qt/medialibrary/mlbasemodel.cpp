@@ -73,6 +73,20 @@ public:
         Q_Q(const MLBaseModel);
         return Parent::loading() || !q->m_mediaLib;
     }
+
+    bool initializeModel() override
+    {
+        Q_Q(MLBaseModel);
+        if (m_qmlInitializing || !q->m_mediaLib)
+            return false;
+
+        if ( q->m_ml_event_handle == nullptr )
+            q->m_ml_event_handle.reset( q->m_mediaLib->registerEventListener(MLBaseModel::onVlcMlEvent, q ) );
+
+        invalidateCache();
+        return true;
+    }
+
 };
 
 // MLBaseModel
@@ -289,17 +303,14 @@ MediaLib* MLBaseModel::ml() const
 
 void MLBaseModel::setMl(MediaLib* medialib)
 {
+    Q_D(MLBaseModel);
     assert(medialib);
 
     if (m_mediaLib == medialib)
         return;
 
     m_mediaLib = medialib;
-    if ( m_ml_event_handle == nullptr )
-        m_ml_event_handle.reset( m_mediaLib->registerEventListener(onVlcMlEvent, this ) );
-
-    invalidateCache();
-
+    d->initializeModel();
     mlChanged();
 }
 
