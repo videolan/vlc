@@ -3,6 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2008-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
+ * Copyright (C) 2023-2025 Alexandre Janniaux <ajanni@videolabs.io>
  *
  * Authors: Laurent Aimar < fenrir _AT_ videolan _DOT_ org >
  *
@@ -153,6 +154,27 @@ float input_clock_GetRate( input_clock_t * );
 int input_clock_GetState( input_clock_t *,
                           vlc_tick_t *pi_stream_start, vlc_tick_t *pi_system_start,
                           vlc_tick_t *pi_stream_duration, vlc_tick_t *pi_system_duration );
+
+/**
+ * Return the duration of stream buffered as well as for how long the
+ * buffering has been started.
+ *
+ * @param clock An input clock with valid references
+ * @param stream_duration the available buffering duration
+ * @param system_duration the time spent in buffering
+ */
+int input_clock_GetBufferingDuration(
+    const input_clock_t *clock,
+    vlc_tick_t *stream_duration,
+    vlc_tick_t *system_duration);
+
+/**
+ * Return for how long the buffering would be running up to the system
+ * reference given.
+ */
+vlc_tick_t input_clock_GetSystemDuration(
+    const input_clock_t *clock,
+    vlc_tick_t system_reference);
 
 /**
  * This function allows the set the minimal configuration for the jitter estimation algo.

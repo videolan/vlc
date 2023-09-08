@@ -3,6 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1999-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
+ * Copyright (C) 2023-2025 Alexandre Janniaux <ajanni@videolabs.io>
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar < fenrir _AT_ videolan _DOT_ org >
@@ -418,6 +419,31 @@ int input_clock_GetState( input_clock_t *cl,
     *pi_system_duration = cl->last.system - cl->ref.system;
 
     return VLC_SUCCESS;
+}
+
+int input_clock_GetBufferingDuration(
+    const input_clock_t *clock,
+    vlc_tick_t *stream_duration,
+    vlc_tick_t *system_duration
+){
+    if (!clock->b_has_reference)
+        return VLC_EGENERIC;
+
+    *stream_duration = clock->last.stream - clock->ref.stream;
+    *system_duration = clock->last.system - clock->ref.system;
+
+    return VLC_SUCCESS;
+}
+
+vlc_tick_t input_clock_GetSystemDuration(
+    const input_clock_t *clock,
+    vlc_tick_t system_reference
+){
+    if (!clock->b_has_reference)
+        return 0;
+
+    vlc_tick_t system_start = clock->ref.system;
+    return system_reference - system_start;
 }
 
 void input_clock_ChangeSystemOrigin( input_clock_t *cl, vlc_tick_t i_system )
