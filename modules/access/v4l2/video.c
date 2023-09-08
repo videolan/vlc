@@ -617,7 +617,6 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_RGB565X, VLC_CODEC_RGB16, 2,  0x001F,   0x07E0,   0xF800 },
 //  { V4L2_PIX_FMT_RGB555,    },
     { V4L2_PIX_FMT_RGB555X, VLC_CODEC_RGB15, 2,  0x001F,   0x03E0,   0x7C00 },
-//  { V4L2_PIX_FMT_RGB444,  VLC_CODEC_RGB12, 2,  0x000F,   0xF000,   0x0F00 },
 #else
     { V4L2_PIX_FMT_RGB32,   VLC_CODEC_RGB32, 4, 0x0000FF, 0x00FF00, 0xFF0000 },
     { V4L2_PIX_FMT_BGR32,   VLC_CODEC_RGB32, 4, 0xFF0000, 0x00FF00, 0x0000FF },
@@ -628,7 +627,6 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
 //  { V4L2_PIX_FMT_RGB565X,   },
     { V4L2_PIX_FMT_RGB555,  VLC_CODEC_RGB15, 2,   0x001F,   0x03E0,   0x7C00 },
 //  { V4L2_PIX_FMT_RGB555X,   },
-//  { V4L2_PIX_FMT_RGB444,  VLC_CODEC_RGB12, 2,   0x0F00,   0x00F0,   0x000F },
 #endif
 //  { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB8,  1,      0xC0,     0x38,     0x07 },
 

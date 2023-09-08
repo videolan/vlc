@@ -345,8 +345,6 @@
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
 /* 8-bit RGB (using explicit masks) */
 #define VLC_CODEC_RGB8            VLC_FOURCC('R','G','B','8')
-/* 12-bit RGB padded to 16 bits (using explicit masks) */
-#define VLC_CODEC_RGB12           VLC_FOURCC('R','V','1','2')
 /* 15-bit RGB padded to 16 bits (using explicit masks) */
 #define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
 /* 16-bit RGB (using explicit masks) */

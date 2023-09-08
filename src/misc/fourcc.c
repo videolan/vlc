@@ -801,7 +801,6 @@ static const struct
         VLC_CODEC_GREY_16B },                  PACKED_FMT(2, 16) },
 
     { { VLC_CODEC_RGB15, 0 },                  PACKED_FMT(2, 15) },
-    { { VLC_CODEC_RGB12, 0 },                  PACKED_FMT(2, 12) },
     { { VLC_CODEC_RGB16, 0 },                  PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3, 24) },
     { { VLC_CODEC_RGB32, 0 },                  PACKED_FMT(4, 24) },
