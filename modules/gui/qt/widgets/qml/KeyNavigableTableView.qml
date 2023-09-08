@@ -310,7 +310,7 @@ FocusScope {
                         model: sortModel
                         MouseArea {
 
-                            height: VLCStyle.dp(20, VLCStyle.scale)
+                            height: VLCStyle.tableHeaderText_height
                             width: VLCStyle.colWidth(modelData.size) || 1
 
                             Accessible.role: Accessible.ColumnHeader
