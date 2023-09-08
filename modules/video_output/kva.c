@@ -451,7 +451,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     const vlc_fourcc_t *fallback;
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
-    bool use_masks = true;
     int i_chroma_shift = 0;
     int w, h;
 
@@ -490,7 +489,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x001f)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_R565;
                     }
                     break;
@@ -501,14 +499,8 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0xf800)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_R565;
                     }
-                    break;
-
-                case VLC_CODEC_RGB16:
-                    b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR16;
-                    i_kva_fourcc = FOURCC_R565;
                     break;
 
                 case VLC_CODEC_RGB555:
@@ -518,7 +510,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x001f)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_R555;
                     }
                     break;
@@ -529,14 +520,8 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x7c00)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_R555;
                     }
-                    break;
-
-                case VLC_CODEC_RGB15:
-                    b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR15;
-                    i_kva_fourcc = FOURCC_R555;
                     break;
 
                 case VLC_CODEC_XRGB:
@@ -546,7 +531,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x000000ff)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
                     }
                     break;
@@ -557,7 +541,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x00ff0000)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
                     }
                     break;
@@ -568,7 +551,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x0000ff00)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
                     }
                     break;
@@ -579,7 +561,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0xff000000)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
                     }
                     break;
@@ -591,7 +572,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0x0000ff)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR3;
                     }
                     break;
@@ -602,7 +582,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         sys->kvac.ulBMask == 0xff0000)
                     {
                         b_hw_accel = true;
-                        use_masks = false;
                         i_kva_fourcc = FOURCC_BGR3;
                     }
                     break;
@@ -623,19 +602,9 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         return VLC_EGENERIC;
     }
 
-    /* Set the RGB masks */
-    if (use_masks)
-    {
-        fmt->i_rmask = sys->kvac.ulRMask;
-        fmt->i_gmask = sys->kvac.ulGMask;
-        fmt->i_bmask = sys->kvac.ulBMask;
-    }
-    else
-    {
-        fmt->i_rmask = 0;
-        fmt->i_gmask = 0;
-        fmt->i_bmask = 0;
-    }
+    fmt->i_rmask = 0;
+    fmt->i_gmask = 0;
+    fmt->i_bmask = 0;
 
     msg_Dbg( vd, "output chroma = %4.4s", ( const char * )&fmt->i_chroma );
     msg_Dbg( vd, "KVA chroma = %4.4s", ( const char * )&i_kva_fourcc );
