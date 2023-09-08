@@ -58,7 +58,7 @@ void input_clock_AttachListener( input_clock_t *clock, vlc_clock_t *clock_listen
 /**
  * This function destroys a input_clock_t created by input_clock_New.
  */
-void           input_clock_Delete( input_clock_t * );
+void input_clock_Delete(input_clock_t *);
 
 /**
  * This function will update a input_clock_t with a new clock reference point.
@@ -82,7 +82,7 @@ vlc_tick_t input_clock_Update( input_clock_t *clock, vlc_object_t *p_log,
  *
  * The actual jitter estimation will not be reset by it.
  */
-void    input_clock_Reset( input_clock_t * );
+void input_clock_Reset( input_clock_t * );
 
 /**
  * This functions will return a deadline used to control the reading speed.
@@ -92,12 +92,12 @@ vlc_tick_t input_clock_GetWakeup( input_clock_t * );
 /**
  * This functions allows changing the actual reading speed.
  */
-void    input_clock_ChangeRate( input_clock_t *, float rate );
+void input_clock_ChangeRate(input_clock_t *, float rate);
 
 /**
  * This function allows changing the pause status.
  */
-void    input_clock_ChangePause( input_clock_t *, bool b_paused, vlc_tick_t i_date );
+void input_clock_ChangePause(input_clock_t *, bool b_paused, vlc_tick_t i_date);
 
 /**
  * This function allows rebasing the original system value date (a valid
@@ -105,7 +105,7 @@ void    input_clock_ChangePause( input_clock_t *, bool b_paused, vlc_tick_t i_da
  * When using the absolute mode, it will create a discontinuity unless
  * called immediately after a input_clock_Update.
  */
-void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_tick_t i_system );
+void input_clock_ChangeSystemOrigin(input_clock_t *, bool b_absolute, vlc_tick_t i_system);
 
 /**
  * This function returns the current rate.
