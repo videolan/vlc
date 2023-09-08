@@ -473,10 +473,10 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
     QString entry;
 
     int index = 0;
-    while( index < entries.count() )
+    while( index < entries.length() )
     {
         int delim_pos = entries.indexOf( QRegularExpression( QStringLiteral( "\\s+|\"" ) ), index );
-        if( delim_pos < 0 ) delim_pos = entries.count() - 1;
+        if( delim_pos < 0 ) delim_pos = entries.length() - 1;
         entry += entries.mid( index, delim_pos - index + 1 );
         index = delim_pos + 1;
 
@@ -485,22 +485,22 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
         if( !b_quotes_mode && entry.endsWith( "\"" ) )
         {
             /* Enters quotes mode */
-            entry.truncate( entry.count() - 1 );
+            entry.truncate( entry.length() - 1 );
             b_quotes_mode = true;
         }
         else if( b_quotes_mode && entry.endsWith( "\"" ) )
         {
             /* Finished the quotes mode */
-            entry.truncate( entry.count() - 1 );
+            entry.truncate( entry.length() - 1 );
             b_quotes_mode = false;
         }
         else if( !b_quotes_mode && !entry.endsWith( "\"" ) )
         {
             /* we found a non-quoted standalone string */
-            if( index < entries.count() ||
+            if( index < entries.length() ||
                 entry.endsWith( " " ) || entry.endsWith( "\t" ) ||
                 entry.endsWith( "\r" ) || entry.endsWith( "\n" ) )
-                entry.truncate( entry.count() - 1 );
+                entry.truncate( entry.length() - 1 );
             if( !entry.isEmpty() ) entries_array.append( entry );
             entry.clear();
         }
