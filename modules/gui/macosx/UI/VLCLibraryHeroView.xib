@@ -25,9 +25,9 @@
                             <shadow key="shadow" blurRadius="20">
                                 <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </shadow>
-                            <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Item title" id="0Cs-Ex-sMn">
+                            <textFieldCell key="cell" controlSize="large" lineBreakMode="truncatingTail" title="Item title" id="0Cs-Ex-sMn">
                                 <font key="font" metaFont="systemBold" size="24"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
@@ -36,9 +36,9 @@
                             <shadow key="shadow" blurRadius="20">
                                 <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </shadow>
-                            <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Item detail string" id="P7c-bg-dPX">
+                            <textFieldCell key="cell" controlSize="large" title="Item detail string" id="P7c-bg-dPX">
                                 <font key="font" metaFont="systemSemibold" size="17"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
