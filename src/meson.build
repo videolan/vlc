@@ -472,3 +472,18 @@ vlc_tests += {
   'link_with' : [libvlccore],
   'include_directories' : [include_directories('.')],
 }
+
+vlc_tests += {
+    'name' : 'input_clock',
+    'sources' : files('clock/test/input_clock.c',
+        'clock/input_clock.c',
+        'clock/input_clock.h',
+        'clock/clock_internal.c',
+        'clock/clock_internal.h',
+        'clock/clock.c',
+        'clock/clock.h',
+    ),
+    'suite' : ['src'],
+    'link_with' : [libvlccore],
+}
+

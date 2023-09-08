@@ -722,6 +722,12 @@ test_input_es_out_SOURCES = input/test/es_out.c \
 	clock/input_clock.c clock/input_clock.h
 check_PROGRAMS += test_input_es_out
 
+test_input_clock_SOURCES = clock/test/input_clock.c \
+	clock/input_clock.c clock/input_clock.h \
+	clock/clock_internal.c clock/clock_internal.h \
+	clock/clock.c clock/clock.h
+check_PROGRAMS += test_input_clock
+
 LDADD = libvlccore.la \
 	../compat/libcompat.la
 
