@@ -628,9 +628,6 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     // { V4L2_PIX_FMT_RGB555,   VLC_CODEC_RGB555LE, 2, 0, 0, 0 },
     // { V4L2_PIX_FMT_RGB555X,  VLC_CODEC_RGB555BE, 2, 0, 0, 0 },
 
-#ifdef WORDS_BIGENDIAN
-#else
-#endif
     { V4L2_PIX_FMT_RGB332,  VLC_CODEC_RGB332,  1, 0, 0, 0 },
 
     /* Bayer (sub-sampled RGB). Not supported. */
