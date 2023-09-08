@@ -138,6 +138,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         for (VLCLibraryVideoCollectionViewContainerView *containerView in self->_collectionViewContainers) {
+            [self.heroView setOptimalRepresentedItem];
             [containerView.collectionView reloadData];
         }
     });
