@@ -29,7 +29,11 @@ Widgets.KeyNavigableListView {
     // required by g_root to indicate view with 'grid' or 'list' mode
     readonly property bool isViewMultiView: false
 
-    model: discoveryFilterModel
+    model: ServicesDiscoveryModel {
+        id: discoveryModel
+        ctx: MainCtx
+    }
+
     topMargin: VLCStyle.margin_large
     leftMargin: VLCStyle.margin_large
     rightMargin: VLCStyle.margin_large
@@ -115,9 +119,9 @@ Widgets.KeyNavigableListView {
 
                         onClicked: {
                             if (model.state === ServicesDiscoveryModel.NOTINSTALLED)
-                                discoveryModel.installService(discoveryFilterModel.mapIndexToSource(index))
+                                discoveryModel.installService(index)
                             else if (model.state === ServicesDiscoveryModel.INSTALLED)
-                                discoveryModel.removeService(discoveryFilterModel.mapIndexToSource(index))
+                                discoveryModel.removeService(index)
                         }
                     }
                 }
@@ -147,18 +151,5 @@ Widgets.KeyNavigableListView {
         anchors.centerIn: parent
         color: servicesView.colorContext.fg.primary
         z: 1
-    }
-
-    ServicesDiscoveryModel {
-        id: discoveryModel
-
-        ctx: MainCtx
-    }
-
-    SortFilterProxyModel {
-        id: discoveryFilterModel
-
-        sourceModel: discoveryModel
-        searchRole: "name"
     }
 }
