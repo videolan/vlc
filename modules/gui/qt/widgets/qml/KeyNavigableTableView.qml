@@ -264,17 +264,15 @@ FocusScope {
             onHeightChanged: if (root.contentY < 0) root.positionViewAtBeginning()
 
             Widgets.ListLabel {
-                height: row.height
-
                 // NOTE: We want the section label to be slightly shifted to the left.
                 x: row.x - VLCStyle.margin_small
-                y: row.y
+                y: row.y + root.headerTopPadding
 
-                topPadding: root.headerTopPadding
+                height: VLCStyle.tableHeaderText_height
+                verticalAlignment: Text.AlignVCenter
 
                 text: view.currentSection
                 color: view.colorContext.accent
-                verticalAlignment: Text.AlignTop
                 visible: view.headerPositioning === ListView.OverlayHeader
                          && text !== ""
                          && view.contentY > (row.height - col.height - row.topPadding)
