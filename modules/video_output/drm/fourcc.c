@@ -109,22 +109,6 @@
 
  */
 
-/* RGB (no alpha) formats.
- * For historical reasons, VLC uses same FourCC with different masks. */
-static const struct {
-    uint32_t drm_fourcc;
-    vlc_fourcc_t vlc_fourcc;
-    uint32_t red; /**< Little endian red mask */
-    uint32_t green; /**< Little endian green mask */
-    uint32_t blue; /**< Little endian blue mask */
-} rgb_fourcc_list[] = {
-#ifndef WORDS_BIGENDIAN
-    /* 16-bit-padded 15-bit RGB */
-    // { DRM_FORMAT_RGBX5551, VLC_CODEC_RGB15, 0xF800, 0x07C0, 0x003E },
-    // { DRM_FORMAT_BGRX5551, VLC_CODEC_RGB15, 0x003E, 0x07C0, 0xF800 },
-#endif
-};
-
 static const struct {
     uint32_t drm_fourcc;
     vlc_fourcc_t vlc_fourcc;
@@ -211,13 +195,6 @@ uint_fast32_t vlc_drm_format(const video_format_t *restrict fmt)
     if (drm_fourcc != DRM_FORMAT_INVALID)
         return drm_fourcc;
 
-    for (size_t i = 0; i < ARRAY_SIZE(rgb_fourcc_list); i++)
-        if (rgb_fourcc_list[i].vlc_fourcc == fmt->i_chroma
-         && rgb_fourcc_list[i].red == fmt->i_rmask
-         && rgb_fourcc_list[i].green == fmt->i_gmask
-         && rgb_fourcc_list[i].blue == fmt->i_bmask)
-            return rgb_fourcc_list[i].drm_fourcc;
-
     return DRM_FORMAT_INVALID;
 }
 
@@ -226,10 +203,6 @@ vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc)
     for (size_t i = 0; i < ARRAY_SIZE(fourcc_list); i++)
         if (fourcc_list[i].drm_fourcc == drm_fourcc)
             return fourcc_list[i].vlc_fourcc;
-
-    for (size_t i = 0; i < ARRAY_SIZE(rgb_fourcc_list); i++)
-        if (rgb_fourcc_list[i].drm_fourcc == drm_fourcc)
-            return rgb_fourcc_list[i].vlc_fourcc;
 
     return 0;
 }
@@ -241,15 +214,6 @@ bool vlc_video_format_drm(video_format_t *restrict fmt,
         if (fourcc_list[i].drm_fourcc == drm_fourcc) {
             fmt->i_chroma = fourcc_list[i].vlc_fourcc;
             fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
-            return true;
-        }
-
-    for (size_t i = 0; i < ARRAY_SIZE(rgb_fourcc_list); i++)
-        if (rgb_fourcc_list[i].drm_fourcc == drm_fourcc) {
-            fmt->i_chroma = rgb_fourcc_list[i].vlc_fourcc;
-            fmt->i_rmask = rgb_fourcc_list[i].red;
-            fmt->i_gmask = rgb_fourcc_list[i].green;
-            fmt->i_bmask = rgb_fourcc_list[i].blue;
             return true;
         }
 
