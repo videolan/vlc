@@ -2,6 +2,10 @@
  * interrupt.c:
  *****************************************************************************
  * Copyright (C) 2015 Rémi Denis-Courmont
+ * Copyright (C) 2023 Videolabs
+ *
+ * Authors: Rémi Denis-Courmont
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -296,7 +300,12 @@ static void vlc_poll_i11e_wake(void *opaque)
     int canc;
 
     canc = vlc_savecancel();
-    write(fd[1], &value, sizeof (value));
+    while (write(fd[1], &value, sizeof (value)) == -1)
+    {
+        /* Only EINTR can happen here, so ignore the error.
+         * We still need to ensure we really wrote the value to trigger
+         * the interruption check though. */
+    }
     vlc_restorecancel(canc);
 }
 
@@ -355,7 +364,12 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
     {
         uint64_t dummy;
 
-        read(fd[0], &dummy, sizeof (dummy));
+        while (read(fd[0], &dummy, sizeof (dummy)) == -1)
+        {
+            /* Only EINTR can happen here, so ignore the error.
+             * We still need to read() the value though, to ensure
+             * that the interruption is correctly acknowledged. */
+        }
         ret--;
     }
     vlc_cleanup_pop();
