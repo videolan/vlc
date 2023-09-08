@@ -348,6 +348,8 @@ FocusScope {
                 Widgets.IconLabel {
                     text: VLCIcons.album_cover
 
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: VLCStyle.icon_tableHeader
