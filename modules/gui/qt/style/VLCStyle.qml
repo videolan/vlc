@@ -216,6 +216,8 @@ QtObject {
 
     readonly property int table_cover_border: dp(2, scale)
 
+    readonly property int tableHeaderText_height: fontHeight_normal
+
     readonly property int artistBanner_height: dp(200, scale)
 
     readonly property int playlistDelegate_verticalPadding: dp(6, scale)
