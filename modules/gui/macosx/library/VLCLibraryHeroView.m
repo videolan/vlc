@@ -24,8 +24,12 @@
 
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryModel.h"
+
+#import "main/VLCMain.h"
 
 @implementation VLCLibraryHeroView
 
@@ -53,6 +57,18 @@
 
     _representedItem = representedItem;
     [self updateRepresentedItem];
+}
+
+- (void)setRandomItem
+{
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    const size_t videoCount = libraryModel.numberOfVideoMedia;
+    const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
+
+    VLCMediaLibraryMediaItem * const item = [libraryModel.listOfVideoMedia objectAtIndex:randIdx];
+    if (item != nil) {
+        self.representedItem = item;
+    }
 }
 
 @end
