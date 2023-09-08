@@ -177,7 +177,7 @@ void EPGView::walkItems( bool b_cleanup )
 
         if( !program->eventsbytime.isEmpty() )
         {
-            const EPGItem *last = (program->eventsbytime.end() - 1).value();
+            const EPGItem *last = program->eventsbytime.last();
             if( !maxTime.isValid() ||
                  last->start().addSecs( last->duration() ) > maxTime )
             {
