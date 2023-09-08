@@ -104,7 +104,7 @@ protected:
     BaseModel* q_ptr = nullptr;
 
     QString m_searchPattern = {};
-    Qt::SortOrder m_sortOrder = Qt::SortOrder::DescendingOrder;
+    Qt::SortOrder m_sortOrder = Qt::SortOrder::AscendingOrder;
     QString m_sortCriteria = {};
     unsigned int m_limit = 0;
     unsigned int m_offset = 0;
