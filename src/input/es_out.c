@@ -1592,10 +1592,10 @@ static char *EsInfoCategoryName( es_out_id_t* es )
 {
     char *psz_category;
 
-    if( asprintf( &psz_category, _("Stream '%s'"), es->id.str_id ) == -1 )
-        return NULL;
+    if (asprintf(&psz_category, _("Stream '%s'"), es->id.str_id) != -1)
+        return psz_category;
 
-    return psz_category;
+    return NULL;
 }
 
 static void EsOutProgramMeta( es_out_t *out, input_source_t *source,
