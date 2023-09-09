@@ -50,6 +50,9 @@ typedef struct vlc_placebo_t
     pl_log log;
     pl_gpu gpu;
     pl_swapchain swapchain;
+#if PL_API_VER >= 320
+    pl_cache cache;
+#endif
 
     const struct vlc_placebo_operations *ops;
 } vlc_placebo_t;

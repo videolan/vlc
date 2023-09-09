@@ -23,10 +23,16 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_configuration.h>
 #include <vlc_modules.h>
+#include <vlc_fs.h>
 
 #include "instance.h"
 #include "utils.h"
+
+// 20 MB is plenty of space to cache all shaders plus several 3DLUTs, while
+// still taking negligible amounts of time to parse on startup (<5ms)
+#define VLC_PL_MAX_CACHE_SIZE (20 << 20)
 
 static int vlc_placebo_start(void *func, bool forced, va_list ap)
 {
@@ -39,6 +45,23 @@ static int vlc_placebo_start(void *func, bool forced, va_list ap)
     (void)forced;
     return ret;
 }
+
+#if PL_API_VER >= 320
+static FILE *vlc_placebo_OpenCache(const char *mode)
+{
+    char *filename;
+    char *cachedir = config_GetUserDir(VLC_CACHE_DIR);
+    if (!cachedir)
+        return NULL;
+    int ret = asprintf(&filename, "%s" DIR_SEP "libplacebo", cachedir);
+    free(cachedir);
+    if (ret < 0)
+        return NULL;
+    FILE *file = vlc_fopen(filename, mode);
+    free(filename);
+    return file;
+}
+#endif
 
 /**
  * Creates a libplacebo context, and swapchain, tied to a window
@@ -65,6 +88,20 @@ vlc_placebo_t *vlc_placebo_Create(const vout_display_cfg_t *cfg, const char *nam
     if (module == NULL)
         goto delete_log;
 
+#if PL_API_VER >= 320
+    pl->cache = pl_cache_create(pl_cache_params(
+        .log = pl->log,
+        .max_total_size = VLC_PL_MAX_CACHE_SIZE,
+    ));
+    assert(pl->gpu);
+    pl_gpu_set_cache(pl->gpu, pl->cache);
+    FILE *cache = vlc_placebo_OpenCache("rb");
+    if (cache) {
+        pl_cache_load_file(pl->cache, cache);
+        fclose(cache);
+    }
+#endif
+
     return pl;
 
 delete_log:
@@ -80,6 +117,15 @@ void vlc_placebo_Release(vlc_placebo_t *pl)
 {
     if (pl->ops)
         pl->ops->close(pl);
+
+#if PL_API_VER >= 320
+    FILE *cache = vlc_placebo_OpenCache("wb");
+    if (cache) {
+        pl_cache_save_file(pl->cache, cache);
+        fclose(cache);
+    }
+    pl_cache_destroy(&pl->cache);
+#endif
 
     pl_log_destroy(&pl->log);
 
