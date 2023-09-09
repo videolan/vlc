@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHeroView.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCLibraryController.h"
@@ -102,12 +103,14 @@
     VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
     if (latestPartialPlayItem != nil) {
         self.representedItem = latestPartialPlayItem;
+        self.playButton.title = _NS("Resume playing");
         return;
     }
 
     VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
     if (randomItem != nil) {
         self.representedItem = randomItem;
+        self.playButton.title = _NS("Play now");
         return;
     }
 
