@@ -103,6 +103,7 @@
     VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
     if (latestPartialPlayItem != nil) {
         self.representedItem = latestPartialPlayItem;
+        self.explanationTextField.stringValue = _NS("Last watched");
         self.playButton.title = _NS("Resume playing");
         return;
     }
@@ -110,6 +111,7 @@
     VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
     if (randomItem != nil) {
         self.representedItem = randomItem;
+        self.explanationTextField.stringValue = _NS("From your library");
         self.playButton.title = _NS("Play now");
         return;
     }
