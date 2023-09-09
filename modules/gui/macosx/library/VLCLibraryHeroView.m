@@ -114,4 +114,10 @@
     NSLog(@"Could not find a food media item for hero view!");
 }
 
+- (IBAction)playRepresentedItem:(id)sender
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    [libraryController appendItemToPlaylist:self.representedItem playImmediately:YES];
+}
+
 @end

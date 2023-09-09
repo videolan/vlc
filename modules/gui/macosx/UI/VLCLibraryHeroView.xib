@@ -51,6 +51,9 @@
                             </buttonCell>
                             <color key="bezelColor" name="VLCAccentColor"/>
                             <color key="contentTintColor" name="VLCAccentColor"/>
+                            <connections>
+                                <action selector="playRepresentedItem:" target="LPV-K6-7AE" id="fGM-xi-Y8E"/>
+                            </connections>
                         </button>
                     </subviews>
                     <constraints>
