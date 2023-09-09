@@ -31,6 +31,8 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCImageView.h"
+
 @interface VLCLibraryHeroView ()
 
 @property (readonly) VLCMediaLibraryMediaItem *randomItem;
@@ -45,6 +47,11 @@
     return (VLCLibraryHeroView*)[NSView fromNibNamed:@"VLCLibraryHeroView"
                                                      withClass:VLCLibraryHeroView.class
                                                      withOwner:owner];
+}
+
+- (void)awakeFromNib
+{
+    self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
 }
 
 - (void)updateRepresentedItem
