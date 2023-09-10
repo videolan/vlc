@@ -119,15 +119,31 @@
 + (NSArray<NSValue *> *)framesForCompositeImageGridWithImages:(NSArray<NSImage *> * const)images
                                                          size:(const NSSize)size
 {
-    const CGFloat halfWidth = size.width / 2;
-    const CGFloat halfHeight = size.height / 2;
+    const NSUInteger imageCount = images.count;
+    // Default to just one item, have a square grid of items up to 9 items
+    NSUInteger gridCount = 1;
 
-    return @[
-        [NSValue valueWithRect:NSMakeRect(0, 0, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(halfWidth, 0, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(0, halfHeight, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(halfWidth, halfHeight, halfWidth, halfHeight)],
-    ];
+    if (imageCount >= 9) {
+        gridCount = 9;
+    } else if (imageCount < 9 && imageCount >= 4) {
+        gridCount = 4;
+    }
+
+    const NSUInteger gridDivisor = imageCount > 1 ? roundf(sqrt(gridCount)) : 1;
+    const CGFloat itemWidth = size.width / gridDivisor;
+    const CGFloat itemHeight = size.height / gridDivisor;
+
+    NSMutableArray<NSValue *> * const rects = NSMutableArray.array;
+
+    for (NSUInteger i = 0; i < gridCount; ++i) {
+        const CGFloat xPos = (i % gridDivisor) * itemWidth;
+        const CGFloat yPos = floor(i / gridDivisor) * itemHeight;
+        const NSRect rect = NSMakeRect(xPos, yPos, itemWidth, itemHeight);
+        NSValue * const rectVal = [NSValue valueWithRect:rect];
+        [rects addObject:rectVal];
+    }
+
+    return rects.copy;
 }
 
 @end
