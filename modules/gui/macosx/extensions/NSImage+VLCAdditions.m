@@ -72,6 +72,35 @@
     return image;
 }
 
++ (instancetype)compositeImageWithImages:(NSArray<NSImage *> * const)images
+                                  frames:(NSArray<NSValue *> * const)frames
+                                    size:(const NSSize)size
+{
+    NSImage * const compositedImage = [[NSImage alloc] initWithSize:size];
+
+    [compositedImage lockFocus];
+
+    NSUInteger counter = 0;
+
+    for (NSValue * const rectValue in frames) {
+        if (counter >= images.count) {
+            break;
+        }
+
+        NSImage * const image = [images objectAtIndex:counter];
+        const NSRect imageRect = rectValue.rectValue;
+        [image drawInRect:imageRect
+                 fromRect:NSZeroRect
+                operation:NSCompositingOperationOverlay
+                 fraction:1.];
+
+        counter += 1;
+    }
+
+    [compositedImage unlockFocus];
+    return compositedImage;
+}
+
 - (instancetype)imageTintedWithColor:(NSColor *)color
 {
     NSImage * const image = [self copy];
