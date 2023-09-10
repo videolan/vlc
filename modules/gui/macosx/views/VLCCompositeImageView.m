@@ -22,6 +22,26 @@
 
 #import "VLCCompositeImageView.h"
 
+@interface VLCCompositeImageView ()
+
+@property (readonly) NSArray<NSValue *> *imageFrames;
+
+@end
+
 @implementation VLCCompositeImageView
+
+- (NSArray<NSValue *> *)imageFrames
+{
+    const CGSize size = self.frame.size;
+    const CGFloat halfWidth = size.width / 2;
+    const CGFloat halfHeight = size.height / 2;
+
+    return @[
+        [NSValue valueWithRect:NSMakeRect(0, 0, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(halfWidth, 0, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(0, halfHeight, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(halfWidth, halfHeight, halfWidth, halfHeight)],
+    ];
+}
 
 @end
