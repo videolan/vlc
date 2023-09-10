@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCCompositeImageView : NSView
 
+@property (readwrite, nonatomic) NSArray<NSImage *> *images;
+@property (readonly) NSImage *compositedImage;
+
 @end
 
 NS_ASSUME_NONNULL_END

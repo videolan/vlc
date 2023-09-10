@@ -44,4 +44,36 @@
     ];
 }
 
+- (void)setImages:(NSArray<NSImage *> *)images
+{
+    _images = images;
+
+    _compositedImage = [[NSImage alloc] initWithSize:self.frame.size];
+
+    [self.compositedImage lockFocus];
+
+    NSArray<NSValue *> * const frames = self.imageFrames;
+    NSUInteger counter = 0;
+
+    for (NSValue * const rectValue in frames) {
+        if (counter >= self.images.count) {
+            break;
+        }
+
+        NSImage * const image = [self.images objectAtIndex:counter];
+        if (image == nil) {
+            break;
+        }
+
+        counter += 1;
+        const NSRect imageRect = rectValue.rectValue;
+        [image drawInRect:imageRect
+                 fromRect:NSZeroRect
+                operation:NSCompositingOperationOverlay
+                 fraction:1.];
+    }
+
+    [self.compositedImage unlockFocus];
+}
+
 @end
