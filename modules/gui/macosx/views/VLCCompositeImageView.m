@@ -32,26 +32,13 @@
 
 @implementation VLCCompositeImageView
 
-- (NSArray<NSValue *> *)imageFrames
-{
-    const CGSize size = self.frame.size;
-    const CGFloat halfWidth = size.width / 2;
-    const CGFloat halfHeight = size.height / 2;
-
-    return @[
-        [NSValue valueWithRect:NSMakeRect(0, 0, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(halfWidth, 0, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(0, halfHeight, halfWidth, halfHeight)],
-        [NSValue valueWithRect:NSMakeRect(halfWidth, halfHeight, halfWidth, halfHeight)],
-    ];
-}
-
 - (void)setImages:(NSArray<NSImage *> *)images
 {
     _images = images;
-    _compositedImage = [NSImage compositeImageWithImages:self.images
-                                                  frames:self.imageFrames
-                                                    size:self.frame.size];
+
+    const NSSize size = self.frame.size;
+    NSArray<NSValue *> * const frames = [NSImage framesForCompositeImageGridWithImages:self.images size:size];
+    _compositedImage = [NSImage compositeImageWithImages:self.images frames:frames size:size];
 }
 
 @end

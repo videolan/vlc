@@ -116,4 +116,18 @@
     return image;
 }
 
++ (NSArray<NSValue *> *)framesForCompositeImageGridWithImages:(NSArray<NSImage *> * const)images
+                                                         size:(const NSSize)size
+{
+    const CGFloat halfWidth = size.width / 2;
+    const CGFloat halfHeight = size.height / 2;
+
+    return @[
+        [NSValue valueWithRect:NSMakeRect(0, 0, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(halfWidth, 0, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(0, halfHeight, halfWidth, halfHeight)],
+        [NSValue valueWithRect:NSMakeRect(halfWidth, halfHeight, halfWidth, halfHeight)],
+    ];
+}
+
 @end
