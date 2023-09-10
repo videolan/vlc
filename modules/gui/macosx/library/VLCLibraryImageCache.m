@@ -29,6 +29,8 @@
 
 #import "playlist/VLCPlaylistItem.h"
 
+#import "views/VLCCompositeImageView.h"
+
 NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
 uint32_t kVLCDesiredThumbnailWidth = 512;
 uint32_t kVLCDesiredThumbnailHeight = 512;
@@ -160,12 +162,31 @@ float kVLCDefaultThumbnailPosition = .15;
 + (void)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
                withCompletion:(void(^)(const NSImage *))completionHandler
 {
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        NSImage * const image = [VLCLibraryImageCache thumbnailForLibraryItem:libraryItem];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(image);
+    if ([libraryItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            VLCAbstractMediaLibraryAudioGroup * const audioGroupItem = (VLCAbstractMediaLibraryAudioGroup *)libraryItem;
+            NSMutableArray<NSImage *> * const itemImages = NSMutableArray.array;
+
+            [audioGroupItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+                NSImage * const itemImage = [VLCLibraryImageCache thumbnailForLibraryItem:item];
+                [itemImages addObject:itemImage];
+            }];
+
+            VLCCompositeImageView * const compositeImage = [[VLCCompositeImageView alloc] initWithFrame:NSMakeRect(0, 0, 1024, 1024)];
+            compositeImage.images = itemImages;
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(compositeImage.compositedImage);
+            });
         });
-    });
+    } else {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            NSImage * const image = [VLCLibraryImageCache thumbnailForLibraryItem:libraryItem];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(image);
+            });
+        });
+    }
 }
 
 + (void)thumbnailForInputItem:(VLCInputItem *)inputItem
