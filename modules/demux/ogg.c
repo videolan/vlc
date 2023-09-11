@@ -1867,6 +1867,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream->fmt.video.i_frame_rate_base = den;
                         date_Init( &p_stream->dts, num, den );
                         unsigned bpp = GetWLE((oggpacket.packet+182));
+                        if (p_stream->fmt.i_profile == -1 && p_stream->fmt.i_level == -1)
+                            // HACK: keep the bits per sample, will be lost if i_level is used.
+                            p_stream->fmt.i_level = bpp;
                         p_stream->fmt.video.i_width =
                             GetDWLE((oggpacket.packet+176));
                         p_stream->fmt.video.i_height =

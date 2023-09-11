@@ -722,6 +722,9 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 }
 
                 p_fmt->video.color_range = p_data->i_fullrange ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+                if (p_fmt->i_profile == -1 && p_fmt->i_level == -1)
+                    // HACK: keep the bits per sample in i_level
+                    p_fmt->i_level = p_data->i_bit_depth;
 
                 CopyExtradata( p_data->p_codec_init_data,
                                p_data->i_codec_init_datasize,
