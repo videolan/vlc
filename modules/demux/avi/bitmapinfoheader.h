@@ -252,13 +252,12 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
                                                              size_t *pi_total )
 {
     uint16_t biBitCount = 0;
-    uint32_t biCompression = 0;
+    uint32_t biCompression = BI_RGB;
     bool b_has_alpha = false;
     switch( fmt->i_codec )
     {
         case VLC_CODEC_BGRX:
             biBitCount = 32;
-            biCompression = BI_RGB;
             break;
         case VLC_CODEC_XBGR:
         case VLC_CODEC_XRGB:
@@ -268,7 +267,8 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
             break;
         case VLC_CODEC_RGB32:
             biBitCount = 32;
-            biCompression = MatchBitmapRGBMasks( fmt ) ? BI_RGB : BI_BITFIELDS;
+            if ( !MatchBitmapRGBMasks( fmt ) )
+                biCompression = BI_BITFIELDS;
             break;
         case VLC_CODEC_BGRA:
         case VLC_CODEC_RGBA:
@@ -280,7 +280,6 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
             break;
         case VLC_CODEC_RGB24:
             biBitCount = 24;
-            biCompression = BI_RGB;
             break;
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB15:
@@ -290,7 +289,6 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
         case VLC_CODEC_RGBP:
         case VLC_CODEC_GREY:
             biBitCount = 8;
-            biCompression = BI_RGB;
             break;
         case VLC_CODEC_MP4V:
             biCompression = VLC_FOURCC( 'X', 'V', 'I', 'D' );
