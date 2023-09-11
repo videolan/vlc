@@ -203,7 +203,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
     static const char *const FRAGMENT_SHADER_BODY =
         "#if __VERSION__ < 300\n"
           "#define FragColor gl_FragColor\n"
-          "attribute vec2 PicCoords;\n"
+          "varying vec2 PicCoords;\n"
         "#else\n"
           "in vec2 PicCoords;\n"
           "out vec4 FragColor;\n"
