@@ -53,9 +53,9 @@ static const struct
     { VLC_CODEC_RGB24,      0x000000ff, /* BGR (see biBitCount) */
                             0x0000ff00,
                             0x00ff0000, },
-    { VLC_CODEC_RGB32,      0x0000ff00, /* This is in BGR0 format */
-                            0x00ff0000,
-                            0xff000000U, },
+    { VLC_CODEC_RGB32,      0x00ff0000, /* This is in XRGB format */
+                            0x0000ff00,
+                            0x000000ff, },
 };
 
 static inline void SetBitmapRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
