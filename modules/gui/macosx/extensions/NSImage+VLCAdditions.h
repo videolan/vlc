@@ -31,8 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)compositeImageWithImages:(NSArray<NSImage *> * const)images
                                   frames:(NSArray<NSValue *> * const)frames
                                     size:(const NSSize)size;
-+ (NSArray<NSValue *> *)framesForCompositeImageGridWithImages:(NSArray<NSImage *> * const)images
-                                                         size:(const NSSize)size;
++ (NSArray<NSValue *> *)framesForCompositeImageSquareGridWithImages:(NSArray<NSImage *> * const)images
+                                                               size:(const NSSize)size
+                                                      gridItemCount:(const NSUInteger)gridItemCount;
 
 - (instancetype)imageTintedWithColor:(NSColor *)color;
 

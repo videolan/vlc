@@ -116,26 +116,25 @@
     return image;
 }
 
-+ (NSArray<NSValue *> *)framesForCompositeImageGridWithImages:(NSArray<NSImage *> * const)images
-                                                         size:(const NSSize)size
++ (NSArray<NSValue *> *)framesForCompositeImageSquareGridWithImages:(NSArray<NSImage *> * const)images
+                                                               size:(const NSSize)size
+                                                      gridItemCount:(const NSUInteger)gridItemCount
 {
-    const NSUInteger imageCount = images.count;
-    // Default to just one item, have a square grid of items up to 9 items
-    NSUInteger gridCount = 1;
+    const float sqrtAxisItemCount = sqrt(gridItemCount);
+    const float roundAxisItemCount = roundf(sqrtAxisItemCount);
+    NSAssert(sqrtAxisItemCount == roundAxisItemCount, @"Provided grid item count should be an integer square root");
 
-    if (imageCount >= 9) {
-        gridCount = 9;
-    } else if (imageCount < 9 && imageCount >= 4) {
-        gridCount = 4;
-    }
+    // Default to just one item if there are not enough images
+    const NSUInteger actualGridItemCount = images.count >= gridItemCount ? gridItemCount : 1;
 
-    const NSUInteger gridDivisor = imageCount > 1 ? roundf(sqrt(gridCount)) : 1;
+    // Default to just one item if there are not enough images
+    const NSUInteger gridDivisor = actualGridItemCount > 1 ? roundAxisItemCount : 1;
     const CGFloat itemWidth = size.width / gridDivisor;
     const CGFloat itemHeight = size.height / gridDivisor;
 
     NSMutableArray<NSValue *> * const rects = NSMutableArray.array;
 
-    for (NSUInteger i = 0; i < gridCount; ++i) {
+    for (NSUInteger i = 0; i < actualGridItemCount; ++i) {
         const CGFloat xPos = (i % gridDivisor) * itemWidth;
         const CGFloat yPos = floor(i / gridDivisor) * itemHeight;
         const NSRect rect = NSMakeRect(xPos, yPos, itemWidth, itemHeight);

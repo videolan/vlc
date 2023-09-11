@@ -65,7 +65,7 @@ static const NSUInteger kVLCCompositeImageViewDefaultCompositedGridItemCount = 4
     _images = images;
 
     const NSSize size = self.frame.size;
-    NSArray<NSValue *> * const frames = [NSImage framesForCompositeImageGridWithImages:self.images size:size];
+    NSArray<NSValue *> * const frames = [NSImage framesForCompositeImageSquareGridWithImages:self.images size:size gridItemCount:self.compositedGridItemCount];
     _compositedImage = [NSImage compositeImageWithImages:self.images frames:frames size:size];
 }
 
