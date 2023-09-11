@@ -256,11 +256,11 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     bool b_has_alpha = false;
     switch( fmt->i_codec )
     {
-        case VLC_CODEC_BGRX:
+        case VLC_CODEC_XRGB:
             biBitCount = 32;
             break;
+        case VLC_CODEC_BGRX:
         case VLC_CODEC_XBGR:
-        case VLC_CODEC_XRGB:
         case VLC_CODEC_RGBX:
             biBitCount = 32;
             biCompression = BI_BITFIELDS;
