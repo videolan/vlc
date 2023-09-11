@@ -340,6 +340,7 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
                 i_bmask = hton32(0x0000ff00);
                 break;
             case VLC_CODEC_BGRA:
+            case VLC_CODEC_BGRX:
                 i_rmask = hton32(0x0000ff00);
                 i_gmask = hton32(0x00ff0000);
                 i_bmask = hton32(0xff000000);
