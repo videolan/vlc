@@ -67,16 +67,7 @@ typedef struct vout_display_sys_t
 
     plane_t    pic_buf;
 
-    union {
-        BITMAPINFO bmiInfo;
-        struct
-        {
-            BITMAPINFOHEADER bmiHeader;
-            RGBQUAD          red;
-            RGBQUAD          green;
-            RGBQUAD          blue;
-        } bi_rgb;
-    };
+    BITMAPINFO bmiInfo;
 } vout_display_sys_t;
 
 static void           Display(vout_display_t *, picture_t *);
@@ -100,7 +91,7 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
     video_format_t fmt_rot;
     video_format_ApplyRotation(&fmt_rot, vd->source);
 
-    BITMAPINFOHEADER *bih = &sys->bi_rgb.bmiHeader;
+    BITMAPINFOHEADER *bih = &sys->bmiInfo.bmiHeader;
     if (bih->biWidth  != (LONG)fmt_rot.i_visible_width ||
         bih->biHeight != -(LONG)fmt_rot.i_visible_height)
     {
@@ -265,43 +256,47 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     switch (i_depth) {
     case 8:
         fmt->i_chroma = VLC_CODEC_RGB233;
+        fmt->i_rmask  = 0;
+        fmt->i_gmask  = 0;
+        fmt->i_bmask  = 0;
         break;
     case 15:
         fmt->i_chroma = VLC_CODEC_RGB15;
+        fmt->i_rmask  = 0x1f << 10;
+        fmt->i_gmask  = 0x1f << 5;
+        fmt->i_bmask  = 0x1f << 0;
         break;
     case 16:
         fmt->i_chroma = VLC_CODEC_RGB16;
+        fmt->i_rmask  = 0x1f << 10;
+        fmt->i_gmask  = 0x3f << 5;
+        fmt->i_bmask  = 0x1f << 0;
         break;
     case 24:
         fmt->i_chroma = VLC_CODEC_RGB24;
+        fmt->i_rmask  = 0xff << 16;
+        fmt->i_gmask  = 0xff << 8;
+        fmt->i_bmask  = 0x1f << 0;
         break;
     case 32: // BGRX
         fmt->i_chroma = VLC_CODEC_BGRA;
+        fmt->i_rmask  = 0;
+        fmt->i_gmask  = 0;
+        fmt->i_bmask  = 0;
         break;
     default:
         msg_Err(vd, "screen depth %i not supported", i_depth);
         ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
         return VLC_EGENERIC;
     }
-    fmt->i_rmask  = 0;
-    fmt->i_gmask  = 0;
-    fmt->i_bmask  = 0;
-    video_format_FixRgb(fmt);
 
     /* Initialize offscreen bitmap */
     sys->bmiInfo.bmiHeader = (BITMAPINFOHEADER) {
         .biSize         = sizeof(BITMAPINFOHEADER),
         .biPlanes       = 1,
         .biBitCount     = i_depth,
-        .biCompression  = (i_depth == 15 ||
-                           i_depth == 16) ? BI_BITFIELDS : BI_RGB,
+        .biCompression  = BI_RGB,
     };
-
-    if (i_depth > 8) {
-        *((DWORD*)&sys->bi_rgb.red)   = fmt->i_rmask;
-        *((DWORD*)&sys->bi_rgb.green) = fmt->i_gmask;
-        *((DWORD*)&sys->bi_rgb.blue)  = fmt->i_bmask;
-    }
 
     sys->off_dc = CreateCompatibleDC(window_dc);
 
