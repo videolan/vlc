@@ -288,8 +288,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/preferences/prefs_widgets.m \
 	gui/macosx/views/VLCBasicView.h \
 	gui/macosx/views/VLCBasicView.m \
-	gui/macosx/views/VLCCompositeImageView.h \
-	gui/macosx/views/VLCCompositeImageView.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
 	gui/macosx/views/VLCCustomWindowButton.h \
