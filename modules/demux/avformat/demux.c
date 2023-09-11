@@ -54,8 +54,6 @@
 
 //#define AVFORMAT_DEBUG 1
 
-# define HAVE_AVUTIL_CODEC_ATTACHMENT 1
-
 #if LIBAVFORMAT_VERSION_CHECK(59, 0, 100)
 # define AVF_MAYBE_CONST const
 #else
@@ -569,7 +567,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         default:
             es_format_Init( &es_fmt, UNKNOWN_ES, 0 );
             es_fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
-#ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
             if( cp->codec_type == AVMEDIA_TYPE_ATTACHMENT )
             {
                 input_attachment_t *p_attachment;
@@ -591,7 +588,6 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 else msg_Warn( p_demux, "unsupported attachment type (%u) in avformat demux", cp->codec_id );
             }
             else
-#endif
             {
                 if( cp->codec_type == AVMEDIA_TYPE_DATA )
                     psz_type = "data";
@@ -608,10 +604,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         if( s->disposition & AV_DISPOSITION_DEFAULT )
             es_fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1000;
 
-#ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
-        if( cp->codec_type != AVMEDIA_TYPE_ATTACHMENT )
-#endif
-        if( cp->codec_type != AVMEDIA_TYPE_DATA )
+        if( cp->codec_type != AVMEDIA_TYPE_ATTACHMENT &&
+            cp->codec_type != AVMEDIA_TYPE_DATA )
         {
             const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
             const uint8_t *p_extra = cp->extradata;
