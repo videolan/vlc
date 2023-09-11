@@ -369,6 +369,10 @@ static int DecOpen( decoder_t *p_dec )
         p_bih->biWidth = p_dec->fmt_in->video.i_width;
         p_bih->biHeight = p_dec->fmt_in->video.i_height;
         p_bih->biBitCount = vlc_fourcc_GetChromaBPP(fcc);
+        if ( p_bih->biBitCount == 0 &&
+             p_dec->fmt_in->i_profile == -1 && p_dec->fmt_in->i_level != -1 )
+            // HACK: the bits per sample was stored in the i_level
+            p_bih->biBitCount = p_dec->fmt_in->i_level;
         p_bih->biPlanes = 1;
         p_bih->biSize = i_size - sizeof(VIDEOINFOHEADER) + sizeof(*p_bih);
 

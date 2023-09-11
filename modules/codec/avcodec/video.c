@@ -419,6 +419,10 @@ static int OpenVideoCodec( decoder_t *p_dec )
     }
 
     ctx->bits_per_coded_sample = vlc_fourcc_GetChromaBPP(p_dec->fmt_in->video.i_chroma);
+    if ( ctx->bits_per_coded_sample == 0 &&
+         p_dec->fmt_in->i_profile == -1 && p_dec->fmt_in->i_level != -1 )
+        // HACK: the bits per sample was stored in the i_level
+        ctx->bits_per_coded_sample = p_dec->fmt_in->i_level;
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
     cc_Init( &p_sys->cc );
 
