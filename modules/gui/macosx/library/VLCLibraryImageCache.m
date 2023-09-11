@@ -22,6 +22,8 @@
 
 #import "VLCLibraryImageCache.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
@@ -29,12 +31,12 @@
 
 #import "playlist/VLCPlaylistItem.h"
 
-#import "views/VLCCompositeImageView.h"
-
 NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
 uint32_t kVLCDesiredThumbnailWidth = 512;
 uint32_t kVLCDesiredThumbnailHeight = 512;
 float kVLCDefaultThumbnailPosition = .15;
+const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
+
 
 @interface VLCLibraryImageCache()
 {
@@ -180,11 +182,12 @@ float kVLCDefaultThumbnailPosition = .15;
                 [itemImages addObject:itemImage];
             }];
 
-            VLCCompositeImageView * const compositeImage = [[VLCCompositeImageView alloc] initWithFrame:NSMakeRect(0, 0, 1024, 1024)];
-            compositeImage.images = itemImages;
+            const NSSize size = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+            NSArray<NSValue *> * const frames = [NSImage framesForCompositeImageSquareGridWithImages:itemImages size:size gridItemCount:kVLCCompositeImageDefaultCompositedGridItemCount];
+            NSImage * const compositeImage = [NSImage compositeImageWithImages:itemImages frames:frames size:size];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                completionHandler(compositeImage.compositedImage);
+                completionHandler(compositeImage);
             });
         });
     } else {
