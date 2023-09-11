@@ -38,7 +38,6 @@
 #include "util/i18n.hpp"
 #include "util/keyhelper.hpp"
 #include "style/systempalette.hpp"
-#include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 #include "util/flickable_scroll_handler.hpp"
 #include "util/color_svg_image_provider.hpp"
@@ -306,7 +305,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkMediaContextMenu>( uri, versionMajor, versionMinor, "NetworkMediaContextMenu" );
         qmlRegisterType<NetworkDeviceContextMenu>( uri, versionMajor, versionMinor, "NetworkDeviceContextMenu" );
         qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
-        qmlRegisterType<SortFilterProxyModel>( uri, versionMajor, versionMinor, "SortFilterProxyModel" );
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 

@@ -314,8 +314,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/selectable_list_model.cpp \
 	gui/qt/util/selectable_list_model.hpp \
 	gui/qt/util/singleton.hpp \
-	gui/qt/util/sortfilterproxymodel.cpp \
-	gui/qt/util/sortfilterproxymodel.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
 	gui/qt/util/varcommon_p.hpp \
@@ -509,7 +507,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/flickable_scroll_handler.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
-	gui/qt/util/sortfilterproxymodel.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
