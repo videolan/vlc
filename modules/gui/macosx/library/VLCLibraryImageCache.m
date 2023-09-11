@@ -167,8 +167,15 @@ float kVLCDefaultThumbnailPosition = .15;
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
             VLCAbstractMediaLibraryAudioGroup * const audioGroupItem = (VLCAbstractMediaLibraryAudioGroup *)libraryItem;
             NSMutableArray<NSImage *> * const itemImages = NSMutableArray.array;
+            NSMutableSet<NSNumber *> * const itemAlbums = NSMutableSet.set;
 
             [audioGroupItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+                NSNumber * const albumId = @(item.albumID);
+                if ([itemAlbums containsObject:albumId]) {
+                    return;
+                }
+
+                [itemAlbums addObject:albumId];
                 NSImage * const itemImage = [VLCLibraryImageCache thumbnailForLibraryItem:item];
                 [itemImages addObject:itemImage];
             }];
