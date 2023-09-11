@@ -47,7 +47,7 @@ static const struct
     { VLC_CODEC_RGB15,      0x7c00, /* R5G5B5 */
                             0x03e0,
                             0x001f, },
-    { VLC_CODEC_RGB16,      0xf800, /* R5G6B5 */
+    { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
                             0x07e0,
                             0x001f, },
     { VLC_CODEC_RGB24,      0x000000ff, /* BGR (see biBitCount) */
