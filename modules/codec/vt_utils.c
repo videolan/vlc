@@ -403,7 +403,7 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
 }
 
 bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key) {
-    if (__builtin_available(macOS 10.12, iOS 15, *)) {
+    if (__builtin_available(macOS 10.12, iOS 15, tvOS 15.0, *)) {
         return CVBufferHasAttachment(pixelBuffer, key);
     }
 #pragma clang diagnostic push
