@@ -24,13 +24,41 @@
 
 #import "extensions/NSImage+VLCAdditions.h"
 
-@interface VLCCompositeImageView ()
-
-@property (readonly) NSArray<NSValue *> *imageFrames;
-
-@end
+static const NSUInteger kVLCCompositeImageViewDefaultCompositedGridItemCount = 4;
 
 @implementation VLCCompositeImageView
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    self.compositedGridItemCount = kVLCCompositeImageViewDefaultCompositedGridItemCount;
+}
 
 - (void)setImages:(NSArray<NSImage *> *)images
 {

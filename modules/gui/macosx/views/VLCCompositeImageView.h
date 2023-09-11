@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCCompositeImageView : NSView
 
 @property (readwrite, nonatomic) NSArray<NSImage *> *images;
+@property (readwrite, atomic) NSUInteger compositedGridItemCount;
 @property (readonly) NSImage *compositedImage;
 
 @end
