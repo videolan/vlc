@@ -346,7 +346,7 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
                 i_bmask = hton32(0xff000000);
                 break;
             default:
-                if (biBitCount == 32)
+                if (biBitCount == 32 || biBitCount == 16)
                 {
                     i_rmask = hton32(fmt->video.i_rmask);
                     i_gmask = hton32(fmt->video.i_gmask);
