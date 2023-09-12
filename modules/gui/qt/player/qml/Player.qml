@@ -700,9 +700,7 @@ FocusScope {
     Widgets.LoaderFade {
         id: controlBarView
 
-        readonly property int sliderY: (MainCtx.pinVideoControls) ? item.sliderY
-                                                                    - VLCStyle.margin_xxxsmall
-                                                                  : item.sliderY
+        readonly property int sliderY: item.sliderY
 
         anchors {
             bottom: parent.bottom
