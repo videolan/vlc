@@ -85,7 +85,7 @@ FocusScope{
     onSideMarginChanged: _layout()
 
     on_ShowTopBarChanged: _layout()
-    on_ShowCenterText: _layout()
+    on_ShowCenterTextChanged: _layout()
 
     // Functions
 
