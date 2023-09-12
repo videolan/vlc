@@ -152,6 +152,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged FINAL)
     Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged FINAL)
     Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged FINAL)
+    Q_PROPERTY(double playerPlaylistWidthFactor READ getPlayerPlaylistWidthFactor WRITE setPlayerPlaylistWidthFactor NOTIFY playerPlaylistFactorChanged FINAL)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged FINAL)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged FINAL)
@@ -235,6 +236,7 @@ public:
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return playlistVisible; }
     inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
+    inline double getPlayerPlaylistWidthFactor() const { return m_playerPlaylistWidthFactor; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
@@ -373,6 +375,7 @@ protected:
     bool                 m_mediaLibraryVisible = true;
     bool                 playlistVisible = false;       ///< Is the playlist visible ?
     double               playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
+    double               m_playerPlaylistWidthFactor = 4.;
 
     VLCVarChoiceModel* m_extraInterfaces = nullptr;
 
@@ -404,6 +407,7 @@ public slots:
     void setPlaylistDocked( bool );
     void setPlaylistVisible( bool );
     void setPlaylistWidthFactor( double );
+    void setPlayerPlaylistWidthFactor( double factor );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
     void setGridView( bool );
@@ -451,6 +455,7 @@ signals:
     void playlistDockedChanged(bool);
     void playlistVisibleChanged(bool);
     void playlistWidthFactorChanged(double);
+    void playerPlaylistFactorChanged(double);
     void interfaceAlwaysOnTopChanged(bool);
     void hasEmbededVideoChanged(bool);
     void showRemainingTimeChanged(bool);

@@ -219,6 +219,7 @@ MainCtx::~MainCtx()
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
     settings->setValue( "playlist-width-factor", playlistWidthFactor);
+    settings->setValue( "player-playlist-width-factor", m_playerPlaylistWidthFactor);
 
     settings->setValue( "grid-view", m_gridView );
     settings->setValue( "grouping", m_grouping );
@@ -355,6 +356,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(playlistVisible, "MainWindow/playlist-visible", false, &MainCtx::playlistVisibleChanged);
 
     loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
+
+    loadFromSettings(m_playerPlaylistWidthFactor, "MainWindow/player-playlist-width-factor", 4.0 , &MainCtx::playerPlaylistFactorChanged);
 
     loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainCtx::gridViewChanged);
 
@@ -532,6 +535,15 @@ void MainCtx::setPlaylistWidthFactor( double factor )
     {
         playlistWidthFactor = factor;
         emit playlistWidthFactorChanged(factor);
+    }
+}
+
+void MainCtx::setPlayerPlaylistWidthFactor( double factor )
+{
+    if (factor > 0.0)
+    {
+        m_playerPlaylistWidthFactor = factor;
+        emit playerPlaylistFactorChanged(factor);
     }
 }
 
