@@ -268,6 +268,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 case 32: bi_rgb_chroma = VLC_CODEC_XBGR; break;
                 case 24: bi_rgb_chroma = VLC_CODEC_BGR24; break;
                 case 16: bi_rgb_chroma = VLC_CODEC_BGR565LE; break;
+                case 15: bi_rgb_chroma = VLC_CODEC_BGR555LE; break;
                 default: bi_rgb_chroma = 0; break;
             }
             if (bi_rgb_chroma != 0)
@@ -356,6 +357,9 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
         case VLC_CODEC_RGB24:
             return VLC_EINVAL;
         case VLC_CODEC_BGR565LE:
+            biBitCount = 16;
+            break;
+        case VLC_CODEC_BGR555LE:
             biBitCount = 16;
             break;
         case VLC_CODEC_RGB16:
