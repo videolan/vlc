@@ -42,7 +42,7 @@ class MediaLib;
 template<typename T>
 class ListCache;
 using MLListCache = ListCache<std::unique_ptr<MLItem>>;
-struct MLListCacheLoader;
+class MLListCacheLoader;
 
 /* Medialib data loader for the cache */
 class MLBaseModelPrivate;
@@ -149,7 +149,7 @@ private:
 };
 
 
-struct MLListCacheLoader: public QObject, public ListCacheLoader<std::unique_ptr<MLItem>>
+class MLListCacheLoader: public QObject, public ListCacheLoader<std::unique_ptr<MLItem>>
 {
     Q_OBJECT
 public:
