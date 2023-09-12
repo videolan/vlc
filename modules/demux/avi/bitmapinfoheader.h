@@ -346,18 +346,9 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
                 i_bmask = hton32(0xff000000);
                 break;
             default:
-                if (biBitCount == 32 || biBitCount == 16)
-                {
-                    i_rmask = hton32(fmt->video.i_rmask);
-                    i_gmask = hton32(fmt->video.i_gmask);
-                    i_bmask = hton32(fmt->video.i_bmask);
-                }
-                else
-                {
-                    i_rmask = fmt->video.i_rmask;
-                    i_gmask = fmt->video.i_gmask;
-                    i_bmask = fmt->video.i_bmask;
-                }
+                i_rmask = hton32(fmt->video.i_rmask);
+                i_gmask = hton32(fmt->video.i_gmask);
+                i_bmask = hton32(fmt->video.i_bmask);
                 break;
         }
         SetDWBE( &p_bmiColors[0], i_rmask );
