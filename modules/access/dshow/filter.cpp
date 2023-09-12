@@ -120,7 +120,7 @@ vlc_fourcc_t GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             else if( media_type.subtype == MEDIASUBTYPE_RGB32 )
                i_fourcc = VLC_CODEC_RGB32;
             else if( media_type.subtype == MEDIASUBTYPE_ARGB32 )
-               i_fourcc = VLC_CODEC_RGBA;
+               i_fourcc = VLC_CODEC_BGRA;
 
             /* Planar YUV formats */
             else if( media_type.subtype == MEDIASUBTYPE_I420 )
