@@ -323,40 +323,40 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
         {
             case VLC_CODEC_ABGR:
             case VLC_CODEC_XBGR:
-                i_rmask = hton32(0x000000ff);
-                i_gmask = hton32(0x0000ff00);
-                i_bmask = hton32(0x00ff0000);
+                i_rmask = 0x000000ff;
+                i_gmask = 0x0000ff00;
+                i_bmask = 0x00ff0000;
                 break;
             case VLC_CODEC_ARGB:
             case VLC_CODEC_XRGB:
-                i_rmask = hton32(0x00ff0000);
-                i_gmask = hton32(0x0000ff00);
-                i_bmask = hton32(0x000000ff);
+                i_rmask = 0x00ff0000;
+                i_gmask = 0x0000ff00;
+                i_bmask = 0x000000ff;
                 break;
             case VLC_CODEC_RGBA:
             case VLC_CODEC_RGBX:
-                i_rmask = hton32(0xff000000);
-                i_gmask = hton32(0x00ff0000);
-                i_bmask = hton32(0x0000ff00);
+                i_rmask = 0xff000000;
+                i_gmask = 0x00ff0000;
+                i_bmask = 0x0000ff00;
                 break;
             case VLC_CODEC_BGRA:
             case VLC_CODEC_BGRX:
-                i_rmask = hton32(0x0000ff00);
-                i_gmask = hton32(0x00ff0000);
-                i_bmask = hton32(0xff000000);
+                i_rmask = 0x0000ff00;
+                i_gmask = 0x00ff0000;
+                i_bmask = 0xff000000;
                 break;
             default:
-                i_rmask = hton32(fmt->video.i_rmask);
-                i_gmask = hton32(fmt->video.i_gmask);
-                i_bmask = hton32(fmt->video.i_bmask);
+                i_rmask = fmt->video.i_rmask;
+                i_gmask = fmt->video.i_gmask;
+                i_bmask = fmt->video.i_bmask;
                 break;
         }
-        SetDWBE( &p_bmiColors[0], i_rmask );
-        SetDWBE( &p_bmiColors[4], i_gmask );
-        SetDWBE( &p_bmiColors[8], i_bmask );
+        SetDWLE( &p_bmiColors[0], i_rmask );
+        SetDWLE( &p_bmiColors[4], i_gmask );
+        SetDWLE( &p_bmiColors[8], i_bmask );
         if( b_has_alpha )
         {
-            SetDWBE( &p_bmiColors[12], ~(i_rmask | i_gmask | i_bmask) );
+            SetDWLE( &p_bmiColors[12], ~(i_rmask | i_gmask | i_bmask) );
         }
     }
     else if( fmt->i_codec == VLC_CODEC_RGBP )
