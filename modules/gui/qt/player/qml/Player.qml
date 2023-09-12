@@ -621,9 +621,11 @@ FocusScope {
                         controlBarView.forceActiveFocus()
                 }
 
-                // TODO: remember width factor?
+
                 Widgets.HorizontalResizeHandle {
                     id: resizeHandle
+
+                    property bool _inhibitMainCtxUpdate: false
 
                     parent: playlistView
 
@@ -636,6 +638,30 @@ FocusScope {
                     atRight: false
                     targetWidth: playlistpopup.width
                     sourceWidth: rootPlayer.width
+
+                    onWidthFactorChanged: {
+                        if (!_inhibitMainCtxUpdate)
+                            MainCtx.playerPlaylistWidthFactor = widthFactor
+                    }
+
+                    Component.onCompleted:  _updateFromMainCtx()
+
+                    function _updateFromMainCtx() {
+                        if (widthFactor == MainCtx.playerPlaylistWidthFactor)
+                            return
+
+                        _inhibitMainCtxUpdate = true
+                        widthFactor = MainCtx.playerPlaylistWidthFactor
+                        _inhibitMainCtxUpdate = false
+                    }
+
+                    Connections {
+                        target: MainCtx
+
+                        onPlaylistWidthFactorChanged: {
+                            resizeHandle._updateFromMainCtx()
+                        }
+                    }
                 }
             }
         }
