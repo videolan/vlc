@@ -200,6 +200,7 @@ var_Read_float(const char *psz)
     Y(video, height, unsigned, add_integer, Unsigned, 480) \
     Y(video, frame_rate, unsigned, add_integer, Unsigned, 25) \
     Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1) \
+    Y(video, colorbar, bool, add_bool, Bool, false) \
     Y(video, orientation, unsigned, add_integer, Unsigned, ORIENT_NORMAL)
 
 #define OPTIONS_SUB(Y) \
@@ -297,6 +298,9 @@ struct demux_sys
 
     int current_title;
     vlc_tick_t chapter_gap;
+
+    uint8_t bar_colors[PICTURE_PLANE_MAX][PICTURE_PLANE_MAX];
+    bool b_colors;
 
     unsigned int updates;
     OPTIONS_GLOBAL(DECLARE_OPTION)
@@ -598,7 +602,23 @@ CreateVideoBlock(demux_t *demux, struct mock_track *track)
         block_len += pic->p[i].i_lines * pic->p[i].i_pitch;
 
     uint8_t pixel = (sys->video_pts / VLC_TICK_FROM_MS(delay)) % range;
-    memset(pic->p[0].p_pixels, pixel, block_len);
+    if (sys->b_colors)
+    {
+        int bars = __MAX(3, pic->p[0].i_pixel_pitch);
+        unsigned lines_per_color = pic->p[0].i_visible_lines / bars;
+        for (int bar = 0; bar < bars; bar++)
+        {
+            for (unsigned y=bar*lines_per_color; y < (bar+1)*lines_per_color; y++)
+            {
+                for (int x=0; x < pic->p[0].i_visible_pitch; x += pic->p[0].i_pixel_pitch)
+                {
+                    memcpy(&pic->p[0].p_pixels[x + y*pic->p[0].i_pitch], &sys->bar_colors[bar], pic->p[0].i_pixel_pitch);
+                }
+            }
+        }
+    }
+    else
+        memset(pic->p[0].p_pixels, pixel, block_len);
 
     if(pic->format.p_palette && pixel < PALETTE_BLACK)
     {
@@ -770,6 +790,47 @@ ConfigureVideoTrack(demux_t *demux,
     fmt->video.orientation = options->orientation;
 
     fmt->b_packetized = options->packetized;
+
+    if (options->colorbar && !vlc_fourcc_IsYUV(chroma) && desc->plane_count == 1)
+    {
+        struct demux_sys *sys = demux->p_sys;
+        sys->b_colors = true;
+
+        unsigned bars = __MAX(3, desc->pixel_size);
+        for (unsigned bar = 0; bar < bars; bar++)
+        {
+            memset(&sys->bar_colors[bar], 0, sizeof(*sys->bar_colors));
+            if (desc->pixel_bits == 15)
+            {
+                // ONLY Little-Endian FOR NOW to match AVI
+
+                // only first 2 bytes of bar_colors are used
+                if (bar == 0)
+                    SetWLE(&sys->bar_colors[bar], 0x1F << 10);
+                else if (bar == 1)
+                    SetWLE(&sys->bar_colors[bar], 0x1F << 5);
+                else if (bar == 2)
+                    SetWLE(&sys->bar_colors[bar], 0x1F << 0);
+            }
+            else if (desc->pixel_bits == 16)
+            {
+                // ONLY Little-Endian FOR NOW to match AVI
+
+                // only first 2 bytes of bar_colors are used
+                if (bar == 0)
+                    SetWLE(&sys->bar_colors[bar], 0x1F << 11);
+                else if (bar == 1)
+                    SetWLE(&sys->bar_colors[bar], 0x3F << 5);
+                else if (bar == 2)
+                    SetWLE(&sys->bar_colors[bar], 0x1F << 0);
+            }
+            else if (desc->pixel_bits == 32 || desc->pixel_bits == 24)
+                // write 0xFF on the offset of the bar
+                sys->bar_colors[bar][bar] = 0xFF;
+            else
+                sys->b_colors = false; // unsupported RGB type
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1270,6 +1331,8 @@ Open(vlc_object_t *obj)
         demux->pf_readdir = Readdir;
         return VLC_SUCCESS;
     }
+
+    sys->b_colors = false;
 
     if (sys->chapter_count > 0 && sys->title_count == 0)
         sys->title_count++;
