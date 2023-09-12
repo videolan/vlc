@@ -234,8 +234,8 @@ public:
     inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
     bool isMediaLibraryVisible() { return m_mediaLibraryVisible; }
     bool isPlaylistDocked() { return b_playlistDocked; }
-    bool isPlaylistVisible() { return playlistVisible; }
-    inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
+    bool isPlaylistVisible() { return m_playlistVisible; }
+    inline double getPlaylistWidthFactor() const { return m_playlistWidthFactor; }
     inline double getPlayerPlaylistWidthFactor() const { return m_playerPlaylistWidthFactor; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
@@ -373,8 +373,8 @@ protected:
 
     /* States */
     bool                 m_mediaLibraryVisible = true;
-    bool                 playlistVisible = false;       ///< Is the playlist visible ?
-    double               playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
+    bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
+    double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
 
     VLCVarChoiceModel* m_extraInterfaces = nullptr;

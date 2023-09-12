@@ -217,8 +217,8 @@ MainCtx::~MainCtx()
     settings->setValue( "interface-scale", m_intfUserScaleFactor );
 
     /* Save playlist state */
-    settings->setValue( "playlist-visible", playlistVisible );
-    settings->setValue( "playlist-width-factor", playlistWidthFactor);
+    settings->setValue( "playlist-visible", m_playlistVisible );
+    settings->setValue( "playlist-width-factor", m_playlistWidthFactor);
     settings->setValue( "player-playlist-width-factor", m_playerPlaylistWidthFactor);
 
     settings->setValue( "grid-view", m_gridView );
@@ -353,9 +353,9 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
 
     loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, &MainCtx::playlistDockedChanged);
 
-    loadFromSettings(playlistVisible, "MainWindow/playlist-visible", false, &MainCtx::playlistVisibleChanged);
+    loadFromSettings(m_playlistVisible, "MainWindow/playlist-visible", false, &MainCtx::playlistVisibleChanged);
 
-    loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
+    loadFromSettings(m_playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
 
     loadFromSettings(m_playerPlaylistWidthFactor, "MainWindow/player-playlist-width-factor", 4.0 , &MainCtx::playerPlaylistFactorChanged);
 
@@ -524,7 +524,7 @@ void MainCtx::setPlaylistDocked( bool docked )
 
 void MainCtx::setPlaylistVisible( bool visible )
 {
-    playlistVisible = visible;
+    m_playlistVisible = visible;
 
     emit playlistVisibleChanged(visible);
 }
@@ -533,7 +533,7 @@ void MainCtx::setPlaylistWidthFactor( double factor )
 {
     if (factor > 0.0)
     {
-        playlistWidthFactor = factor;
+        m_playlistWidthFactor = factor;
         emit playlistWidthFactorChanged(factor);
     }
 }
