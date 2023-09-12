@@ -44,7 +44,7 @@ static const struct
     vlc_fourcc_t codec;
     uint32_t i_rmask, i_gmask, i_bmask;
 } bitmap_rgb_masks[] = {
-    { VLC_CODEC_RGB15,      0x7c00, /* R5G5B5 */
+    { VLC_CODEC_RGB15,      0x7c00, /* FIXME it should be B5G5R5LE */
                             0x03e0,
                             0x001f, },
     { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
