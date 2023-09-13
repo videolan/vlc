@@ -293,13 +293,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
     }
     else /* Compressed codecs */
     {
-        vlc_fourcc_t fcc;
-        /* Shitty VLC muxed files storing chroma in biCompression */
-        if (p_bih->biCompression == VLC_FOURCC('R','V','3','2'))
-            fcc = VLC_CODEC_XRGB;
-        else
-            fcc = p_bih->biCompression;
-        fmt->i_codec = vlc_fourcc_GetCodec( VIDEO_ES, fcc );
+        fmt->i_codec = vlc_fourcc_GetCodec( VIDEO_ES, p_bih->biCompression );
 
         /* Copy extradata if any */
         if( i_bihextra > 0 )
