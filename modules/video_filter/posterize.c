@@ -103,6 +103,8 @@ static int Create( filter_t *p_filter )
         CASE_PACKED_YUV_422
             break;
         case VLC_CODEC_RGB24M:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_BGR24:
             break;
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGBA:
@@ -172,6 +174,8 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
     switch( p_pic->format.i_chroma )
     {
         case VLC_CODEC_RGB24M:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_BGR24:
             RVPosterize( p_pic, p_outpic, false, level );
             break;
         case VLC_CODEC_RGB32:
