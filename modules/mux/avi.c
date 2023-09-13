@@ -88,7 +88,7 @@ static int Mux      ( sout_mux_t * );
 
 typedef struct avi_stream_s
 {
-    int i_cat;
+    enum es_format_category_e i_cat;
 
     char fcc[4];
 
@@ -768,6 +768,9 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
                 bo_add_16le(  p_bo, 0 );
             }
             break;
+        default:
+            // unsupported track type
+            break;
     }
 
     AVI_BOX_EXIT( 0 );
@@ -808,6 +811,9 @@ static int avi_HeaderAdd_strf( bo_t *p_bo, avi_stream_t *p_stream )
             bo_add_mem( p_bo,
                         p_stream->i_bih - sizeof( VLC_BITMAPINFOHEADER ),
                         (uint8_t*)&p_stream->p_bih[1] );
+            break;
+        default:
+            // unsupported track type
             break;
     }
 
