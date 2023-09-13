@@ -102,9 +102,9 @@ typedef struct avi_stream_s
 
     VLC_BITMAPINFOHEADER    bih;
     uint8_t                 *p_bitmap_extra;
-    size_t                  i_bitmap_extra;
+    size_t                   i_bitmap_extra;
     uint8_t                 *p_wav_extra;
-    WAVEFORMATEX            *p_wf;
+    WAVEFORMATEX            wf;
 
 } avi_stream_t;
 
@@ -265,7 +265,6 @@ static void Close( vlc_object_t * p_this )
             free( p_stream->p_bitmap_extra );
         else if ( p_stream->i_cat == AUDIO_ES )
             free( p_stream->p_wav_extra );
-        free( p_stream->p_wf );
     }
     free( p_sys->idx1.entry );
     free( p_sys );
@@ -323,14 +322,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[3] = 'b';
 
             p_stream->p_bitmap_extra = NULL;
+            p_stream->p_wav_extra = NULL;
 
-            WAVEFORMATEX *p_wf = malloc(sizeof(*p_wf));
-            if( !p_wf )
-            {
-                free( p_input->p_sys );
-                p_input->p_sys = NULL;
-                return VLC_ENOMEM;
-            }
+            WAVEFORMATEX *p_wf = &p_stream->wf;
 
             p_wf->cbSize = p_input->p_fmt->i_extra;
             if( p_wf->cbSize > 0 )
@@ -338,7 +332,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->p_wav_extra = malloc( p_wf->cbSize );
                 if ( unlikely(p_stream->p_wav_extra == NULL) )
                 {
-                    free( p_wf );
                     free( p_input->p_sys );
                     p_input->p_sys = NULL;
                     return VLC_ENOMEM;
@@ -416,13 +409,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                                       p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 default:
-                    free( p_wf );
                     free( p_stream->p_wav_extra );
                     free( p_input->p_sys );
                     p_input->p_sys = NULL;
                     return VLC_EGENERIC;
             }
-            p_stream->p_wf = p_wf;
             break;
         case VIDEO_ES:
             p_stream->i_cat = VIDEO_ES;
@@ -436,7 +427,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 p_sys->i_stream_video = p_sys->i_streams;
             }
-            p_stream->p_wf  = NULL;
             if( CreateBitmapInfoHeader( &p_input->fmt, &p_stream->bih,
                                         &p_stream->p_bitmap_extra,
                                         &p_stream->i_bitmap_extra ) != VLC_SUCCESS )
@@ -751,7 +741,7 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
             {
                 int i_rate, i_scale, i_samplesize;
 
-                i_samplesize = p_stream->p_wf->nBlockAlign;
+                i_samplesize = p_stream->wf.nBlockAlign;
                 if( i_samplesize > 1 )
                 {
                     i_scale = i_samplesize;
@@ -797,14 +787,14 @@ static int avi_HeaderAdd_strf( bo_t *p_bo, avi_stream_t *p_stream )
     switch( p_stream->i_cat )
     {
         case AUDIO_ES:
-            bo_add_16le( p_bo, p_stream->p_wf->wFormatTag );
-            bo_add_16le( p_bo, p_stream->p_wf->nChannels );
-            bo_add_32le( p_bo, p_stream->p_wf->nSamplesPerSec );
-            bo_add_32le( p_bo, p_stream->p_wf->nAvgBytesPerSec );
-            bo_add_16le( p_bo, p_stream->p_wf->nBlockAlign );
-            bo_add_16le( p_bo, p_stream->p_wf->wBitsPerSample );
-            bo_add_16le( p_bo, p_stream->p_wf->cbSize );
-            bo_add_mem( p_bo, p_stream->p_wf->cbSize, p_stream->p_wav_extra );
+            bo_add_16le( p_bo, p_stream->wf.wFormatTag );
+            bo_add_16le( p_bo, p_stream->wf.nChannels );
+            bo_add_32le( p_bo, p_stream->wf.nSamplesPerSec );
+            bo_add_32le( p_bo, p_stream->wf.nAvgBytesPerSec );
+            bo_add_16le( p_bo, p_stream->wf.nBlockAlign );
+            bo_add_16le( p_bo, p_stream->wf.wBitsPerSample );
+            bo_add_16le( p_bo, p_stream->wf.cbSize );
+            bo_add_mem( p_bo, p_stream->wf.cbSize, p_stream->p_wav_extra );
             break;
         case VIDEO_ES:
             bo_add_32le( p_bo, p_stream->bih.biSize );
