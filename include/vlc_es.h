@@ -783,4 +783,71 @@ vlc_es_id_GetStrId(vlc_es_id_t *id);
 VLC_API enum es_format_category_e
 vlc_es_id_GetCat(vlc_es_id_t *id);
 
+/**
+ * Get the native endianness mask for a RGB fourcc
+ *
+ * @note the alpha mask is 0 when the chroma doesn't contain an alpha component.
+ *
+ * @return VLC_SUCCESS if the mask values were filled
+ */
+static inline int vlc_RGBChromaToMask( vlc_fourcc_t fcc, uint32_t *rmask,
+                                       uint32_t *gmask, uint32_t *bmask,
+                                       uint32_t *amask )
+{
+    switch(fcc)
+    {
+        case VLC_CODEC_BGRA:
+            *bmask = 0xff000000;
+            *gmask = 0x00ff0000;
+            *rmask = 0x0000ff00;
+            *amask = 0x000000ff;
+            break;
+        case VLC_CODEC_BGRX:
+            *bmask = 0xff000000;
+            *gmask = 0x00ff0000;
+            *rmask = 0x0000ff00;
+            *amask = 0;
+            break;
+        case VLC_CODEC_RGBA:
+            *rmask = 0xff000000;
+            *gmask = 0x00ff0000;
+            *bmask = 0x0000ff00;
+            *amask = 0x000000ff;
+            break;
+        case VLC_CODEC_RGBX:
+            *rmask = 0xff000000;
+            *gmask = 0x00ff0000;
+            *bmask = 0x0000ff00;
+            *amask = 0;
+            break;
+        case VLC_CODEC_ABGR:
+            *amask = 0xff000000;
+            *bmask = 0x00ff0000;
+            *gmask = 0x0000ff00;
+            *rmask = 0x000000ff;
+            break;
+        case VLC_CODEC_XBGR:
+            *amask = 0;
+            *bmask = 0x00ff0000;
+            *gmask = 0x0000ff00;
+            *rmask = 0x000000ff;
+            break;
+        case VLC_CODEC_ARGB:
+            *amask = 0xff000000;
+            *rmask = 0x00ff0000;
+            *gmask = 0x0000ff00;
+            *bmask = 0x000000ff;
+            break;
+        case VLC_CODEC_XRGB:
+            *amask = 0;
+            *rmask = 0x00ff0000;
+            *gmask = 0x0000ff00;
+            *bmask = 0x000000ff;
+            break;
+        default:
+            return VLC_EINVAL;
+    }
+    return VLC_SUCCESS;
+}
+
 #endif
