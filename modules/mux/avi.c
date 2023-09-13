@@ -100,11 +100,17 @@ typedef struct avi_stream_s
     float   f_fps;
     int     i_bitrate;
 
-    VLC_BITMAPINFOHEADER    bih;
-    uint8_t                 *p_bitmap_extra;
-    size_t                   i_bitmap_extra;
-    uint8_t                 *p_wav_extra;
-    WAVEFORMATEX            wf;
+    union {
+        struct {
+            VLC_BITMAPINFOHEADER  bih;
+            uint8_t               *p_bitmap_extra;
+            size_t                 i_bitmap_extra;
+        };
+        struct {
+            uint8_t               *p_wav_extra;
+            WAVEFORMATEX          wf;
+        };
+    };
 
 } avi_stream_t;
 
@@ -320,8 +326,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[1] = '0' + p_sys->i_streams % 10;
             p_stream->fcc[2] = 'w';
             p_stream->fcc[3] = 'b';
-
-            p_stream->p_bitmap_extra = NULL;
             p_stream->p_wav_extra = NULL;
 
             WAVEFORMATEX *p_wf = &p_stream->wf;
@@ -422,7 +426,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[2] = 'd';
             p_stream->fcc[3] = 'c';
             p_stream->p_bitmap_extra = NULL;
-            p_stream->p_wav_extra = NULL;
             if( p_sys->i_stream_video < 0 )
             {
                 p_sys->i_stream_video = p_sys->i_streams;
