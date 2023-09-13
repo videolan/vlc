@@ -67,7 +67,7 @@ Widgets.PageLoader {
 
     // Connections
     Connections {
-        target: (Helpers.isValidInstanceOf(stackViewItem, BrowseHomeDisplay)) ? stackViewItem
+        target: (Helpers.isValidInstanceOf(currentItem, BrowseHomeDisplay)) ? currentItem
                                                                               : null
 
         onSeeAll: {
@@ -80,7 +80,7 @@ Widgets.PageLoader {
     }
 
     Connections {
-        target: stackViewItem
+        target: root.currentItem
 
         onBrowse: History.push(["mc", "network", "browse", { tree: tree }], reason)
     }
@@ -162,7 +162,7 @@ Widgets.PageLoader {
         id: componentBar
 
         NetworkAddressbar {
-            path: view.name === "browse" ? root.stackViewItem.model.path : []
+            path: view.name === "browse" ? root.currentItem.model.path : []
 
             onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
 

@@ -18,7 +18,7 @@
 import QtQuick 2.12
 import org.videolan.vlc 0.1
 
-FocusScope {
+StackViewExt {
     id: root
 
     // Properties
@@ -34,48 +34,39 @@ FocusScope {
     property var loadDefaultView: null
 
     //indicates whether the subview support grid/list mode
-    readonly property bool hasGridListMode: (stackView.currentItem
-                                            && stackView.currentItem.hasGridListMode !== undefined
-                                            && stackView.currentItem.hasGridListMode)
+    readonly property bool hasGridListMode: (currentItem
+                                            && currentItem.hasGridListMode !== undefined
+                                            && currentItem.hasGridListMode)
 
     readonly property bool isSearchable: (currentItem
                                     && currentItem.isSearchable !== undefined
                                     && currentItem.isSearchable)
 
-    readonly property var sortModel: (stackView.currentItem !== undefined
-                                    && stackView.currentItem.sortModel !== undefined) ? stackView.currentItem.sortModel : null
+    readonly property var sortModel: (currentItem
+                                    && currentItem.sortModel !== undefined) ? currentItem.sortModel : null
 
     // Private
 
     property bool _ready: false
 
-    // Aliases
-
-    property alias leftPadding: stackView.leftPadding
-    property alias rightPadding: stackView.rightPadding
-
-    property alias stackViewItem: stackView.currentItem
-
-    property alias stackView: stackView
 
     // Signals
 
     signal pageChanged(string page)
-    signal currentItemChanged(var currentItem)
 
     // Events
 
     Component.onCompleted: {
         _ready = true
 
-        loadView()
+        _loadView()
     }
 
-    onViewChanged: loadView()
+    onViewChanged: _loadView()
 
     // Functions
 
-    function loadView() {
+    function _loadView() {
         // NOTE: We wait for the item to be fully loaded to avoid size glitches.
         if (_ready === false)
             return
@@ -92,41 +83,28 @@ FocusScope {
             console.error("view is not defined")
             return
         }
-        if (pageModel === []) {
+        if (pageModel.length === 0) {
             console.error("pageModel is not defined")
             return
         }
 
         const reason = History.takeFocusReason()
 
-        const found = stackView.loadView(root.pageModel, view.name, view.properties)
+        const found = root.loadView(root.pageModel, view.name, view.properties)
         if (!found) {
             console.error("failed to load", JSON.stringify(History.current))
             return
         }
 
-        stackView.currentItem.Navigation.parentItem = root
+        currentItem.Navigation.parentItem = root
 
         if (reason !== Qt.OtherFocusReason)
             setCurrentItemFocus(reason)
 
-        root.currentItemChanged(stackView.currentItem)
+        currentItemChanged(currentItem)
     }
 
     function loadPage(page) {
         view = {"name": page, "properties": {}}
-    }
-
-    function setCurrentItemFocus(reason) {
-        stackView.setCurrentItemFocus(reason);
-    }
-
-    // Children
-
-    StackViewExt {
-        id: stackView
-
-        anchors.fill: parent
-        focus: true
     }
 }
