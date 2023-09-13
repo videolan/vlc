@@ -102,7 +102,8 @@ typedef struct avi_stream_s
 
     VLC_BITMAPINFOHEADER    bih;
     uint8_t                 *p_bitmap_extra;
-    size_t                   i_bitmap_extra;
+    size_t                  i_bitmap_extra;
+    uint8_t                 *p_wav_extra;
     WAVEFORMATEX            *p_wf;
 
 } avi_stream_t;
@@ -262,6 +263,8 @@ static void Close( vlc_object_t * p_this )
         p_stream = &p_sys->stream[i_stream];
         if ( p_stream->i_cat == VIDEO_ES )
             free( p_stream->p_bitmap_extra );
+        else if ( p_stream->i_cat == AUDIO_ES )
+            free( p_stream->p_wav_extra );
         free( p_stream->p_wf );
     }
     free( p_sys->idx1.entry );
@@ -321,8 +324,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             p_stream->p_bitmap_extra = NULL;
 
-            WAVEFORMATEX *p_wf  = malloc( sizeof( WAVEFORMATEX ) +
-                                  p_input->p_fmt->i_extra );
+            WAVEFORMATEX *p_wf = malloc(sizeof(*p_wf));
             if( !p_wf )
             {
                 free( p_input->p_sys );
@@ -333,7 +335,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_wf->cbSize = p_input->p_fmt->i_extra;
             if( p_wf->cbSize > 0 )
             {
-                memcpy( &p_wf[1],
+                p_stream->p_wav_extra = malloc( p_wf->cbSize );
+                if ( unlikely(p_stream->p_wav_extra == NULL) )
+                {
+                    free( p_wf );
+                    free( p_input->p_sys );
+                    p_input->p_sys = NULL;
+                    return VLC_ENOMEM;
+                }
+                memcpy( p_stream->p_wav_extra,
                         p_input->p_fmt->p_extra,
                         p_input->p_fmt->i_extra );
             }
@@ -407,6 +417,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     break;
                 default:
                     free( p_wf );
+                    free( p_stream->p_wav_extra );
                     free( p_input->p_sys );
                     p_input->p_sys = NULL;
                     return VLC_EGENERIC;
@@ -420,6 +431,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[2] = 'd';
             p_stream->fcc[3] = 'c';
             p_stream->p_bitmap_extra = NULL;
+            p_stream->p_wav_extra = NULL;
             if( p_sys->i_stream_video < 0 )
             {
                 p_sys->i_stream_video = p_sys->i_streams;
@@ -792,7 +804,7 @@ static int avi_HeaderAdd_strf( bo_t *p_bo, avi_stream_t *p_stream )
             bo_add_16le( p_bo, p_stream->p_wf->nBlockAlign );
             bo_add_16le( p_bo, p_stream->p_wf->wBitsPerSample );
             bo_add_16le( p_bo, p_stream->p_wf->cbSize );
-            bo_add_mem( p_bo, p_stream->p_wf->cbSize, (uint8_t*)&p_stream->p_wf[1] );
+            bo_add_mem( p_bo, p_stream->p_wf->cbSize, p_stream->p_wav_extra );
             break;
         case VIDEO_ES:
             bo_add_32le( p_bo, p_stream->bih.biSize );
