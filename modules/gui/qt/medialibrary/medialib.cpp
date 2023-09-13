@@ -270,6 +270,24 @@ void MediaLib::reload()
     });
 }
 
+void MediaLib::mlInputItem(const QVariantList &variantList, QJSValue callback)
+{
+    if (!callback.isCallable()) // invalid argument
+    {
+        msg_Warn(m_intf, "callback is not callbable");
+        return;
+    }
+
+    QVector<MLItemId> mlIdList;
+    for (const auto& variant : variantList)
+    {
+        assert(variant.canConvert<MLItemId>());
+        mlIdList.push_back(variant.value<MLItemId>());
+    }
+
+    mlInputItem(mlIdList, callback);
+}
+
 void MediaLib::mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callback)
 {
     if (!callback.isCallable()) // invalid argument
