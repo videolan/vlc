@@ -101,7 +101,8 @@ typedef struct avi_stream_s
     int     i_bitrate;
 
     VLC_BITMAPINFOHEADER    *p_bih;
-    size_t                   i_bih;
+    uint8_t                 *p_bitmap_extra;
+    size_t                   i_bitmap_extra;
     WAVEFORMATEX            *p_wf;
 
 } avi_stream_t;
@@ -259,6 +260,8 @@ static void Close( vlc_object_t * p_this )
     {
         avi_stream_t *p_stream;
         p_stream = &p_sys->stream[i_stream];
+        if ( p_stream->i_cat == VIDEO_ES )
+            free( p_stream->p_bitmap_extra );
         free( p_stream->p_bih );
         free( p_stream->p_wf );
     }
@@ -318,7 +321,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[3] = 'b';
 
             p_stream->p_bih = NULL;
-            p_stream->i_bih = 0;
+            p_stream->p_bitmap_extra = NULL;
 
             WAVEFORMATEX *p_wf  = malloc( sizeof( WAVEFORMATEX ) +
                                   p_input->p_fmt->i_extra );
@@ -418,14 +421,24 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[1] = '0' + p_sys->i_streams % 10;
             p_stream->fcc[2] = 'd';
             p_stream->fcc[3] = 'c';
+            p_stream->p_bitmap_extra = NULL;
             if( p_sys->i_stream_video < 0 )
             {
                 p_sys->i_stream_video = p_sys->i_streams;
             }
             p_stream->p_wf  = NULL;
-            p_stream->p_bih = CreateBitmapInfoHeader( &p_input->fmt, &p_stream->i_bih );
-            if( !p_stream->p_bih )
+            p_stream->p_bih = malloc(sizeof(*p_stream->p_bih));
+            if ( unlikely( p_stream->p_bih == NULL ) )
             {
+                free( p_input->p_sys );
+                p_input->p_sys = NULL;
+                return VLC_ENOMEM;
+            }
+            if( CreateBitmapInfoHeader( &p_input->fmt, p_stream->p_bih,
+                                        &p_stream->p_bitmap_extra,
+                                        &p_stream->i_bitmap_extra ) != VLC_SUCCESS )
+            {
+                free( p_stream->p_bih );
                 free( p_input->p_sys );
                 p_input->p_sys = NULL;
                 return VLC_ENOMEM;
@@ -465,13 +478,12 @@ static int PrepareSamples( const avi_stream_t *p_stream,
           to first frame in case of XVID */
        if( p_stream->p_bih->biCompression == VLC_FOURCC( 'X', 'V', 'I', 'D' ) )
        {
-           size_t i_header_length =
-               p_stream->p_bih->biSize - sizeof(VLC_BITMAPINFOHEADER);
+           size_t i_header_length = p_stream->i_bitmap_extra;
            *pp_block = block_Realloc( *pp_block, i_header_length,
                                       (*pp_block)->i_buffer );
            if( !*pp_block )
                return VLC_ENOMEM;
-           memcpy((*pp_block)->p_buffer,&p_stream->p_bih[1], i_header_length);
+           memcpy((*pp_block)->p_buffer,p_stream->p_bitmap_extra, i_header_length);
        }
     }
 
@@ -808,9 +820,7 @@ static int avi_HeaderAdd_strf( bo_t *p_bo, avi_stream_t *p_stream )
             bo_add_32le( p_bo, p_stream->p_bih->biYPelsPerMeter );
             bo_add_32le( p_bo, p_stream->p_bih->biClrUsed );
             bo_add_32le( p_bo, p_stream->p_bih->biClrImportant );
-            bo_add_mem( p_bo,
-                        p_stream->i_bih - sizeof( VLC_BITMAPINFOHEADER ),
-                        (uint8_t*)&p_stream->p_bih[1] );
+            bo_add_mem( p_bo, p_stream->i_bitmap_extra, p_stream->p_bitmap_extra );
             break;
         default:
             // unsupported track type

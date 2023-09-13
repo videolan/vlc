@@ -248,8 +248,10 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
     return VLC_SUCCESS;
 }
 
-static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *fmt,
-                                                             size_t *pi_total )
+static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
+                                          VLC_BITMAPINFOHEADER *p_bih,
+                                          uint8_t **p_bih_extra,
+                                          size_t *pi_total )
 {
     uint16_t biBitCount = 0;
     uint32_t biCompression = BI_RGB;
@@ -308,13 +310,11 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     else
         i_bih_extra = fmt->i_extra;
 
-    VLC_BITMAPINFOHEADER *p_bih = malloc( sizeof(VLC_BITMAPINFOHEADER) +
-                                          i_bih_extra +  i_bmiColors );
-    if( p_bih == NULL )
-        return NULL;
+    *p_bih_extra = malloc( i_bih_extra + i_bmiColors );
+    if( *p_bih_extra == NULL && (i_bih_extra + i_bmiColors) != 0 )
+        return VLC_ENOMEM;
 
-    uint8_t *p_bih_extra = (uint8_t *) &p_bih[1];
-    uint8_t *p_bmiColors = p_bih_extra + i_bih_extra;
+    uint8_t *p_bmiColors = *p_bih_extra;
     p_bih->biClrUsed = 0;
     if( biCompression == BI_BITFIELDS )
     {
@@ -343,7 +343,7 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     }
     else if( fmt->i_extra )
     {
-        memcpy( p_bih_extra, fmt->p_extra, fmt->i_extra );
+        memcpy( *p_bih_extra, fmt->p_extra, fmt->i_extra );
     }
 
     p_bih->biSize = sizeof(VLC_BITMAPINFOHEADER) + i_bih_extra;
@@ -357,6 +357,6 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     p_bih->biYPelsPerMeter = 0;
     p_bih->biClrImportant = 0;
 
-    *pi_total = sizeof(VLC_BITMAPINFOHEADER) + i_bih_extra +  i_bmiColors;
-    return p_bih;
+    *pi_total = i_bih_extra + i_bmiColors;
+    return VLC_SUCCESS;
 }
