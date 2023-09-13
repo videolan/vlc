@@ -1,6 +1,6 @@
-From 91bbb73a883de3df77504a5f6d0cd8c69850f286 Mon Sep 17 00:00:00 2001
+From 8c4905abedc2ae7ca507ff2933721ca29ec3a9eb Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@videolan.org>
-Date: Tue, 18 Jul 2023 09:47:19 +0200
+Date: Wed, 13 Sep 2023 11:19:02 -0400
 Subject: [PATCH] Use the pthread library found by CMake in the pkg-config file
 
 It may be empty on some platforms (Android)
@@ -18,10 +18,10 @@ Change-Id: I93a20ea4f7d0687bfa436de07eac7660c8f1e425
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/build/cmake/aom_install.cmake b/build/cmake/aom_install.cmake
-index 3b52a6872d..337ac2ddea 100644
+index b02c7b9..2c263e9 100644
 --- a/build/cmake/aom_install.cmake
 +++ b/build/cmake/aom_install.cmake
-@@ -46,11 +46,11 @@ macro(setup_aom_install_targets)
+@@ -46,12 +46,12 @@ macro(setup_aom_install_targets)
                -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
                -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
                -DCMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
@@ -29,13 +29,14 @@ index 3b52a6872d..337ac2ddea 100644
                -DCONFIG_MULTITHREAD=${CONFIG_MULTITHREAD}
                -DCONFIG_TUNE_VMAF=${CONFIG_TUNE_VMAF}
                -DCONFIG_TUNE_BUTTERAUGLI=${CONFIG_TUNE_BUTTERAUGLI}
+               -DCONFIG_SALIENCY_MAP=${CONFIG_SALIENCY_MAP}
                -DCONFIG_TFLITE=${CONFIG_TFLITE}
 -              -DHAVE_PTHREAD_H=${HAVE_PTHREAD_H}
                -P
                "${AOM_ROOT}/build/cmake/pkg_config.cmake"
        COMMENT "Writing aom.pc"
 diff --git a/build/cmake/pkg_config.cmake b/build/cmake/pkg_config.cmake
-index e8fff2e776..d3ba67b94b 100644
+index e8fff2e..d3ba67b 100644
 --- a/build/cmake/pkg_config.cmake
 +++ b/build/cmake/pkg_config.cmake
 @@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.5)
@@ -59,5 +60,5 @@ index e8fff2e776..d3ba67b94b 100644
    file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
  endif()
 -- 
-2.37.3.windows.1
+2.39.2
 
