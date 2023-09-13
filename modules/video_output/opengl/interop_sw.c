@@ -618,6 +618,18 @@ interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                                     GL_UNSIGNED_BYTE
             };
             break;
+        case VLC_CODEC_RGB24:
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE
+            };
+            break;
+#ifdef GL_BGR
+        case VLC_CODEC_BGR24:
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                { 1, 1 }, { 1, 1 }, GL_RGB, GL_BGR, GL_UNSIGNED_BYTE
+            };
+            break;
+#endif
 
         case VLC_CODEC_RGB32:
             if(!interop->fmt_in.i_rmask && !fallback_masks)
