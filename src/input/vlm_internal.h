@@ -38,7 +38,7 @@ typedef struct
     input_item_t      *p_item;
     vlc_player_t *player;
     vlc_player_listener_id *listener;
-
+    bool finished;
 } vlm_media_instance_sys_t;
 
 

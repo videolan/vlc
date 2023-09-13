@@ -61,13 +61,15 @@ static void player_on_state_changed(vlc_player_t *player,
     vlm_media_sys_t *p_media = data;
     vlm_t *p_vlm = p_media->vlm;
     assert( p_vlm );
+    vlm_media_instance_sys_t *instance = NULL;
     const char *psz_instance_name = NULL;
 
     for( int i = 0; i < p_media->i_instance; i++ )
     {
         if( p_media->instance[i]->player == player )
         {
-            psz_instance_name = p_media->instance[i]->psz_name;
+            instance = p_media->instance[i];
+            psz_instance_name = instance->psz_name;
             break;
         }
     }
@@ -88,6 +90,13 @@ static void player_on_state_changed(vlc_player_t *player,
             break;
         case VLC_PLAYER_STATE_STOPPING:
             vlm_state = vlc_player_GetError(player) ? VLM_ERROR_S : VLM_END_S;
+            if (instance != NULL)
+            {
+                vlc_mutex_lock(&p_vlm->lock);
+                instance->finished = true;
+                vlc_mutex_unlock(&p_vlm->lock);
+            }
+
             break;
         default:
             vlc_assert_unreachable();
@@ -260,10 +269,8 @@ static void* Manage( void* p_object )
             {
                 vlm_media_instance_sys_t *p_instance = p_media->instance[j];
 
-                vlc_player_Lock(p_instance->player);
-                if (!vlc_player_IsStarted(p_instance->player))
+                if (p_instance->finished)
                 {
-                    vlc_player_Unlock(p_instance->player);
                     int i_new_input_index;
 
                     /* */
@@ -280,7 +287,6 @@ static void* Manage( void* p_object )
                 }
                 else
                 {
-                    vlc_player_Unlock(p_instance->player);
                     j++;
                 }
             }
@@ -699,6 +705,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     vlc_player_SetCurrentMedia(player, p_instance->p_item);
     vlc_player_Start(player);
     vlc_player_Unlock(player);
+    p_instance->finished = false;
 
     vlm_SendEventMediaInstanceStarted( p_vlm, id, p_media->cfg.psz_name );
 
