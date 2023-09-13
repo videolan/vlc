@@ -293,6 +293,7 @@ static const pair_format_guid video_format_table[] =
  */
 static const pair_format_guid d3d_format_table[] = {
     { VLC_CODEC_BGRX,  MFVideoFormat_RGB32  },
+    { VLC_CODEC_BGR24, MFVideoFormat_RGB24  },
     { VLC_CODEC_RGB24M, MFVideoFormat_RGB24  },
     { VLC_CODEC_BGRA,  MFVideoFormat_ARGB32 },
     { VLC_CODEC_GREY,  MFVideoFormat_L8 },
