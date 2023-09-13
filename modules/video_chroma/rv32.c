@@ -56,7 +56,8 @@ static const struct vlc_filter_operations filter_ops = {
 static int OpenFilter( filter_t *p_filter )
 {
     /* XXX Only support RV24 -> RV32 conversion */
-    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB24M ||
+    if( (p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB24M &&
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGR24 ) ||
         (p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGB32 &&
         p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA) )
     {
