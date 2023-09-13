@@ -318,45 +318,21 @@ static inline VLC_BITMAPINFOHEADER * CreateBitmapInfoHeader( const es_format_t *
     p_bih->biClrUsed = 0;
     if( biCompression == BI_BITFIELDS )
     {
-        uint32_t i_rmask,i_gmask,i_bmask;
-        switch( fmt->i_codec )
+        uint32_t i_rmask,i_gmask,i_bmask, i_amask;
+        int ret = vlc_RGBChromaToMask( fmt->i_codec, &i_rmask, &i_gmask,
+                                       &i_bmask, &i_amask );
+        if (ret != VLC_SUCCESS)
         {
-            case VLC_CODEC_ABGR:
-            case VLC_CODEC_XBGR:
-                i_rmask = 0x000000ff;
-                i_gmask = 0x0000ff00;
-                i_bmask = 0x00ff0000;
-                break;
-            case VLC_CODEC_ARGB:
-            case VLC_CODEC_XRGB:
-                i_rmask = 0x00ff0000;
-                i_gmask = 0x0000ff00;
-                i_bmask = 0x000000ff;
-                break;
-            case VLC_CODEC_RGBA:
-            case VLC_CODEC_RGBX:
-                i_rmask = 0xff000000;
-                i_gmask = 0x00ff0000;
-                i_bmask = 0x0000ff00;
-                break;
-            case VLC_CODEC_BGRA:
-            case VLC_CODEC_BGRX:
-                i_rmask = 0x0000ff00;
-                i_gmask = 0x00ff0000;
-                i_bmask = 0xff000000;
-                break;
-            default:
-                i_rmask = fmt->video.i_rmask;
-                i_gmask = fmt->video.i_gmask;
-                i_bmask = fmt->video.i_bmask;
-                break;
+            i_rmask = fmt->video.i_rmask;
+            i_gmask = fmt->video.i_gmask;
+            i_bmask = fmt->video.i_bmask;
         }
         SetDWLE( &p_bmiColors[0], i_rmask );
         SetDWLE( &p_bmiColors[4], i_gmask );
         SetDWLE( &p_bmiColors[8], i_bmask );
         if( b_has_alpha )
         {
-            SetDWLE( &p_bmiColors[12], ~(i_rmask | i_gmask | i_bmask) );
+            SetDWLE( &p_bmiColors[12], i_amask );
         }
     }
     else if( fmt->i_codec == VLC_CODEC_RGBP )
