@@ -76,29 +76,28 @@
                                   frames:(NSArray<NSValue *> * const)frames
                                     size:(const NSSize)size
 {
-    NSImage * const compositedImage = [[NSImage alloc] initWithSize:size];
+    return [NSImage imageWithSize:size
+                          flipped:NO
+                   drawingHandler:^BOOL(const NSRect dstRect) {
 
-    [compositedImage lockFocus];
+        NSUInteger counter = 0;
+        for (NSValue * const rectValue in frames) {
+            if (counter >= images.count) {
+                break;
+            }
 
-    NSUInteger counter = 0;
+            NSImage * const image = [images objectAtIndex:counter];
+            const NSRect imageRect = rectValue.rectValue;
+            [image drawInRect:imageRect
+                     fromRect:NSZeroRect
+                    operation:NSCompositingOperationOverlay
+                     fraction:1.];
 
-    for (NSValue * const rectValue in frames) {
-        if (counter >= images.count) {
-            break;
+            counter += 1;
         }
 
-        NSImage * const image = [images objectAtIndex:counter];
-        const NSRect imageRect = rectValue.rectValue;
-        [image drawInRect:imageRect
-                 fromRect:NSZeroRect
-                operation:NSCompositingOperationOverlay
-                 fraction:1.];
-
-        counter += 1;
-    }
-
-    [compositedImage unlockFocus];
-    return compositedImage;
+        return YES;
+    }];
 }
 
 - (instancetype)imageTintedWithColor:(NSColor *)color
