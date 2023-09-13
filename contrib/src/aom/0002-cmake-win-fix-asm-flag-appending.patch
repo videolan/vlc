@@ -1,0 +1,29 @@
+From f7e163fe374bdc5cc6031aec10f678434b8b991d Mon Sep 17 00:00:00 2001
+From: Tristan Matthews <tmatth@videolan.org>
+Date: Wed, 13 Sep 2023 13:17:23 -0400
+Subject: [PATCH 1/1] cmake: win: fix asm flag appending
+
+These were evaluating to e.g.:
+aarch64-w64-mingw32-gcc;-c;-mimplicit-it=always
+
+which broke the detection of the actual asm executable's presence.
+---
+ build/cmake/aom_configure.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/cmake/aom_configure.cmake b/build/cmake/aom_configure.cmake
+index aaef2c3..fe72e17 100644
+--- a/build/cmake/aom_configure.cmake
++++ b/build/cmake/aom_configure.cmake
+@@ -190,7 +190,7 @@ elseif(AOM_TARGET_CPU MATCHES "arm")
+     set(AOM_AS_FLAGS -arch ${AOM_TARGET_CPU} -isysroot ${CMAKE_OSX_SYSROOT})
+   elseif(AOM_TARGET_SYSTEM STREQUAL "Windows")
+     if(NOT CMAKE_ASM_COMPILER)
+-      set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER} -c -mimplicit-it=always)
++      set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER} "-c -mimplicit-it=always")
+     endif()
+   else()
+     if(NOT CMAKE_ASM_COMPILER)
+-- 
+2.39.2
+
