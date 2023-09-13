@@ -100,7 +100,7 @@ typedef struct avi_stream_s
     float   f_fps;
     int     i_bitrate;
 
-    VLC_BITMAPINFOHEADER    *p_bih;
+    VLC_BITMAPINFOHEADER    bih;
     uint8_t                 *p_bitmap_extra;
     size_t                   i_bitmap_extra;
     WAVEFORMATEX            *p_wf;
@@ -262,7 +262,6 @@ static void Close( vlc_object_t * p_this )
         p_stream = &p_sys->stream[i_stream];
         if ( p_stream->i_cat == VIDEO_ES )
             free( p_stream->p_bitmap_extra );
-        free( p_stream->p_bih );
         free( p_stream->p_wf );
     }
     free( p_sys->idx1.entry );
@@ -320,7 +319,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fcc[2] = 'w';
             p_stream->fcc[3] = 'b';
 
-            p_stream->p_bih = NULL;
             p_stream->p_bitmap_extra = NULL;
 
             WAVEFORMATEX *p_wf  = malloc( sizeof( WAVEFORMATEX ) +
@@ -427,18 +425,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_sys->i_stream_video = p_sys->i_streams;
             }
             p_stream->p_wf  = NULL;
-            p_stream->p_bih = malloc(sizeof(*p_stream->p_bih));
-            if ( unlikely( p_stream->p_bih == NULL ) )
-            {
-                free( p_input->p_sys );
-                p_input->p_sys = NULL;
-                return VLC_ENOMEM;
-            }
-            if( CreateBitmapInfoHeader( &p_input->fmt, p_stream->p_bih,
+            if( CreateBitmapInfoHeader( &p_input->fmt, &p_stream->bih,
                                         &p_stream->p_bitmap_extra,
                                         &p_stream->i_bitmap_extra ) != VLC_SUCCESS )
             {
-                free( p_stream->p_bih );
                 free( p_input->p_sys );
                 p_input->p_sys = NULL;
                 return VLC_ENOMEM;
@@ -476,7 +466,7 @@ static int PrepareSamples( const avi_stream_t *p_stream,
     {
        /* Add header present at the end of BITMAP info header
           to first frame in case of XVID */
-       if( p_stream->p_bih->biCompression == VLC_FOURCC( 'X', 'V', 'I', 'D' ) )
+       if( p_stream->bih.biCompression == VLC_FOURCC( 'X', 'V', 'I', 'D' ) )
        {
            size_t i_header_length = p_stream->i_bitmap_extra;
            *pp_block = block_Realloc( *pp_block, i_header_length,
@@ -489,8 +479,8 @@ static int PrepareSamples( const avi_stream_t *p_stream,
 
     /* RV24 is only BGR in AVI, and we can't use BI_BITFIELD */
     if( p_stream->i_cat == VIDEO_ES &&
-        p_stream->p_bih->biCompression == BI_RGB &&
-        p_stream->p_bih->biBitCount == 24 &&
+        p_stream->bih.biCompression == BI_RGB &&
+        p_stream->bih.biBitCount == 24 &&
         (p_fmt->video.i_bmask != 0xFF0000 ||
          p_fmt->video.i_rmask != 0x0000FF) )
     {
@@ -696,8 +686,8 @@ static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
     bo_add_32le( p_bo, 1024 * 1024 );         /* suggested buffer size */
     if( p_video )
     {
-        bo_add_32le( p_bo, p_video->p_bih->biWidth );
-        bo_add_32le( p_bo, p_video->p_bih->biHeight );
+        bo_add_32le( p_bo, p_video->bih.biWidth );
+        bo_add_32le( p_bo, p_video->bih.biHeight );
     }
     else
     {
@@ -720,13 +710,13 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
         case VIDEO_ES:
             {
                 bo_add_fourcc( p_bo, "vids" );
-                if( p_stream->p_bih->biBitCount )
+                if( p_stream->bih.biBitCount )
                     bo_add_fourcc( p_bo, "DIB " );
                 else
 #ifdef WORDS_BIGENDIAN
-                bo_add_32be( p_bo, p_stream->p_bih->biCompression );
+                bo_add_32be( p_bo, p_stream->bih.biCompression );
 #else
-                bo_add_32le( p_bo, p_stream->p_bih->biCompression );
+                bo_add_32le( p_bo, p_stream->bih.biCompression );
 #endif
                 bo_add_32le( p_bo, 0 );   /* flags */
                 bo_add_16le(  p_bo, 0 );   /* priority */
@@ -741,8 +731,8 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
                 bo_add_32le( p_bo, 0 );   /* samplesize */
                 bo_add_16le(  p_bo, 0 );   /* ??? */
                 bo_add_16le(  p_bo, 0 );   /* ??? */
-                bo_add_16le(  p_bo, p_stream->p_bih->biWidth );
-                bo_add_16le(  p_bo, p_stream->p_bih->biHeight );
+                bo_add_16le(  p_bo, p_stream->bih.biWidth );
+                bo_add_16le(  p_bo, p_stream->bih.biHeight );
             }
             break;
         case AUDIO_ES:
@@ -805,21 +795,21 @@ static int avi_HeaderAdd_strf( bo_t *p_bo, avi_stream_t *p_stream )
             bo_add_mem( p_bo, p_stream->p_wf->cbSize, (uint8_t*)&p_stream->p_wf[1] );
             break;
         case VIDEO_ES:
-            bo_add_32le( p_bo, p_stream->p_bih->biSize );
-            bo_add_32le( p_bo, p_stream->p_bih->biWidth );
-            bo_add_32le( p_bo, p_stream->p_bih->biHeight );
-            bo_add_16le( p_bo, p_stream->p_bih->biPlanes );
-            bo_add_16le( p_bo, p_stream->p_bih->biBitCount );
+            bo_add_32le( p_bo, p_stream->bih.biSize );
+            bo_add_32le( p_bo, p_stream->bih.biWidth );
+            bo_add_32le( p_bo, p_stream->bih.biHeight );
+            bo_add_16le( p_bo, p_stream->bih.biPlanes );
+            bo_add_16le( p_bo, p_stream->bih.biBitCount );
 #ifdef WORDS_BIGENDIAN
-                bo_add_32be( p_bo, p_stream->p_bih->biCompression );
+                bo_add_32be( p_bo, p_stream->bih.biCompression );
 #else
-                bo_add_32le( p_bo, p_stream->p_bih->biCompression );
+                bo_add_32le( p_bo, p_stream->bih.biCompression );
 #endif
-            bo_add_32le( p_bo, p_stream->p_bih->biSizeImage );
-            bo_add_32le( p_bo, p_stream->p_bih->biXPelsPerMeter );
-            bo_add_32le( p_bo, p_stream->p_bih->biYPelsPerMeter );
-            bo_add_32le( p_bo, p_stream->p_bih->biClrUsed );
-            bo_add_32le( p_bo, p_stream->p_bih->biClrImportant );
+            bo_add_32le( p_bo, p_stream->bih.biSizeImage );
+            bo_add_32le( p_bo, p_stream->bih.biXPelsPerMeter );
+            bo_add_32le( p_bo, p_stream->bih.biYPelsPerMeter );
+            bo_add_32le( p_bo, p_stream->bih.biClrUsed );
+            bo_add_32le( p_bo, p_stream->bih.biClrImportant );
             bo_add_mem( p_bo, p_stream->i_bitmap_extra, p_stream->p_bitmap_extra );
             break;
         default:
