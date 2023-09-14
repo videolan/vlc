@@ -224,7 +224,7 @@ public:
 public:
     bool loading() const override
     {
-        return m_parsing && BaseModelPrivateT<NetworkMediaItemPtr>::loading();
+        return m_parsing || BaseModelPrivateT<NetworkMediaItemPtr>::loading();
     }
 
     LocalListCacheLoader<NetworkMediaItemPtr>::ItemCompare getSortFunction() const
