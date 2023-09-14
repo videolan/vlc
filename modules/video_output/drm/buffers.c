@@ -148,7 +148,7 @@ error:  drmDestroyDumb(fd, creq.handle);
 picture_t *vlc_drm_dumb_alloc_fb(struct vlc_logger *log, int fd,
                                  const video_format_t *restrict fmt)
 {
-    uint32_t pixfmt = vlc_drm_format(fmt);
+    uint32_t pixfmt = vlc_drm_fourcc(fmt->i_chroma);
     if (pixfmt == DRM_FORMAT_INVALID)
         return NULL;
 
