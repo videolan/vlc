@@ -132,6 +132,7 @@ FocusScope {
                         width: parent.width
                         height: implicitHeight
                         visible: MainCtx.hasToolbarMenu
+                        enabled: visible
                     }
 
                     Item {
@@ -157,9 +158,14 @@ FocusScope {
                                  onClicked: History.previous()
                                  enabled: !History.previousEmpty
 
+                                 onEnabledChanged: {
+                                    if (!enabled && focus)
+                                        globalMenuGroup.focus = true
+                                 }
+
                                  Navigation.parentItem: root
                                  Navigation.rightItem: globalMenuGroup
-                                 Navigation.downItem: localMenuGroup.visible ? localMenuGroup : localToolbarBg
+                                 Navigation.downItem: localMenuGroup.visible ? localMenuGroup : localToolbar
                             }
 
                             Widgets.BannerCone {
@@ -179,13 +185,13 @@ FocusScope {
 
                             focus: true
 
-                            indexFocus: root.selectedIndex
+                            //indexFocus: root.selectedIndex
 
                             Accessible.role: Accessible.PageTabList
 
                             Navigation.parentItem: root
-                            Navigation.leftItem: history_back.enabled ? history_back : null
-                            Navigation.downItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
+                            Navigation.leftItem: history_back
+                            Navigation.downItem: localMenuView.visible ?  localMenuView : localToolbar
 
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
@@ -220,19 +226,6 @@ FocusScope {
                 width: parent.width
                 height: VLCStyle.localToolbar_height
 
-                onActiveFocusChanged: {
-                    if (activeFocus) {
-                        // sometimes when view changes, one of the "focusable" object will become disabled
-                        // but because of focus chainning, FocusScope still tries to force active focus on the object
-                        // but that will fail, manually assign focus in such cases
-                        const focusable = [localContextGroup, localMenuGroup, playlistGroup]
-                        if (!focusable.some(function (obj) { return obj.activeFocus; })) {
-                            // no object has focus
-                            localToolbar.nextItemInFocusChain(true).forceActiveFocus()
-                        }
-                    }
-                }
-
                 background: Rectangle {
                     id: localToolbarBg
 
@@ -260,6 +253,15 @@ FocusScope {
                             leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                         }
                         enabled: list_grid_btn.visible || sortControl.visible
+
+                        onEnabledChanged: {
+                            if (!enabled && focus) {
+                                if (localMenuView.enabled)
+                                    localMenuView.focus = true
+                                else
+                                    playlistGroup.focus = true
+                            }
+                        }
 
                         model: ObjectModel {
                             Widgets.IconToolButton {
@@ -300,30 +302,33 @@ FocusScope {
                         }
 
                         Navigation.parentItem: root
-                        Navigation.rightItem: localMenuGroup.visible ? localMenuGroup : playlistGroup
-                        Navigation.upItem: globalMenuGroup
+                        Navigation.rightItem: localMenuView
+                        Navigation.upItem: history_back.enabled ? history_back : globalMenuGroup
                     }
 
-                    Flickable {
+                    T.Pane {
                         id: localMenuView
 
-                        readonly property int availableWidth: parent.width
+                        readonly property int _availableWidth: parent.width
                                                               - (localContextGroup.width + playlistGroup.width)
                                                               - (VLCStyle.applicationHorizontalMargin * 2)
                                                               - (VLCStyle.margin_xsmall * 2)
                                                               - (VLCStyle.margin_xxsmall * 2)
-                        readonly property bool _alignHCenter: ((localToolbarContent.width - contentWidth) / 2) + contentWidth < playlistGroup.x
+                        readonly property bool _alignHCenter: ((localToolbarContent.width - contentItem.contentWidth) / 2) + contentItem.contentWidth < playlistGroup.x
 
-                        width: Math.min(contentWidth, availableWidth)
+                        width: Math.min(contentItem.contentWidth, _availableWidth)
                         height: VLCStyle.localToolbar_height
-                        clip: contentWidth > width
-                        contentWidth: localMenuGroup.width
-                        contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
+                        enabled: localMenuGroup.sourceComponent !== null
+                        visible: enabled
 
                         anchors.right: playlistGroup.left
                         anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
 
-                        ScrollBar.horizontal: ScrollBar { }
+                        onEnabledChanged: {
+                            if (!enabled && focus) {
+                                playlistGroup.focus = true
+                            }
+                        }
 
                         on_AlignHCenterChanged: {
                             if (_alignHCenter) {
@@ -335,36 +340,42 @@ FocusScope {
                             }
                         }
 
-                        Loader {
-                            id: localMenuGroup
+                        Navigation.parentItem: root
+                        Navigation.leftItem: localContextGroup
+                        Navigation.rightItem: playlistGroup
+                        Navigation.upItem: globalMenuGroup
 
-                            focus: true
-                            visible: !!item
-                            enabled: status === Loader.Ready
-                            y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
-                            width: !!item
-                                   ? Helpers.clamp(localMenuView.availableWidth,
-                                                   localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
-                                                   localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
-                                   : 0
+                        contentItem: Flickable {
 
-                            onVisibleChanged: {
-                                //reset the focus on the global group when the local group is hidden,
-                                //this avoids losing the focus if the subview changes
-                                // FIXME: This block needs refactor for keyboard focus.
-                                if (!visible && localMenuGroup.focus) {
-                                    localMenuGroup.focus = false
-                                    globalMenuGroup.focus = true
-                                }
+                            clip: contentWidth > width
+
+                            contentWidth: localMenuGroup.width
+                            contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
+
+                            ScrollBar.horizontal: ScrollBar {
+                                y: localMenuView.height - height
+                                width: localMenuView.availableWidth
+                                policy: ScrollBar.AsNeeded
                             }
 
-                            onItemChanged: {
-                                if (!item)
-                                    return
-                                item.Navigation.parentItem = root
-                                item.Navigation.leftItem = Qt.binding(function(){ return localContextGroup.enabled ? localContextGroup : null})
-                                item.Navigation.rightItem = Qt.binding(function(){ return playlistGroup.enabled ? playlistGroup : null})
-                                item.Navigation.upItem = globalMenuGroup
+                            Loader {
+                                id: localMenuGroup
+
+                                focus: true
+
+                                enabled: status === Loader.Ready
+                                y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
+                                width: !!item
+                                       ? Helpers.clamp(localMenuView._availableWidth,
+                                                       localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
+                                                       localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
+                                       : 0
+
+                                onItemChanged: {
+                                    if (!item)
+                                        return
+                                    item.Navigation.parentItem = localMenuView
+                                }
                             }
                         }
                     }
@@ -462,7 +473,7 @@ FocusScope {
                         }
 
                         Navigation.parentItem: root
-                        Navigation.leftItem: localMenuGroup.visible ? localMenuGroup : localContextGroup
+                        Navigation.leftItem: localMenuView
                         Navigation.upItem: globalMenuGroup
                     }
                 }
