@@ -272,8 +272,11 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         fmt->i_gmask  = 0xff << 8;
         fmt->i_bmask  = 0x1f << 0;
         break;
-    case 32: // BGRX
-        fmt->i_chroma = VLC_CODEC_BGRA;
+    case 32:
+        if (vd->source->i_chroma == VLC_CODEC_BGRA)
+            fmt->i_chroma = VLC_CODEC_BGRA;
+        else
+            fmt->i_chroma = VLC_CODEC_BGRX;
         fmt->i_rmask  = 0;
         fmt->i_gmask  = 0;
         fmt->i_bmask  = 0;
