@@ -123,7 +123,7 @@ player_on_position_changed(vlc_player_t *player,
         pc->input_buffering = false;
     }
 
-    long position = lroundf(new_pos * 100.f);
+    long position = lround(new_pos * 100.);
 
     if (pc->show_position && position != pc->position)
     {
@@ -702,7 +702,7 @@ static int VideoConfig(struct cli_client *cl, const char *const *args,
         char *name;
         vlc_value_t *val;
         char **text;
-        float f_value = 0.;
+        float f_value = 0.f;
         char *psz_value = NULL;
         size_t count;
 
@@ -1071,7 +1071,7 @@ void *RegisterPlayer(intf_thread_t *intf)
         return NULL;
 
     pc->intf = intf;
-    pc->position = -1.;
+    pc->position = -1;
     pc->input_buffering = false;
     pc->show_position = var_InheritBool(intf, "rc-show-pos");
 
