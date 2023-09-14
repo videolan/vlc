@@ -602,7 +602,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
 static int
 interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                      vlc_fourcc_t chroma, bool fallback_masks)
+                      vlc_fourcc_t chroma)
 {
     switch (chroma)
     {
@@ -652,8 +652,7 @@ interop_xyz12_init(struct vlc_gl_interop *interop)
 
 static int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                    vlc_fourcc_t chroma, video_color_space_t yuv_space,
-                    bool fallback_masks)
+                    vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
     bool is_yuv = vlc_fourcc_IsYUV(chroma);
     const vlc_chroma_description_t *desc =
@@ -663,8 +662,6 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
     assert(!interop->fmt_out.p_palette);
     interop->fmt_out.i_chroma = chroma;
-    if(fallback_masks && !is_yuv)
-        video_format_FixRgb(&interop->fmt_out);
     interop->fmt_out.space = yuv_space;
     interop->tex_target = tex_target;
 
@@ -677,7 +674,7 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
     if (is_yuv)
         return interop_yuv_base_init(interop, tex_target, chroma, desc);
 
-    return interop_rgb_base_init(interop, tex_target, chroma, fallback_masks);
+    return interop_rgb_base_init(interop, tex_target, chroma);
 }
 
 static void
@@ -752,14 +749,14 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 
     /* Check whether the given chroma is translatable to OpenGL. */
     vlc_fourcc_t i_chroma = interop->fmt_in.i_chroma;
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space, false);
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
     if (ret == VLC_SUCCESS)
         goto interop_init;
 
     if (!is_yup)
     {
         i_chroma = VLC_CODEC_RGBA;
-        ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space, false);
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
         if (ret == VLC_SUCCESS)
             goto interop_init;
     }
@@ -770,7 +767,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     /* Check whether any fallback for the chroma is translatable to OpenGL. */
     while (*list)
     {
-        ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space, true);
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
         if (ret == VLC_SUCCESS)
         {
             i_chroma = *list;
