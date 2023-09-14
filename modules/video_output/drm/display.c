@@ -212,13 +212,15 @@ static int Open(vout_display_t *vd,
             (char *)&drm_fourcc, drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->source);
-    if (!vlc_video_format_drm(&fmt, drm_fourcc)) {
+    vlc_fourcc_t vlc_fourcc = vlc_fourcc_drm(drm_fourcc);
+    if (vlc_fourcc == 0) {
         /* This can only occur if $vlc-drm-chroma is unknown. */
         assert(chroma != NULL);
         msg_Err(vd, "unknown DRM pixel format %4.4s (0x%08"PRIXFAST32")",
                 (char *)&drm_fourcc, drm_fourcc);
         return -ENOTSUP;
     }
+    fmt.i_chroma = vlc_fourcc;
 
     for (size_t i = 0; i < ARRAY_SIZE(sys->buffers); i++) {
         sys->buffers[i] = vlc_drm_dumb_alloc_fb(vd->obj.logger, fd, &fmt);
