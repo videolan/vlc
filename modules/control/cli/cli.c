@@ -368,7 +368,7 @@ error:      wordfree(&we);
 
 #ifndef _WIN32
 static ssize_t cli_writev(struct cli_client *cl,
-                          const struct iovec *iov, unsigned iovlen)
+                          const struct iovec *iov, int iovlen)
 {
     ssize_t val;
 
