@@ -206,16 +206,3 @@ vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc)
 
     return 0;
 }
-
-bool vlc_video_format_drm(video_format_t *restrict fmt,
-                          uint_fast32_t drm_fourcc)
-{
-    for (size_t i = 0; i < ARRAY_SIZE(fourcc_list); i++)
-        if (fourcc_list[i].drm_fourcc == drm_fourcc) {
-            fmt->i_chroma = fourcc_list[i].vlc_fourcc;
-            fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
-            return true;
-        }
-
-    return false;
-}
