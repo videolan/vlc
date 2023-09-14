@@ -179,8 +179,6 @@ Item {
                     if (History.current.name === "player")
                         return
 
-                    stackView.currentItem._inhibitMiniPlayer = true
-
                     History.push(["player"])
                 }
             }
