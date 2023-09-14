@@ -38,22 +38,8 @@ struct video_format_t;
  * \param vlc_fourcc VLC video format FourCC
  * \return the corresponding DRM pixel format FourCC or
  *         DRM_FORMAT_INVALID if not found.
- * \warning This function cannot handle RGB formats. Use vlc_drm_format().
  */
 uint_fast32_t vlc_drm_fourcc(vlc_fourcc_t vlc_fourcc);
-
-/**
- * Converts a VLC video format to DRM.
- *
- * This returns the DRM pixel format FourCC for the supplied VLC video format.
- * Unlike vlc_drm_fourcc(), this function can handle RGB formats, but it
- * requires a complete VLC format structure.
- *
- * \param fmt VLC video format
- * \return the corresponding DRM pixel format FourCC or
- *         DRM_FORMAT_INVALID if not found.
- */
-uint_fast32_t vlc_drm_format(const struct video_format_t *fmt);
 
 /**
  * Converts a DRM pixel format to VLC.

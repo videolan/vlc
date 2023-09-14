@@ -189,15 +189,6 @@ uint_fast32_t vlc_drm_fourcc(vlc_fourcc_t vlc_fourcc)
     return DRM_FORMAT_INVALID;
 }
 
-uint_fast32_t vlc_drm_format(const video_format_t *restrict fmt)
-{
-    uint_fast32_t drm_fourcc = vlc_drm_fourcc(fmt->i_chroma);
-    if (drm_fourcc != DRM_FORMAT_INVALID)
-        return drm_fourcc;
-
-    return DRM_FORMAT_INVALID;
-}
-
 vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc)
 {
     for (size_t i = 0; i < ARRAY_SIZE(fourcc_list); i++)
