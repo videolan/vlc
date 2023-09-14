@@ -85,13 +85,13 @@ AbstractButton {
         if (KeyHelper.matchOk(event)) {
             event.accepted = true
 
-            g_mainDisplay.showPlayer()
+            History.push(["player"])
         }
     }
 
     // Events
 
-    onClicked: g_mainDisplay.showPlayer()
+    onClicked: History.push(["player"])
 
     background: Widgets.AnimatedBackground {
         active: visualFocus

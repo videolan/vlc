@@ -90,11 +90,12 @@ MainInterface.MainViewLoader {
 
     function onAction(indexes) {
         model.addAndPlay( indexes )
-        g_mainDisplay.showPlayer()
+        History.push(["player"])
     }
 
     function onDoubleClick(object) {
-        g_mainDisplay.play(MediaLib, object.id)
+        MediaLib.addAndPlay(object.id)
+        History.push(["player"])
     }
 
     function onLabelGrid(object) { return getLabel(object) }

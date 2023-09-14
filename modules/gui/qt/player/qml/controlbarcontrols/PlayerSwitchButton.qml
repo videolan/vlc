@@ -29,7 +29,7 @@ Widgets.IconControlButton {
         if (History.current.view === "player")
             History.previous()
         else
-            g_mainDisplay.showPlayer()
+            History.push(["player"])
     }
 
     text: I18n.qtr("Switch Player")

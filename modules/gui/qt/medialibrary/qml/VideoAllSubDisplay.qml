@@ -143,10 +143,13 @@ VideoAll {
 
             function onAction(indexes) {
                 model.addAndPlay( indexes )
-                g_mainDisplay.showPlayer()
+                History.push(["player"])
             }
 
-            function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
+            function onDoubleClick(object) {
+                MediaLib.addAndPlay(object.id)
+                History.push(["player"])
+            }
 
             function isInfoExpandPanelAvailable(modelIndexData) { return true }
         }
@@ -184,7 +187,7 @@ VideoAll {
 
                 if (object.isVideo) {
                     model.addAndPlay( indexes )
-                    g_mainDisplay.showPlayer()
+                    History.push(["player"])
 
                     return
                 }
@@ -194,8 +197,8 @@ VideoAll {
 
             function onDoubleClick(object) {
                 if (object.isVideo) {
-                    g_mainDisplay.play(MediaLib, object.id)
-
+                    MediaLib.addAndPlay(object.id)
+                    History.push(["player"])
                     return
                 }
 

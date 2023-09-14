@@ -121,7 +121,10 @@ Item {
 
                 playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
-                onPlayIconClicked: g_mainDisplay.play(MediaLib, titleDel.rowModel.id)
+                onPlayIconClicked: {
+                    MediaLib.addAndPlay(titleDel.rowModel.id)
+                    History.push(["player"])
+                }
                 radius: root.titleCover_radius
                 color: titleDel.colorContext.bg.secondary
 

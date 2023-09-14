@@ -185,17 +185,6 @@ FocusScope {
         }
     }
 
-
-    function showPlayer() {
-        History.push(["player"])
-    }
-
-    function play(backend, ids) {
-        showPlayer();
-
-        backend.addAndPlay(ids);
-    }
-
     Util.ModelSortSettingHandler {
         id: modelSortSettingHandler
     }
@@ -567,6 +556,7 @@ FocusScope {
                 if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
                     if (History.current.view !== "player")
                         g_mainDisplay.showPlayer()
+                        History.push(["player"])
                 } else {
                     _showMiniPlayer = false;
                 }
