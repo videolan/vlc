@@ -286,9 +286,13 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     struct pl_frame target;
     pl_frame_from_swapchain(&target, &frame);
     if (vd->cfg->icc_profile) {
-        target.profile.signature = sys->target_icc_signature;
         target.profile.data = vd->cfg->icc_profile->data;
         target.profile.len = vd->cfg->icc_profile->size;
+        target.profile.signature = sys->target_icc_signature;
+        if (!target.profile.signature) {
+            pl_icc_profile_compute_signature(&target.profile);
+            sys->target_icc_signature = target.profile.signature;
+        }
     }
 
     // Set the target crop dynamically based on the swapchain flip state
@@ -520,7 +524,7 @@ static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
 static void UpdateIccProfile(vout_display_t *vd, const vlc_icc_profile_t *prof)
 {
     vout_display_sys_t *sys = vd->sys;
-    sys->target_icc_signature++;
+    sys->target_icc_signature = 0; /* recompute signature on next PictureRender */
     (void) prof; /* we get the current value from vout_display_cfg_t */
 }
 
