@@ -102,11 +102,6 @@ FocusScope {
             return e.name === g_mainDisplay.view.name
         })
 
-        if (item.pageModel !== undefined)
-            sourcesBanner.subSelectedIndex = item.pageModel.findIndex(function (e) {
-                return e.name === item.view.name
-            })
-
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
             _showMiniPlayer = true
     }
