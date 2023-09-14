@@ -622,6 +622,8 @@ static int Volume(struct cli_client *cl, const char *const *args, size_t count,
             const int result = ParseFloat(args[1], &volume);
             if (result != VLC_SUCCESS)
                 return result;
+            if (volume < 0.f || volume > 2.f )
+                return -EINVAL;
         }
 
         vlc_player_Lock(player);
