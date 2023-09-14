@@ -33,13 +33,9 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 import "qrc:///util/Helpers.js" as Helpers
 
-FocusScope {
+T.ToolBar {
     id: root
 
-    height: VLCStyle.applicationVerticalMargin
-            + (menubar.visible ? menubar.height : 0)
-            + VLCStyle.globalToolbar_height
-            + VLCStyle.localToolbar_height
 
     property int selectedIndex: 0
     property alias sortMenu: sortControl.menu
@@ -55,6 +51,13 @@ FocusScope {
     signal itemClicked(int index)
     signal toogleMenu()
 
+
+    height: VLCStyle.applicationVerticalMargin
+            + (menubar.visible ? menubar.height : 0)
+            + VLCStyle.globalToolbar_height
+            + VLCStyle.localToolbar_height
+
+    hoverEnabled: true
 
     // Triggered when the toogleView button is selected
     function toggleView () {
@@ -77,29 +80,16 @@ FocusScope {
         onAskShow: searchBox.expandAndFocus()
     }
 
-    Widgets.AcrylicBackground {
+    background: Widgets.AcrylicBackground {
         tintColor: theme.bg.primary
         alternativeColor: theme.bg.secondary
-        anchors.fill: parent
     }
 
-
-    MouseArea {
-        // don't tranfer mouse to underlying components (#26274)
-        anchors.fill: parent
-        hoverEnabled: true
-        preventStealing: true
-    }
-
-    Item {
+    contentItem:  Column {
         id: pLBannerSources
 
         property alias model: globalMenuGroup.model
 
-        anchors.fill: parent
-
-        Column {
-            id: col
             anchors {
                 fill: parent
                 topMargin: VLCStyle.applicationVerticalMargin
@@ -478,7 +468,7 @@ FocusScope {
                     }
                 }
             }
-        }
+
 
         Keys.priority: Keys.AfterItem
         Keys.onPressed: root.Navigation.defaultKeyAction(event)
