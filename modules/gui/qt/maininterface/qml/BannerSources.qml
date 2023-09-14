@@ -74,7 +74,7 @@ FocusScope {
 
     Connections {
         target: MainCtx.search
-        onAskShow: searchBox.state = "expanded"
+        onAskShow: searchBox.expandAndFocus()
     }
 
     Widgets.AcrylicBackground {

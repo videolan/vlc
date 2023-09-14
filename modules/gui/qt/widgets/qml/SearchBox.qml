@@ -34,6 +34,14 @@ FocusScope {
     property alias searchPattern: textField.text
 
     property bool _widthOverridden: false
+
+    // public functions
+
+    function expandAndFocus() {
+        expandedState.state = "expanded"
+        textField.forceActiveFocus(Qt.ShortcutFocusReason)
+    }
+
     onWidthChanged: {
         // Proper way of this would be checking if width is bound to implicitWidth
         if (width === implicitWidth)
@@ -42,44 +50,48 @@ FocusScope {
             _widthOverridden = true
     }
 
-    states: [
-        State {
-            name: "expanded"
+    StateGroup {
+        id: expandedState
 
-            PropertyChanges {
-                target: textField
+        state: ""
 
-                focus: true
-                // Take care if SearchBox was set a specific width:
-                width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+        states: [
+            State {
+                name: "expanded"
+
+                PropertyChanges {
+                    target: textField
+                    // Take care if SearchBox was set a specific width:
+                    width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+                }
+
+                PropertyChanges {
+                    target: iconButton
+                    checked: true
+                }
+            },
+            State {
+                name: ""
+
+                PropertyChanges {
+                    target: textField
+                    text: ""
+                }
+
+                PropertyChanges {
+                    target: iconButton
+                    focus: true
+                    checked: false
+                }
             }
+        ]
 
-            PropertyChanges {
-                target: iconButton
-                checked: true
-            }
-        },
-        State {
-            name: ""
+        transitions: Transition {
+            from: ""; to: "expanded"
+            reversible: true
 
-            PropertyChanges {
-                target: textField
-                text: ""
-            }
-
-            PropertyChanges {
-                target: iconButton
-                focus: true
-                checked: false
-            }
+            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
         }
-    ]
-
-    transitions: Transition {
-        from: ""; to: "expanded"
-        reversible: true
-
-        NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
     }
 
     readonly property ColorContext colorContext: ColorContext {
@@ -109,7 +121,10 @@ FocusScope {
             Navigation.leftItem: textField
 
             onClicked: {
-                root.state = (root.state === "") ? "expanded" : ""
+                if (expandedState.state == "")
+                    expandAndFocus()
+                else
+                    expandedState.state = ""
             }
         }
 
@@ -136,7 +151,10 @@ FocusScope {
 
             Navigation.parentItem: root
             Navigation.rightItem: clearButton.visible ? clearButton : iconButton
-            Navigation.cancelAction: function() { root.state = ""; iconButton.focusReason = Qt.ShortcutFocusReason }
+            Navigation.cancelAction: function() {
+                expandedState.state = ""
+                iconButton.focusReason = Qt.ShortcutFocusReason
+            }
 
             Accessible.searchEdit: true
 
