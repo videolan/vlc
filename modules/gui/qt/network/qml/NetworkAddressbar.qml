@@ -27,7 +27,7 @@ import "qrc:///widgets/" as Widgets
 T.Control {
     id: control
 
-    property var path
+    property var path: []
 
     property var _contentModel
     property var _menuModel
