@@ -379,7 +379,6 @@ static int BuildChromaChain( filter_t *p_filter )
         fmt_mid.video.i_rmask  = 0;
         fmt_mid.video.i_gmask  = 0;
         fmt_mid.video.i_bmask  = 0;
-        video_format_FixRgb(&fmt_mid.video);
 
         i_ret = CreateChain( p_filter, &fmt_mid );
         es_format_Clean( &fmt_mid );
@@ -427,7 +426,6 @@ static int BuildFilterChain( filter_t *p_filter )
         fmt_mid.video.i_rmask  = 0;
         fmt_mid.video.i_gmask  = 0;
         fmt_mid.video.i_bmask  = 0;
-        video_format_FixRgb(&fmt_mid.video);
 
         if( filter_chain_AppendConverter( p_sys->p_chain,
                                           &fmt_mid ) != VLC_SUCCESS )

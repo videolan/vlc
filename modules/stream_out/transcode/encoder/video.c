@@ -279,10 +279,6 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     p_enc_out->primaries = p_src->primaries;
     p_enc_out->color_range = p_src->color_range;
 
-     /* set masks when RGB */
-    video_format_FixRgb(&p_enc->p_encoder->fmt_in.video);
-    video_format_FixRgb(&p_enc->p_encoder->fmt_out.video);
-
     if ( p_cfg->psz_lang )
     {
         free( p_enc->p_encoder->fmt_in.psz_language );

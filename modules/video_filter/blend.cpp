@@ -723,9 +723,6 @@ static void DoBlend(filter_t *filter,
     if (width <= 0 || height <= 0 || alpha <= 0)
         return;
 
-    video_format_FixRgb(&filter->fmt_out.video);
-    video_format_FixRgb(&filter->fmt_in.video);
-
     sys->blend(CPicture(dst, &filter->fmt_out.video,
                         filter->fmt_out.video.i_x_offset + x_offset,
                         filter->fmt_out.video.i_y_offset + y_offset),

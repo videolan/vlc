@@ -263,7 +263,6 @@ int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
         {
             fmt->i_rmask = fmt->i_gmask = fmt->i_bmask = 0;
             fmt->i_chroma = chroma_table[i].i_chroma;
-            video_format_FixRgb( fmt );
             return VLC_SUCCESS;
         }
     }

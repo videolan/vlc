@@ -220,7 +220,6 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
 
     /* Fill input format */
     fmt.video.i_chroma = i_chroma;
-    video_format_FixRgb(&fmt.video);
 
     fmt.video.i_visible_width =
             fmt.video.i_width = i_width;

@@ -150,7 +150,6 @@ static int Open(vout_display_t *vd,
     video_format_t fmt;
     video_format_ApplyRotation(&fmt, vd->source);
     fmt.i_chroma = chroma;
-    video_format_FixRgb(&fmt);
 
     /* */
     *fmtp = fmt;

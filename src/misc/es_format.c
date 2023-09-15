@@ -33,24 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 
-/* */
-void video_format_FixRgb( video_format_t *p_fmt )
-{
-    /* FIXME find right default mask */
-    if( !p_fmt->i_rmask || !p_fmt->i_gmask || !p_fmt->i_bmask )
-    {
-        switch( p_fmt->i_chroma )
-        {
-        default:
-            // assert(!"a bogus mask was set on a chroma");
-            p_fmt->i_rmask = 0;
-            p_fmt->i_gmask = 0;
-            p_fmt->i_bmask = 0;
-            return;
-        }
-    }
-}
-
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
                          int i_width, int i_height,
                          int i_visible_width, int i_visible_height,
@@ -66,7 +48,6 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
     p_fmt->orientation      = ORIENT_NORMAL;
     vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
                  i_sar_num, i_sar_den, 0 );
-    video_format_FixRgb( p_fmt );
 }
 
 void video_format_CopyCrop( video_format_t *p_dst, const video_format_t *p_src )

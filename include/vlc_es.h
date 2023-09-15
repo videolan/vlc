@@ -673,11 +673,6 @@ struct es_format_t
 };
 
 /**
- * This function will fill all RGB shift from RGB masks.
- */
-VLC_API void video_format_FixRgb( video_format_t * );
-
-/**
  * This function will initialize a es_format_t structure.
  */
 VLC_API void es_format_Init( es_format_t *, int i_cat, vlc_fourcc_t i_codec );

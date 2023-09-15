@@ -499,7 +499,6 @@ var_InheritURational
 var_LocationParse
 video_format_CopyCrop
 video_format_ScaleCropAr
-video_format_FixRgb
 video_format_ApplyRotation
 video_format_TransformBy
 video_format_TransformTo
