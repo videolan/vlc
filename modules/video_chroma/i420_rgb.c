@@ -111,6 +111,11 @@ static int Activate( filter_t *p_filter )
             switch( p_filter->fmt_out.video.i_chroma )
             {
 #ifndef PLUGIN_PLAIN
+                case VLC_CODEC_RGB565:
+                    /* R5G6B5 pixel format */
+                    msg_Dbg(p_filter, "RGB pixel format is R5G6B5");
+                    p_filter->ops = &I420_R5G6B5_ops;
+                    break;
                 case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
                     /* If we don't have support for the bitmasks, bail out */
@@ -161,6 +166,8 @@ static int Activate( filter_t *p_filter )
                     break;
                 case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
+                case VLC_CODEC_RGB565:
+                case VLC_CODEC_BGR565:
                     p_filter->ops = &I420_RGB16_ops;
                     break;
                 case VLC_CODEC_XRGB:
@@ -197,6 +204,10 @@ static int Activate( filter_t *p_filter )
 #endif
         case VLC_CODEC_RGB15:
         case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB565BE:
+        case VLC_CODEC_BGR565BE:
+        case VLC_CODEC_RGB565LE:
+        case VLC_CODEC_BGR565LE:
             p_sys->i_bytespp = 2;
             break;
         case VLC_CODEC_XRGB:
@@ -297,6 +308,24 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
             i_lgshift = 16;
             i_lrshift =  8;
             break;
+        case VLC_CODEC_RGB565BE:
+        case VLC_CODEC_RGB565LE:
+            i_lrshift = 11;
+            i_lgshift = 6;
+            i_lbshift = 0;
+            i_rrshift = 3;
+            i_rgshift = 2;
+            i_rbshift = 3;
+            break;
+        case VLC_CODEC_BGR565BE:
+        case VLC_CODEC_BGR565LE:
+            i_lbshift = 11;
+            i_lgshift = 6;
+            i_lrshift = 0;
+            i_rbshift = 3;
+            i_rgshift = 2;
+            i_rrshift = 3;
+            break;
         case VLC_CODEC_RGB233:
             i_lrshift = 6;
             i_lgshift = 3;
@@ -347,6 +376,10 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 
     case VLC_CODEC_RGB15:
     case VLC_CODEC_RGB16:
+    case VLC_CODEC_RGB565BE:
+    case VLC_CODEC_BGR565BE:
+    case VLC_CODEC_RGB565LE:
+    case VLC_CODEC_BGR565LE:
         p_sys->p_rgb16 = (uint16_t *)p_sys->p_base;
         for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
