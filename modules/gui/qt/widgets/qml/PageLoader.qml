@@ -45,6 +45,11 @@ StackViewExt {
     readonly property var sortModel: (currentItem
                                     && currentItem.sortModel !== undefined) ? currentItem.sortModel : null
 
+    //property is *not* readOnly, a PageLoader may define a localMenuDelegate common for its subviews (music, video)
+    property Component localMenuDelegate: (currentItem
+                                    && currentItem.localMenuDelegate
+                                    && (currentItem.localMenuDelegate instanceof Component)) ? currentItem.localMenuDelegate : null
+
     // Private
 
     property bool _ready: false

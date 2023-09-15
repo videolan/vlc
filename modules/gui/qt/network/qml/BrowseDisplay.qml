@@ -29,9 +29,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    // Properties
-    property Component localMenuDelegate
-
     // Settings
 
     pageModel: [{
@@ -54,16 +51,10 @@ Widgets.PageLoader {
         loadPage("home")
     }
 
+    localMenuDelegate: (view.name !== "home") ? componentBar : null
+
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Browse view")
-
-    // Events
-    onCurrentItemChanged: {
-        if (view.name === "home")
-            localMenuDelegate = null
-        else
-            localMenuDelegate = componentBar
-    }
 
     // Connections
     Connections {

@@ -45,13 +45,10 @@ Widgets.PageLoader {
         loadPage("services")
     }
 
+    localMenuDelegate: menuDelegate
+
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Discover view")
-
-    onCurrentItemChanged: {
-        localMenuDelegate = !!currentItem.localMenuDelegate ? currentItem.localMenuDelegate : menuDelegate
-    }
-
 
     function loadIndex(index) {
         History.push(["mc", "discover", root.pageModel[index].name])
@@ -68,8 +65,6 @@ Widgets.PageLoader {
             })
         }
     }
-
-    property Component localMenuDelegate: menuDelegate
 
     Component {
         id: menuDelegate

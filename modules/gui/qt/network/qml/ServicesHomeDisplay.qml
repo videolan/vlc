@@ -30,8 +30,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property Component localMenuDelegate: null
-
     pageModel: [{
         name: "all",
         url: "qrc:///network/ServicesSources.qml"
@@ -52,10 +50,6 @@ Widgets.PageLoader {
         loadPage("all")
     }
 
-    onCurrentItemChanged: {
-        localMenuDelegate = !!currentItem.addressBar ? currentItem.addressBar : null
-    }
-
     function setCurrentItemFocus(reason) {
         stackView.currentItem.setCurrentItemFocus(reason);
     }
@@ -66,7 +60,7 @@ Widgets.PageLoader {
         BrowseTreeDisplay {
             property alias source_name: deviceModel.source_name
 
-            property Component addressBar: NetworkAddressbar {
+            property Component localMenuDelegate: NetworkAddressbar {
                 path: [{display: deviceModel.name, tree: {}}]
 
                 onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
@@ -101,7 +95,7 @@ Widgets.PageLoader {
             property string root_name
             property string source_name
 
-            property Component addressBar: NetworkAddressbar {
+            property Component localMenuDelegate: NetworkAddressbar {
                 path: {
                     const _path = mediaModel.path
                     _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
