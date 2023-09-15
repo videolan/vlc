@@ -46,7 +46,7 @@ static void Set8bppPalette( filter_t *, uint8_t * );
 /*****************************************************************************
  * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
  *****************************************************************************/
-#define RGB2PIXEL( p_filter, i_r, i_g, i_b )                 \
+#define RGB2PIXEL( i_r, i_g, i_b )       \
     ((((i_r) >> i_rrshift) << i_lrshift) \
    | (((i_g) >> i_rgshift) << i_lgshift) \
    | (((i_b) >> i_rbshift) << i_lbshift))
@@ -338,24 +338,24 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         p_sys->p_rgb16 = (uint16_t *)p_sys->p_base;
         for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
+            p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( 255, 0, 0 );
         }
         for( unsigned i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
+            p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( 0, 255, 0 );
         }
         for( unsigned i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
+            p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( 0, 0, 255 );
         }
         for( unsigned i_index = 0; i_index < 256; i_index++ )
         {
-            p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
-            p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
-            p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, i_index );
+            p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( i_index, 0, 0 );
+            p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( 0, i_index, 0 );
+            p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( 0, 0, i_index );
         }
         break;
 
@@ -364,24 +364,24 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
         for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
+            p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( 255, 0, 0 );
         }
         for( unsigned i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
+            p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( 0, 255, 0 );
         }
         for( unsigned i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
-            p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
+            p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( 0, 0, 0 );
+            p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( 0, 0, 255 );
         }
         for( unsigned i_index = 0; i_index < 256; i_index++ )
         {
-            p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
-            p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
-            p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, i_index );
+            p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( i_index, 0, 0 );
+            p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( 0, i_index, 0 );
+            p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( 0, 0, i_index );
         }
         break;
     }
