@@ -32,8 +32,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property MLModel model
-
     pageModel: [{
         name: "all",
         component: allArtistsComponent
@@ -45,10 +43,6 @@ Widgets.PageLoader {
     loadDefaultView: function () {
         History.update(["mc", "music", "artists", "all"])
         loadPage("all")
-    }
-
-    onCurrentItemChanged: {
-        model = currentItem.model
     }
 
     function _updateArtistsAllHistory(currentIndex) {

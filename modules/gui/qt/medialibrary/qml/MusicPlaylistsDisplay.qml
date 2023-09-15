@@ -31,12 +31,6 @@ Widgets.PageLoader {
     id: root
 
     //---------------------------------------------------------------------------------------------
-    // Aliases
-    //---------------------------------------------------------------------------------------------
-
-    property var model
-
-    //---------------------------------------------------------------------------------------------
     // Settings
     //---------------------------------------------------------------------------------------------
 
@@ -51,14 +45,6 @@ Widgets.PageLoader {
     loadDefaultView: function () {
         History.update(["mc", "music", "playlists", "all"])
         loadPage("all")
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Events
-    //---------------------------------------------------------------------------------------------
-
-    onCurrentItemChanged: {
-        model     = currentItem.model;
     }
 
     //---------------------------------------------------------------------------------------------
@@ -90,8 +76,10 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
-            onShowList: History.push(["mc", "music", "playlists", "list",
-                                      { parentId: model.id, name: model.name }], reason)
+            onShowList: (model, reason) => {
+                History.push(["mc", "music", "playlists", "list",
+                    { parentId: model.id, name: model.name }], reason)
+            }
 
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order

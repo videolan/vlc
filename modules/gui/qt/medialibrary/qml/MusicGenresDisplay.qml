@@ -28,8 +28,6 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var model
-
     pageModel: [{
         name: "all",
         component: genresComponent
@@ -41,10 +39,6 @@ Widgets.PageLoader {
     loadDefaultView: function () {
         History.update(["mc", "music", "genres", "all"])
         loadPage("all")
-    }
-
-    onCurrentItemChanged: {
-        model = currentItem.model
     }
 
 

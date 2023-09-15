@@ -32,7 +32,6 @@ Widgets.PageLoader {
 
     // Properties
 
-    property var model
     property var sortMenu
 
     // Settings
@@ -56,7 +55,6 @@ Widgets.PageLoader {
     // Events
 
     onCurrentItemChanged: {
-        model     = currentItem.model
         sortMenu  = currentItem.sortMenu
     }
     // Functions private
@@ -81,11 +79,11 @@ Widgets.PageLoader {
         VideoAllSubDisplay {
             // Events
 
-            onShowList: History.push(["mc", "video", "all", "group",
-                                      { parentId: model.id, title: model.title }], reason)
+            onShowList: (model, reason) => {
+                History.push(["mc", "video", "all", "group",
+                    { parentId: model.id, title: model.title }], reason)
+            }
 
-            // NOTE: The model can change over time.
-            onModelChanged: root.model = model
 
             onCurrentIndexChanged: root._updateHistoryAll(currentIndex)
         }
