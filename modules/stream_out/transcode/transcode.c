@@ -380,6 +380,7 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 
 static void Flush( sout_stream_t *p_stream, void *_id)
 {
+    VLC_UNUSED(p_stream);
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     enum es_format_category_e i_cat = id->b_transcode && id->p_decoder != NULL ?
                                       id->p_decoder->fmt_in->i_cat : UNKNOWN_ES;
