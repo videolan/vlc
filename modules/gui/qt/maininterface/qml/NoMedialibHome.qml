@@ -23,6 +23,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 FocusScope {
+    id: root
 
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Home view")
@@ -56,6 +57,7 @@ FocusScope {
             focus: true
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: DialogsProvider.simpleOpenDialog()
+            Navigation.parentItem: root
         }
     }
 }
