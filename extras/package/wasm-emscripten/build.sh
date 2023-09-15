@@ -200,6 +200,11 @@ if [ $BUILD_MODE -eq 1 ]; then
                         "${SANITIZER_OPTIONS}"
 fi
 
+if [ "$VLC_COMPILE_SHARED" -eq "1" ]; then
+    sed -i "s|^postdeps_CXX=.*$|postdeps_CXX='-L/$(dirname $(which emcc))/cache/sysroot/lib/wasm32-emscripten -lal -lhtml5 -lbulkmemory -lstubs -lsockets-mt'|" config.status
+fi
+
+
 diagnostic "libvlc build: make"
 emmake make
 
