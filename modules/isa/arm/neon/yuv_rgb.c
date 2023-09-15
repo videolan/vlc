@@ -160,7 +160,7 @@ static int Open (filter_t *filter)
                     || filter->fmt_out.video.i_bmask != 0x00ff0000 )
                 return VLC_EGENERIC;
             /* fallthrough */
-        case VLC_CODEC_RGBX:
+        case VLC_CODEC_XBGR:
 
             switch (filter->fmt_in.video.i_chroma)
             {
