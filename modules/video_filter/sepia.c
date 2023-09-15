@@ -84,7 +84,7 @@ static const struct
     SepiaFunction pf_sepia;
 } p_sepia_cfg[] = {
     { VLC_CODEC_I420, PlanarI420Sepia },
-    { VLC_CODEC_RGB24, RVSepia },
+    { VLC_CODEC_RGB24M, RVSepia },
     { VLC_CODEC_RGB32, RVSepia },
     { VLC_CODEC_BGRA, RVSepia },
     { VLC_CODEC_RGBA, RVSepia },

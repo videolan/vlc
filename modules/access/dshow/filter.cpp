@@ -116,7 +116,7 @@ vlc_fourcc_t GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             else if( media_type.subtype == MEDIASUBTYPE_RGB565 )
                i_fourcc = VLC_CODEC_RGB16;
             else if( media_type.subtype == MEDIASUBTYPE_RGB24 )
-               i_fourcc = VLC_CODEC_RGB24;
+               i_fourcc = VLC_CODEC_RGB24M;
             else if( media_type.subtype == MEDIASUBTYPE_RGB32 )
                i_fourcc = VLC_CODEC_BGRX;
             else if( media_type.subtype == MEDIASUBTYPE_ARGB32 )

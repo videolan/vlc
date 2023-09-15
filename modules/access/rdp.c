@@ -151,7 +151,7 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
             i_chroma = VLC_CODEC_RGB16;
             break;
         case 24:
-            i_chroma = VLC_CODEC_RGB24;
+            i_chroma = VLC_CODEC_RGB24M;
             break;
         case 32:
             i_chroma = VLC_CODEC_ARGB;

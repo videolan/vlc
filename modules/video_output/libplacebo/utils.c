@@ -196,7 +196,7 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_RGB332,         {PACKED(3, 2, 2)} },
     { VLC_CODEC_RGB15,          {PACKED(3, 5, 1)} },
     { VLC_CODEC_RGB16,          {PACKED(3, 5, 1)} },
-    { VLC_CODEC_RGB24,          {PACKED(3, 8, 0)} },
+    { VLC_CODEC_RGB24M,         {PACKED(3, 8, 0)} },
     { VLC_CODEC_RGB32,          {PACKED(3, 8, 8)} },
     { VLC_CODEC_RGBA,           {PACKED(4, 8, 0)} },
     { VLC_CODEC_BGRX,           {PACKED(3, 8, 8)} },

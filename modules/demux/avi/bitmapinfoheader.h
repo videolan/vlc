@@ -50,7 +50,7 @@ static const struct
     { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
                             0x07e0,
                             0x001f, },
-    { VLC_CODEC_RGB24,      0x000000ff, /* BGR (see biBitCount) */
+    { VLC_CODEC_RGB24M,     0x000000ff, /* BGR (see biBitCount) */
                             0x0000ff00,
                             0x00ff0000, },
     { VLC_CODEC_RGB32,      0x00ff0000, /* This is in XRGB format */
@@ -117,7 +117,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
                 break;
             case 24:
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB24M; /* BGR (see biBitCount) */
                 break;
             case 16:
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
@@ -292,7 +292,7 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
             biCompression = BI_BITFIELDS;
             b_has_alpha = true;
             break;
-        case VLC_CODEC_RGB24:
+        case VLC_CODEC_RGB24M:
             biBitCount = 24;
             break;
         case VLC_CODEC_RGB16:

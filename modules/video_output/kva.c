@@ -489,7 +489,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     i_chroma_shift = 0;
                     break;
 
-                case VLC_CODEC_RGB24:
+                case VLC_CODEC_RGB24M:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR24;
                     i_kva_fourcc = FOURCC_BGR3;
                     i_chroma_shift = 0;

@@ -113,7 +113,7 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             if (fmt->bits_per_pixel == 32)
                 f->i_chroma = VLC_CODEC_RGB32;
             else if (fmt->bits_per_pixel == 24)
-                f->i_chroma = VLC_CODEC_RGB24;
+                f->i_chroma = VLC_CODEC_RGB24M;
             else
                 return false;
             break;

@@ -345,7 +345,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
     else if( !(i_color_type & PNG_COLOR_MASK_ALPHA) )
     {
-        p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGB24M;
     }
 
     /* Get a new picture */
@@ -429,7 +429,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         p_enc->fmt_in.video.i_visible_height;
 
     p_enc->fmt_in.i_codec =
-    p_enc->fmt_in.video.i_chroma =  VLC_CODEC_RGB24;
+    p_enc->fmt_in.video.i_chroma =  VLC_CODEC_RGB24M;
     p_enc->fmt_in.video.i_rmask = 0;
     p_enc->fmt_in.video.i_gmask = 0;
     p_enc->fmt_in.video.i_bmask = 0;

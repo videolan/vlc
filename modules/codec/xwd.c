@@ -78,7 +78,7 @@ static int Decode (decoder_t *dec, block_t *block)
             switch (ntohl(hdr->bits_per_pixel))
             {
                 case 32: chroma = VLC_CODEC_XRGB; break;
-                case 24: chroma = VLC_CODEC_RGB24; break;
+                case 24: chroma = VLC_CODEC_RGB24M; break;
             }
             break;
         case 32:

@@ -115,7 +115,7 @@ static int Open(vout_display_t *vd,
 
     /* */
     video_format_t fmt = *fmtp;
-    fmt.i_chroma = VLC_CODEC_RGB24;
+    fmt.i_chroma = VLC_CODEC_RGB24M;
     /* TODO: check if this works on big-endian systems */
     fmt.i_rmask = 0xff0000;
     fmt.i_gmask = 0x00ff00;

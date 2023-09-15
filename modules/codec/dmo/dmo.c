@@ -459,7 +459,7 @@ static int DecOpen( decoder_t *p_dec )
                       p_dec->fmt_in->i_codec == VLC_CODEC_MSS2 ) &&
                       IsEqualGUID( &mt.subtype, &MEDIASUBTYPE_RGB24 ) )
             {
-                i_chroma = VLC_CODEC_RGB24;
+                i_chroma = VLC_CODEC_RGB24M;
             }
 
             DMOFreeMediaType( &mt );
@@ -483,7 +483,7 @@ static int DecOpen( decoder_t *p_dec )
         }
 
         p_bih = &p_vih->bmiHeader;
-        p_bih->biCompression = i_chroma == VLC_CODEC_RGB24 ? BI_RGB : i_chroma;
+        p_bih->biCompression = i_chroma == VLC_CODEC_RGB24M ? BI_RGB : i_chroma;
         p_bih->biHeight *= -1;
         p_bih->biBitCount = vlc_fourcc_GetChromaBPP(i_chroma);
         p_bih->biSizeImage = p_dec->fmt_in->video.i_width *
@@ -495,7 +495,7 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_output_type.majortype = MEDIATYPE_Video;
         dmo_output_type.formattype = FORMAT_VideoInfo;
-        if( i_chroma == VLC_CODEC_RGB24 )
+        if( i_chroma == VLC_CODEC_RGB24M )
         {
             dmo_output_type.subtype = MEDIASUBTYPE_RGB24;
         }
