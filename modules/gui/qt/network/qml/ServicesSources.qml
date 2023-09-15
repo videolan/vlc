@@ -105,8 +105,6 @@ MainInterface.MainGridView {
                           { source_name: itemData.name }], Qt.TabFocusReason)
     }
 
-    Navigation.parentItem: root
-
     Navigation.cancelAction: function() {
         History.previous(Qt.BacktabFocusReason)
     }
