@@ -116,6 +116,29 @@ void video_format_FixRgb( video_format_t *p_fmt )
             p_fmt->i_bmask = 0;
         }
     }
+
+    if ( p_fmt->i_chroma == VLC_CODEC_RGB24M )
+    {
+        if ( p_fmt->i_rmask == 0xff0000 &&
+             p_fmt->i_gmask == 0x00ff00 &&
+             p_fmt->i_bmask == 0x0000ff )
+        {
+            p_fmt->i_chroma = VLC_CODEC_RGB24;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+        else
+        if ( p_fmt->i_rmask == 0x0000ff &&
+             p_fmt->i_gmask == 0x00ff00 &&
+             p_fmt->i_bmask == 0xff0000 )
+        {
+            p_fmt->i_chroma = VLC_CODEC_BGR24;
+            p_fmt->i_rmask = 0;
+            p_fmt->i_gmask = 0;
+            p_fmt->i_bmask = 0;
+        }
+    }
 }
 
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
