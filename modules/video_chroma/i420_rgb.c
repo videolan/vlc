@@ -241,6 +241,8 @@ static int Activate( filter_t *p_filter )
         case VLC_CODEC_XBGR:
         case VLC_CODEC_RGBX:
         case VLC_CODEC_BGRX:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_BGR24:
         case VLC_CODEC_RGB24M:
         case VLC_CODEC_RGB32:
             p_sys->i_bytespp = 4;
@@ -387,6 +389,8 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     case VLC_CODEC_XBGR:
     case VLC_CODEC_RGBX:
     case VLC_CODEC_BGRX:
+    case VLC_CODEC_RGB24:
+    case VLC_CODEC_BGR24:
     case VLC_CODEC_RGB24M:
     case VLC_CODEC_RGB32:
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
