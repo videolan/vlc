@@ -64,6 +64,10 @@ CARGO_PROFILE := "release"
 RUSTFLAGS += -C opt-level=z
 endif
 
+ifdef HAVE_EMSCRIPTEN
+RUSTFLAGS += -C target-feature=+atomics
+endif
+
 CARGO_ENV = TARGET_CC="$(CC)" TARGET_AR="$(AR)" TARGET_RANLIB="$(RANLIB)" \
 	TARGET_CFLAGS="$(CFLAGS)" RUSTFLAGS="$(RUSTFLAGS)"
 
