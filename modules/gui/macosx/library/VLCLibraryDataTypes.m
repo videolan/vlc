@@ -1201,4 +1201,22 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return self;
 }
 
+- (void)moveToTrash
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return;
+}
+
+- (void)revealInFinder
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return;
+}
+
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return;
+}
+
 @end
