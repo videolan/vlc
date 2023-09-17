@@ -101,6 +101,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     _mediaItemFileNameTextField.stringValue = _representedMediaItem.inputItem.name;
     _mediaItemPathTextField.stringValue = _representedMediaItem.inputItem.decodedMRL;
 
+    const BOOL actionableDetail = self.representedMediaItem.actionableDetail;
+    self.mediaItemDetailButton.enabled = actionableDetail;
+    if (@available(macOS 10.14, *)) {
+        self.mediaItemDetailButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+    }
+
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedMediaItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaItemArtworkImageView.image = thumbnail;
     }];
