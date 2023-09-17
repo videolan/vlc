@@ -36,6 +36,7 @@
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
@@ -486,12 +487,12 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
         if (self.displayAllArtistsGenresTableEntry) {
             NSMutableArray * const mutableCollectionCopy = self.displayedCollection.mutableCopy;
-            VLCMediaLibraryAllItemsGroup *group;
+            VLCLibraryAllAudioGroupsMediaLibraryItem *group;
 
             if (self->_currentParentType == VLC_ML_PARENT_GENRE) {
-                group = [[VLCMediaLibraryAllItemsGroup alloc] initWithDisplayString:_NS("All genres")];
+                group = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All genres")];
             } else if (self->_currentParentType == VLC_ML_PARENT_ARTIST) {
-                group = [[VLCMediaLibraryAllItemsGroup alloc] initWithDisplayString:_NS("All artists")];
+                group = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All artists")];
             }
 
             NSAssert(group != nil, @"All items group should not be nil");

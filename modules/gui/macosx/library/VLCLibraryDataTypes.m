@@ -25,9 +25,6 @@
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
-#import "library/VLCLibraryImageCache.h"
-#import "library/VLCLibraryController.h"
-#import "library/VLCLibraryModel.h"
 
 #import <vlc_url.h>
 
@@ -1202,38 +1199,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _actionableDetail = NO;
     }
     return self;
-}
-
-- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
-{
-    return;
-}
-
-- (void)revealInFinder
-{
-    return;
-}
-
-@end
-
-@implementation VLCMediaLibraryAllItemsGroup
-
-@synthesize albums = _albums;
-@synthesize artists = _artists;
-@synthesize numberOfTracks = _numberOfTracks;
-@synthesize tracksAsMediaItems = _tracksAsMediaItems;
-
-- (instancetype)initWithDisplayString:(NSString *)displayString
-{
-    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _albums = libraryModel.listOfAlbums;
-    _artists = libraryModel.listOfArtists;
-    _numberOfTracks = libraryModel.numberOfAudioMedia;
-    _tracksAsMediaItems = libraryModel.listOfAudioMedia;
-
-    NSString * const detailString = [NSString stringWithFormat:_NS("%li albums, %li songs"), _albums.count, _tracksAsMediaItems.count];
-
-    return [super initWithDisplayString:displayString withDetailString:detailString];
 }
 
 @end

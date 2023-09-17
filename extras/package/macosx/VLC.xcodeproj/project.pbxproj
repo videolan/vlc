@@ -108,6 +108,7 @@
 		539BA79F298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 539BA79E298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m */; };
 		539F114B29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 539F114A29E83A4200F13460 /* VLCLibraryTwoPaneSplitViewDelegate.m */; };
 		539F116D29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 539F116C29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.m */; };
+		53A1F1172AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A1F1162AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m */; };
 		53B40FD72AA878E400C814E4 /* VLCLibraryHeroView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B40FD62AA878E400C814E4 /* VLCLibraryHeroView.m */; };
 		53B447CA2939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */; };
 		53B447F6293BB47B00857588 /* VLCLibraryVideoCollectionViewContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */; };
@@ -332,6 +333,8 @@
 		539F116A29F9756000F13460 /* VLCMainVideoViewAudioMediaDecorativeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMainVideoViewAudioMediaDecorativeView.xib; sourceTree = "<group>"; };
 		539F116B29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainVideoViewAudioMediaDecorativeView.h; sourceTree = "<group>"; };
 		539F116C29F9785C00F13460 /* VLCMainVideoViewAudioMediaDecorativeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainVideoViewAudioMediaDecorativeView.m; sourceTree = "<group>"; };
+		53A1F1152AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAllAudioGroupsMediaLibraryItem.h; sourceTree = "<group>"; };
+		53A1F1162AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAllAudioGroupsMediaLibraryItem.m; sourceTree = "<group>"; };
 		53B40FD42AA7618000C814E4 /* VLCLibraryHeroView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryHeroView.xib; sourceTree = "<group>"; };
 		53B40FD52AA878E400C814E4 /* VLCLibraryHeroView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHeroView.h; sourceTree = "<group>"; };
 		53B40FD62AA878E400C814E4 /* VLCLibraryHeroView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHeroView.m; sourceTree = "<group>"; };
@@ -1392,6 +1395,8 @@
 				536283DF291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.m */,
 				53ED472929C8FF9D00795DB1 /* VLCLibraryAlbumTracksTableViewDelegate.h */,
 				53ED472A29C8FF9D00795DB1 /* VLCLibraryAlbumTracksTableViewDelegate.m */,
+				53A1F1152AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.h */,
+				53A1F1162AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m */,
 				7DE2F0422282C84A0040DD0A /* VLCLibraryAudioDataSource.h */,
 				7DE2F0432282C84A0040DD0A /* VLCLibraryAudioDataSource.m */,
 				53903D3829576ED500D0B308 /* VLCLibraryAudioGroupDataSource.h */,
@@ -2116,6 +2121,7 @@
 				6B6FFF701EF9EC350001CEB1 /* CompatibilityFixes.m in Sources */,
 				7D1BF28A22A153E20027C50F /* VLCRoundedCornerTextField.m in Sources */,
 				7DFBDCB4226CD00900B700A5 /* VLCLibraryDataTypes.m in Sources */,
+				53A1F1172AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m in Sources */,
 				1C3113DF1E508C6900D4DD76 /* VLCVideoEffectsWindowController.m in Sources */,
 				53F0E92D299B002300491D49 /* VLCInputNodePathControlItem.m in Sources */,
 				1C3113E11E508C6900D4DD76 /* VLCVoutView.m in Sources */,
