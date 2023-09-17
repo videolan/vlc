@@ -53,8 +53,11 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (void)awakeFromNib
 {
     _mediaItemTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    _mediaItemDetailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
-    _mediaItemDetailTextField.textColor = NSColor.VLCAccentColor;
+    _mediaItemDetailButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+
+    if (@available(macOS 10.14, *)) {
+        _mediaItemDetailButton.contentTintColor = NSColor.VLCAccentColor;
+    }
 
     if(@available(macOS 10.12.2, *)) {
         _playMediaItemButton.bezelColor = NSColor.VLCAccentColor;
@@ -93,7 +96,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 
     _mediaItemTitleTextField.stringValue = _representedMediaItem.displayString;
-    _mediaItemDetailTextField.stringValue = _representedMediaItem.detailString;
+    _mediaItemDetailButton.title = _representedMediaItem.detailString;
     _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
     _mediaItemFileNameTextField.stringValue = _representedMediaItem.inputItem.name;
     _mediaItemPathTextField.stringValue = _representedMediaItem.inputItem.decodedMRL;

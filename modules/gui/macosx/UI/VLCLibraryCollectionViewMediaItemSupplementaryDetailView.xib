@@ -79,7 +79,7 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
+                        <stackView distribution="fillEqually" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
                             <rect key="frame" x="200" y="0.0" width="877" height="225"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
@@ -90,14 +90,14 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Slp-lt-fZv">
-                                    <rect key="frame" x="-2" y="178" width="146" height="16"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Media item detail string" id="S8T-h9-WYr">
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
+                                    <rect key="frame" x="0.0" y="178" width="146" height="16"/>
+                                    <buttonCell key="cell" type="bevel" title="Media item detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="zkC-9p-xFn">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
-                                        <color key="textColor" name="VLCAccentColor"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
+                                    </buttonCell>
+                                    <color key="contentTintColor" name="VLCAccentColor"/>
+                                </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
                                     <rect key="frame" x="-2" y="157" width="94" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
@@ -106,11 +106,11 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fiJ-9f-ecF">
-                                    <rect key="frame" x="0.0" y="136" width="107" height="16"/>
+                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fiJ-9f-ecF">
+                                    <rect key="frame" x="0.0" y="21" width="106" height="131"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="NZk-WW-Uay">
-                                            <rect key="frame" x="-2" y="0.0" width="72" height="16"/>
+                                            <rect key="frame" x="-2" y="115" width="72" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="File Name:" id="CyQ-Ao-mup">
                                                 <font key="font" metaFont="systemBold"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -118,7 +118,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
-                                            <rect key="frame" x="72" y="0.0" width="37" height="16"/>
+                                            <rect key="frame" x="71" y="115" width="37" height="16"/>
                                             <textFieldCell key="cell" title="Label" id="Pzf-s3-rHC">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -135,8 +135,8 @@
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
-                                    <rect key="frame" x="0.0" y="115" width="73" height="16"/>
+                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
+                                    <rect key="frame" x="0.0" y="0.0" width="72" height="16"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hEf-79-49a">
                                             <rect key="frame" x="-2" y="0.0" width="38" height="16"/>
@@ -167,9 +167,6 @@
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="750" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gn0-fR-mbx">
-                                    <rect key="frame" x="0.0" y="0.0" width="50" height="110"/>
-                                </stackView>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -177,10 +174,8 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
-                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -215,7 +210,7 @@
             </constraints>
             <connections>
                 <outlet property="mediaItemArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
-                <outlet property="mediaItemDetailTextField" destination="Slp-lt-fZv" id="d3t-41-l5t"/>
+                <outlet property="mediaItemDetailButton" destination="S5i-gd-zkt" id="SsE-11-GwE"/>
                 <outlet property="mediaItemFileNameTextField" destination="VxL-BW-3eh" id="fiL-3N-m3P"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
                 <outlet property="mediaItemTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
@@ -228,7 +223,7 @@
     <resources>
         <image name="no-art" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
-        <image name="plus" catalog="system" width="15" height="13"/>
+        <image name="plus" catalog="system" width="14" height="13"/>
         <namedColor name="VLCAccentColor">
             <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
