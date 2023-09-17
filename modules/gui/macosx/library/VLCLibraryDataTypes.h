@@ -117,6 +117,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *detailString;
 @property (readonly) NSString *durationString;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
+@property (readonly) BOOL actionableDetail; // If detailAction does anything
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 

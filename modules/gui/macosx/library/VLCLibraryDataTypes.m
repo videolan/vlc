@@ -261,6 +261,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @property (readwrite, assign) int64_t libraryID;
 @property (readwrite, assign) BOOL smallArtworkGenerated;
+@property (readwrite, assign) BOOL actionableDetail;
 @property (readwrite, atomic, strong) NSString *smallArtworkMRL;
 @property (readwrite, atomic, strong) NSString *displayString;
 @property (readwrite, atomic, strong) NSString *detailString;
@@ -368,6 +369,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.libraryID = p_artist->i_id;
         self.smallArtworkGenerated = p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        self.actionableDetail = NO;
 
         _name = toNSStr(p_artist->psz_name);
         if ([_name isEqualToString:@""]) {
@@ -458,6 +460,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.libraryID = p_album->i_id;
         self.smallArtworkGenerated = p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        self.actionableDetail = YES;
 
         _title = toNSStr(p_album->psz_title);
         if ([_title isEqualToString:@""]) {
@@ -524,6 +527,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.libraryID = p_genre->i_id;
         self.smallArtworkGenerated = p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        self.actionableDetail = NO;
 
         _name = toNSStr(p_genre->psz_name);
         if ([_name isEqualToString:@""]) {
@@ -678,10 +682,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         self.libraryID = p_mediaItem->i_id;
         self.smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        self.actionableDetail = p_mediaItem->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
 
         _p_mediaLibrary = p_mediaLibrary;
         _mediaType = p_mediaItem->i_type;
         _mediaSubType = p_mediaItem->i_subtype;
+
         NSMutableArray *mutArray = [[NSMutableArray alloc] initWithCapacity:p_mediaItem->p_files->i_nb_items];
         for (size_t x = 0; x < p_mediaItem->p_files->i_nb_items; x++) {
             VLCMediaLibraryFile *file = [[VLCMediaLibraryFile alloc] initWithFile:&p_mediaItem->p_files->p_items[x]];
@@ -690,6 +696,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
             }
         }
         _files = [mutArray copy];
+
         mutArray = [[NSMutableArray alloc] initWithCapacity:p_mediaItem->p_tracks->i_nb_items];
         for (size_t x = 0; x < p_mediaItem->p_tracks->i_nb_items; x++) {
             VLCMediaLibraryTrack *track = [[VLCMediaLibraryTrack alloc] initWithTrack:&p_mediaItem->p_tracks->p_items[x]];
@@ -701,6 +708,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
             }
         }
         _tracks = [mutArray copy];
+
         _year = p_mediaItem->i_year;
         _duration = p_mediaItem->i_duration;
         _playCount = p_mediaItem->i_playcount;
@@ -1178,6 +1186,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize libraryID = _libraryId;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize actionableDetail = _actionableDetail;
 
 - (instancetype)initWithDisplayString:(NSString*)displayString
                      withDetailString:(NSString*)detailString
@@ -1190,6 +1199,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _libraryId = -1;
         _smallArtworkGenerated = NO;
         _smallArtworkMRL = @"";
+        _actionableDetail = NO;
     }
     return self;
 }
