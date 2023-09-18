@@ -117,7 +117,11 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *detailString;
 @property (readonly) NSString *durationString;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
-@property (readonly) BOOL actionableDetail; // If detailAction does anything
+// If the info in detailString contains a library object that can be used for nav
+// We lazy load the actionable library item so avoid using the property until we
+// actually need to, resort to `actionableDetail` to know if there is one instead
+@property (readonly) BOOL actionableDetail;
+@property (readonly) id<VLCMediaLibraryItemProtocol> actionableDetailLibraryItem;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 

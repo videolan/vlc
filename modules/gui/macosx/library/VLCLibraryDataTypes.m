@@ -274,6 +274,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return nil;
 }
 
+- (id<VLCMediaLibraryItemProtocol>)actionableDetailLibraryItem
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 - (void)moveToTrash
 {
     [self doesNotRecognizeSelector:_cmd];
@@ -435,6 +441,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @implementation VLCMediaLibraryAlbum
 
 @synthesize numberOfTracks = _numberOfTracks;
+@synthesize actionableDetailLibraryItem = _actionableDetailLibraryItem;
 
 + (nullable instancetype)albumWithID:(int64_t)albumID
 {
@@ -502,6 +509,15 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, self.libraryID);
+}
+
+- (id<VLCMediaLibraryItemProtocol>)actionableDetailLibraryItem
+{
+    if (_actionableDetailLibraryItem == nil) {
+        _actionableDetailLibraryItem = [VLCMediaLibraryArtist artistWithID:self.artistID];
+    }
+
+    return _actionableDetailLibraryItem;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -620,6 +636,8 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @end
 
 @implementation VLCMediaLibraryMediaItem
+
+@synthesize actionableDetailLibraryItem = _actionableDetailLibraryItem;
 
 #pragma mark - initialization
 
@@ -1184,6 +1202,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize actionableDetail = _actionableDetail;
+@synthesize actionableDetailLibraryItem = _actionableDetailLibraryItem;
 
 - (instancetype)initWithDisplayString:(NSString*)displayString
                      withDetailString:(NSString*)detailString
@@ -1197,6 +1216,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _smallArtworkGenerated = NO;
         _smallArtworkMRL = @"";
         _actionableDetail = NO;
+        _actionableDetailLibraryItem = nil;
     }
     return self;
 }
