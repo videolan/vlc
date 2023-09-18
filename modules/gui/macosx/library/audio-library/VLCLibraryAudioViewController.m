@@ -369,36 +369,34 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 }
 
+- (VLCLibraryViewModeSegment)viewModeSegmentForCurrentLibrarySegment
+{
+    VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+    switch (_audioSegmentedControl.selectedSegment) {
+        case VLCAudioLibraryArtistsSegment:
+            return libraryWindowPrefs.artistLibraryViewMode;
+        case VLCAudioLibraryGenresSegment:
+            return libraryWindowPrefs.genreLibraryViewMode;
+        case VLCAudioLibrarySongsSegment:
+            return libraryWindowPrefs.songsLibraryViewMode;
+        case VLCAudioLibraryAlbumsSegment:
+            return libraryWindowPrefs.albumLibraryViewMode;
+        default:
+            return VLCLibraryGridViewModeSegment;
+    }
+}
+
 - (void)updatePresentedView
 {
-    const VLCAudioLibrarySegment audioLibrarySegment = _audioSegmentedControl.selectedSegment;
-    _audioDataSource.audioLibrarySegment = audioLibrarySegment;
-
     if (_audioDataSource.libraryModel.numberOfAudioMedia == 0) {
         [self presentPlaceholderAudioView];
     } else {
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
-        VLCLibraryViewModeSegment viewModeSegment = VLCLibraryGridViewModeSegment; // default value
-        VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
-
-        switch (audioLibrarySegment) {
-            case VLCAudioLibraryArtistsSegment:
-                viewModeSegment = libraryWindowPrefs.artistLibraryViewMode;
-                break;
-            case VLCAudioLibraryGenresSegment:
-                viewModeSegment = libraryWindowPrefs.genreLibraryViewMode;
-                break;
-            case VLCAudioLibrarySongsSegment:
-                viewModeSegment = libraryWindowPrefs.songsLibraryViewMode;
-                break;
-            case VLCAudioLibraryAlbumsSegment:
-                viewModeSegment = libraryWindowPrefs.albumLibraryViewMode;
-                break;
-            default:
-                break;
-        }
+        _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+        const VLCLibraryViewModeSegment viewModeSegment = [self viewModeSegmentForCurrentLibrarySegment];
 
         if (viewModeSegment == VLCLibraryListViewModeSegment) {
             [self presentAudioTableView];
