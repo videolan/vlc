@@ -40,7 +40,9 @@
 #import "views/VLCSubScrollView.h"
 
 @interface VLCLibraryAudioGroupDataSource ()
-
+{
+    id<VLCMediaLibraryAudioGroupProtocol> _representedAudioGroup;
+}
 @property (readwrite, atomic, strong) NSArray<VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
 @end
@@ -83,14 +85,23 @@
     });
 }
 
+- (id<VLCMediaLibraryAudioGroupProtocol>)representedAudioGroup
+{
+    @synchronized (self) {
+        return _representedAudioGroup;
+    }
+}
+
 - (void)setRepresentedAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)representedAudioGroup
 {
-    if (representedAudioGroup == _representedAudioGroup) {
-        return;
-    }
+    @synchronized (self) {
+        if (_representedAudioGroup == representedAudioGroup) {
+            return;
+        }
 
-    _representedAudioGroup = representedAudioGroup;
-    [self updateRepresentedListOfAlbums];
+        _representedAudioGroup = representedAudioGroup;
+        [self updateRepresentedListOfAlbums];
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
