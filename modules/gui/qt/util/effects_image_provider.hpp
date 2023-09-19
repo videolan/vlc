@@ -24,7 +24,11 @@
 #include <QSize>
 #include <QQuickImageProvider>
 
-class EffectsImageProvider : public QObject, public QQuickImageProvider
+class EffectsImageProvider :
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+public QObject,
+#endif
+public QQuickImageProvider
 {
     Q_OBJECT
 
