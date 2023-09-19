@@ -730,6 +730,26 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#ifdef _WIN32
+    // QSysInfo::productVersion() returns "unknown" on Windows 7
+    // RHI Fallback does not seem to work.
+
+    DWORD dwVersion = 0;
+    DWORD dwMajorVersion = 0;
+    DWORD dwMinorVersion = 0;
+
+    dwVersion = GetVersion();
+
+    dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+    dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+
+    if (dwMajorVersion <= 6 && dwMinorVersion <= 1)
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+
+#endif
+#endif
+
     auto compositor = var_InheritString(p_intf, "qt-compositor");
     vlc::CompositorFactory compositorFactory(p_intf, compositor);
     free(compositor);
