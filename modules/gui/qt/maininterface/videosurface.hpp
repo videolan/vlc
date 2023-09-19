@@ -30,6 +30,10 @@ extern "C" {
     typedef struct vlc_window vlc_window_t;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+Q_MOC_INCLUDE( "maininterface/mainctx.hpp")
+#endif
+
 class MainCtx;
 
 class WindowResizer :
