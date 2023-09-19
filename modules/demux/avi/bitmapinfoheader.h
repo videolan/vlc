@@ -149,7 +149,7 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
                 video_format_FixRgb( &fmt->video );
                 if( i_bihextra >= 4 * sizeof(uint32_t) ) /* Alpha channel ? */
                 {
-                    uint32_t i_alpha = GetDWLE( &p_bihextra[8] );
+                    uint32_t i_alpha = GetDWLE( &p_bihextra[12] );
                     if( i_alpha == 0xFF )
                     {
                         switch (fmt->i_codec)
