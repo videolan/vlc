@@ -73,6 +73,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 @interface VLCLibraryAudioDataSource ()
 {
     enum vlc_ml_parent_type _currentParentType;
+    BOOL _displayedCollectionUpdating;
 }
 
 @property (readwrite, atomic) NSArray *displayedCollection;
@@ -144,6 +145,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                selector:@selector(currentlyPlayingItemChanged:)
                                    name:VLCPlayerCurrentMediaItemChanged
                                  object:nil];
+
+        _displayedCollectionUpdating = NO;
     }
 
     return self;
@@ -482,6 +485,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)reloadData
 {
+    _displayedCollectionUpdating = YES;
+
     dispatch_async(dispatch_get_main_queue(), ^{
         self.displayedCollection = [self collectionToDisplay];
 
@@ -506,6 +511,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
             [self.collectionSelectionTableView reloadData];
             [self.songsTableView reloadData];
         }];
+
+        self->_displayedCollectionUpdating = NO;
     });
 }
 
@@ -570,6 +577,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     if (audioLibrarySegment == _audioLibrarySegment) {
         return;
     }
+
+    _displayedCollectionUpdating = YES;
 
     _audioLibrarySegment = audioLibrarySegment;
     switch (_audioLibrarySegment) {
@@ -639,7 +648,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         return;
     }
 
-    if (_currentParentType == VLC_ML_PARENT_UNKNOWN || selectedRow < 0) {
+    if (_currentParentType == VLC_ML_PARENT_UNKNOWN || selectedRow < 0 || _displayedCollectionUpdating) {
         _audioGroupDataSource.representedAudioGroup = nil;
     } else {
         _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
