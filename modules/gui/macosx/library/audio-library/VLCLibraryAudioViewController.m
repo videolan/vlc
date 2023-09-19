@@ -420,6 +420,27 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     [_audioDataSource reloadData];
 }
 
+- (void)presentLibraryItemInTableView:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    NSTableView *targetMainTableView;
+    if ([libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+        targetMainTableView = self.audioSongTableView;
+    } else {
+        targetMainTableView = self.audioCollectionSelectionTableView;
+    }
+    NSAssert(targetMainTableView != nil, @"Target tableview for presenting audio library view is nil");
+    NSAssert(targetMainTableView.dataSource == self.audioDataSource, @"Target tableview data source is unexpected");
+
+    const NSInteger rowForLibraryItem = [self.audioDataSource rowForLibraryItem:libraryItem];
+    if (rowForLibraryItem != NSNotFound) {
+        NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
+        [targetMainTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+    }
+}
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
     NSParameterAssert(aNotification);
