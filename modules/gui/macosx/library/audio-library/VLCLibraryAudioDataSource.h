@@ -54,6 +54,8 @@ extern NSString * const VLCLibraryAlbumSortDescriptorKey;
 extern NSString * const VLCLibraryPlayCountSortDescriptorKey;
 extern NSString * const VLCLibraryYearSortDescriptorKey;
 
+extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification;
+
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
@@ -64,6 +66,8 @@ extern NSString * const VLCLibraryYearSortDescriptorKey;
 @property (readwrite, assign) NSTableView *gridModeListTableView;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
+
+@property (readonly) BOOL displayedCollectionUpdating;
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView;
 - (void)setup;

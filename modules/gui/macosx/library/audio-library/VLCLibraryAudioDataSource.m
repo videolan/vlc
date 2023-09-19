@@ -70,10 +70,11 @@ NSString * const VLCLibraryPlayCountSortDescriptorKey = @"VLCLibraryPlayCountSor
 NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescriptorKey";
 // TODO: Add sorting by genre
 
+NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification";
+
 @interface VLCLibraryAudioDataSource ()
 {
     enum vlc_ml_parent_type _currentParentType;
-    BOOL _displayedCollectionUpdating;
 }
 
 @property (readwrite, atomic) NSArray *displayedCollection;
@@ -505,6 +506,8 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
             self.displayedCollection = mutableCollectionCopy;
         }
 
+        self->_displayedCollectionUpdating = NO;
+
         [self resetLayoutsForOperation:^{
             [self.collectionView reloadData];
             [self.gridModeListTableView reloadData];
@@ -512,7 +515,7 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
             [self.songsTableView reloadData];
         }];
 
-        self->_displayedCollectionUpdating = NO;
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];
     });
 }
 
