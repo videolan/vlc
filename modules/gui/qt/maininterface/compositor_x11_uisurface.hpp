@@ -28,6 +28,7 @@ class QQmlEngine;
 class QQmlComponent;
 class QQuickItem;
 class QQuickRenderControl;
+class QOffscreenSurface;
 
 namespace vlc {
 
@@ -51,6 +52,7 @@ private:
 class CompositorX11UISurface : public QWindow , public CompositorVideo::QmlUISurface
 {
     Q_OBJECT
+
 public:
     explicit CompositorX11UISurface(QWindow* window, QScreen *screen = nullptr);
     ~CompositorX11UISurface();
@@ -100,6 +102,14 @@ private:
     CompositorX11RenderControl* m_uiRenderControl = nullptr;
 
     QSize m_onscreenSize;
+
+    uint m_textureId = 0;
+    qreal m_dpr = 0;
+    QOffscreenSurface *m_offscreenSurface = nullptr;
+
+    bool initialized=  false;
+
+    unsigned int m_fboId = 0;
 };
 
 }

@@ -19,13 +19,16 @@
 
 #include <QtEvents>
 #include <QWindow>
-#include <QX11Info>
 #include <QMainWindow>
 #include <QThread>
 #include <QSocketNotifier>
 #ifndef QT_NO_ACCESSIBILITY
 #include <QAccessible>
 #endif
+#ifndef QT_GUI_PRIVATE
+#warning "qplatformnativeinterface is requried for x11 compositor"
+#endif
+#include <QtGui/qpa/qplatformnativeinterface.h>
 
 #include <xcb/composite.h>
 
@@ -159,7 +162,7 @@ void RenderTask::onWindowSizeChanged(const QSize& newSize)
 
 void RenderTask::requestRefresh()
 {
-    emit requestRefreshInternal(m_refreshRequestId, {});
+    emit requestRefreshInternal(m_refreshRequestId, QPrivateSignal());
 }
 
 void RenderTask::onInterfaceSurfaceChanged(CompositorX11RenderClient* surface)
@@ -182,7 +185,7 @@ void RenderTask::onVideoPositionChanged(const QRect& position)
     if (m_videoPosition == position)
         return;
     m_videoPosition = position;
-    emit requestRefreshInternal(m_refreshRequestId, {});
+    emit requestRefreshInternal(m_refreshRequestId, QPrivateSignal());
 }
 
 void RenderTask::onInterfaceSizeChanged(const QSize& size)
@@ -379,15 +382,20 @@ bool CompositorX11RenderWindow::init()
         return false;
     }
 
-    xcb_connection_t* qtConn = QX11Info::connection();
-    xcb_window_t rootWindow = QX11Info::appRootWindow();
-    int appScreen = QX11Info::appScreen();
+    const auto nativeInterface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    assert(nativeInterface);
+    xcb_connection_t* qtConn = nativeInterface->connection();
+    xcb_window_t rootWindow = winId();
 
-    //if we don't have compositor, transparency effects won't work.
-    //Note that composite extention may be available and functionnal without a compositor,
-    //so having video compositing doesn't imply that window transparency is available
-    if (!wmScreenHasCompositor(qtConn, appScreen))
+    QPlatformNativeInterface *native = qApp->platformNativeInterface();
+    if (!native)
         return true;
+
+    if (const int screen = reinterpret_cast<intptr_t>(native->nativeResourceForIntegration(QByteArrayLiteral("x11screen"))))
+    {
+        if (!wmScreenHasCompositor(qtConn, screen))
+            return true;
+    }
 
     //check if KDE "acrylic" effect is available
     xcb_atom_t blurBehindAtom = getInternAtom(qtConn, _KDE_NET_WM_BLUR_BEHIND_REGION_NAME);
@@ -469,7 +477,7 @@ void CompositorX11RenderWindow::stopRendering()
 void CompositorX11RenderWindow::resetClientPixmaps()
 {
     QMutexLocker lock(&m_pictureLock);
-    xcb_flush(QX11Info::connection());
+    xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
     //reset and recreate the clients surfaces
     if (m_interfaceClient)
     {
@@ -528,7 +536,7 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
         m_videoWindow->resize(size);
         {
             QMutexLocker lock(&m_pictureLock);
-            xcb_flush(QX11Info::connection());
+            xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
             //reset and recreate the clients surfaces
             m_videoClient->resetPixmap();
             m_videoClient->getPicture();
@@ -541,7 +549,7 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
 void CompositorX11RenderWindow::setVideoWindow( QWindow* window)
 {
     //ensure Qt x11 pending operation have been forwarded to the server
-    xcb_flush(QX11Info::connection());
+    xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
     m_videoClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
     m_videoPosition = QRect(0,0,0,0);
     m_videoWindow = window;
@@ -568,7 +576,7 @@ QQuickWindow* CompositorX11RenderWindow::getOffscreenWindow() const
 void CompositorX11RenderWindow::setInterfaceWindow(CompositorX11UISurface* window)
 {
     //ensure Qt x11 pending operation have been forwarded to the server
-    xcb_flush(QX11Info::connection());
+    xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
     m_interfaceClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
     m_interfaceWindow = window;
 }

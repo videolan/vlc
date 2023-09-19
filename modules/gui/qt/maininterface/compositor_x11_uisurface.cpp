@@ -21,15 +21,18 @@
 #include <QQuickWindow>
 #include <QQuickItem>
 #include <QOffscreenSurface>
+#include <QGuiApplication>
 #include <QApplication>
+#include <QQuickRenderTarget>
+#include <QQuickGraphicsDevice>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLExtraFunctions>
 #include <QThread>
 
 #include "compositor_x11_uisurface.hpp"
 #include "compositor_common.hpp"
 
 using namespace vlc;
-
-
 
 CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     : QWindow(screen)
@@ -41,7 +44,7 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
 
     QSurfaceFormat format;
     // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
-    format.setDepthBufferSize(8);
+    format.setDepthBufferSize(16);
     format.setStencilBufferSize(8);
     format.setAlphaBufferSize(8);
     format.setSwapInterval(0);
@@ -69,7 +72,6 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     m_uiWindow->setDefaultAlphaBuffer(true);
     m_uiWindow->setFormat(format);
     m_uiWindow->setColor(Qt::transparent);
-    m_uiWindow->setClearBeforeRendering(true);
 
     m_qmlEngine = new QQmlEngine();
     if (!m_qmlEngine->incubationController())
@@ -105,9 +107,14 @@ CompositorX11UISurface::~CompositorX11UISurface()
     delete m_uiWindow;
     delete m_qmlEngine;
 
+    if (m_textureId)
+        m_context->functions()->glDeleteTextures(1, &m_textureId);
+
+    if (m_fboId)
+        m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
+
     m_context->doneCurrent();
 
-    delete surface;
     delete m_context;
 }
 
@@ -116,11 +123,17 @@ void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
 {
     m_rootItem = rootItem;
 
-    QQuickItem* contentItem  = m_uiWindow->contentItem();
-
-    m_rootItem->setParentItem(contentItem);
+    m_rootItem->setParentItem(m_uiWindow->contentItem());
 
     updateSizes();
+
+    m_rootItem->forceActiveFocus();
+
+    m_context->makeCurrent(this);
+    m_uiWindow->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(m_context));
+    m_uiRenderControl->initialize();
+
+    initialized = true;
 }
 
 QQuickItem * CompositorX11UISurface::activeFocusItem() const /* override */
@@ -135,14 +148,31 @@ QQuickWindow* CompositorX11UISurface::getOffscreenWindow() const
 
 void CompositorX11UISurface::createFbo()
 {
-    //write to the immediate context
+    // The scene graph has been initialized. It is now time to create an texture and associate
+    // it with the QQuickWindow.
+    m_dpr = devicePixelRatio();
     QSize fboSize = size() * devicePixelRatio();
-    m_uiWindow->setRenderTarget(0, fboSize);
+    QOpenGLFunctions *f = m_context->functions();
+    f->glGenTextures(1, &m_textureId);
+    f->glBindTexture(GL_TEXTURE_2D, m_textureId);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fboSize.width(), fboSize.height(), 0,
+                    GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    m_uiWindow->setRenderTarget(QQuickRenderTarget::fromOpenGLTexture(m_textureId, fboSize));
+
+    f->glGenFramebuffers(1, &m_fboId);
+
     emit sizeChanged(fboSize);
 }
 
 void CompositorX11UISurface::destroyFbo()
 {
+    m_context->functions()->glDeleteTextures(1, &m_textureId);
+    m_textureId = 0;
+    m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
+    m_fboId = 0;
 }
 
 void CompositorX11UISurface::render()
@@ -150,17 +180,28 @@ void CompositorX11UISurface::render()
     if (!isExposed())
         return;
 
-    m_context->makeCurrent(this);
+    const bool current = m_context->makeCurrent(this);
+    assert(current);
 
+    m_uiRenderControl->beginFrame();
     m_uiRenderControl->polishItems();
     m_uiRenderControl->sync();
 
     // TODO: investigate multithreaded renderer
     m_uiRenderControl->render();
 
-    m_uiWindow->resetOpenGLState();
+    m_uiRenderControl->endFrame();
 
+    //m_uiWindow->resetOpenGLState();
+
+    QOpenGLFramebufferObject::bindDefault();
     m_context->functions()->glFlush();
+
+    const QSize fboSize = size() * devicePixelRatio();
+
+    m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
+    m_context->functions()->glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
+    m_context->extraFunctions()->glBlitFramebuffer(0, 0, fboSize.width(), fboSize.height(), 0, 0, fboSize.width(), fboSize.height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
     m_context->swapBuffers(this);
 
     emit updated();
@@ -322,11 +363,19 @@ bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
 
 void CompositorX11UISurface::resizeFbo()
 {
-    if (m_rootItem && m_context->makeCurrent(this))
+    if (m_rootItem)
     {
+        const bool current = m_context->makeCurrent(this);
+        assert(current);
+
+        m_context->functions()->glDeleteTextures(1, &m_textureId);
+        m_textureId = 0;
+        m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
+        m_fboId = 0;
         createFbo();
         m_context->doneCurrent();
         updateSizes();
+        render();
     }
 }
 
@@ -367,11 +416,9 @@ void CompositorX11UISurface::exposeEvent(QExposeEvent *)
 {
     if (isExposed())
     {
-        if (!m_uiWindow->openglContext())
+        if (!initialized)
         {
-            m_context->makeCurrent(this);
-            m_uiRenderControl->initialize(m_context);
-            m_context->doneCurrent();
+            m_uiRenderControl->initialize();
         }
         requestUpdate();
     }
@@ -379,8 +426,8 @@ void CompositorX11UISurface::exposeEvent(QExposeEvent *)
 
 void CompositorX11UISurface::handleScreenChange()
 {
-    m_uiWindow->setGeometry(0, 0, width(), height());
-    requestUpdate();
+   m_uiWindow->setGeometry(0, 0, width(), height());
+   requestUpdate();
 }
 
 void CompositorX11UISurface::forwardFocusObjectChanged(QObject* object)
