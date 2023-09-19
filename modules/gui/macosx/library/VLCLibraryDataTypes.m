@@ -922,6 +922,15 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return self;
 }
 
+- (id<VLCMediaLibraryItemProtocol>)actionableDetailLibraryItem
+{
+    if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK && _actionableDetailLibraryItem == nil) {
+        _actionableDetailLibraryItem = [VLCMediaLibraryAlbum albumWithID:self.albumID];
+    }
+
+    return _actionableDetailLibraryItem;
+}
+
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 {
     mediaItemBlock(self);
