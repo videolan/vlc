@@ -23,7 +23,6 @@
 #endif
 
 #include <QObject>
-#include <QX11Info>
 #include <QWindow>
 
 #include <vlc_common.h>
@@ -31,6 +30,10 @@
 #include "qt.hpp"
 
 #include "compositor_x11_utils.hpp"
+
+#include <xcb/xcb.h>
+#include <xcb/xproto.h>
+#include <xcb/render.h>
 
 namespace vlc {
 
