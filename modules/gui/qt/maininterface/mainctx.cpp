@@ -922,12 +922,13 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
     // one that is set
 #ifndef NDEBUG
     QQmlComponent component(engine);
-    component.setData(QByteArrayLiteral("import QtQuick 2.12; import QtQuick.Controls 2.12; Item { }"), {});
+    component.setData(QByteArrayLiteral("import QtQuick; import QtQuick.Controls; Item { }"), {});
     QObject* const obj = component.create();
     assert(obj);
     // Consider disabling setting of custom attached
     // tooltip if the following assertion fails:
-    assert(QQmlProperty::read(obj, QStringLiteral("ToolTip.toolTip"), qmlContext(obj)).value<QObject*>() == toolTip);
+    if (QQmlProperty::read(obj, QStringLiteral("ToolTip.toolTip"), qmlContext(obj)).value<QObject*>() != toolTip)
+        qmlWarning(obj) << "Could not set self as custom ToolTip!";
     obj->deleteLater();
 #endif
 }

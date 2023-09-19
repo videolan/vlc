@@ -18,7 +18,7 @@
 
 pragma Singleton
 
-import QtQml 2.11
+import QtQml
 
 import org.videolan.vlc 0.1
 

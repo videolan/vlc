@@ -17,8 +17,8 @@
  *****************************************************************************/
 
 //CSD is only supported on Qt 5.15
-import QtQuick 2.15
-import QtQuick.Window 2.15
+import QtQuick
+import QtQuick.Window
 
 import org.videolan.vlc 0.1
 

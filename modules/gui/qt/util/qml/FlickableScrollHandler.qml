@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQml 2.12
+import QtQml
 
 import org.videolan.vlc 0.1 as VLC
 
