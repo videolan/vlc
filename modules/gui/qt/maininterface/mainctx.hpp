@@ -305,7 +305,7 @@ protected:
     bool                 b_playlistDocked = false;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
     bool                 b_interfaceOnTop = false;      ///keep UI on top
-#ifdef QT5_HAS_WAYLAND
+#ifdef QT_HAS_WAYLAND
     bool                 b_hasWayland = false;
 #endif
     bool                 b_hasMedialibrary = false;

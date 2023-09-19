@@ -68,7 +68,7 @@ private:
     QRect   m_lastWinGeometry;
     QScreen* m_lastWinScreen = nullptr;
 
-#ifdef QT5_HAS_WAYLAND
+#ifdef QT_HAS_WAYLAND
     bool m_hasWayland = false;
 #endif
 };

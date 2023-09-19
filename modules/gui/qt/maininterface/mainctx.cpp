@@ -164,7 +164,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     QString platformName = QGuiApplication::platformName();
 
-#ifdef QT5_HAS_WAYLAND
+#ifdef QT_HAS_WAYLAND
     b_hasWayland = platformName.startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
 #endif
 

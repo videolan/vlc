@@ -20,7 +20,7 @@
 #include "maininterface/mainctx.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
-#ifndef QT5_GUI_PRIVATE
+#ifndef QT_GUI_PRIVATE
 #warning "qplatformnativeinterface is requried for wayland compositor"
 #endif
 

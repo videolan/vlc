@@ -23,7 +23,7 @@
 #include <vlc_window.h>
 
 #include <QQuickRenderControl>
-#ifdef QT5_DECLARATIVE_PRIVATE
+#ifdef QT_DECLARATIVE_PRIVATE
 #  include <QtGui/qpa/qplatformwindow.h>
 #endif
 

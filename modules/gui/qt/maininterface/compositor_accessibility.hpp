@@ -35,7 +35,7 @@ public:
 };
 
 
-#if !defined(QT_NO_ACCESSIBILITY) && defined(QT5_DECLARATIVE_PRIVATE)
+#if !defined(QT_NO_ACCESSIBILITY) && defined(QT_DECLARATIVE_PRIVATE)
 
 QAccessibleInterface* compositionAccessibleFactory(const QString &classname, QObject *object);
 

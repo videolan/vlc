@@ -128,7 +128,7 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
         {
             QRect screenres = screenList[numscreen]->geometry();
             m_lastWinScreen = m_window->screen();
-#ifdef QT5_HAS_WAYLAND
+#ifdef QT_HAS_WAYLAND
             if( !m_hasWayland )
                 m_window->setScreen(screenList[numscreen]);
 #endif
@@ -146,7 +146,7 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     {
         bool hold = WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, false);
 
-#ifdef QT5_HAS_WAYLAND
+#ifdef QT_HAS_WAYLAND
         if( m_lastWinScreen != NULL && !m_hasWayland )
             m_window->setScreen(m_lastWinScreen);
 #else

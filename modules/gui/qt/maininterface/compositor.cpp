@@ -32,11 +32,11 @@
 #  include "compositor_win7.hpp"
 #endif
 
-#ifdef QT5_HAS_WAYLAND_COMPOSITOR
+#ifdef QT_HAS_WAYLAND_COMPOSITOR
 #  include "compositor_wayland.hpp"
 #endif
 
-#ifdef QT5_HAS_X11_COMPOSITOR
+#ifdef QT_HAS_X11_COMPOSITOR
 #  include "compositor_x11.hpp"
 #endif
 
@@ -65,10 +65,10 @@ struct {
 #endif
     {"win7", &instanciateCompositor<CompositorWin7>, &preInit<CompositorWin7> },
 #endif
-#ifdef QT5_HAS_WAYLAND_COMPOSITOR
+#ifdef QT_HAS_WAYLAND_COMPOSITOR
     {"wayland", &instanciateCompositor<CompositorWayland>, &preInit<CompositorWayland> },
 #endif
-#ifdef QT5_HAS_X11_COMPOSITOR
+#ifdef QT_HAS_X11_COMPOSITOR
     {"x11", &instanciateCompositor<CompositorX11>, &preInit<CompositorX11> },
 #endif
     {"dummy", &instanciateCompositor<CompositorDummy>, &preInit<CompositorDummy> }

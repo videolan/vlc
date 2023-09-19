@@ -41,7 +41,7 @@
 
 #include <QWindow>
 
-#ifndef QT5_GUI_PRIVATE
+#ifndef QT_GUI_PRIVATE
 #warning "qplatformnativeinterface.h header is required for MainCtxWin32"
 #endif
 #include <QtGui/qpa/qplatformnativeinterface.h>

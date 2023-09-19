@@ -27,6 +27,7 @@
 
 #include <qconfig.h>
 #include <QtPlugin>
+#include <QQuickStyle>
 
 QT_BEGIN_NAMESPACE
 #include "plugins.hpp"
@@ -62,6 +63,8 @@ extern "C" char **environ;
 #include "dialogs/dialogs_provider.hpp" /* THEDP creation */
 #include "dialogs/dialogs/dialogmodel.hpp"
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 # include "maininterface/mainctx_win32.hpp"
 #else
 # include "maininterface/mainctx.hpp"   /* MainCtx creation */
@@ -269,10 +272,10 @@ static const char *const compositor_vlc[] = {
 #endif
     "win7",
 #endif
-#ifdef QT5_HAS_WAYLAND_COMPOSITOR
+#ifdef QT_HAS_WAYLAND_COMPOSITOR
     "wayland",
 #endif
-#ifdef QT5_HAS_X11_COMPOSITOR
+#ifdef QT_HAS_X11_COMPOSITOR
     "x11",
 #endif
     "dummy"
@@ -285,10 +288,10 @@ static const char *const compositor_user[] = {
 #endif
     "Windows 7",
 #endif
-#ifdef QT5_HAS_WAYLAND_COMPOSITOR
+#ifdef QT_HAS_WAYLAND_COMPOSITOR
     "Wayland",
 #endif
-#ifdef QT5_HAS_X11_COMPOSITOR
+#ifdef QT_HAS_X11_COMPOSITOR
     N_("X11"),
 #endif
     N_("Dummy"),
@@ -750,7 +753,43 @@ static void *Thread( void *obj )
 #endif
     argv[argc] = NULL;
 
+#ifdef QT_STATIC
     Q_INIT_RESOURCE( vlc );
+
+    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
+    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );
+    Q_INIT_RESOURCE( qmake_QtQml );
+    Q_INIT_RESOURCE( qmake_QtQml_Base );
+    Q_INIT_RESOURCE( qmake_QtQml_Models );
+    Q_INIT_RESOURCE( qmake_QtQml_WorkerScript );
+    Q_INIT_RESOURCE( qmake_QtQuick );
+    Q_INIT_RESOURCE( qmake_QtQuick_Window );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_impl );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic_impl );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Fusion );
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Fusion_impl );
+#ifdef _WIN32
+    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Windows );
+    Q_INIT_RESOURCE( qmake_QtQuick_NativeStyle );
+    Q_INIT_RESOURCE( qtquickcontrols2windowsstyleplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtquickcontrols2nativestyleplugin_raw_qml_0 );
+#endif
+    Q_INIT_RESOURCE( qmake_QtQuick_Layouts );
+    Q_INIT_RESOURCE( qmake_QtQuick_Templates );
+
+    Q_INIT_RESOURCE( qtquickcontrols2fusionstyleimplplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtquickcontrols2fusionstyleplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtquickcontrols2fusionstyle );
+    Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin );
+
+    Q_INIT_RESOURCE( qtgraphicaleffectsplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtgraphicaleffectsprivate_raw_qml_0 );
+    Q_INIT_RESOURCE( qtgraphicaleffectsshaders );
+    Q_INIT_RESOURCE( qtquickshapes_shaders );
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #ifdef _WIN32
@@ -778,15 +817,18 @@ static void *Thread( void *obj )
 
     compositorFactory.preInit();
 
-    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
-    QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-    QApplication::setHighDpiScaleFactorRoundingPolicy( Qt::HighDpiScaleFactorRoundingPolicy::RoundPreferFloor );
-#endif
     // at the moment, the vout is created in another thread than the rendering thread
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);
+
+#ifdef QT_STATIC
+#ifdef _WIN32
+    QQuickStyle::setStyle(QLatin1String("Windows"));
+#else
+    QQuickStyle::setStyle(QLatin1String("Fusion"));
+#endif
+    QQuickStyle::setFallbackStyle(QLatin1String("Fusion"));
+#endif
 
     /* Start the QApplication here */
     QApplication app( argc, argv );
@@ -910,7 +952,7 @@ static void *Thread( void *obj )
             // Workaround for popup widgets not closing on mouse press on wayland:
             app.installEventFilter(new DismissPopupEventFilter(&app));
         }
-        else if( platform == QLatin1String("windows") )
+        else if( platform == QLatin1String("windows") || platform == QLatin1String("direct2d") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_HWND;
         else if( platform == QLatin1String("cocoa") )
             p_intf->voutWindowType = VLC_WINDOW_TYPE_NSOBJECT;
