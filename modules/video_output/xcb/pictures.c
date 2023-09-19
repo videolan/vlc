@@ -63,8 +63,8 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
         /* Check that VLC supports the TrueColor visual. */
         switch (depth)
         {
-            /* TODO: 32 bits RGBA */
             /* TODO: 30 bits HDR RGB */
+            case 32:
             case 24:
                 if (vlc_popcount(vt->red_mask) == 8
                  && vlc_popcount(vt->green_mask) == 8
@@ -104,6 +104,11 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
     /* Check that VLC supports the pixel format. */
     switch (fmt->depth)
     {
+        case 32:
+            if (fmt->bits_per_pixel != 32)
+                return false;
+            f->i_chroma = VLC_CODEC_RGB32;
+            break;
         case 24:
             if (fmt->bits_per_pixel == 32)
                 f->i_chroma = VLC_CODEC_RGB32;
