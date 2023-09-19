@@ -45,8 +45,6 @@ public:
 
     ~CompositorX11RenderClient();
 
-    bool registerDamageEvent(Display* dpy);
-
     xcb_drawable_t getWindowXid() const;
 
     void createPicture();
