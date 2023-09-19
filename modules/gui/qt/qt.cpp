@@ -248,6 +248,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                "to ensure the visibility of the user interface on a constrained " \
                                "viewport" )
 
+#define VERBOSE_TEXT N_( "Print Qt's important internal messages" )
+#define VERBOSE_LONGTEXT N_( "Enable Qt's all own messaging categories except the debug category." )
+
 static const int initial_prefs_view_list[] = { 0, 1, 2 };
 static const char *const initial_prefs_view_list_texts[] =
     { N_("Simple"), N_("Advanced"), N_("Expert") };
@@ -417,6 +420,8 @@ vlc_module_begin ()
             change_integer_list( i_raise_list, psz_raise_list_text )
 
     add_bool( "qt-smooth-scrolling", true, SMOOTH_SCROLLING_TEXT, SMOOTH_SCROLLING_LONGTEXT )
+
+    add_bool( "qt-verbose", false, VERBOSE_TEXT, VERBOSE_LONGTEXT )
 
     add_float_with_range( "qt-safe-area", 0, 0, 100.0, SAFE_AREA_TEXT, SAFE_AREA_LONGTEXT )
 
@@ -729,6 +734,28 @@ static inline void registerMetaTypes()
 static void *Thread( void *obj )
 {
     qt_intf_t *p_intf = (qt_intf_t *)obj;
+
+    {
+        QString filterRules;
+
+        const int verbosity = var_InheritInteger(p_intf, "verbose");
+        if (verbosity < 2)
+        {
+            filterRules += QStringLiteral("*.debug=false\n");
+            if (verbosity < 1)
+                filterRules += QStringLiteral("*.warning=false\n");
+        }
+
+        if (var_InheritBool(p_intf, "qt-verbose"))
+        {
+            filterRules += QStringLiteral("*=true\n" /* Qt by default does not enable some info and error messages */
+                                          "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
+                                          "qt.widgets.painting=false\n" /* Not necessary */);
+        }
+
+        QLoggingCategory::setFilterRules(filterRules);
+    }
+
     char vlc_name[] = "vlc"; /* for WM_CLASS */
     char *argv[3] = { nullptr };
     int argc = 0;
