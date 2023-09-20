@@ -29,6 +29,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
+
 @interface VLCLibraryVideoCollectionViewContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) NSCollectionView *collectionView;

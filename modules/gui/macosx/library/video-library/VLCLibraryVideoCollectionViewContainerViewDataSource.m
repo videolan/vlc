@@ -34,6 +34,9 @@
 
 #import "main/VLCMain.h"
 
+NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
+
+
 @interface VLCLibraryVideoCollectionViewContainerViewDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
@@ -182,6 +185,8 @@
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_collectionView reloadData];
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                              object:self];
         });
     });
 }
@@ -199,6 +204,8 @@
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                      object:self];
 }
 
 - (void)deleteDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
@@ -214,6 +221,8 @@
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                      object:self];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
