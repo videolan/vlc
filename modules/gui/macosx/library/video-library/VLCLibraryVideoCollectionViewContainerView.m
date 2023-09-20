@@ -26,6 +26,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
@@ -221,6 +222,26 @@
     // collection view contents we can eliminate this, so we reduce the height
     // just enough to not be noticeable but enough for the bug to not manifest
     return NSMakeSize(width, collectionViewContentSize.height - 15);
+}
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    NSIndexPath * const indexPath = [self.dataSource indexPathForLibraryItem:libraryItem];
+    if (indexPath == nil) {
+        return;
+    }
+
+    NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
+    NSCollectionView * const collectionView = self.collectionView;
+    VLCLibraryCollectionViewFlowLayout * const flowLayout = (VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout;
+
+    [collectionView selectItemsAtIndexPaths:indexPathSet
+                             scrollPosition:NSCollectionViewScrollPositionCenteredVertically];
+    [flowLayout expandDetailSectionAtIndex:indexPath];
 }
 
 @end

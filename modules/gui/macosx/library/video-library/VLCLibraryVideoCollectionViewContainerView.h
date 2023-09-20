@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
 
 - (void)setVideoGroup:(VLCLibraryVideoGroup)group;
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 
