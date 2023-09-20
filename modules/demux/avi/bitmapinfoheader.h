@@ -154,16 +154,9 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
         switch( p_bih->biBitCount )
         {
             case 32:
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_XBGR;
-                break;
             case 24:
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_BGR24;
-                break;
             case 16:
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
-                break;
-            case 15: /* RGB (B least 5 bits) */
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB15;
+            case 15:
                 break;
             case 9: /* <- TODO check that */
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_I410;
@@ -209,12 +202,6 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                     fmt->video.i_rmask = 0;
                     fmt->video.i_gmask = 0;
                     fmt->video.i_bmask = 0;
-                }
-                else if (amask == 0)
-                {
-                    fmt->video.i_rmask = rmask;
-                    fmt->video.i_gmask = gmask;
-                    fmt->video.i_bmask = bmask;
                 }
                 else
                 {
