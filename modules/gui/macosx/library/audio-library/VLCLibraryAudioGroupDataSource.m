@@ -123,6 +123,23 @@
     return self.representedListOfAlbums[row];
 }
 
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return NSNotFound;
+    }
+
+    NSArray<id<VLCMediaLibraryItemProtocol>> *libraryItems = self.representedListOfAlbums;
+    for (NSUInteger i = 0; i < libraryItems.count; ++i) {
+        const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
+        if (collectionItem.libraryID == libraryItem.libraryID) {
+            return i;
+        }
+    }
+
+    return NSNotFound;
+}
+
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
