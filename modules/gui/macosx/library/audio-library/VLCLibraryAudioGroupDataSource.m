@@ -129,7 +129,8 @@
         return NSNotFound;
     }
 
-    NSArray<id<VLCMediaLibraryItemProtocol>> *libraryItems = self.representedListOfAlbums;
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = self.representedListOfAlbums;
+
     for (NSUInteger i = 0; i < libraryItems.count; ++i) {
         const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
         if (collectionItem.libraryID == libraryItem.libraryID) {
