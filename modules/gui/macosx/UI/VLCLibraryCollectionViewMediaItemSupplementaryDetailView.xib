@@ -97,6 +97,9 @@
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <color key="contentTintColor" name="VLCAccentColor"/>
+                                    <connections>
+                                        <action selector="detailAction:" target="HAc-or-XD8" id="JiQ-Ss-fTO"/>
+                                    </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
                                     <rect key="frame" x="-2" y="157" width="94" height="16"/>

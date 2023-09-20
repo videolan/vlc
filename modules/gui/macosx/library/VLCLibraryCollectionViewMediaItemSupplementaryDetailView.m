@@ -35,6 +35,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "views/VLCImageView.h"
 
@@ -106,6 +107,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     if (@available(macOS 10.14, *)) {
         self.mediaItemDetailButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
+    self.mediaItemDetailButton.action = @selector(detailAction:);
 
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedMediaItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaItemArtworkImageView.image = thumbnail;
@@ -128,6 +130,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 
     [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:NO];
+}
+
+- (IBAction)detailAction:(id)sender
+{
+    if (!self.representedMediaItem.actionableDetail) {
+        return;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = self.representedMediaItem.actionableDetailLibraryItem;
+    [libraryWindow presentLibraryItem:libraryItem];
 }
 
 @end
