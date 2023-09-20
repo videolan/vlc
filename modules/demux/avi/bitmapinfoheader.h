@@ -215,7 +215,6 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                     fmt->video.i_rmask = rmask;
                     fmt->video.i_gmask = gmask;
                     fmt->video.i_bmask = bmask;
-                    video_format_FixRgb( &fmt->video );
                 }
                 else
                 {
