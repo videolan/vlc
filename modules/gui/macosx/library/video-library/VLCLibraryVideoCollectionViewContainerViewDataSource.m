@@ -306,4 +306,18 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return self.collectionArray[indexPath.item];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return nil;
+    }
+
+    const NSUInteger libraryItemIndex = [self indexOfMediaItemInCollection:libraryItem.libraryID];
+    if (libraryItemIndex == NSNotFound) {
+        return nil;
+    }
+
+    return [NSIndexPath indexPathForItem:libraryItemIndex inSection:0];
+}
+
 @end
