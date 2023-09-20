@@ -819,4 +819,14 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return self.displayedCollection[indexPathItem];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    const NSInteger libraryItemRow = [self rowForLibraryItem:libraryItem];
+    if (libraryItemRow == NSNotFound) {
+        return nil;
+    }
+
+    return [NSIndexPath indexPathForItem:libraryItemRow inSection:0];
+}
+
 @end
