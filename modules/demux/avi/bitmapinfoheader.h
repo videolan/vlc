@@ -110,6 +110,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
     if( p_bih->biCompression == BI_RGB ||
         p_bih->biCompression == BI_BITFIELDS )
     {
+        uint32_t biCompression = p_bih->biCompression;
         switch( p_bih->biBitCount )
         {
             case 32:
@@ -173,10 +174,8 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
             }
             else
             {
-                if (p_bih->biBitCount == 32)
-                    fmt->i_codec = VLC_CODEC_BGRX;
-                else
-                    SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+                // bogus mask size, assume BI_RGB positions
+                biCompression = BI_RGB;
             }
         }
         else if( fmt->i_codec == VLC_CODEC_RGBP )
@@ -194,7 +193,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 }
             }
         }
-        else
+        if (biCompression == BI_RGB)
         {
             if (p_bih->biBitCount == 32)
                 fmt->i_codec = VLC_CODEC_BGRX;
