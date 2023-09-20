@@ -89,4 +89,21 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
     return self.tracks[row];
 }
 
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return -1;
+    }
+
+    NSArray<id<VLCMediaLibraryItemProtocol>> *libraryItems = self.tracks;
+    for (NSUInteger i = 0; i < libraryItems.count; ++i) {
+        const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
+        if (collectionItem.libraryID == libraryItem.libraryID) {
+            return i;
+        }
+    }
+
+    return NSNotFound;
+}
+
 @end
