@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistSortingMenuController;
 @class VLCCustomEmptyLibraryBrowseButton;
 
+@protocol VLCMediaLibraryItemProtocol;
+
 typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
     VLCLibraryVideoSegment = 0,
     VLCLibraryMusicSegment,
@@ -149,6 +151,8 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)hideControlsBar;
 - (void)showControlsBar;
 - (void)updateGridVsListViewModeSegmentedControl;
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;

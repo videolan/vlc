@@ -620,6 +620,36 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.libraryAudioViewController presentLibraryItem:libraryItem];
 }
 
+- (void)presentVideoLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    [self showVideoLibrary];
+    [self.libraryVideoViewController presentLibraryItem:libraryItem];
+}
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    const BOOL isAudioGroup = [libraryItem isKindOfClass:VLCMediaLibraryAlbum.class] ||
+                              [libraryItem isKindOfClass:VLCMediaLibraryArtist.class] ||
+                              [libraryItem isKindOfClass:VLCMediaLibraryGenre.class];
+
+    if (isAudioGroup) {
+        [self presentAudioLibraryItem:libraryItem];
+        return;
+    }
+
+    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)libraryItem;
+    const BOOL validMediaItem = mediaItem != nil;
+    if (validMediaItem && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO) {
+        [self presentAudioLibraryItem:libraryItem];
+        return;
+    } else if (validMediaItem && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
+        [self presentVideoLibraryItem:libraryItem];
+        return;
+    }
+
+    NSLog(@"Unknown kind of library item provided, cannot present library view for it: %@", libraryItem.displayString);
+}
+
 - (IBAction)playlistDoubleClickAction:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
