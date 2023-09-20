@@ -27,6 +27,7 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
@@ -51,6 +52,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 @interface VLCLibraryAudioViewController()
 {
+    id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
+
     NSArray<NSString *> *_placeholderImageNames;
     NSArray<NSString *> *_placeholderLabelStrings;
 
@@ -465,6 +468,53 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [collectionView selectItemsAtIndexPaths:indexPathSet
                                  scrollPosition:NSCollectionViewScrollPositionTop];
         [expandableFlowLayout expandDetailSectionAtIndex:indexPathForLibraryItem];
+    }
+}
+
+- (void)presentLibraryItemWaitForDataSourceFinished:(NSNotification *)aNotification
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
+                                                object:self.audioDataSource];
+
+    const VLCLibraryViewModeSegment viewModeSegment = [self viewModeSegmentForCurrentLibrarySegment];
+    if (viewModeSegment == VLCLibraryListViewModeSegment) {
+        [self presentLibraryItemInTableView:_awaitingPresentingLibraryItem];
+    } else if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        [self presentLibraryItemInCollectionView:_awaitingPresentingLibraryItem];
+    }
+
+    _awaitingPresentingLibraryItem = nil;
+}
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    _awaitingPresentingLibraryItem = libraryItem;
+
+    // If the library item is a media item, we need to select the corresponding segment
+    // in the segmented control. We then need to update the presented view.
+    if ([libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
+        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryAlbumsSegment];
+    } else if ([libraryItem isKindOfClass:VLCMediaLibraryArtist.class]) {
+        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryArtistsSegment];
+    } else if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class]) {
+        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryGenresSegment];
+    } else {
+        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibrarySongsSegment];
+    }
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(presentLibraryItemWaitForDataSourceFinished:)
+                                               name:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
+                                             object:self.audioDataSource];
+
+    [self updatePresentedView];
+    if (!self.audioDataSource.displayedCollectionUpdating) {
+        [self presentLibraryItemWaitForDataSourceFinished:nil];
     }
 }
 

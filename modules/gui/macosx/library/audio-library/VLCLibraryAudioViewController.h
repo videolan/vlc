@@ -26,6 +26,8 @@
 @class VLCLibraryAudioGroupDataSource;
 @class VLCLibraryWindow;
 
+@protocol VLCMediaLibraryItemProtocol;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAudioViewController : NSObject
@@ -63,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)segmentedControlAction:(id)sender;
 - (void)presentAudioView;
 - (void)reloadData;
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 
