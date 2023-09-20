@@ -80,10 +80,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fillEqually" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
-                            <rect key="frame" x="200" y="0.0" width="877" height="225"/>
+                            <rect key="frame" x="200" y="115" width="877" height="110"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
-                                    <rect key="frame" x="-2" y="199" width="167" height="26"/>
+                                    <rect key="frame" x="-2" y="84" width="167" height="26"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Media item name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -91,7 +91,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
-                                    <rect key="frame" x="0.0" y="178" width="146" height="16"/>
+                                    <rect key="frame" x="0.0" y="63" width="146" height="16"/>
                                     <buttonCell key="cell" type="bevel" title="Media item detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="zkC-9p-xFn">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -102,7 +102,7 @@
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
-                                    <rect key="frame" x="-2" y="157" width="94" height="16"/>
+                                    <rect key="frame" x="-2" y="42" width="94" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -110,10 +110,10 @@
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fiJ-9f-ecF">
-                                    <rect key="frame" x="0.0" y="21" width="106" height="131"/>
+                                    <rect key="frame" x="0.0" y="21" width="106" height="16"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="NZk-WW-Uay">
-                                            <rect key="frame" x="-2" y="115" width="72" height="16"/>
+                                            <rect key="frame" x="-2" y="0.0" width="72" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="File Name:" id="CyQ-Ao-mup">
                                                 <font key="font" metaFont="systemBold"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -121,7 +121,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
-                                            <rect key="frame" x="71" y="115" width="37" height="16"/>
+                                            <rect key="frame" x="71" y="0.0" width="37" height="16"/>
                                             <textFieldCell key="cell" title="Label" id="Pzf-s3-rHC">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -190,7 +190,7 @@
                     <constraints>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="top" secondItem="FWp-yd-2Pm" secondAttribute="top" id="7hM-jR-3N3"/>
                         <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="10" id="bdR-rj-nKk"/>
-                        <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" id="elF-5e-5LQ"/>
+                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="bw7-QB-Ssc" secondAttribute="bottom" id="elF-5e-5LQ"/>
                         <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" id="uvg-NE-l4m"/>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="leading" secondItem="FWp-yd-2Pm" secondAttribute="leading" id="vAN-Ww-VKA"/>
                         <constraint firstItem="bw7-QB-Ssc" firstAttribute="top" secondItem="FWp-yd-2Pm" secondAttribute="top" id="xYi-0p-Tii"/>
