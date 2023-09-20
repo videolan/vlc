@@ -441,6 +441,25 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [targetMainTableView selectRowIndexes:indexSet byExtendingSelection:NO];
     }
 }
+
+- (void)presentLibraryItemInCollectionView:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    NSIndexPath * const indexPathForLibraryItem = [self.audioDataSource indexPathForLibraryItem:libraryItem];
+    if (indexPathForLibraryItem) {
+        NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPathForLibraryItem];
+        NSCollectionView * const collectionView = self.audioLibraryCollectionView;
+        VLCLibraryCollectionViewFlowLayout * const expandableFlowLayout = (VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout;
+
+        [collectionView selectItemsAtIndexPaths:indexPathSet
+                                 scrollPosition:NSCollectionViewScrollPositionTop];
+        [expandableFlowLayout expandDetailSectionAtIndex:indexPathForLibraryItem];
+    }
+}
+
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
     NSParameterAssert(aNotification);
