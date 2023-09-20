@@ -94,7 +94,7 @@ struct bitmapinfoheader_properties
     unsigned i_stride;
 };
 
-static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_bih,
+static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size_t i_bih,
                                          es_format_t *fmt,
                                          struct bitmapinfoheader_properties *p_props )
 {
