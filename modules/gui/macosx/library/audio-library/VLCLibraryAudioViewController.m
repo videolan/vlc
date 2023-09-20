@@ -448,6 +448,14 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
+    // If we are handling a library item that is shown in one of the split view modes,
+    // with a table view on the left and the collection view on the right, defer back
+    // to presentLibraryItemInTabelView
+    if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class] ||
+        [libraryItem isKindOfClass:VLCMediaLibraryArtist.class]) {
+        [self presentLibraryItemInTableView:libraryItem];
+    }
+
     NSIndexPath * const indexPathForLibraryItem = [self.audioDataSource indexPathForLibraryItem:libraryItem];
     if (indexPathForLibraryItem) {
         NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPathForLibraryItem];
