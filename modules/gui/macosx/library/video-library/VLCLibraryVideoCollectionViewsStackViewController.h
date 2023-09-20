@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryHeroView;
+@protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryVideoCollectionViewsStackViewController : NSObject
 
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryHeroView *heroView;
 
 - (void)reloadData;
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 

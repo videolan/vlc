@@ -298,4 +298,18 @@
     return [_collectionViewContainers objectAtIndex:index];
 }
 
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    VLCLibraryVideoCollectionViewContainerView * const containerView = [self containerViewForGroup:VLCLibraryVideoLibraryGroup];
+    if (containerView == nil) {
+        return;
+    }
+
+    [containerView presentLibraryItem:libraryItem];
+}
+
 @end
