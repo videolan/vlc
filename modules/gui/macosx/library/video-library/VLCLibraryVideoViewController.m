@@ -35,6 +35,7 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 
@@ -47,6 +48,8 @@
 {
     VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
+
+    id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 }
 @end
 
@@ -244,6 +247,58 @@
         _libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
+    }
+}
+
+- (void)presentLibraryItemWaitForCollectionViewDataSourceFinished:(NSNotification *)notification
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                object:self.libraryVideoTableViewDataSource];
+
+    [self.libraryVideoCollectionViewsStackViewController presentLibraryItem:_awaitingPresentingLibraryItem];
+    _awaitingPresentingLibraryItem = nil;
+}
+
+- (void)presentLibraryItemWaitForTableViewDataSourceFinished:(NSNotification *)notification
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                             object:self.libraryVideoTableViewDataSource];
+
+    const NSInteger rowForLibraryItem = [self.libraryVideoTableViewDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
+    if (rowForLibraryItem != NSNotFound) {
+        NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
+        [self.videoLibraryGroupsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+    }
+
+    _awaitingPresentingLibraryItem = nil;
+}
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    _awaitingPresentingLibraryItem = libraryItem;
+
+     const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
+
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
+                                               name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                             object:self.libraryVideoTableViewDataSource];
+
+    } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
+                                               name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                             object:self.libraryVideoTableViewDataSource];
+
+    } else {
+        NSAssert(false, @"View mode must be grid or list mode");
     }
 }
 

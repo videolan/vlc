@@ -26,6 +26,8 @@
 @class VLCLibraryVideoTableViewDataSource;
 @class VLCLibraryVideoCollectionViewsStackViewController;
 
+@protocol VLCMediaLibraryItemProtocol;
+
 NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the video library views
@@ -54,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;
-
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 
