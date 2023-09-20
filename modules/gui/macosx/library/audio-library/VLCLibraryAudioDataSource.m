@@ -630,16 +630,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return NSNotFound;
     }
 
-    NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = self.displayedCollection;
-
-    for (NSUInteger i = 0; i < libraryItems.count; ++i) {
-        const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
-        if (collectionItem.libraryID == libraryItem.libraryID) {
-            return i;
-        }
-    }
-
-    return NSNotFound;
+    return [self indexForMediaLibraryItemWithId:libraryItem.libraryID];
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
