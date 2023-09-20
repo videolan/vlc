@@ -38,6 +38,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
+NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification";
+
 @interface VLCLibraryVideoTableViewDataSource ()
 {
     NSArray *_recentsArray;
@@ -193,6 +195,9 @@
     self->_recentsArray = [self.libraryModel listOfRecentMedia];
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
     [self->_groupSelectionTableView reloadData];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                                      object:self
+                                                    userInfo:nil];
 }
 
 - (void)changeDataForSpecificMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
@@ -231,6 +236,9 @@
 
     NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:mediaItemIndex];
     completionHandler(rowIndexSet);
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                                      object:self
+                                                    userInfo:nil];
 }
 
 - (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem

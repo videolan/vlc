@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoTableViewDataSource : NSObject <VLCLibraryTableViewDataSource>
 
+extern NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification;
+
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSTableView *groupsTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
