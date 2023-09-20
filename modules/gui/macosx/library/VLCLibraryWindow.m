@@ -614,6 +614,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
+- (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    [self showAudioLibrary];
+    [self.libraryAudioViewController presentLibraryItem:libraryItem];
+}
+
 - (IBAction)playlistDoubleClickAction:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
