@@ -269,17 +269,12 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 case 24: bi_rgb_chroma = VLC_CODEC_BGR24; break;
                 case 16: bi_rgb_chroma = VLC_CODEC_BGR565LE; break;
                 case 15: bi_rgb_chroma = VLC_CODEC_BGR555LE; break;
-                default: bi_rgb_chroma = 0; break;
+                default: return VLC_EINVAL;
             }
-            if (bi_rgb_chroma != 0)
-            {
-                fmt->video.i_chroma = fmt->i_codec = bi_rgb_chroma;
-                fmt->video.i_rmask = 0;
-                fmt->video.i_gmask = 0;
-                fmt->video.i_bmask = 0;
-            }
-            else
-                SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
+            fmt->video.i_chroma = fmt->i_codec = bi_rgb_chroma;
+            fmt->video.i_rmask = 0;
+            fmt->video.i_gmask = 0;
+            fmt->video.i_bmask = 0;
         }
 
         p_props->i_stride = p_bih->biWidth * (p_bih->biBitCount >> 3);
