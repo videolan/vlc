@@ -285,4 +285,17 @@
     }
 }
 
+- (VLCLibraryVideoCollectionViewContainerView *)containerViewForGroup:(VLCLibraryVideoGroup)group
+{
+    const NSUInteger index = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
+        return container.videoGroup == group;
+    }];
+
+    if (index == NSNotFound) {
+        return nil;
+    }
+
+    return [_collectionViewContainers objectAtIndex:index];
+}
+
 @end
