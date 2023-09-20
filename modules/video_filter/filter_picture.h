@@ -143,6 +143,18 @@ static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_ind
             *i_g_index = 2;
             *i_r_index = 3;
             break;
+        case VLC_CODEC_RGB24:
+            *i_r_index = 0;
+            *i_g_index = 1;
+            *i_b_index = 2;
+            *i_a_index = -1;
+            break;
+        case VLC_CODEC_BGR24:
+            *i_b_index = 0;
+            *i_g_index = 1;
+            *i_r_index = 2;
+            *i_a_index = -1;
+            break;
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGB24M:
 #ifdef WORDS_BIGENDIAN
