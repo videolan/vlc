@@ -344,7 +344,7 @@
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
 /* 8-bit RGB (using explicit masks) */
-#define VLC_CODEC_RGB8            VLC_FOURCC('R','G','B','8')
+#define VLC_CODEC_RGB8            VLC_FOURCC('R','_','B','8')
 /* 15-bit RGB padded to 16 bits (using explicit masks) */
 #define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
 /* 16-bit RGB (using explicit masks) */
@@ -366,7 +366,7 @@
 /* 8-bit RGB "R3G3B2" */
 #define VLC_CODEC_RGB332           VLC_FOURCC('R','3','3','2')
 /* 8-bit RGB "R2G3B3" */
-#define VLC_CODEC_RGB233           VLC_FOURCC('R','2','3','3')
+#define VLC_CODEC_RGB233           VLC_FOURCC('R','G','B','8')
 /* 8-bit BGR "B2G3R3" */
 #define VLC_CODEC_BGR233           VLC_FOURCC('B','2','3','3')
 
