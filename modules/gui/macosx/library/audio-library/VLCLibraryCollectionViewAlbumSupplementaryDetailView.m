@@ -115,6 +115,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumDetailsTextButton.title = _representedAlbum.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
 
+    const BOOL actionableDetail = self.representedAlbum.actionableDetail;
+    self.albumDetailsTextButton.enabled = actionableDetail;
+    if (@available(macOS 10.14, *)) {
+        self.albumDetailsTextButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+    }
+
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {
         self->_albumArtworkImageView.image = thumbnail;
     }];
