@@ -1,0 +1,31 @@
+From a8bcf31c3503815cd62449feacb188f00f0396b9 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 21 Sep 2023 13:10:53 +0200
+Subject: [PATCH] Put the build include include before the CMake/Platform flags
+
+If the CMake flags have some include directory with an old
+pnglibconf.h it will use that one instead of ours
+---
+ scripts/genout.cmake.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/genout.cmake.in b/scripts/genout.cmake.in
+index ec685d900..f6d478723 100644
+--- a/scripts/genout.cmake.in
++++ b/scripts/genout.cmake.in
+@@ -59,11 +59,11 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
+   endif()
+ 
+   execute_process(COMMAND "${CMAKE_C_COMPILER}" "-E"
++                          ${INCLUDES}
+                           ${CMAKE_C_FLAGS}
+                           ${PLATFORM_C_FLAGS}
+                           "-I${SRCDIR}"
+                           "-I${BINDIR}"
+-                          ${INCLUDES}
+                           "-DPNGLIB_LIBNAME=PNG${PNGLIB_MAJOR}${PNGLIB_MINOR}_0"
+                           "-DPNGLIB_VERSION=${PNGLIB_VERSION}"
+                           "-DSYMBOL_PREFIX=${SYMBOL_PREFIX}"
+-- 
+2.38.1.windows.1
+
