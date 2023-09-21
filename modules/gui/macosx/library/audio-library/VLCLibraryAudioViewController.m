@@ -170,7 +170,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupAudioTableViews
 {
     _audioLibrarySplitView.delegate = _splitViewDelegate;
-    
+
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
 
@@ -442,6 +442,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     if (rowForLibraryItem != NSNotFound) {
         NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
         [targetMainTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+        [targetMainTableView scrollRowToVisible:rowForLibraryItem];
     }
 }
 

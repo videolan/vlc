@@ -270,6 +270,7 @@
     if (rowForLibraryItem != NSNotFound) {
         NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
         [self.videoLibraryGroupsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+        [self.videoLibraryGroupsTableView scrollRowToVisible:rowForLibraryItem];
     }
 
     _awaitingPresentingLibraryItem = nil;
