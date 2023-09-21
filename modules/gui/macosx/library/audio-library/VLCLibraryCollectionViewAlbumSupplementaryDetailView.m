@@ -64,11 +64,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTracksTableView.dataSource = _tracksDataSource;
     _albumTracksTableView.delegate = _tracksTableViewDelegate;
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
-    
-    _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    _albumDetailsTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
 
-    _albumDetailsTextField.textColor = NSColor.VLCAccentColor;
+    _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
+    _albumDetailsTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+
+    if (@available(macOS 10.14, *)) {
+        _albumDetailsTextButton.contentTintColor = NSColor.VLCAccentColor;
+    }
 
     if(@available(macOS 10.12.2, *)) {
         _playAlbumButton.bezelColor = NSColor.VLCAccentColor;
@@ -110,7 +112,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     }
 
     _albumTitleTextField.stringValue = _representedAlbum.displayString;
-    _albumDetailsTextField.stringValue = _representedAlbum.artistName;
+    _albumDetailsTextButton.title = _representedAlbum.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
 
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {

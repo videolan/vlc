@@ -36,7 +36,7 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAl
 
 @property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
 @property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
-@property (readwrite, weak) IBOutlet NSTextField *albumDetailsTextField;
+@property (readwrite, weak) IBOutlet NSButton *albumDetailsTextButton;
 @property (readwrite, weak) IBOutlet NSTextField *albumYearAndDurationTextField;
 @property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
 @property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;

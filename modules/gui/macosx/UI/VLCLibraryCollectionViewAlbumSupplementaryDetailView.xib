@@ -82,7 +82,7 @@
                             <rect key="frame" x="257" y="0.0" width="794" height="282"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
-                                    <rect key="frame" x="-2" y="224" width="124" height="58"/>
+                                    <rect key="frame" x="-2" y="256" width="124" height="26"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -90,18 +90,18 @@
                                     </textFieldCell>
                                 </textField>
                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="SvO-zd-2zo">
-                                    <rect key="frame" x="0.0" y="203" width="794" height="16"/>
+                                    <rect key="frame" x="0.0" y="203" width="794" height="50"/>
                                     <subviews>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="HnP-Fk-juB">
-                                            <rect key="frame" x="-2" y="0.0" width="87" height="16"/>
-                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album details" id="Nwk-76-Wx9">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
+                                        <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-0s-xRU">
+                                            <rect key="frame" x="4" y="0.0" width="154" height="50"/>
+                                            <buttonCell key="cell" type="bevel" title="Album detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="SqJ-99-uiI">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="systemSemibold" size="17"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="VLCAccentColor"/>
+                                        </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
-                                            <rect key="frame" x="687" y="0.0" width="94" height="16"/>
+                                            <rect key="frame" x="687" y="17" width="94" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -110,14 +110,12 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="top" relation="greaterThanOrEqual" secondItem="SvO-zd-2zo" secondAttribute="top" id="Fdn-jn-Iaj"/>
-                                        <constraint firstAttribute="bottom" secondItem="HnP-Fk-juB" secondAttribute="bottom" id="ImH-Vf-Khl"/>
-                                        <constraint firstItem="HnP-Fk-juB" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="OUS-PH-e6K"/>
-                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="HnP-Fk-juB" secondAttribute="centerY" id="Som-Jr-qAy"/>
-                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="bottom" id="UDs-9f-Og5"/>
-                                        <constraint firstItem="HnP-Fk-juB" firstAttribute="leading" secondItem="SvO-zd-2zo" secondAttribute="leading" id="Uuo-gf-FxL"/>
+                                        <constraint firstItem="o9Q-0s-xRU" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="QuO-Ev-i98"/>
+                                        <constraint firstItem="o9Q-0s-xRU" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" id="R8I-I6-uGg"/>
+                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="SvO-zd-2zo" secondAttribute="centerY" id="TX6-cF-dnh"/>
                                         <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="15" id="Wfo-47-OGd"/>
-                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="HnP-Fk-juB" secondAttribute="trailing" constant="5" id="aD2-Ry-CuA"/>
+                                        <constraint firstAttribute="bottom" secondItem="o9Q-0s-xRU" secondAttribute="bottom" id="lvh-r5-QzT"/>
+                                        <constraint firstItem="o9Q-0s-xRU" firstAttribute="leading" secondItem="SvO-zd-2zo" secondAttribute="leading" id="nYc-fo-IyN"/>
                                     </constraints>
                                 </customView>
                                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="52" horizontalPageScroll="10" verticalLineScroll="52" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9" customClass="VLCSubScrollView">
@@ -172,6 +170,7 @@
                             <constraints>
                                 <constraint firstItem="SvO-zd-2zo" firstAttribute="leading" secondItem="nCe-dY-YMM" secondAttribute="leading" id="gSC-OW-Sld"/>
                                 <constraint firstAttribute="trailing" secondItem="SvO-zd-2zo" secondAttribute="trailing" id="hZf-vs-RlK"/>
+                                <constraint firstItem="nCe-dY-YMM" firstAttribute="bottom" secondItem="SvO-zd-2zo" secondAttribute="top" constant="5" id="yCI-UB-mPR"/>
                             </constraints>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -211,7 +210,7 @@
             </constraints>
             <connections>
                 <outlet property="albumArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
-                <outlet property="albumDetailsTextField" destination="HnP-Fk-juB" id="Hm3-l8-a9s"/>
+                <outlet property="albumDetailsTextButton" destination="o9Q-0s-xRU" id="vQv-Q6-HdR"/>
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="albumYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
@@ -224,7 +223,7 @@
     <resources>
         <image name="no-art" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
-        <image name="plus" catalog="system" width="15" height="13"/>
+        <image name="plus" catalog="system" width="14" height="13"/>
         <namedColor name="VLCAccentColor">
             <color red="1" green="0.37999999523162842" blue="0.039999999105930328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
