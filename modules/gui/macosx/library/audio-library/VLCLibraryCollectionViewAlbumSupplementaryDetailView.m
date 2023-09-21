@@ -45,7 +45,7 @@
 NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
 
-@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView () 
+@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView ()
 {
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
@@ -55,12 +55,6 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 @end
 
 @implementation VLCLibraryCollectionViewAlbumSupplementaryDetailView
-
-@synthesize representedAlbum = _representedAlbum;
-@synthesize albumTitleTextField = _albumTitleTextField;
-@synthesize albumDetailsTextField = _albumDetailsTextField;
-@synthesize albumArtworkImageView = _albumArtworkImageView;
-@synthesize albumTracksTableView = _albumTracksTableView;
 
 - (void)awakeFromNib
 {
