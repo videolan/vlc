@@ -195,6 +195,10 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     self.yearTextField.hidden = NO;
     self.playInstantlyButton.hidden = YES;
 
+    if (@available(macOS 10.14, *)) {
+        self.artistNameTextButton.contentTintColor = NSColor.VLCAccentColor;
+    }
+
     _tracksDataSource.representedAlbum = nil;
     [_tracksTableView reloadData];
 }
@@ -260,6 +264,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.summaryTextField.stringValue = _representedAlbum.summary;
     } else {
         self.summaryTextField.stringValue = _representedAlbum.durationString;
+    }
+
+    const BOOL actionableDetail = self.representedAlbum.actionableDetail;
+    self.artistNameTextButton.enabled = actionableDetail;
+    if (@available(macOS 10.14, *)) {
+        self.artistNameTextButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {
