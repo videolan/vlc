@@ -81,19 +81,21 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
                             <rect key="frame" x="257" y="0.0" width="794" height="282"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="nCe-dY-YMM">
                                     <rect key="frame" x="-2" y="256" width="124" height="26"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="SvO-zd-2zo">
-                                    <rect key="frame" x="0.0" y="203" width="794" height="50"/>
+                                <customView id="SvO-zd-2zo">
+                                    <rect key="frame" x="0.0" y="203" width="794" height="48"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-0s-xRU">
-                                            <rect key="frame" x="4" y="0.0" width="154" height="50"/>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-0s-xRU">
+                                            <rect key="frame" x="0.0" y="0.0" width="154" height="48"/>
                                             <buttonCell key="cell" type="bevel" title="Album detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="SqJ-99-uiI">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="systemSemibold" size="17"/>
@@ -101,7 +103,7 @@
                                             <color key="contentTintColor" name="VLCAccentColor"/>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
-                                            <rect key="frame" x="687" y="17" width="94" height="16"/>
+                                            <rect key="frame" x="687" y="16" width="94" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -168,9 +170,7 @@
                                 </scrollView>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="SvO-zd-2zo" firstAttribute="leading" secondItem="nCe-dY-YMM" secondAttribute="leading" id="gSC-OW-Sld"/>
                                 <constraint firstAttribute="trailing" secondItem="SvO-zd-2zo" secondAttribute="trailing" id="hZf-vs-RlK"/>
-                                <constraint firstItem="nCe-dY-YMM" firstAttribute="bottom" secondItem="SvO-zd-2zo" secondAttribute="top" constant="5" id="yCI-UB-mPR"/>
                             </constraints>
                             <visibilityPriorities>
                                 <integer value="1000"/>
