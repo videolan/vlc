@@ -62,6 +62,8 @@ x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(X264CONF)
+	# make dummy dependency file
+	touch $(BUILD_DIR)/.depend
 	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
