@@ -56,6 +56,7 @@ x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/x264/x264-winstore.patch
+	$(APPLY) $(SRC)/x264/0001-osdep-use-direct-path-to-internal-x264.h.patch
 	$(MOVE)
 
 .x264: x264
