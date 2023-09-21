@@ -14,6 +14,7 @@ $(TARBALLS)/libpng-$(PNG_VERSION).tar.xz:
 
 png: libpng-$(PNG_VERSION).tar.xz .sum-png
 	$(UNPACK)
+	$(APPLY) $(SRC)/png/0001-Put-the-build-include-include-before-the-CMake-Platf.patch
 	$(call pkg_static,"libpng.pc.in")
 	$(MOVE)
 
