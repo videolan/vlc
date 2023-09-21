@@ -35,19 +35,19 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U23-gv-Pf6">
-                            <rect key="frame" x="142" y="386" width="86" height="19"/>
-                            <textFieldCell key="cell" lineBreakMode="clipping" title="Artist name" id="3Ae-qv-Wyy">
-                                <font key="font" metaFont="systemMedium" size="15"/>
-                                <color key="textColor" name="VLCAccentColor"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kvo-td-z48">
+                            <rect key="frame" x="144" y="386" width="92" height="19"/>
+                            <buttonCell key="cell" type="bevel" title="Album artist" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="WVL-LH-ZiA">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="systemSemibold" size="15"/>
+                            </buttonCell>
+                            <color key="contentTintColor" name="VLCAccentColor"/>
+                        </button>
                     </subviews>
                     <constraints>
                         <constraint firstItem="lyR-U9-HKd" firstAttribute="top" secondItem="dd9-b1-XEf" secondAttribute="bottom" constant="5" id="36N-Cq-Zjf"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="kvo-td-z48" secondAttribute="trailing" constant="20" id="Wg0-Tn-f2L"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lyR-U9-HKd" secondAttribute="trailing" constant="20" id="dzL-hG-1nc"/>
-                        <constraint firstItem="U23-gv-Pf6" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="cAS-FG-otl" secondAttribute="trailing" constant="-20" id="gAZ-If-sHJ"/>
                     </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
@@ -78,13 +78,14 @@
             </subviews>
             <constraints>
                 <constraint firstItem="dd9-b1-XEf" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="leading" id="5Gn-ze-Gf7"/>
+                <constraint firstItem="kvo-td-z48" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="20" id="7bs-tQ-eAW"/>
                 <constraint firstItem="KVh-Zn-l7I" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="AZI-Eo-9so"/>
+                <constraint firstItem="kvo-td-z48" firstAttribute="top" secondItem="xJW-ps-ycn" secondAttribute="bottom" constant="5" id="BvS-ax-Ct6"/>
                 <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="20" id="IWI-9l-HnJ"/>
                 <constraint firstItem="lyR-U9-HKd" firstAttribute="trailing" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" id="MCe-hU-gES"/>
                 <constraint firstItem="KVh-Zn-l7I" firstAttribute="centerX" secondItem="Ydb-7n-5Cd" secondAttribute="centerX" id="Mnq-he-JXh"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xJW-ps-ycn" secondAttribute="trailing" constant="20" id="NhG-8C-EDX"/>
                 <constraint firstItem="cAS-FG-otl" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="O89-IU-nIf"/>
-                <constraint firstItem="U23-gv-Pf6" firstAttribute="top" secondItem="xJW-ps-ycn" secondAttribute="bottom" constant="5" id="a6g-MU-jOX"/>
                 <constraint firstItem="xJW-ps-ycn" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="20" id="dai-Pj-DEx"/>
                 <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="20" id="gVW-Rd-TA5"/>
                 <constraint firstAttribute="bottom" secondItem="cAS-FG-otl" secondAttribute="bottom" id="hr4-VR-MQ0"/>
@@ -93,12 +94,11 @@
                 <constraint firstItem="dd9-b1-XEf" firstAttribute="trailing" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" id="sFl-F3-GQN"/>
                 <constraint firstAttribute="trailing" secondItem="cAS-FG-otl" secondAttribute="trailing" id="w5r-Yv-oeN"/>
                 <constraint firstItem="xJW-ps-ycn" firstAttribute="top" secondItem="Ydb-7n-5Cd" secondAttribute="top" id="xQf-rb-J0b"/>
-                <constraint firstItem="U23-gv-Pf6" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="20" id="xp8-bi-OAa"/>
                 <constraint firstItem="cAS-FG-otl" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="zdo-e5-cek"/>
             </constraints>
             <connections>
                 <outlet property="albumNameTextField" destination="xJW-ps-ycn" id="nX9-SH-RZA"/>
-                <outlet property="artistNameTextField" destination="U23-gv-Pf6" id="n1x-05-ZAR"/>
+                <outlet property="artistNameTextButton" destination="kvo-td-z48" id="U94-du-RqP"/>
                 <outlet property="playInstantlyButton" destination="KVh-Zn-l7I" id="Ri1-YF-Fe2"/>
                 <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>
                 <outlet property="summaryTextField" destination="dd9-b1-XEf" id="ne9-oA-zPw"/>

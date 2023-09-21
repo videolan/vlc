@@ -80,13 +80,13 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }
 
     const CGFloat artworkAndSecondaryLabelsHeight = VLCLibraryUIUnits.largeSpacing +
-                                                    _representedImageView.frame.size.height + 
+                                                    _representedImageView.frame.size.height +
                                                     VLCLibraryUIUnits.mediumSpacing +
-                                                    _summaryTextField.frame.size.height + 
+                                                    _summaryTextField.frame.size.height +
                                                     VLCLibraryUIUnits.smallSpacing +
-                                                    _yearTextField.frame.size.height + 
+                                                    _yearTextField.frame.size.height +
                                                     VLCLibraryUIUnits.largeSpacing;
-    
+
     if(_tracksTableView == nil) {
         return artworkAndSecondaryLabelsHeight;
     }
@@ -94,7 +94,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     const CGFloat titleAndTableViewHeight = VLCLibraryUIUnits.largeSpacing +
                                             _albumNameTextField.frame.size.height +
                                             VLCLibraryUIUnits.smallSpacing +
-                                            _artistNameTextField.frame.size.height + 
+                                            _artistNameTextButton.frame.size.height +
                                             VLCLibraryUIUnits.smallSpacing +
                                             [self expectedTableViewHeight] +
                                             VLCLibraryUIUnits.largeSpacing;
@@ -122,9 +122,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 {
     [self setupTracksTableView];
     self.albumNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    self.artistNameTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.artistNameTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
     self.trackingView.viewToHide = self.playInstantlyButton;
-    self.artistNameTextField.textColor = NSColor.VLCAccentColor;
+
+    if (@available(macOS 10.14, *)) {
+        self.artistNameTextButton.contentTintColor = NSColor.VLCAccentColor;
+    }
 
     [self prepareForReuse];
 
@@ -164,12 +167,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
                                              VLCLibraryUIUnits.largeSpacing,
                                              VLCLibraryUIUnits.largeSpacing,
                                              VLCLibraryUIUnits.largeSpacing];
-    NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextField]-%f-[_tracksTableView]->=%f-|",
+    NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextButton]-%f-[_tracksTableView]->=%f-|",
                                           VLCLibraryUIUnits.largeSpacing,
                                           VLCLibraryUIUnits.smallSpacing,
                                           VLCLibraryUIUnits.mediumSpacing,
                                           VLCLibraryUIUnits.largeSpacing];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextField);
+    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextButton);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
 
@@ -186,7 +189,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     self.representedImageView.image = nil;
     self.albumNameTextField.stringValue = @"";
-    self.artistNameTextField.stringValue = @"";
+    self.artistNameTextButton.title = @"";
     self.yearTextField.stringValue = @"";
     self.summaryTextField.stringValue = @"";
     self.yearTextField.hidden = NO;
@@ -245,8 +248,8 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 {
     _representedAlbum = representedAlbum;
     self.albumNameTextField.stringValue = _representedAlbum.title;
-    self.artistNameTextField.stringValue = _representedAlbum.artistName;
-    
+    self.artistNameTextButton.title = _representedAlbum.artistName;
+
     if (_representedAlbum.year > 0) {
         self.yearTextField.intValue = _representedAlbum.year;
     } else {
