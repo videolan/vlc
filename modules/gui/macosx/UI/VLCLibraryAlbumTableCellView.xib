@@ -42,6 +42,9 @@
                                 <font key="font" metaFont="systemSemibold" size="15"/>
                             </buttonCell>
                             <color key="contentTintColor" name="VLCAccentColor"/>
+                            <connections>
+                                <action selector="detailAction:" target="c22-O7-iKe" id="Onc-S8-WGY"/>
+                            </connections>
                         </button>
                     </subviews>
                     <constraints>

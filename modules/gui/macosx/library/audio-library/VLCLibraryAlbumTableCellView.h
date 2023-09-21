@@ -51,6 +51,7 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 @property (readwrite, assign, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
 
 - (IBAction)playInstantly:(id)sender;
+- (IBAction)detailAction:(id)sender;
 
 @end
 

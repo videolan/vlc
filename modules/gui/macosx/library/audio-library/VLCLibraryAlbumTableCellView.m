@@ -39,6 +39,7 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
@@ -123,6 +124,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     [self setupTracksTableView];
     self.albumNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.artistNameTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.artistNameTextButton.action = @selector(detailAction:);
     self.trackingView.viewToHide = self.playInstantlyButton;
 
     if (@available(macOS 10.14, *)) {
@@ -246,6 +248,17 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
             playImmediately = NO;
         }
     }
+}
+
+- (void)detailAction:(id)sender
+{
+    if (!self.representedAlbum.actionableDetail) {
+        return;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = self.representedAlbum.actionableDetailLibraryItem;
+    [libraryWindow presentLibraryItem:libraryItem];
 }
 
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
