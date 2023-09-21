@@ -1,0 +1,26 @@
+From 2597083bc24f3d3172ecc4fc336face1fcc0c4e2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 21 Sep 2023 11:44:40 +0200
+Subject: [PATCH] osdep: use direct path to internal x264.h
+
+This fixes issues when a previous x264.h is found in the include path.
+---
+ common/osdep.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/osdep.h b/common/osdep.h
+index dfa4aaec..f3cd5822 100644
+--- a/common/osdep.h
++++ b/common/osdep.h
+@@ -49,7 +49,7 @@
+ #include <io.h>
+ #endif
+ 
+-#include "x264.h"
++#include "../x264.h"
+ 
+ #if !HAVE_LOG2F
+ #define log2f(x) (logf(x)/0.693147180559945f)
+-- 
+2.38.1.windows.1
+
