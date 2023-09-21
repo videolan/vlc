@@ -89,6 +89,9 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
     hpux*)
       LIBEXT=".sl"
       ;;
+    emscripten*)
+      LIBEXT=".wasm"
+      ;;
     *)
       LIBEXT=".so"
       ;;
