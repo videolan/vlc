@@ -33,6 +33,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
@@ -67,6 +68,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 
     _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     _albumDetailsTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+
+    _albumDetailsTextButton.action = @selector(detailAction:);
 
     if (@available(macOS 10.14, *)) {
         _albumDetailsTextButton.contentTintColor = NSColor.VLCAccentColor;
@@ -162,6 +165,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
     }];
+}
+
+- (IBAction)detailAction:(id)sender
+{
+    if (!self.representedAlbum.actionableDetail) {
+        return;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = self.representedAlbum.actionableDetailLibraryItem;
+    [libraryWindow presentLibraryItem:libraryItem];
 }
 
 @end

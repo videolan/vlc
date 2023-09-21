@@ -44,6 +44,7 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAl
 
 - (IBAction)playAction:(id)sender;
 - (IBAction)enqueueAction:(id)sender;
+- (IBAction)detailAction:(id)sender;
 
 @end
 
