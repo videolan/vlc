@@ -1427,6 +1427,8 @@ static void ThreadChangeWindowMouse(vout_thread_t *vout,
         case VOUT_WINDOW_MOUSE_DOUBLE_CLICK:
             if (mouse->button_mask == 0)
                 vout_display_SendEventMouseDoubleClick(vd);
+            else
+                vout_display_SendEventMousePressed(vd, mouse->button_mask);
             break;
         default: vlc_assert_unreachable();
             break;
