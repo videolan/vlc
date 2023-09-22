@@ -185,6 +185,11 @@ T.Pane {
                 onVolumeChanged: volControl._syncVolumeWithPlayer()
             }
 
+            Binding on toolTip.visible {
+                when: sliderMouseArea.pressed
+                value: true
+            }
+
             Navigation.leftItem: volumeBtn
             Navigation.parentItem: root
 
