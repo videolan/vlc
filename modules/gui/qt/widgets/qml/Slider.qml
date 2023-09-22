@@ -141,7 +141,7 @@ T.Slider {
 
        pos: Qt.point(control._tooltipX, control.handle.height / 2)
 
-       visible: hoverHandler.hovered || control.visualFocus
+       visible: hoverHandler.hovered || control.visualFocus || control.pressed
 
        text: {
            if (!visible) return ""
