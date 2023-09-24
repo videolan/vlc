@@ -130,8 +130,9 @@
     }
 
     NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = self.representedListOfAlbums;
+    const NSUInteger itemCount = libraryItems.count;
 
-    for (NSUInteger i = 0; i < libraryItems.count; ++i) {
+    for (NSUInteger i = 0; i < itemCount; ++i) {
         const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
         if (collectionItem.libraryID == libraryItem.libraryID) {
             return i;
