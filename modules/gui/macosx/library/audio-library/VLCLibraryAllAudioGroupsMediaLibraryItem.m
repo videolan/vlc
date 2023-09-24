@@ -44,7 +44,9 @@
     _numberOfTracks = libraryModel.numberOfAudioMedia;
     _tracksAsMediaItems = libraryModel.listOfAudioMedia;
 
-    NSString * const detailString = [NSString stringWithFormat:_NS("%li albums, %li songs"), _albums.count, _tracksAsMediaItems.count];
+    const NSUInteger numberOfAlbums = libraryModel.numberOfAlbums;
+
+    NSString * const detailString = [NSString stringWithFormat:_NS("%li albums, %li songs"), numberOfAlbums, _numberOfTracks];
 
     return [super initWithDisplayString:displayString withDetailString:detailString];
 }
