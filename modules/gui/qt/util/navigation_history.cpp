@@ -206,6 +206,8 @@ void NavigationHistory::previous(Qt::FocusReason reason, PostAction postAction)
         emit previousEmptyChanged(true);
 
     if (postAction == PostAction::Go) {
+        updateViewPath();
+
         m_reason = reason;
 
         emit currentChanged( m_history.back() );
