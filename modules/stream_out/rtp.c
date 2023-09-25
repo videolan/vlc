@@ -919,6 +919,7 @@ uint32_t rtp_compute_ts( unsigned i_clock_rate, vlc_tick_t i_pts )
 /** Add an ES as a new RTP stream */
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char * es_id )
 {
+    (void)es_id;
     /* NOTE: As a special case, if we use a non-RTP
      * mux (TS/PS), then p_fmt is NULL. */
     sout_stream_sys_t *p_sys = p_stream->p_sys;
