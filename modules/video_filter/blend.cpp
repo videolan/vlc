@@ -534,7 +534,7 @@ void Blend(const CPicture &dst_data, const CPicture &src_data,
 
     for (unsigned y = 0; y < height; y++) {
         for (unsigned x = 0; x < width; x++) {
-            CPixel spx;
+            CPixel spx {};
 
             src.get(&spx, x);
             convert(spx);
