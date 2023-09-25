@@ -221,6 +221,7 @@ check_c_headers = [
     ['netinet/udplite.h'],
     ['pthread.h'],
     ['poll.h'],
+    ['sys/auxv.h'],
     ['sys/eventfd.h'],
     ['sys/mount.h'],
     ['sys/shm.h'],

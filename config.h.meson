@@ -128,6 +128,9 @@
 /* Define to 1 if you have the `fsync' function. */
 #mesondefine HAVE_FSYNC
 
+/* Define to 1 if you have the <sys/auxv.h> header file */
+#mesondefine HAVE_SYS_AUXV_H
+
 /* Define to 1 if you have the `getauxval' function. */
 #mesondefine HAVE_GETAUXVAL
 
