@@ -185,7 +185,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         p_spu = decoder_NewSubpictureText( p_dec );
         if( p_spu )
         {
-            subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+            subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
 
             p_spu->i_start = p_block->i_pts;
             if( p_cea->alert_message_time_remaining )

@@ -73,7 +73,7 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
 
         p_subpic->updater.pf_update   = NULL;
         p_subpic->updater.pf_destroy  = NULL;
-        p_subpic->updater.p_sys       = NULL;
+        p_subpic->updater.sys         = NULL;
     }
     return p_subpic;
 }

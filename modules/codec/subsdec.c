@@ -457,7 +457,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     p_spu->b_ephemer  = (p_block->i_length == VLC_TICK_INVALID);
     p_spu->b_absolute = false;
 
-    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
 
     int i_inline_align = -1;
     p_spu_sys->region.p_segments = ParseSubtitles( &i_inline_align, psz_subtitle );

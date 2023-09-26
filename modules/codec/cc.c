@@ -506,7 +506,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, vlc_tick_t i_pts )
     p_spu->b_ephemer  = true;
     p_spu->b_absolute = false;
 
-    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
     decoder_sys_t *p_dec_sys = p_dec->p_sys;
 
     /* Set first region defaults */

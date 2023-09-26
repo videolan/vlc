@@ -1084,7 +1084,7 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
     if( !p_spu )
         return NULL;
 
-    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
     substext_updater_region_t *p_region = &p_spu_sys->region;
 
     p_spu_sys->margin_ratio = CEA708_SCREEN_SAFE_MARGIN_RATIO;

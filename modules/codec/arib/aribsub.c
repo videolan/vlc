@@ -266,7 +266,7 @@ static subpicture_t *render( decoder_t *p_dec, arib_parser_t *p_parser,
     p_spu->b_ephemer  = (p_spu->i_start == p_spu->i_stop);
     p_spu->b_absolute = true;
 
-    arib_spu_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    arib_spu_updater_sys_t *p_spu_sys = p_spu->updater.sys;
 
     arib_text_region_t *p_region = p_spu_sys->p_region =
         (arib_text_region_t*) calloc( 1, sizeof(arib_text_region_t) );

@@ -1121,7 +1121,7 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
                                          ttml_region_t *p_regions )
 {
     decoder_sys_t *p_dec_sys = p_dec->p_sys;
-    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
     substext_updater_region_t *p_updtregion = NULL;
 
     /* Create region update info from each ttml region */
@@ -1283,7 +1283,7 @@ static void TTMLRegionsToSpuBitmapRegions( decoder_t *p_dec, subpicture_t *p_spu
             r->origin.y = p_region->updt.origin.y;
             r->extent.x = p_region->updt.extent.x;
             r->extent.y = p_region->updt.extent.y;
-            TTML_ImageSpuAppendRegion( p_spu->updater.p_sys, r );
+            TTML_ImageSpuAppendRegion( p_spu->updater.sys, r );
         }
     }
 }

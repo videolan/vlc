@@ -186,7 +186,7 @@ typedef struct
                          vlc_tick_t );
     /** Optional callback for subpicture private data cleanup */
     void (*pf_destroy) ( subpicture_t * );
-    void *p_sys;
+    void *sys;
 } subpicture_updater_t;
 
 typedef struct subpicture_private_t subpicture_private_t;

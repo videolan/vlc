@@ -669,7 +669,7 @@ static subsdelay_heap_entry_t * SubsdelayEntryCreate( subpicture_t *p_source, fi
 
     /* initialize local updater */
 
-    updater.p_sys = p_entry;
+    updater.sys = p_entry;
     updater.pf_update = SubpicUpdateWrapper;
     updater.pf_destroy = SubpicDestroyWrapper;
 
@@ -915,7 +915,7 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, c
     subsdelay_heap_entry_t *p_entry;
     vlc_tick_t i_new_ts;
 
-    p_entry = p_subpic->updater.p_sys;
+    p_entry = p_subpic->updater.sys;
     if( !p_entry )
     {
         return;
@@ -961,7 +961,7 @@ static void SubpicDestroyWrapper( subpicture_t *p_subpic )
     subsdelay_heap_entry_t *p_entry;
     subsdelay_heap_t *p_heap;
 
-    p_entry = p_subpic->updater.p_sys;
+    p_entry = p_subpic->updater.sys;
 
     if( !p_entry )
     {
@@ -992,7 +992,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
     int i_overlapping;
 
-    p_entry = p_subpic->updater.p_sys;
+    p_entry = p_subpic->updater.sys;
     if( !p_entry || !p_entry->p_filter )
     {
         return;

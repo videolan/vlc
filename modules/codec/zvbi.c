@@ -450,7 +450,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         while( offset < i_total && isspace( p_text[offset] ) )
            offset++;
 
-        subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+        subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
         p_spu_sys->region.p_segments = text_segment_New( &p_text[offset] );
         if( !p_spu_sys->region.p_segments )
         {

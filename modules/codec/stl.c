@@ -407,7 +407,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
             subpicture_t *p_sub = decoder_NewSubpictureText(p_dec);
             if( p_sub )
             {
-                FillSubpictureUpdater(p_group, p_sub->updater.p_sys );
+                FillSubpictureUpdater(p_group, p_sub->updater.sys );
 
                 p_sub->b_absolute = false;
 

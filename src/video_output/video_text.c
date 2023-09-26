@@ -42,7 +42,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
                           bool has_dst_changed, const video_format_t *fmt_dst,
                           vlc_tick_t ts)
 {
-    osd_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    osd_spu_updater_sys_t *sys = subpic->updater.sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
     VLC_UNUSED(has_src_changed);
 
@@ -88,7 +88,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
 
 static void OSDTextDestroy(subpicture_t *subpic)
 {
-    osd_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    osd_spu_updater_sys_t *sys = subpic->updater.sys;
 
     free(sys->text);
     free(sys);
@@ -110,7 +110,7 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     subpicture_updater_t updater = {
         .pf_update   = OSDTextUpdate,
         .pf_destroy  = OSDTextDestroy,
-        .p_sys       = sys,
+        .sys         = sys,
     };
     subpicture_t *subpic = subpicture_New(&updater);
     if (!subpic) {

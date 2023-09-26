@@ -50,7 +50,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  bool has_dst_changed, const video_format_t *fmt_dst,
                                  vlc_tick_t ts)
 {
-    arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    arib_spu_updater_sys_t *sys = subpic->updater.sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
     VLC_UNUSED(has_src_changed);
 
@@ -103,7 +103,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
 {
-    arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    arib_spu_updater_sys_t *sys = subpic->updater.sys;
 
     arib_text_region_t *p_region, *p_region_next;
     for( p_region = sys->p_region; p_region; p_region = p_region_next )
@@ -124,7 +124,7 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
     subpicture_updater_t updater = {
         .pf_update   = SubpictureTextUpdate,
         .pf_destroy  = SubpictureTextDestroy,
-        .p_sys       = sys,
+        .sys         = sys,
     };
     subpicture_t *subpic = decoder_NewSubpicture(decoder, &updater);
     if( subpic == NULL )
