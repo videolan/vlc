@@ -186,6 +186,7 @@ T.ItemDelegate {
                     anchors.centerIn: parent
                     width: parent.paintedWidth
                     height: parent.paintedHeight
+                    visible: (artwork.status === Image.Ready)
 
                     z: -1
 
