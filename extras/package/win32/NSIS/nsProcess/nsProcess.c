@@ -171,7 +171,7 @@ void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
   HANDLE hProc;
   DWORD ec;
   BOOL bDone = FALSE;
-  if (hProc=OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, id))
+  if ((hProc=OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, id)) != NULL)
   {
 	struct win_id window = { id, NULL };
 
@@ -281,7 +281,7 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
     DWORD dwData;
     ULONG (WINAPI *NtQuerySystemInformationPtr)(ULONG, PVOID, LONG, PULONG);
 
-    if (hLib=LoadLibraryW(L"NTDLL.DLL"))
+    if ((hLib=LoadLibraryW(L"NTDLL.DLL")) != NULL)
     {
       NtQuerySystemInformationPtr=(ULONG(WINAPI *)(ULONG, PVOID, LONG, PULONG))GetProcAddress(hLib, "NtQuerySystemInformation");
 
@@ -289,7 +289,7 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
       {
         while (1)
         {
-          if (spi=LocalAlloc(LMEM_FIXED, dwSize))
+          if ((spi=LocalAlloc(LMEM_FIXED, dwSize)) != NULL)
           {
             uError=(*NtQuerySystemInformationPtr)(SystemProcessInformation, spi, dwSize, &dwData);
 
