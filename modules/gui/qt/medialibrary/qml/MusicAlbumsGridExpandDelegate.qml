@@ -129,6 +129,7 @@ FocusScope {
 
                 Widgets.ListCoverShadow {
                     anchors.fill: parent
+                    visible: (parent.status === RoundImage.Ready)
                 }
             }
         }
