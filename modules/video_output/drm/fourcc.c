@@ -120,8 +120,8 @@ static const struct {
 } rgb_fourcc_list[] = {
 #ifndef WORDS_BIGENDIAN
     /* 16-bit-padded 15-bit RGB */
-    { DRM_FORMAT_RGBX5551, VLC_CODEC_RGB15, 0xF800, 0x07C0, 0x003E },
-    { DRM_FORMAT_BGRX5551, VLC_CODEC_RGB15, 0x003E, 0x07C0, 0xF800 },
+    // { DRM_FORMAT_RGBX5551, VLC_CODEC_RGB15, 0xF800, 0x07C0, 0x003E },
+    // { DRM_FORMAT_BGRX5551, VLC_CODEC_RGB15, 0x003E, 0x07C0, 0xF800 },
 #endif
 };
 
