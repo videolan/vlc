@@ -118,40 +118,10 @@ static const struct {
     uint32_t green; /**< Little endian green mask */
     uint32_t blue; /**< Little endian blue mask */
 } rgb_fourcc_list[] = {
-#ifdef WORDS_BIGENDIAN
-    /* 24-bit RGB */
-    { DRM_FORMAT_RGB888,   VLC_CODEC_RGB24M, 0x0000FF, 0x00FF00, 0xFF0000 },
-    { DRM_FORMAT_BGR888,   VLC_CODEC_RGB24M, 0xFF0000, 0x00FF00, 0x0000FF },
-    /* 32-bit-padded 24-bit RGB */
-    { DRM_FORMAT_XRGB8888, VLC_CODEC_RGB32,
-                                          0x0000FF00, 0x00FF0000, 0xFF000000 },
-    { DRM_FORMAT_XBGR8888, VLC_CODEC_RGB32,
-                                          0xFF000000, 0x00FF0000, 0x0000FF00 },
-    { DRM_FORMAT_RGBX8888, VLC_CODEC_RGB32,
-                                          0x000000FF, 0x0000FF00, 0x00FF0000 },
-    { DRM_FORMAT_BGRX8888, VLC_CODEC_RGB32,
-                                          0x00FF0000, 0x0000FF00, 0x000000FF },
-#else
+#ifndef WORDS_BIGENDIAN
     /* 16-bit-padded 15-bit RGB */
-    { DRM_FORMAT_XRGB1555, VLC_CODEC_RGB15, 0x7C00, 0x03E0, 0x001F },
-    { DRM_FORMAT_XBGR1555, VLC_CODEC_RGB15, 0x001F, 0x03E0, 0x7C00 },
     { DRM_FORMAT_RGBX5551, VLC_CODEC_RGB15, 0xF800, 0x07C0, 0x003E },
     { DRM_FORMAT_BGRX5551, VLC_CODEC_RGB15, 0x003E, 0x07C0, 0xF800 },
-    /* 16-bit RGB */
-    { DRM_FORMAT_RGB565,   VLC_CODEC_RGB16, 0xF800, 0x07E0, 0x001F },
-    { DRM_FORMAT_BGR565,   VLC_CODEC_RGB16, 0x001F, 0x07E0, 0xF800 },
-    /* 24-bit RGB */
-    { DRM_FORMAT_RGB888,   VLC_CODEC_RGB24M, 0xFF0000, 0x00FF00, 0x0000FF },
-    { DRM_FORMAT_BGR888,   VLC_CODEC_RGB24M, 0x0000FF, 0x00FF00, 0xFF0000 },
-    /* 32-bit-padded 24-bit RGB */
-    { DRM_FORMAT_XRGB8888, VLC_CODEC_RGB32,
-                                          0x00FF0000, 0x0000FF00, 0x000000FF },
-    { DRM_FORMAT_XBGR8888, VLC_CODEC_RGB32,
-                                          0x000000FF, 0x0000FF00, 0x00FF0000 },
-    { DRM_FORMAT_RGBX8888, VLC_CODEC_RGB32,
-                                          0xFF000000, 0x00FF0000, 0x0000FF00 },
-    { DRM_FORMAT_BGRX8888, VLC_CODEC_RGB32,
-                                          0x0000FF00, 0x00FF0000, 0xFF000000 },
 #endif
 };
 
