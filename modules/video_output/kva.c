@@ -451,6 +451,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     const vlc_fourcc_t *fallback;
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
+    bool use_masks = true;
     int i_chroma_shift;
     int w, h;
 
@@ -506,6 +507,80 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     i_kva_fourcc = FOURCC_R555;
                     i_chroma_shift = 0;
                     break;
+
+                case VLC_CODEC_XRGB:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
+                        sys->kvac.ulRMask == 0x00ff0000 &&
+                        sys->kvac.ulGMask == 0x0000ff00 &&
+                        sys->kvac.ulBMask == 0x000000ff)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR4;
+                        i_chroma_shift = 0;
+                    }
+                    break;
+                case VLC_CODEC_XBGR:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
+                        sys->kvac.ulRMask == 0x000000ff &&
+                        sys->kvac.ulGMask == 0x0000ff00 &&
+                        sys->kvac.ulBMask == 0x00ff0000)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR4;
+                        i_chroma_shift = 0;
+                    }
+                    break;
+                case VLC_CODEC_RGBX:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
+                        sys->kvac.ulRMask == 0xff000000 &&
+                        sys->kvac.ulGMask == 0x00ff0000 &&
+                        sys->kvac.ulBMask == 0x0000ff00)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR4;
+                        i_chroma_shift = 0;
+                    }
+                    break;
+                case VLC_CODEC_BGRX:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
+                        sys->kvac.ulRMask == 0x0000ff00 &&
+                        sys->kvac.ulGMask == 0x00ff0000 &&
+                        sys->kvac.ulBMask == 0xff000000)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR4;
+                        i_chroma_shift = 0;
+                    }
+                    break;
+
+                case VLC_CODEC_RGB24:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR24 &&
+                        sys->kvac.ulRMask == 0xff0000 &&
+                        sys->kvac.ulGMask == 0x00ff00 &&
+                        sys->kvac.ulBMask == 0x0000ff)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR3;
+                        i_chroma_shift = 0;
+                    }
+                    break;
+                case VLC_CODEC_BGR24:
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR24 &&
+                        sys->kvac.ulRMask == 0x0000ff &&
+                        sys->kvac.ulGMask == 0x00ff00 &&
+                        sys->kvac.ulBMask == 0xff0000)
+                    {
+                        b_hw_accel = true;
+                        use_masks = false;
+                        i_kva_fourcc = FOURCC_BGR3;
+                        i_chroma_shift = 0;
+                    }
+                    break;
             }
 
             if( b_hw_accel )
@@ -524,9 +599,18 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     }
 
     /* Set the RGB masks */
-    fmt->i_rmask = sys->kvac.ulRMask;
-    fmt->i_gmask = sys->kvac.ulGMask;
-    fmt->i_bmask = sys->kvac.ulBMask;
+    if (use_masks)
+    {
+        fmt->i_rmask = sys->kvac.ulRMask;
+        fmt->i_gmask = sys->kvac.ulGMask;
+        fmt->i_bmask = sys->kvac.ulBMask;
+    }
+    else
+    {
+        fmt->i_rmask = 0;
+        fmt->i_gmask = 0;
+        fmt->i_bmask = 0;
+    }
 
     msg_Dbg( vd, "output chroma = %4.4s", ( const char * )&fmt->i_chroma );
     msg_Dbg( vd, "KVA chroma = %4.4s", ( const char * )&i_kva_fourcc );
