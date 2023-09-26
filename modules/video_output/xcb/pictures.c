@@ -101,6 +101,8 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
     if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
         return false;
 
+    bool use_masks = true;
+
     /* Check that VLC supports the pixel format. */
     switch (fmt->depth)
     {
@@ -130,6 +132,7 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
         case 8:
             if (fmt->bits_per_pixel != 8)
                 return false;
+            use_masks = false;
             if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
                 f->i_chroma = VLC_CODEC_RGB233;
             else
@@ -139,9 +142,18 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             vlc_assert_unreachable();
     }
 
-    f->i_rmask = vt->red_mask;
-    f->i_gmask = vt->green_mask;
-    f->i_bmask = vt->blue_mask;
+    if (use_masks)
+    {
+        f->i_rmask = vt->red_mask;
+        f->i_gmask = vt->green_mask;
+        f->i_bmask = vt->blue_mask;
+    }
+    else
+    {
+        f->i_rmask = 0;
+        f->i_gmask = 0;
+        f->i_bmask = 0;
+    }
     return true;
 }
 
