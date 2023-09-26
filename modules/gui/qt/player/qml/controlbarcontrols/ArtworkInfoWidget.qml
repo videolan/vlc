@@ -117,6 +117,7 @@ AbstractButton {
                 anchors.centerIn: cover
                 width: cover.paintedWidth
                 height: cover.paintedHeight
+                z: -1
 
                 primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
                 primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
