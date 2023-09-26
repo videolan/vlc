@@ -115,7 +115,25 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             if (fmt->bits_per_pixel == 32)
                 f->i_chroma = VLC_CODEC_RGB32;
             else if (fmt->bits_per_pixel == 24)
-                f->i_chroma = VLC_CODEC_RGB24M;
+            {
+                if (vt->red_mask   == 0xff0000 &&
+                    vt->green_mask == 0x00ff00 &&
+                    vt->blue_mask  == 0x0000ff)
+                {
+                    f->i_chroma = VLC_CODEC_RGB24;
+                    use_masks = false;
+                }
+                else
+                if (vt->red_mask   == 0x0000ff &&
+                    vt->green_mask == 0x00ff00 &&
+                    vt->blue_mask  == 0xff0000)
+                {
+                    f->i_chroma = VLC_CODEC_BGR24;
+                    use_masks = false;
+                }
+                else
+                    f->i_chroma = VLC_CODEC_RGB24M;
+            }
             else
                 return false;
             break;
