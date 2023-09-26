@@ -145,17 +145,23 @@ BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
   return TRUE;
 }
 
+struct win_id
+{
+    DWORD proc_id;
+    HWND prev_hwnd;
+};
+
 BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
     LPARAM lParam
 )
 {
-	HANDLE *data = lParam;
+	struct win_id *data = (struct win_id *)lParam;
 	DWORD pid;
 	GetWindowThreadProcessId(hwnd, &pid);
-	if (pid == data[0])
+	if (pid == data->proc_id)
 	{
-		PostMessage(data[1], WM_CLOSE, 0, 0);
-		data[1] = hwnd;
+		PostMessage(data->prev_hwnd, WM_CLOSE, 0, 0);
+		data->prev_hwnd = hwnd;
 	}
 	return TRUE;
 }
@@ -163,17 +169,15 @@ BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
 void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
 {
   HANDLE hProc;
-  HANDLE data[2];
   DWORD ec;
   BOOL bDone = FALSE;
   if (hProc=OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, id))
   {
-	data[0] = id;
-	data[1] = NULL;
+	struct win_id window = { id, NULL };
 
 	if (bClose)
-		EnumWindows(EnumWindowsProc, data);
-	if (data[1] != NULL)
+		EnumWindows(EnumWindowsProc, (LPARAM)&window);
+	if (window.prev_hwnd != NULL)
 	{	  
 	  if (GetExitCodeProcess(hProc,&ec) && ec == STILL_ACTIVE)
 		if (WaitForSingleObject(hProc, 3000) == WAIT_OBJECT_0)
