@@ -58,8 +58,8 @@ extern TCHAR *g_variables;
 
 int NSISCALL popstring(TCHAR *str); // 0 on success, 1 on empty stack
 int NSISCALL popstringn(TCHAR *str, int maxlen); // with length limit, pass 0 for g_stringsize
-int NSISCALL popint(); // pops an integer
-int NSISCALL popint_or(); // with support for or'ing (2|4|8)
+int NSISCALL popint(void); // pops an integer
+int NSISCALL popint_or(void); // with support for or'ing (2|4|8)
 int NSISCALL myatoi(const TCHAR *s); // converts a string to an integer
 unsigned NSISCALL myatou(const TCHAR *s); // converts a string to an unsigned integer, decimal only
 int NSISCALL myatoi_or(const TCHAR *s); // with support for or'ing (2|4|8)
