@@ -874,7 +874,7 @@ static void FillFileStatsIfAny( input_thread_t * p_input )
         return;
 
     uint64_t size;
-    
+
     if( vlc_stream_GetSize(stream_filters, &size) == VLC_SUCCESS )
         input_item_AddStat( priv->p_item, "size", size );
 
