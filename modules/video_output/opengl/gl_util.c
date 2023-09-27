@@ -39,61 +39,58 @@ LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
     if (info_len <= 0)
         return;
 
+    char *info_log = malloc(info_len);
+    if (info_log == NULL)
+        return;
+
+    GLsizei written;
+    vt->GetShaderInfoLog(id, info_len, &written, info_log);
+
+    GLint size;
+    vt->GetShaderiv(id, GL_SHADER_SOURCE_LENGTH, &size);
+    char *sources = malloc(size + 1);
+    if (sources == NULL)
+        goto end;
+
+    vt->GetShaderSource(id, size + 1, NULL, sources);
+
+    struct vlc_memstream stream;
+    int ret = vlc_memstream_open(&stream);
+
+    /* This is debugging code, we don't want an hard failure if
+     * the allocation failed. */
+    if (ret != 0)
+        goto end;
+
+    const char *cursor = sources;
+    size_t line = 1;
+    while (cursor != NULL && *cursor != '\0')
     {
-        char *info_log = malloc(info_len);
-        if (info_log == NULL)
-            return;
+        const char *end = strchr(cursor, '\n');
+        if (end != NULL)
         {
-            GLsizei written;
-            vt->GetShaderInfoLog(id, info_len, &written, info_log);
+            vlc_memstream_printf(&stream, "%4zu: %.*s\n", line, (int)(ptrdiff_t)(end - cursor), cursor);
+            cursor = end + 1;
+        }
+        else
+        {
+            vlc_memstream_printf(&stream, "%4zu: %s", line, cursor);
+            break;
+        }
+        line++;
+    }
 
-            GLint size;
-            vt->GetShaderiv(id, GL_SHADER_SOURCE_LENGTH, &size);
-            char *sources = malloc(size + 1);
-            if (sources == NULL)
-                goto end;
+    ret = vlc_memstream_close(&stream);
+    if (ret != 0)
+        goto end;
 
-            vt->GetShaderSource(id, size + 1, NULL, sources);
-
-            struct vlc_memstream stream;
-            int ret = vlc_memstream_open(&stream);
-
-            /* This is debugging code, we don't want an hard failure if
-             * the allocation failed. */
-            if (ret != 0)
-                goto end;
-
-            const char *cursor = sources;
-            size_t line = 1;
-            while (cursor != NULL && *cursor != '\0')
-            {
-                const char *end = strchr(cursor, '\n');
-                if (end != NULL)
-                {
-                    vlc_memstream_printf(&stream, "%4zu: %.*s\n", line, (int)(ptrdiff_t)(end - cursor), cursor);
-                    cursor = end + 1;
-                }
-                else
-                {
-                    vlc_memstream_printf(&stream, "%4zu: %s", line, cursor);
-                    break;
-                }
-                line++;
-            }
-
-            ret = vlc_memstream_close(&stream);
-            if (ret != 0)
-                goto end;
-
-            msg_Err(obj, "Shader:\n%s", stream.ptr);
-            free(stream.ptr);
+    msg_Err(obj, "Shader:\n%s", stream.ptr);
+    free(stream.ptr);
 
 end:
-            msg_Err(obj, "shader: %s", info_log);
-            free(info_log);
-            free(sources);
-        }
-    }
+    msg_Err(obj, "shader: %s", info_log);
+    free(info_log);
+    free(sources);
 }
 
 static void
