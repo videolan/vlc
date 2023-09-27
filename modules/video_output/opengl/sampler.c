@@ -525,17 +525,24 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
 }
 
 static void
-GetNames(GLenum tex_target, const char **glsl_sampler, const char **texture)
+GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
+         const char **glsl_sampler, const char **texture)
 {
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    bool has_texture_func =
+        (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
+        (priv->gl->api_type = VLC_OPENGL_ES2 && priv->glsl_version >= 300);
+
     switch (tex_target)
     {
         case GL_TEXTURE_EXTERNAL_OES:
             *glsl_sampler = "samplerExternalOES";
-            *texture = "texture2D";
+            *texture = has_texture_func ? "texture" : "texture2D";
             break;
         case GL_TEXTURE_2D:
             *glsl_sampler = "sampler2D";
-            *texture = "texture2D";
+            *texture = has_texture_func ? "texture" : "texture2D";
             break;
         case GL_TEXTURE_RECTANGLE:
             *glsl_sampler = "sampler2DRect";
@@ -618,7 +625,7 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
 
     const char *sampler_type;
     const char *texture_fn;
-    GetNames(tex_target, &sampler_type, &texture_fn);
+    GetNames(sampler, tex_target, &sampler_type, &texture_fn);
 
     ADDF("uniform %s Texture;\n", sampler_type);
 
@@ -740,7 +747,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     }
 
     const char *glsl_sampler, *lookup;
-    GetNames(tex_target, &glsl_sampler, &lookup);
+    GetNames(sampler, tex_target, &glsl_sampler, &lookup);
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms) != 0)
