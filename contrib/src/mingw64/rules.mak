@@ -14,7 +14,7 @@ PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += d3d9 dcomp
 endif # !HAVE_WINSTORE
-PKGS += dxva dxvahd
+PKGS += dxva dxvahd mingw11-fixes
 
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9
@@ -33,6 +33,9 @@ endif
 ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 11
+ifeq ($(call mingw_at_least, 12), true)
+PKGS_FOUND += mingw11-fixes
+endif # MINGW 12
 endif # !HAVE_VISUALSTUDIO
 
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
@@ -42,7 +45,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp alloweduwp
+PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -80,6 +83,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0003-headers-allow-more-wincrypt-API-s-in-Win10-RS4-UWP-b.patch
 	$(APPLY) $(SRC)/mingw64/0004-headers-allow-more-wincrypt-API-s-in-Win10-19H1-UWP-.patch
 	$(APPLY) $(SRC)/mingw64/0005-crt-use-wincrypt-API-from-windowsapp-in-Windows-10.patch
+	$(APPLY) $(SRC)/mingw64/0001-include-process-fix-bare-DllMain-_CRT_INIT-signature.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -119,6 +123,14 @@ MINGW_HEADERS_WINRT := \
 .dxvahd: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
+	touch $@
+
+.sum-mingw11-fixes: .sum-mingw64
+	touch $@
+
+.mingw11-fixes: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/crt/process.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dcomp: .sum-mingw64
