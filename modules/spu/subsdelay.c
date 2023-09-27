@@ -950,14 +950,9 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, c
     p_entry->p_source->regions = p_entry->p_subpic->regions;
 
     subpicture_updater_t *updater = &p_entry->p_source->updater;
-    if (updater->pf_update != NULL)
-            updater->pf_update( p_entry->p_source,
-                                has_src_changed, p_fmt_src,
-                                has_dst_changed, p_fmt_dst, i_new_ts );
-    else
-        updater->ops->update( p_entry->p_source,
-                              has_src_changed, p_fmt_src,
-                              has_dst_changed, p_fmt_dst, i_new_ts );
+    updater->ops->update( p_entry->p_source,
+                          has_src_changed, p_fmt_src,
+                          has_dst_changed, p_fmt_dst, i_new_ts );
 
     p_entry->p_subpic->regions = p_entry->p_source->regions;
 
