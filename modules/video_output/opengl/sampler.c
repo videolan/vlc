@@ -73,6 +73,8 @@ struct vlc_gl_sampler_priv {
     bool expose_planes;
     unsigned plane;
 
+    int glsl_version;
+
     struct vlc_gl_extension_vt extension_vt;
 };
 
@@ -993,6 +995,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         if (asprintf(&sampler->shader.version, "#version %d\n", glsl_version) < 0)
             goto error;
     }
+    priv->glsl_version = glsl_version;
 
 #ifdef HAVE_LIBPLACEBO_GL
     priv->uloc.pl_vars = NULL;
