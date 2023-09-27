@@ -342,7 +342,7 @@ Open(vlc_object_t *obj)
 
             break;
         case VLC_CODEC_CVPX_BGRA:
-            interop->fmt_out.i_chroma = VLC_CODEC_RGB32;
+            interop->fmt_out.i_chroma = VLC_CODEC_BGRA;
             interop->fmt_out.space = COLOR_SPACE_UNDEF;
 
             interop->tex_count = 1;
