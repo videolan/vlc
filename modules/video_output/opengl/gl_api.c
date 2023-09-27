@@ -99,6 +99,7 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR(GetShaderiv);
     GET_PROC_ADDR(GetProgramInfoLog);
     GET_PROC_ADDR(GetShaderInfoLog);
+    GET_PROC_ADDR(GetShaderSource);
 
     GET_PROC_ADDR(GetUniformLocation);
     GET_PROC_ADDR(GetAttribLocation);
