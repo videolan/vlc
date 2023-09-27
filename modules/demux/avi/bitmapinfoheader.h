@@ -141,38 +141,105 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
         {
             if( i_bihextra >= 3 * sizeof(uint32_t) )
             {
-                fmt->video.i_rmask = GetDWLE( &p_bihextra[0] );
-                fmt->video.i_gmask = GetDWLE( &p_bihextra[4] );
-                fmt->video.i_bmask = GetDWLE( &p_bihextra[8] );
+                uint32_t rmask = GetDWLE( &p_bihextra[0] );
+                uint32_t gmask = GetDWLE( &p_bihextra[4] );
+                uint32_t bmask = GetDWLE( &p_bihextra[8] );
+                uint32_t amask = i_bihextra >= 4 * sizeof(uint32_t) ? GetDWLE( &p_bihextra[12] ) : 0;
+
+                vlc_fourcc_t known_chroma = 0;
                 switch( p_bih->biBitCount )
                 {
                     case 32:
-                        fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
+                        if (rmask == 0x00ff0000 &&
+                            gmask == 0x0000ff00 &&
+                            bmask == 0x000000ff &&
+                            amask == 0x00000000)
+                        {
+                            known_chroma = VLC_CODEC_XRGB;
+                        }
+                        else
+                        if (rmask == 0x000000ff &&
+                            gmask == 0x0000ff00 &&
+                            bmask == 0x00ff0000 &&
+                            amask == 0x00000000)
+                        {
+                            known_chroma = VLC_CODEC_XBGR;
+                        }
+                        else
+                        if (rmask == 0xff000000 &&
+                            gmask == 0x00ff0000 &&
+                            bmask == 0x0000ff00 &&
+                            amask == 0x00000000)
+                        {
+                            known_chroma = VLC_CODEC_RGBX;
+                        }
+                        else
+                        if (rmask == 0x0000ff00 &&
+                            gmask == 0x00ff0000 &&
+                            bmask == 0xff000000 &&
+                            amask == 0x00000000)
+                        {
+                            known_chroma = VLC_CODEC_BGRX;
+                        }
+                        if (rmask == 0x00ff0000 &&
+                            gmask == 0x0000ff00 &&
+                            bmask == 0x000000ff &&
+                            amask == 0xff000000)
+                        {
+                            known_chroma = VLC_CODEC_ARGB;
+                        }
+                        else
+                        if (rmask == 0x000000ff &&
+                            gmask == 0x0000ff00 &&
+                            bmask == 0x00ff0000 &&
+                            amask == 0xff000000)
+                        {
+                            known_chroma = VLC_CODEC_ABGR;
+                        }
+                        else
+                        if (rmask == 0xff000000 &&
+                            gmask == 0x00ff0000 &&
+                            bmask == 0x0000ff00 &&
+                            amask == 0x000000ff)
+                        {
+                            known_chroma = VLC_CODEC_RGBA;
+                        }
+                        else
+                        if (rmask == 0x0000ff00 &&
+                            gmask == 0x00ff0000 &&
+                            bmask == 0xff000000 &&
+                            amask == 0x000000ff)
+                        {
+                            known_chroma = VLC_CODEC_BGRA;
+                        }
+                        else
+                        {
+                            // unknown mask
+                            fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
+                        }
+                        break;
+                    default:
                         break;
                 }
-                video_format_FixRgb( &fmt->video );
-                if( i_bihextra >= 4 * sizeof(uint32_t) ) /* Alpha channel ? */
+
+                if (known_chroma != 0)
                 {
-                    uint32_t i_alpha = GetDWLE( &p_bihextra[12] );
-                    if( i_alpha == 0xFF )
-                    {
-                        switch (fmt->i_codec)
-                        {
-                            case VLC_CODEC_RGB32: // unknown mask
-                            case VLC_CODEC_BGRX:
-                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_BGRA;
-                                break;
-                            case VLC_CODEC_RGBX:
-                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_RGBA;
-                                break;
-                            case VLC_CODEC_XBGR:
-                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_ABGR;
-                                break;
-                            case VLC_CODEC_XRGB:
-                                fmt->i_codec = fmt->video.i_chroma = VLC_CODEC_ARGB;
-                                break;
-                        }
-                    }
+                    fmt->video.i_chroma = fmt->i_codec = known_chroma;
+                    fmt->video.i_rmask = 0;
+                    fmt->video.i_gmask = 0;
+                    fmt->video.i_bmask = 0;
+                }
+                else if (amask == 0)
+                {
+                    fmt->video.i_rmask = rmask;
+                    fmt->video.i_gmask = gmask;
+                    fmt->video.i_bmask = bmask;
+                    video_format_FixRgb( &fmt->video );
+                }
+                else
+                {
+                    // unsupported alpha mask
+                    return VLC_ENOTSUP;
                 }
             }
             else
