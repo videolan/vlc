@@ -240,7 +240,7 @@ Open(vlc_object_t *obj)
     interop->ops = &ops;
 
     interop->tex_target = GL_TEXTURE_EXTERNAL_OES;
-    interop->fmt_out.i_chroma = VLC_CODEC_RGB32;
+    interop->fmt_out.i_chroma = VLC_CODEC_RGBA;
     interop->fmt_out.space = COLOR_SPACE_UNDEF;
 
     interop->tex_count = 1;

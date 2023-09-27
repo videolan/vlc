@@ -189,7 +189,7 @@ Open(vlc_object_t *obj)
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     interop->tex_target = GL_TEXTURE_2D;
-    interop->fmt_out.i_chroma = VLC_CODEC_RGB32;
+    interop->fmt_out.i_chroma = VLC_CODEC_RGBA;
     interop->fmt_out.space = COLOR_SPACE_UNDEF;
 
     interop->tex_count = 1;
