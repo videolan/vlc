@@ -117,7 +117,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
                 break;
             case 24:
-                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB24M; /* BGR (see biBitCount) */
+                fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_BGR24;
                 break;
             case 16:
                 fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB16; /* RGB (5,6,5 bits) */
