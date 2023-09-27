@@ -707,7 +707,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
 
-int __stdcall DllMain (void *hinstDll, unsigned fdwReason, void *lpvReserved)
+int __stdcall DllMain (void *hinstDll, unsigned long fdwReason, void *lpvReserved)
 {
     (void) hinstDll;
     (void) lpvReserved;

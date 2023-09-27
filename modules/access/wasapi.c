@@ -75,7 +75,7 @@ static msftime_t GetQPC_100ns(void)
 
 static msftime_t (*get_qpc)(void);
 
-int __stdcall DllMain(void *dll, unsigned reason, void *reserved)
+int __stdcall DllMain(void *dll, unsigned long reason, void *reserved)
 {
     (void) dll;
     (void) reserved;
