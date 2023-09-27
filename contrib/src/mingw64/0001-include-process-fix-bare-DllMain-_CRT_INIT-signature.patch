@@ -1,0 +1,33 @@
+From aa4e9797bac4b353ebfd6159e731e8347ea10f28 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 27 Sep 2023 13:53:54 +0200
+Subject: [PATCH] include/process: fix bare DllMain/_CRT_INIT signature
+
+The DWORD reason corresponds to an "unsigned long", not an "unsigned".
+This is also how it's defined in the Windows SDK.
+---
+ mingw-w64-headers/crt/process.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mingw-w64-headers/crt/process.h b/mingw-w64-headers/crt/process.h
+index 08b73cf58..1ac39a064 100644
+--- a/mingw-w64-headers/crt/process.h
++++ b/mingw-w64-headers/crt/process.h
+@@ -138,10 +138,10 @@ extern "C" {
+   WINBOOL WINAPI _wCRT_INIT(HANDLE _HDllHandle,DWORD _Reason,LPVOID _Reserved);
+   extern WINBOOL (WINAPI *const _pRawDllMain)(HANDLE,DWORD,LPVOID);
+ #else
+-  int __stdcall DllMain(void *_HDllHandle,unsigned _Reason,void *_Reserved);
+-  int __stdcall _CRT_INIT(void *_HDllHandle,unsigned _Reason,void *_Reserved);
+-  int __stdcall _wCRT_INIT(void *_HDllHandle,unsigned _Reason,void *_Reserved);
+-  extern int (__stdcall *const _pRawDllMain)(void *,unsigned,void *);
++  int __stdcall DllMain(void *_HDllHandle,unsigned long _Reason,void *_Reserved);
++  int __stdcall _CRT_INIT(void *_HDllHandle,unsigned long _Reason,void *_Reserved);
++  int __stdcall _wCRT_INIT(void *_HDllHandle,unsigned long _Reason,void *_Reserved);
++  extern int (__stdcall *const _pRawDllMain)(void *,unsigned long,void *);
+ #endif
+ #endif
+ 
+-- 
+2.37.3.windows.1
+

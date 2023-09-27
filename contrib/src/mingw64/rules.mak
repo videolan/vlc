@@ -12,13 +12,16 @@ ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 PKGS += alloweduwp
 endif
-PKGS += dxva dxvahd
+PKGS += dxva dxvahd mingw11-fixes
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
 ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 11
+ifeq ($(call mingw_at_least, 12), true)
+PKGS_FOUND += mingw11-fixes
+endif # MINGW 12
 endif # !HAVE_VISUALSTUDIO
 
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
@@ -28,7 +31,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads dxva dxvahd alloweduwp
+PKGS_ALL += winpthreads dxva dxvahd mingw11-fixes alloweduwp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -52,6 +55,7 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
 	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
 	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0001-include-process-fix-bare-DllMain-_CRT_INIT-signature.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -73,6 +77,14 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 .dxvahd: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
+	touch $@
+
+.sum-mingw11-fixes: .sum-mingw64
+	touch $@
+
+.mingw11-fixes: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/crt/process.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dxva: .sum-mingw64
