@@ -87,7 +87,6 @@ typedef struct
         WRITE_BYTEARRAY,
         WRITE_BYTEARRAYV23,
         WRITE_SHORTARRAYV23,
-        WRITE_BYTEBUFFER,
         WRITE_FLOATARRAY
     } i_write_type;
 
@@ -1039,52 +1038,6 @@ AudioTrack_WriteByteArrayV23(JNIEnv *env, aout_stream_t *stream)
 }
 
 /**
- * Non blocking play function for Lollipop and after, run from
- * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
- * flags.
- */
-static int
-AudioTrack_WriteByteBuffer(JNIEnv *env, aout_stream_t *stream)
-{
-    aout_sys_t *p_sys = stream->sys;
-
-    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
-    {
-        vlc_frame_t *f = p_sys->frame_chain;
-        assert(f != NULL);
-        if (p_sys->jbuffer.array != NULL)
-            (*env)->DeleteLocalRef(env, p_sys->jbuffer.array);
-        p_sys->jbuffer.array = (*env)->NewDirectByteBuffer(env,
-                                                           f->p_buffer,
-                                                           f->i_buffer);
-        if (p_sys->jbuffer.array == NULL)
-        {
-            if ((*env)->ExceptionCheck(env))
-                (*env)->ExceptionClear(env);
-            return jfields.AudioTrack.ERROR;
-        }
-        p_sys->jbuffer.offset = 0;
-        p_sys->jbuffer.size = f->i_buffer;
-        /* Don't take account of the current frame for the delay */
-        f->i_buffer = 0;
-    }
-
-    int ret = JNI_AT_CALL_INT(writeBufferV21, p_sys->jbuffer.array,
-                              p_sys->jbuffer.size - p_sys->jbuffer.offset,
-                              jfields.AudioTrack.WRITE_NON_BLOCKING);
-    if (ret > 0)
-    {
-        p_sys->jbuffer.offset += ret;
-        /* The ByteBuffer reference directly the data from the frame, so it
-         * should stay allocated until all the data is written */
-        if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
-            AudioTrack_ConsumeFrame(stream, p_sys->frame_chain);
-    }
-
-    return ret;
-}
-
-/**
  * Non blocking short write function for Android M and after, run from
  * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
  * flags.
@@ -1171,9 +1124,6 @@ AudioTrack_Write( JNIEnv *env, aout_stream_t *stream, bool b_force )
     {
     case WRITE_BYTEARRAYV23:
         i_ret = AudioTrack_WriteByteArrayV23(env, stream);
-        break;
-    case WRITE_BYTEBUFFER:
-        i_ret = AudioTrack_WriteByteBuffer(env, stream);
         break;
     case WRITE_SHORTARRAYV23:
         i_ret = AudioTrack_WriteShortArrayV23(env, stream);
@@ -1940,11 +1890,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     {
         msg_Dbg( stream, "using WRITE_BYTEARRAYV23");
         p_sys->i_write_type = WRITE_BYTEARRAYV23;
-    }
-    else if( jfields.AudioTrack.writeBufferV21 )
-    {
-        msg_Dbg( stream, "using WRITE_BYTEBUFFER");
-        p_sys->i_write_type = WRITE_BYTEBUFFER;
     }
     else
     {
