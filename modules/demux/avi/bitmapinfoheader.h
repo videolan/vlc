@@ -215,7 +215,7 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                         else
                         {
                             // unknown mask
-                            fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGB32;
+                            return VLC_ENOTSUP;
                         }
                         break;
                     default:
