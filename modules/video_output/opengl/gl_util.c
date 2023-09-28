@@ -114,6 +114,23 @@ LogProgramErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
     char *info_log = malloc(info_len);
     if (info_log == NULL)
         return;
+
+
+    GLsizei shader_count;
+    GLuint shaders[3];
+    vt->GetAttachedShaders(id, 2, &shader_count, shaders);
+    for (size_t i=0; i<shader_count; ++i)
+    {
+        GLint shader_type;
+        vt->GetShaderiv(shaders[i], GL_SHADER_TYPE, &shader_type);
+
+        const char *prefix =
+            shader_type == GL_VERTEX_SHADER ? "vertex shader:\n" :
+            shader_type == GL_FRAGMENT_SHADER ? "fragment shader:\n" :
+            "unknown shader:\n";
+        LogShader(obj, prefix, vt, shaders[i]);
+    }
+
     GLsizei written;
     vt->GetProgramInfoLog(id, info_len, &written, info_log);
     msg_Err(obj, "program: %s", info_log);
