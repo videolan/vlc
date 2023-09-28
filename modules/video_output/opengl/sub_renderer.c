@@ -132,11 +132,10 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     sr->regions = NULL;
 
     static const char *const VERTEX_SHADER_SRC =
-#if defined(USE_OPENGL_ES2)
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
+        "#ifdef GL_ES\n"
+        "precision mediump float;\n"
+        "#endif\n"
+
         "attribute vec2 vertex_pos;\n"
         "attribute vec2 tex_coords_in;\n"
         "varying vec2 tex_coords;\n"
@@ -146,12 +145,10 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         "}\n";
 
     static const char *const FRAGMENT_SHADER_SRC =
-#if defined(USE_OPENGL_ES2)
-        "#version 100\n"
+        "#ifdef GL_ES\n"
         "precision mediump float;\n"
-#else
-        "#version 120\n"
-#endif
+        "#endif\n"
+
         "uniform sampler2D sampler;\n"
         "uniform float alpha;\n"
         "varying vec2 tex_coords;\n"
@@ -161,10 +158,23 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         "  gl_FragColor = color;\n"
         "}\n";
 
+    const char *glsl_version = gl->api_type == VLC_OPENGL ?
+        "#version 120\n" : "#version 100\n";
+
+    const char *vertex_shader[] = {
+        glsl_version,
+        VERTEX_SHADER_SRC,
+    };
+
+    const char *fragment_shader[] = {
+        glsl_version,
+        FRAGMENT_SHADER_SRC,
+    };
+
     sr->program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(sr->gl), vt,
-                            1, (const char **) &VERTEX_SHADER_SRC,
-                            1, (const char **) &FRAGMENT_SHADER_SRC);
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
     if (!sr->program_id)
         goto error_1;
 
