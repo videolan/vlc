@@ -7,7 +7,7 @@
 set -e
 
 # Array of paths that should trigger contrib rebuilds
-VLC_CONTRIB_REBUILD_PATHS=("extras/tools" "contrib" "extras/ci")
+VLC_CONTRIB_REBUILD_PATHS=("extras/tools" "contrib" "extras/ci" "extras/package")
 # Revision from which to start look for changes (backwards in time)
 VLC_START_REVISION="HEAD"
 
