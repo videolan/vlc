@@ -36,10 +36,13 @@ LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
 {
     GLint info_len;
     vt->GetShaderiv(id, GL_INFO_LOG_LENGTH, &info_len);
-    if (info_len > 0)
+    if (info_len <= 0)
+        return;
+
     {
         char *info_log = malloc(info_len);
-        if (info_log)
+        if (info_log == NULL)
+            return;
         {
             GLsizei written;
             vt->GetShaderInfoLog(id, info_len, &written, info_log);
