@@ -468,18 +468,6 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
     }
 }
 
-void filter_chain_SubSource( filter_chain_t *p_chain, spu_t *spu,
-                             vlc_tick_t display_date )
-{
-    for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
-    {
-        filter_t *p_filter = &f->filter;
-        subpicture_t *p_subpic = p_filter->ops->source_sub( p_filter, display_date );
-        if( p_subpic )
-            spu_PutSubpicture( spu, p_subpic );
-    }
-}
-
 subpicture_t *filter_chain_SubFilter( filter_chain_t *p_chain, subpicture_t *p_subpic )
 {
     for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )

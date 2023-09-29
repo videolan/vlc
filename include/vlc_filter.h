@@ -606,16 +606,6 @@ VLC_API picture_t *filter_chain_VideoFilter(filter_chain_t *chain,
 VLC_API void filter_chain_VideoFlush( filter_chain_t * );
 
 /**
- * Generate subpictures from a chain of subpicture source "filters".
- *
- * \param chain filter chain
- * \param spu an initialized subpicture unit
- * \param display_date of subpictures
- */
-void filter_chain_SubSource(filter_chain_t *chain, spu_t *spu,
-                            vlc_tick_t display_date);
-
-/**
  * Apply filter chain to subpictures.
  *
  * \param chain filter chain
