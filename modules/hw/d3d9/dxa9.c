@@ -450,7 +450,8 @@ int D3D9OpenConverter( filter_t *p_filter )
 static void D3D9CloseCPUConverter( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    DeleteFilter(p_sys->filter);
+    if (p_sys->filter != NULL)
+        DeleteFilter(p_sys->filter);
     if (p_sys->staging)
         picture_Release(p_sys->staging);
     vlc_video_context_Release(p_filter->vctx_out);
