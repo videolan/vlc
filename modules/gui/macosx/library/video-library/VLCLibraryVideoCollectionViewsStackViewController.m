@@ -33,6 +33,7 @@
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
 #import "main/VLCMain.h"
 
@@ -40,7 +41,7 @@
 
 @interface VLCLibraryVideoCollectionViewsStackViewController()
 {
-    NSArray *_collectionViewContainers;
+    NSArray<NSView<VLCLibraryVideoViewContainerView> *> *_containers;
     NSUInteger _leadingContainerCount;
 }
 @end
@@ -90,7 +91,7 @@
 - (void)recentsChanged:(NSNotification *)notification
 {
     const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
-    const NSUInteger recentsContainerIndex = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
+    const NSUInteger recentsContainerIndex = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryVideoViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
         return container.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
     }];
     const BOOL recentsContainerPresent = recentsContainerIndex != NSNotFound;
@@ -99,7 +100,7 @@
         return;
     }
 
-    NSMutableArray * const mutableContainers = _collectionViewContainers.mutableCopy;
+    NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
 
     if (shouldShowRecentsContainer) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
@@ -111,17 +112,17 @@
         [self setupContainerView:containerView forStackView:_collectionsStackView];
     } else {
         [mutableContainers removeObjectAtIndex:recentsContainerIndex];
-        VLCLibraryVideoCollectionViewContainerView * const existingContainer = [_collectionViewContainers objectAtIndex:recentsContainerIndex];
+        VLCLibraryVideoCollectionViewContainerView * const existingContainer = [_containers objectAtIndex:recentsContainerIndex];
         [_collectionsStackView removeConstraints:existingContainer.constraintsWithSuperview];
         [_collectionsStackView removeArrangedSubview:existingContainer];
     }
 
-    _collectionViewContainers = mutableContainers.copy;
+    _containers = mutableContainers.copy;
 }
 
 - (void)generateCollectionViewContainers
 {
-    NSMutableArray * const collectionViewContainers = [[NSMutableArray alloc] init];
+    NSMutableArray<VLCLibraryVideoCollectionViewContainerView *> * const collectionViewContainers = [[NSMutableArray alloc] init];
     const BOOL anyRecents = [self recentMediaPresent];
     NSUInteger i = anyRecents ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
@@ -131,13 +132,13 @@
         [collectionViewContainers addObject:containerView];
     }
 
-    _collectionViewContainers = collectionViewContainers;
+    _containers = collectionViewContainers;
 }
 
 - (void)reloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (VLCLibraryVideoCollectionViewContainerView *containerView in self->_collectionViewContainers) {
+        for (VLCLibraryVideoCollectionViewContainerView *containerView in self->_containers) {
             [self.heroView setOptimalRepresentedItem];
             [containerView.collectionView reloadData];
         }
@@ -214,7 +215,7 @@
     NSParameterAssert(collectionsStackView);
 
     if (_collectionsStackView) {
-        for (VLCLibraryVideoCollectionViewContainerView * const containerView in _collectionViewContainers) {
+        for (NSView<VLCLibraryVideoViewContainerView> * const containerView in _containers) {
             if (containerView.constraintsWithSuperview.count > 0) {
                 [_collectionsStackView removeConstraints:containerView.constraintsWithSuperview];
             }
@@ -233,7 +234,7 @@
     [self addView:self.heroView toStackView:_collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 
-    for (VLCLibraryVideoCollectionViewContainerView * const containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView * const containerView in _containers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];
     }
 }
@@ -244,7 +245,7 @@
 
     _collectionsStackViewScrollView = newScrollView;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
         containerView.scrollView.parentScrollView = _collectionsStackViewScrollView;
     }
 }
@@ -253,7 +254,7 @@
 {
     _collectionViewItemSize = collectionViewItemSize;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
         containerView.collectionViewDelegate.staticItemSize = collectionViewItemSize;
     }
 }
@@ -262,7 +263,7 @@
 {
     _collectionViewSectionInset = collectionViewSectionInset;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
         containerView.collectionViewLayout.sectionInset = collectionViewSectionInset;
     }
 }
@@ -271,7 +272,7 @@
 {
     _collectionViewMinimumLineSpacing = collectionViewMinimumLineSpacing;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
         containerView.collectionViewLayout.minimumLineSpacing = collectionViewMinimumLineSpacing;
     }
 }
@@ -280,14 +281,14 @@
 {
     _collectionViewMinimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
         containerView.collectionViewLayout.minimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
     }
 }
 
 - (VLCLibraryVideoCollectionViewContainerView *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
 {
-    const NSUInteger index = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
+    const NSUInteger index = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryVideoViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
         return container.videoGroup == group;
     }];
 
@@ -295,7 +296,7 @@
         return nil;
     }
 
-    return [_collectionViewContainers objectAtIndex:index];
+    return [_containers objectAtIndex:index];
 }
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
