@@ -36,6 +36,10 @@
 
 @implementation VLCLibraryVideoCollectionViewContainerView
 
+@synthesize groupDescriptor = _groupDescriptor;
+@synthesize videoGroup = _videoGroup;
+@synthesize constraintsWithSuperview = _constraintsWithSuperview;
+
 - (instancetype)init
 {
     self = [super init];

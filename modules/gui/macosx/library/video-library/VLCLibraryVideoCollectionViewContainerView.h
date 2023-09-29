@@ -22,29 +22,22 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
 @class VLCSubScrollView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
-@class VLCLibraryVideoCollectionViewGroupDescriptor;
 @class VLCLibraryVideoCollectionViewContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewContainerView : NSView
+@interface VLCLibraryVideoCollectionViewContainerView : NSView<VLCLibraryVideoViewContainerView>
 
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) VLCSubScrollView *scrollView;
 @property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
-@property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;
-@property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
-
-- (void)setVideoGroup:(const VLCMediaLibraryParentGroupType)group;
-- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 
