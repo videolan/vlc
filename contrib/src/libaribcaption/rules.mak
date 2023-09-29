@@ -1,6 +1,5 @@
-LIBARIBCC_HASH := fab6e2a857dbda2eabca5c9b53d7a67e5c00c626
-LIBARIBCC_VERSION := git-$(LIBARIBCC_HASH)
-LIBARIBCC_GITURL := $(GITHUB)/xqq/libaribcaption.git
+LIBARIBCC_VERSION := 1.1.1
+LIBARIBCC_URL := $(GITHUB)/xqq/libaribcaption/archive/refs/tags/v$(LIBARIBCC_VERSION).tar.gz
 
 PKGS += libaribcaption
 ifeq ($(call need_pkg,"libaribcaption"),)
@@ -27,14 +26,12 @@ ifeq ($(LIBARIBCC_WITH_FONTCONFIG), 1)
 DEPS_libaribcaption += fontconfig $(DEPS_fontconfig)
 endif
 
-$(TARBALLS)/libaribcaption-$(LIBARIBCC_VERSION).tar.xz:
-	$(call download_git,$(LIBARIBCC_GITURL),,$(LIBARIBCC_HASH))
+$(TARBALLS)/libaribcaption-$(LIBARIBCC_VERSION).tar.gz:
+	${call download_pkg,$(LIBARIBCC_URL),libaribcaption}
 
-.sum-libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.xz
-	$(call check_githash,$(LIBARIBCC_HASH))
-	touch $@
+.sum-libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.gz
 
-libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.xz .sum-libaribcaption
+libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.gz .sum-libaribcaption
 	$(UNPACK)
 	$(MOVE)
 
