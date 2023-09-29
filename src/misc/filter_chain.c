@@ -37,8 +37,7 @@ typedef struct chained_filter_t
 {
     /* Public part of the filter structure */
     filter_t filter;
-    /* Private filter chain data (shhhh!) */
-    struct chained_filter_t *prev, *next;
+    struct vlc_list node;
     vlc_mouse_t mouse;
     vlc_picture_chain_t pending;
 } chained_filter_t;
@@ -49,7 +48,7 @@ struct filter_chain_t
     vlc_object_t *obj;
     filter_owner_t parent_video_owner; /**< Owner (downstream) callbacks */
 
-    chained_filter_t *first, *last; /**< List of filters */
+    struct vlc_list filter_list; /* chained_filter_t */
 
     es_format_t fmt_in; /**< Chain input format (constant) */
     vlc_video_context *vctx_in; /**< Chain input video context (set on Reset) */
@@ -76,8 +75,7 @@ static filter_chain_t *filter_chain_NewInner( vlc_object_t *obj,
         return NULL;
 
     chain->obj = obj;
-    chain->first = NULL;
-    chain->last = NULL;
+    vlc_list_init( &chain->filter_list );
     es_format_Init( &chain->fmt_in, cat, 0 );
     chain->vctx_in = NULL;
     es_format_Init( &chain->fmt_out, cat, 0 );
@@ -98,7 +96,8 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
 {
     picture_t *pic;
     chained_filter_t *chained = container_of(filter, chained_filter_t, filter);
-    if( chained->next != NULL )
+    filter_chain_t *chain = filter->owner.sys;
+    if( !vlc_list_is_last( &chained->node, &chain->filter_list ) )
     {
         // HACK as intermediate filters may not have the same video format as
         // the last one handled by the owner
@@ -111,8 +110,6 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
     }
     else
     {
-        filter_chain_t *chain = filter->owner.sys;
-
         // the owner of the chain requires pictures from the last filter to be grabbed from its callback
         /* XXX ugly */
         filter_owner_t saved_owner = filter->owner;
@@ -162,8 +159,9 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
 
 void filter_chain_Clear( filter_chain_t *p_chain )
 {
-    while( p_chain->first != NULL )
-        filter_chain_DeleteFilter( p_chain, &p_chain->first->filter );
+    chained_filter_t *chained;
+    vlc_list_foreach( chained, &p_chain->filter_list, node )
+        filter_chain_DeleteFilter( p_chain, &chained->filter );
 }
 
 void filter_chain_Delete( filter_chain_t *p_chain )
@@ -211,10 +209,12 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
 
     const es_format_t *fmt_in;
     vlc_video_context *vctx_in;
-    if( chain->last != NULL )
+    chained_filter_t *last =
+        vlc_list_last_entry_or_null( &chain->filter_list, chained_filter_t, node );
+    if( last != NULL )
     {
-        fmt_in = &chain->last->filter.fmt_out;
-        vctx_in = chain->last->filter.vctx_out;
+        fmt_in = &last->filter.fmt_out;
+        vctx_in = last->filter.vctx_out;
     }
     else
     {
@@ -257,16 +257,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
         goto error;
     assert( filter->ops != NULL );
 
-    if( chain->last == NULL )
-    {
-        assert( chain->first == NULL );
-        chain->first = chained;
-    }
-    else
-        chain->last->next = chained;
-    chained->prev = chain->last;
-    chain->last = chained;
-    chained->next = NULL;
+    vlc_list_append( &chained->node, &chain->filter_list );
 
     vlc_mouse_Init( &chained->mouse );
     vlc_picture_chain_Init( &chained->pending );
@@ -304,24 +295,10 @@ int filter_chain_AppendConverter( filter_chain_t *chain,
 
 void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
 {
-    chained_filter_t *chained = (chained_filter_t *)filter;
+    chained_filter_t *chained = container_of(filter, chained_filter_t, filter);
 
     /* Remove it from the chain */
-    if( chained->prev != NULL )
-        chained->prev->next = chained->next;
-    else
-    {
-        assert( chained == chain->first );
-        chain->first = chained->next;
-    }
-
-    if( chained->next != NULL )
-        chained->next->prev = chained->prev;
-    else
-    {
-        assert( chained == chain->last );
-        chain->last = chained->prev;
-    }
+    vlc_list_remove( &chained->node );
 
     filter_Close( filter );
     module_unneed( filter, filter->p_module );
@@ -374,7 +351,10 @@ int filter_chain_AppendFromString( filter_chain_t *chain, const char *str )
 error:
     while( ret > 0 ) /* Unwind */
     {
-        filter_chain_DeleteFilter( chain, &chain->last->filter );
+        chained_filter_t *last =
+            vlc_list_last_entry_or_null( &chain->filter_list, chained_filter_t, node );
+        assert( last != NULL );
+        filter_chain_DeleteFilter( chain, &last->filter );
         ret--;
     }
     free( buf );
@@ -384,7 +364,8 @@ error:
 int filter_chain_ForEach( filter_chain_t *chain,
                           int (*cb)( filter_t *, void * ), void *opaque )
 {
-    for( chained_filter_t *f = chain->first; f != NULL; f = f->next )
+    chained_filter_t *f;
+    vlc_list_foreach( f, &chain->filter_list, node )
     {
         int ret = cb( &f->filter, opaque );
         if( ret )
@@ -395,13 +376,15 @@ int filter_chain_ForEach( filter_chain_t *chain,
 
 bool filter_chain_IsEmpty(const filter_chain_t *chain)
 {
-    return chain->first == NULL;
+    return vlc_list_is_empty( &chain->filter_list );
 }
 
 const es_format_t *filter_chain_GetFmtOut( const filter_chain_t *p_chain )
 {
-    if( p_chain->last != NULL )
-        return &p_chain->last->filter.fmt_out;
+    chained_filter_t *last =
+        vlc_list_last_entry_or_null( &p_chain->filter_list, chained_filter_t, node );
+    if( last != NULL )
+        return &last->filter.fmt_out;
 
     /* Unless filter_chain_Reset has been called we are doomed */
     return &p_chain->fmt_out;
@@ -409,8 +392,10 @@ const es_format_t *filter_chain_GetFmtOut( const filter_chain_t *p_chain )
 
 vlc_video_context *filter_chain_GetVideoCtxOut(const filter_chain_t *p_chain)
 {
-    if( p_chain->last != NULL )
-        return p_chain->last->filter.vctx_out;
+    chained_filter_t *last =
+        vlc_list_last_entry_or_null( &p_chain->filter_list, chained_filter_t, node );
+    if( last != NULL )
+        return last->filter.vctx_out;
 
     /* No filter was added, the filter chain has no effect, make sure the chromas are compatible */
     assert( video_format_IsSameChroma( &p_chain->fmt_in.video, &p_chain->fmt_out.video ) );
@@ -433,32 +418,40 @@ static picture_t *FilterSingleChainedFilter( chained_filter_t *f, picture_t *p_p
     return p_pic;
 }
 
-static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic )
-{
-    for( ; f != NULL; f = f->next )
-    {
-        p_pic = FilterSingleChainedFilter( f, p_pic );
-        if( !p_pic )
-            break;
-    }
-    return p_pic;
-}
-
 picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
 {
     if( p_pic )
     {
-        p_pic = FilterChainVideoFilter( p_chain->first, p_pic );
+        chained_filter_t *f;
+        vlc_list_foreach( f, &p_chain->filter_list, node )
+        {
+            p_pic = FilterSingleChainedFilter( f, p_pic );
+            if( !p_pic )
+                break;
+        }
         if( p_pic )
             return p_pic;
     }
-    for( chained_filter_t *b = p_chain->last; b != NULL; b = b->prev )
-    {
-        if( vlc_picture_chain_IsEmpty( &b->pending ) )
-            continue;
-        p_pic = vlc_picture_chain_PopFront( &b->pending );
 
-        p_pic = FilterChainVideoFilter( b->next, p_pic );
+    // look backward in filters for a pending picture
+    chained_filter_t *b;
+    vlc_list_reverse_foreach( b, &p_chain->filter_list, node )
+    {
+        p_pic = vlc_picture_chain_PopFront( &b->pending );
+        if (p_pic == NULL)
+            continue;
+
+        // iterate forward through the next filters
+        struct vlc_list_it f_it = vlc_list_it_b;
+        vlc_list_it_next(&f_it);
+        for ( ; vlc_list_it_continue(&f_it); vlc_list_it_next(&f_it) )
+        {
+            chained_filter_t *f =
+                container_of(f_it.current, chained_filter_t, node);
+            p_pic = FilterSingleChainedFilter( f, p_pic );
+            if( !p_pic )
+                break;
+        }
         if( p_pic )
             return p_pic;
     }
@@ -467,7 +460,8 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
 
 void filter_chain_VideoFlush( filter_chain_t *p_chain )
 {
-    for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
+    chained_filter_t *f;
+    vlc_list_foreach( f, &p_chain->filter_list, node )
     {
         filter_t *p_filter = &f->filter;
 
@@ -480,8 +474,9 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
 int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const vlc_mouse_t *p_src )
 {
     vlc_mouse_t current = *p_src;
+    chained_filter_t *f;
 
-    for( chained_filter_t *f = p_chain->last; f != NULL; f = f->prev )
+    vlc_list_reverse_foreach( f, &p_chain->filter_list, node )
     {
         filter_t *p_filter = &f->filter;
 
