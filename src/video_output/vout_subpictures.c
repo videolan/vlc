@@ -1911,6 +1911,24 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     vlc_mutex_unlock(&sys->lock);
 }
 
+struct sub_source
+{
+    spu_t       *spu;
+    vlc_tick_t  display_date;
+};
+
+/**
+ * Generate subpictures from a chain of subpicture source "filters".
+ */
+static int SubSourceGenerate( filter_t *p_filter, void *opaque )
+{
+    const struct sub_source *spu_src = opaque;
+    subpicture_t *p_subpic = p_filter->ops->source_sub( p_filter, spu_src->display_date );
+    if( p_subpic )
+        spu_PutSubpicture( spu_src->spu, p_subpic );
+    return VLC_SUCCESS;
+}
+
 subpicture_t *spu_Render(spu_t *spu,
                          const vlc_fourcc_t *chroma_list,
                          const video_format_t *fmt_dst,
@@ -1945,7 +1963,8 @@ subpicture_t *spu_Render(spu_t *spu,
         free(chain_update);
     }
     /* Run subpicture sources */
-    filter_chain_SubSource(sys->source_chain, spu, system_now);
+    struct sub_source sub_src = { spu, system_now };
+    filter_chain_ForEach(sys->source_chain, SubSourceGenerate, &sub_src);
 
     static const vlc_fourcc_t chroma_list_default_yuv[] = {
         VLC_CODEC_YUVA,
