@@ -563,6 +563,8 @@ VLC_API int filter_chain_AppendFromString(filter_chain_t *chain,
  *
  * \param chain filter chain to remove the filter from
  * \param filter filter to remove from the chain and delete
+ *
+ * \note the filter must be created with filter_chain_AppendInner().
  */
 VLC_API void filter_chain_DeleteFilter(filter_chain_t *chain,
                                        filter_t *filter);
