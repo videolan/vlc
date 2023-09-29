@@ -136,9 +136,10 @@ T.Pane {
                 anchors.right: (parent === pseudoRow) ? parent.right : undefined
                 anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: MainCtx.showRemainingTime = !MainCtx.showRemainingTime
+                TapHandler {
+                    onTapped: (eventPoint, button) => {
+                        MainCtx.showRemainingTime = !MainCtx.showRemainingTime
+                    }
                 }
             },
             SliderBar {
