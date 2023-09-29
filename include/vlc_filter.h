@@ -606,16 +606,6 @@ VLC_API picture_t *filter_chain_VideoFilter(filter_chain_t *chain,
 VLC_API void filter_chain_VideoFlush( filter_chain_t * );
 
 /**
- * Apply filter chain to subpictures.
- *
- * \param chain filter chain
- * \param subpic subpicture to apply filters on
- * \return modified subpicture after applying all subpicture filters
- */
-VLC_API subpicture_t *filter_chain_SubFilter(filter_chain_t *chain,
-                                             subpicture_t *subpic);
-
-/**
  * Apply the filter chain to a mouse state.
  *
  * It will be applied from the output to the input. It makes sense only

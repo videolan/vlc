@@ -468,20 +468,6 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
     }
 }
 
-subpicture_t *filter_chain_SubFilter( filter_chain_t *p_chain, subpicture_t *p_subpic )
-{
-    for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
-    {
-        filter_t *p_filter = &f->filter;
-
-        p_subpic = p_filter->ops->filter_sub( p_filter, p_subpic );
-
-        if( !p_subpic )
-            break;
-    }
-    return p_subpic;
-}
-
 int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const vlc_mouse_t *p_src )
 {
     vlc_mouse_t current = *p_src;
