@@ -119,18 +119,20 @@ static int SubpictureValidate(subpicture_t *p_subpic,
 
     const vlc_tick_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
 
-    aribcc_render_status_t status = aribcc_renderer_render(p_sys->p_renderer,
-                                                           MS_FROM_VLC_TICK(i_stream_date),
-                                                           &p_spusys->render_result);
-    if (status == ARIBCC_RENDER_STATUS_ERROR) {
-        return VLC_SUCCESS;
+    /* Retrieve the expected render status for detecting whether the subtitle image changed */
+    aribcc_render_status_t status = aribcc_renderer_try_render(p_sys->p_renderer,
+                                                               MS_FROM_VLC_TICK(i_stream_date));
+    if (status == ARIBCC_RENDER_STATUS_GOT_IMAGE_UNCHANGED) {
+        /* Skip rendering since images were not changed */
+        if (!b_src_changed && !b_dst_changed) {
+            return VLC_SUCCESS;
+        }
     }
 
-    bool b_changed = (status != ARIBCC_RENDER_STATUS_GOT_IMAGE_UNCHANGED);
-
-    if (!b_changed && !b_src_changed && !b_dst_changed &&
-        (p_spusys->render_result.images != NULL) == (p_subpic->p_region != NULL)) {
-        aribcc_render_result_cleanup(&p_spusys->render_result);
+    status = aribcc_renderer_render(p_sys->p_renderer,
+                                    MS_FROM_VLC_TICK(i_stream_date),
+                                    &p_spusys->render_result);
+    if (status == ARIBCC_RENDER_STATUS_ERROR) {
         return VLC_SUCCESS;
     }
 
