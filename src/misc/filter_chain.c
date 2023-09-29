@@ -417,20 +417,29 @@ vlc_video_context *filter_chain_GetVideoCtxOut(const filter_chain_t *p_chain)
     return p_chain->vctx_in;
 }
 
+static picture_t *FilterSingleChainedFilter( chained_filter_t *f, picture_t *p_pic )
+{
+    filter_t *p_filter = &f->filter;
+    p_pic = p_filter->ops->filter_video( p_filter, p_pic );
+    if( !p_pic )
+        return NULL;
+
+    if( !vlc_picture_chain_IsEmpty( &f->pending ) )
+    {
+        msg_Warn( p_filter, "dropping pictures" );
+        FilterDeletePictures( &f->pending );
+    }
+    f->pending = picture_GetAndResetChain( p_pic );
+    return p_pic;
+}
+
 static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic )
 {
     for( ; f != NULL; f = f->next )
     {
-        filter_t *p_filter = &f->filter;
-        p_pic = p_filter->ops->filter_video( p_filter, p_pic );
+        p_pic = FilterSingleChainedFilter( f, p_pic );
         if( !p_pic )
             break;
-        if( !vlc_picture_chain_IsEmpty( &f->pending ) )
-        {
-            msg_Warn( p_filter, "dropping pictures" );
-            FilterDeletePictures( &f->pending );
-        }
-        f->pending = picture_GetAndResetChain( p_pic );
     }
     return p_pic;
 }
