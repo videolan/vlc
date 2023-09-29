@@ -339,10 +339,15 @@ FocusScope {
             showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
             Navigation.parentItem: rootPlayer
-            Navigation.downItem: playlistVisibility.isPlaylistVisible ?
-                                     playlistpopup : (audioControls.visible ?
-                                                          audioControls : (Player.isInteractive ?
-                                                                               toggleControlBarButton : controlBarView))
+            Navigation.downItem: {
+                if (playlistVisibility.isPlaylistVisible)
+                    return playlistpopup
+                if (audioControls.visible)
+                    return audioControls
+                if (Player.isInteractive)
+                    return toggleControlBarButton
+                return controlBarView
+            }
 
             onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
@@ -753,10 +758,15 @@ FocusScope {
                           : ControlBar.TimeTextPosition.AboveSlider
 
             Navigation.parentItem: rootPlayer
-            Navigation.upItem: playlistVisibility.isPlaylistVisible ?
-                                   playlistpopup : (Player.isInteractive ?
-                                                        toggleControlBarButton : (audioControls.visible ?
-                                                                                      audioControls : topcontrolView))
+            Navigation.upItem: {
+                if (playlistVisibility.isPlaylistVisible)
+                    return playlistpopup
+                if (Player.isInteractive)
+                    return toggleControlBarButton
+                if (audioControls.visible)
+                    return audioControls
+                return topcontrolView
+            }
 
             onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
 
