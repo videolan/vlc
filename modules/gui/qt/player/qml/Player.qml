@@ -339,7 +339,7 @@ FocusScope {
             showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
             Navigation.parentItem: rootPlayer
-            Navigation.downItem: playlistpopup.showPlaylist ?
+            Navigation.downItem: playlistVisibility.isPlaylistVisible ?
                                      playlistpopup : (audioControls.visible ?
                                                           audioControls : (Player.isInteractive ?
                                                                                toggleControlBarButton : controlBarView))
@@ -565,8 +565,6 @@ FocusScope {
     Widgets.DrawerExt {
         id: playlistpopup
 
-        property bool showPlaylist: false
-
         anchors {
             // NOTE: When the controls are pinned we display the playqueue under the topBar.
             top: (rootPlayer._controlsUnderVideo) ? topcontrolView.bottom
@@ -715,7 +713,7 @@ FocusScope {
         iconTxt: controlBarView.state === "hidden" ? VLCIcons.expand_inverted : VLCIcons.expand
 
         Navigation.parentItem: rootPlayer
-        Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
+        Navigation.upItem: playlistVisibility.isPlaylistVisible ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
         Navigation.downItem: controlBarView
 
         onClicked: {
@@ -755,7 +753,7 @@ FocusScope {
                           : ControlBar.TimeTextPosition.AboveSlider
 
             Navigation.parentItem: rootPlayer
-            Navigation.upItem: playlistpopup.showPlaylist ?
+            Navigation.upItem: playlistVisibility.isPlaylistVisible ?
                                    playlistpopup : (Player.isInteractive ?
                                                         toggleControlBarButton : (audioControls.visible ?
                                                                                       audioControls : topcontrolView))
