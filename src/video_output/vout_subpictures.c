@@ -1796,6 +1796,15 @@ void spu_SetClockRate(spu_t *spu, size_t channel_id, float rate)
     vlc_mutex_unlock(&sys->lock);
 }
 
+static int SubFilter( filter_t *p_filter, void *opaque )
+{
+    subpicture_t **pp_subpic = opaque;
+    *pp_subpic = p_filter->ops->filter_sub( p_filter, *pp_subpic );
+    if (*pp_subpic == NULL)
+        return VLC_EINVAL; // stop filtering
+    return VLC_SUCCESS;
+}
+
 /**
  * Display a subpicture
  *
@@ -1861,7 +1870,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     /* Run filter chain on the new subpicture */
     vlc_mutex_lock(&sys->filter_chain_lock);
-    subpic = filter_chain_SubFilter(spu->p->filter_chain, subpic);
+    filter_chain_ForEach( sys->filter_chain, SubFilter, &subpic );
     vlc_mutex_unlock(&sys->filter_chain_lock);
     if (!subpic || subpic->i_channel < 0)
     {
