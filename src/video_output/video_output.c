@@ -911,7 +911,8 @@ static void ChangeFilters(vout_thread_sys_t *vout)
 
         if (ret != VLC_SUCCESS)
         {
-            msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
+            msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes in interactive chain (%p)",
+                    (void*)sys->filter.chain_interactive);
             if (filter_chain_AppendConverter(sys->filter.chain_interactive,
                                              &fmt_target) != VLC_SUCCESS) {
                 msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");

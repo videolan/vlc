@@ -262,9 +262,9 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     vlc_mouse_Init( &chained->mouse );
     vlc_picture_chain_Init( &chained->pending );
 
-    msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain",
+    msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain (%p)",
              (name != NULL) ? name : module_GetShortName(filter->p_module),
-             (void *)filter );
+             (void *)filter, (void *)chain );
     return filter;
 
 error:

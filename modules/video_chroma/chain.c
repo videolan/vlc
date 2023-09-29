@@ -417,8 +417,8 @@ static int BuildFilterChain( filter_t *p_filter )
             i_chroma == p_filter->fmt_out.i_codec )
             continue;
 
-        msg_Dbg( p_filter, "Trying to use chroma %4.4s as middle man",
-                 (char*)&i_chroma );
+        msg_Dbg( p_filter, "Trying to use chroma %4.4s as middle man in chain (%p)",
+                 (char*)&i_chroma, (void*)p_sys->p_chain );
 
         es_format_Clean( &fmt_mid );
         es_format_Copy( &fmt_mid, &p_filter->fmt_in );
