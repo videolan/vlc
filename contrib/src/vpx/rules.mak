@@ -1,7 +1,7 @@
 # libvpx
 
-VPX_VERSION := 1.13.0
-VPX_URL := http://github.com/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
+VPX_VERSION := 1.13.1
+VPX_URL := $(GITHUB)/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
 ifeq ($(call need_pkg,"vpx >= 1.5.0"),)
