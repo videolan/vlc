@@ -1,7 +1,7 @@
 # X protocol C language Bindings
 
 XCB_VERSION := 1.14
-XCB_URL := http://xorg.freedesktop.org/archive/individual/lib/libxcb-$(XCB_VERSION).tar.gz
+XCB_URL := $(XORG)/lib/libxcb-$(XCB_VERSION).tar.gz
 
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID

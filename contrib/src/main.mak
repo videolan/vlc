@@ -30,6 +30,7 @@ GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/c
 GNUGPG := https://www.gnupg.org/ftp/gcrypt
 QT := https://download.qt.io/official_releases/qt
 XIPH := https://ftp.osuosl.org/pub/xiph/releases
+XORG := https://www.x.org/releases/individual
 
 #
 # Machine-dependent variables
