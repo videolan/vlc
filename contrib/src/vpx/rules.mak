@@ -3,7 +3,9 @@
 VPX_VERSION := 1.13.1
 VPX_URL := $(GITHUB)/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
+ifneq ($(filter arm aarch64 i386 loongarch64 mipsel mips64el ppc64le x86_64, $(ARCH)),)
 PKGS += vpx
+endif
 ifeq ($(call need_pkg,"vpx >= 1.5.0"),)
 PKGS_FOUND += vpx
 endif
