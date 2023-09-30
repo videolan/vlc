@@ -40,7 +40,7 @@ Input:
 Contribs:
  * Update of fluidlite, fixing some MIDI rendering on Windows
  * Update of zlib to 1.2.13 (CVE-2022-37434)
- * Update of FFmpeg, vpx, ebml, dav1d, libass
+ * Update of FFmpeg, vpx (CVE-2023-5217), ebml, dav1d, libass
 
 Misc:
  * Improve muxing timestamps in a few formats (reset to 0)
@@ -55,10 +55,13 @@ Misc:
  * Fix 5.1/7.1 output on macOS and tvOS
  * Fix several crashes and bugs in the macOS preferences panel
  * Improvements on the threading of the MMDevice audio output on Windows
+ * Fix a potential security issue on the uninstaller DLLs
+ * Fix memory leaks when using the media_list_player libVLC APIs
 
 Translations:
  * Update of most translations
  * New translations to Esperanto, Interlingue, Lao, Macedonian, Burmese, Odia, Samoan and Swahili
+
 
 Changes between 3.0.18-rc2 and 3.0.18:
 --------------------------------------
