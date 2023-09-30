@@ -163,7 +163,7 @@ MINGW64_UWP_CONF := --without-headers --with-crt --without-libraries --without-t
 ifeq ($(ARCH),x86_64)
 MINGW64_UWP_CONF +=--disable-lib32 --enable-lib64
 MINGW64_BUILDDIR := lib64
-else ifeq ($(ARCH),i686)
+else ifeq ($(ARCH),i386)
 MINGW64_UWP_CONF +=--enable-lib32 --disable-lib64
 MINGW64_BUILDDIR := lib32
 else ifeq ($(ARCH),aarch64)
