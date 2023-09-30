@@ -619,13 +619,11 @@ interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
             break;
 #endif
 
-        case VLC_CODEC_XRGB:
         case VLC_CODEC_RGBA:
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
             };
             break;
-        case VLC_CODEC_BGRX:
         case VLC_CODEC_BGRA: {
             if (vlc_gl_interop_GetTexFormatSize(interop, tex_target, GL_BGRA, GL_RGBA,
                                                 GL_UNSIGNED_BYTE) != 32)
