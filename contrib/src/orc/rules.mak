@@ -23,6 +23,7 @@ orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(MOVE)
 
 .orc: orc
+	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)
