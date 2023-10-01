@@ -35,6 +35,6 @@ endif
 	  ./rustup-init.sh --no-modify-path -y --default-toolchain $(RUST_VERSION)
 	+$(RUSTUP) default $(RUST_VERSION)
 	+$(RUSTUP) target add $(RUST_TARGET)
-	unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
+	+unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
 		$(CARGO) install --locked $(CARGOC_FEATURES) cargo-c --version $(CARGOC_VERSION)
 	touch $@
