@@ -109,10 +109,10 @@
 
         // Insert at top after leading containers, hence _leadingContainerCount
         [_collectionsStackView insertArrangedSubview:containerView atIndex:_leadingContainerCount];
-        [self setupContainerView:containerView forStackView:_collectionsStackView];
+        [self setupContainerView:containerView withStackView:_collectionsStackView];
     } else {
         [mutableContainers removeObjectAtIndex:recentsContainerIndex];
-        VLCLibraryVideoCollectionViewContainerView * const existingContainer = [_containers objectAtIndex:recentsContainerIndex];
+        NSView<VLCLibraryVideoViewContainerView> * const existingContainer = [_containers objectAtIndex:recentsContainerIndex];
         [_collectionsStackView removeConstraints:existingContainer.constraintsWithSuperview];
         [_collectionsStackView removeArrangedSubview:existingContainer];
     }
@@ -122,7 +122,7 @@
 
 - (void)generateCollectionViewContainers
 {
-    NSMutableArray<VLCLibraryVideoCollectionViewContainerView *> * const collectionViewContainers = [[NSMutableArray alloc] init];
+    NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const collectionViewContainers = [[NSMutableArray alloc] init];
     const BOOL anyRecents = [self recentMediaPresent];
     NSUInteger i = anyRecents ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
@@ -132,21 +132,21 @@
         [collectionViewContainers addObject:containerView];
     }
 
-    _containers = collectionViewContainers;
+    _containers = collectionViewContainers.copy;
 }
 
 - (void)reloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (VLCLibraryVideoCollectionViewContainerView *containerView in self->_containers) {
+        for (NSView<VLCLibraryVideoViewContainerView> *containerView in self->_containers) {
             [self.heroView setOptimalRepresentedItem];
-            [containerView.collectionView reloadData];
+            [containerView.dataSource reloadData];
         }
     });
 }
 
 - (NSArray<NSLayoutConstraint*> *)setupViewConstraints:(NSView *)view
-                                          forStackView:(NSStackView *)stackView
+                                         withStackView:(NSStackView *)stackView
 {
     if (view == nil || stackView == nil) {
         return @[];
@@ -177,15 +177,15 @@
     return constraintsWithSuperview;
 }
 
-- (void)setupContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
-              forStackView:(NSStackView *)stackView
+- (void)setupContainerView:(NSView<VLCLibraryVideoViewContainerView> *)containerView
+             withStackView:(NSStackView *)stackView
 {
     if (containerView == nil || stackView == nil) {
         return;
     }
 
-    NSArray<NSLayoutConstraint*> * const constraintsWithSuperview = [self setupViewConstraints:containerView forStackView:stackView];
-    containerView.constraintsWithSuperview = constraintsWithSuperview;
+    containerView.constraintsWithSuperview = [self setupViewConstraints:containerView
+                                                          withStackView:stackView];
 }
 
 - (void)addView:(NSView *)view
@@ -196,10 +196,10 @@
     }
 
     [stackView addArrangedSubview:view];
-    [self setupViewConstraints:view forStackView:stackView];
+    [self setupViewConstraints:view withStackView:stackView];
 }
 
-- (void)addContainerView:(VLCLibraryVideoCollectionViewContainerView *)containerView
+- (void)addContainerView:(NSView<VLCLibraryVideoViewContainerView> *)containerView
              toStackView:(NSStackView *)stackView
 {
     if (containerView == nil || stackView == nil) {
@@ -207,7 +207,7 @@
     }
 
     [stackView addArrangedSubview:containerView];
-    [self setupContainerView:containerView forStackView:stackView];
+    [self setupContainerView:containerView withStackView:stackView];
 }
 
 - (void)setCollectionsStackView:(NSStackView *)collectionsStackView
@@ -234,7 +234,7 @@
     [self addView:self.heroView toStackView:_collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 
-    for (VLCLibraryVideoCollectionViewContainerView * const containerView in _containers) {
+    for (NSView<VLCLibraryVideoViewContainerView> * const containerView in _containers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];
     }
 }
@@ -245,8 +245,11 @@
 
     _collectionsStackViewScrollView = newScrollView;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
-        containerView.scrollView.parentScrollView = _collectionsStackViewScrollView;
+    for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
+            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+            collectionViewContainerView.scrollView.parentScrollView = _collectionsStackViewScrollView;
+        }
     }
 }
 
@@ -254,8 +257,11 @@
 {
     _collectionViewItemSize = collectionViewItemSize;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
-        containerView.collectionViewDelegate.staticItemSize = collectionViewItemSize;
+     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
+            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+            collectionViewContainerView.collectionViewDelegate.staticItemSize = collectionViewItemSize;
+        }
     }
 }
 
@@ -263,17 +269,23 @@
 {
     _collectionViewSectionInset = collectionViewSectionInset;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
-        containerView.collectionViewLayout.sectionInset = collectionViewSectionInset;
-    }
+     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
+            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+            collectionViewContainerView.collectionViewLayout.sectionInset = collectionViewSectionInset;
+        }
+     }
 }
 
 - (void)setCollectionViewMinimumLineSpacing:(CGFloat)collectionViewMinimumLineSpacing
 {
     _collectionViewMinimumLineSpacing = collectionViewMinimumLineSpacing;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
-        containerView.collectionViewLayout.minimumLineSpacing = collectionViewMinimumLineSpacing;
+     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
+            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+            collectionViewContainerView.collectionViewLayout.minimumLineSpacing = collectionViewMinimumLineSpacing;
+        }
     }
 }
 
@@ -281,8 +293,11 @@
 {
     _collectionViewMinimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
 
-    for (VLCLibraryVideoCollectionViewContainerView *containerView in _containers) {
-        containerView.collectionViewLayout.minimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
+    for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
+            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+            collectionViewContainerView.collectionViewLayout.minimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
+        }
     }
 }
 
