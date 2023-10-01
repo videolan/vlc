@@ -30,7 +30,6 @@
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
 
@@ -39,6 +38,7 @@
 @synthesize groupDescriptor = _groupDescriptor;
 @synthesize videoGroup = _videoGroup;
 @synthesize constraintsWithSuperview = _constraintsWithSuperview;
+@synthesize dataSource = _dataSource;
 
 - (instancetype)init
 {

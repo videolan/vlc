@@ -27,7 +27,6 @@
 @class VLCSubScrollView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
-@class VLCLibraryVideoCollectionViewContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,7 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) VLCSubScrollView *scrollView;
-@property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
 
 @end
 

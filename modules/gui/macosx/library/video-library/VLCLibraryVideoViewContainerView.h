@@ -24,7 +24,7 @@
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
-@class VLCLibraryVideoCollectionViewGroupDescriptor;
+@class VLCLibraryVideoCollectionViewContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;
 @property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
+@property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
 
 - (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
