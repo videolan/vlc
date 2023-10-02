@@ -68,20 +68,6 @@ static inline void SetBitmapRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt
     }
 }
 
-static inline bool MatchBitmapRGBMasks( const es_format_t *fmt )
-{
-    for( size_t i=0; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
-    {
-        if( bitmap_rgb_masks[i].codec == fmt->i_codec )
-        {
-            return fmt->video.i_rmask == bitmap_rgb_masks[i].i_rmask &&
-                   fmt->video.i_gmask == bitmap_rgb_masks[i].i_gmask &&
-                   fmt->video.i_bmask == bitmap_rgb_masks[i].i_bmask;
-        }
-    }
-    return false;
-}
-
 struct bitmapinfoheader_properties
 {
     bool b_flipped;
