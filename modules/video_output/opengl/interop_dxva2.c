@@ -59,16 +59,6 @@
 static int  GLConvOpen(vlc_object_t *);
 static void GLConvClose(vlc_object_t *);
 
-vlc_module_begin ()
-    set_shortname("dxva2")
-    set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_description("DXVA2 surface converter")
-    set_capability("glinterop", 1)
-    set_callbacks(GLConvOpen, GLConvClose)
-
-    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL)
-vlc_module_end ()
-
 struct wgl_vt {
     PFNWGLGETEXTENSIONSSTRINGEXTPROC     GetExtensionsStringEXT;
     PFNWGLGETEXTENSIONSSTRINGARBPROC     GetExtensionsStringARB;
@@ -561,3 +551,13 @@ error:
     GLConvClose(obj);
     return VLC_EGENERIC;
 }
+
+vlc_module_begin ()
+    set_shortname("dxva2")
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_description("DXVA2 surface converter")
+    set_capability("glinterop", 1)
+    set_callbacks(GLConvOpen, GLConvClose)
+
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL)
+vlc_module_end ()
