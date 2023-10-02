@@ -138,9 +138,8 @@ error:
     return result;
 }
 
-static void Close(vlc_object_t *obj)
+static void tc_nvdec_gl_close(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *)obj;
     converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device_Release(p_sys->device);
 }
@@ -275,6 +274,7 @@ static int Open(vlc_object_t *obj)
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_nvdec_gl_allocate_texture,
         .update_textures = tc_nvdec_gl_update,
+        .close = tc_nvdec_gl_close,
     };
     interop->ops = &ops;
     interop->priv = p_sys;
@@ -285,7 +285,7 @@ static int Open(vlc_object_t *obj)
 vlc_module_begin ()
     set_description("NVDEC OpenGL surface converter")
     set_capability("glinterop", 2)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("nvdec")
 vlc_module_end ()
