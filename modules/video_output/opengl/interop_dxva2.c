@@ -181,9 +181,8 @@ GLConvAllocateTextures(const struct vlc_gl_interop *interop, uint32_t textures[]
 }
 
 static void
-GLConvClose(vlc_object_t *obj)
+GLConvClose(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = container_of(obj, struct vlc_gl_interop, obj);
     struct glpriv *priv = interop->priv;
 
     if (priv->gl_handle_d3d)
@@ -520,6 +519,7 @@ GLConvOpen(vlc_object_t *obj)
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = GLConvAllocateTextures,
         .update_textures = GLConvUpdate,
+        .close = GLConvClose,
     };
     interop->ops = &ops;
 
@@ -542,7 +542,7 @@ GLConvOpen(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    GLConvClose(obj);
+    GLConvClose(interop);
     return VLC_EGENERIC;
 }
 
@@ -551,7 +551,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description("DXVA2 surface converter")
     set_capability("glinterop", 1)
-    set_callbacks(GLConvOpen, GLConvClose)
+    set_callback(GLConvOpen)
 
     add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL)
 vlc_module_end ()
