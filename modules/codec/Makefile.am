@@ -352,7 +352,7 @@ codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox/decoder.c
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
-libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo -Wl,-framework,Metal
 if HAVE_DARWIN
 codec_LTLIBRARIES += libvideotoolbox_plugin.la
 endif
@@ -360,7 +360,7 @@ endif
 libvideotoolbox_enc_plugin_la_SOURCES = codec/videotoolbox/encoder.c
 libvideotoolbox_enc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) # Trigger MODULE_NAME declaration
 libvideotoolbox_enc_plugin_la_LIBADD = libvlc_hxxxhelper.la libvlc_vtutils.la
-libvideotoolbox_enc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+libvideotoolbox_enc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo -Wl,-framework,Metal
 if HAVE_DARWIN
 if ENABLE_SOUT
 codec_LTLIBRARIES += libvideotoolbox_enc_plugin.la
@@ -652,6 +652,6 @@ libhxxxhelper_testdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libhxxxhelper_testdec_plugin_la_LIBADD = libvlc_hxxxhelper.la
 noinst_LTLIBRARIES += libhxxxhelper_testdec_plugin.la
 
-libvlc_vtutils_la_SOURCES = codec/vt_utils.c codec/vt_utils.h
+libvlc_vtutils_la_SOURCES = codec/vt_utils.c codec/vt_utils.h codec/vt_utils_native.m
 libvlc_vtutils_la_LDFLAGS = -static -no-undefined
 EXTRA_LTLIBRARIES += libvlc_vtutils.la

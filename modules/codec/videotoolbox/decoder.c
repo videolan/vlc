@@ -73,6 +73,7 @@ static void Drain(decoder_t *p_dec, bool flush);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
 static Boolean deviceSupportsHEVC();
+static bool deviceSupports42010bitRendering();
 static Boolean deviceSupportsAdvancedProfiles();
 static Boolean deviceSupportsAdvancedLevels();
 
@@ -252,7 +253,7 @@ static OSType GetBestChroma(uint8_t i_chroma_format, uint8_t i_depth_luma,
             return kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
         if (i_depth_luma == 10 && i_depth_chroma == 10)
         {
-            if (deviceSupportsHEVC()) /* 42010bit went with HEVC on macOS */
+            if (deviceSupportsHEVC() && deviceSupports42010bitRendering())
                 return kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
 
            /* Force BGRA output (and let VT handle the tone mapping) since the
@@ -1631,6 +1632,17 @@ static Boolean deviceSupportsHEVC()
         return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
     else
         return false;
+}
+
+static bool deviceSupports42010bitRendering()
+{
+#if TARGET_OS_IPHONE
+    /* iPhone/iPad/aTV needs metal device to render 420 10bit */
+    return cvpx_system_has_metal_device();
+#else
+    /* macOS can render 420 10bit with OpenGL and Metal */
+    return true;
+#endif
 }
 
 static Boolean deviceSupportsAdvancedProfiles()

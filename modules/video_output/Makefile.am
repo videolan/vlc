@@ -37,7 +37,7 @@ libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
 libglinterop_cvpx_plugin_la_LIBADD = libvlc_vtutils.la
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface
+	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface,-framework,Metal
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_DARWIN
 if HAVE_OSX
@@ -105,7 +105,7 @@ libcvpx_gl_plugin_la_SOURCES = video_output/apple/VLCCVOpenGLProvider.m
 libcvpx_gl_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libcvpx_gl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DGL_SILENCE_DEPRECATION
 libcvpx_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
-    -Wl,-framework,Foundation,-framework,CoreFoundation,-framework,CoreVideo
+    -Wl,-framework,Foundation,-framework,CoreFoundation,-framework,CoreVideo,-framework,Metal
 libcvpx_gl_plugin_la_LIBADD = libvlc_vtutils.la
 
 if HAVE_DARWIN

@@ -129,6 +129,13 @@ bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key);
  */
 void cvpx_attach_mapped_color_properties(CVPixelBufferRef cvpx, 
                                          const video_format_t *fmt);
+/**
+ * @brief Check if current system has at least one metal GPU device
+ * 
+ * @return true if there's at least one metal device available
+ * @return false if there's no metal device
+ */
+bool cvpx_system_has_metal_device();
 
 enum cvpx_video_context_type
 {
