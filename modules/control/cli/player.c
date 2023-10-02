@@ -646,14 +646,13 @@ static int VolumeMove(struct cli_client *cl, const char *const *args,
     const char *psz_cmd = args[0];
     const char *arg = count > 1 ? args[1] : "";
 
-    float volume;
     int i_nb_steps = atoi(arg);
 
     if( !strcmp(psz_cmd, "voldown") )
         i_nb_steps *= -1;
 
     vlc_player_Lock(player);
-    vlc_player_aout_IncrementVolume(player, i_nb_steps, &volume);
+    vlc_player_aout_IncrementVolume(player, i_nb_steps, NULL);
     vlc_player_Unlock(player);
     (void) cl;
     return 0;
