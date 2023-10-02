@@ -259,7 +259,7 @@ static int Open(vout_display_t *vd,
     if (sys->vgl == NULL)
         goto error;
 
-    vlc_viewpoint_init(&sys->viewpoint);
+    sys->viewpoint = vd->cfg->viewpoint;
 
     vd->info.subpicture_chromas = spu_chromas;
     vd->ops = &ops;
