@@ -113,7 +113,7 @@ player_on_rate_changed(vlc_player_t *player, float new_rate, void *data)
 static void
 player_on_position_changed(vlc_player_t *player,
                            vlc_tick_t new_time, double new_pos, void *data)
-{ VLC_UNUSED(player); VLC_UNUSED(new_pos);
+{ VLC_UNUSED(player);
     struct player_cli *pc = data;
 
     if (pc->input_buffering)
