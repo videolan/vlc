@@ -882,14 +882,31 @@ static void ChangeFilters(vout_thread_sys_t *vout)
         bool only_chroma_changed = es_format_IsSimilar(&tmp, &fmt_target);
         if (only_chroma_changed)
         {
-            msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
-                                (const char *) &p_fmt_current->video.i_chroma);
-            /* Only the chroma changed, request the vout to update the format */
-            ret = vout_SetDisplayFormat(sys->display, &p_fmt_current->video,
-                                        vctx_current);
-            if (ret != VLC_SUCCESS)
-                msg_Dbg(&vout->obj, "Changing vout format to %4.4s failed",
-                        (const char *) &p_fmt_current->video.i_chroma);
+            const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
+            const unsigned kept_picture     = 1; /* last displayed picture */
+            picture_pool_t *new_private_pool =
+                    picture_pool_NewFromFormat(&p_fmt_current->video,
+                                               private_picture + kept_picture);
+            if (new_private_pool != NULL)
+            {
+                msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
+                                    (const char *) &p_fmt_current->video.i_chroma);
+                /* Only the chroma changed, request the vout to update the format */
+                ret = vout_SetDisplayFormat(sys->display, &p_fmt_current->video,
+                                            vctx_current);
+                if (ret != VLC_SUCCESS)
+                {
+                    picture_pool_Release(new_private_pool);
+                    msg_Dbg(&vout->obj, "Changing vout format to %4.4s failed",
+                            (const char *) &p_fmt_current->video.i_chroma);
+                }
+                else
+                {
+                    // update the pool
+                    picture_pool_Release(sys->private_pool);
+                    sys->private_pool = new_private_pool;
+                }
+            }
         }
 
         if (ret != VLC_SUCCESS)
