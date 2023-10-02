@@ -41,9 +41,6 @@
 #  include <GL/glext.h>
 #endif
 
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
-
 typedef struct {
     vlc_decoder_device *device;
     CUcontext cuConverterCtx;
