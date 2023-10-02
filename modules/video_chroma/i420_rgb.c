@@ -268,15 +268,35 @@ static void Deactivate( filter_t *p_filter )
 static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    unsigned i_lrshift = ctz(vfmt->i_rmask);
-    unsigned i_lgshift = ctz(vfmt->i_gmask);
-    unsigned i_lbshift = ctz(vfmt->i_bmask);
-    unsigned i_rrshift = 8 - vlc_popcount(vfmt->i_rmask);
-    unsigned i_rgshift = 8 - vlc_popcount(vfmt->i_gmask);
-    unsigned i_rbshift = 8 - vlc_popcount(vfmt->i_bmask);
+    unsigned i_lrshift, i_lgshift, i_lbshift;
+    unsigned i_rrshift = 0;
+    unsigned i_rgshift = 0;
+    unsigned i_rbshift = 0;
 
     switch (p_filter->fmt_out.video.i_chroma)
     {
+        case VLC_CODEC_XRGB:
+        case VLC_CODEC_RGB24:
+            i_lrshift = 16;
+            i_lgshift =  8;
+            i_lbshift =  0;
+            break;
+        case VLC_CODEC_XBGR:
+        case VLC_CODEC_BGR24:
+            i_lbshift = 16;
+            i_lgshift =  8;
+            i_lrshift =  0;
+            break;
+        case VLC_CODEC_RGBX:
+            i_lrshift = 24;
+            i_lgshift = 16;
+            i_lbshift =  8;
+            break;
+        case VLC_CODEC_BGRX:
+            i_lbshift = 24;
+            i_lgshift = 16;
+            i_lrshift =  8;
+            break;
         case VLC_CODEC_RGB233:
             i_lrshift = 6;
             i_lgshift = 3;
@@ -302,6 +322,12 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
             i_rbshift = 6;
             break;
         default:
+            i_lrshift = ctz(vfmt->i_rmask);
+            i_lgshift = ctz(vfmt->i_gmask);
+            i_lbshift = ctz(vfmt->i_bmask);
+            i_rrshift = 8 - vlc_popcount(vfmt->i_rmask);
+            i_rgshift = 8 - vlc_popcount(vfmt->i_gmask);
+            i_rbshift = 8 - vlc_popcount(vfmt->i_bmask);
             break;
     }
 
