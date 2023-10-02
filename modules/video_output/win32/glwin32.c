@@ -66,6 +66,7 @@ typedef struct vout_display_sys_t
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
+    vlc_viewpoint_t       viewpoint;
 } vout_display_sys_t;
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
@@ -74,7 +75,11 @@ static void           Display(vout_display_t *, picture_t *);
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
     vout_display_sys_t *sys = vd->sys;
-    return vout_display_opengl_SetViewpoint(sys->vgl, vp);
+    int ret = vout_display_opengl_SetViewpoint(sys->vgl, vp);
+    if (ret != VLC_SUCCESS)
+        return ret;
+    sys->viewpoint = *vp;
+    return VLC_SUCCESS;
 }
 
 static int Control(vout_display_t *vd, int query)
@@ -102,12 +107,39 @@ static vlc_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
     return wnd;
 }
 
+static int
+UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
+             vlc_video_context *vctx)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    int ret = vlc_gl_MakeCurrent(sys->gl);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    ret = vout_display_opengl_UpdateFormat(sys->vgl, fmt, vctx);
+
+    // /* Force to recompute the viewport on next picture */
+    sys->area.place_changed = true;
+
+    /* Restore viewpoint */
+    int vp_ret = vout_display_opengl_SetViewpoint(sys->vgl, &sys->viewpoint);
+    /* The viewpoint previously applied is necessarily valid */
+    assert(vp_ret == VLC_SUCCESS);
+    (void) vp_ret;
+
+    vlc_gl_ReleaseCurrent(sys->gl);
+
+    return ret;
+}
+
 static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
     .control = Control,
     .set_viewpoint = SetViewpoint,
+    .update_format = UpdateFormat,
 };
 
 /**
@@ -160,6 +192,8 @@ static int Open(vout_display_t *vd,
     vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->vgl)
         goto error;
+
+    sys->viewpoint = vd->cfg->viewpoint;
 
     /* Setup vout_display now that everything is fine */
     vd->info.subpicture_chromas = subpicture_chromas;
