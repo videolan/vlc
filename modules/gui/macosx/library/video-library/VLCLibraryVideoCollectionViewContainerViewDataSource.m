@@ -28,8 +28,10 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
@@ -168,8 +170,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)reloadData
 {
-    if(!_collectionView || !_groupDescriptor) {
-        NSLog(@"Null collection view or video group descriptor");
+    if((self.collectionView == nil && self.carouselView == nil) || !_groupDescriptor) {
+        NSLog(@"Null collection view/carousel view or video group descriptor");
         return;
     }
 
@@ -186,7 +188,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_collectionView reloadData];
+            [self.collectionView reloadData];
+            [self.carouselView reloadData];
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                               object:self];
         });
@@ -205,7 +208,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     self.collectionArray = [mutableCollectionCopy copy];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
-    [self->_collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [self.carouselView reloadData];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
@@ -222,7 +226,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     self.collectionArray = [mutableCollectionCopy copy];
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
-    [self->_collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [self.carouselView reloadData];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
@@ -240,23 +245,21 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)setup
 {
-    VLCLibraryCollectionViewFlowLayout *collectionViewLayout = (VLCLibraryCollectionViewFlowLayout*)_collectionView.collectionViewLayout;
-    NSAssert(collectionViewLayout, @"Collection view must have a VLCLibraryCollectionViewFlowLayout!");
+    _collectionViewFlowLayout = _collectionView.collectionViewLayout;
+    self.collectionView.dataSource = self;
+    self.carouselView.dataSource = self;
 
-    _collectionViewFlowLayout = collectionViewLayout;
-    _collectionView.dataSource = self;
-
-    [_collectionView registerClass:[VLCLibraryCollectionViewItem class]
+    [self.collectionView registerClass:[VLCLibraryCollectionViewItem class]
              forItemWithIdentifier:VLCLibraryCellIdentifier];
 
-    [_collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+    [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
         forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                     withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
 
-    NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
-    [_collectionView registerNib:mediaItemSupplementaryDetailView
-      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
-                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+    NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
+    [self.collectionView registerNib:mediaItemSupplementaryDetailView
+          forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                      withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
