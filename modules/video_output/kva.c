@@ -452,7 +452,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
     bool use_masks = true;
-    int i_chroma_shift;
+    int i_chroma_shift = 0;
     int w, h;
 
     msg_Dbg( vd, "render chroma = %4.4s", ( const char * )&fmt->i_chroma );
@@ -475,7 +475,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                 case VLC_CODEC_YUYV:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_YUY2;
                     i_kva_fourcc = FOURCC_Y422;
-                    i_chroma_shift = 0;
                     break;
 
                 case VLC_CODEC_YV9:
@@ -487,13 +486,11 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                 case VLC_CODEC_RGB16:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR16;
                     i_kva_fourcc = FOURCC_R565;
-                    i_chroma_shift = 0;
                     break;
 
                 case VLC_CODEC_RGB15:
                     b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_BGR15;
                     i_kva_fourcc = FOURCC_R555;
-                    i_chroma_shift = 0;
                     break;
 
                 case VLC_CODEC_XRGB:
@@ -505,7 +502,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
-                        i_chroma_shift = 0;
                     }
                     break;
                 case VLC_CODEC_XBGR:
@@ -517,7 +513,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
-                        i_chroma_shift = 0;
                     }
                     break;
                 case VLC_CODEC_RGBX:
@@ -529,7 +524,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
-                        i_chroma_shift = 0;
                     }
                     break;
                 case VLC_CODEC_BGRX:
@@ -541,7 +535,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR4;
-                        i_chroma_shift = 0;
                     }
                     break;
 
@@ -554,7 +547,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR3;
-                        i_chroma_shift = 0;
                     }
                     break;
                 case VLC_CODEC_BGR24:
@@ -566,7 +558,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                         b_hw_accel = true;
                         use_masks = false;
                         i_kva_fourcc = FOURCC_BGR3;
-                        i_chroma_shift = 0;
                     }
                     break;
             }
