@@ -190,79 +190,17 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
                 uint32_t amask = i_bihextra >= 4 * sizeof(uint32_t) ? GetDWLE( &p_bihextra[12] ) : 0;
 
                 vlc_fourcc_t known_chroma = 0;
-                switch( p_bih->biBitCount )
+                for( size_t i=0; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
                 {
-                    case 32:
-                        if (rmask == 0x00ff0000 &&
-                            gmask == 0x0000ff00 &&
-                            bmask == 0x000000ff &&
-                            amask == 0x00000000)
-                        {
-                            known_chroma = VLC_CODEC_XRGB;
-                        }
-                        else
-                        if (rmask == 0x000000ff &&
-                            gmask == 0x0000ff00 &&
-                            bmask == 0x00ff0000 &&
-                            amask == 0x00000000)
-                        {
-                            known_chroma = VLC_CODEC_XBGR;
-                        }
-                        else
-                        if (rmask == 0xff000000 &&
-                            gmask == 0x00ff0000 &&
-                            bmask == 0x0000ff00 &&
-                            amask == 0x00000000)
-                        {
-                            known_chroma = VLC_CODEC_RGBX;
-                        }
-                        else
-                        if (rmask == 0x0000ff00 &&
-                            gmask == 0x00ff0000 &&
-                            bmask == 0xff000000 &&
-                            amask == 0x00000000)
-                        {
-                            known_chroma = VLC_CODEC_BGRX;
-                        }
-                        if (rmask == 0x00ff0000 &&
-                            gmask == 0x0000ff00 &&
-                            bmask == 0x000000ff &&
-                            amask == 0xff000000)
-                        {
-                            known_chroma = VLC_CODEC_ARGB;
-                        }
-                        else
-                        if (rmask == 0x000000ff &&
-                            gmask == 0x0000ff00 &&
-                            bmask == 0x00ff0000 &&
-                            amask == 0xff000000)
-                        {
-                            known_chroma = VLC_CODEC_ABGR;
-                        }
-                        else
-                        if (rmask == 0xff000000 &&
-                            gmask == 0x00ff0000 &&
-                            bmask == 0x0000ff00 &&
-                            amask == 0x000000ff)
-                        {
-                            known_chroma = VLC_CODEC_RGBA;
-                        }
-                        else
-                        if (rmask == 0x0000ff00 &&
-                            gmask == 0x00ff0000 &&
-                            bmask == 0xff000000 &&
-                            amask == 0x000000ff)
-                        {
-                            known_chroma = VLC_CODEC_BGRA;
-                        }
-                        else
-                        {
-                            // unknown mask
-                            return VLC_ENOTSUP;
-                        }
+                    if (bitmap_rgb_masks[i].depth == p_bih->biBitCount &&
+                        bitmap_rgb_masks[i].i_rmask == rmask &&
+                        bitmap_rgb_masks[i].i_gmask == gmask &&
+                        bitmap_rgb_masks[i].i_bmask == bmask &&
+                        bitmap_rgb_masks[i].i_amask == amask )
+                    {
+                        known_chroma = bitmap_rgb_masks[i].codec;
                         break;
-                    default:
-                        break;
+                    }
                 }
 
                 if (known_chroma != 0)
