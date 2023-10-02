@@ -41,9 +41,6 @@
 #pragma mark local prototypes & module descriptor
 
 
-#define AOUT_VOLUME_DEFAULT             256
-#define AOUT_VOLUME_MAX                 512
-
 #define VOLUME_TEXT N_("Audio volume")
 #define DEVICE_TEXT N_("Last audio device")
 
