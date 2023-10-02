@@ -44,14 +44,6 @@
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
-vlc_module_begin ()
-    set_description("NVDEC OpenGL surface converter")
-    set_capability("glinterop", 2)
-    set_callbacks(Open, Close)
-    set_subcategory(SUBCAT_VIDEO_VOUT)
-    add_shortcut("nvdec")
-vlc_module_end ()
-
 typedef struct {
     vlc_decoder_device *device;
     CUcontext cuConverterCtx;
@@ -292,3 +284,11 @@ static int Open(vlc_object_t *obj)
 
     return VLC_SUCCESS;
 }
+
+vlc_module_begin ()
+    set_description("NVDEC OpenGL surface converter")
+    set_capability("glinterop", 2)
+    set_callbacks(Open, Close)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_shortcut("nvdec")
+vlc_module_end ()
