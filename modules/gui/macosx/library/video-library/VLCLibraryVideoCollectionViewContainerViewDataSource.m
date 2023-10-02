@@ -341,4 +341,25 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return [NSIndexPath indexPathForItem:libraryItemIndex inSection:0];
 }
 
+// pragma mark: iCarouselDataSource methods
+
+- (NSInteger)numberOfItemsInCarousel:(iCarousel *)carousel
+{
+    return self.collectionArray.count;
+}
+
+- (NSView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
+{
+    NSImageView *carouselItemView = (NSImageView *)view;
+    if (carouselItemView == nil) {
+        const NSUInteger itemLength = VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth;
+        const NSRect itemFrame = NSMakeRect(0, 0, itemLength, itemLength);
+        carouselItemView = [[NSImageView alloc] initWithFrame:itemFrame];
+    }
+
+    //carouselItemView.representedItem = self.collectionArray[index];
+    carouselItemView.image = [VLCLibraryImageCache thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)self.collectionArray[index]];
+    return carouselItemView;
+ }
+
 @end
