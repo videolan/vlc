@@ -53,12 +53,6 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  GLConvOpen(vlc_object_t *);
-static void GLConvClose(vlc_object_t *);
-
 struct wgl_vt {
     PFNWGLGETEXTENSIONSSTRINGEXTPROC     GetExtensionsStringEXT;
     PFNWGLGETEXTENSIONSSTRINGARBPROC     GetExtensionsStringARB;
