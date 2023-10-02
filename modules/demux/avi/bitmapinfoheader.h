@@ -106,22 +106,6 @@ static const struct
                             0x0000, 15 },
 };
 
-static inline void SetBitmapRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
-{
-    for( size_t i=0; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
-    {
-        if( bitmap_rgb_masks[i].codec == i_fourcc )
-        {
-            fmt->i_rmask = bitmap_rgb_masks[i].i_rmask;
-            fmt->i_gmask = bitmap_rgb_masks[i].i_gmask;
-            fmt->i_bmask = bitmap_rgb_masks[i].i_bmask;
-            fmt->i_chroma = i_fourcc;
-            video_format_FixRgb( fmt );
-            break;
-        }
-    }
-}
-
 struct bitmapinfoheader_properties
 {
     bool b_flipped;
@@ -262,8 +246,6 @@ static inline int ParseBitmapInfoHeader( const VLC_BITMAPINFOHEADER *p_bih, size
             fmt->i_extra = i_bihextra;
             memcpy( fmt->p_extra, p_bihextra, i_bihextra );
         }
-
-        SetBitmapRGBMasks( fmt->i_codec, &fmt->video );
     }
 
     video_format_Setup( &fmt->video, fmt->i_codec,
