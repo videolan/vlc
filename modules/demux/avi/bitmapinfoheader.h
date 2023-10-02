@@ -42,14 +42,74 @@
 static const struct
 {
     vlc_fourcc_t codec;
-    uint32_t i_rmask, i_gmask, i_bmask;
+    uint32_t i_rmask, i_gmask, i_bmask, i_amask;
+    uint8_t depth;
 } bitmap_rgb_masks[] = {
     { VLC_CODEC_RGB15,      0x7c00, /* FIXME it should be B5G5R5LE */
                             0x03e0,
-                            0x001f, },
+                            0x001f, 0x0000, 15 },
     { VLC_CODEC_RGB16,      0xf800, /* FIXME it should be B5G6R5LE */
                             0x07e0,
-                            0x001f, },
+                            0x001f, 0x0000, 16 },
+    { VLC_CODEC_XRGB,       0x00ff0000,
+                            0x0000ff00,
+                            0x000000ff,
+                            0x00000000, 32 },
+    { VLC_CODEC_XBGR,       0x000000ff,
+                            0x0000ff00,
+                            0x00ff0000,
+                            0x00000000, 32 },
+    { VLC_CODEC_RGBX,       0xff000000,
+                            0x00ff0000,
+                            0x0000ff00,
+                            0x00000000, 32 },
+    { VLC_CODEC_BGRX,       0x0000ff00,
+                            0x00ff0000,
+                            0xff000000,
+                            0x00000000, 32 },
+    { VLC_CODEC_ARGB,       0x00ff0000,
+                            0x0000ff00,
+                            0x000000ff,
+                            0xff000000, 32 },
+    { VLC_CODEC_ABGR,       0x000000ff,
+                            0x0000ff00,
+                            0x00ff0000,
+                            0xff000000, 32 },
+    { VLC_CODEC_RGBA,       0xff000000,
+                            0x00ff0000,
+                            0x0000ff00,
+                            0x000000ff, 32 },
+    { VLC_CODEC_BGRA,       0x0000ff00,
+                            0x00ff0000,
+                            0xff000000,
+                            0x000000ff, 32 },
+
+    { VLC_CODEC_RGB24,      0xff0000,
+                            0x00ff00,
+                            0x0000ff,
+                            0x000000, 24 },
+    { VLC_CODEC_BGR24,      0x0000ff,
+                            0x00ff00,
+                            0xff0000,
+                            0x000000, 24 },
+
+    { VLC_CODEC_RGB565LE,   0xf800,
+                            0x07e0,
+                            0x001f,
+                            0x0000, 16 },
+    { VLC_CODEC_BGR565LE,   0x001f,
+                            0x07e0,
+                            0xf800,
+                            0x0000, 16 },
+
+    { VLC_CODEC_RGB555LE,   0x7c00,
+                            0x03e0,
+                            0x001f,
+                            0x0000, 15 },
+    { VLC_CODEC_BGR555LE,   0x001f,
+                            0x03e0,
+                            0x7c00,
+                            0x0000, 15 },
 };
 
 static inline void SetBitmapRGBMasks( vlc_fourcc_t i_fourcc, video_format_t *fmt )
