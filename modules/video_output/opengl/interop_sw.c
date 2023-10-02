@@ -821,15 +821,13 @@ error:
     return VLC_EGENERIC;
 }
 
-static int OpenInteropSW(vlc_object_t *obj)
+static int OpenInteropSW(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     return opengl_interop_generic_init(interop, false);
 }
 
-static int OpenInteropDirectRendering(vlc_object_t *obj)
+static int OpenInteropDirectRendering(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     return opengl_interop_generic_init(interop, true);
 }
 

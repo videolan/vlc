@@ -428,9 +428,8 @@ done:
 }
 
 static int
-Open(vlc_object_t *obj)
+Open(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     struct priv *priv = NULL;
 
     if (interop->vctx == NULL)

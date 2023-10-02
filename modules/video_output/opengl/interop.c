@@ -150,6 +150,14 @@ static int GetTexFormatSize(struct vlc_gl_interop *interop, GLenum target,
     return size > 0 ? size * mul : size;
 }
 
+static int
+LoadInterop(void *func, bool forced, va_list args)
+{
+    vlc_gl_interop_probe start = func;
+    struct vlc_gl_interop *interop = va_arg(args, struct vlc_gl_interop *);
+    return start(interop);
+}
+
 struct vlc_gl_interop *
 vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
                    const video_format_t *fmt)
@@ -159,6 +167,7 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
         return NULL;
 
     struct vlc_gl_interop *interop = &priv->interop;
+    struct vlc_logger *logger = vlc_object_logger(interop);
 
     interop->get_tex_format_size = GetTexFormatSize;
     interop->ops = NULL;
@@ -186,12 +195,15 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
         /* Opaque chroma: load a module to handle it */
         assert(context);
         interop->vctx = vlc_video_context_Hold(context);
-        interop->module = module_need_var(interop, "glinterop", "glinterop");
+        char *interop_name = var_InheritString(interop, "glinterop");
+        interop->module = vlc_module_load(logger, "glinterop", interop_name,
+                                          true, LoadInterop, interop);
     }
     else
     {
         interop->vctx = NULL;
-        interop->module = module_need(interop, "opengl sw interop", NULL, false);
+        interop->module = vlc_module_load(logger, "opengl sw interop", NULL,
+                                          false, LoadInterop, interop);
     }
 
     if (interop->module == NULL)

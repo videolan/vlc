@@ -402,10 +402,8 @@ error:
 }
 
 static int
-GLConvOpen(vlc_object_t *obj)
+GLConvOpen(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = container_of(obj, struct vlc_gl_interop, obj);
-
     if (interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
@@ -417,7 +415,7 @@ GLConvOpen(vlc_object_t *obj)
 
     if (!d3d9_decoder->hd3d.use_ex)
     {
-        msg_Warn(obj, "DX/GL interrop only working on d3d9x");
+        msg_Warn(interop, "DX/GL interrop only working on d3d9x");
         return VLC_EGENERIC;
     }
     HGLRC hGLRC = wglGetCurrentContext();
@@ -429,7 +427,7 @@ GLConvOpen(vlc_object_t *obj)
 #define LOAD_EXT(name, type) do { \
     vt.name = (type) vlc_gl_GetProcAddress(interop->gl, "wgl" #name); \
     if (!vt.name) { \
-        msg_Warn(obj, "'wgl " #name "' could not be loaded"); \
+        msg_Warn(interop, "'wgl " #name "' could not be loaded"); \
         return VLC_EGENERIC; \
     } \
 } while(0)
@@ -502,7 +500,7 @@ GLConvOpen(vlc_object_t *obj)
                                                &priv->dx_render, &shared_handle);
     if (FAILED(hr))
     {
-        msg_Warn(obj, "IDirect3DDevice9Ex_CreateRenderTarget failed");
+        msg_Warn(interop, "IDirect3DDevice9Ex_CreateRenderTarget failed");
         goto error;
     }
 
@@ -512,7 +510,7 @@ GLConvOpen(vlc_object_t *obj)
     priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(d3d9_decoder->d3ddev.devex);
     if (!priv->gl_handle_d3d)
     {
-        msg_Warn(obj, "DXOpenDeviceNV failed: %lu", GetLastError());
+        msg_Warn(interop, "DXOpenDeviceNV failed: %lu", GetLastError());
         goto error;
     }
 

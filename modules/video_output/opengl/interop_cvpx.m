@@ -174,10 +174,8 @@ Close(struct vlc_gl_interop *interop)
 }
 
 static int
-Open(vlc_object_t *obj)
+Open(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
-
     if (interop->fmt_in.i_chroma != VLC_CODEC_CVPX_UYVY
      && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_NV12
      && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_I420

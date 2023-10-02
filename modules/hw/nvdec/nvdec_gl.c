@@ -144,9 +144,8 @@ static void tc_nvdec_gl_close(struct vlc_gl_interop *interop)
     vlc_decoder_device_Release(p_sys->device);
 }
 
-static int Open(vlc_object_t *obj)
+static int Open(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     if (!is_nvdec_opaque(interop->fmt_in.i_chroma))
         return VLC_EGENERIC;
 

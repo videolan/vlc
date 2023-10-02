@@ -120,9 +120,8 @@ Close(struct vlc_gl_interop *interop)
 }
 
 static int
-Open(vlc_object_t *obj)
+Open(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     if (interop->vctx == NULL)
         return VLC_EGENERIC;
 

@@ -157,6 +157,9 @@ struct vlc_gl_interop {
                            uint32_t format, int32_t internal, uint32_t type);
 };
 
+/* Activation function for the OpenGL interop implementations. */
+typedef int (*vlc_gl_interop_probe)(struct vlc_gl_interop *interop);
+
 static inline int
 vlc_gl_interop_GetTexFormatSize(struct vlc_gl_interop *interop, uint32_t target,
                                 uint32_t format, int32_t internal,
