@@ -96,11 +96,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
     if (unlikely(fmt == NULL))
         return false;
 
-    /* Byte sex is a non-issue for 8-bits. It can be worked around with
-     * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
-    if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
-        return false;
-
     /* Check that VLC supports the pixel format. */
     switch (fmt->depth)
     {
