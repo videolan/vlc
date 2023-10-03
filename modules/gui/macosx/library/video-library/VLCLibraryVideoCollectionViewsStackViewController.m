@@ -30,6 +30,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
+#import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
@@ -69,9 +70,10 @@
                                 name:VLCLibraryModelRecentsMediaItemDeleted
                                 object:nil];
 
+    _containers = @[];
     _leadingContainerCount = 0;
     [self generateCustomContainers];
-    [self generateCollectionViewContainers];
+    [self generateGenericCollectionViewContainers];
 }
 
 - (void)generateCustomContainers
@@ -80,6 +82,8 @@
     _leadingContainerCount += 1;
     [self addView:self.heroView toStackView:self.collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
+
+    [self recentsChanged:nil];
 }
 
 - (BOOL)recentMediaPresent
@@ -91,10 +95,7 @@
 - (void)recentsChanged:(NSNotification *)notification
 {
     const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
-    const NSUInteger recentsContainerIndex = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryVideoViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
-        return container.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
-    }];
-    const BOOL recentsContainerPresent = recentsContainerIndex != NSNotFound;
+    const BOOL recentsContainerPresent = self.recentsView != nil;
 
     if (recentsContainerPresent == shouldShowRecentsContainer) {
         return;
@@ -103,36 +104,39 @@
     NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
 
     if (shouldShowRecentsContainer) {
-        VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
-        containerView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
-        [mutableContainers insertObject:containerView atIndex:0];
+        _recentsView = [[VLCLibraryVideoCarouselViewContainerView alloc] init];
+        self.recentsView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
 
-        // Insert at top after leading containers, hence _leadingContainerCount
-        [_collectionsStackView insertArrangedSubview:containerView atIndex:_leadingContainerCount];
-        [self setupContainerView:containerView withStackView:_collectionsStackView];
+        // Insert as last leading container
+        [self.collectionsStackView insertArrangedSubview:self.recentsView
+                                                 atIndex:_leadingContainerCount];
+        [self setupContainerView:self.recentsView
+                   withStackView:_collectionsStackView];
+        [mutableContainers insertObject:self.recentsView atIndex:0];
+        ++_leadingContainerCount;
     } else {
-        [mutableContainers removeObjectAtIndex:recentsContainerIndex];
-        NSView<VLCLibraryVideoViewContainerView> * const existingContainer = [_containers objectAtIndex:recentsContainerIndex];
-        [_collectionsStackView removeConstraints:existingContainer.constraintsWithSuperview];
-        [_collectionsStackView removeArrangedSubview:existingContainer];
+        [self.collectionsStackView removeConstraints:self.recentsView.constraintsWithSuperview];
+        [self.collectionsStackView removeArrangedSubview:self.recentsView];
+        [mutableContainers removeObject:self.recentsView];
+        _recentsView = nil;
+        --_leadingContainerCount;
     }
 
     _containers = mutableContainers.copy;
 }
 
-- (void)generateCollectionViewContainers
+- (void)generateGenericCollectionViewContainers
 {
-    NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const collectionViewContainers = [[NSMutableArray alloc] init];
-    const BOOL anyRecents = [self recentMediaPresent];
-    NSUInteger i = anyRecents ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeRecentVideos + 1;
+    NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
+    NSUInteger i = VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
     for (; i <= VLCMediaLibraryParentGroupTypeVideoLibrary; ++i) {
-        VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
+        NSView<VLCLibraryVideoViewContainerView> *containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = i;
-        [collectionViewContainers addObject:containerView];
+        [mutableContainers addObject:containerView];
     }
 
-    _containers = collectionViewContainers.copy;
+    _containers = mutableContainers.copy;
 }
 
 - (void)reloadData
@@ -301,7 +305,8 @@
     }
 }
 
-- (VLCLibraryVideoCollectionViewContainerView *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
+
+- (NSView<VLCLibraryVideoViewContainerView> *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
 {
     const NSUInteger index = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryVideoViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
         return container.videoGroup == group;
@@ -320,7 +325,7 @@
         return;
     }
 
-    VLCLibraryVideoCollectionViewContainerView * const containerView = [self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
+    NSView<VLCLibraryVideoViewContainerView> * const containerView = [self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
     if (containerView == nil) {
         return;
     }
