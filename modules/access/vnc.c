@@ -162,7 +162,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
             break;
         default:
         case 16:
-            i_chroma = VLC_CODEC_RGB16;
+            i_chroma = p_client->format.bigEndian ? VLC_CODEC_RGB565BE : VLC_CODEC_RGB565LE;
             break;
         case 24:
             i_chroma = VLC_CODEC_RGB24;
@@ -174,7 +174,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
 
     switch( i_chroma )
     {
-        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB565BE:
+        case VLC_CODEC_RGB565LE:
             p_client->format.redShift   = 11;
             p_client->format.greenShift =  5;
             p_client->format.blueShift  =  0;
