@@ -362,14 +362,24 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
     p_bih->biClrUsed = 0;
     if( biCompression == BI_BITFIELDS )
     {
-        uint32_t i_rmask,i_gmask,i_bmask, i_amask;
-        int ret = vlc_RGBChromaToMask( fmt->i_codec, &i_rmask, &i_gmask,
-                                       &i_bmask, &i_amask );
-        if (ret != VLC_SUCCESS)
+        uint32_t i_rmask = 0,i_gmask,i_bmask, i_amask;
+        for( size_t i=0; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
+        {
+            if ( bitmap_rgb_masks[i].codec == fmt->i_codec )
+            {
+                i_rmask = bitmap_rgb_masks[i].i_rmask;
+                i_gmask = bitmap_rgb_masks[i].i_gmask;
+                i_bmask = bitmap_rgb_masks[i].i_bmask;
+                i_amask = bitmap_rgb_masks[i].i_amask;
+                break;
+            }
+        }
+        if (i_rmask == 0)
         {
             i_rmask = fmt->video.i_rmask;
             i_gmask = fmt->video.i_gmask;
             i_bmask = fmt->video.i_bmask;
+            i_amask = 0;
         }
         SetDWLE( &p_bmiColors[0], i_rmask );
         SetDWLE( &p_bmiColors[4], i_gmask );
