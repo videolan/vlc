@@ -33,6 +33,45 @@
 @synthesize constraintsWithSuperview = _constraintsWithSuperview;
 @synthesize dataSource = _dataSource;
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+    [self setup];
+}
+
+- (void)setup
+{
+    [self setupView];
+    [self setupDataSource];
+}
+
 - (void)setupView
 {
     _carouselView = [[iCarousel alloc] initWithFrame:self.bounds];
