@@ -371,6 +371,18 @@
 /* 16-bit BGR Little-Endian: "g3R5 B5G3" */
 #define VLC_CODEC_BGR565LE          VLC_FOURCC('B','L','1','6')
 
+#ifdef WORDS_BIGENDIAN
+/* 16-bit RGB with host endianness */
+#define VLC_CODEC_RGB565    VLC_CODEC_RGB565BE
+/* 16-bit BGR with host endianness */
+#define VLC_CODEC_BGR565    VLC_CODEC_BGR565BE
+#else
+/* 16-bit RGB with host endianness */
+#define VLC_CODEC_RGB565    VLC_CODEC_RGB565LE
+/* 16-bit BGR with host endianness */
+#define VLC_CODEC_BGR565    VLC_CODEC_BGR565LE
+#endif
+
 /* 15-bit RGB Big-Endian: "0R5G5B5" */
 #define VLC_CODEC_RGB555BE          VLC_FOURCC('R','B','1','5')
 /* 15-bit RGB Little-Endian: "g3B5 0R5G2" */
@@ -379,6 +391,19 @@
 #define VLC_CODEC_BGR555BE          VLC_FOURCC('B','B','1','5')
 /* 15-bit BGR Little-Endian: "g3R5 0B5G2" */
 #define VLC_CODEC_BGR555LE          VLC_FOURCC('B','L','1','5')
+
+#ifdef WORDS_BIGENDIAN
+/* 15-bit RGB with host endianness */
+#define VLC_CODEC_RGB555    VLC_CODEC_RGB555BE
+/* 15-bit BGR with host endianness */
+#define VLC_CODEC_BGR555    VLC_CODEC_BGR565BE
+#else
+/* 15-bit RGB with host endianness */
+#define VLC_CODEC_RGB555    VLC_CODEC_RGB555LE
+/* 15-bit BGR with host endianness */
+#define VLC_CODEC_BGR555    VLC_CODEC_BGR555LE
+#endif
+
 
 /* 8-bit RGB "R3G3B2" */
 #define VLC_CODEC_RGB332           VLC_FOURCC('R','3','3','2')
