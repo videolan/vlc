@@ -79,7 +79,7 @@ QVector<Media> toMediaList(const QVariantList &sources)
             if (mrl.isLocalFile())
                 mrl = resolveWinSymlinks(mrl);
 
-            return Media(mrl.toString(QUrl::None), mrl.fileName());
+            return Media(mrl.toString(QUrl::FullyEncoded), mrl.fileName());
         } else if (value.canConvert<SharedInputItem>())
         {
             return Media(value.value<SharedInputItem>().get());
