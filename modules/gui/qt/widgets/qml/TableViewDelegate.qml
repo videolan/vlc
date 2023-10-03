@@ -36,7 +36,7 @@ T.Control {
     required property Widgets.DragItem dragItem
     required property bool acceptDrop
 
-    readonly property bool dragActive: hoverArea.drag.active
+    readonly property bool dragActive: dragHandler.active
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -93,74 +93,83 @@ T.Control {
         hovered: delegate.hovered
     }
 
+    // TODO: Qt bug 6.2: QTBUG-103604
+    DoubleClickIgnoringItem {
+        anchors.fill: parent
+
+        z: -1
+
+        DragHandler {
+            id: dragHandler
+
+            target: null
+
+            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
+
+            onActiveChanged: {
+                if (dragItem) {
+                    if (active) {
+                        dragItem.Drag.active = true
+                    } else {
+                        dragItem.Drag.drop()
+                    }
+                }
+            }
+        }
+
+        TapHandler {
+            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+
+            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
+
+            onSingleTapped: (point, button) => {
+                initialAction()
+
+                if (button === Qt.RightButton)
+                    delegate.rightClick(delegate, delegate.rowModel, parent.mapToGlobal(point.position.x, point.position.y))
+            }
+
+            onDoubleTapped: (point, button) => {
+                if (button === Qt.LeftButton)
+                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
+            }
+
+            Component.onCompleted: {
+                canceled.connect(initialAction)
+            }
+
+            function initialAction() {
+                if ((point.pressedButtons === Qt.LeftButton) || !delegate.selected) {
+                    delegate.selectAndFocus(point.modifiers, Qt.MouseFocusReason)
+                }
+            }
+        }
+
+        TapHandler {
+            acceptedDevices: PointerDevice.TouchScreen
+
+            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
+
+            onTapped: (eventPoint, button) => {
+                delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
+                delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
+            }
+
+            onLongPressed: {
+                delegate.rightClick(delegate, delegate.rowModel, parent.mapToGlobal(point.position.x, point.position.y))
+            }
+        }
+    }
+
     background: AnimatedBackground {
         animationDuration: VLCStyle.duration_short
         enabled: theme.initialized
         color: delegate.selected ? theme.bg.highlight : theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
-
-        MouseArea {
-            id: hoverArea
-
-            // Settings
-
-            anchors.fill: parent
-
-            hoverEnabled: false
-
-            acceptedButtons: Qt.RightButton | Qt.LeftButton
-
-            drag.target: delegate.dragItem
-
-            drag.axis: Drag.XAndYAxis
-
-            drag.smoothed: false
-
-            // Events
-
-            onPressed: (mouse) => {
-                _modifiersOnLastPress = mouse.modifiers
-            }
-
-            onClicked: (mouse) => {
-                if ((mouse.button === Qt.LeftButton) || !delegate.selected) {
-                    delegate.selectAndFocus(mouse.modifiers, Qt.MouseFocusReason)
-                }
-
-                if (mouse.button === Qt.RightButton)
-                    delegate.rightClick(delegate, delegate.rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
-            }
-
-            onDoubleClicked: (mouse) => {
-                if (mouse.button === Qt.LeftButton)
-                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
-            }
-
-            drag.onActiveChanged: {
-                // NOTE: Perform the "click" action because the click action is only executed on mouse
-                //       release (we are in the pressed state) but we will need the updated list on drop.
-                if (drag.active && !delegate.selected) {
-                    delegate.selectAndFocus(_modifiersOnLastPress, index)
-                } else if (delegate.dragItem) {
-                    delegate.dragItem.Drag.drop()
-                }
-
-                delegate.dragItem.Drag.active = drag.active
-            }
-
-            TapHandler {
-                acceptedDevices: PointerDevice.TouchScreen
-
-                onTapped: {
-                    delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
-                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
-                }
-
-                onLongPressed: {
-                    delegate.rightClick(delegate, delegate.rowModel, point.scenePosition)
-                }
-            }
-        }
     }
 
     contentItem: Row {
@@ -190,7 +199,7 @@ T.Control {
                             index: Qt.binding(() => delegate.index),
                             currentlyFocused: Qt.binding(() => delegate.visualFocus),
                             selected: Qt.binding(() => delegate.selected),
-                            containsMouse: Qt.binding(() => hoverArea.containsMouse),
+                            containsMouse: Qt.binding(() => delegate.hovered),
                             colorContext: Qt.binding(() => theme),
                         }
                     )
