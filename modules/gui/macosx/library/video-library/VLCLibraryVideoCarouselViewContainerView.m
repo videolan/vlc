@@ -33,4 +33,21 @@
 @synthesize constraintsWithSuperview = _constraintsWithSuperview;
 @synthesize dataSource = _dataSource;
 
+- (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
+{
+    _groupDescriptor = groupDescriptor;
+    _videoGroup = groupDescriptor.group;
+    self.dataSource.groupDescriptor = groupDescriptor;
+ }
+
+- (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group
+{
+    if (_groupDescriptor.group == group) {
+        return;
+    }
+
+    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    [self setGroupDescriptor:descriptor];
+}
+
 @end
