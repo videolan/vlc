@@ -25,6 +25,7 @@ import QtQml.Models 2.12
 import QtGraphicalEffects 1.12
 
 import org.videolan.vlc 0.1
+import org.videolan.controls 0.1
 
 import "qrc:///style/"
 import "qrc:///playlist/" as Playlist
@@ -419,12 +420,28 @@ Item {
                 }
             }
 
+            RoundImage {
+                id: fallbackCover
+
+                anchors.centerIn: parent
+                width: coverSize
+                height: coverSize
+                radius: bg.radius
+                source: dragItem.defaultCover
+                visible: !loader.visible
+            }
 
             Loader {
+                id: loader
+
                 // parent may provide extra data with covers
                 property var model: modelData
 
                 anchors.centerIn: parent
+
+                visible: (status === Loader.Ready)
+                         && (!("status" in item) || (item.status === Image.Ready))
+
                 sourceComponent: (!modelData.artwork || modelData.artwork.toString() === "") ? modelData.cover : artworkLoader
                 layer.enabled: true
                 layer.effect: OpacityMask {
