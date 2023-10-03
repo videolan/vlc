@@ -294,8 +294,8 @@ static BOOL postConnectHandler( freerdp *p_instance )
             break;
     }
 
-    gdi_init( p_instance,
-                format );
+    if ( gdi_init( p_instance, format ) != TRUE )
+        return FALSE;
 
     desktopResizeHandler( p_instance->context );
     return TRUE;
