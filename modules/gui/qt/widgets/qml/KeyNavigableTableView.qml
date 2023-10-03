@@ -301,7 +301,7 @@ FocusScope {
 
                     Repeater {
                         model: sortModel
-                        MouseArea {
+                        Item {
                             id: headerCell
 
                             required property var modelData
@@ -338,13 +338,16 @@ FocusScope {
                                     rightMargin: VLCStyle.margin_xsmall
                                 }
                             }
-                            onClicked: {
-                                if (!(modelData.model.isSortable ?? true))
-                                    return
-                                else if (root.model.sortCriteria !== modelData.model.criteria)
-                                    root.model.sortCriteria = modelData.model.criteria
-                                else
-                                    root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
+
+                            TapHandler {
+                                onTapped: (eventPoint, button) => {
+                                    if (!(modelData.model.isSortable ?? true))
+                                        return
+                                    else if (root.model.sortCriteria !== modelData.model.criteria)
+                                        root.model.sortCriteria = modelData.model.criteria
+                                    else
+                                        root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
+                                }
                             }
                         }
                     }
