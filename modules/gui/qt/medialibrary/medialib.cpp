@@ -100,7 +100,7 @@ static void convertMLItemToPlaylistMedias(vlc_medialibrary_t* ml, const MLItemId
 
 static void convertQUrlToPlaylistMedias(QUrl mrl, const QStringList& options, QVector<vlc::playlist::Media>& medias)
 {
-    vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName(), options };
+    vlc::playlist::Media media{ mrl.toString(QUrl::FullyEncoded), mrl.fileName(), options };
     medias.push_back(media);
 }
 
@@ -217,7 +217,7 @@ void MediaLib::addAndPlay(const QString& mrl, const QStringList &options)
 
 void MediaLib::addAndPlay(const QUrl& mrl, const QStringList &options)
 {
-    vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName(), options };
+    vlc::playlist::Media media{ mrl.toString(QUrl::FullyEncoded), mrl.fileName(), options };
     m_intf->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{media}, true );
 }
 
