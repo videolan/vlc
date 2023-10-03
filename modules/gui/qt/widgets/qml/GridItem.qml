@@ -252,10 +252,10 @@ T.ItemDelegate {
                 Layout.preferredWidth: pictureWidth
                 Layout.preferredHeight: pictureHeight
 
-                onPlayIconClicked: (mouse) => {
+                onPlayIconClicked: (point) => {
                     // emulate a mouse click before delivering the play signal as to select the item
                     // this helps in updating the selection and restore of initial index in the parent views
-                    root.itemClicked(mouse.modifiers)
+                    root.itemClicked(point.modifiers)
                     root.playClicked()
                 }
 
