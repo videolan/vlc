@@ -140,23 +140,60 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
         p_sys->es = NULL;
     }
 
-    vlc_fourcc_t i_chroma;
+    vlc_fourcc_t i_chroma = 0;
     /* Now init and fill es format */
-    switch ( i_colordepth )
+    switch ( p_gdi->dstFormat )
     {
         default:
             msg_Dbg( p_vlccontext->p_demux, "invalid color depth %d", i_colordepth);
             /* fallthrough */
-        case 16:
-            i_chroma = VLC_CODEC_RGB16;
+        case PIXEL_FORMAT_RGB16:
+            i_chroma = VLC_CODEC_RGB565LE;
             break;
-        case 24:
+        case PIXEL_FORMAT_BGR16:
+            i_chroma = VLC_CODEC_BGR565LE;
+            break;
+        case PIXEL_FORMAT_RGB15:
+            i_chroma = VLC_CODEC_RGB555LE;
+            break;
+        case PIXEL_FORMAT_BGR15:
+            i_chroma = VLC_CODEC_BGR555LE;
+            break;
+        case PIXEL_FORMAT_RGB24:
             i_chroma = VLC_CODEC_RGB24;
             break;
-        case 32:
+        case PIXEL_FORMAT_BGR24:
+            i_chroma = VLC_CODEC_BGR24;
+            break;
+        case PIXEL_FORMAT_ARGB32:
             i_chroma = VLC_CODEC_ARGB;
             break;
+        case PIXEL_FORMAT_XRGB32:
+            i_chroma = VLC_CODEC_XRGB;
+            break;
+        case PIXEL_FORMAT_ABGR32:
+            i_chroma = VLC_CODEC_ABGR;
+            break;
+        case PIXEL_FORMAT_XBGR32:
+            i_chroma = VLC_CODEC_XBGR;
+            break;
+        case PIXEL_FORMAT_BGRA32:
+            i_chroma = VLC_CODEC_BGRA;
+            break;
+        case PIXEL_FORMAT_BGRX32:
+            i_chroma = VLC_CODEC_BGRX;
+            break;
+        case PIXEL_FORMAT_RGBA32:
+            i_chroma = VLC_CODEC_RGBA;
+            break;
+        case PIXEL_FORMAT_RGBX32:
+            i_chroma = VLC_CODEC_RGBX;
+            break;
     }
+
+    if (unlikely(i_chroma == 0))
+        return FALSE;
+
     es_format_t fmt;
     es_format_Init( &fmt, VIDEO_ES, i_chroma );
     video_format_Setup( &fmt.video, i_chroma, p_gdi->width, p_gdi->height,
