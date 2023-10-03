@@ -194,22 +194,16 @@ static int Open(vout_display_t *vd,
     {
     case VLC_CODEC_RGB15:
         fmt.i_chroma = VLC_CODEC_BGR555;
-        fmt.i_rmask = 0;
-        fmt.i_gmask = 0;
-        fmt.i_bmask = 0;
         break;
     case VLC_CODEC_RGB16:
         fmt.i_chroma = VLC_CODEC_BGR565;
-        fmt.i_rmask = 0;
-        fmt.i_gmask = 0;
-        fmt.i_bmask = 0;
         break;
     default:
-        fmt.i_rmask = 0;
-        fmt.i_gmask = 0;
-        fmt.i_bmask = 0;
         break;
     }
+    fmt.i_rmask = 0;
+    fmt.i_gmask = 0;
+    fmt.i_bmask = 0;
 
     /* */
     *fmtp = fmt;
