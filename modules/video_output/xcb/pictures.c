@@ -101,7 +101,7 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
     if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
         return false;
 
-    bool use_masks = true;
+    bool use_masks = false;
 
     /* Check that VLC supports the pixel format. */
     switch (fmt->depth)
@@ -118,7 +118,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0x000000ff)
                 {
                     f->i_chroma = VLC_CODEC_XRGB;
-                    use_masks = false;
                 }
                 else
                 if (vt->red_mask   == 0x000000ff &&
@@ -126,7 +125,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0x00ff0000)
                 {
                     f->i_chroma = VLC_CODEC_XBGR;
-                    use_masks = false;
                 }
                 else
                 if (vt->red_mask   == 0xff000000 &&
@@ -134,7 +132,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0x0000ff00)
                 {
                     f->i_chroma = VLC_CODEC_RGBX;
-                    use_masks = false;
                 }
                 else
                 if (vt->red_mask   == 0x0000ff00 &&
@@ -142,7 +139,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0xff000000)
                 {
                     f->i_chroma = VLC_CODEC_BGRX;
-                    use_masks = false;
                 }
                 else
                     return false;
@@ -154,7 +150,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0x0000ff)
                 {
                     f->i_chroma = VLC_CODEC_RGB24;
-                    use_masks = false;
                 }
                 else
                 if (vt->red_mask   == 0x0000ff &&
@@ -162,7 +157,6 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->blue_mask  == 0xff0000)
                 {
                     f->i_chroma = VLC_CODEC_BGR24;
-                    use_masks = false;
                 }
                 else
                     return false;
@@ -174,16 +168,17 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
             if (fmt->bits_per_pixel != 16)
                 return false;
             f->i_chroma = VLC_CODEC_RGB16;
+            use_masks = true;
             break;
         case 15:
             if (fmt->bits_per_pixel != 16)
                 return false;
             f->i_chroma = VLC_CODEC_RGB15;
+            use_masks = true;
             break;
         case 8:
             if (fmt->bits_per_pixel != 8)
                 return false;
-            use_masks = false;
             if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
                 f->i_chroma = VLC_CODEC_RGB233;
             else
