@@ -176,6 +176,10 @@ typedef struct vout_thread_sys_t
     container_of(vout, vout_thread_sys_t, obj.obj)
 
 
+/* Amount of pictures in the private pool:
+ * 3 for interactive+static filters, 1 for SPU blending, 1 for currently displayed */
+#define FILTER_POOL_SIZE  (3+1+1)
+
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
  */
@@ -882,11 +886,9 @@ static void ChangeFilters(vout_thread_sys_t *vout)
         bool only_chroma_changed = es_format_IsSimilar(&tmp, &fmt_target);
         if (only_chroma_changed)
         {
-            const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-            const unsigned kept_picture     = 1; /* last displayed picture */
             picture_pool_t *new_private_pool =
                     picture_pool_NewFromFormat(&p_fmt_current->video,
-                                               private_picture + kept_picture);
+                                               FILTER_POOL_SIZE);
             if (new_private_pool != NULL)
             {
                 msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
@@ -1750,12 +1752,8 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     dcfg.display.width = sys->window_width;
     dcfg.display.height = sys->window_height;
 
-    const unsigned private_picture  = 4; /* XXX 3 for filter, 1 for SPU */
-    const unsigned kept_picture     = 1; /* last displayed picture */
-
     sys->private_pool =
-        picture_pool_NewFromFormat(&sys->original,
-                                   private_picture + kept_picture);
+        picture_pool_NewFromFormat(&sys->original, FILTER_POOL_SIZE);
     if (sys->private_pool == NULL) {
         vlc_queuedmutex_unlock(&sys->display_lock);
         goto error;
