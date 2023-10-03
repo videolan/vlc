@@ -471,9 +471,21 @@ struct convertYuv8ToRgb {
 struct convertRgbToRgbSmall {
     convertRgbToRgbSmall(const video_format_t *dst, const video_format_t *)
     {
-        rshift = 8 - vlc_popcount(dst->i_rmask);
-        bshift = 8 - vlc_popcount(dst->i_bmask);
-        gshift = 8 - vlc_popcount(dst->i_gmask);
+        uint32_t rmask, gmask, bmask;
+        switch (dst->i_chroma)
+        {
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB15:
+            rmask = dst->i_rmask;
+            gmask = dst->i_gmask;
+            bmask = dst->i_bmask;
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+        rshift = 8 - vlc_popcount(rmask);
+        bshift = 8 - vlc_popcount(bmask);
+        gshift = 8 - vlc_popcount(gmask);
     }
     void operator()(CPixel &p)
     {
