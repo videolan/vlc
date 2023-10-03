@@ -51,6 +51,13 @@
     self.carouselView.scrollEnabled = YES;
 }
 
+- (void)setupDataSource
+{
+    _dataSource = [[VLCLibraryVideoCollectionViewContainerViewDataSource alloc] init];
+    self.dataSource.carouselView = self.carouselView;
+    [self.dataSource setup];
+}
+
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
 {
     _groupDescriptor = groupDescriptor;
