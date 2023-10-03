@@ -360,7 +360,6 @@ public:
             rmask = 0x001f;
             break;
         case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB15:
             rmask = fmt->i_rmask;
             gmask = fmt->i_gmask;
             bmask = fmt->i_bmask;
@@ -515,7 +514,6 @@ struct convertRgbToRgbSmall {
             rmask = 0x001f;
             break;
         case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB15:
             rmask = dst->i_rmask;
             gmask = dst->i_gmask;
             bmask = dst->i_bmask;
@@ -638,7 +636,6 @@ static const struct {
     { csp, VLC_CODEC_RGBA, Blend<picture, CPictureRGBA, compose<cvt, convertRgbToYuv8> > }, \
     { csp, VLC_CODEC_YUVP, Blend<picture, CPictureYUVP, compose<cvt, convertYuvpToYuva8> > }
 
-    RGB(VLC_CODEC_RGB15,    CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB555,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_BGR555,   CPictureRGB16,    convertRgbToRgbSmall),
     RGB(VLC_CODEC_RGB16,    CPictureRGB16,    convertRgbToRgbSmall),

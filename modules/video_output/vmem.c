@@ -192,9 +192,6 @@ static int Open(vout_display_t *vd,
     /* Define the bitmasks */
     switch (fmt.i_chroma)
     {
-    case VLC_CODEC_RGB15:
-        fmt.i_chroma = VLC_CODEC_BGR555;
-        break;
     case VLC_CODEC_RGB16:
         fmt.i_chroma = VLC_CODEC_BGR565;
         break;

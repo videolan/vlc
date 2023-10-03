@@ -121,7 +121,6 @@ static int Activate( filter_t *p_filter )
                     msg_Dbg(p_filter, "RGB pixel format is R5G5B5");
                     p_filter->ops = &I420_R5G5B5_ops;
                     break;
-                case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
                     /* If we don't have support for the bitmasks, bail out */
                     if( ( p_filter->fmt_out.video.i_rmask == 0x7c00
@@ -169,7 +168,6 @@ static int Activate( filter_t *p_filter )
                 case VLC_CODEC_BGR233:
                     p_filter->ops = &I420_RGB8_ops;
                     break;
-                case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
                 case VLC_CODEC_RGB565:
                 case VLC_CODEC_BGR565:
@@ -209,7 +207,6 @@ static int Activate( filter_t *p_filter )
             p_sys->i_bytespp = 1;
             break;
 #endif
-        case VLC_CODEC_RGB15:
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB565BE:
         case VLC_CODEC_BGR565BE:
@@ -403,7 +400,6 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         Set8bppPalette( p_filter, p_sys->p_rgb8 );
         break;
 
-    case VLC_CODEC_RGB15:
     case VLC_CODEC_RGB16:
     case VLC_CODEC_RGB565BE:
     case VLC_CODEC_BGR565BE:
