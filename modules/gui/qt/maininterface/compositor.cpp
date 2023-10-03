@@ -32,7 +32,7 @@
 #  include "compositor_win7.hpp"
 #endif
 
-#ifdef QT5_HAS_XCB
+#ifdef QT5_HAS_X11_COMPOSITOR
 #  include "compositor_x11.hpp"
 #endif
 
