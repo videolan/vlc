@@ -33,6 +33,24 @@
 @synthesize constraintsWithSuperview = _constraintsWithSuperview;
 @synthesize dataSource = _dataSource;
 
+- (void)setupView
+{
+    _carouselView = [[iCarousel alloc] initWithFrame:self.bounds];
+    self.carouselView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.carouselView];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [self.leadingAnchor constraintEqualToAnchor:self.carouselView.leadingAnchor],
+        [self.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
+        [self.topAnchor constraintEqualToAnchor:self.carouselView.topAnchor],
+        [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
+    ]];
+    NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:300];
+    heightConstraint.active = YES;
+
+    self.carouselView.scrollEnabled = YES;
+}
+
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
 {
     _groupDescriptor = groupDescriptor;
