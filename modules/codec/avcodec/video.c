@@ -353,15 +353,16 @@ static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 {
     decoder_sys_t *sys = dec->p_sys;
 
-    vlc_fourcc_t fourcc = FindVlcChroma(frame->format);
-    if (!fourcc)
+    video_format_t test_chroma;
+    video_format_Init(&test_chroma, 0);
+    if (GetVlcChroma(&test_chroma, frame->format) != VLC_SUCCESS)
     {
         const char *name = av_get_pix_fmt_name(frame->format);
 
         msg_Err(dec, "Unsupported decoded output format %d (%s)",
                 sys->p_context->pix_fmt, (name != NULL) ? name : "unknown");
         return VLC_EGENERIC;
-    } else if (!chroma_compatible(fourcc, pic->format.i_chroma)
+    } else if (!chroma_compatible(test_chroma.i_chroma, pic->format.i_chroma)
      /* ensure we never read more than dst lines/pixels from src */
      || frame->width != (int) pic->format.i_visible_width
      || frame->height < (int) pic->format.i_visible_height)
