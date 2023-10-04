@@ -636,7 +636,8 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_sys->i_quality = var_GetInteger(p_enc, ENC_CFG_PREFIX "quality");
     p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_J420;
+    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_in.video.color_range = COLOR_RANGE_FULL;
 
     static const struct vlc_encoder_operations ops =
     {
