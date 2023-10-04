@@ -203,12 +203,11 @@ static const struct
 
     /* XYZ */
     {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12BE,  COLOR_RANGE_UNDEF },
-    { 0, 0, COLOR_RANGE_UNDEF }
 };
 
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 {
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(chroma_table); i++ )
     {
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
         {
@@ -223,7 +222,7 @@ int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 
 enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t fourcc )
 {
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(chroma_table) != 0; i++ )
         if( chroma_table[i].i_chroma == fourcc )
             return chroma_table[i].i_chroma_id;
     return AV_PIX_FMT_NONE;
