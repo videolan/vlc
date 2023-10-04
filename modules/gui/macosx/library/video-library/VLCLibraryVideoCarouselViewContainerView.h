@@ -23,13 +23,11 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/video-library/VLCLibraryVideoViewContainerView.h"
+#import "views/iCarousel/iCarousel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class iCarousel;
-@protocol iCarouselDelegate;
-
-@interface VLCLibraryVideoCarouselViewContainerView : NSView<VLCLibraryVideoViewContainerView>
+@interface VLCLibraryVideoCarouselViewContainerView : NSView<VLCLibraryVideoViewContainerView, iCarouselDelegate>
 
 @property (readonly) iCarousel *carouselView;
 @property (readonly) NSObject<iCarouselDelegate> *delegate;

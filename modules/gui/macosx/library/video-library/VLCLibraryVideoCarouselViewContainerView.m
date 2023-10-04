@@ -75,6 +75,7 @@
 - (void)setupView
 {
     _carouselView = [[iCarousel alloc] initWithFrame:self.bounds];
+    self.carouselView.delegate = self;
     self.carouselView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.carouselView];
 
