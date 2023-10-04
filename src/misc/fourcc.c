@@ -687,42 +687,38 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 }
 
 #define PLANAR(n, w_den, h_den, size, bits) \
-    { .plane_count = n, \
+      .plane_count = n, \
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,    1}, .h = {1,    1}} }, \
       .pixel_size = size, \
-      .pixel_bits = bits }
+      .pixel_bits = bits
 
 #define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 1, 8)
 #define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, 2, bits)
 
 #define SEMIPLANAR(w_den, h_den, size, bits) \
-    { .plane_count = 2, \
+      .plane_count = 2, \
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {2,w_den}, .h = {1,h_den}} }, \
       .pixel_size = size, \
-      .pixel_bits = bits }
+      .pixel_bits = bits
 
 #define PACKED_FMT(size, bits) \
-    { .plane_count = 1, \
+      .plane_count = 1, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
       .pixel_size = size, \
-      .pixel_bits = bits }
+      .pixel_bits = bits
 
 /* Zero planes for hardware picture handles. Cannot be manipulated directly. */
 #define FAKE_FMT() \
-    { .plane_count = 0, \
+      .plane_count = 0, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
       .pixel_size = 0, \
-      .pixel_bits = 0 }
+      .pixel_bits = 0
 
-static const struct
-{
-    vlc_fourcc_t             p_fourcc;
-    vlc_chroma_description_t description;
-} p_list_chroma_description[] = {
+static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_I411,                  PLANAR_8(3, 4, 1) },
     { VLC_CODEC_I410,                  PLANAR_8(3, 4, 4) },
     { VLC_CODEC_YV9,                   PLANAR_8(3, 4, 4) },
@@ -833,7 +829,7 @@ static const struct
     { VLC_CODEC_Y210,                  PACKED_FMT(4, 32) },
     { VLC_CODEC_Y410,                  PACKED_FMT(4, 32) },
 
-    { VLC_CODEC_Y211,                 { 1, { {{1,4}, {1,1}} }, 4, 32 } },
+    { VLC_CODEC_Y211,                 1, { {{1,4}, {1,1}} }, 4, 32 },
     { VLC_CODEC_XYZ12,                 PACKED_FMT(6, 48) },
 
     { VLC_CODEC_VDPAU_VIDEO,           FAKE_FMT() },
@@ -876,8 +872,8 @@ const vlc_chroma_description_t *vlc_fourcc_GetChromaDescription( vlc_fourcc_t i_
 {
     for( size_t i = 0; i < ARRAY_SIZE(p_list_chroma_description); i++ )
     {
-        if( p_list_chroma_description[i].p_fourcc == i_fourcc )
-            return &p_list_chroma_description[i].description;
+        if( p_list_chroma_description[i].fcc == i_fourcc )
+            return &p_list_chroma_description[i];
     }
     return NULL;
 }

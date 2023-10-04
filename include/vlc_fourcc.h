@@ -802,6 +802,7 @@ VLC_API bool vlc_fourcc_AreUVPlanesSwapped(vlc_fourcc_t , vlc_fourcc_t );
  * Chroma related information.
  */
 typedef struct {
+    vlc_fourcc_t fcc;
     unsigned plane_count;
     struct {
         vlc_rational_t w;
