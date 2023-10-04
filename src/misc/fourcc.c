@@ -668,11 +668,11 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 #define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 1, 8)
 #define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, 2, bits)
 
-#define SEMIPLANAR(w_den, h_den, size, bits) \
+#define SEMIPLANAR(w_den, h_den, bits) \
       .plane_count = 2, \
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {2,w_den}, .h = {1,h_den}} }, \
-      .pixel_size = size, \
+      .pixel_size = ((bits + 7) / 8), \
       .pixel_bits = bits
 
 #define PACKED_FMT(size, bits) \
@@ -693,15 +693,15 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_I410,                  PLANAR_8(3, 4, 4) },
     { VLC_CODEC_I420,                  PLANAR_8(3, 2, 2) },
     { VLC_CODEC_YV12,                  PLANAR_8(3, 2, 2) },
-    { VLC_CODEC_NV12,                  SEMIPLANAR(2, 2, 1, 8) },
-    { VLC_CODEC_NV21,                  SEMIPLANAR(2, 2, 1, 8) },
+    { VLC_CODEC_NV12,                  SEMIPLANAR(2, 2, 8) },
+    { VLC_CODEC_NV21,                  SEMIPLANAR(2, 2, 8) },
     { VLC_CODEC_I422,                  PLANAR_8(3, 2, 1) },
-    { VLC_CODEC_NV16,                  SEMIPLANAR(2, 1, 1, 8) },
-    { VLC_CODEC_NV61,                  SEMIPLANAR(2, 1, 1, 8) },
+    { VLC_CODEC_NV16,                  SEMIPLANAR(2, 1, 8) },
+    { VLC_CODEC_NV61,                  SEMIPLANAR(2, 1, 8) },
     { VLC_CODEC_I440,                  PLANAR_8(3, 1, 2) },
     { VLC_CODEC_I444,                  PLANAR_8(3, 1, 1) },
-    { VLC_CODEC_NV24,                  SEMIPLANAR(1, 1, 1, 8) },
-    { VLC_CODEC_NV42,                  SEMIPLANAR(1, 1, 1, 8) },
+    { VLC_CODEC_NV24,                  SEMIPLANAR(1, 1, 8) },
+    { VLC_CODEC_NV42,                  SEMIPLANAR(1, 1, 8) },
     { VLC_CODEC_YUVA,                  PLANAR_8(4, 1, 1) },
     { VLC_CODEC_YUV420A,               PLANAR_8(4, 2, 2) },
     { VLC_CODEC_YUV422A,               PLANAR_8(4, 2, 1) },
@@ -753,8 +753,8 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_YUVA_444_10B,          PLANAR_16(4, 1, 1, 10) },
     { VLC_CODEC_YUVA_444_12L,          PLANAR_16(4, 1, 1, 12) },
     { VLC_CODEC_YUVA_444_12B,          PLANAR_16(4, 1, 1, 12) },
-    { VLC_CODEC_P010,                  SEMIPLANAR(2, 2, 2, 10) },
-    { VLC_CODEC_P016,                  SEMIPLANAR(2, 2, 2, 16) },
+    { VLC_CODEC_P010,                  SEMIPLANAR(2, 2, 10) },
+    { VLC_CODEC_P016,                  SEMIPLANAR(2, 2, 16) },
 
     { VLC_CODEC_YUYV,                  PACKED_FMT(2, 16) },
     { VLC_CODEC_YVYU,                  PACKED_FMT(2, 16) },
