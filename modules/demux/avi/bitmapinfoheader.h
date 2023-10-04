@@ -265,42 +265,37 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
                                           uint8_t **p_bih_extra,
                                           size_t *pi_total )
 {
-    uint16_t biBitCount = 0;
+    const vlc_chroma_description_t *desc =
+        vlc_fourcc_GetChromaDescription(fmt->i_codec);
+    uint16_t biBitCount = desc != NULL ? desc->pixel_size * 8 : 0;
     uint32_t biCompression = BI_RGB;
     bool b_has_alpha = false;
     switch( fmt->i_codec )
     {
         case VLC_CODEC_XRGB:
-            biBitCount = 32;
             break;
         case VLC_CODEC_BGRX:
         case VLC_CODEC_XBGR:
         case VLC_CODEC_RGBX:
-            biBitCount = 32;
             biCompression = BI_BITFIELDS;
             break;
         case VLC_CODEC_BGRA:
         case VLC_CODEC_RGBA:
         case VLC_CODEC_ARGB:
         case VLC_CODEC_ABGR:
-            biBitCount = 32;
             biCompression = BI_BITFIELDS;
             b_has_alpha = true;
             break;
         case VLC_CODEC_BGR24:
-            biBitCount = 24;
             break;
         case VLC_CODEC_RGB24:
             return VLC_EINVAL;
         case VLC_CODEC_BGR565LE:
-            biBitCount = 16;
             break;
         case VLC_CODEC_BGR555LE:
-            biBitCount = 16;
             break;
         case VLC_CODEC_RGBP:
         case VLC_CODEC_GREY:
-            biBitCount = 8;
             break;
         case VLC_CODEC_MP4V:
             biCompression = VLC_FOURCC( 'X', 'V', 'I', 'D' );
