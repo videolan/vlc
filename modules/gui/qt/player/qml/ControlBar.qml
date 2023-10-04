@@ -56,6 +56,7 @@ T.Pane {
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
+    property alias showRemainingTime: mediaRemainingTime.visible
 
     property var menu: undefined
 
