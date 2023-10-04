@@ -122,4 +122,10 @@
     self.carouselView.contentOffset = NSMakeSize(horizontalOffset, 0);
 }
 
+- (void)resizeWithOldSuperviewSize:(NSSize)oldSize
+{
+    [super resizeWithOldSuperviewSize:oldSize];
+    [self updateCarouselOffset];
+}
+
 @end
