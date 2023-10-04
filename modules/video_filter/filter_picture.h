@@ -56,6 +56,22 @@
         case VLC_CODEC_YUYV:   \
         case VLC_CODEC_YVYU:
 
+#define CASE_PACKED_RGBX                    \
+        case VLC_CODEC_RGBX:   \
+        case VLC_CODEC_XRGB:   \
+        case VLC_CODEC_BGRX:   \
+        case VLC_CODEC_XBGR:
+
+#define CASE_PACKED_RGBA                    \
+        case VLC_CODEC_RGBA:   \
+        case VLC_CODEC_ARGB:   \
+        case VLC_CODEC_BGRA:   \
+        case VLC_CODEC_ABGR:
+
+#define CASE_PACKED_RGB32                   \
+        CASE_PACKED_RGBX       \
+        CASE_PACKED_RGBA
+
 static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
     int *i_y_offset, int *i_u_offset, int *i_v_offset )
 {

@@ -120,16 +120,10 @@ static int Create( filter_t *p_filter )
             break;
         CASE_PACKED_YUV_422
             break;
+        CASE_PACKED_RGB32
+            break;
         case VLC_CODEC_RGB24:
         case VLC_CODEC_BGR24:
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-        case VLC_CODEC_BGRA:
-        case VLC_CODEC_ABGR:
-        case VLC_CODEC_RGBX:
-        case VLC_CODEC_XRGB:
-        case VLC_CODEC_BGRX:
-        case VLC_CODEC_XBGR:
             break;
 
         default:
@@ -229,14 +223,7 @@ static void VerticalMirror( picture_t *p_pic, picture_t *p_outpic, int i_plane,
         case VLC_CODEC_BGR24:
             RV24VerticalMirror( p_pic, p_outpic, i_plane, b_left_to_right );
             break;
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-        case VLC_CODEC_BGRA:
-        case VLC_CODEC_ABGR:
-        case VLC_CODEC_RGBX:
-        case VLC_CODEC_XRGB:
-        case VLC_CODEC_BGRX:
-        case VLC_CODEC_XBGR:
+        CASE_PACKED_RGB32
             RV32VerticalMirror( p_pic, p_outpic, i_plane, b_left_to_right );
             break;
         default:

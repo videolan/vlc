@@ -105,14 +105,7 @@ static int Create( filter_t *p_filter )
         case VLC_CODEC_RGB24:
         case VLC_CODEC_BGR24:
             break;
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-        case VLC_CODEC_BGRA:
-        case VLC_CODEC_ABGR:
-        case VLC_CODEC_RGBX:
-        case VLC_CODEC_XRGB:
-        case VLC_CODEC_BGRX:
-        case VLC_CODEC_XBGR:
+        CASE_PACKED_RGB32
             break;
         default:
             msg_Err( p_filter, "Unsupported input chroma (%4.4s)",
@@ -175,14 +168,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
         case VLC_CODEC_BGR24:
             RVPosterize( p_pic, p_outpic, false, level );
             break;
-        case VLC_CODEC_RGBA:
-        case VLC_CODEC_ARGB:
-        case VLC_CODEC_BGRA:
-        case VLC_CODEC_ABGR:
-        case VLC_CODEC_RGBX:
-        case VLC_CODEC_XRGB:
-        case VLC_CODEC_BGRX:
-        case VLC_CODEC_XBGR:
+        CASE_PACKED_RGB32
             RVPosterize( p_pic, p_outpic, true, level );
             break;
         CASE_PLANAR_YUV_SQUARE
