@@ -757,6 +757,10 @@ FocusScope {
                           ? ControlBar.TimeTextPosition.LeftRightSlider
                           : ControlBar.TimeTextPosition.AboveSlider
 
+            // hide right text so that it won't overlap with playlist
+            showRemainingTime: (textPosition !== ControlBar.TimeTextPosition.AboveSlider)
+                               || !playlistVisibility.isPlaylistVisible
+
             Navigation.parentItem: rootPlayer
             Navigation.upItem: {
                 if (playlistVisibility.isPlaylistVisible)
