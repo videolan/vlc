@@ -47,23 +47,22 @@ typedef struct
     /* Font style */
     float      f_font_relsize;    /**< The font size in video height % */
     int        i_font_size;       /**< The font size in pixels */
-    int        i_font_color;      /**< The color of the text 0xRRGGBB
-                                       (native endianness) */
+    uint32_t   i_font_color;      /**< The color of the text in XRGB */
     uint8_t    i_font_alpha;      /**< The transparency of the text.*/
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
 
     /* Outline */
-    int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
+    uint32_t   i_outline_color;   /**< The color of the outline in XRGB */
     uint8_t    i_outline_alpha;   /**< The transparency of the outline */
     int        i_outline_width;   /**< The width of the outline in pixels */
 
     /* Shadow */
-    int        i_shadow_color;    /**< The color of the shadow 0xRRGGBB */
+    uint32_t   i_shadow_color;    /**< The color of the shadow in XRGB */
     uint8_t    i_shadow_alpha;    /**< The transparency of the shadow. */
     int        i_shadow_width;    /**< The width of the shadow in pixels */
 
     /* Background */
-    int        i_background_color;/**< The color of the background 0xRRGGBB */
+    uint32_t   i_background_color;/**< The color of the background in XRGB */
     uint8_t    i_background_alpha;/**< The transparency of the background */
 
     /* Line breaking */

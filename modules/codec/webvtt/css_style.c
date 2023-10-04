@@ -28,7 +28,7 @@
 #include "css_style.h"
 
 static void Color( vlc_css_term_t term,
-                   int *color, uint8_t *alpha,
+                   uint32_t *color, uint8_t *alpha,
                    uint16_t *feat, int cflag, int aflag )
 {
     if( term.type == TYPE_FUNCTION )
@@ -38,9 +38,9 @@ static void Color( vlc_css_term_t term,
             if( ( !strcmp( term.psz, "rgb" ) && term.function->i_count == 3 ) ||
                 ( !strcmp( term.psz, "rgba" ) && term.function->i_count == 4 ) )
             {
-                *color = (((int)term.function->seq[0].term.val) << 16) |
-                         (((int)term.function->seq[1].term.val) << 8) |
-                          ((int)term.function->seq[2].term.val);
+                *color = (((uint32_t)term.function->seq[0].term.val) << 16) |
+                         (((uint32_t)term.function->seq[1].term.val) << 8) |
+                          ((uint32_t)term.function->seq[2].term.val);
                 *feat |= cflag;
                 if( term.psz[3] != 0 ) /* rgba */
                 {

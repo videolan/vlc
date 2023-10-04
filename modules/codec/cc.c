@@ -169,7 +169,7 @@ static const struct {
 
 #define EIA608_COLOR_DEFAULT EIA608_COLOR_WHITE
 
-static const int rgi_eia608_colors[] = {
+static const uint32_t rgi_eia608_colors[] = {
     0xffffff,  // white
     0x00ff00,  // green
     0x0000ff,  // blue

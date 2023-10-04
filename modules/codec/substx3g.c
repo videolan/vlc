@@ -639,9 +639,9 @@ static int ConvertFromVLCFlags( const text_style_t *p_style )
 
 static uint32_t ConvertFromVLCColor( const text_style_t *p_style )
 {
-    uint32_t rgba = 0;
+    uint32_t rgba;
     if( p_style->i_features & STYLE_HAS_FONT_COLOR )
-        rgba = ((uint32_t)p_style->i_font_color) << 8;
+        rgba = p_style->i_font_color << 8;
     else
         rgba = 0xFFFFFF00U;
     if( p_style->i_features & STYLE_HAS_FONT_ALPHA )
