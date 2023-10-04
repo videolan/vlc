@@ -959,7 +959,8 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
         {
             //exact number required to fill screen
             CGFloat spacing = [self valueForOption:iCarouselOptionSpacing withDefault:1.0];
-            CGFloat width = _vertical ? self.bounds.size.height: self.bounds.size.width;
+            CGFloat width = _vertical ? self.bounds.size.height : self.bounds.size.width;
+            width -= _vertical ? self.contentOffset.height : self.contentOffset.width;
             CGFloat itemWidth = _itemWidth * spacing;
             _numberOfVisibleItems = ceil(width / itemWidth) + 2;
             break;
