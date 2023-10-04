@@ -144,6 +144,13 @@ typedef struct vout_display_sys_t {
 } vout_display_sys_t;
 
 
+// At the moment we cope with any mono-planar RGBA thing
+// We could cope with many other things but they currently don't occur
+const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[] = {
+    VLC_CODEC_RGBA, VLC_CODEC_BGRA, VLC_CODEC_ARGB, VLC_CODEC_ABGR, 0
+};
+
+
 // ISP setup
 
 static bool want_copy(const video_format_t * const fmt)

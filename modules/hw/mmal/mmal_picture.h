@@ -113,10 +113,6 @@ MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MM
 
 //----------------------------------------------------------------------------
 
-// At the moment we cope with any mono-planar RGBA thing
-// We could cope with many other things but they currently don't occur
-extern const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[];
-
 bool hw_mmal_vzc_buf_set_format(MMAL_BUFFER_HEADER_T * const buf, MMAL_ES_FORMAT_T * const es_fmt);
 MMAL_DISPLAYREGION_T * hw_mmal_vzc_buf_region(MMAL_BUFFER_HEADER_T * const buf);
 void hw_mmal_vzc_buf_scale_dest_rect(MMAL_BUFFER_HEADER_T * const buf, const MMAL_RECT_T * const scale_rect);

@@ -34,8 +34,6 @@
 #include "mmal_cma.h"
 #include "mmal_picture.h"
 
-const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[] = { VLC_CODEC_RGBA, VLC_CODEC_BGRA, VLC_CODEC_ARGB, 0 };
-
 #define UINT64_SIZE(s) (((s) + sizeof(uint64_t) - 1)/sizeof(uint64_t))
 
 // WB + Inv
@@ -94,7 +92,8 @@ MMAL_FOURCC_T vlc_to_mmal_video_fourcc(const video_frame_format_t * const vf_vlc
             return MMAL_ENCODING_BGRA;
         case VLC_CODEC_ARGB:
             return MMAL_ENCODING_ARGB;
-        // VLC_CODEC_ABGR does not exist in VLC
+        case VLC_CODEC_ABGR:
+            return MMAL_ENCODING_ABGR;
         case VLC_CODEC_MMAL_OPAQUE:
             return MMAL_ENCODING_OPAQUE;
         default:
