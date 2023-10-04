@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include "filter_picture.h"
 
 /****************************************************************************
  * Local prototypes
@@ -53,22 +54,19 @@ vlc_module_end ()
  *****************************************************************************/
 static int OpenFilter( filter_t *p_filter )
 {
-    if( ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVA &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420 &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_YV12 &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBA &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRA &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_ABGR &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBX &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_XRGB &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRX &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_XBGR ) ||
-        !video_format_IsSameChroma( &p_filter->fmt_in.video,
-                                    &p_filter->fmt_out.video ) )
+    switch (p_filter->fmt_in.video.i_chroma)
     {
-        return VLC_EGENERIC;
+        case VLC_CODEC_YUVP:
+        case VLC_CODEC_YUVA:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
+        CASE_PACKED_RGB32
+            if (!video_format_IsSameChroma( &p_filter->fmt_in.video,
+                                            &p_filter->fmt_out.video ) )
+                return VLC_EINVAL;
+            break;
+        default:
+            return VLC_EINVAL;
     }
 
     if( p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
@@ -94,15 +92,9 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_pic_dst )
 #warning Converter cannot (really) change output format.
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
 
-    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBA &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRA &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_ABGR &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBX &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_XRGB &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRX &&
-        p_filter->fmt_in.video.i_chroma != VLC_CODEC_XBGR )
+    switch (p_filter->fmt_in.video.i_chroma)
     {
+    default:
         for( int i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
         {
             const int i_src_pitch    = p_pic->p[i_plane].i_pitch;
@@ -147,8 +139,8 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_pic_dst )
                 }
             }
         }
-    }
-    else /* RGBA */
+        break;
+    CASE_PACKED_RGB32
     {
         const int i_src_pitch = p_pic->p->i_pitch;
         const int i_dst_pitch = p_pic_dst->p->i_pitch;
@@ -190,5 +182,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_pic_dst )
                 *p_dst = p_srcl[__MIN( i_src_width_1, k >> SHIFT_SIZE )];
             }
         }
+        break;
+    }
     }
 }
