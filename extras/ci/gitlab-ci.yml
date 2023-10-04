@@ -366,14 +366,14 @@ debian-meson:
         - |
             # We split in two different commands to handle the case where
             # the coverage will be generated on different jobs later.
-            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j4 --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
+            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j$NCPU --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
 
         - mkdir html-coverage
         - >
             gcovr --add-tracefile "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json"
             --xml="cobertura.xml"
             --html="html-coverage/vlc.html"
-            --html-details -s
+            --html-details -s -j$NCPU
 
     allow_failure: true
     variables: *variables-debian
