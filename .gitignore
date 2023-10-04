@@ -54,5 +54,6 @@ build*/
 target*/
 contrib-*
 install-*
+!buildsystem/
 !build.rs
 !extras/package/apple/build.sh
