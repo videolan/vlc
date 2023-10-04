@@ -385,7 +385,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     /* Calculate text color components
      * Only use the first color */
     const int i_alpha = p_line->p_character[0].p_style->i_font_alpha;
-    YUVFromRGB( p_line->p_character[0].p_style->i_font_color, &i_y, &i_u, &i_v );
+    YUVFromXRGB( p_line->p_character[0].p_style->i_font_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -1132,13 +1132,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
         const ft_drawing_functions drawfuncs[] =
         {
-            [DRAW_YUVA] = { .extract = YUVFromRGB,
+            [DRAW_YUVA] = { .extract = YUVFromXRGB,
                             .fill =    FillYUVAPicture,
                             .blend =   BlendGlyphToYUVA },
-            [DRAW_RGBA] = { .extract = RGBFromRGB,
+            [DRAW_RGBA] = { .extract = RGBFromXRGB,
                             .fill =    FillRGBAPicture,
                             .blend =   BlendGlyphToRGBA },
-            [DRAW_ARGB] = { .extract = RGBFromRGB,
+            [DRAW_ARGB] = { .extract = RGBFromXRGB,
                             .fill =    FillARGBPicture,
                             .blend =   BlendGlyphToARGB },
         };

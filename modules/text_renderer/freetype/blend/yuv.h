@@ -19,8 +19,8 @@
  *****************************************************************************/
 #include "blend.h"
 
-static void YUVFromRGB( uint32_t i_argb,
-                        uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v )
+static void YUVFromXRGB( uint32_t i_argb,
+                         uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v )
 {
     int i_red   = ( i_argb & 0x00ff0000 ) >> 16;
     int i_green = ( i_argb & 0x0000ff00 ) >>  8;
