@@ -129,4 +129,18 @@
     [self updateCarouselOffset];
 }
 
+// pragma mark - iCarousel delegate methods
+
+- (CGFloat)carousel:(iCarousel *)carousel
+     valueForOption:(iCarouselOption)option
+        withDefault:(CGFloat)value
+{
+    switch (option) {
+    case iCarouselOptionWrap:
+        return YES;
+    default:
+        return value;
+    }
+}
+
 @end
