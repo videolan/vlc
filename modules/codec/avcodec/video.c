@@ -325,24 +325,15 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     return 0;
 }
 
-static bool chroma_compatible(vlc_fourcc_t a, vlc_fourcc_t b)
+static bool chroma_compatible(const video_format_t *a, const video_format_t *b)
 {
-    static const vlc_fourcc_t compat_lists[][2] = {
-        {VLC_CODEC_J420, VLC_CODEC_I420},
-        {VLC_CODEC_J422, VLC_CODEC_I422},
-        {VLC_CODEC_J440, VLC_CODEC_I440},
-        {VLC_CODEC_J444, VLC_CODEC_I444},
-    };
+    if (a->i_chroma != b->i_chroma)
+        return false;
 
-    if (a == b)
-        return true;
+    if (a->color_range != b->color_range && a->color_range != COLOR_RANGE_UNDEF)
+        return false;
 
-    for (size_t i = 0; i < ARRAY_SIZE(compat_lists); i++) {
-        if ((a == compat_lists[i][0] || a == compat_lists[i][1]) &&
-            (b == compat_lists[i][0] || b == compat_lists[i][1]))
-            return true;
-    }
-    return false;
+    return true;
 }
 
 /**
@@ -362,7 +353,7 @@ static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
         msg_Err(dec, "Unsupported decoded output format %d (%s)",
                 sys->p_context->pix_fmt, (name != NULL) ? name : "unknown");
         return VLC_EGENERIC;
-    } else if (!chroma_compatible(test_chroma.i_chroma, pic->format.i_chroma)
+    } else if (!chroma_compatible(&test_chroma, &pic->format)
      /* ensure we never read more than dst lines/pixels from src */
      || frame->width != (int) pic->format.i_visible_width
      || frame->height < (int) pic->format.i_visible_height)

@@ -63,17 +63,17 @@ static const struct
 {
     /* Planar YUV formats */
     {VLC_CODEC_I444, AV_PIX_FMT_YUV444P,  COLOR_RANGE_UNDEF },
-    {VLC_CODEC_J444, AV_PIX_FMT_YUVJ444P,  COLOR_RANGE_FULL },
+    {VLC_CODEC_I444, AV_PIX_FMT_YUVJ444P,  COLOR_RANGE_FULL },
 
     {VLC_CODEC_I440, AV_PIX_FMT_YUV440P,  COLOR_RANGE_UNDEF },
-    {VLC_CODEC_J440, AV_PIX_FMT_YUVJ440P,  COLOR_RANGE_FULL },
+    {VLC_CODEC_I440, AV_PIX_FMT_YUVJ440P,  COLOR_RANGE_FULL },
 
     {VLC_CODEC_I422, AV_PIX_FMT_YUV422P,  COLOR_RANGE_UNDEF },
-    {VLC_CODEC_J422, AV_PIX_FMT_YUVJ422P,  COLOR_RANGE_FULL },
+    {VLC_CODEC_I422, AV_PIX_FMT_YUVJ422P,  COLOR_RANGE_FULL },
 
     {VLC_CODEC_I420, AV_PIX_FMT_YUV420P,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_YV12, AV_PIX_FMT_YUV420P,  COLOR_RANGE_UNDEF },
-    {VLC_CODEC_J420, AV_PIX_FMT_YUVJ420P,  COLOR_RANGE_FULL },
+    {VLC_CODEC_I420, AV_PIX_FMT_YUVJ420P,  COLOR_RANGE_FULL },
     {VLC_CODEC_I411, AV_PIX_FMT_YUV411P,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_I410, AV_PIX_FMT_YUV410P,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_YV9, AV_PIX_FMT_YUV410P,  COLOR_RANGE_UNDEF },
@@ -226,7 +226,8 @@ enum AVPixelFormat GetFfmpegChroma( const video_format_t *fmt )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
-        if( chroma_table[i].i_chroma == fmt->i_chroma )
+        if( chroma_table[i].i_chroma == fmt->i_chroma &&
+            (chroma_table[i].range == COLOR_RANGE_UNDEF || fmt->color_range == chroma_table[i].range) )
         {
             return chroma_table[i].i_chroma_id;
         }
@@ -241,6 +242,8 @@ int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
         {
             fmt->i_chroma = chroma_table[i].i_chroma;
+            if (chroma_table[i].range != COLOR_RANGE_UNDEF)
+                fmt->color_range = chroma_table[i].range;
             return VLC_SUCCESS;
         }
     }
