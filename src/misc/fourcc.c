@@ -656,17 +656,17 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
     return false;
 }
 
-#define PLANAR(n, w_den, h_den, size, bits) \
+#define PLANAR(n, w_den, h_den, bits) \
       .plane_count = n, \
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,    1}, .h = {1,    1}} }, \
-      .pixel_size = size, \
+      .pixel_size = ((bits + 7) / 8), \
       .pixel_bits = bits
 
-#define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 1, 8)
-#define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, 2, bits)
+#define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 8)
+#define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, bits)
 
 #define SEMIPLANAR(w_den, h_den, bits) \
       .plane_count = 2, \
