@@ -922,7 +922,7 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
             assert(p->i_visible_lines <= p->i_lines);
         }
         /* The dx/d3d buffer is always allocated as NV12 */
-        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_NV12)) {
+        if (picture->format.i_chroma == VLC_CODEC_NV21) {
             /* TODO : Swap NV21 UV planes to match NV12 */
             return VLC_EGENERIC;
         }
