@@ -27,7 +27,7 @@
 
 #include <libavutil/pixfmt.h>
 
-enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t );
+enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t, bool *uv_flipped );
 
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma );
 

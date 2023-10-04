@@ -709,13 +709,14 @@ static int ExtractAV1Profile(AVCodecContext *p_context, const es_format_t *fmt_i
         AV1_release_sequence_header(sequence_hdr);
         return VLC_ENOTSUP;
     }
-    p_context->sw_pix_fmt = FindFfmpegChroma(chroma);
-
+    bool uv_flipped;
+    p_context->sw_pix_fmt = FindFfmpegChroma(chroma, &uv_flipped);
     if (p_context->sw_pix_fmt == AV_PIX_FMT_NONE)
     {
         AV1_release_sequence_header(sequence_hdr);
         return VLC_ENOTSUP;
     }
+    assert(uv_flipped == false);
 
     AV1_get_frame_max_dimensions(sequence_hdr, &w, &h);
 

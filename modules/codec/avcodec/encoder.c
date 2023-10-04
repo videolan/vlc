@@ -339,7 +339,8 @@ int InitVideoEnc( vlc_object_t *p_this )
             if( GetFfmpegCodec( VIDEO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
                                 &psz_namecodec ) )
                 break;
-            if( FindFfmpegChroma( p_enc->fmt_out.i_codec ) != AV_PIX_FMT_NONE )
+            bool uv_flipped;
+            if( FindFfmpegChroma( p_enc->fmt_out.i_codec, &uv_flipped ) != AV_PIX_FMT_NONE )
             {
                 i_codec_id = AV_CODEC_ID_RAWVIDEO;
                 psz_namecodec = "Raw video";
@@ -569,7 +570,9 @@ int InitVideoEnc( vlc_object_t *p_this )
             p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24;
         }
 
-        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma );
+        bool uv_flipped;
+        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma, &uv_flipped );
+        assert(!uv_flipped); // I420/RGB24 should not be flipped
 
         if( p_codec->pix_fmts )
         {
@@ -868,7 +871,12 @@ int InitVideoEnc( vlc_object_t *p_this )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
-        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma );
+
+        bool uv_flipped;
+        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma, &uv_flipped );
+        if (unlikely(uv_flipped))
+            msg_Warn(p_enc, "VLC chroma needs UV planes swapping %4.4s",
+                p_enc->fmt_in.video.i_chroma);
     }
 
     /* Make sure we get extradata filled by the encoder */

@@ -318,11 +318,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         stream->time_base.num = i_frame_rate_base;
         if(i_codec_id == AV_CODEC_ID_RAWVIDEO)
         {
+            bool uv_flipped;
             video_format_t vfmt;
             video_format_Copy(&vfmt, &fmt->video);
-            enum AVPixelFormat avformat = FindFfmpegChroma(vfmt.i_chroma);
+            enum AVPixelFormat avformat = FindFfmpegChroma(vfmt.i_chroma, &uv_flipped);
             if(avformat == AV_PIX_FMT_NONE)
                 msg_Warn(p_mux, "can't match format RAW video %4.4s",
+                         (const char *)&vfmt.i_chroma);
+            else if (unlikely(uv_flipped))
+                msg_Warn(p_mux, "UV planes need swapping for %4.4s",
                          (const char *)&vfmt.i_chroma);
             video_format_Clean(&vfmt);
             codecpar->format = avformat;

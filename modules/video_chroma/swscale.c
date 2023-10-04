@@ -320,8 +320,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     bool b_swap_uvi = false;
     bool b_swap_uvo = false;
 
-    i_fmti = FindFfmpegChroma( p_fmti->i_chroma );
-    i_fmto = FindFfmpegChroma( p_fmto->i_chroma );
+    i_fmti = FindFfmpegChroma( p_fmti->i_chroma, &b_swap_uvi );
+    i_fmto = FindFfmpegChroma( p_fmto->i_chroma, &b_swap_uvo );
 
     if( p_fmti->i_chroma == p_fmto->i_chroma )
     {
