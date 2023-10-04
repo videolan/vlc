@@ -3950,15 +3950,11 @@ AS_IF([test "${enable_qt}" != "no"], [
           AC_MSG_WARN([Not building Qt Interface with wayland support.])
       ])
 
-      PKG_CHECK_MODULES([QT5_QUICK_TEST], [Qt5QuickTest], [
-          have_qt5_quick_test="yes"
-      ],[
-      ])
-
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix Qt5Core)"
       QT_HOST_PATH="$(eval $PKG_CONFIG --variable=host_bins Qt5Core)"
       QT_INCLUDE_DIRECTORY="$(eval $PKG_CONFIG --variable=includedir Qt5Core)"
       QT_VERSION="$(eval $PKG_CONFIG --modversion Qt5Gui)"
+      AC_PATH_PROGS(QMAKE, [qmake], qmake, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
@@ -3966,6 +3962,28 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test "${QMLCACHE}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
+
+      AC_CHECK_PROGS(PYTHON3, [python3], [no])
+      AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
+            --qmake "${QMAKE}" \
+            --modules \
+            QtQml.Models=2.12 \
+            QtQuick.Layouts=1.12 \
+            QtQuick.Window=2.12 \
+            QtQuick.Controls=2.12 \
+            QtGraphicalEffects=1.12],
+      [],[
+          AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
+          enable_qt="no"
+      ])
+
+      PKG_CHECK_MODULES([QT5_QUICK_TEST], [Qt5QuickTest], [
+          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py --qmake "${QMAKE}" --modules QtTest=1.12], [], [
+              have_qt5_quick_test="yes"
+          ])
+      ],[
+      ])
+
 
       dnl Check private headers avaibility
       VLC_SAVE_FLAGS
