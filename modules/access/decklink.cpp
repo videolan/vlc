@@ -196,7 +196,7 @@ static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
     }
 }
 
-static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
+static int GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
         BMDDetectedVideoInputFormatFlags fmt_flags)
 {
     demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
@@ -209,7 +209,6 @@ static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
         frame_duration = 1;
     }
 
-    es_format_t video_fmt;
     vlc_fourcc_t chroma = 0;
     switch (fmt_flags) {
         case bmdDetectedVideoInputYCbCr422:
@@ -220,29 +219,28 @@ static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
             break;
         default:
             msg_Err(demux, "Unsupported input format");
-            break;
+            return VLC_ENOTSUP;
     }
-    es_format_Init(&video_fmt, VIDEO_ES, chroma);
+    es_format_Init(&sys->video_fmt, VIDEO_ES, chroma);
 
-    video_fmt.video.i_chroma = chroma;
-    video_fmt.video.i_width = m->GetWidth();
-    video_fmt.video.i_height = m->GetHeight();
-    video_fmt.video.i_sar_num = 1;
-    video_fmt.video.i_sar_den = 1;
-    video_fmt.video.i_frame_rate = time_scale;
-    video_fmt.video.i_frame_rate_base = frame_duration;
-    video_fmt.i_bitrate = video_fmt.video.i_width * video_fmt.video.i_height * video_fmt.video.i_frame_rate * 2 * 8;
+    sys->video_fmt.video.i_chroma = chroma;
+    sys->video_fmt.video.i_width = m->GetWidth();
+    sys->video_fmt.video.i_height = m->GetHeight();
+    sys->video_fmt.video.i_sar_num = 1;
+    sys->video_fmt.video.i_sar_den = 1;
+    sys->video_fmt.video.i_frame_rate = time_scale;
+    sys->video_fmt.video.i_frame_rate_base = frame_duration;
+    sys->video_fmt.i_bitrate = sys->video_fmt.video.i_width * sys->video_fmt.video.i_height * sys->video_fmt.video.i_frame_rate * 2 * 8;
 
     unsigned aspect_num, aspect_den;
     if (!var_InheritURational(demux, &aspect_num, &aspect_den, "decklink-aspect-ratio") &&
          aspect_num > 0 && aspect_den > 0) {
-        video_fmt.video.i_sar_num = aspect_num * video_fmt.video.i_height;
-        video_fmt.video.i_sar_den = aspect_den * video_fmt.video.i_width;
+        sys->video_fmt.video.i_sar_num = aspect_num * sys->video_fmt.video.i_height;
+        sys->video_fmt.video.i_sar_den = aspect_den * sys->video_fmt.video.i_width;
     }
 
     sys->dominance_flags = flags;
-
-    return video_fmt;
+    return VLC_SUCCESS;
 }
 namespace {
 
@@ -309,7 +307,9 @@ public:
         }
 
         es_out_Del(demux_->out, sys->video_es);
-        sys->video_fmt = GetModeSettings(demux_, mode, flags);
+        sys->video_es = NULL;
+        if (GetModeSettings(demux_, mode, flags) != VLC_SUCCESS)
+            return E_NOTIMPL;
         sys->video_es = es_out_Add(demux_->out, &sys->video_fmt);
 
         sys->input->PauseStreams();
@@ -691,7 +691,7 @@ static int Open(vlc_object_t *p_this)
                  double(time_scale) / frame_duration, field);
 
         if (u_id == mode.id) {
-            sys->video_fmt = GetModeSettings(demux, m, bmdDetectedVideoInputYCbCr422);
+            GetModeSettings(demux, m, bmdDetectedVideoInputYCbCr422);
             msg_Dbg(demux, "Using that mode");
         }
     }
