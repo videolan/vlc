@@ -382,7 +382,7 @@ fi
 cd ../..
 
 if [ -z "$PKG_CONFIG" ]; then
-    if [ `unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL` = "FAIL" ]; then
+    if [ "`unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL`" = "FAIL" ]; then
         # $TRIPLET-pkg-config DOESNT WORK
         # on Debian it pretends it works to autoconf
         export PKG_CONFIG="pkg-config"
