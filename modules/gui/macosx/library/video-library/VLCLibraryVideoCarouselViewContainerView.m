@@ -22,6 +22,7 @@
 
 #import "VLCLibraryVideoCarouselViewContainerView.h"
 
+#import "library/VLCLibraryUIUnits.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
 #import "views/iCarousel/iCarousel.h"
@@ -136,6 +137,21 @@
         withDefault:(CGFloat)value
 {
     switch (option) {
+    case iCarouselOptionSpacing:
+    {
+        // iCarousel calculates spacing as a multiplier on the item width.
+        // So a spacing of 1.2 means the item's width will grow to 1.2x its
+        // width, with the extra width as spacing.
+        //
+        // Because of this... interesting approach to spacing, we calculate
+        // the constant VLC-wide spacing relative to the width of the carousel's
+        // itemWidth.
+        const CGFloat itemWidth = carousel.itemWidth;
+        const CGFloat bothSidesSpacing = VLCLibraryUIUnits.mediumSpacing * 2;
+        const CGFloat desiredWidthWithSpacing = itemWidth + bothSidesSpacing;
+        const CGFloat desiredMultiple = desiredWidthWithSpacing / itemWidth;
+        return desiredMultiple;
+    }
     case iCarouselOptionWrap:
         return YES;
     default:
