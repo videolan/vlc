@@ -87,7 +87,7 @@
     NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:300];
     heightConstraint.active = YES;
 
-    self.carouselView.scrollEnabled = YES;
+    [self updateCarouselOffset];
 }
 
 - (void)setupDataSource
@@ -112,6 +112,14 @@
 
     VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
+}
+
+- (void)updateCarouselOffset
+{
+    const CGFloat widthToFirstItemCenter = self.frame.size.width / 2;
+    const CGFloat itemWidth = self.carouselView.itemWidth;
+    const CGFloat horizontalOffset = -(widthToFirstItemCenter - itemWidth / 2);
+    self.carouselView.contentOffset = NSMakeSize(horizontalOffset, 0);
 }
 
 @end
