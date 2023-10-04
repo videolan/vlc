@@ -62,18 +62,20 @@ static int Open( filter_t *p_filter )
 {
     /* It only supports YUVP to YUVA/RGBA without scaling
      * (if scaling is required another filter can do it) */
-    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP ||
-        ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_YUVA &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_BGRA &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ABGR) ||
-        p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
+    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP )
+        return VLC_EGENERIC;
+    switch ( p_filter->fmt_out.video.i_chroma )
+    {
+        CASE_PACKED_RGBA
+        case VLC_CODEC_YUVA:
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+    if( p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
         p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
-    {
         return VLC_EGENERIC;
-    }
 
     p_filter->ops = &Convert_ops;
 
