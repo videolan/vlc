@@ -126,7 +126,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
                               __MIN(desc.Height, src->format.i_y_offset + src->format.i_visible_height),
                               6, p_copy_cache);
 
-        if (dst->format.i_chroma != VLC_CODEC_I420 && dst->format.i_chroma != VLC_CODEC_I420_10L)
+        if (dst->format.i_chroma == VLC_CODEC_YV12)
             picture_SwapUV(dst);
     } else {
         msg_Err(p_filter, "Unsupported DXA9 conversion from 0x%08X to YV12", desc.Format);
