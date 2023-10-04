@@ -39,20 +39,6 @@
 /*****************************************************************************
  * Chroma fourcc -> libavutil pixfmt mapping
  *****************************************************************************/
-#if defined(WORDS_BIGENDIAN)
-#   define VLC_RGB_ES( fcc, leid, beid ) \
-    { fcc, beid },
-#else
-#   define VLC_RGB_ES( fcc, leid, beid ) \
-    { fcc, leid },
-#endif
-
-#define VLC_RGB( fcc, leid, beid, rmask, gmask, bmask ) \
-    { fcc, leid, rmask, gmask, bmask }, \
-    { fcc, beid, bmask, gmask, rmask }, \
-    VLC_RGB_ES( fcc, leid, beid )
-
-
 static const struct
 {
     vlc_fourcc_t  i_chroma;
