@@ -32,6 +32,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <assert.h>
+#include "../video_filter/filter_picture.h"
 
 /* TODO:
  *  Add anti-aliasing support (specially for DVD where only 4 colors are used)
@@ -125,15 +126,7 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
         video_palette_t rgbp;
         int r, g, b, a;
 
-        switch( p_filter->fmt_out.video.i_chroma )
-        {
-            case VLC_CODEC_ARGB: r = 1, g = 2, b = 3, a = 0; break;
-            case VLC_CODEC_RGBA: r = 0, g = 1, b = 2, a = 3; break;
-            case VLC_CODEC_BGRA: r = 2, g = 1, b = 0, a = 3; break;
-            case VLC_CODEC_ABGR: r = 3, g = 2, b = 1, a = 0; break;
-            default:
-                vlc_assert_unreachable();
-        }
+        GetPackedRgbIndexes(p_filter->fmt_out.video.i_chroma, &r, &g, &b, &a);
         /* Create a RGBA palette */
         rgbp.i_entries = p_yuvp->i_entries;
         for( int i = 0; i < p_yuvp->i_entries; i++ )
@@ -170,15 +163,6 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
     }
 }
 
-/* FIXME copied from blend.c */
-static inline uint8_t vlc_uint8( int v )
-{
-    if( v > 255 )
-        return 255;
-    else if( v < 0 )
-        return 0;
-    return v;
-}
 static void Yuv2Rgb( uint8_t *r, uint8_t *g, uint8_t *b, int y1, int u1, int v1 )
 {
     /* macros used for YUV pixel conversions */
