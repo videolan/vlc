@@ -367,7 +367,7 @@ debian-meson:
             # We split in two different commands to handle the case where
             # the coverage will be generated on different jobs later.
             mkdir html-coverage
-            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j4
+            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j4 --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
         - >
             gcovr --add-tracefile "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json"
             --xml="cobertura.xml"
