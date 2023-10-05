@@ -4232,11 +4232,7 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     es_format_Clean(&es->fmt_out);
     int ret = es_format_Copy(&es->fmt_out, &update);
     if (ret == VLC_SUCCESS)
-    {
         EsOutUpdateEsLanguageTitle(es, &es->fmt_out);
-        input_item_UpdateTracksInfo(input_GetItem(p_input), &es->fmt_out,
-                                    es->id.str_id, es->id.stable);
-    }
 
     return ret;
 }
