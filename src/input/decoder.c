@@ -1197,7 +1197,10 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
 
         if( i_bitmap > 1 )
         {
-            block_FifoPut( p_ccowner->p_fifo, block_Duplicate(p_cc) );
+            block_t *dup = block_Duplicate(p_cc);
+            if (dup == NULL)
+                break;
+            block_FifoPut(p_ccowner->p_fifo, dup);
         }
         else
         {
