@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.medialib 0.1
@@ -43,7 +44,7 @@ FocusScope {
 
     implicitHeight: recentVideosColumn.height
 
-    focus: listView.count > 0
+    focus: recentModel.count > 0
 
     // Functions
 
@@ -58,6 +59,14 @@ FocusScope {
     }
 
     // Childs
+
+    MLRecentsVideoModel {
+        id: recentModel
+
+        ml: MediaLib
+
+        limit: 10
+    }
 
     Util.MLContextMenu {
         id: contextMenu
@@ -81,13 +90,43 @@ FocusScope {
 
         spacing: VLCStyle.margin_normal
 
-        Widgets.SubtitleLabel {
-            text: I18n.qtr("Continue Watching")
+        RowLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-            // NOTE: Setting this to listView.visible seems to causes unnecessary implicitHeight
-            //       calculations in the Column parent.
-            visible: listView.count > 0
-            color: theme.fg.primary
+            anchors.leftMargin: listView.contentLeftMargin
+            anchors.rightMargin: listView.contentRightMargin
+
+            Widgets.SubtitleLabel {
+                id: label
+
+                Layout.fillWidth: true
+
+                text: I18n.qtr("Continue Watching")
+
+                // NOTE: Setting this to gridView.visible seems to causes unnecessary implicitHeight
+                //       calculations in the Column parent.
+                visible: recentModel.count > 0
+                color: theme.fg.primary
+            }
+
+            Widgets.TextToolButton {
+                id: button
+
+                visible: recentModel.maximumCount > recentModel.count
+
+                Layout.preferredWidth: implicitWidth
+
+                focus: true
+
+                text: I18n.qtr("See All")
+
+                font.pixelSize: VLCStyle.fontSize_large
+
+                Navigation.parentItem: root
+
+                onClicked: History.push(["mc", "video", "all", "recentVideos"]);
+            }
         }
 
         Widgets.KeyNavigableListView {
@@ -113,14 +152,9 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            visible: listView.count > 0
+            visible: recentModel.count > 0
 
-            model: MLRecentsVideoModel {
-                id: recentModel
-
-                ml: MediaLib
-                limit: 10
-            }
+            model: recentModel
 
             delegate: VideoGridItem {
                 id: gridItem

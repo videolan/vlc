@@ -810,7 +810,8 @@ modules/gui/qt/medialibrary/qml/VideoAll.qml
 modules/gui/qt/medialibrary/qml/VideoAllDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoAllSubDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoDisplay.qml
-modules/gui/qt/medialibrary/qml/VideoDisplayRecentVideos.qml
+modules/gui/qt/medialibrary/qml/VideoRecentVideos.qml
+modules/gui/qt/medialibrary/qml/VideoRecentVideosDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoGridItem.qml
 modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml
 modules/gui/qt/medialibrary/qml/VideoListDisplay.qml

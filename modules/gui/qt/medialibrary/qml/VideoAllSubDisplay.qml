@@ -250,7 +250,7 @@ VideoAll {
         }
     }
 
-    header: VideoDisplayRecentVideos {
+    header: VideoRecentVideos {
         width: root.width - displayMarginBeginning - displayMarginEnd
 
         x: displayMarginBeginning

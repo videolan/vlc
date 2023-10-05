@@ -44,6 +44,9 @@ Widgets.PageLoader {
     }, {
         name: "group",
         component: componentGroup
+    }, {
+        name: "recentVideos",
+        component: componentRecentVideos
     }]
 
     loadDefaultView: function () {
@@ -105,4 +108,15 @@ Widgets.PageLoader {
             }
         }
     }
+
+    Component {
+        id: componentRecentVideos
+
+        VideoRecentVideosDisplay {
+            function isInfoExpandPanelAvailable(/* modelIndexData */) {
+                return true
+            }
+        }
+    }
+
 }
