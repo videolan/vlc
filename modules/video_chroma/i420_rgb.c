@@ -36,6 +36,7 @@
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"
+#include "../video_filter/filter_picture.h"
 #ifdef PLUGIN_PLAIN
 # include "i420_rgb_c.h"
 
@@ -153,10 +154,7 @@ static int Activate( filter_t *p_filter )
                 case VLC_CODEC_BGR555:
                     p_filter->ops = &I420_RGB16_ops;
                     break;
-                case VLC_CODEC_XRGB:
-                case VLC_CODEC_XBGR:
-                case VLC_CODEC_RGBX:
-                case VLC_CODEC_BGRX:
+                CASE_PACKED_RGBX
                     p_filter->ops = &I420_RGB32_ops;
                     break;
 #endif
@@ -185,20 +183,10 @@ static int Activate( filter_t *p_filter )
             p_sys->i_bytespp = 1;
             break;
 #endif
-        case VLC_CODEC_RGB565BE:
-        case VLC_CODEC_BGR565BE:
-        case VLC_CODEC_RGB565LE:
-        case VLC_CODEC_BGR565LE:
-        case VLC_CODEC_RGB555BE:
-        case VLC_CODEC_BGR555BE:
-        case VLC_CODEC_RGB555LE:
-        case VLC_CODEC_BGR555LE:
+        CASE_PACKED_RGB1615
             p_sys->i_bytespp = 2;
             break;
-        case VLC_CODEC_XRGB:
-        case VLC_CODEC_XBGR:
-        case VLC_CODEC_RGBX:
-        case VLC_CODEC_BGRX:
+        CASE_PACKED_RGBX
         case VLC_CODEC_RGB24:
         case VLC_CODEC_BGR24:
             p_sys->i_bytespp = 4;
@@ -366,14 +354,7 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         Set8bppPalette( p_filter, p_sys->p_rgb8 );
         break;
 
-    case VLC_CODEC_RGB565BE:
-    case VLC_CODEC_BGR565BE:
-    case VLC_CODEC_RGB565LE:
-    case VLC_CODEC_BGR565LE:
-    case VLC_CODEC_RGB555BE:
-    case VLC_CODEC_BGR555BE:
-    case VLC_CODEC_RGB555LE:
-    case VLC_CODEC_BGR555LE:
+    CASE_PACKED_RGB1615
         p_sys->p_rgb16 = (uint16_t *)p_sys->p_base;
         for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
@@ -398,10 +379,7 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         }
         break;
 
-    case VLC_CODEC_XRGB:
-    case VLC_CODEC_XBGR:
-    case VLC_CODEC_RGBX:
-    case VLC_CODEC_BGRX:
+    CASE_PACKED_RGBX
     case VLC_CODEC_RGB24:
     case VLC_CODEC_BGR24:
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
