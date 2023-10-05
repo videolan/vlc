@@ -860,6 +860,7 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_input_HandleVoutEvent(input, &event->vout);
             break;
         case INPUT_EVENT_ITEM_META:
+        case INPUT_EVENT_ITEM_INFO:
             vlc_player_SendEvent(player, on_media_meta_changed,
                                  input_GetItem(input->thread));
             break;

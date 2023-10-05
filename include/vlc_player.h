@@ -3136,7 +3136,7 @@ struct vlc_player_cbs
         enum vlc_player_media_stopped_action new_action, void *data);
 
     /**
-     * Called when the media meta has changed
+     * Called when the media meta and/or info has changed
      *
      * @param player locked player instance
      * @param media current media
