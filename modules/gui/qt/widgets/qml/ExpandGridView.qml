@@ -735,25 +735,33 @@ FocusScope {
             id: flickableScrollBar
         }
 
-        MouseArea {
-            anchors.fill: parent
-            z: -1
+        TapHandler {
+            acceptedDevices: PointerDevice.Mouse
 
-            preventStealing: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onPressed: (mouse) => {
-                Helpers.enforceFocus(flickable, Qt.MouseFocusReason)
+            grabPermissions: PointerHandler.TakeOverForbidden
 
-                if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
-                    if (selectionModel)
-                        selectionModel.clearSelection()
+            gesturePolicy: TapHandler.ReleaseWithinBounds
+
+            onTapped: (eventPoint, button) => {
+                initialAction()
+
+                if (button === Qt.RightButton) {
+                    root.showContextMenu(parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
                 }
             }
 
-            onReleased: (mouse) => {
-                if (mouse.button & Qt.RightButton) {
-                    root.showContextMenu(mapToGlobal(mouse.x, mouse.y))
+            Component.onCompleted: {
+                canceled.connect(initialAction)
+            }
+
+            function initialAction() {
+                Helpers.enforceFocus(flickable, Qt.MouseFocusReason)
+
+                if (!(point.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
+                    if (root.selectionModel)
+                        root.selectionModel.clearSelection()
                 }
             }
         }
