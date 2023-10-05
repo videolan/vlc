@@ -298,30 +298,35 @@ ListView {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-
-        z: -1
-
-        preventStealing: true
+    TapHandler {
+        acceptedDevices: PointerDevice.Mouse
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onPressed: (mouse) => {
-            focus = true // Grab the focus from delegate
-            root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
+        grabPermissions: PointerHandler.TakeOverForbidden
 
-            if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
-                if (selectionModel)
-                    selectionModel.clearSelection()
+        gesturePolicy: TapHandler.ReleaseWithinBounds
+
+        onTapped: (eventPoint, button) => {
+            initialAction()
+
+            if (button === Qt.RightButton) {
+                root.showContextMenu(parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
             }
-
-            mouse.accepted = true
         }
 
-        onReleased: (mouse) => {
-            if (mouse.button & Qt.RightButton) {
-                root.showContextMenu(mapToGlobal(mouse.x, mouse.y))
+        Component.onCompleted: {
+            canceled.connect(initialAction)
+        }
+
+        function initialAction() {
+            if (root.currentItem)
+                root.currentItem.focus = false // Grab the focus from delegate
+            root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
+
+            if (!(point.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
+                if (selectionModel)
+                    selectionModel.clearSelection()
             }
         }
     }
