@@ -1170,13 +1170,12 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
     }
 }
 
-static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
-                           const decoder_cc_desc_t *p_desc )
+static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
+                                 const decoder_cc_desc_t *p_desc )
 {
-    vlc_fifo_Lock(p_owner->p_fifo);
+    vlc_fifo_Assert(p_owner->p_fifo);
     if (p_owner->flushing || p_owner->aborting)
     {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         vlc_frame_Release(p_cc);
         return;
     }
@@ -1210,8 +1209,6 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
     }
     vlc_mutex_unlock(&p_owner->cc.lock);
 
-    vlc_fifo_Unlock(p_owner->p_fifo);
-
     if( p_cc ) /* can have bitmap set but no created decs */
         block_Release( p_cc );
 }
@@ -1231,9 +1228,7 @@ static void PacketizerGetCc( vlc_input_decoder_t *p_owner, decoder_t *p_dec_cc )
     if( !p_cc )
         return;
 
-    vlc_fifo_Unlock(p_owner->p_fifo);
-    DecoderPlayCc( p_owner, p_cc, &desc );
-    vlc_fifo_Lock(p_owner->p_fifo);
+    DecoderPlayCcLocked( p_owner, p_cc, &desc );
 }
 
 static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
@@ -1251,7 +1246,9 @@ static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
         return;
     }
 
-    DecoderPlayCc(p_owner, p_cc, p_desc);
+    vlc_fifo_Lock(p_owner->p_fifo);
+    DecoderPlayCcLocked(p_owner, p_cc, p_desc);
+    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_picture )
