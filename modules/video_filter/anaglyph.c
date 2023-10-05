@@ -90,7 +90,6 @@ static int Create(filter_t *p_filter)
     switch (p_filter->fmt_in.video.i_chroma)
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
             break;
 
@@ -163,7 +162,6 @@ static void Filter(filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic)
     switch (p_pic->format.i_chroma)
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
             combine_side_by_side_yuv420(p_pic, p_outpic,
                                         p_sys->left, p_sys->right);

@@ -259,14 +259,6 @@
 #define VLC_CODEC_I444_16L        VLC_FOURCC('I','4','F','L')
 #define VLC_CODEC_I444_16B        VLC_FOURCC('I','4','F','B')
 
-/* Planar YUV 4:2:0 Y:U:V full scale */
-#define VLC_CODEC_J420            VLC_FOURCC('J','4','2','0')
-/* Planar YUV 4:2:2 Y:U:V full scale */
-#define VLC_CODEC_J422            VLC_FOURCC('J','4','2','2')
-/* Planar YUV 4:4:0 Y:U:V full scale */
-#define VLC_CODEC_J440            VLC_FOURCC('J','4','4','0')
-/* Planar YUV 4:4:4 Y:U:V full scale */
-#define VLC_CODEC_J444            VLC_FOURCC('J','4','4','4')
 /* Palettized YUV with palette element Y:U:V:A */
 #define VLC_CODEC_YUVP            VLC_FOURCC('Y','U','V','P')
 

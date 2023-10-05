@@ -98,11 +98,9 @@ static int Create( filter_t *p_filter )
         case VLC_CODEC_I420:
         case VLC_CODEC_I420_10L:
         case VLC_CODEC_I420_10B:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
 
         case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
 
         CASE_PACKED_YUV_422
             break;
@@ -170,10 +168,8 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
     case VLC_CODEC_I420:
     case VLC_CODEC_I420_10L:
     case VLC_CODEC_I420_10B:
-    case VLC_CODEC_J420:
     case VLC_CODEC_YV12:
     case VLC_CODEC_I422:
-    case VLC_CODEC_J422:
         get_custom_from_yuv( p_pic, p_outpic, Y_PLANE, U_PLANE, V_PLANE, p_sys->projection_matrix );
         break;
 

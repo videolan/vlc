@@ -182,14 +182,12 @@ static void PreparePlanar( filter_t *p_filter, picture_t *p_inpic )
     switch( p_inpic->format.i_chroma )
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
             i_chroma_dx = 2;
             i_chroma_dy = 2;
             break;
 
         case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
             i_chroma_dx = 2;
             i_chroma_dy = 1;
             break;

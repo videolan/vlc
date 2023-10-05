@@ -649,7 +649,6 @@ static const struct {
     YUV(VLC_CODEC_YV12,     CPictureYV12,     convertNone),
     YUV(VLC_CODEC_NV12,     CPictureNV12,     convertNone),
     YUV(VLC_CODEC_NV21,     CPictureNV21,     convertNone),
-    YUV(VLC_CODEC_J420,     CPictureI420_8,   convertNone),
     YUV(VLC_CODEC_I420,     CPictureI420_8,   convertNone),
 #ifdef WORDS_BIGENDIAN
     YUV(VLC_CODEC_I420_9B,  CPictureI420_16,  convert8To9Bits),
@@ -659,7 +658,6 @@ static const struct {
     YUV(VLC_CODEC_I420_10L, CPictureI420_16,  convert8To10Bits),
 #endif
 
-    YUV(VLC_CODEC_J422,     CPictureI422_8,   convertNone),
     YUV(VLC_CODEC_I422,     CPictureI422_8,   convertNone),
 #ifdef WORDS_BIGENDIAN
     YUV(VLC_CODEC_I422_9B,  CPictureI422_16,  convert8To9Bits),
@@ -671,7 +669,6 @@ static const struct {
     YUV(VLC_CODEC_I422_16L, CPictureI422_16,  convert8To16Bits),
 #endif
 
-    YUV(VLC_CODEC_J444,     CPictureI444_8,   convertNone),
     YUV(VLC_CODEC_I444,     CPictureI444_8,   convertNone),
 #ifdef WORDS_BIGENDIAN
     YUV(VLC_CODEC_I444_9B,  CPictureI444_16,  convert8To9Bits),

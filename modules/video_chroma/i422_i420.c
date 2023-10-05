@@ -75,11 +75,9 @@ static int Activate( filter_t *p_filter )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
             switch( p_filter->fmt_out.video.i_chroma )
             {
                 case VLC_CODEC_I420:
-                case VLC_CODEC_J420:
                     p_filter->ops = &I422_I420_ops;
                     break;
 

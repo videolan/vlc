@@ -613,8 +613,7 @@ notsupp:
             2 * chroma->p[2].h.num == chroma->p[2].h.den &&
             i_c420 == PC_UPCONVERT )
         {
-            fmt.i_chroma = p_filter->fmt_in.video.i_chroma == VLC_CODEC_J420 ?
-                        VLC_CODEC_J422 : VLC_CODEC_I422;
+            fmt.i_chroma = VLC_CODEC_I422;
         }
     }
     free( psz_mode );

@@ -130,11 +130,9 @@ static int Create( filter_t *p_filter )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
 
         case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
             break;
 
         default:
@@ -237,8 +235,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         int i_width  = i_mask_visible_pitch;
 
         const bool b_line_factor = ( i_plane /* U_PLANE or V_PLANE */ &&
-            !( p_inpic->format.i_chroma == VLC_CODEC_I422
-            || p_inpic->format.i_chroma == VLC_CODEC_J422 ) );
+            p_inpic->format.i_chroma != VLC_CODEC_I422 );
 
         if( i_plane ) /* U_PLANE or V_PLANE */
         {

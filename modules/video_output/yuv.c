@@ -117,7 +117,6 @@ static int Open(vout_display_t *vd,
         switch (chroma) {
         case VLC_CODEC_YV12:
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
             break;
         default:
             msg_Err(vd, "YUV4MPEG2 mode needs chroma YV12 not %4.4s as requested",

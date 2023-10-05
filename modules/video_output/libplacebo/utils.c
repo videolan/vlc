@@ -131,11 +131,9 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_I410,           {PLANAR(3,  8, _410)} },
     { VLC_CODEC_I411,           {PLANAR(3,  8, _411)} },
     { VLC_CODEC_I440,           {PLANAR(3,  8, _440)} },
-    { VLC_CODEC_J440,           {PLANAR(3,  8, _440)} },
     { VLC_CODEC_GREY,           {PLANAR(1,  8, _444)} },
 
     { VLC_CODEC_I420,           {PLANAR(3,  8, _420)} },
-    { VLC_CODEC_J420,           {PLANAR(3,  8, _420)} },
 #ifdef WORDS_BIGENDIAN
     { VLC_CODEC_I420_9B,        {PLANAR(3, 16, _420), .color_bits = 9} },
     { VLC_CODEC_I420_10B,       {PLANAR(3, 16, _420), .color_bits = 10} },
@@ -149,7 +147,6 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
 #endif
 
     { VLC_CODEC_I422,           {PLANAR(3,  8, _422)} },
-    { VLC_CODEC_J422,           {PLANAR(3,  8, _422)} },
 #ifdef WORDS_BIGENDIAN
     { VLC_CODEC_I422_9B,        {PLANAR(3, 16, _422), .color_bits = 9} },
     { VLC_CODEC_I422_10B,       {PLANAR(3, 16, _422), .color_bits = 10} },
@@ -161,7 +158,6 @@ static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
 #endif
 
     { VLC_CODEC_I444,           {PLANAR(3,  8, _444)} },
-    { VLC_CODEC_J444,           {PLANAR(3,  8, _444)} },
 #ifdef WORDS_BIGENDIAN
     { VLC_CODEC_I444_9B,        {PLANAR(3, 16, _444), .color_bits = 9} },
     { VLC_CODEC_I444_10B,       {PLANAR(3, 16, _444), .color_bits = 10} },

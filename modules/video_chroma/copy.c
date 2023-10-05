@@ -931,7 +931,6 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
     /*  Fill chroma planes for planar YUV */
     else
     if (picture->format.i_chroma == VLC_CODEC_I420 ||
-        picture->format.i_chroma == VLC_CODEC_J420 ||
         picture->format.i_chroma == VLC_CODEC_YV12) {
 
         for (int n = 1; n < picture->i_planes; n++) {

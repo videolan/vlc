@@ -1328,7 +1328,6 @@ static const d3d9_format_t d3d_formats[] = {
     /* YV12 is always used for planar 420, the planes are then swapped in Lock() */
     { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
     { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_I420 },
-    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_J420 },
     { "NV12",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
     { "DXA9",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_D3D9_OPAQUE },
     { "DXA9_422",   MAKEFOURCC('Y','U','Y','2'),    VLC_CODEC_D3D9_OPAQUE },

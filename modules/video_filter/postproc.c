@@ -134,7 +134,6 @@ static int OpenPostproc( filter_t *p_filter )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I444:
-        case VLC_CODEC_J444:
         /* case VLC_CODEC_YUVA:
            FIXME: Should work but alpha plane needs to be copied manually and
                   I'm kind of feeling too lazy to write the code to do that ATM
@@ -142,14 +141,12 @@ static int OpenPostproc( filter_t *p_filter )
             i_flags |= PP_FORMAT_444;
             break;
         case VLC_CODEC_I422:
-        case VLC_CODEC_J422:
             i_flags |= PP_FORMAT_422;
             break;
         case VLC_CODEC_I411:
             i_flags |= PP_FORMAT_411;
             break;
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
         case VLC_CODEC_YV12:
             i_flags |= PP_FORMAT_420;
             break;

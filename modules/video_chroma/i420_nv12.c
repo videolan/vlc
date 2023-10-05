@@ -168,7 +168,6 @@ static int Create( filter_t *p_filter )
     switch( infcc )
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
             if( outfcc != VLC_CODEC_NV12 )
                 return -1;
             p_filter->ops = &I420_NV12_ops;
@@ -183,7 +182,6 @@ static int Create( filter_t *p_filter )
             switch( outfcc )
             {
                 case VLC_CODEC_I420:
-                case VLC_CODEC_J420:
                     p_filter->ops = &NV12_I420_ops;
                     break;
                 case VLC_CODEC_YV12:

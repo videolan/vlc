@@ -230,7 +230,6 @@ static int Create( filter_t *p_filter )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:
-        case VLC_CODEC_J420:
             p_sys->drawingPixelFunction = drawPixelI420;
             COLORS_YUV
             break;
