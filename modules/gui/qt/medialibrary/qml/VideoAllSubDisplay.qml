@@ -251,18 +251,14 @@ VideoAll {
     }
 
     header: VideoRecentVideos {
-        width: root.width - displayMarginBeginning - displayMarginEnd
-
-        x: displayMarginBeginning
+        width: root.width
 
         // spacing between header and content
         bottomPadding: VLCStyle.margin_normal
+        leftPadding: root.leftPadding
+        rightPadding: root.rightPadding
 
         subtitleText: (root.model && root.model.count > 0) ? I18n.qtr("Videos") : ""
-
-        // NOTE: We want grid items to be visible on the sides.
-        displayMarginBeginning: root.contentMargin
-        displayMarginEnd: displayMarginBeginning
 
         Navigation.parentItem: root
 
