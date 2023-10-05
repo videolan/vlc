@@ -270,7 +270,7 @@ static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_
     switch( fmt )
     {
     case VLC_CODEC_YUV422A:
-        *pi_fmt = AV_PIX_FMT_YUV422P;
+        *pi_fmt = AV_PIX_FMT_YUVA422P;
         *pb_has_a = true;
         break;
     case VLC_CODEC_YUV420A:
