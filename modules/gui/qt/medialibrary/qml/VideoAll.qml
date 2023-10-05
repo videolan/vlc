@@ -126,13 +126,10 @@ MainInterface.MainViewLoader {
     Component {
         id: grid
 
-        MainInterface.MainGridView {
+        VideoGridDisplay {
             id: gridView
 
             // Settings
-
-            cellWidth : VLCStyle.gridItem_video_width
-            cellHeight: VLCStyle.gridItem_video_height
 
             topMargin: VLCStyle.margin_normal
 
@@ -142,7 +139,11 @@ MainInterface.MainViewLoader {
 
             headerDelegate: root.header
 
-            activeFocusOnTab: true
+            dragItem: root.dragItem
+
+            contextMenu: root.contextMenu
+
+            labels: root.gridLabels
 
             // Navigation
 
@@ -150,96 +151,17 @@ MainInterface.MainViewLoader {
 
             Navigation.upAction: _onNavigationUp
 
-            // Events
+            // Functions
 
-            // NOTE: Define the initial position and selection. This is done on activeFocus rather
-            //       than Component.onCompleted because selectionModel.selectedGroup update itself
-            //       after this event.
-            onActiveFocusChanged: {
-                if (activeFocus == false || model.count === 0 || selectionModel.hasSelection)
-                    return;
-
-                resetFocus() // restores initialIndex
+            function isInfoExpandPanelAvailable(modelIndexData) {
+                return root.isInfoExpandPanelAvailable(modelIndexData)
             }
+
+            // Events
 
             onActionAtIndex: root.onAction(selectionModel.selectedIndexes)
 
-            // Connections
-
-            Connections {
-                target: root.contextMenu
-
-                onShowMediaInformation: {
-                    gridView.switchExpandItem(index)
-
-                    if (gridView.focus)
-                        expandItem.setCurrentItemFocus(Qt.TabFocusReason)
-                }
-            }
-
-            // Children
-
-            delegate: VideoGridItem {
-                id: gridItem
-
-                // properties required by ExpandGridView
-
-                property var model: ({})
-                property int index: -1
-
-                // Settings
-
-                opacity: (gridView.expandIndex !== -1
-                          &&
-                          gridView.expandIndex !== gridItem.index) ? 0.7 : 1
-
-               labels: root.gridLabels(model)
-
-                // FIXME: Sometimes MLBaseModel::getDataAt returns {} so we use 'isNew === true'.
-                showNewIndicator: (model.isNew === true)
-
-                dragItem: root.dragItem
-
-                // Events
-
-                onItemClicked: gridView.leftClickOnItem(modifier, index)
-
-                onItemDoubleClicked: root.onDoubleClick(model)
-
-                onContextMenuButtonClicked: {
-                    gridView.rightClickOnItem(index);
-
-                    const options = {}
-                    if (root.isInfoExpandPanelAvailable(model))
-                        options["information"] = index
-
-                    root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, options);
-                }
-
-                // Animations
-
-                Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_short } }
-            }
-
-            expandDelegate: VideoInfoExpandPanel {
-                width: gridView.width
-
-                x: 0
-
-                model: root.model
-
-                Navigation.parentItem: gridView
-
-                Navigation.cancelAction: gridView.forceFocus
-                Navigation.upAction: gridView.forceFocus
-                Navigation.downAction: gridView.forceFocus
-
-                onRetract: gridView.retract()
-            }
-
-            function forceFocus() {
-                setCurrentItemFocus(Qt.TabFocus)
-            }
+            onItemDoubleClicked: root.onDoubleClick(model)
         }
     }
 

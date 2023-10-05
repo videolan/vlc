@@ -882,6 +882,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoGridItem.qml \
 	gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml \
 	gui/qt/medialibrary/qml/VideoListDisplay.qml \
+        gui/qt/medialibrary/qml/VideoGridDisplay.qml \
 	gui/qt/menus/qml/GlobalShortcuts.qml \
 	gui/qt/menus/qml/GlobalShortcutsMedialib.qml \
 	gui/qt/menus/qml/Menubar.qml \

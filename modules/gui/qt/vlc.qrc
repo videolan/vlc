@@ -279,6 +279,7 @@
         <file alias="VideoGridItem.qml">medialibrary/qml/VideoGridItem.qml</file>
         <file alias="AudioGridItem.qml">medialibrary/qml/AudioGridItem.qml</file>
         <file alias="VideoDisplayRecentVideos.qml">medialibrary/qml/VideoDisplayRecentVideos.qml</file>
+        <file alias="VideoGridDisplay.qml">medialibrary/qml/VideoGridDisplay.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="AcrylicController.qml">style/AcrylicController.qml</file>

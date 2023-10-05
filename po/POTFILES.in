@@ -815,6 +815,7 @@ modules/gui/qt/medialibrary/qml/VideoGridItem.qml
 modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml
 modules/gui/qt/medialibrary/qml/VideoListDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoPlaylistsDisplay.qml
+modules/gui/qt/medialibrary/qml/VideoGridDisplay.qml
 modules/gui/qt/menus/custom_menus.cpp
 modules/gui/qt/menus/custom_menus.hpp
 modules/gui/qt/menus/menus.cpp
