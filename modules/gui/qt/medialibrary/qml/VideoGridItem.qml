@@ -29,10 +29,7 @@ Widgets.GridItem {
 
     property alias showNewIndicator: image.visible
     
-    property var labels: [
-        model.resolution_name || "",
-        model.channel || ""
-    ].filter(function(a) { return a !== "" })
+    property var labels
 
     function play() {
         if ( model.id !== undefined ) {

@@ -98,9 +98,6 @@ MainInterface.MainViewLoader {
         History.push(["player"])
     }
 
-    function onLabelGrid(object) { return getLabel(object) }
-    function onLabelList(object) { return getLabel(object) }
-
     // Private events
 
     function _onNavigationUp() {
@@ -202,10 +199,6 @@ MainInterface.MainViewLoader {
             onRightClick: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
             coverLabels: root.listLabels
-
-            // Functions
-
-            function onLabels(model) { return root.onLabelList(model); }
         }
     }
 

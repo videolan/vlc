@@ -37,7 +37,7 @@ MainInterface.MainTableView {
     // NOTE: This is useful for groups because our main criteria is 'name' instead of 'title'.
     property string mainCriteria: "title"
 
-    property alias coverLabels: tableColumns.titlecoverLabels
+    property var coverLabels
 
     //---------------------------------------------------------------------------------------------
     // Private
@@ -116,22 +116,6 @@ MainInterface.MainTableView {
     rowHeight: VLCStyle.tableCoverRow_height
 
     //---------------------------------------------------------------------------------------------
-    // Functions
-    //---------------------------------------------------------------------------------------------
-    // Events
-
-    function onLabels(model)
-    {
-        if (model === null)
-            return [];
-
-        return [
-            model.resolution_name || "",
-            model.channel         || ""
-        ].filter(function(a) { return a !== "" });
-    }
-
-    //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
 
@@ -147,6 +131,6 @@ MainInterface.MainTableView {
         titleCover_width: VLCStyle.listAlbumCover_width
         titleCover_radius: VLCStyle.listAlbumCover_radius
 
-        titlecoverLabels: listView_id.onLabels
+        titlecoverLabels: listView_id.coverLabels
     }
 }
