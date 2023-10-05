@@ -176,7 +176,7 @@ struct demux_sys_t
 
 } // namespace
 
-static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
+static const char *FieldDominanceStr(BMDFieldDominance dom)
 {
     switch(dom)
     {
@@ -185,10 +185,8 @@ static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
         case bmdProgressiveSegmentedFrame:
             return ", segmented";
         case bmdLowerFieldFirst:
-            *flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             return ", interlaced [BFF]";
         case bmdUpperFieldFirst:
-            *flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             return ", interlaced [TFF]";
         case bmdUnknownFieldDominance:
         default:
@@ -196,12 +194,26 @@ static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
     }
 }
 
+static uint32_t FieldDominanceBlockFlag(BMDFieldDominance dom)
+{
+    switch(dom)
+    {
+        case bmdLowerFieldFirst:
+            return BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+        case bmdUpperFieldFirst:
+            return BLOCK_FLAG_TOP_FIELD_FIRST;
+        case bmdProgressiveFrame:
+        case bmdProgressiveSegmentedFrame:
+        case bmdUnknownFieldDominance:
+        default:
+            return 0;
+    }
+}
+
 static int GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
         BMDDetectedVideoInputFormatFlags fmt_flags)
 {
     demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
-    uint32_t flags = 0;
-    (void)GetFieldDominance(m->GetFieldDominance(), &flags);
 
     BMDTimeValue frame_duration, time_scale;
     if (m->GetFrameRate(&frame_duration, &time_scale) != S_OK) {
@@ -239,7 +251,7 @@ static int GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
         sys->video_fmt.video.i_sar_den = aspect_den * sys->video_fmt.video.i_width;
     }
 
-    sys->dominance_flags = flags;
+    sys->dominance_flags = FieldDominanceBlockFlag(m->GetFieldDominance());
     return VLC_SUCCESS;
 }
 namespace {
@@ -666,8 +678,6 @@ static int Open(vlc_object_t *p_this)
 
         const char *mode_name;
         BMDTimeValue frame_duration, time_scale;
-        uint32_t field_flags;
-        const char *field = GetFieldDominance(m->GetFieldDominance(), &field_flags);
         union {
             BMDDisplayMode id;
             char str[4];
@@ -688,7 +698,8 @@ static int Open(vlc_object_t *p_this)
         msg_Dbg(demux, "Found mode '%4.4s': %s (%dx%d, %.3f fps%s)",
                  mode.str, mode_name,
                  (int)m->GetWidth(), (int)m->GetHeight(),
-                 double(time_scale) / frame_duration, field);
+                 double(time_scale) / frame_duration,
+                 FieldDominanceStr(m->GetFieldDominance()));
 
         if (u_id == mode.id) {
             GetModeSettings(demux, m, bmdDetectedVideoInputYCbCr422);
