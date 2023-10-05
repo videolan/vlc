@@ -2968,11 +2968,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             vlc_input_decoder_Decode( es->p_dec_record, p_dup,
                                       input_priv(p_input)->b_out_pace_control );
     }
-    vlc_input_decoder_Decode( es->p_dec, p_block,
-                              input_priv(p_input)->b_out_pace_control );
-
     struct vlc_input_decoder_status status;
-    vlc_input_decoder_GetStatus( es->p_dec, &status );
+    vlc_input_decoder_DecodeWithStatus(es->p_dec, p_block,
+                                       input_priv(p_input)->b_out_pace_control,
+                                       &status);
 
     if( status.format.changed )
     {

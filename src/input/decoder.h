@@ -145,8 +145,9 @@ struct vlc_input_decoder_status
 /**
  * Get the last status of the decoder.
  */
-void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_dec,
-                                  struct vlc_input_decoder_status *status );
+void vlc_input_decoder_DecodeWithStatus(vlc_input_decoder_t *p_dec,
+                                        vlc_frame_t *frame, bool do_pace,
+                                        struct vlc_input_decoder_status *status);
 
 /**
  * This function returns the current size in bytes of the decoder fifo

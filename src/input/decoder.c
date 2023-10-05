@@ -2246,10 +2246,10 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     DeleteDecoder(p_owner, p_owner->dec_fmt_in.i_cat);
 }
 
-void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
-                                  struct vlc_input_decoder_status *status )
+static void GetStatusLocked(vlc_input_decoder_t *p_owner,
+                            struct vlc_input_decoder_status *status)
 {
-    vlc_fifo_Lock(p_owner->p_fifo);
+    vlc_fifo_Assert(p_owner->p_fifo);
 
     status->format.changed = p_owner->b_fmt_description;
     p_owner->b_fmt_description = false;
@@ -2273,12 +2273,11 @@ void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
         }
     }
     status->cc.desc = p_owner->cc.desc;
-
-    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
-void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
-                               bool b_do_pace )
+void vlc_input_decoder_DecodeWithStatus(vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
+                                        bool b_do_pace,
+                                        struct vlc_input_decoder_status *status)
 {
     if( vlc_input_decoder_IsSynchronous( p_owner ) )
     {
@@ -2286,6 +2285,8 @@ void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
         assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
         vlc_fifo_Lock(p_owner->p_fifo);
         DecoderThread_ProcessInput( p_owner, frame );
+        if (status != NULL)
+            GetStatusLocked(p_owner, status);
         vlc_fifo_Unlock(p_owner->p_fifo);
         return;
     }
@@ -2314,7 +2315,15 @@ void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
     }
 
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, frame );
+    if (status != NULL)
+        GetStatusLocked(p_owner, status);
     vlc_fifo_Unlock( p_owner->p_fifo );
+}
+
+void vlc_input_decoder_Decode(vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
+                              bool b_do_pace)
+{
+    vlc_input_decoder_DecodeWithStatus(p_owner, frame, b_do_pace, NULL);
 }
 
 bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
