@@ -406,8 +406,8 @@
 #define VLC_CODEC_BGRA            VLC_FOURCC('B','G','R','A')
 /* 32-bit RGBA, in memory address order: "ABGR" */
 #define VLC_CODEC_ABGR            VLC_FOURCC('A','B','G','R')
-/* 32 bits BGRA 10:10:10:2 */
-#define VLC_CODEC_RGBA10          VLC_FOURCC('R','G','A','0')
+/* 32 bits Little-Endian RGBA with 10-bit colors "A2B6 b4G4 g6R2 r8" */
+#define VLC_CODEC_RGBA10LE        VLC_FOURCC('R','G','A','0')
 /* 64 bits RGBA */
 #define VLC_CODEC_RGBA64          VLC_FOURCC('R','G','A','4')
 

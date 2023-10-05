@@ -104,7 +104,7 @@ static const vlc_fourcc_t pi_allowed_chromas_yuv444[] = {
 };
 
 static const vlc_fourcc_t pi_allowed_chromas_yuv444_10[] = {
-    VLC_CODEC_RGBA10,
+    VLC_CODEC_RGBA10LE,
     VLC_CODEC_RGBA64,
     ALLOWED_CHROMAS_YUV10,
     VLC_CODEC_I422,

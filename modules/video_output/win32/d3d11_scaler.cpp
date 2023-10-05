@@ -76,7 +76,7 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
     if ((*out_fmt)->bitsPerChannel > 10)
         fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA64);
     if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 8)
-        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA10);
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA10LE);
     if (fmt == nullptr)
         fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA);
     if (fmt == nullptr)
