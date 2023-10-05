@@ -2977,9 +2977,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( status.format.changed )
     {
         int ret = EsOutEsUpdateFmt( out, es, &status.format.fmt );
-        EsOutUpdateInfo(out, es, status.format.meta);
         if (ret == VLC_SUCCESS)
+        {
+            EsOutUpdateInfo(out, es, status.format.meta);
             EsOutSendEsEvent(out, es, VLC_INPUT_ES_UPDATED, false);
+        }
 
         es_format_Clean( &status.format.fmt );
         if( status.format.meta )
