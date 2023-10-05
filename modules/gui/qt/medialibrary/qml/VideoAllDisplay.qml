@@ -96,8 +96,6 @@ Widgets.PageLoader {
         MediaGroupDisplay {
             id: group
 
-            anchors.fill: parent
-
             onCurrentIndexChanged: root._updateHistoryGroup(group)
             onParentIdChanged    : root._updateHistoryGroup(group)
             onTitleChanged       : root._updateHistoryGroup(group)

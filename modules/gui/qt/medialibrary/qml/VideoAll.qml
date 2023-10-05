@@ -131,8 +131,6 @@ MainInterface.MainViewLoader {
 
             // Settings
 
-            topMargin: VLCStyle.margin_normal
-
             model: root.model
 
             selectionDelegateModel: selectionModel
@@ -180,8 +178,6 @@ MainInterface.MainViewLoader {
             dragItem: root.dragItem
 
             header: root.header
-
-            topMargin: VLCStyle.margin_normal
 
             headerPositioning: ListView.InlineHeader
 

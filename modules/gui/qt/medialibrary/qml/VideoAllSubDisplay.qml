@@ -50,8 +50,6 @@ VideoAll {
 
     // Settings
 
-    anchors.fill: parent
-
     model: !!_meta ? _meta.model : null
 
     contextMenu: Util.MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }

@@ -54,7 +54,7 @@ VideoAll {
 
         // NOTE: We want this to be properly aligned with the grid items.
         leftPadding: root.contentMargin
-
+        topPadding: VLCStyle.margin_large
         bottomPadding: VLCStyle.margin_normal
 
         text: root.title

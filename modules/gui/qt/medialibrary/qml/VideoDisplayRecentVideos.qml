@@ -77,6 +77,8 @@ FocusScope {
 
         width: root.width
 
+        topPadding: VLCStyle.margin_large
+
         spacing: VLCStyle.margin_normal
 
         Widgets.SubtitleLabel {
