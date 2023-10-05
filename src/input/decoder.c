@@ -2246,6 +2246,37 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     DeleteDecoder(p_owner, p_owner->dec_fmt_in.i_cat);
 }
 
+void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
+                                  struct vlc_input_decoder_status *status )
+{
+    vlc_fifo_Lock(p_owner->p_fifo);
+
+    status->format.changed = p_owner->b_fmt_description;
+    p_owner->b_fmt_description = false;
+
+    if( status->format.changed && p_owner->fmt.i_cat == UNKNOWN_ES )
+    {
+        /* The format changed but the output creation failed */
+        status->format.changed = false;
+    }
+
+    if( status->format.changed )
+    {
+        es_format_Copy( &status->format.fmt, &p_owner->fmt );
+        status->format.meta = NULL;
+
+        if( p_owner->p_description )
+        {
+            status->format.meta  = vlc_meta_New();
+            if( status->format.meta  )
+                vlc_meta_Merge( status->format.meta, p_owner->p_description );
+        }
+    }
+    status->cc.desc = p_owner->cc.desc;
+
+    vlc_fifo_Unlock(p_owner->p_fifo);
+}
+
 void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
                                bool b_do_pace )
 {
@@ -2592,37 +2623,6 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
         if( p_owner->p_vout )
             vout_NextPicture( p_owner->p_vout );
     }
-    vlc_fifo_Unlock(p_owner->p_fifo);
-}
-
-void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
-                                  struct vlc_input_decoder_status *status )
-{
-    vlc_fifo_Lock(p_owner->p_fifo);
-
-    status->format.changed = p_owner->b_fmt_description;
-    p_owner->b_fmt_description = false;
-
-    if( status->format.changed && p_owner->fmt.i_cat == UNKNOWN_ES )
-    {
-        /* The format changed but the output creation failed */
-        status->format.changed = false;
-    }
-
-    if( status->format.changed )
-    {
-        es_format_Copy( &status->format.fmt, &p_owner->fmt );
-        status->format.meta = NULL;
-
-        if( p_owner->p_description )
-        {
-            status->format.meta  = vlc_meta_New();
-            if( status->format.meta  )
-                vlc_meta_Merge( status->format.meta, p_owner->p_description );
-        }
-    }
-    status->cc.desc = p_owner->cc.desc;
-
     vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
