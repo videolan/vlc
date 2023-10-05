@@ -1724,7 +1724,7 @@ static void EsOutProgramMeta( es_out_t *out, input_source_t *source,
         input_item_MergeInfos( p_item, p_cat );
         b_has_new_infos = true;
     }
-    if( p_sys->input_type != INPUT_TYPE_PREPARSING && b_has_new_infos )
+    if( b_has_new_infos )
         input_SendEventMetaInfo( p_input );
 }
 
@@ -1819,7 +1819,7 @@ static void EsOutProgramEpg( es_out_t *out, input_source_t *source,
         else
             ret = input_item_DelInfo( p_item, psz_cat, now_playing_tr );
 
-        if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING  )
+        if( ret == VLC_SUCCESS )
             input_SendEventMetaInfo( p_input );
     }
 
@@ -1863,7 +1863,7 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
         ret = input_item_DelInfo( p_item, psz_cat, _("Scrambled") );
     free( psz_cat );
 
-    if( ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING )
+    if( ret == VLC_SUCCESS )
         input_SendEventMetaInfo( p_input );
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
 }
@@ -4614,8 +4614,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     }
     /* */
     input_item_ReplaceInfos( p_item, p_cat );
-    if( p_sys->input_type != INPUT_TYPE_PREPARSING )
-        input_SendEventMetaInfo( p_input );
+    input_SendEventMetaInfo( p_input );
 }
 
 static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
@@ -4630,7 +4629,7 @@ static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
     int ret = input_item_DelInfo(p_item, psz_info_category, NULL);
     free(psz_info_category);
 
-    if (ret == VLC_SUCCESS && p_sys->input_type != INPUT_TYPE_PREPARSING)
+    if (ret == VLC_SUCCESS)
         input_SendEventMetaInfo(p_input);
 }
 
