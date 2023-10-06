@@ -76,6 +76,7 @@ static vlc_frame_t *create_cc_frame(vlc_tick_t ts)
     vlc_frame_t *f = vlc_frame_Alloc(1);
     assert(f != NULL);
     f->i_dts = f->i_pts = ts;
+    f->i_length = VLC_TICK_FROM_MS(20);
     return f;
 }
 
