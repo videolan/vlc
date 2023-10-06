@@ -89,10 +89,9 @@ static vlc_frame_t *create_cc_frame(vlc_tick_t ts)
     return f;
 }
 
-static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
+static void decoder_decode_check_cc_common(decoder_t *dec, picture_t *pic)
 {
     vlc_tick_t date = pic->date;
-    picture_Release(pic);
 
     vlc_frame_t *cc = create_cc_frame(date);
 
@@ -101,6 +100,12 @@ static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
         .i_reorder_depth = 4,
     };
     decoder_QueueCc(dec, cc, &desc);
+}
+
+static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
+{
+    decoder_decode_check_cc_common(dec, pic);
+    picture_Release(pic);
 
     vlc_sem_post(&scenario_data.wait_ready_to_flush);
 
