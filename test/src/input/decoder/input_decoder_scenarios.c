@@ -65,6 +65,13 @@ static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
 static void decoder_i420_800_600(decoder_t *dec)
     { decoder_fixed_size(dec, VLC_CODEC_I420, 800, 600); }
 
+static void decoder_i420_800_600_update(decoder_t *dec)
+{
+    decoder_fixed_size(dec, VLC_CODEC_I420, 800, 600);
+    int ret = decoder_UpdateVideoOutput(dec, NULL);
+    assert(ret == VLC_SUCCESS);
+}
+
 static void decoder_i420_800_600_stop(decoder_t *dec)
 {
     decoder_i420_800_600(dec);
@@ -128,6 +135,12 @@ static int decoder_decode_drop(decoder_t *dec, picture_t *pic)
 {
     (void)dec;
     picture_Release(pic);
+    return VLC_SUCCESS;
+}
+
+static int decoder_decode(decoder_t *dec, picture_t *pic)
+{
+    decoder_QueueVideo(dec, pic);
     return VLC_SUCCESS;
 }
 
@@ -370,6 +383,60 @@ static void on_track_list_changed_check_cea608(
     vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static void player_setup_select_cc(vlc_player_t *player)
+{
+    vlc_player_SelectTracksByStringIds(player, SPU_ES, "video/0/cc/spu/auto/0");
+}
+
+static void cc_decoder_setup_01(decoder_t *dec)
+{
+    assert(dec->fmt_in->i_codec == VLC_CODEC_CEA608);
+    assert(dec->fmt_in->subs.cc.i_channel == 0);
+    assert(dec->fmt_in->subs.cc.i_reorder_depth == 4);
+
+    dec->fmt_out.i_codec = VLC_CODEC_TEXT;
+}
+
+static const char cc_block_decoded[] = "cc01_dec";
+static int cc_decoder_decode(decoder_t *dec, vlc_frame_t *in)
+{
+    assert(memcmp(in->p_buffer, cc_block_input, sizeof(cc_block_input)) == 0);
+
+    subpicture_t *subpic = decoder_NewSubpicture(dec, NULL);
+    assert(subpic != NULL);
+
+    subpic->i_start = in->i_pts;
+    subpic->i_stop = subpic->i_start + in->i_length;
+
+    video_format_t fmt;
+    video_format_Init(&fmt, VLC_CODEC_TEXT);
+    subpic->p_region = subpicture_region_New(&fmt);
+    assert(subpic->p_region != NULL);
+
+    subpic->p_region->p_text = text_segment_New(cc_block_decoded);
+    assert(subpic->p_region->p_text != NULL);
+
+    decoder_QueueSub(dec, subpic);
+
+    return VLC_SUCCESS;
+}
+
+static void display_prepare_noop(vout_display_t *vd, picture_t *pic)
+{
+    (void)vd; (void) pic;
+}
+
+static void cc_text_renderer_render(filter_t *filter, subpicture_region_t *region_in)
+{
+    (void) filter;
+    assert(strcmp(region_in->p_text->psz_text, cc_block_decoded) == 0);
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static const vlc_fourcc_t subpicture_chromas[] = {
+    VLC_CODEC_RGBA, 0
+};
+
 #define source_800_600 "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600"
 struct input_decoder_scenario input_decoder_scenarios[] =
 {{
@@ -432,7 +499,28 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_drop,
     .on_track_list_changed = on_track_list_changed_check_cea608,
-}};
+},
+{
+    /* Check that the CC coming from the packetizer is decoded and rendered:
+     * - A valid vout is needed (to blend subtitles into)
+     * - Text vlc_frames are passed from the packetizer to the cc decoder to
+     *   the text renderer and are checked at each step
+     *  - A text renderer is used, this is the last place a text can be checked
+     *  before it is rendered (and converted to RGB/YUV)
+     */
+    .source = source_800_600 ";video_packetized=false",
+    .subpicture_chromas = subpicture_chromas,
+    .packetizer_getcc = packetizer_getcc,
+    .decoder_setup = decoder_i420_800_600_update,
+    .decoder_decode = decoder_decode,
+    .cc_decoder_setup = cc_decoder_setup_01,
+    .cc_decoder_decode = cc_decoder_decode,
+    .display_prepare = display_prepare_noop,
+    .text_renderer_render = cc_text_renderer_render,
+    .player_setup_before_start = player_setup_select_cc,
+},
+};
+
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
 void input_decoder_scenario_init(void)
