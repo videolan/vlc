@@ -255,6 +255,28 @@ static int OpenWindow(vlc_window_t *wnd)
     return VLC_SUCCESS;
 }
 
+static int TextRendererRender(filter_t *filter, subpicture_region_t *region_out,
+                              subpicture_region_t *region_in,
+                              const vlc_fourcc_t *chroma_list)
+{
+    (void) region_out; (void) chroma_list;
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->text_renderer_render != NULL)
+        scenario->text_renderer_render(filter, region_in);
+    return VLC_EGENERIC;
+}
+
+static int OpenTextRenderer(filter_t *filter)
+{
+    static const struct vlc_filter_operations ops =
+    {
+        .render = TextRendererRender,
+    };
+
+    filter->ops = &ops;
+    return VLC_SUCCESS;
+}
+
 static void *SoutFilterAdd(sout_stream_t *stream, const es_format_t *fmt,
                            const char *es_id)
 {
@@ -429,6 +451,9 @@ vlc_module_begin()
 
     add_submodule()
         set_callback_display(OpenDisplay, 0)
+
+    add_submodule()
+        set_callback_text_renderer(OpenTextRenderer, INT_MAX)
 
     add_submodule()
         set_callback(OpenSoutFilter)

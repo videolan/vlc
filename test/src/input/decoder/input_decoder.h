@@ -41,6 +41,7 @@ struct input_decoder_scenario {
     vlc_frame_t * (*packetizer_getcc)(decoder_t *, decoder_cc_desc_t *);
     void (*decoder_flush)(decoder_t *);
     void (*display_prepare)(vout_display_t *vd, picture_t *pic);
+    void (*text_renderer_render)(filter_t *filter, subpicture_region_t *region_in);
     void (*player_setup_before_start)(vlc_player_t *);
     void (*interface_setup)(intf_thread_t *intf);
     int (*sout_filter_send)(sout_stream_t *stream, void *id, block_t *block);
