@@ -112,6 +112,14 @@ static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
     return VLC_SUCCESS;
 }
 
+static int decoder_decode_check_cc_queue_video(decoder_t *dec, picture_t *pic)
+{
+    decoder_decode_check_cc_common(dec, pic);
+    decoder_QueueVideo(dec, pic);
+
+    return VLC_SUCCESS;
+}
+
 struct picture_watcher_context {
     picture_context_t context;
     vlc_sem_t wait_picture;
@@ -518,6 +526,19 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .packetizer_getcc = packetizer_getcc,
     .decoder_setup = decoder_i420_800_600_update,
     .decoder_decode = decoder_decode,
+    .cc_decoder_setup = cc_decoder_setup_01,
+    .cc_decoder_decode = cc_decoder_decode,
+    .display_prepare = display_prepare_noop,
+    .text_renderer_render = cc_text_renderer_render,
+    .player_setup_before_start = player_setup_select_cc,
+},
+{
+    /* Check that the CC coming from the video decoder is decoded and rendered,
+     * cf. the previous scenario for more details. */
+    .source = source_800_600,
+    .subpicture_chromas = subpicture_chromas,
+    .decoder_setup = decoder_i420_800_600_update,
+    .decoder_decode = decoder_decode_check_cc_queue_video,
     .cc_decoder_setup = cc_decoder_setup_01,
     .cc_decoder_decode = cc_decoder_decode,
     .display_prepare = display_prepare_noop,
