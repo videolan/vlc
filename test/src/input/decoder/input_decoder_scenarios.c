@@ -71,10 +71,12 @@ static void decoder_i420_800_600_stop(decoder_t *dec)
     vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static const char cc_block_input[] = "cc01_input";
 static vlc_frame_t *create_cc_frame(vlc_tick_t ts)
 {
-    vlc_frame_t *f = vlc_frame_Alloc(1);
+    vlc_frame_t *f = vlc_frame_Alloc(sizeof(cc_block_input));
     assert(f != NULL);
+    memcpy(f->p_buffer, cc_block_input, sizeof(cc_block_input));
     f->i_dts = f->i_pts = ts;
     f->i_length = VLC_TICK_FROM_MS(20);
     return f;
