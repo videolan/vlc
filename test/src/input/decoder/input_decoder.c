@@ -314,6 +314,8 @@ static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *sc
     vlc_player_listener_id *listener =
         vlc_player_AddListener(player, &player_cbs, NULL);
     vlc_player_SetCurrentMedia(player, media);
+    if (scenario->player_setup_before_start != NULL)
+        scenario->player_setup_before_start(player);
     vlc_player_Start(player);
     vlc_player_Unlock(player);
 
