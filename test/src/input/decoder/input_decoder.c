@@ -93,6 +93,19 @@ static int DecoderDecode(decoder_t *dec, block_t *block)
     return ret;
 }
 
+static int CcDecoderDecode(decoder_t *dec, vlc_frame_t *frame)
+{
+    if (frame == NULL)
+        return VLC_SUCCESS;
+
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    assert(scenario->cc_decoder_decode != NULL);
+    int ret = scenario->cc_decoder_decode(dec, frame);
+    if (ret != VLCDEC_RELOAD)
+        vlc_frame_Release(frame);
+    return ret;
+}
+
 static void DecoderFlush(decoder_t *dec)
 {
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
@@ -110,6 +123,15 @@ static void CloseDecoder(vlc_object_t *obj)
     struct vlc_video_context *vctx = dec->p_sys;
     if (vctx)
         vlc_video_context_Release(vctx);
+}
+
+static void CloseCcDecoder(vlc_object_t *obj)
+{
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    decoder_t *dec = (decoder_t*)obj;
+
+    if (scenario->cc_decoder_destroy != NULL)
+        scenario->cc_decoder_destroy(dec);
 }
 
 static vlc_frame_t *PacketizerPacketize(decoder_t *dec, vlc_frame_t **in)
@@ -167,6 +189,29 @@ static int OpenDecoder(vlc_object_t *obj)
             (const char *)&dec->fmt_in->i_codec,
             (const char *)&dec->fmt_out.i_codec,
             dec->fmt_out.video.i_width, dec->fmt_out.video.i_height);
+
+    return VLC_SUCCESS;
+}
+
+static int OpenCcDecoder(vlc_object_t *obj)
+{
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->cc_decoder_setup == NULL)
+        return VLC_EGENERIC;
+
+    decoder_t *dec = (decoder_t*)obj;
+
+    dec->pf_decode = CcDecoderDecode;
+    dec->pf_get_cc = NULL;
+    dec->pf_flush = NULL;
+    es_format_Clean(&dec->fmt_out);
+    es_format_Copy(&dec->fmt_out, dec->fmt_in);
+
+    scenario->cc_decoder_setup(dec);
+
+    msg_Dbg(obj, "Decoder chroma %4.4s -> %4.4s",
+            (const char *)&dec->fmt_in->i_codec,
+            (const char *)&dec->fmt_out.i_codec);
 
     return VLC_SUCCESS;
 }
@@ -369,6 +414,10 @@ vlc_module_begin()
     add_submodule()
         set_callbacks(OpenDecoder, CloseDecoder)
         set_capability("video decoder", INT_MAX)
+
+    add_submodule()
+        set_callbacks(OpenCcDecoder, CloseCcDecoder)
+        set_capability("spu decoder", INT_MAX)
 
     add_submodule()
         set_callback(OpenPacketizer)
