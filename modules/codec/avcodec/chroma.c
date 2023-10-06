@@ -234,14 +234,6 @@ enum AVPixelFormat GetFfmpegChroma( const video_format_t *fmt )
     return AV_PIX_FMT_NONE;
 }
 
-vlc_fourcc_t FindVlcChroma( enum AVPixelFormat i_ffmpeg_id )
-{
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
-        if( chroma_table[i].i_chroma_id == i_ffmpeg_id )
-            return chroma_table[i].i_chroma;
-    return 0;
-}
-
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
