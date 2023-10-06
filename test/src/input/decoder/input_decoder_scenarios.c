@@ -71,21 +71,25 @@ static void decoder_i420_800_600_stop(decoder_t *dec)
     vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static vlc_frame_t *create_cc_frame(vlc_tick_t ts)
+{
+    vlc_frame_t *f = vlc_frame_Alloc(1);
+    assert(f != NULL);
+    f->i_dts = f->i_pts = ts;
+    return f;
+}
+
 static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
 {
     vlc_tick_t date = pic->date;
     picture_Release(pic);
 
-    block_t *p_cc = block_Alloc( 1 );
-    if (p_cc == NULL)
-        return VLC_ENOMEM;
-
-    p_cc->i_dts = p_cc->i_pts = date;
+    vlc_frame_t *cc = create_cc_frame(date);
 
     decoder_cc_desc_t desc = {
         .i_608_channels = 1,
     };
-    decoder_QueueCc( dec, p_cc, &desc );
+    decoder_QueueCc(dec, cc, &desc);
 
     vlc_sem_post(&scenario_data.wait_ready_to_flush);
 
@@ -345,10 +349,7 @@ static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
     cc_desc->i_608_channels = 1;
     cc_desc->i_reorder_depth = -1;
 
-    vlc_frame_t *f =  vlc_frame_Alloc(1);
-    assert(f != NULL);
-
-    return f;
+    return create_cc_frame(VLC_TICK_INVALID);
 }
 
 static void on_track_list_changed_check_cea608(
