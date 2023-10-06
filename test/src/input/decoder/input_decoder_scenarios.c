@@ -349,7 +349,7 @@ static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
     cc_desc->i_608_channels = 1;
     cc_desc->i_reorder_depth = -1;
 
-    return create_cc_frame(VLC_TICK_INVALID);
+    return create_cc_frame(VLC_TICK_0);
 }
 
 static void on_track_list_changed_check_cea608(
