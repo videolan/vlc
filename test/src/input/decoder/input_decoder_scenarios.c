@@ -91,6 +91,7 @@ static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
 
     decoder_cc_desc_t desc = {
         .i_608_channels = 1,
+        .i_reorder_depth = 4,
     };
     decoder_QueueCc(dec, cc, &desc);
 
@@ -350,7 +351,7 @@ static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
     (void)dec;
 
     cc_desc->i_608_channels = 1;
-    cc_desc->i_reorder_depth = -1;
+    cc_desc->i_reorder_depth = 4;
 
     return create_cc_frame(VLC_TICK_0);
 }
