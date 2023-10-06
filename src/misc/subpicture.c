@@ -201,7 +201,7 @@ void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
     free( p_private );
 }
 
-subpicture_region_t * subpicture_region_NewInternal( const video_format_t *p_fmt )
+static subpicture_region_t * subpicture_region_NewInternal( const video_format_t *p_fmt )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
     if( unlikely(p_region == NULL) )

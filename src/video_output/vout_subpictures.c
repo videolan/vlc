@@ -1114,13 +1114,12 @@ static void SpuRenderRegion(spu_t *spu,
         }
     }
 
-    subpicture_region_t *dst = *dst_ptr = subpicture_region_NewInternal(&region_fmt);
+    assert(video_format_IsSameChroma( &region_fmt, &region_picture->format ));
+    subpicture_region_t *dst = *dst_ptr = subpicture_region_ForPicture(&region_fmt, region_picture);
     if (dst) {
         dst->i_x       = x_offset;
         dst->i_y       = y_offset;
         dst->i_align   = 0;
-        assert(!dst->p_picture);
-        dst->p_picture = picture_Hold(region_picture);
         int fade_alpha = 255;
         if (subpic->b_fade) {
             vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
