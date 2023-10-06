@@ -57,7 +57,7 @@ static int OpenIntf(vlc_object_t *root)
     fmt_in.i_height = fmt_in.i_visible_height = 600;
 
     video_format_t fmt_out;
-    video_format_Init(&fmt_out, VLC_CODEC_PNG);
+    video_format_Init(&fmt_out, 0);
     fmt_out.i_width = fmt_out.i_visible_width = 800;
     fmt_out.i_height = fmt_out.i_visible_height = 600;
 
@@ -66,7 +66,7 @@ static int OpenIntf(vlc_object_t *root)
 
     block_t *block;
 
-    block = image_Write(ih, picture, &fmt_in, &fmt_out);
+    block = image_Write(ih, picture, &fmt_in, VLC_CODEC_PNG, &fmt_out);
     assert(block != NULL);
     block_Release(block);
     picture_Release(picture);
@@ -76,7 +76,7 @@ static int OpenIntf(vlc_object_t *root)
     picture = picture_NewFromFormat(&fmt_in);
     fmt_out.i_width = fmt_out.i_visible_width = 400;
     fmt_out.i_height = fmt_out.i_visible_height = 300;
-    block = image_Write(ih, picture, &fmt_in, &fmt_out);
+    block = image_Write(ih, picture, &fmt_in, VLC_CODEC_PNG, &fmt_out);
     assert(block != NULL);
     block_Release(block);
     picture_Release(picture);

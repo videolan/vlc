@@ -66,16 +66,19 @@ static picture_t *ImageRead( image_handler_t *, block_t *,
 static picture_t *ImageReadUrl( image_handler_t *, const char *,
                                 video_format_t * );
 static block_t *ImageWrite( image_handler_t *, picture_t *,
-                            const video_format_t *, const video_format_t * );
+                            const video_format_t *,
+                            vlc_fourcc_t, const video_format_t * );
 static int ImageWriteUrl( image_handler_t *, picture_t *,
-                          const video_format_t *, const video_format_t *, const char * );
+                          const video_format_t *,
+                          vlc_fourcc_t, const video_format_t *,
+                          const char * );
 
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 const video_format_t *, video_format_t * );
 
 static decoder_t *CreateDecoder( image_handler_t *, const es_format_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
-                                 const video_format_t * );
+                                 vlc_fourcc_t, const video_format_t * );
 static filter_t *CreateConverter( vlc_object_t *, const es_format_t *,
                                   struct vlc_video_context *,
                                   const video_format_t * );
@@ -353,11 +356,11 @@ error:
 
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             const video_format_t *p_fmt_in,
-                            const video_format_t *p_fmt_out )
+                            vlc_fourcc_t codec, const video_format_t *p_fmt_out )
 {
     /* Check if we can reuse the current encoder */
     if( p_image->p_enc &&
-        ( p_image->p_enc->fmt_out.i_codec != p_fmt_out->i_chroma ||
+        ( p_image->p_enc->fmt_out.i_codec != codec ||
           p_image->p_enc->fmt_out.video.i_width != p_fmt_out->i_width ||
           p_image->p_enc->fmt_out.video.i_height != p_fmt_out->i_height ) )
     {
@@ -369,7 +372,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     if( !p_image->p_enc )
     {
         p_image->p_enc = CreateEncoder( p_image->p_parent,
-                                        p_fmt_in, p_fmt_out );
+                                        p_fmt_in, codec, p_fmt_out );
         if( !p_image->p_enc ) return NULL;
     }
 
@@ -441,17 +444,18 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 }
 
 static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
-                          const video_format_t *p_fmt_in, const video_format_t *p_fmt_out,
+                          const video_format_t *p_fmt_in,
+                          vlc_fourcc_t codec, const video_format_t *p_fmt_out,
                           const char *psz_url )
 {
     block_t *p_block;
     FILE *file;
     video_format_t fmt_out = *p_fmt_out;
 
-    if( !fmt_out.i_chroma )
+    if( !codec )
     {
         /* Try to guess format from file name */
-        fmt_out.i_chroma = image_Ext2Fourcc( psz_url );
+        codec = image_Ext2Fourcc( psz_url );
     }
 
     file = vlc_fopen( psz_url, "wb" );
@@ -461,7 +465,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
         return VLC_EGENERIC;
     }
 
-    p_block = ImageWrite( p_image, p_pic, p_fmt_in, &fmt_out );
+    p_block = ImageWrite( p_image, p_pic, p_fmt_in, codec, &fmt_out );
 
     int err = 0;
     if( p_block )
@@ -691,7 +695,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
 
 
 static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt_in,
-                                 const video_format_t *fmt_out )
+                                 vlc_fourcc_t codec, const video_format_t *fmt_out )
 {
     encoder_t *p_enc;
 
@@ -723,6 +727,8 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
     p_enc->fmt_in.video.i_frame_rate_base = 1;
 
     es_format_InitFromVideo( &p_enc->fmt_out, fmt_out );
+    p_enc->fmt_out.i_codec = codec;
+    p_enc->fmt_out.video.i_chroma = 0;
     p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
     p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
     p_enc->ops = NULL;
@@ -739,7 +745,6 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
         return NULL;
     }
     assert( p_enc->ops != NULL );
-    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
 
     return p_enc;
 }

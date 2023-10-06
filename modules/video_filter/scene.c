@@ -290,7 +290,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     char *psz_temp = NULL;
     int i_ret;
 
-    video_format_Init( &fmt_out, p_sys->i_format );
+    video_format_Init( &fmt_out, 0 );
 
     /* Save snapshot psz_format to a memory zone */
     fmt_in = p_pic->format;
@@ -325,7 +325,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     }
 
     /* Save the image */
-    i_ret = image_WriteUrl( p_sys->p_image, p_pic, &fmt_in, &fmt_out,
+    i_ret = image_WriteUrl( p_sys->p_image, p_pic, &fmt_in, p_sys->i_format, &fmt_out,
                             psz_temp );
     if( i_ret != VLC_SUCCESS )
     {

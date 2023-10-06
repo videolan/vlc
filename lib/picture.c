@@ -126,7 +126,7 @@ static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* att
     vlc_atomic_rc_init( &pic->rc );
     pic->attachment = vlc_input_attachment_Hold( attachment );
     pic->time = VLC_TICK_INVALID;
-    video_format_Init( &pic->fmt, fcc );
+    video_format_Init( &pic->fmt, 0 );
     switch ( fcc )
     {
     case VLC_CODEC_PNG:

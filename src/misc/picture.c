@@ -518,7 +518,7 @@ int picture_Export( vlc_object_t *p_obj,
                     block_t **pp_image,
                     video_format_t *p_fmt,
                     picture_t *p_picture,
-                    vlc_fourcc_t i_format,
+                    vlc_fourcc_t i_codec,
                     int i_override_width, int i_override_height,
                     bool b_crop )
 {
@@ -535,7 +535,6 @@ int picture_Export( vlc_object_t *p_obj,
     memset( &fmt_out, 0, sizeof(fmt_out) );
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 1;
-    fmt_out.i_chroma  = i_format;
 
     /* compute original width/height */
     unsigned int i_width, i_height, i_original_width, i_original_height;
@@ -610,7 +609,7 @@ int picture_Export( vlc_object_t *p_obj,
         return VLC_ENOMEM;
 
     vlc_tick_t date = p_picture->date;
-    block_t *p_block = image_Write( p_image, p_picture, &fmt_in, &fmt_out );
+    block_t *p_block = image_Write( p_image, p_picture, &fmt_in, i_codec, &fmt_out );
 
     image_HandlerDelete( p_image );
 
