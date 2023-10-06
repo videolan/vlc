@@ -46,6 +46,7 @@ static struct scenario_data
     bool has_reload;
     bool stream_out_sent;
     size_t decoder_image_sent;
+    size_t cc_track_idx;
 } scenario_data;
 
 static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
@@ -377,6 +378,18 @@ static vlc_frame_t *packetizer_getcc(decoder_t *dec, decoder_cc_desc_t *cc_desc)
     (void)dec;
 
     cc_desc->i_608_channels = 1;
+    cc_desc->i_708_channels = 0;
+    cc_desc->i_reorder_depth = 4;
+
+    return create_cc_frame(VLC_TICK_0);
+}
+
+static vlc_frame_t *packetizer_getcc_cea608_max(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    (void)dec;
+
+    cc_desc->i_608_channels = 0xF;
+    cc_desc->i_708_channels = 0;
     cc_desc->i_reorder_depth = 4;
 
     return create_cc_frame(VLC_TICK_0);
@@ -394,6 +407,36 @@ static void on_track_list_changed_check_cea608(
 
     assert(track->fmt.i_codec == VLC_CODEC_CEA608);
     vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static void on_track_list_changed_check_count(
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track,
+        vlc_fourcc_t codec, unsigned track_max)
+{
+    if (action != VLC_PLAYER_LIST_ADDED)
+        return;
+
+    char buffer[] = "video/0/cc/spu/auto/xx";
+    assert(scenario_data.cc_track_idx < 100);
+    sprintf(buffer, "video/0/cc/spu/auto/%zu", scenario_data.cc_track_idx);
+
+    if (strcmp(vlc_es_id_GetStrId(track->es_id), buffer) != 0)
+        return;
+
+    assert(track->fmt.i_codec == codec);
+
+    scenario_data.cc_track_idx++;
+
+    if (scenario_data.cc_track_idx == track_max)
+        vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static void on_track_list_changed_check_cea608_count(
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track)
+{
+    on_track_list_changed_check_count(action, track, VLC_CODEC_CEA608, 4);
 }
 
 static void player_setup_select_cc(vlc_player_t *player)
@@ -545,6 +588,14 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .text_renderer_render = cc_text_renderer_render,
     .player_setup_before_start = player_setup_select_cc,
 },
+{
+    /* Check that we can create 4 cea608 tracks */
+    .source = source_800_600 ";video_packetized=false",
+    .packetizer_getcc = packetizer_getcc_cea608_max,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_drop,
+    .on_track_list_changed = on_track_list_changed_check_cea608_count,
+},
 };
 
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
@@ -556,6 +607,7 @@ void input_decoder_scenario_init(void)
     scenario_data.has_reload = false;
     scenario_data.stream_out_sent = false;
     scenario_data.decoder_image_sent = 0;
+    scenario_data.cc_track_idx = 0;
     vlc_sem_init(&scenario_data.wait_stop, 0);
     vlc_sem_init(&scenario_data.display_prepare_signal, 0);
     vlc_sem_init(&scenario_data.wait_ready_to_flush, 0);
