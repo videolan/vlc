@@ -400,9 +400,7 @@ int main( int argc, char **argv )
         "--vout=" MODULE_STRING,
         "--dec-dev=" MODULE_STRING,
         "--aout=dummy",
-        "--text-renderer=dummy",
         "--no-auto-preparse",
-        "--no-spu",
         "--no-osd",
     };
 
