@@ -320,7 +320,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             video_format_t vfmt;
             video_format_Copy(&vfmt, &fmt->video);
-            enum AVPixelFormat avformat = GetFfmpegChroma(&vfmt);
+            enum AVPixelFormat avformat = FindFfmpegChroma(vfmt.i_chroma);
             if(avformat == AV_PIX_FMT_NONE)
                 msg_Warn(p_mux, "can't match format RAW video %4.4s",
                          (const char *)&vfmt.i_chroma);

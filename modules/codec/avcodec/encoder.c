@@ -569,7 +569,7 @@ int InitVideoEnc( vlc_object_t *p_this )
             p_enc->fmt_in.video.i_chroma = VLC_CODEC_RGB24;
         }
 
-        p_context->pix_fmt = GetFfmpegChroma( &p_enc->fmt_in.video );
+        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma );
 
         if( p_codec->pix_fmts )
         {
@@ -868,7 +868,7 @@ int InitVideoEnc( vlc_object_t *p_this )
     {
         /* XXX: hack: Force same codec (will be handled by transcode) */
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
-        p_context->pix_fmt = GetFfmpegChroma( &p_enc->fmt_in.video );
+        p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma );
     }
 
     /* Make sure we get extradata filled by the encoder */

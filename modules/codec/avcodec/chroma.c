@@ -222,20 +222,6 @@ static const struct
     { 0, 0, COLOR_RANGE_UNDEF }
 };
 
-/* FIXME special case the RGB formats */
-enum AVPixelFormat GetFfmpegChroma( const video_format_t *fmt )
-{
-    for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
-    {
-        if( chroma_table[i].i_chroma == fmt->i_chroma &&
-            (chroma_table[i].range == COLOR_RANGE_UNDEF || fmt->color_range == chroma_table[i].range) )
-        {
-            return chroma_table[i].i_chroma_id;
-        }
-    }
-    return AV_PIX_FMT_NONE;
-}
-
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
