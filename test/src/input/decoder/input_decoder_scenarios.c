@@ -394,6 +394,17 @@ static vlc_frame_t *packetizer_getcc_cea608_max(decoder_t *dec, decoder_cc_desc_
     return create_cc_frame(VLC_TICK_0);
 }
 
+static vlc_frame_t *packetizer_getcc_cea708_max(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    (void)dec;
+
+    cc_desc->i_608_channels = 0;
+    cc_desc->i_708_channels = UINT64_MAX;
+    cc_desc->i_reorder_depth = 4;
+
+    return create_cc_frame(VLC_TICK_0);
+}
+
 static void on_track_list_changed_check_cea608(
         enum vlc_player_list_action action,
         const struct vlc_player_track *track)
@@ -436,6 +447,13 @@ static void on_track_list_changed_check_cea608_count(
         const struct vlc_player_track *track)
 {
     on_track_list_changed_check_count(action, track, VLC_CODEC_CEA608, 4);
+}
+
+static void on_track_list_changed_check_cea708_count(
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track)
+{
+    on_track_list_changed_check_count(action, track, VLC_CODEC_CEA708, 64);
 }
 
 static void player_setup_select_cc(vlc_player_t *player)
@@ -603,6 +621,15 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_drop,
     .on_track_list_changed = on_track_list_changed_check_cea608_count,
+},
+{
+    .name = "we can create 64 cea708 tracks",
+    .source = source_800_600 ";video_packetized=false",
+    .item_option = ":captions=708",
+    .packetizer_getcc = packetizer_getcc_cea708_max,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_drop,
+    .on_track_list_changed = on_track_list_changed_check_cea708_count,
 },
 };
 
