@@ -258,7 +258,9 @@ subpicture_region_t *subpicture_region_NewText( void )
     if( !p_region )
         return NULL;
 
-    video_format_Init( &p_region->fmt, VLC_CODEC_TEXT );
+    p_region->text_flags |= VLC_SUBPIC_TEXT_FLAG_IS_TEXT;
+
+    video_format_Init( &p_region->fmt, 0 );
 
     return p_region;
 }

@@ -1328,7 +1328,7 @@ static int SubsdelayGetTextRank( char *psz_text )
  *****************************************************************************/
 static bool SubsdelayIsTextEmpty( const subpicture_region_t *p_region )
 {
-    if ( p_region->fmt.i_chroma != VLC_CODEC_TEXT )
+    if (!subpicture_region_IsText( p_region ))
         return true;
     const text_segment_t *p_segment = p_region->p_text;
     while ( p_segment )

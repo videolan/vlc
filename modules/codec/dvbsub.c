@@ -1959,7 +1959,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     /* Sanity check */
     if( !p_region ) return NULL;
 
-    if( ( p_region->fmt.i_chroma != VLC_CODEC_TEXT ) &&
+    if( (!subpicture_region_IsText( p_region )) &&
         ( p_region->fmt.i_chroma != VLC_CODEC_YUVP ) )
     {
         msg_Err( p_enc, "chroma %4.4s not supported", (char *)&p_region->fmt.i_chroma );
@@ -2182,8 +2182,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
          p_region = p_region->p_next, i_region++ )
     {
         int i_entries = 4, i_depth = 0x1, i_bg = 0;
-        bool b_text =
-            ( p_region->fmt.i_chroma == VLC_CODEC_TEXT );
+        bool b_text = subpicture_region_IsText( p_region );
 
         if( !b_text )
         {
@@ -2267,15 +2266,12 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         bs_write( s, 4, p_sys->i_region_ver++ );
 
         /* object coding method */
-        switch( p_region->fmt.i_chroma )
-        {
-        case VLC_CODEC_YUVP:
-            bs_write( s, 2, 0 );
-            break;
-        case VLC_CODEC_TEXT:
+        if (subpicture_region_IsText( p_region ))
             bs_write( s, 2, 1 );
-            break;
-        default:
+        else if ( p_region->fmt.i_chroma == VLC_CODEC_YUVP )
+            bs_write( s, 2, 0 );
+        else
+        {
             msg_Err( p_enc, "FOURCC %4.4s not supported by encoder.",
                      (const char*)&p_region->fmt.i_chroma );
             continue;
@@ -2284,7 +2280,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         bs_write( s, 1, 0 ); /* non modifying color flag */
         bs_write( s, 1, 0 ); /* Reserved */
 
-        if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
+        if(subpicture_region_IsText( p_region ))
         {
             int i_size, i;
 

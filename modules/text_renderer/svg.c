@@ -390,6 +390,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         p_region_out->p_picture = p_picture;
         video_format_Clean( &p_region_out->fmt );
         video_format_Copy( &p_region_out->fmt, &p_picture->format );
+        subpicture_region_TextMarkRendered(p_region_out);
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;

@@ -216,7 +216,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
             block_t *p_block;
 
             es_format_t fmt;
-            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_TEXT );
+            es_format_Init( &fmt, VIDEO_ES, 0 );
 
             unsigned w, h;
             if( id->pf_get_output_dimensions == NULL ||

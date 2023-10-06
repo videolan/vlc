@@ -54,6 +54,8 @@ typedef struct filter_t vlc_blender_t;
 #define VLC_SUBPIC_TEXT_FLAG_GRID_MODE         (1 << 5)
 /** don't try to balance wrapped text lines */
 #define VLC_SUBPIC_TEXT_FLAG_TEXT_NOT_BALANCED (1 << 6)
+/** mark the subpicture region as a text flag */
+#define VLC_SUBPIC_TEXT_FLAG_IS_TEXT           (1 << 7)
 
 /**
  * Video subtitle region
@@ -153,6 +155,18 @@ VLC_API void subpicture_region_ChainDelete( subpicture_region_t *p_head );
  * Provided for convenience.
  */
 VLC_API subpicture_region_t *subpicture_region_Copy( subpicture_region_t *p_region );
+
+/**
+ * Tells if the region is a text-based region.
+ */
+#define subpicture_region_IsText(r)  \
+    (((r)->text_flags & VLC_SUBPIC_TEXT_FLAG_IS_TEXT) != 0)
+
+/**
+ * Marks a text-based region as rendered into the p_picture.
+ */
+#define subpicture_region_TextMarkRendered(r)  \
+    ((r)->text_flags &= ~VLC_SUBPIC_TEXT_FLAG_IS_TEXT)
 
 /**
  *

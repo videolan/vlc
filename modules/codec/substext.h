@@ -138,7 +138,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         return;
 
     video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
+    video_format_Init(&fmt, 0);
 
     /* NOTE about fmt_dst:
      * fmt_dst area and A/R will change to display once WxH of the

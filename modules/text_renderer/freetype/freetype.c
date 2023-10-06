@@ -1177,7 +1177,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             continue;
 
         if( rv == VLC_SUCCESS )
+        {
+            subpicture_region_TextMarkRendered( p_region_out );
             break;
+        }
     }
 
 done:

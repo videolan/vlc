@@ -320,7 +320,7 @@ static int SpuRenderText(spu_t *spu,
                           const vlc_fourcc_t *chroma_list)
 {
     spu_private_t *sys = spu->p;
-    assert(region->fmt.i_chroma == VLC_CODEC_TEXT);
+    assert(subpicture_region_IsText( region ));
 
     vlc_mutex_lock(&sys->textlock);
     filter_t *text = sys->text;
@@ -806,13 +806,13 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     *dst_area = spu_area_create(0,0, 0,0, scale_size);
 
     /* Render text region */
-    if (region->fmt.i_chroma == VLC_CODEC_TEXT)
+    if (subpicture_region_IsText( region ))
     {
         if(SpuRenderText(spu, region,
                       i_original_width, i_original_height,
                       chroma_list) != VLC_SUCCESS)
             return NULL;
-        assert(region->fmt.i_chroma != VLC_CODEC_TEXT);
+        assert(!subpicture_region_IsText( region ));
     }
 
     video_format_AdjustColorSpace(&region->fmt);
@@ -1245,7 +1245,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
 
-            const bool do_external_scale = external_scale && region->fmt.i_chroma != VLC_CODEC_TEXT;
+            const bool do_external_scale = external_scale && !subpicture_region_IsText( region );
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
 
             /* */
@@ -1519,7 +1519,7 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
     subpicture_region_t *region;
     for (region = p_subpic->p_region; region != NULL; region = region->p_next)
     {
-        if(region->fmt.i_chroma != VLC_CODEC_TEXT)
+        if(!subpicture_region_IsText( region ))
             continue;
         SpuRenderText(spu, region,
                       i_original_picture_width, i_original_picture_height,

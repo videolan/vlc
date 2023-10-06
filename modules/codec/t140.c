@@ -85,7 +85,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 
     p_region = p_spu->p_region;
     if( ( p_region == NULL )
-     || ( p_region->fmt.i_chroma != VLC_CODEC_TEXT )
+     || (!subpicture_region_IsText( p_region ))
      || ( p_region->p_text == NULL )
      || ( p_region->p_text->psz_text == NULL) )
         return NULL;
