@@ -168,10 +168,11 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     for( substext_updater_region_t *p_updtregion = &sys->region;
                                           p_updtregion; p_updtregion = p_updtregion->p_next )
     {
-        subpicture_region_t *r = *pp_last_region = subpicture_region_NewText(&fmt);
+        subpicture_region_t *r = *pp_last_region = subpicture_region_NewText();
         if (!r)
             return;
         pp_last_region = &r->p_next;
+        video_format_Copy( &r->fmt, &fmt );
 
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
         r->i_align = p_updtregion->align;

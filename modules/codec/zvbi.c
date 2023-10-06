@@ -522,7 +522,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
                                  int i_columns, int i_rows, int i_align,
                                  vlc_tick_t i_pts )
 {
-    video_format_t fmt;
     subpicture_t *p_spu=NULL;
 
     /* If there is a page or sub to render, then we do that here */
@@ -537,15 +536,20 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
         return NULL;
     }
 
-    video_format_Init(&fmt, b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA);
     if( !b_text )
     {
+        video_format_t fmt;
+        video_format_Init(&fmt, VLC_CODEC_RGBA);
         fmt.i_width = fmt.i_visible_width = i_columns * 12;
         fmt.i_height = fmt.i_visible_height = i_rows * 10;
         fmt.i_sar_num = fmt.i_sar_den = 0; /* let the vout set the correct AR */
+        p_spu->p_region = subpicture_region_New( &fmt );
+    }
+    else
+    {
+        p_spu->p_region = subpicture_region_NewText();
     }
 
-    p_spu->p_region = b_text ? subpicture_region_NewText( &fmt ) : subpicture_region_New( &fmt );
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
@@ -563,11 +567,11 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
     if( !b_text )
         p_spu->p_region->i_align = i_align;
-    p_spu->i_original_picture_width = fmt.i_width;
-    p_spu->i_original_picture_height = fmt.i_height;
+    p_spu->i_original_picture_width = p_spu->p_region->fmt.i_width;
+    p_spu->i_original_picture_height = p_spu->p_region->fmt.i_height;
 
     /* */
-    *p_fmt = fmt;
+    *p_fmt = p_spu->p_region->fmt;
     return p_spu;
 }
 

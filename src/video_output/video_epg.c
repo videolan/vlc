@@ -251,21 +251,18 @@ static void vout_OSDRegionConstrain(subpicture_region_t *p_region, int w, int h)
 static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
                                                 int x, int y )
 {
-    video_format_t fmt;
     subpicture_region_t *region;
 
     if (!p_segment)
         return NULL;
 
     /* Create a new subpicture region */
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
-
-    region = subpicture_region_NewText(&fmt);
+    region = subpicture_region_NewText();
     if (!region)
         return NULL;
 
+    region->fmt.i_sar_num = 1;
+    region->fmt.i_sar_den = 1;
     region->p_text   = p_segment;
     region->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
     region->i_text_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;

@@ -284,17 +284,14 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     if( !p_spu )
         goto out;
 
-    video_format_t vfmt;
-    video_format_Init( &vfmt, VLC_CODEC_TEXT );
-    vfmt.i_sar_den = vfmt.i_sar_num = 1;
-    p_spu->p_region = subpicture_region_NewText( &vfmt );
-    video_format_Clean(&vfmt);
+    p_spu->p_region = subpicture_region_NewText();
     if( !p_spu->p_region )
     {
         subpicture_Delete( p_spu );
         p_spu = NULL;
         goto out;
     }
+    p_spu->p_region->fmt.i_sar_den = p_spu->p_region->fmt.i_sar_num = 1;
 
     p_sys->last_time = date;
 

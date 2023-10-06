@@ -66,15 +66,12 @@ static void OSDTextUpdate(subpicture_t *subpic,
     subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
     subpic->i_original_picture_height = fmt_dst->i_visible_height;
 
-    video_format_t fmt;
-    video_format_Init( &fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
-
-    subpicture_region_t *r = subpic->p_region = subpicture_region_NewText(&fmt);
+    subpicture_region_t *r = subpic->p_region = subpicture_region_NewText();
     if (!r)
         return;
 
+    r->fmt.i_sar_num = 1;
+    r->fmt.i_sar_den = 1;
     r->p_text = text_segment_New( sys->text );
 
     const float margin_ratio = 0.04f;

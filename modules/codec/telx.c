@@ -620,7 +620,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t  *p_spu = NULL;
-    video_format_t fmt;
     /* int erase = 0; */
 #if 0
     int i_wanted_magazine = i_conf_wanted_page / 100;
@@ -730,9 +729,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Create a new subpicture region */
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
-    p_spu->p_region = subpicture_region_NewText( &fmt );
-    video_format_Clean(&fmt);
+    p_spu->p_region = subpicture_region_NewText();
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );

@@ -416,13 +416,9 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
     subpicture_region_t  *p_text_region;
-    video_format_t        fmt;
 
     /* Create a new subpicture region */
-    video_format_Init( &fmt, VLC_CODEC_TEXT );
-    p_text_region = subpicture_region_NewText( &fmt );
-    video_format_Clean( &fmt );
-
+    p_text_region = subpicture_region_NewText();
     if( p_text_region != NULL )
     {
         ssa_style_t  *p_ssa_style = NULL;

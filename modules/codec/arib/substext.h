@@ -73,28 +73,25 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         return;
     }
 
-    video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
-
     subpicture_region_t *r = NULL;
     arib_text_region_t *p_region;
     for( p_region = sys->p_region; p_region; p_region = p_region->p_next )
     {
         if( !r )
         {
-            subpic->p_region = r = subpicture_region_NewText(&fmt);
+            subpic->p_region = r = subpicture_region_NewText();
         }
         else
         {
-            r->p_next = subpicture_region_NewText(&fmt);
+            r->p_next = subpicture_region_NewText();
             r = r->p_next;
         }
         if( r == NULL )
         {
             return;
         }
+        r->fmt.i_sar_num = 1;
+        r->fmt.i_sar_den = 1;
 
         r->p_text = text_segment_New( p_region->psz_text );
         r->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;

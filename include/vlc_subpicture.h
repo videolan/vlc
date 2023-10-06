@@ -111,7 +111,7 @@ VLC_API subpicture_region_t * subpicture_region_New( const video_format_t *p_fmt
  *
  * You must use subpicture_region_Delete to destroy it.
  */
-VLC_API subpicture_region_t * subpicture_region_NewText( const video_format_t *p_fmt );
+VLC_API subpicture_region_t * subpicture_region_NewText( void );
 
 /**
  * Create a subpicture region containing the picture.

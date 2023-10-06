@@ -343,7 +343,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
-    video_format_t fmt;
     subpicture_region_t *p_region;
 
     int i_item;
@@ -403,9 +402,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
     }
 
-    video_format_Init( &fmt, VLC_CODEC_TEXT );
-    p_spu->p_region = subpicture_region_NewText( &fmt );
-    video_format_Clean( &fmt );
+    p_spu->p_region = subpicture_region_NewText();
     if( !p_spu->p_region )
     {
         subpicture_Delete( p_spu );

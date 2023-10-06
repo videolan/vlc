@@ -1632,13 +1632,17 @@ static subpicture_t *render( decoder_t *p_dec )
                 continue;
 
             /* Create new SPU region */
-            video_format_Init( &fmt, VLC_CODEC_TEXT );
-            fmt.i_sar_num = 1;
-            fmt.i_sar_den = 1;
-            fmt.i_width = fmt.i_visible_width = p_region->i_width;
-            fmt.i_height = fmt.i_visible_height = p_region->i_height;
-            p_spu_region = subpicture_region_NewText( &fmt );
-            video_format_Clean( &fmt );
+            p_spu_region = subpicture_region_NewText();
+            if( !p_spu_region )
+            {
+                msg_Err( p_dec, "cannot allocate SPU region" );
+                continue;
+            }
+
+            p_spu_region->fmt.i_sar_num = 1;
+            p_spu_region->fmt.i_sar_den = 1;
+            p_spu_region->fmt.i_width = p_spu_region->fmt.i_visible_width = p_region->i_width;
+            p_spu_region->fmt.i_height = p_spu_region->fmt.i_visible_height = p_region->i_height;
 
             p_spu_region->p_text = text_segment_New( p_object_def->psz_text );
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;

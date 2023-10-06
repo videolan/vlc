@@ -482,9 +482,7 @@ static int cc_decoder_decode_common(decoder_t *dec, vlc_frame_t *in,
     subpic->i_start = in->i_pts;
     subpic->i_stop = subpic->i_start + in->i_length;
 
-    video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_TEXT);
-    subpic->p_region = subpicture_region_NewText(&fmt);
+    subpic->p_region = subpicture_region_NewText();
     assert(subpic->p_region != NULL);
 
     subpic->p_region->p_text = text_segment_New(text);
