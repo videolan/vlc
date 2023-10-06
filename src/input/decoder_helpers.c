@@ -89,6 +89,11 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
         return -1;
 
     /* */
+    const vlc_chroma_description_t *dsc =
+        vlc_fourcc_GetChromaDescription(dec->fmt_out.i_codec);
+    if (unlikely(dsc == NULL))
+        // the "codec" must be a valid picture chroma
+        return -1;
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec;
 
     if( dec->fmt_out.video.i_visible_height == 1088 &&
@@ -114,7 +119,6 @@ int decoder_UpdateVideoOutput( decoder_t *dec, vlc_video_context *vctx_out )
 
     if( vlc_fourcc_IsYUV( dec->fmt_out.video.i_chroma ) )
     {
-        const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( dec->fmt_out.video.i_chroma );
         for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
         {
             while( dec->fmt_out.video.i_width % dsc->p[i].w.den )
