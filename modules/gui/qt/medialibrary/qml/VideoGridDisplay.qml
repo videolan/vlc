@@ -62,7 +62,7 @@ MainInterface.MainGridView {
     //       than Component.onCompleted because selectionModel.selectedGroup update itself
     //       after this event.
     onActiveFocusChanged: {
-        if (activeFocus == false || model.count === 0 || selectionModel.hasSelection)
+        if (!activeFocus || model.count === 0 || selectionModel.hasSelection)
             return;
 
         resetFocus() // restores initialIndex
@@ -86,10 +86,10 @@ MainInterface.MainGridView {
     delegate: VideoGridItem {
         id: gridItem
 
-        // properties required by ExpandGridView
+        // Properties
 
-        property var model: ({})
-        property int index: -1
+        /* required */ property var model: ({})
+        /* required */ property int index: -1
 
         // Settings
 

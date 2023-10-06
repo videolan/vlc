@@ -54,7 +54,7 @@ VideoAll {
         topPadding: VLCStyle.margin_large
         bottomPadding: VLCStyle.margin_normal
 
-        text: "Continue Watching"
+        text: I18n.qtr("Continue Watching")
         color: root.colorContext.fg.primary
     }
 }
