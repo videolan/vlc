@@ -51,10 +51,8 @@
  * usual UIApplicationMain.
  */
 
+#import <TargetConditionals.h>
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/ES2/glext.h>
 #import <QuartzCore/QuartzCore.h>
 #import <dlfcn.h>
 
@@ -326,7 +324,9 @@
 
 - (void)didMoveToWindow
 {
-    self.contentScaleFactor = self.window.screen.scale;
+    #if !defined(TARGET_OS_VISION) || !TARGET_OS_VISION
+        self.contentScaleFactor = self.window.screen.scale;
+    #endif
 }
 
 - (void)layoutSubviews
