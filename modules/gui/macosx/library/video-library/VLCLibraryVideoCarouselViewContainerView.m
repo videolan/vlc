@@ -22,6 +22,9 @@
 
 #import "VLCLibraryVideoCarouselViewContainerView.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryUIUnits.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
@@ -75,15 +78,29 @@
 
 - (void)setupView
 {
+    _titleView = [[NSTextField alloc] init];
+    self.titleView.stringValue = _NS("Recents");
+    self.titleView.font = NSFont.VLClibrarySectionHeaderFont;
+    self.titleView.textColor = NSColor.headerTextColor;
+    self.titleView.selectable = NO;
+    self.titleView.bordered = NO;
+    self.titleView.drawsBackground = NO;
+    [self addSubview:self.titleView];
+    self.titleView.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [self.leadingAnchor constraintEqualToAnchor:self.titleView.leadingAnchor],
+        [self.trailingAnchor constraintEqualToAnchor:self.titleView.trailingAnchor],
+        [self.topAnchor constraintEqualToAnchor:self.titleView.topAnchor],
+    ]];
+
     _carouselView = [[iCarousel alloc] initWithFrame:self.bounds];
     self.carouselView.delegate = self;
-    self.carouselView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.carouselView];
-
+    self.carouselView.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
         [self.leadingAnchor constraintEqualToAnchor:self.carouselView.leadingAnchor],
         [self.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
-        [self.topAnchor constraintEqualToAnchor:self.carouselView.topAnchor],
+        [self.titleView.bottomAnchor constraintEqualToAnchor:self.carouselView.topAnchor], // titleView bottom
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
     NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:300];

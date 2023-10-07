@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoCarouselViewContainerView : NSView<VLCLibraryVideoViewContainerView, iCarouselDelegate>
 
+@property (readonly) NSTextField *titleView;
 @property (readonly) iCarousel *carouselView;
 @property (readonly) NSObject<iCarouselDelegate> *delegate;
 
