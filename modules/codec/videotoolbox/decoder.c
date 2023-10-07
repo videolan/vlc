@@ -1173,11 +1173,15 @@ static int StartVideoToolbox(decoder_t *p_dec)
         goto error;
     }
 
-#if !TARGET_OS_IPHONE
+#if TARGET_OS_OSX
+   CFDictionarySetValue(destinationPixelBufferAttributes,
+                        kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey,
+                        kCFBooleanTrue);
+#elif defined(TARGET_OS_VISION) && TARGET_OS_VISION
     CFDictionarySetValue(destinationPixelBufferAttributes,
-                         kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey,
+                         kCVPixelBufferMetalCompatibilityKey,
                          kCFBooleanTrue);
-#else
+#else // iOS and tvOS
     CFDictionarySetValue(destinationPixelBufferAttributes,
                          kCVPixelBufferOpenGLESCompatibilityKey,
                          kCFBooleanTrue);
