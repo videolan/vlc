@@ -79,7 +79,6 @@
 - (void)setupView
 {
     _titleView = [[NSTextField alloc] init];
-    self.titleView.stringValue = _NS("Recents");
     self.titleView.font = NSFont.VLClibrarySectionHeaderFont;
     self.titleView.textColor = NSColor.headerTextColor;
     self.titleView.selectable = NO;
@@ -121,6 +120,7 @@
     _groupDescriptor = groupDescriptor;
     _videoGroup = groupDescriptor.group;
     self.dataSource.groupDescriptor = groupDescriptor;
+    self.titleView.stringValue = groupDescriptor.name;
  }
 
 - (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group
