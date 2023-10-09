@@ -99,12 +99,9 @@ T.SpinBox {
 
         Keys.priority: Keys.AfterItem
 
-        Keys.onPressed: Navigation.defaultKeyAction(event)
-        Keys.onReleased: Navigation.defaultKeyReleaseAction(event)
-
         Navigation.parentItem: control
-
     }
+
     up.indicator: Rectangle {
         x: control.mirrored ? 0: parent.width - width
         height: parent.height / 2
