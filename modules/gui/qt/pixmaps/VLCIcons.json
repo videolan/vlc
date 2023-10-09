@@ -67,6 +67,8 @@
         {"key":"topbar_network", "path": "./icons/ic_fluent_wifi_1.svg"},
         {"key":"topbar_sort", "path": "./icons/ic_fluent_arrow_sort.svg"},
         {"key":"topbar_video", "path": "./icons/ic_fluent_filmstrip.svg"},
+        {"key":"chevron_up", "path": "./icons/ic_fluent_chevron_up.svg"},
+        {"key":"chevron_down", "path": "./icons/ic_fluent_chevron_down.svg"},
         {"key":"tv", "path": "./icons/tv.svg"},
         {"key":"tvtelx", "path": "./icons/tvtelx.svg"},
         {"key":"transparency", "path": "./icons/transparency.svg"},

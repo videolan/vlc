@@ -711,6 +711,8 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/ic_fluent_wifi_1.svg \
 	gui/qt/pixmaps/icons/ic_fluent_arrow_sort.svg \
 	gui/qt/pixmaps/icons/ic_fluent_filmstrip.svg \
+	gui/qt/pixmaps/icons/ic_fluent_chevron_up.svg \
+	gui/qt/pixmaps/icons/ic_fluent_chevron_down.svg \
 	gui/qt/pixmaps/icons/tv.svg \
 	gui/qt/pixmaps/icons/tvtelx.svg \
 	gui/qt/pixmaps/icons/visualization.svg \
