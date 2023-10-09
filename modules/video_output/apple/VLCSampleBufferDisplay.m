@@ -48,6 +48,73 @@
 
 #include "../../codec/vt_utils.h"
 
+static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
+{
+    VLC_UNUSED(o);
+    vout_display_t *vd = sys;
+    static vlc_decoder_device *device = NULL;
+    if (!device) {
+        device = vlc_decoder_device_Create(VLC_OBJECT(vd), vd->cfg->window);
+        static const struct vlc_decoder_device_operations ops =
+        {
+            NULL,
+        };
+        device->ops = &ops;
+        device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
+    }
+    return device;
+}
+
+static filter_t *
+CreateCVPXConverter(vout_display_t *vd)
+{
+    filter_t *converter = vlc_object_create(vd, sizeof(filter_t));
+    if (!converter)
+        return NULL;
+
+    static const struct filter_video_callbacks cbs =
+    {
+        .buffer_new = NULL,
+        .hold_device = CVPXHoldDecoderDevice,
+    };
+    converter->owner.video = &cbs;
+    converter->owner.sys = vd;
+
+    es_format_InitFromVideo( &converter->fmt_in,  vd->fmt );
+    es_format_InitFromVideo( &converter->fmt_out,  vd->fmt );
+
+    converter->fmt_out.video.i_chroma =
+    converter->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
+
+    converter->p_module = module_need(converter, "video converter", NULL, false);
+    if (!converter->p_module)
+    {
+        vlc_object_delete(converter);
+        return NULL;
+    }
+    assert( converter->ops != NULL );
+
+    return converter;
+}
+
+
+static void DeleteCVPXConverter( filter_t * p_converter )
+{
+    if (!p_converter)
+        return;
+
+    if( p_converter->p_module )
+    {
+        filter_Close( p_converter );
+        module_unneed( p_converter, p_converter->p_module );
+    }
+
+    es_format_Clean( &p_converter->fmt_in );
+    es_format_Clean( &p_converter->fmt_out );
+
+    vlc_object_delete(p_converter);
+}
+
 /**
  * Protocol declaration that drawable-nsobject should follow
  */
@@ -558,74 +625,6 @@ static int Control (vout_display_t *vd, int query)
     }
 
     return VLC_SUCCESS;
-}
-
-static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
-{
-    VLC_UNUSED(o);
-    vout_display_t *vd = sys;
-    static vlc_decoder_device *device = NULL;
-    if (!device) {
-        device = vlc_decoder_device_Create(VLC_OBJECT(vd), vd->cfg->window);
-        static const struct vlc_decoder_device_operations ops =
-        {
-            NULL,
-        };
-        device->ops = &ops;
-        device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
-    }
-    
-    return device;
-}
-
-static filter_t *
-CreateCVPXConverter(vout_display_t *vd)
-{
-    filter_t *converter = vlc_object_create(vd, sizeof(filter_t));
-    if (!converter)
-        return NULL;
-
-    static const struct filter_video_callbacks cbs =
-    {
-        .buffer_new = NULL,
-        .hold_device = CVPXHoldDecoderDevice,
-    };
-    converter->owner.video = &cbs;
-    converter->owner.sys = vd;
-
-    es_format_InitFromVideo( &converter->fmt_in,  vd->fmt );
-    es_format_InitFromVideo( &converter->fmt_out,  vd->fmt );
-
-    converter->fmt_out.video.i_chroma =
-    converter->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
-
-    converter->p_module = module_need(converter, "video converter", NULL, false);
-    if (!converter->p_module)
-    {
-        vlc_object_delete(converter);
-        return NULL;
-    }
-    assert( converter->ops != NULL );
-
-    return converter;
-}
-
-
-static void DeleteCVPXConverter( filter_t * p_converter )
-{
-    if (!p_converter)
-        return;
-
-    if( p_converter->p_module )
-    {
-        filter_Close( p_converter );
-        module_unneed( p_converter, p_converter->p_module );
-    }
-
-    es_format_Clean( &p_converter->fmt_in );
-    es_format_Clean( &p_converter->fmt_out );
-
-    vlc_object_delete(p_converter);
 }
 
 static int Open (vout_display_t *vd,
