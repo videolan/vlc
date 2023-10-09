@@ -62,6 +62,7 @@ static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
         device->ops = &ops;
         device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
     }
+    vlc_decoder_device_Hold(device);
     return device;
 }
 
@@ -318,6 +319,8 @@ static void Close(vout_display_t *vd)
 {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge_transfer VLCSampleBufferDisplay*)vd->sys;
+
+    DeleteCVPXConverter(sys->converter);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([sys.container respondsToSelector:@selector(removeVoutSubview:)]) {
