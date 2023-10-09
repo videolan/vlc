@@ -579,7 +579,7 @@ static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
 }
 
 static filter_t *
-SW_to_CVPX_converter_Create(vout_display_t *vd)
+CreateCVPXConverter(vout_display_t *vd)
 {
     filter_t *converter = vlc_object_create(vd, sizeof(filter_t));
     if (!converter)
@@ -611,21 +611,21 @@ SW_to_CVPX_converter_Create(vout_display_t *vd)
 }
 
 
-static void DeleteFilter( filter_t * p_filter )
+static void DeleteCVPXConverter( filter_t * p_converter )
 {
-    if (!p_filter)
+    if (!p_converter)
         return;
 
-    if( p_filter->p_module )
+    if( p_converter->p_module )
     {
-        filter_Close( p_filter );
-        module_unneed( p_filter, p_filter->p_module );
+        filter_Close( p_converter );
+        module_unneed( p_converter, p_converter->p_module );
     }
 
-    es_format_Clean( &p_filter->fmt_in );
-    es_format_Clean( &p_filter->fmt_out );
+    es_format_Clean( &p_converter->fmt_in );
+    es_format_Clean( &p_converter->fmt_out );
 
-    vlc_object_delete(p_filter);
+    vlc_object_delete(p_converter);
 }
 
 static int Open (vout_display_t *vd,
@@ -648,7 +648,7 @@ static int Open (vout_display_t *vd,
     // Display will only work with CVPX video context
     filter_t *converter = NULL;
     if (!vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_CVPX)) {
-        converter = SW_to_CVPX_converter_Create(vd);
+        converter = CreateCVPXConverter(vd);
         if (!converter)
             return VLC_EGENERIC;
     }
@@ -658,7 +658,7 @@ static int Open (vout_display_t *vd,
         id container = (__bridge id)vd->cfg->window->handle.nsobject;
         if (!container) {
             msg_Err(vd, "No drawable-nsobject found!");
-            DeleteFilter(converter);
+            DeleteCVPXConverter(converter);
             return VLC_EGENERIC;
         }
 
