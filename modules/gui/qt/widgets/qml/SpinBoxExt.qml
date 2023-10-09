@@ -18,18 +18,14 @@
 
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Templates 2.12 as T
 
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 
-SpinBox {
+T.SpinBox {
     id: control
-    font.pixelSize: VLCStyle.fontSize_large
-
-    padding: 0
-    leftPadding: padding + (control.mirrored ? up.indicator.width : 0)
-    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width)
 
     property color textColor: theme.fg.primary
     property color bgColor: theme.bg.primary
@@ -44,6 +40,22 @@ SpinBox {
         focused: control.visualFocus
         hovered: control.hovered
     }
+
+    font.pixelSize: VLCStyle.fontSize_large
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                              contentItem.implicitWidth + 2 * padding +
+                              up.implicitIndicatorWidth +
+                              down.implicitIndicatorWidth)
+
+    implicitHeight: Math.max(implicitContentHeight + topPadding + bottomPadding,
+                           implicitBackgroundHeight,
+                           up.implicitIndicatorHeight,
+                           down.implicitIndicatorHeight)
+
+    padding: VLCStyle.margin_xxsmall
+    leftPadding: padding + (control.mirrored ? up.indicator.width : 0)
+    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width)
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
