@@ -44,47 +44,26 @@ RowLayout {
 
     focus: true
 
-    onActiveFocusChanged: if (activeFocus) column.forceActiveFocus()
+    onActiveFocusChanged: if (activeFocus) playbackBtn.forceActiveFocus()
 
-    Widgets.NavigableCol {
-        id: column
+    Widgets.ButtonExt {
+        id: playbackBtn
 
-        focus: true
+        text: I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
 
-        Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
-        Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-        Layout.topMargin: VLCStyle.margin_large
+        onPressed: {
+            trackMenuController.requestPlaybackSpeedPage()
+        }
 
+        T.ToolTip.visible: (hovered || visualFocus)
+        T.ToolTip.text: I18n.qtr("Playback Speed")
+        T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
+        Navigation.parentItem: root
         Navigation.rightItem: row
 
-        //we store the model in a different property as functions can't be passed in modelData
-        property var modelDefination: [{
-            "tooltip": I18n.qtr("Playback Speed"),
-            "action": function () {
-                trackMenuController.requestPlaybackSpeedPage()
-            }
-        }]
-
-        model: modelDefination
-
-        delegate: Widgets.IconTrackButton {
-            font.pixelSize: (index === 0) ? VLCStyle.fontSize_large
-                                          : VLCStyle.dp(40, VLCStyle.scale)
-
-            x: (column.width - width) / 2
-
-            text: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
-                                : modelData.icon
-
-            T.ToolTip.visible: (hovered || visualFocus)
-            T.ToolTip.delay: VLCStyle.delayToolTipAppear
-
-            description: modelData.tooltip
-
-            Navigation.parentItem: column
-
-            onClicked: column.modelDefination[index].action()
-        }
+        Layout.alignment: Qt.AlignTop | Qt.AlignLeft
+        Layout.margins: VLCStyle.margin_large
     }
 
     Widgets.NavigableRow {
@@ -93,7 +72,7 @@ RowLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
 
-        Navigation.leftItem: column
+        Navigation.leftItem: playbackBtn
 
         //we store the model in a different property as functions can't be passed in modelData
         property var modelDefinition: [{
