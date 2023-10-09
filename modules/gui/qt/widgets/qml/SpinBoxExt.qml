@@ -124,8 +124,8 @@ T.SpinBox {
             focused: false
         }
 
-        Text {
-            text: "\u2227" // ^ logical AND
+        IconLabel {
+            text: VLCIcons.chevron_up
             font.pixelSize: control.font.pixelSize * 2
             color: upTheme.fg.primary
             font.bold: true
@@ -156,8 +156,8 @@ T.SpinBox {
             focused: false
         }
 
-        Text {
-            text: "\u2228" // ^ logical OR
+        IconLabel {
+            text: VLCIcons.chevron_down
             font.pixelSize: control.font.pixelSize * 2
             color: downTheme.fg.primary
             font.bold: true
