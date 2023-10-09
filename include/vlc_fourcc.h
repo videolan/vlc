@@ -384,7 +384,7 @@
 /* 15-bit RGB with host endianness */
 #define VLC_CODEC_RGB555    VLC_CODEC_RGB555BE
 /* 15-bit BGR with host endianness */
-#define VLC_CODEC_BGR555    VLC_CODEC_BGR565BE
+#define VLC_CODEC_BGR555    VLC_CODEC_BGR555BE
 #else
 /* 15-bit RGB with host endianness */
 #define VLC_CODEC_RGB555    VLC_CODEC_RGB555LE
