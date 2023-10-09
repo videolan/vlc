@@ -17,8 +17,6 @@ $(TARBALLS)/twolame-$(TWOLAME_VERSION).tar.gz:
 
 twolame: twolame-$(TWOLAME_VERSION).tar.gz .sum-twolame
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
-	cd $(UNPACK_DIR) && cp config.guess config.sub build-scripts
 	$(MOVE)
 
 TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
