@@ -822,6 +822,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
             .resource = input_priv(p_input)->p_resource,
             .sout = p_sys->p_sout_record,
             .input_type = INPUT_TYPE_NONE,
+            .cc_decoder = p_sys->cc_decoder,
             .cbs = &decoder_cbs,
             .cbs_data = p_es,
         };
@@ -2277,6 +2278,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
         .resource = priv->p_resource,
         .sout = priv->p_sout,
         .input_type = p_sys->input_type,
+        .cc_decoder = p_sys->cc_decoder,
         .cbs = &decoder_cbs,
         .cbs_data = p_es,
     };
@@ -2300,6 +2302,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
                 .resource = priv->p_resource,
                 .sout = p_sys->p_sout_record,
                 .input_type = INPUT_TYPE_NONE,
+                .cc_decoder = p_sys->cc_decoder,
                 .cbs = &decoder_cbs,
                 .cbs_data = p_es,
             };

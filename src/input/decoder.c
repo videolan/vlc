@@ -216,6 +216,7 @@ struct vlc_input_decoder_t
 #define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
     struct
     {
+        vlc_fourcc_t selected_codec;
         vlc_mutex_t lock;
         bool b_supported;
         decoder_cc_desc_t desc;
@@ -1183,10 +1184,9 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
     vlc_mutex_lock(&p_owner->cc.lock);
     p_owner->cc.desc = *p_desc;
 
-    /* Fanout data to all decoders. We do not know if es_out
-       selected 608 or 708. */
-    uint64_t i_bitmap = p_owner->cc.desc.i_608_channels |
-                        p_owner->cc.desc.i_708_channels;
+    uint64_t i_bitmap = p_owner->cc.selected_codec == VLC_CODEC_CEA708 ?
+                        p_owner->cc.desc.i_708_channels :
+                        p_owner->cc.desc.i_608_channels;
 
     for( int i=0; i_bitmap > 0; i_bitmap >>= 1, i++ )
     {
@@ -2011,6 +2011,8 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 
     /* */
     vlc_mutex_init(&p_owner->cc.lock);
+    p_owner->cc.selected_codec = cfg->cc_decoder == 708 ?
+                                 VLC_CODEC_CEA708 : VLC_CODEC_CEA608;
     p_owner->cc.b_supported = ( cfg->sout == NULL );
 
     p_owner->cc.desc.i_608_channels = 0;
