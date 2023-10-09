@@ -114,11 +114,6 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *, vlc_fourcc_t, int i_cha
 int vlc_input_decoder_GetCcState( vlc_input_decoder_t *, vlc_fourcc_t, int i_channel, bool *pb_decode );
 
 /**
- * This function get cc channels descriptions
- */
-void vlc_input_decoder_GetCcDesc( vlc_input_decoder_t *, decoder_cc_desc_t * );
-
-/**
  * This function forces the display of the next picture
  */
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
