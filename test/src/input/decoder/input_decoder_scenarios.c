@@ -470,8 +470,8 @@ static void cc_decoder_setup_01(decoder_t *dec)
     dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 }
 
-static const char cc_block_decoded[] = "cc01_dec";
-static int cc_decoder_decode(decoder_t *dec, vlc_frame_t *in)
+static int cc_decoder_decode_common(decoder_t *dec, vlc_frame_t *in,
+                                    const char *text)
 {
     assert(memcmp(in->p_buffer, cc_block_input, sizeof(cc_block_input)) == 0);
 
@@ -486,12 +486,18 @@ static int cc_decoder_decode(decoder_t *dec, vlc_frame_t *in)
     subpic->p_region = subpicture_region_New(&fmt);
     assert(subpic->p_region != NULL);
 
-    subpic->p_region->p_text = text_segment_New(cc_block_decoded);
+    subpic->p_region->p_text = text_segment_New(text);
     assert(subpic->p_region->p_text != NULL);
 
     decoder_QueueSub(dec, subpic);
 
     return VLC_SUCCESS;
+}
+
+static const char cc_block_decoded[] = "cc01_dec";
+static int cc_decoder_decode(decoder_t *dec, vlc_frame_t *in)
+{
+    return cc_decoder_decode_common(dec, in, cc_block_decoded);
 }
 
 static void display_prepare_noop(vout_display_t *vd, picture_t *pic)
