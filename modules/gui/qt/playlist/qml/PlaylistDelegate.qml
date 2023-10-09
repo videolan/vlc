@@ -27,7 +27,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-T.ItemDelegate {
+T.Control {
     id: delegate
 
     // Properties
@@ -68,6 +68,8 @@ T.ItemDelegate {
 
     // Settings
 
+    hoverEnabled: true
+
     verticalPadding: VLCStyle.playlistDelegate_verticalPadding
 
     leftPadding: VLCStyle.margin_normal
@@ -79,7 +81,7 @@ T.ItemDelegate {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    ListView.delayRemove: mouseArea.drag.active
+    ListView.delayRemove: dragHandler.active
 
     T.ToolTip.visible: ( visible && (visualFocus || hovered) &&
                          (textInfoColumn.implicitWidth > textInfoColumn.width) )
@@ -236,60 +238,76 @@ T.ItemDelegate {
         }
     }
 
-    MouseArea {
-        id: mouseArea
-
+    // TODO: Qt bug 6.2: QTBUG-103604
+    DoubleClickIgnoringItem {
         anchors.fill: parent
 
-        hoverEnabled: true
+        TapHandler {
+            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
 
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onClicked: (mouse) => {
-            /* to receive keys events */
-            if (!(delegate.selected && mouse.button === Qt.RightButton)) {
-                view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
-                view.currentIndex = index
+            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+
+            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
+
+            onSingleTapped: (eventPoint, button) => {
+                initialAction()
+
+                if (!(delegate.selected && button === Qt.RightButton)) {
+                    view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                    view.currentIndex = index
+                }
+
+                if (contextMenu && button === Qt.RightButton)
+                    contextMenu.popup(index, parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
             }
 
-            if (contextMenu && mouse.button === Qt.RightButton)
-                contextMenu.popup(index, mapToGlobal(mouse.x, mouse.y))
+            onDoubleTapped: (eventPoint, button) => {
+                if (button !== Qt.RightButton)
+                    MainPlaylistController.goTo(index, true)
+            }
+
+            Component.onCompleted: {
+                canceled.connect(initialAction)
+            }
+
+            function initialAction() {
+                delegate.forceActiveFocus(Qt.MouseFocusReason)
+            }
         }
 
-        onDoubleClicked: (mouse) => {
-            if (mouse.button !== Qt.RightButton)
-                MainPlaylistController.goTo(index, true)
-        }
+        DragHandler {
+            id: dragHandler
 
-        onPressed: (mouse) => {
-            delegate.forceActiveFocus(Qt.MouseFocusReason)
-        }
+            target: null
 
-        drag.target: dragItem
+            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
 
-        drag.smoothed: false
+            onActiveChanged: {
+                if (dragItem) {
+                    if (active) {
+                        if (!selected) {
+                            /* the dragged item is not in the selection, replace the selection */
+                            view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                        }
 
-        drag.onActiveChanged: {
-            if (dragItem) {
-                if (drag.active) {
-                    if (!selected) {
-                        /* the dragged item is not in the selection, replace the selection */
-                        view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                        dragItem.indexes = view.selectionModel.selectedIndexesFlat
+                        dragItem.indexesFlat = true
+                        dragItem.Drag.active = true
+                    } else {
+                        dragItem.Drag.drop()
                     }
-
-                    dragItem.indexes = view.selectionModel.selectedIndexesFlat
-                    dragItem.indexesFlat = true
-                    dragItem.Drag.active = true
-                } else {
-                    dragItem.Drag.drop()
                 }
             }
         }
 
         TapHandler {
             acceptedDevices: PointerDevice.TouchScreen
-            
-            onTapped: {
+
+            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
+
+            onTapped: (eventPoint, button) => {
                 MainPlaylistController.goTo(index, true)
             }
 
