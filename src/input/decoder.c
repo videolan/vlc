@@ -2453,7 +2453,6 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
                                   int i_channel, bool b_decode )
 {
     decoder_t *p_dec = &p_owner->dec;
-    //msg_Warn( p_dec, "vlc_input_decoder_SetCcState: %d @%x", b_decode, i_channel );
 
     vlc_mutex_lock(&p_owner->cc.lock);
     if( !vlc_input_decoder_HasCCChanFlag( p_owner, codec, i_channel ) )
