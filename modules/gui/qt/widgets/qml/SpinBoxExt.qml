@@ -105,9 +105,11 @@ SpinBox {
             colorSet: ColorContext.ButtonStandard
 
             enabled: control.enabled
-            focused: control.up.visualFocus
             hovered: control.up.hovered
             pressed: control.up.pressed
+
+            // root control handles focused state
+            focused: false
         }
 
         Text {
@@ -135,9 +137,11 @@ SpinBox {
             colorSet: ColorContext.ButtonStandard
 
             enabled: control.enabled
-            focused: control.down.visualFocus
             hovered: control.down.hovered
             pressed: control.down.pressed
+
+            // root control handles focused state
+            focused: false
         }
 
         Text {
