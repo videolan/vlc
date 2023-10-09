@@ -32,6 +32,7 @@
 #include <vlc_interface.h>
 #include <vlc_frame.h>
 #include <vlc_codec.h>
+#include <vlc_filter.h>
 #include <vlc_vout_display.h>
 
 #include "input_decoder.h"
@@ -512,6 +513,72 @@ static void cc_text_renderer_render(filter_t *filter, subpicture_region_t *regio
     vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static vlc_frame_t *packetizer_getcc_cea708_1064(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    (void)dec;
+
+    cc_desc->i_608_channels = 0;
+    cc_desc->i_708_channels = (1ULL << 9) | (1ULL << 63);
+    cc_desc->i_reorder_depth = 4;
+
+    return create_cc_frame(VLC_TICK_0);
+}
+
+static void cc_decoder_setup_708_1064(decoder_t *dec)
+{
+    assert(dec->fmt_in->i_codec == VLC_CODEC_CEA708);
+    assert(dec->fmt_in->subs.cc.i_channel == 9
+        || dec->fmt_in->subs.cc.i_channel == 63);
+    assert(dec->fmt_in->subs.cc.i_reorder_depth == 4);
+
+    dec->fmt_out.i_codec = VLC_CODEC_TEXT;
+}
+
+static int cc_decoder_decode_channel(decoder_t *dec, vlc_frame_t *in)
+{
+    char buf[] = "ccxx_dec";
+    assert(dec->fmt_in->subs.cc.i_channel < 64);
+    sprintf(buf, "cc%02u_dec", dec->fmt_in->subs.cc.i_channel + 1);
+    return cc_decoder_decode_common(dec, in, buf);
+}
+
+static void cc_text_renderer_render_708_1064(filter_t *filter,
+                                             subpicture_region_t *region_in)
+{
+    (void) filter;
+    /* Make sure each tracks are rendered once */
+    static unsigned chans[] = { 10, 64 };
+    static bool rendered[] = { false, false };
+
+    char buf[] = "ccxx_dec";
+    for (size_t i = 0; i < ARRAY_SIZE(chans); ++i)
+    {
+        unsigned chan = chans[i];
+        sprintf(buf, "cc%u_dec", chan);
+
+        if (strcmp(region_in->p_text->psz_text, buf) == 0)
+        {
+            if (rendered[i])
+                return;
+            rendered[i] = true;
+        }
+    }
+
+    for (size_t i = 0; i < ARRAY_SIZE(chans); ++i)
+    {
+        if (!rendered[i])
+            return;
+    }
+
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static void player_setup_select_ccdec_708_1064(vlc_player_t *player)
+{
+    vlc_player_SelectTracksByStringIds(player, SPU_ES,
+        "video/0/cc/spu/10,video/0/cc/spu/64");
+}
+
 static const vlc_fourcc_t subpicture_chromas[] = {
     VLC_CODEC_RGBA, 0
 };
@@ -636,6 +703,19 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_drop,
     .on_track_list_changed = on_track_list_changed_check_cea708_count,
+},
+{
+    .name = "cea708 10 and 63 tracks can be rendered simultaneously",
+    .source = source_800_600 ";video_packetized=false",
+    .item_option = ":captions=708",
+    .packetizer_getcc = packetizer_getcc_cea708_1064,
+    .decoder_setup = decoder_i420_800_600_update,
+    .decoder_decode = decoder_decode,
+    .cc_decoder_setup = cc_decoder_setup_708_1064,
+    .cc_decoder_decode = cc_decoder_decode_channel,
+    .display_prepare = display_prepare_noop,
+    .text_renderer_render = cc_text_renderer_render_708_1064,
+    .player_setup_before_start = player_setup_select_ccdec_708_1064,
 },
 };
 
