@@ -37,7 +37,7 @@ T.SpinBox {
         colorSet: ColorContext.SpinBox
 
         enabled: control.enabled
-        focused: control.visualFocus
+        focused: (control.visualFocus || textInput.activeFocus)
         hovered: control.hovered
     }
 
@@ -77,6 +77,8 @@ T.SpinBox {
     }
 
     contentItem: TextInput {
+        id: textInput
+
         // NOTE: This is required for InterfaceWindowHandler::applyKeyEvent.
         property bool visualFocus: control.activeFocus
 
