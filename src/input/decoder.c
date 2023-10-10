@@ -2119,6 +2119,20 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
     decoder_Destroy( &p_owner->dec );
 }
 
+static void DeleteCcDecoder(vlc_input_decoder_t *owner, size_t index)
+{
+    assert(vlc_mutex_held(&owner->cc.lock));
+
+    vlc_input_decoder_t *cc = owner->cc.pp_decoder[index];
+    owner->cc.pp_decoder[index] = NULL;
+
+    if (cc != NULL)
+    {
+        vlc_input_decoder_Flush(cc);
+        vlc_input_decoder_Delete(cc);
+    }
+}
+
 /* */
 static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, bool b_decoding )
 {
@@ -2503,19 +2517,8 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
         p_owner->cc.pp_decoder[i_channel] = p_ccowner;
     }
     else
-    {
-        vlc_input_decoder_t *p_cc;
+        DeleteCcDecoder(p_owner, i_channel);
 
-        p_cc = p_owner->cc.pp_decoder[i_channel];
-        p_owner->cc.pp_decoder[i_channel] = NULL;
-
-        if( p_cc )
-        {
-
-            vlc_input_decoder_Flush(p_cc);
-            vlc_input_decoder_Delete(p_cc);
-        }
-    }
     vlc_mutex_unlock(&p_owner->cc.lock);
     return VLC_SUCCESS;
 }
