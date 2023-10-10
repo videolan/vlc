@@ -52,17 +52,14 @@ static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
 {
     VLC_UNUSED(o);
     vout_display_t *vd = sys;
-    static vlc_decoder_device *device = NULL;
-    if (!device) {
-        device = vlc_decoder_device_Create(VLC_OBJECT(vd), vd->cfg->window);
-        static const struct vlc_decoder_device_operations ops =
-        {
-            NULL,
-        };
-        device->ops = &ops;
-        device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
-    }
-    vlc_decoder_device_Hold(device);
+    vlc_decoder_device *device =
+        vlc_decoder_device_Create(VLC_OBJECT(vd), vd->cfg->window);
+    static const struct vlc_decoder_device_operations ops =
+    {
+        NULL,
+    };
+    device->ops = &ops;
+    device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
     return device;
 }
 
