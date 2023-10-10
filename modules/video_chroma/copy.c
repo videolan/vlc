@@ -921,6 +921,7 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
             assert(p->i_visible_pitch <= p->i_pitch);
             assert(p->i_visible_lines <= p->i_lines);
         }
+        return VLC_SUCCESS;
     }
 
     /*  Fill chroma planes for planar YUV */
@@ -936,8 +937,9 @@ int picture_UpdatePlanes(picture_t *picture, uint8_t *data, unsigned pitch)
             p->i_pitch  = pitch / 2;
             p->i_lines  = picture->format.i_height / 2;
         }
+        return VLC_SUCCESS;
     }
-    return VLC_SUCCESS;
+    return VLC_ENOTSUP;
 }
 
 #ifdef COPY_TEST
