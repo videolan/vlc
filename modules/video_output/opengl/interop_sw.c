@@ -434,7 +434,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
 
 static int
 interop_yuv_base_init(struct vlc_gl_interop *interop,
-                      vlc_fourcc_t chroma, const vlc_chroma_description_t *desc)
+                      const vlc_chroma_description_t *desc)
 {
     struct interop_formats
     {
@@ -460,7 +460,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
 
     if (desc->plane_count == 1)
     {
-        if (chroma == VLC_CODEC_VUYA)
+        if (desc->fcc == VLC_CODEC_VUYA)
         {
             interop->tex_count = 2;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -471,7 +471,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
         }
         else if (desc->pixel_size != 2)
         {
-            msg_Warn(interop->gl, "unsupported chroma %.4s", (char*)&chroma);
+            msg_Warn(interop->gl, "unsupported chroma %.4s", (char*)&desc->fcc);
             return VLC_EGENERIC;
         }
 
@@ -671,7 +671,7 @@ opengl_interop_init(struct vlc_gl_interop *interop,
     }
 
     if (is_yuv)
-        return interop_yuv_base_init(interop, chroma, desc);
+        return interop_yuv_base_init(interop, desc);
 
     return interop_rgb_base_init(interop, chroma);
 }
