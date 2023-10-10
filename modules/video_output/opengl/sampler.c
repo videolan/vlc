@@ -175,7 +175,7 @@ init_conv_matrix(float conv_matrix_out[],
 }
 
 static int
-sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
+sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
                       const vlc_chroma_description_t *desc,
                       video_color_space_t yuv_space)
 {
@@ -188,7 +188,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
 
     if (desc->pixel_size == 2)
     {
-        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016) {
+        if (desc->fcc != VLC_CODEC_P010 && desc->fcc != VLC_CODEC_P016) {
             /* Do a bit shift if samples are stored on LSB. */
             float yuv_range_correction = (float)((1 << 16) - 1)
                                          / ((1 << desc->pixel_bits) - 1);
@@ -234,8 +234,8 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
      *
      * This is equivalent to swap columns 1 and 2.
      */
-    bool swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
-                   chroma == VLC_CODEC_NV21;
+    bool swap_uv = desc->fcc == VLC_CODEC_YV12 || desc->fcc == VLC_CODEC_YV9 ||
+                   desc->fcc == VLC_CODEC_NV21;
     if (swap_uv)
     {
         /* Remember, the matrix in column-major order */
@@ -471,7 +471,6 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
 static int
 opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                     const char *swizzle_per_tex[],
-                    vlc_fourcc_t chroma,
                     const vlc_chroma_description_t *desc)
 {
     if (desc->plane_count == 4)
@@ -498,7 +497,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
          * V  Y1 U  Y2 => GBR
          * Y1 V  Y2 U  => RAG
          */
-        switch (chroma)
+        switch (desc->fcc)
         {
             case VLC_CODEC_UYVY:
                 swizzle_per_tex[0] = "g";
@@ -738,10 +737,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
     if (is_yuv)
     {
-        ret = sampler_yuv_base_init(sampler, chroma, desc, yuv_space);
+        ret = sampler_yuv_base_init(sampler, desc, yuv_space);
         if (ret != VLC_SUCCESS)
             return ret;
-        ret = opengl_init_swizzle(sampler, swizzle_per_tex, chroma, desc);
+        ret = opengl_init_swizzle(sampler, swizzle_per_tex, desc);
         if (ret != VLC_SUCCESS)
             return ret;
     }
