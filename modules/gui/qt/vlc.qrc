@@ -224,7 +224,6 @@
         <file alias="ScaledImage.qml">widgets/qml/ScaledImage.qml</file>
         <file alias="DropShadowImage.qml">widgets/qml/DropShadowImage.qml</file>
         <file alias="DoubleShadow.qml">widgets/qml/DoubleShadow.qml</file>
-        <file alias="FadingEdgeListView.qml">widgets/qml/FadingEdgeListView.qml</file>
         <file alias="CSDThemeButtonSet.qml">widgets/qml/CSDThemeButtonSet.qml</file>
         <file alias="CSDThemeButton.qml">widgets/qml/CSDThemeButton.qml</file>
         <file alias="TextFieldExt.qml">widgets/qml/TextFieldExt.qml</file>
