@@ -2827,14 +2827,14 @@ static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i
         if( (i_bitmap & 1) == 0 || (i_existingbitmap & 1) )
             continue;
 
-        msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, parent->fmt.i_id );
-
         es_format_Init( &fmt, SPU_ES, codec );
         fmt.i_id = i + 1;
         fmt.subs.cc.i_channel = i;
         fmt.i_group = parent->fmt.i_group;
-        if( asprintf( &fmt.psz_description, psz_descfmt, 1 + i ) == -1 )
+        if( asprintf( &fmt.psz_description, psz_descfmt, fmt.i_id ) == -1 )
             fmt.psz_description = NULL;
+
+        msg_Dbg( p_input, "Adding CC track %d for es[%d]", fmt.i_id, parent->fmt.i_id );
 
         es_out_id_t **pp_es = &parent->cc.pp_es[i];
         *pp_es = EsOutAddLocked( out, parent->p_pgrm->source, &fmt, parent );
