@@ -791,12 +791,6 @@ VLC_API const vlc_fourcc_t * vlc_fourcc_GetFallback( vlc_fourcc_t );
 VLC_API bool vlc_fourcc_IsYUV( vlc_fourcc_t );
 
 /**
- * It returns true if the two fourccs are equivalent if their U&V planes are
- * swapped.
- */
-VLC_API bool vlc_fourcc_AreUVPlanesSwapped(vlc_fourcc_t , vlc_fourcc_t );
-
-/**
  * Chroma related information.
  */
 typedef struct {
