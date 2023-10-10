@@ -2255,7 +2255,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     if( p_owner->cc.b_supported )
     {
         for( int i = 0; i < MAX_CC_DECODERS; i++ )
-            vlc_input_decoder_SetCcState( p_owner, VLC_CODEC_CEA608, i, false );
+            vlc_input_decoder_SetCcState( p_owner, i, false );
     }
 
     /* Delete decoder */
@@ -2445,16 +2445,16 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 }
 
 static bool vlc_input_decoder_HasCCChanFlag( vlc_input_decoder_t *p_owner,
-                                             vlc_fourcc_t codec, int i_channel )
+                                             int i_channel )
 {
     int i_max_channels;
     uint64_t i_bitmap;
-    if( codec == VLC_CODEC_CEA608 )
+    if( p_owner->cc.selected_codec == VLC_CODEC_CEA608 )
     {
         i_max_channels = 4;
         i_bitmap = p_owner->cc.desc.i_608_channels;
     }
-    else if( codec == VLC_CODEC_CEA708 )
+    else if( p_owner->cc.selected_codec == VLC_CODEC_CEA708 )
     {
         i_max_channels = 64;
         i_bitmap = p_owner->cc.desc.i_708_channels;
@@ -2465,13 +2465,13 @@ static bool vlc_input_decoder_HasCCChanFlag( vlc_input_decoder_t *p_owner,
              ( i_bitmap & ((uint64_t)1 << i_channel) ) );
 }
 
-int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t codec,
+int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner,
                                   int i_channel, bool b_decode )
 {
     decoder_t *p_dec = &p_owner->dec;
 
     vlc_mutex_lock(&p_owner->cc.lock);
-    if( !vlc_input_decoder_HasCCChanFlag( p_owner, codec, i_channel ) )
+    if( !vlc_input_decoder_HasCCChanFlag( p_owner, i_channel ) )
     {
         vlc_mutex_unlock(&p_owner->cc.lock);
         return VLC_EGENERIC;
@@ -2482,7 +2482,7 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
         vlc_input_decoder_t *p_ccowner;
         es_format_t fmt;
 
-        es_format_Init( &fmt, SPU_ES, codec );
+        es_format_Init( &fmt, SPU_ES, p_owner->cc.selected_codec );
         fmt.subs.cc.i_channel = i_channel;
         fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
 
@@ -2525,11 +2525,11 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
     return VLC_SUCCESS;
 }
 
-int vlc_input_decoder_GetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t codec,
+int vlc_input_decoder_GetCcState( vlc_input_decoder_t *p_owner,
                                   int i_channel, bool *pb_decode )
 {
     vlc_mutex_lock(&p_owner->cc.lock);
-    if( !vlc_input_decoder_HasCCChanFlag( p_owner, codec, i_channel ) )
+    if( !vlc_input_decoder_HasCCChanFlag( p_owner, i_channel ) )
     {
         vlc_mutex_unlock(&p_owner->cc.lock);
         return VLC_EGENERIC;

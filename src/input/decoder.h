@@ -106,13 +106,13 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
 /**
  * This function activates the request closed caption channel.
  */
-int vlc_input_decoder_SetCcState( vlc_input_decoder_t *, vlc_fourcc_t, int i_channel, bool b_decode );
+int vlc_input_decoder_SetCcState( vlc_input_decoder_t *, int i_channel, bool b_decode );
 
 /**
  * This function returns an error if the requested channel does not exist and
  * set pb_decode to the channel status(active or not) otherwise.
  */
-int vlc_input_decoder_GetCcState( vlc_input_decoder_t *, vlc_fourcc_t, int i_channel, bool *pb_decode );
+int vlc_input_decoder_GetCcState( vlc_input_decoder_t *, int i_channel, bool *pb_decode );
 
 /**
  * This function forces the display of the next picture

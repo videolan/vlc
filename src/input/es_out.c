@@ -2201,8 +2201,7 @@ static bool EsIsSelected( es_out_id_t *es )
     if( es->p_master->p_dec )
     {
         int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-        vlc_input_decoder_GetCcState( es->p_master->p_dec, es->fmt.i_codec,
-                                      i_channel, &b_decode );
+        vlc_input_decoder_GetCcState( es->p_master->p_dec, i_channel, &b_decode );
     }
     return b_decode;
 }
@@ -2383,8 +2382,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
         i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
 
         if( i_channel == -1 ||
-            vlc_input_decoder_SetCcState( es->p_master->p_dec, es->fmt.i_codec,
-                                          i_channel, true ) )
+            vlc_input_decoder_SetCcState( es->p_master->p_dec, i_channel, true ) )
             return;
     }
     else
@@ -2508,7 +2506,7 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
         {
             int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
             if( i_channel != -1 )
-                vlc_input_decoder_SetCcState( es->p_master->p_dec, es->fmt.i_codec,
+                vlc_input_decoder_SetCcState( es->p_master->p_dec,
                                               i_channel, false );
         }
     }
