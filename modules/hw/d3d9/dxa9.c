@@ -241,6 +241,10 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 
         picture_UpdatePlanes(dst, d3drect.pBits, d3drect.Pitch);
 
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (dst->format.i_chroma == VLC_CODEC_I420)
+            picture_SwapUV( dst );
+
         picture_CopyPixels(dst, src);
 
         dst->context = dst_pic_ctx;
@@ -257,6 +261,11 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
             return;
 
         picture_UpdatePlanes(sys->staging, d3drect.pBits, d3drect.Pitch);
+
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (sys->staging->format.i_chroma == VLC_CODEC_I420)
+            picture_SwapUV( sys->staging );
+
         picture_context_t *staging_pic_ctx = sys->staging->context;
         sys->staging->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 

@@ -1194,6 +1194,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
         picture_t fake_pic = *picture;
         picture_UpdatePlanes(&fake_pic, d3drect.pBits, d3drect.Pitch);
+
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (fake_pic.format.i_chroma == VLC_CODEC_I420)
+            picture_SwapUV( &fake_pic );
+
         picture_CopyPixels(&fake_pic, picture);
         IDirect3DSurface9_UnlockRect(surface);
     }

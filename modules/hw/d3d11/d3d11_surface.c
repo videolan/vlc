@@ -540,6 +540,11 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         }
 
         picture_UpdatePlanes(dst, lock.pData, lock.RowPitch);
+
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (dst->format.i_chroma == VLC_CODEC_I420)
+            picture_SwapUV( dst );
+
         picture_context_t *dst_pic_ctx = dst->context;
         dst->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 
@@ -565,6 +570,11 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         }
 
         picture_UpdatePlanes(sys->staging_pic, lock.pData, lock.RowPitch);
+
+        /* The dx/d3d buffer is always allocated as YV12 */
+        if (sys->staging_pic->format.i_chroma == VLC_CODEC_I420)
+            picture_SwapUV( sys->staging_pic );
+
         picture_context_t *staging_pic_ctx = sys->staging_pic->context;
         sys->staging_pic->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 

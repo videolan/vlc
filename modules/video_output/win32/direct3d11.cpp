@@ -1422,6 +1422,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
+            /* The dx/d3d buffer is always allocated as YV12 */
+            if (quad_picture->format.i_chroma == VLC_CODEC_I420)
+                picture_SwapUV( quad_picture );
+
             picture_CopyPixels(quad_picture, r->p_picture);
 
             sys->d3d_dev->d3dcontext->Unmap(quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
