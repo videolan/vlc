@@ -265,7 +265,7 @@ static void CloseScaler( filter_t *p_filter )
 /*****************************************************************************
  * Helpers
  *****************************************************************************/
-static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fourcc_t fmt )
+static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, vlc_fourcc_t fmt )
 {
     switch( fmt )
     {
@@ -296,10 +296,6 @@ static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_
     case VLC_CODEC_ABGR:
         *pi_fmt = AV_PIX_FMT_RGB32_1;
         *pb_has_a = true;
-        break;
-    case VLC_CODEC_YV12:
-        *pi_fmt = AV_PIX_FMT_YUV420P;
-        *pb_swap_uv = true;
         break;
     default:
         break;
@@ -332,8 +328,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         }
     }
 
-    FixParameters( &i_fmti, &b_has_ai, &b_swap_uvi, p_fmti->i_chroma );
-    FixParameters( &i_fmto, &b_has_ao, &b_swap_uvo, p_fmto->i_chroma );
+    FixParameters( &i_fmti, &b_has_ai, p_fmti->i_chroma );
+    FixParameters( &i_fmto, &b_has_ao, p_fmto->i_chroma );
 
 #if !defined (__ANDROID__) && !defined(TARGET_OS_IPHONE)
     /* FIXME TODO removed when ffmpeg is fixed
