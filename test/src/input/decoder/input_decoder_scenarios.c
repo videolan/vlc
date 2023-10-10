@@ -496,6 +496,7 @@ static const vlc_fourcc_t subpicture_chromas[] = {
 #define source_800_600 "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600"
 struct input_decoder_scenario input_decoder_scenarios[] =
 {{
+    .name = "decoder is flushed",
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600,
     .decoder_flush = decoder_flush_signal,
@@ -503,6 +504,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .interface_setup = interface_setup_select_cc,
 },
 {
+    .name = "video output is flushed",
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_check_flush_video,
@@ -517,6 +519,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
       - the interface change player position to trigger a flush
       - the flush is signaled to the stream_out filter
       - the stream_out filter signal the end of the test */
+    .name = "stream output is also flushed",
     .source = source_800_600,
     .sout = "#" MODULE_STRING,
     .sout_filter_send = sout_filter_send,
@@ -527,6 +530,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     /* Check that releasing a decoder while it is triggering an update
      * of the video output format doesn't lead to a crash. Non-regression
      * test from issue #27532. */
+    .name = "releasing a decoder while updating the vout doesn't lead to a crash",
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600_stop,
     .decoder_decode = decoder_decode_drop,
@@ -536,12 +540,14 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     /* Check that reloading a decoder while it is triggering an update
      * of the video output format doesn't lead to a crash. Non-regression
      * test from issue #27532. */
+    .name = "reloading a decoder while updating the vout doesn't lead to a crash",
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_trigger_reload,
     .decoder_destroy = decoder_destroy_trigger_update,
 },
 {
+    .name = "CC frames are sent to the sout",
     .source = source_800_600,
     .sout = "#" MODULE_STRING,
     .packetizer_getcc = packetizer_getcc,
@@ -550,6 +556,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .interface_setup = interface_setup_check_flush,
 },
 {
+    .name = "CC tracks are added",
     .source = source_800_600 ";video_packetized=false",
     .packetizer_getcc = packetizer_getcc,
     .decoder_setup = decoder_i420_800_600,
@@ -564,6 +571,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
      *  - A text renderer is used, this is the last place a text can be checked
      *  before it is rendered (and converted to RGB/YUV)
      */
+    .name = "CC coming from the packetizer is decoded and rendered",
     .source = source_800_600 ";video_packetized=false",
     .subpicture_chromas = subpicture_chromas,
     .packetizer_getcc = packetizer_getcc,
@@ -578,6 +586,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
 {
     /* Check that the CC coming from the video decoder is decoded and rendered,
      * cf. the previous scenario for more details. */
+    .name = "CC coming from the video decoder is decoded and rendered",
     .source = source_800_600,
     .subpicture_chromas = subpicture_chromas,
     .decoder_setup = decoder_i420_800_600_update,
@@ -589,7 +598,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .player_setup_before_start = player_setup_select_cc,
 },
 {
-    /* Check that we can create 4 cea608 tracks */
+    .name = "we can create 4 cea608 tracks",
     .source = source_800_600 ";video_packetized=false",
     .packetizer_getcc = packetizer_getcc_cea608_max,
     .decoder_setup = decoder_i420_800_600,

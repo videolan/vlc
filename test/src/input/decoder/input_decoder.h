@@ -30,6 +30,7 @@ typedef struct intf_thread_t intf_thread_t;
 typedef struct decoder_cc_desc_t decoder_cc_desc_t;
 
 struct input_decoder_scenario {
+    const char *name;
     const char *source;
     const char *sout;
     const vlc_fourcc_t *subpicture_chromas;

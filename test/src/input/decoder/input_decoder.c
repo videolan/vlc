@@ -354,6 +354,8 @@ static void on_track_list_changed(vlc_player_t *player,
 
 static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *scenario)
 {
+    assert(scenario->name != NULL);
+    fprintf(stderr, "\nChecking '%s'\n\n", scenario->name);
     input_decoder_scenario_init();
     input_item_t *media = input_item_New(scenario->source, "dummy");
     assert(media);
