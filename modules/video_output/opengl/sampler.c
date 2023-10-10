@@ -234,7 +234,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
      *
      * This is equivalent to swap columns 1 and 2.
      */
-    bool swap_uv = desc->fcc == VLC_CODEC_YV12 || desc->fcc == VLC_CODEC_YV9 ||
+    bool swap_uv = desc->fcc == VLC_CODEC_YV12 ||
                    desc->fcc == VLC_CODEC_NV21;
     if (swap_uv)
     {

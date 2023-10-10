@@ -301,10 +301,6 @@ static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_
         *pi_fmt = AV_PIX_FMT_YUV420P;
         *pb_swap_uv = true;
         break;
-    case VLC_CODEC_YV9:
-        *pi_fmt = AV_PIX_FMT_YUV410P;
-        *pb_swap_uv = true;
-        break;
     default:
         break;
     }

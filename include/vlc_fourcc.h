@@ -202,8 +202,6 @@
 
 /* Planar YUV */
 
-/* Planar YUV 4:1:0 Y:V:U */
-#define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
 /* Planar YUV 4:1:0 Y:U:V */
 #define VLC_CODEC_I410            VLC_FOURCC('I','4','1','0')
 /* Planar YUV 4:1:1 Y:U:V */

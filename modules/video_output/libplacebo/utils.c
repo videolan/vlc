@@ -127,7 +127,6 @@ struct fmt_desc {
 // rules, but which are included regardless. The corrections for these
 // exceptions happen below, in the function vlc_placebo_PlaneFormat!
 static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
-    { VLC_CODEC_YV9,            {PLANAR(3,  8, _410)} },
     { VLC_CODEC_I410,           {PLANAR(3,  8, _410)} },
     { VLC_CODEC_I411,           {PLANAR(3,  8, _411)} },
     { VLC_CODEC_I440,           {PLANAR(3,  8, _440)} },
@@ -257,7 +256,6 @@ static void FillDesc(vlc_fourcc_t fcc, const struct fmt_desc *desc,
 
     // Exceptions to the rule
     switch (fcc) {
-    case VLC_CODEC_YV9:
     case VLC_CODEC_YV12:
         // Planar Y:V:U
         data[1].component_map[0] = 2;

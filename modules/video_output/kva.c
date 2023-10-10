@@ -476,12 +476,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     i_kva_fourcc = FOURCC_Y422;
                     break;
 
-                case VLC_CODEC_YV9:
-                    b_hw_accel = sys->kvac.ulInputFormatFlags & KVAF_YVU9;
-                    i_kva_fourcc = FOURCC_YVU9;
-                    i_chroma_shift = 2;
-                    break;
-
                 case VLC_CODEC_RGB565:
                     if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
                         sys->kvac.ulRMask == 0xf800 &&

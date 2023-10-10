@@ -761,8 +761,6 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
         A("YV12"),
         A("yv12"),
-    B(VLC_CODEC_YV9,  "Planar 4:1:0 YVU"),
-        A("YVU9"),
     B(VLC_CODEC_I410, "Planar 4:1:0 YUV"),
         A("I410"),
     B(VLC_CODEC_I411, "Planar 4:1:1 YUV"),

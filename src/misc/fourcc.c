@@ -204,7 +204,7 @@ const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
 
 /* */
 #define VLC_CODEC_YUV_PLANAR_410 \
-    VLC_CODEC_I410, VLC_CODEC_YV9
+    VLC_CODEC_I410
 
 #define VLC_CODEC_YUV_PLANAR_420 \
     VLC_CODEC_I420, VLC_CODEC_YV12
@@ -653,7 +653,6 @@ bool vlc_fourcc_AreUVPlanesSwapped( vlc_fourcc_t a, vlc_fourcc_t b )
 {
     static const vlc_fourcc_t pp_swapped[][4] = {
         { VLC_CODEC_YV12, VLC_CODEC_I420, 0 },
-        { VLC_CODEC_YV9,  VLC_CODEC_I410, 0 },
         { 0 }
     };
 
@@ -721,7 +720,6 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_I411,                  PLANAR_8(3, 4, 1) },
     { VLC_CODEC_I410,                  PLANAR_8(3, 4, 4) },
-    { VLC_CODEC_YV9,                   PLANAR_8(3, 4, 4) },
     { VLC_CODEC_I420,                  PLANAR_8(3, 2, 2) },
     { VLC_CODEC_YV12,                  PLANAR_8(3, 2, 2) },
     { VLC_CODEC_NV12,                  SEMIPLANAR(2, 2, 1, 8) },

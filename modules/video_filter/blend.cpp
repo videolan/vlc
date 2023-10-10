@@ -401,7 +401,6 @@ private:
 
 typedef CPictureYUVPlanar<uint8_t,  1,1, true,  false> CPictureYUVA;
 
-typedef CPictureYUVPlanar<uint8_t,  4,4, false, true>  CPictureYV9;
 typedef CPictureYUVPlanar<uint8_t,  4,4, false, false> CPictureI410_8;
 
 typedef CPictureYUVPlanar<uint8_t,  4,1, false, false> CPictureI411_8;
@@ -641,7 +640,6 @@ static const struct {
     RGB(VLC_CODEC_BGRX,     CPictureRGB32,    convertAddOpaque),
     RGB(VLC_CODEC_XBGR,     CPictureRGB32,    convertAddOpaque),
 
-    YUV(VLC_CODEC_YV9,      CPictureYV9,      convertNone),
     YUV(VLC_CODEC_I410,     CPictureI410_8,   convertNone),
 
     YUV(VLC_CODEC_I411,     CPictureI411_8,   convertNone),
