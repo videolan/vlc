@@ -220,6 +220,7 @@ struct vlc_input_decoder_t
         vlc_mutex_t lock;
         bool b_supported;
         decoder_cc_desc_t desc;
+        bool desc_changed;
         vlc_input_decoder_t *pp_decoder[MAX_CC_DECODERS];
         bool b_sout_created;
         sout_packetizer_input_t *p_sout_input;
@@ -1204,7 +1205,13 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
     }
 
     vlc_mutex_lock(&p_owner->cc.lock);
-    p_owner->cc.desc = *p_desc;
+    if (p_owner->cc.desc.i_608_channels != p_desc->i_608_channels ||
+        p_owner->cc.desc.i_708_channels != p_desc->i_708_channels ||
+        p_owner->cc.desc.i_reorder_depth != p_desc->i_reorder_depth)
+    {
+        p_owner->cc.desc = *p_desc;
+        p_owner->cc.desc_changed = true;
+    }
 
     uint64_t i_bitmap;
     GetCcChannels(p_owner, NULL, &i_bitmap);
@@ -2287,6 +2294,65 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     DeleteDecoder(p_owner, p_owner->dec_fmt_in.i_cat);
 }
 
+void vlc_subdec_desc_Clean(struct vlc_subdec_desc *desc)
+{
+    for (size_t i = 0; i < desc->fmt_count; ++i)
+        es_format_Clean(&desc->fmt_array[i]);
+    free(desc->fmt_array);
+}
+
+static void GetCCDescLocked(vlc_input_decoder_t *owner,
+                            struct vlc_subdec_desc *desc)
+{
+    vlc_fifo_Assert(owner->p_fifo);
+
+    if (!owner->cc.desc_changed)
+    {
+        desc->fmt_array = NULL;
+        desc->fmt_count = 0;
+        return;
+    }
+    owner->cc.desc_changed = false;
+
+    size_t max_channels;
+    uint64_t bitmap;
+    GetCcChannels(owner, &max_channels, &bitmap);
+
+    int count = vlc_popcount(bitmap);
+    if (count == 0)
+    {
+        desc->fmt_array = NULL;
+        desc->fmt_count = 0;
+        return;
+    }
+
+    desc->fmt_array = vlc_alloc(count, sizeof(es_format_t));
+    if (unlikely(desc->fmt_array == NULL))
+    {
+        desc->fmt_count = 0;
+        return;
+    }
+    desc->fmt_count = count;
+
+    static const char CEA608_fmtdesc[] = N_("Closed captions %u");
+    static const char CEA708_fmtdesc[] = N_("DTVCC Closed captions %u");
+    const char *fmtdesc = owner->cc.selected_codec == VLC_CODEC_CEA608 ?
+                          CEA608_fmtdesc : CEA708_fmtdesc;
+
+    size_t array_idx = 0;
+    for (int i = 0; bitmap > 0; bitmap >>= 1, i++)
+    {
+        if ((bitmap & 1) == 0)
+            continue;
+        es_format_t *fmt = &desc->fmt_array[array_idx++];
+        es_format_Init(fmt, SPU_ES, owner->cc.selected_codec);
+        fmt->i_id = i + 1;
+        fmt->subs.cc.i_channel = i;
+        if (asprintf(&fmt->psz_description, fmtdesc, fmt->i_id) == -1)
+            fmt->psz_description = NULL;
+    }
+}
+
 static void GetStatusLocked(vlc_input_decoder_t *p_owner,
                             struct vlc_input_decoder_status *status)
 {
@@ -2313,7 +2379,7 @@ static void GetStatusLocked(vlc_input_decoder_t *p_owner,
                 vlc_meta_Merge( status->format.meta, p_owner->p_description );
         }
     }
-    status->cc.desc = p_owner->cc.desc;
+    GetCCDescLocked(p_owner, &status->subdec_desc);
 }
 
 void vlc_input_decoder_DecodeWithStatus(vlc_input_decoder_t *p_owner, vlc_frame_t *frame,

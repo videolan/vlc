@@ -119,6 +119,14 @@ int vlc_input_decoder_GetCcState( vlc_input_decoder_t *, int i_channel, bool *pb
  */
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec );
 
+struct vlc_subdec_desc
+{
+    es_format_t *fmt_array;
+    size_t fmt_count;
+};
+
+void vlc_subdec_desc_Clean(struct vlc_subdec_desc *desc);
+
 struct vlc_input_decoder_status
 {
     struct {
@@ -133,9 +141,7 @@ struct vlc_input_decoder_status
         vlc_meta_t *meta;
     } format;
 
-    struct {
-        decoder_cc_desc_t desc;
-    } cc;
+    struct vlc_subdec_desc subdec_desc;
 };
 
 /**

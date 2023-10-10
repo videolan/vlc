@@ -142,15 +142,10 @@ struct es_out_id_t
     vlc_tick_t i_pts_level;
     vlc_tick_t delay;
 
-    /* Fields for Video with CC */
-    struct
-    {
-        vlc_fourcc_t type;
-        uint64_t     i_bitmap;    /* channels bitmap */
-        es_out_id_t  *pp_es[64]; /* a max of 64 chans for CEA708 */
-    } cc;
+    /* Fields for ES created by decoders */
+    struct VLC_VECTOR(es_out_id_t *) sub_es_vec;
 
-    /* Field for CC track from a master video */
+    /* Field for a sub track from a master ES */
     es_out_id_t *p_master;
 
     struct vlc_list node;
@@ -2151,8 +2146,7 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
     es->p_dec_record = NULL;
     es->p_clock = NULL;
     es->master = false;
-    es->cc.type = 0;
-    es->cc.i_bitmap = 0;
+    vlc_vector_init(&es->sub_es_vec);
     es->p_master = p_master;
     es->mouse_event_cb = NULL;
     es->mouse_event_userdata = NULL;
@@ -2446,44 +2440,30 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
     }
 }
 
-static void EsOutDrainCCChannels( es_out_id_t *parent )
+static void EsOutDrainSubESes(es_out_id_t *parent)
 {
-    /* Drain captions sub ES as well */
-    uint64_t i_bitmap = parent->cc.i_bitmap;
-    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1 )
+    /* Drain sub ES as well */
+    for (size_t i = 0; i < parent->sub_es_vec.size; ++i)
     {
-        if( (i_bitmap & 1) == 0 || !parent->cc.pp_es[i] ||
-            !parent->cc.pp_es[i]->p_dec )
+        es_out_id_t *es = parent->sub_es_vec.data[i];
+        assert(es != NULL);
+        if (es->p_dec == NULL)
             continue;
-        vlc_input_decoder_Drain( parent->cc.pp_es[i]->p_dec );
+
+        vlc_input_decoder_Drain(es->p_dec);
     }
 }
 
-static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
+static void EsDeleteSubESes(es_out_t *out, es_out_id_t *parent)
 {
-    if( parent->cc.type == 0 )
-        return;
-
-    es_out_id_t *spu_es = EsOutGetSelectedCat( out, SPU_ES );
-    const int i_spu_id = spu_es ? spu_es->fmt.i_id : -1;
-
-    uint64_t i_bitmap = parent->cc.i_bitmap;
-    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1 )
+    for (size_t i = 0; i < parent->sub_es_vec.size; ++i)
     {
-        if( (i_bitmap & 1) == 0 || !parent->cc.pp_es[i] )
-            continue;
-
-        if( i_spu_id == parent->cc.pp_es[i]->fmt.i_id )
-        {
-            /* Force unselection of the CC */
-            EsOutSendEsEvent(out, parent->cc.pp_es[i], VLC_INPUT_ES_UNSELECTED,
-                             false);
-        }
-        EsOutDelLocked( out, parent->cc.pp_es[i] );
+        es_out_id_t *es = parent->sub_es_vec.data[i];
+        assert(es != NULL);
+        EsOutDelLocked(out, es);
     }
 
-    parent->cc.i_bitmap = 0;
-    parent->cc.type = 0;
+    vlc_vector_clear(&parent->sub_es_vec);
 }
 
 static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
@@ -2512,7 +2492,7 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
     }
     else
     {
-        EsDeleteCCChannels( out, es );
+        EsDeleteSubESes( out, es );
         EsOutDestroyDecoder( out, es );
     }
 
@@ -2809,44 +2789,53 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
     }
 }
 
-static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i_bitmap,
-                                   const char *psz_descfmt, es_out_id_t *parent )
+static void EsOutCreateSubESes(es_out_t *out,
+                               struct vlc_subdec_desc *desc,
+                               es_out_id_t *parent)
 {
-    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    input_thread_t *p_input = p_sys->p_input;
+    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    input_thread_t *input = sys->p_input;
 
-    /* Only one type of captions is allowed ! */
-    if( parent->cc.type && parent->cc.type != codec )
+    size_t prev_count = parent->sub_es_vec.size;
+    bool success = vlc_vector_reserve(&parent->sub_es_vec, desc->fmt_count);
+    if (!success)
         return;
 
-    uint64_t i_existingbitmap = parent->cc.i_bitmap;
-    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1, i_existingbitmap >>= 1 )
+    /* Initialize new data to NULL */
+    for (size_t i = prev_count; i < desc->fmt_count; ++i)
+        parent->sub_es_vec.data[i] = NULL;
+
+    for (size_t i = 0; i < desc->fmt_count; ++i)
     {
-        es_format_t fmt;
+        es_format_t *fmt = &desc->fmt_array[i];
+        fmt->i_group = parent->fmt.i_group;
 
-        if( (i_bitmap & 1) == 0 || (i_existingbitmap & 1) )
-            continue;
+        es_out_id_t *es = parent->sub_es_vec.data[i];
+        if (es != NULL)
+            continue; /* XXX: Update or Del/Add the new FMT (if same codec) */
 
-        es_format_Init( &fmt, SPU_ES, codec );
-        fmt.i_id = i + 1;
-        fmt.subs.cc.i_channel = i;
-        fmt.i_group = parent->fmt.i_group;
-        if( asprintf( &fmt.psz_description, psz_descfmt, fmt.i_id ) == -1 )
-            fmt.psz_description = NULL;
+        es = EsOutAddLocked(out, parent->p_pgrm->source, fmt, parent);
+        if (es == NULL)
+        {
+            parent->sub_es_vec.size = i;
+            break;
+        }
+        success = vlc_vector_insert(&parent->sub_es_vec, i, es);
+        assert(success); /* vlc_vector_reserve() already checked */
 
-        msg_Dbg( p_input, "Adding CC track %d for es[%d]", fmt.i_id, parent->fmt.i_id );
+        msg_Dbg(input, "Added Sub track [%s] from parent [%s]",
+                es->id.str_id , parent->id.str_id);
 
-        es_out_id_t **pp_es = &parent->cc.pp_es[i];
-        *pp_es = EsOutAddLocked( out, parent->p_pgrm->source, &fmt, parent );
-        es_format_Clean( &fmt );
-
-        /* */
-        parent->cc.i_bitmap |= (1ULL << i);
-        parent->cc.type = codec;
-
-        /* Enable if user specified on command line */
-        if (p_sys->sub.i_channel == i)
-            EsOutSelect(out, *pp_es, true);
+        switch (fmt->i_cat)
+        {
+            case SPU_ES:
+                /* Enable if user specified on command line */
+                if (sys->sub.i_channel == fmt->subs.cc.i_channel)
+                    EsOutSelect(out, es, true);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -2989,13 +2978,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             vlc_meta_Delete( status.format.meta );
     }
 
-    /* Check CC status */
-    if( p_sys->cc_decoder == 708 )
-        EsOutCreateCCChannels( out, VLC_CODEC_CEA708, status.cc.desc.i_708_channels,
-                               _("DTVCC Closed captions %u"), es );
-    else
-        EsOutCreateCCChannels( out, VLC_CODEC_CEA608, status.cc.desc.i_608_channels,
-                               _("Closed captions %u"), es );
+    /* Check subdec status */
+    if (status.subdec_desc.fmt_count > 0)
+        EsOutCreateSubESes(out, &status.subdec_desc, es);
+
+    vlc_subdec_desc_Clean(&status.subdec_desc);
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -3009,7 +2996,7 @@ EsOutDrainDecoder(es_out_t *out, es_out_id_t *es, bool wait)
     assert( es->p_dec );
 
     vlc_input_decoder_Drain( es->p_dec );
-    EsOutDrainCCChannels( es );
+    EsOutDrainSubESes(es);
 
     if (!wait)
         return;
@@ -3497,7 +3484,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         if( es->p_dec )
         {
             EsOutDrainDecoder(out, es, true);
-            EsDeleteCCChannels( out, es );
+            EsDeleteSubESes(out, es);
             EsOutDestroyDecoder( out, es );
         }
 
