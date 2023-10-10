@@ -4203,9 +4203,7 @@ static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang )
 static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
                             const es_format_t *fmt)
 {
-    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    input_thread_t *p_input = p_sys->p_input;
-
+    (void) out;
     assert(es->fmt.i_cat == fmt->i_cat);
 
     es_format_t update = *fmt;
