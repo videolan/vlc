@@ -1412,19 +1412,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         hr = sys->d3d_dev->d3dcontext->Map(quad->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( SUCCEEDED(hr) ) {
-            err = picture_UpdatePlanes(quad_picture, static_cast<uint8_t*>(mappedResource.pData), mappedResource.RowPitch);
-            if (err != VLC_SUCCESS || quad_picture->format.i_chroma == VLC_CODEC_NV21) {
-                msg_Err(vd, "Failed to set the buffer on the SPU picture" );
-                sys->d3d_dev->d3dcontext->Unmap(quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
-                picture_Release(quad_picture);
-                if ((*region)[i] == quad_picture)
-                    (*region)[i] = NULL;
-                continue;
-            }
-
-            /* The dx/d3d buffer is always allocated as YV12 */
-            if (quad_picture->format.i_chroma == VLC_CODEC_I420)
-                picture_SwapUV( quad_picture );
+            picture_UpdatePlanes(quad_picture, static_cast<uint8_t*>(mappedResource.pData), mappedResource.RowPitch);
 
             picture_CopyPixels(quad_picture, r->p_picture);
 
