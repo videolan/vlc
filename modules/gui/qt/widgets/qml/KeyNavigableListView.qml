@@ -28,7 +28,7 @@ import "qrc:///style/"
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
 
-FadingEdgeListView {
+ListView {
     id: root
 
     // Properties
@@ -47,6 +47,11 @@ FadingEdgeListView {
     property bool _keyPressed: false
 
     // Aliases
+
+    property alias backgroundColor: fadingEdge.backgroundColor
+    property alias enableEndFade: fadingEdge.enableEndFade
+    property alias enableBeginningFade: fadingEdge.enableBeginningFade
+    property alias fadeSize: fadingEdge.fadeSize
 
     //forward view properties
 
@@ -257,6 +262,13 @@ FadingEdgeListView {
         colorSet: ColorContext.View
     }
 
+    FadingEdgeForListView {
+        id: fadingEdge
+
+        anchors.fill: parent
+
+        listView: root
+    }
 
     Component {
         id: sectionHeading

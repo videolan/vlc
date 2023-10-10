@@ -289,10 +289,15 @@ T.Pane {
             // NOTE: We want a gentle fade at the beginning / end of the playqueue.
             enableFade: true
 
-            enableBeginningFade: (autoScroller.scrollingDirection !== Util.ViewDragAutoScrollHandler.Direction.Backward)
+            BindingCompat on enableBeginningFade {
+                when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Backward)
+                value: false
+            }
 
-            enableEndFade: (autoScroller.scrollingDirection !== Util.ViewDragAutoScrollHandler.Direction.Forward)
-
+            BindingCompat on enableEndFade {
+                when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Forward)
+                value: false
+            }
 
             backgroundColor: root.background.usingAcrylic ? "transparent"
                                                           : listView.colorContext.bg.primary
