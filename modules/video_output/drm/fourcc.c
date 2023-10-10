@@ -171,7 +171,6 @@ static const struct {
 
     /* Planar YUV */
     { DRM_FORMAT_YUV410,   VLC_CODEC_I410 },
-    { DRM_FORMAT_YVU410,   VLC_CODEC_YV9 },
     { DRM_FORMAT_YUV411,   VLC_CODEC_I411 },
     { DRM_FORMAT_YUV420,   VLC_CODEC_I420 },
     { DRM_FORMAT_YVU420,   VLC_CODEC_YV12 },
