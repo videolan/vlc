@@ -2830,6 +2830,7 @@ static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i
         msg_Dbg( p_input, "Adding CC track %d for es[%d]", 1+i, parent->fmt.i_id );
 
         es_format_Init( &fmt, SPU_ES, codec );
+        fmt.i_id = i + 1;
         fmt.subs.cc.i_channel = i;
         fmt.i_group = parent->fmt.i_group;
         if( asprintf( &fmt.psz_description, psz_descfmt, 1 + i ) == -1 )

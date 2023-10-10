@@ -412,7 +412,7 @@ static void on_track_list_changed_check_cea608(
     if (action != VLC_PLAYER_LIST_ADDED)
         return;
 
-    if (strcmp(vlc_es_id_GetStrId(track->es_id), "video/0/cc/spu/auto/0") != 0)
+    if (strcmp(vlc_es_id_GetStrId(track->es_id), "video/0/cc/spu/1") != 0)
         return;
 
     assert(track->fmt.i_codec == VLC_CODEC_CEA608);
@@ -427,9 +427,9 @@ static void on_track_list_changed_check_count(
     if (action != VLC_PLAYER_LIST_ADDED)
         return;
 
-    char buffer[] = "video/0/cc/spu/auto/xx";
+    char buffer[] = "video/0/cc/spu/xx";
     assert(scenario_data.cc_track_idx < 100);
-    sprintf(buffer, "video/0/cc/spu/auto/%zu", scenario_data.cc_track_idx);
+    sprintf(buffer, "video/0/cc/spu/%zu", scenario_data.cc_track_idx);
 
     if (strcmp(vlc_es_id_GetStrId(track->es_id), buffer) != 0)
         return;
@@ -458,7 +458,7 @@ static void on_track_list_changed_check_cea708_count(
 
 static void player_setup_select_cc(vlc_player_t *player)
 {
-    vlc_player_SelectTracksByStringIds(player, SPU_ES, "video/0/cc/spu/auto/0");
+    vlc_player_SelectTracksByStringIds(player, SPU_ES, "video/0/cc/spu/1");
 }
 
 static void cc_decoder_setup_01(decoder_t *dec)
@@ -642,7 +642,7 @@ void input_decoder_scenario_init(void)
     scenario_data.has_reload = false;
     scenario_data.stream_out_sent = false;
     scenario_data.decoder_image_sent = 0;
-    scenario_data.cc_track_idx = 0;
+    scenario_data.cc_track_idx = 1;
     vlc_sem_init(&scenario_data.wait_stop, 0);
     vlc_sem_init(&scenario_data.wait_ready_to_flush, 0);
 }
