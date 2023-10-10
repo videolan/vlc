@@ -2275,8 +2275,12 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     /* */
     if( p_owner->cc.b_supported )
     {
-        for( int i = 0; i < MAX_CC_DECODERS; i++ )
-            vlc_input_decoder_SetCcState( p_owner, i, false );
+        size_t max_channels;
+        GetCcChannels(p_owner, &max_channels, NULL);
+        vlc_mutex_lock(&p_owner->cc.lock);
+        for (size_t i = 0; i < max_channels; i++)
+            DeleteCcDecoder(p_owner, i);
+        vlc_mutex_unlock(&p_owner->cc.lock);
     }
 
     /* Delete decoder */
