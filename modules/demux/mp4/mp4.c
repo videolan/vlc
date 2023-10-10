@@ -3548,7 +3548,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                                    &i_withdelay_chunk,
                                    &i_withdelay_sample ) == VLC_SUCCESS )
             {
-                msg_Warn( p_demux, "track[Id 0x%x] has %ldµs decoder delay from %ld",
+                msg_Warn( p_demux, "track[Id 0x%x] has %" PRId64 "µs decoder delay from %" PRId64,
                           p_track->i_track_ID,
                           MP4_rescale_mtime( p_track->i_decoder_delay, p_track->i_timescale),
                           i_start );
