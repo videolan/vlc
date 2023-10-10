@@ -1171,6 +1171,28 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
     }
 }
 
+static void GetCcChannels(vlc_input_decoder_t *owner, size_t *max_channels,
+                          uint64_t *bitmap)
+{
+    switch (owner->cc.selected_codec)
+    {
+        case VLC_CODEC_CEA608:
+            if (max_channels != NULL)
+                *max_channels = 4;
+            if (bitmap != NULL)
+                *bitmap = owner->cc.desc.i_608_channels;
+            break;
+        case VLC_CODEC_CEA708:
+            if (max_channels != NULL)
+                *max_channels = 64;
+            if (bitmap != NULL)
+                *bitmap = owner->cc.desc.i_708_channels;
+            break;
+        default: vlc_assert_unreachable();
+    }
+}
+
+/* */
 static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
                                  const decoder_cc_desc_t *p_desc )
 {
@@ -1184,9 +1206,8 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
     vlc_mutex_lock(&p_owner->cc.lock);
     p_owner->cc.desc = *p_desc;
 
-    uint64_t i_bitmap = p_owner->cc.selected_codec == VLC_CODEC_CEA708 ?
-                        p_owner->cc.desc.i_708_channels :
-                        p_owner->cc.desc.i_608_channels;
+    uint64_t i_bitmap;
+    GetCcChannels(p_owner, NULL, &i_bitmap);
 
     for( int i=0; i_bitmap > 0; i_bitmap >>= 1, i++ )
     {
@@ -2447,21 +2468,11 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 static bool vlc_input_decoder_HasCCChanFlag( vlc_input_decoder_t *p_owner,
                                              int i_channel )
 {
-    int i_max_channels;
+    size_t i_max_channels;
     uint64_t i_bitmap;
-    if( p_owner->cc.selected_codec == VLC_CODEC_CEA608 )
-    {
-        i_max_channels = 4;
-        i_bitmap = p_owner->cc.desc.i_608_channels;
-    }
-    else if( p_owner->cc.selected_codec == VLC_CODEC_CEA708 )
-    {
-        i_max_channels = 64;
-        i_bitmap = p_owner->cc.desc.i_708_channels;
-    }
-    else return false;
+    GetCcChannels(p_owner, &i_max_channels, &i_bitmap);
 
-    return ( i_channel >= 0 && i_channel < i_max_channels &&
+    return ( i_channel >= 0 && (size_t) i_channel < i_max_channels &&
              ( i_bitmap & ((uint64_t)1 << i_channel) ) );
 }
 
