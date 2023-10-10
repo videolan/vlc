@@ -265,6 +265,12 @@ static int Open( vlc_object_t *p_this )
     {
         memcpy( &p_sys->i_chroma, val.psz_string, 4 );
         msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
+        if ( vlc_fourcc_GetChromaDescription( p_sys->i_chroma ) == NULL )
+        {
+            msg_Err( p_stream, "Unknown chroma" );
+            free( p_sys );
+            return VLC_EINVAL;
+        }
     }
     free( val.psz_string );
 
