@@ -236,11 +236,14 @@ static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp, vlc_video_conte
 {
     (void)fmtp; (void)context;
 
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     static const struct vlc_display_operations ops = {
         .prepare = DisplayPrepare,
         .control = DisplayControl,
     };
     vd->ops = &ops;
+
+    vd->info.subpicture_chromas = scenario->subpicture_chromas;
 
     return VLC_SUCCESS;
 }
