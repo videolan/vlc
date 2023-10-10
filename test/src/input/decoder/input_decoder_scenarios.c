@@ -39,7 +39,6 @@
 static struct scenario_data
 {
     vlc_sem_t wait_stop;
-    vlc_sem_t display_prepare_signal;
     vlc_sem_t wait_ready_to_flush;
     struct vlc_video_context *decoder_vctx;
     bool skip_decoder;
@@ -618,7 +617,6 @@ void input_decoder_scenario_init(void)
     scenario_data.decoder_image_sent = 0;
     scenario_data.cc_track_idx = 0;
     vlc_sem_init(&scenario_data.wait_stop, 0);
-    vlc_sem_init(&scenario_data.display_prepare_signal, 0);
     vlc_sem_init(&scenario_data.wait_ready_to_flush, 0);
 }
 
