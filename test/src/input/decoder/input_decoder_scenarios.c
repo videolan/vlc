@@ -520,7 +520,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
       - the stream_out filter signal the end of the test */
     .name = "stream output is also flushed",
     .source = source_800_600,
-    .sout = "#" MODULE_STRING,
+    .item_option = ":sout=#" MODULE_STRING,
     .sout_filter_send = sout_filter_send,
     .sout_filter_flush = sout_filter_flush,
     .interface_setup = interface_setup_check_flush,
@@ -548,7 +548,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
 {
     .name = "CC frames are sent to the sout",
     .source = source_800_600,
-    .sout = "#" MODULE_STRING,
+    .item_option = ":sout=#" MODULE_STRING,
     .packetizer_getcc = packetizer_getcc,
     .sout_filter_send = sout_filter_wait_cc,
     .sout_filter_flush = sout_filter_flush,

@@ -360,13 +360,8 @@ static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *sc
     var_Create(intf, "codec", VLC_VAR_STRING);
     var_SetString(intf, "codec", MODULE_STRING);
 
-    if (scenario->sout != NULL)
-    {
-        char *sout;
-        assert(asprintf(&sout, ":sout=%s", scenario->sout) != -1);
-        input_item_AddOption(media, sout, VLC_INPUT_OPTION_TRUSTED);
-        free(sout);
-    }
+    if (scenario->item_option != NULL)
+        input_item_AddOption(media, scenario->item_option, VLC_INPUT_OPTION_TRUSTED);
 
     vlc_player_t *player = vlc_player_New(&intf->obj,
         VLC_PLAYER_LOCK_NORMAL, NULL, NULL);

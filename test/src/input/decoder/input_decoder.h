@@ -32,7 +32,7 @@ typedef struct decoder_cc_desc_t decoder_cc_desc_t;
 struct input_decoder_scenario {
     const char *name;
     const char *source;
-    const char *sout;
+    const char *item_option;
     const vlc_fourcc_t *subpicture_chromas;
     void (*decoder_setup)(decoder_t *);
     void (*decoder_destroy)(decoder_t *);
