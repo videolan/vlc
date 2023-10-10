@@ -589,8 +589,6 @@ int picture_Export( vlc_object_t *p_obj,
         fmt_out.i_height = ( i_override_height < 0 ) ?
                            i_original_height : (unsigned)i_override_height;
     }
-    fmt_out.i_visible_width = fmt_out.i_width;
-    fmt_out.i_visible_height = fmt_out.i_height;
 
     /* scale if only one direction is provided */
     if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
@@ -603,6 +601,8 @@ int picture_Export( vlc_object_t *p_obj,
         fmt_out.i_width  = i_width * fmt_out.i_height
                          * fmt_in.i_sar_num / fmt_in.i_height / fmt_in.i_sar_den;
     }
+    fmt_out.i_visible_width = fmt_out.i_width;
+    fmt_out.i_visible_height = fmt_out.i_height;
 
     image_handler_t *p_image = image_HandlerCreate( p_obj );
     if( !p_image )
