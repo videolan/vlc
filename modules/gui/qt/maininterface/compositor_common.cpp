@@ -30,6 +30,8 @@
 
 using namespace vlc;
 
+DummyRenderWindow::~DummyRenderWindow() = default;
+
 DummyRenderWindow::DummyRenderWindow(QWindow* parent)
     : QWindow(parent)
 {
@@ -82,7 +84,7 @@ void DummyRenderWindow::init()
     if (m_initialized)
         return;
     m_initialized = true;
-    m_backingStore = new QBackingStore(this);
+    m_backingStore = std::make_unique<QBackingStore>(this);
 }
 
 void DummyRenderWindow::render()
