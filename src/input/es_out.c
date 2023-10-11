@@ -3003,16 +3003,20 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 }
 
 static void
-EsOutDrainDecoder( es_out_t *out, es_out_id_t *es )
+EsOutDrainDecoder(es_out_t *out, es_out_id_t *es, bool wait)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     assert( es->p_dec );
 
+    vlc_input_decoder_Drain( es->p_dec );
+    EsOutDrainCCChannels( es );
+
+    if (!wait)
+        return;
+
     /* FIXME: This might hold the ES output caller (i.e. the demux), and
      * the corresponding thread (typically the input thread), for a little
      * bit too long if the ES is deleted in the middle of a stream. */
-    vlc_input_decoder_Drain( es->p_dec );
-    EsOutDrainCCChannels( es );
     while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
     {
         if( vlc_input_decoder_IsEmpty( es->p_dec ) &&
@@ -3037,7 +3041,7 @@ static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
     /* We don't try to reselect */
     if( es->p_dec )
     {
-        EsOutDrainDecoder( out, es );
+        EsOutDrainDecoder(out, es, true);
         EsOutUnselectEs( out, es, es->p_pgrm == p_sys->p_pgrm );
     }
 
@@ -3492,7 +3496,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         const bool b_was_selected = EsIsSelected( es );
         if( es->p_dec )
         {
-            EsOutDrainDecoder( out, es );
+            EsOutDrainDecoder(out, es, true);
             EsDeleteCCChannels( out, es );
             EsOutDestroyDecoder( out, es );
         }
