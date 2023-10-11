@@ -2348,6 +2348,7 @@ static void GetCCDescLocked(vlc_input_decoder_t *owner,
         es_format_Init(fmt, SPU_ES, owner->cc.selected_codec);
         fmt->i_id = i + 1;
         fmt->subs.cc.i_channel = i;
+        fmt->subs.cc.i_reorder_depth = owner->cc.desc.i_reorder_depth;
         if (asprintf(&fmt->psz_description, fmtdesc, fmt->i_id) == -1)
             fmt->psz_description = NULL;
     }
