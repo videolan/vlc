@@ -2559,47 +2559,49 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner,
         return VLC_EGENERIC;
     }
 
-    if( b_decode )
+    if( !b_decode )
     {
-        vlc_input_decoder_t *p_ccowner;
-        es_format_t fmt;
-
-        es_format_Init( &fmt, SPU_ES, p_owner->cc.selected_codec );
-        fmt.subs.cc.i_channel = i_channel;
-        fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
-
-        const struct vlc_input_decoder_cfg cfg = {
-            .fmt = &fmt,
-            .str_id = p_owner->psz_id,
-            .clock = p_owner->p_clock,
-            .resource = p_owner->p_resource,
-            .sout = p_owner->p_sout,
-            .input_type = INPUT_TYPE_NONE,
-            .cbs = NULL, .cbs_data = NULL,
-        };
-
-        p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &cfg );
-        if( !p_ccowner )
-        {
-            msg_Err( p_dec, "could not create decoder" );
-            vlc_dialog_display_error( p_dec,
-                _("Streaming / Transcoding failed"), "%s",
-                _("VLC could not open the decoder module.") );
-            vlc_mutex_unlock(&p_owner->cc.lock);
-            return VLC_EGENERIC;
-        }
-        else if( !p_ccowner->dec.p_module )
-        {
-            DecoderUnsupportedCodec( p_dec, &fmt, true );
-            vlc_input_decoder_Delete(p_ccowner);
-            vlc_mutex_unlock(&p_owner->cc.lock);
-            return VLC_EGENERIC;
-        }
-
-        p_owner->cc.pp_decoder[i_channel] = p_ccowner;
-    }
-    else
         DeleteCcDecoder(p_owner, i_channel);
+        vlc_mutex_unlock(&p_owner->cc.lock);
+        return VLC_SUCCESS;
+    }
+
+    vlc_input_decoder_t *p_ccowner;
+    es_format_t fmt;
+
+    es_format_Init( &fmt, SPU_ES, p_owner->cc.selected_codec );
+    fmt.subs.cc.i_channel = i_channel;
+    fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
+
+    const struct vlc_input_decoder_cfg cfg = {
+        .fmt = &fmt,
+        .str_id = p_owner->psz_id,
+        .clock = p_owner->p_clock,
+        .resource = p_owner->p_resource,
+        .sout = p_owner->p_sout,
+        .input_type = INPUT_TYPE_NONE,
+        .cbs = NULL, .cbs_data = NULL,
+    };
+
+    p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &cfg );
+    if( !p_ccowner )
+    {
+        msg_Err( p_dec, "could not create decoder" );
+        vlc_dialog_display_error( p_dec,
+            _("Streaming / Transcoding failed"), "%s",
+            _("VLC could not open the decoder module.") );
+        vlc_mutex_unlock(&p_owner->cc.lock);
+        return VLC_EGENERIC;
+    }
+    else if( !p_ccowner->dec.p_module )
+    {
+        DecoderUnsupportedCodec( p_dec, &fmt, true );
+        vlc_input_decoder_Delete(p_ccowner);
+        vlc_mutex_unlock(&p_owner->cc.lock);
+        return VLC_EGENERIC;
+    }
+
+    p_owner->cc.pp_decoder[i_channel] = p_ccowner;
 
     vlc_mutex_unlock(&p_owner->cc.lock);
     return VLC_SUCCESS;
