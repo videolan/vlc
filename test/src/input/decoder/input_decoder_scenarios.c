@@ -579,6 +579,31 @@ static void player_setup_select_ccdec_708_1064(vlc_player_t *player)
         "video/0/cc/spu/10,video/0/cc/spu/64");
 }
 
+static vlc_frame_t *packetizer_getcc_cea608_02(decoder_t *dec, decoder_cc_desc_t *cc_desc)
+{
+    (void)dec;
+
+    cc_desc->i_608_channels = 1 << 1;
+    cc_desc->i_708_channels = 0;
+    cc_desc->i_reorder_depth = 4;
+
+    return create_cc_frame(VLC_TICK_0);
+}
+
+static void cc_decoder_setup_608(decoder_t *dec)
+{
+    assert(dec->fmt_in->i_codec == VLC_CODEC_CEA608);
+
+    dec->fmt_out.i_codec = VLC_CODEC_TEXT;
+}
+
+static void cc_text_renderer_render_608_02(filter_t *filter,
+                                             subpicture_region_t *region_in)
+{
+    assert(strcmp(region_in->p_text->psz_text, "cc02_dec") == 0);
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
 static const vlc_fourcc_t subpicture_chromas[] = {
     VLC_CODEC_RGBA, 0
 };
@@ -716,6 +741,20 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .display_prepare = display_prepare_noop,
     .text_renderer_render = cc_text_renderer_render_708_1064,
     .player_setup_before_start = player_setup_select_ccdec_708_1064,
+},
+{
+    /* The "--sub-track" option use channel starting with 0 whereas CC tracks
+     * indexes start with 1. Ensure channel 1 match with the CC track 2. */
+    .name = "A cea608 track can be selected via command line",
+    .source = source_800_600 ";video_packetized=false",
+    .item_option = ":sub-track=1",
+    .packetizer_getcc = packetizer_getcc_cea608_02,
+    .decoder_setup = decoder_i420_800_600_update,
+    .decoder_decode = decoder_decode,
+    .cc_decoder_setup = cc_decoder_setup_608,
+    .cc_decoder_decode = cc_decoder_decode_channel,
+    .display_prepare = display_prepare_noop,
+    .text_renderer_render = cc_text_renderer_render_608_02,
 },
 };
 
