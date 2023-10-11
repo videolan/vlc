@@ -68,9 +68,6 @@ T.ItemDelegate {
     // Optional, but required to drop a drag
     property var acceptDrop
 
-    // Optional, but required for some actions
-    property int mode: -1
-
     // Settings
 
     verticalPadding: VLCStyle.playlistDelegate_verticalPadding
@@ -100,19 +97,6 @@ T.ItemDelegate {
     // Events
 
     // Functions
-
-    function moveSelected() {
-        const selectedIndexes = view.model.getSelection()
-        if (selectedIndexes.length === 0)
-            return
-        let preTarget = index
-        /* move to _above_ the clicked item if move up, but
-         * _below_ the clicked item if move down */
-        if (preTarget > selectedIndexes[0])
-            preTarget++
-        view.currentIndex = selectedIndexes[0]
-        view.model.moveItemsPre(selectedIndexes, preTarget)
-    }
 
     // Childs
 
@@ -282,11 +266,7 @@ T.ItemDelegate {
         onClicked: {
             /* to receive keys events */
             view.forceActiveFocus(Qt.MouseFocusReason)
-            if (mode === PlaylistListView.Mode.Move) {
-                moveSelected()
-                return
-            } else if (mode === PlaylistListView.Mode.Select) {
-            } else if (!(view.model.isSelected(index) && mouse.button === Qt.RightButton)) {
+            if (!(view.model.isSelected(index) && mouse.button === Qt.RightButton)) {
                 view.updateSelection(mouse.modifiers, view.currentIndex, index)
                 view.currentIndex = index
             }
@@ -296,7 +276,7 @@ T.ItemDelegate {
         }
 
         onDoubleClicked: {
-            if (mouse.button !== Qt.RightButton && (mode >= 0 && mode === PlaylistListView.Mode.Normal))
+            if (mouse.button !== Qt.RightButton)
                 MainPlaylistController.goTo(index, true)
         }
 
@@ -324,11 +304,7 @@ T.ItemDelegate {
             acceptedDevices: PointerDevice.TouchScreen
             
             onTapped: {
-                if (mode >= 0 && mode === PlaylistListView.Mode.Normal) {
-                    MainPlaylistController.goTo(index, true)
-                } else if (mode >= 0 && mode === PlaylistListView.Mode.Move) {
-                    moveSelected()
-                }
+                MainPlaylistController.goTo(index, true)
             }
 
             onLongPressed: {

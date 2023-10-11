@@ -892,7 +892,6 @@ modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml
 modules/gui/qt/playlist/qml/PlaylistDelegate.qml
 modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml
 modules/gui/qt/playlist/qml/PlaylistListView.qml
-modules/gui/qt/playlist/qml/PlaylistOverlayMenu.qml
 modules/gui/qt/playlist/qml/PlaylistToolbar.qml
 modules/gui/qt/qt.cpp
 modules/gui/qt/qt.hpp

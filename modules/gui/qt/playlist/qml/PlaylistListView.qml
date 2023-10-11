@@ -68,14 +68,6 @@ T.Pane {
         enabled: root.enabled
     }
 
-    property int mode: PlaylistListView.Mode.Normal
-
-    enum Mode {
-        Normal,
-        Select, // Keyboard item selection mode, activated through PlaylistOverlayMenu
-        Move // Keyboard item move mode, activated through PlaylistOverlayMenu
-    }
-
     function isDropAcceptable(drop, index) {
         if (drop.source === dragItem)
             return Helpers.itemsMovable(drop.source.indexes, index)
@@ -116,25 +108,6 @@ T.Pane {
         }
 
         listView.forceActiveFocus();
-    }
-
-    PlaylistOverlayMenu {
-        id: overlayMenu
-
-        anchors.fill: parent
-        parent: root
-        z: 1
-
-        onVisibleChanged: {
-            if (visible)
-                focus = true
-            else
-                listView.focus = true
-        }
-
-        isRight: true
-        rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
-        bottomPadding: VLCStyle.margin_large + root.bottomPadding
     }
 
     Widgets.DragItem {
@@ -190,20 +163,9 @@ T.Pane {
             }
 
             Widgets.CaptionLabel {
-                color: (root.mode === PlaylistListView.Mode.Select || root.mode === PlaylistListView.Mode.Move)
-                       ? theme.accent : theme.fg.secondary
+                color: theme.fg.secondary
                 visible: model.count !== 0
-                text: {
-                    switch (root.mode) {
-                    case PlaylistListView.Mode.Select:
-                        return I18n.qtr("Selected tracks: %1").arg(model.selectedCount)
-                    case PlaylistListView.Mode.Move:
-                        return I18n.qtr("Moving tracks: %1").arg(model.selectedCount)
-                    case PlaylistListView.Mode.Normal:
-                    default:
-                        return I18n.qtr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
-                    }
-                }
+                text: I18n.qtr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
             }
         }
 
@@ -455,13 +417,6 @@ T.Pane {
                 isDropAcceptable: root.isDropAcceptable
                 acceptDrop: root.acceptDrop
 
-                mode: root.mode
-
-                BindingCompat on T.ToolTip.visible {
-                    value: false
-                    when: overlayMenu.visible
-                }
-
                 onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
             }
 
@@ -493,70 +448,18 @@ T.Pane {
 
             onSelectAll: root.model.selectAll()
             onSelectionUpdated: {
-                if (root.mode === PlaylistListView.Mode.Select) {
-                    console.log("update selection select")
-                } else if (root.mode === PlaylistListView.Mode.Move) {
-                    const selectedIndexes = root.model.getSelection()
-                    if (selectedIndexes.length === 0)
-                        return
-                    /* always move relative to the first item of the selection */
-                    let target = selectedIndexes[0];
-                    if (newIndex > oldIndex) {
-                        /* move down */
-                        target++
-                    } else if (newIndex < oldIndex && target > 0) {
-                        /* move up */
-                        target--
-                    }
-
-                    listView.currentIndex = selectedIndexes[0]
-                    /* the target is the position _after_ the move is applied */
-                    root.model.moveItemsPost(selectedIndexes, target)
-                } else { // normal
-                    updateSelection(keyModifiers, oldIndex, newIndex);
-                }
+                updateSelection(keyModifiers, oldIndex, newIndex);
             }
 
             Keys.onDeletePressed: onDelete()
-            Keys.onMenuPressed: overlayMenu.open()
 
             Navigation.parentItem: root
-            Navigation.rightAction: function() {
-                overlayMenu.open()
-            }
-            Navigation.leftAction: function() {
-                if (mode === PlaylistListView.Mode.Normal) {
-                    root.Navigation.defaultNavigationLeft()
-                } else {
-                    mode = PlaylistListView.Mode.Normal
-                }
-            }
-            Navigation.cancelAction: function() {
-                if (mode === PlaylistListView.Mode.Normal) {
-                    root.Navigation.defaultNavigationCancel()
-                } else {
-                    mode = PlaylistListView.Mode.Normal
-                }
-            }
-
-            Navigation.upAction: function() {
-                if (mode === PlaylistListView.Mode.Normal)
-                    root.Navigation.defaultNavigationUp()
-            }
-
-            Navigation.downAction: function() {
-                if (mode === PlaylistListView.Mode.Normal)
-                    root.Navigation.defaultNavigationDown()
-            }
 
             onActionAtIndex: {
                 if (index < 0)
                     return
 
-                if (mode === PlaylistListView.Mode.Select)
-                    root.model.toggleSelected(index)
-                else if (mode === PlaylistListView.Mode.Normal)
-                    MainPlaylistController.goTo(index, true)
+                MainPlaylistController.goTo(index, true)
             }
 
             function onDelete() {

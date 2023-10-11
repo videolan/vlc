@@ -292,7 +292,6 @@
     <qresource prefix="/playlist">
         <file alias="PlaylistDelegate.qml">playlist/qml/PlaylistDelegate.qml</file>
         <file alias="PlaylistListView.qml">playlist/qml/PlaylistListView.qml</file>
-        <file alias="PlaylistOverlayMenu.qml">playlist/qml/PlaylistOverlayMenu.qml</file>
         <file alias="PlaylistToolbar.qml">playlist/qml/PlaylistToolbar.qml</file>
         <file alias="PlaylistDetachedWindow.qml">playlist/qml/PlaylistDetachedWindow.qml</file>
     </qresource>
