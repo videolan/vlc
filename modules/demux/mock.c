@@ -42,11 +42,13 @@ enum
     PALETTE_BLACK,
 };
 
+// packed RGBA in memory order
 const uint8_t rgbpal[4][4] = {[PALETTE_RED] =   { 0xFF, 0x00, 0x00, 0xFF },
                               [PALETTE_GREEN] = { 0x00, 0xFF, 0x00, 0xFF },
                               [PALETTE_BLUE] =  { 0x00, 0x00, 0xFF, 0xFF },
                               [PALETTE_BLACK] = { 0x00, 0x00, 0x00, 0xFF }};
 
+// packed YUVA in memory order
 const uint8_t yuvpal[4][4] = {[PALETTE_RED] =   { 0x4C, 0x54, 0xFF, 0xFF },
                               [PALETTE_GREEN] = { 0x95, 0x2B, 0x15, 0xFF },
                               [PALETTE_BLUE] =  { 0x1D, 0xFF, 0x6B, 0xFF },
