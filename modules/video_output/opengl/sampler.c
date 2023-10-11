@@ -555,10 +555,15 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
 static int
 InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 {
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    const char *image_external = priv->glsl_version >= 300
+        ? "#extension GL_OES_EGL_image_external_essl3 : require\n"
+        : "#extension GL_OES_EGL_image_external : require\n";
+
     if (tex_target == GL_TEXTURE_EXTERNAL_OES)
     {
-        sampler->shader.extensions =
-            strdup("#extension GL_OES_EGL_image_external : require\n");
+        sampler->shader.extensions = strdup(image_external);
         if (!sampler->shader.extensions)
             return VLC_EGENERIC;
     }
