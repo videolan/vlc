@@ -2378,50 +2378,51 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
         if( i_channel == -1 ||
             vlc_input_decoder_SetCcState( es->p_master->p_dec, i_channel, true ) )
             return;
+
+        EsOutSendEsEvent(out, es, VLC_INPUT_ES_SELECTED, b_force);
+        return;
     }
-    else
+
+    const bool b_sout = input_priv(p_input)->p_sout != NULL;
+    /* If b_forced, the ES is specifically requested by the user, so bypass
+     * the following vars check. */
+    if( !b_force )
     {
-        const bool b_sout = input_priv(p_input)->p_sout != NULL;
-        /* If b_forced, the ES is specifically requested by the user, so bypass
-         * the following vars check. */
-        if( !b_force )
+        if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
         {
-            if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
+            if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
             {
-                if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
-                {
-                    msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
-                             es->fmt.i_id );
-                    return;
-                }
-            }
-            else if( es->fmt.i_cat == AUDIO_ES )
-            {
-                if( b_thumbnailing
-                 || !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
-                {
-                    msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
-                             es->fmt.i_id );
-                    return;
-                }
-            }
-            if( es->fmt.i_cat == SPU_ES )
-            {
-                if( b_thumbnailing
-                 || !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
-                {
-                    msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
-                             es->fmt.i_id );
-                    return;
-                }
+                msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
+                         es->fmt.i_id );
+                return;
             }
         }
-
-        EsOutCreateDecoder( out, es );
-
-        if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
-            return;
+        else if( es->fmt.i_cat == AUDIO_ES )
+        {
+            if( b_thumbnailing
+             || !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
+            {
+                msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
+                         es->fmt.i_id );
+                return;
+            }
+        }
+        if( es->fmt.i_cat == SPU_ES )
+        {
+            if( b_thumbnailing
+             || !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
+            {
+                msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
+                         es->fmt.i_id );
+                return;
+            }
+        }
     }
+
+    EsOutCreateDecoder( out, es );
+
+    if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
+        return;
 
     /* Mark it as selected */
     EsOutSendEsEvent(out, es, VLC_INPUT_ES_SELECTED, b_force);
