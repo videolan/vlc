@@ -36,18 +36,15 @@ import "qrc:///dialogs/" as DG
 FocusScope {
     id: g_mainDisplay
 
-    //name and properties of the tab to be initially loaded
-    property var view: ({
-        "name": "",
-        "properties": {}
-    })
-
     // Properties
 
     property bool hasMiniPlayer: miniPlayer.visible
 
     // NOTE: The main view must be above the indexing bar and the mini player.
     property real displayMargin: (height - miniPlayer.y) + (loaderProgress.active ? loaderProgress.height : 0)
+
+    //MainDisplay behave as a PageLoader
+    property alias pagePrefix: stackView.pagePrefix
 
     readonly property int positionSliderY: {
         var size = miniPlayer.y + miniPlayer.sliderY
@@ -61,21 +58,15 @@ FocusScope {
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
 
-    onViewChanged: {
-        _oldViewProperties[view.name] = view.properties
-        loadView()
-    }
+    // functions
 
-    Component.onCompleted: {
-        loadView()
-    }
-
-    function loadView() {
-        const found = stackView.loadView(g_mainDisplay.pageModel, g_mainDisplay.view.name, g_mainDisplay.view.properties)
+    //MainDisplay behave as a PageLoader
+    function loadView(path, properties, focusReason) {
+        const found = stackView.loadView(path, properties, focusReason)
+        if (!found)
+            return
 
         const item = stackView.currentItem
-
-        item.Navigation.parentItem = stackView
 
         sourcesBanner.localMenuDelegate = Qt.binding(function () {
             return !!item.localMenuDelegate ? item.localMenuDelegate : null
@@ -94,13 +85,6 @@ FocusScope {
         MainCtx.search.available = Qt.binding(() => item.isSearchable !== undefined && item.isSearchable)
         MainCtx.sort.model = Qt.binding(function () { return item.sortModel })
         MainCtx.sort.available = Qt.binding(function () { return Array.isArray(item.sortModel) && item.sortModel.length > 0 })
-
-        // Restore sourcesBanner state
-        sourcesBanner.selectedIndex = pageModel.filter(function (e) {
-            return e.listed
-        }).findIndex(function (e) {
-            return e.name === g_mainDisplay.view.name
-        })
 
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
             _showMiniPlayer = true
@@ -270,6 +254,8 @@ FocusScope {
                                    ? playlistColumn.left
                                    : parent.right
                         }
+
+                        pageModel: g_mainDisplay.pageModel
 
                         leftPadding: VLCStyle.applicationHorizontalMargin
 

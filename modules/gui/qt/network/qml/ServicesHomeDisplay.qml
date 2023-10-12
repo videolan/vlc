@@ -32,7 +32,8 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "all",
-        url: "qrc:///network/ServicesSources.qml"
+        url: "qrc:///network/ServicesSources.qml",
+        default: true,
     }, {
         name: "services_manage",
         url: "qrc:///network/ServicesManage.qml"
@@ -44,11 +45,6 @@ Widgets.PageLoader {
         component: sourceBrowseComponent,
         guard: function (prop) { return !!prop.tree }
     }]
-
-    loadDefaultView: function() {
-        History.update(["mc", "discover", "services", "all"])
-        loadPage("all")
-    }
 
     function setCurrentItemFocus(reason) {
         stackView.currentItem.setCurrentItemFocus(reason);

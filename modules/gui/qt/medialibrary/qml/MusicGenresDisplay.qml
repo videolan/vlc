@@ -30,17 +30,12 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "all",
+        default: true,
         component: genresComponent
     }, {
         name: "albums",
         component: albumGenreComponent
     }]
-
-    loadDefaultView: function () {
-        History.update(["mc", "music", "genres", "all"])
-        loadPage("all")
-    }
-
 
     function _updateGenresAllHistory(currentIndex) {
         History.update(["mc", "music", "genres", "all"], { "initialIndex": currentIndex })

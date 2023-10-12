@@ -33,7 +33,8 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "home",
-        url: "qrc:///network/BrowseHomeDisplay.qml"
+        url: "qrc:///network/BrowseHomeDisplay.qml",
+        default: true,
     }, {
         name: "folders",
         component: browseFolders,
@@ -46,12 +47,7 @@ Widgets.PageLoader {
         guard: function (prop) { return !!prop.tree }
     }]
 
-    loadDefaultView: function() {
-        History.update(["mc", "network", "home"])
-        loadPage("home")
-    }
-
-    localMenuDelegate: (view.name !== "home") ? componentBar : null
+    localMenuDelegate: (pageName !== "home") ? componentBar : null
 
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Browse view")
@@ -153,7 +149,7 @@ Widgets.PageLoader {
         id: componentBar
 
         NetworkAddressbar {
-            path: view.name === "browse" ? root.currentItem.model.path : []
+            path: root.pageName === "browse" ? root.currentItem.model.path : []
 
             onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
 

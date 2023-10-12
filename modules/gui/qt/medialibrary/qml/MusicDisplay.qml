@@ -35,6 +35,7 @@ Widgets.PageLoader {
     pageModel: [{
             displayText: I18n.qtr("Artists"),
             name: "artists",
+            default: true,
             url: "qrc:///medialibrary/MusicArtistsDisplay.qml"
         }, {
             displayText: I18n.qtr("Albums"),
@@ -55,11 +56,6 @@ Widgets.PageLoader {
         }
     ]
 
-    loadDefaultView: function () {
-        History.update(["mc", "music", "artists"])
-        loadPage("artists")
-    }
-
     function loadIndex(index) {
         History.push(["mc", "music", root.pageModel[index].name])
     }
@@ -75,14 +71,11 @@ Widgets.PageLoader {
         }
     }
 
-    property Component localMenuDelegate: Widgets.LocalTabBar {
-        currentView: root.view
+    localMenuDelegate: Widgets.LocalTabBar {
+        currentView: root.pageName
         model: tabModel
 
         onClicked: {
-            if (root.pageModel[index].name === currentView.name)
-                return
-
             root.loadIndex(index)
         }
     }

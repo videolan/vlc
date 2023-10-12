@@ -36,16 +36,12 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "all",
+        default: true,
         component: componentAll
     }, {
         name: "list",
         component: componentList
     }]
-
-    loadDefaultView: function () {
-        History.update(["mc", "video", "playlists", "all"])
-        loadPage("all")
-    }
 
     //---------------------------------------------------------------------------------------------
     // Functions

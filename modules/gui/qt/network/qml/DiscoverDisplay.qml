@@ -31,6 +31,7 @@ Widgets.PageLoader {
 
     pageModel: [{
             displayText: I18n.qtr("Services"),
+            default: true,
             name: "services",
             url: "qrc:///network/ServicesHomeDisplay.qml"
         }, {
@@ -39,11 +40,6 @@ Widgets.PageLoader {
             url: "qrc:///network/DiscoverUrlDisplay.qml"
         }
     ]
-
-    loadDefaultView: function () {
-        History.update(["mc", "discover", "services"])
-        loadPage("services")
-    }
 
     localMenuDelegate: menuDelegate
 
@@ -70,11 +66,11 @@ Widgets.PageLoader {
         id: menuDelegate
 
         Widgets.LocalTabBar {
-            currentView: root.view
+            currentView: root.pageName
             model: tabModel
 
             onClicked: {
-                if (root.pageModel[index].name === currentView.name)
+                if (root.pageModel[index].name === root.pageName)
                     return
 
                 root.loadIndex(index)

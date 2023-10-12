@@ -46,8 +46,8 @@ Widgets.PageLoader {
         }
     }
 
-    property Component localMenuDelegate: Widgets.LocalTabBar {
-        currentView: root.view
+    localMenuDelegate: Widgets.LocalTabBar {
+        currentView: root.pageName
 
         model: tabModel
 
@@ -65,6 +65,7 @@ Widgets.PageLoader {
 
     pageModel: [{
             name: "all",
+            default: true,
             displayText: I18n.qtr("All"),
             url: "qrc:///medialibrary/VideoAllDisplay.qml"
         },{
@@ -73,11 +74,6 @@ Widgets.PageLoader {
             url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
         }
     ]
-
-    loadDefaultView: function () {
-        History.update(["mc", "video", "all"])
-        loadPage("all")
-    }
 
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Video view")

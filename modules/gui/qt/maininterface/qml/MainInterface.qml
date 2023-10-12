@@ -31,6 +31,7 @@ import "qrc:///util/" as Util
 import "qrc:///playlist/" as PL
 
 Item {
+    id: root
 
     property bool _interfaceReady: false
     property bool _playlistReady: false
@@ -69,10 +70,9 @@ Item {
     }
 
     function loadCurrentHistoryView(focusReason) {
-
         contextSaver.save(_oldHistoryPath)
 
-        stackView.loadView(_pageModel, History.viewPropLegacy.name, History.viewPropLegacy.properties)
+        stackView.loadView(History.viewPath, History.viewProp, focusReason)
 
         contextSaver.restore(History.viewPath)
         _oldHistoryPath = History.viewPath
@@ -242,6 +242,8 @@ Item {
                 anchors.fill: parent
                 focus: true
                 clip: _extendedFrameVisible
+
+                pageModel: _pageModel
 
                 Connections {
                     target: Player

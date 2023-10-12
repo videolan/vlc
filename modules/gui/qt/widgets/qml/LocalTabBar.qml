@@ -32,7 +32,7 @@ NavigableRow {
 
     delegate: BannerTabButton {
         text: model.displayText
-        selected: model.name === row.currentView.name
+        selected: model.name === row.currentView
         showCurrentIndicator: false
         height: VLCStyle.localToolbar_height
         onClicked: row.clicked(index)

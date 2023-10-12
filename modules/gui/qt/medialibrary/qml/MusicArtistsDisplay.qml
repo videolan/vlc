@@ -34,16 +34,12 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "all",
+        default: true,
         component: allArtistsComponent
     }, {
         name: "albums",
         component: artistAlbumsComponent
     }]
-
-    loadDefaultView: function () {
-        History.update(["mc", "music", "artists", "all"])
-        loadPage("all")
-    }
 
     function _updateArtistsAllHistory(currentIndex) {
         History.update(["mc", "music", "artists", "all"], { "initialIndex": currentIndex })
@@ -75,9 +71,6 @@ Widgets.PageLoader {
         id: artistAlbumsComponent
 
         MusicArtistsAlbums {
-
-            Navigation.parentItem: root
-
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria

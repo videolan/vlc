@@ -18,20 +18,21 @@
 import QtQuick 2.12
 import org.videolan.vlc 0.1
 
+import "qrc:///util/Helpers.js" as Helpers
+
 StackViewExt {
     id: root
 
     // Properties
 
-    property var view: null
+    //name of the loaded page
+    property string pageName: ""
 
+    //path of the current page loader
+    property var pagePrefix: []
+
+    //list of available pages
     property var pageModel: []
-
-    // loadDefaultView - function ()
-    // a function that loads the default page,
-    // must be implemented by the user of the class
-    // one may use `loadPage(string pageName)` to load the page from 'pageModel'
-    property var loadDefaultView: null
 
     //indicates whether the subview support grid/list mode
     readonly property bool hasGridListMode: (currentItem
@@ -50,102 +51,41 @@ StackViewExt {
                                     && currentItem.localMenuDelegate
                                     && (currentItem.localMenuDelegate instanceof Component)) ? currentItem.localMenuDelegate : null
 
-    // Private
-
-    property bool _ready: false
-
-    property string _currentView: ""
-
-    // Signals
-
-    signal pageChanged(string page)
-
-    // Events
-
-    Component.onCompleted: {
-        _ready = true
-
-        _loadView()
-    }
-
-    onViewChanged: _loadView()
 
     // Functions
 
-    function _loadView() {
-        // NOTE: We wait for the item to be fully loaded to avoid size glitches.
-        if (_ready === false)
-            return
-
-        if (view === null) {
-            if (!loadDefaultView)
-                console.error("both 'view' and 'loadDefaultView' is null, history -", JSON.stringify(History.current))
-            else
-                loadDefaultView()
-            return
-        }
-
-        if (view.name === "") {
-            console.error("view is not defined")
-            return
-        }
-        if (pageModel.length === 0) {
-            console.error("pageModel is not defined")
-            return
-        }
-
-        const reason = History.takeFocusReason()
-
-        const found = root.loadView(root.pageModel, view.name, view.properties)
-        if (!found) {
-            console.error("failed to load", JSON.stringify(History.current))
-            return
-        }
-
-        currentItem.Navigation.parentItem = root
-
-        if (reason !== Qt.OtherFocusReason)
-            setCurrentItemFocus(reason)
-
-        currentItemChanged(currentItem)
-    }
-
-    function loadPage(page) {
-        view = {"name": page, "properties": {}}
-    }
-
     /**
-     * viewModel: model with the definition of the available view
-     *            elements should contains at least :
-     *     name: name of the view
-     *     url or component: the url of the Component or the component to load
-     * view: string (name of the view to load)
-     * viewProperties: map of the propertes to apply to the view
+     * @arg {string[]} path - the (sub) path to load
+     * @arg {Object.<string, Object>} properties - the properties to apply to the loaded view
+     * @arg {number} focusReason - the initial focus reason
      */
-    function loadView(viewModel, view, viewProperties)
+    function loadView(path, properties, focusReason)
     {
-        if (root.currentItem && root.currentItem.hasOwnProperty("dismiss"))
-            root.currentItem.dismiss()
+        if (currentItem && typeof currentItem.dismiss === "function")
+            currentItem.dismiss()
 
-        if (view === _currentView) {
-            if (Object.keys(viewProperties).length === 0 && root.currentItem.hasOwnProperty("loadDefaultView") ) {
-                root.currentItem.loadDefaultView()
-            } else {
-                for ( let viewProp in viewProperties ) {
-                    if ( root.currentItem.hasOwnProperty(viewProp) ) {
-                        root.currentItem[viewProp] = viewProperties[viewProp]
-                    }
-                }
+        if (path.length === 0) {
+            path = _getDefaultPage()
+            if (path.length === 0) {
+                console.assert("trying to load an empty view path")
+                return false
             }
-            return true
+        }
+
+        const head = path[0]
+
+        //We always reload if the last node even if this is the same page, as initial properties may differ
+        //for the intermediary pages, we can just forward the request down the tree
+        if (pageName === head && path.length > 1) {
+            return _reloadPage(path, properties, focusReason)
         }
 
         let found = false
-        for (let tab = 0; tab < viewModel.length; tab++ )
-        {
-            const model = viewModel[tab]
-            if (model.name === view) {
-                if (model.guard !== undefined && typeof model.guard === "function" && !model.guard(viewProperties)) {
+        for (let tab = 0; tab < pageModel.length; tab++ ) {
+
+            const model = pageModel[tab]
+            if (model.name === head) {
+                if (model.guard !== undefined && typeof model.guard === "function" && !model.guard(properties)) {
                     continue //we're not allowed to load this page
                 }
 
@@ -162,8 +102,15 @@ StackViewExt {
                 }
 
                 if (component.status === Component.Ready ) {
-                    //note doesn't work with qt 5.9
-                    root.replace(null, component, viewProperties)
+
+                    let pageProp = {
+                        pagePrefix:[...pagePrefix, head]
+                    }
+                    for (const key of properties.keys()) {
+                        pageProp[key] = properties[key]
+                    }
+
+                    root.replace(null, component, pageProp)
                     found = true
                     break;
                 } else {
@@ -171,10 +118,51 @@ StackViewExt {
                 }
             }
         }
-        if (!found)
-            console.warn("unable to load view " + view)
-        else
-            _currentView = view
-        return found
+        if (!found) {
+            console.warn("unable to load view " + head)
+            return false
+        }
+
+        pageName = head
+        currentItem.Navigation.parentItem = root
+        //pages like MainDisplay are not page PageLoader, so just check for the loadView function
+        if (typeof currentItem.loadView === "function") {
+            currentItem.loadView(path.slice(1), properties, focusReason)
+        } else {
+            setCurrentItemFocus(focusReason)
+        }
+
+        return true
+    }
+
+    function _getDefaultPage() {
+        for (let tab = 0; tab < pageModel.length; tab++ ) {
+            if (pageModel[tab].default) {
+                return [pageModel[tab].name]
+            }
+        }
+        console.assert("no default page set")
+        return []
+    }
+
+    function _reloadPage(path, properties, focusReason)
+    {
+        if (!currentItem) {
+            console.warn("try to update subpage, but page isn't loaded")
+            return false
+        }
+
+        for (const key of properties.keys()) {
+            if (currentItem.hasOwnProperty(key))
+                currentItem[key] = properties[key]
+        }
+
+        if (typeof currentItem.loadView === "function") {
+            currentItem.loadView(path.slice(1), properties, focusReason)
+        } else if (path.length > 1) {
+            console.warn("unable to load subpath", path.slice(1))
+            return false
+        }
+        return true
     }
 }
