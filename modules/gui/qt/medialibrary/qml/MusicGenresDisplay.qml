@@ -37,23 +37,11 @@ Widgets.PageLoader {
         component: albumGenreComponent
     }]
 
-    function _updateGenresAllHistory(currentIndex) {
-        History.update(["mc", "music", "genres", "all"], { "initialIndex": currentIndex })
-    }
-
-    function _updateGenresAlbumsHistory(currentIndex, parentId, genreName) {
-        History.update(["mc","music", "genres", "albums"], {
-            "initialIndex": currentIndex,
-            "parentId": parentId,
-            "genreName": genreName,
-        })
-    }
-
     Component {
         id: genresComponent
         /* List View */
         MusicGenres {
-            onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
@@ -88,9 +76,7 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
-            onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
-            onCurrentIndexChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 }

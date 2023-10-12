@@ -53,19 +53,6 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         sortMenu  = currentItem.sortMenu
     }
-    // Functions private
-
-    function _updateHistoryAll(index) {
-        History.update(["mc", "video", "all", "base"], { "initialIndex": index })
-    }
-
-    function _updateHistoryGroup(group) {
-        History.update(["mc", "video", "all", "group"], {
-                            "initialIndex": group.currentIndex,
-                            "parentId" : group.parentId,
-                            "title" : group.title
-                        })
-    }
 
     // Children
 
@@ -80,8 +67,7 @@ Widgets.PageLoader {
                     { parentId: model.id, title: model.title }, reason)
             }
 
-
-            onCurrentIndexChanged: root._updateHistoryAll(currentIndex)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 
@@ -91,9 +77,7 @@ Widgets.PageLoader {
         MediaGroupDisplay {
             id: group
 
-            onCurrentIndexChanged: root._updateHistoryGroup(group)
-            onParentIdChanged    : root._updateHistoryGroup(group)
-            onTitleChanged       : root._updateHistoryGroup(group)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             function isInfoExpandPanelAvailable(/* modelIndexData */) {
                 return true

@@ -44,23 +44,6 @@ Widgets.PageLoader {
     }]
 
     //---------------------------------------------------------------------------------------------
-    // Functions
-    //---------------------------------------------------------------------------------------------
-    // Private
-
-    function _updateHistoryList(index) {
-        History.update(["mc", "video", "playlists", "all"], { "initialIndex": index })
-    }
-
-    function _updateHistoryPlaylist(playlist) {
-        History.update(["mc", "video", "playlists", "list"], {
-                            "currentIndex": playlist.currentIndex,
-                            "parentId"   : playlist.parentId,
-                            "name" : playlist.name
-                        });
-    }
-
-    //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
 
@@ -75,7 +58,7 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onCurrentIndexChanged: _updateHistoryList(currentIndex)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             onShowList: (model, reason) => {
                 History.push(["mc", "video", "playlists", "list"],
@@ -96,9 +79,7 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
-            onParentIdChanged    : _updateHistoryPlaylist(playlist)
-            onNameChanged        : _updateHistoryPlaylist(playlist)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 }

@@ -26,11 +26,9 @@ import "qrc:///widgets/" as Widgets
 MusicAlbums {
     id: root
 
-    onCurrentIndexChanged: {
-        History.update(["mc","music", "albums"], {"initialIndex": currentIndex})
-    }
-
     searchPattern: MainCtx.search.pattern
     sortCriteria: MainCtx.sort.criteria
     sortOrder: MainCtx.sort.order
+
+    onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 }

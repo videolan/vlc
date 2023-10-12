@@ -69,6 +69,8 @@ Widgets.PageLoader {
                                     { tree: tree, "root_name": deviceModel.name,
                                       "source_name": source_name }, reason)
 
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+
             NetworkDeviceModel {
                 id: deviceModel
 
@@ -112,6 +114,8 @@ Widgets.PageLoader {
 
             onBrowse: History.push(["mc", "discover", "services", "source_browse"],
                                     { tree: tree, "root": root_name }, reason)
+
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             model: NetworkMediaModel {
                 id: mediaModel

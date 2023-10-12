@@ -41,27 +41,17 @@ Widgets.PageLoader {
         component: artistAlbumsComponent
     }]
 
-    function _updateArtistsAllHistory(currentIndex) {
-        History.update(["mc", "music", "artists", "all"], { "initialIndex": currentIndex })
-    }
-
-    function _updateArtistsAlbumsHistory(currentIndex, initialAlbumIndex) {
-        History.update(["mc","music", "artists", "albums"], {
-            "initialIndex": currentIndex,
-            "initialAlbumIndex": initialAlbumIndex,
-        })
-    }
 
     Component {
         id: allArtistsComponent
 
         MusicAllArtists {
-            onCurrentIndexChanged: _updateArtistsAllHistory(currentIndex)
 
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
             onRequestArtistAlbumView: History.push(["mc", "music", "artists", "albums",
                                                     { initialIndex: currentIndex }], reason)
         }
@@ -75,8 +65,8 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onCurrentIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
-            onCurrentAlbumIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+            onCurrentAlbumIndexChanged: History.viewProp.initialAlbumIndex = currentAlbumIndex
         }
     }
 }

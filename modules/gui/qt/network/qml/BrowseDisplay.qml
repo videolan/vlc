@@ -90,6 +90,8 @@ Widgets.PageLoader {
                 sortOrder: MainCtx.sort.order
                 searchPattern: MainCtx.search.pattern
             }
+
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 
@@ -118,6 +120,8 @@ Widgets.PageLoader {
                 sortOrder: MainCtx.sort.order
                 searchPattern: MainCtx.search.pattern
             }
+
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 
@@ -142,6 +146,8 @@ Widgets.PageLoader {
             Navigation.cancelAction: function() {
                 History.previous(Qt.BacktabFocusReason)
             }
+
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 

@@ -44,23 +44,6 @@ Widgets.PageLoader {
     }]
 
     //---------------------------------------------------------------------------------------------
-    // Functions
-    //---------------------------------------------------------------------------------------------
-    // Private
-
-    function _updateHistoryList(index) {
-        History.update(["mc", "music", "playlists", "all"], { "initialIndex": index });
-    }
-
-    function _updateHistoryPlaylist(playlist) {
-        History.update(["mc", "music", "playlists", "list"], {
-                            "initialIndex": playlist.currentIndex,
-                            "parentId"   : playlist.parentId,
-                            "name" : playlist.name
-                        });
-    }
-
-    //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
 
@@ -70,8 +53,6 @@ Widgets.PageLoader {
         PlaylistMediaList {
             isMusic: true
 
-            onCurrentIndexChanged: _updateHistoryList(currentIndex)
-
             onShowList: (model, reason) => {
                 History.push(["mc", "music", "playlists", "list"],
                     { parentId: model.id, name: model.name }, reason)
@@ -80,6 +61,9 @@ Widgets.PageLoader {
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
+
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+
         }
     }
 
@@ -95,9 +79,7 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
-            onParentIdChanged    : _updateHistoryPlaylist(playlist)
-            onNameChanged        : _updateHistoryPlaylist(playlist)
+            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
 }
