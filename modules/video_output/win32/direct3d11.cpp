@@ -178,7 +178,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         break;
     default:
         {
-            const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+            const auto *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
             if (p_format == NULL)
             {
                 cfg.bitdepth = 8;
@@ -938,7 +938,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
             break;
         default:
             {
-                const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+                const auto *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
                 if (p_format == NULL)
                 {
                     bits_per_channel = 8;
