@@ -158,7 +158,7 @@ T.ItemDelegate {
         id: theme
         colorSet: ColorContext.Item
 
-        focused: root.activeFocus
+        focused: root.visualFocus
         hovered: root.hovered
     }
 

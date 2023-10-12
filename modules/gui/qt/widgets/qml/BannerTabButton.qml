@@ -77,7 +77,7 @@ T.TabButton {
         id: theme
         colorSet: ColorContext.TabButton
 
-        focused: control.activeFocus
+        focused: control.visualFocus
         hovered: control.hovered
         pressed: control.down
         enabled: control.enabled
