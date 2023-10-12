@@ -97,7 +97,7 @@
  * content with `decoder_QueueCc`.
  *
  * In the `input/decoder.c` code, the access to the sub-decoders in the
- * cc.decs table is protected through the `cc.lock` mutex.
+ * subdecs.list table is protected through the `subdecs.lock` mutex.
  * Taking this lock ensures that the sub-decoder won't get
  * asynchronously removed while using it, and any mutex from the
  * sub-decoder can then be taken under this lock.
@@ -213,12 +213,18 @@ struct vlc_input_decoder_t
     bool b_idle;
     bool aborting;
 
+    /* Sub decs */
+    struct
+    {
+        vlc_mutex_t lock;
+        struct vlc_list list;
+    } subdecs;
+
     /* CC */
     struct
     {
+        /* All members guarded by subdecs.lock */
         vlc_fourcc_t selected_codec;
-        vlc_mutex_t lock;
-        struct vlc_list decs;
         bool b_supported;
         decoder_cc_desc_t desc;
         bool desc_changed;
@@ -1215,7 +1221,7 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
         return;
     }
 
-    vlc_mutex_lock(&p_owner->cc.lock);
+    vlc_mutex_lock(&p_owner->subdecs.lock);
     if (p_owner->cc.desc.i_608_channels != p_desc->i_608_channels ||
         p_owner->cc.desc.i_708_channels != p_desc->i_708_channels ||
         p_owner->cc.desc.i_reorder_depth != p_desc->i_reorder_depth)
@@ -1226,7 +1232,7 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
 
     bool first_cc = true;
     vlc_input_decoder_t *it;
-    vlc_list_foreach(it, &p_owner->cc.decs, node)
+    vlc_list_foreach(it, &p_owner->subdecs.list, node)
     {
         if (!SubDecoderIsCc(it))
             continue;
@@ -1245,7 +1251,7 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
         }
     }
 
-    vlc_mutex_unlock(&p_owner->cc.lock);
+    vlc_mutex_unlock(&p_owner->subdecs.lock);
 
     if (first_cc) /* can have bitmap set but no created decs */
         block_Release( p_cc );
@@ -2033,14 +2039,14 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     }
 
     /* */
-    vlc_mutex_init(&p_owner->cc.lock);
+    vlc_mutex_init(&p_owner->subdecs.lock);
     p_owner->cc.selected_codec = cfg->cc_decoder == 708 ?
                                  VLC_CODEC_CEA708 : VLC_CODEC_CEA608;
     p_owner->cc.b_supported = ( cfg->sout == NULL );
 
     p_owner->cc.desc.i_608_channels = 0;
     p_owner->cc.desc.i_708_channels = 0;
-    vlc_list_init(&p_owner->cc.decs);
+    vlc_list_init(&p_owner->subdecs.list);
     p_owner->cc.p_sout_input = NULL;
     p_owner->cc.sout_es_id = NULL;
     p_owner->cc.b_sout_created = false;
@@ -2250,14 +2256,14 @@ vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const 
 static void RemoveCcDecoder(vlc_input_decoder_t *owner,
                             vlc_input_decoder_t *subdec)
 {
-    vlc_mutex_lock(&owner->cc.lock);
+    vlc_mutex_lock(&owner->subdecs.lock);
 
     vlc_input_decoder_t *it;
-    vlc_list_foreach(it, &owner->cc.decs, node)
+    vlc_list_foreach(it, &owner->subdecs.list, node)
         if (it == subdec)
         {
             vlc_list_remove(&it->node);
-            vlc_mutex_unlock(&owner->cc.lock);
+            vlc_mutex_unlock(&owner->subdecs.lock);
             return;
         }
 
@@ -2282,9 +2288,9 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
         vlc_join( p_owner->thread, NULL );
 
 #ifndef NDEBUG
-    vlc_mutex_lock(&p_owner->cc.lock);
-    assert(vlc_list_is_empty(&p_owner->cc.decs));
-    vlc_mutex_unlock(&p_owner->cc.lock);
+    vlc_mutex_lock(&p_owner->subdecs.lock);
+    assert(vlc_list_is_empty(&p_owner->subdecs.list));
+    vlc_mutex_unlock(&p_owner->subdecs.lock);
 #endif
 
     /* Delete decoder */
@@ -2539,7 +2545,7 @@ vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *p_owner,
 {
     decoder_t *p_dec = &p_owner->dec;
 
-    vlc_mutex_lock(&p_owner->cc.lock);
+    vlc_mutex_lock(&p_owner->subdecs.lock);
 
     vlc_input_decoder_t *p_ccowner;
 
@@ -2550,21 +2556,21 @@ vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *p_owner,
         vlc_dialog_display_error( p_dec,
             _("Streaming / Transcoding failed"), "%s",
             _("VLC could not open the decoder module.") );
-        vlc_mutex_unlock(&p_owner->cc.lock);
+        vlc_mutex_unlock(&p_owner->subdecs.lock);
         return NULL;
     }
     else if( !p_ccowner->dec.p_module )
     {
         DecoderUnsupportedCodec( p_dec, cfg->fmt, true );
         vlc_input_decoder_Delete(p_ccowner);
-        vlc_mutex_unlock(&p_owner->cc.lock);
+        vlc_mutex_unlock(&p_owner->subdecs.lock);
         return NULL;
     }
 
-    vlc_list_append(&p_ccowner->node, &p_owner->cc.decs);
+    vlc_list_append(&p_ccowner->node, &p_owner->subdecs.list);
     p_ccowner->master_dec = p_owner;
 
-    vlc_mutex_unlock(&p_owner->cc.lock);
+    vlc_mutex_unlock(&p_owner->subdecs.lock);
     return p_ccowner;
 }
 
