@@ -104,15 +104,14 @@ void vlc_input_decoder_StopWait( vlc_input_decoder_t * );
 bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * );
 
 /**
- * This function activates the request closed caption channel.
+ * This function Creates and adds the requested SubDec.
+ *
+ * The sub decoder returned by this function must be deleted with
+ * vlc_input_decoder_Delete() before the parent is deleted.
  */
-int vlc_input_decoder_SetCcState( vlc_input_decoder_t *, int i_channel, bool b_decode );
-
-/**
- * This function returns an error if the requested channel does not exist and
- * set pb_decode to the channel status(active or not) otherwise.
- */
-int vlc_input_decoder_GetCcState( vlc_input_decoder_t *, int i_channel, bool *pb_decode );
+vlc_input_decoder_t *
+vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *dec,
+                               const struct vlc_input_decoder_cfg *cfg);
 
 /**
  * This function forces the display of the next picture

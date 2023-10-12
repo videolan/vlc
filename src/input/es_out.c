@@ -310,15 +310,6 @@ default_val:
     return VLC_CLOCK_MASTER_AUTO;
 }
 
-static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
-{
-    if ((p_fmt->i_codec == VLC_CODEC_CEA608 && p_fmt->subs.cc.i_channel < 4)
-     || (p_fmt->i_codec == VLC_CODEC_CEA708 && p_fmt->subs.cc.i_channel < 64))
-        return p_fmt->subs.cc.i_channel;
-
-    return -1;
-}
-
 #define foreach_es_then_es_slaves( pos ) \
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
@@ -663,18 +654,6 @@ static vlc_tick_t EsOutGetWakeup( es_out_t *out )
 }
 
 static es_out_id_t es_cat[DATA_ES];
-
-static es_out_id_t *EsOutGetSelectedCat( es_out_t *out,
-                                         enum es_format_category_e cat )
-{
-    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    es_out_id_t *es;
-
-    foreach_es_then_es_slaves( es )
-        if( es->fmt.i_cat == cat && EsIsSelected( es ) )
-            return es;
-    return NULL;
-}
 
 static bool EsOutDecodersIsEmpty( es_out_t *out )
 {
@@ -2184,20 +2163,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, input_source_t *source, const es_fo
 
 static bool EsIsSelected( es_out_id_t *es )
 {
-    /* Some tracks, especially closed-captions, are extracted from an
-     * existing elementary stream through the packetizer or the decoder,
-     * which must be selected for the extracted track to be selected.
-     * In every other cases, we don't need to consider that. */
-    if (es->p_master == NULL)
-        return es->p_dec != NULL;
-
-    bool b_decode = false;
-    if( es->p_master->p_dec )
-    {
-        int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-        vlc_input_decoder_GetCcState( es->p_master->p_dec, i_channel, &b_decode );
-    }
-    return b_decode;
+    return es->p_dec != NULL;
 }
 
 static void ClockUpdate(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
@@ -2275,7 +2241,15 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
         .cbs = &decoder_cbs,
         .cbs_data = p_es,
     };
-    dec = vlc_input_decoder_New( VLC_OBJECT(p_input), &cfg );
+    if (p_es->p_master != NULL)
+    {
+        assert(p_es->p_master->p_dec != NULL);
+        dec = vlc_input_decoder_CreateSubDec(p_es->p_master->p_dec, &cfg);
+    }
+    else
+    {
+        dec = vlc_input_decoder_New( VLC_OBJECT(p_input), &cfg );
+    }
     if( dec != NULL )
     {
         vlc_input_decoder_ChangeRate( dec, p_sys->rate );
@@ -2325,6 +2299,19 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
     EsOutUpdateDelayJitter(out);
 }
+
+static void EsOutDeleteSubESes(es_out_t *out, es_out_id_t *parent)
+{
+    for (size_t i = 0; i < parent->sub_es_vec.size; ++i)
+    {
+        es_out_id_t *subes = parent->sub_es_vec.data[i];
+        assert(subes != NULL);
+        EsOutDelLocked(out, subes);
+    }
+
+    vlc_vector_clear(&parent->sub_es_vec);
+}
+
 static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 {
     VLC_UNUSED(out);
@@ -2334,13 +2321,18 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 
     assert( p_es->p_pgrm );
 
+    EsOutDeleteSubESes(out, p_es);
+
     vlc_input_decoder_Flush(p_es->p_dec);
     vlc_input_decoder_Delete( p_es->p_dec );
     p_es->p_dec = NULL;
     if( p_es->p_pgrm->p_master_es_clock == p_es->p_clock )
         p_es->p_pgrm->p_master_es_clock = NULL;
-    vlc_clock_Delete( p_es->p_clock );
-    p_es->p_clock = NULL;
+    if( p_es->p_clock != NULL ) /* SubEs have their own clocks */
+    {
+        vlc_clock_Delete( p_es->p_clock );
+        p_es->p_clock = NULL;
+    }
 
     if( p_es->p_dec_record )
     {
@@ -2366,22 +2358,6 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
 
     if( !es->p_pgrm )
         return;
-
-    if( es->p_master )
-    {
-        int i_channel;
-        if( !es->p_master->p_dec )
-            return;
-
-        i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-
-        if( i_channel == -1 ||
-            vlc_input_decoder_SetCcState( es->p_master->p_dec, i_channel, true ) )
-            return;
-
-        EsOutSendEsEvent(out, es, VLC_INPUT_ES_SELECTED, b_force);
-        return;
-    }
 
     const bool b_sout = input_priv(p_input)->p_sout != NULL;
     /* If b_forced, the ES is specifically requested by the user, so bypass
@@ -2455,18 +2431,6 @@ static void EsOutDrainSubESes(es_out_id_t *parent)
     }
 }
 
-static void EsDeleteSubESes(es_out_t *out, es_out_id_t *parent)
-{
-    for (size_t i = 0; i < parent->sub_es_vec.size; ++i)
-    {
-        es_out_id_t *es = parent->sub_es_vec.data[i];
-        assert(es != NULL);
-        EsOutDelLocked(out, es);
-    }
-
-    vlc_vector_clear(&parent->sub_es_vec);
-}
-
 static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -2481,21 +2445,7 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
     if( p_sys->p_next_frame_es == es )
         EsOutStopNextFrame( out );
 
-    if( es->p_master )
-    {
-        if( es->p_master->p_dec )
-        {
-            int i_channel = EsOutGetClosedCaptionsChannel( &es->fmt );
-            if( i_channel != -1 )
-                vlc_input_decoder_SetCcState( es->p_master->p_dec,
-                                              i_channel, false );
-        }
-    }
-    else
-    {
-        EsDeleteSubESes( out, es );
-        EsOutDestroyDecoder( out, es );
-    }
+    EsOutDestroyDecoder( out, es );
 
     if( !b_update )
         return;
@@ -2795,7 +2745,6 @@ static void EsOutCreateSubESes(es_out_t *out,
                                es_out_id_t *parent)
 {
     es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
-    input_thread_t *input = sys->p_input;
 
     size_t prev_count = parent->sub_es_vec.size;
     bool success = vlc_vector_reserve(&parent->sub_es_vec, desc->fmt_count);
@@ -2823,9 +2772,6 @@ static void EsOutCreateSubESes(es_out_t *out,
         }
         success = vlc_vector_insert(&parent->sub_es_vec, i, es);
         assert(success); /* vlc_vector_reserve() already checked */
-
-        msg_Dbg(input, "Added Sub track [%s] from parent [%s]",
-                es->id.str_id , parent->id.str_id);
 
         switch (fmt->i_cat)
         {
@@ -2953,6 +2899,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     /* Decode */
+    assert(es->p_master == NULL);
     if( es->p_dec_record )
     {
         block_t *p_dup = block_Duplicate( p_block );
@@ -3485,7 +3432,6 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         if( es->p_dec )
         {
             EsOutDrainDecoder(out, es, true);
-            EsDeleteSubESes(out, es);
             EsOutDestroyDecoder( out, es );
         }
 
