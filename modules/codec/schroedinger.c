@@ -1014,7 +1014,7 @@ static inline bool SchroSetEnum( encoder_t *p_enc, int i_list_size, const char *
     return false;
 }
 
-static bool SetEncChromaFormat( encoder_t *p_enc, uint32_t i_codec )
+static bool SetEncChromaFormat( encoder_t *p_enc, vlc_fourcc_t i_codec )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
 
@@ -1022,7 +1022,7 @@ static bool SetEncChromaFormat( encoder_t *p_enc, uint32_t i_codec )
     case VLC_CODEC_I420:
         p_enc->fmt_in.i_codec = i_codec;
         p_sys->p_format->chroma_format = SCHRO_CHROMA_420;
-           break;
+        break;
     case VLC_CODEC_I422:
         p_enc->fmt_in.i_codec = i_codec;
         p_sys->p_format->chroma_format = SCHRO_CHROMA_422;
@@ -1165,22 +1165,22 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( !psz_tmp )
         goto error;
     else {
-        uint32_t i_codec;
+        vlc_fourcc_t i_chroma;
         if( !strcmp( psz_tmp, "420" ) ) {
-            i_codec = VLC_CODEC_I420;
+            i_chroma = VLC_CODEC_I420;
         }
         else if( !strcmp( psz_tmp, "422" ) ) {
-            i_codec = VLC_CODEC_I422;
+            i_chroma = VLC_CODEC_I422;
         }
         else if( !strcmp( psz_tmp, "444" ) ) {
-            i_codec = VLC_CODEC_I444;
+            i_chroma = VLC_CODEC_I444;
         }
         else {
             msg_Err( p_enc, "Invalid chroma format: %s", psz_tmp );
             free( psz_tmp );
             goto error;
         }
-        SetEncChromaFormat( p_enc, i_codec );
+        SetEncChromaFormat( p_enc, i_chroma );
     }
     free( psz_tmp );
 
