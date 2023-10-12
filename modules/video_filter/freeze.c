@@ -109,8 +109,9 @@ static int Open( filter_t *p_filter )
     /* Reject 0 bpp and unsupported chroma */
     const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;
     const vlc_chroma_description_t *p_chroma
-          = vlc_fourcc_GetChromaDescription( p_filter->fmt_in.video.i_chroma );
-    if( !p_chroma || p_chroma->pixel_size == 0
+          = vlc_fourcc_GetChromaDescription( fourcc );
+    assert( p_chroma != NULL );
+    if( p_chroma->pixel_size == 0
         || p_chroma->plane_count < 3 || p_chroma->pixel_size > 1
         || !vlc_fourcc_IsYUV( fourcc ) )
     {
