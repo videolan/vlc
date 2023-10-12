@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hib-tD-Vvh" customClass="VLCLibraryCarouselViewItemView">
+            <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="6QI-EH-rMu" customClass="VLCImageView">
+                    <rect key="frame" x="0.0" y="42" width="468" height="412"/>
+                    <subviews>
+                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="yL8-2q-Oke" customClass="VLCLinearProgressIndicator">
+                            <rect key="frame" x="0.0" y="0.0" width="468" height="4"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="4" id="e6s-3X-uz4"/>
+                            </constraints>
+                        </customView>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syV-Ok-FR7">
+                            <rect key="frame" x="202" y="174" width="64" height="64"/>
+                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="824-Le-0iH">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                        </button>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="isd-eb-9XW" customClass="VLCRoundedCornerTextField">
+                            <rect key="frame" x="3" y="391" width="37" height="16"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="UPP-lQ-LJU">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="yL8-2q-Oke" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="Gm9-k6-wLd"/>
+                        <constraint firstItem="syV-Ok-FR7" firstAttribute="centerX" secondItem="6QI-EH-rMu" secondAttribute="centerX" id="Psg-YF-rcM"/>
+                        <constraint firstAttribute="bottom" secondItem="yL8-2q-Oke" secondAttribute="bottom" id="T2x-wN-od0"/>
+                        <constraint firstItem="isd-eb-9XW" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" constant="5" id="Vgu-8n-XUQ"/>
+                        <constraint firstItem="isd-eb-9XW" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="top" constant="5" id="crc-Yn-dBs"/>
+                        <constraint firstAttribute="trailing" secondItem="yL8-2q-Oke" secondAttribute="trailing" id="g4b-g0-GWl"/>
+                        <constraint firstItem="syV-Ok-FR7" firstAttribute="centerY" secondItem="6QI-EH-rMu" secondAttribute="centerY" id="rwX-LB-Wzb"/>
+                    </constraints>
+                </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CKr-3L-pMu">
+                    <rect key="frame" x="3" y="21" width="462" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" usesSingleLineMode="YES" id="eyx-mZ-AnK">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="orq-rq-pBK">
+                    <rect key="frame" x="3" y="5" width="462" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="mOK-xd-hhN">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="6QI-EH-rMu" firstAttribute="leading" secondItem="Hib-tD-Vvh" secondAttribute="leading" id="0jm-0O-LrX"/>
+                <constraint firstItem="orq-rq-pBK" firstAttribute="leading" secondItem="Hib-tD-Vvh" secondAttribute="leading" constant="5" id="IlA-QV-Zl1"/>
+                <constraint firstItem="CKr-3L-pMu" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="bottom" constant="5" id="Qln-LR-oL5"/>
+                <constraint firstItem="CKr-3L-pMu" firstAttribute="leading" secondItem="Hib-tD-Vvh" secondAttribute="leading" constant="5" id="bW1-WZ-Ycn"/>
+                <constraint firstItem="orq-rq-pBK" firstAttribute="top" secondItem="CKr-3L-pMu" secondAttribute="bottom" id="bfh-C3-WkB"/>
+                <constraint firstItem="6QI-EH-rMu" firstAttribute="top" secondItem="Hib-tD-Vvh" secondAttribute="top" id="eG8-yk-fCb"/>
+                <constraint firstAttribute="trailing" secondItem="CKr-3L-pMu" secondAttribute="trailing" constant="5" id="edB-6v-tSL"/>
+                <constraint firstAttribute="trailing" secondItem="6QI-EH-rMu" secondAttribute="trailing" id="oce-vs-pLd"/>
+                <constraint firstAttribute="trailing" secondItem="orq-rq-pBK" secondAttribute="trailing" constant="5" id="rou-q0-WrF"/>
+                <constraint firstAttribute="bottom" secondItem="orq-rq-pBK" secondAttribute="bottom" constant="5" id="vwh-Yj-Ux4"/>
+            </constraints>
+            <point key="canvasLocation" x="3" y="162"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="libraryPlay" width="64" height="64"/>
+    </resources>
+</document>
