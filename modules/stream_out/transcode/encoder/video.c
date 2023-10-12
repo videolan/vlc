@@ -236,7 +236,7 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     video_format_t *p_enc_out = &p_enc->p_encoder->fmt_out.video;
 
     /* Complete destination format */
-    p_enc->p_encoder->fmt_out.i_codec = p_enc_out->i_chroma = p_cfg->i_codec;
+    p_enc->p_encoder->fmt_out.i_codec = p_cfg->i_codec;
     p_enc->p_encoder->fmt_out.i_bitrate = p_cfg->video.i_bitrate;
     p_enc_out->i_sar_num = p_enc_out->i_sar_den = 0;
     transcode_encoder_video_set_src(p_enc->p_encoder, p_src, p_cfg);
