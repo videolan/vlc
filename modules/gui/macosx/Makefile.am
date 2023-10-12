@@ -95,6 +95,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputNodePathControl.m \
 	gui/macosx/library/VLCInputNodePathControlItem.h \
 	gui/macosx/library/VLCInputNodePathControlItem.m \
+	gui/macosx/library/VLCLibraryCarouselViewItemView.h \
+	gui/macosx/library/VLCLibraryCarouselViewItemView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDataSource.h \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.h \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
