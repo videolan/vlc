@@ -254,7 +254,7 @@ FocusScope {
                     Layout.fillHeight: true
                     z: 0
 
-                    Widgets.StackViewExt {
+                    Widgets.PageLoader {
                         id: stackView
 
                         focus: true

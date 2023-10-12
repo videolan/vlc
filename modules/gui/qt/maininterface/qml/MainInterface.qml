@@ -237,7 +237,7 @@ Item {
                 }
             }
 
-            Widgets.StackViewExt {
+            Widgets.PageLoader {
                 id: stackView
                 anchors.fill: parent
                 focus: true
