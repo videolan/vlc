@@ -69,9 +69,9 @@ Widgets.PageLoader {
             model: deviceModel
             contextMenu: contextMenu
 
-            onBrowse: History.push(["mc", "discover", "services", "source_browse",
+            onBrowse: History.push(["mc", "discover", "services", "source_browse"],
                                     { tree: tree, "root_name": deviceModel.name,
-                                      "source_name": source_name }], reason)
+                                      "source_name": source_name }, reason)
 
             NetworkDeviceModel {
                 id: deviceModel
@@ -106,16 +106,16 @@ Widgets.PageLoader {
 
                 onBrowse: {
                     if (!!tree.isRoot)
-                        History.push(["mc", "discover", "services", "source_root",
-                                      { source_name: tree.source_name }], reason)
+                        History.push(["mc", "discover", "services", "source_root"],
+                                      { source_name: tree.source_name }, reason)
                     else
-                        History.push(["mc", "discover", "services", "source_browse",
-                                      { tree: tree, "root": root_name }], reason)
+                        History.push(["mc", "discover", "services", "source_browse"],
+                                      { tree: tree, "root": root_name }, reason)
                 }
             }
 
-            onBrowse: History.push(["mc", "discover", "services", "source_browse",
-                                    { tree: tree, "root": root_name }], reason)
+            onBrowse: History.push(["mc", "discover", "services", "source_browse"],
+                                    { tree: tree, "root": root_name }, reason)
 
             model: NetworkMediaModel {
                 id: mediaModel

@@ -3,96 +3,46 @@
 #include "network/networkmediamodel.hpp"
 #include "medialibrary/mlqmltypes.hpp"
 
-
 NavigationHistory::NavigationHistory(QObject *parent)
-    : QObject(parent),
-      m_reason(Qt::OtherFocusReason)
+    : QObject(parent)
 {
-}
-
-QVariant NavigationHistory::getCurrent()
-{
-    assert(m_history.isEmpty() == false);
-
-    return m_history.back();
 }
 
 bool NavigationHistory::isPreviousEmpty()
 {
-    return m_history.count() <= 1;
+    return m_history.size() <= 1;
 }
 
-void NavigationHistory::push(QVariantMap item, Qt::FocusReason reason, PostAction postAction)
+void NavigationHistory::push(QStringList path, const QVariantMap& properties, Qt::FocusReason focusReason)
 {
-    m_history.push_back(item);
-    emit previousEmptyChanged(false);
-    if (postAction == PostAction::Go)
-    {
-        updateViewPath();
+    auto prop = std::make_unique<QQmlPropertyMap>();
+    for (auto it =  properties.keyValueBegin(); it != properties.keyValueEnd(); ++it)
+        prop->insert((*it).first, (*it).second);
 
-        m_reason = reason;
+    m_history.emplace_back(path, std::move(prop));
 
-        emit currentChanged(m_history.back());
-    }
+    updateCurrent();
+
+    if (m_history.size() == 2)
+        emit previousEmptyChanged(false);
+
+    emit navigate(focusReason);
 }
 
-static void pushListRec(QVariantMap& itemMap, QVariantList::const_iterator it, QVariantList::const_iterator end )
+void NavigationHistory::push(QStringList path, Qt::FocusReason focusReason)
 {
-    if (it == end)
-        return;
-    if(it->canConvert<QString>())
-    {
-        QVariantMap subViewMap;
-        subViewMap["name"] = it->toString();
-        QVariantMap subViewProperties;
-        pushListRec(subViewProperties, ++it, end);
-        subViewMap["properties"] = subViewProperties;
-        itemMap["view"] = subViewMap;
-    }
-    else if ( it->canConvert<QVariantMap>() )
-    {
-        QVariantMap varMap = it->toMap();
-        for (auto kv = varMap.constBegin(); kv != varMap.constEnd(); ++kv )
-            itemMap[kv.key()] = kv.value();
-        pushListRec(itemMap, ++it, end);
-    }
+    m_history.emplace_back(path, std::make_unique<QQmlPropertyMap>());
+
+    updateCurrent();
+
+    if (m_history.size() == 2)
+        emit previousEmptyChanged(false);
+
+    emit navigate(focusReason);
+
 }
 
-static void addLeafRec(QVariant &item, const QVariantMap &leaf)
-{
-    auto itemMap = item.toMap();
-    if (itemMap.contains("view"))
-    {
-        QVariant viewProps = itemMap.value("view");
-        addLeafRec(viewProps, leaf);
-        itemMap["view"] = viewProps;
-    }
-    else if (itemMap.contains("properties"))
-    {
-        QVariant propsVar = itemMap.value("properties");
-        const auto propsMap = propsVar.toMap();
-        if (propsMap.empty())
-        {
-            itemMap["properties"] = leaf;
-        }
-        else
-        {
-            addLeafRec(propsVar, leaf);
-            itemMap["properties"] = propsVar;
-        }
-    }
-    else
-    {
-        // invalid node?
-        return;
-    }
-
-    //overwrite item QVariant
-    item = itemMap;
-}
-
-
-static bool isNodeValid(QVariant& value)
+static bool isNodeValid(const QVariant& value)
 {
     if (value.canConvert(QVariant::StringList)
         || value.canConvert(QVariant::StringList)
@@ -107,7 +57,8 @@ static bool isNodeValid(QVariant& value)
     else if ( value.canConvert(QVariant::List) )
     {
         QVariantList valueList = value.toList();
-        for (QVariant& v : valueList) {
+        for (QVariant& v : valueList)
+        {
             if (!isNodeValid(v))
                 return false;
         }
@@ -117,18 +68,17 @@ static bool isNodeValid(QVariant& value)
     {
         NetworkTreeItem item = value.value<NetworkTreeItem>();
         if ( ! item.isValid() )
-        {
             return false;
-        }
+
         return true;
     }
     else if ( value.canConvert(QVariant::Map) )
     {
         QVariantMap valueList = value.toMap();
-        for (QVariant& v : valueList.values()) {
-            if (!isNodeValid(v)) {
+        for (QVariant& v : valueList.values())
+        {
+            if (!isNodeValid(v))
                 return false;
-            }
         }
         return true;
     }
@@ -137,91 +87,81 @@ static bool isNodeValid(QVariant& value)
     return false;
 }
 
-static QStringList getViewPath(QVariantMap map)
+static bool isNodeValid(const QQmlPropertyMap& value)
 {
-    QStringList r;
-    if (map.contains("view"))
-        return getViewPath(map.value("view").toMap());
-    else if (map.contains("name"))
+    for (auto it: value.keys())
     {
-        r = QStringList( map.value("name").toString() );
-        r.append(std::move(getViewPath(map.value("properties").toMap())));
+        if (!isNodeValid(value[it]))
+            return false;
     }
-    return r;
-}
-
-void NavigationHistory::push(QVariantList itemList, Qt::FocusReason reason,
-                             NavigationHistory::PostAction postAction)
-{
-    QVariantMap itemMap;
-    pushListRec(itemMap, itemList.cbegin(), itemList.cend());
-    if (!itemMap.contains("view"))
-        return;
-    QVariant rootView = itemMap["view"];
-    if (!rootView.canConvert(QVariant::Map))
-        return;
-    push(rootView.toMap(), reason, postAction);
+    return true;
 }
 
 
-void NavigationHistory::update(QVariantMap item)
+
+void NavigationHistory::update(QStringList path)
 {
-    assert(m_history.size() >= 1);
-    m_history.back() = item;
-    updateViewPath();
+    if (m_history.size() == 0)
+    {
+        m_history.emplace_back(path, std::make_unique<QQmlPropertyMap>());
+    }
+    else
+    {
+        auto& last = *m_history.rbegin();
+        last.first = path;
+    }
+    updateCurrent();
 }
 
-void NavigationHistory::update(QVariantList itemList)
+void NavigationHistory::update(QStringList path, const QVariantMap& properties)
 {
-    QVariantMap itemMap;
-    pushListRec(itemMap, itemList.cbegin(), itemList.cend());
-    if (!itemMap.contains("view"))
-        return;
-    QVariant rootView = itemMap["view"];
-    if (!rootView.canConvert(QVariant::Map))
-        return;
-    update(rootView.toMap());
+    if (m_history.size() == 0)
+    {
+        auto prop = std::make_unique<QQmlPropertyMap>();
+        for (auto it =  properties.keyValueBegin(); it != properties.keyValueEnd(); ++it)
+        {
+            prop->insert((*it).first, (*it).second);
+        }
+        m_history.emplace_back(path, std::move(prop));
+    }
+    else
+    {
+        auto& last = *m_history.rbegin();
+        last.first = path;
+    }
+    updateCurrent();
 }
 
-void NavigationHistory::addLeaf(QVariantMap itemMap)
-{
-    assert(m_history.size() >= 1);
-    addLeafRec(m_history.back(), itemMap);
-    updateViewPath();
-}
 
-void NavigationHistory::previous(Qt::FocusReason reason, PostAction postAction)
+void NavigationHistory::previous(Qt::FocusReason reason)
 {
-    if (m_history.count() == 1)
+    if (m_history.size() == 1)
         return;
 
     m_history.pop_back();
-    while (!isNodeValid(m_history.back())) {
+
+    while (!isNodeValid(*m_history.back().second)) {
         m_history.pop_back();
-        if (m_history.count() == 1)
+        if (m_history.size() == 1)
             break;
     }
 
-    if (m_history.count() == 1)
+    if (m_history.size() == 1)
         emit previousEmptyChanged(true);
 
-    if (postAction == PostAction::Go) {
-        updateViewPath();
-
-        m_reason = reason;
-
-        emit currentChanged( m_history.back() );
-    }
+    updateCurrent();
+    emit navigate(reason);
 }
 
-void NavigationHistory::updateViewPath()
+void NavigationHistory::updateCurrent()
 {
-    const auto viewPath = getViewPath(getCurrent().toMap());
-    if (viewPath == m_viewPath)
-        return;
+    assert(m_history.size() >= 1);
+    const auto it = m_history.rbegin();
 
-    m_viewPath = viewPath;
-    emit viewPathChanged( m_viewPath );
+    m_viewPath = it->first;
+    m_viewProperties = it->second.get();
+    emit viewPathChanged(m_viewPath);
+    emit viewPropChanged(m_viewProperties);
 }
 
 QStringList NavigationHistory::viewPath() const
@@ -229,13 +169,32 @@ QStringList NavigationHistory::viewPath() const
     return m_viewPath;
 }
 
-Qt::FocusReason NavigationHistory::takeFocusReason()
+QQmlPropertyMap* NavigationHistory::viewProp() const
 {
-    Qt::FocusReason reason = m_reason;
+    return m_viewProperties;
+}
 
-    m_reason = Qt::OtherFocusReason;
+QVariant viewPropLegacyBuilder(QStringList::const_iterator it, QStringList::const_iterator end, QQmlPropertyMap* properties)
+{
+    QVariantMap prop;
+    if (it+1 == end)
+    {
+        for (auto key : properties->keys())
+            prop[key] = properties->value(key);
+    }
+    else
+    {
+        prop["view"] = viewPropLegacyBuilder(it+1, end, properties);
+    }
+    QVariantMap ret;
+    ret["name"] = *it;
+    ret["properties"] = prop;
+    return ret;
+}
 
-    return reason;
+QVariant NavigationHistory::viewPropLegacy() const
+{
+    return viewPropLegacyBuilder(m_viewPath.cbegin(), m_viewPath.cend(), m_viewProperties);
 }
 
 Q_INVOKABLE bool NavigationHistory::match(const QStringList& path,  const QStringList& pattern)

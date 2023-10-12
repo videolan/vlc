@@ -63,9 +63,9 @@ Widgets.PageLoader {
 
         onSeeAll: {
             if (sd_source === -1)
-                History.push(["mc", "network", "folders", { title: title }], reason)
+                History.push(["mc", "network", "folders"], { title: title }, reason)
             else
-                History.push(["mc", "network", "device", { title: title, sd_source: sd_source }],
+                History.push(["mc", "network", "device"], { title: title, sd_source: sd_source },
                              reason)
         }
     }
@@ -73,7 +73,7 @@ Widgets.PageLoader {
     Connections {
         target: root.currentItem
 
-        onBrowse: History.push(["mc", "network", "browse", { tree: tree }], reason)
+        onBrowse: History.push(["mc", "network", "browse"], { tree: tree }, reason)
     }
 
     // Children
@@ -157,7 +157,7 @@ Widgets.PageLoader {
 
             onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
 
-            onBrowse: History.push(["mc", "network", "browse", { "tree": tree }], reason)
+            onBrowse: History.push(["mc", "network", "browse"], { "tree": tree }, reason)
         }
     }
 }

@@ -85,8 +85,8 @@ MainInterface.MainGridView {
                 History.push(["mc", "discover", "services", "services_manage"],
                              Qt.MouseFocusReason)
             else
-                History.push(["mc", "discover", "services", "source_root",
-                              { source_name: model.name }], Qt.MouseFocusReason)
+                History.push(["mc", "discover", "services", "source_root"],
+                              { source_name: model.name }, Qt.MouseFocusReason)
         }
 
         onItemClicked : {
@@ -102,8 +102,8 @@ MainInterface.MainGridView {
         if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
             History.push(["mc", "discover", "services", "services_manage"], Qt.TabFocusReason)
         else
-            History.push(["mc", "discover", "services", "source_root",
-                          { source_name: itemData.name }], Qt.TabFocusReason)
+            History.push(["mc", "discover", "services", "source_root"],
+                          { source_name: itemData.name }, Qt.TabFocusReason)
     }
 
     Navigation.cancelAction: function() {

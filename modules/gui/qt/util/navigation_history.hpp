@@ -1,6 +1,8 @@
 #ifndef NAVIGATION_HISTORY_HPP
 #define NAVIGATION_HISTORY_HPP
 
+#include <memory>
+
 #include <QObject>
 #include <QtQml/QQmlPropertyMap>
 
@@ -8,9 +10,21 @@ class NavigationHistory : public QObject
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged FINAL)
+    //@depecated this property only exists during while refactoring code
+    Q_PROPERTY(QVariant viewPropLegacy READ viewPropLegacy NOTIFY viewPropChanged FINAL)
+
+
     Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged FINAL)
+    /**
+     * current path
+     */
     Q_PROPERTY(QStringList viewPath READ viewPath NOTIFY viewPathChanged FINAL)
+    /**
+     * properties of the current view,
+     * * properties that are pushed will be accessible thru this property
+     * * views may store values in this property, they will be restored when navigating back
+     */
+    Q_PROPERTY(QQmlPropertyMap* viewProp READ viewProp NOTIFY viewPropChanged FINAL)
 
     enum class PostAction{
         Stay,
@@ -24,90 +38,58 @@ public:
     QVariant getCurrent();
     bool isPreviousEmpty();
     QStringList viewPath() const;
-
-    // NOTE: The first item to call this takes ownership over the focus reason.
-    Q_INVOKABLE Qt::FocusReason takeFocusReason();
+    QQmlPropertyMap* viewProp() const;
+    QVariant viewPropLegacy() const;
 
     Q_INVOKABLE bool match(const QStringList& path,  const QStringList& pattern);
     Q_INVOKABLE bool exactMatch(const QStringList& path,  const QStringList& pattern);
 
 signals:
-    void currentChanged(QVariant current);
+    void navigate(Qt::FocusReason);
     void previousEmptyChanged(bool empty);
     void viewPathChanged(const QStringList& viewPath);
+    void viewPropChanged(QQmlPropertyMap*);
 
 public slots:
     /**
-     * Push a
      *
-     * \code
-     * push({
-     *   name: "foo", //push the view foo
-     *   properties: {
-     *      view: { //the sub view "bar"
-     *          name: "bar",
-     *          properties: {
-     *              baz: "plop" //the property baz will be set in the view "bar"
-     *          }
-     *      }
-     *   }
-     * }, History.Go)
-     * \endcode
-     */
-    Q_INVOKABLE void push( QVariantMap, Qt::FocusReason = Qt::OtherFocusReason,
-                           PostAction = PostAction::Go );
-
-    /**
-     * provide a short version of the history push({k:v}), which implicitly create a dictonnary tree from the input list
+     * navigate to a new page
      *
-     * List items are interpreted as
-     *   * strings will push a dict with "view" key to the value of the string and
-     *     a "viewProperties" dict configured with the tail of the list
-     *
-     *   * dict: values will be added to the current viewProperty
+     * @param path: path of the page to load
+     * @param properties: values that will be set to the current viewProp
      *
      * example:
      * \code
      * //push the view foo, then bar, set baz to plop in the view "bar"
-     *  push(["foo", "bar", {baz: "plop"} ], History.Go)
+     *  push(["foo", "bar"], {baz: "plop"})
      * \endcode
      */
-    Q_INVOKABLE void push(QVariantList itemList, Qt::FocusReason = Qt::OtherFocusReason,
-                          PostAction = PostAction::Go );
+    Q_INVOKABLE void push(QStringList path, const QVariantMap& properties, Qt::FocusReason focusReason = Qt::OtherFocusReason);
+    Q_INVOKABLE void push(QStringList path, Qt::FocusReason focusReason = Qt::OtherFocusReason);
 
 
-    /**
-     * @brief same as @a push(QVariantMap) but modify the last (current) item instead of insterting a new one
-     *
-     * @see push
-     */
-    Q_INVOKABLE void update(QVariantMap itemList);
 
     /**
-     * @brief same as @a push(QVariantList) but modify the last (current) item instead of insterting a new one
+     * @brief modify the current history path
      *
-     * @see push
+     * @note:
+     * * invoking update won't cause page to be reloaded, this mainly affects history
+     * * invoking update when there is no path will create a node (the initial history node)
      */
-    Q_INVOKABLE void update(QVariantList itemList);
+    Q_INVOKABLE void update(QStringList path);
 
-    /**
-     * @brief same as @a push(QVariantList) but modify the last (current) item's tail instead of insterting a new one
-     *
-     * @see push
-     */
-    Q_INVOKABLE void addLeaf(QVariantMap itemMap);
+    Q_INVOKABLE void update(QStringList path, const QVariantMap& properties);
 
 
-    // Go to previous page
-    void previous( Qt::FocusReason = Qt::OtherFocusReason, PostAction = PostAction::Go );
+    /// Go to previous page
+    void previous(Qt::FocusReason = Qt::OtherFocusReason);
 
 private:
-    void updateViewPath();
+    void updateCurrent();
 
-    QVariantList m_history;
+    std::vector<std::pair<QStringList, std::unique_ptr<QQmlPropertyMap>>> m_history;
     QStringList m_viewPath;
-
-    Qt::FocusReason m_reason;
+    QQmlPropertyMap* m_viewProperties = nullptr;
 };
 
 #endif // NAVIGATION_HISTORY_HPP

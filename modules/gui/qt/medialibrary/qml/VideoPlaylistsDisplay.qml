@@ -53,15 +53,15 @@ Widgets.PageLoader {
     // Private
 
     function _updateHistoryList(index) {
-        History.update(["mc", "video", "playlists", "all", { "initialIndex": index }]);
+        History.update(["mc", "video", "playlists", "all"], { "initialIndex": index })
     }
 
     function _updateHistoryPlaylist(playlist) {
-        History.update(["mc", "video", "playlists", "list", {
+        History.update(["mc", "video", "playlists", "list"], {
                             "currentIndex": playlist.currentIndex,
                             "parentId"   : playlist.parentId,
                             "name" : playlist.name
-                        }]);
+                        });
     }
 
     //---------------------------------------------------------------------------------------------
@@ -82,8 +82,8 @@ Widgets.PageLoader {
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
             onShowList: (model, reason) => {
-                History.push(["mc", "video", "playlists", "list",
-                             { parentId: model.id, name: model.name }], reason);
+                History.push(["mc", "video", "playlists", "list"],
+                             { parentId: model.id, name: model.name }, reason);
             }
         }
     }

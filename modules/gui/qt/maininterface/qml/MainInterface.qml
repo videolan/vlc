@@ -49,15 +49,16 @@ Item {
         //set the initial view
         const loadPlayer = !MainPlaylistController.empty;
 
-        if (MainCtx.mediaLibraryAvailable)
-            History.push(["mc", "video"],
-                         Qt.OtherFocusReason, loadPlayer ? History.Stay : History.Go)
-        else
-            History.push(["mc", "home"],
-                         Qt.OtherFocusReason, loadPlayer ? History.Stay : History.Go)
-
         if (loadPlayer)
+        {
+            if (MainCtx.mediaLibraryAvailable)
+                History.update(["mc", "video"])
+            else
+                History.update(["mc", "home"])
             History.push(["player"])
+        }
+        else
+            _pushHome()
     }
 
     function _pushHome() {
@@ -67,20 +68,14 @@ Item {
             History.push(["mc", "home"])
     }
 
-    function loadCurrentHistoryView() {
-        const current = History.current
-        if ( !current || !current.name  || !current.properties ) {
-            console.warn("unable to load requested view, undefined")
-            return
-        }
+    function loadCurrentHistoryView(focusReason) {
+
         contextSaver.save(_oldHistoryPath)
 
-        stackView.loadView(_pageModel, current.name, current.properties)
+        stackView.loadView(_pageModel, History.viewPropLegacy.name, History.viewPropLegacy.properties)
 
         contextSaver.restore(History.viewPath)
         _oldHistoryPath = History.viewPath
-
-        MainCtx.mediaLibraryVisible = !History.match(History.viewPath, ["player"])
     }
 
     Util.ModelSortSettingHandler {
@@ -162,7 +157,10 @@ Item {
 
         Connections {
             target: History
-            onCurrentChanged: loadCurrentHistoryView()
+            onNavigate: (focusReason) => {
+                loadCurrentHistoryView(focusReason)
+                MainCtx.mediaLibraryVisible = !History.match(History.viewPath, ["player"])
+            }
         }
 
         Connections {

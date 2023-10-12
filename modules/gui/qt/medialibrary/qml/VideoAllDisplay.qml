@@ -60,15 +60,15 @@ Widgets.PageLoader {
     // Functions private
 
     function _updateHistoryAll(index) {
-        History.update(["mc", "video", "all", "base", { "initialIndex": index }])
+        History.update(["mc", "video", "all", "base"], { "initialIndex": index })
     }
 
     function _updateHistoryGroup(group) {
-        History.update(["mc", "video", "all", "group", {
+        History.update(["mc", "video", "all", "group"], {
                             "initialIndex": group.currentIndex,
                             "parentId" : group.parentId,
                             "title" : group.title
-                        }])
+                        })
     }
 
     // Children
@@ -80,8 +80,8 @@ Widgets.PageLoader {
             // Events
 
             onShowList: (model, reason) => {
-                History.push(["mc", "video", "all", "group",
-                    { parentId: model.id, title: model.title }], reason)
+                History.push(["mc", "video", "all", "group"],
+                    { parentId: model.id, title: model.title }, reason)
             }
 
 

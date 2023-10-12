@@ -242,7 +242,7 @@ FocusScope {
                         if (_oldViewProperties[name] === undefined)
                             History.push(["mc", name])
                         else
-                            History.push(["mc", name, _oldViewProperties[name]])
+                            History.push(["mc", name], _oldViewProperties[name])
                     }
 
                     Navigation.parentItem: medialibId

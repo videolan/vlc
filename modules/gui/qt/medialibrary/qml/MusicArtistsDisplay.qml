@@ -46,14 +46,14 @@ Widgets.PageLoader {
     }
 
     function _updateArtistsAllHistory(currentIndex) {
-        History.update(["mc", "music", "artists", "all", { "initialIndex": currentIndex }])
+        History.update(["mc", "music", "artists", "all"], { "initialIndex": currentIndex })
     }
 
     function _updateArtistsAlbumsHistory(currentIndex, initialAlbumIndex) {
-        History.update(["mc","music", "artists", "albums", {
+        History.update(["mc","music", "artists", "albums"], {
             "initialIndex": currentIndex,
             "initialAlbumIndex": initialAlbumIndex,
-        }])
+        })
     }
 
     Component {

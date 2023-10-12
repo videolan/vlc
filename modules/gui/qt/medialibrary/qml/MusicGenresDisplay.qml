@@ -43,15 +43,15 @@ Widgets.PageLoader {
 
 
     function _updateGenresAllHistory(currentIndex) {
-        History.update(["mc", "music", "genres", "all", { "initialIndex": currentIndex }])
+        History.update(["mc", "music", "genres", "all"], { "initialIndex": currentIndex })
     }
 
     function _updateGenresAlbumsHistory(currentIndex, parentId, genreName) {
-        History.update(["mc","music", "genres", "albums", {
+        History.update(["mc","music", "genres", "albums"], {
             "initialIndex": currentIndex,
             "parentId": parentId,
             "genreName": genreName,
-        }])
+        })
     }
 
     Component {
@@ -64,8 +64,8 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onShowAlbumView: History.push(["mc", "music", "genres", "albums",
-                                           { parentId: id, genreName: name }], reason)
+            onShowAlbumView: History.push(["mc", "music", "genres", "albums"],
+                                           { parentId: id, genreName: name }, reason)
         }
     }
 
