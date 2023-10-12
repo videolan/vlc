@@ -32,7 +32,6 @@ MainInterface.MainViewLoader {
     // Properties
 
     property var contextMenu
-    property var tree
 
     readonly property var currentIndex: _currentView.currentIndex
 
@@ -65,8 +64,6 @@ MainInterface.MainViewLoader {
     Navigation.cancelAction: function() {
         History.previous(Qt.BacktabFocusReason)
     }
-
-    onTreeChanged: model.tree = tree
 
     function playSelected() {
         model.addAndPlay(selectionModel.selectedIndexes)

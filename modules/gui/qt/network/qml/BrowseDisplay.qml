@@ -33,8 +33,8 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "home",
-        url: "qrc:///network/BrowseHomeDisplay.qml",
         default: true,
+        component: browseHome
     }, {
         name: "folders",
         component: browseFolders,
@@ -52,27 +52,44 @@ Widgets.PageLoader {
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Browse view")
 
-    // Connections
-    Connections {
-        target: (Helpers.isValidInstanceOf(currentItem, BrowseHomeDisplay)) ? currentItem
-                                                                              : null
+    //functions
 
-        onSeeAll: {
-            if (sd_source === -1)
-                History.push(["mc", "network", "folders"], { title: title }, reason)
-            else
-                History.push(["mc", "network", "device"], { title: title, sd_source: sd_source },
-                             reason)
-        }
+    function _showBrowseNode(tree, reason) {
+        History.push([...root.pagePrefix, "browse"], { tree: tree }, reason)
     }
 
-    Connections {
-        target: root.currentItem
+    function _showHome(reason) {
+        History.push([...root.pagePrefix, "home"], reason)
+    }
 
-        onBrowse: History.push(["mc", "network", "browse"], { tree: tree }, reason)
+
+    function _showBrowseFolder(title, reason) {
+        History.push([...root.pagePrefix, "folders"], { title: title }, reason)
+    }
+
+    function _showBrowseDevices(title, sd_source, reason) {
+        History.push([...root.pagePrefix, "device"], { title: title, sd_source: sd_source }, reason)
     }
 
     // Children
+    Component {
+        id: browseHome
+
+        BrowseHomeDisplay {
+            onSeeAllDevices: (title, sd_source, reason) => {
+                root._showBrowseDevices(title, sd_source, reason)
+            }
+
+            onSeeAllFolders:(title, reason) => {
+                root._showBrowseFolder(title, reason)
+            }
+
+            onBrowse: (tree, reason) => {
+                root._showBrowseNode(tree, reason)
+            }
+        }
+    }
+
 
     Component {
         id: browseFolders
@@ -91,6 +108,8 @@ Widgets.PageLoader {
                 searchPattern: MainCtx.search.pattern
             }
 
+            onBrowse: (tree, reason) => { root._showBrowseNode(tree, reason) }
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
@@ -101,7 +120,7 @@ Widgets.PageLoader {
         BrowseDeviceView {
             id: viewDevice
 
-            property var sd_source
+            /*required*/ property var sd_source
 
             property var sortModel: [
                 { text: I18n.qtr("Alphabetic"), criteria: "name" },
@@ -121,6 +140,10 @@ Widgets.PageLoader {
                 searchPattern: MainCtx.search.pattern
             }
 
+            onBrowse: (tree, reason) => {
+                root._showBrowseNode(tree, reason)
+            }
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
@@ -129,6 +152,9 @@ Widgets.PageLoader {
         id: browseComponent
 
         BrowseTreeDisplay {
+
+            property alias tree: mediaModel.tree
+
             model: NetworkMediaModel {
                 id: mediaModel
 
@@ -147,6 +173,10 @@ Widgets.PageLoader {
                 History.previous(Qt.BacktabFocusReason)
             }
 
+            onBrowse: (tree, reason) => {
+                root._showBrowseNode(tree, reason)
+            }
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
     }
@@ -157,9 +187,9 @@ Widgets.PageLoader {
         NetworkAddressbar {
             path: root.pageName === "browse" ? root.currentItem.model.path : []
 
-            onHomeButtonClicked: History.push(["mc", "network", "home"], reason)
+            onHomeButtonClicked: root._showHome(reason)
 
-            onBrowse: History.push(["mc", "network", "browse"], { "tree": tree }, reason)
+            onBrowse:  (tree, reason) => { root._showBrowseNode(tree, reason) }
         }
     }
 }

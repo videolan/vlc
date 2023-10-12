@@ -59,7 +59,8 @@ FocusScope {
 
     // Signals
 
-    signal seeAll(var title, var sd_source, int reason)
+    signal seeAllDevices(var title, var sd_source, int reason)
+    signal seeAllFolders(var title, int reason)
 
     signal browse(var tree, int reason)
 
@@ -171,7 +172,7 @@ FocusScope {
 
                 onBrowse: root.browse(tree, reason)
 
-                onSeeAll: root.seeAll(title, -1, reason)
+                onSeeAll: root.seeAllFolders(title, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
@@ -221,7 +222,7 @@ FocusScope {
 
                 onBrowse: root.browse(tree, reason)
 
-                onSeeAll: root.seeAll(title, model.sd_source, reason)
+                onSeeAll: root.seeAllDevices(title, model.sd_source, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
@@ -265,7 +266,7 @@ FocusScope {
 
                 onBrowse: root.browse(tree, reason)
 
-                onSeeAll: root.seeAll(title, model.sd_source, reason)
+                onSeeAll: root.seeAllDevices(title, model.sd_source, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(lanSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(lanSection)

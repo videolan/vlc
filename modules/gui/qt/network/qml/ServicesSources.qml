@@ -29,8 +29,17 @@ import "qrc:///style/"
 MainInterface.MainGridView {
     id: root
 
+    //properties
+
     readonly property bool hasGridListMode: false
     readonly property bool isSearchable: true
+
+    //signals
+
+    signal browseServiceManage(int reason)
+    signal browseSourceRoot(string sourceName, int reason)
+
+    //settings
 
     selectionDelegateModel: selectionModel
     model: sourcesModel
@@ -82,11 +91,9 @@ MainInterface.MainGridView {
 
         onItemDoubleClicked: {
             if (is_dummy)
-                History.push(["mc", "discover", "services", "services_manage"],
-                             Qt.MouseFocusReason)
+                root.browseServiceManage(Qt.MouseFocusReason)
             else
-                History.push(["mc", "discover", "services", "source_root"],
-                              { source_name: model.name }, Qt.MouseFocusReason)
+                root.browseSourceRoot(model.name, Qt.TabFocusReason)
         }
 
         onItemClicked : {
@@ -100,10 +107,9 @@ MainInterface.MainGridView {
         const itemData = sourcesModel.getDataAt(index);
 
         if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
-            History.push(["mc", "discover", "services", "services_manage"], Qt.TabFocusReason)
+            browseServiceManage(Qt.TabFocusReason)
         else
-            History.push(["mc", "discover", "services", "source_root"],
-                          { source_name: itemData.name }, Qt.TabFocusReason)
+            browseSourceRoot(itemData.name, Qt.TabFocusReason)
     }
 
     Navigation.cancelAction: function() {

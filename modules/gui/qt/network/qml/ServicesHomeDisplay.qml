@@ -32,8 +32,8 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "all",
-        url: "qrc:///network/ServicesSources.qml",
         default: true,
+        component: serviceSourceComponent
     }, {
         name: "services_manage",
         url: "qrc:///network/ServicesManage.qml"
@@ -46,9 +46,38 @@ Widgets.PageLoader {
         guard: function (prop) { return !!prop.tree }
     }]
 
-    function setCurrentItemFocus(reason) {
-        stackView.currentItem.setCurrentItemFocus(reason);
+
+    function _showServiceHome(reason) {
+        History.push([...root.pagePrefix, "services"], reason)
     }
+
+    function _showServiceManage(reason) {
+        History.push([...root.pagePrefix, "services_manage"], reason)
+    }
+
+    function _showServiceRoot(source_name, reason) {
+        History.push([...root.pagePrefix, "source_root"], { source_name: source_name }, reason)
+    }
+
+    function _showServiceNode(tree, source_name, reason) {
+        History.push(
+            [...root.pagePrefix, "source_browse"],
+            {
+                tree: tree,
+                source_name: source_name
+            },
+            reason)
+    }
+
+    Component {
+        id: serviceSourceComponent
+
+        ServicesSources {
+            onBrowseServiceManage:  (reason) => root._showServiceManage(reason)
+            onBrowseSourceRoot: (name, reason) => root. _showServiceRoot(name, reason)
+        }
+    }
+
 
     Component {
         id: sourceRootComponent
@@ -59,15 +88,15 @@ Widgets.PageLoader {
             property Component localMenuDelegate: NetworkAddressbar {
                 path: [{display: deviceModel.name, tree: {}}]
 
-                onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
+                onHomeButtonClicked: _showServiceHome(reason)
             }
 
             model: deviceModel
             contextMenu: contextMenu
 
-            onBrowse: History.push(["mc", "discover", "services", "source_browse"],
-                                    { tree: tree, "root_name": deviceModel.name,
-                                      "source_name": source_name }, reason)
+            onBrowse: (tree, reason) => {
+                root._showServiceNode(tree, deviceModel.source_name, reason)
+            }
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
@@ -90,7 +119,7 @@ Widgets.PageLoader {
         id: sourceBrowseComponent
 
         BrowseTreeDisplay {
-            property string root_name
+            property alias tree: mediaModel.tree
             property string source_name
 
             property Component localMenuDelegate: NetworkAddressbar {
@@ -100,20 +129,17 @@ Widgets.PageLoader {
                     return _path
                 }
 
-                onHomeButtonClicked: History.push(["mc", "discover", "services"], reason)
+                onHomeButtonClicked: root._showServiceHome(reason)
 
-                onBrowse: {
-                    if (!!tree.isRoot)
-                        History.push(["mc", "discover", "services", "source_root"],
-                                      { source_name: tree.source_name }, reason)
+                onBrowse: (tree, reason) => {
+                    if (tree.isRoot)
+                        root._showServiceRoot(source_name, reason)
                     else
-                        History.push(["mc", "discover", "services", "source_browse"],
-                                      { tree: tree, "root": root_name }, reason)
+                        root._showServiceNode(tree, source_name, reason)
                 }
             }
 
-            onBrowse: History.push(["mc", "discover", "services", "source_browse"],
-                                    { tree: tree, "root": root_name }, reason)
+            onBrowse:  root._showServiceNode(tree, source_name, reason)
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
