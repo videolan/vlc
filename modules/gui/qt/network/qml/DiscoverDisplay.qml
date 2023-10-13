@@ -47,7 +47,7 @@ Widgets.PageLoader {
     Accessible.name: I18n.qtr("Discover view")
 
     function loadIndex(index) {
-        History.push(["mc", "discover", root.pageModel[index].name])
+        History.push([...root.pagePrefix, root.pageModel[index].name])
     }
 
 

@@ -47,8 +47,9 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onShowAlbumView: History.push(["mc", "music", "genres", "albums"],
-                                           { parentId: id, genreName: name }, reason)
+            onShowAlbumView: (id, name, reason) => {
+                History.push([...root.pagePrefix, "albums"], { parentId: id, genreName: name }, reason)
+            }
         }
     }
 

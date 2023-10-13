@@ -51,12 +51,7 @@ Widgets.PageLoader {
 
         model: tabModel
 
-        onClicked: {
-            if (root.pageModel[index].name === currentView.name)
-                return
-
-            root.loadIndex(index)
-        }
+        onClicked: (index) => History.push([...root.pagePrefix, root.pageModel[index].name])
     }
 
     //---------------------------------------------------------------------------------------------
@@ -81,13 +76,5 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         // NOTE: We need bindings because the VideoAll model can change over time.
         sortMenu     = Qt.binding(function () { return currentItem.sortMenu; })
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Functions
-    //---------------------------------------------------------------------------------------------
-
-    function loadIndex(index) {
-        History.push(["mc", "video", root.pageModel[index].name]);
     }
 }

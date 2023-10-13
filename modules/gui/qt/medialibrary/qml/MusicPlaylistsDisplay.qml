@@ -53,17 +53,15 @@ Widgets.PageLoader {
         PlaylistMediaList {
             isMusic: true
 
-            onShowList: (model, reason) => {
-                History.push(["mc", "music", "playlists", "list"],
-                    { parentId: model.id, name: model.name }, reason)
-            }
-
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
+            onShowList: (model, reason) => {
+                History.push([...root.pagePrefix, "list"], { parentId: model.id, name: model.name }, reason)
+            }
         }
     }
 

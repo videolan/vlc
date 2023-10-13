@@ -52,8 +52,10 @@ Widgets.PageLoader {
             sortCriteria: MainCtx.sort.criteria
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
-            onRequestArtistAlbumView: History.push(["mc", "music", "artists", "albums",
-                                                    { initialIndex: currentIndex }], reason)
+
+            onRequestArtistAlbumView: (reason) => {
+                History.push([...root.pagePrefix, "albums"], { initialIndex: currentIndex }, reason)
+            }
         }
     }
 
