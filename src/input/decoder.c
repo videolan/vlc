@@ -2591,7 +2591,6 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner,
         else if( !p_ccowner->dec.p_module )
         {
             DecoderUnsupportedCodec( p_dec, &fmt, true );
-            vlc_input_decoder_Flush(p_ccowner);
             vlc_input_decoder_Delete(p_ccowner);
             vlc_mutex_unlock(&p_owner->cc.lock);
             return VLC_EGENERIC;
