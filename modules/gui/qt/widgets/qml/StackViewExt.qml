@@ -26,6 +26,18 @@ import "qrc:///style/"
 StackView {
     id: root
 
+    // Functions
+
+    function setCurrentItemFocus(reason) {
+        if (reason === Qt.OtherFocusReason)
+            return
+        focus = true
+        focusReason = reason
+        if (typeof currentItem.setCurrentItemFocus === "function")
+            currentItem.setCurrentItemFocus(reason)
+
+    }
+
     // Settings
 
     replaceEnter: null
@@ -56,11 +68,5 @@ StackView {
                 return rightPadding
             })
         }
-    }
-
-    // Functions
-
-    function setCurrentItemFocus(reason) {
-        currentItem.setCurrentItemFocus(reason);
     }
 }
