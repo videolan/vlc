@@ -2596,7 +2596,6 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner,
             vlc_mutex_unlock(&p_owner->cc.lock);
             return VLC_EGENERIC;
         }
-        p_ccowner->p_clock = p_owner->p_clock;
 
         p_owner->cc.pp_decoder[i_channel] = p_ccowner;
     }
