@@ -174,29 +174,6 @@ QQmlPropertyMap* NavigationHistory::viewProp() const
     return m_viewProperties;
 }
 
-QVariant viewPropLegacyBuilder(QStringList::const_iterator it, QStringList::const_iterator end, QQmlPropertyMap* properties)
-{
-    QVariantMap prop;
-    if (it+1 == end)
-    {
-        for (auto key : properties->keys())
-            prop[key] = properties->value(key);
-    }
-    else
-    {
-        prop["view"] = viewPropLegacyBuilder(it+1, end, properties);
-    }
-    QVariantMap ret;
-    ret["name"] = *it;
-    ret["properties"] = prop;
-    return ret;
-}
-
-QVariant NavigationHistory::viewPropLegacy() const
-{
-    return viewPropLegacyBuilder(m_viewPath.cbegin(), m_viewPath.cend(), m_viewProperties);
-}
-
 Q_INVOKABLE bool NavigationHistory::match(const QStringList& path,  const QStringList& pattern)
 {
     if (pattern.length() > path.length())

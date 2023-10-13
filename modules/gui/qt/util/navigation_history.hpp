@@ -10,10 +10,6 @@ class NavigationHistory : public QObject
 {
     Q_OBJECT
 public:
-    //@depecated this property only exists during while refactoring code
-    Q_PROPERTY(QVariant viewPropLegacy READ viewPropLegacy NOTIFY viewPropChanged FINAL)
-
-
     Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged FINAL)
     /**
      * current path
@@ -39,7 +35,6 @@ public:
     bool isPreviousEmpty();
     QStringList viewPath() const;
     QQmlPropertyMap* viewProp() const;
-    QVariant viewPropLegacy() const;
 
     Q_INVOKABLE bool match(const QStringList& path,  const QStringList& pattern);
     Q_INVOKABLE bool exactMatch(const QStringList& path,  const QStringList& pattern);
