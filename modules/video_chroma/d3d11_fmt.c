@@ -146,21 +146,32 @@ int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 #if !VLC_WINSTORE_APP
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
-    HKEY hKey;
+    HKEY hDisplayKey, hKey;
     CHAR key[128];
     CHAR szData[256], lookup[256];
     DWORD len = 256;
     LSTATUS ret;
 
-    _snprintf(lookup, 256, "pci\\ven_%04x&dev_%04x", adapterDesc->VendorId, adapterDesc->DeviceId);
-    for (int i=0;;i++)
+    ret = RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}", 0, KEY_READ, &hDisplayKey);
+    if ( ret != ERROR_SUCCESS )
     {
-        _snprintf(key, 128, "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d", i);
-        ret = RegOpenKeyExA(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
+        msg_Warn(obj, "failed to read the Display Adapter registry key (%ld)", ret);
+        return NULL;
+    }
+
+    char DisplayNum[16];
+    _snprintf(lookup, 256, "pci\\ven_%04x&dev_%04x", adapterDesc->VendorId, adapterDesc->DeviceId);
+    for (DWORD k=0;; k++)
+    {
+        ret = RegEnumKeyA(hDisplayKey, k, DisplayNum, ARRAY_SIZE(DisplayNum));
+        if (ret != ERROR_SUCCESS)
+            break;
+
+        ret = RegOpenKeyExA(hDisplayKey, DisplayNum, 0, KEY_READ, &hKey);
         if ( ret != ERROR_SUCCESS )
         {
-            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%ld)", i, ret);
-            return NULL;
+            msg_Warn(obj, "failed to read the %s Display Adapter registry key (%ld)", DisplayNum, ret);
+            continue;
         }
 
         len = sizeof(szData);
@@ -168,13 +179,15 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
         if ( ret == ERROR_SUCCESS ) {
             if (_strnicmp(lookup, szData, strlen(lookup)) == 0)
                 return hKey;
-            msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
+            msg_Dbg(obj, "different %s device %s vs %s", DisplayNum, lookup, szData);
         }
         else
-            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%ld)", i, ret);
+            msg_Warn(obj, "failed to get the %s MatchingDeviceId (%ld)", DisplayNum, ret);
 
         RegCloseKey(hKey);
     }
+    RegCloseKey(hDisplayKey);
+
     return NULL;
 }
 
