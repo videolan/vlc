@@ -1570,10 +1570,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 
     video_format_Copy(&sys->pool_fmt, &fmt);
 
-    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 ||
-            (sys->scaleProc == NULL && !CanUseTextureArray(vd)) ||
-            BogusZeroCopy(vd);
-
     if (!sys->legacy_shader && is_d3d11_opaque(sys->pool_fmt.i_chroma))
     {
         sys->pool_fmt.i_width  = (sys->pool_fmt.i_width  + 0x7F) & ~0x7F;
@@ -1688,6 +1684,10 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
 
     InitScaleProcessor(vd);
+
+    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 ||
+            (sys->scaleProc == NULL && !CanUseTextureArray(vd)) ||
+            BogusZeroCopy(vd);
 
     if (Direct3D11CreateFormatResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate format resources");
