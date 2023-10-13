@@ -285,10 +285,6 @@ T.Pane {
 
             model: root.model
 
-
-            // NOTE: We want a gentle fade at the beginning / end of the playqueue.
-            enableFade: true
-
             BindingCompat on enableBeginningFade {
                 when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Backward)
                 value: false

@@ -38,10 +38,6 @@ ListView {
 
     property bool keyNavigationWraps: false
 
-    // NOTE: Fading is disabled by default, 'enableBeginningFade' and 'enableEndFade' take
-    // precedence over 'enableFade'.
-    property bool enableFade: false
-
     // Private
 
     property bool _keyPressed: false
