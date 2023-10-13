@@ -24,7 +24,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCImageView;
+@class VLCLinearProgressIndicator;
+
 @interface VLCLibraryCarouselViewItemView : NSView
+
+@property (readwrite, weak) IBOutlet VLCImageView *imageView;
+@property (readwrite, weak) IBOutlet NSTextField *annotationTextField;
+@property (readwrite, weak) IBOutlet VLCLinearProgressIndicator *progressIndicator;
+@property (readwrite, weak) IBOutlet NSButton *playButton;
+@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *detailTextField;
+
 
 @end
 

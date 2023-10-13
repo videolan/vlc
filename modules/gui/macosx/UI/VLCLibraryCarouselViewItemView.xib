@@ -76,6 +76,14 @@
                 <constraint firstAttribute="trailing" secondItem="orq-rq-pBK" secondAttribute="trailing" constant="5" id="rou-q0-WrF"/>
                 <constraint firstAttribute="bottom" secondItem="orq-rq-pBK" secondAttribute="bottom" constant="5" id="vwh-Yj-Ux4"/>
             </constraints>
+            <connections>
+                <outlet property="annotationTextField" destination="isd-eb-9XW" id="fvc-2y-amx"/>
+                <outlet property="detailTextField" destination="orq-rq-pBK" id="czh-aO-pe4"/>
+                <outlet property="imageView" destination="6QI-EH-rMu" id="B23-fp-a2H"/>
+                <outlet property="playButton" destination="syV-Ok-FR7" id="aGW-Ci-sgq"/>
+                <outlet property="progressIndicator" destination="yL8-2q-Oke" id="Pys-e7-wrU"/>
+                <outlet property="titleTextField" destination="CKr-3L-pMu" id="ot4-iB-tBK"/>
+            </connections>
             <point key="canvasLocation" x="3" y="162"/>
         </customView>
     </objects>
