@@ -25,6 +25,7 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
@@ -32,6 +33,13 @@
 #import "views/VLCImageView.h"
 
 @implementation VLCLibraryCarouselViewItemView
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCLibraryCarouselViewItemView *)[NSView fromNibNamed:@"VLCLibraryCarouselViewItemView"
+                                                        withClass:VLCLibraryCarouselViewItemView.class
+                                                        withOwner:owner];
+}
 
 - (instancetype)init
 {
