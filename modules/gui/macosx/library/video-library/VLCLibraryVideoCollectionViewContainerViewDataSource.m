@@ -22,6 +22,7 @@
 
 #import "VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
+#import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
@@ -353,15 +354,15 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (NSView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
 {
-    NSImageView *carouselItemView = (NSImageView *)view;
+    VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)view;
     if (carouselItemView == nil) {
         const NSUInteger itemLength = VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth;
         const NSRect itemFrame = NSMakeRect(0, 0, itemLength, itemLength);
-        carouselItemView = [[NSImageView alloc] initWithFrame:itemFrame];
+        carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
+        carouselItemView.frame = itemFrame;
     }
 
-    //carouselItemView.representedItem = self.collectionArray[index];
-    carouselItemView.image = [VLCLibraryImageCache thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)self.collectionArray[index]];
+    carouselItemView.representedItem = self.collectionArray[index];
     return carouselItemView;
  }
 
