@@ -39,4 +39,9 @@
     return [NSFont systemFontOfSize:15. weight:NSFontWeightMedium];
 }
 
++ (NSFont *)VLCLibraryItemAnnotationFont
+{
+    return [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
+}
+
 @end

@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) NSFont *VLClibrarySectionHeaderFont;
 @property (class, readonly) NSFont *VLCLibrarySubsectionHeaderFont;
 @property (class, readonly) NSFont *VLCLibrarySubsectionSubheaderFont;
+@property (class, readonly) NSFont *VLCLibraryItemAnnotationFont;
 
 @end
 
