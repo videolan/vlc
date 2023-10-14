@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
+@protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryCarouselViewItemView : NSView
 
@@ -36,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
 
+@property (readwrite, strong, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 
 @end
 

@@ -24,6 +24,10 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import "views/VLCImageView.h"
 
@@ -79,6 +83,47 @@
     self.titleTextField.stringValue = @"";
     self.detailTextField.stringValue = @"";
     self.imageView.image = nil;
+}
+
+- (void)updateRepresentation
+{
+    [self prepareForReuse];
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+        self.imageView.image = thumbnail;
+    }];
+
+    self.titleTextField.stringValue = self.representedItem.displayString;
+    self.detailTextField.stringValue = self.representedItem.detailString;
+
+    if ([_representedItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)self.representedItem;
+        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
+            VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
+            [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
+        }
+    }
+}
+
+- (void)showVideoSizeIfNeededForWidth:(CGFloat)width andHeight:(CGFloat)height
+{
+    if (width >= VLCMediaLibrary4KWidth || height >= VLCMediaLibrary4KHeight) {
+        _annotationTextField.stringValue = _NS("4K");
+        _annotationTextField.hidden = NO;
+    } else if (width >= VLCMediaLibrary720pWidth || height >= VLCMediaLibrary720pHeight) {
+        _annotationTextField.stringValue = _NS("HD");
+        _annotationTextField.hidden = NO;
+    }
+}
+
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
+{
+    if (representedItem == _representedItem) {
+        return;
+    }
+
+    _representedItem = representedItem;
+    [self updateRepresentation];
 }
 
 @end
