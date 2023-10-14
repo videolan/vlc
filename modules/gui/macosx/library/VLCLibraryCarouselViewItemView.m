@@ -22,6 +22,31 @@
 
 #import "VLCLibraryCarouselViewItemView.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
+
+#import "views/VLCImageView.h"
+
 @implementation VLCLibraryCarouselViewItemView
+
+- (void)setup
+{
+    self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
+    self.detailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.annotationTextField.font = NSFont.VLCLibraryItemAnnotationFont;
+    self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
+    self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
+
+    [self prepareForReuse];
+}
+
+- (void)prepareForReuse
+{
+    self.playButton.hidden = YES;
+    self.annotationTextField.hidden = YES;
+    self.titleTextField.stringValue = @"";
+    self.detailTextField.stringValue = @"";
+    self.imageView.image = nil;
+}
 
 @end
