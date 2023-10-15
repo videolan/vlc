@@ -10,6 +10,7 @@
         <file alias="FSM.qml">util/qml/FSM.qml</file>
         <file alias="FSMState.qml">util/qml/FSMState.qml</file>
         <file alias="FadeControllerStateGroup.qml">util/qml/FadeControllerStateGroup.qml</file>
+        <file alias="GridSizeHelper.qml">util/qml/GridSizeHelper.qml</file>
     </qresource>
     <qresource prefix="/main">
         <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
