@@ -142,23 +142,30 @@ FocusScope {
                     width: albumsList.width
                     height: implicitHeight
 
-                    spacing: VLCStyle.tableView_spacing
+                    spacing: VLCStyle.tableView_spacing - VLCStyle.margin_xxxsmall
 
                     Widgets.KeyNavigableListView {
                         id: albumsList
 
-                        focus: true
+                        x: VLCStyle.margin_xlarge - VLCStyle.gridItemSelectedBorder
 
-                        height: VLCStyle.gridItem_music_height + topMargin + bottomMargin
-                        width: root.width - root.rightPadding
+                        width: root.width - root.rightPadding - x * 2
+                        height: gridHelper.cellHeight + topMargin + bottomMargin + VLCStyle.margin_xxxsmall
 
-                        leftMargin: VLCStyle.margin_xlarge
+                        leftMargin: VLCStyle.gridItemSelectedBorder
+                        rightMargin: leftMargin
+
                         topMargin: VLCStyle.gridItemSelectedBorder
                         bottomMargin: VLCStyle.gridItemSelectedBorder
+
+                        focus: true
+
                         model: albumModel
                         selectionModel: albumSelectionModel
                         orientation: ListView.Horizontal
                         spacing: VLCStyle.column_spacing
+                        buttonMargin: (gridHelper.cellHeight - gridHelper.textHeight - buttonLeft.height) / 2 +
+                                      VLCStyle.gridItemSelectedBorder
 
                         Navigation.parentItem: root
 
@@ -170,8 +177,21 @@ FocusScope {
                             root.setCurrentItemFocus(Qt.TabFocusReason);
                         }
 
+                        Util.GridSizeHelper {
+                            id: gridHelper
+
+                            availableWidth: albumsList.width
+                            basePictureWidth: VLCStyle.gridCover_music_width
+                            basePictureHeight: VLCStyle.gridCover_music_height
+                        }
+
                         delegate: Widgets.GridItem {
                             id: gridItem
+
+                            y: selectedBorderWidth
+
+                            width: gridHelper.cellWidth
+                            height: gridHelper.cellHeight
 
                             image: model.cover || ""
                             fallbackImage: VLCStyle.noArtAlbumCover
@@ -179,8 +199,6 @@ FocusScope {
                             title: model.title || qsTr("Unknown title")
                             subtitle: model.release_year || ""
                             textAlignHCenter: true
-                            x: selectedBorderWidth
-                            y: selectedBorderWidth
                             pictureWidth: VLCStyle.gridCover_music_width
                             pictureHeight: VLCStyle.gridCover_music_height
                             dragItem: albumDragItem
