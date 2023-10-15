@@ -207,15 +207,6 @@ QtObject {
     readonly property int gridItemSubtitle_topMargin: margin_xsmall - margin_xxxsmall
     readonly property int gridItemSubtitle_height: fontHeight_normal
 
-    readonly property int gridItem_network_width: VLCStyle.gridCover_network_width
-    readonly property int gridItem_network_height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
-
-    readonly property int gridItem_music_width: VLCStyle.gridCover_music_width
-    readonly property int gridItem_music_height: VLCStyle.gridCover_music_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.margin_xsmall + VLCStyle.fontHeight_small
-
-    readonly property int gridItem_video_width: VLCStyle.gridCover_video_width
-    readonly property int gridItem_video_height: VLCStyle.gridCover_video_height + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_normal
-
     readonly property int gridItemSelectedBorder: MainCtx.dp(8, scale)
 
     readonly property int gridItem_newIndicator: MainCtx.dp(8, scale)
