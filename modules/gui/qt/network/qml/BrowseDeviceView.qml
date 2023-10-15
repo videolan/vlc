@@ -23,7 +23,6 @@ import QtQuick
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///main/"    as MainInterface
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/"    as Util
 
@@ -182,15 +181,15 @@ FocusScope {
     Component {
         id: grid
 
-        Widgets.ExpandGridView {
+        Widgets.ExpandGridItemView {
             id: gridView
+
+            basePictureWidth: VLCStyle.gridCover_network_width
+            basePictureHeight: VLCStyle.gridCover_network_height
 
             readonly property int maximumCount: (root.maximumRows === -1)
                                                 ? -1
                                                 : root.maximumRows * nbItemPerRow
-
-            cellWidth: VLCStyle.gridItem_network_width
-            cellHeight: VLCStyle.gridItem_network_height
 
             displayMarginEnd: root.displayMarginEnd
 
@@ -207,6 +206,9 @@ FocusScope {
             onActionAtIndex: (index) => { root.onAction(index) }
 
             delegate: NetworkGridItem {
+                width: gridView.cellWidth;
+                height: gridView.cellHeight;
+
                 onItemClicked: (modifier) => { root.onClicked(model, index, modifier) }
 
                 onItemDoubleClicked: root.onDoubleClicked(model, index)

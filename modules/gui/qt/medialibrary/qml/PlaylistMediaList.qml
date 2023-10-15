@@ -55,18 +55,6 @@ MainInterface.MainViewLoader {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    property int _width: (isMusic) ? VLCStyle.gridItem_music_width
-                                   : VLCStyle.gridItem_video_width
-
-    property int _height: (isMusic) ? VLCStyle.gridItem_music_height
-                                    : VLCStyle.gridItem_video_height
-
-    property int _widthCover: (isMusic) ? VLCStyle.gridCover_music_width
-                                        : VLCStyle.gridCover_video_width
-
-    property int _heightCover: (isMusic) ? VLCStyle.gridCover_music_height
-                                         : VLCStyle.gridCover_video_height
-
     property string _placeHolder: (isMusic) ? VLCStyle.noArtAlbumCover
                                             : VLCStyle.noArtVideoCover
 
@@ -252,14 +240,14 @@ MainInterface.MainViewLoader {
     Component {
         id: grid
 
-        MainInterface.MainGridView {
+        Widgets.ExpandGridItemView {
             id: gridView
 
             //-------------------------------------------------------------------------------------
             // Settings
 
-            cellWidth : _width
-            cellHeight: _height
+            basePictureWidth: isMusic ? VLCStyle.gridCover_music_width : VLCStyle.gridCover_video_width
+            basePictureHeight: isMusic ? VLCStyle.gridCover_music_height : VLCStyle.gridCover_video_height
 
             model: root.model
 
@@ -280,8 +268,11 @@ MainInterface.MainViewLoader {
                 //---------------------------------------------------------------------------------
                 // Settings
 
-                pictureWidth : _widthCover
-                pictureHeight: _heightCover
+                width: gridView.cellWidth;
+                height: gridView.cellHeight;
+
+                pictureWidth : gridView.maxPictureWidth
+                pictureHeight: gridView.maxPictureHeight
 
                 title: (model.name) ? model.name
                                     : qsTr("Unknown title")

@@ -24,12 +24,11 @@ import QtQml.Models
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///main/" as MainInterface
 import "qrc:///util" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-MainInterface.MainGridView {
+Widgets.ExpandGridItemView {
     id: gridView
 
     // Properties
@@ -44,8 +43,8 @@ MainInterface.MainGridView {
 
     // Settings
 
-    cellWidth : VLCStyle.gridItem_video_width
-    cellHeight: VLCStyle.gridItem_video_height
+    basePictureWidth: VLCStyle.gridCover_video_width
+    basePictureHeight: VLCStyle.gridCover_video_height
 
     activeFocusOnTab: true
 
@@ -92,6 +91,9 @@ MainInterface.MainGridView {
         required property int index
 
         // Settings
+
+        width: gridView.cellWidth
+        height: gridView.cellHeight
 
         opacity: (gridView.expandIndex !== -1
                   &&

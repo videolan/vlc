@@ -32,24 +32,19 @@ FocusScope {
     id: root
 
     // Properties
-
-    /// cell Width
-    property int cellWidth: 100
-    // cell Height
-    property int cellHeight: 100
+    required property int cellWidth
+    required property int cellHeight
 
     //margin to apply
     property int bottomMargin: 0
     property int topMargin: 0
-    property int leftMargin: VLCStyle.column_margin + leftPadding
-    property int rightMargin: VLCStyle.column_margin + rightPadding
+    property int leftMargin: VLCStyle.margin_normal + leftPadding
+    property int rightMargin: VLCStyle.margin_normal + rightPadding
 
     property int leftPadding: 0
     property int rightPadding: 0
 
-    readonly property int extraMargin: (_contentWidth - nbItemPerRow * _effectiveCellWidth
-                                        +
-                                        horizontalSpacing) / 2
+    readonly property int extraMargin: VLCStyle.margin_normal
 
     // NOTE: The grid margins for the item(s) horizontal positioning.
     readonly property int contentLeftMargin: extraMargin + leftMargin
@@ -68,13 +63,12 @@ FocusScope {
 
     property int displayMarginEnd: 0
 
-    readonly property int nbItemPerRow: Math.max(Math.floor((_contentWidth + horizontalSpacing)
-                                                            /
-                                                            _effectiveCellWidth), 1)
+    required property int nbItemPerRow
 
-    readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
+    property int _effectiveCellWidth: cellWidth + horizontalSpacing
 
     readonly property int _contentWidth: width - rightMargin - leftMargin
+    readonly property int _availableContentWidth: width - contentRightMargin - contentLeftMargin
 
     property ListSelectionModel selectionModel: ListSelectionModel {
         model: root.model
@@ -182,6 +176,9 @@ FocusScope {
     }
 
     onHeightChanged: flickable.layout(false)
+
+    onContentWidthChanged: flickable.layout(true)
+    onContentHeightChanged: flickable.layout(true)
 
     // NOTE: Update on contentLeftMargin since we depend on this for item placements.
     onContentLeftMarginChanged: flickable.layout(true)
@@ -785,7 +782,7 @@ FocusScope {
 
             focus: (status === Loader.Ready) ? item.focus : false
 
-            y: root.topMargin + root.headerHeight + (root.rowHeight * (Math.ceil(model.count / root.nbItemPerRow))) +
+            y: root.topMargin + root.headerHeight + (root.rowHeight * (Math.ceil(model.count / nbItemPerRow))) +
                root._expandItemVerticalSpace
         }
 
@@ -843,7 +840,7 @@ FocusScope {
             if (root.expandIndex !== -1) {
                 const rowCol = root.getItemRowCol(root.expandIndex)
                 const rowId = rowCol[1] + 1
-                return rowId * root.nbItemPerRow
+                return rowId * nbItemPerRow
             } else {
                 return root._count
             }

@@ -329,13 +329,14 @@ FocusScope {
     Component {
         id: gridComponent
 
-        MainInterface.MainGridView {
+        Widgets.ExpandGridItemView {
             id: gridView_id
+
+            basePictureWidth: VLCStyle.gridCover_music_width
+            basePictureHeight: VLCStyle.gridCover_music_height
 
             focus: true
             activeFocusOnTab:true
-            cellWidth: VLCStyle.gridItem_music_width
-            cellHeight: VLCStyle.gridItem_music_height
             headerDelegate: root.header
             selectionModel: albumSelectionModel
             model: albumModel
@@ -350,6 +351,9 @@ FocusScope {
 
             delegate: AudioGridItem {
                 id: audioGridItem
+
+                width: gridView_id.cellWidth
+                height: gridView_id.cellHeight
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem

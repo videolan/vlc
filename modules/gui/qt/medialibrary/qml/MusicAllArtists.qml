@@ -81,14 +81,15 @@ MainInterface.MainViewLoader {
     Component {
         id: gridComponent
 
-        MainInterface.MainGridView {
+        Widgets.ExpandGridItemView {
             id: artistGrid
 
+            basePictureWidth: VLCStyle.gridCover_music_width
+            basePictureHeight: VLCStyle.gridCover_music_height
+            
             selectionModel: root.selectionModel
             model: artistModel
             focus: true
-            cellWidth: VLCStyle.colWidth(1)
-            cellHeight: VLCStyle.gridItem_music_height
 
             headerDelegate: root.header
             Navigation.parentItem: root
@@ -105,6 +106,9 @@ MainInterface.MainViewLoader {
             delegate: AudioGridItem {
                 id: gridItem
 
+                width: artistGrid.cellWidth
+                height: artistGrid.cellHeight
+
                 image: model.cover || ""
                 fallbackImage: VLCStyle.noArtArtistSmall
 
@@ -116,7 +120,6 @@ MainInterface.MainViewLoader {
                 titleMargin: VLCStyle.margin_xlarge
                 playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true
-                width: VLCStyle.colWidth(1)
                 dragItem: artistsDragItem
 
                 onItemClicked: (modifier) => { artistGrid.leftClickOnItem(modifier, index) }

@@ -32,9 +32,6 @@ Widgets.GridItem {
     property var model: ({})
     property int index: -1
 
-    width: VLCStyle.gridItem_network_width
-    height: VLCStyle.gridItem_network_height
-
     pictureWidth: VLCStyle.gridCover_network_width
     pictureHeight: VLCStyle.gridCover_network_height
 

@@ -118,8 +118,13 @@ MainInterface.MainViewLoader {
     /* Grid View */
     Component {
         id: gridComponent
-        MainInterface.MainGridView {
+        Widgets.ExpandGridItemView {
             id: gridView_id
+            
+            basePictureWidth: VLCStyle.gridCover_video_width
+            basePictureHeight: VLCStyle.gridCover_video_width / 2
+            titleHeight: 0
+            subtitleHeight: 0
 
             selectionModel: root.selectionModel
             model: genreModel
@@ -132,8 +137,9 @@ MainInterface.MainViewLoader {
                 property var model: ({})
                 property int index: -1
 
-                width: VLCStyle.colWidth(2)
-                height: width / 2
+                width: gridView_id.cellWidth
+                height: gridView_id.cellHeight
+
                 pictureWidth: width
                 pictureHeight: height
 
@@ -197,9 +203,6 @@ MainInterface.MainViewLoader {
             }
 
             focus: true
-
-            cellWidth: VLCStyle.colWidth(2)
-            cellHeight: cellWidth / 2
 
             onActionAtIndex: (index) => { _actionAtIndex(index) }
 
