@@ -54,8 +54,10 @@ T.SpinBox {
                            down.implicitIndicatorHeight)
 
     padding: VLCStyle.margin_xxsmall
-    leftPadding: padding + (control.mirrored ? up.indicator.width : 0)
-    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width)
+    leftPadding: padding + (control.mirrored ? up.indicator.width : 0) + control.borderWidth
+    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width) + control.borderWidth
+    topPadding: padding + control.borderWidth
+    bottomPadding: padding + control.borderWidth
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -103,11 +105,12 @@ T.SpinBox {
     }
 
     up.indicator: Rectangle {
-        x: control.mirrored ? 0: parent.width - width
+        x: control.mirrored ? control.borderWidth : parent.width - width - control.borderWidth
         height: parent.height / 2
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.top: parent.top
+        anchors.topMargin: control.borderWidth
 
         color: downTheme.bg.primary
 
@@ -136,11 +139,12 @@ T.SpinBox {
     }
 
     down.indicator: Rectangle {
-        x: control.mirrored ? 0 : parent.width - width
+        x: control.mirrored ? control.borderWidth : parent.width - width - control.borderWidth
         height: parent.height / 2
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: control.borderWidth
         color: downTheme.bg.primary
 
         ColorContext {
