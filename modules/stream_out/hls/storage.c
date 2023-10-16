@@ -24,6 +24,8 @@
 #include <assert.h>
 #include <fcntl.h>
 
+#include <unistd.h>     /* close() */
+
 #include <vlc_common.h>
 
 #include <vlc_block.h>
