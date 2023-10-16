@@ -406,7 +406,7 @@ int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
             /* suggestion matching */
             if( !state.opt )
             {
-                float jw_filter = 0.8, best_metric = jw_filter, metric;
+                float jw_filter = 0.8f, best_metric = jw_filter, metric;
                 const char *best = NULL;
                 const char *jw_a = ppsz_argv[state.ind-1] + 2;
                 for (size_t i = 0; i < (size_t)i_opts; i++) {
