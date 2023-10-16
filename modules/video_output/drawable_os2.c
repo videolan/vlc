@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
+#include <vlc_threads.h>
 
 #define HWND_TEXT N_("Window handle (HWND)")
 #define HWND_LONGTEXT N_( \
