@@ -85,21 +85,12 @@ function alignDown(a, b) {
 }
 
 function isSortedIntegerArrayConsecutive(array) {
-    const length = array.length
+    for (let i = 1; i < array.length; ++i) {
+        if ((array[i] - array[i - 1]) !== 1)
+            return false
+    }
 
-    if (length <= 1)
-        return true
-
-    const first = array[0]
-    const last = array[length - 1]
-
-    if (length === 2)
-        return Math.abs(first - last) === 1
-
-    const sum1 = array.reduce((i, j) => i + j)
-    const sum2 = length * (first + last) / 2
-
-    return (sum1 === sum2)
+    return true
 }
 
 function itemsMovable(sortedItemIndexes, targetIndex) {
