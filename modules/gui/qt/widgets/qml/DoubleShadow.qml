@@ -50,6 +50,7 @@ Item {
         id: primaryShadow
 
         anchors.centerIn: parent
+        anchors.alignWhenCentered: false
 
         color: Qt.rgba(0, 0, 0, .18)
         xOffset: 0
@@ -64,6 +65,7 @@ Item {
         id: secondaryShadow
 
         anchors.centerIn: parent
+        anchors.alignWhenCentered: false
 
         color: Qt.rgba(0, 0, 0, .22)
         xOffset: 0
