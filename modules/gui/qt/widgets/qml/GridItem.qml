@@ -259,7 +259,7 @@ T.ItemDelegate {
                     root.playClicked()
                 }
 
-                DoubleShadow {
+                DefaultShadow {
                     id: unselectedShadow
 
                     anchors.fill: parent
@@ -271,12 +271,6 @@ T.ItemDelegate {
 
                     xRadius: parent.radius
                     yRadius: parent.radius
-
-                    primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                    primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
-
-                    secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                    secondaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
                 }
 
                 DoubleShadow {

@@ -124,20 +124,13 @@ AbstractButton {
                                                 .arg(artistLabel.text)
                                                 .arg(progressIndicator.text)
 
-            Widgets.DoubleShadow {
+            Widgets.DefaultShadow {
                 anchors.centerIn: coverImage
-                anchors.alignWhenCentered: false
 
-                implicitWidth: coverImage.paintedWidth
-                implicitHeight: coverImage.paintedHeight
+                width: coverImage.paintedWidth
+                height: coverImage.paintedHeight
 
                 z: -1
-
-                primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
-                primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-
-                secondaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
-                secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
             }
         }
 

@@ -409,21 +409,13 @@ Item {
                 anchors.fill: parent
                 color: theme.bg.primary
 
-                DoubleShadow {
+                DefaultShadow {
                     anchors.fill: parent
 
                     z: -1
 
                     xRadius: bg.radius
                     yRadius: bg.radius
-
-                    primaryBlurRadius: VLCStyle.dp(3)
-                    primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                    primaryHorizontalOffset: 0
-
-                    secondaryBlurRadius: VLCStyle.dp(14)
-                    secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                    secondaryHorizontalOffset: 0
                 }
             }
 
@@ -502,19 +494,11 @@ Item {
             text: "+" + (dragItem._indexesSize - dragItem._maxCovers)
         }
 
-        DoubleShadow {
+        DefaultShadow {
             z: -1
             anchors.fill: parent
             xRadius: extraCovers.radius
             yRadius: extraCovers.radius
-
-            primaryBlurRadius: VLCStyle.dp(3)
-            primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-            primaryHorizontalOffset: 0
-
-            secondaryBlurRadius: VLCStyle.dp(14)
-            secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-            secondaryHorizontalOffset: 0
         }
     }
 

@@ -168,19 +168,11 @@ T.ItemDelegate {
                 visible: !statusIcon.visible
                 asynchronous: true
 
-                Widgets.DoubleShadow {
+                Widgets.DefaultShadow {
                     anchors.centerIn: parent
                     width: parent.paintedWidth
                     height: parent.paintedHeight
                     visible: (artwork.status === Image.Ready)
-
-                    z: -1
-
-                    primaryBlurRadius: VLCStyle.dp(3)
-                    primaryVerticalOffset: VLCStyle.dp(1)
-
-                    secondaryBlurRadius: VLCStyle.dp(14)
-                    secondaryVerticalOffset: VLCStyle.dp(6)
                 }
             }
 
