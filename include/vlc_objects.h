@@ -81,7 +81,7 @@ struct vlc_object_t
 # define VLC_OBJECT(x) \
     _Generic((x)->obj, \
         struct vlc_object_marker *: (x), \
-        default: (&((x)->obj)) \
+        struct vlc_object_t: (&((x)->obj)) \
     )
 #else
 static inline vlc_object_t *VLC_OBJECT(vlc_object_t *o)
