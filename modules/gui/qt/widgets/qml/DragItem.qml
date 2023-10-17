@@ -412,8 +412,6 @@ Item {
                 DefaultShadow {
                     anchors.fill: parent
 
-                    z: -1
-
                     xRadius: bg.radius
                     yRadius: bg.radius
                 }
@@ -495,8 +493,8 @@ Item {
         }
 
         DefaultShadow {
-            z: -1
             anchors.fill: parent
+
             xRadius: extraCovers.radius
             yRadius: extraCovers.radius
         }

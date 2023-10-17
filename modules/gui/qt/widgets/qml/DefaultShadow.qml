@@ -24,6 +24,8 @@ import "qrc:///style/"
 DoubleShadow {
     id: root
 
+    opacity: 0.62
+
     primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
     primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
 

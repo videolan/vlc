@@ -129,8 +129,6 @@ AbstractButton {
 
                 width: coverImage.paintedWidth
                 height: coverImage.paintedHeight
-
-                z: -1
             }
         }
 

@@ -140,7 +140,6 @@ Item {
 
             DefaultShadow {
                 anchors.fill: parent
-                z: -1
 
                 xRadius: parent.radius
                 yRadius: parent.radius

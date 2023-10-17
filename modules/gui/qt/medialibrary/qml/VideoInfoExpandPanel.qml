@@ -119,7 +119,6 @@ FocusScope {
 
                             Widgets.DefaultShadow {
                                 anchors.fill: parent
-                                z: -1
                                 visible: (parent.status === RoundImage.Ready)
 
                                 xRadius: parent.radius

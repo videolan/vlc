@@ -264,9 +264,7 @@ T.ItemDelegate {
 
                     anchors.fill: parent
                     anchors.margins: VLCStyle.dp(1) // outside border (unselected)
-                    z: -1
 
-                    opacity: 0.62
                     visible: opacity > 0
 
                     xRadius: parent.radius
