@@ -111,14 +111,10 @@ void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVar
 
     onPopup(m_menu.get());
 
-    // m_menu->height() returns invalid height until initial popup call
-    // so in case of 'popupAbovePoint', first show the menu and then reposition it
-    m_menu->popup(point);
     if (popupAbovePoint)
-    {
-        // use 'popup' instead of 'move' so that menu can reposition itself if it's parts are hidden
-        m_menu->popup(QPoint(point.x(), point.y() - m_menu->height()));
-    }
+        m_menu->popup(QPoint(point.x(), point.y() - m_menu->sizeHint().height()));
+    else
+        m_menu->popup(point);
 }
 
 void SortMenu::close()
