@@ -67,6 +67,8 @@ class SortMenu : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool shown READ isShown NOTIFY shownChanged FINAL)
+
 public:
     using QObject::QObject;
 
@@ -74,14 +76,18 @@ public:
 
     Q_INVOKABLE void close();
 
+    bool isShown() const { return m_shown; };
+
 protected:
     virtual void onPopup(QMenu * menu);
 
 signals:
     void selected(int index);
+    void shownChanged();
 
 private:
     std::unique_ptr<QMenu> m_menu;
+    bool m_shown = false;
 };
 
 class SortMenuVideo : public SortMenu
@@ -102,17 +108,24 @@ class QmlGlobalMenu : public VLCMenuBar
 {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
+
+    Q_PROPERTY(bool shown READ isShown NOTIFY shownChanged FINAL)
+
 public:
     explicit QmlGlobalMenu(QObject *parent = nullptr);
+
+    bool isShown() const { return m_shown; };
 
 signals:
     void aboutToShow();
     void aboutToHide();
+    void shownChanged();
 
 public slots:
     void popup( QPoint pos );
 private:
     std::unique_ptr<QMenu> m_menu;
+    bool m_shown = false;
 };
 
 //inherit VLCMenuBar so we can access menu creation functions

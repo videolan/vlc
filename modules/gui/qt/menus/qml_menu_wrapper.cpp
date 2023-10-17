@@ -89,6 +89,15 @@ void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVar
 {
     m_menu = std::make_unique<QMenu>();
 
+    connect( m_menu.get(), &QMenu::aboutToShow, this, [this]() {
+        m_shown = true;
+        shownChanged();
+    } );
+    connect( m_menu.get(), &QMenu::aboutToHide, this, [this]() {
+        m_shown = false;
+        shownChanged();
+    } );
+
     // model => [{text: "", checked: <bool>, order: <sort order> if checked else <invalid>}...]
     for (int i = 0; i != model.size(); ++i)
     {
@@ -192,8 +201,16 @@ void QmlGlobalMenu::popup(QPoint pos)
     m_menu = std::make_unique<QMenu>();
     QMenu* submenu;
 
-    connect( m_menu.get(), &QMenu::aboutToShow, this, &QmlGlobalMenu::aboutToShow );
-    connect( m_menu.get(), &QMenu::aboutToHide, this, &QmlGlobalMenu::aboutToHide );
+    connect( m_menu.get(), &QMenu::aboutToShow, this, [this]() {
+        m_shown = true;
+        shownChanged();
+        aboutToShow();
+    });
+    connect( m_menu.get(), &QMenu::aboutToHide, this, [this]() {
+        m_shown = false;
+        shownChanged();
+        aboutToHide();
+    });
 
     submenu = m_menu->addMenu(qtr( "&Media" ));
     FileMenu( p_intf, submenu );
