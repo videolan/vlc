@@ -1001,17 +1001,6 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
             vlc_input_decoder_Wait( p_es->p_dec_record );
     }
 
-    /* Resetting the main_clock here will drop all points that were sent during
-     * the buffering step. Only points coming from the input_clock are dropped
-     * here. Indeed, decoders should not send any output frames while buffering
-     * so outputs could not update the clock while buffering.
-     *
-     * Reset the main clock once all decoders are ready to output their first
-     * frames and not from EsOutChangePosition(), like the input clock. Indeed,
-     * flush is asynchronous and the output used by the decoder may still need
-     * a valid reference of the clock to output their last frames. */
-    vlc_clock_main_Reset( p_sys->p_pgrm->p_main_clock );
-
     msg_Dbg( p_sys->p_input, "Decoder wait done in %d ms",
               (int)MS_FROM_VLC_TICK(vlc_tick_now() - i_decoder_buffering_start) );
 
@@ -1024,12 +1013,37 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
     const vlc_tick_t update = i_current_date + i_wakeup_delay - i_buffering_duration;
 
+    /* The call order of these 3 input_clock_t/vlc_clock_main_t functions is
+     * important:
+     *
+     * - vlc_clock_main_Reset() must be called after
+     *   input_clock_ChangeSystemOrigin() since we want to use update points
+     *   after the buffering step. Indeed, in case of an input clock source,
+     *   input_clock_ChangeSystemOrigin() also forward the updated point to the
+     *   output clock.
+     *
+     * - vlc_clock_main_SetFirstPcr() must be called after
+     *   vlc_clock_main_Reset() since the reset function also reset the first
+     *   PCR point.
+     */
+
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true, update );
+
+    /* Resetting the main_clock here will drop all points that were sent during
+     * the buffering step. Only points coming from the input_clock are dropped
+     * here. Indeed, decoders should not send any output frames while buffering
+     * so outputs could not update the clock while buffering.
+     *
+     * Reset the main clock once all decoders are ready to output their first
+     * frames and not from EsOutChangePosition(), like the input clock. Indeed,
+     * flush is asynchronous and the output used by the decoder may still need
+     * a valid reference of the clock to output their last frames. */
+    vlc_clock_main_Reset( p_sys->p_pgrm->p_main_clock );
+
     /* Send the first PCR to the output clock. This will be used as a reference
      * point for the sync point. */
     vlc_clock_main_SetFirstPcr(p_sys->p_pgrm->p_main_clock, update,
                                i_stream_start);
-
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true, update );
 
     foreach_es_then_es_slaves(p_es)
     {
