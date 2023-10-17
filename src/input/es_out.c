@@ -1001,7 +1001,12 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
             vlc_input_decoder_Wait( p_es->p_dec_record );
     }
 
-    /* Reset the main clock once all decoders are ready to output their first
+    /* Resetting the main_clock here will drop all points that were sent during
+     * the buffering step. Only points coming from the input_clock are dropped
+     * here. Indeed, decoders should not send any output frames while buffering
+     * so outputs could not update the clock while buffering.
+     *
+     * Reset the main clock once all decoders are ready to output their first
      * frames and not from EsOutChangePosition(), like the input clock. Indeed,
      * flush is asynchronous and the output used by the decoder may still need
      * a valid reference of the clock to output their last frames. */
