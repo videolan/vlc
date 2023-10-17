@@ -229,7 +229,7 @@ var_Read_float(const char *psz)
     X(can_control_rate, bool, add_bool, Bool, true) \
     X(can_record, bool, add_bool, Bool, true) \
     X(error, bool, add_bool, Bool, false) \
-    X(pts_delay, unsigned, add_integer, Unsigned, MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY)) \
+    X(pts_delay, vlc_tick_t, add_integer, Unsigned, DEFAULT_PTS_DELAY) \
     X(config, char *, add_string, String, NULL )
 
 #define DECLARE_OPTION(var_name, type, module_header_type, getter, default_value)\
@@ -375,7 +375,7 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, bool *) = sys->can_control_pace;
             return VLC_SUCCESS;
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args, vlc_tick_t *) = VLC_TICK_FROM_MS(sys->pts_delay);
+            *va_arg(args, vlc_tick_t *) = sys->pts_delay;
             return VLC_SUCCESS;
         case DEMUX_GET_META:
             return VLC_EGENERIC;
