@@ -30,6 +30,7 @@ Widgets.IconControlButton {
 
     iconText: VLCIcons.ellipsis
     text: I18n.qtr("Menu")
+    checked: contextMenu.shown
 
     onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
 

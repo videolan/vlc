@@ -452,6 +452,7 @@ T.ToolBar {
                                 text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
+                                checked: contextMenu.shown
 
                                 onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 

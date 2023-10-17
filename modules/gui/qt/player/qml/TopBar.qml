@@ -425,6 +425,7 @@ FocusScope{
 
             iconText: VLCIcons.more
             text: I18n.qtr("Menu")
+            checked: contextMenu.shown
 
             Navigation.parentItem: root
             Navigation.leftItem: backBtn
