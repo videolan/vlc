@@ -477,20 +477,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     break;
 
                 case VLC_CODEC_RGB565:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
-                        sys->kvac.ulRMask == 0xf800 &&
-                        sys->kvac.ulGMask == 0x07e0 &&
-                        sys->kvac.ulBMask == 0x001f)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_R565;
-                    }
-                    break;
-                case VLC_CODEC_BGR565:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
-                        sys->kvac.ulRMask == 0x001f &&
-                        sys->kvac.ulGMask == 0x07e0 &&
-                        sys->kvac.ulBMask == 0xf800)
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16)
                     {
                         b_hw_accel = true;
                         i_kva_fourcc = FOURCC_R565;
@@ -498,82 +485,23 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                     break;
 
                 case VLC_CODEC_RGB555:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
-                        sys->kvac.ulRMask == 0x7c00 &&
-                        sys->kvac.ulGMask == 0x03e0 &&
-                        sys->kvac.ulBMask == 0x001f)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_R555;
-                    }
-                    break;
-                case VLC_CODEC_BGR555:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR16 &&
-                        sys->kvac.ulRMask == 0x001f &&
-                        sys->kvac.ulGMask == 0x03e0 &&
-                        sys->kvac.ulBMask == 0x7c00)
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR15)
                     {
                         b_hw_accel = true;
                         i_kva_fourcc = FOURCC_R555;
                     }
                     break;
 
-                case VLC_CODEC_XRGB:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
-                        sys->kvac.ulRMask == 0x00ff0000 &&
-                        sys->kvac.ulGMask == 0x0000ff00 &&
-                        sys->kvac.ulBMask == 0x000000ff)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_BGR4;
-                    }
-                    break;
-                case VLC_CODEC_XBGR:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
-                        sys->kvac.ulRMask == 0x000000ff &&
-                        sys->kvac.ulGMask == 0x0000ff00 &&
-                        sys->kvac.ulBMask == 0x00ff0000)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_BGR4;
-                    }
-                    break;
-                case VLC_CODEC_RGBX:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
-                        sys->kvac.ulRMask == 0xff000000 &&
-                        sys->kvac.ulGMask == 0x00ff0000 &&
-                        sys->kvac.ulBMask == 0x0000ff00)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_BGR4;
-                    }
-                    break;
                 case VLC_CODEC_BGRX:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32 &&
-                        sys->kvac.ulRMask == 0x0000ff00 &&
-                        sys->kvac.ulGMask == 0x00ff0000 &&
-                        sys->kvac.ulBMask == 0xff000000)
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR32)
                     {
                         b_hw_accel = true;
                         i_kva_fourcc = FOURCC_BGR4;
                     }
                     break;
 
-                case VLC_CODEC_RGB24:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR24 &&
-                        sys->kvac.ulRMask == 0xff0000 &&
-                        sys->kvac.ulGMask == 0x00ff00 &&
-                        sys->kvac.ulBMask == 0x0000ff)
-                    {
-                        b_hw_accel = true;
-                        i_kva_fourcc = FOURCC_BGR3;
-                    }
-                    break;
                 case VLC_CODEC_BGR24:
-                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR24 &&
-                        sys->kvac.ulRMask == 0x0000ff &&
-                        sys->kvac.ulGMask == 0x00ff00 &&
-                        sys->kvac.ulBMask == 0xff0000)
+                    if (sys->kvac.ulInputFormatFlags & KVAF_BGR24)
                     {
                         b_hw_accel = true;
                         i_kva_fourcc = FOURCC_BGR3;
