@@ -127,7 +127,7 @@ FocusScope {
                     ?  root.model.cover
                     : VLCStyle.noArtAlbumCover
 
-                Widgets.ListCoverShadow {
+                Widgets.DefaultShadow {
                     anchors.fill: parent
                     visible: (parent.status === RoundImage.Ready)
 

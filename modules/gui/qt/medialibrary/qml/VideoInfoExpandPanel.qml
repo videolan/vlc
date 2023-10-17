@@ -117,7 +117,7 @@ FocusScope {
                             source: model.thumbnail || VLCStyle.noArtVideoCover
                             radius: VLCStyle.gridCover_radius
 
-                            Widgets.ListCoverShadow {
+                            Widgets.DefaultShadow {
                                 anchors.fill: parent
                                 z: -1
                                 visible: (parent.status === RoundImage.Ready)

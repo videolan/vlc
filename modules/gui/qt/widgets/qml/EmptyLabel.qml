@@ -84,7 +84,7 @@ T.Control {
                     fillMode: Image.PreserveAspectFit
                 }
 
-                Widgets.ListCoverShadow {
+                Widgets.DefaultShadow {
                     anchors.fill: cover
                 }
             }

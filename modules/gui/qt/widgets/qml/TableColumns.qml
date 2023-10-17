@@ -138,7 +138,7 @@ Item {
                 }
             }
 
-            ListCoverShadow {
+            DefaultShadow {
                 anchors.fill: parent
                 z: -1
 

@@ -101,7 +101,7 @@ Row {
         width: artwork.width
         height: artwork.height
 
-        Widgets.ListCoverShadow {
+        Widgets.DefaultShadow {
             // clip shadows to only the painted area of cover
             x: (artwork.x + artwork.width - artwork.paintedWidth) / 2
             y: (artwork.y + artwork.height - artwork.paintedHeight) / 2
