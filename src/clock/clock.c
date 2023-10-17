@@ -169,6 +169,12 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                             vlc_warning(main_clock->logger, "resetting master clock: "
                                         "coefficient too unstable: %f", instant_coeff);
                     }
+
+                    if (main_clock->tracer != NULL && clock->track_str_id != NULL)
+                        vlc_tracer_TraceEvent(main_clock->tracer, "RENDER",
+                                              clock->track_str_id,
+                                              "reset_bad_source");
+
                     /* Reset and continue (calculate the offset from the
                      * current point) */
                     vlc_clock_main_reset(main_clock);
@@ -215,6 +221,9 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
     vlc_clock_main_t *main_clock = clock->owner;
 
     vlc_mutex_lock(&main_clock->lock);
+    if (main_clock->tracer != NULL && clock->track_str_id != NULL)
+        vlc_tracer_TraceEvent(main_clock->tracer, "RENDER", clock->track_str_id,
+                              "reset_user");
     vlc_clock_main_reset(main_clock);
 
     assert(main_clock->delay <= 0);
