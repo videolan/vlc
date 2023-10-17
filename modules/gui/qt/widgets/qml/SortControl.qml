@@ -64,6 +64,8 @@ Widgets.IconToolButton {
 
     iconText: VLCIcons.topbar_sort
 
+    checked: _menu && _menu.shown
+
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
