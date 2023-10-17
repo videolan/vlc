@@ -112,7 +112,7 @@ T.SpinBox {
         anchors.top: parent.top
         anchors.topMargin: control.borderWidth
 
-        color: downTheme.bg.primary
+        color: upTheme.bg.primary
 
         ColorContext {
             id: upTheme
