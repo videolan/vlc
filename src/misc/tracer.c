@@ -4,7 +4,7 @@
  * modules. See vlc_config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 2021 VLC authors and VideoLAN
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or
@@ -79,7 +79,7 @@ static struct vlc_tracer *vlc_TraceModuleCreate(vlc_object_t *parent)
         return NULL;
 
     char *module_name = var_InheritString(parent, "tracer");
-    if (vlc_module_load(VLC_OBJECT(module), "tracer", module_name, false,
+    if (vlc_module_load(vlc_object_logger(module), "tracer", module_name, false,
                         vlc_tracer_load, module) == NULL) {
         vlc_object_delete(VLC_OBJECT(module));
         free(module_name);

@@ -93,9 +93,9 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     gl->surface = wnd;
     gl->device = NULL;
 
-    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
-                                 cfg->display.width, cfg->display.height,
-                                 gl_cfg);
+    gl->module = vlc_module_load(vlc_object_logger(gl), type, name, true,
+                                 vlc_gl_start, gl,
+                                 cfg->display.width, cfg->display.height, gl_cfg);
     if (gl->module == NULL)
     {
         vlc_object_delete(gl);
@@ -152,8 +152,8 @@ vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
 
     gl->surface = NULL;
     gl->device = device ? vlc_decoder_device_Hold(device) : NULL;
-    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl, width,
-                                 height, gl_cfg);
+    gl->module = vlc_module_load(vlc_object_logger(gl), type, name, true,
+                                 vlc_gl_start, gl, width, height, gl_cfg);
     if (gl->module == NULL)
     {
         vlc_object_delete(gl);

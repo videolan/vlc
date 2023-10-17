@@ -551,8 +551,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     for (;;)
     {
         owner->device = sys->client;
-        sys->module = vlc_module_load(s, "aout stream", NULL, false,
-                                      aout_stream_Start, s, fmt, &hr);
+        sys->module = vlc_module_load(vlc_object_logger(s), "aout stream", NULL,
+                                      false, aout_stream_Start, s, fmt, &hr);
 
         int ret = -1;
         if (hr == AUDCLNT_E_DEVICE_INVALIDATED)

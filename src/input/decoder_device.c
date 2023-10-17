@@ -53,9 +53,10 @@ vlc_decoder_device_Create(vlc_object_t *o, vlc_window_t *window)
     if (!priv)
         return NULL;
     char *name = var_InheritString(o, "dec-dev");
-    module_t *module = vlc_module_load(&priv->device, "decoder device", name,
-                                    true, decoder_device_Open, &priv->device,
-                                    window);
+    module_t *module = vlc_module_load(vlc_object_logger(&priv->device),
+                                       "decoder device", name,true,
+                                       decoder_device_Open, &priv->device,
+                                       window);
     free(name);
     if (module == NULL)
     {

@@ -83,7 +83,8 @@ vlc_placebo_t *vlc_placebo_Create(const vout_display_cfg_t *cfg, const char *nam
     if (pl->log == NULL)
         goto delete_pl;
 
-    module_t *module = vlc_module_load(parent, "libplacebo gpu", name, false,
+    module_t *module = vlc_module_load(vlc_object_logger(parent), "libplacebo gpu",
+                                       name, false,
                                        vlc_placebo_start, pl, cfg);
     if (module == NULL)
         goto delete_log;

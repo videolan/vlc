@@ -193,8 +193,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
         strict = false;
     }
 
-    priv->module = vlc_module_load(p_demux, "demux", module, strict,
-                                   demux_Probe, p_demux);
+    priv->module = vlc_module_load(vlc_object_logger(p_demux), "demux", module,
+                                   strict, demux_Probe, p_demux);
     free(modbuf);
 
     if (priv->module == NULL)
