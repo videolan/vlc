@@ -152,23 +152,23 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 double instant_coeff = system_diff / (double) stream_diff * rate;
 
                 /* System and stream ts should be incrementing */
-                if (system_diff < 0 || stream_diff < 0)
-                {
-                    if (main_clock->logger != NULL)
-                        vlc_warning(main_clock->logger, "resetting master clock: "
-                                    "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
-                                    system_diff, stream_diff);
-                    /* Reset and continue (calculate the offset from the
-                     * current point) */
-                    vlc_clock_main_reset(main_clock);
-                }
+                bool decreasing_ts = system_diff < 0 || stream_diff < 0;
                 /* The instant coeff should always be around 1.0 */
-                else if (instant_coeff > 1.0 + COEFF_THRESHOLD
-                      || instant_coeff < 1.0 - COEFF_THRESHOLD)
+                bool coefficient_unstable = instant_coeff > 1.0 + COEFF_THRESHOLD
+                    || instant_coeff < 1.0 - COEFF_THRESHOLD;
+
+                if (decreasing_ts || coefficient_unstable)
                 {
                     if (main_clock->logger != NULL)
-                        vlc_warning(main_clock->logger, "resetting master clock: "
-                                    "coefficient too unstable: %f", instant_coeff);
+                    {
+                        if (decreasing_ts)
+                            vlc_warning(main_clock->logger, "resetting master clock: "
+                                        "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
+                                        system_diff, stream_diff);
+                        else
+                            vlc_warning(main_clock->logger, "resetting master clock: "
+                                        "coefficient too unstable: %f", instant_coeff);
+                    }
                     /* Reset and continue (calculate the offset from the
                      * current point) */
                     vlc_clock_main_reset(main_clock);
