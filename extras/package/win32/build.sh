@@ -415,11 +415,7 @@ if [ ! -z "$WITH_PDB" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-pdb"
 fi
 if [ ! -z "$EXTRA_CHECKS" ]; then
-    CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
-    CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
-    if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
-        CFLAGS="$CFLAGS -Werror=restrict"
-    fi
+    CONFIGFLAGS="$CONFIGFLAGS --enable-extra-checks"
 fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"

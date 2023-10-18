@@ -252,8 +252,7 @@ if [ "$NODEBUG" = "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
 fi
 if [ -n "$EXTRA_CHECKS" ]; then
-    CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
-    CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
+    CONFIGFLAGS="$CONFIGFLAGS --enable-extra-checks"
 fi
 
 export CFLAGS
