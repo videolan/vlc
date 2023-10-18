@@ -101,6 +101,8 @@ VLC_USE_BITCODE=0
 VLC_BITCODE_FLAG="-fembed-bitcode"
 # whether to build static or dynamic plugins
 VLC_BUILD_DYNAMIC=0
+# Add extra checks when compiling
+VLC_BUILD_EXTRA_CHECKS=0
 
 # Tools to be used
 VLC_HOST_CC="$(xcrun --find clang)"
@@ -135,6 +137,7 @@ usage()
     echo " --with-prebuilt-contribs  Use prebuilt contribs instead of building"
     echo "                           them from source"
     echo " --enable-shared           Build dynamic libraries and plugins"
+    echo " --enable-extra-checks     Add extra checks when compiling"
     echo "Environment variables:"
     echo " VLC_PREBUILT_CONTRIBS_URL  URL to fetch the prebuilt contrib archive"
     echo "                            from when --with-prebuilt-contribs is used"
@@ -475,6 +478,9 @@ do
         --enable-shared)
             VLC_BUILD_DYNAMIC=1
             ;;
+        --enable-extra-checks)
+            VLC_BUILD_EXTRA_CHECKS=1
+            ;;
         VLC_PREBUILT_CONTRIBS_URL=*)
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
@@ -682,6 +688,10 @@ if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
     VLC_CONFIG_OPTIONS+=( "--enable-shared" )
 else
     VLC_CONFIG_OPTIONS+=( "--disable-shared" "--enable-static" )
+fi
+
+if [ "$VLC_BUILD_EXTRA_CHECKS" -gt "0" ]; then
+    VLC_CONFIG_OPTIONS+=( "--enable-extra-checks" )
 fi
 
 # Bootstrap VLC
