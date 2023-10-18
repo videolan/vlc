@@ -478,7 +478,8 @@ add_project_arguments(cc.get_supported_arguments([
 
 if get_option('extra_checks')
     add_project_arguments(cc.get_supported_arguments([
-        '-Werror=missing-field-initializers'
+        '-Werror=missing-field-initializers',
+        '-Werror=format'
     ]), language: ['c', 'cpp'])
     add_project_arguments(cc.get_supported_arguments([
         '-Werror=incompatible-pointer-types',

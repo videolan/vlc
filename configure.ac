@@ -1161,9 +1161,9 @@ AC_ARG_ENABLE([extra_checks],
                     [Turn some warnings into compilation error (default disabled)]),,
                     [enable_extra_checks="no"])
 AS_IF([test "${enable_extra_checks}" = "yes"], [
-    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=incompatible-pointer-types -Werror=restrict], [CFLAGS])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format -Werror=incompatible-pointer-types -Werror=restrict], [CFLAGS])
     AC_LANG_PUSH(C++)
-    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers], [CXXFLAGS])
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=format], [CXXFLAGS])
     AC_LANG_POP(C++)
 ])
 
