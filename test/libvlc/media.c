@@ -163,6 +163,7 @@ static void test_media_tracks(libvlc_instance_t *vlc)
                                  libvlc_media_parse_local|libvlc_media_parse_forced,
                                  libvlc_media_parsed_status_done);
 
+    char buf[32];
     libvlc_media_tracklist_t *tracklist;
 
     tracklist = libvlc_media_get_tracklist(media, libvlc_track_video);
@@ -176,7 +177,6 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         assert(track->video->i_width == 100);
         assert(track->video->i_height == 50);
 
-        char buf[] = "video/4";
         sprintf(buf, "video/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
         assert(track->id_stable);
@@ -194,7 +194,6 @@ static void test_media_tracks(libvlc_instance_t *vlc)
         assert(track->audio->i_channels == 2);
         assert(track->audio->i_rate == 48000);
 
-        char buf[] = "audio/42";
         sprintf(buf, "audio/%zu", i);
         assert(strcmp(track->psz_id, buf) == 0);
         assert(track->id_stable);
