@@ -181,7 +181,7 @@ static int SetSoundfont(decoder_t *p_dec, AudioUnit synthUnit, const char *sfPat
     CFRelease(url);
 
     if (status != noErr) {
-        msg_Err(p_dec, "failed setting custom SoundFont for MIDI synthesis (%i)", status);
+        msg_Err(p_dec, "failed setting custom SoundFont for MIDI synthesis (%i)", (int)status);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -203,7 +203,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->graph = NULL;
     status = CreateAUGraph(&p_sys->graph, &p_sys->synthUnit, &p_sys->outputUnit);
     if (unlikely(status != noErr)) {
-        msg_Err(p_dec, "failed to create audiograph (%i)", status);
+        msg_Err(p_dec, "failed to create audiograph (%i)", (int)status);
         ret = VLC_EGENERIC;
         goto bailout;
     }
@@ -245,7 +245,7 @@ static int Open(vlc_object_t *p_this)
                                   kAudioUnitScope_Output, 0, &ASBD,
                                   sizeof(AudioStreamBasicDescription));
     if (unlikely(status != noErr)) {
-        msg_Err(p_dec, "failed setting output format for output unit (%i)", status);
+        msg_Err(p_dec, "failed setting output format for output unit (%i)", (int)status);
         ret = VLC_EGENERIC;
         goto bailout;
     }
@@ -256,7 +256,7 @@ static int Open(vlc_object_t *p_this)
         if (status == kAudioUnitErr_InvalidFile)
             msg_Err(p_dec, "failed initializing audiograph: invalid soundfont file");
         else
-            msg_Err(p_dec, "failed initializing audiograph (%i)", status);
+            msg_Err(p_dec, "failed initializing audiograph (%i)", (int)status);
         ret = VLC_EGENERIC;
         goto bailout;
     }
@@ -269,7 +269,7 @@ static int Open(vlc_object_t *p_this)
     // Start the AU
     status = AUGraphStart(p_sys->graph);
     if (unlikely(status != noErr)) {
-        msg_Err(p_dec, "failed starting audiograph (%i)", status);
+        msg_Err(p_dec, "failed starting audiograph (%i)", (int)status);
         ret = VLC_EGENERIC;
         goto bailout;
     }
@@ -405,7 +405,7 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
                              frames, &bufferList);
 
     if (status != noErr) {
-        msg_Warn(p_dec, "rendering audio unit failed: %i", status);
+        msg_Warn(p_dec, "rendering audio unit failed: %i", (int)status);
         block_Release(p_out);
         p_out = NULL;
     }

@@ -456,7 +456,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
 
     status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &result);
     if (status != errSecSuccess) {
-        msg_Warn(p_keystore, "lookup failed (%i: '%s')", status, [ErrorForStatus(status) UTF8String]);
+        msg_Warn(p_keystore, "lookup failed (%i: '%s')", (int)status, [ErrorForStatus(status) UTF8String]);
         return 0;
     }
 

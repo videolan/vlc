@@ -2163,7 +2163,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
     else
     {
-        msg_Dbg(p_dec, "session rejected frame %"PRId64" with status %d", p_info->pts, status);
+        msg_Dbg(p_dec, "session rejected frame %"PRId64" with status %d", p_info->pts, (int)status);
         p_sys->sync_state = p_sys->start_sync_state;
         vlc_mutex_lock(&p_sys->lock);
         p_sys->vtsession_status = vtsession_status;
