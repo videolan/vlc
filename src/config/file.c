@@ -367,7 +367,7 @@ int (config_SaveConfigFile) (libvlc_int_t *p_this)
     char *permanent = config_GetConfigFile (p_this);
     if (permanent == NULL)
         return -1;
-    if (asprintf (&temporary, "%s.%u", permanent, getpid ()) == -1)
+    if (asprintf (&temporary, "%s.%"PRIu32, permanent, (uint32_t)getpid ()) == -1)
     {
         free (permanent);
         return -1;
