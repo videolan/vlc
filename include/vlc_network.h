@@ -286,7 +286,7 @@ static inline int vlc_setsockopt(int s, int level, int name,
 #endif
 
 #ifdef _WIN32
-# if !defined(WINAPI_FAMILY) || WINAPI_FAMILY != WINAPI_FAMILY_APP
+# if defined(UNICODE)
 #  undef gai_strerror
 #  define gai_strerror gai_strerrorA
 # endif
