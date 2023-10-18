@@ -618,8 +618,8 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
     {
         assert(outlayout->mNumberChannelDescriptions > 0);
 
-        msg_Dbg(p_aout, "output layout of AUHAL has %i channels",
-                outlayout->mNumberChannelDescriptions);
+        msg_Dbg(p_aout, "output layout of AUHAL has %d channels",
+                (int) outlayout->mNumberChannelDescriptions);
         uint32_t chans_out[AOUT_CHAN_MAX];
 
         /* For 7.1, AOUT_CHAN_MIDDLELEFT/RIGHT needs to be swapped with
@@ -660,7 +660,7 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
             {
                 chans_out[i] = 0;
                 msg_Dbg(p_aout, "found nonrecognized channel %d at index "
-                        "%d", chan, i);
+                        "%u", (int) chan, i);
             }
         }
         if (fmt->i_physical_channels == 0)
