@@ -347,7 +347,7 @@ debian-meson:
         - |
             echo -e "\e[0Ksection_start:$(date +%s):setup_meson_section\r\e[0KMeson setup"
             # Setup meson build dir
-            meson setup -Db_coverage=true build-meson || (echo "ERROR: Meson setup failed!" >&2 ; cat build-meson/meson-logs/meson-log.txt >&2 ; exit 1)
+            meson setup -Db_coverage=true -Dextra_checks=true build-meson || (echo "ERROR: Meson setup failed!" >&2 ; cat build-meson/meson-logs/meson-log.txt >&2 ; exit 1)
             echo -e "\e[0Ksection_end:$(date +%s):setup_meson_section\r\e[0K"
 
         - |
