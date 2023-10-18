@@ -73,7 +73,7 @@ struct vlc_clock_main_t
     struct VLC_VECTOR(struct vlc_clock_event) events;
 };
 
-struct vlc_clock_t
+struct vlc_clock_ops
 {
     vlc_tick_t (*update)(vlc_clock_t *clock, vlc_tick_t system_now,
                          vlc_tick_t ts, double rate,
@@ -82,7 +82,11 @@ struct vlc_clock_t
     vlc_tick_t (*set_delay)(vlc_clock_t *clock, vlc_tick_t delay);
     vlc_tick_t (*to_system_locked)(vlc_clock_t *clock, vlc_tick_t system_now,
                                    vlc_tick_t ts, double rate);
+};
 
+struct vlc_clock_t
+{
+    const struct vlc_clock_ops *ops;
     vlc_clock_main_t *owner;
     vlc_tick_t delay;
     unsigned priority;
@@ -432,7 +436,7 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
 
     vlc_mutex_lock(&main_clock->lock);
 
-    vlc_tick_t computed = clock->to_system_locked(clock, system_now, ts, rate);
+    vlc_tick_t computed = clock->ops->to_system_locked(clock, system_now, ts, rate);
 
     vlc_mutex_unlock(&main_clock->lock);
 
@@ -627,48 +631,46 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate)
 {
-    return clock->update(clock, system_now, ts, rate, 0, 0);
+    return clock->ops->update(clock, system_now, ts, rate, 0, 0);
 }
 
 vlc_tick_t vlc_clock_UpdateVideo(vlc_clock_t *clock, vlc_tick_t system_now,
                                  vlc_tick_t ts, double rate,
                                  unsigned frame_rate, unsigned frame_rate_base)
 {
-    return clock->update(clock, system_now, ts, rate, frame_rate, frame_rate_base);
+    return clock->ops->update(clock, system_now, ts, rate, frame_rate, frame_rate_base);
 }
 
 void vlc_clock_Reset(vlc_clock_t *clock)
 {
-    clock->reset(clock);
+    clock->ops->reset(clock);
 }
 
 vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t delay)
 {
-    return clock->set_delay(clock, delay);
+    return clock->ops->set_delay(clock, delay);
 }
 
 vlc_tick_t vlc_clock_ConvertToSystemLocked(vlc_clock_t *clock,
                                            vlc_tick_t system_now, vlc_tick_t ts,
                                            double rate)
 {
-    return clock->to_system_locked(clock, system_now, ts, rate);
+    return clock->ops->to_system_locked(clock, system_now, ts, rate);
 }
 
-static void vlc_clock_set_master_callbacks(vlc_clock_t *clock)
-{
-    clock->update = vlc_clock_master_update;
-    clock->reset = vlc_clock_master_reset;
-    clock->set_delay = vlc_clock_master_set_delay;
-    clock->to_system_locked = vlc_clock_master_to_system_locked;
-}
+static const struct vlc_clock_ops master_ops = {
+    .update = vlc_clock_master_update,
+    .reset = vlc_clock_master_reset,
+    .set_delay = vlc_clock_master_set_delay,
+    .to_system_locked = vlc_clock_master_to_system_locked,
+};
 
-static void vlc_clock_set_slave_callbacks(vlc_clock_t *clock)
-{
-    clock->update = vlc_clock_slave_update;
-    clock->reset = vlc_clock_slave_reset;
-    clock->set_delay = vlc_clock_slave_set_delay;
-    clock->to_system_locked = vlc_clock_slave_to_system_locked;
-}
+static const struct vlc_clock_ops slave_ops = {
+    .update = vlc_clock_slave_update,
+    .reset = vlc_clock_slave_reset,
+    .set_delay = vlc_clock_slave_set_delay,
+    .to_system_locked = vlc_clock_slave_to_system_locked,
+};
 
 static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
                                           const char* track_str_id,
@@ -705,9 +707,9 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
     assert(main_clock->master == NULL);
 
     if (main_clock->input_master == NULL)
-        vlc_clock_set_master_callbacks(clock);
+        clock->ops = &master_ops;
     else
-        vlc_clock_set_slave_callbacks(clock);
+        clock->ops = &slave_ops;
 
     main_clock->master = clock;
     main_clock->rc++;
@@ -732,9 +734,9 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 
     /* Override the master ES clock if it exists */
     if (main_clock->master != NULL)
-        vlc_clock_set_slave_callbacks(main_clock->master);
+        main_clock->master->ops = &slave_ops;
 
-    vlc_clock_set_master_callbacks(clock);
+    clock->ops = &master_ops;
     main_clock->input_master = clock;
     main_clock->rc++;
     vlc_mutex_unlock(&main_clock->lock);
@@ -771,7 +773,7 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
         return NULL;
 
     vlc_mutex_lock(&main_clock->lock);
-    vlc_clock_set_slave_callbacks(clock);
+    clock->ops = &slave_ops;
     main_clock->rc++;
     vlc_mutex_unlock(&main_clock->lock);
 
