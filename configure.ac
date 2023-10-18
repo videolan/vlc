@@ -1156,6 +1156,17 @@ dnl -Werror-implicit-function-declaration is used for the if_nametoindex detecti
 AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local -Wmultistatement-macros], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-pipe], [CFLAGS])
 
+AC_ARG_ENABLE([extra_checks],
+     AS_HELP_STRING([--enable-extra-checks],
+                    [Turn some warnings into compilation error (default disabled)]),,
+                    [enable_extra_checks="no"])
+AS_IF([test "${enable_extra_checks}" = "yes"], [
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers -Werror=incompatible-pointer-types -Werror=restrict], [CFLAGS])
+    AC_LANG_PUSH(C++)
+    AX_APPEND_COMPILE_FLAGS([-Werror=missing-field-initializers], [CXXFLAGS])
+    AC_LANG_POP(C++)
+])
+
 dnl UWP forbidden checks
 AS_IF([test "${SYS}" = "mingw32"], [
   AC_MSG_CHECKING(for if_nametoindex availability)
