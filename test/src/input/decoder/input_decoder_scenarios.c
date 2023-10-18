@@ -536,7 +536,7 @@ static void cc_decoder_setup_708_1064(decoder_t *dec)
 
 static int cc_decoder_decode_channel(decoder_t *dec, vlc_frame_t *in)
 {
-    char buf[] = "ccxx_dec";
+    char buf[] = "ccxxx_dec";
     assert(dec->fmt_in->subs.cc.i_channel < 64);
     sprintf(buf, "cc%02u_dec", dec->fmt_in->subs.cc.i_channel + 1);
     return cc_decoder_decode_common(dec, in, buf);
