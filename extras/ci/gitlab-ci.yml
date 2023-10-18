@@ -535,9 +535,10 @@ nightly-macos-arm64:
         mkdir build && cd build
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs \
-                --with-prebuilt-contribs
+                --enable-extra-checks --with-prebuilt-contribs
         else
-            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs
+            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs \
+                --enable-extra-checks
         fi
 
 ios-arm64:
