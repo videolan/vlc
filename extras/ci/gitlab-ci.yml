@@ -568,10 +568,11 @@ tvos-arm64:
         git clone https://code.videolan.org/videolan/libvlcjni.git
         (cd libvlcjni && git checkout aa63288b6bb5c52dfacbdec95104cd4c86c7e9c2)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH --with-prebuilt-contribs
+          CONTRIB_FLAGS="--with-prebuilt-contribs"
         else
-            /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH --package-contribs
+          CONTRIB_FLAGS="--package-contribs"
         fi
+        EXTRA_PARAMS="--enable-extra-checks" /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH $CONTRIB_FLAGS
 
 android-arm:
     extends: .android-common
