@@ -52,6 +52,9 @@ do
         --enable-shared)
             VLC_COMPILE_SHARED=1
             ;;
+        --enable-extra-checks)
+            VLC_BUILD_EXTRA_CHECKS=1
+            ;;
         --gen-contrib-archive|-c)
             GENERATE_ARCHIVE=1
             ;;
@@ -70,6 +73,7 @@ BUILDDIR_NAME="build-emscripten"
 GENERATE_ARCHIVE=${GENERATE_ARCHIVE:=0}
 VLC_USE_PREBUILT_CONTRIBS=${VLC_USE_PREBUILT_CONTRIBS:=0}
 VLC_COMPILE_SHARED=${VLC_COMPILE_SHARED:=0}
+VLC_BUILD_EXTRA_CHECKS=${VLC_BUILD_EXTRA_CHECKS:=0}
 
 diagnostic "setting MAKEFLAGS"
 if [ -z "$MAKEFLAGS" ]; then
@@ -175,6 +179,10 @@ else
     SHARED_CONFIGURE_FLAGS="--disable-shared"
 fi
 
+if [ "$VLC_BUILD_EXTRA_CHECKS" -eq "1" ]; then
+    EXTRA_CONFIGURE_FLAGS="--enable-extra-checks"
+fi
+
 cd "$BUILD_PATH"
 if [ $BUILD_MODE -eq 1 ]; then
     diagnostic "libvlc build: bootstrap"
@@ -192,7 +200,7 @@ if [ $BUILD_MODE -eq 1 ]; then
         SANITIZER_OPTIONS="--with-sanitizer=${VLC_USE_SANITIZER}"
     fi
     emconfigure "$VLC_SRCPATH"/configure --host=wasm32-unknown-emscripten --enable-debug \
-                        $SHARED_CONFIGURE_FLAGS --disable-vlc \
+                        $SHARED_CONFIGURE_FLAGS $EXTRA_CONFIGURE_FLAGS --disable-vlc \
                         --enable-avcodec --enable-avformat --enable-swscale --enable-postproc \
                         --disable-sout --disable-vlm --disable-a52 --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
