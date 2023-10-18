@@ -1148,7 +1148,9 @@ dnl  Compiler warnings
 dnl
 
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CFLAGS])
+AC_LANG_PUSH(C++)
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CXXFLAGS])
+AC_LANG_POP(C++)
 
 dnl -Werror-implicit-function-declaration is used for the if_nametoindex detection with winstore
 AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local -Wmultistatement-macros], [CFLAGS])
