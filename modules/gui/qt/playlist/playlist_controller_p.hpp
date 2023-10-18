@@ -66,10 +66,10 @@ public:
 private:
     inline void fillSortKeyTitleList()
     {
-        auto filler = [this](PlaylistController::SortKey key, const QString& title) {
+        auto filler = [this](PlaylistController::SortKey key, const QString& text) {
             QVariantMap map;
             map.insert("criteria", key);
-            map.insert("title", title);
+            map.insert("text", text);
             sortKeyTitleList.push_back(map);
         };
 

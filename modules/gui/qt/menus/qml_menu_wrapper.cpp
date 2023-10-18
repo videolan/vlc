@@ -976,7 +976,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
             const QVariantMap varmap = it.toMap();
 
             auto key = static_cast<PlaylistController::SortKey>(varmap.value("key").toInt());
-            QString label = varmap.value("title").toString();
+            QString label = varmap.value("text").toString();
 
             addSortAction(qtr("%1 Ascending").arg(label), key, PlaylistController::SORT_ORDER_ASC);
             addSortAction(qtr("%1 Descending").arg(label), key, PlaylistController::SORT_ORDER_DESC);
