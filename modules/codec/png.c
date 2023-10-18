@@ -221,7 +221,7 @@ static int make_xmp_packet( const video_format_t *fmt, png_textp chunk )
                "</rdf:Description>"
               "</rdf:RDF>"
              "</x:xmpmeta>"
-            "<?xpacket end='r'?>", id, ORIENT_TO_EXIF(fmt->orientation) );
+            "<?xpacket end='r'?>", id, (uint8_t)ORIENT_TO_EXIF(fmt->orientation) );
     if(len == 0)
     {
         free(chunk->text);
