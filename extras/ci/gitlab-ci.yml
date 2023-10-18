@@ -307,17 +307,16 @@ debian:
 
         # Configure VLC
         ./bootstrap
-        ./configure CFLAGS="$LIBVLC_EXTRA_CFLAGS"
+        ./configure
 
         # Allow core dumps for tracing test failures
         ulimit -c unlimited
 
         # Build, check and distcheck VLC
         export XZ_OPT="-T 0"
-        DISTCHECK_CONFIGURE_FLAGS="CFLAGS='$LIBVLC_EXTRA_CFLAGS'" make -j$NCPU distcheck AM_DISTCHECK_CONFIGURE_FLAGS="--enable-fast-install" || ./test/dump_stacktraces.sh
+        make -j$NCPU distcheck AM_DISTCHECK_CONFIGURE_FLAGS="--enable-fast-install --enable-extra-checks" || ./test/dump_stacktraces.sh
     variables:
         <<: *variables-debian
-        LIBVLC_EXTRA_CFLAGS: -Werror=restrict -Werror=incompatible-pointer-types
 
 nightly-debian:
     extends: debian
