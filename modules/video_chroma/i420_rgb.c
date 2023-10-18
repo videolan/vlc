@@ -40,7 +40,7 @@
 #ifdef PLUGIN_PLAIN
 # include "i420_rgb_c.h"
 
-static void SetYUV( filter_t *, const video_format_t * );
+static void SetYUV( filter_t * );
 static void Set8bppPalette( filter_t *, uint8_t * );
 #endif
 
@@ -214,10 +214,7 @@ static int Activate( filter_t *p_filter )
         return -1;
     }
 
-    video_format_t vfmt;
-    video_format_Copy( &vfmt, &p_filter->fmt_out.video );
-    SetYUV( p_filter, &vfmt );
-    video_format_Clean( &vfmt );
+    SetYUV( p_filter );
 #endif
 
     return 0;
@@ -244,7 +241,7 @@ static void Deactivate( filter_t *p_filter )
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
-static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
+static void SetYUV( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     unsigned i_lrshift, i_lgshift, i_lbshift;
