@@ -1482,7 +1482,7 @@ static void DestroyMFT(decoder_t *p_dec)
         p_sys->flushStream();
     }
 
-    if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
+    if (p_sys->hh.p_obj)
         hxxx_helper_clean(&p_sys->hh);
 }
 
