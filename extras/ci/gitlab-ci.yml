@@ -601,6 +601,7 @@ wasm32-emscripten-build :
     script:
         - source $EMSCRIPTEN_SDK/emsdk_env.sh
         - |
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-extra-checks"
             if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
                 echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
                 EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
