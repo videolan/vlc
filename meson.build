@@ -476,6 +476,16 @@ add_project_arguments(cc.get_supported_arguments([
     '-pipe'
 ]), language: ['c'])
 
+if get_option('extra_checks')
+    add_project_arguments(cc.get_supported_arguments([
+        '-Werror=missing-field-initializers'
+    ]), language: ['c', 'cpp'])
+    add_project_arguments(cc.get_supported_arguments([
+        '-Werror=incompatible-pointer-types',
+        '-Werror=restrict'
+    ]), language: ['c'])
+endif
+
 if get_option('branch_protection') \
     .require(host_machine.cpu_family() == 'aarch64', error_message: 'Branch protection is only available for AArch64') \
     .require(cc.has_argument('-mbranch-protection=standard'), error_message: 'Compiler does not support `-mbranch-protection`') \

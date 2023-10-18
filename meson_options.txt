@@ -50,6 +50,11 @@ option('ssp',
     value : 'auto',
     description : 'Stack smashing protection')
 
+option('extra_checks',
+    type : 'boolean',
+    value : false,
+    description : 'Turn some warnings into compilation error')
+
 option('winstore_app',
     type : 'boolean',
     value : false,
