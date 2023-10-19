@@ -510,7 +510,6 @@ static const struct
     { VLC_CODEC_RV40, OMX_VIDEO_CodingRV,    "video_decoder.rv"    },
     { VLC_CODEC_VP8,  OMX_VIDEO_CodingAutoDetect, "video_decoder.vp8" },
     { VLC_CODEC_VP9,  OMX_VIDEO_CodingAutoDetect, "video_decoder.vp9" },
-    { 0, 0, 0 }
 };
 
 static const struct
@@ -592,11 +591,9 @@ static const struct
 
 OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc )
 {
-    unsigned int i;
-
     i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
 
-    for( i = 0; video_format_table[i].i_codec != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_fourcc == i_fourcc )
             return video_format_table[i].i_codec;
 
@@ -605,9 +602,7 @@ OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc )
 
 vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec )
 {
-    unsigned int i;
-
-    for( i = 0; video_format_table[i].i_codec != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_codec == i_omx_codec )
             return video_format_table[i].i_fourcc;
 
@@ -616,14 +611,13 @@ vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec )
 
 static const char *GetOmxVideoRole( vlc_fourcc_t i_fourcc )
 {
-    unsigned int i;
-
     i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
 
-    for( i = 0; video_format_table[i].i_codec != 0; i++ )
-        if( video_format_table[i].i_fourcc == i_fourcc ) break;
+    for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
+        if( video_format_table[i].i_fourcc == i_fourcc )
+            return video_format_table[i].psz_role;
 
-    return video_format_table[i].psz_role;
+    return NULL;
 }
 
 static const char *GetOmxVideoEncRole( vlc_fourcc_t i_fourcc )
