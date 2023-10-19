@@ -1179,11 +1179,11 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
     vlc_assert_unreachable();
 }
 
-static void 
-SetDecoderColorProperties(CFMutableDictionaryRef decoderConfiguration, 
+static void
+SetDecoderColorProperties(CFMutableDictionaryRef decoderConfiguration,
                           const video_format_t *video_fmt)
 {
-    /** 
+    /**
      VideoToolbox decoder doesn't attach all color properties to image buffers.
      Current display modules handle tonemap without them.
      Attaching additional color properties to image buffers is mandatory for
@@ -1191,8 +1191,8 @@ SetDecoderColorProperties(CFMutableDictionaryRef decoderConfiguration,
      tonemap when AVFoundation APIs are used to render them and prevent
      flickering while using multiple displays with different colorsync profiles.
     */
-    
-    CFStringRef color_matrix = 
+
+    CFStringRef color_matrix =
         cvpx_map_YCbCrMatrix_from_vcs(video_fmt->space);
     if (color_matrix) {
         CFDictionarySetValue(
@@ -1201,22 +1201,22 @@ SetDecoderColorProperties(CFMutableDictionaryRef decoderConfiguration,
             color_matrix);
     }
 
-    CFStringRef color_primaries = 
+    CFStringRef color_primaries =
         cvpx_map_ColorPrimaries_from_vcp(video_fmt->primaries);
     if (color_primaries) {
         CFDictionarySetValue(
-            decoderConfiguration, 
-            kCVImageBufferColorPrimariesKey, 
+            decoderConfiguration,
+            kCVImageBufferColorPrimariesKey,
             color_primaries
         );
     }
 
-    CFStringRef color_transfer_func = 
+    CFStringRef color_transfer_func =
         cvpx_map_TransferFunction_from_vtf(video_fmt->transfer);
     if (color_transfer_func) {
         CFDictionarySetValue(
-            decoderConfiguration, 
-            kCVImageBufferTransferFunctionKey, 
+            decoderConfiguration,
+            kCVImageBufferTransferFunctionKey,
             color_transfer_func
         );
     }
