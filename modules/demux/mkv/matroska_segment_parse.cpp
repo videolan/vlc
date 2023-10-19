@@ -580,6 +580,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 }
             }
         }
+#if LIBMATROSKA_VERSION >= 0x010400
+        E_CASE( KaxVideoAlphaMode, mode )
+        {
+            ONLY_FMT(VIDEO);
+            debug( vars, "Track Video Alpha Mode %u", static_cast<uint8>( mode ) ) ;
+            vars.tk->b_has_alpha = static_cast<uint8>( mode ) == 1;
+        }
+#endif
 #if LIBMATROSKA_VERSION >= 0x010406
         E_CASE( KaxVideoProjection, proj )
         {

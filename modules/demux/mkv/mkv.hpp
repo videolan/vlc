@@ -191,6 +191,7 @@ class mkv_track_t
         PrivateTrackData *p_sys;
 
         bool            b_discontinuity;
+        bool            b_has_alpha;
 
         /* informative */
         std::string str_codec_name;

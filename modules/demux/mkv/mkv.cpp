@@ -884,6 +884,7 @@ mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
   ,i_chans_to_reorder(0)
   ,p_sys(NULL)
   ,b_discontinuity(false)
+  ,b_has_alpha(false)
   ,i_compression_type(MATROSKA_COMPRESSION_NONE)
   ,i_encoding_scope(MATROSKA_ENCODING_SCOPE_ALL_FRAMES)
   ,p_compression_data(NULL)
