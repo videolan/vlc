@@ -213,8 +213,8 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             def->format.video.eCompressionFormat = GetOmxVideoFormat(p_fmt->i_codec);
             if( def->format.video.eCompressionFormat == OMX_VIDEO_CodingUnused)
             {
-                if(!GetOmxChromaFormat(p_fmt->i_codec,
-                                       &def->format.video.eColorFormat) )
+                def->format.video.eColorFormat = GetOmxChromaFormat(p_fmt->i_codec);
+                if( def->format.video.eColorFormat == OMX_COLOR_FormatUnused)
                 {
                     omx_error = OMX_ErrorNotImplemented;
                     CHECK_ERROR(omx_error, "codec %4.4s doesn't match any OMX format",

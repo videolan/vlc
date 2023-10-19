@@ -231,8 +231,7 @@ OMX_AUDIO_CODINGTYPE GetOmxAudioFormat( vlc_fourcc_t i_fourcc );
 vlc_fourcc_t OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec );
 const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
                         bool b_enc );
-int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
-                        OMX_COLOR_FORMATTYPE *pi_omx_codec );
+OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc );
 vlc_fourcc_t GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec );
 int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
                        unsigned int width, unsigned int height,
