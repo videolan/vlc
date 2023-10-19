@@ -654,16 +654,15 @@ int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
     return !!audio_format_table[i].i_codec;
 }
 
-int OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec,
-                       vlc_fourcc_t *pi_fourcc )
+vlc_fourcc_t OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec )
 {
     unsigned int i;
 
     for( i = 0; audio_format_table[i].i_codec != 0; i++ )
-        if( audio_format_table[i].i_codec == i_omx_codec ) break;
+        if( audio_format_table[i].i_codec == i_omx_codec )
+            return audio_format_table[i].i_fourcc;
 
-    if( pi_fourcc ) *pi_fourcc = audio_format_table[i].i_fourcc;
-    return !!audio_format_table[i].i_fourcc;
+    return 0;
 }
 
 static const char *GetOmxAudioRole( vlc_fourcc_t i_fourcc )
@@ -1113,8 +1112,7 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
 
             case OMX_PortDomainAudio:
 
-                OmxToVlcAudioFormat( definition.format.audio.eEncoding,
-                                   &i_fourcc );
+                i_fourcc = OmxToVlcAudioFormat( definition.format.audio.eEncoding );
 
                 GetAudioParameters(omx_handle, &format_param,
                                    definition.nPortIndex,
