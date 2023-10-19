@@ -265,7 +265,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         else
         {
             if( !OmxToVlcAudioFormat(def->format.audio.eEncoding,
-                                   &p_fmt->i_codec, 0 ) )
+                                   &p_fmt->i_codec ) )
             {
                 omx_error = OMX_ErrorNotImplemented;
                 CHECK_ERROR(omx_error, "OMX audio encoding %i not supported",
@@ -571,7 +571,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
 
     case AUDIO_ES:
         if( !OmxToVlcAudioFormat( def->format.audio.eEncoding,
-                                &p_fmt->i_codec, 0 ) )
+                                &p_fmt->i_codec ) )
         {
             omx_error = OMX_ErrorNotImplemented;
             CHECK_ERROR(omx_error, "OMX audio format %i not supported",
