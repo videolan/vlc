@@ -605,16 +605,15 @@ int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
     return !!video_format_table[i].i_codec;
 }
 
-int GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec,
-                       vlc_fourcc_t *pi_fourcc )
+vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec )
 {
     unsigned int i;
 
     for( i = 0; video_format_table[i].i_codec != 0; i++ )
-        if( video_format_table[i].i_codec == i_omx_codec ) break;
+        if( video_format_table[i].i_codec == i_omx_codec )
+            return video_format_table[i].i_fourcc;
 
-    if( pi_fourcc ) *pi_fourcc = video_format_table[i].i_fourcc;
-    return !!video_format_table[i].i_fourcc;
+    return 0;
 }
 
 static const char *GetOmxVideoRole( vlc_fourcc_t i_fourcc )
@@ -1084,8 +1083,7 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
             case OMX_PortDomainVideo:
 
                 if(definition.format.video.eCompressionFormat)
-                    GetVlcVideoFormat( definition.format.video.eCompressionFormat,
-                                       &i_fourcc );
+                    i_fourcc = GetVlcVideoFormat( definition.format.video.eCompressionFormat );
                 else
                     i_fourcc = GetVlcChromaFormat( definition.format.video.eColorFormat );
 

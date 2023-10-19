@@ -541,8 +541,8 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             def->format.video.nStride = p_fmt->video.i_width;
         }
 
-        if(!GetVlcVideoFormat( def->format.video.eCompressionFormat,
-                               &p_fmt->i_codec ) )
+        p_fmt->i_codec = GetVlcVideoFormat( def->format.video.eCompressionFormat );
+        if( p_fmt->i_codec == 0 )
         {
             p_fmt->i_codec = GetVlcChromaFormat( def->format.video.eColorFormat );
             if( p_fmt->i_codec == 0 )
