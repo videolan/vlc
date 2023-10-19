@@ -153,6 +153,12 @@ const struct wl_output_listener output_cbs =
     output_mode_cb,
     NULL,
     NULL,
+#ifdef WL_OUTPUT_NAME_SINCE_VERSION
+    NULL,
+#endif
+#ifdef WL_OUTPUT_DESCRIPTION_SINCE_VERSION
+    NULL,
+#endif
 };
 
 static void screenshooter_done_cb(void *data,
