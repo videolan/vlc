@@ -1092,10 +1092,10 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
 
                 if(definition.format.video.eCompressionFormat)
                     GetVlcVideoFormat( definition.format.video.eCompressionFormat,
-                                       &i_fourcc, &psz_name );
+                                       &i_fourcc, NULL );
                 else
                     GetVlcChromaFormat( definition.format.video.eColorFormat,
-                                        &i_fourcc, &psz_name );
+                                        &i_fourcc, NULL );
 
                 OMX_INIT_STRUCTURE(crop_rect);
                 crop_rect.nPortIndex = definition.nPortIndex;
@@ -1106,6 +1106,8 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
                     crop_rect.nWidth  = definition.format.video.nFrameWidth;
                     crop_rect.nHeight = definition.format.video.nFrameHeight;
                 }
+
+                psz_name = vlc_fourcc_GetDescription( VIDEO_ES, i_fourcc );
 
                 msg_Dbg( p_dec, "  -> video %s %ix%i@%.2f (%i,%i) (%i,%i) (%i,%i,%i,%i)", psz_name,
                          (int)definition.format.video.nFrameWidth,
@@ -1122,13 +1124,15 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
             case OMX_PortDomainAudio:
 
                 OmxToVlcAudioFormat( definition.format.audio.eEncoding,
-                                   &i_fourcc, &psz_name );
+                                   &i_fourcc, NULL );
 
                 GetAudioParameters(omx_handle, &format_param,
                                    definition.nPortIndex,
                                    definition.format.audio.eEncoding,
                                    &i_channels, &i_samplerate, &i_bitrate,
                                    &i_bitspersample, &i_blockalign);
+
+                psz_name = vlc_fourcc_GetDescription( AUDIO_ES, i_fourcc );
 
                 msg_Dbg( p_dec, "  -> audio %s (%i) %i,%i,%i,%i,%i", psz_name,
                          (int)definition.format.audio.eEncoding,
