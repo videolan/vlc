@@ -166,50 +166,6 @@ void PrintOmxEvent(vlc_object_t *p_this, OMX_EVENTTYPE event, OMX_U32 data_1,
 /*****************************************************************************
  * Picture utility functions
  *****************************************************************************/
-void ArchitectureSpecificCopyHooks( decoder_t *p_dec, int i_color_format,
-                                    int i_slice_height, int i_src_stride,
-                                    ArchitectureSpecificCopyData *p_architecture_specific )
-{
-    (void)i_slice_height;
-
-#ifdef CAN_COMPILE_SSE2
-    if( i_color_format == OMX_COLOR_FormatYUV420SemiPlanar && vlc_CPU_SSE2() )
-    {
-        copy_cache_t *p_surface_cache = malloc( sizeof(copy_cache_t) );
-        if( !p_surface_cache || CopyInitCache( p_surface_cache, i_src_stride ) )
-        {
-            free( p_surface_cache );
-            return;
-        }
-        p_architecture_specific->data = p_surface_cache;
-        p_dec->fmt_out.i_codec = VLC_CODEC_YV12;
-    }
-#else
-    VLC_UNUSED(p_dec);
-    VLC_UNUSED(i_color_format);
-    VLC_UNUSED(i_src_stride);
-    VLC_UNUSED(p_architecture_specific);
-#endif
-}
-
-void ArchitectureSpecificCopyHooksDestroy( int i_color_format,
-                                           ArchitectureSpecificCopyData *p_architecture_specific )
-{
-    if (!p_architecture_specific->data)
-        return;
-#ifdef CAN_COMPILE_SSE2
-    if( i_color_format == OMX_COLOR_FormatYUV420SemiPlanar && vlc_CPU_SSE2() )
-    {
-        copy_cache_t *p_surface_cache = (copy_cache_t*)p_architecture_specific->data;
-        CopyCleanCache(p_surface_cache);
-    }
-#else
-    VLC_UNUSED(i_color_format);
-#endif
-    free(p_architecture_specific->data);
-    p_architecture_specific->data = NULL;
-}
-
 void CopyOmxPicture( int i_color_format, picture_t *p_pic,
                      int i_slice_height,
                      int i_src_stride, uint8_t *p_src, int i_chroma_div )

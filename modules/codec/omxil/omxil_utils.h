@@ -191,18 +191,6 @@ void PrintOmxEvent(vlc_object_t *p_this, OMX_EVENTTYPE event, OMX_U32 data_1,
 /*****************************************************************************
  * Picture utility functions
  *****************************************************************************/
-typedef struct ArchitectureSpecificCopyData
-{
-    void *data;
-} ArchitectureSpecificCopyData;
-
-void ArchitectureSpecificCopyHooks( decoder_t *p_dec, int i_color_format,
-                                    int i_slice_height, int i_src_stride,
-                                    ArchitectureSpecificCopyData *p_architecture_specific );
-
-void ArchitectureSpecificCopyHooksDestroy( int i_color_format,
-                                           ArchitectureSpecificCopyData *p_architecture_specific );
-
 void CopyOmxPicture( int i_color_format, picture_t *p_pic,
                      int i_slice_height,
                      int i_src_stride, uint8_t *p_src, int i_chroma_div );
