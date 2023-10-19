@@ -554,9 +554,11 @@ int libvlc_InternalActionsInit (libvlc_int_t *libvlc)
 #endif
         as->ppsz_keys[i] = s_names2actions[i].psz;
 
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x) STRINGIFY_(x)
         char name[12 + MAXACTION];
 
-        snprintf (name, sizeof (name), "global-key-%s", s_names2actions[i].psz);
+        snprintf (name, sizeof (name), "global-key-%." STRINGIFY(MAXACTION) "s", s_names2actions[i].psz);
         init_action (obj, &as->map, name + 7, s_names2actions[i].id);
         init_action (obj, &as->global_map, name, s_names2actions[i].id);
     }
