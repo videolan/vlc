@@ -711,8 +711,7 @@ const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
 }
 
 int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
-                        OMX_COLOR_FORMATTYPE *pi_omx_codec,
-                        const char **ppsz_name )
+                        OMX_COLOR_FORMATTYPE *pi_omx_codec )
 {
     unsigned int i;
 
@@ -722,7 +721,6 @@ int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
         if( chroma_format_table[i].i_fourcc == i_fourcc ) break;
 
     if( pi_omx_codec ) *pi_omx_codec = chroma_format_table[i].i_codec;
-    if( ppsz_name ) *ppsz_name = vlc_fourcc_GetDescription( VIDEO_ES, i_fourcc );
     return !!chroma_format_table[i].i_codec;
 }
 

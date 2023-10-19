@@ -215,7 +215,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                   &def->format.video.eCompressionFormat, 0) )
             {
                 if(!GetOmxChromaFormat(p_fmt->i_codec,
-                                       &def->format.video.eColorFormat, 0) )
+                                       &def->format.video.eColorFormat) )
                 {
                     omx_error = OMX_ErrorNotImplemented;
                     CHECK_ERROR(omx_error, "codec %4.4s doesn't match any OMX format",
