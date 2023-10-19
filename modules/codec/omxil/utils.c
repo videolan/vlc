@@ -202,26 +202,23 @@ void CopyVlcPicture( decoder_t *p_dec, OMX_BUFFERHEADERTYPE *p_header,
                      picture_t *p_pic)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_src_stride, i_dst_stride;
-    int i_plane, i_width, i_line;
-    uint8_t *p_dst, *p_src;
+    int i_dst_stride;
+    uint8_t *p_dst;
 
     i_dst_stride  = p_sys->out.i_frame_stride;
     p_dst = p_header->pBuffer + p_header->nOffset;
 
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+    for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         if(i_plane == 1) i_dst_stride /= p_sys->in.i_frame_stride_chroma_div;
-        p_src = p_pic->p[i_plane].p_pixels;
-        i_src_stride = p_pic->p[i_plane].i_pitch;
-        i_width = p_pic->p[i_plane].i_visible_pitch;
 
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
-        {
-            memcpy( p_dst, p_src, i_width );
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
+        plane_t plane_dst = p_pic->p[i_plane];
+        plane_dst.p_pixels = p_dst;
+        plane_dst.i_pitch = i_dst_stride;
+
+        plane_CopyPixels(&plane_dst, &p_pic->p[i_plane]);
+
+        p_dst += i_dst_stride * p_pic->p[i_plane].i_visible_lines;
     }
 }
 
