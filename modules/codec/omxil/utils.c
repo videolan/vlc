@@ -592,8 +592,7 @@ static const struct
 };
 
 int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
-                       OMX_VIDEO_CODINGTYPE *pi_omx_codec,
-                       const char **ppsz_name )
+                       OMX_VIDEO_CODINGTYPE *pi_omx_codec )
 {
     unsigned int i;
 
@@ -603,7 +602,6 @@ int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
         if( video_format_table[i].i_fourcc == i_fourcc ) break;
 
     if( pi_omx_codec ) *pi_omx_codec = video_format_table[i].i_codec;
-    if( ppsz_name ) *ppsz_name = vlc_fourcc_GetDescription( VIDEO_ES, i_fourcc );
     return !!video_format_table[i].i_codec;
 }
 

@@ -226,8 +226,7 @@ int OMXCodec_GetQuirks( enum es_format_category_e i_cat, vlc_fourcc_t i_codec,
  * fourcc -> omx id mapping
  *****************************************************************************/
 int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
-                       OMX_VIDEO_CODINGTYPE *pi_omx_codec,
-                       const char **ppsz_name );
+                       OMX_VIDEO_CODINGTYPE *pi_omx_codec );
 int GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec,
                        vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,

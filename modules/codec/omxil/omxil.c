@@ -212,7 +212,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             p_port->i_frame_size = def->nBufferSize;
 
             if(!GetOmxVideoFormat(p_fmt->i_codec,
-                                  &def->format.video.eCompressionFormat, 0) )
+                                  &def->format.video.eCompressionFormat) )
             {
                 if(!GetOmxChromaFormat(p_fmt->i_codec,
                                        &def->format.video.eColorFormat) )
