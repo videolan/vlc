@@ -133,8 +133,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
         {
             /* I420 xvideo is slow on OMAP */
             def->format.video.eColorFormat = OMX_COLOR_FormatCbYCrY;
-            GetVlcChromaFormat( def->format.video.eColorFormat,
-                                &p_fmt->i_codec );
+            p_fmt->i_codec = GetVlcChromaFormat( def->format.video.eColorFormat );
             GetVlcChromaSizes( p_fmt->i_codec,
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,
@@ -232,8 +231,8 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         }
         else
         {
-            if( !GetVlcChromaFormat( def->format.video.eColorFormat,
-                                     &p_fmt->i_codec ) )
+            p_fmt->i_codec = GetVlcChromaFormat( def->format.video.eColorFormat );
+            if( p_fmt->i_codec == 0 )
             {
                 omx_error = OMX_ErrorNotImplemented;
                 CHECK_ERROR(omx_error, "OMX color format %i not supported",
@@ -545,8 +544,8 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         if(!GetVlcVideoFormat( def->format.video.eCompressionFormat,
                                &p_fmt->i_codec ) )
         {
-            if( !GetVlcChromaFormat( def->format.video.eColorFormat,
-                                     &p_fmt->i_codec ) )
+            p_fmt->i_codec = GetVlcChromaFormat( def->format.video.eColorFormat );
+            if( p_fmt->i_codec == 0 )
             {
                 omx_error = OMX_ErrorNotImplemented;
                 CHECK_ERROR(omx_error, "OMX color format %i not supported",

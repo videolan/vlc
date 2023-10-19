@@ -716,16 +716,15 @@ int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
     return !!chroma_format_table[i].i_codec;
 }
 
-int GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec,
-                        vlc_fourcc_t *pi_fourcc )
+vlc_fourcc_t GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec )
 {
     unsigned int i;
 
     for( i = 0; chroma_format_table[i].i_codec != 0; i++ )
-        if( chroma_format_table[i].i_codec == i_omx_codec ) break;
+        if( chroma_format_table[i].i_codec == i_omx_codec )
+            return chroma_format_table[i].i_fourcc;
 
-    if( pi_fourcc ) *pi_fourcc = chroma_format_table[i].i_fourcc;
-    return !!chroma_format_table[i].i_fourcc;
+    return 0;
 }
 
 int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
@@ -1088,8 +1087,7 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port)
                     GetVlcVideoFormat( definition.format.video.eCompressionFormat,
                                        &i_fourcc );
                 else
-                    GetVlcChromaFormat( definition.format.video.eColorFormat,
-                                        &i_fourcc );
+                    i_fourcc = GetVlcChromaFormat( definition.format.video.eColorFormat );
 
                 OMX_INIT_STRUCTURE(crop_rect);
                 crop_rect.nPortIndex = definition.nPortIndex;
