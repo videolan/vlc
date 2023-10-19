@@ -307,9 +307,6 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
     if (Q_LIKELY(qGuiApp))
         setDPR(qGuiApp->devicePixelRatio());
 
-    connect(this, &QQuickItem::heightChanged, this, &RoundImage::regenerateRoundImage);
-    connect(this, &QQuickItem::widthChanged, this, &RoundImage::regenerateRoundImage);
-
     connect(this, &QQuickItem::windowChanged, this, [this](const QQuickWindow* const window) {
         if (window)
             setDPR(window->devicePixelRatio());
@@ -417,6 +414,11 @@ QUrl RoundImage::source() const
     return m_source;
 }
 
+QSize RoundImage::sourceSize() const
+{
+    return m_sourceSize;
+}
+
 qreal RoundImage::radius() const
 {
     return m_radius;
@@ -439,6 +441,16 @@ void RoundImage::setSource(const QUrl& source)
 
     m_source = source;
     emit sourceChanged(m_source);
+    regenerateRoundImage();
+}
+
+void RoundImage::setSourceSize(const QSize& size)
+{
+    if (m_sourceSize == size)
+        return;
+
+    m_sourceSize = size;
+    emit sourceSizeChanged(size);
     regenerateRoundImage();
 }
 
@@ -481,11 +493,11 @@ void RoundImage::load()
     m_enqueuedGeneration = false;
 
     auto engine = qmlEngine(this);
-    if (!engine || m_source.isEmpty() || !size().isValid() || size().isEmpty())
+    if (!engine || m_source.isEmpty() || !m_sourceSize.isValid() || m_sourceSize.isEmpty())
         return;
 
-    const qreal scaledWidth = this->width() * m_dpr;
-    const qreal scaledHeight = this->height() * m_dpr;
+    const qreal scaledWidth = m_sourceSize.width() * m_dpr;
+    const qreal scaledHeight = m_sourceSize.height() * m_dpr;
     const qreal scaledRadius = m_QSGCustomGeometry ? 0.0 : (this->radius() * m_dpr);
 
     const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};

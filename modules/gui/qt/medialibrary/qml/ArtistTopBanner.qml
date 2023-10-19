@@ -104,6 +104,8 @@ FocusScope {
 
             RoundImage {
                 source: artist.cover || VLCStyle.noArtArtist
+                sourceSize.width: width
+                sourceSize.height: height
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
             }

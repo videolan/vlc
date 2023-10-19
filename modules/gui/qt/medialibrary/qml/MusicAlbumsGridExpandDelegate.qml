@@ -126,6 +126,8 @@ FocusScope {
                 source: (root.model && root.model.cover && root.model.cover !== "")
                     ?  root.model.cover
                     : VLCStyle.noArtAlbumCover
+                sourceSize.width: width
+                sourceSize.height: height
 
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent

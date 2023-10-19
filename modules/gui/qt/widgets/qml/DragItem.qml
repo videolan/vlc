@@ -423,6 +423,8 @@ Item {
                 height: coverSize
                 radius: bg.radius
                 source: dragItem.defaultCover
+                sourceSize.width: width
+                sourceSize.height: height
                 visible: !loader.visible
             }
 

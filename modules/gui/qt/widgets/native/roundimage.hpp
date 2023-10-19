@@ -38,6 +38,8 @@ class RoundImage : public QQuickItem
     // url of the image
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged FINAL)
 
+    Q_PROPERTY(QSize sourceSize READ sourceSize WRITE setSourceSize NOTIFY sourceSizeChanged FINAL)
+
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged FINAL)
 
     Q_PROPERTY(Status status READ status NOTIFY statusChanged FINAL)
@@ -64,17 +66,20 @@ public:
     qreal radius() const;
     Status status() const;
     bool cache() const;
+    QSize sourceSize() const;
 
 public slots:
     void setSource(const QUrl& source);
     void setRadius(qreal radius);
     void setCache(bool cache);
+    void setSourceSize(const QSize&);
 
 signals:
     void sourceChanged(const QUrl&);
     void radiusChanged(qreal);
     void statusChanged();
     void cacheChanged();;
+    void sourceSizeChanged(const QSize&);
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
@@ -99,6 +104,7 @@ private:
     bool m_enqueuedGeneration = false;
 
     QUrl m_source;
+    QSize m_sourceSize;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
     bool m_cache = true;

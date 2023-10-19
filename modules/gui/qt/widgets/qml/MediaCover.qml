@@ -53,6 +53,9 @@ Rectangle {
     property alias playCoverVisible: playCoverLoader.visible
     property alias playCoverOpacity: playCoverLoader.opacity
 
+    property int pictureWidth
+    property int pictureHeight
+
     // Signals
 
     signal playIconClicked(var point)
@@ -74,6 +77,9 @@ Rectangle {
 
         radius: root.radius
 
+        sourceSize.width: root.pictureWidth
+        sourceSize.height: root.pictureHeight
+
         cache: false
     }
 
@@ -89,6 +95,9 @@ Rectangle {
         // we only keep this image till there is no main image
         // try to release the resources otherwise
         source: !root.isImageReady ? root.fallbackImageSource : ""
+
+        sourceSize.width: root.pictureWidth
+        sourceSize.height: root.pictureHeight
 
         cache: true
     }

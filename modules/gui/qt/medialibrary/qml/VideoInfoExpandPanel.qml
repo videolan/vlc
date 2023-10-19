@@ -115,6 +115,8 @@ FocusScope {
 
                             anchors.fill: parent
                             source: model.thumbnail || VLCStyle.noArtVideoCover
+                            sourceSize.width: width
+                            sourceSize.height: height
                             radius: VLCStyle.gridCover_radius
 
                             Widgets.DefaultShadow {
