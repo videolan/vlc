@@ -170,28 +170,24 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
                      int i_slice_height,
                      int i_src_stride, uint8_t *p_src, int i_chroma_div )
 {
-    uint8_t *p_dst;
-    int i_dst_stride;
-    int i_plane, i_width, i_line;
     if( i_color_format == QOMX_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka )
     {
         qcom_convert(p_src, p_pic);
         return;
     }
 
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+    for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         if(i_plane == 1) i_src_stride /= i_chroma_div;
-        p_dst = p_pic->p[i_plane].p_pixels;
-        i_dst_stride = p_pic->p[i_plane].i_pitch;
-        i_width = p_pic->p[i_plane].i_visible_pitch;
 
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
-        {
-            memcpy( p_dst, p_src, i_width );
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
+        plane_t plane_src = p_pic->p[i_plane];
+        plane_src.p_pixels = p_src;
+        plane_src.i_pitch = i_src_stride;
+
+        plane_CopyPixels(&p_pic->p[i_plane], &plane_src);
+
+        p_src += i_src_stride * p_pic->p[i_plane].i_visible_lines;
+
         /* Handle plane height, which may be indicated via nSliceHeight in OMX.
          * The handling for chroma planes currently assumes vertically
          * subsampled chroma, e.g. 422 planar wouldn't work right. */
