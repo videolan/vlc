@@ -588,7 +588,6 @@ static const struct
     { VLC_CODEC_YVYU, OMX_COLOR_FormatYCrYCb, 4, 2, 0 },
     { VLC_CODEC_UYVY, OMX_COLOR_FormatCbYCrY, 4, 2, 0 },
     { VLC_CODEC_VYUY, OMX_COLOR_FormatCrYCbY, 4, 2, 0 },
-    { 0, 0, 0, 0, 0 }
 };
 
 OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc )
@@ -700,11 +699,9 @@ const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
 
 OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc )
 {
-    unsigned int i;
-
     i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
 
-    for( i = 0; chroma_format_table[i].i_codec != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(chroma_format_table); i++ )
         if( chroma_format_table[i].i_fourcc == i_fourcc )
             return chroma_format_table[i].i_codec;
 
@@ -713,9 +710,7 @@ OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc )
 
 vlc_fourcc_t GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec )
 {
-    unsigned int i;
-
-    for( i = 0; chroma_format_table[i].i_codec != 0; i++ )
+    for( size_t i = 0; i < ARRAY_SIZE(chroma_format_table); i++ )
         if( chroma_format_table[i].i_codec == i_omx_codec )
             return chroma_format_table[i].i_fourcc;
 
@@ -727,12 +722,14 @@ int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
                        unsigned int *size, unsigned int *pitch,
                        unsigned int *chroma_pitch_div )
 {
-    unsigned int i;
+    size_t i;
 
     i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
 
-    for( i = 0; chroma_format_table[i].i_codec != 0; i++ )
+    for( i = 0; i < ARRAY_SIZE(chroma_format_table); i++ )
         if( chroma_format_table[i].i_fourcc == i_fourcc ) break;
+    if (i == ARRAY_SIZE(chroma_format_table))
+        return 0;
 
     /* Align on macroblock boundary */
     width = (width + 15) & ~0xF;
