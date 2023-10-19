@@ -210,6 +210,9 @@ static const struct wl_pointer_listener pointer_cbs =
 #ifdef WL_POINTER_AXIS_VALUE120_SINCE_VERSION
     NULL, /* We don't support axis_value120 for now */
 #endif
+#ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+    NULL, /* We don't support axis_relative_direction for now */
+#endif
 };
 
 static void pointer_create(struct seat_data *sd)
