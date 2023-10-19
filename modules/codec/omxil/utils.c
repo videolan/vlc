@@ -591,18 +591,17 @@ static const struct
     { 0, 0, 0, 0, 0 }
 };
 
-int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
-                       OMX_VIDEO_CODINGTYPE *pi_omx_codec )
+OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc )
 {
     unsigned int i;
 
     i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
 
     for( i = 0; video_format_table[i].i_codec != 0; i++ )
-        if( video_format_table[i].i_fourcc == i_fourcc ) break;
+        if( video_format_table[i].i_fourcc == i_fourcc )
+            return video_format_table[i].i_codec;
 
-    if( pi_omx_codec ) *pi_omx_codec = video_format_table[i].i_codec;
-    return !!video_format_table[i].i_codec;
+    return OMX_VIDEO_CodingUnused;
 }
 
 vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec )
