@@ -230,8 +230,7 @@ int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,
 int GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec,
                        vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
-                       OMX_AUDIO_CODINGTYPE *pi_omx_codec,
-                       const char **ppsz_name );
+                       OMX_AUDIO_CODINGTYPE *pi_omx_codec );
 int OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec,
                        vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,

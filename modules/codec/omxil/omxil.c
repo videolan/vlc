@@ -255,7 +255,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         if(def->eDir == OMX_DirInput)
         {
             if(!GetOmxAudioFormat(p_fmt->i_codec,
-                                  &def->format.audio.eEncoding, 0) )
+                                  &def->format.audio.eEncoding) )
             {
                 omx_error = OMX_ErrorNotImplemented;
                 CHECK_ERROR(omx_error, "codec %4.4s doesn't match any OMX format",

@@ -644,8 +644,7 @@ static const char *GetOmxVideoEncRole( vlc_fourcc_t i_fourcc )
 }
 
 int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
-                       OMX_AUDIO_CODINGTYPE *pi_omx_codec,
-                       const char **ppsz_name )
+                       OMX_AUDIO_CODINGTYPE *pi_omx_codec )
 {
     unsigned int i;
 
@@ -655,7 +654,6 @@ int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
         if( audio_format_table[i].i_fourcc == i_fourcc ) break;
 
     if( pi_omx_codec ) *pi_omx_codec = audio_format_table[i].i_codec;
-    if( ppsz_name ) *ppsz_name = vlc_fourcc_GetDescription( AUDIO_ES, i_fourcc );
     return !!audio_format_table[i].i_codec;
 }
 
