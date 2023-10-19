@@ -167,6 +167,9 @@ MainInterface.MainViewLoader {
                 width: gridView.cellWidth;
                 height: gridView.cellHeight;
 
+                pictureWidth: gridView.maxPictureWidth
+                pictureHeight: gridView.maxPictureHeight
+
                 subtitle: ""
                 dragItem: networkDragItem
 

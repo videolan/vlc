@@ -63,6 +63,9 @@ Widgets.ExpandGridItemView {
         width: root.cellWidth;
         height: root.cellHeight;
 
+        pictureWidth: root.maxPictureWidth
+        pictureHeight: root.maxPictureHeight
+
         title: is_dummy ? qsTr("Add a service") : model.long_name
         subtitle: ""
         playCoverShowPlay: false

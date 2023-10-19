@@ -272,6 +272,9 @@ T.ItemDelegate {
             Layout.preferredHeight: (root.pictureHeight / root.pictureWidth) * root.width
             Layout.alignment: Qt.AlignCenter
 
+            pictureWidth: root.pictureWidth
+            pictureHeight: root.pictureHeight
+
             onPlayIconClicked: (point) => {
                 // emulate a mouse click before delivering the play signal as to select the item
                 // this helps in updating the selection and restore of initial index in the parent views

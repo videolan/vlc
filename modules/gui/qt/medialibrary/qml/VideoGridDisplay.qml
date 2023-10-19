@@ -95,6 +95,9 @@ Widgets.ExpandGridItemView {
         width: gridView.cellWidth
         height: gridView.cellHeight
 
+        pictureWidth: gridView.maxPictureWidth
+        pictureHeight: gridView.maxPictureHeight
+
         opacity: (gridView.expandIndex !== -1
                   &&
                   gridView.expandIndex !== gridItem.index) ? 0.7 : 1

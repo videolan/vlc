@@ -110,14 +110,15 @@ MainInterface.MainViewLoader {
                 width: artistGrid.cellWidth
                 height: artistGrid.cellHeight
 
+                pictureWidth: artistGrid.maxPictureWidth
+                pictureHeight: artistGrid.maxPictureHeight
+                pictureRadius: artistGrid.maxPictureWidth
+
                 image: model.cover || ""
                 fallbackImage: VLCStyle.noArtArtistSmall
 
                 title: model.name || qsTr("Unknown artist")
                 subtitle: model.nb_tracks > 1 ? qsTr("%1 songs").arg(model.nb_tracks) : qsTr("%1 song").arg(model.nb_tracks)
-                pictureRadius: VLCStyle.artistGridCover_radius
-                pictureHeight: VLCStyle.artistGridCover_radius
-                pictureWidth: VLCStyle.artistGridCover_radius
                 titleTopMargin: artistGrid.titleTopMargin
                 playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true

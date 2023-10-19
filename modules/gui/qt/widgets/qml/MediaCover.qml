@@ -53,8 +53,8 @@ Rectangle {
     property alias playCoverVisible: playCoverLoader.visible
     property alias playCoverOpacity: playCoverLoader.opacity
 
-    property int pictureWidth
-    property int pictureHeight
+    required property int pictureWidth
+    required property int pictureHeight
 
     // Signals
 

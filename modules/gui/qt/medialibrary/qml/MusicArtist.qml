@@ -193,14 +193,15 @@ FocusScope {
                             width: gridHelper.cellWidth
                             height: gridHelper.cellHeight
 
+                            pictureWidth: gridHelper.maxPictureWidth
+                            pictureHeight: gridHelper.maxPictureHeight
+
                             image: model.cover || ""
                             fallbackImage: VLCStyle.noArtAlbumCover
 
                             title: model.title || qsTr("Unknown title")
                             subtitle: model.release_year || ""
                             textAlignHCenter: true
-                            pictureWidth: VLCStyle.gridCover_music_width
-                            pictureHeight: VLCStyle.gridCover_music_height
                             dragItem: albumDragItem
 
                             onPlayClicked: play()
@@ -372,6 +373,9 @@ FocusScope {
 
                 width: gridView_id.cellWidth
                 height: gridView_id.cellHeight
+
+                pictureWidth: gridView_id.maxPictureWidth
+                pictureHeight: gridView_id.maxPictureHeight
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem

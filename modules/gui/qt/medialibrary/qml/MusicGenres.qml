@@ -140,8 +140,8 @@ MainInterface.MainViewLoader {
                 width: gridView_id.cellWidth
                 height: gridView_id.cellHeight
 
-                pictureWidth: width
-                pictureHeight: height
+                pictureWidth: gridView_id.maxPictureWidth
+                pictureHeight: gridView_id.maxPictureHeight
 
                 image: model.cover || ""
                 cacheImage: true // for this view, we generate custom covers, cache it

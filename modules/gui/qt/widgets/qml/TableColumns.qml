@@ -95,6 +95,9 @@ Item {
 
                 Layout.preferredHeight: root.titleCover_height
                 Layout.preferredWidth: root.titleCover_width
+                
+                pictureWidth: width
+                pictureHeight: height
 
                 source: titleDel.rowModel?.[root.criteriaCover] ?? ""
 
