@@ -731,8 +731,8 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     /* Set component role */
     OMX_INIT_STRUCTURE(role);
     strcpy((char*)role.cRole,
-           GetOmxRole(p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->fmt_in->i_codec,
-                      p_dec->fmt_in->i_cat, p_sys->b_enc));
+           GetOmxRole(p_sys->b_enc ? &p_dec->fmt_out : p_dec->fmt_in,
+                      p_sys->b_enc));
 
     omx_error = OMX_SetParameter(omx_handle, OMX_IndexParamStandardComponentRole,
                                  &role);
@@ -877,7 +877,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     int status;
 
-    if( 0 || !GetOmxRole(p_dec->fmt_in->i_codec, p_dec->fmt_in->i_cat, false) )
+    if( 0 || !GetOmxRole(p_dec->fmt_in, false) )
         return VLC_EGENERIC;
 
     status = OpenGeneric( p_this, false );
@@ -907,7 +907,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t*)p_this;
     int status;
 
-    if( !GetOmxRole(p_enc->fmt_out.i_codec, p_enc->fmt_in.i_cat, true) )
+    if( !GetOmxRole(&p_enc->fmt_out, true) )
         return VLC_EGENERIC;
 
     status = OpenGeneric( p_this, true );
@@ -978,8 +978,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     /* Enumerate components and build a list of the one we want to try */
     p_sys->components =
         CreateComponentsList(p_this,
-             GetOmxRole(p_sys->b_enc ? p_dec->fmt_out.i_codec :
-                        p_dec->fmt_in->i_codec, p_dec->fmt_in->i_cat,
+             GetOmxRole(p_sys->b_enc ? &p_dec->fmt_out : p_dec->fmt_in,
                         p_sys->b_enc), p_sys->ppsz_components);
     if( !p_sys->components )
     {

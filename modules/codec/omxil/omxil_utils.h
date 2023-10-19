@@ -229,7 +229,7 @@ OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc );
 vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec );
 OMX_AUDIO_CODINGTYPE GetOmxAudioFormat( vlc_fourcc_t i_fourcc );
 vlc_fourcc_t OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec );
-const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
+const char *GetOmxRole( const es_format_t *,
                         bool b_enc );
 OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc );
 vlc_fourcc_t GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec );

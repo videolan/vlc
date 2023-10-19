@@ -674,15 +674,15 @@ static const char *GetOmxAudioEncRole( vlc_fourcc_t i_fourcc )
     return audio_enc_format_table[i].psz_role;
 }
 
-const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
+const char *GetOmxRole( const es_format_t *es,
                         bool b_enc )
 {
     if(b_enc)
-        return i_cat == VIDEO_ES ?
-            GetOmxVideoEncRole( i_fourcc ) : GetOmxAudioEncRole( i_fourcc );
-    else
-        return i_cat == VIDEO_ES ?
-            GetOmxVideoRole( i_fourcc ) : GetOmxAudioRole( i_fourcc );
+        return es->i_cat == VIDEO_ES ?
+            GetOmxVideoEncRole( es->i_codec ) : GetOmxAudioEncRole( es->i_codec );
+
+    return es->i_cat == VIDEO_ES ?
+        GetOmxVideoRole( es->i_codec ) : GetOmxAudioRole( es->i_codec );
 }
 
 OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc )
