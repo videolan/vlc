@@ -639,18 +639,17 @@ static const char *GetOmxVideoEncRole( vlc_fourcc_t i_fourcc )
     return video_enc_format_table[i].psz_role;
 }
 
-int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
-                       OMX_AUDIO_CODINGTYPE *pi_omx_codec )
+OMX_AUDIO_CODINGTYPE GetOmxAudioFormat( vlc_fourcc_t i_fourcc )
 {
     unsigned int i;
 
     i_fourcc = vlc_fourcc_GetCodec( AUDIO_ES, i_fourcc );
 
     for( i = 0; audio_format_table[i].i_codec != 0; i++ )
-        if( audio_format_table[i].i_fourcc == i_fourcc ) break;
+        if( audio_format_table[i].i_fourcc == i_fourcc )
+            return audio_format_table[i].i_codec;
 
-    if( pi_omx_codec ) *pi_omx_codec = audio_format_table[i].i_codec;
-    return !!audio_format_table[i].i_codec;
+    return OMX_AUDIO_CodingUnused;
 }
 
 vlc_fourcc_t OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec )
