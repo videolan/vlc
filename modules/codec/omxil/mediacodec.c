@@ -1172,14 +1172,18 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         assert(p_out->type == MC_OUT_TYPE_CONF);
         p_sys->video.i_pixel_format = p_out->conf.video.pixel_format;
 
-        const char *name = "unknown";
+        const char *name;
         if (!p_sys->api.b_direct_rendering
          && !GetVlcChromaFormat(p_sys->video.i_pixel_format,
-                                &p_dec->fmt_out.i_codec, &name))
+                                &p_dec->fmt_out.i_codec, NULL))
         {
             msg_Err(p_dec, "color-format not recognized");
             return -1;
         }
+
+        name = vlc_fourcc_GetDescription( VIDEO_ES,p_dec->fmt_out.i_codec );
+        if (name == NULL)
+            name = "unknown";
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
                 p_sys->video.i_pixel_format, name,
