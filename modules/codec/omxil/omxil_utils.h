@@ -238,7 +238,7 @@ const char *GetOmxRole( vlc_fourcc_t i_fourcc, enum es_format_category_e i_cat,
 int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
                         OMX_COLOR_FORMATTYPE *pi_omx_codec );
 int GetVlcChromaFormat( OMX_COLOR_FORMATTYPE i_omx_codec,
-                        vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
+                        vlc_fourcc_t *pi_fourcc );
 int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
                        unsigned int width, unsigned int height,
                        unsigned int *size, unsigned int *pitch,

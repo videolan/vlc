@@ -1175,7 +1175,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         const char *name;
         if (!p_sys->api.b_direct_rendering
          && !GetVlcChromaFormat(p_sys->video.i_pixel_format,
-                                &p_dec->fmt_out.i_codec, NULL))
+                                &p_dec->fmt_out.i_codec))
         {
             msg_Err(p_dec, "color-format not recognized");
             return -1;
