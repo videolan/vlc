@@ -212,8 +212,7 @@ void ArchitectureSpecificCopyHooksDestroy( int i_color_format,
 
 void CopyOmxPicture( int i_color_format, picture_t *p_pic,
                      int i_slice_height,
-                     int i_src_stride, uint8_t *p_src, int i_chroma_div,
-                     ArchitectureSpecificCopyData *p_architecture_specific )
+                     int i_src_stride, uint8_t *p_src, int i_chroma_div )
 {
     uint8_t *p_dst;
     int i_dst_stride;
@@ -223,21 +222,6 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
         qcom_convert(p_src, p_pic);
         return;
     }
-#ifdef CAN_COMPILE_SSE2
-    if( i_color_format == OMX_COLOR_FormatYUV420SemiPlanar
-        && vlc_CPU_SSE2() && p_architecture_specific && p_architecture_specific->data )
-    {
-        copy_cache_t *p_surface_cache = (copy_cache_t*)p_architecture_specific->data;
-        const uint8_t *ppi_src_pointers[2] = { p_src, p_src + i_src_stride * i_slice_height };
-        const size_t pi_src_strides[2] = { i_src_stride, i_src_stride };
-        Copy420_SP_to_P( p_pic, ppi_src_pointers, pi_src_strides,
-                         i_slice_height, p_surface_cache );
-        picture_SwapUV( p_pic );
-        return;
-    }
-#else
-    VLC_UNUSED(p_architecture_specific);
-#endif
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {

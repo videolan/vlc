@@ -1157,7 +1157,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                               NULL, NULL, &chroma_div);
             CopyOmxPicture(p_sys->video.i_pixel_format, p_pic,
                            p_sys->video.i_slice_height, p_sys->video.i_stride,
-                           (uint8_t *)p_out->buf.p_ptr, chroma_div, NULL);
+                           (uint8_t *)p_out->buf.p_ptr, chroma_div);
 
             if (p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false))
             {

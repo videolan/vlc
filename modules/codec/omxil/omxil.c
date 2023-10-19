@@ -1272,7 +1272,7 @@ static int DecodeVideoOutput( decoder_t *p_dec, OmxPort *p_port, picture_t **pp_
                                    p_pic, p_port->definition.format.video.nSliceHeight,
                                    p_port->i_frame_stride,
                                    p_header->pBuffer + p_header->nOffset,
-                                   p_port->i_frame_stride_chroma_div, NULL);
+                                   p_port->i_frame_stride_chroma_div);
             }
 
             if (p_pic)

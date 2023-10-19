@@ -205,8 +205,7 @@ void ArchitectureSpecificCopyHooksDestroy( int i_color_format,
 
 void CopyOmxPicture( int i_color_format, picture_t *p_pic,
                      int i_slice_height,
-                     int i_src_stride, uint8_t *p_src, int i_chroma_div,
-                     ArchitectureSpecificCopyData *p_architecture_specific );
+                     int i_src_stride, uint8_t *p_src, int i_chroma_div );
 
 void CopyVlcPicture( decoder_t *, OMX_BUFFERHEADERTYPE *, picture_t * );
 
