@@ -926,7 +926,15 @@ static int GetPacket( stream_t * p_access, chunk_t *p_ck )
     if( restsize < 8 )
         p_ck->i_size2 = 8;
     else
+    {
         p_ck->i_size2 = GetWLE( p_sys->buffer + 10);
+        if (p_ck->i_size2 < 8 /* Prevent underflow when set to i_data */
+         || p_ck->i_size2 - 8 > BUFFER_SIZE - 12 /* Prevent Out Of Bound Write */)
+        {
+            msg_Err(p_access, "invalid size2: %" PRIu16, p_ck->i_size2);
+            return VLC_EGENERIC;
+        }
+    }
 
     p_ck->p_data      = p_sys->buffer + 12;
     p_ck->i_data      = p_ck->i_size2 - 8;
