@@ -60,11 +60,6 @@ vlc_module_end()
 
 
 /* */
-typedef struct {
-    const char   *name;
-    D3DFORMAT    format;
-    vlc_fourcc_t codec;
-} d3d9_format_t;
 /* XXX Preferred format must come first */
 static const d3d9_format_t d3d_formats[] = {
     { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },

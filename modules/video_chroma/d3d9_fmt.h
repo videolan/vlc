@@ -144,4 +144,10 @@ int D3D9_ResetDevice(vlc_object_t *, d3d9_decoder_device_t *);
 void d3d9_pic_context_destroy(picture_context_t *);
 picture_context_t *d3d9_pic_context_copy(picture_context_t *);
 
+typedef struct {
+    const char   *name;
+    D3DFORMAT    format;
+    vlc_fourcc_t vlc_chroma;
+} d3d9_format_t;
+
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */

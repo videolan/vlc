@@ -119,13 +119,6 @@ static const vlc_fourcc_t d3d_subpicture_chromas[] = {
     0
 };
 
-typedef struct
-{
-    const char   *name;
-    D3DFORMAT    format;    /* D3D format */
-    vlc_fourcc_t fourcc;    /* VLC fourcc */
-} d3d9_format_t;
-
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area;
@@ -1397,7 +1390,7 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
             for (unsigned j = 0; d3d_formats[j].name; j++) {
                 const d3d9_format_t *format = &d3d_formats[j];
 
-                if (format->fourcc != list[i])
+                if (format->vlc_chroma != list[i])
                     continue;
                 if (decoder_format != D3DFMT_UNKNOWN && format->format != decoder_format)
                     continue; // not the Hardware format we prefer
@@ -1635,7 +1628,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     bool force_dxva_hd = var_InheritBool(vd, "direct3d9-dxvahd");
     if (force_dxva_hd || (dst_format && vd->source->color_range != COLOR_RANGE_FULL &&
                           sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA) &&
-                          !vlc_fourcc_IsYUV(dst_format->fourcc) && vlc_fourcc_IsYUV(d3dfmt->fourcc))
+                          !vlc_fourcc_IsYUV(dst_format->vlc_chroma) && vlc_fourcc_IsYUV(d3dfmt->vlc_chroma))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
         msg_Dbg(vd, "init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown");
@@ -1660,7 +1653,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
 
     /* */
     *fmt = *vd->source;
-    fmt->i_chroma = d3dfmt->fourcc;
+    fmt->i_chroma = d3dfmt->vlc_chroma;
     sys->sw_texture_fmt = d3dfmt;
 
     if (Direct3D9CreateResources(vd, fmt)) {
