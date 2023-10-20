@@ -1089,7 +1089,7 @@ bool FullscreenControllerWidget::eventFilter( QObject *watched, QEvent *event )
     if ( watched == wParent && event->type() == QEvent::ActivationChange )
     {
         /* Hide if not active */
-        if ( !wParent->isActiveWindow() )
+        if ( !wParent->isActiveWindow() && !isActiveWindow() )
             hideFSC();
     }
 
@@ -1307,7 +1307,7 @@ void FullscreenControllerWidget::mouseChanged( vout_thread_t *, int i_mousex, in
     Q_ASSERT( wParent );
 
     /* Ignore mouse events if not active */
-    if ( !wParent->isActiveWindow() ) return;
+    if ( !wParent->isActiveWindow() &&  !isActiveWindow() ) return;
 
     bool b_toShow;
 
