@@ -76,6 +76,8 @@ public:
     inline void setCriteria(const QString& value) {
         if (m_criteria == value)
             return;
+
+        m_criteria = value;
         emit criteriaChanged(m_criteria);
     }
 
