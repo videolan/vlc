@@ -909,17 +909,10 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         uint8_t widthDenominator, heightDenominator;
         switch (fmt->i_chroma)
         {
-        case VLC_CODEC_D3D11_OPAQUE:
         case VLC_CODEC_NVDEC_OPAQUE:
             bits_per_channel = 8;
             widthDenominator = heightDenominator = 2;
             break;
-        case VLC_CODEC_D3D11_OPAQUE_RGBA:
-        case VLC_CODEC_D3D11_OPAQUE_BGRA:
-            bits_per_channel = 8;
-            widthDenominator = heightDenominator = 1;
-            break;
-        case VLC_CODEC_D3D11_OPAQUE_10B:
         case VLC_CODEC_NVDEC_OPAQUE_10B:
             bits_per_channel = 10;
             widthDenominator = heightDenominator = 2;
@@ -938,7 +931,13 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
             break;
         default:
             {
-                const auto *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+                vlc_fourcc_t cpu_chroma;
+                if (is_d3d11_opaque(fmt->i_chroma))
+                    cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
+                else
+                    cpu_chroma = fmt->i_chroma;
+
+                const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
                 if (p_format == NULL)
                 {
                     bits_per_channel = 8;
