@@ -60,29 +60,6 @@ vlc_module_end()
 
 
 /* */
-/* XXX Preferred format must come first */
-static const d3d9_format_t d3d_formats[] = {
-    { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
-    { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
-    //{ "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
-    { "P010",   MAKEFOURCC('P','0','1','0'),    VLC_CODEC_P010 },
-    { "AYUV",   MAKEFOURCC('A','Y','U','V'),    VLC_CODEC_YUVA },
-    { "YUY2",   MAKEFOURCC('Y','U','Y','2'),    VLC_CODEC_YUYV },
-    { "Y410",   MAKEFOURCC('Y','4','1','0'),    VLC_CODEC_Y410 },
-    { "Y210",   MAKEFOURCC('Y','2','1','0'),    VLC_CODEC_Y210 },
-
-    { NULL, 0, 0 }
-};
-
-static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
-{
-    for (unsigned i = 0; d3d_formats[i].name; i++) {
-        if (d3d_formats[i].format == format)
-            return &d3d_formats[i];
-    }
-    return NULL;
-}
-
 typedef struct
 {
     /* Direct3D */
@@ -435,7 +412,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
     for (unsigned j = 0; j < output_count; j++) {
         const D3DFORMAT f = output_list[j];
-        const d3d9_format_t *format = D3dFindFormat(f);
+        const d3d9_format_t *format = D3D9FormatFourcc(f);
         if (format) {
             msg_Dbg(va, "%s is supported for output", format->name);
         } else {
@@ -465,24 +442,20 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     /* */
     for (unsigned pass = 0; pass < 2 && err != VLC_SUCCESS; ++pass)
     {
-        for (unsigned j = 0; d3d_formats[j].name; j++) {
-            const d3d9_format_t *format = &d3d_formats[j];
+        for (unsigned k = 0; k < output_count; k++)
+        {
+            if (pass == 0 && output_list[k] != preferredOutput)
+                continue;
 
-            /* */
-            bool is_supported = false;
-            for (unsigned k = 0; !is_supported && k < output_count; k++) {
-                is_supported = format->format == output_list[k];
+            const d3d9_format_t *format = D3D9FormatFourcc(output_list[k]);
+            if (format != NULL)
+            {
+                /* We have our solution */
+                msg_Dbg(va, "Using decoder output '%s'", format->name);
+                sys->render = format->format;
+                err = VLC_SUCCESS;
+                break;
             }
-            if (!is_supported)
-                continue;
-            if (pass == 0 && format->format != preferredOutput)
-                continue;
-
-            /* We have our solution */
-            msg_Dbg(va, "Using decoder output '%s'", format->name);
-            sys->render = format->format;
-            err = VLC_SUCCESS;
-            break;
         }
     }
     CoTaskMemFree(output_list);
