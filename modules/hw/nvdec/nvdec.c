@@ -32,6 +32,7 @@
 
 #include "../../codec/hxxx_helper.h"
 #include "nvdec_fmt.h"
+#include "nvdec_priv.h"
 #include "hw_pool.h"
 
 #ifndef CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT

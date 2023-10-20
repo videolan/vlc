@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 
 #include "nvdec_fmt.h"
+#include "nvdec_priv.h"
 
 #include "../../video_output/opengl/interop.h"
 

@@ -30,6 +30,7 @@
 #include <vlc_codec.h>
 
 #include "nvdec_fmt.h"
+#include "nvdec_priv.h"
 
 static int OpenCUDAToCPU( filter_t * );
 
