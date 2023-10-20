@@ -214,17 +214,7 @@ static int Open(vlc_object_t *obj)
         }
     }
 
-    vlc_fourcc_t render_chroma;
-    switch (interop->fmt_in.i_chroma)
-    {
-        case VLC_CODEC_NVDEC_OPAQUE_10B: render_chroma = VLC_CODEC_P010; break;
-        case VLC_CODEC_NVDEC_OPAQUE_16B: render_chroma = VLC_CODEC_P016; break;
-        case VLC_CODEC_NVDEC_OPAQUE_444:     render_chroma = VLC_CODEC_I444; break;
-        case VLC_CODEC_NVDEC_OPAQUE_444_16B: render_chroma = VLC_CODEC_I444_16L; break;
-        case VLC_CODEC_NVDEC_OPAQUE:
-        default:                         render_chroma = VLC_CODEC_NV12; break;
-    }
-
+    vlc_fourcc_t render_chroma = NVDECToVlcChroma(interop->fmt_in.i_chroma);
     switch (render_chroma)
     {
         case VLC_CODEC_P010:
