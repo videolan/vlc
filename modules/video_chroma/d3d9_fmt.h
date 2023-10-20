@@ -150,4 +150,6 @@ typedef struct {
     vlc_fourcc_t vlc_chroma;
 } d3d9_format_t;
 
+const d3d9_format_t *D3D9FormatFourcc(D3DFORMAT);
+
 #endif /* VLC_VIDEOCHROMA_D3D9_FMT_H_ */
