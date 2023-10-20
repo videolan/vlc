@@ -1627,8 +1627,8 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
 
     bool force_dxva_hd = var_InheritBool(vd, "direct3d9-dxvahd");
     if (force_dxva_hd || (dst_format && vd->source->color_range != COLOR_RANGE_FULL &&
-                          sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA) &&
-                          !vlc_fourcc_IsYUV(dst_format->vlc_chroma) && vlc_fourcc_IsYUV(d3dfmt->vlc_chroma))
+                          sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA &&
+                          !vlc_fourcc_IsYUV(dst_format->vlc_chroma) && vlc_fourcc_IsYUV(d3dfmt->vlc_chroma)))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
         msg_Dbg(vd, "init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown");
