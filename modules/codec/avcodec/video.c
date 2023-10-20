@@ -788,7 +788,7 @@ int InitVideoHwDec( vlc_object_t *obj )
 
     int res = InitVideoDecCommon( p_dec );
     if (res != VLC_SUCCESS)
-        goto not_usable;
+        return res;
 
     const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(p_context->sw_pix_fmt);
 
@@ -799,7 +799,6 @@ int InitVideoHwDec( vlc_object_t *obj )
             return VLC_SUCCESS;
     }
 
-not_usable:
     EndVideoDec(obj);
     return VLC_EGENERIC;
 failed:
