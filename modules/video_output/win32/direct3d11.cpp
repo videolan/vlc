@@ -40,6 +40,7 @@
 #include <new>
 
 #include "../../video_chroma/d3d11_fmt.h"
+#include "../../hw/nvdec/nvdec_fmt.h"
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
@@ -909,31 +910,13 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         uint8_t widthDenominator, heightDenominator;
         switch (fmt->i_chroma)
         {
-        case VLC_CODEC_NVDEC_OPAQUE:
-            bits_per_channel = 8;
-            widthDenominator = heightDenominator = 2;
-            break;
-        case VLC_CODEC_NVDEC_OPAQUE_10B:
-            bits_per_channel = 10;
-            widthDenominator = heightDenominator = 2;
-            break;
-        case VLC_CODEC_NVDEC_OPAQUE_16B:
-            bits_per_channel = 16;
-            widthDenominator = heightDenominator = 2;
-            break;
-        case VLC_CODEC_NVDEC_OPAQUE_444:
-            bits_per_channel = 8;
-            widthDenominator = heightDenominator = 1;
-            break;
-        case VLC_CODEC_NVDEC_OPAQUE_444_16B:
-            bits_per_channel = 16;
-            widthDenominator = heightDenominator = 1;
-            break;
         default:
             {
                 vlc_fourcc_t cpu_chroma;
                 if (is_d3d11_opaque(fmt->i_chroma))
                     cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
+                else if (is_nvdec_opaque(fmt->i_chroma))
+                    cpu_chroma = NVDECToVlcChroma(fmt->i_chroma);
                 else
                     cpu_chroma = fmt->i_chroma;
 
