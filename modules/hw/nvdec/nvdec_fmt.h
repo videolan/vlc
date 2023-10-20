@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nvdec_fmt.h : NVDEC common shared code
  *****************************************************************************
- * Copyright © 2019 VLC authors, VideoLAN and VideoLabs
+ * Copyright © 2019-2023 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Steve Lhomme <robux4@videolabs.io>
  *
@@ -28,6 +28,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static inline vlc_fourcc_t NVDECToVlcChroma(vlc_fourcc_t chroma)
+{
+    switch (chroma)
+    {
+    case VLC_CODEC_NVDEC_OPAQUE:
+        return VLC_CODEC_NV12;
+    case VLC_CODEC_NVDEC_OPAQUE_10B:
+        return VLC_CODEC_P010;
+    case VLC_CODEC_NVDEC_OPAQUE_16B:
+        return VLC_CODEC_P016;
+    case VLC_CODEC_NVDEC_OPAQUE_444:
+        return VLC_CODEC_I444;
+    case VLC_CODEC_NVDEC_OPAQUE_444_16B:
+        return VLC_CODEC_I444_16L;
+    default:
+        return 0;
+    }
+}
 
 static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 {
