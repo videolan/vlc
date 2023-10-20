@@ -68,10 +68,30 @@ video_output/wayland/xdg-decoration-protocol.c: \
 		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
+video_output/wayland/linux-dmabuf-client-protocol.h: \
+		$(WAYLAND_PROTOCOLS)/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml \
+		video_output/Makefile.am
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
+
+video_output/wayland/linux-dmabuf-protocol.c: \
+		$(WAYLAND_PROTOCOLS)/unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml \
+		video_output/Makefile.am
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
+
 libegl_wl_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1
 libegl_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS)
 libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
+
+libegl_gbm_wl_plugin_la_SOURCES = video_output/opengl/egl_gbm.c
+nodist_libegl_gbm_wl_plugin_la_SOURCES = \
+	video_output/wayland/linux-dmabuf-client-protocol.h \
+	video_output/wayland/linux-dmabuf-protocol.c
+libegl_gbm_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(builddir)/video_output/wayland
+libegl_gbm_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS) $(GBM_CFLAGS) $(LIBDRM_CFLAGS)
+libegl_gbm_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS) $(GBM_LIBS) $(LIBDRM_LIBS)
+CLEANFILES += $(nodist_libegl_gbm_wl_plugin_la_SOURCES)
 
 libvk_wl_plugin_la_SOURCES = \
 	video_output/vulkan/platform.h \
@@ -89,6 +109,13 @@ BUILT_SOURCES += $(nodist_libxdg_shell_plugin_la_SOURCES)
 vout_LTLIBRARIES += libxdg_shell_plugin.la
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_wl_plugin.la
+BUILT_SOURCES += $(nodist_libegl_wl_plugin_la_SOURCES)
+if HAVE_GBM
+if HAVE_LIBDRM
+vout_LTLIBRARIES += libegl_gbm_wl_plugin.la
+BUILT_SOURCES += $(nodist_libegl_gbm_wl_plugin_la_SOURCES)
+endif
+endif
 endif
 if HAVE_VULKAN
 vout_LTLIBRARIES += libvk_wl_plugin.la
