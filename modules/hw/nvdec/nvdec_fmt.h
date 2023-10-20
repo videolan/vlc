@@ -50,11 +50,7 @@ static inline vlc_fourcc_t NVDECToVlcChroma(vlc_fourcc_t chroma)
 
 static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 {
-    return fourcc == VLC_CODEC_NVDEC_OPAQUE ||
-           fourcc == VLC_CODEC_NVDEC_OPAQUE_10B ||
-           fourcc == VLC_CODEC_NVDEC_OPAQUE_16B ||
-           fourcc == VLC_CODEC_NVDEC_OPAQUE_444 ||
-           fourcc == VLC_CODEC_NVDEC_OPAQUE_444_16B;
+    return NVDECToVlcChroma(fourcc) != 0;
 }
 
 #ifdef __cplusplus
