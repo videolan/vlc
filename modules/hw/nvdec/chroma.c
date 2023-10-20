@@ -125,17 +125,11 @@ static int OpenCUDAToCPU( filter_t *p_filter )
     if ( p_filter->vctx_in == NULL ||
          vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_NVDEC )
         return VLC_EGENERIC;
-    if ( !( ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE &&
-              p_filter->fmt_out.video.i_chroma == VLC_CODEC_NV12 ) ||
-            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_10B &&
-              p_filter->fmt_out.video.i_chroma == VLC_CODEC_P010 ) ||
-            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_16B &&
-              p_filter->fmt_out.video.i_chroma == VLC_CODEC_P016 ) ||
-            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_444 &&
-              (p_filter->fmt_out.video.i_chroma == VLC_CODEC_I444 || p_filter->fmt_out.video.i_chroma == VLC_CODEC_YUVA) ) ||
-            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_444_16B &&
-              p_filter->fmt_out.video.i_chroma == VLC_CODEC_I444_16L )
-           ) )
+    assert(is_nvdec_opaque(p_filter->fmt_in.video.i_chroma));
+    vlc_fourcc_t outfcc = NVDECToVlcChroma(p_filter->fmt_in.video.i_chroma);
+    if (p_filter->fmt_out.video.i_chroma != outfcc &&
+        !(p_filter->fmt_in.video.i_chroma == VLC_CODEC_NVDEC_OPAQUE_444 &&
+          p_filter->fmt_out.video.i_chroma == VLC_CODEC_YUVA))
         return VLC_EGENERIC;
 
     p_filter->ops = &filter_ops;
