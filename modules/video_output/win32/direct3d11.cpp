@@ -908,39 +908,32 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
     {
         uint8_t bits_per_channel;
         uint8_t widthDenominator, heightDenominator;
-        switch (fmt->i_chroma)
-        {
-        default:
-            {
-                vlc_fourcc_t cpu_chroma;
-                if (is_d3d11_opaque(fmt->i_chroma))
-                    cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
-                else if (is_nvdec_opaque(fmt->i_chroma))
-                    cpu_chroma = NVDECToVlcChroma(fmt->i_chroma);
-                else
-                    cpu_chroma = fmt->i_chroma;
+        vlc_fourcc_t cpu_chroma;
+        if (is_d3d11_opaque(fmt->i_chroma))
+            cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
+        else if (is_nvdec_opaque(fmt->i_chroma))
+            cpu_chroma = NVDECToVlcChroma(fmt->i_chroma);
+        else
+            cpu_chroma = fmt->i_chroma;
 
-                const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
-                if (unlikely(p_format == NULL || p_format->plane_count == 0))
-                {
-                    bits_per_channel = 8;
-                    widthDenominator = heightDenominator = 2;
-                }
-                else
-                {
-                    bits_per_channel = p_format->pixel_bits /
-                                       (p_format->plane_count==1 ? p_format->pixel_size : 1);
-                    widthDenominator = heightDenominator = 1;
-                    for (size_t i=0; i<p_format->plane_count; i++)
-                    {
-                        if (widthDenominator < p_format->p[i].w.den)
-                            widthDenominator = p_format->p[i].w.den;
-                        if (heightDenominator < p_format->p[i].h.den)
-                            heightDenominator = p_format->p[1].h.den;
-                    }
-                }
+        const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
+        if (unlikely(p_format == NULL || p_format->plane_count == 0))
+        {
+            bits_per_channel = 8;
+            widthDenominator = heightDenominator = 2;
+        }
+        else
+        {
+            bits_per_channel = p_format->pixel_bits /
+                               (p_format->plane_count==1 ? p_format->pixel_size : 1);
+            widthDenominator = heightDenominator = 1;
+            for (size_t i=0; i<p_format->plane_count; i++)
+            {
+                if (widthDenominator < p_format->p[i].w.den)
+                    widthDenominator = p_format->p[i].w.den;
+                if (heightDenominator < p_format->p[i].h.den)
+                    heightDenominator = p_format->p[1].h.den;
             }
-            break;
         }
 
         /* look for a decoder format that can be decoded but not used in shaders */
