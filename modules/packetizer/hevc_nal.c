@@ -1092,9 +1092,9 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
     return true;
 }
 
-uint8_t hevc_get_max_num_reorder( const hevc_video_parameter_set_t *p_vps )
+uint8_t hevc_get_max_num_reorder( const hevc_sequence_parameter_set_t *p_sps )
 {
-    return p_vps->vps_max[p_vps->vps_max_sub_layers_minus1/* HighestTid */].num_reorder_pics;
+    return p_sps->sps_max[p_sps->sps_max_sub_layers_minus1/* HighestTid */].num_reorder_pics;
 }
 
 static inline uint8_t vlc_ceil_log2( uint32_t val )
