@@ -921,15 +921,15 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
                     cpu_chroma = fmt->i_chroma;
 
                 const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
-                if (p_format == NULL)
+                if (unlikely(p_format == NULL || p_format->plane_count == 0))
                 {
                     bits_per_channel = 8;
                     widthDenominator = heightDenominator = 2;
                 }
                 else
                 {
-                    bits_per_channel = p_format->pixel_bits == 0 ? 8 : p_format->pixel_bits /
-                                                                   (p_format->plane_count==1 ? p_format->pixel_size : 1);
+                    bits_per_channel = p_format->pixel_bits /
+                                       (p_format->plane_count==1 ? p_format->pixel_size : 1);
                     widthDenominator = heightDenominator = 1;
                     for (size_t i=0; i<p_format->plane_count; i++)
                     {
