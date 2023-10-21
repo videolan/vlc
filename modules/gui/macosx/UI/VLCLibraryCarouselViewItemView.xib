@@ -32,15 +32,27 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
+                        <box boxType="custom" borderType="line" borderWidth="5" cornerRadius="4" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="gbr-Zj-SfM">
+                            <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
+                            <view key="contentView" id="jzj-qx-zfw">
+                                <rect key="frame" x="5" y="5" width="458" height="444"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </view>
+                            <color key="borderColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </box>
                     </subviews>
                     <constraints>
                         <constraint firstItem="a6H-E2-egy" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="1hR-0Z-EtS"/>
+                        <constraint firstAttribute="trailing" secondItem="gbr-Zj-SfM" secondAttribute="trailing" id="CNq-Da-ilA"/>
                         <constraint firstAttribute="bottom" secondItem="a6H-E2-egy" secondAttribute="bottom" id="DKA-QP-duD"/>
                         <constraint firstItem="yL8-2q-Oke" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="Gm9-k6-wLd"/>
                         <constraint firstAttribute="trailing" secondItem="a6H-E2-egy" secondAttribute="trailing" id="Nek-ow-UIE"/>
+                        <constraint firstItem="gbr-Zj-SfM" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="top" id="OYP-r6-Ebp"/>
+                        <constraint firstItem="gbr-Zj-SfM" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="PZg-u1-As6"/>
                         <constraint firstAttribute="bottom" secondItem="yL8-2q-Oke" secondAttribute="bottom" id="T2x-wN-od0"/>
                         <constraint firstItem="isd-eb-9XW" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" constant="10" id="Vgu-8n-XUQ"/>
                         <constraint firstItem="isd-eb-9XW" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="top" constant="10" id="crc-Yn-dBs"/>
+                        <constraint firstAttribute="bottom" secondItem="gbr-Zj-SfM" secondAttribute="bottom" id="fup-3g-nwv"/>
                         <constraint firstAttribute="trailing" secondItem="yL8-2q-Oke" secondAttribute="trailing" id="g4b-g0-GWl"/>
                         <constraint firstItem="a6H-E2-egy" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="top" id="gE5-T0-1dm"/>
                     </constraints>
@@ -83,6 +95,7 @@
             <connections>
                 <outlet property="annotationTextField" destination="isd-eb-9XW" id="fvc-2y-amx"/>
                 <outlet property="detailTextField" destination="orq-rq-pBK" id="czh-aO-pe4"/>
+                <outlet property="highlightBox" destination="gbr-Zj-SfM" id="0nG-FQ-W3p"/>
                 <outlet property="imageView" destination="6QI-EH-rMu" id="B23-fp-a2H"/>
                 <outlet property="progressIndicator" destination="yL8-2q-Oke" id="Pys-e7-wrU"/>
                 <outlet property="titleTextField" destination="CKr-3L-pMu" id="ot4-iB-tBK"/>

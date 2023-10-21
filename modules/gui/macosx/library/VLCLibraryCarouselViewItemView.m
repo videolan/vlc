@@ -86,6 +86,7 @@
 
 - (void)prepareForReuse
 {
+    self.highlightBox.hidden = YES;
     self.playButton.hidden = YES;
     self.annotationTextField.hidden = YES;
     self.titleTextField.stringValue = @"";

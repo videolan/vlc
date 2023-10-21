@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *playButton;
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
+@property (readwrite, weak) IBOutlet NSBox *highlightBox;
 
 @property (readwrite, strong, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 
