@@ -191,11 +191,18 @@
         return;
     }
 
-    VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)currentItemView;
+    VLCLibraryCarouselViewItemView * const carouselItemView = (VLCLibraryCarouselViewItemView *)currentItemView;
     NSAssert(carouselItemView != nil, @"Expected carousel item view to be non-nil!");
     self.selectedItemView.selected = NO;
     carouselItemView.selected = YES;
     self.selectedItemView = carouselItemView;
+}
+
+- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index
+{
+    VLCLibraryCarouselViewItemView * const carouselItemView = (VLCLibraryCarouselViewItemView *)[carousel itemViewAtIndex:index];
+    NSAssert(carouselItemView != nil, @"Expected carousel item view to be non-nil!");
+    [carouselItemView playRepresentedItem];
 }
 
 @end
