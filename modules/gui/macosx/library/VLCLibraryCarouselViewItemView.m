@@ -86,6 +86,7 @@
 
 - (void)prepareForReuse
 {
+    self.selected = NO;
     self.highlightBox.hidden = YES;
     self.playButton.hidden = YES;
     self.annotationTextField.hidden = YES;
@@ -133,6 +134,17 @@
 
     _representedItem = representedItem;
     [self updateRepresentation];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    if (_selected == selected) {
+        return;
+    }
+
+    _selected = selected;
+
+    self.highlightBox.hidden = !selected;
 }
 
 @end
