@@ -26,9 +26,16 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
 #import "views/iCarousel/iCarousel.h"
+
+@interface VLCLibraryVideoCarouselViewContainerView ()
+
+@property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;
+
+@end
 
 @implementation VLCLibraryVideoCarouselViewContainerView
 
@@ -175,6 +182,20 @@
     default:
         return value;
     }
+}
+
+- (void)carouselCurrentItemIndexDidChange:(iCarousel *)carousel
+{
+    NSView * const currentItemView = carousel.currentItemView;
+    if (currentItemView == nil) {
+        return;
+    }
+
+    VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)currentItemView;
+    NSAssert(carouselItemView != nil, @"Expected carousel item view to be non-nil!");
+    self.selectedItemView.selected = NO;
+    carouselItemView.selected = YES;
+    self.selectedItemView = carouselItemView;
 }
 
 @end
