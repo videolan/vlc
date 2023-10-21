@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)fromNibWithOwner:(id)owner;
 
+- (void)playRepresentedItem;
+
 @end
 
 NS_ASSUME_NONNULL_END

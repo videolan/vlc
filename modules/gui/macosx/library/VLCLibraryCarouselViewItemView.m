@@ -27,8 +27,11 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+
+#import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
 
@@ -143,8 +146,21 @@
     }
 
     _selected = selected;
-
     self.highlightBox.hidden = !selected;
+}
+
+- (void)playRepresentedItem
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+
+     __block BOOL playImmediately = YES;
+    [self.representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+
+        if(playImmediately) {
+            playImmediately = NO;
+        }
+    }];
 }
 
 @end
