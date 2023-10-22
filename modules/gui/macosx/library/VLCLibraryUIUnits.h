@@ -54,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) const CGFloat collectionViewItemSpacing;
 @property (class, readonly) const NSEdgeInsets collectionViewSectionInsets;
 
+@property (class, readonly) const CGFloat carouselViewItemViewWidth;
+@property (class, readonly) const CGFloat carouselViewVideoItemViewHeight;
+
 @property (class, readonly) const NSEdgeInsets libraryViewScrollViewContentInsets;
 @property (class, readonly) const NSEdgeInsets libraryViewScrollViewScrollerInsets;
 

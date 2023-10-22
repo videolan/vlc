@@ -356,8 +356,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 {
     VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)view;
     if (carouselItemView == nil) {
-        const NSUInteger itemLength = VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth;
-        const NSRect itemFrame = NSMakeRect(0, 0, itemLength, itemLength);
+        const NSRect itemFrame = NSMakeRect(0,
+                                            0,
+                                            VLCLibraryUIUnits.carouselViewItemViewWidth,
+                                            VLCLibraryUIUnits.carouselViewVideoItemViewHeight);
         carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
         carouselItemView.frame = itemFrame;
     }

@@ -149,6 +149,16 @@
     return NSMakeSize(itemWidth, itemHeight);
 }
 
++ (const CGFloat)carouselViewItemViewWidth
+{
+    return 300;
+}
+
++ (const CGFloat)carouselViewVideoItemViewHeight
+{
+    return VLCLibraryUIUnits.carouselViewItemViewWidth / 16 * 9;
+}
+
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets
 {
     return NSEdgeInsetsMake(VLCLibraryUIUnits.mediumSpacing,
