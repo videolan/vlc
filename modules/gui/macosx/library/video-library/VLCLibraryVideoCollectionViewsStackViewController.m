@@ -32,7 +32,7 @@
 
 #import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
-#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoViewContainerView.h"
 

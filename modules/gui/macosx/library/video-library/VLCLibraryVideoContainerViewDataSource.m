@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewContainerViewDataSource.m: MacOS X interface module
+ * VLCLibraryVideoContainerViewDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCollectionViewContainerViewDataSource.h"
+#import "VLCLibraryVideoContainerViewDataSource.h"
 
 #import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -42,7 +42,7 @@
 NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
 
 
-@interface VLCLibraryVideoCollectionViewContainerViewDataSource ()
+@interface VLCLibraryVideoContainerViewDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     VLCLibraryModel *_libraryModel;
@@ -52,7 +52,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 @end
 
-@implementation VLCLibraryVideoCollectionViewContainerViewDataSource
+@implementation VLCLibraryVideoContainerViewDataSource
 
 - (instancetype)init
 {

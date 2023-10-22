@@ -29,7 +29,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
 
 #import "views/VLCSubScrollView.h"
 
@@ -141,7 +141,7 @@
 
 - (void)setupDataSource
 {
-    _dataSource = [[VLCLibraryVideoCollectionViewContainerViewDataSource alloc] init];
+    _dataSource = [[VLCLibraryVideoContainerViewDataSource alloc] init];
     _dataSource.collectionView = _collectionView;
     [_dataSource setup];
 }

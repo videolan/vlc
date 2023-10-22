@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
 
-@interface VLCLibraryVideoCollectionViewContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, iCarouselDataSource>
+@interface VLCLibraryVideoContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) iCarousel *carouselView;

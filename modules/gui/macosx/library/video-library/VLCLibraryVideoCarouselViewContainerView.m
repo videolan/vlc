@@ -29,7 +29,7 @@
 #import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryUIUnits.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
 
 
 #import "views/iCarousel/iCarousel.h"
@@ -124,7 +124,7 @@
 
 - (void)setupDataSource
 {
-    _dataSource = [[VLCLibraryVideoCollectionViewContainerViewDataSource alloc] init];
+    _dataSource = [[VLCLibraryVideoContainerViewDataSource alloc] init];
     self.dataSource.carouselView = self.carouselView;
     [self.dataSource setup];
 }

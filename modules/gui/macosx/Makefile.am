@@ -157,8 +157,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.m \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.m \
+	gui/macosx/library/video-library/VLCLibraryVideoContainerViewDataSource.h \
+	gui/macosx/library/video-library/VLCLibraryVideoContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
 	gui/macosx/library/video-library/VLCLibraryVideoDataSource.h \
