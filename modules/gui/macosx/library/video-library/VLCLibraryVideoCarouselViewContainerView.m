@@ -109,7 +109,11 @@
         [self.titleView.bottomAnchor constraintEqualToAnchor:self.carouselView.topAnchor], // titleView bottom
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
-    NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:300];
+
+    const CGFloat viewHeight = self.titleView.frame.size.height +
+                               VLCLibraryUIUnits.largeSpacing * 2 +
+                               VLCLibraryUIUnits.carouselViewVideoItemViewHeight;
+    NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:viewHeight];
     heightConstraint.active = YES;
 
     [self updateCarouselOffset];
