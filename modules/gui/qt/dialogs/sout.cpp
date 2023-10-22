@@ -65,6 +65,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add.svg" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
+    ui.destBox->addItem( "RIST / MPEG Transport Stream" );
     ui.destBox->addItem( "HTTP" );
     ui.destBox->addItem( "MS-WMSP (MMSH)" );
     ui.destBox->addItem( "RTSP" );
@@ -119,30 +120,34 @@ void SoutDialog::addDest( )
             caption = qtr( "File" );
             break;
         case 1:
+            db = new RISTDestBox( this );
+            caption = qfu( "RIST" );
+            break;
+        case 2:
             db = new HTTPDestBox( this );
             caption = qfu( "HTTP" );
             break;
-        case 2:
+        case 3:
             db = new MMSHDestBox( this );
             caption = qfu( "WMSP" );
             break;
-        case 3:
+        case 4:
             db = new RTSPDestBox( this );
             caption = qfu( "RTSP" );
             break;
-        case 4:
+        case 5:
             db = new RTPDestBox( this, "ts" );
             caption = "RTP/TS";
             break;
-        case 5:
+        case 6:
             db = new RTPDestBox( this );
             caption = "RTP/AVP";
             break;
-        case 6:
+        case 7:
             db = new UDPDestBox( this );
             caption = "UDP";
             break;
-        case 7:
+        case 8:
             db = new ICEDestBox( this );
             caption = "Icecast";
             break;

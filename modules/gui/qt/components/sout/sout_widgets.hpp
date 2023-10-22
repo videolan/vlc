@@ -74,6 +74,19 @@ class FileDestBox: public VirtualDestBox
         void fileBrowse();
 };
 
+class RISTDestBox: public VirtualDestBox
+{
+    Q_OBJECT
+    public:
+        RISTDestBox( QWidget *_parent = NULL, const char *mux = NULL );
+        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+    private:
+        QLineEdit *RISTAddress;
+        QSpinBox *RISTPort;
+        QLineEdit *RISTName;
+        QString mux;
+};
+
 class HTTPDestBox: public VirtualDestBox
 {
     Q_OBJECT
