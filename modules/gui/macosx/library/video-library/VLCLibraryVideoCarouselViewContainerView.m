@@ -25,9 +25,12 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
+#import "library/VLCLibraryUIUnits.h"
+
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
+
 
 #import "views/iCarousel/iCarousel.h"
 
@@ -157,6 +160,22 @@
 {
     [super resizeWithOldSuperviewSize:oldSize];
     [self updateCarouselOffset];
+}
+
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    const int64_t itemId = libraryItem.libraryID;
+    NSIndexPath * const itemIndexPath = [self.dataSource indexPathForLibraryItem:libraryItem];
+    if (itemIndexPath == nil) {
+        return;
+    }
+
+    const NSInteger itemIndex = itemIndexPath.item;
+    [self.carouselView scrollToItemAtIndex:itemIndex animated:YES];
 }
 
 // pragma mark - iCarousel delegate methods
