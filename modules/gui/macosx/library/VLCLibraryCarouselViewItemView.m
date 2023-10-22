@@ -34,6 +34,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCLinearProgressIndicator.h"
 
 @implementation VLCLibraryCarouselViewItemView
 
@@ -93,6 +94,7 @@
     self.highlightBox.hidden = YES;
     self.playButton.hidden = YES;
     self.annotationTextField.hidden = YES;
+    self.progressIndicator.hidden = YES;
     self.titleTextField.stringValue = @"";
     self.detailTextField.stringValue = @"";
     self.imageView.image = nil;
@@ -111,9 +113,16 @@
 
     if ([_representedItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)self.representedItem;
+
         if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
+        }
+
+        const CGFloat position = mediaItem.progress;
+        if (position > 0.05 && position < 0.95) {
+            _progressIndicator.progress = position;
+            _progressIndicator.hidden = NO;
         }
     }
 }
