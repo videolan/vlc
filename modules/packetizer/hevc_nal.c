@@ -1085,6 +1085,10 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
         *p_vh -= (p_sps->conf_win.bottom_offset + p_sps->conf_win.top_offset) * sub_height_c;
         *p_vw -= (p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset) * sub_width_c;
     }
+    else
+    {
+        *p_oy = *p_ox = 0;
+    }
     return true;
 }
 
