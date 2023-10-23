@@ -97,7 +97,7 @@ struct frame_info_t
     bool b_progressive;
     bool b_top_field_first;
     uint8_t i_num_ts;
-    uint8_t i_max_reorder;
+    uint8_t i_max_pics_buffering;
     unsigned i_length;
     frame_info_t *p_next;
 };
@@ -149,9 +149,9 @@ typedef struct decoder_sys_t
     vlc_mutex_t                 lock;
     bool                        b_discard_decoder_output;
 
-    frame_info_t               *p_pic_reorder;
-    uint8_t                     i_pic_reorder;
-    uint8_t                     i_pic_reorder_max;
+    frame_info_t               *p_dpb;
+    uint8_t                     i_dpb_size;
+    uint8_t                     i_dpb_max_pics;
     bool                        b_strict_reorder;
     bool                        b_invalid_pic_reorder_max;
     bool                        b_poc_based_reorder;
@@ -316,7 +316,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
                 unsigned dummy;
-                h264_get_dpb_values(p_sps, &p_info->i_max_reorder, &dummy);
+                h264_get_dpb_values(p_sps, &p_info->i_max_pics_buffering, &dummy);
 
                 if (!p_info->b_progressive)
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
@@ -706,9 +706,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
                 p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
                 uint8_t dummy;
-                hevc_get_dpb_values(p_sps, &p_info->i_max_reorder, &dummy, &dummy);
+                hevc_get_dpb_values(p_sps, &p_info->i_max_pics_buffering, &dummy, &dummy);
                 VLC_UNUSED(dummy);
-
                 p_info->b_flush = (POC == 0) ||
                                   (i_nal_type >= HEVC_NAL_IDR_N_LP &&
                                    i_nal_type <= HEVC_NAL_IRAP_VCL23);
@@ -816,7 +815,7 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 
 static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
 {
-    frame_info_t **pp_lead_in = &p_sys->p_pic_reorder;
+    frame_info_t **pp_lead_in = &p_sys->p_dpb;
 
     for ( ;; pp_lead_in = & ((*pp_lead_in)->p_next))
     {
@@ -832,12 +831,12 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
         {
             p_info->p_next = *pp_lead_in;
             *pp_lead_in = p_info;
-            p_sys->i_pic_reorder++;
+            p_sys->i_dpb_size++;
             break;
         }
     }
 #if 0
-    for (frame_info_t *p_in=p_sys->p_pic_reorder; p_in; p_in = p_in->p_next)
+    for (frame_info_t *p_in=p_sys->p_dpb; p_in; p_in = p_in->p_next)
         printf(" %d", p_in->i_foc);
     printf("\n");
 #endif
@@ -845,7 +844,7 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
 
 static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
 {
-    frame_info_t *p_info = p_sys->p_pic_reorder;
+    frame_info_t *p_info = p_sys->p_dpb;
     if (p_info == NULL)
     {
         *pp_ret = NULL;
@@ -899,11 +898,11 @@ static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
             pp_ret_last = &p_info->p_picture->p_next;
         }
 
-        p_sys->i_pic_reorder--;
+        p_sys->i_dpb_size--;
 
-        p_sys->p_pic_reorder = p_info->p_next;
+        p_sys->p_dpb = p_info->p_next;
         free(p_info);
-        p_info = p_sys->p_pic_reorder;
+        p_info = p_sys->p_dpb;
 
         if (p_info)
         {
@@ -992,34 +991,34 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if(!p_sys->b_invalid_pic_reorder_max &&
-       p_info->i_max_reorder != p_sys->i_pic_reorder_max)
+       p_info->i_max_pics_buffering != p_sys->i_dpb_max_pics)
     {
-        p_sys->i_pic_reorder_max = p_info->i_max_reorder;
-        pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
+        p_sys->i_dpb_max_pics = p_info->i_max_pics_buffering;
+        pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
     }
 
-    while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
+    while(p_info->b_flush || p_sys->i_dpb_size >= p_sys->i_dpb_max_pics)
     {
         /* First check if DPB sizing was correct before removing one frame */
-        if (p_sys->p_pic_reorder && !p_sys->b_strict_reorder && !p_info->b_flush &&
-            p_sys->i_pic_reorder_max < H264_MAX_DPB)
+        if (p_sys->p_dpb && !p_sys->b_strict_reorder && !p_info->b_flush &&
+            p_sys->i_dpb_max_pics < H264_MAX_DPB)
         {
-            if (p_sys->b_poc_based_reorder && p_sys->p_pic_reorder->i_foc > p_info->i_foc)
+            if (p_sys->b_poc_based_reorder && p_sys->p_dpb->i_foc > p_info->i_foc)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
-                p_sys->i_pic_reorder_max++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                p_sys->i_dpb_max_pics++;
+                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_dpb_max_pics);
                 break;
             }
             else if (!p_sys->b_poc_based_reorder &&
                      p_info->pts > VLC_TICK_INVALID &&
-                     p_sys->p_pic_reorder->pts > p_info->pts)
+                     p_sys->p_dpb->pts > p_info->pts)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
-                p_sys->i_pic_reorder_max++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                p_sys->i_dpb_max_pics++;
+                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_dpb_max_pics);
                 break;
             }
         }
@@ -1464,7 +1463,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->session = NULL;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = NULL;
-    p_sys->i_pic_reorder_max = 4;
+    p_sys->i_dpb_max_pics = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
     /* will be fixed later */
