@@ -177,8 +177,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
         r->i_align = p_updtregion->align;
         r->i_text_align = p_updtregion->inner_align;
-        r->b_noregionbg = p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND;
-        r->b_gridmode = p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES;
+        r->b_noregionbg = (p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND) != 0;
+        r->b_gridmode = (p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;
 
         if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE))
         {
