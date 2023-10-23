@@ -76,72 +76,10 @@ public:
         VIDEO = 2,
     };
 
-    static bool holdFullscreen( QWindow* window, Source source, bool hold )
-    {
-        QVariant prop = window->property("__windowFullScreen");
-        bool ok = false;
-        unsigned fullscreenCounter = prop.toUInt(&ok);
-        if (!ok)
-            fullscreenCounter = 0;
-
-        if (hold)
-            fullscreenCounter |= source;
-        else
-            fullscreenCounter &= ~source;
-
-        Qt::WindowStates oldflags = window->windowStates();
-        Qt::WindowStates newflags;
-
-        if( fullscreenCounter != 0 )
-            newflags = oldflags | Qt::WindowFullScreen;
-        else
-            newflags = oldflags & ~Qt::WindowFullScreen;
-
-        if( newflags != oldflags )
-        {
-            window->setWindowStates( newflags );
-        }
-
-        window->setProperty("__windowFullScreen", QVariant::fromValue(fullscreenCounter));
-
-        return fullscreenCounter != 0;
-    }
+    static bool holdFullscreen( QWindow* window, Source source, bool hold );
 
 
-    static bool holdOnTop( QWindow* window, Source source, bool hold )
-    {
-        QVariant prop = window->property("__windowOnTop");
-        bool ok = false;
-        unsigned onTopCounter = prop.toUInt(&ok);
-        if (!ok)
-            onTopCounter = 0;
-
-        if (hold)
-            onTopCounter |= source;
-        else
-            onTopCounter &= ~source;
-
-        Qt::WindowStates oldStates = window->windowStates();
-        Qt::WindowFlags oldflags = window->flags();
-        Qt::WindowFlags newflags;
-
-        if( onTopCounter != 0 )
-            newflags = oldflags | Qt::WindowStaysOnTopHint;
-        else
-            newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-        if( newflags != oldflags )
-        {
-
-            window->setFlags( newflags );
-            window->show(); /* necessary to apply window flags */
-            //workaround: removing onTop state might drop fullscreen state
-            window->setWindowStates(oldStates);
-        }
-
-        window->setProperty("__windowOnTop", QVariant::fromValue(onTopCounter));
-
-        return onTopCounter != 0;
-    }
+    static bool holdOnTop( QWindow* window, Source source, bool hold );
 
 };
 
