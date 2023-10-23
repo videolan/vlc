@@ -71,7 +71,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
     fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
 
-    subpicture_region_t *r = subpic->p_region = subpicture_region_New(&fmt);
+    subpicture_region_t *r = subpic->p_region = subpicture_region_NewText(&fmt);
     if (!r)
         return;
 

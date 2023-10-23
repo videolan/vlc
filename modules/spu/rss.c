@@ -404,8 +404,8 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     }
 
     video_format_Init( &fmt, VLC_CODEC_TEXT );
-
-    p_spu->p_region = subpicture_region_New( &fmt );
+    p_spu->p_region = subpicture_region_NewText( &fmt );
+    video_format_Clean( &fmt );
     if( !p_spu->p_region )
     {
         subpicture_Delete( p_spu );

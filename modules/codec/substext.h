@@ -168,7 +168,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     for( substext_updater_region_t *p_updtregion = &sys->region;
                                           p_updtregion; p_updtregion = p_updtregion->p_next )
     {
-        subpicture_region_t *r = *pp_last_region = subpicture_region_New(&fmt);
+        subpicture_region_t *r = *pp_last_region = subpicture_region_NewText(&fmt);
         if (!r)
             return;
         pp_last_region = &r->p_next;

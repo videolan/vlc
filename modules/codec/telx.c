@@ -731,7 +731,8 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     /* Create a new subpicture region */
     video_format_Init(&fmt, VLC_CODEC_TEXT);
-    p_spu->p_region = subpicture_region_New( &fmt );
+    p_spu->p_region = subpicture_region_NewText( &fmt );
+    video_format_Clean(&fmt);
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );

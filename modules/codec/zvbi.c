@@ -544,9 +544,8 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
         fmt.i_height = fmt.i_visible_height = i_rows * 10;
         fmt.i_sar_num = fmt.i_sar_den = 0; /* let the vout set the correct AR */
     }
-    fmt.i_x_offset = fmt.i_y_offset = 0;
 
-    p_spu->p_region = subpicture_region_New( &fmt );
+    p_spu->p_region = b_text ? subpicture_region_NewText( &fmt ) : subpicture_region_New( &fmt );
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );

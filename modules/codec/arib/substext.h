@@ -84,11 +84,11 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     {
         if( !r )
         {
-            subpic->p_region = r = subpicture_region_New(&fmt);
+            subpic->p_region = r = subpicture_region_NewText(&fmt);
         }
         else
         {
-            r->p_next = subpicture_region_New(&fmt);
+            r->p_next = subpicture_region_NewText(&fmt);
             r = r->p_next;
         }
         if( r == NULL )

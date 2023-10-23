@@ -352,7 +352,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         subpicture_region_t *p_region;
 
         if( p_overlay->format.i_chroma == VLC_CODEC_TEXT )
-            p_region = subpicture_region_New( &p_overlay->format );
+            p_region = subpicture_region_NewText( &p_overlay->format );
         else
             p_region = subpicture_region_ForPicture( &p_overlay->format, p_overlay->data.p_pic );
         if( unlikely(p_region == NULL) )

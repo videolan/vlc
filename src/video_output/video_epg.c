@@ -262,7 +262,7 @@ static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
     fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
 
-    region = subpicture_region_New(&fmt);
+    region = subpicture_region_NewText(&fmt);
     if (!region)
         return NULL;
 
