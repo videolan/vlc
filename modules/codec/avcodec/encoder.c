@@ -876,7 +876,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_context->pix_fmt = FindFfmpegChroma( p_enc->fmt_in.video.i_chroma, &uv_flipped );
         if (unlikely(uv_flipped))
             msg_Warn(p_enc, "VLC chroma needs UV planes swapping %4.4s",
-                p_enc->fmt_in.video.i_chroma);
+                     (char*)&p_enc->fmt_in.video.i_chroma);
     }
 
     /* Make sure we get extradata filled by the encoder */
