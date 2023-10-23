@@ -336,17 +336,6 @@ protected:
     QSystemTrayIcon     *sysTray = nullptr;
     std::unique_ptr<QMenu> systrayMenu;
 
-    QString              input_name;
-
-    /* Status and flags */
-    QPoint              lastWinPosition;
-    QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
-    QScreen             *lastWinScreen = nullptr;
-
-    QSize               pendingResize; // to be applied when fullscreen is disabled
-
-    QMap<QWidget *, QSize> stackWidgetsSizes;
-
     /* Flags */
     double               m_intfUserScaleFactor = 1.;
     double               m_intfScaleFactor = 1.;
