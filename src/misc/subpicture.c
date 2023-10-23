@@ -217,6 +217,7 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
 
 subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
 {
+    assert(p_fmt->i_chroma != VLC_CODEC_TEXT);
     subpicture_region_t *p_region = subpicture_region_NewInternal( );
     if( !p_region )
         return NULL;
@@ -240,9 +241,6 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     {
         assert(p_fmt->p_palette == NULL);
     }
-
-    if( p_fmt->i_chroma == VLC_CODEC_TEXT )
-        return p_region;
 
     p_region->p_picture = picture_NewFromFormat( p_fmt );
     if( !p_region->p_picture )

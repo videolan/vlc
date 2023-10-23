@@ -101,6 +101,8 @@ struct vlc_spu_highlight_t
  * This function will create a new subpicture region.
  *
  * You must use subpicture_region_Delete to destroy it.
+ *
+ * \note use subpicture_region_NewText() to create a text region
  */
 VLC_API subpicture_region_t * subpicture_region_New( const video_format_t *p_fmt );
 
