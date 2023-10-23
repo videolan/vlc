@@ -201,10 +201,24 @@ void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
     free( p_private );
 }
 
-static subpicture_region_t * subpicture_region_NewInternal( const video_format_t *p_fmt )
+static subpicture_region_t * subpicture_region_NewInternal( void )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
     if( unlikely(p_region == NULL) )
+        return NULL;
+
+    p_region->zoom_h.den = p_region->zoom_h.num = 1;
+    p_region->zoom_v.den = p_region->zoom_v.num = 1;
+    p_region->i_alpha = 0xff;
+    p_region->b_balanced_text = true;
+
+    return p_region;
+}
+
+subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
+{
+    subpicture_region_t *p_region = subpicture_region_NewInternal( );
+    if( !p_region )
         return NULL;
 
     video_format_Copy( &p_region->fmt, p_fmt );
@@ -227,21 +241,6 @@ static subpicture_region_t * subpicture_region_NewInternal( const video_format_t
         assert(p_fmt->p_palette == NULL);
     }
 
-    p_region->zoom_h.den = p_region->zoom_h.num = 1;
-    p_region->zoom_v.den = p_region->zoom_v.num = 1;
-    p_region->i_alpha = 0xff;
-    p_region->b_balanced_text = true;
-
-    return p_region;
-}
-
-subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
-{
-    subpicture_region_t *p_region =
-        subpicture_region_NewInternal( p_fmt );
-    if( !p_region )
-        return NULL;
-
     if( p_fmt->i_chroma == VLC_CODEC_TEXT )
         return p_region;
 
@@ -261,9 +260,29 @@ subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, 
     if ( !video_format_IsSameChroma( p_fmt, &pic->format ) )
         return NULL;
 
-    subpicture_region_t *p_region = subpicture_region_NewInternal( p_fmt );
+    subpicture_region_t *p_region = subpicture_region_NewInternal( );
     if( !p_region )
         return NULL;
+
+    video_format_Copy( &p_region->fmt, p_fmt );
+    if ( p_fmt->i_chroma == VLC_CODEC_YUVP || p_fmt->i_chroma == VLC_CODEC_RGBP )
+    {
+        /* YUVP/RGBP should have a palette */
+        if( p_region->fmt.p_palette == NULL )
+        {
+            p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
+            if( p_region->fmt.p_palette == NULL )
+            {
+                video_format_Clean( &p_region->fmt );
+                free( p_region );
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        assert(p_fmt->p_palette == NULL);
+    }
 
     p_region->p_picture = picture_Hold(pic);
 
