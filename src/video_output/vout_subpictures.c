@@ -812,7 +812,9 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                       i_original_width, i_original_height,
                       chroma_list) != VLC_SUCCESS)
             return NULL;
-        assert(!subpicture_region_IsText( region ));
+        if(subpicture_region_IsText( region ))
+            // not a rendering error for Text-To-Speech
+            return NULL;
     }
 
     video_format_AdjustColorSpace(&region->fmt);
