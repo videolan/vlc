@@ -1045,10 +1045,6 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                 region->p_private = subpicture_region_private_New(&picture->format);
                 if (region->p_private) {
                     region->p_private->p_picture = picture;
-                    if (!region->p_private->p_picture) {
-                        subpicture_region_private_Delete(region->p_private);
-                        region->p_private = NULL;
-                    }
                 } else {
                     picture_Release(picture);
                 }
