@@ -784,8 +784,8 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 /**
  * It will transform the provided region into another region suitable for rendering.
  */
-static void SpuRenderRegion(spu_t *spu,
-                            subpicture_region_t **dst_ptr, spu_area_t *dst_area,
+static subpicture_region_t *SpuRenderRegion(spu_t *spu,
+                            spu_area_t *dst_area,
                             const spu_render_entry_t *entry, subpicture_region_t *region,
                             const spu_scale_t scale_size,
                             const vlc_fourcc_t *chroma_list,
@@ -805,7 +805,6 @@ static void SpuRenderRegion(spu_t *spu,
 
     /* Invalidate area by default */
     *dst_area = spu_area_create(0,0, 0,0, scale_size);
-    *dst_ptr  = NULL;
 
     /* Render text region */
     if (region->fmt.i_chroma == VLC_CODEC_TEXT)
@@ -813,7 +812,7 @@ static void SpuRenderRegion(spu_t *spu,
         if(SpuRenderText(spu, region,
                       i_original_width, i_original_height,
                       chroma_list) != VLC_SUCCESS)
-            return;
+            return NULL;
         assert(region->fmt.i_chroma != VLC_CODEC_TEXT);
     }
 
@@ -1115,21 +1114,23 @@ static void SpuRenderRegion(spu_t *spu,
     }
 
     assert(video_format_IsSameChroma( &region_fmt, &region_picture->format ));
-    subpicture_region_t *dst = *dst_ptr = subpicture_region_ForPicture(&region_fmt, region_picture);
-    if (dst) {
-        dst->i_x       = x_offset;
-        dst->i_y       = y_offset;
-        dst->i_align   = 0;
-        int fade_alpha = 255;
-        if (subpic->b_fade) {
-            vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
+    subpicture_region_t *dst = subpicture_region_ForPicture(&region_fmt, region_picture);
+    if (dst == NULL)
+        return NULL;
 
-            if (fade_start <= render_date && fade_start < subpic->i_stop)
-                fade_alpha = 255 * (subpic->i_stop - render_date) /
-                                   (subpic->i_stop - fade_start);
-        }
-        dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / 65025;
+    dst->i_x       = x_offset;
+    dst->i_y       = y_offset;
+    dst->i_align   = 0;
+    int fade_alpha = 255;
+    if (subpic->b_fade) {
+        vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
+
+        if (fade_start <= render_date && fade_start < subpic->i_stop)
+            fade_alpha = 255 * (subpic->i_stop - render_date) /
+                                (subpic->i_stop - fade_start);
     }
+    dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / 65025;
+    return dst;
 }
 
 /**
@@ -1253,7 +1254,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
 
             /* */
-            SpuRenderRegion(spu, output_last_ptr, &area,
+            *output_last_ptr = SpuRenderRegion(spu, &area,
                             entry, region, virtual_scale,
                             chroma_list, fmt_dst,
                             i_original_width, i_original_height,
