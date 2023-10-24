@@ -163,9 +163,7 @@ static const char *const localDevicesDescription = "My Machine";
                     input_item_node_Delete(childNode);
                 }
             }
-            
-            _p_mediaSource->description = NULL;
-            
+
             free(_p_mediaSource->tree);
             free(_p_mediaSource);
             _p_mediaSource = NULL;
