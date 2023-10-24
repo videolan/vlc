@@ -90,7 +90,7 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
                                 const video_format_t *p_fmt_dst,
                                 vlc_tick_t i_ts)
 {
-    VLC_UNUSED(p_fmt_src); VLC_UNUSED(p_fmt_dst);
+    VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(i_ts);
     ttml_image_updater_sys_t *p_sys = p_spu->updater.p_sys;
     subpicture_region_t **pp_last_region = &p_spu->p_region;
