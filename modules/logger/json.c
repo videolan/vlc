@@ -138,6 +138,12 @@ static void JsonPrintKeyValueNumber(FILE *stream, const char *key, int64_t value
     fprintf(stream, ": \"%"PRId64"\"", value);
 }
 
+static void JsonPrintKeyValueNumberFromDouble(FILE *stream, const char *key, double value)
+{
+    JsonPrintString(stream, key);
+    vlc_fprintf_c(stream, ": \"%le\"", value);
+}
+
 static void JsonPrintKeyValueLabel(FILE *stream, const char *key, const char *value)
 {
     JsonPrintString(stream, key);
@@ -177,6 +183,9 @@ static void TraceJson(void *opaque, vlc_tick_t ts, va_list entries)
         {
             case VLC_TRACER_INT:
                 JsonPrintKeyValueNumber(stream, entry.key, entry.value.integer);
+                break;
+            case VLC_TRACER_DOUBLE:
+                JsonPrintKeyValueNumberFromDouble(stream, entry.key, entry.value.double_);
                 break;
             case VLC_TRACER_STRING:
                 JsonPrintKeyValueLabel(stream, entry.key, entry.value.string);
