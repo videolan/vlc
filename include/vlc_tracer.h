@@ -46,12 +46,14 @@
 enum vlc_tracer_value
 {
     VLC_TRACER_INT,
+    VLC_TRACER_DOUBLE,
     VLC_TRACER_STRING
 };
 
 typedef union
 {
     int64_t integer;
+    double double_;
     const char *string;
 } vlc_tracer_value_t;
 
@@ -112,6 +114,15 @@ static inline struct vlc_tracer_entry vlc_tracer_entry_FromInt(const char *key, 
     return trace;
 }
 
+static inline struct vlc_tracer_entry vlc_tracer_entry_FromDouble(const char *key, double value)
+{
+    vlc_tracer_value_t tracer_value = {
+        .double_ = value,
+    };
+    struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_DOUBLE };
+    return trace;
+}
+
 static inline struct vlc_tracer_entry vlc_tracer_entry_FromString(const char *key, const char *value)
 {
     vlc_tracer_value_t tracer_value;
@@ -127,6 +138,7 @@ static inline struct vlc_tracer_entry vlc_tracer_entry_FromString(const char *ke
 #define VLC_TRACE(key, value) \
         _Generic((value), \
         int64_t: vlc_tracer_entry_FromInt, \
+        double: vlc_tracer_entry_FromDouble, \
         char *: vlc_tracer_entry_FromString, \
         const char *: vlc_tracer_entry_FromString) (key, value)
 #else
