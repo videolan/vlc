@@ -1097,6 +1097,25 @@ uint8_t hevc_get_max_num_reorder( const hevc_sequence_parameter_set_t *p_sps )
     return p_sps->sps_max[p_sps->sps_max_sub_layers_minus1/* HighestTid */].num_reorder_pics;
 }
 
+void hevc_get_dpb_values( const hevc_sequence_parameter_set_t *p_sps, uint8_t *max_num_reorder_pics,
+                          uint8_t *max_latency_pics, uint8_t *max_dec_pic_buffering )
+{
+    *max_num_reorder_pics = p_sps->sps_max[p_sps->sps_max_sub_layers_minus1/* HighestTid */].num_reorder_pics;
+    *max_latency_pics = p_sps->sps_max[p_sps->sps_max_sub_layers_minus1/* HighestTid */].latency_increase_plus1;
+    if(*max_latency_pics != 0)
+        *max_latency_pics = *max_num_reorder_pics + *max_latency_pics - 1;
+    *max_dec_pic_buffering = 1 +
+        p_sps->sps_max[p_sps->sps_max_sub_layers_minus1/* HighestTid */].dec_pic_buffering_minus1;
+    /*
+    When sps_max_dec_pic_buffering_minus1[ TemporalId ] is equal to 0, the value of TwoVersionsOfCurrDecPicFlag
+                                                                         shall be equal to 0.
+
+    pps_curr_pic_ref_enabled_flag &&
+        ( sample_adaptive_offset_enabled_flag | | !pps_deblocking_filter_disabled_flag | |
+                                      deblocking_filter_override_enabled_flag );
+    */
+}
+
 static inline uint8_t vlc_ceil_log2( uint32_t val )
 {
     uint8_t n = 31 - clz(val);
