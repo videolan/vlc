@@ -421,7 +421,7 @@ VLC_API int vlc_vasprintf_c(char **restrict p, const char *restrict fmt,
  * Formats a string using the C locale.
  *
  * This function formats a string from a format string and a variable argument
- * list, just like the standard vasprintf() but using the C locale for the
+ * list, just like the standard asprintf() but using the C locale for the
  * formatting of numerals.
  *
  * \param[out] p storage space for a pointer to the heap-allocated formatted
