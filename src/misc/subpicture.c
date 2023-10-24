@@ -363,7 +363,16 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
     p_region_dst->i_align  = p_region_src->i_align;
     p_region_dst->i_alpha  = p_region_src->i_alpha;
 
+    p_region_dst->i_text_align    = p_region_src->i_text_align;
+    p_region_dst->b_noregionbg    = p_region_src->b_noregionbg;
+    p_region_dst->b_gridmode      = p_region_src->b_gridmode;
+    p_region_dst->b_balanced_text = p_region_src->b_balanced_text;
+    p_region_dst->i_max_width     = p_region_src->i_max_width;
+    p_region_dst->i_max_height    = p_region_src->i_max_height;
     p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );
+
+    p_region_dst->zoom_h   = p_region_src->zoom_h;
+    p_region_dst->zoom_v   = p_region_src->zoom_v;
 
     picture_CopyPixels(p_region_dst->p_picture, p_region_src->p_picture);
     return p_region_dst;
