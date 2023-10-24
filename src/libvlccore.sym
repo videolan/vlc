@@ -442,6 +442,8 @@ update_Download
 update_GetRelease
 update_NeedUpgrade
 update_New
+vlc_vfprintf_c
+vlc_fprintf_c
 vlc_asprintf_c
 vlc_strtod_c
 vlc_strtof_c

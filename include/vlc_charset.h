@@ -432,6 +432,35 @@ VLC_API int vlc_vasprintf_c(char **restrict p, const char *restrict fmt,
  */
 VLC_API int vlc_asprintf_c( char **p, const char *fmt, ... ) VLC_USED;
 
+/**
+ * Write a string to the output using the C locale
+ *
+ * This function formats a string from a format string and a variable argument
+ * list, just like the standard vfprintf() but using the C locale for the
+ * formatting of numerals.
+ *
+ * \param f output stream to write the string to
+ * \param fmt format string
+ * \param ap variable argument list
+ * \return number of bytes formatted (excluding the nul terminator)
+ *        or -1 on error
+ */
+VLC_API int vlc_vfprintf_c(FILE *f, const char *fmt, va_list ap);
+
+/**
+ * Write a string to the output using the C locale
+ *
+ * This function formats a string from a format string and a variable argument
+ * list, just like the standard fprintf() but using the C locale for the
+ * formatting of numerals.
+ *
+ * \param f output stream to write the string to
+ * \param fmt format string
+ * \return number of bytes formatted (excluding the nul terminator)
+ *        or -1 on error
+ */
+VLC_API int vlc_fprintf_c(FILE *f, const char *fmt, ...);
+
 int vlc_vsscanf_c(const char *, const char *, va_list) VLC_USED;
 int vlc_sscanf_c(const char*, const char*, ...) VLC_USED
 #ifdef __GNUC__
