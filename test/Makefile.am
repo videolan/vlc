@@ -24,6 +24,7 @@ check_PROGRAMS = \
 	test_libvlc_renderer_discoverer \
 	test_libvlc_slaves \
 	test_src_config_chain \
+	test_src_clock_clock \
 	test_src_misc_ancillary \
 	test_src_misc_variables \
 	test_src_input_stream \
@@ -155,6 +156,10 @@ test_libvlc_slaves_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_meta_SOURCES = libvlc/meta.c
 test_libvlc_meta_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
+test_src_clock_clock_SOURCES = src/clock/clock.c \
+	../src/clock/clock.c \
+	../src/clock/clock_internal.c
+test_src_clock_clock_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_ancillary_SOURCES = src/misc/ancillary.c
 test_src_misc_ancillary_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_variables_SOURCES = src/misc/variables.c
