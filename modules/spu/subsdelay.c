@@ -208,7 +208,7 @@ static int SubsdelayCalculateAlpha( filter_t *p_filter, int i_overlapping, int i
 
 static int SubsdelayGetTextRank( char *psz_text );
 
-static bool SubsdelayIsTextEmpty( const text_segment_t* p_segment );
+static bool SubsdelayIsTextEmpty( const subpicture_region_t * );
 
 /*****************************************************************************
  * Subpicture functions
@@ -1044,8 +1044,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
     if( p_entry->b_check_empty && p_subpic->p_region )
     {
-        //FIXME: What if there is more than one segment?
-        if( SubsdelayIsTextEmpty( p_subpic->p_region->p_text ) )
+        if( SubsdelayIsTextEmpty( p_subpic->p_region ) )
         {
             /* remove empty subtitle */
 
@@ -1108,7 +1107,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
  *****************************************************************************/
 static bool SubpicIsEmpty( subpicture_t* p_subpic )
 {
-    return ( p_subpic->p_region && ( SubsdelayIsTextEmpty( p_subpic->p_region->p_text ) ) );
+    return p_subpic->p_region != NULL && SubsdelayIsTextEmpty( p_subpic->p_region );
 }
 
 /*****************************************************************************
@@ -1327,8 +1326,11 @@ static int SubsdelayGetTextRank( char *psz_text )
 /*****************************************************************************
  * SubsdelayIsTextEmpty: Check if the text contains spaces only
  *****************************************************************************/
-static bool SubsdelayIsTextEmpty( const text_segment_t *p_segment )
+static bool SubsdelayIsTextEmpty( const subpicture_region_t *p_region )
 {
+    if ( p_region->fmt.i_chroma != VLC_CODEC_TEXT )
+        return true;
+    const text_segment_t *p_segment = p_region->p_text;
     while ( p_segment )
     {
         if ( p_segment->psz_text && strlen( p_segment->psz_text ) > 0 )
