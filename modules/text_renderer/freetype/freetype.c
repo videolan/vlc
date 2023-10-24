@@ -1036,151 +1036,151 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Don't attempt to render text that couldn't be laid out
      * properly. */
-    if( rv == VLC_SUCCESS && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
+    if (!( rv == VLC_SUCCESS && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax ))
     {
-        const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
-        const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
+        rv = VLC_EGENERIC;
+        goto done;
+    }
 
-        int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !p_region_in->b_gridmode)
-                     ? i_max_face_height / 4 : 0;
+    const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
+    const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
 
-        if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
-            i_margin = 0;
+    int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !p_region_in->b_gridmode)
+                    ? i_max_face_height / 4 : 0;
 
-        if( p_sys->i_forced_chroma == VLC_CODEC_YUVP )
-            p_chroma_list = p_chroma_list_yuvp;
-        else if( !p_chroma_list || *p_chroma_list == 0 )
-            p_chroma_list = p_chroma_list_rgba;
+    if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
+        i_margin = 0;
 
-        FT_BBox paddedbbox = bbox;
-        paddedbbox.xMin -= i_margin;
-        paddedbbox.xMax += i_margin;
-        paddedbbox.yMin -= i_margin;
-        paddedbbox.yMax += i_margin;
+    if( p_sys->i_forced_chroma == VLC_CODEC_YUVP )
+        p_chroma_list = p_chroma_list_yuvp;
+    else if( !p_chroma_list || *p_chroma_list == 0 )
+        p_chroma_list = p_chroma_list_rgba;
 
-        FT_BBox regionbbox = paddedbbox;
+    FT_BBox paddedbbox = bbox;
+    paddedbbox.xMin -= i_margin;
+    paddedbbox.xMax += i_margin;
+    paddedbbox.yMin -= i_margin;
+    paddedbbox.yMax += i_margin;
 
-        /* _______regionbbox_______________
-         * |                               |
-         * |                               |
-         * |                               |
-         * |     _bbox(<paddedbbox)___     |
-         * |    |         rightaligned|    |
-         * |    |            textlines|    |
-         * |    |_____________________|    |
-         * |_______________________________|
-         *
-         * we need at least 3 bounding boxes.
-         * regionbbox containing the whole, including region background pixels
-         * paddedbox an enlarged text box when for drawing text background
-         * bbox the lines bounding box for all glyphs
-         * For simple unstyled subs, bbox == paddedbox == regionbbox
-         */
+    FT_BBox regionbbox = paddedbbox;
 
-        unsigned outertext_w = (regionbbox.xMax - regionbbox.xMin);
-        if( outertext_w < (unsigned) p_region_in->i_max_width )
+    /* _______regionbbox_______________
+        * |                               |
+        * |                               |
+        * |                               |
+        * |     _bbox(<paddedbbox)___     |
+        * |    |         rightaligned|    |
+        * |    |            textlines|    |
+        * |    |_____________________|    |
+        * |_______________________________|
+        *
+        * we need at least 3 bounding boxes.
+        * regionbbox containing the whole, including region background pixels
+        * paddedbox an enlarged text box when for drawing text background
+        * bbox the lines bounding box for all glyphs
+        * For simple unstyled subs, bbox == paddedbox == regionbbox
+        */
+
+    unsigned outertext_w = (regionbbox.xMax - regionbbox.xMin);
+    if( outertext_w < (unsigned) p_region_in->i_max_width )
+    {
+        if( p_region_in->i_text_align & SUBPICTURE_ALIGN_RIGHT )
+            regionbbox.xMin -= (p_region_in->i_max_width - outertext_w);
+        else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_LEFT )
+            regionbbox.xMax += (p_region_in->i_max_width - outertext_w);
+        else
         {
-            if( p_region_in->i_text_align & SUBPICTURE_ALIGN_RIGHT )
-                regionbbox.xMin -= (p_region_in->i_max_width - outertext_w);
-            else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_LEFT )
-                regionbbox.xMax += (p_region_in->i_max_width - outertext_w);
-            else
-            {
-                regionbbox.xMin -= (p_region_in->i_max_width - outertext_w) / 2;
-                regionbbox.xMax += (p_region_in->i_max_width - outertext_w + 1) / 2;
-            }
+            regionbbox.xMin -= (p_region_in->i_max_width - outertext_w) / 2;
+            regionbbox.xMax += (p_region_in->i_max_width - outertext_w + 1) / 2;
         }
+    }
 
-        unsigned outertext_h = (regionbbox.yMax - regionbbox.yMin);
-        if( outertext_h < (unsigned) p_region_in->i_max_height )
+    unsigned outertext_h = (regionbbox.yMax - regionbbox.yMin);
+    if( outertext_h < (unsigned) p_region_in->i_max_height )
+    {
+        if( p_region_in->i_text_align & SUBPICTURE_ALIGN_TOP )
+            regionbbox.yMin -= (p_region_in->i_max_height - outertext_h);
+        else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_BOTTOM )
+            regionbbox.yMax += (p_region_in->i_max_height - outertext_h);
+        else
         {
-            if( p_region_in->i_text_align & SUBPICTURE_ALIGN_TOP )
-                regionbbox.yMin -= (p_region_in->i_max_height - outertext_h);
-            else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_BOTTOM )
-                regionbbox.yMax += (p_region_in->i_max_height - outertext_h);
-            else
-            {
-                regionbbox.yMin -= (p_region_in->i_max_height - outertext_h + 1) / 2;
-                regionbbox.yMax += (p_region_in->i_max_height - outertext_h) / 2;
-            }
+            regionbbox.yMin -= (p_region_in->i_max_height - outertext_h + 1) / 2;
+            regionbbox.yMax += (p_region_in->i_max_height - outertext_h) / 2;
         }
+    }
 
 //        unsigned bboxcolor = 0xFF000000;
-        /* TODO 4.0. No region self BG color for VLC 3.0 API*/
+    /* TODO 4.0. No region self BG color for VLC 3.0 API*/
 
-        /* Avoid useless pixels:
-         *        reshrink/trim Region Box to padded text one,
-         *        but update offsets to keep position and have same rendering */
+    /* Avoid useless pixels:
+        *        reshrink/trim Region Box to padded text one,
+        *        but update offsets to keep position and have same rendering */
 //        if( (bboxcolor & 0xFF) == 0 )
-        {
-            p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
-            p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
-            regionbbox = paddedbbox;
-        }
+    {
+        p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
+        p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
+        regionbbox = paddedbbox;
+    }
 //        else /* case where the bounding box is larger and visible */
 //        {
 //            p_region_out->i_x = p_region_in->i_x;
 //            p_region_out->i_y = p_region_in->i_y;
 //        }
 
-        enum
-        {
-            DRAW_YUVA = 0,
-            DRAW_RGBA,
-            DRAW_ARGB,
-        };
-
-        const ft_drawing_functions drawfuncs[] =
-        {
-            [DRAW_YUVA] = { .extract = YUVFromXRGB,
-                            .fill =    FillYUVAPicture,
-                            .blend =   BlendGlyphToYUVA },
-            [DRAW_RGBA] = { .extract = RGBFromXRGB,
-                            .fill =    FillRGBAPicture,
-                            .blend =   BlendGlyphToRGBA },
-            [DRAW_ARGB] = { .extract = RGBFromXRGB,
-                            .fill =    FillARGBPicture,
-                            .blend =   BlendGlyphToARGB },
-        };
-
-        rv = VLC_EGENERIC;
-        for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
-        {
-            if( *p_chroma == VLC_CODEC_YUVP )
-                rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
-                                 &regionbbox, &paddedbbox, &bbox );
-            else if( *p_chroma == VLC_CODEC_YUVA )
-                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                 &regionbbox, &paddedbbox, &bbox,
-                                 VLC_CODEC_YUVA,
-                                 &p_region_out->fmt,
-                                 drawfuncs[DRAW_YUVA] );
-            else if( *p_chroma == VLC_CODEC_RGBA
-                  || *p_chroma == VLC_CODEC_BGRA )
-                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                 &regionbbox, &paddedbbox, &bbox,
-                                 *p_chroma,
-                                 &p_region_out->fmt,
-                                 drawfuncs[DRAW_RGBA] );
-            else if( *p_chroma == VLC_CODEC_ARGB
-                  || *p_chroma == VLC_CODEC_ABGR)
-                rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                 &regionbbox, &paddedbbox, &bbox,
-                                 *p_chroma,
-                                 &p_region_out->fmt,
-                                 drawfuncs[DRAW_ARGB] );
-            else
-                continue;
-
-            if( rv == VLC_SUCCESS )
-                break;
-        }
-    }
-    else
+    enum
     {
-        rv = VLC_EGENERIC;
+        DRAW_YUVA = 0,
+        DRAW_RGBA,
+        DRAW_ARGB,
+    };
+
+    const ft_drawing_functions drawfuncs[] =
+    {
+        [DRAW_YUVA] = { .extract = YUVFromXRGB,
+                        .fill =    FillYUVAPicture,
+                        .blend =   BlendGlyphToYUVA },
+        [DRAW_RGBA] = { .extract = RGBFromXRGB,
+                        .fill =    FillRGBAPicture,
+                        .blend =   BlendGlyphToRGBA },
+        [DRAW_ARGB] = { .extract = RGBFromXRGB,
+                        .fill =    FillARGBPicture,
+                        .blend =   BlendGlyphToARGB },
+    };
+
+    rv = VLC_EGENERIC;
+    for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
+    {
+        if( *p_chroma == VLC_CODEC_YUVP )
+            rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
+                                &regionbbox, &paddedbbox, &bbox );
+        else if( *p_chroma == VLC_CODEC_YUVA )
+            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
+                                &regionbbox, &paddedbbox, &bbox,
+                                VLC_CODEC_YUVA,
+                                &p_region_out->fmt,
+                                drawfuncs[DRAW_YUVA] );
+        else if( *p_chroma == VLC_CODEC_RGBA
+                || *p_chroma == VLC_CODEC_BGRA )
+            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
+                                &regionbbox, &paddedbbox, &bbox,
+                                *p_chroma,
+                                &p_region_out->fmt,
+                                drawfuncs[DRAW_RGBA] );
+        else if( *p_chroma == VLC_CODEC_ARGB
+                || *p_chroma == VLC_CODEC_ABGR)
+            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
+                                &regionbbox, &paddedbbox, &bbox,
+                                *p_chroma,
+                                &p_region_out->fmt,
+                                drawfuncs[DRAW_ARGB] );
+        else
+            continue;
+
+        if( rv == VLC_SUCCESS )
+            break;
     }
 
+done:
     FreeLines( text_block.p_laid );
 
     free( text_block.p_uchars );
