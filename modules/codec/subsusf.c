@@ -412,6 +412,7 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 
 static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
                                               char *psz_subtitle,
+                                              char *psz_plaintext,
                                               int i_sys_align )
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
@@ -463,6 +464,9 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
         {
             p_text_region->p_text = text_segment_New( NULL );
         }
+
+        p_text_region->p_text->psz_text = psz_plaintext;
+
         /* Look for position arguments which may override the style-based
          * defaults.
          */
@@ -835,11 +839,10 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                         {
                             p_text_region = CreateTextRegion( p_dec,
                                                               psz_flat,
+                                                              psz_flat,
                                                               p_sys->i_align );
                             if( p_text_region )
                             {
-                                free( p_text_region->p_text->psz_text );
-                                p_text_region->p_text->psz_text = psz_flat;
                                 if( !p_region_first )
                                 {
                                     p_region_first = p_region_upto = p_text_region;
@@ -922,11 +925,10 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                 {
                     p_text_region = CreateTextRegion( p_dec,
                                                       psz_subtitle,
+                                                      psz_flat,
                                                       p_sys->i_align );
                     if( p_text_region )
                     {
-                        free( p_text_region->p_text->psz_text );
-                        p_text_region->p_text->psz_text = psz_flat;
                         if( !p_region_first )
                         {
                             p_region_first = p_region_upto = p_text_region;
