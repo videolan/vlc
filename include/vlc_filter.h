@@ -100,8 +100,11 @@ struct vlc_filter_operations
         /** Filter a subpicture (sub filter) */
         subpicture_t *(*filter_sub)(filter_t *, subpicture_t *);
 
-        /** Render text (text renderer) */
-        int (*render)(filter_t *, subpicture_region_t *,
+        /** Render text (text renderer)
+         *
+         * \return a picture-based region or NULL
+         */
+        subpicture_region_t * (*render)(filter_t *,
                       const subpicture_region_t *, const vlc_fourcc_t *);
     };
 

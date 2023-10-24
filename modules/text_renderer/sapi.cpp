@@ -56,8 +56,7 @@ DEFINE_GUID(CLSID_SpObjectTokenCategory, 0xa910187f, 0x0c7a, 0x45ac, 0x92,0xcc, 
 extern "C" {
 static int Create (filter_t *);
 static void Destroy(filter_t *);
-static int RenderText(filter_t *,
-                      subpicture_region_t *,
+static subpicture_region_t *RenderText(filter_t *,
                       const subpicture_region_t *,
                       const vlc_fourcc_t *);
 }
@@ -213,8 +212,7 @@ error:
     return -ENOENT;
 }
 
-static int RenderText(filter_t *p_filter,
-        subpicture_region_t *,
+static subpicture_region_t *RenderText(filter_t *p_filter,
         const subpicture_region_t *region_in,
         const vlc_fourcc_t *)
 {
@@ -223,7 +221,7 @@ static int RenderText(filter_t *p_filter,
     sys->cmd.render_text.region = region_in;
     sys->cmd_available.post();
     sys->cmd_ready.wait();
-    return VLC_EGENERIC; /* We don't generate output region. */
+    return NULL; /* We don't generate output region. */
 }
 
 static const struct vlc_filter_operations filter_ops = []{

@@ -342,8 +342,7 @@ error:
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int RenderYUVP( const subpicture_region_t *p_region_in,
-                       subpicture_region_t *p_region,
+static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
                        const line_desc_t *p_line,
                        const FT_BBox *p_regionbbox,
                        const FT_BBox *p_bbox )
@@ -372,20 +371,16 @@ static int RenderYUVP( const subpicture_region_t *p_region_in,
 
     fmt.p_palette = p_region_in->fmt.p_palette ? p_region_in->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
 
-    assert( !p_region->p_picture );
-    p_region->p_picture = picture_NewFromFormat( &fmt );
-    if( !p_region->p_picture )
+    subpicture_region_t *p_region = subpicture_region_New(&fmt);
+    if (unlikely(p_region == NULL))
     {
         if (p_region_in->fmt.p_palette == NULL)
             free(fmt.p_palette);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
-    const unsigned regionnum = p_region_in->fmt.i_sar_num;
-    const unsigned regionden = p_region_in->fmt.i_sar_den;
-    p_region->fmt = fmt;
-    p_region->fmt.i_sar_num = regionnum;
-    p_region->fmt.i_sar_den = regionden;
+    p_region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
+    p_region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
 
     /* Calculate text color components
      * Only use the first color */
@@ -463,7 +458,7 @@ static int RenderYUVP( const subpicture_region_t *p_region_in,
         memset( p_top, 0, fmt.i_width );
     }
 
-    return VLC_SUCCESS;
+    return p_region;
 }
 
 /*****************************************************************************
@@ -641,9 +636,8 @@ static void RenderCharAXYZ( filter_t *p_filter,
     }
 }
 
-static inline int RenderAXYZ( filter_t *p_filter,
+static inline subpicture_region_t *RenderAXYZ( filter_t *p_filter,
                               const subpicture_region_t *p_region_in,
-                              subpicture_region_t *p_region,
                               const line_desc_t *p_line_head,
                               const FT_BBox *p_regionbbox,
                               const FT_BBox *p_paddedtextbbox,
@@ -666,15 +660,14 @@ static inline int RenderAXYZ( filter_t *p_filter,
     fmt.space     = p_region_in->fmt.space;
     fmt.mastering = p_region_in->fmt.mastering;
 
-    picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
-    if( !p_region->p_picture )
-        return VLC_EGENERIC;
+    subpicture_region_t *p_region = subpicture_region_New(&fmt);
+    if (unlikely(p_region == NULL))
+        return NULL;
 
-    const unsigned regionnum = p_region_in->fmt.i_sar_num;
-    const unsigned regionden = p_region_in->fmt.i_sar_den;
-    p_region->fmt = fmt;
-    p_region->fmt.i_sar_num = regionnum;
-    p_region->fmt.i_sar_den = regionden;
+    picture_t *p_picture = p_region->p_picture;
+
+    p_region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
+    p_region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
 
     /* Initialize the picture background */
     const text_style_t *p_style = p_sys->p_default_style;
@@ -713,7 +706,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         }
     }
 
-    return VLC_SUCCESS;
+    return p_region;
 }
 
 static void UpdateDefaultLiveStyles( filter_t *p_filter )
@@ -980,14 +973,15 @@ static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t 
  * needed glyphs into memory. It is used as pf_add_string callback in
  * the vout method by this module
  */
-static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
+static subpicture_region_t *Render( filter_t *p_filter,
                          const subpicture_region_t *p_region_in,
                          const vlc_fourcc_t *p_chroma_list )
 {
     if( !p_region_in || !p_region_in->p_text )
-        return VLC_EGENERIC;
+        return NULL;
 
     filter_sys_t *p_sys = p_filter->p_sys;
+    subpicture_region_t *region = NULL;
     bool b_grid = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_GRID_MODE) != 0;
     p_sys->i_scale = ( b_grid ) ? 100 : var_InheritInteger( p_filter, "sub-text-scale");
 
@@ -1001,7 +995,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( !p_sys->p_faceid )
         {
             msg_Err( p_filter, "Render(): Error loading default face" );
-            return VLC_EGENERIC;
+            return NULL;
         }
         p_sys->i_font_default_size = i_font_default_size;
     }
@@ -1015,7 +1009,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         free( text_block.pp_styles );
         free( text_block.p_uchars );
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     /* */
@@ -1125,12 +1119,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         regionbbox = paddedbbox;
     }
 
-    rv = VLC_EGENERIC;
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
         if( *p_chroma == VLC_CODEC_YUVP )
-            rv = RenderYUVP( p_region_in, p_region_out, text_block.p_laid,
-                             &regionbbox, &bbox );
+            region = RenderYUVP( p_region_in, text_block.p_laid,
+                                &regionbbox, &bbox );
         else
         {
             const ft_drawing_functions *func;
@@ -1163,29 +1156,29 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             else
                 continue;
 
-            rv = RenderAXYZ( p_filter, p_region_in, p_region_out, text_block.p_laid,
-                             &regionbbox, &paddedbbox, &bbox,
-                             *p_chroma,
-                             func );
+            region = RenderAXYZ( p_filter, p_region_in, text_block.p_laid,
+                                 &regionbbox, &paddedbbox, &bbox,
+                                 *p_chroma,
+                                 func );
         }
 
-        if( rv == VLC_SUCCESS )
+        if( region != NULL )
         {
-            subpicture_region_TextMarkRendered( p_region_out );
-
             /* Avoid useless pixels:
                 *        reshrink/trim Region Box to padded text one,
                 *        but update offsets to keep position and have same rendering */
 //          if( (bboxcolor & 0xFF) == 0 )
             {
-                p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
-                p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
+                region->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
+                region->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
             }
 //          else /* case where the bounding box is larger and visible */
 //          {
-//              p_region_out->i_x = p_region_in->i_x;
-//              p_region_out->i_y = p_region_in->i_y;
+//              region->i_x = p_region_in->i_x;
+//              region->i_y = p_region_in->i_y;
 //          }
+            region->i_alpha = p_region_in->i_alpha;
+            region->i_align = p_region_in->i_align;
             break;
         }
     }
@@ -1198,7 +1191,7 @@ done:
     if( text_block.pp_ruby )
         FreeRubyBlockArray( text_block.pp_ruby, text_block.i_count );
 
-    return rv;
+    return region;
 }
 
 static const struct vlc_filter_operations filter_ops =

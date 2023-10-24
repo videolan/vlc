@@ -37,8 +37,7 @@
 
 static int Create (filter_t *);
 static void Destroy(filter_t *);
-static int RenderText(filter_t *,
-                      subpicture_region_t *,
+static subpicture_region_t *RenderText(filter_t *,
                       const subpicture_region_t *,
                       const vlc_fourcc_t *);
 
@@ -97,8 +96,7 @@ static NSString * languageCodeForString(NSString *string) {
     return (NSString *)CFStringTokenizerCopyBestStringLanguage((CFStringRef)string, CFRangeMake(0, [string length]));
 }
 
-static int RenderText(filter_t *p_filter,
-                      subpicture_region_t *p_region_out,
+static subpicture_region_t *RenderText(filter_t *p_filter,
                       const subpicture_region_t *p_region_in,
                       const vlc_fourcc_t *p_chroma_list)
 {
@@ -107,7 +105,7 @@ static int RenderText(filter_t *p_filter,
         const text_segment_t *p_segment = p_region_in->p_text;
 
         if (!p_segment)
-            return VLC_EGENERIC;
+            return NULL;
 
         for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
             if ( !s->psz_text )
@@ -155,6 +153,6 @@ static int RenderText(filter_t *p_filter,
             [p_sys->speechSynthesizer startSpeakingString:stringToSpeech];
         }
 
-        return VLC_SUCCESS;
+        return NULL;
     }
 }

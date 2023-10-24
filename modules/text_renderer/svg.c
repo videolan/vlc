@@ -49,7 +49,7 @@
  *****************************************************************************/
 static int  Create    ( filter_t * );
 static void Destroy   ( filter_t * );
-static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+static subpicture_region_t *RenderText( filter_t *p_filter,
                         const subpicture_region_t *p_region_in,
                         const vlc_fourcc_t * );
 
@@ -328,24 +328,21 @@ static char * SegmentsToSVG( text_segment_t *p_segment, int i_height, int *pi_to
     return psz_result;
 }
 
-static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+static subpicture_region_t *RenderText( filter_t *p_filter,
                        const subpicture_region_t *p_region_in,
                        const vlc_fourcc_t *p_chroma_list )
 {
     /* Sanity check */
-    if( !p_region_in || !p_region_out || !p_region_in->p_text )
-        return VLC_EGENERIC;
+    if( !p_region_in || !p_region_in->p_text )
+        return NULL;
 
     for( size_t i=0; p_chroma_list[i]; i++ )
     {
         if( p_chroma_list[i] == VLC_CODEC_BGRA )
             break;
         if( p_chroma_list[i] == 0 )
-            return VLC_EGENERIC;
+            return NULL;
     }
-
-    p_region_out->i_x = p_region_in->i_x;
-    p_region_out->i_y = p_region_in->i_y;
 
     unsigned i_width = p_filter->fmt_out.video.i_visible_width;
     if( (unsigned) p_region_in->i_x <= i_width )
@@ -356,7 +353,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_height -= p_region_in->i_y;
 
     if( i_height == 0 || i_width == 0 )
-        return VLC_EGENERIC;
+        return NULL;
 
     char *psz_svg;
     /* Check if the data is SVG or pure text. In the latter case,
@@ -379,19 +376,23 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     if( !psz_svg )
-        return VLC_EGENERIC;
+        return NULL;
 
     picture_t *p_picture = svg_RenderPicture( p_filter, psz_svg );
 
     free( psz_svg );
 
-    if (p_picture)
-    {
-        p_region_out->p_picture = p_picture;
-        video_format_Clean( &p_region_out->fmt );
-        video_format_Copy( &p_region_out->fmt, &p_picture->format );
-        subpicture_region_TextMarkRendered(p_region_out);
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
+    if (p_picture == NULL)
+        return NULL;
+
+    subpicture_region_t *p_region_out = subpicture_region_ForPicture(&p_picture->format, p_picture);
+    picture_Release(p_picture);
+    if (unlikely(p_region_out == NULL))
+        return NULL;
+    p_region_out->i_x     = p_region_in->i_x;
+    p_region_out->i_y     = p_region_in->i_y;
+    p_region_out->i_alpha = p_region_in->i_alpha;
+    p_region_out->i_align = p_region_in->i_align;
+
+    return p_region_out;
 }

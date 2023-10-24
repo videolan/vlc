@@ -255,15 +255,15 @@ static int OpenWindow(vlc_window_t *wnd)
     return VLC_SUCCESS;
 }
 
-static int TextRendererRender(filter_t *filter, subpicture_region_t *region_out,
+static subpicture_region_t *TextRendererRender(filter_t *filter,
                               const subpicture_region_t *region_in,
                               const vlc_fourcc_t *chroma_list)
 {
-    (void) region_out; (void) chroma_list;
+    (void) chroma_list;
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     if (scenario->text_renderer_render != NULL)
         scenario->text_renderer_render(filter, region_in);
-    return VLC_EGENERIC;
+    return NULL;
 }
 
 static int OpenTextRenderer(filter_t *filter)

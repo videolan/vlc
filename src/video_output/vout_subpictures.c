@@ -313,7 +313,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     return scale;
 }
 
-static int SpuRenderText(spu_t *spu,
+static subpicture_region_t *SpuRenderText(spu_t *spu,
                           subpicture_region_t *region,
                           unsigned i_original_width,
                           unsigned i_original_height,
@@ -327,7 +327,7 @@ static int SpuRenderText(spu_t *spu,
     if(unlikely(text == NULL))
     {
         vlc_mutex_unlock(&sys->textlock);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     // assume rendered text is in sRGB if nothing is set
@@ -347,10 +347,11 @@ static int SpuRenderText(spu_t *spu,
     text->fmt_out.video.i_height =
     text->fmt_out.video.i_visible_height = i_original_height;
 
-    int i_ret = text->ops->render(text, region, region, chroma_list);
+    subpicture_region_t *rendered_region = text->ops->render(text, region, chroma_list);
+    assert(rendered_region == NULL || !subpicture_region_IsText(rendered_region));
 
     vlc_mutex_unlock(&sys->textlock);
-    return i_ret;
+    return rendered_region;
 }
 
 /**
@@ -808,13 +809,15 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     /* Render text region */
     if (subpicture_region_IsText( region ))
     {
-        if(SpuRenderText(spu, region,
+        subpicture_region_t *rendered_text =
+            SpuRenderText(spu, region,
                       i_original_width, i_original_height,
-                      chroma_list) != VLC_SUCCESS)
-            return NULL;
-        if(subpicture_region_IsText( region ))
+                      chroma_list);
+        if ( rendered_text  == NULL)
             // not a rendering error for Text-To-Speech
             return NULL;
+        // FIXME notify the caller it is allocated
+        region = rendered_text;
     }
 
     video_format_AdjustColorSpace(&region->fmt);
@@ -1530,9 +1533,16 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
     {
         if(!subpicture_region_IsText( region ))
             continue;
-        SpuRenderText(spu, region,
-                      i_original_picture_width, i_original_picture_height,
-                      chroma_list);
+        subpicture_region_t *rendered_text =
+            SpuRenderText(spu, region,
+                        i_original_picture_width, i_original_picture_height,
+                        chroma_list);
+        if (rendered_text == NULL)
+            vlc_spu_regions_remove(&p_subpic->regions, region);
+        else
+            // replace the text region with the rendered region
+            vlc_list_replace(&region->node, &rendered_text->node);
+        subpicture_region_Delete(region);
     }
 }
 
