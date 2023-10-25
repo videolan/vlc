@@ -675,7 +675,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     const text_style_t *p_style = p_sys->p_default_style;
     uint8_t i_x, i_y, i_z;
 
-    if (p_region->b_noregionbg) {
+    if (p_region->text_flags & VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG) {
         /* Render the background just under the text */
         draw.fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
                    0, 0, fmt.i_visible_width, fmt.i_visible_height );
@@ -983,7 +983,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
 
     filter_sys_t *p_sys = p_filter->p_sys;
-    bool b_grid = p_region_in->b_gridmode;
+    bool b_grid = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_GRID_MODE) != 0;
     p_sys->i_scale = ( b_grid ) ? 100 : var_InheritInteger( p_filter, "sub-text-scale");
 
     UpdateDefaultLiveStyles( p_filter );
@@ -1002,8 +1002,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     layout_text_block_t text_block = { 0 };
-    text_block.b_balanced = p_region_in->b_balanced_text;
-    text_block.b_grid = p_region_in->b_gridmode;
+    text_block.b_balanced = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT) != 0;
+    text_block.b_grid = b_grid;
     text_block.i_count = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
                                                   &text_block );
     if( text_block.i_count == 0 )
@@ -1045,7 +1045,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
     const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
 
-    int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !p_region_in->b_gridmode)
+    int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !b_grid)
                     ? i_max_face_height / 4 : 0;
 
     if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )

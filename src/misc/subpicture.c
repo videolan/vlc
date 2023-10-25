@@ -210,7 +210,7 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     p_region->zoom_h.den = p_region->zoom_h.num = 1;
     p_region->zoom_v.den = p_region->zoom_v.num = 1;
     p_region->i_alpha = 0xff;
-    p_region->b_balanced_text = true;
+    p_region->text_flags |= VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT;
 
     return p_region;
 }
@@ -363,10 +363,7 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
     p_region_dst->i_align  = p_region_src->i_align;
     p_region_dst->i_alpha  = p_region_src->i_alpha;
 
-    p_region_dst->i_text_align    = p_region_src->i_text_align;
-    p_region_dst->b_noregionbg    = p_region_src->b_noregionbg;
-    p_region_dst->b_gridmode      = p_region_src->b_gridmode;
-    p_region_dst->b_balanced_text = p_region_src->b_balanced_text;
+    p_region_dst->text_flags      = p_region_src->text_flags;
     p_region_dst->i_max_width     = p_region_src->i_max_width;
     p_region_dst->i_max_height    = p_region_src->i_max_height;
     p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );

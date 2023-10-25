@@ -177,14 +177,17 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
         r->i_align = p_updtregion->align;
         r->i_text_align = p_updtregion->inner_align;
-        r->b_noregionbg = (p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND) != 0;
-        r->b_gridmode = (p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;
+        if (p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND)
+            r->text_flags |= VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG;
+        bool b_gridmode = (p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;
+        if (b_gridmode)
+            r->text_flags |= VLC_SUBPIC_TEXT_FLAG_GRID_MODE;
 
         if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE))
         {
             const float margin_ratio = sys->margin_ratio;
-            const int   margin_h     = margin_ratio * (( r->b_gridmode ) ? subpic->i_original_picture_width
-                                                                         : fmt_dst->i_visible_width );
+            const int   margin_h     = margin_ratio * ( b_gridmode ? subpic->i_original_picture_width
+                                                                   : fmt_dst->i_visible_width );
             const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 
             /* subpic invisible margins sizes */

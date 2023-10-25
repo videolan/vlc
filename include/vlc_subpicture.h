@@ -48,6 +48,13 @@ typedef struct subpicture_region_private_t subpicture_region_private_t;
 typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 typedef struct filter_t vlc_blender_t;
 
+/**< render background under text only */
+#define VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG      (1 << 4)
+/** if the decoder sends row/cols based output */
+#define VLC_SUBPIC_TEXT_FLAG_GRID_MODE         (1 << 5)
+/** try to balance wrapped text lines */
+#define VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT     (1 << 6)
+
 /**
  * Video subtitle region
  *
@@ -68,9 +75,7 @@ struct subpicture_region_t
     /* Parameters for text regions (p_picture to be rendered) */
     text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
     int             i_text_align;    /**< alignment flags of region content */
-    bool            b_noregionbg;    /**< render background under text only */
-    bool            b_gridmode;      /** if the decoder sends row/cols based output */
-    bool            b_balanced_text; /** try to balance wrapped text lines */
+    int             text_flags;      /**< VLC_SUBPIC_TEXT_FLAG_xxx */
     int             i_max_width;     /** horizontal rendering/cropping target/limit */
     int             i_max_height;    /** vertical rendering/cropping target/limit */
 
