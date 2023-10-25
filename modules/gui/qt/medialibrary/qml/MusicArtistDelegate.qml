@@ -59,6 +59,9 @@ T.ItemDelegate {
 
     height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
 
+    verticalPadding: VLCStyle.margin_xsmall
+    horizontalPadding: VLCStyle.margin_normal
+
     Accessible.onPressAction: root.itemClicked()
 
     // Childs
@@ -68,7 +71,7 @@ T.ItemDelegate {
         colorSet: ColorContext.Item
 
         focused: root.activeFocus
-        hovered: contentItem.containsMouse
+        hovered: root.hovered
         enabled: root.enabled
     }
 
@@ -78,10 +81,18 @@ T.ItemDelegate {
         animate: theme.initialized
         backgroundColor: root.isCurrent ? theme.bg.highlight : theme.bg.primary
         activeBorderColor: theme.visualFocus
+
+        Widgets.CurrentIndicator {
+            length: parent.height - (margin * 2)
+
+            margin: VLCStyle.dp(2, VLCStyle.scale)
+
+            visible: isCurrent
+        }
     }
 
-    contentItem: MouseArea {
-        hoverEnabled: true
+    MouseArea {
+        anchors.fill: parent
 
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false
@@ -112,73 +123,62 @@ T.ItemDelegate {
         onClicked: itemClicked(mouse)
 
         onDoubleClicked: itemDoubleClicked(mouse)
+    }
 
-        Widgets.CurrentIndicator {
-            length: parent.height - (margin * 2)
+    contentItem: RowLayout {
+        spacing: VLCStyle.margin_xsmall
 
-            margin: VLCStyle.dp(4, VLCStyle.scale)
+        RoundImage {
+            implicitWidth: VLCStyle.play_cover_small
+            implicitHeight: VLCStyle.play_cover_small
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
 
-            visible: isCurrent
+            radius: width
+
+            source: (model.cover) ? model.cover
+                                  : VLCStyle.noArtArtistSmall
+
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+            Rectangle {
+                anchors.fill: parent
+
+                radius: VLCStyle.play_cover_small
+
+                color: "transparent"
+
+                border.width: VLCStyle.dp(1, VLCStyle.scale)
+
+                border.color: (isCurrent || _isHover) ? theme.accent
+                                                      : theme.border
+            }
         }
 
-        RowLayout {
-            anchors.fill: parent
+        Widgets.ScrollingText {
+            label: artistName
 
-            anchors.leftMargin: VLCStyle.margin_normal
-            anchors.rightMargin: VLCStyle.margin_normal
-            anchors.topMargin: VLCStyle.margin_xsmall
-            anchors.bottomMargin: VLCStyle.margin_xsmall
+            forceScroll: root.isCurrent || root._isHover
+            clip: scrolling
 
-            spacing: VLCStyle.margin_xsmall
+            implicitHeight: artistName.implicitHeight
+            implicitWidth: artistName.implicitWidth
 
-            RoundImage {
-                Layout.preferredWidth: VLCStyle.play_cover_small
-                Layout.preferredHeight: Layout.preferredWidth
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-                radius: width
+            Widgets.ListLabel {
+                id: artistName
 
-                source: (model.cover) ? model.cover
-                                      : VLCStyle.noArtArtistSmall
-
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-
-                Rectangle {
-                    anchors.fill: parent
-
-                    radius: VLCStyle.play_cover_small
-
-                    color: "transparent"
-
-                    border.width: VLCStyle.dp(1, VLCStyle.scale)
-
-                    border.color: (isCurrent || _isHover) ? theme.accent
-                                                          : theme.border
+                anchors {
+                    verticalCenter: parent.verticalCenter
                 }
+
+                text: (model.name) ? model.name
+                                   : I18n.qtr("Unknown artist")
+
+                color: theme.fg.primary
             }
-
-            Widgets.ScrollingText {
-                label: artistName
-
-                forceScroll: root.isCurrent || root._isHover
-                clip: scrolling
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                Widgets.ListLabel {
-                    id: artistName
-
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                    }
-
-                    text: (model.name) ? model.name
-                                       : I18n.qtr("Unknown artist")
-
-                    color: theme.fg.primary
-                }
-            }
-
         }
     }
 }

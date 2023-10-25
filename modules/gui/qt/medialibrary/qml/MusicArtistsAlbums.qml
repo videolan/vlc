@@ -191,7 +191,7 @@ FocusScope {
             delegate: MusicArtistDelegate {
                 width: artistList.width
 
-                leftPadding: root.leftPadding
+                leftPadding: rightPadding + root.leftPadding
 
                 isCurrent: ListView.isCurrentItem
 
