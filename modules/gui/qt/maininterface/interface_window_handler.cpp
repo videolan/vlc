@@ -25,6 +25,21 @@
 #include <QQmlProperty>
 #include <cmath>
 
+namespace
+{
+
+void setWindowState(QWindow *window, Qt::WindowState state)
+{
+    // make sure to preserve original state, Qt saves this info
+    // in underlying platform window but we need this in top level
+    // so that our window handling code works.
+    // see issue #28071
+    const auto original = window->windowStates();
+    window->setWindowStates(original | state);
+}
+
+}
+
 
 InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent)
     : QObject(parent)
@@ -364,7 +379,7 @@ void InterfaceWindowHandler::setInterfaceMinimized()
     if (m_widget)
         m_widget->showMinimized();
     else
-        m_window->showMinimized();
+        setWindowState(m_window, Qt::WindowMinimized);
 }
 
 void InterfaceWindowHandler::setInterfaceMaximized()
@@ -372,7 +387,7 @@ void InterfaceWindowHandler::setInterfaceMaximized()
     if (m_widget)
         m_widget->showMaximized();
     else
-        m_window->showMaximized();
+        setWindowState(m_window, Qt::WindowMaximized);
 }
 
 void InterfaceWindowHandler::setInterfaceNormal()
