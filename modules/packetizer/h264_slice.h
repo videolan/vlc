@@ -51,6 +51,7 @@ typedef struct
     int i_delta_pic_order_cnt0;
     int i_delta_pic_order_cnt1;
 
+    bool no_output_of_prior_pics_flag;
     bool has_mmco5;
 } h264_slice_t;
 

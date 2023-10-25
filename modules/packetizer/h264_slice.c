@@ -185,7 +185,12 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     }
 
     /* dec_ref_pic_marking() */
-    if( p_slice->i_nal_type != 5 ) /* IdrFlag */
+    if( p_slice->i_nal_type == 5 ) /* IdrFlag */
+    {
+        p_slice->no_output_of_prior_pics_flag = bs_read1( &s );
+        bs_skip( &s, 1 ); /* long_term_reference_flag */
+    }
+    else
     {
         if( bs_read1( &s ) ) /* adaptive_ref_pic_marking_mode_flag */
         {
