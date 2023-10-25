@@ -600,6 +600,8 @@ FocusScope {
                 useAcrylic: false
                 focus: true
 
+                wheelEnabled: true
+
                 anchors.fill: parent
                 rightPadding: VLCStyle.applicationHorizontalMargin
                 topPadding:  {
