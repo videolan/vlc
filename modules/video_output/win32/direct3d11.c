@@ -1570,12 +1570,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 
     video_format_Copy(&sys->pool_fmt, &fmt);
 
-    if (!sys->legacy_shader && is_d3d11_opaque(sys->pool_fmt.i_chroma))
-    {
-        sys->pool_fmt.i_width  = (sys->pool_fmt.i_width  + 0x7F) & ~0x7F;
-        sys->pool_fmt.i_height = (sys->pool_fmt.i_height + 0x7F) & ~0x7F;
-    }
-    else
     if ( sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
