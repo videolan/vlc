@@ -130,10 +130,12 @@ FocusScope {
       focus: false
     }
 
-    Row {
+    RowLayout {
         anchors.fill: parent
 
         visible: artistModel.count > 0
+
+        spacing: 0
 
         Widgets.KeyNavigableListView {
             id: artistList
@@ -143,12 +145,12 @@ FocusScope {
             selectionModel: root.selectionModel
             currentIndex: -1
             z: 1
-            height: parent.height
-            width: VLCStyle.isScreenSmall
-                   ? 0
-                   : Math.round(Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                              VLCStyle.colWidth(1) + VLCStyle.column_spacing,
-                                              root.width * .5))
+            Layout.fillHeight: true
+            Layout.preferredWidth: VLCStyle.isScreenSmall
+                                   ? 0
+                                   : Math.round(Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                                              VLCStyle.colWidth(1) + VLCStyle.column_spacing,
+                                                              root.width * .5))
 
             visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
             focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
@@ -226,18 +228,17 @@ FocusScope {
         }
 
         Rectangle {
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            Layout.fillHeight: true
 
-            width: VLCStyle.border
+            implicitWidth: VLCStyle.border
             color: artistList.colorContext.separator
         }
 
         MusicArtist {
             id: albumSubView
 
-            height: parent.height
-            width: root.width - root.leftPadding - artistList.width
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             rightPadding: root.rightPadding
 
