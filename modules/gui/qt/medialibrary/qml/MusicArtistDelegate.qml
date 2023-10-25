@@ -51,7 +51,13 @@ T.ItemDelegate {
 
     // Settings
 
-    implicitHeight: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding,
+                             implicitIndicatorHeight + topPadding + bottomPadding)
+
+    height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
 
     Accessible.onPressAction: root.itemClicked()
 
