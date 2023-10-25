@@ -358,6 +358,8 @@ FocusScope {
 
             headerColor: theme.bg.secondary
 
+            backgroundColor: headerColor
+
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 
             property Component titleDelegate: RowLayout {
