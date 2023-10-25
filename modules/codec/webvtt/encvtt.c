@@ -159,7 +159,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 
         /* Settings */
 
-        if( (p_region->i_text_align & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT)) ||
+        if( (p_region->text_flags & (SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT)) ||
                 (p_region->i_align & SUBPICTURE_ALIGN_TOP) )
         {
             size_t i_start = bo_size( &box );
@@ -167,9 +167,9 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
             bo_add_32be( &box, 0 );
             bo_add_fourcc( &box, "sttg" );
 
-            if( p_region->i_text_align & SUBPICTURE_ALIGN_LEFT )
+            if( p_region->text_flags & SUBPICTURE_ALIGN_LEFT )
                 bo_add_mem( &box, 10, "align:left" );
-            else if( p_region->i_text_align & SUBPICTURE_ALIGN_RIGHT )
+            else if( p_region->text_flags & SUBPICTURE_ALIGN_RIGHT )
                 bo_add_mem( &box, 11, "align:right" );
 
             if( p_region->i_align & SUBPICTURE_ALIGN_TOP )

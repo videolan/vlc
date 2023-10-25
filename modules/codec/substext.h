@@ -176,7 +176,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
         r->i_align = p_updtregion->align;
-        r->i_text_align = p_updtregion->inner_align;
+        r->text_flags |= p_updtregion->inner_align & SUBPICTURE_ALIGN_MASK;
         if (p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND)
             r->text_flags |= VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG;
         bool b_gridmode = (p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;

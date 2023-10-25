@@ -74,8 +74,7 @@ struct subpicture_region_t
 
     /* Parameters for text regions (p_picture to be rendered) */
     text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
-    int             i_text_align;    /**< alignment flags of region content */
-    int             text_flags;      /**< VLC_SUBPIC_TEXT_FLAG_xxx */
+    int             text_flags;      /**< VLC_SUBPIC_TEXT_FLAG_xxx and SUBPICTURE_ALIGN_xxx */
     int             i_max_width;     /** horizontal rendering/cropping target/limit */
     int             i_max_height;    /** vertical rendering/cropping target/limit */
 

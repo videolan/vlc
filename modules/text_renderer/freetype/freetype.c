@@ -477,7 +477,7 @@ static void RenderBackground( subpicture_region_t *p_region,
 {
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
-        FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
+        FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->text_flags & SUBPICTURE_ALIGN_MASK );
 
         FT_BBox linebgbox = p_line->bbox;
         linebgbox.xMin += offset.x;
@@ -697,7 +697,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         /* Render all lines */
         for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
-            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
+            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->text_flags & SUBPICTURE_ALIGN_MASK );
 
             int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->origin.y;
             int i_glyph_offset_x = offset.x - p_regionbbox->xMin;
@@ -1084,9 +1084,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     unsigned outertext_w = (regionbbox.xMax - regionbbox.xMin);
     if( outertext_w < (unsigned) p_region_in->i_max_width )
     {
-        if( p_region_in->i_text_align & SUBPICTURE_ALIGN_RIGHT )
+        if( p_region_in->text_flags & SUBPICTURE_ALIGN_RIGHT )
             regionbbox.xMin -= (p_region_in->i_max_width - outertext_w);
-        else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_LEFT )
+        else if( p_region_in->text_flags & SUBPICTURE_ALIGN_LEFT )
             regionbbox.xMax += (p_region_in->i_max_width - outertext_w);
         else
         {
@@ -1098,9 +1098,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     unsigned outertext_h = (regionbbox.yMax - regionbbox.yMin);
     if( outertext_h < (unsigned) p_region_in->i_max_height )
     {
-        if( p_region_in->i_text_align & SUBPICTURE_ALIGN_TOP )
+        if( p_region_in->text_flags & SUBPICTURE_ALIGN_TOP )
             regionbbox.yMin -= (p_region_in->i_max_height - outertext_h);
-        else if( p_region_in->i_text_align & SUBPICTURE_ALIGN_BOTTOM )
+        else if( p_region_in->text_flags & SUBPICTURE_ALIGN_BOTTOM )
             regionbbox.yMax += (p_region_in->i_max_height - outertext_h);
         else
         {
