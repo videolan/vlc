@@ -212,18 +212,6 @@ FocusScope {
                 }
             }
 
-            Rectangle {
-                // id: musicArtistLeftBorder
-
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-
-                width: VLCStyle.border
-                color: artistList.colorContext.separator
-            }
-
-
             Widgets.HorizontalResizeHandle {
                 id: resizeHandle
 
@@ -235,6 +223,14 @@ FocusScope {
                 sourceWidth: root.width
                 targetWidth: artistList.width
             }
+        }
+
+        Rectangle {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
+            width: VLCStyle.border
+            color: artistList.colorContext.separator
         }
 
         MusicArtist {
