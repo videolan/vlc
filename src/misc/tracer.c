@@ -46,6 +46,19 @@ struct vlc_tracer_module {
     void *opaque;
 };
 
+void vlc_tracer_vaTraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts,
+                              va_list entries)
+{
+    assert(tracer->ops->trace != NULL);
+    struct vlc_tracer_module *module =
+            container_of(tracer, struct vlc_tracer_module, tracer);
+
+    va_list copy;
+    va_copy(copy, entries);
+    tracer->ops->trace(module->opaque, ts, copy);
+    va_end(copy);
+}
+
 void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ...)
 {
     assert(tracer->ops->trace != NULL);

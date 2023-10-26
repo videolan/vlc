@@ -136,10 +136,21 @@ VLC_API void vlc_tracer_Destroy(struct vlc_tracer *tracer);
 /**
  * Emit traces
  *
- * va-args are a list of key / value parameters.
+ * \param tracer tracer emitting the traces
+ * \param ts timestamp of the current trace
+ * \param entries  list of key / value parameters.
  * Key must be a not NULL string.
  * Value has to be defined with one of the type defined
  * in the \ref vlc_tracer_entry union.
+ */
+VLC_API void vlc_tracer_vaTraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts,
+                                      va_list entries);
+
+/**
+ * Emit traces
+ *
+ * cf. vlc_tracer_vaTraceWithTs()
+ *
  * \param tracer tracer emitting the traces
  * \param ts timestamp of the current trace
  */
