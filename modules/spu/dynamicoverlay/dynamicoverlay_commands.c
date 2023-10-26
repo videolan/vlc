@@ -54,7 +54,7 @@ overlay_t *OverlayCreate( void )
     p_ovl->i_x = p_ovl->i_y = 0;
     p_ovl->i_alpha = 0xFF;
     p_ovl->b_active = false;
-    video_format_Setup( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
+    video_format_Setup( &p_ovl->format, 0, 0, 0,
                         0, 0, 1, 1 );
     p_ovl->p_fontstyle = text_style_Create( STYLE_NO_DEFAULTS );
     p_ovl->data.p_text = NULL;
@@ -474,7 +474,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
             return VLC_ENOMEM;
         }
 
-        video_format_Setup( &p_ovl->format, VLC_CODEC_TEXT,
+        video_format_Setup( &p_ovl->format, 0,
                             0, 0, 0, 0, 0, 1 );
 
         p_data = shmat( p_params->i_shmid, NULL, SHM_RDONLY );

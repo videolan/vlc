@@ -351,7 +351,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     {
         subpicture_region_t *p_region;
 
-        if( p_overlay->format.i_chroma == VLC_CODEC_TEXT )
+        if( p_overlay->format.i_chroma == 0 )
             p_region = subpicture_region_NewText();
         else
             p_region = subpicture_region_ForPicture( &p_overlay->format, p_overlay->data.p_pic );
@@ -365,7 +365,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
                  (char*)&p_overlay->format.i_chroma, p_overlay->i_x, p_overlay->i_y,
                  p_overlay->i_alpha );
 
-        if( p_overlay->format.i_chroma == VLC_CODEC_TEXT )
+        if( p_overlay->format.i_chroma == 0 )
         {
             video_format_Copy( &p_region->fmt, &p_overlay->format );
             p_region->p_text = text_segment_New( p_overlay->data.p_text );
