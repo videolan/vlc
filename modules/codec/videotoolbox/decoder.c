@@ -2094,7 +2094,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         goto skip;
     }
 
-    pic_pacer_WaitAllocatableSlot(p_sys->pic_pacer);
+    pic_pacer_WaitAllocatableSlot(p_sys->pic_pacer, p_info->b_field);
 
     VTDecodeInfoFlags flagOut;
     VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
@@ -2106,7 +2106,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     enum vtsession_status vtsession_status;
     if (HandleVTStatus(p_dec, status, &vtsession_status) == VLC_SUCCESS)
     {
-        pic_pacer_AccountScheduledDecode(p_sys->pic_pacer);
+        pic_pacer_AccountScheduledDecode(p_sys->pic_pacer, p_info->b_field);
 
         if(p_sys->decoder_state != STATE_DECODER_STARTED)
         {
@@ -2216,9 +2216,8 @@ video_context_OnPicReleased(vlc_video_context *vctx, unsigned nb_fields)
 {
     struct pic_pacer *pic_pacer =
         vlc_video_context_GetCVPXPrivate(vctx, CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
-    VLC_UNUSED(nb_fields);
 
-    pic_pacer_AccountDeallocation(pic_pacer);
+    pic_pacer_AccountDeallocation(pic_pacer, nb_fields == 1);
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
@@ -2233,6 +2232,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     decoder_t *p_dec = (decoder_t *)decompressionOutputRefCon;
     decoder_sys_t *p_sys = p_dec->p_sys;
     frame_info_t *p_info = (frame_info_t *) sourceFrameRefCon;
+    const bool b_field = p_info->b_field;
 
     vlc_mutex_lock(&p_sys->lock);
     if (p_sys->b_discard_decoder_output)
@@ -2305,7 +2305,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
                  * allocating way too many frames. This can be problematic for 4K
                  * 10bits. To fix this issue, we ensure that we don't have too many
                  * output frames allocated by waiting for the vout to release them. */
-            pic_pacer_AccountAllocation(p_sys->pic_pacer);
+            pic_pacer_AccountAllocation(p_sys->pic_pacer, p_info->b_field);
         }
     }
 
@@ -2322,7 +2322,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 end:
     free(p_info);
     vlc_mutex_unlock(&p_sys->lock);
-    pic_pacer_AccountFinishedDecode(p_sys->pic_pacer);
+    pic_pacer_AccountFinishedDecode(p_sys->pic_pacer, b_field);
     return;
 }
 

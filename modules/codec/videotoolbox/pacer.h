@@ -24,25 +24,25 @@ struct pic_pacer
 {
     vlc_mutex_t lock;
     vlc_cond_t  wait;
-    uint8_t     nb_out;
-    uint8_t     allocated_max;
-    uint8_t     allocated_next;
-    uint8_t     queued_for_decode;
+    uint8_t     nb_fields_out;
+    uint8_t     allocated_fields_max;
+    uint8_t     allocated_fields_next;
+    uint8_t     queued_fields_for_decode;
 };
 
 void pic_pacer_Clean(struct pic_pacer *);
 
 void pic_pacer_Init(struct pic_pacer *);
 
-void pic_pacer_AccountAllocation(struct pic_pacer *);
+void pic_pacer_AccountAllocation(struct pic_pacer *, bool b_field);
 
-void pic_pacer_AccountScheduledDecode(struct pic_pacer *);
+void pic_pacer_AccountScheduledDecode(struct pic_pacer *, bool b_field);
 
-void pic_pacer_AccountFinishedDecode(struct pic_pacer *);
+void pic_pacer_AccountFinishedDecode(struct pic_pacer *, bool b_field);
 
-void pic_pacer_WaitAllocatableSlot(struct pic_pacer *);
+void pic_pacer_WaitAllocatableSlot(struct pic_pacer *, bool b_field);
 
-void pic_pacer_AccountDeallocation(struct pic_pacer *);
+void pic_pacer_AccountDeallocation(struct pic_pacer *, bool b_field);
 
 void pic_pacer_UpdateMaxBuffering(struct pic_pacer *, uint8_t);
 
