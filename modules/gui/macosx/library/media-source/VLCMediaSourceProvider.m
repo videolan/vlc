@@ -70,7 +70,7 @@ static inline void getMediaSourcesForCategory(NSMutableArray <VLCMediaSource *> 
     return [mutableArray copy];
 }
 
-+ (NSArray<VLCMediaSource *> *)listOfLocalMediaSources;
++ (NSArray<VLCMediaSource *> *)listOfLocalMediaSources
 {
     libvlc_int_t *p_libvlcInstance = vlc_object_instance(getIntf());
     vlc_media_source_provider_t *p_sourceProvider = vlc_media_source_provider_Get(p_libvlcInstance);
