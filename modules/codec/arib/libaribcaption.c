@@ -139,12 +139,12 @@ static int SubpictureValidate(subpicture_t *p_subpic,
     return VLC_EGENERIC;
 }
 
-static void CopyImageToRegion(subpicture_region_t *p_region, const aribcc_image_t *image)
+static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
 {
     if(image->pixel_format != ARIBCC_PIXELFORMAT_RGBA8888)
         return;
 
-    plane_t *p_dstplane = &p_region->p_picture->p[0];
+    plane_t *p_dstplane = &dst_pic->p[0];
     plane_t srcplane;
     srcplane.i_lines = image->height;
     srcplane.i_pitch = image->stride;
@@ -201,7 +201,7 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
         region->i_y = image->dst_y;
         region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
 
-        CopyImageToRegion(region, image);
+        CopyImageToRegion(region->p_picture, image);
 
         *pp_region_last = region;
         pp_region_last = &region->p_next;
