@@ -224,6 +224,7 @@ struct vlc_input_decoder_t
     struct
     {
         /* All members guarded by subdecs.lock */
+        size_t count;
         vlc_fourcc_t selected_codec;
         bool b_supported;
         decoder_cc_desc_t desc;
@@ -1230,17 +1231,18 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
         p_owner->cc.desc_changed = true;
     }
 
-    bool first_cc = true;
+    size_t cc_idx = 0;
     vlc_input_decoder_t *it;
+
     vlc_list_foreach(it, &p_owner->subdecs.list, node)
     {
         if (!SubDecoderIsCc(it))
             continue;
 
-        if (first_cc)
+        if (++cc_idx == p_owner->cc.count)
         {
             block_FifoPut(it->p_fifo, p_cc);
-            first_cc = false;
+            p_cc = NULL;
         }
         else
         {
@@ -1253,7 +1255,7 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
 
     vlc_mutex_unlock(&p_owner->subdecs.lock);
 
-    if (first_cc) /* can have bitmap set but no created decs */
+    if (p_cc != NULL) /* can have bitmap set but no created decs */
         block_Release( p_cc );
 }
 
@@ -2047,6 +2049,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     p_owner->cc.desc.i_608_channels = 0;
     p_owner->cc.desc.i_708_channels = 0;
     vlc_list_init(&p_owner->subdecs.list);
+    p_owner->cc.count = 0;
     p_owner->cc.p_sout_input = NULL;
     p_owner->cc.sout_es_id = NULL;
     p_owner->cc.b_sout_created = false;
@@ -2263,6 +2266,7 @@ static void RemoveCcDecoder(vlc_input_decoder_t *owner,
         if (it == subdec)
         {
             vlc_list_remove(&it->node);
+            owner->cc.count--;
             vlc_mutex_unlock(&owner->subdecs.lock);
             return;
         }
@@ -2290,6 +2294,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
 #ifndef NDEBUG
     vlc_mutex_lock(&p_owner->subdecs.lock);
     assert(vlc_list_is_empty(&p_owner->subdecs.list));
+    assert(p_owner->cc.count == 0);
     vlc_mutex_unlock(&p_owner->subdecs.lock);
 #endif
 
@@ -2568,6 +2573,7 @@ vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *p_owner,
     }
 
     vlc_list_append(&p_ccowner->node, &p_owner->subdecs.list);
+    p_owner->cc.count++;
     p_ccowner->master_dec = p_owner;
 
     vlc_mutex_unlock(&p_owner->subdecs.lock);
