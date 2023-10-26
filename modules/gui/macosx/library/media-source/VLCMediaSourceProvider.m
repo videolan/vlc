@@ -89,9 +89,51 @@ static inline void getMediaSourcesForCategory(NSMutableArray <VLCMediaSource *> 
     return [mutableArray copy];
 }
 
++ (NSArray<VLCMediaSource *> *)listOfMyFoldersMediaSources
+{
+    NSMutableArray<VLCMediaSource *> * const mutableArray = NSMutableArray.array;
+    NSFileManager * const fileManager = NSFileManager.defaultManager;
+
+    void (^addIfNotEmpty)(NSArray<NSURL *> *directories) = ^(NSArray<NSURL *> *directories) {
+        if (directories == nil || directories.count == 0) {
+            return;
+        }
+
+        NSURL * const directory = directories.firstObject;
+        VLCMediaSource * const directoryMacMediaSource = [[VLCMediaSource alloc] initWithLocalURL:directory
+                                                                                andLibVLCInstance:vlc_object_instance(getIntf())];
+
+        NSLog(@"directoryMacMediaSource: %@", directoryMacMediaSource);
+        if (directoryMacMediaSource != nil) {
+            [mutableArray addObject:directoryMacMediaSource];
+        }
+    };
+
+    NSArray<NSURL *> * const documentUrls = [fileManager URLsForDirectory:NSDocumentDirectory
+                                                                inDomains:NSUserDomainMask];
+    addIfNotEmpty(documentUrls);
+
+    NSArray<NSURL *> * const desktopUrls = [fileManager URLsForDirectory:NSDesktopDirectory
+                                                               inDomains:NSUserDomainMask];
+    addIfNotEmpty(desktopUrls);
+
+    NSArray<NSURL *> * const downloadsUrls = [fileManager URLsForDirectory:NSDownloadsDirectory
+                                                                 inDomains:NSUserDomainMask];
+    addIfNotEmpty(downloadsUrls);
+
+    NSArray<NSURL *> * const moviesUrls = [fileManager URLsForDirectory:NSMoviesDirectory
+                                                              inDomains:NSUserDomainMask];
+    addIfNotEmpty(moviesUrls);
+
+    NSArray<NSURL *> * const musicUrls = [fileManager URLsForDirectory:NSMusicDirectory
+                                                             inDomains:NSUserDomainMask];
+    addIfNotEmpty(musicUrls);
+
+    NSArray<NSURL *> * const picturesUrls = [fileManager URLsForDirectory:NSPicturesDirectory
+                                                                inDomains:NSUserDomainMask];
+    addIfNotEmpty(picturesUrls);
+
+    return mutableArray.copy;
+}
 
 @end
-
-
-
-
