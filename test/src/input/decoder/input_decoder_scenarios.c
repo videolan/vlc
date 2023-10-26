@@ -596,8 +596,9 @@ static void cc_decoder_setup_608(decoder_t *dec)
 }
 
 static void cc_text_renderer_render_608_02(filter_t *filter,
-                                             subpicture_region_t *region_in)
+                                           subpicture_region_t *region_in)
 {
+    (void) filter;
     assert(strcmp(region_in->p_text->psz_text, "cc02_dec") == 0);
     vlc_sem_post(&scenario_data.wait_stop);
 }
