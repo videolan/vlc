@@ -34,6 +34,27 @@ FocusScope {
 
     property int contentWidth: 0
 
+    readonly property real minimumWidth: {
+        if (count === 0)
+            return 0
+
+        var size = 0
+
+        for (var i = 0; i < count; ++i) {
+            var item = repeater.itemAt(i)
+
+            if (item.minimumWidth === undefined)
+                size += item.implicitWidth
+            else
+                size += item.minimumWidth
+        }
+
+        if (alignment)
+            return size + count * playerControlLayout.spacing
+        else
+            return size + (count - 1) * playerControlLayout.spacing
+    }
+
     property int alignment: 0
 
     property var altFocusAction: Navigation.defaultNavigationUp
@@ -57,23 +78,7 @@ FocusScope {
 
     // Settings
 
-    implicitWidth: {
-        if (count === 0)
-            return 0
-
-        let size = 0
-        
-        for (let i = 0; i < count; ++i) {
-            size += repeater.itemAt(i).implicitWidth
-        }
-
-        if (alignment)
-            // NOTE: We provision the spacing induced by the alignment item.
-            return size + count * rowLayout.spacing
-        else
-            return size + (count - 1) * rowLayout.spacing
-    }
-
+    implicitWidth: minimumWidth
     implicitHeight: rowLayout.implicitHeight
 
     Navigation.navigable: {
