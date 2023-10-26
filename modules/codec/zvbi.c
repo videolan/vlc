@@ -174,7 +174,7 @@ typedef struct
 
 static int Decode( decoder_t *, block_t * );
 
-static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
+static subpicture_t *Subpicture( decoder_t *p_dec,
                                  bool b_text,
                                  int i_columns, int i_rows,
                                  int i_align, vlc_tick_t i_pts );
@@ -385,11 +385,13 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         if( p_sys->b_text && p_sys->i_last_page != i_wanted_page )
         {
             /* We need to reset the subtitle */
-            p_spu = Subpicture( p_dec, &fmt, true,
+            p_spu = Subpicture( p_dec, true,
                                 p_page.columns, p_page.rows,
                                 i_align, p_block->i_pts );
             if( !p_spu )
                 goto error;
+
+            fmt = p_spu->p_region->fmt;
 
             p_sys->b_update = true;
             p_sys->i_last_page = i_wanted_page;
@@ -421,11 +423,13 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
-    p_spu = Subpicture( p_dec, &fmt, p_sys->b_text,
+    p_spu = Subpicture( p_dec, p_sys->b_text,
                         p_page.columns, __MAX(i_num_rows, 1),
                         i_align, p_block->i_pts );
     if( !p_spu )
         goto error;
+
+    fmt = p_spu->p_region->fmt;
 
     if( !p_sys->b_text && i_num_rows == 0 )
     {
@@ -517,7 +521,7 @@ error:
     return VLCDEC_SUCCESS;
 }
 
-static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
+static subpicture_t *Subpicture( decoder_t *p_dec,
                                  bool b_text,
                                  int i_columns, int i_rows, int i_align,
                                  vlc_tick_t i_pts )
@@ -570,8 +574,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     p_spu->i_original_picture_width = p_spu->p_region->fmt.i_width;
     p_spu->i_original_picture_height = p_spu->p_region->fmt.i_height;
 
-    /* */
-    *p_fmt = p_spu->p_region->fmt;
     return p_spu;
 }
 
