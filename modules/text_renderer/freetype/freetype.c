@@ -1002,7 +1002,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     layout_text_block_t text_block = { 0 };
-    text_block.b_balanced = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT) != 0;
+    text_block.b_balanced = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_TEXT_NOT_BALANCED) == 0;
     text_block.b_grid = b_grid;
     text_block.i_count = SegmentsToTextAndStyles( p_filter, p_region_in->p_text,
                                                   &text_block );

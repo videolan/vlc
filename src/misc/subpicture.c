@@ -210,7 +210,6 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     p_region->zoom_h.den = p_region->zoom_h.num = 1;
     p_region->zoom_v.den = p_region->zoom_v.num = 1;
     p_region->i_alpha = 0xff;
-    p_region->text_flags |= VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT;
 
     return p_region;
 }

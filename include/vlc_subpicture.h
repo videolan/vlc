@@ -52,8 +52,8 @@ typedef struct filter_t vlc_blender_t;
 #define VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG      (1 << 4)
 /** if the decoder sends row/cols based output */
 #define VLC_SUBPIC_TEXT_FLAG_GRID_MODE         (1 << 5)
-/** try to balance wrapped text lines */
-#define VLC_SUBPIC_TEXT_FLAG_BALANCED_TEXT     (1 << 6)
+/** don't try to balance wrapped text lines */
+#define VLC_SUBPIC_TEXT_FLAG_TEXT_NOT_BALANCED (1 << 6)
 
 /**
  * Video subtitle region
