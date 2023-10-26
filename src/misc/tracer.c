@@ -70,7 +70,7 @@ static int vlc_tracer_load(void *func, bool forced, va_list ap)
     return (module->tracer.ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static struct vlc_tracer *vlc_TraceModuleCreate(vlc_object_t *parent)
+static struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent)
 {
     struct vlc_tracer_module *module;
 
@@ -94,7 +94,7 @@ static struct vlc_tracer *vlc_TraceModuleCreate(vlc_object_t *parent)
  * Initializes the messages tracing system */
 void vlc_tracer_Init(libvlc_int_t *vlc)
 {
-    struct vlc_tracer *tracer = vlc_TraceModuleCreate(VLC_OBJECT(vlc));
+    struct vlc_tracer *tracer = vlc_tracer_Create(VLC_OBJECT(vlc));
     libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
     vlc_priv->tracer = tracer;
 }
