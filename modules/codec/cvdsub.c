@@ -67,7 +67,7 @@ static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseMetaInfo  ( decoder_t *, block_t * );
 static void ParseHeader    ( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
-static void RenderImage( decoder_t *, block_t *, subpicture_region_t * );
+static void RenderImage( decoder_t *, block_t *, picture_t * );
 
 #define SUBTITLE_BLOCK_EMPTY 0
 #define SUBTITLE_BLOCK_PARTIAL 1
@@ -550,7 +550,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_region->i_x = p_region->i_x * 3 / 4; /* FIXME: use aspect ratio for x? */
     p_region->i_y = p_sys->i_y_start;
 
-    RenderImage( p_dec, p_data, p_region );
+    RenderImage( p_dec, p_data, p_region->p_picture );
 
     return p_spu;
 }
@@ -579,10 +579,10 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
 
  *****************************************************************************/
 static void RenderImage( decoder_t *p_dec, block_t *p_data,
-                         subpicture_region_t *p_region )
+                         picture_t *dst_pic )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_dest = p_region->p_picture->Y_PIXELS;
+    uint8_t *p_dest = dst_pic->Y_PIXELS;
     int i_field;            /* The subtitles are interlaced */
     int i_row, i_column;    /* scanline row/column number */
     uint8_t i_color, i_count;
@@ -604,7 +604,7 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
                     /* Fill the rest of the line with next color */
                     i_color = bs_read( &bs, 4 );
 
-                    memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
+                    memset( &p_dest[i_row * dst_pic->Y_PITCH +
                                     i_column], i_color,
                             p_sys->i_width - i_column );
                     i_column = p_sys->i_width;
@@ -618,7 +618,7 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
 
                     i_count = __MIN( i_count, p_sys->i_width - i_column );
 
-                    memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
+                    memset( &p_dest[i_row * dst_pic->Y_PITCH +
                                     i_column], i_color, i_count );
                     i_column += i_count - 1;
                     continue;
