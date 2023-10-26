@@ -62,9 +62,9 @@ FocusScope {
             return 0
 
         let size = 0
-
+        
         for (let i = 0; i < count; ++i) {
-            size += repeater.itemAt(i).preferredWidth
+            size += repeater.itemAt(i).implicitWidth
         }
 
         if (alignment)
@@ -175,9 +175,6 @@ FocusScope {
                         return 0
                 }
 
-                property int preferredWidth: (item && item.preferredWidth) ? item.preferredWidth
-                                                                           : minimumWidth
-
                 readonly property bool expandable: (item && item.minimumWidth !== undefined)
 
                 // Settings
@@ -190,9 +187,8 @@ FocusScope {
 
                 Layout.minimumWidth: minimumWidth
 
-                Layout.preferredWidth: preferredWidth
-
-                Layout.maximumWidth: preferredWidth
+                // NOTE: -1 resets to the implicit maximum width.
+                Layout.maximumWidth: (item) ? item.implicitWidth : -1
 
                 Layout.alignment: (Qt.AlignVCenter | controlLayout.alignment)
 
