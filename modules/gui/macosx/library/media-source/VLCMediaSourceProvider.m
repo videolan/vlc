@@ -79,6 +79,10 @@ static inline void getMediaSourcesForCategory(NSMutableArray <VLCMediaSource *> 
     [mutableArray addObject:[[VLCMediaSource alloc] initForLocalDevices:p_libvlcInstance]];
 
     if (p_sourceProvider != NULL) {
+        // "My Folders" entry is a bit of a custom implementation so it gets treated differently
+        VLCMediaSource * const myFoldersMediaSource = [[VLCMediaSource alloc] initMyFoldersMediaSourceWithLibVLCInstance:p_libvlcInstance];
+        [mutableArray addObject:myFoldersMediaSource];
+
         // Currently, SD_CAT_MYCOMPUTER and SD_CAT_DEVICES return empty list.
         // They are left for future implementation.
         getMediaSourcesForCategory(mutableArray, p_libvlcInstance, p_sourceProvider, SD_CAT_MYCOMPUTER);
