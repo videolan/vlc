@@ -28,7 +28,6 @@
 
 @interface VLCMediaSource ()
 {
-    BOOL _localMediaSource;
     BOOL _respondsToDiskChanges;
     libvlc_int_t *_p_libvlcInstance;
     vlc_media_source_t *_p_mediaSource;
@@ -98,6 +97,7 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
 };
 
 static const char *const localDevicesDescription = "My Machine";
+static const char *const myFoldersDescription = "My Folders";
 
 #pragma mark - VLCMediaSource methods
 @implementation VLCMediaSource
@@ -106,7 +106,6 @@ static const char *const localDevicesDescription = "My Machine";
 {
     self = [super init];
     if (self) {
-        _localMediaSource = YES;
         _respondsToDiskChanges = NO;
         _p_libvlcInstance = p_libvlcInstance;
         
@@ -148,12 +147,10 @@ static const char *const localDevicesDescription = "My Machine";
     return self;
 }
 
-- (instancetype)initWithLocalURL:(NSURL *)localURL
-               andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+- (instancetype)initMyFoldersMediaSourceWithLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
 {
     self = [super init];
-    if (self && localURL != nil) {
-        _localMediaSource = YES;
+    if (self) {
         _p_libvlcInstance = p_libvlcInstance;
 
          _p_mediaSource = malloc(sizeof(vlc_media_source_t));
@@ -161,7 +158,7 @@ static const char *const localDevicesDescription = "My Machine";
             return self;
         }
 
-        _p_mediaSource->description = localURL.description.UTF8String;
+        _p_mediaSource->description = myFoldersDescription;
         _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
 
         if (_p_mediaSource->tree == NULL) {
@@ -172,17 +169,48 @@ static const char *const localDevicesDescription = "My Machine";
 
         _category = SD_CAT_MYCOMPUTER;
 
-        const char * const directoryPath = localURL.absoluteString.UTF8String;
-        const char * const directoryDesc = localURL.description.UTF8String;
-        input_item_t * const directoryItem = input_item_NewExt(directoryPath,
-                                                               directoryDesc,
-                                                               0,
-                                                               ITEM_TYPE_DIRECTORY,
-                                                               ITEM_LOCAL);
-        input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
-        _p_mediaSource->tree->root = *directoryNode;
-        VLCInputNode * const directoryMacNode = [[VLCInputNode alloc] initWithInputNode:directoryNode];
-        input_item_Release(directoryItem);
+        NSFileManager * const fileManager = NSFileManager.defaultManager;
+
+        void (^addIfNotEmpty)(NSArray<NSURL *> *directories) = ^(NSArray<NSURL *> *directories) {
+            if (directories == nil || directories.count == 0) {
+                return;
+            }
+
+            NSURL * const directory = directories.firstObject;
+            const char * const directoryPath = directory.absoluteString.UTF8String;
+            const char * const directoryDesc = directory.description.UTF8String;
+            input_item_t * const directoryItem = input_item_NewExt(directoryPath,
+                                                                   directoryDesc,
+                                                                   0,
+                                                                   ITEM_TYPE_DIRECTORY,
+                                                                   ITEM_LOCAL);
+            input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
+            input_item_node_AppendNode(&(_p_mediaSource->tree->root), directoryNode);
+            input_item_Release(directoryItem);
+        };
+
+        NSArray<NSURL *> * const documentUrls = [fileManager URLsForDirectory:NSDocumentDirectory
+                                                                    inDomains:NSUserDomainMask];
+        addIfNotEmpty(documentUrls);
+
+        NSArray<NSURL *> * const desktopUrls = [fileManager URLsForDirectory:NSDesktopDirectory
+                                                                   inDomains:NSUserDomainMask];
+        addIfNotEmpty(desktopUrls);
+
+        NSArray<NSURL *> * const downloadsUrls = [fileManager URLsForDirectory:NSDownloadsDirectory
+                                                                     inDomains:NSUserDomainMask];
+        addIfNotEmpty(downloadsUrls);
+
+        NSArray<NSURL *> * const moviesUrls = [fileManager URLsForDirectory:NSMoviesDirectory
+                                                                  inDomains:NSUserDomainMask];
+        addIfNotEmpty(moviesUrls);
+
+        NSArray<NSURL *> * const musicUrls = [fileManager URLsForDirectory:NSMusicDirectory
+                                                                 inDomains:NSUserDomainMask];
+        addIfNotEmpty(musicUrls);
+
+        NSArray<NSURL *> * const picturesUrls = [fileManager URLsForDirectory:NSPicturesDirectory
+                                                                    inDomains:NSUserDomainMask];
     }
     return self;
 }
@@ -194,7 +222,7 @@ static const char *const localDevicesDescription = "My Machine";
             vlc_media_tree_RemoveListener(_p_mediaSource->tree,
                                           _p_treeListenerID);
         }
-        if (_localMediaSource) {
+        if (_p_mediaSource->description == localDevicesDescription || _p_mediaSource->description == myFoldersDescription) {
             _p_mediaSource->description = NULL;
 
             input_item_node_t **childrenNodes = _p_mediaSource->tree->root.pp_children;
@@ -396,7 +424,7 @@ static const char *const localDevicesDescription = "My Machine";
 - (VLCInputNode *)rootNode
 {
     VLCInputNode *inputNode = nil;
-    if (_localMediaSource) {
+    if (_p_mediaSource->description == localDevicesDescription || _p_mediaSource->description == myFoldersDescription) {
         // Since it is a manually constructed tree, we skip the locking
         inputNode = [[VLCInputNode alloc] initWithInputNode:&_p_mediaSource->tree->root];
     } else {
