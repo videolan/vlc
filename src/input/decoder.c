@@ -1280,7 +1280,7 @@ static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_videodec );
 
-    if (likely(p_cc == NULL))
+    if (unlikely(p_cc == NULL))
         return;
 
     if (!p_owner->cc.b_supported ||
