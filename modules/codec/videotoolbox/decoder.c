@@ -1984,8 +1984,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    pic_pacer_WaitAllocatableSlot(p_sys->pic_pacer);
-
     if (p_block == NULL)
     {
         Drain(p_dec, false);
@@ -2162,6 +2160,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         free(p_info);
         goto skip;
     }
+
+    pic_pacer_WaitAllocatableSlot(p_sys->pic_pacer);
 
     VTDecodeInfoFlags flagOut;
     VTDecodeFrameFlags decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
