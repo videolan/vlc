@@ -85,6 +85,16 @@ struct vlc_tracer_operations
 };
 
 /**
+ * Module probe/open function signature
+ *
+ * \param obj a valid object
+ * \param[out] sysp to module specific data
+ * \return the operations implemented by the module or NULL in case of error
+ * */
+typedef struct vlc_tracer_operations *(*vlc_tracer_open_cb)(vlc_object_t *obj,
+                                                            void **restrict sysp);
+
+/**
  * Emit traces
  *
  * va-args are a list of key / value parameters.

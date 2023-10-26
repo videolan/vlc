@@ -61,8 +61,7 @@ void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ...)
 
 static int vlc_tracer_load(void *func, bool forced, va_list ap)
 {
-    const struct vlc_tracer_operations *(*activate)(vlc_object_t *,
-                                                    void **) = func;
+    vlc_tracer_open_cb activate = func;
     struct vlc_tracer_module *module = va_arg(ap, struct vlc_tracer_module *);
 
     (void) forced;
