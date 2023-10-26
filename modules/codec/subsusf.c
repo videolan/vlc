@@ -1155,10 +1155,9 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         int i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
         int i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
 
-        assert( p_region->fmt.i_chroma == VLC_CODEC_YUVA );
-        for( unsigned int y = 0; y < p_region->fmt.i_height; y++ )
+        for( unsigned int y = 0; y < fmt_out.i_height; y++ )
         {
-            for( unsigned int x = 0; x < p_region->fmt.i_width; x++ )
+            for( unsigned int x = 0; x < fmt_out.i_width; x++ )
             {
                 if( p_region->p_picture->Y_PIXELS[y*p_region->p_picture->Y_PITCH + x] != i_y ||
                     p_region->p_picture->U_PIXELS[y*p_region->p_picture->U_PITCH + x] != i_u ||
