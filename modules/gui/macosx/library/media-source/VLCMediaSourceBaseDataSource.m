@@ -155,14 +155,11 @@
     }
     NSAssert(mediaSources != nil, @"Media sources array should not be nil");
 
-    const NSUInteger count = mediaSources.count;
-    if (count > 0) {
-        for (NSUInteger x = 0; x < count; x++) {
-            VLCMediaSource * const mediaSource = mediaSources[x];
-            VLCInputNode * const rootNode = [mediaSource rootNode];
-            [mediaSource preparseInputNodeWithinTree:rootNode];
-        }
+    for (VLCMediaSource * const mediaSource in mediaSources) {
+        VLCInputNode * const rootNode = [mediaSource rootNode];
+        [mediaSource preparseInputNodeWithinTree:rootNode];
     }
+
     _mediaSources = mediaSources;
     [self.collectionView reloadData];
 }
@@ -338,8 +335,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
             const NSInteger mediaSourceCount = _mediaSources.count;
             currentDevices = [[NSMutableArray alloc] initWithCapacity:mediaSourceCount];
 
-            for (NSUInteger x = 0; x < mediaSourceCount; x++) {
-                VLCMediaSource * const mediaSource = _mediaSources[x];
+            for (VLCMediaSource * const mediaSource in _mediaSources) {
                 VLCInputNode * const rootNode = mediaSource.rootNode;
                 [currentDevices addObjectsFromArray:rootNode.children];
             }
