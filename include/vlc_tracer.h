@@ -29,15 +29,19 @@
 #include <vlc_threads.h>
 
 /**
- * \defgroup traces Tracing
+ * \defgroup tracer Tracer module and API
  * \ingroup os
- * \brief Message traces
  *
  * Functions for modules to emit traces.
  *
  * @{
  * \file
  * Tracing functions
+ *
+ * \defgroup tracer_module Tracer Module implementation
+ * \ingroup tracer
+ *
+ * @{
  */
 
 /**
@@ -70,18 +74,26 @@ struct vlc_tracer_entry
 struct vlc_tracer;
 
 /**
- * Trace logging callback signature.
- *
- * va-args can only be \ref vlc_tracer_entry and the va-args list
- * should be ended by a \ref vlc_tracer_entry with a NULL key.
- * \param data data pointer as provided to vlc_tracer_Trace().
+ * Tracer operations returned by the module probe function
  */
-typedef void (*vlc_trace_cb) (void *data, vlc_tick_t ts, va_list entries);
-
 struct vlc_tracer_operations
 {
-    vlc_trace_cb trace;
-    void (*destroy)(void *data);
+    /**
+     * Called when tracing data
+     *
+     * \param sys data pointer set by vlc_tracer_open_cb()
+     * \param ts timestamp of the trace (based on vlc_tick_now())
+     * \param entries can only be \ref vlc_tracer_entry and the va-args list
+     * should be ended by a \ref vlc_tracer_entry with a NULL key.
+     */
+    void (*trace)(void *sys, vlc_tick_t ts, va_list entries);
+
+    /**
+     * Called to clean module specific resources
+     *
+     * \param sys data pointer set by vlc_tracer_open_cb()
+     */
+    void (*destroy)(void *sys);
 };
 
 /**
@@ -93,6 +105,15 @@ struct vlc_tracer_operations
  * */
 typedef struct vlc_tracer_operations *(*vlc_tracer_open_cb)(vlc_object_t *obj,
                                                             void **restrict sysp);
+
+/**
+ * @}
+ *
+ * \defgroup tracer_api Tracer API
+ * \ingroup tracer
+ *
+ * @{
+ */
 
 /**
  * Emit traces
@@ -108,13 +129,6 @@ VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ..
 
 #define vlc_tracer_Trace(tracer, ...) \
     vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), __VA_ARGS__)
-
-/**
- * \defgroup tracer Tracer
- * \brief Tracing back-end.
- *
- * @{
- */
 
 static inline struct vlc_tracer_entry vlc_tracer_entry_FromInt(const char *key, int64_t value)
 {
@@ -173,8 +187,13 @@ static inline struct vlc_tracer_entry VLC_TRACE(const char *key, const char *val
 
 #define VLC_TRACE_TICK_NS(key, tick) VLC_TRACE((key), NS_FROM_VLC_TICK((tick)))
 
-/*
- * Helper trace functions
+/**
+ * @}
+ *
+ * \defgroup tracer_helper Tracer helper functions
+ * \ingroup tracer
+ *
+ * @{
  */
 
 static inline void vlc_tracer_TraceStreamPTS(struct vlc_tracer *tracer, const char *type,
