@@ -35,6 +35,8 @@ FocusScope {
     property int contentWidth: 0
 
     readonly property real minimumWidth: {
+        var count = repeater.count
+
         if (count === 0)
             return 0
 
@@ -49,10 +51,10 @@ FocusScope {
                 size += item.minimumWidth
         }
 
-        if (alignment)
-            return size + count * playerControlLayout.spacing
-        else
-            return size + (count - 1) * playerControlLayout.spacing
+        if (alignment === 0)
+            count--
+
+        return size + count * playerControlLayout.spacing
     }
 
     property int alignment: 0
@@ -65,8 +67,6 @@ FocusScope {
     }
 
     // Aliases
-
-    property alias count: repeater.count
 
     property alias model: repeater.model
 
@@ -111,8 +111,8 @@ FocusScope {
 
     function _updateContentWidth() {
         let size = 0
-
-        for (let i = 0; i < count; i++) {
+        
+        for (let i = 0; i < repeater.count; i++) {
 
             const item = repeater.itemAt(i)
 
