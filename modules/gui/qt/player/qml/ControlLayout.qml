@@ -32,8 +32,6 @@ FocusScope {
 
     // Properties
 
-    property int contentWidth: 0
-
     readonly property real minimumWidth: {
         var count = repeater.count
 
@@ -106,28 +104,6 @@ FocusScope {
             altFocusAction()
     }
 
-    function _updateContentWidth() {
-        let size = 0
-        
-        for (let i = 0; i < repeater.count; i++) {
-
-            const item = repeater.itemAt(i)
-
-            if (item === null || item.isActive === false)
-                continue
-
-            const width = item.width
-
-            if (width)
-                size += width + spacing
-        }
-
-        if (size)
-            contentWidth = size - spacing
-        else
-            contentWidth = size
-    }
-
     // Children
 
     RowLayout {
@@ -145,28 +121,19 @@ FocusScope {
             id: repeater
 
             // NOTE: We apply the 'navigation chain' after adding the item.
-            onItemAdded: {
-                item.applyNavigation()
-
-                controlLayout._updateContentWidth()
-            }
+            onItemAdded: item.applyNavigation()
 
             onItemRemoved: {
                 // NOTE: We update the 'navigation chain' after removing the item.
                 item.removeNavigation()
 
                 item.recoverFocus(index)
-
-                controlLayout._updateContentWidth()
             }
 
             delegate: Loader {
                 id: loader
 
                 // Properties
-
-                // NOTE: This is required for contentWidth because the visible property is delayed.
-                property bool isActive: (x + minimumWidth <= rowLayout.width)
 
                 property int minimumWidth: {
                     if (expandable)
@@ -198,16 +165,12 @@ FocusScope {
                     delayed: true // this is important
                     target: loader
                     property: "visible"
-                    value: isActive
+                    value: (loader.x + minimumWidth <= rowLayout.width)
                 }
 
                 // Events
 
                 Component.onCompleted: repeater.countChanged.connect(controlLayout._handleFocus)
-
-                onIsActiveChanged: controlLayout._updateContentWidth()
-
-                onWidthChanged: controlLayout._updateContentWidth()
 
                 onActiveFocusChanged: {
                     if (activeFocus && (!!item && !item.focus)) {
