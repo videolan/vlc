@@ -28,6 +28,7 @@
 
 @interface VLCMediaSource ()
 {
+    BOOL _localMediaSource;
     BOOL _respondsToDiskChanges;
     libvlc_int_t *_p_libvlcInstance;
     vlc_media_source_t *_p_mediaSource;
@@ -105,6 +106,7 @@ static const char *const localDevicesDescription = "My Machine";
 {
     self = [super init];
     if (self) {
+        _localMediaSource = YES;
         _respondsToDiskChanges = NO;
         _p_libvlcInstance = p_libvlcInstance;
         
@@ -146,6 +148,45 @@ static const char *const localDevicesDescription = "My Machine";
     return self;
 }
 
+- (instancetype)initWithLocalURL:(NSURL *)localURL
+               andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+{
+    self = [super init];
+    if (self && localURL != nil) {
+        _localMediaSource = YES;
+        _p_libvlcInstance = p_libvlcInstance;
+
+         _p_mediaSource = malloc(sizeof(vlc_media_source_t));
+        if (!_p_mediaSource) {
+            return self;
+        }
+
+        _p_mediaSource->description = localURL.description.UTF8String;
+        _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+
+        if (_p_mediaSource->tree == NULL) {
+            free(_p_mediaSource);
+            _p_mediaSource = NULL;
+            return self;
+        }
+
+        _category = SD_CAT_MYCOMPUTER;
+
+        const char * const directoryPath = localURL.absoluteString.UTF8String;
+        const char * const directoryDesc = localURL.description.UTF8String;
+        input_item_t * const directoryItem = input_item_NewExt(directoryPath,
+                                                               directoryDesc,
+                                                               0,
+                                                               ITEM_TYPE_DIRECTORY,
+                                                               ITEM_LOCAL);
+        input_item_node_t * const directoryNode = input_item_node_Create(directoryItem);
+        _p_mediaSource->tree->root = *directoryNode;
+        VLCInputNode * const directoryMacNode = [[VLCInputNode alloc] initWithInputNode:directoryNode];
+        input_item_Release(directoryItem);
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     if (_p_mediaSource != NULL) {
@@ -153,8 +194,9 @@ static const char *const localDevicesDescription = "My Machine";
             vlc_media_tree_RemoveListener(_p_mediaSource->tree,
                                           _p_treeListenerID);
         }
-        if (_p_mediaSource->description == localDevicesDescription) {
+        if (_localMediaSource) {
             _p_mediaSource->description = NULL;
+
             input_item_node_t **childrenNodes = _p_mediaSource->tree->root.pp_children;
             if (childrenNodes) {
                 for (int i = 0; i <_p_mediaSource->tree->root.i_children; ++i) {
@@ -354,7 +396,7 @@ static const char *const localDevicesDescription = "My Machine";
 - (VLCInputNode *)rootNode
 {
     VLCInputNode *inputNode = nil;
-    if (_p_mediaSource->description == localDevicesDescription) {
+    if (_localMediaSource) {
         // Since it is a manually constructed tree, we skip the locking
         inputNode = [[VLCInputNode alloc] initWithInputNode:&_p_mediaSource->tree->root];
     } else {

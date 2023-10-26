@@ -40,6 +40,8 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 - (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource
                   andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
                         forCategory:(enum services_discovery_category_e)category;
+- (instancetype)initWithLocalURL:(NSURL *)localURL
+               andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
 
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
