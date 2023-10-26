@@ -65,7 +65,7 @@ static block_t *Packetize  ( decoder_t *, block_t ** );
 static block_t *Reassemble ( decoder_t *, block_t * );
 static void ParseHeader( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
-static void SVCDSubRenderImage( decoder_t *, block_t *, subpicture_region_t * );
+static void SVCDSubRenderImage( decoder_t *, block_t *, picture_t * );
 
 #define GETINT16(p) GetWBE(p)  ; p +=2;
 
@@ -500,7 +500,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     p_region->i_x = p_sys->i_x_start;
     p_region->i_y = p_sys->i_y_start;
 
-    SVCDSubRenderImage( p_dec, p_data, p_region );
+    SVCDSubRenderImage( p_dec, p_data, p_region->p_picture );
 
     return p_spu;
 }
@@ -524,10 +524,10 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
  interlacing will also be removed.
  *****************************************************************************/
 static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
-                subpicture_region_t *p_region )
+                                picture_t *dst_pic )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_dest = p_region->p_picture->Y_PIXELS;
+    uint8_t *p_dest = dst_pic->Y_PIXELS;
     int i_field;            /* The subtitles are interlaced */
     int i_row, i_column;    /* scanline row/column number */
     uint8_t i_color, i_count;
@@ -546,13 +546,13 @@ static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
                 if( i_color == 0 && (i_count = bs_read( &bs, 2 )) )
                 {
                     i_count = __MIN( i_count, p_sys->i_width - i_column );
-                    memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
+                    memset( &p_dest[i_row * dst_pic->Y_PITCH +
                                     i_column], 0, i_count + 1 );
                     i_column += i_count;
                     continue;
                 }
 
-                p_dest[i_row * p_region->p_picture->Y_PITCH + i_column] = i_color;
+                p_dest[i_row * dst_pic->Y_PITCH + i_column] = i_color;
             }
 
             bs_align( &bs );
