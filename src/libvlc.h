@@ -62,8 +62,8 @@ void vlc_LogInit(libvlc_int_t *);
  */
 typedef struct vlc_tracer vlc_tracer_t;
 
-void vlc_tracer_Init(libvlc_int_t *);
-void vlc_tracer_Destroy(libvlc_int_t *);
+struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent);
+void vlc_tracer_Destroy(struct vlc_tracer *tracer);
 
 /*
  * LibVLC exit event handling
