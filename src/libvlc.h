@@ -53,17 +53,10 @@ void vlc_trace (const char *fn, const char *file, unsigned line);
  * Logging
  */
 typedef struct vlc_logger vlc_logger_t;
+typedef struct vlc_tracer vlc_tracer_t;
 
 int vlc_LogPreinit(libvlc_int_t *) VLC_USED;
 void vlc_LogInit(libvlc_int_t *);
-
-/*
- * Tracing
- */
-typedef struct vlc_tracer vlc_tracer_t;
-
-struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent, const char *name);
-void vlc_tracer_Destroy(struct vlc_tracer *tracer);
 
 /*
  * LibVLC exit event handling

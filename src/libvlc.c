@@ -63,6 +63,7 @@
 #include <vlc_modules.h>
 #include <vlc_media_library.h>
 #include <vlc_thumbnailer.h>
+#include <vlc_tracer.h>
 
 #include "libvlc.h"
 

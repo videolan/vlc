@@ -116,6 +116,24 @@ typedef struct vlc_tracer_operations *(*vlc_tracer_open_cb)(vlc_object_t *obj,
  */
 
 /**
+ * Create a tracer object
+ *
+ * \note This function is for advanced debugging/testing.
+ * Use vlc_object_get_tracer() to get the existing tracer.
+ *
+ * \param parent parent object used to create the tracer
+ * \param name module to load or NULL for the default one
+ * \return a valid tracer or NULL in case of error
+ */
+VLC_API struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent,
+                                             const char *name);
+
+/**
+ * Destroy a tracer object
+ */
+VLC_API void vlc_tracer_Destroy(struct vlc_tracer *tracer);
+
+/**
  * Emit traces
  *
  * va-args are a list of key / value parameters.
