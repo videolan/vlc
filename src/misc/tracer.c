@@ -69,7 +69,7 @@ static int vlc_tracer_load(void *func, bool forced, va_list ap)
     return (module->tracer.ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent)
+struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent, const char *module_name)
 {
     struct vlc_tracer_module *module;
 
@@ -77,14 +77,11 @@ struct vlc_tracer *vlc_tracer_Create(vlc_object_t *parent)
     if (unlikely(module == NULL))
         return NULL;
 
-    char *module_name = var_InheritString(parent, "tracer");
     if (vlc_module_load(vlc_object_logger(module), "tracer", module_name, false,
                         vlc_tracer_load, module) == NULL) {
         vlc_object_delete(VLC_OBJECT(module));
-        free(module_name);
         return NULL;
     }
-    free(module_name);
 
     return &module->tracer;
 }

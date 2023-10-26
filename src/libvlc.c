@@ -180,7 +180,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     vlc_LogInit(p_libvlc);
-    priv->tracer = vlc_tracer_Create(VLC_OBJECT(p_libvlc));
+
+    char *tracer_name = var_InheritString(p_libvlc, "tracer");
+    priv->tracer = vlc_tracer_Create(VLC_OBJECT(p_libvlc), tracer_name);
+    free(tracer_name);
 
     /*
      * Support for gettext
