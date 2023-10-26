@@ -178,7 +178,7 @@ static const char *const myFoldersDescription = "My Folders";
 
             NSURL * const directory = directories.firstObject;
             const char * const directoryPath = directory.absoluteString.UTF8String;
-            const char * const directoryDesc = directory.description.UTF8String;
+            const char * const directoryDesc = directory.lastPathComponent.UTF8String;
             input_item_t * const directoryItem = input_item_NewExt(directoryPath,
                                                                    directoryDesc,
                                                                    0,
