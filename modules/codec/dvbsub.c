@@ -1739,8 +1739,6 @@ static void YuvaYuvp( subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
 
-    if( !p_subpic ) return;
-
     for( p_region = p_subpic->p_region; p_region; p_region = p_region->p_next )
     {
         video_format_t *p_fmt = &p_region->fmt;
@@ -1948,11 +1946,6 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     p_region = p_subpic->p_region;
     if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
     {
-        if( !p_subpic )
-        {
-            msg_Err( p_enc, "no picture in subpicture" );
-            return NULL;
-        }
         YuvaYuvp( p_subpic );
     }
 
