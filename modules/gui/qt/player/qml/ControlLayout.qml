@@ -51,13 +51,10 @@ FocusScope {
                 size += item.minimumWidth
         }
 
-        if (alignment === 0)
-            count--
-
-        return size + count * playerControlLayout.spacing
+        return size + ((count - 1) * playerControlLayout.spacing)
     }
 
-    property int alignment: 0
+    property bool rightAligned: false
 
     property var altFocusAction: Navigation.defaultNavigationUp
 
@@ -141,7 +138,7 @@ FocusScope {
         spacing: playerControlLayout.spacing
 
         Item {
-            Layout.fillWidth: (controlLayout.alignment === Qt.AlignRight)
+            Layout.fillWidth: rightAligned
         }
 
         Repeater {
@@ -195,7 +192,7 @@ FocusScope {
                 // NOTE: -1 resets to the implicit maximum width.
                 Layout.maximumWidth: (item) ? item.implicitWidth : -1
 
-                Layout.alignment: (Qt.AlignVCenter | controlLayout.alignment)
+                Layout.alignment: Qt.AlignVCenter | (rightAligned ? Qt.AlignRight : Qt.AlignLeft)
 
                 BindingCompat {
                     delayed: true // this is important
@@ -379,7 +376,7 @@ FocusScope {
         }
 
         Item {
-            Layout.fillWidth: (controlLayout.alignment === Qt.AlignLeft)
+            Layout.fillWidth: !rightAligned
         }
     }
 }
