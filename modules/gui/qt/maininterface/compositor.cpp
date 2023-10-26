@@ -237,7 +237,7 @@ void CompositorVideo::commonWindowDisable()
 }
 
 
-bool CompositorVideo::commonGUICreateImpl(QWindow* window, QWidget* rootWidget, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags)
 {
     assert(m_mainCtx);
 
@@ -255,9 +255,9 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, QWidget* rootWidget, 
     m_videoWindowHandler->setWindow( window );
 
 #ifdef _WIN32
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, window, rootWidget);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, window);
 #else
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx,  window, rootWidget);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
 #endif
     m_mainCtx->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
     m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
@@ -270,9 +270,9 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, QWidget* rootWidget, 
     return true;
 }
 
-bool CompositorVideo::commonGUICreate(QWindow* window, QWidget* rootWidget, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
 {
-    bool ret = commonGUICreateImpl(window, rootWidget, flags);
+    bool ret = commonGUICreateImpl(window, flags);
     if (!ret)
         return false;
     ret = m_ui->setup(qmlSurface->engine());
@@ -282,9 +282,9 @@ bool CompositorVideo::commonGUICreate(QWindow* window, QWidget* rootWidget, QmlU
     return true;
 }
 
-bool CompositorVideo::commonGUICreate(QWindow* window, QWidget* rootWidget, QQuickView* qmlView, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreate(QWindow* window, QQuickView* qmlView, CompositorVideo::Flags flags)
 {
-    bool ret = commonGUICreateImpl(window, rootWidget, flags);
+    bool ret = commonGUICreateImpl(window, flags);
     if (!ret)
         return false;
     ret = m_ui->setup(qmlView->engine());

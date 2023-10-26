@@ -792,8 +792,8 @@ void MainCtxWin32::reloadPrefs()
 
 // InterfaceWindowHandlerWin32
 
-InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent)
-    : InterfaceWindowHandler(_p_intf, mainCtx, window, widget, parent)
+InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
+    : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx, window, window))

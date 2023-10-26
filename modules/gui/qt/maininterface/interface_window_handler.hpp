@@ -28,7 +28,7 @@ class InterfaceWindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent = nullptr);
+    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandler();
 
 public slots:
@@ -69,10 +69,7 @@ private:
 
 protected:
     qt_intf_t* p_intf = nullptr;
-    //some compositor uses a Window as the base interface, some uses a widget
-    //when a widget is used, perform window operation on it
     QWindow* m_window = nullptr;
-    QWidget* m_widget = nullptr;
 
     MainCtx* m_mainCtx = nullptr;
 
