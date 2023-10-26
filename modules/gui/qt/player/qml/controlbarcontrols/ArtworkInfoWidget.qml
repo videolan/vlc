@@ -35,13 +35,7 @@ AbstractButton {
     readonly property real minimumWidth: coverRect.implicitWidth +
                                          + (leftPadding + rightPadding)
 
-    property int maximumHeight: _preferredHeight
-
-    readonly property int preferredWidth: minimumWidth + contentItem.spacing * 2
-                                          +
-                                          Math.max(titleLabel.implicitWidth,
-                                                   artistLabel.implicitWidth,
-                                                   progressIndicator.implicitWidth)
+    property bool _keyPressed: false
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -51,10 +45,6 @@ AbstractButton {
         focused: root.visualFocus
         hovered: root.hovered
     }
-
-    property int _preferredHeight: VLCStyle.dp(60, VLCStyle.scale)
-
-    property bool _keyPressed: false
 
     // Settings
 
