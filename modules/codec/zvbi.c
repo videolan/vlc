@@ -305,7 +305,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t   *p_sys = p_dec->p_sys;
     subpicture_t    *p_spu = NULL;
-    video_format_t  fmt;
     bool            b_cached = false;
     vbi_page        p_page;
 
@@ -391,8 +390,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             if( !p_spu )
                 goto error;
 
-            fmt = p_spu->p_region->fmt;
-
             p_sys->b_update = true;
             p_sys->i_last_page = i_wanted_page;
             goto exit;
@@ -428,8 +425,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                         i_align, p_block->i_pts );
     if( !p_spu )
         goto error;
-
-    fmt = p_spu->p_region->fmt;
 
     if( !p_sys->b_text && i_num_rows == 0 )
     {
@@ -483,13 +478,14 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
     else
     {
-        picture_t *p_pic = p_spu->p_region->p_picture;
+        subpicture_region_t *p_region = p_spu->p_region;
+        picture_t *p_pic = p_region->p_picture;
 
         /* ZVBI is stupid enough to assume pitch == width */
-        p_pic->p->i_pitch = 4 * fmt.i_width;
+        p_pic->p->i_pitch = 4 * p_region->fmt.i_width;
 
         /* Maintain subtitle position */
-        p_spu->p_region->i_y = i_first_row*10;
+        p_region->i_y = i_first_row*10;
         if (p_page.columns > 0 && p_page.rows > 0)
         {
             p_spu->i_original_picture_width = p_page.columns*12;
@@ -497,7 +493,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         }
 
         vbi_draw_vt_page_region( &p_page, ZVBI_PIXFMT_RGBA32,
-                          p_spu->p_region->p_picture->p->p_pixels, -1,
+                          p_region->p_picture->p->p_pixels, -1,
                           0, i_first_row, p_page.columns, i_num_rows,
                           1, 1);
 
@@ -505,7 +501,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         memcpy( p_sys->nav_link, &p_page.nav_link, sizeof( p_sys->nav_link )) ;
         vlc_mutex_unlock( &p_sys->lock );
 
-        OpaquePage( p_pic, &p_page, &fmt, b_opaque, i_first_row * p_page.columns );
+        OpaquePage( p_pic, &p_page, &p_region->fmt, b_opaque, i_first_row * p_page.columns );
     }
 
 exit:
