@@ -73,22 +73,21 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         return;
     }
 
-    subpicture_region_t *r = NULL;
+    subpicture_region_t *r, **last = &subpic->p_region;
     arib_text_region_t *p_region;
     for( p_region = sys->p_region; p_region; p_region = p_region->p_next )
     {
-        if( !r )
-        {
-            subpic->p_region = r = subpicture_region_NewText();
-        }
-        else
-        {
-            r->p_next = subpicture_region_NewText();
-            r = r->p_next;
-        }
+        r = subpicture_region_NewText();
         if( r == NULL )
         {
             return;
+        }
+        if (*last == NULL)
+            *last = r;
+        else
+        {
+            (*last)->p_next = r;
+            *last = r;
         }
         r->fmt.i_sar_num = 1;
         r->fmt.i_sar_den = 1;
