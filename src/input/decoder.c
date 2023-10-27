@@ -1231,6 +1231,9 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
         p_owner->cc.desc_changed = true;
     }
 
+    if (p_owner->cc.count == 0)
+        goto end;
+
     size_t cc_idx = 0;
     vlc_input_decoder_t *it;
 
@@ -1253,6 +1256,7 @@ static void DecoderPlayCcLocked( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc
         }
     }
 
+end:
     vlc_mutex_unlock(&p_owner->subdecs.lock);
 
     if (p_cc != NULL) /* can have bitmap set but no created decs */
