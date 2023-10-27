@@ -104,7 +104,7 @@ static int           ParseImageAttachments( decoder_t *p_dec );
 
 static subpicture_t        *ParseText     ( decoder_t *, block_t * );
 static void                 ParseUSFHeader( decoder_t * );
-static subpicture_region_t *ParseUSFString( decoder_t *, char * );
+static void ParseUSFString( decoder_t *, char *, subpicture_region_t ** );
 static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, const char *psz_filename, int i_transparent_color );
 
 /*****************************************************************************
@@ -258,7 +258,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode USF strings */
-    p_spu->p_region = ParseUSFString( p_dec, psz_subtitle );
+    ParseUSFString( p_dec, psz_subtitle, &p_spu->p_region );
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -805,12 +805,13 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 
 
 
-static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
-                                            char *psz_subtitle )
+static void ParseUSFString( decoder_t *p_dec,
+                            char *psz_subtitle,
+                            subpicture_region_t **regions )
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
-    subpicture_region_t  *p_region_first = NULL;
-    subpicture_region_t  *p_region_upto  = p_region_first;
+    *regions = NULL;
+    subpicture_region_t *p_region_upto = NULL;
 
     while( *psz_subtitle )
     {
@@ -842,14 +843,14 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                                                               p_sys->i_align );
                             if( p_text_region )
                             {
-                                if( !p_region_first )
+                                if( *regions == NULL)
                                 {
-                                    p_region_first = p_region_upto = p_text_region;
+                                    *regions = p_region_upto = p_text_region;
                                 }
                                 else
                                 {
                                     p_region_upto->p_next = p_text_region;
-                                    p_region_upto = p_region_upto->p_next;
+                                    p_region_upto = p_text_region;
                                 }
                             }
                             else free( psz_flat );
@@ -901,16 +902,15 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                 {
                     SetupPositions( p_image_region, psz_subtitle );
 
-                    p_image_region->p_next   = NULL;
-                }
-                if( !p_region_first )
-                {
-                    p_region_first = p_region_upto = p_image_region;
-                }
-                else if( p_image_region )
-                {
-                    p_region_upto->p_next = p_image_region;
-                    p_region_upto = p_region_upto->p_next;
+                    if( *regions == NULL)
+                    {
+                        *regions = p_region_upto = p_image_region;
+                    }
+                    else
+                    {
+                        p_region_upto->p_next = p_image_region;
+                        p_region_upto = p_image_region;
+                    }
                 }
             }
             else
@@ -928,14 +928,14 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                                                       p_sys->i_align );
                     if( p_text_region )
                     {
-                        if( !p_region_first )
+                        if( *regions == NULL)
                         {
-                            p_region_first = p_region_upto = p_text_region;
+                            *regions = p_region_upto = p_text_region;
                         }
                         else
                         {
                             p_region_upto->p_next = p_text_region;
-                            p_region_upto = p_region_upto->p_next;
+                            p_region_upto = p_text_region;
                         }
                     }
                     else free( psz_flat );
@@ -949,8 +949,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 
         psz_subtitle++;
     }
-
-    return p_region_first;
 }
 
 /*****************************************************************************
