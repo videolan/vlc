@@ -409,7 +409,6 @@ static void normal_check(const struct clock_ctx *ctx, size_t update_count,
                          vlc_tick_t expected_system_end,
                          vlc_tick_t stream_end)
 {
-    (void) expected_system_end; (void) stream_end;
     const struct clock_scenario *scenario = ctx->scenario;
 
     check_no_event_error(update_count);
