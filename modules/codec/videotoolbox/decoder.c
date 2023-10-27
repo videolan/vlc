@@ -37,6 +37,7 @@
 #import "../../packetizer/h264_slice.h"
 #import "../../packetizer/hxxx_nal.h"
 #import "../../packetizer/hxxx_sei.h"
+#import "pacer.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
@@ -165,83 +166,10 @@ typedef struct decoder_sys_t
     date_t                      pts;
 
     vlc_video_context          *vctx;
+    /* Picture pacer to work-around the VT session allocating too many CVPX buffers
+     * that can lead to a OOM. */
     struct pic_pacer           *pic_pacer;
 } decoder_sys_t;
-
-/* Picture pacer to work-around the VT session allocating too much CVPX buffers
- * that can lead to a OOM. */
-struct pic_pacer
-{
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-    uint8_t     nb_out;
-    uint8_t     allocated_max;
-    uint8_t     allocated_next;
-    uint8_t     queued_for_decode;
-};
-
-#define PIC_PACER_ALLOCATABLE_MAX (1 /* callback, pre-reorder */ \
-                                 + 2 /* filters */ \
-                                 + 1 /* display */ \
-                                 + 1 /* next/prev display */)
-#define PIC_PACER_DECODE_QUEUE 4  /* max async decode before callback */
-//#define PIC_PACER_DEBUG
-static void pic_pacer_UpdateMaxBuffering(struct pic_pacer *, uint8_t);
-
-static void pic_pacer_Destroy(void *priv)
-{
-    (void) priv;
-}
-
-static void pic_pacer_Init(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_init(&pic_pacer->lock);
-    vlc_cond_init(&pic_pacer->wait);
-    pic_pacer->nb_out = 0;
-    pic_pacer->allocated_max = 6;
-    pic_pacer->allocated_next = pic_pacer->allocated_max;
-    pic_pacer->queued_for_decode = 0;
-}
-
-static void pic_pacer_AccountAllocation(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_lock(&pic_pacer->lock);
-    pic_pacer->nb_out += 1;
-    vlc_mutex_unlock(&pic_pacer->lock);
-}
-
-static void pic_pacer_AccountScheduledDecode(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_lock(&pic_pacer->lock);
-    pic_pacer->queued_for_decode += 1;
-    vlc_mutex_unlock(&pic_pacer->lock);
-}
-
-static void pic_pacer_AccountFinishedDecode(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_lock(&pic_pacer->lock);
-    pic_pacer->queued_for_decode -= 1;
-    vlc_cond_signal(&pic_pacer->wait);
-    vlc_mutex_unlock(&pic_pacer->lock);
-}
-
-static void pic_pacer_WaitAllocatableSlot(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_lock(&pic_pacer->lock);
-    uint8_t allocatable_total = pic_pacer->allocated_max + PIC_PACER_DECODE_QUEUE;
-
-    while( pic_pacer->queued_for_decode + pic_pacer->nb_out >= allocatable_total )
-    {
-#ifdef PIC_PACER_DEBUG
-        fprintf(stderr, "input pacing %d+%d >= %d\n",
-                pic_pacer->queued_for_decode, pic_pacer->nb_out, allocatable_total);
-#endif
-        vlc_cond_wait(&pic_pacer->wait, &pic_pacer->lock);
-        /*update*/
-        allocatable_total = pic_pacer->allocated_max + PIC_PACER_DECODE_QUEUE;
-    }
-    vlc_mutex_unlock(&pic_pacer->lock);
-}
 
 #pragma mark - start & stop
 
@@ -1452,6 +1380,11 @@ static void StopVideoToolbox(decoder_t *p_dec)
 
 #pragma mark - module open and close
 
+static void pic_pacer_Destroy(void *priv)
+{
+    pic_pacer_Clean((struct pic_pacer *) priv);
+}
+
 static int
 CreateVideoContext(decoder_t *p_dec)
 {
@@ -2285,43 +2218,7 @@ video_context_OnPicReleased(vlc_video_context *vctx, unsigned nb_fields)
         vlc_video_context_GetCVPXPrivate(vctx, CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
     VLC_UNUSED(nb_fields);
 
-    vlc_mutex_lock(&pic_pacer->lock);
-    assert(pic_pacer->nb_out > 0);
-    pic_pacer->nb_out -= 1;
-
-    /* our shrink condition */
-    if(pic_pacer->allocated_next < pic_pacer->allocated_max &&
-       pic_pacer->nb_out <= pic_pacer->allocated_next)
-        pic_pacer->allocated_max = pic_pacer->allocated_next;
-
-    vlc_cond_signal(&pic_pacer->wait);
-
-    vlc_mutex_unlock(&pic_pacer->lock);
-}
-
-static void
-pic_pacer_UpdateMaxBuffering(struct pic_pacer *pic_pacer, uint8_t pic_max)
-{
-    vlc_mutex_lock(&pic_pacer->lock);
-
-    pic_max += PIC_PACER_ALLOCATABLE_MAX;
-    bool b_growing  = pic_max > pic_pacer->allocated_max;
-#ifdef PIC_PACER_DEBUG
-    fprintf(stderr, "updating pacer max %d/%d to %d\n",
-            pic_pacer->nb_out, pic_pacer->allocated_max, pic_reorder_max);
-#endif
-    if(b_growing)
-    {
-        pic_pacer->allocated_max = pic_max;
-        pic_pacer->allocated_next = pic_max;
-        vlc_cond_signal(&pic_pacer->wait);
-    }
-    else
-    {
-        pic_pacer->allocated_next = pic_max;
-    }
-
-    vlc_mutex_unlock(&pic_pacer->lock);
+    pic_pacer_AccountDeallocation(pic_pacer);
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
