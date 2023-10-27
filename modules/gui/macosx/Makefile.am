@@ -122,6 +122,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryNavigationStack.m \
 	gui/macosx/library/VLCLibraryNavigationState.h \
 	gui/macosx/library/VLCLibraryNavigationState.m \
+	gui/macosx/library/VLCLibraryRepresentedItem.h \
+	gui/macosx/library/VLCLibraryRepresentedItem.m \
 	gui/macosx/library/VLCLibrarySortingMenuController.h \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableView.h \
