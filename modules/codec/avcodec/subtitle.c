@@ -354,8 +354,7 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, vlc_tick
             region = ConvertRegionRGBA(rec);
             break;
         default:
-            msg_Warn(dec, "unsupported subtitle type");
-            region = NULL;
+            msg_Warn(dec, "unsupported subtitle type %" PRIu16, ffsub->format);
             break;
         }
         if (region) {
