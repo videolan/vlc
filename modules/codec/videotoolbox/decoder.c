@@ -149,12 +149,15 @@ typedef struct decoder_sys_t
     vlc_mutex_t                 lock;
     bool                        b_discard_decoder_output;
 
-    frame_info_t               *p_dpb;
-    uint8_t                     i_dpb_size;
-    uint8_t                     i_dpb_max_pics;
-    bool                        b_strict_reorder;
-    bool                        b_invalid_pic_reorder_max;
-    bool                        b_poc_based_reorder;
+    struct
+    {
+        frame_info_t           *p_entries;
+        uint8_t                 i_size;
+        uint8_t                 i_max_pics;
+        bool                    b_strict_reorder;
+        bool                    b_invalid_pic_reorder_max;
+        bool                    b_poc_based_reorder;
+    } dpb;
 
     bool                        b_format_propagated;
 
@@ -815,14 +818,14 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 
 static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
 {
-    frame_info_t **pp_lead_in = &p_sys->p_dpb;
+    frame_info_t **pp_lead_in = &p_sys->dpb.p_entries;
 
     for ( ;; pp_lead_in = & ((*pp_lead_in)->p_next))
     {
         bool b_insert;
         if (*pp_lead_in == NULL)
             b_insert = true;
-        else if (p_sys->b_poc_based_reorder)
+        else if (p_sys->dpb.b_poc_based_reorder)
             b_insert = ((*pp_lead_in)->i_foc > p_info->i_foc);
         else
             b_insert = ((*pp_lead_in)->pts >= p_info->pts);
@@ -831,12 +834,12 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
         {
             p_info->p_next = *pp_lead_in;
             *pp_lead_in = p_info;
-            p_sys->i_dpb_size++;
+            p_sys->dpb.i_size++;
             break;
         }
     }
 #if 0
-    for (frame_info_t *p_in=p_sys->p_dpb; p_in; p_in = p_in->p_next)
+    for (frame_info_t *p_in=p_sys->dpb.p_entries; p_in; p_in = p_in->p_next)
         printf(" %d", p_in->i_foc);
     printf("\n");
 #endif
@@ -844,7 +847,7 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
 
 static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
 {
-    frame_info_t *p_info = p_sys->p_dpb;
+    frame_info_t *p_info = p_sys->dpb.p_entries;
     if (p_info == NULL)
     {
         *pp_ret = NULL;
@@ -898,15 +901,15 @@ static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
             pp_ret_last = &p_info->p_picture->p_next;
         }
 
-        p_sys->i_dpb_size--;
+        p_sys->dpb.i_size--;
 
-        p_sys->p_dpb = p_info->p_next;
+        p_sys->dpb.p_entries = p_info->p_next;
         free(p_info);
-        p_info = p_sys->p_dpb;
+        p_info = p_sys->dpb.p_entries;
 
         if (p_info)
         {
-            if (p_sys->b_poc_based_reorder)
+            if (p_sys->dpb.b_poc_based_reorder)
                 b_dequeue = (p_info->i_poc == i_framepoc);
             else
                 b_dequeue = (p_info->pts == i_framepts);
@@ -990,35 +993,35 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if(!p_sys->b_invalid_pic_reorder_max &&
-       p_info->i_max_pics_buffering != p_sys->i_dpb_max_pics)
+    if(!p_sys->dpb.b_invalid_pic_reorder_max &&
+       p_info->i_max_pics_buffering != p_sys->dpb.i_max_pics)
     {
-        p_sys->i_dpb_max_pics = p_info->i_max_pics_buffering;
-        pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
+        p_sys->dpb.i_max_pics = p_info->i_max_pics_buffering;
+        pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
     }
 
-    while(p_info->b_flush || p_sys->i_dpb_size >= p_sys->i_dpb_max_pics)
+    while(p_info->b_flush || p_sys->dpb.i_size >= p_sys->dpb.i_max_pics)
     {
         /* First check if DPB sizing was correct before removing one frame */
-        if (p_sys->p_dpb && !p_sys->b_strict_reorder && !p_info->b_flush &&
-            p_sys->i_dpb_max_pics < H264_MAX_DPB)
+        if (p_sys->dpb.p_entries && !p_sys->dpb.b_strict_reorder && !p_info->b_flush &&
+            p_sys->dpb.i_max_pics < H264_MAX_DPB)
         {
-            if (p_sys->b_poc_based_reorder && p_sys->p_dpb->i_foc > p_info->i_foc)
+            if (p_sys->dpb.b_poc_based_reorder && p_sys->dpb.p_entries->i_foc > p_info->i_foc)
             {
-                p_sys->b_invalid_pic_reorder_max = true;
-                p_sys->i_dpb_max_pics++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_dpb_max_pics);
+                p_sys->dpb.b_invalid_pic_reorder_max = true;
+                p_sys->dpb.i_max_pics++;
+                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
                 break;
             }
-            else if (!p_sys->b_poc_based_reorder &&
+            else if (!p_sys->dpb.b_poc_based_reorder &&
                      p_info->pts > VLC_TICK_INVALID &&
-                     p_sys->p_dpb->pts > p_info->pts)
+                     p_sys->dpb.p_entries->pts > p_info->pts)
             {
-                p_sys->b_invalid_pic_reorder_max = true;
-                p_sys->i_dpb_max_pics++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->i_dpb_max_pics);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_dpb_max_pics);
+                p_sys->dpb.b_invalid_pic_reorder_max = true;
+                p_sys->dpb.i_max_pics++;
+                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
                 break;
             }
         }
@@ -1463,7 +1466,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->session = NULL;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = NULL;
-    p_sys->i_dpb_max_pics = 4;
+    p_sys->dpb.i_max_pics = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
     /* will be fixed later */
@@ -1520,8 +1523,8 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_configure_vout = ConfigureVoutH264;
             p_sys->pf_copy_extradata = CopyDecoderExtradataH264;
             p_sys->pf_fill_reorder_info = FillReorderInfoH264;
-            p_sys->b_strict_reorder = false;
-            p_sys->b_poc_based_reorder = true;
+            p_sys->dpb.b_strict_reorder = false;
+            p_sys->dpb.b_poc_based_reorder = true;
             p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
             break;
 
@@ -1536,8 +1539,8 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_configure_vout = ConfigureVoutHEVC;
             p_sys->pf_copy_extradata = CopyDecoderExtradataHEVC;
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
-            p_sys->b_strict_reorder = true;
-            p_sys->b_poc_based_reorder = true;
+            p_sys->dpb.b_strict_reorder = true;
+            p_sys->dpb.b_poc_based_reorder = true;
             p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
             break;
 
@@ -1743,7 +1746,7 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     CMBlockBufferRef  block_buf = NULL;
     CMSampleBufferRef sample_buf = NULL;
     CMTime pts;
-    if (!p_sys->b_poc_based_reorder && p_block->i_pts == VLC_TICK_INVALID)
+    if (!p_sys->dpb.b_poc_based_reorder && p_block->i_pts == VLC_TICK_INVALID)
         pts = CMTimeMake(p_block->i_dts, CLOCK_FREQ);
     else
         pts = CMTimeMake(p_block->i_pts, CLOCK_FREQ);
