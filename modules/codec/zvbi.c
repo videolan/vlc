@@ -536,6 +536,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         return NULL;
     }
 
+    subpicture_region_t *p_region;
     if( !b_text )
     {
         video_format_t fmt;
@@ -543,22 +544,20 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         fmt.i_width = fmt.i_visible_width = i_columns * 12;
         fmt.i_height = fmt.i_visible_height = i_rows * 10;
         fmt.i_sar_num = fmt.i_sar_den = 0; /* let the vout set the correct AR */
-        p_spu->p_region = subpicture_region_New( &fmt );
+        p_region = subpicture_region_New( &fmt );
     }
     else
     {
-        p_spu->p_region = subpicture_region_NewText();
+        p_region = subpicture_region_NewText();
     }
 
-    if( p_spu->p_region == NULL )
+    if( p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
         subpicture_Delete( p_spu );
         return NULL;
     }
-
-    p_spu->p_region->i_x = 0;
-    p_spu->p_region->i_y = 0;
+    p_spu->p_region = p_region;
 
     p_spu->i_start = i_pts;
     p_spu->i_stop = b_text ? i_pts + VLC_TICK_FROM_SEC(10): 0;
@@ -566,9 +565,9 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
     p_spu->b_absolute = b_text ? false : true;
 
     if( !b_text )
-        p_spu->p_region->i_align = i_align;
-    p_spu->i_original_picture_width = p_spu->p_region->fmt.i_width;
-    p_spu->i_original_picture_height = p_spu->p_region->fmt.i_height;
+        p_region->i_align = i_align;
+    p_spu->i_original_picture_width = p_region->fmt.i_width;
+    p_spu->i_original_picture_height = p_region->fmt.i_height;
 
     return p_spu;
 }
