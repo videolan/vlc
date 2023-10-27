@@ -703,7 +703,7 @@ static void CreateKatePalette( video_palette_t *fmt_palette, const kate_palette 
     }
 }
 
-static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *ev )
+static void SetupText( decoder_t *p_dec, subpicture_region_t *p_region, const kate_event *ev )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -718,10 +718,10 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
         case kate_markup_none:
         case kate_markup_simple:
             if( p_sys->b_formatted )
-//                p_spu->p_region->p_text = ParseSubtitles(&p_spu->p_region->i_align, ev->text );
+//                p_region->p_text = ParseSubtitles(&p_region->i_align, ev->text );
                 ;//FIXME
             else
-                p_spu->p_region->p_text = text_segment_New( ev->text ); /* no leak, this actually gets killed by the core */
+                p_region->p_text = text_segment_New( ev->text ); /* no leak, this actually gets killed by the core */
             break;
         default:
             /* we don't know about this one, so remove markup and display as text */
@@ -729,7 +729,7 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
                 char *copy = strdup( ev->text );
                 size_t len0 = strlen( copy ) + 1;
                 kate_text_remove_markup( ev->text_encoding, copy, &len0 );
-                p_spu->p_region->p_text = text_segment_New( copy );
+                p_region->p_text = text_segment_New( copy );
                 free( copy );
             }
             break;
@@ -1143,8 +1143,8 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     }
 
     /* text region */
-    p_spu->p_region = subpicture_region_NewText();
-    if( !p_spu->p_region )
+    subpicture_region_t *p_region = subpicture_region_NewText();
+    if( unlikely(p_region == NULL) )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
         if( p_bitmap_region )
@@ -1152,27 +1152,28 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         subpicture_Delete( p_spu );
         return NULL;
     }
-    p_spu->p_region->fmt.i_sar_num = 0;
-    p_spu->p_region->fmt.i_sar_den = 1;
+    p_spu->p_region = p_region;
+    p_region->fmt.i_sar_num = 0;
+    p_region->fmt.i_sar_den = 1;
 
-    SetupText( p_dec, p_spu, ev );
+    SetupText( p_dec, p_region, ev );
 
     /* default positioning */
-    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+    p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     if (p_bitmap_region)
     {
         p_bitmap_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     }
-    p_spu->p_region->i_x = 0;
-    p_spu->p_region->i_y = 10;
+    p_region->i_x = 0;
+    p_region->i_y = 10;
 
     /* override if tracker info present */
     if (b_tracker_valid)
     {
         if (kin.has.region)
         {
-            p_spu->p_region->i_x = kin.region_x;
-            p_spu->p_region->i_y = kin.region_y;
+            p_region->i_x = kin.region_x;
+            p_region->i_y = kin.region_y;
             if (p_bitmap_region)
             {
                 p_bitmap_region->i_x = kin.region_x;
