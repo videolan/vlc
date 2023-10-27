@@ -1684,7 +1684,7 @@ typedef struct
 
 #ifdef ENABLE_SOUT
 static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );
-static void encode_clut( encoder_t *, bs_t *, subpicture_t * );
+static void encode_clut( encoder_t *, bs_t *, subpicture_region_t * );
 static void encode_region_composition( encoder_t *, bs_t *, subpicture_t * );
 static void encode_object( encoder_t *, bs_t *, subpicture_t * );
 
@@ -1987,7 +1987,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
 
     encode_page_composition( p_enc, s, p_subpic );
     encode_region_composition( p_enc, s, p_subpic );
-    encode_clut( p_enc, s, p_subpic );
+    encode_clut( p_enc, s, p_region );
     encode_object( p_enc, s, p_subpic );
 
     /* End of display */
@@ -2123,10 +2123,9 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
     }
 }
 
-static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
+static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_region_t *p_region )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    subpicture_region_t *p_region = p_subpic->p_region;
     video_palette_t *p_pal, empty_palette = { .i_entries = 4 };
 
     /* Sanity check */
