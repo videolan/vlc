@@ -402,13 +402,14 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
     }
 
-    p_spu->p_region = subpicture_region_NewText();
-    if( !p_spu->p_region )
+    subpicture_region_t *region = subpicture_region_NewText();
+    if( !region )
     {
         subpicture_Delete( p_spu );
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
+    p_spu->p_region = region;
 
     /* Generate the string that will be displayed. This string is supposed to
        be p_sys->i_length characters long. */
@@ -472,9 +473,9 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         free( a2 );
     }
 
-    p_spu->p_region->p_text = text_segment_New(p_sys->psz_marquee);
+    region->p_text = text_segment_New(p_sys->psz_marquee);
     if( p_sys->p_style->i_font_size > 0 )
-        p_spu->p_region->fmt.i_visible_height = p_sys->p_style->i_font_size;
+        region->fmt.i_visible_height = p_sys->p_style->i_font_size;
     p_spu->i_start = date;
     p_spu->i_stop  = 0;
     p_spu->b_ephemer = true;
@@ -482,18 +483,18 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
     {   /*  set to an absolute xy */
-        p_spu->p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
+        region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
-        p_spu->p_region->i_align = p_sys->i_pos;
+        region->i_align = p_sys->i_pos;
         p_spu->b_absolute = false;
     }
-    p_spu->p_region->i_x = p_sys->i_xoff;
-    p_spu->p_region->i_y = p_sys->i_yoff;
+    region->i_x = p_sys->i_xoff;
+    region->i_y = p_sys->i_yoff;
 
-    p_spu->p_region->p_text->style = text_style_Duplicate( p_sys->p_style );
+    region->p_text->style = text_style_Duplicate( p_sys->p_style );
 
     if( p_feed->p_pic )
     {
@@ -516,12 +517,12 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         }
         else
         {
-            p_region->i_x = p_spu->p_region->i_x;
-            p_region->i_y = p_spu->p_region->i_y;
-            p_spu->p_region->p_next = p_region;
+            p_region->i_x = region->i_x;
+            p_region->i_y = region->i_y;
+            region->p_next = p_region;
 
             /* Offset text to display right next to the image */
-            p_spu->p_region->i_x += fmt_out.i_visible_width;
+            region->i_x += fmt_out.i_visible_width;
         }
         video_format_Clean(&fmt_out);
     }
