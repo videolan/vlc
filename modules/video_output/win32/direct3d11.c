@@ -122,6 +122,7 @@ struct vout_display_sys_t
     d3d11_handle_t           hd3d;
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4          *dxgiswapChain4;  /* DXGI 1.5 for HDR */
+    DXGI_HDR_METADATA_HDR10  hdr10;
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
     video_format_t           quad_fmt;
@@ -1103,7 +1104,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
             hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
             hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-            IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+            if (memcmp(&sys->hdr10, &hdr10, sizeof(hdr10)))
+            {
+                memcpy(&sys->hdr10, &hdr10, sizeof(hdr10));
+                IDXGISwapChain4_SetHDRMetaData(sys->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof(hdr10), &hdr10);
+            }
         }
     }
 
