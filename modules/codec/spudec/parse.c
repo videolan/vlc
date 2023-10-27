@@ -105,10 +105,10 @@ static void CLUTIdxToYUV(const struct subs_format_t *subs,
 }
 
 static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
-                         subpicture_t *p_spu )
+                         subpicture_region_t *p_region )
 {
-    plane_t *p_plane = &p_spu->p_region->p_picture->p[0];
-    video_palette_t *p_palette = p_spu->p_region->fmt.p_palette;
+    plane_t *p_plane = &p_region->p_picture->p[0];
+    video_palette_t *p_palette = p_region->fmt.p_palette;
 
     if( !p_dec->fmt_in->subs.spu.b_palette )
         return;
@@ -168,8 +168,8 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
             index_map[j] = i_index;
         }
 
-        if( p_spu->p_region->i_x >= i_col )
-            i_col -= p_spu->p_region->i_x;
+        if( p_region->i_x >= i_col )
+            i_col -= p_region->i_x;
 
         for( int j=0; j<p_plane->i_visible_lines; j++ )
         {
@@ -253,7 +253,7 @@ static void OutputPicture( decoder_t *p_dec,
     free( p_pixeldata );
 
     if( p_spu_data->p_pxctli && p_spu )
-        ParsePXCTLI( p_dec, p_spu_data, p_spu );
+        ParsePXCTLI( p_dec, p_spu_data, p_spu->p_region );
 
     pf_queue( p_dec, p_spu );
 }
@@ -859,19 +859,20 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
         fmt.p_palette->palette[i_x][3] = p_spu_data->pi_alpha[i_x] * 0x11;
     }
 
-    p_spu->p_region = subpicture_region_New( &fmt );
-    if( !p_spu->p_region )
+    subpicture_region_t *p_region = subpicture_region_New( &fmt );
+    if( !p_region )
     {
         fmt.p_palette = NULL;
         video_format_Clean( &fmt );
         msg_Err( p_dec, "cannot allocate SPU region" );
         return VLC_EGENERIC;
     }
+    p_spu->p_region = p_region;
 
-    p_spu->p_region->i_x = p_spu_properties->i_x;
-    p_spu->p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;
-    p_p = p_spu->p_region->p_picture->p->p_pixels;
-    i_pitch = p_spu->p_region->p_picture->p->i_pitch;
+    p_region->i_x = p_spu_properties->i_x;
+    p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;
+    p_p = p_region->p_picture->p->p_pixels;
+    i_pitch = p_region->p_picture->p->i_pitch;
 
     /* Draw until we reach the bottom of the subtitle */
     for( i_y = 0; i_y < (int)fmt.i_height * i_pitch; i_y += i_pitch )
