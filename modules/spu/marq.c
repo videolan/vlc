@@ -284,18 +284,19 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     if( !p_spu )
         goto out;
 
-    p_spu->p_region = subpicture_region_NewText();
-    if( !p_spu->p_region )
+    subpicture_region_t *p_region = subpicture_region_NewText();
+    if( !p_region )
     {
         subpicture_Delete( p_spu );
         p_spu = NULL;
         goto out;
     }
-    p_spu->p_region->fmt.i_sar_den = p_spu->p_region->fmt.i_sar_num = 1;
+    p_spu->p_region = p_region;
+    p_region->fmt.i_sar_den = p_region->fmt.i_sar_num = 1;
 
     p_sys->last_time = date;
 
-    p_spu->p_region->p_text = text_segment_New( msg );
+    p_region->p_text = text_segment_New( msg );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout;
     p_spu->b_ephemer = true;
@@ -303,19 +304,19 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     /*  where to locate the string: */
     if( p_sys->i_pos < 0 )
     {   /*  set to an absolute xy */
-        p_spu->p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
+        p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
-        p_spu->p_region->i_align = p_sys->i_pos;
+        p_region->i_align = p_sys->i_pos;
         p_spu->b_absolute = false;
     }
 
-    p_spu->p_region->i_x = p_sys->i_xoff;
-    p_spu->p_region->i_y = p_sys->i_yoff;
+    p_region->i_x = p_sys->i_xoff;
+    p_region->i_y = p_sys->i_yoff;
 
-    p_spu->p_region->p_text->style = text_style_Duplicate( p_sys->p_style );
+    p_region->p_text->style = text_style_Duplicate( p_sys->p_style );
 
 out:
     vlc_mutex_unlock( &p_sys->lock );
