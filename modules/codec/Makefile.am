@@ -351,6 +351,8 @@ EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox/decoder.c \
+                                    codec/videotoolbox/dpb.c \
+                                    codec/videotoolbox/dpb.h \
                                     codec/videotoolbox/pacer.c \
                                     codec/videotoolbox/pacer.h
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la

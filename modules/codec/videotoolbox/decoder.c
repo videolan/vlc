@@ -38,6 +38,7 @@
 #import "../../packetizer/hxxx_nal.h"
 #import "../../packetizer/hxxx_sei.h"
 #import "pacer.h"
+#import "dpb.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
@@ -78,33 +79,8 @@ static bool deviceSupports42010bitRendering();
 static Boolean deviceSupportsAdvancedProfiles();
 static Boolean deviceSupportsAdvancedLevels();
 
-typedef struct frame_info_t frame_info_t;
-
-struct frame_info_t
-{
-    picture_t *p_picture;
-    int i_poc;
-    int i_foc;
-    vlc_tick_t pts;
-    vlc_tick_t dts;
-    unsigned field_rate_num;
-    unsigned field_rate_den;
-    bool b_flush;
-    bool b_eos;
-    bool b_keyframe;
-    bool b_leading;
-    bool b_field;
-    bool b_progressive;
-    bool b_top_field_first;
-    uint8_t i_num_ts;
-    uint8_t i_max_pics_buffering;
-    unsigned i_length;
-    frame_info_t *p_next;
-};
-
 #pragma mark - decoder structure
 
-#define H264_MAX_DPB 16
 #define VT_MAX_SEI_COUNT 16
 
 #define DEFAULT_FRAME_RATE_NUM 30000
@@ -149,15 +125,7 @@ typedef struct decoder_sys_t
     vlc_mutex_t                 lock;
     bool                        b_discard_decoder_output;
 
-    struct dpb_s
-    {
-        frame_info_t           *p_entries;
-        uint8_t                 i_size;
-        uint8_t                 i_max_pics;
-        bool                    b_strict_reorder;
-        bool                    b_invalid_pic_reorder_max;
-        bool                    b_poc_based_reorder;
-    } dpb;
+    struct dpb_s                dpb;
 
     bool                        b_format_propagated;
 
@@ -816,114 +784,6 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 
 /* !Codec Specific */
 
-static void InsertIntoDPB(struct dpb_s *dpb, frame_info_t *p_info)
-{
-    frame_info_t **pp_lead_in = &dpb->p_entries;
-
-    for ( ;; pp_lead_in = & ((*pp_lead_in)->p_next))
-    {
-        bool b_insert;
-        if (*pp_lead_in == NULL)
-            b_insert = true;
-        else if (dpb->b_poc_based_reorder)
-            b_insert = ((*pp_lead_in)->i_foc > p_info->i_foc);
-        else
-            b_insert = ((*pp_lead_in)->pts >= p_info->pts);
-
-        if (b_insert)
-        {
-            p_info->p_next = *pp_lead_in;
-            *pp_lead_in = p_info;
-            dpb->i_size++;
-            break;
-        }
-    }
-#if 0
-    for (frame_info_t *p_in=dpb->p_entries; p_in; p_in = p_in->p_next)
-        printf(" %d", p_in->i_foc);
-    printf("\n");
-#endif
-}
-
-static int RemoveOneFrameFromDPB(struct dpb_s *dpb, date_t *ptsdate, picture_t **pp_ret)
-{
-    frame_info_t *p_info = dpb->p_entries;
-    if (p_info == NULL)
-    {
-        *pp_ret = NULL;
-        return VLC_EGENERIC;
-    }
-
-    const int i_framepoc = p_info->i_poc;
-    const vlc_tick_t i_framepts = p_info->pts;
-
-    picture_t **pp_ret_last = pp_ret;
-    bool b_dequeue;
-
-    do
-    {
-        /* Asynchronous fallback time init */
-        if(date_Get(ptsdate) == VLC_TICK_INVALID)
-        {
-            date_Set(ptsdate, p_info->pts != VLC_TICK_INVALID ?
-                                  p_info->pts : p_info->dts );
-        }
-
-        /* Compute time from output if missing */
-        if (p_info->pts == VLC_TICK_INVALID)
-            p_info->pts = date_Get(ptsdate);
-        else
-            date_Set(ptsdate, p_info->pts);
-
-        /* Update frame rate (used on interpolation) */
-        if(p_info->field_rate_num != ptsdate->i_divider_num ||
-           p_info->field_rate_den != ptsdate->i_divider_den)
-        {
-            /* no date_Change due to possible invalid num */
-            date_Init(ptsdate, p_info->field_rate_num,
-                                   p_info->field_rate_den);
-            date_Set(ptsdate, p_info->pts);
-        }
-
-        /* Set next picture time, in case it is missing */
-        if (p_info->i_length)
-            date_Set(ptsdate, p_info->pts + p_info->i_length);
-        else
-            date_Increment(ptsdate, p_info->i_num_ts);
-
-        if( p_info->p_picture ) /* Can have no picture attached to entry on error */
-        {
-            if( p_info->p_picture->date == VLC_TICK_INVALID )
-                p_info->p_picture->date = p_info->pts;
-
-            /* Extract attached field to output list */
-            *pp_ret_last = p_info->p_picture;
-            pp_ret_last = &p_info->p_picture->p_next;
-        }
-
-        dpb->i_size--;
-
-        dpb->p_entries = p_info->p_next;
-        free(p_info);
-        p_info = dpb->p_entries;
-
-        if (p_info)
-        {
-            if (dpb->b_poc_based_reorder)
-                b_dequeue = (p_info->i_poc == i_framepoc);
-            else
-                b_dequeue = (p_info->pts == i_framepts);
-        }
-        else
-        {
-            b_dequeue = false;
-        }
-
-    } while(b_dequeue);
-
-    return VLC_SUCCESS;
-}
-
 static void DrainDPBLocked(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1003,7 +863,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     /* First check if DPB sizing was correct before removing one frame */
     if (!p_sys->dpb.b_strict_reorder && !p_info->b_flush &&
         p_sys->dpb.i_size == p_sys->dpb.i_max_pics &&
-        p_sys->dpb.i_size && p_sys->dpb.i_max_pics < H264_MAX_DPB)
+        p_sys->dpb.i_size && p_sys->dpb.i_max_pics < DPB_MAX_PICS)
     {
         if (p_sys->dpb.b_poc_based_reorder && p_sys->dpb.p_entries->i_foc > p_info->i_foc)
         {
