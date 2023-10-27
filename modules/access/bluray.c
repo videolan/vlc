@@ -2045,7 +2045,8 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
 #else
     const vlc_fourcc_t rgbchroma = VLC_CODEC_BGRA;
 #endif
-    if (!ov->p_regions)
+    subpicture_region_t *p_reg = ov->p_regions;
+    if (!p_reg)
     {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
@@ -2053,12 +2054,16 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
                            rgbchroma,
                            eventov->stride, ov->height,
                            ov->width, ov->height, 1, 1);
-        ov->p_regions = subpicture_region_New(&fmt);
+        p_reg = subpicture_region_New(&fmt);
+        if (unlikely(p_reg == NULL)) {
+            vlc_mutex_unlock(&ov->lock);
+            return;
+        }
+        ov->p_regions = p_reg;
     }
 
     /* Find a region to update */
-    subpicture_region_t *p_reg = ov->p_regions;
-    if (!p_reg || p_reg->fmt.i_chroma != rgbchroma) {
+    if (p_reg->fmt.i_chroma != rgbchroma) {
         vlc_mutex_unlock(&ov->lock);
         return;
     }
