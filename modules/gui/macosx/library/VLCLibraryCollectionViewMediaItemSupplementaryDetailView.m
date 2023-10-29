@@ -35,6 +35,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "views/VLCImageView.h"
@@ -65,51 +66,56 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 }
 
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
-    _representedMediaItem = representedMediaItem;
+    _representedItem = representedItem;
     [self updateRepresentation];
 }
 
-- (NSString*)formattedYearAndDurationString
+- (NSString *)formattedYearAndDurationString
 {
-    if (_representedMediaItem.year > 0) {
-        return [NSString stringWithFormat:@"%u · %@", _representedMediaItem.year, _representedMediaItem.durationString];
-    } else if (_representedMediaItem.files.count > 0) {
-        VLCMediaLibraryFile *firstFile = _representedMediaItem.files.firstObject;
-        time_t fileLastModTime = firstFile.lastModificationDate;
-        
+    if (self.representedItem == nil) {
+        return @"";
+    }
+
+    const VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+
+    if (actualItem.year > 0) {
+        return [NSString stringWithFormat:@"%u · %@", actualItem.year, actualItem.durationString];
+    } else if (actualItem.files.count > 0) {
+        VLCMediaLibraryFile * const firstFile = actualItem.files.firstObject;
+        const time_t fileLastModTime = firstFile.lastModificationDate;
+
         if (fileLastModTime > 0) {
-            NSDate *lastModDate = [NSDate dateWithTimeIntervalSince1970:fileLastModTime];
-            NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:lastModDate];
-            return [NSString stringWithFormat:@"%ld · %@", components.year, _representedMediaItem.durationString];
+            NSDate * const lastModDate = [NSDate dateWithTimeIntervalSince1970:fileLastModTime];
+            NSDateComponents * const components = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:lastModDate];
+            return [NSString stringWithFormat:@"%ld · %@", components.year, actualItem.durationString];
         }
     }
-    
-    return _representedMediaItem.durationString;
+
+    return actualItem.durationString;
 }
 
 - (void)updateRepresentation
 {
-    if (_representedMediaItem == nil) {
-        NSAssert(1, @"no media item assigned for collection view item", nil);
-        return;
-    }
+    NSAssert(self.representedItem, @"no represented item assigned for collection view item", nil);
+    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    NSAssert(actualItem != nil, @"represented item is not a media item", nil);
 
-    _mediaItemTitleTextField.stringValue = _representedMediaItem.displayString;
-    _mediaItemDetailButton.title = _representedMediaItem.detailString;
+    _mediaItemTitleTextField.stringValue = actualItem.displayString;
+    _mediaItemDetailButton.title = actualItem.detailString;
     _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
-    _mediaItemFileNameTextField.stringValue = _representedMediaItem.inputItem.name;
-    _mediaItemPathTextField.stringValue = _representedMediaItem.inputItem.decodedMRL;
+    _mediaItemFileNameTextField.stringValue = actualItem.inputItem.name;
+    _mediaItemPathTextField.stringValue = actualItem.inputItem.decodedMRL;
 
-    const BOOL actionableDetail = self.representedMediaItem.actionableDetail;
+    const BOOL actionableDetail = actualItem.actionableDetail;
     self.mediaItemDetailButton.enabled = actionableDetail;
     if (@available(macOS 10.14, *)) {
         self.mediaItemDetailButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
     self.mediaItemDetailButton.action = @selector(detailAction:);
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:_representedMediaItem withCompletion:^(NSImage * const thumbnail) {
+    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaItemArtworkImageView.image = thumbnail;
     }];
 }
@@ -120,7 +126,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
-    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:YES];
+    [_libraryController appendItemToPlaylist:self.representedItem.item playImmediately:YES];
 }
 
 - (IBAction)enqueueAction:(id)sender
@@ -129,17 +135,18 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
-    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:NO];
+    [_libraryController appendItemToPlaylist:self.representedItem.item playImmediately:NO];
 }
 
 - (IBAction)detailAction:(id)sender
 {
-    if (!self.representedMediaItem.actionableDetail) {
+    VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    if (actualItem == nil || !actualItem.actionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    id<VLCMediaLibraryItemProtocol> libraryItem = self.representedMediaItem.actionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = actualItem.actionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 

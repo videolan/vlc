@@ -793,8 +793,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        VLCMediaLibraryMediaItem * const mediaItem = self.displayedCollection[indexPath.item];
-        mediaItemSupplementaryDetailView.representedMediaItem = mediaItem;
+        const id<VLCMediaLibraryItemProtocol> actualItem = self.displayedCollection[indexPath.item];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];
+        mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
 
         return mediaItemSupplementaryDetailView;

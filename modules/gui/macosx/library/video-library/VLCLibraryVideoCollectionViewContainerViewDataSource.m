@@ -297,9 +297,12 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         return sectionHeadingView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
-        VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        mediaItemSupplementaryDetailView.representedMediaItem = self.collectionArray[indexPath.item];
+        const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLC_ML_PARENT_UNKNOWN];
+
+        mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
         return mediaItemSupplementaryDetailView;
     }
