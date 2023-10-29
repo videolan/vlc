@@ -23,9 +23,13 @@
 #import "VLCLibraryAudioGroupHeaderView.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
 #import "main/VLCMain.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
 
@@ -47,17 +51,18 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 - (void)updateRepresentation
 {
-    if (_representedItem == nil) {
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+    if (actualItem == nil) {
         _titleTextField.stringValue = _NS("Unknown");
         _detailTextField.stringValue = _NS("Unknown");
         return;
     }
 
-    _titleTextField.stringValue = _representedItem.displayString;
-    _detailTextField.stringValue = _representedItem.detailString;
+    _titleTextField.stringValue = actualItem.displayString;
+    _detailTextField.stringValue = actualItem.detailString;
 }
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryAudioGroupProtocol>)representedItem
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     if (representedItem == _representedItem) {
         return;
@@ -74,7 +79,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
     // We want to add all the tracks to the playlist but only play the first one immediately,
     // otherwise we will skip straight to the last track of the last album from the artist
     __block BOOL playImmediately = YES;
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
 
         if(playImmediately) {
@@ -87,7 +92,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 {
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
 
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
     }];
 }

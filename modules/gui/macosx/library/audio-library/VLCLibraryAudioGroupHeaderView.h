@@ -24,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryAudioGroupProtocol;
 
 extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
@@ -32,7 +33,7 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 
 @property (class, readonly) const CGSize defaultHeaderSize;
 
-@property (readwrite, retain, nonatomic) id<VLCMediaLibraryAudioGroupProtocol> representedItem;
+@property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 @property (readwrite, weak) IBOutlet NSTextField *titleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;

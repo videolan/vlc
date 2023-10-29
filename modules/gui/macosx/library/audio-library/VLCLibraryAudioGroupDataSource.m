@@ -194,7 +194,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
     } else if ([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
         VLCLibraryAudioGroupHeaderView * const headerView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier forIndexPath:indexPath];
-        headerView.representedItem = _representedAudioGroup;
+
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:_representedAudioGroup parentType:_parentType];
+        headerView.representedItem = representedItem;
         return headerView;
     }
 
