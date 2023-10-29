@@ -26,6 +26,7 @@
 #import "library/VLCLibraryTableCellViewProtocol.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 @implementation VLCLibraryTableViewDelegate
 
@@ -50,7 +51,8 @@
         return nil;
     }
 
-    [cellView setRepresentedItem:libraryItem];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:VLC_ML_PARENT_UNKNOWN]; //TODO
+    [cellView setRepresentedItem:representedItem];
     return cellView;
 }
 

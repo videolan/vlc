@@ -22,10 +22,10 @@
 
 #import "VLCLibraryTableCellViewProtocol.h"
 
-@protocol VLCMediaLibraryItemProtocol;
+@class VLCLibraryRepresentedItem;
 
 @protocol VLCLibraryTableCellViewProtocol<NSObject>
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem;
 
 @end
