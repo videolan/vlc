@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
+@class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryItemProtocol;
 
 extern NSString *VLCLibraryCellIdentifier;
@@ -52,7 +53,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, assign) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
 @property (readwrite, assign) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
 
-@property (readwrite, retain, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
+@property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 @end
 

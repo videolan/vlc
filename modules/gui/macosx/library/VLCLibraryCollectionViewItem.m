@@ -32,6 +32,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryUIUnits.h"
 
 #import "main/VLCMain.h"
@@ -184,7 +185,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     [self setUnplayedIndicatorHidden:YES];
 }
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     if (!_libraryController) {
         _libraryController = VLCMain.sharedInstance.libraryController;
@@ -215,21 +216,19 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)updateRepresentation
 {
-    if (_representedItem == nil) {
-        NSAssert(1, @"no item assigned for collection view item", nil);
-        return;
-    }
+    NSAssert(self.representedItem != nil, @"no item assigned for collection view item", nil);
 
-    _mediaTitleTextField.stringValue = _representedItem.displayString;
-    _secondaryInfoTextField.stringValue = _representedItem.detailString;
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+    _mediaTitleTextField.stringValue = actualItem.displayString;
+    _secondaryInfoTextField.stringValue = actualItem.detailString;
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaImageView.image = thumbnail;
     }];
 
     // TODO: Add handling for the other types
-    if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
+    if([actualItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
+        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)actualItem;
 
         if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
@@ -286,7 +285,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     // We want to add all the tracks to the playlist but only play the first one immediately,
     // otherwise we will skip straight to the last track of the last album from the artist
     __block BOOL playImmediately = YES;
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
 
         if(playImmediately) {
@@ -301,7 +300,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
     }];
 }

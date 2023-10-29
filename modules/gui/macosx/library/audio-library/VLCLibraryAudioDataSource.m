@@ -34,6 +34,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
@@ -752,8 +753,11 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = self.displayedCollection[indexPath.item];
+    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.displayedCollection[indexPath.item];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];
+
+    viewItem.representedItem = representedItem;
     return viewItem;
 }
 

@@ -31,6 +31,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
@@ -168,8 +169,10 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = self.representedListOfAlbums[indexPath.item];
+    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:_parentType];
+    viewItem.representedItem = representedItem;
     return viewItem;
 }
 

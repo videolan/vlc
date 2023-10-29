@@ -29,6 +29,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
@@ -275,8 +276,11 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = self.collectionArray[indexPath.item];
+    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLC_ML_PARENT_UNKNOWN];
+
+    viewItem.representedItem = representedItem;
     return viewItem;
 }
 
