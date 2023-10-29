@@ -73,9 +73,6 @@ NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification";
 
 @interface VLCLibraryAudioDataSource ()
-{
-    enum vlc_ml_parent_type _currentParentType;
-}
 
 @property (readwrite, atomic) NSArray *displayedCollection;
 @property (readonly) BOOL displayAllArtistsGenresTableEntry;
@@ -646,7 +643,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row
 {
     NSParameterAssert(tableView);
-    
+
     if (tableView != _collectionSelectionTableView && tableView != _gridModeListTableView) {
         return;
     }
@@ -726,7 +723,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (void)collectionSelectionDoubleClickAction:(id)sender
 {
     id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[self.collectionSelectionTableView.selectedRow];
-    
+
     [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
     }];
