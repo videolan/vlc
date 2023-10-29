@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, retain) id<VLCMediaLibraryItemProtocol> item;
 @property (readwrite, retain) id<VLCMediaLibraryItemProtocol> parentItem;
-@property (readwrite, assign) NSInteger itemIndexInParent;
+@property (readonly) NSInteger itemIndexInParent;
 
 @end
 

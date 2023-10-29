@@ -20,8 +20,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryRepresentedItem.m"
+#import "VLCLibraryRepresentedItem.h"
+
+#import "library/VLCLibraryDataTypes.h"
+
+@interface VLCLibraryRepresentedItem ()
+{
+    NSInteger _itemIndexInParent;
+}
+@end
 
 @implementation VLCLibraryRepresentedItem
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _itemIndexInParent = NSNotFound;
+    }
+    return self;
+}
+
+- (NSInteger)itemIndexInParent
+{
+    if (_itemIndexInParent != NSNotFound) {
+        return _itemIndexInParent;
+    }
+
+    __block NSInteger index = 0;
+    const NSInteger itemId = self.item.libraryID;
+
+    [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
+        if (mediaItem.libraryID == itemId) {
+            return;
+        }
+
+        index++;
+    }];
+
+    _itemIndexInParent = index;
+    return _itemIndexInParent;
+}
 
 @end
