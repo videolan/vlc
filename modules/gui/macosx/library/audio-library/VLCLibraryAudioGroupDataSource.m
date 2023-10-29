@@ -42,6 +42,7 @@
 @interface VLCLibraryAudioGroupDataSource ()
 {
     id<VLCMediaLibraryAudioGroupProtocol> _representedAudioGroup;
+    enum vlc_ml_parent_type _parentType;
 }
 @property (readwrite, atomic, strong) NSArray<VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
@@ -100,6 +101,17 @@
         }
 
         _representedAudioGroup = representedAudioGroup;
+
+        if ([representedAudioGroup isKindOfClass:VLCMediaLibraryAlbum.class]) {
+            _parentType = VLC_ML_PARENT_ALBUM;
+        } else if ([representedAudioGroup isKindOfClass:VLCMediaLibraryArtist.class]) {
+            _parentType = VLC_ML_PARENT_ARTIST;
+        } else if ([representedAudioGroup isKindOfClass:VLCMediaLibraryGenre.class]) {
+            _parentType = VLC_ML_PARENT_GENRE;
+        } else {
+            _parentType = VLC_ML_PARENT_UNKNOWN;
+        }
+
         [self updateRepresentedListOfAlbums];
     }
 }
