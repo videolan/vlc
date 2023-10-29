@@ -32,13 +32,27 @@
 
 @implementation VLCLibraryRepresentedItem
 
+- (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
+{
+    self = [self init];
+    if (self) {
+        _item = item;
+    }
+    return self;
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        _itemIndexInParent = NSNotFound;
+        [self setup];
     }
     return self;
+}
+
+- (void)setup
+{
+    _itemIndexInParent = NSNotFound;
 }
 
 - (NSInteger)itemIndexInParent

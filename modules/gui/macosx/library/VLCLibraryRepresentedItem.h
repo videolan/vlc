@@ -28,9 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryRepresentedItem : NSObject
 
-@property (readwrite, retain) id<VLCMediaLibraryItemProtocol> item;
-@property (readwrite, retain) id<VLCMediaLibraryItemProtocol> parentItem;
+@property (readonly) id<VLCMediaLibraryItemProtocol> item;
+@property (readonly) id<VLCMediaLibraryItemProtocol> parentItem;
 @property (readonly) NSInteger itemIndexInParent;
+
+- (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item;
 
 @end
 
