@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCTrackingView;
-@class VLCMediaLibraryAlbum;
+@class VLCLibraryRepresentedItem;
 
 @interface VLCLibraryAlbumTableCellView : NSTableCellView<VLCLibraryTableCellViewProtocol>
 
@@ -48,7 +48,7 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
 
 @property (readonly) CGFloat height;
-@property (readwrite, assign, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
+@property (readwrite, assign, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 - (IBAction)playInstantly:(id)sender;
 - (IBAction)detailAction:(id)sender;
