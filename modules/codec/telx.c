@@ -729,18 +729,19 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Create a new subpicture region */
-    p_spu->p_region = subpicture_region_NewText();
-    if( p_spu->p_region == NULL )
+    subpicture_region_t *p_region = subpicture_region_NewText();
+    if( p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
         goto error;
     }
+    p_spu->p_region = p_region;
 
     /* Normal text subs, easy markup */
-    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
-    p_spu->p_region->i_y = 10;
-    p_spu->p_region->p_text = text_segment_New(psz_text);
+    p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+    p_region->i_x = p_sys->i_align ? 20 : 0;
+    p_region->i_y = 10;
+    p_region->p_text = text_segment_New(psz_text);
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
