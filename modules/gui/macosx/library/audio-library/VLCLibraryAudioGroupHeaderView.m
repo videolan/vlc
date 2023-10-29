@@ -48,8 +48,8 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 - (void)updateRepresentation
 {
     if (_representedItem == nil) {
-        _titleTextField.stringValue = @"Unknown";
-        _detailTextField.stringValue = @"Unknown";
+        _titleTextField.stringValue = _NS("Unknown");
+        _detailTextField.stringValue = _NS("Unknown");
         return;
     }
 
