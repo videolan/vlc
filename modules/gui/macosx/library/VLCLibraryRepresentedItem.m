@@ -33,10 +33,12 @@
 @implementation VLCLibraryRepresentedItem
 
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
+                  parentType:(const enum vlc_ml_parent_type)parentType
 {
     self = [self init];
     if (self) {
         _item = item;
+        _parentType = parentType;
     }
     return self;
 }
