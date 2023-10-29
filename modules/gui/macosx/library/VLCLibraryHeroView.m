@@ -29,6 +29,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
@@ -58,12 +59,13 @@
 - (void)updateRepresentedItem
 {
     NSAssert(self.representedItem != nil, @"Should not update nil represented item!");
-    self.largeImageView.image = [VLCLibraryImageCache thumbnailForLibraryItem:self.representedItem];
-    self.titleTextField.stringValue = self.representedItem.displayString;
-    self.detailTextField.stringValue = self.representedItem.detailString;
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+    self.largeImageView.image = [VLCLibraryImageCache thumbnailForLibraryItem:actualItem];
+    self.titleTextField.stringValue = actualItem.displayString;
+    self.detailTextField.stringValue = actualItem.detailString;
 }
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     NSParameterAssert(representedItem != nil);
     if (representedItem == self.representedItem) {
@@ -102,7 +104,8 @@
 {
     VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
     if (latestPartialPlayItem != nil) {
-        self.representedItem = latestPartialPlayItem;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:latestPartialPlayItem parentType:VLC_ML_PARENT_UNKNOWN];
+        self.representedItem = representedItem;;
         self.explanationTextField.stringValue = _NS("Last watched");
         self.playButton.title = _NS("Resume playing");
         return;
@@ -110,7 +113,8 @@
 
     VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
     if (randomItem != nil) {
-        self.representedItem = randomItem;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:VLC_ML_PARENT_UNKNOWN];
+        self.representedItem = representedItem;
         self.explanationTextField.stringValue = _NS("From your library");
         self.playButton.title = _NS("Play now");
         return;
@@ -122,7 +126,7 @@
 - (IBAction)playRepresentedItem:(id)sender
 {
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-    [libraryController appendItemToPlaylist:self.representedItem playImmediately:YES];
+    [libraryController appendItemToPlaylist:self.representedItem.item playImmediately:YES];
 }
 
 @end
