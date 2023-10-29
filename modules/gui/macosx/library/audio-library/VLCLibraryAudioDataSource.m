@@ -770,7 +770,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
 
         VLCMediaLibraryAlbum * const album = self.displayedCollection[indexPath.item];
-        albumSupplementaryDetailView.representedAlbum = album;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:_currentParentType];
+
+        albumSupplementaryDetailView.representedItem = representedItem;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
         albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
@@ -781,8 +783,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         VLCLibraryCollectionViewAudioGroupSupplementaryDetailView* audioGroupSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        id<VLCMediaLibraryAudioGroupProtocol> audioGroup = self.displayedCollection[indexPath.item];
-        audioGroupSupplementaryDetailView.representedAudioGroup = audioGroup;
+        const id<VLCMediaLibraryAudioGroupProtocol> audioGroup = self.displayedCollection[indexPath.item];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:audioGroup parentType:_currentParentType];
+
+        audioGroupSupplementaryDetailView.representedItem = representedItem;
         audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
         audioGroupSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;

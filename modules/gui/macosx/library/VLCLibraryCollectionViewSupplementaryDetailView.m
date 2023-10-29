@@ -99,5 +99,16 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     _internalScrollView.parentScrollView = parentScrollView;
 }
 
-@end
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+{
+    _representedItem = representedItem;
+    [self updateRepresentation];
+}
 
+- (void)updateRepresentation
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return;
+}
+
+@end

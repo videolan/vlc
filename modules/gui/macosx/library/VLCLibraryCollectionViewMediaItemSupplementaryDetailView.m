@@ -66,12 +66,6 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 }
 
-- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-{
-    _representedItem = representedItem;
-    [self updateRepresentation];
-}
-
 - (NSString *)formattedYearAndDurationString
 {
     if (self.representedItem == nil) {

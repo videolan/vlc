@@ -185,7 +185,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
 
         VLCMediaLibraryAlbum * const album = self.representedListOfAlbums[indexPath.item];
-        albumSupplementaryDetailView.representedAlbum = album;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:_parentType];
+
+        albumSupplementaryDetailView.representedItem = representedItem;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
         albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;

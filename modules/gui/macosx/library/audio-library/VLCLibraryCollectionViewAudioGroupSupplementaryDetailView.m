@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupTableViewDelegate.h"
@@ -33,7 +34,7 @@
 NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 
-@interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView () 
+@interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView ()
 {
     VLCLibraryAudioGroupDataSource *_audioGroupAlbumsDataSource;
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupAlbumsTableViewDelegate;
@@ -47,12 +48,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 {
     _audioGroupAlbumsDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
     _audioGroupAlbumsDataSource.tableViews = @[_audioGroupAlbumsTableView];
-    
+
     _audioGroupAlbumsTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
 
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
     _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsTableViewDelegate;
-    
+
     _audioGroupNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -73,8 +74,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 - (void)handleAudioGroupUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    
-    if (_representedAudioGroup == nil ||
+
+    if (self.representedItem == nil ||
         notification.object == nil ||
         ![notification.object conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
 
@@ -82,24 +83,18 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
     }
 
     const id<VLCMediaLibraryAudioGroupProtocol> audioGroup = (id<VLCMediaLibraryAudioGroupProtocol>)notification.object;
-    [self setRepresentedAudioGroup:audioGroup];
-}
-
-- (void)setRepresentedAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedAudioGroup
-{
-    _representedAudioGroup = representedAudioGroup;
-    [self updateRepresentation];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:audioGroup parentType:self.representedItem.parentType];
+    self.representedItem = representedItem;
 }
 
 - (void)updateRepresentation
 {
-    if (_representedAudioGroup == nil) {
-        NSAssert(1, @"no media item assigned for collection view item", nil);
-        return;
-    }
+    NSAssert(self.representedItem != nil, @"no media item assigned for collection view item", nil);
+    const id<VLCMediaLibraryAudioGroupProtocol> audioGroup = (id<VLCMediaLibraryAudioGroupProtocol>)self.representedItem.item;
+    NSAssert(audioGroup != nil, @"audio group should not be nil!");
 
-    _audioGroupNameTextField.stringValue = _representedAudioGroup.displayString;
-    _audioGroupAlbumsDataSource.representedAudioGroup = _representedAudioGroup;
+    _audioGroupNameTextField.stringValue = audioGroup.displayString;
+    _audioGroupAlbumsDataSource.representedAudioGroup = audioGroup;
 }
 
 @end

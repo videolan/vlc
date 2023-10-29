@@ -33,6 +33,7 @@
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
@@ -89,47 +90,41 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 - (void)handleAlbumUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    if (_representedAlbum == nil) {
+    if (self.representedItem == nil) {
         return;
     }
 
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)notification.object;
-    if (album == nil || _representedAlbum.libraryID != album.libraryID) {
+    if (album == nil || self.representedItem.item.libraryID != album.libraryID) {
         return;
     }
 
-    [self setRepresentedAlbum:album];
-}
-
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
-{
-    _representedAlbum = representedAlbum;
-    [self updateRepresentation];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:self.representedItem.parentType];
+    self.representedItem = representedItem;
 }
 
 - (void)updateRepresentation
 {
-    if (_representedAlbum == nil) {
-        NSAssert(1, @"no media item assigned for collection view item", nil);
-        return;
-    }
+    NSAssert(self.representedItem != nil, @"no media item assigned for collection view item", nil);
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
+    NSAssert(album != nil, @"represented item is not an album", nil);
 
-    _albumTitleTextField.stringValue = _representedAlbum.displayString;
-    _albumDetailsTextButton.title = _representedAlbum.artistName;
-    _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
+    _albumTitleTextField.stringValue = album.displayString;
+    _albumDetailsTextButton.title = album.artistName;
+    _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
 
-    const BOOL actionableDetail = self.representedAlbum.actionableDetail;
+    const BOOL actionableDetail = album.actionableDetail;
     self.albumDetailsTextButton.enabled = actionableDetail;
     if (@available(macOS 10.14, *)) {
         self.albumDetailsTextButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:_representedAlbum withCompletion:^(NSImage * const thumbnail) {
+    [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
         self->_albumArtworkImageView.image = thumbnail;
     }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
-    [_tracksDataSource setRepresentedAlbum:_representedAlbum withCompletion:^{
+    [_tracksDataSource setRepresentedAlbum:album withCompletion:^{
         __strong typeof(self) strongSelf = weakSelf;
 
         if (strongSelf) {
@@ -147,7 +142,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     // We want to add all the tracks to the playlist but only play the first one immediately,
     // otherwise we will skip straight to the last track of the last album from the artist
     __block BOOL playImmediately = YES;
-    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
 
         if(playImmediately) {
@@ -162,19 +157,20 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
         _libraryController = VLCMain.sharedInstance.libraryController;
     }
 
-    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
     }];
 }
 
 - (IBAction)detailAction:(id)sender
 {
-    if (!self.representedAlbum.actionableDetail) {
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem;
+    if (album == nil || !album.actionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    id<VLCMediaLibraryItemProtocol> libraryItem = self.representedAlbum.actionableDetailLibraryItem;
+    id<VLCMediaLibraryItemProtocol> libraryItem = album.actionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
