@@ -51,4 +51,13 @@
     return [super initWithDisplayString:displayString withDetailString:detailString];
 }
 
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
+{
+    // Iterate by album
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const childItems = self.albums;
+    for(id<VLCMediaLibraryItemProtocol> childItem in childItems) {
+        [childItem iterateMediaItemsWithBlock:mediaItemBlock];
+    }
+}
+
 @end
