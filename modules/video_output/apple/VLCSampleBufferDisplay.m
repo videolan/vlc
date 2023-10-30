@@ -404,7 +404,7 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 }
 
 static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
-                                 const vlc_render_subpicture *subpicture,
+                                 const const vlc_render_subpicture *subpicture,
                                  const subpicture_region_t *r)
 {
     const float scale_w = (float)(sys->place.width)  / subpicture->i_original_picture_width;
@@ -422,7 +422,7 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
 }
 
 static void UpdateSubpictureRegions(vout_display_t *vd,
-                                    vlc_render_subpicture *subpicture)
+                                    const vlc_render_subpicture *subpicture)
 {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
@@ -465,7 +465,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
     sys.subpicture.regions = regions;
 }
 
-static bool IsSubpictureDrawNeeded(vout_display_t *vd, vlc_render_subpicture *subpicture)
+static bool IsSubpictureDrawNeeded(vout_display_t *vd, const vlc_render_subpicture *subpicture)
 {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
@@ -530,7 +530,7 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, vlc_render_subpicture *su
     return true;
 }
 
-static void RenderSubpicture(vout_display_t *vd, vlc_render_subpicture *spu)
+static void RenderSubpicture(vout_display_t *vd, const vlc_render_subpicture *spu)
 {
     if (!IsSubpictureDrawNeeded(vd, spu))
         return;
@@ -586,7 +586,7 @@ static void PrepareDisplay (vout_display_t *vd) {
 }
 
 static void Prepare (vout_display_t *vd, picture_t *pic,
-                     vlc_render_subpicture *subpicture, vlc_tick_t date)
+                     const vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     PrepareDisplay(vd);
     if (pic) {

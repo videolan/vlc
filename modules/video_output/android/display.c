@@ -115,7 +115,7 @@ static int subpicture_Control(vout_display_t *vd, int query)
 }
 
 static bool subpicture_NeedDraw(vout_display_t *vd,
-                                vlc_render_subpicture *subpicture)
+                                const vlc_render_subpicture *subpicture)
 {
     struct sys *sys = vd->sys;
     struct subpicture *sub = &sys->sub;
@@ -194,7 +194,7 @@ end:
     return true;
 }
 
-static void subpicture_Prepare(vout_display_t *vd, vlc_render_subpicture *subpicture)
+static void subpicture_Prepare(vout_display_t *vd, const vlc_render_subpicture *subpicture)
 {
     struct sys *sys = vd->sys;
     struct subpicture *sub = &sys->sub;
@@ -388,7 +388,7 @@ delete_win:
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    vlc_render_subpicture *subpicture, vlc_tick_t date)
+                    const vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     struct sys *sys = vd->sys;
 

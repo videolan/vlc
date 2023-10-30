@@ -140,7 +140,7 @@ typedef struct vout_display_sys_t
     d3d11_scaler             *scaleProc;
 } vout_display_sys_t;
 
-static void Prepare(vout_display_t *, picture_t *, vlc_render_subpicture *, vlc_tick_t);
+static void Prepare(vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
 static void Display(vout_display_t *, picture_t *);
 
 static int  Direct3D11Open (vout_display_t *, video_format_t *, vlc_video_context *);
@@ -152,7 +152,7 @@ static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
 static void Direct3D11DeleteRegions(int, picture_t **);
-static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, vlc_render_subpicture *);
+static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, const vlc_render_subpicture *);
 
 static int Control(vout_display_t *, int);
 
@@ -515,7 +515,7 @@ static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView
 }
 
 static void PreparePicture(vout_display_t *vd, picture_t *picture,
-                           vlc_render_subpicture *subpicture,
+                           const vlc_render_subpicture *subpicture,
                            vlc_tick_t date)
 {
     VLC_UNUSED(date);
@@ -691,7 +691,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    vlc_render_subpicture *subpicture, vlc_tick_t date)
+                    const vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
@@ -1272,7 +1272,7 @@ static void DestroyPictureQuad(picture_t *p_picture)
 }
 
 static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_count,
-                                   picture_t ***region, vlc_render_subpicture *subpicture)
+                                   picture_t ***region, const vlc_render_subpicture *subpicture)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     D3D11_MAPPED_SUBRESOURCE mappedResource;

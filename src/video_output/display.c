@@ -403,7 +403,7 @@ picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
 }
 
 picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
-                                vlc_render_subpicture *subpic, vlc_tick_t date)
+                                const vlc_render_subpicture *subpic, vlc_tick_t date)
 {
     assert(subpic == NULL); /* TODO */
     picture = vout_ConvertForDisplay(vd, picture);

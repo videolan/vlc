@@ -185,7 +185,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
 }
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
-                    vlc_render_subpicture *subpic,
+                    const vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     const video_format_t *fmt = vd->source;

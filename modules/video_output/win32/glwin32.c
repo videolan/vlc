@@ -69,7 +69,7 @@ typedef struct vout_display_sys_t
     vlc_viewpoint_t       viewpoint;
 } vout_display_sys_t;
 
-static void           Prepare(vout_display_t *, picture_t *, vlc_render_subpicture *, vlc_tick_t);
+static void           Prepare(vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
 
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
@@ -235,7 +235,7 @@ static void Close(vout_display_t *vd)
 
 /* */
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    vlc_render_subpicture *subpicture,
+                    const vlc_render_subpicture *subpicture,
                     vlc_tick_t date)
 {
     VLC_UNUSED(date);

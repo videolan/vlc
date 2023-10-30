@@ -264,7 +264,7 @@ struct vlc_display_operations
      * \param date time when the picture is intended to be shown
      */
     void       (*prepare)(vout_display_t *, picture_t *pic,
-                          struct vlc_render_subpicture *subpic, vlc_tick_t date);
+                          const struct vlc_render_subpicture *subpic, vlc_tick_t date);
 
     /**
      * Displays a picture.
@@ -435,7 +435,7 @@ VLC_API void vout_display_Delete(vout_display_t *);
  * \return The prepared picture is returned, NULL on error.
  */
 VLC_API picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
-                                        struct vlc_render_subpicture *subpic, vlc_tick_t date);
+                                        const struct vlc_render_subpicture *subpic, vlc_tick_t date);
 
 /**
  * Displays a picture.

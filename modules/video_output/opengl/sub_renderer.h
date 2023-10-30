@@ -70,7 +70,7 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr);
  */
 int
 vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
-                            struct vlc_render_subpicture *subpicture);
+                            const struct vlc_render_subpicture *subpicture);
 
 /**
  * Draw the prepared subpicture

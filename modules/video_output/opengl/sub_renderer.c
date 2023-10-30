@@ -221,7 +221,7 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr)
 
 int
 vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
-                            vlc_render_subpicture *subpicture)
+                            const vlc_render_subpicture *subpicture)
 {
     GL_ASSERT_NOERROR(sr->vt);
 

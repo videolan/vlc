@@ -868,7 +868,7 @@ static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
 
 static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                      size_t *count_ptr, d3d_region_t **region,
-                                     vlc_render_subpicture *subpicture)
+                                     const vlc_render_subpicture *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -1120,7 +1120,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    vlc_render_subpicture *subpicture, vlc_tick_t date)
+                    const vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;

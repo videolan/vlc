@@ -214,7 +214,7 @@ static int OpenCcDecoder(vlc_object_t *obj)
 }
 
 static void DisplayPrepare(vout_display_t *vd, picture_t *picture,
-        struct vlc_render_subpicture *subpic, vlc_tick_t date)
+        const struct vlc_render_subpicture *subpic, vlc_tick_t date)
 {
     (void)vd; (void)subpic; (void)date;
 

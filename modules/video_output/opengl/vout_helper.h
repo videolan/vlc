@@ -80,7 +80,7 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture,
-                                struct vlc_render_subpicture *subpicture);
+                                const struct vlc_render_subpicture *subpicture);
 int vout_display_opengl_Display(vout_display_opengl_t *vgl);
 
 int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,

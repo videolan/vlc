@@ -86,7 +86,7 @@ typedef struct vout_display_sys_t
 } vout_display_sys_t;
 
 /* Display callbacks */
-static void PictureRender (vout_display_t *, picture_t *, vlc_render_subpicture *, vlc_tick_t);
+static void PictureRender (vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
 static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int);
 
@@ -289,8 +289,8 @@ static void Close(vout_display_t *vd)
     free (sys);
 }
 
-static void PictureRender (vout_display_t *vd, picture_t *pic, struct
-                           vlc_render_subpicture *subpicture,
+static void PictureRender (vout_display_t *vd, picture_t *pic,
+                           const vlc_render_subpicture *subpicture,
                            vlc_tick_t date)
 {
     VLC_UNUSED(date);

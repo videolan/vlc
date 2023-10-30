@@ -52,7 +52,7 @@ typedef struct vout_display_sys_t
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
-                    struct vlc_render_subpicture *subpic,
+                    const struct vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;

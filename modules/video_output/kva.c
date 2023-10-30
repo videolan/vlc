@@ -142,7 +142,7 @@ struct open_init
 };
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
-                    vlc_render_subpicture *subpic, vlc_tick_t date)
+                    const vlc_render_subpicture *subpic, vlc_tick_t date)
 {
     VLC_UNUSED(subpic);
     VLC_UNUSED(date);

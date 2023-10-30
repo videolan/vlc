@@ -80,7 +80,7 @@ static const struct wl_buffer_listener buffer_cbs =
 };
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
-                    struct vlc_render_subpicture *subpic,
+                    const struct vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     VLC_UNUSED(date);
