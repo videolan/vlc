@@ -25,6 +25,8 @@
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryTableView.h"
 
+#import <vlc_media_library.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
@@ -36,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic, retain, nullable) id<VLCMediaLibraryAudioGroupProtocol> representedAudioGroup;
 @property (readwrite, atomic, retain) NSArray <NSTableView *> *tableViews;
 @property (readwrite, atomic, retain) NSArray <NSCollectionView *> *collectionViews;
+
+@property (readonly) enum vlc_ml_parent_type currentParentType;
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView;
 
