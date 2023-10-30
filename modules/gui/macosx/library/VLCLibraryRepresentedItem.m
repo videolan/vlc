@@ -25,7 +25,11 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryController.h"
+
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
+
+#import "main/VLCMain.h"
 
 @interface VLCLibraryRepresentedItem ()
 {
@@ -151,6 +155,22 @@
 
     _parentItem = [self parentItemForItem:self.item];
     return _parentItem;
+}
+
+- (void)playImmediately:(BOOL)playImmediately
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+
+    // If play immediately, play first item, queue following items
+    // If not then just queue all items
+    __block BOOL startingPlayImmediately = playImmediately;
+    [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:startingPlayImmediately];
+
+        if (startingPlayImmediately) {
+            startingPlayImmediately = NO;
+        }
+    }];
 }
 
 @end
