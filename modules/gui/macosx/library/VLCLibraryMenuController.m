@@ -127,35 +127,6 @@
 }
 
 #pragma mark - actions
-- (void)addToPlaylist:(BOOL)playImmediately
-{
-    if (self.representedItem != nil) {
-        [self addMediaLibraryItemToPlaylist:self.representedItem.item
-                            playImmediately:playImmediately];
-    } else if (_representedInputItem != nil) {
-        [self addInputItemToPlaylist:_representedInputItem
-                     playImmediately:playImmediately];
-    }
-}
-
-- (void)addMediaLibraryItemToPlaylist:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
-                      playImmediately:(BOOL)playImmediately
-{
-    NSParameterAssert(mediaLibraryItem);
-
-    // We want to add all the tracks to the playlist but only play the first one immediately,
-    // otherwise we will skip straight to the last track of the last album from the artist
-    __block BOOL beginPlayImmediately = playImmediately;
-
-    [mediaLibraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* childMediaItem) {
-        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:childMediaItem
-                                                       playImmediately:beginPlayImmediately];
-
-        if(beginPlayImmediately) {
-            beginPlayImmediately = NO;
-        }
-    }];
-}
 
 - (void)addInputItemToPlaylist:(VLCInputItem*)inputItem
                playImmediately:(BOOL)playImmediately
@@ -164,17 +135,26 @@
     [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItem.vlcInputItem
                                                  atPosition:-1
                                               startPlayback:playImmediately];
-
 }
 
 - (void)play:(id)sender
 {
-    [self addToPlaylist:YES];
+    if (self.representedItem != nil) {
+        [self.representedItem play];
+    } else if (self.representedInputItem != nil) {
+        [self addInputItemToPlaylist:self.representedInputItem
+                     playImmediately:YES];
+    }
 }
 
 - (void)appendToPlaylist:(id)sender
 {
-    [self addToPlaylist:NO];
+    if (self.representedInputItem != nil) {
+        [self.representedItem queue];
+    } else if (self.representedInputItem != nil) {
+        [self addInputItemToPlaylist:self.representedInputItem
+                     playImmediately:NO];
+    }
 }
 
 - (void)addMedia:(id)sender
