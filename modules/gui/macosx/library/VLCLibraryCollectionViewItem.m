@@ -49,9 +49,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 @interface VLCLibraryCollectionViewItem()
 {
-    VLCLibraryController *_libraryController;
     VLCLibraryMenuController *_menuController;
-
     NSLayoutConstraint *_videoImageViewAspectRatioConstraint;
 }
 
@@ -187,10 +185,6 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
     _representedItem = representedItem;
     [self updateRepresentation];
 }
@@ -278,31 +272,12 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (IBAction)playInstantly:(id)sender
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    // We want to add all the tracks to the playlist but only play the first one immediately,
-    // otherwise we will skip straight to the last track of the last album from the artist
-    __block BOOL playImmediately = YES;
-    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-
-        if(playImmediately) {
-            playImmediately = NO;
-        }
-    }];
+    [self.representedItem play];
 }
 
 - (IBAction)addToPlaylist:(id)sender
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
-    }];
+    [self.representedItem queue];
 }
 
 -(void)mouseDown:(NSEvent *)theEvent
@@ -312,7 +287,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             _menuController = [[VLCLibraryMenuController alloc] init];
         }
 
-        [_menuController setRepresentedItem:_representedItem];
+        [_menuController setRepresentedItem:self.representedItem.item];
         [_menuController popupMenuWithEvent:theEvent forView:self.view];
     }
 
@@ -325,7 +300,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    [_menuController setRepresentedItem:_representedItem];
+    [_menuController setRepresentedItem:self.representedItem.item];
     [_menuController popupMenuWithEvent:theEvent forView:self.view];
 
     [super rightMouseDown:theEvent];
