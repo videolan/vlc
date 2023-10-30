@@ -28,6 +28,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
@@ -81,7 +82,7 @@
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
-    
+
     _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_mediaItemRequiringMenuItems addObject:playItem];
     [_mediaItemRequiringMenuItems addObject:appendItem];
@@ -115,7 +116,7 @@
     } else if (_representedInputItem != nil) {
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
-        
+
         [self menuItems:_localInputItemRequiringMenuItems setHidden:_representedInputItem.isStream];
     }
 }
@@ -128,8 +129,8 @@
 #pragma mark - actions
 - (void)addToPlaylist:(BOOL)playImmediately
 {
-    if (_representedItem != nil) {
-        [self addMediaLibraryItemToPlaylist:_representedItem
+    if (self.representedItem != nil) {
+        [self addMediaLibraryItemToPlaylist:self.representedItem.item
                             playImmediately:playImmediately];
     } else if (_representedInputItem != nil) {
         [self addInputItemToPlaylist:_representedInputItem
@@ -195,8 +196,8 @@
 
 - (void)revealInFinder:(id)sender
 {
-    if (_representedItem != nil) {
-        [_representedItem revealInFinder];
+    if (self.representedItem != nil) {
+        [self.representedItem.item revealInFinder];
     } else if (_representedInputItem != nil) {
         [_representedInputItem revealInFinder];
     }
@@ -204,8 +205,8 @@
 
 - (void)moveToTrash:(id)sender
 {
-    if (_representedItem != nil) {
-        [_representedItem moveToTrash];
+    if (self.representedItem != nil) {
+        [self.representedItem.item moveToTrash];
     } else if (_representedInputItem != nil) {
         [_representedInputItem moveToTrash];
     }
@@ -217,11 +218,12 @@
         _informationWindowController = [[VLCInformationWindowController alloc] init];
     }
 
-    if (_representedItem != nil) {
-        if ([_representedItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
-            [_informationWindowController setRepresentedMediaLibraryAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)_representedItem];
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+    if (actualItem != nil) {
+        if ([actualItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
+            [_informationWindowController setRepresentedMediaLibraryAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)actualItem];
         } else {
-            [_informationWindowController setRepresentedInputItem:_representedItem.firstMediaItem.inputItem];
+            [_informationWindowController setRepresentedInputItem:actualItem.firstMediaItem.inputItem];
         }
     } else if (_representedInputItem != nil) {
         _informationWindowController.representedInputItem = _representedInputItem;
@@ -230,7 +232,7 @@
     [_informationWindowController toggleWindow:sender];
 }
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)item
 {
     _representedItem = item;
     _representedInputItem = nil;

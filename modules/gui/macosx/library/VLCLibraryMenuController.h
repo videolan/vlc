@@ -25,12 +25,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputItem;
+@class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryMenuController : NSObject
 
 @property (readonly) NSMenu *libraryMenu;
-@property (readwrite, strong, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
+@property (readwrite, strong, nonatomic) VLCLibraryRepresentedItem *representedItem;
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;

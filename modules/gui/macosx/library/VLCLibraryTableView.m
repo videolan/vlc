@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Claudio Cambra <claudio.cambra@gmail.com>
+ * Authors: Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,14 @@
  *****************************************************************************/
 
 #import "VLCLibraryTableView.h"
+
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryRepresentedItem.h"
+
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
+
 #import "media-source/VLCMediaSourceDataSource.h"
 
 @interface VLCLibraryTableView ()
@@ -68,10 +74,21 @@
     }
 
     if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = (id<VLCLibraryTableViewDataSource>)self.dataSource;
-        id<VLCMediaLibraryItemProtocol> mediaLibraryItem = [vlcLibraryDataSource libraryItemAtRow:self.clickedRow
-                                                                                     forTableView:self];
-        [_menuController setRepresentedItem:mediaLibraryItem];
+        enum vlc_ml_parent_type parentType = VLC_ML_PARENT_UNKNOWN;
+
+        if ([self.dataSource isKindOfClass:VLCLibraryAudioDataSource.class]) {
+            VLCLibraryAudioDataSource * const audioDataSource = (VLCLibraryAudioDataSource*)self.dataSource;
+            parentType = audioDataSource.currentParentType;
+        } else if ([self.dataSource isKindOfClass:VLCLibraryAudioGroupDataSource.class]) {
+            VLCLibraryAudioGroupDataSource * const audioGroupDataSource = (VLCLibraryAudioGroupDataSource*)self.dataSource;
+            parentType = audioGroupDataSource.currentParentType;
+        }
+
+        const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = (id<VLCLibraryTableViewDataSource>)self.dataSource;
+        const id<VLCMediaLibraryItemProtocol> mediaLibraryItem = [vlcLibraryDataSource libraryItemAtRow:self.clickedRow
+                                                                                           forTableView:self];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaLibraryItem parentType:parentType];
+        [_menuController setRepresentedItem:representedItem];
     } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
         VLCMediaSourceDataSource *mediaSourceDataSource = (VLCMediaSourceDataSource*)self.dataSource;
         NSAssert(mediaSourceDataSource != nil, @"This should be a valid pointer");
