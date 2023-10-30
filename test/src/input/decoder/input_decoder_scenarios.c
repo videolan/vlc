@@ -482,11 +482,12 @@ static int cc_decoder_decode_common(decoder_t *dec, vlc_frame_t *in,
     subpic->i_start = in->i_pts;
     subpic->i_stop = subpic->i_start + in->i_length;
 
-    subpic->p_region = subpicture_region_NewText();
-    assert(subpic->p_region != NULL);
+    subpicture_region_t *p_region = subpicture_region_NewText();;
+    assert(p_region != NULL);
+    subpic->p_region = p_region;
 
-    subpic->p_region->p_text = text_segment_New(text);
-    assert(subpic->p_region->p_text != NULL);
+    p_region->p_text = text_segment_New(text);
+    assert(p_region->p_text != NULL);
 
     decoder_QueueSub(dec, subpic);
 
