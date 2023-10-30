@@ -178,8 +178,9 @@ static void test_opengl_offscreen(
     subpicture->i_original_picture_width = 4;
     subpicture->i_original_picture_height = 4;
 
-    subpicture->p_region = subpicture_region_ForPicture(&fmt, picture);
-    assert(subpicture->p_region != NULL);
+    subpicture_region_t *p_region = subpicture_region_ForPicture(&fmt, picture);
+    assert(p_region != NULL);
+    subpicture->p_region = p_region;
 
     ret = vlc_gl_sub_renderer_Prepare(sr, subpicture);
     assert(ret == VLC_SUCCESS);
@@ -293,7 +294,7 @@ int main( int argc, char **argv )
         { 2, 1, black },
         { 2, 2, black },
     };
-    test_opengl_offscreen(root, ORIENT_NORMAL, 
+    test_opengl_offscreen(root, ORIENT_NORMAL,
                           points_normal, ARRAY_SIZE(points_normal));
 
     struct test_point points_rotated_90[] = {
