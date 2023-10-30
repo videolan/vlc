@@ -81,7 +81,7 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
 
 void subpicture_Delete( subpicture_t *p_subpic )
 {
-    subpicture_region_ChainDelete( &p_subpic->regions );
+    vlc_spu_regions_Clear( &p_subpic->regions );
 
     if( p_subpic->updater.pf_destroy )
         p_subpic->updater.pf_destroy( p_subpic );
@@ -162,7 +162,7 @@ void subpicture_Update( subpicture_t *p_subpicture,
                           i_ts ) )
         return;
 
-    subpicture_region_ChainDelete( &p_subpicture->regions );
+    vlc_spu_regions_Clear( &p_subpicture->regions );
 
     p_upd->pf_update( p_subpicture, p_fmt_src, p_fmt_dst, i_ts );
 
@@ -313,7 +313,7 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
     free( p_region );
 }
 
-void subpicture_region_ChainDelete( vlc_spu_regions *regions )
+void vlc_spu_regions_Clear( vlc_spu_regions *regions )
 {
     subpicture_region_t *p_head;
     vlc_list_foreach(p_head, regions, node)

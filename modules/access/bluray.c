@@ -1789,7 +1789,7 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
         /* no references to this overlay exist in vo anymore */
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_DELETE_OVERLAY, plane);
 
-        subpicture_region_ChainDelete(&ov->regions);
+        vlc_spu_regions_Clear(&ov->regions);
         free(ov);
 
         p_sys->bdj.p_overlays[plane] = NULL;
@@ -1849,7 +1849,7 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
 
     vlc_mutex_lock(&ov->lock);
 
-    subpicture_region_ChainDelete(&ov->regions);
+    vlc_spu_regions_Clear(&ov->regions);
     ov->status = Outdated;
 
     vlc_mutex_unlock(&ov->lock);

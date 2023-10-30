@@ -910,7 +910,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
 
 failure:
     vlc_mutex_unlock( &p_sys->lock );
-    subpicture_region_ChainDelete( &p_subpic->regions );
+    vlc_spu_regions_Clear( &p_subpic->regions );
 }
 
 static uint32_t GetTigerColor( decoder_t *p_dec, const char *psz_prefix )

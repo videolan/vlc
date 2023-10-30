@@ -409,7 +409,7 @@ subpicture_Delete
 subpicture_New
 subpicture_NewFromPicture
 subpicture_Update
-subpicture_region_ChainDelete
+vlc_spu_regions_Clear
 subpicture_region_Copy
 subpicture_region_Delete
 subpicture_region_New

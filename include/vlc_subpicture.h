@@ -144,12 +144,12 @@ VLC_API subpicture_region_t * subpicture_region_ForPicture( const video_format_t
 VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
 
 /**
- * This function will destroy a list of subpicture regions allocated by
+ * This function will clear a list of subpicture regions allocated by
  * subpicture_region_New.
  *
  * Provided for convenience.
  */
-VLC_API void subpicture_region_ChainDelete( vlc_spu_regions * );
+VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
 
 /**
  * This function will copy a subpicture region to a new allocated one
