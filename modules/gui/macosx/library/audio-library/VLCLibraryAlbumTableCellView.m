@@ -253,17 +253,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
 - (IBAction)playInstantly:(id)sender
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    __block BOOL playImmediately = YES;
-    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
-        [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-        if (playImmediately) {
-            playImmediately = NO;
-        }
-    }];
+    [self.representedItem play];
 }
 
 - (void)detailAction:(id)sender
