@@ -51,7 +51,7 @@
         return nil;
     }
 
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:VLC_ML_PARENT_UNKNOWN]; //TODO
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:vlcDataSource.currentParentType];
     [cellView setRepresentedItem:representedItem];
     return cellView;
 }
