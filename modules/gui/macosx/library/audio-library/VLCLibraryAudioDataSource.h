@@ -67,7 +67,6 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
 
-@property (readonly) enum vlc_ml_parent_type currentParentType;
 @property (readonly) BOOL displayedCollectionUpdating;
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView;

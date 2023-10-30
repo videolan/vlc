@@ -50,6 +50,8 @@
 
 @implementation VLCLibraryAudioGroupDataSource
 
+@synthesize currentParentType = _currentParentType;
+
 + (void)setupCollectionView:(NSCollectionView *)collectionView
 {
     NSNib * const audioGroupHeaderView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryAudioGroupHeaderView"

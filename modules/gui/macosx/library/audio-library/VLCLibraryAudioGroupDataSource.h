@@ -39,8 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, atomic, retain) NSArray <NSTableView *> *tableViews;
 @property (readwrite, atomic, retain) NSArray <NSCollectionView *> *collectionViews;
 
-@property (readonly) enum vlc_ml_parent_type currentParentType;
-
 + (void)setupCollectionView:(NSCollectionView *)collectionView;
 
 @end

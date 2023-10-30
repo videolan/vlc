@@ -108,4 +108,9 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
     return NSNotFound;
 }
 
+- (enum vlc_ml_parent_type)currentParentType
+{
+    return VLC_ML_PARENT_ALBUM;
+}
+
 @end

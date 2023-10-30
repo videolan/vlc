@@ -189,9 +189,9 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     if(!_libraryModel) {
         return;
     }
-    
+
     [_collectionViewFlowLayout resetLayout];
-    
+
     self->_recentsArray = [self.libraryModel listOfRecentMedia];
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
     [self->_groupSelectionTableView reloadData];
@@ -336,7 +336,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
                 break;
         }
     }
-    
+
     return 0;
 }
 
@@ -370,6 +370,11 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
         return NSNotFound;
     }
     return [self indexOfMediaItem:libraryItem.libraryID inArray:_libraryArray];
+}
+
+- (enum vlc_ml_parent_type)currentParentType
+{
+    return VLC_ML_PARENT_UNKNOWN;
 }
 
 @end

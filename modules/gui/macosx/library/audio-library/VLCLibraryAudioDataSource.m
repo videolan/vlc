@@ -82,6 +82,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 @implementation VLCLibraryAudioDataSource
 
+@synthesize currentParentType = _currentParentType;
+
 - (instancetype)init
 {
     self = [super init];
