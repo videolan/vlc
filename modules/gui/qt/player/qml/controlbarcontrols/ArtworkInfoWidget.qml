@@ -21,6 +21,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -32,8 +33,9 @@ AbstractButton {
 
     property bool paintOnly: false
 
-    readonly property real minimumWidth: coverRect.implicitWidth +
-                                         + (leftPadding + rightPadding)
+    Layout.minimumWidth: height
+
+    implicitHeight: 0
 
     property bool _keyPressed: false
 
@@ -92,21 +94,44 @@ AbstractButton {
     // Children
 
     contentItem: RowLayout {
-        spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
+        spacing: VLCStyle.margin_xsmall
 
-        Rectangle {
-            id: coverRect
+        Image {
+            id: coverImage
 
-            implicitWidth: implicitHeight
+            Layout.fillHeight: true
+            Layout.preferredWidth: root.height
 
-            implicitHeight: Math.min(root._preferredHeight, root.maximumHeight)
+            sourceSize.width: root.height
 
-            color: theme.bg.primary
+            source: {
+                if (!paintOnly && Player.artwork && Player.artwork.toString())
+                    return Player.artwork
+                else
+                    return VLCStyle.noArtAlbumCover
+            }
+
+            fillMode: Image.PreserveAspectFit
+
+            asynchronous: true
+
+            Accessible.role: Accessible.Graphic
+            Accessible.name: I18n.qtr("Cover")
+
+            ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
+                             && (root.hovered || root.visualFocus)
+            ToolTip.delay: VLCStyle.delayToolTipAppear
+            ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
+                                                .arg(artistLabel.text)
+                                                .arg(progressIndicator.text)
 
             Widgets.DoubleShadow {
-                anchors.centerIn: cover
-                width: cover.paintedWidth
-                height: cover.paintedHeight
+                anchors.centerIn: coverImage
+                anchors.alignWhenCentered: false
+
+                implicitWidth: coverImage.paintedWidth
+                implicitHeight: coverImage.paintedHeight
+
                 z: -1
 
                 primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
@@ -115,49 +140,24 @@ AbstractButton {
                 secondaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
                 secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
             }
-
-            Widgets.ScaledImage {
-                id: cover
-
-                anchors.fill: parent
-
-                source: {
-                    if (!paintOnly
-                        && Player.artwork
-                        && Player.artwork.toString())
-                        Player.artwork
-                    else
-                        VLCStyle.noArtAlbumCover
-                }
-
-                fillMode: Image.PreserveAspectFit
-
-                asynchronous: true
-
-                Accessible.role: Accessible.Graphic
-                Accessible.name: I18n.qtr("Cover")
-
-                ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
-                                 && (root.hovered || root.visualFocus)
-                ToolTip.delay: VLCStyle.delayToolTipAppear
-                ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
-                                                    .arg(artistLabel.text)
-                                                    .arg(progressIndicator.text)
-            }
         }
 
         ColumnLayout {
             id: infoColumn
 
             Layout.fillWidth: true
-            Layout.preferredHeight: coverRect.height
+            Layout.fillHeight: true
             Layout.minimumWidth: 0.1 // FIXME: Qt layout bug
+
+            spacing: 0
 
             Widgets.MenuLabel {
                 id: titleLabel
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                visible: text.length > 0
 
                 text: {
                     if (paintOnly)
@@ -174,12 +174,18 @@ AbstractButton {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+                BindingCompat on visible {
+                    delayed: (MainCtx.qtVersion() < MainCtx.qtVersionCheck(5, 15, 8))
+                    value: (infoColumn.height > infoColumn.implicitHeight) && (artistLabel.text.length > 0)
+                }
+
                 text: {
                     if (paintOnly)
                         I18n.qtr("Artist")
                     else
                         Player.artist
                 }
+
                 color: theme.fg.secondary
             }
 
@@ -189,7 +195,7 @@ AbstractButton {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                visible: (infoColumn.height >= root._preferredHeight)
+                visible: text.length > 0
 
                 text: {
                     if (paintOnly)

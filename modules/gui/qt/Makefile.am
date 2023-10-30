@@ -930,6 +930,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/TracksPageSubtitle.qml \
 	gui/qt/player/qml/TracksListPage.qml \
 	gui/qt/player/qml/ControlLayout.qml \
+	gui/qt/player/qml/ControlRepeater.qml \
 	gui/qt/player/qml/controlbarcontrols/HighResolutionTimeWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml \

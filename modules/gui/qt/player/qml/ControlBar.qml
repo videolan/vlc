@@ -243,6 +243,9 @@ T.Pane {
             Layout.rightMargin: VLCStyle.margin_large
 
             identifier: root.identifier
+            
+            implicitHeight: MainCtx.pinVideoControls ? VLCStyle.controlLayoutHeightPinned
+                                                     : VLCStyle.controlLayoutHeight
 
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 

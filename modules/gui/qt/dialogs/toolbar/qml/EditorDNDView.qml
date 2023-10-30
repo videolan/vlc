@@ -161,8 +161,9 @@ ListView {
     }
 
     delegate: EditorDNDDelegate {
-        anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
+        height: Math.min((contentItem.implicitHeight > 0) ? contentItem.implicitHeight : Number.MAX_VALUE, VLCStyle.controlLayoutHeight)
 
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         dndView: playerBtnDND
 
         BindingCompat {

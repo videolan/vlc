@@ -30,8 +30,6 @@ T.Control {
 
     // Properties
 
-    property int maximumHeight: VLCStyle.icon_medium
-
     property bool paintOnly: false
 
     readonly property ColorContext colorContext: ColorContext {
@@ -53,9 +51,8 @@ T.Control {
 
     // Settings
 
-    implicitWidth: implicitHeight
-
-    implicitHeight: Math.min(VLCStyle.icon_medium, maximumHeight)
+    implicitWidth: implicitBackgroundWidth + leftInset + rightInset
+    implicitHeight: implicitBackgroundHeight + topInset + bottomInset
 
     scale: (_keyOkPressed || (mouseArea.pressed && cursorInside)) ? 0.95
                                                                   : 1.00
@@ -230,6 +227,9 @@ T.Control {
     }
 
     background: Item {
+        implicitWidth: height
+        implicitHeight: VLCStyle.icon_medium
+
         // TODO: Qt >= 5.15 use inline component for the drop shadows
         Widgets.DropShadowImage {
             id: hoverShadow

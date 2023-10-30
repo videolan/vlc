@@ -318,6 +318,7 @@
         <file alias="PIPPlayer.qml">player/qml/PIPPlayer.qml</file>
         <file alias="PlayerControlLayout.qml">player/qml/PlayerControlLayout.qml</file>
         <file alias="ControlLayout.qml">player/qml/ControlLayout.qml</file>
+        <file alias="ControlRepeater.qml">player/qml/ControlRepeater.qml</file>
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
         <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>
         <file alias="PlayerBlurredBackground.qml">player/qml/PlayerBlurredBackground.qml</file>

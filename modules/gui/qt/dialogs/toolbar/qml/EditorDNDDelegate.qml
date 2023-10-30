@@ -18,6 +18,7 @@
 
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
@@ -35,7 +36,7 @@ Control {
     readonly property int controlId: model.id
     property ListView dndView: null
 
-    readonly property bool dragActive: loader.Drag.active
+    readonly property bool dragActive: contentItem.target.Drag.active
     property alias dropArea: dropArea
 
     property alias containsMouse: mouseArea.containsMouse
@@ -78,9 +79,9 @@ Control {
         }
 
         onPressed: {
-            const pos = mapToItem(loader.parent, mouseX, mouseY)
-            loader.y = pos.y + VLCStyle.dragDelta
-            loader.x = pos.x + VLCStyle.dragDelta
+            const pos = mapToItem(control.contentItem.target.parent, mouseX, mouseY)
+            control.contentItem.target.y = pos.y + VLCStyle.dragDelta
+            control.contentItem.target.x = pos.x + VLCStyle.dragDelta
         }
     }
 
@@ -132,8 +133,6 @@ Control {
     }
 
     background: Rectangle {
-        opacity: Drag.active ? 0.75 : 1.0
-
         color: "transparent"
 
         border.width: VLCStyle.dp(1, VLCStyle.scale)
@@ -145,13 +144,14 @@ Control {
         implicitHeight: loader.implicitHeight
         implicitWidth: loader.implicitWidth
 
+        readonly property Item target: loader
+
         Loader {
             id: loader
 
             parent: Drag.active ? root : control.contentItem
 
-            anchors.horizontalCenter: Drag.active ? undefined : parent.horizontalCenter
-            anchors.verticalCenter:  Drag.active ? undefined : parent.verticalCenter
+            anchors.fill: (parent === control.contentItem) ? parent : undefined
 
             source: PlayerControlbarControls.control(model.id).source
 
@@ -160,10 +160,6 @@ Control {
             onLoaded: {
                 item.paintOnly = true
                 item.enabled = false
-
-                if (!extraWidthAvailable && item.minimumWidth !== undefined) {
-                    item.width = item.minimumWidth
-                }
             }
         }
     }
