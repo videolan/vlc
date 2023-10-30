@@ -43,13 +43,6 @@
 NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind = @"VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier";
 
-@interface VLCLibraryCollectionViewMediaItemSupplementaryDetailView ()
-{
-    VLCLibraryController *_libraryController;
-}
-
-@end
-
 @implementation VLCLibraryCollectionViewMediaItemSupplementaryDetailView
 
 - (void)awakeFromNib
@@ -116,20 +109,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)playAction:(id)sender
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    [_libraryController appendItemToPlaylist:self.representedItem.item playImmediately:YES];
+    [self.representedItem play];
 }
 
 - (IBAction)enqueueAction:(id)sender
 {
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    [_libraryController appendItemToPlaylist:self.representedItem.item playImmediately:NO];
+    [self.representedItem queue];
 }
 
 - (IBAction)detailAction:(id)sender
