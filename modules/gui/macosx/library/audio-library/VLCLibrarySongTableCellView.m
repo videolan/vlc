@@ -83,15 +83,7 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
 - (IBAction)playInstantly:(id)sender
 {
-    if(self.representedItem == nil) {
-        return;
-    }
-
-    if (!_libraryController) {
-        _libraryController = VLCMain.sharedInstance.libraryController;
-    }
-
-    [_libraryController appendItemToPlaylist:self.representedItem.item playImmediately:YES];
+    [self.representedItem play];
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
