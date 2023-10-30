@@ -377,7 +377,7 @@ static int Open (vout_display_t *vd,
 
         // Retain container, released in Close
         sys->container = [container retain];
-    
+
         // Create the CGL context
         CGLContextObj cgl_ctx = vlc_CreateCGLContext();
         if (cgl_ctx == NULL) {
@@ -802,7 +802,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 - (CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask
 {
     CGLPixelFormatObj fmt = CGLGetPixelFormat(_glContext);
-    
+
     return (fmt) ? CGLRetainPixelFormat(fmt) : NULL;
 }
 
