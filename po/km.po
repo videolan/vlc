@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2023-09-05 23:12+0200\n"
+"POT-Creation-Date: 2023-10-30 09:17+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Sam A. T. <qamnott@gmail.com>, 2021\n"
 "Language-Team: Khmer (https://app.transifex.com/yaron/teams/16553/km/)\n"
@@ -43,8 +43,8 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "ជ្រើស \"ជម្រើស​កម្រិត​ខ្ពស់\" ដើម្បី​មើល​ជម្រើស​ទាំងអស់។"
 
 #: include/vlc_config_cat.h:38
-#: modules/gui/macosx/VLCSimplePrefsController.m:233
-#: modules/gui/qt/components/simple_preferences.cpp:239
+#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/qt/components/simple_preferences.cpp:247
 #: modules/gui/qt/menus.cpp:1094
 msgid "Interface"
 msgstr "ចំណុចប្រទាក់"
@@ -74,7 +74,7 @@ msgid "Settings for VLC's control interfaces"
 msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់​វត្ថុ​បញ្ជា VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
-#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/macosx/VLCSimplePrefsController.m:251
 msgid "Hotkeys settings"
 msgstr "ការ​កំណត់​គ្រាប់ចុច​រហ័ស"
 
@@ -83,9 +83,9 @@ msgstr "ការ​កំណត់​គ្រាប់ចុច​រហ័ស
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
-#: modules/gui/macosx/VLCSimplePrefsController.m:235
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
 #: modules/gui/qt/components/info_panels.cpp:572
-#: modules/gui/qt/components/simple_preferences.cpp:241
+#: modules/gui/qt/components/simple_preferences.cpp:249
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
 #: modules/stream_out/es.c:94 modules/stream_out/transcode/transcode.c:182
 #: share/lua/http/dialogs/create_stream.html:150
@@ -147,10 +147,10 @@ msgstr "ការ​កំណត់​អូឌីយ៉ូ​ផ្សេងៗ
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:86
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
-#: modules/gui/macosx/VLCSimplePrefsController.m:380
+#: modules/gui/macosx/VLCSimplePrefsController.m:245
+#: modules/gui/macosx/VLCSimplePrefsController.m:388
 #: modules/gui/qt/components/info_panels.cpp:573
-#: modules/gui/qt/components/simple_preferences.cpp:243
+#: modules/gui/qt/components/simple_preferences.cpp:251
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
@@ -723,7 +723,7 @@ msgstr "កាស"
 #: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
 #: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:991
-#: modules/gui/qt/components/simple_preferences.cpp:386
+#: modules/gui/qt/components/simple_preferences.cpp:394
 msgid "Automatic"
 msgstr "ស្វ័យប្រវត្តិ"
 
@@ -984,7 +984,7 @@ msgstr "កូដិក"
 
 #: src/input/es_out.c:3151 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:98
-#: modules/gui/macosx/VLCSimplePrefsController.m:317
+#: modules/gui/macosx/VLCSimplePrefsController.m:325
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:527
 msgid "Language"
 msgstr "ភាសា"
@@ -1609,7 +1609,7 @@ msgstr ""
 msgid "Media (player) role for operating system policy."
 msgstr ""
 
-#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
+#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:281
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
 msgid "Enable audio"
 msgstr "បើក​អូឌីយ៉ូ"
@@ -1856,7 +1856,7 @@ msgstr ""
 "នេះ​ជា​វិធីសាស្ត្រ​បង្ហាញ​វីដេអូ​ដែល​បាន​ប្រើ​ដោយ VLC ។ ឥរិយាបថ​លំនាំដើម​គឺ​ត្រូវ​ជ្រើស​វិធីសាស្ត្រ​ល្អ​បំផុត​ដែល​"
 "មាន​ដោយ​ស្វ័យប្រវត្តិ។"
 
-#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
+#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:311
 msgid "Enable video"
 msgstr "បើក​វីដេអូ"
@@ -2087,7 +2087,7 @@ msgstr "លាក់​ទស្សន៍ទ្រនិច និង​ឧប�
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
 #: modules/gui/macosx/VLCMainMenu.m:444
-#: modules/gui/macosx/VLCSimplePrefsController.m:378
+#: modules/gui/macosx/VLCSimplePrefsController.m:386
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
@@ -2096,7 +2096,7 @@ msgstr "មិន​ត្របាញ់"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
-#: modules/gui/macosx/VLCSimplePrefsController.m:379
+#: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
 msgstr "របៀប​មិន​ត្របាញ់"
@@ -2139,7 +2139,7 @@ msgstr "បិទ​ធាតុ​រក្សា​អេក្រង់"
 msgid "Disable the screensaver during video playback."
 msgstr "បិទ​ធាតុ​រក្សា​អេក្រង់​នៅ​ពេល​ចាក់​វីដេអូ។"
 
-#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:364
+#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:314
 msgid "Window decorations"
 msgstr "ការ​តុបតែង​បង្អួច"
@@ -2330,7 +2330,7 @@ msgstr ""
 "វា​បង្ខំ​សមាមាត្រ​ម៉ូនីទ័រ។ ម៉ូនីទ័រ​ភាគច្រើន​មាន​ភីកសែល​ការ៉េ (1:1)។ ប្រសិនបើ​អ្នក​មាន​អេក្រង់ 16:9 អ្នក​"
 "អាច​ត្រូវ​ប្ដូរ​វា​ទៅ 4:3 ដើម្បី​រក្សា​សមាមាត្រ។"
 
-#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
+#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:315
 msgid "Skip frames"
 msgstr "រំលង​ស៊ុម"
 
@@ -2475,7 +2475,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:322
 #: modules/gui/macosx/VLCMainMenu.m:602
-#: modules/gui/macosx/VLCSimplePrefsController.m:661
+#: modules/gui/macosx/VLCSimplePrefsController.m:669
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:388
 #: modules/gui/macosx/prefs_widgets.m:1219
@@ -2847,7 +2847,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "អ្នក​អាច​បិទ​ដំណើរការ​រូបភាព​រង​ទាំងស្រុង​បាន។"
 
 #: src/libvlc-module.c:717 src/libvlc-module.c:1674 src/text/iso-639_def.h:146
-#: modules/gui/macosx/VLCSimplePrefsController.m:351
+#: modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 msgid "On Screen Display"
 msgstr "បង្ហាញ​លើ​អេក្រង់"
@@ -3616,7 +3616,7 @@ msgstr ""
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
 
-#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
+#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:342
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:562
 msgid "Allow metadata network access"
@@ -4669,7 +4669,7 @@ msgstr "ត្រួត​គ្នា"
 msgid "Track settings"
 msgstr "ការ​កំណត់​បទ"
 
-#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:322
+#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Playback control"
 msgstr "ការ​គ្រប់គ្រង​ការ​ចាក់​ឡើងវិញ"
 
@@ -5118,10 +5118,10 @@ msgstr "បាន​បរាជ័យ​ក្នុង​កា​របើក
 #: modules/gui/macosx/VLCMainWindow.m:233
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:286
-#: modules/gui/macosx/VLCSimplePrefsController.m:313
-#: modules/gui/macosx/VLCSimplePrefsController.m:384
-#: modules/gui/macosx/VLCSimplePrefsController.m:827
+#: modules/gui/macosx/VLCSimplePrefsController.m:294
+#: modules/gui/macosx/VLCSimplePrefsController.m:321
+#: modules/gui/macosx/VLCSimplePrefsController.m:392
+#: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:791
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:860
@@ -7243,7 +7243,7 @@ msgstr ""
 #: modules/access/smb_common.h:21 modules/access/vnc.c:47
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
-#: modules/gui/macosx/VLCSimplePrefsController.m:278
+#: modules/gui/macosx/VLCSimplePrefsController.m:286
 #: modules/gui/qt/dialogs/external.cpp:203 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
@@ -7261,8 +7261,8 @@ msgstr ""
 #: modules/access/smb_common.h:24 modules/access/vnc.c:48
 #: modules/access_output/http.c:55
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:277
-#: modules/gui/macosx/VLCSimplePrefsController.m:340
+#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/gui/qt/dialogs/external.cpp:208 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
@@ -8181,7 +8181,7 @@ msgstr "ព័ត៌មាន​បញ្ចូល​អេក្រង់"
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:489
 #: modules/gui/macosx/VLCOpenWindowController.m:1118
-#: modules/gui/macosx/VLCSimplePrefsController.m:666
+#: modules/gui/macosx/VLCSimplePrefsController.m:674
 msgid "Screen"
 msgstr "អេក្រង់"
 
@@ -10819,7 +10819,7 @@ msgid "Internal libavcodec codec name"
 msgstr "​កូឌីក​ឈ្មោះ libavcodec ខាង​ក្នុង"
 
 #: modules/codec/avcodec/avcodec.h:109
-#: modules/gui/macosx/VLCSimplePrefsController.m:305
+#: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "រំលង​​តម្រង​រង្វិល​ជុំ​សម្រាប់​ការ​អ៊ិនកូដ H.264"
 
@@ -10832,7 +10832,7 @@ msgstr ""
 "វា​ផ្ដល់​ឲ្យ​នូវ​ការ​បង្កើន​ល្បឿន​ខ្លាំង​សម្រាប់​ស្ទ្រីម​​ការ​កំណត់​ខ្ពស់ ។"
 
 #: modules/codec/avcodec/avcodec.h:114
-#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:311
 msgid "Hardware decoding"
 msgstr "ការ​ឌិកូដ​ផ្នែក​រឹង"
 
@@ -11156,7 +11156,7 @@ msgid "BPG image decoder"
 msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
-#: modules/gui/macosx/VLCSimplePrefsController.m:353 modules/spu/marq.c:108
+#: modules/gui/macosx/VLCSimplePrefsController.m:361 modules/spu/marq.c:108
 #: modules/spu/rss.c:144 modules/gui/qt/ui/video_effects.h:1312
 msgid "Opacity"
 msgstr "ភាព​ស្រអាប់​"
@@ -13914,8 +13914,8 @@ msgstr "លឿន​"
 
 #: modules/codec/x264.c:429 modules/gui/macosx/VLCMainMenu.m:290
 #: modules/gui/macosx/VLCMainMenu.m:392
-#: modules/gui/macosx/VLCSimplePrefsController.m:703
-#: modules/gui/qt/components/simple_preferences.cpp:695
+#: modules/gui/macosx/VLCSimplePrefsController.m:711
+#: modules/gui/qt/components/simple_preferences.cpp:703
 #: modules/misc/gnutls.c:778 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14124,9 +14124,9 @@ msgid "Global Hotkeys interface"
 msgstr "ចំណុច​ប្រទាក់​​គ្រាប់ចុច​រហ័ស​​សកល"
 
 #: modules/control/hotkeys.c:100
-#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/macosx/VLCSimplePrefsController.m:251
 #: modules/gui/qt/components/preferences_widgets.cpp:1136
-#: modules/gui/qt/components/simple_preferences.cpp:249
+#: modules/gui/qt/components/simple_preferences.cpp:257
 msgid "Hotkeys"
 msgstr "គ្រាប់ចុច​រហ័ស"
 
@@ -14827,7 +14827,7 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:85
-#: modules/gui/qt/components/simple_preferences.cpp:694
+#: modules/gui/qt/components/simple_preferences.cpp:702
 msgid "Low latency"
 msgstr "ភាព​មើលមិនឃើញ​ទាប"
 
@@ -16212,7 +16212,7 @@ msgstr "តម្រង"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:276
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:280
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "បែបផែន​អូឌីយ៉ូ"
@@ -16243,8 +16243,8 @@ msgstr "បញ្ចូល​ឈ្មោះ​សម្រាប់​ប្រ
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:489
 #: modules/gui/macosx/VLCMainMenu.m:1164 modules/gui/macosx/VLCOutput.m:414
-#: modules/gui/macosx/VLCSimplePrefsController.m:312
-#: modules/gui/macosx/VLCSimplePrefsController.m:386
+#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:394
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:449
@@ -16310,7 +16310,7 @@ msgid "Add"
 msgstr "បន្ថែម"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:76
-#: modules/gui/macosx/VLCSimplePrefsController.m:288
+#: modules/gui/macosx/VLCSimplePrefsController.m:296
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:297
 msgid "Clear"
 msgstr "សម្អាត"
@@ -16338,7 +16338,7 @@ msgstr "ពេលវេលា"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:337
-#: modules/gui/macosx/VLCSimplePrefsController.m:287
+#: modules/gui/macosx/VLCSimplePrefsController.m:295
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1380
 #: modules/stream_out/chromecast/cast.cpp:1197
@@ -16453,11 +16453,11 @@ msgstr "ជ្រើស​ទីតាំង​បង្ហាញ"
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 #: modules/gui/macosx/VLCOutput.m:67
-#: modules/gui/macosx/VLCSimplePrefsController.m:295
-#: modules/gui/macosx/VLCSimplePrefsController.m:373
+#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:381
 #: modules/gui/macosx/prefs_widgets.m:1126
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:463
+#: modules/gui/qt/components/simple_preferences.cpp:471
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
 #: modules/gui/qt/ui/open.h:279 modules/gui/qt/ui/open_disk.h:304
 #: modules/gui/qt/ui/open_file.h:146 modules/gui/qt/ui/sprefs_audio.h:414
@@ -16665,10 +16665,10 @@ msgid "A SDP export is requested, but no URL is provided."
 msgstr "បាន​ស្នើ​ការ​នាំចេញ SDP ប់ូន្តែ​មិន​បាន​ផ្ដល់ URL ។"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1060
-#: modules/gui/macosx/VLCSimplePrefsController.m:697
-#: modules/gui/macosx/VLCSimplePrefsController.m:725
-#: modules/gui/macosx/VLCSimplePrefsController.m:1258
-#: modules/gui/qt/components/simple_preferences.cpp:692
+#: modules/gui/macosx/VLCSimplePrefsController.m:705
+#: modules/gui/macosx/VLCSimplePrefsController.m:733
+#: modules/gui/macosx/VLCSimplePrefsController.m:1266
+#: modules/gui/qt/components/simple_preferences.cpp:700
 msgid "Custom"
 msgstr "តាម​តម្រូវការ"
 
@@ -16842,7 +16842,7 @@ msgid "Hide Others"
 msgstr "លាក់​ផ្សេងទៀត"
 
 #: modules/gui/macosx/VLCMainMenu.m:351
-#: modules/gui/macosx/VLCSimplePrefsController.m:383
+#: modules/gui/macosx/VLCSimplePrefsController.m:391
 msgid "Show All"
 msgstr "បង្ហាញ​ទាំងអស់​"
 
@@ -17010,12 +17010,12 @@ msgid "Fit to Screen"
 msgstr "សម​ទៅ​នឹង​អេក្រង់"
 
 #: modules/gui/macosx/VLCMainMenu.m:433
-#: modules/gui/macosx/VLCSimplePrefsController.m:363
+#: modules/gui/macosx/VLCSimplePrefsController.m:371
 msgid "Float on Top"
 msgstr "អណ្ដែត​នៅលើ​កំពូល"
 
 #: modules/gui/macosx/VLCMainMenu.m:441 modules/gui/macosx/VLCMainMenu.m:442
-#: modules/gui/macosx/VLCSimplePrefsController.m:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:378
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "Fullscreen Video Device"
 msgstr "ឧបករណ៍​វីដេអូ​ពេញ​អេក្រង់"
@@ -17278,7 +17278,7 @@ msgid "Disc"
 msgstr "ថាស"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
-#: modules/gui/macosx/VLCSimplePrefsController.m:302
+#: modules/gui/macosx/VLCSimplePrefsController.m:310
 #: modules/gui/qt/ui/sprefs_input.h:368
 msgid "Network"
 msgstr "បណ្ដាញ"
@@ -17307,7 +17307,7 @@ msgstr "ចាក់​មេឌៀ​ផ្សេង​ទៀត​ដំណា
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#: modules/gui/macosx/VLCSimplePrefsController.m:345
+#: modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Choose..."
 msgstr "ជ្រើស..."
@@ -17443,7 +17443,7 @@ msgid "Subtitle encoding"
 msgstr "ការ​ដាក់​លេខ​កូដ​ចំណងជើង​រង"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:361
-#: modules/gui/macosx/VLCSimplePrefsController.m:347
+#: modules/gui/macosx/VLCSimplePrefsController.m:355
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Font size"
 msgstr "ទំហំ​ពុម្ពអក្សរ"
@@ -17626,7 +17626,7 @@ msgid "Continue playback?"
 msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:828
+#: modules/gui/macosx/VLCSimplePrefsController.m:836
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
 msgstr "បន្ត"
@@ -17664,105 +17664,105 @@ msgstr "បណ្ដាញ​មូលដ្ឋាន"
 msgid "INTERNET"
 msgstr "អ៊ីនធឺណិត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:233
-#: modules/gui/qt/components/simple_preferences.cpp:239
-#: modules/gui/qt/components/simple_preferences.cpp:719
+#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/qt/components/simple_preferences.cpp:247
+#: modules/gui/qt/components/simple_preferences.cpp:727
 #: modules/gui/qt/dialogs/plugins.cpp:383
 msgid "Interface Settings"
 msgstr "ការ​កំណត់​ចំណុច​ប្រទាក់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:235
-#: modules/gui/qt/components/simple_preferences.cpp:241
-#: modules/gui/qt/components/simple_preferences.cpp:438
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/qt/components/simple_preferences.cpp:249
+#: modules/gui/qt/components/simple_preferences.cpp:446
 msgid "Audio Settings"
 msgstr "ការ​កំណត់​អូឌីយ៉ូ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
-#: modules/gui/qt/components/simple_preferences.cpp:243
-#: modules/gui/qt/components/simple_preferences.cpp:371
+#: modules/gui/macosx/VLCSimplePrefsController.m:245
+#: modules/gui/qt/components/simple_preferences.cpp:251
+#: modules/gui/qt/components/simple_preferences.cpp:379
 msgid "Video Settings"
 msgstr "ការ​កំណត់​វីដេអូ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:239
-#: modules/gui/qt/components/simple_preferences.cpp:245
-#: modules/gui/qt/components/simple_preferences.cpp:860
+#: modules/gui/macosx/VLCSimplePrefsController.m:247
+#: modules/gui/qt/components/simple_preferences.cpp:253
+#: modules/gui/qt/components/simple_preferences.cpp:868
 msgid "Subtitle & On Screen Display Settings"
 msgstr "ការ​កំណត់​ចំណងជើង​រង និង​ការ​បង្ហាញ​លើ​អេក្រង់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/macosx/VLCSimplePrefsController.m:249
 msgid "Input & Codec Settings"
 msgstr "ការ​កំណត់​ព័ត៌មាន​បញ្ចូល និង​ការ​ដាក់​លេខ​កូដ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:274
+#: modules/gui/macosx/VLCSimplePrefsController.m:282
 msgid "General Audio"
 msgstr "អូឌីយ៉ូ​ទូទៅ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:275
+#: modules/gui/macosx/VLCSimplePrefsController.m:283
 msgid "Preferred Audio language"
 msgstr "ភាសា​អូឌីយ៉ូ​ដែល​ចូលចិត្ត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:276
+#: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Enable Last.fm submissions"
 msgstr "បើក​ការ​ដាក់​ស្នើ Last.fm"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:279
+#: modules/gui/macosx/VLCSimplePrefsController.m:287
 msgid "Visualization"
 msgstr "រូបភាព​មើល​ឃើញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:280
+#: modules/gui/macosx/VLCSimplePrefsController.m:288
 msgid "Keep audio level between sessions"
 msgstr "រក្សាទុក​កម្រិត​អូឌីយ៉ូ​រវាង​សម័យ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:281
+#: modules/gui/macosx/VLCSimplePrefsController.m:289
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Always reset audio start level to:"
 msgstr "តែងតែ​កំណត់​កម្រិត​អូឌីយ៉ូ​ចាប់ផ្ដើម​ឡើងវិញ​ទៅ ៖"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:284
+#: modules/gui/macosx/VLCSimplePrefsController.m:292
 #: modules/gui/qt/dialogs/vlm.cpp:492
 msgid "Change"
 msgstr "ផ្លាស់ប្ដូរ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:293
 msgid "Change Hotkey"
 msgstr "ប្ដូរ​គ្រាប់ចុច​រហ័ស"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:289
+#: modules/gui/macosx/VLCSimplePrefsController.m:297
 msgid "Select an action to change the associated hotkey:"
 msgstr "ជ្រើស​សកម្មភាព​ដើម្បី​ផ្លាស់ប្ដូរ​គ្រាប់ចុច​រហ័ស​ដែល​បាន​ភ្ជាប់ ៖"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:298
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "Action"
 msgstr "សកម្មភាព"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:291
+#: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Shortcut"
 msgstr "ផ្លូវកាត់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:294
+#: modules/gui/macosx/VLCSimplePrefsController.m:302
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Record directory or filename"
 msgstr "ថត ឬ​ឈ្មោះ​ឯកសារ​កំណត់ត្រា"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:296
+#: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Directory or filename where the records will be stored"
 msgstr "ថត ឬ​ឈ្មោះ​ឯកសារ​ដែល​នឹង​ត្រូវ​ផ្ទុក​កំណត់ត្រា។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:297
+#: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Repair AVI Files"
 msgstr "ជួសជុល​ឯកសារ AVI"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:298
+#: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Default Caching Level"
 msgstr "កម្រិត​ឃ្លាំង​សម្ងាត់​លំនាំដើម"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:299
+#: modules/gui/macosx/VLCSimplePrefsController.m:307
 #: modules/gui/qt/ui/open.h:263
 msgid "Caching"
 msgstr "ដាក់​ក្នុង​ឃ្លាំង​សម្ងាត់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:300
+#: modules/gui/macosx/VLCSimplePrefsController.m:308
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
@@ -17770,246 +17770,246 @@ msgstr ""
 "ប្រើ​ចំណូលចិត្ត​ពេញលេញ​ ដើម្បី​កំណត់​រចនា​សម្ព័ន្ធ​តម្លៃ​ឃ្លាំង​សម្ងាត់​តាម​តម្រូវការ​សម្រាប់​ម៉ូឌុល​ចូល​ដំណើរការ​នីមួយៗ "
 "។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:301
+#: modules/gui/macosx/VLCSimplePrefsController.m:309
 msgid "Codecs / Muxers"
 msgstr "កូដិក/ឧបករណ៍​ទ្វេ​ទិស"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:304
+#: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Post-Processing Quality"
 msgstr "គុណភាព​ដំណើរការ​តាមក្រោយ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:314
 msgid "Edit default application settings for network protocols"
 msgstr "កែសម្រួល​ការ​កំណត់​កម្មវិធី​លំនាំដើម​សម្រាប់​ពិធីការ​បណ្ដាញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:310
+#: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Open network streams using the following protocols"
 msgstr "បើក​ការ​ស្ទ្រីក​បណ្ដាញ​ដោយ​ប្រើ​ពិធិការ​ដូចខាងក្រោម"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:311
+#: modules/gui/macosx/VLCSimplePrefsController.m:319
 msgid "Note that these are system-wide settings."
 msgstr "ចងចាំ​ថា​ទាំងនេះ​ជា​ការ​កំណត់​​ប្រព័ន្ធ​ទាំងមូល។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:316
+#: modules/gui/macosx/VLCSimplePrefsController.m:324
 msgid "General settings"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:318
+#: modules/gui/macosx/VLCSimplePrefsController.m:326
 msgid "Interface style"
 msgstr "រចនាប័ទ្ម​ចំណុចប្រទាក់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:319
+#: modules/gui/macosx/VLCSimplePrefsController.m:327
 msgid "Dark"
 msgstr "ងងឹត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:328
 msgid "Bright"
 msgstr "ភ្លឺ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:323
+#: modules/gui/macosx/VLCSimplePrefsController.m:331
 msgid "Continue playback"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:324
+#: modules/gui/macosx/VLCSimplePrefsController.m:332
 #: modules/gui/macosx/macosx.m:76
 msgid "Control playback with the Apple Remote"
 msgstr "បញ្ជា​ការ​ចាក់​ឡើងវិញ​ជាមួយ​វត្ថុ​បញ្ជា​ពី​ចម្ងាយ​របស់ Apple"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:325
+#: modules/gui/macosx/VLCSimplePrefsController.m:333
 #: modules/gui/macosx/macosx.m:88
 msgid "Control playback with media keys"
 msgstr "បញ្ជា​ការ​ចាក់​ឡើង​វិញ​ជាមួយ​គ្រាប់ចុច​មេឌៀ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:326
+#: modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/macosx/macosx.m:79
 msgid "Control system volume with the Apple Remote"
 msgstr "គ្រប់គ្រង​កម្រិត​សំឡេង​ប្រព័ន្ធ​ដោយ​ប្រើ​ឧបករណ៍​បញ្ជា​ពី​ចម្ងាយ​របស់ Apple"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:327
+#: modules/gui/macosx/VLCSimplePrefsController.m:335
 #: modules/gui/macosx/macosx.m:82
 msgid "Display VLC status menu icon"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:329
+#: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Playback behaviour"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:330
+#: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Enable notifications on playlist item change"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:331
+#: modules/gui/macosx/VLCSimplePrefsController.m:339
 #: modules/gui/macosx/macosx.m:125
 msgid "Control external music players"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:333
+#: modules/gui/macosx/VLCSimplePrefsController.m:341
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Privacy / Network Interaction"
 msgstr "ភាព​ឯកជន/អន្តរកម្ម​បណ្ដាញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:335
+#: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Automatically check for updates"
 msgstr "ពិនិត្យមើល​បច្ចុប្បន្នភាព​ដោយ​ស្វ័យប្រវត្តិ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:338
+#: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "HTTP web interface"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:339
+#: modules/gui/macosx/VLCSimplePrefsController.m:347
 msgid "Enable HTTP web interface"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:343
+#: modules/gui/macosx/VLCSimplePrefsController.m:351
 msgid "Default Encoding"
 msgstr "ការ​អ៊ិនកូដ​លំនាំដើម"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:344
+#: modules/gui/macosx/VLCSimplePrefsController.m:352
 msgid "Display Settings"
 msgstr "កំណត់​ការ​បង្ហាញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:346
+#: modules/gui/macosx/VLCSimplePrefsController.m:354
 #: modules/gui/qt/ui/sprefs_subtitles.h:300
 msgid "Font color"
 msgstr "ពណ៌​ពុម្ពអក្សរ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:348 modules/spu/marq.c:157
+#: modules/gui/macosx/VLCSimplePrefsController.m:356 modules/spu/marq.c:157
 #: modules/spu/rss.c:204 modules/text_renderer/freetype/freetype.c:80
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Font"
 msgstr "ពុម្ពអក្សរ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:349
+#: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Subtitle languages"
 msgstr "ភាសា​ចំណងជើង​រង"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:350
+#: modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
 msgid "Preferred subtitle language"
 msgstr "ភាសា​ចំណងជើង​រង​ដែល​ចូលចិត្ត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:352
+#: modules/gui/macosx/VLCSimplePrefsController.m:360
 msgid "Enable OSD"
 msgstr "បើក OSD"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:354
+#: modules/gui/macosx/VLCSimplePrefsController.m:362
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
 msgstr "បង្ខំ​ដិត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:355
+#: modules/gui/macosx/VLCSimplePrefsController.m:363
 #: modules/text_renderer/freetype/freetype.c:110
 #: modules/gui/qt/ui/sprefs_subtitles.h:302
 msgid "Outline color"
 msgstr "ពណ៌​គ្រោង"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:356
+#: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/text_renderer/freetype/freetype.c:111
 #: modules/gui/qt/ui/sprefs_subtitles.h:301
 msgid "Outline thickness"
 msgstr "កម្រាស់​គ្រោង"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/VLCSimplePrefsController.m:368
 #: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:312
 msgid "Display"
 msgstr "បង្ហាញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:361
+#: modules/gui/macosx/VLCSimplePrefsController.m:369
 msgid "Show video within the main window"
 msgstr "បង្ហាញ​វីដេអូ​នៅ​ក្នុង​បង្អួច​មេ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:362
+#: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/macosx/macosx.m:104 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
 msgstr "នៅ​ពេល​បង្រួម​អប្បបរមា ផ្អាក​ការ​ចាក់​វីដេអូ​ឡើងវិញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:366
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
 msgid "Fullscreen settings"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:367
+#: modules/gui/macosx/VLCSimplePrefsController.m:375
 msgid "Start in fullscreen"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:368
+#: modules/gui/macosx/VLCSimplePrefsController.m:376
 msgid "Black screens in Fullscreen mode"
 msgstr "អេក្រង់​ខ្មៅ​នៅ​ក្នុង​របៀប​ពេញ​អេក្រង់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:369
+#: modules/gui/macosx/VLCSimplePrefsController.m:377
 #: modules/gui/macosx/macosx.m:95
 msgid "Use the native fullscreen mode"
 msgstr "ប្រើ​របៀប​ពេញ​អេក្រង់​ដើម"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Video snapshots"
 msgstr "រូបថត​វីដេអូ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/VLCSimplePrefsController.m:382
 #: modules/meta_engine/folder.c:70
 msgid "Folder"
 msgstr "ថត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:375
+#: modules/gui/macosx/VLCSimplePrefsController.m:383
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Format"
 msgstr "ទ្រង់ទ្រាយ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:376
+#: modules/gui/macosx/VLCSimplePrefsController.m:384
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Prefix"
 msgstr "បុព្វបទ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:377
+#: modules/gui/macosx/VLCSimplePrefsController.m:385
 #: modules/gui/qt/ui/sprefs_video.h:332
 msgid "Sequential numbering"
 msgstr "ការ​ដាក់​លេខរៀងតាម​លំដាប់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:385
+#: modules/gui/macosx/VLCSimplePrefsController.m:393
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
 msgstr "កំណត់​ឡើងវិញ​ទាំងអស់"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:387
+#: modules/gui/macosx/VLCSimplePrefsController.m:395
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
 msgstr "ចំណូល​ចិត្ត"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:560
+#: modules/gui/macosx/VLCSimplePrefsController.m:568
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:580
+#: modules/gui/macosx/VLCSimplePrefsController.m:588
 msgid "Last check on: %@"
 msgstr "បាន​ពិនិត្យ​មើល​ចុងក្រោយ​នៅ ៖ %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:582
+#: modules/gui/macosx/VLCSimplePrefsController.m:590
 msgid "No check was performed yet."
 msgstr "មិន​ទាន់​មាន​ការ​ពិនិត្យមើល​នៅ​ឡើយ​ទេ ។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:699
+#: modules/gui/macosx/VLCSimplePrefsController.m:707
 msgid "Lowest Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:701
+#: modules/gui/macosx/VLCSimplePrefsController.m:709
 msgid "Low Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:705
+#: modules/gui/macosx/VLCSimplePrefsController.m:713
 msgid "Higher Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:707
+#: modules/gui/macosx/VLCSimplePrefsController.m:715
 msgid "Highest Latency"
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:827
+#: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
 msgstr "កំណត់​ចំណូលចិត្ត​ឡើងវិញ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:830
+#: modules/gui/macosx/VLCSimplePrefsController.m:838
 msgid ""
 "This will reset VLC media player's preferences.\n"
 "\n"
@@ -18030,25 +18030,25 @@ msgstr ""
 "\n"
 "តើ​អ្នក​ពិជា​ចង់​បន្ត​មែន​ឬ?"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1100
+#: modules/gui/macosx/VLCSimplePrefsController.m:1108
 msgid ""
 "This setting cannot be changed because the native fullscreen mode is enabled."
 msgstr ""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1169
+#: modules/gui/macosx/VLCSimplePrefsController.m:1177
 msgid "Choose the folder to save your video snapshots to."
 msgstr "ជ្រើស​ថត​ដើម្បី​រក្សាទុក​រូបថត​វីដេអូ​របស់​អ្នក ។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1171
-#: modules/gui/macosx/VLCSimplePrefsController.m:1270
+#: modules/gui/macosx/VLCSimplePrefsController.m:1179
+#: modules/gui/macosx/VLCSimplePrefsController.m:1278
 msgid "Choose"
 msgstr "ជ្រើសរើស"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1268
+#: modules/gui/macosx/VLCSimplePrefsController.m:1276
 msgid "Choose the directory or filename where the records will be stored."
 msgstr "ជ្រើសរើស​ថត ឬ​ឈ្មោះ​ឯកសារ​ដើម្បី​រក្សាទុក​កំណត់ត្រា ។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1381
+#: modules/gui/macosx/VLCSimplePrefsController.m:1389
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -18056,16 +18056,16 @@ msgstr ""
 "ចុង​គ្រាប់ចុច​ថ្មី​សម្រាប់\n"
 "\"%@\""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1454
+#: modules/gui/macosx/VLCSimplePrefsController.m:1462
 msgid "Invalid combination"
 msgstr "បន្សំ​មិនត្រឹមត្រូវ"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1455
+#: modules/gui/macosx/VLCSimplePrefsController.m:1463
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "គួរ​ឲ្យ​ស្ដាយ គ្រាប់ចុច​ទាំងនេះ​មិន​អាច​កំណត់​ជា​គ្រាប់ចុច​​ផ្លូវ​កាត់រហ័ស​បានទេ ។"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1465
-#: modules/gui/macosx/VLCSimplePrefsController.m:1469
+#: modules/gui/macosx/VLCSimplePrefsController.m:1473
+#: modules/gui/macosx/VLCSimplePrefsController.m:1477
 msgid "This combination is already taken by \"%@\"."
 msgstr "ការ​បន្សំ​នេះ​គឺ​ត្រូវ​បាន​ជ្រើស​រួចហើយ​ដោយ \"%@\" ។"
 
@@ -19771,21 +19771,21 @@ msgstr "គ្រាប់ចុច ឬ​បន្សំ៖"
 msgid "Key: "
 msgstr "គ្រាប់ចុច ៖ "
 
-#: modules/gui/qt/components/simple_preferences.cpp:247
-#: modules/gui/qt/components/simple_preferences.cpp:620
+#: modules/gui/qt/components/simple_preferences.cpp:255
+#: modules/gui/qt/components/simple_preferences.cpp:628
 msgid "Input & Codecs Settings"
 msgstr "ការ​កំណត់​ព័ត៌មាន​បញ្ចូល និង​កូដិក"
 
-#: modules/gui/qt/components/simple_preferences.cpp:249
-#: modules/gui/qt/components/simple_preferences.cpp:904
+#: modules/gui/qt/components/simple_preferences.cpp:257
+#: modules/gui/qt/components/simple_preferences.cpp:912
 msgid "Configure Hotkeys"
 msgstr "កំណត់​រចនា​សម្ព័ន្ធ​គ្រាប់ចុច​រហ័ស"
 
-#: modules/gui/qt/components/simple_preferences.cpp:446
+#: modules/gui/qt/components/simple_preferences.cpp:454
 msgid "Device:"
 msgstr "ឧបករណ៍ ៖"
 
-#: modules/gui/qt/components/simple_preferences.cpp:625
+#: modules/gui/qt/components/simple_preferences.cpp:633
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -19797,54 +19797,54 @@ msgstr ""
 "អ្នក​អាច​កំណត់​ឲ្យ​យូនីក​បាន ឬ​កំណត់​រចនា​សម្ព័ន្ធ​ពួកវា\n"
 "ដាច់​ដោយឡែក​ពី​គ្នា​នៅ​ក្នុង​ចំណូលចិត្ត​កម្រិត​ខ្ពស់ ។"
 
-#: modules/gui/qt/components/simple_preferences.cpp:693
+#: modules/gui/qt/components/simple_preferences.cpp:701
 msgid "Lowest latency"
 msgstr "ភាព​មើល​មិន​ឃើញ​ទាប​បំផុត"
 
-#: modules/gui/qt/components/simple_preferences.cpp:696
+#: modules/gui/qt/components/simple_preferences.cpp:704
 msgid "High latency"
 msgstr "ភាព​មើល​មិន​ឃើញ​ខ្ពស់"
 
-#: modules/gui/qt/components/simple_preferences.cpp:697
+#: modules/gui/qt/components/simple_preferences.cpp:705
 msgid "Higher latency"
 msgstr "ភាព​មើល​មិនឃើញ​ខ្ពស់​ជាង"
 
-#: modules/gui/qt/components/simple_preferences.cpp:745
+#: modules/gui/qt/components/simple_preferences.cpp:753
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "នេះ​ជា​ចំណុច​ប្រទាក់​របស់ VLC ដែល​អាច​ប្ដូរ​ស្បែក​បាន ។ អ្នក​អាច​ទាញ​យក​ស្បែក​​ផ្សេងទៀត​​នៅ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:747
+#: modules/gui/qt/components/simple_preferences.cpp:755
 msgid "VLC skins website"
 msgstr "តំបន់​បណ្ដាញ​ស្បែក VLC"
 
-#: modules/gui/qt/components/simple_preferences.cpp:771
+#: modules/gui/qt/components/simple_preferences.cpp:779
 msgid "System's default"
 msgstr "លំនាំដើម​របស់​ប្រព័ន្ធ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1309
+#: modules/gui/qt/components/simple_preferences.cpp:1317
 msgid "File associations"
 msgstr "ឯកសារ​ដែល​ពាក់ព័ន្ធ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1318
+#: modules/gui/qt/components/simple_preferences.cpp:1326
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "ឯកសារ​អូឌីយ៉ូ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1319
+#: modules/gui/qt/components/simple_preferences.cpp:1327
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "ឯកសារ​វីដេអូ"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1320
+#: modules/gui/qt/components/simple_preferences.cpp:1328
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "ឯកសារ​បញ្ជី​ចាក់"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1385
+#: modules/gui/qt/components/simple_preferences.cpp:1393
 msgid "&Apply"
 msgstr "អនុវត្ត"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1386
+#: modules/gui/qt/components/simple_preferences.cpp:1394
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60

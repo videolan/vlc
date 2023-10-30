@@ -33,7 +33,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2023-09-05 23:12+0200\n"
+"POT-Creation-Date: 2023-10-30 09:17+0100\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Manuela Silva <mmsrs@sky.com>, 2023\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/yaron/"
@@ -67,8 +67,8 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "Selecione “Opções avançadas” para ver todas as opções."
 
 #: include/vlc_config_cat.h:38
-#: modules/gui/macosx/VLCSimplePrefsController.m:233
-#: modules/gui/qt/components/simple_preferences.cpp:239
+#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/qt/components/simple_preferences.cpp:247
 #: modules/gui/qt/menus.cpp:1094
 msgid "Interface"
 msgstr "Interface"
@@ -98,7 +98,7 @@ msgid "Settings for VLC's control interfaces"
 msgstr "Definições para as interfaces de controlo do VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
-#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/macosx/VLCSimplePrefsController.m:251
 msgid "Hotkeys settings"
 msgstr "Definições das teclas de atalho"
 
@@ -107,9 +107,9 @@ msgstr "Definições das teclas de atalho"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
 #: modules/gui/macosx/VLCPlaylistInfo.m:91
-#: modules/gui/macosx/VLCSimplePrefsController.m:235
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
 #: modules/gui/qt/components/info_panels.cpp:572
-#: modules/gui/qt/components/simple_preferences.cpp:241
+#: modules/gui/qt/components/simple_preferences.cpp:249
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
 #: modules/stream_out/es.c:94 modules/stream_out/transcode/transcode.c:182
 #: share/lua/http/dialogs/create_stream.html:150
@@ -172,10 +172,10 @@ msgstr "Módulos e outras definições de áudio."
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
 #: modules/gui/macosx/VLCPlaylistInfo.m:86
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
-#: modules/gui/macosx/VLCSimplePrefsController.m:380
+#: modules/gui/macosx/VLCSimplePrefsController.m:245
+#: modules/gui/macosx/VLCSimplePrefsController.m:388
 #: modules/gui/qt/components/info_panels.cpp:573
-#: modules/gui/qt/components/simple_preferences.cpp:243
+#: modules/gui/qt/components/simple_preferences.cpp:251
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
@@ -774,7 +774,7 @@ msgstr "Auscultadores"
 #: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
 #: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:991
-#: modules/gui/qt/components/simple_preferences.cpp:386
+#: modules/gui/qt/components/simple_preferences.cpp:394
 msgid "Automatic"
 msgstr "Automático"
 
@@ -1042,7 +1042,7 @@ msgstr "Codec"
 
 #: src/input/es_out.c:3151 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:98
-#: modules/gui/macosx/VLCSimplePrefsController.m:317
+#: modules/gui/macosx/VLCSimplePrefsController.m:325
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:527
 msgid "Language"
 msgstr "Idioma"
@@ -1679,7 +1679,7 @@ msgid "Media (player) role for operating system policy."
 msgstr ""
 "Função de multimédia (reprodutor) para a política do sistema operativo."
 
-#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
+#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:281
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
 msgid "Enable audio"
 msgstr "Ativar áudio"
@@ -1945,7 +1945,7 @@ msgstr ""
 "Este é o método de saída de vídeo utilizado pelo VLC. O comportamento "
 "predefinido é para selecionar automaticamente o melhor método disponível."
 
-#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
+#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:367
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:311
 msgid "Enable video"
 msgstr "Ativar vídeo"
@@ -2196,7 +2196,7 @@ msgstr ""
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
 #: modules/gui/macosx/VLCMainMenu.m:444
-#: modules/gui/macosx/VLCSimplePrefsController.m:378
+#: modules/gui/macosx/VLCSimplePrefsController.m:386
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
@@ -2205,7 +2205,7 @@ msgstr "Desentrelaçar"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
-#: modules/gui/macosx/VLCSimplePrefsController.m:379
+#: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
 msgstr "Modo de desentrelaçar"
@@ -2248,7 +2248,7 @@ msgstr "Desativar protetor de ecrã"
 msgid "Disable the screensaver during video playback."
 msgstr "Desativa o protetor de ecrã durante a reprodução de vídeo."
 
-#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:364
+#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:314
 msgid "Window decorations"
 msgstr "Decorações de janela"
@@ -2454,7 +2454,7 @@ msgstr ""
 "quadrados (1:1). Se tem um ecrã 16:9, pode ter de alterar esta proporção "
 "para 4:3 de forma a manter a imagem proporcional."
 
-#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
+#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:315
 msgid "Skip frames"
 msgstr "Ignorar fotogramas"
 
@@ -2611,7 +2611,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:322
 #: modules/gui/macosx/VLCMainMenu.m:602
-#: modules/gui/macosx/VLCSimplePrefsController.m:661
+#: modules/gui/macosx/VLCSimplePrefsController.m:669
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:388
 #: modules/gui/macosx/prefs_widgets.m:1219
@@ -3006,7 +3006,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "Pode desativar completamente o processamento de sub-imagens."
 
 #: src/libvlc-module.c:717 src/libvlc-module.c:1674 src/text/iso-639_def.h:146
-#: modules/gui/macosx/VLCSimplePrefsController.m:351
+#: modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 msgid "On Screen Display"
 msgstr "Visualização no ecrã (OSD)"
@@ -3843,7 +3843,7 @@ msgstr "Tempo limite da pré-análise"
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr "Tempo máximo em milissegundos para pré-analisar um item"
 
-#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
+#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:342
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:562
 msgid "Allow metadata network access"
@@ -4934,7 +4934,7 @@ msgstr "Sobreposições"
 msgid "Track settings"
 msgstr "Definições de faixa"
 
-#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:322
+#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Playback control"
 msgstr "Controlo da reprodução"
 
@@ -5385,10 +5385,10 @@ msgstr "Erro ao abrir \"%s\" para gravar"
 #: modules/gui/macosx/VLCMainWindow.m:233
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:286
-#: modules/gui/macosx/VLCSimplePrefsController.m:313
-#: modules/gui/macosx/VLCSimplePrefsController.m:384
-#: modules/gui/macosx/VLCSimplePrefsController.m:827
+#: modules/gui/macosx/VLCSimplePrefsController.m:294
+#: modules/gui/macosx/VLCSimplePrefsController.m:321
+#: modules/gui/macosx/VLCSimplePrefsController.m:392
+#: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:791
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:860
@@ -7593,7 +7593,7 @@ msgstr "Incluir dispositivos e pipes ao listar pastas"
 #: modules/access/smb_common.h:21 modules/access/vnc.c:47
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
-#: modules/gui/macosx/VLCSimplePrefsController.m:278
+#: modules/gui/macosx/VLCSimplePrefsController.m:286
 #: modules/gui/qt/dialogs/external.cpp:203 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
@@ -7613,8 +7613,8 @@ msgstr ""
 #: modules/access/smb_common.h:24 modules/access/vnc.c:48
 #: modules/access_output/http.c:55
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:277
-#: modules/gui/macosx/VLCSimplePrefsController.m:340
+#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/gui/qt/dialogs/external.cpp:208 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
@@ -8568,7 +8568,7 @@ msgstr "Entrada do ecrã"
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:489
 #: modules/gui/macosx/VLCOpenWindowController.m:1118
-#: modules/gui/macosx/VLCSimplePrefsController.m:666
+#: modules/gui/macosx/VLCSimplePrefsController.m:674
 msgid "Screen"
 msgstr "Ecrã"
 
@@ -11291,7 +11291,7 @@ msgid "Internal libavcodec codec name"
 msgstr "Nome interno do codec libavcodec"
 
 #: modules/codec/avcodec/avcodec.h:109
-#: modules/gui/macosx/VLCSimplePrefsController.m:305
+#: modules/gui/macosx/VLCSimplePrefsController.m:313
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "Ignorar o filtro cíclico para descodificação H.264"
 
@@ -11304,7 +11304,7 @@ msgstr ""
 "qualidade. No entanto aumenta a velocidade em transmissões de alta definição."
 
 #: modules/codec/avcodec/avcodec.h:114
-#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:311
 msgid "Hardware decoding"
 msgstr "Descodificação por hardware"
 
@@ -11646,7 +11646,7 @@ msgid "BPG image decoder"
 msgstr "Descodificador de vídeo BPG"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
-#: modules/gui/macosx/VLCSimplePrefsController.m:353 modules/spu/marq.c:108
+#: modules/gui/macosx/VLCSimplePrefsController.m:361 modules/spu/marq.c:108
 #: modules/spu/rss.c:144 modules/gui/qt/ui/video_effects.h:1312
 msgid "Opacity"
 msgstr "Opacidade"
@@ -14577,8 +14577,8 @@ msgstr "Rápido"
 
 #: modules/codec/x264.c:429 modules/gui/macosx/VLCMainMenu.m:290
 #: modules/gui/macosx/VLCMainMenu.m:392
-#: modules/gui/macosx/VLCSimplePrefsController.m:703
-#: modules/gui/qt/components/simple_preferences.cpp:695
+#: modules/gui/macosx/VLCSimplePrefsController.m:711
+#: modules/gui/qt/components/simple_preferences.cpp:703
 #: modules/misc/gnutls.c:778 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14790,9 +14790,9 @@ msgid "Global Hotkeys interface"
 msgstr "Interface das teclas globais de atalho"
 
 #: modules/control/hotkeys.c:100
-#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/macosx/VLCSimplePrefsController.m:251
 #: modules/gui/qt/components/preferences_widgets.cpp:1136
-#: modules/gui/qt/components/simple_preferences.cpp:249
+#: modules/gui/qt/components/simple_preferences.cpp:257
 msgid "Hotkeys"
 msgstr "Teclas de atalho"
 
@@ -15512,7 +15512,7 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr "Conectar usando aceso HTTP em vez de código personalizado HTTP"
 
 #: modules/demux/adaptive/adaptive.cpp:85
-#: modules/gui/qt/components/simple_preferences.cpp:694
+#: modules/gui/qt/components/simple_preferences.cpp:702
 msgid "Low latency"
 msgstr "Latência baixa"
 
@@ -16944,7 +16944,7 @@ msgstr "Filtro"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:276
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:280
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "Efeitos de áudio"
@@ -16975,8 +16975,8 @@ msgstr "Digite um nome para o novo perfil:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:489
 #: modules/gui/macosx/VLCMainMenu.m:1164 modules/gui/macosx/VLCOutput.m:414
-#: modules/gui/macosx/VLCSimplePrefsController.m:312
-#: modules/gui/macosx/VLCSimplePrefsController.m:386
+#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:394
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:449
@@ -17042,7 +17042,7 @@ msgid "Add"
 msgstr "Adicionar"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:76
-#: modules/gui/macosx/VLCSimplePrefsController.m:288
+#: modules/gui/macosx/VLCSimplePrefsController.m:296
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:297
 msgid "Clear"
 msgstr "Limpar "
@@ -17070,7 +17070,7 @@ msgstr "Tempo"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 #: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:337
-#: modules/gui/macosx/VLCSimplePrefsController.m:287
+#: modules/gui/macosx/VLCSimplePrefsController.m:295
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1380
 #: modules/stream_out/chromecast/cast.cpp:1197
@@ -17188,11 +17188,11 @@ msgstr "Escolher uma localização de saída"
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 #: modules/gui/macosx/VLCOutput.m:67
-#: modules/gui/macosx/VLCSimplePrefsController.m:295
-#: modules/gui/macosx/VLCSimplePrefsController.m:373
+#: modules/gui/macosx/VLCSimplePrefsController.m:303
+#: modules/gui/macosx/VLCSimplePrefsController.m:381
 #: modules/gui/macosx/prefs_widgets.m:1126
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:463
+#: modules/gui/qt/components/simple_preferences.cpp:471
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
 #: modules/gui/qt/ui/open.h:279 modules/gui/qt/ui/open_disk.h:304
 #: modules/gui/qt/ui/open_file.h:146 modules/gui/qt/ui/sprefs_audio.h:414
@@ -17403,10 +17403,10 @@ msgid "A SDP export is requested, but no URL is provided."
 msgstr "É necessária uma exportação SDP mas não foi fornecido nenhum URL."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1060
-#: modules/gui/macosx/VLCSimplePrefsController.m:697
-#: modules/gui/macosx/VLCSimplePrefsController.m:725
-#: modules/gui/macosx/VLCSimplePrefsController.m:1258
-#: modules/gui/qt/components/simple_preferences.cpp:692
+#: modules/gui/macosx/VLCSimplePrefsController.m:705
+#: modules/gui/macosx/VLCSimplePrefsController.m:733
+#: modules/gui/macosx/VLCSimplePrefsController.m:1266
+#: modules/gui/qt/components/simple_preferences.cpp:700
 msgid "Custom"
 msgstr "Personalizado"
 
@@ -17581,7 +17581,7 @@ msgid "Hide Others"
 msgstr "Ocultar outras aplicações"
 
 #: modules/gui/macosx/VLCMainMenu.m:351
-#: modules/gui/macosx/VLCSimplePrefsController.m:383
+#: modules/gui/macosx/VLCSimplePrefsController.m:391
 msgid "Show All"
 msgstr "Mostrar tudo"
 
@@ -17749,12 +17749,12 @@ msgid "Fit to Screen"
 msgstr "Ajustar ao ecrã"
 
 #: modules/gui/macosx/VLCMainMenu.m:433
-#: modules/gui/macosx/VLCSimplePrefsController.m:363
+#: modules/gui/macosx/VLCSimplePrefsController.m:371
 msgid "Float on Top"
 msgstr "Sobrepor a todas as janelas"
 
 #: modules/gui/macosx/VLCMainMenu.m:441 modules/gui/macosx/VLCMainMenu.m:442
-#: modules/gui/macosx/VLCSimplePrefsController.m:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:378
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "Fullscreen Video Device"
 msgstr "Dispositivo de vídeo em ecrã completo"
@@ -18024,7 +18024,7 @@ msgid "Disc"
 msgstr "Disco"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
-#: modules/gui/macosx/VLCSimplePrefsController.m:302
+#: modules/gui/macosx/VLCSimplePrefsController.m:310
 #: modules/gui/qt/ui/sprefs_input.h:368
 msgid "Network"
 msgstr "Rede"
@@ -18053,7 +18053,7 @@ msgstr "Reproduzir outra média simultaneamente"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#: modules/gui/macosx/VLCSimplePrefsController.m:345
+#: modules/gui/macosx/VLCSimplePrefsController.m:353
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Choose..."
 msgstr "Escolher..."
@@ -18194,7 +18194,7 @@ msgid "Subtitle encoding"
 msgstr "Codificação das legendas"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:361
-#: modules/gui/macosx/VLCSimplePrefsController.m:347
+#: modules/gui/macosx/VLCSimplePrefsController.m:355
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Font size"
 msgstr "Tamanho do tipo de letra"
@@ -18377,7 +18377,7 @@ msgid "Continue playback?"
 msgstr "Continuar reprodução?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:828
+#: modules/gui/macosx/VLCSimplePrefsController.m:836
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
 msgstr "Continuar"
@@ -18415,105 +18415,105 @@ msgstr "REDE LOCAL"
 msgid "INTERNET"
 msgstr "INTERNET"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:233
-#: modules/gui/qt/components/simple_preferences.cpp:239
-#: modules/gui/qt/components/simple_preferences.cpp:719
+#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/qt/components/simple_preferences.cpp:247
+#: modules/gui/qt/components/simple_preferences.cpp:727
 #: modules/gui/qt/dialogs/plugins.cpp:383
 msgid "Interface Settings"
 msgstr "Definições da Interface"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:235
-#: modules/gui/qt/components/simple_preferences.cpp:241
-#: modules/gui/qt/components/simple_preferences.cpp:438
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
+#: modules/gui/qt/components/simple_preferences.cpp:249
+#: modules/gui/qt/components/simple_preferences.cpp:446
 msgid "Audio Settings"
 msgstr "Definições de Áudio"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
-#: modules/gui/qt/components/simple_preferences.cpp:243
-#: modules/gui/qt/components/simple_preferences.cpp:371
+#: modules/gui/macosx/VLCSimplePrefsController.m:245
+#: modules/gui/qt/components/simple_preferences.cpp:251
+#: modules/gui/qt/components/simple_preferences.cpp:379
 msgid "Video Settings"
 msgstr "Definições de Vídeo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:239
-#: modules/gui/qt/components/simple_preferences.cpp:245
-#: modules/gui/qt/components/simple_preferences.cpp:860
+#: modules/gui/macosx/VLCSimplePrefsController.m:247
+#: modules/gui/qt/components/simple_preferences.cpp:253
+#: modules/gui/qt/components/simple_preferences.cpp:868
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Definições de legendas e visualização no ecrã (OSD)"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:241
+#: modules/gui/macosx/VLCSimplePrefsController.m:249
 msgid "Input & Codec Settings"
 msgstr "Definições de entrada e codec"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:274
+#: modules/gui/macosx/VLCSimplePrefsController.m:282
 msgid "General Audio"
 msgstr "Áudio geral"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:275
+#: modules/gui/macosx/VLCSimplePrefsController.m:283
 msgid "Preferred Audio language"
 msgstr "Idioma preferido do áudio"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:276
+#: modules/gui/macosx/VLCSimplePrefsController.m:284
 msgid "Enable Last.fm submissions"
 msgstr "Ativar submissões para Last.fm"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:279
+#: modules/gui/macosx/VLCSimplePrefsController.m:287
 msgid "Visualization"
 msgstr "Visualização"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:280
+#: modules/gui/macosx/VLCSimplePrefsController.m:288
 msgid "Keep audio level between sessions"
 msgstr "Manter nível de áudio entre sessões"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:281
+#: modules/gui/macosx/VLCSimplePrefsController.m:289
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Always reset audio start level to:"
 msgstr "Repor sempre o nível de áudio inicial para:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:284
+#: modules/gui/macosx/VLCSimplePrefsController.m:292
 #: modules/gui/qt/dialogs/vlm.cpp:492
 msgid "Change"
 msgstr "Alterar"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:293
 msgid "Change Hotkey"
 msgstr "Alterar tecla de atalho"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:289
+#: modules/gui/macosx/VLCSimplePrefsController.m:297
 msgid "Select an action to change the associated hotkey:"
 msgstr "Selecione uma ação para alterar a tecla de atalho associada:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:298
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "Action"
 msgstr "Ação"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:291
+#: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Shortcut"
 msgstr "Atalho"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:294
+#: modules/gui/macosx/VLCSimplePrefsController.m:302
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Record directory or filename"
 msgstr "Pasta ou nome do ficheiro do registo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:296
+#: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Directory or filename where the records will be stored"
 msgstr "Pasta ou nome do ficheiro onde os registos serão armazenados"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:297
+#: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Repair AVI Files"
 msgstr "Reparar ficheiros AVI"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:298
+#: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Default Caching Level"
 msgstr "Nível predefinido da cache"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:299
+#: modules/gui/macosx/VLCSimplePrefsController.m:307
 #: modules/gui/qt/ui/open.h:263
 msgid "Caching"
 msgstr "Caching"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:300
+#: modules/gui/macosx/VLCSimplePrefsController.m:308
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
@@ -18521,212 +18521,212 @@ msgstr ""
 "Utiliza as preferências avançadas para configurar um valor personalizado da "
 "cache para cada módulo de acesso."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:301
+#: modules/gui/macosx/VLCSimplePrefsController.m:309
 msgid "Codecs / Muxers"
 msgstr "Codecs / multiplexadores"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:304
+#: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Post-Processing Quality"
 msgstr "Qualidade do pós-processamento"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:306
+#: modules/gui/macosx/VLCSimplePrefsController.m:314
 msgid "Edit default application settings for network protocols"
 msgstr "Editar definições da aplicação predefinida para os protocolos de rede"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:310
+#: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Open network streams using the following protocols"
 msgstr "Abrir transmissões de rede utilizando os seguintes protocolos"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:311
+#: modules/gui/macosx/VLCSimplePrefsController.m:319
 msgid "Note that these are system-wide settings."
 msgstr "Note que estas são as definições de todo o sistema."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:316
+#: modules/gui/macosx/VLCSimplePrefsController.m:324
 msgid "General settings"
 msgstr "Definições gerais"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:318
+#: modules/gui/macosx/VLCSimplePrefsController.m:326
 msgid "Interface style"
 msgstr "Estilo da interface"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:319
+#: modules/gui/macosx/VLCSimplePrefsController.m:327
 msgid "Dark"
 msgstr "Escuro"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:328
 msgid "Bright"
 msgstr "Claro"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:323
+#: modules/gui/macosx/VLCSimplePrefsController.m:331
 msgid "Continue playback"
 msgstr "Continuar última reprodução"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:324
+#: modules/gui/macosx/VLCSimplePrefsController.m:332
 #: modules/gui/macosx/macosx.m:76
 msgid "Control playback with the Apple Remote"
 msgstr "Controlar a reprodução com o Apple Remote"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:325
+#: modules/gui/macosx/VLCSimplePrefsController.m:333
 #: modules/gui/macosx/macosx.m:88
 msgid "Control playback with media keys"
 msgstr "Controlar a reprodução com as teclas de multimédia"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:326
+#: modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/macosx/macosx.m:79
 msgid "Control system volume with the Apple Remote"
 msgstr "Controlar volume do sistema com o Apple Remote"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:327
+#: modules/gui/macosx/VLCSimplePrefsController.m:335
 #: modules/gui/macosx/macosx.m:82
 msgid "Display VLC status menu icon"
 msgstr "Mostrar o VLC barra de menus"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:329
+#: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Playback behaviour"
 msgstr "Comportamento da reprodução"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:330
+#: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "Enable notifications on playlist item change"
 msgstr "Ativar notificações ao alterar item na lista de reprodução"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:331
+#: modules/gui/macosx/VLCSimplePrefsController.m:339
 #: modules/gui/macosx/macosx.m:125
 msgid "Control external music players"
 msgstr "Controlar reprodutores de música externos"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:333
+#: modules/gui/macosx/VLCSimplePrefsController.m:341
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Privacy / Network Interaction"
 msgstr "Privacidade e interação na rede"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:335
+#: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Automatically check for updates"
 msgstr "Procurar atualizações automaticamente"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:338
+#: modules/gui/macosx/VLCSimplePrefsController.m:346
 msgid "HTTP web interface"
 msgstr "Interface web HTTP"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:339
+#: modules/gui/macosx/VLCSimplePrefsController.m:347
 msgid "Enable HTTP web interface"
 msgstr "Ativar interface web HTTP"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:343
+#: modules/gui/macosx/VLCSimplePrefsController.m:351
 msgid "Default Encoding"
 msgstr "Codificação padrão"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:344
+#: modules/gui/macosx/VLCSimplePrefsController.m:352
 msgid "Display Settings"
 msgstr "Definições de visualização"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:346
+#: modules/gui/macosx/VLCSimplePrefsController.m:354
 #: modules/gui/qt/ui/sprefs_subtitles.h:300
 msgid "Font color"
 msgstr "Cor do tipo de letra"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:348 modules/spu/marq.c:157
+#: modules/gui/macosx/VLCSimplePrefsController.m:356 modules/spu/marq.c:157
 #: modules/spu/rss.c:204 modules/text_renderer/freetype/freetype.c:80
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Font"
 msgstr "Tipo de letra"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:349
+#: modules/gui/macosx/VLCSimplePrefsController.m:357
 msgid "Subtitle languages"
 msgstr "Idioma da legenda"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:350
+#: modules/gui/macosx/VLCSimplePrefsController.m:358
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
 msgid "Preferred subtitle language"
 msgstr "Idioma preferencial para legendas"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:352
+#: modules/gui/macosx/VLCSimplePrefsController.m:360
 msgid "Enable OSD"
 msgstr "Ativar visualização no ecrã (OSD)"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:354
+#: modules/gui/macosx/VLCSimplePrefsController.m:362
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
 msgstr "Forçar negrito"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:355
+#: modules/gui/macosx/VLCSimplePrefsController.m:363
 #: modules/text_renderer/freetype/freetype.c:110
 #: modules/gui/qt/ui/sprefs_subtitles.h:302
 msgid "Outline color"
 msgstr "Cor do contorno"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:356
+#: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/text_renderer/freetype/freetype.c:111
 #: modules/gui/qt/ui/sprefs_subtitles.h:301
 msgid "Outline thickness"
 msgstr "Espessura do contorno"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/VLCSimplePrefsController.m:368
 #: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:312
 msgid "Display"
 msgstr "Visualização"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:361
+#: modules/gui/macosx/VLCSimplePrefsController.m:369
 msgid "Show video within the main window"
 msgstr "Mostrar vídeos dentro da janela principal"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:362
+#: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/macosx/macosx.m:104 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
 msgstr "Pausar a reprodução de vídeo quando for minimizado"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:366
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
 msgid "Fullscreen settings"
 msgstr "Definições de ecrã completo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:367
+#: modules/gui/macosx/VLCSimplePrefsController.m:375
 msgid "Start in fullscreen"
 msgstr "Iniciar em ecrã completo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:368
+#: modules/gui/macosx/VLCSimplePrefsController.m:376
 msgid "Black screens in Fullscreen mode"
 msgstr "Ecrãs pretos no modo de Ecrã Completo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:369
+#: modules/gui/macosx/VLCSimplePrefsController.m:377
 #: modules/gui/macosx/macosx.m:95
 msgid "Use the native fullscreen mode"
 msgstr "Utilizar o modo nativo de ecrã completo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Video snapshots"
 msgstr "Capturas de ecrã de vídeos"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/VLCSimplePrefsController.m:382
 #: modules/meta_engine/folder.c:70
 msgid "Folder"
 msgstr "Pasta"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:375
+#: modules/gui/macosx/VLCSimplePrefsController.m:383
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Format"
 msgstr "Formato"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:376
+#: modules/gui/macosx/VLCSimplePrefsController.m:384
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Prefix"
 msgstr "Prefixo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:377
+#: modules/gui/macosx/VLCSimplePrefsController.m:385
 #: modules/gui/qt/ui/sprefs_video.h:332
 msgid "Sequential numbering"
 msgstr "Numeração sequencial"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:385
+#: modules/gui/macosx/VLCSimplePrefsController.m:393
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
 msgstr "Repor tudo"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:387
+#: modules/gui/macosx/VLCSimplePrefsController.m:395
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
 msgstr "Preferências"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:560
+#: modules/gui/macosx/VLCSimplePrefsController.m:568
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
@@ -18734,36 +18734,36 @@ msgstr ""
 "recentes\" está desativada. Para a ativar aceda a \"Menu VLC > Preferências… "
 "> Mostrar tudo > Interface > Interfaces principais > Mac OS X\"."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:580
+#: modules/gui/macosx/VLCSimplePrefsController.m:588
 msgid "Last check on: %@"
 msgstr "Última procura em: %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:582
+#: modules/gui/macosx/VLCSimplePrefsController.m:590
 msgid "No check was performed yet."
 msgstr "Ainda não foi feita nenhuma procura."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:699
+#: modules/gui/macosx/VLCSimplePrefsController.m:707
 msgid "Lowest Latency"
 msgstr "Latência mais baixa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:701
+#: modules/gui/macosx/VLCSimplePrefsController.m:709
 msgid "Low Latency"
 msgstr "Latência baixa"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:705
+#: modules/gui/macosx/VLCSimplePrefsController.m:713
 msgid "Higher Latency"
 msgstr "Latência alta"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:707
+#: modules/gui/macosx/VLCSimplePrefsController.m:715
 msgid "Highest Latency"
 msgstr "Latência mais alta"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:827
+#: modules/gui/macosx/VLCSimplePrefsController.m:835
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
 msgstr "Restaurar preferências"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:830
+#: modules/gui/macosx/VLCSimplePrefsController.m:838
 msgid ""
 "This will reset VLC media player's preferences.\n"
 "\n"
@@ -18785,28 +18785,28 @@ msgstr ""
 "\n"
 "Tem a certeza que deseja continuar?"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1100
+#: modules/gui/macosx/VLCSimplePrefsController.m:1108
 msgid ""
 "This setting cannot be changed because the native fullscreen mode is enabled."
 msgstr ""
 "Esta definição não pode ser alterada porque o modo de ecrã inteiro nativo "
 "está ativado."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1169
+#: modules/gui/macosx/VLCSimplePrefsController.m:1177
 msgid "Choose the folder to save your video snapshots to."
 msgstr "Escolha a pasta em que serão guardadas as capturas de ecrã."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1171
-#: modules/gui/macosx/VLCSimplePrefsController.m:1270
+#: modules/gui/macosx/VLCSimplePrefsController.m:1179
+#: modules/gui/macosx/VLCSimplePrefsController.m:1278
 msgid "Choose"
 msgstr "Escolher"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1268
+#: modules/gui/macosx/VLCSimplePrefsController.m:1276
 msgid "Choose the directory or filename where the records will be stored."
 msgstr ""
 "Escolha a pasta ou nome do ficheiro em que serão guardados os registos."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1381
+#: modules/gui/macosx/VLCSimplePrefsController.m:1389
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -18814,16 +18814,16 @@ msgstr ""
 "Digite as novas teclas para\n"
 "\"%@\""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1454
+#: modules/gui/macosx/VLCSimplePrefsController.m:1462
 msgid "Invalid combination"
 msgstr "Combinação inválida"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1455
+#: modules/gui/macosx/VLCSimplePrefsController.m:1463
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "Lamentavelmente, estas teclas não podem ser associadas a atalhos."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1465
-#: modules/gui/macosx/VLCSimplePrefsController.m:1469
+#: modules/gui/macosx/VLCSimplePrefsController.m:1473
+#: modules/gui/macosx/VLCSimplePrefsController.m:1477
 msgid "This combination is already taken by \"%@\"."
 msgstr "Esta combinação já é usada por \"%@\"."
 
@@ -20564,21 +20564,21 @@ msgstr "Tecla ou combinação: "
 msgid "Key: "
 msgstr "Tecla: "
 
-#: modules/gui/qt/components/simple_preferences.cpp:247
-#: modules/gui/qt/components/simple_preferences.cpp:620
+#: modules/gui/qt/components/simple_preferences.cpp:255
+#: modules/gui/qt/components/simple_preferences.cpp:628
 msgid "Input & Codecs Settings"
 msgstr "Definições de entrada e codecs"
 
-#: modules/gui/qt/components/simple_preferences.cpp:249
-#: modules/gui/qt/components/simple_preferences.cpp:904
+#: modules/gui/qt/components/simple_preferences.cpp:257
+#: modules/gui/qt/components/simple_preferences.cpp:912
 msgid "Configure Hotkeys"
 msgstr "Configurar teclas de atalho"
 
-#: modules/gui/qt/components/simple_preferences.cpp:446
+#: modules/gui/qt/components/simple_preferences.cpp:454
 msgid "Device:"
 msgstr "Dispositivo:"
 
-#: modules/gui/qt/components/simple_preferences.cpp:625
+#: modules/gui/qt/components/simple_preferences.cpp:633
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -20589,54 +20589,54 @@ msgstr ""
 "para DVD, VCD e CDDA. É possível definir um valor único ou configurá-los "
 "independentemente nas preferências avançadas."
 
-#: modules/gui/qt/components/simple_preferences.cpp:693
+#: modules/gui/qt/components/simple_preferences.cpp:701
 msgid "Lowest latency"
 msgstr "Latência mais baixa"
 
-#: modules/gui/qt/components/simple_preferences.cpp:696
+#: modules/gui/qt/components/simple_preferences.cpp:704
 msgid "High latency"
 msgstr "Latência alta"
 
-#: modules/gui/qt/components/simple_preferences.cpp:697
+#: modules/gui/qt/components/simple_preferences.cpp:705
 msgid "Higher latency"
 msgstr "Latência mais alta"
 
-#: modules/gui/qt/components/simple_preferences.cpp:745
+#: modules/gui/qt/components/simple_preferences.cpp:753
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "Esta é a interface de temas do VLC. Pode transferir mais temas em"
 
-#: modules/gui/qt/components/simple_preferences.cpp:747
+#: modules/gui/qt/components/simple_preferences.cpp:755
 msgid "VLC skins website"
 msgstr "Site da Web de temas do VLC"
 
-#: modules/gui/qt/components/simple_preferences.cpp:771
+#: modules/gui/qt/components/simple_preferences.cpp:779
 msgid "System's default"
 msgstr "Padrão do sistema"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1309
+#: modules/gui/qt/components/simple_preferences.cpp:1317
 msgid "File associations"
 msgstr "Associações de ficheiros"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1318
+#: modules/gui/qt/components/simple_preferences.cpp:1326
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "Ficheiros de áudio"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1319
+#: modules/gui/qt/components/simple_preferences.cpp:1327
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "Ficheiros de vídeo"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1320
+#: modules/gui/qt/components/simple_preferences.cpp:1328
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "Ficheiros de listas de reprodução"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1385
+#: modules/gui/qt/components/simple_preferences.cpp:1393
 msgid "&Apply"
 msgstr "&Aplicar"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1386
+#: modules/gui/qt/components/simple_preferences.cpp:1394
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60
