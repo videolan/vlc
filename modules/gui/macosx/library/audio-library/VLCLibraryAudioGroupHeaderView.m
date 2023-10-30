@@ -74,27 +74,12 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
 - (IBAction)play:(id)sender
 {
-    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-
-    // We want to add all the tracks to the playlist but only play the first one immediately,
-    // otherwise we will skip straight to the last track of the last album from the artist
-    __block BOOL playImmediately = YES;
-    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-
-        if(playImmediately) {
-            playImmediately = NO;
-        }
-    }];
+    [self.representedItem play];
 }
 
 - (IBAction)enqueue:(id)sender
 {
-    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-
-    [self.representedItem.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
-    }];
+    [self.representedItem queue];
 }
 
 @end
