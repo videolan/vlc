@@ -1152,7 +1152,6 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         subpicture_Delete( p_spu );
         return NULL;
     }
-    p_spu->p_region = p_region;
     p_region->fmt.i_sar_num = 0;
     p_region->fmt.i_sar_den = 1;
 
@@ -1188,9 +1187,11 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     /* if we have a bitmap, chain it before the text */
     if (p_bitmap_region)
     {
-        p_bitmap_region->p_next = p_spu->p_region;
         p_spu->p_region = p_bitmap_region;
+        p_bitmap_region->p_next = p_region;
     }
+    else
+        p_spu->p_region = p_region;
 
     return p_spu;
 }
