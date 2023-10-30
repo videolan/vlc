@@ -173,4 +173,14 @@
     }];
 }
 
+- (void)play
+{
+    [self playImmediately:YES];
+}
+
+- (void)queue
+{
+    [self playImmediately:NO];
+}
+
 @end

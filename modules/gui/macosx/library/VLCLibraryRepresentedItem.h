@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
                   parentType:(const enum vlc_ml_parent_type)parentType;
 
+- (void)play;
+- (void)queue;
+
 @end
 
 NS_ASSUME_NONNULL_END
