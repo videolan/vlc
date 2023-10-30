@@ -1000,32 +1000,31 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
         pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
     }
 
+    /* First check if DPB sizing was correct before removing one frame */
+    if (!p_sys->dpb.b_strict_reorder && !p_info->b_flush &&
+        p_sys->dpb.i_size == p_sys->dpb.i_max_pics &&
+        p_sys->dpb.i_size && p_sys->dpb.i_max_pics < H264_MAX_DPB)
+    {
+        if (p_sys->dpb.b_poc_based_reorder && p_sys->dpb.p_entries->i_foc > p_info->i_foc)
+        {
+            p_sys->dpb.b_invalid_pic_reorder_max = true;
+            p_sys->dpb.i_max_pics++;
+            pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
+            msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
+        }
+        else if (!p_sys->dpb.b_poc_based_reorder &&
+                 p_info->pts > VLC_TICK_INVALID &&
+                 p_sys->dpb.p_entries->pts > p_info->pts)
+        {
+            p_sys->dpb.b_invalid_pic_reorder_max = true;
+            p_sys->dpb.i_max_pics++;
+            pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
+            msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
+        }
+    }
+
     while(p_info->b_flush || p_sys->dpb.i_size >= p_sys->dpb.i_max_pics)
     {
-        /* First check if DPB sizing was correct before removing one frame */
-        if (p_sys->dpb.p_entries && !p_sys->dpb.b_strict_reorder && !p_info->b_flush &&
-            p_sys->dpb.i_max_pics < H264_MAX_DPB)
-        {
-            if (p_sys->dpb.b_poc_based_reorder && p_sys->dpb.p_entries->i_foc > p_info->i_foc)
-            {
-                p_sys->dpb.b_invalid_pic_reorder_max = true;
-                p_sys->dpb.i_max_pics++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
-                break;
-            }
-            else if (!p_sys->dpb.b_poc_based_reorder &&
-                     p_info->pts > VLC_TICK_INVALID &&
-                     p_sys->dpb.p_entries->pts > p_info->pts)
-            {
-                p_sys->dpb.b_invalid_pic_reorder_max = true;
-                p_sys->dpb.i_max_pics++;
-                pic_pacer_UpdateMaxBuffering(p_sys->pic_pacer, p_sys->dpb.i_max_pics);
-                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->dpb.i_max_pics);
-                break;
-            }
-        }
-
         picture_t *p_fields;
         if(RemoveOneFrameFromDPB(p_sys, &p_fields) != VLC_SUCCESS)
             break;
