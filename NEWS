@@ -1,3 +1,21 @@
+Changes between 3.0.19 and 3.0.20:
+----------------------------------
+
+Video Output:
+ - Fix green line in fullscreen in D3D11 video output
+ - Fix crash with some AMD drivers old versions
+ - Fix events propagation issue when double-clicking with mouse wheel
+
+Decoders:
+ - Fix crash when AV1 hardware decoder fails
+
+Interface:
+ - Fix annoying disappearance of the Windows fullscreen controller
+
+Demuxers:
+ - Fix potential security issue (OOB Write) on MMS:// by checking user size bounds
+
+
 Changes between 3.0.18 and 3.0.19:
 ----------------------------------
 
@@ -55,7 +73,7 @@ Misc:
  * Fix 5.1/7.1 output on macOS and tvOS
  * Fix several crashes and bugs in the macOS preferences panel
  * Improvements on the threading of the MMDevice audio output on Windows
- * Fix a potential security issue on the uninstaller DLLs
+ * Fix a potential security issue on the uninstaller DLLs (CVE-2023-46814)
  * Fix memory leaks when using the media_list_player libVLC APIs
 
 Translations:
