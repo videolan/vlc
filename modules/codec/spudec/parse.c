@@ -254,7 +254,7 @@ static void OutputPicture( decoder_t *p_dec,
 
     if( p_spu_data->p_pxctli && p_spu )
         ParsePXCTLI( p_dec, p_spu_data,
-                    vlc_list_first_entry_or_null(&p_spu->regions, subpicture_region_t, node) );
+                    vlc_spu_regions_first_or_null(&p_spu->regions) );
 
     pf_queue( p_dec, p_spu );
 }
@@ -868,7 +868,7 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
         msg_Err( p_dec, "cannot allocate SPU region" );
         return VLC_EGENERIC;
     }
-    vlc_list_append(&p_region->node, &p_spu->regions);
+    vlc_spu_regions_push(&p_spu->regions, p_region);
 
     p_region->i_x = p_spu_properties->i_x;
     p_region->i_y = p_spu_properties->i_y + p_spu_data->i_y_top_offset;

@@ -735,7 +735,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         msg_Err( p_dec, "cannot allocate SPU region" );
         goto error;
     }
-    vlc_list_append( &p_region->node, &p_spu->regions );
+    vlc_spu_regions_push( &p_spu->regions, p_region );
 
     /* Normal text subs, easy markup */
     p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;

@@ -899,7 +899,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
     PROFILE_STOP( tiger_renderer_render );
 
     PostprocessTigerImage( p_plane, fmt.i_width );
-    vlc_list_append( &p_r->node, &p_subpic->regions );
+    vlc_spu_regions_push( &p_subpic->regions, p_r );
     p_sys->b_dirty = false;
 
     PROFILE_STOP( TigerUpdateSubpicture );
@@ -1187,9 +1187,9 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     /* if we have a bitmap, chain it before the text */
     if (p_bitmap_region)
     {
-        vlc_list_append(&p_bitmap_region->node, &p_spu->regions);
+        vlc_spu_regions_push(&p_spu->regions, p_bitmap_region);
     }
-    vlc_list_append(&p_region->node, &p_spu->regions);
+    vlc_spu_regions_push(&p_spu->regions, p_region);
 
     return p_spu;
 }

@@ -381,7 +381,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         p_region->i_y = p_overlay->i_y;
         p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_region->i_alpha = p_overlay->i_alpha;
-        vlc_list_append( &p_region->node, &p_spu->regions );
+        vlc_spu_regions_push( &p_spu->regions, p_region );
     }
 
     p_sys->b_updated = false;

@@ -703,7 +703,7 @@ static block_t * Encode( encoder_t *p_enc, subpicture_t *p_spu )
 {
     VLC_UNUSED(p_enc);
     subpicture_region_t *p_region =
-        vlc_list_first_entry_or_null(&p_spu->regions, subpicture_region_t, node);
+        vlc_spu_regions_first_or_null(&p_spu->regions);
     const text_segment_t *p_segments = p_region ? p_region->p_text : NULL;
     size_t i_len = 0;
     size_t i_styles = 0;

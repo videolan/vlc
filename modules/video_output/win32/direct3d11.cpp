@@ -1284,7 +1284,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
     int count = 0;
     subpicture_region_t *r;
-    vlc_list_foreach(r, &subpicture->regions, node)
+    vlc_spu_regions_foreach(r, &subpicture->regions)
         count++;
 
     *region = static_cast<picture_t**>(calloc(count, sizeof(picture_t *)));
@@ -1293,7 +1293,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     *subpicture_region_count = count;
 
     int i = 0;
-    vlc_list_foreach(r, &subpicture->regions, node) {
+    vlc_spu_regions_foreach(r, &subpicture->regions) {
         if (!r->fmt.i_visible_width || !r->fmt.i_visible_height)
         {
             i++;

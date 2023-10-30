@@ -709,7 +709,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         p_region->i_align = p_sys->i_align;
         p_region->i_alpha = p_es->i_alpha;
 
-        vlc_list_append(&p_region->node, &p_spu->regions);
+        vlc_spu_regions_push(&p_spu->regions, p_region);
 
         video_format_Clean( &fmt_in );
         video_format_Clean( &fmt_out );

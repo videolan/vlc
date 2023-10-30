@@ -1151,7 +1151,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
 
         size_t count = 0;
         subpicture_region_t *p_head;
-        vlc_list_foreach(p_head, &subpic->regions, node)
+        vlc_spu_regions_foreach(p_head, &subpic->regions)
             count++;
 
         if (subpic->b_subtitle)
@@ -1185,7 +1185,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
         subpicture_t *subpic = entry->subpic;
         subpicture_region_t *region;
 
-        if (vlc_list_is_empty(&subpic->regions))
+        if (vlc_spu_regions_is_empty(&subpic->regions))
             continue;
 
         if (subpic->i_original_picture_width  == 0 ||
@@ -1209,7 +1209,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
          * We always transform non absolute subtitle into absolute one on the
          * first rendering to allow good subtitle overlap support.
          */
-        vlc_list_foreach(region, &subpic->regions, node) {
+        vlc_spu_regions_foreach(region, &subpic->regions) {
             spu_area_t area;
 
             /* Compute region scale AR */
@@ -1277,7 +1277,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                     }
                 }
 
-                vlc_list_append(&output_last_ptr->node, &output->regions);
+                vlc_spu_regions_push(&output->regions, output_last_ptr);
             }
 
             if (subpic->b_subtitle) {
@@ -1290,7 +1290,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                     subtitle_area[subtitle_area_count++] = area;
             }
         }
-        if (subpic->b_subtitle && vlc_list_is_empty(&subpic->regions))
+        if (subpic->b_subtitle && vlc_spu_regions_is_empty(&subpic->regions))
             subpic->b_absolute = true;
     }
 
@@ -1523,7 +1523,7 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
     const unsigned i_original_picture_height = p_subpic->i_original_picture_height;
 
     subpicture_region_t *region;
-    vlc_list_foreach(region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(region, &p_subpic->regions)
     {
         if(!subpicture_region_IsText( region ))
             continue;
@@ -1885,7 +1885,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     /* p_private is for spu only and cannot be non NULL here */
     subpicture_region_t *r;
-    vlc_list_foreach(r, &subpic->regions, node)
+    vlc_spu_regions_foreach(r, &subpic->regions)
         assert(r->p_private == NULL);
 
     /* */

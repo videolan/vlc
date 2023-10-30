@@ -941,7 +941,7 @@ static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, 
     p_entry->b_last_region_saved = false;
 
     subpicture_region_t *p_region =
-        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+        vlc_spu_regions_first_or_null(&p_subpic->regions);
     if( p_region )
     {
         /* save copy */
@@ -1045,7 +1045,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
     SubsdelayHeapLock( p_heap );
 
     subpicture_region_t *p_region =
-        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+        vlc_spu_regions_first_or_null(&p_subpic->regions);
     if( p_entry->b_check_empty && p_region )
     {
         if( SubsdelayIsTextEmpty( p_region ) )
@@ -1112,7 +1112,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 static bool SubpicIsEmpty( subpicture_t* p_subpic )
 {
     subpicture_region_t *p_region =
-        vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+        vlc_spu_regions_first_or_null(&p_subpic->regions);
     return p_region != NULL && SubsdelayIsTextEmpty( p_region );
 }
 
@@ -1152,7 +1152,7 @@ static subpicture_t *SubpicClone( subpicture_t *p_source, subpicture_updater_t *
  *****************************************************************************/
 static void SubpicDestroyClone( subpicture_t *p_subpic )
 {
-    vlc_list_init(&p_subpic->regions); /* don't destroy region */
+    vlc_spu_regions_init(&p_subpic->regions); /* don't destroy region */
     subpicture_Delete( p_subpic );
 }
 
@@ -1179,7 +1179,7 @@ static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_ent
         if( p_entry->p_subpic )
         {
             subpicture_region_t *p_region =
-                vlc_list_first_entry_or_null( &p_entry->p_subpic->regions, subpicture_region_t, node );
+                vlc_spu_regions_first_or_null( &p_entry->p_subpic->regions );
             if( p_region && ( p_region->p_text ) )
             {
             //FIXME: We only use a single segment here

@@ -484,7 +484,7 @@ static int cc_decoder_decode_common(decoder_t *dec, vlc_frame_t *in,
 
     subpicture_region_t *p_region = subpicture_region_NewText();;
     assert(p_region != NULL);
-    vlc_list_append( &p_region->node, &subpic->regions );
+    vlc_spu_regions_push( &subpic->regions, p_region );
 
     p_region->p_text = text_segment_New(text);
     assert(p_region->p_text != NULL);

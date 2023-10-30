@@ -479,7 +479,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     else
     {
         subpicture_region_t *p_region =
-            vlc_list_first_entry_or_null(&p_spu->regions, subpicture_region_t, node);
+            vlc_spu_regions_first_or_null(&p_spu->regions);
         picture_t *p_pic = p_region->p_picture;
 
         /* ZVBI is stupid enough to assume pitch == width */
@@ -558,7 +558,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         subpicture_Delete( p_spu );
         return NULL;
     }
-    vlc_list_append(&p_region->node, &p_spu->regions);
+    vlc_spu_regions_push(&p_spu->regions, p_region);
 
     p_spu->i_start = i_pts;
     p_spu->i_stop = b_text ? i_pts + VLC_TICK_FROM_SEC(10): 0;

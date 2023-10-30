@@ -116,7 +116,7 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
         else
             r->i_y = p_updtregion->origin.y;
 
-        vlc_list_append(&r->node, &p_spu->regions);
+        vlc_spu_regions_push(&p_spu->regions, r);
     }
 }
 

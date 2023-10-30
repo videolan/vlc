@@ -82,7 +82,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         {
             return;
         }
-        vlc_list_append(&r->node, &subpic->regions);
+        vlc_spu_regions_push(&subpic->regions, r);
         r->fmt.i_sar_num = 1;
         r->fmt.i_sar_den = 1;
 

@@ -85,7 +85,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
         return NULL;
 
     subpicture_region_t *p_region;
-    vlc_list_foreach(p_region, &p_spu->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_spu->regions)
     {
         if(!subpicture_region_IsText( p_region )||
             p_region->p_text == NULL ||

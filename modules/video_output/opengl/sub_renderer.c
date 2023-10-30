@@ -232,7 +232,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
     if (subpicture) {
         int count = 0;
         subpicture_region_t *r;
-        vlc_list_foreach(r, &subpicture->regions, node)
+        vlc_spu_regions_foreach(r, &subpicture->regions)
             count++;
 
         gl_region_t *regions = calloc(count, sizeof(*regions));
@@ -243,7 +243,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
         sr->regions = regions;
 
         int i = 0;
-        vlc_list_foreach(r, &subpicture->regions, node) {
+        vlc_spu_regions_foreach(r, &subpicture->regions) {
             gl_region_t *glr = &sr->regions[i];
 
             glr->width  = r->fmt.i_visible_width;

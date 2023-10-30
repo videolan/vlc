@@ -1604,7 +1604,7 @@ static subpicture_t *render( decoder_t *p_dec )
         p_spu_region->i_x = i_base_x + p_regiondef->i_x;
         p_spu_region->i_y = i_base_y + p_regiondef->i_y;
         p_spu_region->i_align = p_sys->i_spu_position;
-        vlc_list_append(&p_spu_region->node, &p_spu->regions);
+        vlc_spu_regions_push(&p_spu->regions, p_spu_region);
 
         p_src = p_region->p_pixbuf;
         p_dst = p_spu_region->p_picture->Y_PIXELS;
@@ -1644,7 +1644,7 @@ static subpicture_t *render( decoder_t *p_dec )
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
             p_spu_region->i_y = i_base_y + p_regiondef->i_y + p_object_def->i_y;
             p_spu_region->i_align = p_sys->i_spu_position;
-            vlc_list_append(&p_spu_region->node, &p_spu->regions);
+            vlc_spu_regions_push(&p_spu->regions, p_spu_region);
         }
     }
 
@@ -1734,7 +1734,7 @@ static void YuvaYuvp( subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
 
-    vlc_list_foreach(p_region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
         video_format_t *p_fmt = &p_region->fmt;
         int i = 0, j = 0, n = 0, p = 0;
@@ -1933,12 +1933,12 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_t bits, *s = &bits;
     block_t *p_block;
 
-    if( !p_subpic || !vlc_list_is_empty(&p_subpic->regions) ) return NULL;
+    if( !p_subpic || !vlc_spu_regions_is_empty(&p_subpic->regions) ) return NULL;
 
     /* FIXME: this is a hack to convert VLC_CODEC_YUVA into
      *  VLC_CODEC_YUVP
      */
-    p_region = vlc_list_first_entry_or_null(&p_subpic->regions, subpicture_region_t, node);
+    p_region = vlc_spu_regions_first_or_null(&p_subpic->regions);
     if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
     {
         YuvaYuvp( p_subpic );
@@ -2051,7 +2051,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 
     i_regions = 0;
     if (p_subpic)
-    vlc_list_foreach(p_region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
         if( i_regions >= p_sys->i_regions )
         {
@@ -2104,7 +2104,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 
     i_regions = 0;
     if (p_subpic)
-    vlc_list_foreach(p_region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
         bs_write( s, 8, i_regions );
         bs_write( s, 8, 0 ); /* Reserved */
@@ -2170,7 +2170,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
     unsigned int i_region;
 
     i_region = 0;
-    vlc_list_foreach(p_region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
         int i_entries = 4, i_depth = 0x1, i_bg = 0;
         bool b_text = subpicture_region_IsText( p_region );
@@ -2246,7 +2246,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     int i_length_pos, i_update_pos, i_pixel_data_pos;
 
     i_region = 0;
-    vlc_list_foreach(p_region, &p_subpic->regions, node)
+    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_OBJECT_DATA ); /* Segment type */

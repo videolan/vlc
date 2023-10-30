@@ -51,7 +51,7 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
     p_subpic->b_fade     = false;
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
-    vlc_list_init(&p_subpic->regions);
+    vlc_spu_regions_init(&p_subpic->regions);
 
     if( p_upd )
     {
@@ -316,9 +316,9 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
 void vlc_spu_regions_Clear( vlc_spu_regions *regions )
 {
     subpicture_region_t *p_head;
-    vlc_list_foreach(p_head, regions, node)
+    vlc_spu_regions_foreach(p_head, regions)
     {
-        vlc_list_remove( &p_head->node );
+        vlc_spu_regions_remove( regions, p_head );
         subpicture_region_Delete( p_head );
     }
 }
@@ -333,7 +333,7 @@ unsigned picture_BlendSubpicture(picture_t *dst,
     assert(src && !src->b_fade && src->b_absolute);
 
     subpicture_region_t *r;
-    vlc_list_foreach(r, &src->regions, node) {
+    vlc_spu_regions_foreach(r, &src->regions) {
         assert(r->p_picture && r->i_align == 0);
         if (filter_ConfigureBlend(blend, dst->format.i_width,
                                   dst->format.i_height,  &r->fmt)

@@ -454,7 +454,7 @@ static int SubpictureValidate( subpicture_t *p_subpic,
                                          MS_FROM_VLC_TICK( i_stream_date ), &i_changed );
 
     if( !i_changed && !b_fmt_src && !b_fmt_dst &&
-        (p_img != NULL) == (!vlc_list_is_empty(&p_subpic->regions)) )
+        (p_img != NULL) == (!vlc_spu_regions_is_empty(&p_subpic->regions)) )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
@@ -522,7 +522,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         RegionDraw( r, p_img );
 
         /* */
-        vlc_list_append(&r->node, &p_subpic->regions);
+        vlc_spu_regions_push(&p_subpic->regions, r);
     }
     vlc_mutex_unlock( &p_sys->lock );
 

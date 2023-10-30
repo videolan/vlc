@@ -291,7 +291,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         p_spu = NULL;
         goto out;
     }
-    vlc_list_append( &p_region->node, &p_spu->regions );
+    vlc_spu_regions_push( &p_spu->regions, p_region );
     p_region->fmt.i_sar_den = p_region->fmt.i_sar_num = 1;
 
     p_sys->last_time = date;

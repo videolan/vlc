@@ -392,7 +392,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
     p_region->i_x = p_sys->i_pos_x > 0 ? p_sys->i_pos_x : 0;
     p_region->i_y = p_sys->i_pos_y > 0 ? p_sys->i_pos_y : 0;
 
-    vlc_list_append( &p_region->node, &p_spu->regions );
+    vlc_spu_regions_push( &p_spu->regions, p_region );
 
     p_spu->i_alpha = ( p_logo->i_alpha != -1 ?
                        p_logo->i_alpha : p_list->i_alpha );

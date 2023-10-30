@@ -874,7 +874,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
     size_t count = 0;
     subpicture_region_t *r;
-    vlc_list_foreach(r, &subpicture->regions, node)
+    vlc_spu_regions_foreach(r, &subpicture->regions)
         count++;
 
     *count_ptr = count;
@@ -885,7 +885,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
     }
 
     int i = 0;
-    vlc_list_foreach(r, &subpicture->regions, node) {
+    vlc_spu_regions_foreach(r, &subpicture->regions) {
         d3d_region_t *d3dr = &(*region)[i];
         HRESULT hr;
 

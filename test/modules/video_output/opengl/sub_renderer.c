@@ -180,7 +180,7 @@ static void test_opengl_offscreen(
 
     subpicture_region_t *p_region = subpicture_region_ForPicture(&fmt, picture);
     assert(p_region != NULL);
-    vlc_list_append( &p_region->node, &subpicture->regions );
+    vlc_spu_regions_push( &subpicture->regions, p_region );
 
     ret = vlc_gl_sub_renderer_Prepare(sr, subpicture);
     assert(ret == VLC_SUCCESS);

@@ -69,7 +69,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
     subpicture_region_t *r = subpicture_region_NewText();
     if (!r)
         return;
-    vlc_list_append(&r->node, &subpic->regions);
+    vlc_spu_regions_push(&subpic->regions, r);
 
     r->fmt.i_sar_num = 1;
     r->fmt.i_sar_den = 1;
