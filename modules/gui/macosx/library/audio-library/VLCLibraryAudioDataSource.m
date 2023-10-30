@@ -716,27 +716,27 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     NSParameterAssert(tableView != nil);
 
     const NSInteger clickedRow = tableView.clickedRow;
-    id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[clickedRow - 1];
+    const id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[clickedRow - 1];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:self.currentParentType];
 
-    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
-    }];
+    [representedItem play];
 }
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
 {
-    id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[self.collectionSelectionTableView.selectedRow];
+    const id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[self.collectionSelectionTableView.selectedRow];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:self.currentParentType];
 
-    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
-    }];
+    [representedItem play];
 }
 
 - (void)songDoubleClickAction:(id)sender
 {
     NSAssert(_audioLibrarySegment == VLCAudioLibrarySongsSegment, @"Should not be possible to trigger this action from a non-song library view");
-    VLCMediaLibraryMediaItem *mediaItem = self.displayedCollection[_songsTableView.selectedRow];
-    [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
+    VLCMediaLibraryMediaItem * const mediaItem = self.displayedCollection[_songsTableView.selectedRow];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:self.currentParentType];
+
+    [representedItem play];
 }
 
 #pragma mark - collection view data source
