@@ -27,7 +27,6 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
@@ -177,7 +176,7 @@
 - (void)revealInFinder:(id)sender
 {
     if (self.representedItem != nil) {
-        [self.representedItem.item revealInFinder];
+        [self.representedItem revealInFinder];
     } else if (_representedInputItem != nil) {
         [_representedInputItem revealInFinder];
     }
@@ -186,7 +185,7 @@
 - (void)moveToTrash:(id)sender
 {
     if (self.representedItem != nil) {
-        [self.representedItem.item moveToTrash];
+        [self.representedItem moveToTrash];
     } else if (_representedInputItem != nil) {
         [_representedInputItem moveToTrash];
     }

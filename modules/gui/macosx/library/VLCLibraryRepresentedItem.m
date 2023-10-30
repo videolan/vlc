@@ -183,4 +183,14 @@
     [self playImmediately:NO];
 }
 
+- (void)revealInFinder
+{
+    [self.item revealInFinder];
+}
+
+- (void)moveToTrash
+{
+    [self.item moveToTrash];
+}
+
 @end

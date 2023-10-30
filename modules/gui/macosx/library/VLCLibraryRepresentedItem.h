@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)play;
 - (void)queue;
+- (void)revealInFinder;
+- (void)moveToTrash;
 
 @end
 
