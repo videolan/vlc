@@ -105,7 +105,7 @@
     VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
     if (latestPartialPlayItem != nil) {
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:latestPartialPlayItem parentType:VLC_ML_PARENT_UNKNOWN];
-        self.representedItem = representedItem;;
+        self.representedItem = representedItem;
         self.explanationTextField.stringValue = _NS("Last watched");
         self.playButton.title = _NS("Resume playing");
         return;
@@ -125,8 +125,7 @@
 
 - (IBAction)playRepresentedItem:(id)sender
 {
-    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-    [libraryController appendItemToPlaylist:self.representedItem.item playImmediately:YES];
+    [self.representedItem play];
 }
 
 @end
