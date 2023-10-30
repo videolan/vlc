@@ -79,7 +79,8 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
                                   unsigned width, unsigned height);
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
-                                picture_t *picture, subpicture_t *subpicture);
+                                picture_t *picture,
+                                struct vlc_render_subpicture *subpicture);
 int vout_display_opengl_Display(vout_display_opengl_t *vgl);
 
 int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,

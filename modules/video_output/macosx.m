@@ -56,7 +56,7 @@ static int Open(vout_display_t *vd,
                 video_format_t *fmt, vlc_video_context *context);
 static void Close(vout_display_t *vd);
 
-static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
+static void PictureRender (vout_display_t *vd, picture_t *pic, vlc_render_subpicture *subpicture,
                            vlc_tick_t date);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic);
 static int Control (vout_display_t *vd, int query);
@@ -294,7 +294,8 @@ static void Close(vout_display_t *vd)
  * vout display callbacks
  *****************************************************************************/
 
-static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
+static void PictureRender (vout_display_t *vd, picture_t *pic,
+                           vlc_render_subpicture *subpicture,
                            vlc_tick_t date)
 {
     VLC_UNUSED(date);

@@ -410,6 +410,8 @@ subpicture_New
 subpicture_NewFromPicture
 subpicture_Update
 vlc_spu_regions_Clear
+vlc_render_subpicture_New
+vlc_render_subpicture_Delete
 subpicture_region_Copy
 subpicture_region_Delete
 subpicture_region_New

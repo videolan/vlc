@@ -96,6 +96,24 @@ void subpicture_Delete( subpicture_t *p_subpic )
     free( p_subpic );
 }
 
+vlc_render_subpicture *vlc_render_subpicture_New( void )
+{
+    vlc_render_subpicture *p_subpic = malloc( sizeof(*p_subpic) );
+    if( unlikely(p_subpic == NULL ) )
+        return NULL;
+    p_subpic->i_alpha = 0xFF;
+    p_subpic->i_original_picture_width = 0;
+    p_subpic->i_original_picture_height = 0;
+    vlc_spu_regions_init(&p_subpic->regions);
+    return p_subpic;
+}
+
+void vlc_render_subpicture_Delete( vlc_render_subpicture *p_subpic )
+{
+    vlc_spu_regions_Clear( &p_subpic->regions );
+    free( p_subpic );
+}
+
 subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
                                          picture_t *p_picture, vlc_fourcc_t i_chroma )
 {
@@ -326,11 +344,11 @@ void vlc_spu_regions_Clear( vlc_spu_regions *regions )
 #include <vlc_filter.h>
 
 unsigned picture_BlendSubpicture(picture_t *dst,
-                                 vlc_blender_t *blend, subpicture_t *src)
+                                 vlc_blender_t *blend, vlc_render_subpicture *src)
 {
     unsigned done = 0;
 
-    assert(src && !src->b_fade && src->b_absolute);
+    assert(src);
 
     subpicture_region_t *r;
     vlc_spu_regions_foreach(r, &src->regions) {

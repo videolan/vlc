@@ -86,7 +86,8 @@ static int Control(vout_display_t *vd, int query)
     return VLC_EGENERIC;
 }
 
-static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+static void Prepare(vout_display_t *vd, picture_t *pic,
+                    struct vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     VLC_UNUSED(subpic); VLC_UNUSED(date);

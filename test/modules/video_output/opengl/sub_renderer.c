@@ -173,7 +173,7 @@ static void test_opengl_offscreen(
     memcpy(&picture->p[0].p_pixels[0 * 4 + picture->p[0].i_pitch], blue, sizeof(blue));
     memcpy(&picture->p[0].p_pixels[1 * 4 + picture->p[0].i_pitch], white, sizeof(white));
 
-    subpicture_t *subpicture = subpicture_New(NULL);
+    vlc_render_subpicture *subpicture = vlc_render_subpicture_New();
     assert(subpicture != NULL);
     subpicture->i_original_picture_width = 4;
     subpicture->i_original_picture_height = 4;
@@ -236,7 +236,7 @@ static void test_opengl_offscreen(
     vlc_gl_Delete(gl);
 
     picture_Release(picture);
-    subpicture_Delete(subpicture);
+    vlc_render_subpicture_Delete(subpicture);
 }
 
 int main( int argc, char **argv )

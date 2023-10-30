@@ -1133,7 +1133,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 /**
  * This function renders all sub picture units in the list.
  */
-static subpicture_t *SpuRenderSubpictures(spu_t *spu,
+static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                                           size_t i_subpicture,
                                           const spu_render_entry_t *p_entries,
                                           const vlc_fourcc_t *chroma_list,
@@ -1162,7 +1162,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
         return NULL;
 
     /* Create the output subpicture */
-    subpicture_t *output = subpicture_New(NULL);
+    vlc_render_subpicture *output = vlc_render_subpicture_New();
     if (unlikely(output == NULL))
         return NULL;
     output->i_order = p_entries[i_subpicture - 1].subpic->i_order;
@@ -1939,7 +1939,7 @@ static int SubSourceGenerate( filter_t *p_filter, void *opaque )
     return VLC_SUCCESS;
 }
 
-subpicture_t *spu_Render(spu_t *spu,
+vlc_render_subpicture *spu_Render(spu_t *spu,
                          const vlc_fourcc_t *chroma_list,
                          const video_format_t *fmt_dst,
                          const video_format_t *fmt_src,
@@ -2044,7 +2044,7 @@ subpicture_t *spu_Render(spu_t *spu,
     qsort(subpicture_array, subpicture_count, sizeof(*subpicture_array), SpuRenderCmp);
 
     /* Render the subpictures */
-    subpicture_t *render = SpuRenderSubpictures(spu,
+    vlc_render_subpicture *render = SpuRenderSubpictures(spu,
                                                 subpicture_count, subpicture_array,
                                                 chroma_list,
                                                 fmt_dst,

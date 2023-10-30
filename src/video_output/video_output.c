@@ -1045,7 +1045,7 @@ static const struct filter_video_callbacks vout_video_cbs = {
 };
 
 static picture_t *ConvertRGBAAndBlend(vout_thread_sys_t *vout, picture_t *pic,
-                                      subpicture_t *subpic)
+                                      vlc_render_subpicture *subpic)
 {
     vout_thread_sys_t *sys = vout;
     /* This function will convert the pic to RGBA and blend the subpic to it.
@@ -1111,7 +1111,7 @@ static picture_t *FilterPictureInteractive(vout_thread_sys_t *sys)
     return filtered;
 }
 
-static subpicture_t *RenderSPUs(vout_thread_sys_t *sys,
+static vlc_render_subpicture *RenderSPUs(vout_thread_sys_t *sys,
                                 const vlc_fourcc_t *subpicture_chromas,
                                 const video_format_t *spu_frame,
                                 vlc_tick_t system_now, vlc_tick_t render_subtitle_date,
@@ -1128,7 +1128,7 @@ static subpicture_t *RenderSPUs(vout_thread_sys_t *sys,
 
 static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                             bool *render_now, picture_t **out_pic,
-                            subpicture_t **out_subpic)
+                            vlc_render_subpicture **out_subpic)
 {
     vout_display_t *vd = sys->display;
 
@@ -1221,7 +1221,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     picture_t *todisplay = filtered;
     picture_t *snap_pic = todisplay;
     if (!vd_does_blending && blending_before_converter && sys->spu_blend) {
-        subpicture_t *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
+        vlc_render_subpicture *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
                                           system_now, render_subtitle_date,
                                           do_snapshot);
         if (subpic) {
@@ -1246,7 +1246,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
                     picture_Release(blent);
                 }
             }
-            subpicture_Delete(subpic);
+            vlc_render_subpicture_Delete(subpic);
         }
     }
 
@@ -1271,13 +1271,13 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
 
     if (!vd_does_blending && !blending_before_converter && sys->spu_blend)
     {
-        subpicture_t *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
+        vlc_render_subpicture *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
                                           system_now, render_subtitle_date,
                                           do_snapshot);
         if (subpic)
         {
             picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
-            subpicture_Delete(subpic);
+            vlc_render_subpicture_Delete(subpic);
         }
     }
 
@@ -1308,7 +1308,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     vlc_queuedmutex_lock(&sys->display_lock);
 
     picture_t *todisplay;
-    subpicture_t *subpic;
+    vlc_render_subpicture *subpic;
     int ret = PrerenderPicture(sys, filtered, &render_now, &todisplay, &subpic);
     if (ret != VLC_SUCCESS)
     {
@@ -1407,7 +1407,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     picture_Release(todisplay);
 
     if (subpic)
-        subpicture_Delete(subpic);
+        vlc_render_subpicture_Delete(subpic);
 
     vout_statistic_AddDisplayed(&sys->statistic, 1);
 

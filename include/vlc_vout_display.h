@@ -30,6 +30,8 @@
 #include <vlc_window.h>
 #include <vlc_viewpoint.h>
 
+struct vlc_render_subpicture;
+
 /**
  * \defgroup video_display Video output display
  * Video output display: output buffers and rendering
@@ -262,7 +264,7 @@ struct vlc_display_operations
      * \param date time when the picture is intended to be shown
      */
     void       (*prepare)(vout_display_t *, picture_t *pic,
-                          subpicture_t *subpic, vlc_tick_t date);
+                          struct vlc_render_subpicture *subpic, vlc_tick_t date);
 
     /**
      * Displays a picture.
@@ -433,7 +435,7 @@ VLC_API void vout_display_Delete(vout_display_t *);
  * \return The prepared picture is returned, NULL on error.
  */
 VLC_API picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
-                                        subpicture_t *subpic, vlc_tick_t date);
+                                        struct vlc_render_subpicture *subpic, vlc_tick_t date);
 
 /**
  * Displays a picture.

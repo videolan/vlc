@@ -368,7 +368,8 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
 }
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
-                                picture_t *picture, subpicture_t *subpicture)
+                                picture_t *picture,
+                                vlc_render_subpicture *subpicture)
 {
     GL_ASSERT_NOERROR(&vgl->api.vt);
 

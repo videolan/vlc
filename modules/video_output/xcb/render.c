@@ -111,7 +111,7 @@ static void PictureDetach(vout_display_t *vd)
     xcb_shm_detach(sys->conn, sys->segment);
 }
 
-static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
+static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic,
                          const subpicture_region_t *reg)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -184,7 +184,8 @@ static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
     xcb_free_pixmap(conn, sys->drawable.subpic);
 }
 
-static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+static void Prepare(vout_display_t *vd, picture_t *pic,
+                    vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     const video_format_t *fmt = vd->source;

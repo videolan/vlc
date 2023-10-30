@@ -210,6 +210,17 @@ typedef struct
 
 typedef struct subpicture_private_t subpicture_private_t;
 
+struct vlc_render_subpicture
+{
+    vlc_spu_regions regions;                  /**< list of regions to render */
+    int          i_alpha;                                  /**< transparency */
+    int64_t      i_order;                    /** an increasing unique number */
+    unsigned     i_original_picture_width;  /**< original width of the movie */
+    unsigned     i_original_picture_height;/**< original height of the movie */
+};
+
+typedef struct vlc_render_subpicture vlc_render_subpicture;
+
 /**
  * Video subtitle
  *
@@ -298,7 +309,19 @@ VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const
  *  - contains only picture (no text rendering).
  * \return the number of region(s) successfully blent
  */
-VLC_API unsigned picture_BlendSubpicture( picture_t *, vlc_blender_t *, subpicture_t * );
+VLC_API unsigned picture_BlendSubpicture( picture_t *, vlc_blender_t *, vlc_render_subpicture * );
+
+/**
+ * Create a vlc_render_subpicture.
+ *
+ * It should be released with \ref vlc_render_subpicture_Delete.
+ */
+VLC_API vlc_render_subpicture *vlc_render_subpicture_New( void );
+
+/**
+ * Destroy a vlc_render_subpicture.
+ */
+VLC_API void vlc_render_subpicture_Delete(vlc_render_subpicture *);
 
 /**@}*/
 

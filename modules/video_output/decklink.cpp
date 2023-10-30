@@ -636,7 +636,7 @@ error:
 /*****************************************************************************
  * Video
  *****************************************************************************/
-static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
+static void PrepareVideo(vout_display_t *vd, picture_t *picture, vlc_render_subpicture *,
                          vlc_tick_t date)
 {
     decklink_sys_t *sys = (decklink_sys_t *) vd->sys;

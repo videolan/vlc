@@ -467,7 +467,7 @@ static picture_t * RenderSubpictures( sout_stream_id_sys_t *id, picture_t *p_pic
         fmt.i_y_offset       = 0;
     }
 
-    subpicture_t *p_subpic = spu_Render( id->p_spu, NULL, &fmt,
+    vlc_render_subpicture *p_subpic = spu_Render( id->p_spu, NULL, &fmt,
                                          &outfmt, vlc_tick_now(), p_pic->date,
                                          false, false );
 
@@ -490,7 +490,7 @@ static picture_t * RenderSubpictures( sout_stream_id_sys_t *id, picture_t *p_pic
             id->p_spu_blender = filter_NewBlend( VLC_OBJECT( id->p_spu ), &fmt );
         if( likely( id->p_spu_blender ) )
             picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
-        subpicture_Delete( p_subpic );
+        vlc_render_subpicture_Delete( p_subpic );
     }
     video_format_Clean( &fmt );
     video_format_Clean( &outfmt );

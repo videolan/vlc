@@ -32,6 +32,8 @@
 #include "gl_common.h"
 #include "interop.h"
 
+struct vlc_render_subpicture;
+
 /**
  * A subpictures renderer handles the rendering of RGB subpictures.
  */
@@ -68,7 +70,7 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr);
  */
 int
 vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
-                            subpicture_t *subpicture);
+                            struct vlc_render_subpicture *subpicture);
 
 /**
  * Draw the prepared subpicture

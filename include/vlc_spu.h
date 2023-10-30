@@ -40,6 +40,7 @@ extern "C" {
  */
 
 typedef struct spu_private_t spu_private_t;
+struct vlc_render_subpicture;
 
 /**
  * Subpicture unit descriptor
@@ -78,7 +79,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  *
  * The returned value if non NULL must be released by subpicture_Delete().
  */
-VLC_API subpicture_t * spu_Render( spu_t *spu, const vlc_fourcc_t *p_chroma_list,
+VLC_API struct vlc_render_subpicture * spu_Render( spu_t *spu, const vlc_fourcc_t *p_chroma_list,
                                    const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src,
                                    vlc_tick_t system_now, vlc_tick_t pts,
                                    bool ignore_osd, bool external_scale );

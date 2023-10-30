@@ -126,7 +126,7 @@ static void Manage(vout_display_t *vd);
 /**
  * Prepare a picture for display */
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture, vlc_tick_t date)
+                    struct vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     Manage(vd);
     VLC_UNUSED(date);

@@ -741,7 +741,7 @@ static void vd_manage(vout_display_t *vd)
 
 
 static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const sys,
-                          subpicture_t * const subpicture)
+                          vlc_render_subpicture * const spic)
 {
     unsigned int n = 0;
 
@@ -755,7 +755,6 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
     }
 
     // Attempt to import the subpics
-    for (subpicture_t * spic = subpicture; spic != NULL; spic = spic->p_next)
     {
         subpicture_region_t *sreg;
         vlc_spu_regions_foreach(sreg, &spic->regions) {
@@ -783,7 +782,7 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
 
 
 static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
-                       subpicture_t *subpicture, vlc_tick_t date)
+                       vlc_render_subpicture *subpicture, vlc_tick_t date)
 {
     VLC_UNUSED(date);
     vout_display_sys_t * const sys = vd->sys;

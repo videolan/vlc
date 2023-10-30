@@ -97,7 +97,7 @@ typedef struct vout_display_sys_t {
 typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
                                   unsigned *, unsigned *);
 
-static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
+static void           Prepare(vout_display_t *, picture_t *, struct vlc_render_subpicture *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int);
 
@@ -208,7 +208,8 @@ static void Close(vout_display_t *vd)
     free(sys);
 }
 
-static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+static void Prepare(vout_display_t *vd, picture_t *pic,
+                    struct vlc_render_subpicture *subpic,
                     vlc_tick_t date)
 {
     VLC_UNUSED(date);

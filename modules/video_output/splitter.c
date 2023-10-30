@@ -52,7 +52,7 @@ typedef struct vout_display_sys_t {
 } vout_display_sys_t;
 
 static void vlc_vidsplit_Prepare(vout_display_t *vd, picture_t *pic,
-                                 subpicture_t *subpic, vlc_tick_t date)
+                                 vlc_render_subpicture *subpic, vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
 
