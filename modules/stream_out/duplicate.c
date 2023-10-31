@@ -67,6 +67,7 @@ static void  SetPCR( sout_stream_t *, vlc_tick_t );
 typedef struct {
     sout_stream_t *stream;
     char *select_chain;
+    char *es_id_suffix;
 } duplicated_stream_t;
 
 typedef struct
@@ -173,6 +174,25 @@ static int Open( vlc_object_t *p_this )
                 }
             }
         }
+        else if( !strncmp( p_cfg->psz_name, "suffix", strlen( "suffix" ) ) )
+        {
+            const char *value = p_cfg->psz_value;
+            if( value == NULL || value[0] == '\0' )
+                continue;
+
+            if( p_sys->streams.size == 0 )
+            {
+                msg_Err( p_stream, " * ignore ES ID suffix `%s'", value );
+            }
+            else
+            {
+                msg_Dbg( p_stream, " * apply ES ID suffix `%s'", value );
+                char *name = strdup( value );
+                if( unlikely(name == NULL) )
+                    goto nomem;
+                vlc_vector_last_ref( &p_sys->streams )->es_id_suffix = name;
+            }
+        }
         else
         {
             msg_Err( p_stream, " * ignore unknown option `%s'", p_cfg->psz_name );
@@ -209,6 +229,7 @@ static void Close( vlc_object_t * p_this )
     {
         sout_StreamChainDelete( dup_stream->stream, p_stream->p_next );
         free( dup_stream->select_chain );
+        free( dup_stream->es_id_suffix );
     }
     vlc_vector_destroy( &p_sys->streams );
 
@@ -216,17 +237,23 @@ static void Close( vlc_object_t * p_this )
 }
 
 static char *
-SuffixESID( size_t stream_index, const char *es_id )
+SuffixESID( size_t stream_index, const char *es_id, const char *suffix )
 {
     char *dup_es_id;
-    if( stream_index == 0 )
+    int wrote;
+    if( suffix == NULL )
     {
-        /* first stream just forwards the original ES ID. */
-        return strdup( es_id );
-    }
+        if( stream_index == 0 )
+        {
+            /* first stream just forwards the original ES ID. */
+            return strdup( es_id );
+        }
 
-    const int wrote =
-        asprintf( &dup_es_id, "%s/duplicated-stream-%zu", es_id, stream_index );
+        wrote = asprintf(
+            &dup_es_id, "%s/duplicated-stream-%zu", es_id, stream_index );
+    }
+    else
+        wrote = asprintf( &dup_es_id, "%s/%s", es_id, suffix );
 
     return (wrote != -1) ? dup_es_id : NULL;
 }
@@ -256,7 +283,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
         if( ESSelected(p_stream->obj.logger, p_fmt, dup_stream->select_chain) )
         {
-            char *dup_es_id = SuffixESID( idx, es_id );
+            char *dup_es_id =
+                SuffixESID( idx, es_id, dup_stream->es_id_suffix );
             if( unlikely(dup_es_id == NULL) )
                 goto error;
 
