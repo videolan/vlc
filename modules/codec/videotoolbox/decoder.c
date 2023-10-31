@@ -149,7 +149,7 @@ typedef struct decoder_sys_t
     vlc_mutex_t                 lock;
     bool                        b_discard_decoder_output;
 
-    struct
+    struct dpb_s
     {
         frame_info_t           *p_entries;
         uint8_t                 i_size;
@@ -816,16 +816,16 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 
 /* !Codec Specific */
 
-static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
+static void InsertIntoDPB(struct dpb_s *dpb, frame_info_t *p_info)
 {
-    frame_info_t **pp_lead_in = &p_sys->dpb.p_entries;
+    frame_info_t **pp_lead_in = &dpb->p_entries;
 
     for ( ;; pp_lead_in = & ((*pp_lead_in)->p_next))
     {
         bool b_insert;
         if (*pp_lead_in == NULL)
             b_insert = true;
-        else if (p_sys->dpb.b_poc_based_reorder)
+        else if (dpb->b_poc_based_reorder)
             b_insert = ((*pp_lead_in)->i_foc > p_info->i_foc);
         else
             b_insert = ((*pp_lead_in)->pts >= p_info->pts);
@@ -834,20 +834,20 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
         {
             p_info->p_next = *pp_lead_in;
             *pp_lead_in = p_info;
-            p_sys->dpb.i_size++;
+            dpb->i_size++;
             break;
         }
     }
 #if 0
-    for (frame_info_t *p_in=p_sys->dpb.p_entries; p_in; p_in = p_in->p_next)
+    for (frame_info_t *p_in=dpb->p_entries; p_in; p_in = p_in->p_next)
         printf(" %d", p_in->i_foc);
     printf("\n");
 #endif
 }
 
-static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
+static int RemoveOneFrameFromDPB(struct dpb_s *dpb, date_t *ptsdate, picture_t **pp_ret)
 {
-    frame_info_t *p_info = p_sys->dpb.p_entries;
+    frame_info_t *p_info = dpb->p_entries;
     if (p_info == NULL)
     {
         *pp_ret = NULL;
@@ -863,33 +863,33 @@ static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
     do
     {
         /* Asynchronous fallback time init */
-        if(date_Get(&p_sys->pts) == VLC_TICK_INVALID)
+        if(date_Get(ptsdate) == VLC_TICK_INVALID)
         {
-            date_Set(&p_sys->pts, p_info->pts != VLC_TICK_INVALID ?
+            date_Set(ptsdate, p_info->pts != VLC_TICK_INVALID ?
                                   p_info->pts : p_info->dts );
         }
 
         /* Compute time from output if missing */
         if (p_info->pts == VLC_TICK_INVALID)
-            p_info->pts = date_Get(&p_sys->pts);
+            p_info->pts = date_Get(ptsdate);
         else
-            date_Set(&p_sys->pts, p_info->pts);
+            date_Set(ptsdate, p_info->pts);
 
         /* Update frame rate (used on interpolation) */
-        if(p_info->field_rate_num != p_sys->pts.i_divider_num ||
-           p_info->field_rate_den != p_sys->pts.i_divider_den)
+        if(p_info->field_rate_num != ptsdate->i_divider_num ||
+           p_info->field_rate_den != ptsdate->i_divider_den)
         {
             /* no date_Change due to possible invalid num */
-            date_Init(&p_sys->pts, p_info->field_rate_num,
+            date_Init(ptsdate, p_info->field_rate_num,
                                    p_info->field_rate_den);
-            date_Set(&p_sys->pts, p_info->pts);
+            date_Set(ptsdate, p_info->pts);
         }
 
         /* Set next picture time, in case it is missing */
         if (p_info->i_length)
-            date_Set(&p_sys->pts, p_info->pts + p_info->i_length);
+            date_Set(ptsdate, p_info->pts + p_info->i_length);
         else
-            date_Increment(&p_sys->pts, p_info->i_num_ts);
+            date_Increment(ptsdate, p_info->i_num_ts);
 
         if( p_info->p_picture ) /* Can have no picture attached to entry on error */
         {
@@ -901,15 +901,15 @@ static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
             pp_ret_last = &p_info->p_picture->p_next;
         }
 
-        p_sys->dpb.i_size--;
+        dpb->i_size--;
 
-        p_sys->dpb.p_entries = p_info->p_next;
+        dpb->p_entries = p_info->p_next;
         free(p_info);
-        p_info = p_sys->dpb.p_entries;
+        p_info = dpb->p_entries;
 
         if (p_info)
         {
-            if (p_sys->dpb.b_poc_based_reorder)
+            if (dpb->b_poc_based_reorder)
                 b_dequeue = (p_info->i_poc == i_framepoc);
             else
                 b_dequeue = (p_info->pts == i_framepts);
@@ -930,7 +930,7 @@ static void DrainDPBLocked(decoder_t *p_dec, bool flush)
     for ( ;; )
     {
         picture_t *p_fields;
-        if(RemoveOneFrameFromDPB(p_sys, &p_fields) != VLC_SUCCESS)
+        if(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_fields) != VLC_SUCCESS)
             break;
         for ( ; p_fields; )
         {
@@ -1026,7 +1026,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     while(p_info->b_flush || p_sys->dpb.i_size >= p_sys->dpb.i_max_pics)
     {
         picture_t *p_fields;
-        if(RemoveOneFrameFromDPB(p_sys, &p_fields) != VLC_SUCCESS)
+        if(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_fields) != VLC_SUCCESS)
             break;
         for(; p_fields;)
         {
@@ -1037,7 +1037,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
         }
     }
 
-    InsertIntoDPB(p_sys, p_info);
+    InsertIntoDPB(&p_sys->dpb, p_info);
 }
 
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
@@ -1908,7 +1908,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     vlc_mutex_lock(&p_sys->lock);
     DrainDPBLocked(p_dec, flush);
     picture_t *p_output;
-    assert(RemoveOneFrameFromDPB(p_sys, &p_output) == VLC_EGENERIC);
+    assert(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_output) == VLC_EGENERIC);
     p_sys->b_discard_decoder_output = false;
     p_sys->sync_state = p_sys->start_sync_state;
     vlc_mutex_unlock(&p_sys->lock);
