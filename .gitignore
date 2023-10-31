@@ -48,6 +48,8 @@ wxvlc
 vlc_install_dir/*
 plugins.dat
 patches/*
+share/macosx/Info.plist
+Frameworks
 
 # Ignore build dirs
 build*/
