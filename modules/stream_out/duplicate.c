@@ -76,6 +76,7 @@ typedef struct
 
 typedef struct {
     void *id;
+    char *es_id;
     /* Reference to the duplicated output stream. */
     sout_stream_t *stream_owner;
 } duplicated_id_t;
@@ -214,6 +215,22 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static char *
+SuffixESID( size_t stream_index, const char *es_id )
+{
+    char *dup_es_id;
+    if( stream_index == 0 )
+    {
+        /* first stream just forwards the original ES ID. */
+        return strdup( es_id );
+    }
+
+    const int wrote =
+        asprintf( &dup_es_id, "%s/duplicated-stream-%zu", es_id, stream_index );
+
+    return (wrote != -1) ? dup_es_id : NULL;
+}
+
 /*****************************************************************************
  * Add:
  *****************************************************************************/
@@ -239,18 +256,23 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
         if( ESSelected(p_stream->obj.logger, p_fmt, dup_stream->select_chain) )
         {
-            /* FIXME(Alaric): suffix the string id with the duplicated track
-             * count. */
+            char *dup_es_id = SuffixESID( idx, es_id );
+            if( unlikely(dup_es_id == NULL) )
+                goto error;
+
             void *next_id = sout_StreamIdAdd( dup_stream->stream,
-                                              p_fmt, es_id );
+                                              p_fmt, dup_es_id );
             if( next_id != NULL )
             {
                 msg_Dbg( p_stream, "    - added for output %zu", idx );
-                const duplicated_id_t dup_id = {
-                    .stream_owner = dup_stream->stream, .id = next_id};
+                const duplicated_id_t dup_id = {.id = next_id,
+                                                .es_id = dup_es_id,
+                                                .stream_owner =
+                                                    dup_stream->stream};
                 if( !vlc_vector_push(&id->dup_ids, dup_id) )
                 {
                     sout_StreamIdDel( dup_stream->stream, next_id );
+                    free( dup_id.es_id );
                     goto error;
                 }
             }
@@ -283,6 +305,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
     vlc_vector_foreach_ref( dup_id, &id->dup_ids )
     {
         sout_StreamIdDel( dup_id->stream_owner, dup_id->id );
+        free( dup_id->es_id );
     }
     vlc_vector_destroy( &id->dup_ids );
 
