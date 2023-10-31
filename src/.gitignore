@@ -1,4 +1,5 @@
 test_*
+checkheader_*_h.c
 fourcc_gen
 fourcc_tables.h
 libvlccore_win32_rc.rc
