@@ -286,6 +286,7 @@ VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
  *
  * The returned opaque identifier should be released by ::sout_StreamIdDel().
  *
+ * \param s
  * \param fmt A non-NULL es-format descriptor.
  * \param es_id A non-NULL unique string describing the ES. This string is
  *              guaranteed to be valid for the whole lifetime of the ES (at
@@ -297,20 +298,18 @@ VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
  * \return An opaque pointer identifying the ES.
  * \retval NULL In case of error.
  */
-VLC_API void *sout_StreamIdAdd(sout_stream_t *,
+VLC_API void *sout_StreamIdAdd(sout_stream_t *s,
                                const es_format_t *fmt,
                                const char *es_id) VLC_USED;
 
 /**
  * Delete an ES from the stream output.
  *
+ * \param s
  * \param id An opaque pointer identifying the ES returned by
  * ::sout_StreamIdAdd().
- *
- * \return An opaque pointer identifying the ES.
- * \retval NULL In case of error.
  */
-VLC_API void sout_StreamIdDel(sout_stream_t *, void *id);
+VLC_API void sout_StreamIdDel(sout_stream_t *s, void *id);
 
 /**
  * Pass a \ref vlc_frame_t to the stream output.
@@ -321,13 +320,15 @@ VLC_API void sout_StreamIdDel(sout_stream_t *, void *id);
  * \warning Only single frames are expected through this call, for frame chains,
  * you'll have to call this for each frames.
  *
+ * \param s
  * \param id The ES identifier that sent the frame.
+ * \param f a frame that will be consumed (through vlc_frame_Release)
  *
  * \retval VLC_SUCCESS on success.
  * \retval VLC_EGENERIC on non-recoverable unspecific error cases.
  * \retval (-ERRNO) A negated errno value describing the error case.
  */
-VLC_API int sout_StreamIdSend(sout_stream_t *, void *id, vlc_frame_t *);
+VLC_API int sout_StreamIdSend(sout_stream_t *s, void *id, vlc_frame_t *f);
 
 /**
  * Signal a flush of an ES to the stream output.
@@ -335,9 +336,10 @@ VLC_API int sout_StreamIdSend(sout_stream_t *, void *id, vlc_frame_t *);
  * Flush is an optional control, if implemented, it will drop all the bufferized
  * data from ES and/or forward the Flush command to the next stream.
  *
+ * \param s
  * \param id An identifier of the ES to flush.
  */
-VLC_API void sout_StreamFlush(sout_stream_t *, void *id);
+VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
 
 /**
  * Signal a PCR update to the stream output.
