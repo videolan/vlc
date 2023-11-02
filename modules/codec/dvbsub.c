@@ -1510,13 +1510,17 @@ static subpicture_t *render( decoder_t *p_dec )
         i_base_y += p_sys->display.i_y;
     }
 
+    if ( p_sys->p_page == NULL)
+    {
+        return p_spu;
+    }
+
     /* Loop on region definitions */
 #ifdef DEBUG_DVBSUB
-    if( p_sys->p_page )
-        msg_Dbg( p_dec, "rendering %i regions", p_sys->p_page->i_region_defs );
+    msg_Dbg( p_dec, "rendering %i regions", p_sys->p_page->i_region_defs );
 #endif
 
-    for( i = 0; p_sys->p_page && ( i < p_sys->p_page->i_region_defs ); i++ )
+    for( i = 0; i < p_sys->p_page->i_region_defs; i++ )
     {
         dvbsub_region_t     *p_region;
         dvbsub_regiondef_t  *p_regiondef;
