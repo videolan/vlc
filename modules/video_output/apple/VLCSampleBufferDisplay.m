@@ -437,9 +437,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
         const size_t pixels_offset =
                 r->fmt.i_y_offset * r->p_picture->p->i_pitch +
                 r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
-        r->p_picture->p->i_visible_pitch = 
-            r->fmt.i_visible_width * r->p_picture->p->i_pixel_pitch;
-        
+
         CFDataRef data = CFDataCreate(
             NULL,
             r->p_picture->p->p_pixels + pixels_offset,
