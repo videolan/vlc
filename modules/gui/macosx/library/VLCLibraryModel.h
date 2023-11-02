@@ -86,6 +86,7 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 
 - (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(enum vlc_ml_parent_type)parentType;
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(enum vlc_ml_parent_type)parentType;
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending;
 - (void)filterByString:(NSString*)filterString;

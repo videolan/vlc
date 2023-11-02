@@ -556,6 +556,18 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(enum vlc_ml_parent_type)parentType
+{
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = [self listOfLibraryItemsOfParentType:parentType];
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [[NSMutableArray alloc] initWithCapacity:self.numberOfAudioMedia];
+
+    for (id<VLCMediaLibraryItemProtocol> libraryItem in libraryItems) {
+        [mediaItems addObjectsFromArray:libraryItem.mediaItems];
+    }
+
+    return mediaItems.copy;
+}
+
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending
 {
     if(sortCriteria == _sortCriteria && descending == _sortDescending) {
