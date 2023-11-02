@@ -404,8 +404,8 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 }
 
 static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys, 
-                                 subpicture_t *subpicture,
-                                 subpicture_region_t *r)
+                                 const subpicture_t *subpicture,
+                                 const subpicture_region_t *r)
 {
     const float scale_w = (float)(sys->place.width)  / subpicture->i_original_picture_width;
     const float scale_h = (float)(sys->place.height) / subpicture->i_original_picture_height;
