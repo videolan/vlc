@@ -171,6 +171,14 @@
     default:
         break;
     }
+
+    // If the parent item class and the actual item class are the same, we likely want
+    // to also play the entirety of the library -- think of playing an album within the
+    // albums view, or playing a song within the songs view.
+    if (_parentItem.class == self.item.class) {
+        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
+    }
+
     return _parentItem;
 }
 
