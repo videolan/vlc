@@ -910,6 +910,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
 
 failure:
     vlc_mutex_unlock( &p_sys->lock );
+    subpicture_region_Delete( p_r );
     vlc_spu_regions_Clear( &p_subpic->regions );
 }
 
