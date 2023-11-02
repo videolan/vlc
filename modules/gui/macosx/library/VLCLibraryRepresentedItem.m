@@ -111,24 +111,16 @@
     }];
 }
 
-- (const id<VLCMediaLibraryItemProtocol>)parentItemForItem:(const id<VLCMediaLibraryItemProtocol>)item
+- (int64_t)parentItemIdForItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
-    // If we have no defined parent type, use the all audio groups item.
-    // This item essentially represents the entirety of the library and all of its media items.
-    const enum vlc_ml_parent_type parentType = self.parentType;
-    if (parentType == VLC_ML_PARENT_UNKNOWN) {
-        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
-        return _parentItem;
-    }
-
     // Decide which other items we are going to be adding to the playlist when playing the item.
     // Key for playing in library mode, not in individual mode
-    int64_t parentItemId = -1;
+    int64_t parentItemId = NSNotFound;
 
     if ([item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)item;
 
-        switch (parentType) {
+        switch (self.parentType) {
         case VLC_ML_PARENT_ALBUM:
             parentItemId = mediaItem.albumID;
             break;
@@ -144,7 +136,7 @@
     } else if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
         VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)item;
 
-        switch (parentType) {
+        switch (self.parentType) {
         case VLC_ML_PARENT_ARTIST:
             parentItemId = album.artistID;
             break;
@@ -159,7 +151,23 @@
         }
     }
 
-    if (parentItemId < 0) {
+    return parentItemId;
+}
+
+- (const id<VLCMediaLibraryItemProtocol>)parentItemForItem:(const id<VLCMediaLibraryItemProtocol>)item
+{
+    // If we have no defined parent type, use the all audio groups item.
+    // This item essentially represents the entirety of the library and all of its media items.
+    const enum vlc_ml_parent_type parentType = self.parentType;
+    if (parentType == VLC_ML_PARENT_UNKNOWN) {
+
+        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
+        return _parentItem;
+
+    }
+
+    const int64_t parentItemId = [self parentItemIdForItem:item];
+    if (parentItemId == NSNotFound) {
         return nil;
     }
 
@@ -175,13 +183,6 @@
         break;
     default:
         break;
-    }
-
-    // If the parent item class and the actual item class are the same, we likely want
-    // to also play the entirety of the library -- think of playing an album within the
-    // albums view, or playing a song within the songs view.
-    if (_parentItem.class == self.item.class) {
-        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
     }
 
     return _parentItem;
