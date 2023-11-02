@@ -26,6 +26,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
 
+#import <vlc_media_library.h>
 #import <vlc_url.h>
 
 NSString * const VLCMediaLibraryMediaItemPasteboardType = @"VLCMediaLibraryMediaItemPasteboardType";
@@ -329,6 +330,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return 0;
 }
 
+- (enum vlc_ml_parent_type)matchingParentType
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return VLC_ML_PARENT_UNKNOWN;
+}
+
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
     [self doesNotRecognizeSelector:_cmd];
@@ -435,6 +442,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, self.libraryID);
 }
 
+- (enum vlc_ml_parent_type)matchingParentType
+{
+    return VLC_ML_PARENT_ARTIST;
+}
+
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 {
     for(VLCMediaLibraryAlbum* album in self.albums) {
@@ -526,6 +538,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _actionableDetailLibraryItem;
 }
 
+- (enum vlc_ml_parent_type)matchingParentType
+{
+    return VLC_ML_PARENT_ALBUM;
+}
+
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
     for(VLCMediaLibraryMediaItem* mediaItem in self.mediaItems) {
@@ -604,6 +621,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, self.libraryID);
+}
+
+- (enum vlc_ml_parent_type)matchingParentType
+{
+    return VLC_ML_PARENT_GENRE;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock

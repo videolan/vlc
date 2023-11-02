@@ -35,10 +35,12 @@
 @synthesize artists = _artists;
 @synthesize numberOfTracks = _numberOfTracks;
 @synthesize mediaItems = _mediaItems;
+@synthesize matchingParentType = _matchingParentType;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    _matchingParentType = VLC_ML_PARENT_UNKNOWN;
     _albums = libraryModel.listOfAlbums;
     _artists = libraryModel.listOfArtists;
     _numberOfTracks = libraryModel.numberOfAudioMedia;
