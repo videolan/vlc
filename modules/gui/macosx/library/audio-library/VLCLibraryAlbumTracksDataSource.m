@@ -53,7 +53,7 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
     self.internalAlbum = album;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        self.tracks = [self.representedAlbum tracksAsMediaItems];
+        self.tracks = self.representedAlbum.mediaItems;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completionHandler != nil) {

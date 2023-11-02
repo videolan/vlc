@@ -34,7 +34,7 @@
 @synthesize albums = _albums;
 @synthesize artists = _artists;
 @synthesize numberOfTracks = _numberOfTracks;
-@synthesize tracksAsMediaItems = _tracksAsMediaItems;
+@synthesize mediaItems = _mediaItems;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
 {
@@ -42,7 +42,7 @@
     _albums = libraryModel.listOfAlbums;
     _artists = libraryModel.listOfArtists;
     _numberOfTracks = libraryModel.numberOfAudioMedia;
-    _tracksAsMediaItems = libraryModel.listOfAudioMedia;
+    _mediaItems = libraryModel.listOfAudioMedia;
 
     const NSUInteger numberOfAlbums = libraryModel.numberOfAlbums;
 

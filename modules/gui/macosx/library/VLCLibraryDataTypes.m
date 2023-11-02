@@ -274,6 +274,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return nil;
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 - (id<VLCMediaLibraryItemProtocol>)actionableDetailLibraryItem
 {
     [self doesNotRecognizeSelector:_cmd];
@@ -311,7 +317,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return nil;
 }
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     [self doesNotRecognizeSelector:_cmd];
     return nil;
@@ -330,7 +336,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
-    return [[self tracksAsMediaItems] firstObject];
+    return self.mediaItems.firstObject;
 }
 
 - (void)moveToTrash
@@ -424,7 +430,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return fetchAlbumsForLibraryItem(vlc_ml_list_artist_albums, self.libraryID);
 }
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, self.libraryID);
 }
@@ -506,7 +512,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return @[self];
 }
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, self.libraryID);
 }
@@ -522,7 +528,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
 {
-    for(VLCMediaLibraryMediaItem* mediaItem in self.tracksAsMediaItems) {
+    for(VLCMediaLibraryMediaItem* mediaItem in self.mediaItems) {
         mediaItemBlock(mediaItem);
     }
 }
@@ -595,7 +601,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, self.libraryID);
 }
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, self.libraryID);
 }
@@ -618,7 +624,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
             break;
         case VLC_ML_PARENT_UNKNOWN:
         default:
-            childItems = self.tracksAsMediaItems;
+            childItems = self.mediaItems;
             break;
     }
 
@@ -922,6 +928,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return self;
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    return @[self];
+}
+
 - (id<VLCMediaLibraryItemProtocol>)actionableDetailLibraryItem
 {
     if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK && _actionableDetailLibraryItem == nil) {
@@ -1207,6 +1218,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize displayString = _displayString;
 @synthesize durationString = _durationString;
 @synthesize firstMediaItem = _firstMediaItem;
+@synthesize mediaItems = _mediaItems;
 @synthesize libraryID = _libraryId;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;

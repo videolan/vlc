@@ -156,7 +156,7 @@ actionCallback(encodedBy);
 _##field##TextField.delegate = self
 
     PERFORM_ACTION_ALL_TEXTFIELDS(SET_METADATA_SETTING_FIELD_DELEGATE)
-    
+
     [self updateRepresentation];
 }
 
@@ -272,7 +272,7 @@ _##field##TextField.delegate = self
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
 {
     NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
-    for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.tracksAsMediaItems) {
+    for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
         [inputItems addObject:mediaItem.inputItem];
     }
 
@@ -345,7 +345,7 @@ _##field##TextField.delegate = self
     } else {                                                        \
         _##field##TextField.originalStateString = @"";              \
     }                                                               \
-}                                                           
+}
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_INPUTITEM);
 
@@ -375,7 +375,7 @@ _##field##TextField.delegate = self
 }                                                                           \
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_DICT);
-    
+
 #undef FILL_FIELD_FROM_DICT
 
     _artworkImageButton.image = _artwork;
@@ -467,7 +467,7 @@ _##field##TextField.originalStateString = @"";
 - (void)controlTextDidChange:(NSNotification *)notification
 {
     BOOL settingsChanged = NO;
-    
+
 #define CHECK_FIELD_SETTING_CHANGED(field)                              \
 settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 
@@ -476,7 +476,7 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 #undef CHECK_FIELD_SETTING_CHANGED
 
     settingsChanged = settingsChanged || _newArtworkURL != nil;
-    
+
     _saveMetaDataButton.enabled = settingsChanged;
 }
 
@@ -521,7 +521,7 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 
 #define SET_INPUTITEM_MATCHING_PROP(field)      \
 SET_INPUTITEM_PROP(field, field)                \
-    
+
     for (VLCInputItem * const inputItem in inputItems) {
         SET_INPUTITEM_PROP(title, name); // Input items do not have a title field
         PERFORM_ACTION_READWRITE_TEXTFIELDS(SET_INPUTITEM_MATCHING_PROP);
@@ -535,7 +535,7 @@ SET_INPUTITEM_PROP(field, field)                \
 
 #undef SET_INPUTITEM_MATCHING_PROP
 #undef SET_INPUTITEM_PROP
-    
+
     [self updateRepresentation];
     [self reloadMediaLibraryFoldersForInputItems:inputItems];
 }
