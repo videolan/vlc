@@ -117,6 +117,9 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *detailString;
 @property (readonly) NSString *durationString;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
+// Media items should be delivered album-wise. If it is required for derivative
+// types to provide media items in a different grouping or order, use methods
+// or properties specific to the type (e.g. like in VLCMeidaLibraryGenre)
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *mediaItems;
 // If the info in detailString contains a library object that can be used for nav
 // We lazy load the actionable library item so avoid using the property until we

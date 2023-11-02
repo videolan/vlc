@@ -76,7 +76,6 @@
         return _itemIndexInParent;
     }
 
-    const NSInteger itemId = self.item.libraryID;
     NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
     if (_parentType == VLC_ML_PARENT_UNKNOWN) {
@@ -89,6 +88,15 @@
         items = self.parentItem.mediaItems;
     }
 
+    // We search by mediaItem, so we want to find the index of the item in the parent.
+    // Specifically, the first media item. For a media item, we will just receive its self.
+    // For other types, we will get the first item. Albums, genres, and artists all provide
+    // their media items in an album-by-album manner, so this works for us.
+    //
+    // Remember that library IDs for albums, genres, and artists are specific to them and we
+    // cannot use these to search the list of audio media
+
+    const int64_t itemId = self.item.firstMediaItem.libraryID;
     _itemIndexInParent = [items indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem,
                                                                const NSUInteger idx,
                                                                BOOL * const stop) {
