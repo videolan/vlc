@@ -811,12 +811,11 @@ static void ParseUSFString( decoder_t *p_dec,
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
 
-    while( *psz_subtitle )
+    for( ; *psz_subtitle; psz_subtitle++ )
     {
         if( *psz_subtitle == '<' )
         {
             char *psz_end = NULL;
-
 
             if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
                     ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
@@ -919,8 +918,6 @@ static void ParseUSFString( decoder_t *p_dec,
 
             psz_subtitle += strcspn( psz_subtitle, ">" );
         }
-
-        psz_subtitle++;
     }
 }
 
