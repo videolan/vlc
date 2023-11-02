@@ -652,7 +652,8 @@ static void on_player_category_delay_changed(vlc_player_t *,
                 that->m_subtitleDelay = new_delay;
                 emit that->q_func()->subtitleDelayChanged( new_delay );
                 break;
-            default: vlc_assert_unreachable();
+            default:
+                break;
         }
     });
 }
