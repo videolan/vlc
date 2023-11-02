@@ -468,11 +468,6 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
 
     p_text_region->p_text->psz_text = psz_plaintext;
 
-    /* Look for position arguments which may override the style-based
-     * defaults.
-     */
-    SetupPositions( p_text_region, psz_subtitle );
-
     return p_text_region;
 }
 
@@ -817,6 +812,7 @@ static void ParseUSFString( decoder_t *p_dec,
             continue;
 
         char *psz_end = NULL;
+        subpicture_region_t *p_region = NULL;
 
         if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
                 ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
@@ -825,8 +821,6 @@ static void ParseUSFString( decoder_t *p_dec,
 
             if( psz_end )
             {
-                subpicture_region_t  *p_text_region;
-
                 char *psz_knodes = strndup( &psz_subtitle[9], psz_end - &psz_subtitle[9] );
                 if( psz_knodes )
                 {
@@ -835,15 +829,12 @@ static void ParseUSFString( decoder_t *p_dec,
                     free( psz_knodes );
                     if( psz_flat )
                     {
-                        p_text_region = CreateTextRegion( p_dec,
-                                                          psz_flat,
-                                                          psz_flat,
-                                                          p_sys->i_align );
-                        if( p_text_region )
-                        {
-                            vlc_spu_regions_push(regions, p_text_region);
-                        }
-                        else free( psz_flat );
+                        p_region = CreateTextRegion( p_dec,
+                                                     psz_flat,
+                                                     psz_flat,
+                                                     p_sys->i_align );
+                        if( !p_region )
+                            free( psz_flat );
                     }
                 }
 
@@ -853,8 +844,6 @@ static void ParseUSFString( decoder_t *p_dec,
         else if(( !strncasecmp( psz_subtitle, "<image ", 7 )) ||
                 ( !strncasecmp( psz_subtitle, "<image>", 7 )))
         {
-            subpicture_region_t *p_image_region = NULL;
-
             psz_end = strcasestr( psz_subtitle, "</image>" );
             char *psz_content = strchr( psz_subtitle, '>' );
             int   i_transparent = -1;
@@ -880,40 +869,40 @@ static void ParseUSFString( decoder_t *p_dec,
                 char *psz_filename = strndup( &psz_content[1], psz_end - &psz_content[1] );
                 if( psz_filename )
                 {
-                    p_image_region = LoadEmbeddedImage( p_dec,
+                    p_region = LoadEmbeddedImage( p_dec,
                                         psz_filename, i_transparent );
                     free( psz_filename );
                 }
             }
 
             if( psz_end ) psz_end += strcspn( psz_end, ">" ) + 1;
-
-            if( p_image_region )
-            {
-                SetupPositions( p_image_region, psz_subtitle );
-                vlc_spu_regions_push(regions, p_image_region);
-            }
         }
         else
         {
-            subpicture_region_t  *p_text_region;
-
             psz_end = psz_subtitle + strlen( psz_subtitle );
 
             char *psz_flat = CreatePlainText( psz_subtitle );
             if( psz_flat )
             {
-                p_text_region = CreateTextRegion( p_dec,
-                                                  psz_subtitle,
-                                                  psz_flat,
-                                                  p_sys->i_align );
-                if( p_text_region )
-                {
-                    vlc_spu_regions_push(regions, p_text_region);
-                }
-                else free( psz_flat );
+                p_region = CreateTextRegion( p_dec,
+                                             psz_subtitle,
+                                             psz_flat,
+                                             p_sys->i_align );
+                if( !p_region )
+                    free( psz_flat );
             }
         }
+
+        if( p_region )
+        {
+            vlc_spu_regions_push(regions, p_region);
+
+            /* Look for position arguments which may override the style-based
+            * defaults.
+            */
+            SetupPositions( p_region, psz_subtitle );
+        }
+
         if( psz_end )
             psz_subtitle = psz_end - 1;
 
