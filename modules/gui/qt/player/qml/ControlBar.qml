@@ -50,10 +50,10 @@ T.Pane {
 
     readonly property real sliderY: mapFromItem(contentItem, 0, contentItem.sliderY).y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
-    property alias identifier: playerControlLayout.identifier
-    property alias sliderHeight: trackPositionSlider.barHeight
+    property int identifier: -1
+    property real sliderHeight: VLCStyle.heightBar_xxsmall
     property real bookmarksHeight: VLCStyle.controlBarBookmarksHeight
-    property alias showRemainingTime: mediaRemainingTime.visible
+    property bool showRemainingTime: true
 
     property var menu: undefined
 
@@ -68,7 +68,8 @@ T.Pane {
     Accessible.name: I18n.qtr("Player controls")
 
     function showChapterMarks() {
-        trackPositionSlider.showChapterMarks()
+        if (contentItem.trackPositionSlider)
+            contentItem.trackPositionSlider.showChapterMarks()
     }
 
     function applyMenu(menu) {
@@ -105,6 +106,12 @@ T.Pane {
 
         readonly property real sliderY: row2.y
 
+        property alias trackPositionSlider: trackPositionSlider
+
+        property alias mediaRemainingTime: mediaRemainingTime
+
+        property alias playerControlLayout: playerControlLayout
+
         readonly property list<Item> strayItems: [
             T.Label {
                 id: mediaTime
@@ -125,6 +132,8 @@ T.Pane {
                 color: mediaTime.color
                 font.pixelSize: mediaTime.font.pixelSize
 
+                visible: root.showRemainingTime
+
                 anchors.right: (parent === pseudoRow) ? parent.right : undefined
                 anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
 
@@ -136,7 +145,7 @@ T.Pane {
             SliderBar {
                 id: trackPositionSlider
 
-                barHeight: VLCStyle.heightBar_xxsmall
+                barHeight: root.sliderHeight
                 Layout.fillWidth: true
                 enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
 
@@ -232,6 +241,8 @@ T.Pane {
             Layout.fillHeight: true
             Layout.leftMargin: VLCStyle.margin_large
             Layout.rightMargin: VLCStyle.margin_large
+
+            identifier: root.identifier
 
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
