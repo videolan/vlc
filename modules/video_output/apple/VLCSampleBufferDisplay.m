@@ -125,7 +125,7 @@ static void DeleteCVPXConverter( filter_t * p_converter )
 @class VLCSampleBufferSubpicture, VLCSampleBufferDisplay;
 
 @interface VLCSampleBufferSubpictureRegion: NSObject
-@property (nonatomic, weak) VLCSampleBufferSubpicture *subpicture;   
+@property (nonatomic, weak) VLCSampleBufferSubpicture *subpicture;
 @property (nonatomic) CGRect backingFrame;
 @property (nonatomic) CGImageRef image;
 @end
@@ -189,9 +189,9 @@ static void DeleteCVPXConverter( filter_t * p_converter )
     #else
     CGContextRef cgCtx = UIGraphicsGetCurrentContext();
     #endif
-    
+
     CGContextClearRect(cgCtx, self.bounds);
-    
+
 #if TARGET_OS_IPHONE
     CGContextSaveGState(cgCtx);
     CGAffineTransform translate = CGAffineTransformTranslate(CGAffineTransformIdentity, 0.0, self.frame.size.height);
@@ -274,7 +274,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 {
     return YES;
 }
-#endif 
+#endif
 
 /*
  * General properties
@@ -331,7 +331,7 @@ static void Close(vout_display_t *vd)
 static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
-    
+
     @synchronized(sys.displayLayer) {
         if (sys.displayLayer == nil)
             return;
@@ -387,7 +387,7 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
         .duration = kCMTimeInvalid,
         .presentationTimeStamp = CMTimeMakeWithSeconds(ca_date, 1000000)
     };
-    
+
     err = CMSampleBufferCreateReadyWithImageBuffer(kCFAllocatorDefault, pixelBuffer, formatDesc, &sampleTimingInfo, &sampleBuffer);
     CFRelease(formatDesc);
     CVPixelBufferRelease(pixelBuffer);
@@ -403,7 +403,7 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
     CFRelease(sampleBuffer);
 }
 
-static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys, 
+static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
                                  const subpicture_t *subpicture,
                                  const subpicture_region_t *r)
 {
@@ -414,22 +414,22 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
     const float y = subpicture->i_original_picture_height - r->fmt.i_visible_height - r->i_y;
 
     return CGRectMake(
-        scale_w * r->i_x + sys->place.x, 
+        scale_w * r->i_x + sys->place.x,
         scale_h * y + sys->place.y,
-        scale_w * r->fmt.i_visible_width, 
+        scale_w * r->fmt.i_visible_width,
         scale_h * r->fmt.i_visible_height
     );
 }
 
-static void UpdateSubpictureRegions(vout_display_t *vd, 
-                                    subpicture_t *subpicture) 
+static void UpdateSubpictureRegions(vout_display_t *vd,
+                                    subpicture_t *subpicture)
 {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
 
     if (sys.subpicture == nil || subpicture == NULL)
         return;
-    
+
     NSMutableArray *regions = [NSMutableArray new];
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
     for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next) {
@@ -444,8 +444,8 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
             length - pixels_offset);
         CGDataProviderRef provider = CGDataProviderCreateWithCFData(data);
         CGImageRef image = CGImageCreate(
-            r->fmt.i_visible_width, r->fmt.i_visible_height, 
-            8, 32, r->p_picture->p->i_pitch,  
+            r->fmt.i_visible_width, r->fmt.i_visible_height,
+            8, 32, r->p_picture->p->i_pitch,
             space, kCGImageByteOrderDefault | kCGImageAlphaFirst,
             provider, NULL, true, kCGRenderingIntentDefault
             );
@@ -525,19 +525,19 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, subpicture_t *subpicture)
 
     /* Store the current subpicture regions in order to compare then later.
      */
-    
+
     UpdateSubpictureRegions(vd, subpicture);
     return true;
 }
 
-static void RenderSubpicture(vout_display_t *vd, subpicture_t *spu) 
+static void RenderSubpicture(vout_display_t *vd, subpicture_t *spu)
 {
     if (!IsSubpictureDrawNeeded(vd, spu))
         return;
-    
+
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [sys.spuView drawSubpicture:sys.subpicture];
     });
@@ -555,9 +555,9 @@ static void PrepareDisplay (vout_display_t *vd) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sys.displayView)
             return;
-        VLCSampleBufferDisplayView *displayView = 
+        VLCSampleBufferDisplayView *displayView =
             [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:vd];
-        VLCSampleBufferSubpictureView *spuView = 
+        VLCSampleBufferSubpictureView *spuView =
             [VLCSampleBufferSubpictureView new];
         id container = sys.container;
         //TODO: Is it still relevant ?
@@ -585,14 +585,14 @@ static void PrepareDisplay (vout_display_t *vd) {
     });
 }
 
-static void Prepare (vout_display_t *vd, picture_t *pic, 
+static void Prepare (vout_display_t *vd, picture_t *pic,
                            subpicture_t *subpicture, vlc_tick_t date)
 {
     PrepareDisplay(vd);
     if (pic) {
         RenderPicture(vd, pic, date);
     }
-    
+
     RenderSubpicture(vd, subpicture);
 }
 
@@ -675,7 +675,7 @@ static int Open (vout_display_t *vd,
         };
 
         vd->info.subpicture_chromas = subfmts;
-        
+
         return VLC_SUCCESS;
     }
 }
