@@ -22,6 +22,8 @@
 
 #import "VLCLibraryModel.h"
 
+#import <vlc_media_library.h>
+
 #import "main/VLCMain.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "extensions/NSString+Helpers.h"
@@ -537,6 +539,21 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
     vlc_ml_album_list_release(p_albumList);
     return [mutableArray copy];
+}
+
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(enum vlc_ml_parent_type)parentType
+{
+    switch(parentType) {
+    case VLC_ML_PARENT_ARTIST:
+        return self.listOfArtists;
+    case VLC_ML_PARENT_ALBUM:
+        return self.listOfAlbums;
+    case VLC_ML_PARENT_GENRE:
+        return self.listOfGenres;
+    case VLC_ML_PARENT_UNKNOWN:
+    default:
+        return self.listOfAudioMedia;
+    }
 }
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending
