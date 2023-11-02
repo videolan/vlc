@@ -42,7 +42,7 @@ extern NSString *VLCAudioLibrarySongCellIdentifier;
 @property (readwrite, assign) IBOutlet NSTextField *trackNumberTextField;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
 
-@property (readwrite, assign, nonatomic) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 - (IBAction)playInstantly:(id)sender;
 
