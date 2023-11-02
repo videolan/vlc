@@ -39,15 +39,21 @@
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
 {
+     return [self initWithDisplayString:displayString
+                  accordingToParentType:VLC_ML_PARENT_UNKNOWN];
+}
+
+- (instancetype)initWithDisplayString:(NSString *)displayString
+                accordingToParentType:(enum vlc_ml_parent_type)parentType
+{
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _matchingParentType = VLC_ML_PARENT_UNKNOWN;
     _albums = libraryModel.listOfAlbums;
     _artists = libraryModel.listOfArtists;
-    _numberOfTracks = libraryModel.numberOfAudioMedia;
-    _mediaItems = libraryModel.listOfAudioMedia;
+    _mediaItems = [libraryModel listOfMediaItemsForParentType:parentType];
+    _numberOfTracks = _mediaItems.count;
 
     const NSUInteger numberOfAlbums = libraryModel.numberOfAlbums;
-
     NSString * const detailString = [NSString stringWithFormat:_NS("%li albums, %li songs"), numberOfAlbums, _numberOfTracks];
 
     return [super initWithDisplayString:displayString withDetailString:detailString];

@@ -24,11 +24,15 @@
 
 #import "library/VLCLibraryDataTypes.h"
 
+#import <vlc_media_library.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAllAudioGroupsMediaLibraryItem : VLCMediaLibraryDummyItem<VLCMediaLibraryAudioGroupProtocol>
 
 - (nullable instancetype)initWithDisplayString:(NSString *)displayString;
+- (nullable instancetype)initWithDisplayString:(NSString *)displayString // Parent type affects ordering of items
+                         accordingToParentType:(enum vlc_ml_parent_type)parentType;
 
 @end
 
