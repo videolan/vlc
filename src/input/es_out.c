@@ -3540,36 +3540,6 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         return VLC_SUCCESS;
     }
 
-    case ES_OUT_GET_PCR_SYSTEM:
-    {
-        if( p_sys->b_buffering )
-            return VLC_EGENERIC;
-
-        es_out_pgrm_t *p_pgrm = p_sys->p_pgrm;
-        if( !p_pgrm )
-            return VLC_EGENERIC;
-
-        vlc_tick_t *pi_system = va_arg( args, vlc_tick_t *);
-        vlc_tick_t *pi_delay  = va_arg( args, vlc_tick_t *);
-        input_clock_GetSystemOrigin( p_pgrm->p_input_clock, pi_system, pi_delay );
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_MODIFY_PCR_SYSTEM:
-    {
-        if( p_sys->b_buffering )
-            return VLC_EGENERIC;
-
-        es_out_pgrm_t *p_pgrm = p_sys->p_pgrm;
-        if( !p_pgrm )
-            return VLC_EGENERIC;
-
-        const bool    b_absolute = va_arg( args, int );
-        const vlc_tick_t i_system   = va_arg( args, vlc_tick_t );
-        input_clock_ChangeSystemOrigin( p_pgrm->p_input_clock, b_absolute, i_system );
-        return VLC_SUCCESS;
-    }
-
     case ES_OUT_POST_SUBNODE:
     {
         input_thread_t *input = p_sys->p_input;

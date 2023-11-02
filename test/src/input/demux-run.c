@@ -191,9 +191,6 @@ static int EsOutControl(es_out_t *out, input_source_t* in, int query, va_list ar
             break;
         case ES_OUT_SET_META:
             break;
-        case ES_OUT_GET_PCR_SYSTEM:
-        case ES_OUT_MODIFY_PCR_SYSTEM:
-            abort();
         default:
             return VLC_EGENERIC;
     }

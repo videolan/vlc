@@ -695,24 +695,8 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
         return ControlLockedGetEmpty( p_out, in, pb_empty );
     }
 
-    case ES_OUT_GET_PCR_SYSTEM:
-        if( p_sys->b_delayed )
-            return VLC_EGENERIC;
-        /* fall through */
     case ES_OUT_POST_SUBNODE:
         return es_out_in_vaControl( p_sys->p_out, in, i_query, args );
-
-    case ES_OUT_MODIFY_PCR_SYSTEM:
-    {
-        const bool    b_absolute = va_arg( args, int );
-        const vlc_tick_t i_system   = va_arg( args, vlc_tick_t );
-
-        if( b_absolute && p_sys->b_delayed )
-            return VLC_EGENERIC;
-
-        return es_out_in_Control( p_sys->p_out, in, i_query, b_absolute,
-                                  i_system );
-    }
 
     default:
         vlc_assert_unreachable();
