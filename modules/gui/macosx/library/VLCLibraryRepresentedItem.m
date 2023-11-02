@@ -108,9 +108,12 @@
 
 - (const id<VLCMediaLibraryItemProtocol>)parentItemForItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
+    // If we have no defined parent type, use the all audio groups item.
+    // This item essentially represents the entirety of the library and all of its media items.
     const enum vlc_ml_parent_type parentType = self.parentType;
     if (parentType == VLC_ML_PARENT_UNKNOWN) {
-        return [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
+        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
+        return _parentItem;
     }
 
     // Decide which other items we are going to be adding to the playlist when playing the item.
@@ -157,14 +160,18 @@
 
     switch (parentType) {
     case VLC_ML_PARENT_ALBUM:
-        return [VLCMediaLibraryAlbum albumWithID:parentItemId];
+        _parentItem = [VLCMediaLibraryAlbum albumWithID:parentItemId];
+        break;
     case VLC_ML_PARENT_ARTIST:
-        return [VLCMediaLibraryArtist artistWithID:parentItemId];
+        _parentItem = [VLCMediaLibraryArtist artistWithID:parentItemId];
+        break;
     case VLC_ML_PARENT_GENRE:
-        return [VLCMediaLibraryGenre genreWithID:parentItemId];
+        _parentItem = [VLCMediaLibraryGenre genreWithID:parentItemId];
+        break;
     default:
-        return nil;
+        break;
     }
+    return _parentItem;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)parentItem
