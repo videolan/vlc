@@ -41,17 +41,14 @@ T.Pane {
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+    implicitHeight: Math.max(implicitBackgroundHeight + bottomInset,
                              contentHeight + topPadding + bottomPadding)
+
+    topInset: sliderY
 
     bottomPadding: VLCStyle.margin_xsmall
 
-    BindingCompat on topInset {
-        delayed: true
-        value: row2.y
-    }
-
-    readonly property alias sliderY: row2.y
+    readonly property real sliderY: mapFromItem(contentItem, 0, contentItem.sliderY).y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
@@ -105,6 +102,8 @@ T.Pane {
 
     contentItem: ColumnLayout {
         spacing: VLCStyle.margin_xsmall
+
+        readonly property real sliderY: row2.y
 
         Item {
             // BUG: RowLayout can not be used here
