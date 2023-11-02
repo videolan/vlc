@@ -335,7 +335,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
 
     subpicture_t *p_spu = NULL;
-    overlay_t *p_overlay = NULL;
+    overlay_t *p_overlay;
 
     p_spu = filter_NewSubpicture( p_filter );
     if( !p_spu )
@@ -347,8 +347,11 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     p_spu->b_ephemer = true;
 
     subpicture_region_t **pp_region = &p_spu->p_region;
-    while( (p_overlay = ListWalk( &p_sys->overlays )) )
+    vlc_vector_foreach(p_overlay, &p_sys->overlays)
     {
+        if (!p_overlay->b_active || p_overlay->format.i_chroma == 0)
+            continue;
+
         subpicture_region_t *p_region;
 
         if( p_overlay->format.i_chroma == 0 )

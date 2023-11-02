@@ -26,6 +26,7 @@
 #include <vlc_common.h>
 #include <vlc_filter.h>
 #include <vlc_text_style.h>
+#include <vlc_vector.h>
 
 /*****************************************************************************
  * buffer_t: Command and response buffer
@@ -147,17 +148,13 @@ int OverlayDestroy( overlay_t *p_ovl );
  * list_t: Command queue
  *****************************************************************************/
 
-typedef struct list_t
-{
-    overlay_t **pp_head, **pp_tail;
-} list_t;
+typedef struct VLC_VECTOR(overlay_t *) list_t;
 
 int do_ListInit( list_t *p_list );
 int do_ListDestroy( list_t *p_list );
 ssize_t ListAdd( list_t *p_list, overlay_t *p_new );
 int ListRemove( list_t *p_list, size_t i_idx );
 overlay_t *ListGet( list_t *p_list, size_t i_idx );
-overlay_t *ListWalk( list_t *p_list );
 
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
