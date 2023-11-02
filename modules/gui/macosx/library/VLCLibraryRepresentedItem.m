@@ -24,8 +24,9 @@
 
 #import "extensions/NSString+Helpers.h"
 
-#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModel.h"
 
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
 
@@ -75,18 +76,25 @@
         return _itemIndexInParent;
     }
 
-    __block NSInteger index = 0;
     const NSInteger itemId = self.item.libraryID;
+    NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
-    [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
-        if (mediaItem.libraryID == itemId) {
-            return;
-        }
+    if (_parentType == VLC_ML_PARENT_UNKNOWN) {
 
-        index++;
+        VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+        const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+        items = isVideo ? libraryModel.listOfVideoMedia : libraryModel.listOfAudioMedia;
+
+    } else {
+        items = self.parentItem.mediaItems;
+    }
+
+    _itemIndexInParent = [items indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem,
+                                                               const NSUInteger idx,
+                                                               BOOL * const stop) {
+        return mediaItem.libraryID == itemId;
     }];
 
-    _itemIndexInParent = index;
     return _itemIndexInParent;
 }
 
