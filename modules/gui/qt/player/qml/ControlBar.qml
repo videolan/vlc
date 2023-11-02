@@ -105,6 +105,71 @@ T.Pane {
 
         readonly property real sliderY: row2.y
 
+        readonly property list<Item> strayItems: [
+            T.Label {
+                id: mediaTime
+                text: Player.time.formatHMS()
+                color: theme.fg.primary
+                font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
+                                                                                               : VLCStyle.fontSize_normal
+
+                anchors.left: (parent === pseudoRow) ? parent.left : undefined
+                anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
+            },
+            T.Label {
+                id: mediaRemainingTime
+
+                text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
+                      ? "-" + Player.remainingTime.formatHMS()
+                      : Player.length.formatHMS()
+                color: mediaTime.color
+                font.pixelSize: mediaTime.font.pixelSize
+
+                anchors.right: (parent === pseudoRow) ? parent.right : undefined
+                anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: MainCtx.showRemainingTime = !MainCtx.showRemainingTime
+                }
+            },
+            SliderBar {
+                id: trackPositionSlider
+
+                barHeight: VLCStyle.heightBar_xxsmall
+                Layout.fillWidth: true
+                enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
+
+                Navigation.parentItem: root
+                Navigation.downItem: playerControlLayout
+
+                activeFocusOnTab: true
+
+                focus: true
+
+                Keys.onPressed: {
+                    Navigation.defaultKeyAction(event)
+                }
+            },
+            Loader {
+                id: bookmarksLoader
+
+                parent: root
+                active: MainCtx.mediaLibraryAvailable
+                source: "qrc:/player/Bookmarks.qml"
+
+                x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
+                y: row2.y + row2.height + VLCStyle.margin_xxsmall
+                width: trackPositionSlider.width
+
+                onLoaded: {
+                   item.barHeight = Qt.binding(function() { return bookmarksHeight })
+                   item.controlBarHovered = Qt.binding(function() { return root.hovered })
+                   item.yShift = Qt.binding(function() { return row2.height + VLCStyle.margin_xxsmall })
+                }
+            }
+        ]
+
         Item {
             // BUG: RowLayout can not be used here
             // because of a Qt bug. (Height is
@@ -175,69 +240,4 @@ T.Pane {
             onMenuOpened: root.applyMenu(menu)
         }
     }
-
-    readonly property list<Item> strayItems: [
-        T.Label {
-            id: mediaTime
-            text: Player.time.formatHMS()
-            color: theme.fg.primary
-            font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
-                                                                                           : VLCStyle.fontSize_normal
-
-            anchors.left: (parent === pseudoRow) ? parent.left : undefined
-            anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
-        },
-        T.Label {
-            id: mediaRemainingTime
-
-            text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
-                  ? "-" + Player.remainingTime.formatHMS()
-                  : Player.length.formatHMS()
-            color: mediaTime.color
-            font.pixelSize: mediaTime.font.pixelSize
-
-            anchors.right: (parent === pseudoRow) ? parent.right : undefined
-            anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: MainCtx.showRemainingTime = !MainCtx.showRemainingTime
-            }
-        },
-        SliderBar {
-            id: trackPositionSlider
-
-            barHeight: VLCStyle.heightBar_xxsmall
-            Layout.fillWidth: true
-            enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
-
-            Navigation.parentItem: root
-            Navigation.downItem: playerControlLayout
-
-            activeFocusOnTab: true
-
-            focus: true
-
-            Keys.onPressed: {
-                Navigation.defaultKeyAction(event)
-            }
-        },
-        Loader {
-            id: bookmarksLoader
-
-            parent: root
-            active: MainCtx.mediaLibraryAvailable
-            source: "qrc:/player/Bookmarks.qml"
-
-            x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
-            y: row2.y + row2.height + VLCStyle.margin_xxsmall
-            width: trackPositionSlider.width
-
-            onLoaded: {
-               item.barHeight = Qt.binding(function() { return bookmarksHeight })
-               item.controlBarHovered = Qt.binding(function() { return root.hovered })
-               item.yShift = Qt.binding(function() { return row2.height + VLCStyle.margin_xxsmall })
-            }
-        }
-    ]
 }
