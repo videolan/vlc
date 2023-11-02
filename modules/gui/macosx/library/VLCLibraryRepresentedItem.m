@@ -35,9 +35,9 @@
 @interface VLCLibraryRepresentedItem ()
 {
     NSInteger _itemIndexInParent; // Call self.itemIndexInParent, don't access directly
+    id<VLCMediaLibraryItemProtocol> _parentItem;
 }
 
-@property (readwrite) id<VLCMediaLibraryItemProtocol> parentItem;
 @property (readwrite) enum vlc_ml_media_type_t mediaType;
 
 @end
@@ -161,12 +161,14 @@
 
 - (id<VLCMediaLibraryItemProtocol>)parentItem
 {
-    if (_parentItem != nil) {
+    @synchronized(self) {
+        if (_parentItem != nil) {
+            return _parentItem;
+        }
+
+        _parentItem = [self parentItemForItem:self.item];
         return _parentItem;
     }
-
-    _parentItem = [self parentItemForItem:self.item];
-    return _parentItem;
 }
 
 - (void)playImmediately:(BOOL)playImmediately
