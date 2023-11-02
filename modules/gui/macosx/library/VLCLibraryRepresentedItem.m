@@ -164,6 +164,17 @@
         _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
         return _parentItem;
 
+    } else if ([self.item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
+
+        // If the parent item class and the actual item class are the same, we likely want
+        // to also play the entirety of the library -- think of playing an album within the
+        // albums view, or playing a song within the songs view.
+        const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = (id<VLCMediaLibraryAudioGroupProtocol>)self.item;
+        if (audioGroupItem.matchingParentType == parentType) {
+            _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")
+                                                                            accordingToParentType:self.parentType];
+            return _parentItem;
+        }
     }
 
     const int64_t parentItemId = [self parentItemIdForItem:item];
