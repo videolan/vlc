@@ -361,6 +361,14 @@ if HAVE_DARWIN
 codec_LTLIBRARIES += libvideotoolbox_plugin.la
 endif
 
+videotoolbox_dpb_test_SOURCES = codec/videotoolbox/dpb_test.c \
+                                codec/videotoolbox/dpb.c \
+                                codec/videotoolbox/dpb.h
+videotoolbox_dpb_test_CFLAGS = $(AM_CFLAGS) -DDPB_DEBUG
+
+check_PROGRAMS += videotoolbox_dpb_test
+TESTS += videotoolbox_dpb_test
+
 libvideotoolbox_enc_plugin_la_SOURCES = codec/videotoolbox/encoder.c
 libvideotoolbox_enc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) # Trigger MODULE_NAME declaration
 libvideotoolbox_enc_plugin_la_LIBADD = libvlc_hxxxhelper.la libvlc_vtutils.la
