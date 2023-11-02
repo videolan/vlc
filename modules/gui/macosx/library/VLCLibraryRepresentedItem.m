@@ -33,9 +33,12 @@
 
 @interface VLCLibraryRepresentedItem ()
 {
-    NSInteger _itemIndexInParent;
-    id<VLCMediaLibraryItemProtocol> _parentItem;
+    NSInteger _itemIndexInParent; // Call self.itemIndexInParent, don't access directly
 }
+
+@property (readwrite) id<VLCMediaLibraryItemProtocol> parentItem;
+@property (readwrite) enum vlc_ml_media_type_t mediaType;
+
 @end
 
 @implementation VLCLibraryRepresentedItem
@@ -47,6 +50,7 @@
     if (self) {
         _item = item;
         _parentType = parentType;
+        _mediaType = item.firstMediaItem.mediaType;
     }
     return self;
 }
