@@ -100,12 +100,6 @@ void    input_clock_ChangeRate( input_clock_t *, float rate );
 void    input_clock_ChangePause( input_clock_t *, bool b_paused, vlc_tick_t i_date );
 
 /**
- * This function returns the original system value date and the delay for the current
- * reference point (a valid reference point must have been set).
- */
-void    input_clock_GetSystemOrigin( input_clock_t *, vlc_tick_t *pi_system, vlc_tick_t *pi_delay );
-
-/**
  * This function allows rebasing the original system value date (a valid
  * reference point must have been set).
  * When using the absolute mode, it will create a discontinuity unless

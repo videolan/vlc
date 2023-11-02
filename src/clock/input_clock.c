@@ -412,15 +412,6 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tic
     UpdateListener( cl );
 }
 
-void input_clock_GetSystemOrigin( input_clock_t *cl, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
-{
-    assert( cl->b_has_reference );
-
-    *pi_system = cl->ref.system;
-    if( pi_delay )
-        *pi_delay  = cl->i_pts_delay;
-}
-
 #warning "input_clock_SetJitter needs more work"
 void input_clock_SetJitter( input_clock_t *cl,
                             vlc_tick_t i_pts_delay, int i_cr_average )
