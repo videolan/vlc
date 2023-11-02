@@ -347,7 +347,11 @@ static subpicture_t *DecodeSubtitleMessage(decoder_t *dec,
     if (block_length > size)
         goto error;
 
-    if (subtitle_type == 1) {
+    if (subtitle_type != 1) {
+        /* Reserved */
+        return NULL;
+    }
+
         subpicture_region_t *region = DecodeSimpleBitmap(dec, data, block_length);
         if (!region)
             goto error;
@@ -394,10 +398,6 @@ static subpicture_t *DecodeSubtitleMessage(decoder_t *dec,
         vlc_spu_regions_push(&sub->regions, region);
 
         return sub;
-    } else {
-        /* Reserved */
-        return NULL;
-    }
 
 error:
     msg_Err(dec, "corrupted subtitle_message");
