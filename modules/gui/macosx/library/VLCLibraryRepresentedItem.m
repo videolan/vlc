@@ -72,10 +72,17 @@
 
 - (NSInteger)itemIndexInParent
 {
-    if (_itemIndexInParent != NSNotFound) {
+    @synchronized(self) {
+        if (_itemIndexInParent == NSNotFound) {
+            _itemIndexInParent = [self findItemIndexInParent];
+        }
+
         return _itemIndexInParent;
     }
+}
 
+- (NSInteger)findItemIndexInParent
+{
     NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
     if (_parentType == VLC_ML_PARENT_UNKNOWN) {
@@ -97,13 +104,11 @@
     // cannot use these to search the list of audio media
 
     const int64_t itemId = self.item.firstMediaItem.libraryID;
-    _itemIndexInParent = [items indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem,
-                                                               const NSUInteger idx,
-                                                               BOOL * const stop) {
+    return [items indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const mediaItem,
+                                                 const NSUInteger idx,
+                                                 BOOL * const stop) {
         return mediaItem.libraryID == itemId;
     }];
-
-    return _itemIndexInParent;
 }
 
 - (const id<VLCMediaLibraryItemProtocol>)parentItemForItem:(const id<VLCMediaLibraryItemProtocol>)item
