@@ -190,11 +190,10 @@
 - (id<VLCMediaLibraryItemProtocol>)parentItem
 {
     @synchronized(self) {
-        if (_parentItem != nil) {
-            return _parentItem;
+        if (_parentItem == nil) {
+            _parentItem = [self parentItemForItem:self.item];
         }
 
-        _parentItem = [self parentItemForItem:self.item];
         return _parentItem;
     }
 }
