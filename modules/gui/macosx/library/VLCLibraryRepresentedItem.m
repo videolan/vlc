@@ -176,13 +176,20 @@
     // If play immediately, play first item, queue following items
     // If not then just queue all items
     __block BOOL startingPlayImmediately = playImmediately;
-    [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
+
+    NSArray<VLCMediaLibraryMediaItem *> * const parentItems = self.parentItem.mediaItems;
+    const NSUInteger parentItemCount = parentItems.count;
+    const NSUInteger itemIndexInParent = self.itemIndexInParent;
+    const NSUInteger startingIndex = itemIndexInParent == NSNotFound ? 0 : itemIndexInParent;
+
+    for (NSUInteger i = startingIndex; i < parentItemCount; i++) {
+        const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
         [libraryController appendItemToPlaylist:mediaItem playImmediately:startingPlayImmediately];
 
         if (startingPlayImmediately) {
             startingPlayImmediately = NO;
         }
-    }];
+    }
 }
 
 - (void)play
