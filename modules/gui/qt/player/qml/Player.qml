@@ -468,6 +468,7 @@ FocusScope {
 
                 BindingCompat on visible {
                     delayed: true
+                    when: albumLabel.componentCompleted
                     value: centerContent.height > (albumLabel.y + albumLabel.height)
                 }
 
@@ -476,6 +477,12 @@ FocusScope {
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary
                 Accessible.description: I18n.qtr("album")
+
+                property bool componentCompleted: false
+
+                Component.onCompleted: {
+                    componentCompleted = true
+                }
             }
 
             Widgets.MenuLabel {
@@ -486,6 +493,7 @@ FocusScope {
 
                 BindingCompat on visible {
                     delayed: true
+                    when: artistLabel.componentCompleted
                     value: centerContent.height > (artistLabel.y + artistLabel.height)
                 }
 
@@ -494,6 +502,12 @@ FocusScope {
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary
                 Accessible.description: I18n.qtr("artist")
+
+                property bool componentCompleted: false
+
+                Component.onCompleted: {
+                    componentCompleted = true
+                }
             }
 
             Widgets.NavigableRow {
@@ -504,6 +518,7 @@ FocusScope {
 
                 BindingCompat on visible {
                     delayed: true
+                    when: audioControls.componentCompleted
                     value: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
                 }
 
@@ -512,6 +527,12 @@ FocusScope {
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: topcontrolView
                 Navigation.downItem: Player.isInteractive ? toggleControlBarButton : controlBarView
+
+                property bool componentCompleted: false
+
+                Component.onCompleted: {
+                    componentCompleted = true
+                }
 
                 model: ObjectModel {
                     Widgets.IconToolButton {
