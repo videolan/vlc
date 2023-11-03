@@ -28,7 +28,7 @@
 
 @implementation VLCLibraryVideoCollectionViewGroupDescriptor
 
-- (instancetype)initWithVLCVideoLibraryGroup:(VLCLibraryVideoGroup)group
+- (instancetype)initWithVLCVideoLibraryGroup:(const VLCMediaLibraryParentGroupType)group
 {
     self = [super init];
 
@@ -36,19 +36,19 @@
         _group = group;
 
         switch (_group) {
-            case VLCLibraryVideoRecentsGroup:
+            case VLCMediaLibraryParentGroupTypeRecentVideos:
                 _libraryModelDataSelector = @selector(listOfRecentMedia);
                 _isHorizontalBarCollectionView = YES;
                 _name = _NS("Recents");
                 break;
-            case VLCLibraryVideoLibraryGroup:
+            case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 _libraryModelDataSelector = @selector(listOfVideoMedia);
                 _isHorizontalBarCollectionView = NO;
                 _name = _NS("Library");
                 break;
             default:
-                NSAssert(1, @"Cannot construct group descriptor from invalid VLCLibraryVideoGroup value");
-                _group = VLCLibraryVideoInvalidGroup;
+                NSAssert(1, @"Cannot construct group descriptor from invalid VLCMediaLibraryParentGroupTypexs value");
+                _group = VLCMediaLibraryParentGroupTypeUnknown;
                 break;
         }
 

@@ -112,20 +112,19 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 
 - (void)setRepresentedVideoLibrarySection:(NSUInteger)section
 {
-    // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
-    // Additionally, we hide recents when there are no recent media items. Since the recent group
-    // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
-    // defined in the desired order.
+    // We need to adjust the selected row value to match the backing enum.
+    // Additionally, we hide recents when there are no recent media items.
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const BOOL anyRecents = model.numberOfRecentMedia > 0;
-    const NSUInteger sectionAdjustment = anyRecents ? 1 : 2;
+    const NSUInteger sectionBase = VLCMediaLibraryParentGroupTypeRecentVideos;
+    const NSUInteger sectionAdjustment = anyRecents ? sectionBase : sectionBase + 1;
 
     NSString *sectionString = @"";
     switch(section + sectionAdjustment) { // Group 0 is Invalid, so add one
-        case VLCLibraryVideoRecentsGroup:
+        case VLCMediaLibraryParentGroupTypeRecentVideos:
             sectionString = _NS("Recents");
             break;
-        case VLCLibraryVideoLibraryGroup:
+        case VLCMediaLibraryParentGroupTypeVideoLibrary:
             sectionString = _NS("Library");
             break;
         default:

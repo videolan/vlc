@@ -91,7 +91,7 @@
 {
     const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
     const NSUInteger recentsContainerIndex = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
-        return container.videoGroup == VLCLibraryVideoRecentsGroup;
+        return container.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
     }];
     const BOOL recentsContainerPresent = recentsContainerIndex != NSNotFound;
 
@@ -103,7 +103,7 @@
 
     if (shouldShowRecentsContainer) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
-        containerView.videoGroup = VLCLibraryVideoRecentsGroup;
+        containerView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
         [mutableContainers insertObject:containerView atIndex:0];
 
         // Insert at top after leading containers, hence _leadingContainerCount
@@ -123,9 +123,9 @@
 {
     NSMutableArray * const collectionViewContainers = [[NSMutableArray alloc] init];
     const BOOL anyRecents = [self recentMediaPresent];
-    NSUInteger i = anyRecents ? VLCLibraryVideoRecentsGroup : VLCLibraryVideoRecentsGroup + 1;
+    NSUInteger i = anyRecents ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
-    for (; i < VLCLibraryVideoSentinel; ++i) {
+    for (; i <= VLCMediaLibraryParentGroupTypeVideoLibrary; ++i) {
         VLCLibraryVideoCollectionViewContainerView * const containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
         containerView.videoGroup = i;
         [collectionViewContainers addObject:containerView];
@@ -204,7 +204,7 @@
     if (containerView == nil || stackView == nil) {
         return;
     }
-    
+
     [stackView addArrangedSubview:containerView];
     [self setupContainerView:containerView forStackView:stackView];
 }
@@ -285,7 +285,7 @@
     }
 }
 
-- (VLCLibraryVideoCollectionViewContainerView *)containerViewForGroup:(VLCLibraryVideoGroup)group
+- (VLCLibraryVideoCollectionViewContainerView *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
 {
     const NSUInteger index = [_collectionViewContainers indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewContainerView * const container, const NSUInteger idx, BOOL * const stop) {
         return container.videoGroup == group;
@@ -304,7 +304,7 @@
         return;
     }
 
-    VLCLibraryVideoCollectionViewContainerView * const containerView = [self containerViewForGroup:VLCLibraryVideoLibraryGroup];
+    VLCLibraryVideoCollectionViewContainerView * const containerView = [self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
     if (containerView == nil) {
         return;
     }

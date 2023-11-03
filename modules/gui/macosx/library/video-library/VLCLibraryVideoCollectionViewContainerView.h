@@ -40,10 +40,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCSubScrollView *scrollView;
 @property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign, nonatomic) VLCLibraryVideoGroup videoGroup;
+@property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;
 @property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
 
-- (void)setVideoGroup:(VLCLibraryVideoGroup)group;
+- (void)setVideoGroup:(const VLCMediaLibraryParentGroupType)group;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end

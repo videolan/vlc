@@ -96,8 +96,8 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 - (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
-    if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+    if (self.groupsTableView.selectedRow == -1 ||
+        [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
 
         return;
     }
@@ -108,41 +108,41 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 - (void)libraryModelVideoItemUpdated:(NSNotification * const)aNotification
 {
     if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+        [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
 
         return;
     }
 
     NSParameterAssert(aNotification);
-    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
 
     [self reloadDataForMediaItem:notificationMediaItem
-                    inVideoGroup:VLCLibraryVideoLibraryGroup];
+                    inVideoGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
 }
 
 - (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
 {
-    if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoLibraryGroup - 1) { // Row 0 == second value in enum, so compensate
+    if (self.groupsTableView.selectedRow == -1 ||
+       [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
 
         return;
     }
 
     NSParameterAssert(aNotification);
-    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
 
     [self deleteDataForMediaItem:notificationMediaItem
-                    inVideoGroup:VLCLibraryVideoLibraryGroup];
+                    inVideoGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
 }
 
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
     [self checkRecentsSection];
 
-    if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+    if (self.groupsTableView.selectedRow == -1 ||
+        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
 
         return;
     }
@@ -152,18 +152,18 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 - (void)libraryModelRecentsItemUpdated:(NSNotification * const)aNotification
 {
-    if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+    if (self.groupsTableView.selectedRow == -1 ||
+        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
 
         return;
     }
 
     NSParameterAssert(aNotification);
-    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
 
     [self reloadDataForMediaItem:notificationMediaItem
-                    inVideoGroup:VLCLibraryVideoRecentsGroup];
+                    inVideoGroup:VLCMediaLibraryParentGroupTypeRecentVideos];
 }
 
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
@@ -171,17 +171,17 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     [self checkRecentsSection];
 
     if (_groupsTableView.selectedRow == -1 ||
-        _groupsTableView.selectedRow != VLCLibraryVideoRecentsGroup - 1) { // Row 0 == second value in enum, so compensate
+        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
 
         return;
     }
 
     NSParameterAssert(aNotification);
-    VLCMediaLibraryMediaItem *notificationMediaItem = aNotification.object;
+    VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
 
     [self deleteDataForMediaItem:notificationMediaItem
-                    inVideoGroup:VLCLibraryVideoRecentsGroup];
+                    inVideoGroup:VLCMediaLibraryParentGroupTypeRecentVideos];
 }
 
 - (void)reloadData
@@ -201,16 +201,16 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 }
 
 - (void)changeDataForSpecificMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
-                          inVideoGroup:(VLCLibraryVideoGroup)group
+                          inVideoGroup:(const VLCMediaLibraryParentGroupType)group
                         arrayOperation:(void(^)(const NSMutableArray*, const NSUInteger))arrayOperation
                      completionHandler:(void(^)(const NSIndexSet*))completionHandler
 {
     NSMutableArray *groupMutableCopyArray;
     switch(group) {
-        case VLCLibraryVideoLibraryGroup:
+        case VLCMediaLibraryParentGroupTypeVideoLibrary:
             groupMutableCopyArray = [_libraryArray mutableCopy];
             break;
-        case VLCLibraryVideoRecentsGroup:
+        case VLCMediaLibraryParentGroupTypeRecentVideos:
             groupMutableCopyArray = [_recentsArray mutableCopy];
             break;
         default:
@@ -224,10 +224,10 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     arrayOperation(groupMutableCopyArray, mediaItemIndex);
     switch(group) {
-        case VLCLibraryVideoLibraryGroup:
+        case VLCMediaLibraryParentGroupTypeVideoLibrary:
             _libraryArray = [groupMutableCopyArray copy];
             break;
-        case VLCLibraryVideoRecentsGroup:
+        case VLCMediaLibraryParentGroupTypeRecentVideos:
             _recentsArray = [groupMutableCopyArray copy];
             break;
         default:
@@ -242,7 +242,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 }
 
 - (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
-                  inVideoGroup:(VLCLibraryVideoGroup)group
+                  inVideoGroup:(const VLCMediaLibraryParentGroupType)group
 {
     [self changeDataForSpecificMediaItem:mediaItem
                             inVideoGroup:group
@@ -254,7 +254,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
         // Don't regenerate the groups by index as these do not change according to the notification
         // Stick to the selection table view
-        NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
+        const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
         NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
         [self->_groupSelectionTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
 
@@ -262,7 +262,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 }
 
 - (void)deleteDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
-                  inVideoGroup:(VLCLibraryVideoGroup)group
+                  inVideoGroup:(const VLCMediaLibraryParentGroupType)group
 {
     [self changeDataForSpecificMediaItem:mediaItem
                             inVideoGroup:group
@@ -294,15 +294,14 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 - (NSUInteger)rowToVideoGroupAdjustment
 {
-    // Group 0 is invalid so we need to adjust the selected row value to match the backing enum.
-    // Additionally, we hide recents when there are no recent media items. Since the recent group
-    // enum value is 1, we need to adjust by more if we are hiding it. Remember the groups are
-    // defined in the desired order.
+    // We need to adjust the selected row value to match the backing enum.
+    // Additionally, we hide recents when there are no recent media items.
+    static const VLCMediaLibraryParentGroupType firstEntry = VLCMediaLibraryParentGroupTypeRecentVideos;
     const BOOL anyRecents = [self recentItemsPresent];
-    return anyRecents ? 1 : 2;
+    return anyRecents ? firstEntry : firstEntry + 1;
 }
 
-- (NSInteger)rowToVideoGroup:(NSInteger)row
+- (NSUInteger)rowToVideoGroup:(NSInteger)row
 {
     return row + [self rowToVideoGroupAdjustment];
 }
@@ -327,9 +326,9 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
         return _priorNumVideoSections;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
         switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
-            case VLCLibraryVideoRecentsGroup:
+            case VLCMediaLibraryParentGroupTypeRecentVideos:
                 return _recentsArray.count;
-            case VLCLibraryVideoLibraryGroup:
+            case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 return _libraryArray.count;
             default:
                 NSAssert(1, @"Reached unreachable case for video library section");
@@ -351,9 +350,9 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 {
     if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
         switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
-            case VLCLibraryVideoRecentsGroup:
+            case VLCMediaLibraryParentGroupTypeRecentVideos:
                 return _recentsArray[row];
-            case VLCLibraryVideoLibraryGroup:
+            case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 return _libraryArray[row];
             default:
                 NSAssert(1, @"Reached unreachable case for video library section");

@@ -164,7 +164,7 @@
     _collectionViewDelegate.dynamicItemSizing = !_groupDescriptor.isHorizontalBarCollectionView;
 }
 
-- (void)setVideoGroup:(VLCLibraryVideoGroup)group
+- (void)setVideoGroup:(const VLCMediaLibraryParentGroupType)group
 {
     if (_groupDescriptor.group == group) {
         return;

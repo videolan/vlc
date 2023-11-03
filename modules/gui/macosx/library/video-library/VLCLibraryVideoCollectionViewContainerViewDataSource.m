@@ -97,7 +97,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeVideoLibrary) {
         return;
     }
 
@@ -106,7 +106,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelVideoItemUpdated:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeVideoLibrary) {
         return;
     }
 
@@ -119,7 +119,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoLibraryGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeVideoLibrary) {
         return;
     }
 
@@ -132,7 +132,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeRecentVideos) {
         return;
     }
 
@@ -141,7 +141,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelRecentsItemUpdated:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeRecentVideos) {
         return;
     }
 
@@ -154,7 +154,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
 {
-    if (_groupDescriptor.group != VLCLibraryVideoRecentsGroup) {
+    if (_groupDescriptor.group != VLCMediaLibraryParentGroupTypeRecentVideos) {
         return;
     }
 
@@ -174,10 +174,10 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         switch(self->_groupDescriptor.group) {
-            case VLCLibraryVideoLibraryGroup:
+            case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 self.collectionArray = self->_libraryModel.listOfVideoMedia;
                 break;
-            case VLCLibraryVideoRecentsGroup:
+            case VLCMediaLibraryParentGroupTypeRecentVideos:
                 self.collectionArray = self->_libraryModel.listOfRecentMedia;
                 break;
             default:
