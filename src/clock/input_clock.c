@@ -278,8 +278,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl,
 
         /* Feed synchro with a new reference point. */
         cl->b_has_reference = true;
-        cl->ref = clock_point_Create( __MAX( CR_MEAN_PTS_GAP, i_ck_system ),
-                                      i_ck_stream );
+        cl->ref = clock_point_Create(i_ck_system, i_ck_stream);
     }
 
     /* Compute the drift between the stream clock and the system clock
