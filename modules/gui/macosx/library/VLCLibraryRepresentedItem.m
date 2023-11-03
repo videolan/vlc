@@ -39,6 +39,7 @@
 }
 
 @property (readwrite) enum vlc_ml_media_type_t mediaType;
+@property (readwrite) BOOL individualMode;
 
 @end
 
@@ -68,6 +69,7 @@
 - (void)setup
 {
     _itemIndexInParent = NSNotFound;
+    _individualMode = NO; // TODO: Connect outside
 }
 
 - (NSInteger)itemIndexInParent
@@ -210,7 +212,24 @@
     }
 }
 
-- (void)playImmediately:(BOOL)playImmediately
+- (void)playIndividualModeImmediately:(BOOL)playImmediately
+{
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+
+    // If play immediately, play first item, queue following items
+    // If not then just queue all items
+    __block BOOL startingPlayImmediately = playImmediately;
+
+    [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:startingPlayImmediately];
+
+        if (startingPlayImmediately) {
+            startingPlayImmediately = NO;
+        }
+    }];
+}
+
+- (void)playLibraryModeImmediately:(BOOL)playImmediately
 {
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
 
@@ -230,6 +249,15 @@
         if (startingPlayImmediately) {
             startingPlayImmediately = NO;
         }
+    }
+}
+
+- (void)playImmediately:(BOOL)playImmediately
+{
+    if (self.individualMode) {
+        [self playIndividualModeImmediately:playImmediately];
+    } else {
+        [self playLibraryModeImmediately:playImmediately];
     }
 }
 
