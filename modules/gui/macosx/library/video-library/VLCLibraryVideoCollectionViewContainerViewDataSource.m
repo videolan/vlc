@@ -278,7 +278,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 {
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLC_ML_PARENT_UNKNOWN];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLCMediaLibraryParentGroupTypeVideoLibrary]; // TODO: recents?
 
     viewItem.representedItem = representedItem;
     return viewItem;
@@ -300,7 +300,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
         const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLC_ML_PARENT_UNKNOWN];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLCMediaLibraryParentGroupTypeVideoLibrary]; // TODO: recents?
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];

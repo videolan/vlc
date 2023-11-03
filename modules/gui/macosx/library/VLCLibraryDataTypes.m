@@ -330,10 +330,10 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return 0;
 }
 
-- (enum vlc_ml_parent_type)matchingParentType
+- (VLCMediaLibraryParentGroupType)matchingParentType
 {
     [self doesNotRecognizeSelector:_cmd];
-    return VLC_ML_PARENT_UNKNOWN;
+    return VLCMediaLibraryParentGroupTypeUnknown;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -442,9 +442,9 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, self.libraryID);
 }
 
-- (enum vlc_ml_parent_type)matchingParentType
+- (VLCMediaLibraryParentGroupType)matchingParentType
 {
-    return VLC_ML_PARENT_ARTIST;
+    return VLCMediaLibraryParentGroupTypeArtist;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
@@ -538,9 +538,9 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _actionableDetailLibraryItem;
 }
 
-- (enum vlc_ml_parent_type)matchingParentType
+- (VLCMediaLibraryParentGroupType)matchingParentType
 {
-    return VLC_ML_PARENT_ALBUM;
+    return VLCMediaLibraryParentGroupTypeAlbum;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -623,9 +623,9 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, self.libraryID);
 }
 
-- (enum vlc_ml_parent_type)matchingParentType
+- (VLCMediaLibraryParentGroupType)matchingParentType
 {
-    return VLC_ML_PARENT_GENRE;
+    return VLCMediaLibraryParentGroupTypeGenre;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock

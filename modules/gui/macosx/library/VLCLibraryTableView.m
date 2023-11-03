@@ -77,7 +77,7 @@
         const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = (id<VLCLibraryTableViewDataSource>)self.dataSource;
         const id<VLCMediaLibraryItemProtocol> mediaLibraryItem = [vlcLibraryDataSource libraryItemAtRow:self.clickedRow
                                                                                            forTableView:self];
-        const enum vlc_ml_parent_type parentType = vlcLibraryDataSource.currentParentType;
+        const VLCMediaLibraryParentGroupType parentType = vlcLibraryDataSource.currentParentType;
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaLibraryItem
                                                                                                  parentType:parentType];
         [_menuController setRepresentedItem:representedItem];

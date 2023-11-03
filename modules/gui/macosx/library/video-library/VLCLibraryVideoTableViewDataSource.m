@@ -372,9 +372,9 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return [self indexOfMediaItem:libraryItem.libraryID inArray:_libraryArray];
 }
 
-- (enum vlc_ml_parent_type)currentParentType
+- (VLCMediaLibraryParentGroupType)currentParentType
 {
-    return VLC_ML_PARENT_UNKNOWN;
+    return VLCMediaLibraryParentGroupTypeVideoLibrary;
 }
 
 @end

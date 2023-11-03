@@ -331,7 +331,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     const NSInteger clickedRow = _tracksTableView.clickedRow;
     if (clickedRow < trackCount) {
         VLCMediaLibraryMediaItem * const mediaItem = tracks[_tracksTableView.clickedRow];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:VLC_ML_PARENT_ALBUM];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:VLCMediaLibraryParentGroupTypeAlbum];
 
         [representedItem play];
     }

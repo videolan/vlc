@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <vlc_media_library.h>
+#import "library/VLCLibraryDataTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,11 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) id<VLCMediaLibraryItemProtocol> item;
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *parentMediaArray;
-@property (readonly) enum vlc_ml_parent_type parentType;
+@property (readonly) VLCMediaLibraryParentGroupType parentType;
 @property (readonly) NSInteger itemIndexInParent;
 
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
-                  parentType:(const enum vlc_ml_parent_type)parentType;
+                  parentType:(const VLCMediaLibraryParentGroupType)parentType;
 
 - (void)play;
 - (void)queue;

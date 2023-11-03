@@ -46,7 +46,7 @@
 @implementation VLCLibraryRepresentedItem
 
 - (instancetype)initWithItem:(const id<VLCMediaLibraryItemProtocol>)item
-                  parentType:(const enum vlc_ml_parent_type)parentType
+                  parentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     self = [self init];
     if (self) {
@@ -87,7 +87,7 @@
 {
     NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
-    if (self.parentType == VLC_ML_PARENT_UNKNOWN) {
+    if (self.parentType == VLCMediaLibraryParentGroupTypeUnknown) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
         items = isVideo ? libraryModel.listOfVideoMedia : libraryModel.listOfAudioMedia;
@@ -121,13 +121,13 @@
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)item;
 
         switch (self.parentType) {
-        case VLC_ML_PARENT_ALBUM:
+        case VLCMediaLibraryParentGroupTypeAlbum:
             parentItemId = mediaItem.albumID;
             break;
-        case VLC_ML_PARENT_ARTIST:
+        case VLCMediaLibraryParentGroupTypeArtist:
             parentItemId = mediaItem.artistID;
             break;
-        case VLC_ML_PARENT_GENRE:
+        case VLCMediaLibraryParentGroupTypeGenre:
             parentItemId = mediaItem.genreID;
             break;
         default:
@@ -137,10 +137,10 @@
         VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)item;
 
         switch (self.parentType) {
-        case VLC_ML_PARENT_ARTIST:
+        case VLCMediaLibraryParentGroupTypeArtist:
             parentItemId = album.artistID;
             break;
-        case VLC_ML_PARENT_GENRE:
+        case VLCMediaLibraryParentGroupTypeGenre:
         {
             VLCMediaLibraryMediaItem * const firstChildItem = album.firstMediaItem;
             parentItemId = firstChildItem.genreID;
@@ -158,7 +158,7 @@
 {
     // If we have no defined parent type, use the all audio groups item.
     // This item essentially represents the entirety of the library and all of its media items.
-    const enum vlc_ml_parent_type parentType = self.parentType;
+    const VLCMediaLibraryParentGroupType parentType = self.parentType;
     if (parentType == VLC_ML_PARENT_UNKNOWN) {
         return [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
     } else if ([self.item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
@@ -178,11 +178,11 @@
     }
 
     switch (parentType) {
-    case VLC_ML_PARENT_ALBUM:
+    case VLCMediaLibraryParentGroupTypeAlbum:
         return [VLCMediaLibraryAlbum albumWithID:parentItemId];
-    case VLC_ML_PARENT_ARTIST:
+    case VLCMediaLibraryParentGroupTypeArtist:
         return [VLCMediaLibraryArtist artistWithID:parentItemId];
-    case VLC_ML_PARENT_GENRE:
+    case VLCMediaLibraryParentGroupTypeGenre:
         return [VLCMediaLibraryGenre genreWithID:parentItemId];
     default:
         return nil;

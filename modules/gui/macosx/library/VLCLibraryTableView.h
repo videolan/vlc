@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <vlc_media_library.h>
+#import "library/VLCLibraryDataTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryTableViewDataSource <NSTableViewDataSource>
 
-@property (readonly) enum vlc_ml_parent_type currentParentType;
+@property (readonly) VLCMediaLibraryParentGroupType currentParentType;
 
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row

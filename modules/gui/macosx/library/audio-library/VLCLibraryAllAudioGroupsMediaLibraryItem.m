@@ -40,14 +40,14 @@
 - (instancetype)initWithDisplayString:(NSString *)displayString
 {
      return [self initWithDisplayString:displayString
-                  accordingToParentType:VLC_ML_PARENT_UNKNOWN];
+                  accordingToParentType:VLCMediaLibraryParentGroupTypeAudioLibrary];
 }
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
-                accordingToParentType:(enum vlc_ml_parent_type)parentType
+                accordingToParentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _matchingParentType = VLC_ML_PARENT_UNKNOWN;
+    _matchingParentType = VLCMediaLibraryParentGroupTypeAudioLibrary;
     _albums = libraryModel.listOfAlbums;
     _artists = libraryModel.listOfArtists;
     _mediaItems = [libraryModel listOfMediaItemsForParentType:parentType];

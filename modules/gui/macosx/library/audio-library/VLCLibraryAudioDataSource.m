@@ -586,16 +586,16 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     _audioLibrarySegment = audioLibrarySegment;
     switch (_audioLibrarySegment) {
         case VLCAudioLibraryArtistsSegment:
-            _currentParentType = VLC_ML_PARENT_ARTIST;
+            _currentParentType = VLCMediaLibraryParentGroupTypeArtist;
             break;
         case VLCAudioLibraryAlbumsSegment:
-            _currentParentType = VLC_ML_PARENT_ALBUM;
+            _currentParentType = VLCMediaLibraryParentGroupTypeAlbum;
             break;
         case VLCAudioLibrarySongsSegment:
-            _currentParentType = VLC_ML_PARENT_UNKNOWN;
+            _currentParentType = VLCMediaLibraryParentGroupTypeAudioLibrary;
             break;
         case VLCAudioLibraryGenresSegment:
-            _currentParentType = VLC_ML_PARENT_GENRE;
+            _currentParentType = VLCMediaLibraryParentGroupTypeGenre;
             break;
         default:
             NSAssert(1, @"reached the unreachable");
@@ -615,8 +615,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (BOOL)displayAllArtistsGenresTableEntry
 {
-    return _currentParentType == VLC_ML_PARENT_GENRE ||
-           _currentParentType == VLC_ML_PARENT_ARTIST;
+    return _currentParentType == VLCMediaLibraryParentGroupTypeGenre ||
+           _currentParentType == VLCMediaLibraryParentGroupTypeArtist;
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView

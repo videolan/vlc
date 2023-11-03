@@ -39,6 +39,21 @@ extern const CGFloat VLCMediaLibrary720pWidth;
 extern const CGFloat VLCMediaLibrary720pHeight;
 extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
+typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
+    VLCMediaLibraryParentGroupTypeUnknown = VLC_ML_PARENT_UNKNOWN,
+    VLCMediaLibraryParentGroupTypeAlbum = VLC_ML_PARENT_ALBUM,
+    VLCMediaLibraryParentGroupTypeArtist = VLC_ML_PARENT_ARTIST,
+    VLCMediaLibraryParentGroupTypeShow = VLC_ML_PARENT_SHOW,
+    VLCMediaLibraryParentGroupTypeGenre = VLC_ML_PARENT_GENRE,
+    VLCMediaLibraryParentGroupTypeGroup = VLC_ML_PARENT_GROUP,
+    VLCMediaLibraryParentGroupTypeFolder = VLC_ML_PARENT_FOLDER,
+    VLCMediaLibraryParentGroupTypePlaylist = VLC_ML_PARENT_PLAYLIST,
+    // Additional types over vlc_ml_parent_type below
+    VLCMediaLibraryParentGroupTypeAudioLibrary,
+    VLCMediaLibraryParentGroupTypeVideoLibrary,
+    VLCMediaLibraryParentGroupTypeRecentVideos,
+};
+
 @interface VLCMediaLibraryFile : NSObject
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file;
@@ -138,7 +153,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) unsigned int numberOfTracks;
 @property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
-@property (readonly) enum vlc_ml_parent_type matchingParentType;
+@property (readonly) VLCMediaLibraryParentGroupType matchingParentType;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 

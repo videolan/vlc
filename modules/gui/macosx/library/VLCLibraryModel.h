@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <vlc_media_library.h>
+#import "library/VLCLibraryDataTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -84,11 +84,12 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
-- (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
-- (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(enum vlc_ml_parent_type)parentType;
-- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(enum vlc_ml_parent_type)parentType;
+- (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType;
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(const VLCMediaLibraryParentGroupType)parentType;
 
-- (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending;
+- (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria
+         andDescending:(bool)descending;
 - (void)filterByString:(NSString*)filterString;
 
 @end

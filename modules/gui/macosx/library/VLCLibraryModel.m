@@ -22,10 +22,7 @@
 
 #import "VLCLibraryModel.h"
 
-#import <vlc_media_library.h>
-
 #import "main/VLCMain.h"
-#import "library/VLCLibraryDataTypes.h"
 #import "extensions/NSString+Helpers.h"
 
 NSString * const VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
@@ -62,7 +59,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     enum vlc_ml_sorting_criteria_t _sortCriteria;
     bool _sortDescending;
     NSString *_filterString;
-    
+
     size_t _initialVideoCount;
     size_t _initialAudioCount;
     size_t _initialAlbumCount;
@@ -525,7 +522,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedListOfMonitoredFolders;
 }
 
-- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
+- (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 {
     const vlc_ml_query_params_t queryParams = [self queryParams];
     vlc_ml_album_list_t *p_albumList = vlc_ml_list_albums_of(_p_mediaLibrary, &queryParams, parentType, ID);
@@ -541,22 +538,27 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return [mutableArray copy];
 }
 
-- (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(enum vlc_ml_parent_type)parentType
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     switch(parentType) {
-    case VLC_ML_PARENT_ARTIST:
+    case VLCMediaLibraryParentGroupTypeArtist:
         return self.listOfArtists;
-    case VLC_ML_PARENT_ALBUM:
+    case VLCMediaLibraryParentGroupTypeAlbum:
         return self.listOfAlbums;
-    case VLC_ML_PARENT_GENRE:
+    case VLCMediaLibraryParentGroupTypeGenre:
         return self.listOfGenres;
-    case VLC_ML_PARENT_UNKNOWN:
-    default:
+    case VLCMediaLibraryParentGroupTypeAudioLibrary:
         return self.listOfAudioMedia;
+    case VLCMediaLibraryParentGroupTypeVideoLibrary:
+        return self.listOfVideoMedia;
+    case VLCMediaLibraryParentGroupTypeRecentVideos:
+        return self.listOfRecentMedia;
+    case VLCMediaLibraryParentGroupTypeUnknown:
+        return nil;
     }
 }
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(enum vlc_ml_parent_type)parentType
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = [self listOfLibraryItemsOfParentType:parentType];
     NSMutableArray<VLCMediaLibraryMediaItem *> * const mediaItems = [[NSMutableArray alloc] initWithCapacity:self.numberOfAudioMedia];
@@ -573,7 +575,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if(sortCriteria == _sortCriteria && descending == _sortDescending) {
         return;
     }
-    
+
     _sortCriteria = sortCriteria;
     _sortDescending = descending;
     [self dropCaches];
