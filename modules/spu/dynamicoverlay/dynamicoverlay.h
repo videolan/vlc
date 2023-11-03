@@ -142,7 +142,7 @@ typedef struct overlay_t
 } overlay_t;
 
 overlay_t *OverlayCreate( void );
-int OverlayDestroy( overlay_t *p_ovl );
+void OverlayDestroy( overlay_t *p_ovl );
 
 /*****************************************************************************
  * list_t: Command queue

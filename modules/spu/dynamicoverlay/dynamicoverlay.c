@@ -147,7 +147,6 @@ static void Destroy( filter_t *p_filter )
     vlc_vector_foreach(p_cur, &p_sys->overlays)
     {
         OverlayDestroy( p_cur );
-        free( p_cur );
     }
     vlc_vector_destroy( &p_sys->overlays );
     UnregisterCommand( p_filter );

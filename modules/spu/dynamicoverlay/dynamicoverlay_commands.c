@@ -63,14 +63,13 @@ overlay_t *OverlayCreate( void )
     return p_ovl;
 }
 
-int OverlayDestroy( overlay_t *p_ovl )
+void OverlayDestroy( overlay_t *p_ovl )
 {
     if( p_ovl->data.p_pic != NULL )
         picture_Release( p_ovl->data.p_pic );
     free( p_ovl->data.p_text );
     text_style_Delete( p_ovl->p_fontstyle );
-
-    return VLC_SUCCESS;
+    free( p_ovl );
 }
 
 /*****************************************************************************
@@ -580,7 +579,8 @@ static int exec_DeleteImage( filter_t *p_filter,
 
     overlay_t *p_del = p_sys->overlays.data[p_params->i_id];
     vlc_vector_remove(&p_sys->overlays, p_params->i_id);
-    return OverlayDestroy( p_del );
+    OverlayDestroy( p_del );
+    return VLC_SUCCESS;
 }
 
 static int exec_EndAtomic( filter_t *p_filter,
