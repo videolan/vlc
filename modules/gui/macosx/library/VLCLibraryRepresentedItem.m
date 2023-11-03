@@ -35,7 +35,7 @@
 @interface VLCLibraryRepresentedItem ()
 {
     NSInteger _itemIndexInParent; // Call self.itemIndexInParent, don't access directly
-    id<VLCMediaLibraryItemProtocol> _parentItem;
+    NSArray<VLCMediaLibraryMediaItem *> * _parentMediaArray;
 }
 
 @property (readwrite) enum vlc_ml_media_type_t mediaType;
@@ -87,14 +87,12 @@
 {
     NSArray<VLCMediaLibraryMediaItem *> * items = nil;
 
-    if (_parentType == VLC_ML_PARENT_UNKNOWN) {
-
+    if (self.parentType == VLC_ML_PARENT_UNKNOWN) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
         items = isVideo ? libraryModel.listOfVideoMedia : libraryModel.listOfAudioMedia;
-
     } else {
-        items = self.parentItem.mediaItems;
+        items = self.parentMediaArray;
     }
 
     // We search by mediaItem, so we want to find the index of the item in the parent.
@@ -113,7 +111,7 @@
     }];
 }
 
-- (int64_t)parentItemIdForItem:(const id<VLCMediaLibraryItemProtocol>)item
+- (int64_t)parentItemIdForAudioItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
     // Decide which other items we are going to be adding to the playlist when playing the item.
     // Key for playing in library mode, not in individual mode
@@ -156,7 +154,7 @@
     return parentItemId;
 }
 
-- (const id<VLCMediaLibraryItemProtocol>)parentItemForItem:(const id<VLCMediaLibraryItemProtocol>)item
+- (const id<VLCMediaLibraryItemProtocol>)parentItemForAudioItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
     // If we have no defined parent type, use the all audio groups item.
     // This item essentially represents the entirety of the library and all of its media items.
@@ -191,16 +189,25 @@
     }
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArrayForItem:(const id<VLCMediaLibraryItemProtocol>)item
+{
+    const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+    if (isVideo) {
+        return nil;
+    } else {
+        const id<VLCMediaLibraryItemProtocol> parentAudioItem = [self parentItemForAudioItem:item];
+        return parentAudioItem.mediaItems;
+    }
 }
 
-- (id<VLCMediaLibraryItemProtocol>)parentItem
+- (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArray
 {
     @synchronized(self) {
-        if (_parentItem == nil) {
-            _parentItem = [self parentItemForItem:self.item];
+        if (_parentMediaArray == nil || _parentMediaArray.count == 0) {
+            _parentMediaArray = [self parentMediaArrayForItem:self.item];
         }
 
-        return _parentItem;
+        return _parentMediaArray;
     }
 }
 
@@ -229,7 +236,7 @@
     // If not then just queue all items
     __block BOOL startingPlayImmediately = playImmediately;
 
-    NSArray<VLCMediaLibraryMediaItem *> * const parentItems = self.parentItem.mediaItems;
+    NSArray<VLCMediaLibraryMediaItem *> * const parentItems = self.parentMediaArray;
     const NSUInteger parentItemCount = parentItems.count;
     const NSUInteger itemIndexInParent = self.itemIndexInParent;
     const NSUInteger startingIndex = itemIndexInParent == NSNotFound ? 0 : itemIndexInParent;

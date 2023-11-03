@@ -26,12 +26,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCMediaLibraryMediaItem;
 @protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryRepresentedItem : NSObject
 
 @property (readonly) id<VLCMediaLibraryItemProtocol> item;
-@property (readonly) id<VLCMediaLibraryItemProtocol> parentItem;
+@property (readonly) NSArray<VLCMediaLibraryMediaItem *> *parentMediaArray;
 @property (readonly) enum vlc_ml_parent_type parentType;
 @property (readonly) NSInteger itemIndexInParent;
 
