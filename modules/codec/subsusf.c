@@ -813,111 +813,111 @@ static void ParseUSFString( decoder_t *p_dec,
 
     for( ; *psz_subtitle; psz_subtitle++ )
     {
-        if( *psz_subtitle == '<' )
+        if( *psz_subtitle != '<' )
+            continue;
+
+        char *psz_end = NULL;
+
+        if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
+                ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
         {
-            char *psz_end = NULL;
+            psz_end = strcasestr( psz_subtitle, "</karaoke>" );
 
-            if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
-                    ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
-            {
-                psz_end = strcasestr( psz_subtitle, "</karaoke>" );
-
-                if( psz_end )
-                {
-                    subpicture_region_t  *p_text_region;
-
-                    char *psz_knodes = strndup( &psz_subtitle[9], psz_end - &psz_subtitle[9] );
-                    if( psz_knodes )
-                    {
-                        /* remove timing <k> tags */
-                        char *psz_flat = CreatePlainText( psz_knodes );
-                        free( psz_knodes );
-                        if( psz_flat )
-                        {
-                            p_text_region = CreateTextRegion( p_dec,
-                                                              psz_flat,
-                                                              psz_flat,
-                                                              p_sys->i_align );
-                            if( p_text_region )
-                            {
-                                vlc_spu_regions_push(regions, p_text_region);
-                            }
-                            else free( psz_flat );
-                        }
-                    }
-
-                    psz_end += strcspn( psz_end, ">" ) + 1;
-                }
-            }
-            else if(( !strncasecmp( psz_subtitle, "<image ", 7 )) ||
-                    ( !strncasecmp( psz_subtitle, "<image>", 7 )))
-            {
-                subpicture_region_t *p_image_region = NULL;
-
-                psz_end = strcasestr( psz_subtitle, "</image>" );
-                char *psz_content = strchr( psz_subtitle, '>' );
-                int   i_transparent = -1;
-
-                /* If a colorkey parameter is specified, then we have to map
-                 * that index in the picture through as transparent (it is
-                 * required by the USF spec but is also recommended that if the
-                 * creator really wants a transparent colour that they use a
-                 * type like PNG that properly supports it; this goes doubly
-                 * for VLC because the pictures are stored internally in YUV
-                 * and the resulting colour-matching may not produce the
-                 * desired results.)
-                 */
-                char *psz_tmp = GrabAttributeValue( "colorkey", psz_subtitle );
-                if( psz_tmp )
-                {
-                    if( *psz_tmp == '#' )
-                        i_transparent = strtol( psz_tmp + 1, NULL, 16 ) & 0x00ffffff;
-                    free( psz_tmp );
-                }
-                if( psz_content && ( psz_content < psz_end ) )
-                {
-                    char *psz_filename = strndup( &psz_content[1], psz_end - &psz_content[1] );
-                    if( psz_filename )
-                    {
-                        p_image_region = LoadEmbeddedImage( p_dec,
-                                            psz_filename, i_transparent );
-                        free( psz_filename );
-                    }
-                }
-
-                if( psz_end ) psz_end += strcspn( psz_end, ">" ) + 1;
-
-                if( p_image_region )
-                {
-                    SetupPositions( p_image_region, psz_subtitle );
-                    vlc_spu_regions_push(regions, p_image_region);
-                }
-            }
-            else
+            if( psz_end )
             {
                 subpicture_region_t  *p_text_region;
 
-                psz_end = psz_subtitle + strlen( psz_subtitle );
-
-                char *psz_flat = CreatePlainText( psz_subtitle );
-                if( psz_flat )
+                char *psz_knodes = strndup( &psz_subtitle[9], psz_end - &psz_subtitle[9] );
+                if( psz_knodes )
                 {
-                    p_text_region = CreateTextRegion( p_dec,
-                                                      psz_subtitle,
-                                                      psz_flat,
-                                                      p_sys->i_align );
-                    if( p_text_region )
+                    /* remove timing <k> tags */
+                    char *psz_flat = CreatePlainText( psz_knodes );
+                    free( psz_knodes );
+                    if( psz_flat )
                     {
-                        vlc_spu_regions_push(regions, p_text_region);
+                        p_text_region = CreateTextRegion( p_dec,
+                                                          psz_flat,
+                                                          psz_flat,
+                                                          p_sys->i_align );
+                        if( p_text_region )
+                        {
+                            vlc_spu_regions_push(regions, p_text_region);
+                        }
+                        else free( psz_flat );
                     }
-                    else free( psz_flat );
+                }
+
+                psz_end += strcspn( psz_end, ">" ) + 1;
+            }
+        }
+        else if(( !strncasecmp( psz_subtitle, "<image ", 7 )) ||
+                ( !strncasecmp( psz_subtitle, "<image>", 7 )))
+        {
+            subpicture_region_t *p_image_region = NULL;
+
+            psz_end = strcasestr( psz_subtitle, "</image>" );
+            char *psz_content = strchr( psz_subtitle, '>' );
+            int   i_transparent = -1;
+
+            /* If a colorkey parameter is specified, then we have to map
+             * that index in the picture through as transparent (it is
+             * required by the USF spec but is also recommended that if the
+             * creator really wants a transparent colour that they use a
+             * type like PNG that properly supports it; this goes doubly
+             * for VLC because the pictures are stored internally in YUV
+             * and the resulting colour-matching may not produce the
+             * desired results.)
+             */
+            char *psz_tmp = GrabAttributeValue( "colorkey", psz_subtitle );
+            if( psz_tmp )
+            {
+                if( *psz_tmp == '#' )
+                    i_transparent = strtol( psz_tmp + 1, NULL, 16 ) & 0x00ffffff;
+                free( psz_tmp );
+            }
+            if( psz_content && ( psz_content < psz_end ) )
+            {
+                char *psz_filename = strndup( &psz_content[1], psz_end - &psz_content[1] );
+                if( psz_filename )
+                {
+                    p_image_region = LoadEmbeddedImage( p_dec,
+                                        psz_filename, i_transparent );
+                    free( psz_filename );
                 }
             }
-            if( psz_end )
-                psz_subtitle = psz_end - 1;
 
-            psz_subtitle += strcspn( psz_subtitle, ">" );
+            if( psz_end ) psz_end += strcspn( psz_end, ">" ) + 1;
+
+            if( p_image_region )
+            {
+                SetupPositions( p_image_region, psz_subtitle );
+                vlc_spu_regions_push(regions, p_image_region);
+            }
         }
+        else
+        {
+            subpicture_region_t  *p_text_region;
+
+            psz_end = psz_subtitle + strlen( psz_subtitle );
+
+            char *psz_flat = CreatePlainText( psz_subtitle );
+            if( psz_flat )
+            {
+                p_text_region = CreateTextRegion( p_dec,
+                                                  psz_subtitle,
+                                                  psz_flat,
+                                                  p_sys->i_align );
+                if( p_text_region )
+                {
+                    vlc_spu_regions_push(regions, p_text_region);
+                }
+                else free( psz_flat );
+            }
+        }
+        if( psz_end )
+            psz_subtitle = psz_end - 1;
+
+        psz_subtitle += strcspn( psz_subtitle, ">" );
     }
 }
 
