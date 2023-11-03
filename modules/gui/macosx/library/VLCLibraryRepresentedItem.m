@@ -159,7 +159,7 @@
     // If we have no defined parent type, use the all audio groups item.
     // This item essentially represents the entirety of the library and all of its media items.
     const VLCMediaLibraryParentGroupType parentType = self.parentType;
-    if (parentType == VLC_ML_PARENT_UNKNOWN) {
+    if (parentType == VLCMediaLibraryParentGroupTypeUnknown || parentType == VLCMediaLibraryParentGroupTypeAudioLibrary) {
         return [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
     } else if ([self.item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
         // If the parent item class and the actual item class are the same, we likely want
@@ -193,7 +193,8 @@
 {
     const BOOL isVideo = self.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
     if (isVideo) {
-        return nil;
+        VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+        return [libraryModel listOfMediaItemsForParentType:self.parentType];
     } else {
         const id<VLCMediaLibraryItemProtocol> parentAudioItem = [self parentItemForAudioItem:item];
         return parentAudioItem.mediaItems;
