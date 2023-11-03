@@ -162,43 +162,35 @@
     // This item essentially represents the entirety of the library and all of its media items.
     const enum vlc_ml_parent_type parentType = self.parentType;
     if (parentType == VLC_ML_PARENT_UNKNOWN) {
-
-        _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
-        return _parentItem;
-
+        return [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")];
     } else if ([self.item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
-
         // If the parent item class and the actual item class are the same, we likely want
         // to also play the entirety of the library -- think of playing an album within the
         // albums view, or playing a song within the songs view.
         const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = (id<VLCMediaLibraryAudioGroupProtocol>)self.item;
         if (audioGroupItem.matchingParentType == parentType) {
-            _parentItem = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")
-                                                                            accordingToParentType:self.parentType];
-            return _parentItem;
+            return [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All items")
+                                                                     accordingToParentType:self.parentType];
         }
     }
 
-    const int64_t parentItemId = [self parentItemIdForItem:item];
+    const int64_t parentItemId = [self parentItemIdForAudioItem:item];
     if (parentItemId == NSNotFound) {
         return nil;
     }
 
     switch (parentType) {
     case VLC_ML_PARENT_ALBUM:
-        _parentItem = [VLCMediaLibraryAlbum albumWithID:parentItemId];
-        break;
+        return [VLCMediaLibraryAlbum albumWithID:parentItemId];
     case VLC_ML_PARENT_ARTIST:
-        _parentItem = [VLCMediaLibraryArtist artistWithID:parentItemId];
-        break;
+        return [VLCMediaLibraryArtist artistWithID:parentItemId];
     case VLC_ML_PARENT_GENRE:
-        _parentItem = [VLCMediaLibraryGenre genreWithID:parentItemId];
-        break;
+        return [VLCMediaLibraryGenre genreWithID:parentItemId];
     default:
-        break;
+        return nil;
     }
+}
 
-    return _parentItem;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)parentItem
