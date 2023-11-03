@@ -32,6 +32,7 @@
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 
 #import "main/VLCMain.h"
 
@@ -278,7 +279,9 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 {
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLCMediaLibraryParentGroupTypeVideoLibrary]; // TODO: recents?
+    // TODO: Find a more elegant way to do this
+    VLCLibraryVideoCollectionViewContainerView * const containerView = (VLCLibraryVideoCollectionViewContainerView *)collectionView.superview.superview.superview;
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
 
     viewItem.representedItem = representedItem;
     return viewItem;
@@ -300,7 +303,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
         const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:VLCMediaLibraryParentGroupTypeVideoLibrary]; // TODO: recents?
+        // TODO: Find a more elegant way to do this
+        VLCLibraryVideoCollectionViewContainerView * const containerView = (VLCLibraryVideoCollectionViewContainerView *)collectionView.superview.superview.superview;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
