@@ -104,7 +104,10 @@
 {
     VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
     if (latestPartialPlayItem != nil) {
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:latestPartialPlayItem parentType:VLCMediaLibraryParentGroupTypeUnknown]; // TODO: check item type
+        const BOOL isVideo = latestPartialPlayItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+        const VLCMediaLibraryParentGroupType parentType = isVideo ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeAudioLibrary;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:latestPartialPlayItem parentType:parentType];
+
         self.representedItem = representedItem;
         self.explanationTextField.stringValue = _NS("Last watched");
         self.playButton.title = _NS("Resume playing");
@@ -113,7 +116,10 @@
 
     VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
     if (randomItem != nil) {
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:VLCMediaLibraryParentGroupTypeUnknown]; // TODO: check item type
+        const BOOL isVideo = randomItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+        const VLCMediaLibraryParentGroupType parentType = isVideo ? VLCMediaLibraryParentGroupTypeVideoLibrary : VLCMediaLibraryParentGroupTypeAudioLibrary;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:VLCMediaLibraryParentGroupTypeUnknown];
+
         self.representedItem = representedItem;
         self.explanationTextField.stringValue = _NS("From your library");
         self.playButton.title = _NS("Play now");

@@ -554,6 +554,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     case VLCMediaLibraryParentGroupTypeRecentVideos:
         return self.listOfRecentMedia;
     case VLCMediaLibraryParentGroupTypeUnknown:
+    default:
         return nil;
     }
 }
