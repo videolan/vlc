@@ -1,6 +1,3 @@
-*.tar.*
-*.zip
-*.h
-*.tgz
-*.idl
-*.githash
+# ignore everything except this file
+*
+!.gitignore
