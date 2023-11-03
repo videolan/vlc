@@ -143,14 +143,15 @@ static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 
 static void UpdateListener( input_clock_t *cl )
 {
-    if( cl->clock_listener )
-    {
-        const vlc_tick_t system_expected =
-            ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
-            cl->i_pts_delay + ClockGetTsOffset( cl );
+    if (cl->clock_listener == NULL)
+        return;
 
-        vlc_clock_Update( cl->clock_listener, system_expected, cl->last.stream, cl->rate );
-    }
+    const vlc_tick_t system_expected =
+        ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
+        cl->i_pts_delay + ClockGetTsOffset( cl );
+
+    vlc_clock_Update(cl->clock_listener, system_expected, cl->last.stream,
+                     cl->rate);
 }
 
 /*****************************************************************************
