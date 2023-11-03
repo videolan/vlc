@@ -811,7 +811,7 @@ static void ParseUSFString( decoder_t *p_dec,
         if( *psz_subtitle != '<' )
             continue;
 
-        char *psz_end = NULL;
+        char *psz_end;
         subpicture_region_t *p_region = NULL;
 
         if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
