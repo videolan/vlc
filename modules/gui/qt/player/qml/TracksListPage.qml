@@ -222,6 +222,8 @@ RowLayout {
                     focus: true
                     clip: true
 
+                    fadingEdge.backgroundColor: "transparent"
+
                     Accessible.role: Accessible.List
                     Accessible.name: I18n.qtr("Track list")
 
