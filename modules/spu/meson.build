@@ -43,7 +43,6 @@ if host_system != 'windows'
         'sources' : files(
             'dynamicoverlay/dynamicoverlay_buffer.c',
             'dynamicoverlay/dynamicoverlay_queue.c',
-            'dynamicoverlay/dynamicoverlay_list.c',
             'dynamicoverlay/dynamicoverlay_commands.c',
             'dynamicoverlay/dynamicoverlay.c'
         )

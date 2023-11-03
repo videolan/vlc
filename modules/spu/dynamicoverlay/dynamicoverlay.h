@@ -150,12 +150,6 @@ int OverlayDestroy( overlay_t *p_ovl );
 
 typedef struct VLC_VECTOR(overlay_t *) list_t;
 
-int do_ListInit( list_t *p_list );
-int do_ListDestroy( list_t *p_list );
-ssize_t ListAdd( list_t *p_list, overlay_t *p_new );
-int ListRemove( list_t *p_list, size_t i_idx );
-overlay_t *ListGet( list_t *p_list, size_t i_idx );
-
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/

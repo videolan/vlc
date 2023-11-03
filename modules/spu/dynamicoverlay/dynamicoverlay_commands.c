@@ -418,6 +418,13 @@ static int unparse_GetVisibility( const commandparams_t *p_results,
     return VLC_SUCCESS;
 }
 
+static inline overlay_t *ListGet( list_t *p_list, size_t i_idx )
+{
+    if (i_idx >= p_list->size)
+        return NULL;
+    return p_list->data[i_idx];
+}
+
 /*****************************************************************************
  * Command functions
  *****************************************************************************/
@@ -568,7 +575,12 @@ static int exec_DeleteImage( filter_t *p_filter,
     filter_sys_t *p_sys = p_filter->p_sys;
     p_sys->b_updated = true;
 
-    return ListRemove( &p_sys->overlays, p_params->i_id );
+    if ( p_params->i_id >= p_sys->overlays.size)
+        return VLC_EINVAL;
+
+    overlay_t *p_del = p_sys->overlays.data[p_params->i_id];
+    vlc_vector_remove(&p_sys->overlays, p_params->i_id);
+    return OverlayDestroy( p_del );
 }
 
 static int exec_EndAtomic( filter_t *p_filter,
@@ -594,11 +606,10 @@ static int exec_GenImage( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_ENOMEM;
 
-    ssize_t i_idx = ListAdd( &p_sys->overlays, p_ovl );
-    if( i_idx < 0 )
-        return i_idx;
+    if (!vlc_vector_push(&p_sys->overlays, p_ovl))
+        return VLC_ENOMEM;
 
-    p_results->i_id = i_idx;
+    p_results->i_id = p_sys->overlays.size - 1;
     return VLC_SUCCESS;
 }
 

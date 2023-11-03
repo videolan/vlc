@@ -25,7 +25,6 @@ spu_LTLIBRARIES += \
 libdynamicoverlay_plugin_la_SOURCES = \
 	spu/dynamicoverlay/dynamicoverlay_buffer.c \
 	spu/dynamicoverlay/dynamicoverlay_queue.c \
-	spu/dynamicoverlay/dynamicoverlay_list.c \
 	spu/dynamicoverlay/dynamicoverlay_commands.c \
 	spu/dynamicoverlay/dynamicoverlay.c spu/dynamicoverlay/dynamicoverlay.h
 if !HAVE_WIN32

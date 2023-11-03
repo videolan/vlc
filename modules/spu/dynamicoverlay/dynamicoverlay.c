@@ -104,7 +104,7 @@ static int Create( filter_t *p_filter )
     QueueInit( &p_sys->atomic );
     QueueInit( &p_sys->pending );
     QueueInit( &p_sys->processed );
-    do_ListInit( &p_sys->overlays );
+    vlc_vector_init( &p_sys->overlays );
 
     p_sys->i_inputfd = -1;
     p_sys->i_outputfd = -1;
@@ -143,7 +143,13 @@ static void Destroy( filter_t *p_filter )
     QueueDestroy( &p_sys->atomic );
     QueueDestroy( &p_sys->pending );
     QueueDestroy( &p_sys->processed );
-    do_ListDestroy( &p_sys->overlays );
+    overlay_t *p_cur;
+    vlc_vector_foreach(p_cur, &p_sys->overlays)
+    {
+        OverlayDestroy( p_cur );
+        free( p_cur );
+    }
+    vlc_vector_destroy( &p_sys->overlays );
     UnregisterCommand( p_filter );
 
     var_DelCallback( p_filter, "overlay-input", AdjustCallback, p_sys );
