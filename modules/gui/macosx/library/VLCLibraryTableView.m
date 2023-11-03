@@ -74,20 +74,12 @@
     }
 
     if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        enum vlc_ml_parent_type parentType = VLC_ML_PARENT_UNKNOWN;
-
-        if ([self.dataSource isKindOfClass:VLCLibraryAudioDataSource.class]) {
-            VLCLibraryAudioDataSource * const audioDataSource = (VLCLibraryAudioDataSource*)self.dataSource;
-            parentType = audioDataSource.currentParentType;
-        } else if ([self.dataSource isKindOfClass:VLCLibraryAudioGroupDataSource.class]) {
-            VLCLibraryAudioGroupDataSource * const audioGroupDataSource = (VLCLibraryAudioGroupDataSource*)self.dataSource;
-            parentType = audioGroupDataSource.currentParentType;
-        }
-
         const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = (id<VLCLibraryTableViewDataSource>)self.dataSource;
         const id<VLCMediaLibraryItemProtocol> mediaLibraryItem = [vlcLibraryDataSource libraryItemAtRow:self.clickedRow
                                                                                            forTableView:self];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaLibraryItem parentType:parentType];
+        const enum vlc_ml_parent_type parentType = vlcLibraryDataSource.currentParentType;
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaLibraryItem
+                                                                                                 parentType:parentType];
         [_menuController setRepresentedItem:representedItem];
     } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
         VLCMediaSourceDataSource *mediaSourceDataSource = (VLCMediaSourceDataSource*)self.dataSource;
