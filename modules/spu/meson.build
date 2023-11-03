@@ -36,15 +36,13 @@ vlc_modules += {
     'sources' : files('rss.c')
 }
 
-if host_system != 'windows'
-    # dynamicoverlay
-    vlc_modules += {
-        'name' : 'dynamicoverlay',
-        'sources' : files(
-            'dynamicoverlay/dynamicoverlay_buffer.c',
-            'dynamicoverlay/dynamicoverlay_queue.c',
-            'dynamicoverlay/dynamicoverlay_commands.c',
-            'dynamicoverlay/dynamicoverlay.c'
-        )
-    }
-endif
+# dynamicoverlay
+vlc_modules += {
+    'name' : 'dynamicoverlay',
+    'sources' : files(
+        'dynamicoverlay/dynamicoverlay_buffer.c',
+        'dynamicoverlay/dynamicoverlay_queue.c',
+        'dynamicoverlay/dynamicoverlay_commands.c',
+        'dynamicoverlay/dynamicoverlay.c'
+    )
+}
