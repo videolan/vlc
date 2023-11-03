@@ -161,7 +161,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
-    if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+    if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary) {
         NSString * const currentItemMrl = currentInputItem.MRL;
 
         const NSUInteger itemIndexInDisplayedCollection = [self.displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
@@ -178,22 +178,23 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (NSArray *)collectionToDisplay
 {
     switch(_currentParentType) {
-        case VLC_ML_PARENT_UNKNOWN:
-            return [_libraryModel listOfAudioMedia];
-        case VLC_ML_PARENT_ALBUM:
-            return [_libraryModel listOfAlbums];
-        case VLC_ML_PARENT_ARTIST:
-            return [_libraryModel listOfArtists];
-        case VLC_ML_PARENT_GENRE:
-            return [_libraryModel listOfGenres];
-        default:
-            return nil;
+    case VLCMediaLibraryParentGroupTypeAudioLibrary:
+        return self.libraryModel.listOfAudioMedia;
+    case VLCMediaLibraryParentGroupTypeAlbum:
+        return self.libraryModel.listOfAlbums;
+    case VLCMediaLibraryParentGroupTypeArtist:
+        return self.libraryModel.listOfArtists;
+    case VLCMediaLibraryParentGroupTypeGenre:
+        return self.libraryModel.listOfGenres;
+    default:
+        NSAssert(1, @"current parent type should not be unknown, no collection to display");
+        return nil;
     }
 }
 
 - (void)libraryModelReset:(NSNotification * const)aNotification
 {
-    if(_libraryModel == nil) {
+    if(self.libraryModel == nil) {
         return;
     }
 
@@ -202,7 +203,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemsReset:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
         return;
     }
 
@@ -211,7 +212,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelArtistsReset:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ARTIST) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeArtist) {
         return;
     }
 
@@ -220,7 +221,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAlbumsReset:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ALBUM) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAlbum) {
         return;
     }
 
@@ -229,7 +230,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelGenresReset:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_GENRE) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeGenre) {
         return;
     }
 
@@ -241,7 +242,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     NSParameterAssert(aNotification);
     NSParameterAssert([aNotification.object conformsToProtocol:@protocol(VLCMediaLibraryItemProtocol)]);
 
-    if(_libraryModel == nil) {
+    if(self.libraryModel == nil) {
         return;
     }
 
@@ -251,7 +252,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemUpdated:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
         return;
     }
 
@@ -260,7 +261,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelArtistUpdated:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ARTIST) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeArtist) {
         return;
     }
 
@@ -269,7 +270,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAlbumUpdated:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ALBUM) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAlbum) {
         return;
     }
 
@@ -278,7 +279,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelGenreUpdated:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_GENRE) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeGenre) {
         return;
     }
 
@@ -300,7 +301,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
         return;
     }
 
@@ -309,7 +310,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelArtistDeleted:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ARTIST) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeArtist) {
         return;
     }
 
@@ -318,7 +319,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAlbumDeleted:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_ALBUM) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAlbum) {
         return;
     }
 
@@ -327,7 +328,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelGenreDeleted:(NSNotification * const)aNotification
 {
-    if (_currentParentType != VLC_ML_PARENT_GENRE) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeGenre) {
         return;
     }
 
@@ -336,7 +337,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (id<VLCMediaLibraryItemProtocol>)selectedCollectionViewItem
 {
-    NSIndexPath *indexPath = _collectionView.selectionIndexPaths.anyObject;
+    NSIndexPath *indexPath = self.collectionView.selectionIndexPaths.anyObject;
     if (!indexPath) {
         return nil;
     }
@@ -495,9 +496,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             NSMutableArray * const mutableCollectionCopy = self.displayedCollection.mutableCopy;
             VLCLibraryAllAudioGroupsMediaLibraryItem *group;
 
-            if (self->_currentParentType == VLC_ML_PARENT_GENRE) {
+            if (self->_currentParentType == VLCMediaLibraryParentGroupTypeGenre) {
                 group = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All genres")];
-            } else if (self->_currentParentType == VLC_ML_PARENT_ARTIST) {
+            } else if (self->_currentParentType == VLCMediaLibraryParentGroupTypeArtist) {
                 group = [[VLCLibraryAllAudioGroupsMediaLibraryItem alloc] initWithDisplayString:_NS("All artists")];
             }
 
@@ -660,10 +661,12 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
-    if (_currentParentType == VLC_ML_PARENT_UNKNOWN || selectedRow < 0 || _displayedCollectionUpdating) {
-        _audioGroupDataSource.representedAudioGroup = nil;
+    if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary ||
+        selectedRow < 0 ||
+        self.displayedCollectionUpdating) {
+        self.audioGroupDataSource.representedAudioGroup = nil;
     } else {
-        _audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
+        self.audioGroupDataSource.representedAudioGroup = self.displayedCollection[selectedRow];
     }
 }
 
