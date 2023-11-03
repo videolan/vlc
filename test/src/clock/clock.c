@@ -52,6 +52,7 @@ struct clock_scenario
     vlc_tick_t duration;
     vlc_tick_t stream_increment; /* VLC_TICK_INVALID for manual increment */
     vlc_tick_t total_drift_duration; /* VLC_TICK_INVALID for non-drift test */
+    double coeff_epsilon; /* Valid for lowprecision/burst checks */
 
     void (*update)(const struct clock_ctx *ctx, size_t index,
                    vlc_tick_t *system, vlc_tick_t stream);
@@ -453,18 +454,16 @@ static void lowprecision_check(const struct clock_ctx *ctx, size_t update_count,
                                vlc_tick_t expected_system_end,
                                vlc_tick_t stream_end)
 {
-    (void) ctx; (void) expected_system_end; (void) stream_end;
+    const struct clock_scenario *scenario = ctx->scenario;
+    (void) expected_system_end; (void) stream_end;
 
     check_no_event_error(update_count);
-
-    static const double epsilon = 0.005;
 
     for (size_t i = 0; i < tracer_ctx.events.size; ++i)
     {
         struct tracer_event event = tracer_ctx.events.data[i];
         if (event.type == TRACER_EVENT_TYPE_UPDATE)
-            assert(fabs(event.update.coeff - 1.0f) <= epsilon);
-
+            assert(fabs(event.update.coeff - 1.0f) <= scenario->coeff_epsilon);
     }
 }
 
@@ -553,6 +552,7 @@ static struct clock_scenario clock_scenarios[] = {
     .name = "lowprecision",
     .desc = "low precision update has a coeff near 1.0f",
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT),
+    .coeff_epsilon = 0.005,
     .update = lowprecision_update,
     .check = lowprecision_check,
 },
