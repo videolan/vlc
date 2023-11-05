@@ -85,6 +85,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *random;
 @property (readwrite, weak) IBOutlet NSMenuItem *repeat;
 @property (readwrite, weak) IBOutlet NSMenuItem *AtoBloop;
+@property (readwrite, weak) IBOutlet NSMenuItem *libraryPlaylistMode;
 @property (readwrite, weak) IBOutlet NSMenuItem *sortPlaylist;
 @property (readwrite, weak) IBOutlet NSMenuItem *quitAfterPB;
 @property (readwrite, weak) IBOutlet NSMenuItem *fwd;
@@ -253,6 +254,7 @@
 - (IBAction)toggleRecord:(id)sender;
 - (IBAction)setPlaybackRate:(id)sender;
 - (IBAction)toggleAtoBloop:(id)sender;
+- (IBAction)toggleLibraryPlaylistMode:(id)sender;
 - (IBAction)selectRenderer:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;

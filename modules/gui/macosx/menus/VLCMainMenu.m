@@ -163,6 +163,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [self mediaItemChanged:nil];
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
+    [self updateLibraryPlaylistMode];
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -392,6 +393,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_random setTitle: _NS("Random")];
     [_repeat setTitle: _NS("Repeat")];
     [_AtoBloop setTitle: _NS("A→B Loop")];
+    [_libraryPlaylistMode setTitle: _NS("Library Playlist Mode")];
     [_sortPlaylist setTitle: _NS("Sort Playlist")];
     [_quitAfterPB setTitle: _NS("Quit after Playback")];
     [_fwd setTitle: _NS("Step Forward")];
@@ -929,6 +931,18 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)toggleAtoBloop:(id)sender
 {
     [_playerController setABLoop];
+}
+
+- (IBAction)toggleLibraryPlaylistMode:(id)sender
+{
+    _playlistController.libraryPlaylistMode = !_playlistController.libraryPlaylistMode;
+    [self updateLibraryPlaylistMode];
+}
+
+- (void)updateLibraryPlaylistMode
+{
+    const BOOL libraryPlaylistMode = _playlistController.libraryPlaylistMode;
+    _libraryPlaylistMode.state = libraryPlaylistMode ? NSOnState : NSOffState;
 }
 
 - (IBAction)goToSpecificTime:(id)sender
