@@ -26,7 +26,13 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
-    readonly property bool hovered: minimizeButton.hovered || maximizeButton.hovered || closeButton.hovered
+    readonly property bool hovered: {
+        for (let i = 0; i < loader.count; ++i) {
+            const button = loader.itemAt(i)
+            if (button.hovered) return true
+        }
+        return false
+    }
 
     readonly property int _frameMarginLeft: VLCStyle.palette.csdMetrics ? VLCStyle.palette.csdMetrics.csdFrameMarginLeft : 0
     readonly property int _frameMarginRight: VLCStyle.palette.csdMetrics ? VLCStyle.palette.csdMetrics.csdFrameMarginRight : 0
@@ -47,6 +53,8 @@ Rectangle {
         spacing: root._interNavButtonSpacing
 
         Repeater {
+            id: loader
+
             model: MainCtx.csdButtonModel.windowCSDButtons
 
             CSDThemeButton {
