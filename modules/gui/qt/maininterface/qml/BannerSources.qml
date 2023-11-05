@@ -136,7 +136,7 @@ T.ToolBar {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
                             anchors.leftMargin: VLCStyle.margin_xsmall
-                            spacing: VLCStyle.margin_xxxsmall
+                            spacing: VLCStyle.margin_normal
 
                             Widgets.IconToolButton {
                                  id: history_back
@@ -242,6 +242,8 @@ T.ToolBar {
                             left: parent.left
                             leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                         }
+
+                        spacing: VLCStyle.margin_normal
                         enabled: list_grid_btn.visible || sortControl.visible
 
                         onEnabledChanged: {
@@ -304,7 +306,9 @@ T.ToolBar {
                                                               - (VLCStyle.applicationHorizontalMargin * 2)
                                                               - (VLCStyle.margin_xsmall * 2)
                                                               - (VLCStyle.margin_xxsmall * 2)
-                        readonly property bool _alignHCenter: ((localToolbarContent.width - contentItem.contentWidth) / 2) + contentItem.contentWidth < playlistGroup.x
+
+                        readonly property bool _alignHCenter: ((localToolbarContent.width - contentItem.contentWidth) / 2) + contentItem.contentWidth
+                                                              < playlistGroup.x
 
                         width: Math.min(contentItem.contentWidth, _availableWidth)
                         height: VLCStyle.localToolbar_height
@@ -377,7 +381,7 @@ T.ToolBar {
                             right: parent.right
                             rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                         }
-                        spacing: VLCStyle.margin_xxxsmall
+                        spacing: VLCStyle.margin_normal
 
                         model: ObjectModel {
 
