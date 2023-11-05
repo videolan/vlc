@@ -230,6 +230,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         /* set initial values, further updates through callbacks */
         vlc_playlist_Lock(_p_playlist);
         _unsorted = YES;
+        _libraryPlaylistMode = YES;
         _playbackOrder = vlc_playlist_GetPlaybackOrder(_p_playlist);
         _playbackRepeat = vlc_playlist_GetPlaybackRepeat(_p_playlist);
         _playlistListenerID = vlc_playlist_AddListener(_p_playlist,

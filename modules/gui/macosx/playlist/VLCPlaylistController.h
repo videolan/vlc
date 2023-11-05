@@ -104,6 +104,8 @@ extern NSString *VLCPlaylistItemsRemoved;
  */
 @property (readwrite, nonatomic) enum vlc_playlist_playback_order playbackOrder;
 
+@property (readwrite) BOOL libraryPlaylistMode;
+
 /**
  * Simplified version to add new items to the end of the current playlist
  * @param array array of items. Each item is an instance of VLCOpenInputMetadata.
