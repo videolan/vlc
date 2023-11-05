@@ -32,6 +32,8 @@
 
 #import "main/VLCMain.h"
 
+#import "playlist/VLCPlaylistController.h"
+
 @interface VLCLibraryRepresentedItem ()
 {
     NSInteger _itemIndexInParent; // Call self.itemIndexInParent, don't access directly
@@ -39,7 +41,6 @@
 }
 
 @property (readwrite) enum vlc_ml_media_type_t mediaType;
-@property (readwrite) BOOL individualMode;
 
 @end
 
@@ -69,7 +70,6 @@
 - (void)setup
 {
     _itemIndexInParent = NSNotFound;
-    _individualMode = NO; // TODO: Connect outside
 }
 
 - (NSInteger)itemIndexInParent
@@ -254,10 +254,11 @@
 
 - (void)playImmediately:(BOOL)playImmediately
 {
-    if (self.individualMode) {
-        [self playIndividualModeImmediately:playImmediately];
-    } else {
+    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    if (playlistController.libraryPlaylistMode) {
         [self playLibraryModeImmediately:playImmediately];
+    } else {
+        [self playIndividualModeImmediately:playImmediately];
     }
 }
 
