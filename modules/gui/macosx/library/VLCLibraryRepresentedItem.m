@@ -231,6 +231,7 @@
 
 - (void)playLibraryModeImmediately:(BOOL)playImmediately
 {
+    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
 
     // If play immediately, play first item, queue following items
@@ -248,6 +249,13 @@
 
         if (startingPlayImmediately) {
             startingPlayImmediately = NO;
+        }
+    }
+
+    if (playlistController.playbackRepeat != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE) {
+        for (NSUInteger i = 0; i < startingIndex; i++) {
+            const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
+            [libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
         }
     }
 }
