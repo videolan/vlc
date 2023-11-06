@@ -1013,21 +1013,21 @@ static subpicture_region_t *Render( filter_t *p_filter,
     FT_BBox regionbbox = paddedbbox;
 
     /* _______regionbbox_______________
-        * |                               |
-        * |                               |
-        * |                               |
-        * |     _bbox(<paddedbbox)___     |
-        * |    |         rightaligned|    |
-        * |    |            textlines|    |
-        * |    |_____________________|    |
-        * |_______________________________|
-        *
-        * we need at least 3 bounding boxes.
-        * regionbbox containing the whole, including region background pixels
-        * paddedbox an enlarged text box when for drawing text background
-        * bbox the lines bounding box for all glyphs
-        * For simple unstyled subs, bbox == paddedbox == regionbbox
-        */
+     * |                               |
+     * |                               |
+     * |                               |
+     * |     _bbox(<paddedbbox)___     |
+     * |    |         rightaligned|    |
+     * |    |            textlines|    |
+     * |    |_____________________|    |
+     * |_______________________________|
+     *
+     * we need at least 3 bounding boxes.
+     * regionbbox containing the whole, including region background pixels
+     * paddedbox an enlarged text box when for drawing text background
+     * bbox the lines bounding box for all glyphs
+     * For simple unstyled subs, bbox == paddedbox == regionbbox
+     */
 
     unsigned outertext_w = (regionbbox.xMax - regionbbox.xMin);
     if( outertext_w < (unsigned) p_region_in->i_max_width )
@@ -1136,24 +1136,22 @@ static subpicture_region_t *Render( filter_t *p_filter,
                                  func );
         }
 
+        /* Avoid useless pixels:
+         *        reshrink/trim Region Box to padded text one,
+         *        but update offsets to keep position and have same rendering */
+//      if( (bboxcolor & 0xFF) == 0 )
         {
-            /* Avoid useless pixels:
-                *        reshrink/trim Region Box to padded text one,
-                *        but update offsets to keep position and have same rendering */
-//          if( (bboxcolor & 0xFF) == 0 )
-            {
-                region->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
-                region->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
-            }
-//          else /* case where the bounding box is larger and visible */
-//          {
-//              region->i_x = p_region_in->i_x;
-//              region->i_y = p_region_in->i_y;
-//          }
-            region->i_alpha = p_region_in->i_alpha;
-            region->i_align = p_region_in->i_align;
-            break;
+            region->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
+            region->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
         }
+//      else /* case where the bounding box is larger and visible */
+//      {
+//          region->i_x = p_region_in->i_x;
+//          region->i_y = p_region_in->i_y;
+//      }
+        region->i_alpha = p_region_in->i_alpha;
+        region->i_align = p_region_in->i_align;
+        break;
     }
 
 done:
