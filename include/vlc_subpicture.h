@@ -179,12 +179,6 @@ VLC_API subpicture_region_t *subpicture_region_Copy( subpicture_region_t *p_regi
     (((r)->text_flags & VLC_SUBPIC_TEXT_FLAG_IS_TEXT) != 0)
 
 /**
- * Marks a text-based region as rendered into the p_picture.
- */
-#define subpicture_region_TextMarkRendered(r)  \
-    ((r)->text_flags &= ~VLC_SUBPIC_TEXT_FLAG_IS_TEXT)
-
-/**
  *
  */
 typedef struct
