@@ -379,8 +379,8 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
         return VLC_EGENERIC;
     fmt.p_palette = p_region->fmt.p_palette ? p_region->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
     p_region->fmt = fmt;
-    fmt.i_sar_num = regionnum;
-    fmt.i_sar_den = regionden;
+    p_region->fmt.i_sar_num = regionnum;
+    p_region->fmt.i_sar_den = regionden;
 
     /* Calculate text color components
      * Only use the first color */
