@@ -473,7 +473,7 @@ static void RenderBackground( subpicture_region_t *p_region,
                                      FT_BBox *p_paddedbbox,
                                      FT_BBox *p_textbbox,
                                      picture_t *p_picture,
-                                     ft_drawing_functions draw )
+                                     const ft_drawing_functions *draw )
 {
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
@@ -531,7 +531,7 @@ static void RenderBackground( subpicture_region_t *p_region,
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
             {
                 uint8_t i_x, i_y, i_z;
-                draw.extract( p_char->p_style->i_background_color,
+                draw->extract( p_char->p_style->i_background_color,
                                  &i_x, &i_y, &i_z );
                 const uint8_t i_alpha = p_char->p_style->i_background_alpha;
 
@@ -549,7 +549,7 @@ static void RenderBackground( subpicture_region_t *p_region,
                         .yMax = __MAX(0, p_regionbbox->yMax - segmentbgbox.yMax),
                     };
 
-                    draw.fill( p_picture, i_alpha, i_x, i_y, i_z,
+                    draw->fill( p_picture, i_alpha, i_x, i_y, i_z,
                                absbox.xMin, absbox.yMax,
                                absbox.xMax - absbox.xMin, absbox.yMin - absbox.yMax );
                 }
@@ -569,7 +569,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
                            int i_offset_x,
                            int i_offset_y,
                            int g,
-                           ft_drawing_functions draw )
+                           const ft_drawing_functions *draw )
 {
     VLC_UNUSED(p_filter);
     /* Render all glyphs and underline/strikethrough */
@@ -617,12 +617,12 @@ static void RenderCharAXYZ( filter_t *p_filter,
             continue;
 
         uint8_t i_x, i_y, i_z;
-        draw.extract( i_color, &i_x, &i_y, &i_z );
+        draw->extract( i_color, &i_x, &i_y, &i_z );
 
         int i_glyph_y = i_offset_y - p_glyph->top;
         int i_glyph_x = i_offset_x + p_glyph->left;
 
-        draw.blend( p_picture, i_glyph_x, i_glyph_y,
+        draw->blend( p_picture, i_glyph_x, i_glyph_y,
                     i_a, i_x, i_y, i_z, p_glyph );
 
         /* underline/strikethrough are only rendered for the normal glyph */
@@ -644,7 +644,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
                               const video_format_t *fmt_out,
-                              ft_drawing_functions draw )
+                              const ft_drawing_functions *draw )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -677,12 +677,12 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
     if (p_region->text_flags & VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG) {
         /* Render the background just under the text */
-        draw.fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
+        draw->fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
                    0, 0, fmt.i_visible_width, fmt.i_visible_height );
     } else {
         /* Render background under entire subpicture block */
-        draw.extract( p_style->i_background_color, &i_x, &i_y, &i_z );
-        draw.fill( p_picture, p_style->i_background_alpha, i_x, i_y, i_z,
+        draw->extract( p_style->i_background_color, &i_x, &i_y, &i_z );
+        draw->fill( p_picture, p_style->i_background_alpha, i_x, i_y, i_z,
                    0, 0, fmt.i_visible_width, fmt.i_visible_height );
     }
 
@@ -1127,54 +1127,50 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 //            p_region_out->i_y = p_region_in->i_y;
 //        }
 
-    enum
-    {
-        DRAW_YUVA = 0,
-        DRAW_RGBA,
-        DRAW_ARGB,
-    };
-
-    const ft_drawing_functions drawfuncs[] =
-    {
-        [DRAW_YUVA] = { .extract = YUVFromXRGB,
-                        .fill =    FillYUVAPicture,
-                        .blend =   BlendGlyphToYUVA },
-        [DRAW_RGBA] = { .extract = RGBFromXRGB,
-                        .fill =    FillRGBAPicture,
-                        .blend =   BlendGlyphToRGBA },
-        [DRAW_ARGB] = { .extract = RGBFromXRGB,
-                        .fill =    FillARGBPicture,
-                        .blend =   BlendGlyphToARGB },
-    };
-
     rv = VLC_EGENERIC;
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
         if( *p_chroma == VLC_CODEC_YUVP )
             rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
                                 &regionbbox, &paddedbbox, &bbox );
-        else if( *p_chroma == VLC_CODEC_YUVA )
-            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                &regionbbox, &paddedbbox, &bbox,
-                                VLC_CODEC_YUVA,
-                                &p_region_out->fmt,
-                                drawfuncs[DRAW_YUVA] );
-        else if( *p_chroma == VLC_CODEC_RGBA
-                || *p_chroma == VLC_CODEC_BGRA )
-            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                &regionbbox, &paddedbbox, &bbox,
-                                *p_chroma,
-                                &p_region_out->fmt,
-                                drawfuncs[DRAW_RGBA] );
-        else if( *p_chroma == VLC_CODEC_ARGB
-                || *p_chroma == VLC_CODEC_ABGR)
-            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
-                                &regionbbox, &paddedbbox, &bbox,
-                                *p_chroma,
-                                &p_region_out->fmt,
-                                drawfuncs[DRAW_ARGB] );
         else
-            continue;
+        {
+            const ft_drawing_functions *func;
+            if( *p_chroma == VLC_CODEC_YUVA )
+            {
+                static const ft_drawing_functions DRAW_YUVA =
+                    { .extract = YUVFromXRGB,
+                      .fill =    FillYUVAPicture,
+                      .blend =   BlendGlyphToYUVA };
+                func = &DRAW_YUVA;
+            }
+            else if( *p_chroma == VLC_CODEC_RGBA
+                  || *p_chroma == VLC_CODEC_BGRA )
+            {
+                static const ft_drawing_functions DRAW_RGBA =
+                    { .extract = RGBFromXRGB,
+                      .fill =    FillRGBAPicture,
+                      .blend =   BlendGlyphToRGBA };
+                func = &DRAW_RGBA;
+            }
+            else if( *p_chroma == VLC_CODEC_ARGB
+                  || *p_chroma == VLC_CODEC_ABGR)
+            {
+                static const ft_drawing_functions DRAW_ARGB =
+                    { .extract = RGBFromXRGB,
+                      .fill =    FillARGBPicture,
+                      .blend =   BlendGlyphToARGB };
+                func = &DRAW_ARGB;
+            }
+            else
+                continue;
+
+            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
+                             &regionbbox, &paddedbbox, &bbox,
+                             *p_chroma,
+                             &p_region_out->fmt,
+                             func );
+        }
 
         if( rv == VLC_SUCCESS )
         {
