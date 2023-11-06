@@ -361,7 +361,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     char *psz_svg;
     /* Check if the data is SVG or pure text. In the latter case,
        convert the text to SVG. FIXME: find a better test */
-    if( p_region_in->p_text && strstr( p_region_in->p_text->psz_text, "<svg" ) )
+    if( strstr( p_region_in->p_text->psz_text, "<svg" ) )
     {
         psz_svg = strdup( p_region_in->p_text->psz_text );
     }
