@@ -343,7 +343,7 @@ error:
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 static int RenderYUVP( subpicture_region_t *p_region,
-                       line_desc_t *p_line,
+                       const line_desc_t *p_line,
                        const FT_BBox *p_regionbbox,
                        const FT_BBox *p_bbox )
 {
@@ -467,7 +467,7 @@ static int RenderYUVP( subpicture_region_t *p_region,
  *****************************************************************************/
 
 static void RenderBackground( subpicture_region_t *p_region,
-                                     line_desc_t *p_line_head,
+                                     const line_desc_t *p_line_head,
                                      const FT_BBox *p_regionbbox,
                                      const FT_BBox *p_paddedbbox,
                                      const FT_BBox *p_textbbox,
@@ -637,7 +637,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
 
 static inline int RenderAXYZ( filter_t *p_filter,
                               subpicture_region_t *p_region,
-                              line_desc_t *p_line_head,
+                              const line_desc_t *p_line_head,
                               const FT_BBox *p_regionbbox,
                               const FT_BBox *p_paddedtextbbox,
                               const FT_BBox *p_textbbox,
@@ -693,7 +693,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     for( int g = 0; g < 3; g++ )
     {
         /* Render all lines */
-        for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
+        for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
             FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->text_flags & SUBPICTURE_ALIGN_MASK );
 
