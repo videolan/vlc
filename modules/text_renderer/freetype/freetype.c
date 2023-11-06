@@ -342,7 +342,8 @@ error:
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int RenderYUVP( subpicture_region_t *p_region,
+static int RenderYUVP( subpicture_region_t *p_region_in,
+                       subpicture_region_t *p_region,
                        const line_desc_t *p_line,
                        const FT_BBox *p_regionbbox,
                        const FT_BBox *p_bbox )
@@ -364,19 +365,19 @@ static int RenderYUVP( subpicture_region_t *p_region,
     fmt.i_height         =
     fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin + 4;
     fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = p_region->fmt.transfer;
-    fmt.primaries = p_region->fmt.primaries;
-    fmt.space     = p_region->fmt.space;
-    fmt.mastering = p_region->fmt.mastering;
+    fmt.transfer  = p_region_in->fmt.transfer;
+    fmt.primaries = p_region_in->fmt.primaries;
+    fmt.space     = p_region_in->fmt.space;
+    fmt.mastering = p_region_in->fmt.mastering;
 
     assert( !p_region->p_picture );
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
-    fmt.p_palette = p_region->fmt.p_palette ? p_region->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
+    fmt.p_palette = p_region_in->fmt.p_palette ? p_region_in->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
 
-    const unsigned regionnum = p_region->fmt.i_sar_num;
-    const unsigned regionden = p_region->fmt.i_sar_den;
+    const unsigned regionnum = p_region_in->fmt.i_sar_num;
+    const unsigned regionden = p_region_in->fmt.i_sar_den;
     p_region->fmt = fmt;
     p_region->fmt.i_sar_num = regionnum;
     p_region->fmt.i_sar_den = regionden;
@@ -411,7 +412,7 @@ static int RenderYUVP( subpicture_region_t *p_region,
 
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
-        FT_Vector offset = GetAlignedOffset( p_line, p_bbox, p_region->i_align );
+        FT_Vector offset = GetAlignedOffset( p_line, p_bbox, p_region_in->i_align );
 
         for( i = 0; i < p_line->i_character_count; i++ )
         {
@@ -466,7 +467,7 @@ static int RenderYUVP( subpicture_region_t *p_region,
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 
-static void RenderBackground( subpicture_region_t *p_region,
+static void RenderBackground( subpicture_region_t *p_region_in,
                                      const line_desc_t *p_line_head,
                                      const FT_BBox *p_regionbbox,
                                      const FT_BBox *p_paddedbbox,
@@ -476,7 +477,7 @@ static void RenderBackground( subpicture_region_t *p_region,
 {
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
-        FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->text_flags & SUBPICTURE_ALIGN_MASK );
+        FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region_in->text_flags & SUBPICTURE_ALIGN_MASK );
 
         FT_BBox linebgbox = p_line->bbox;
         linebgbox.xMin += offset.x;
@@ -542,9 +543,9 @@ static void RenderBackground( subpicture_region_t *p_region,
                     {
                         .xMin = __MAX(0, segmentbgbox.xMin - p_regionbbox->xMin),
                         .xMax = VLC_CLIP(segmentbgbox.xMax - p_regionbbox->xMin,
-                                         0, p_region->fmt.i_visible_width),
+                                         0, p_region_in->fmt.i_visible_width),
                         .yMin = VLC_CLIP(p_regionbbox->yMax - segmentbgbox.yMin,
-                                         0, p_region->fmt.i_visible_height),
+                                         0, p_region_in->fmt.i_visible_height),
                         .yMax = __MAX(0, p_regionbbox->yMax - segmentbgbox.yMax),
                     };
 
@@ -636,6 +637,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
 }
 
 static inline int RenderAXYZ( filter_t *p_filter,
+                              subpicture_region_t *p_region_in,
                               subpicture_region_t *p_region,
                               const line_desc_t *p_line_head,
                               const FT_BBox *p_regionbbox,
@@ -654,17 +656,17 @@ static inline int RenderAXYZ( filter_t *p_filter,
     fmt.i_height         =
     fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin;
     fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = p_region->fmt.transfer;
-    fmt.primaries = p_region->fmt.primaries;
-    fmt.space     = p_region->fmt.space;
-    fmt.mastering = p_region->fmt.mastering;
+    fmt.transfer  = p_region_in->fmt.transfer;
+    fmt.primaries = p_region_in->fmt.primaries;
+    fmt.space     = p_region_in->fmt.space;
+    fmt.mastering = p_region_in->fmt.mastering;
 
     picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
 
-    const unsigned regionnum = p_region->fmt.i_sar_num;
-    const unsigned regionden = p_region->fmt.i_sar_den;
+    const unsigned regionnum = p_region_in->fmt.i_sar_num;
+    const unsigned regionden = p_region_in->fmt.i_sar_den;
     p_region->fmt = fmt;
     p_region->fmt.i_sar_num = regionnum;
     p_region->fmt.i_sar_den = regionden;
@@ -673,7 +675,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     const text_style_t *p_style = p_sys->p_default_style;
     uint8_t i_x, i_y, i_z;
 
-    if (p_region->text_flags & VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG) {
+    if (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG) {
         /* Render the background just under the text */
         draw->fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
                    0, 0, fmt.i_visible_width, fmt.i_visible_height );
@@ -685,7 +687,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     }
 
     /* Render text's background (from decoder) if any */
-    RenderBackground(p_region, p_line_head,
+    RenderBackground(p_region_in, p_line_head,
                      p_regionbbox, p_paddedtextbbox, p_textbbox,
                      p_picture, draw);
 
@@ -695,7 +697,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         /* Render all lines */
         for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
-            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->text_flags & SUBPICTURE_ALIGN_MASK );
+            FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region_in->text_flags & SUBPICTURE_ALIGN_MASK );
 
             int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->origin.y;
             int i_glyph_offset_x = offset.x - p_regionbbox->xMin;
@@ -1122,7 +1124,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
         if( *p_chroma == VLC_CODEC_YUVP )
-            rv = RenderYUVP( p_region_out, text_block.p_laid,
+            rv = RenderYUVP( p_region_in, p_region_out, text_block.p_laid,
                              &regionbbox, &bbox );
         else
         {
@@ -1156,7 +1158,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             else
                 continue;
 
-            rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
+            rv = RenderAXYZ( p_filter, p_region_in, p_region_out, text_block.p_laid,
                              &regionbbox, &paddedbbox, &bbox,
                              *p_chroma,
                              func );
