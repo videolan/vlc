@@ -971,9 +971,6 @@ static subpicture_region_t *Render( filter_t *p_filter,
                          const subpicture_region_t *p_region_in,
                          const vlc_fourcc_t *p_chroma_list )
 {
-    if( !p_region_in->p_text )
-        return NULL;
-
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_region_t *region = NULL;
     bool b_grid = (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_GRID_MODE) != 0;

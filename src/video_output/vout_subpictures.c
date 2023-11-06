@@ -321,6 +321,8 @@ static subpicture_region_t *SpuRenderText(spu_t *spu,
 {
     spu_private_t *sys = spu->p;
     assert(subpicture_region_IsText( region ));
+    if ( region->p_text == NULL )
+        return NULL;
 
     vlc_mutex_lock(&sys->textlock);
     filter_t *text = sys->text;

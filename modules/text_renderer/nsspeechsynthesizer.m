@@ -104,9 +104,6 @@ static subpicture_region_t *RenderText(filter_t *p_filter,
         filter_sys_t *p_sys = p_filter->p_sys;
         const text_segment_t *p_segment = p_region_in->p_text;
 
-        if (!p_segment)
-            return NULL;
-
         for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
             if ( !s->psz_text )
                 continue;

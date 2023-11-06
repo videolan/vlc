@@ -129,9 +129,6 @@ static int RenderTextMTA(filter_t *p_filter,
     struct filter_sapi *p_sys = static_cast<struct filter_sapi *>( p_filter->p_sys );
     const text_segment_t *p_segment = p_region_in->p_text;
 
-    if (!p_segment)
-        return VLC_EGENERIC;
-
     for (const text_segment_t *s = p_segment; s != NULL; s = s->p_next ) {
         if (!s->psz_text)
             continue;
