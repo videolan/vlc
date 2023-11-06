@@ -505,7 +505,7 @@ static void display_prepare_noop(vout_display_t *vd, picture_t *pic)
     (void)vd; (void) pic;
 }
 
-static void cc_text_renderer_render(filter_t *filter, subpicture_region_t *region_in)
+static void cc_text_renderer_render(filter_t *filter, const subpicture_region_t *region_in)
 {
     (void) filter;
     assert(strcmp(region_in->p_text->psz_text, cc_block_decoded) == 0);
@@ -542,7 +542,7 @@ static int cc_decoder_decode_channel(decoder_t *dec, vlc_frame_t *in)
 }
 
 static void cc_text_renderer_render_708_1064(filter_t *filter,
-                                             subpicture_region_t *region_in)
+                                             const subpicture_region_t *region_in)
 {
     (void) filter;
     /* Make sure each tracks are rendered once */
@@ -597,7 +597,7 @@ static void cc_decoder_setup_608(decoder_t *dec)
 }
 
 static void cc_text_renderer_render_608_02(filter_t *filter,
-                                           subpicture_region_t *region_in)
+                                           const subpicture_region_t *region_in)
 {
     (void) filter;
     assert(strcmp(region_in->p_text->psz_text, "cc02_dec") == 0);

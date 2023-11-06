@@ -256,7 +256,7 @@ static int OpenWindow(vlc_window_t *wnd)
 }
 
 static int TextRendererRender(filter_t *filter, subpicture_region_t *region_out,
-                              subpicture_region_t *region_in,
+                              const subpicture_region_t *region_in,
                               const vlc_fourcc_t *chroma_list)
 {
     (void) region_out; (void) chroma_list;

@@ -58,7 +58,7 @@ static int Create (filter_t *);
 static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
-                      subpicture_region_t *,
+                      const subpicture_region_t *,
                       const vlc_fourcc_t *);
 }
 
@@ -100,7 +100,7 @@ struct filter_sapi
         union {
             struct {
                 int result;
-                subpicture_region_t *region;
+                const subpicture_region_t *region;
             } render_text;
         };
     } cmd;
@@ -125,10 +125,10 @@ struct MTAGuard
 }
 
 static int RenderTextMTA(filter_t *p_filter,
-        subpicture_region_t * p_region_in)
+        const subpicture_region_t * p_region_in)
 {
     struct filter_sapi *p_sys = static_cast<struct filter_sapi *>( p_filter->p_sys );
-    text_segment_t *p_segment = p_region_in->p_text;
+    const text_segment_t *p_segment = p_region_in->p_text;
 
     if (!p_segment)
         return VLC_EGENERIC;
@@ -215,7 +215,7 @@ error:
 
 static int RenderText(filter_t *p_filter,
         subpicture_region_t *,
-        subpicture_region_t *region_in,
+        const subpicture_region_t *region_in,
         const vlc_fourcc_t *)
 {
     auto *sys = static_cast<struct filter_sapi *>( p_filter->p_sys );

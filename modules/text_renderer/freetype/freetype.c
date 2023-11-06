@@ -342,7 +342,7 @@ error:
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int RenderYUVP( subpicture_region_t *p_region_in,
+static int RenderYUVP( const subpicture_region_t *p_region_in,
                        subpicture_region_t *p_region,
                        const line_desc_t *p_line,
                        const FT_BBox *p_regionbbox,
@@ -467,7 +467,7 @@ static int RenderYUVP( subpicture_region_t *p_region_in,
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 
-static void RenderBackground( subpicture_region_t *p_region_in,
+static void RenderBackground( const subpicture_region_t *p_region_in,
                                      const line_desc_t *p_line_head,
                                      const FT_BBox *p_regionbbox,
                                      const FT_BBox *p_paddedbbox,
@@ -637,7 +637,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
 }
 
 static inline int RenderAXYZ( filter_t *p_filter,
-                              subpicture_region_t *p_region_in,
+                              const subpicture_region_t *p_region_in,
                               subpicture_region_t *p_region,
                               const line_desc_t *p_line_head,
                               const FT_BBox *p_regionbbox,
@@ -976,7 +976,7 @@ static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t 
  * the vout method by this module
  */
 static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
-                         subpicture_region_t *p_region_in,
+                         const subpicture_region_t *p_region_in,
                          const vlc_fourcc_t *p_chroma_list )
 {
     if( !p_region_in || !p_region_in->p_text )

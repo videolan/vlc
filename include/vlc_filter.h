@@ -102,7 +102,7 @@ struct vlc_filter_operations
 
         /** Render text (text renderer) */
         int (*render)(filter_t *, subpicture_region_t *,
-                      subpicture_region_t *, const vlc_fourcc_t *);
+                      const subpicture_region_t *, const vlc_fourcc_t *);
     };
 
     union

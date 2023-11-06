@@ -39,7 +39,7 @@ static int Create (filter_t *);
 static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
-                      subpicture_region_t *,
+                      const subpicture_region_t *,
                       const vlc_fourcc_t *);
 
 vlc_module_begin ()
@@ -99,12 +99,12 @@ static NSString * languageCodeForString(NSString *string) {
 
 static int RenderText(filter_t *p_filter,
                       subpicture_region_t *p_region_out,
-                      subpicture_region_t *p_region_in,
+                      const subpicture_region_t *p_region_in,
                       const vlc_fourcc_t *p_chroma_list)
 {
     @autoreleasepool {
         filter_sys_t *p_sys = p_filter->p_sys;
-        text_segment_t *p_segment = p_region_in->p_text;
+        const text_segment_t *p_segment = p_region_in->p_text;
 
         if (!p_segment)
             return VLC_EGENERIC;

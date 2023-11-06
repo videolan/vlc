@@ -50,7 +50,7 @@
 static int  Create    ( filter_t * );
 static void Destroy   ( filter_t * );
 static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                        subpicture_region_t *p_region_in,
+                        const subpicture_region_t *p_region_in,
                         const vlc_fourcc_t * );
 
 typedef struct
@@ -329,7 +329,7 @@ static char * SegmentsToSVG( text_segment_t *p_segment, int i_height, int *pi_to
 }
 
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in,
+                       const subpicture_region_t *p_region_in,
                        const vlc_fourcc_t *p_chroma_list )
 {
     /* Sanity check */
