@@ -342,7 +342,8 @@ error:
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
+static void RenderYUVP( const subpicture_region_t *p_region_in,
+                       subpicture_region_t *p_region,
                        const line_desc_t *p_line,
                        const FT_BBox *p_regionbbox,
                        const FT_BBox *p_bbox )
@@ -352,29 +353,9 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
     uint8_t *p_dst;
-    video_format_t fmt;
     int i, i_pitch;
     unsigned int x, y;
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
-
-    /* Create a new subpicture region */
-    video_format_Init( &fmt, VLC_CODEC_YUVP );
-    fmt.i_width          =
-    fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin;
-    fmt.i_height         =
-    fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin;
-    fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = p_region_in->fmt.transfer;
-    fmt.primaries = p_region_in->fmt.primaries;
-    fmt.space     = p_region_in->fmt.space;
-    fmt.mastering = p_region_in->fmt.mastering;
-
-    subpicture_region_t *p_region = subpicture_region_New(&fmt);
-    if (unlikely(p_region == NULL))
-        return NULL;
-
-    p_region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
-    p_region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
 
     /* Calculate text color components
      * Only use the first color */
@@ -435,13 +416,13 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
         uint8_t *p_top = p_dst; /* Use 1st line as a cache */
         uint8_t left, current;
 
-        for( y = 1; y < fmt.i_height - 1; y++ )
+        for( y = 1; y < p_region->fmt.i_height - 1; y++ )
         {
-            if( y > 1 ) memcpy( p_top, p_dst, fmt.i_width );
+            if( y > 1 ) memcpy( p_top, p_dst, p_region->fmt.i_width );
             p_dst += p_region->p_picture->Y_PITCH;
             left = 0;
 
-            for( x = 1; x < fmt.i_width - 1; x++ )
+            for( x = 1; x < p_region->fmt.i_width - 1; x++ )
             {
                 current = p_dst[x];
                 p_dst[x] = ( 8 * (int)p_dst[x] + left + p_dst[x+1] + p_top[x -1]+ p_top[x] + p_top[x+1] +
@@ -449,10 +430,8 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
                 left = current;
             }
         }
-        memset( p_top, 0, fmt.i_width );
+        memset( p_top, 0, p_region->fmt.i_width );
     }
-
-    return p_region;
 }
 
 /*****************************************************************************
@@ -630,8 +609,9 @@ static void RenderCharAXYZ( filter_t *p_filter,
     }
 }
 
-static inline subpicture_region_t *RenderAXYZ( filter_t *p_filter,
+static inline void RenderAXYZ( filter_t *p_filter,
                               const subpicture_region_t *p_region_in,
+                              subpicture_region_t *p_region,
                               const line_desc_t *p_line_head,
                               const FT_BBox *p_regionbbox,
                               const FT_BBox *p_paddedtextbbox,
@@ -641,27 +621,7 @@ static inline subpicture_region_t *RenderAXYZ( filter_t *p_filter,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    /* Create a new subpicture region */
-    video_format_t fmt;
-    video_format_Init( &fmt, i_chroma );
-    fmt.i_width          =
-    fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin;
-    fmt.i_height         =
-    fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin;
-    fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = p_region_in->fmt.transfer;
-    fmt.primaries = p_region_in->fmt.primaries;
-    fmt.space     = p_region_in->fmt.space;
-    fmt.mastering = p_region_in->fmt.mastering;
-
-    subpicture_region_t *p_region = subpicture_region_New(&fmt);
-    if (unlikely(p_region == NULL))
-        return NULL;
-
     picture_t *p_picture = p_region->p_picture;
-
-    p_region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
-    p_region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
 
     /* Initialize the picture background */
     const text_style_t *p_style = p_sys->p_default_style;
@@ -670,12 +630,12 @@ static inline subpicture_region_t *RenderAXYZ( filter_t *p_filter,
     if (p_region_in->text_flags & VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG) {
         /* Render the background just under the text */
         draw->fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
-                   0, 0, fmt.i_visible_width, fmt.i_visible_height );
+                   0, 0, p_region->fmt.i_visible_width, p_region->fmt.i_visible_height );
     } else {
         /* Render background under entire subpicture block */
         draw->extract( p_style->i_background_color, &i_x, &i_y, &i_z );
         draw->fill( p_picture, p_style->i_background_alpha, i_x, i_y, i_z,
-                   0, 0, fmt.i_visible_width, fmt.i_visible_height );
+                   0, 0, p_region->fmt.i_visible_width, p_region->fmt.i_visible_height );
     }
 
     /* Render text's background (from decoder) if any */
@@ -699,8 +659,6 @@ static inline subpicture_region_t *RenderAXYZ( filter_t *p_filter,
                             draw );
         }
     }
-
-    return p_region;
 }
 
 static void UpdateDefaultLiveStyles( filter_t *p_filter )
@@ -1110,10 +1068,31 @@ static subpicture_region_t *Render( filter_t *p_filter,
         regionbbox = paddedbbox;
     }
 
+    video_format_t fmt;
+    video_format_Init( &fmt, 0 );
+    fmt.i_width          =
+    fmt.i_visible_width  = regionbbox.xMax - regionbbox.xMin;
+    fmt.i_height         =
+    fmt.i_visible_height = regionbbox.yMax - regionbbox.yMin;
+    fmt.i_sar_num = fmt.i_sar_den = 1;
+    fmt.transfer  = p_region_in->fmt.transfer;
+    fmt.primaries = p_region_in->fmt.primaries;
+    fmt.space     = p_region_in->fmt.space;
+    fmt.mastering = p_region_in->fmt.mastering;
+
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
+        /* Create a new subpicture region */
+        fmt.i_chroma = *p_chroma;
+        region = subpicture_region_New(&fmt);
+        if (unlikely(region == NULL))
+            continue;
+
+        region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
+        region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
+
         if( *p_chroma == VLC_CODEC_YUVP )
-            region = RenderYUVP( p_region_in, text_block.p_laid,
+            RenderYUVP( p_region_in, region, text_block.p_laid,
                                 &regionbbox, &bbox );
         else
         {
@@ -1145,15 +1124,18 @@ static subpicture_region_t *Render( filter_t *p_filter,
                 func = &DRAW_ARGB;
             }
             else
+            {
+                subpicture_region_Delete(region);
+                region = NULL;
                 continue;
+            }
 
-            region = RenderAXYZ( p_filter, p_region_in, text_block.p_laid,
+            RenderAXYZ( p_filter, p_region_in, region, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  *p_chroma,
                                  func );
         }
 
-        if( region != NULL )
         {
             /* Avoid useless pixels:
                 *        reshrink/trim Region Box to padded text one,
