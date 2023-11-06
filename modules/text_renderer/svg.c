@@ -333,7 +333,7 @@ static subpicture_region_t *RenderText( filter_t *p_filter,
                        const vlc_fourcc_t *p_chroma_list )
 {
     /* Sanity check */
-    if( !p_region_in || !p_region_in->p_text )
+    if( !p_region_in->p_text )
         return NULL;
 
     for( size_t i=0; p_chroma_list[i]; i++ )
