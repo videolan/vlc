@@ -370,11 +370,16 @@ static int RenderYUVP( const subpicture_region_t *p_region_in,
     fmt.space     = p_region_in->fmt.space;
     fmt.mastering = p_region_in->fmt.mastering;
 
+    fmt.p_palette = p_region_in->fmt.p_palette ? p_region_in->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
+
     assert( !p_region->p_picture );
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
+    {
+        if (p_region_in->fmt.p_palette == NULL)
+            free(fmt.p_palette);
         return VLC_EGENERIC;
-    fmt.p_palette = p_region_in->fmt.p_palette ? p_region_in->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
+    }
 
     const unsigned regionnum = p_region_in->fmt.i_sar_num;
     const unsigned regionden = p_region_in->fmt.i_sar_den;
