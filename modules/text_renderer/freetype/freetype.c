@@ -365,8 +365,6 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin + 4;
     fmt.i_height         =
     fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin + 4;
-    const unsigned regionnum = p_region->fmt.i_sar_num;
-    const unsigned regionden = p_region->fmt.i_sar_den;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.transfer  = p_region->fmt.transfer;
     fmt.primaries = p_region->fmt.primaries;
@@ -378,6 +376,9 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     if( !p_region->p_picture )
         return VLC_EGENERIC;
     fmt.p_palette = p_region->fmt.p_palette ? p_region->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
+
+    const unsigned regionnum = p_region->fmt.i_sar_num;
+    const unsigned regionden = p_region->fmt.i_sar_den;
     p_region->fmt = fmt;
     p_region->fmt.i_sar_num = regionnum;
     p_region->fmt.i_sar_den = regionden;
@@ -643,7 +644,6 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               FT_BBox *p_paddedtextbbox,
                               FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
-                              const video_format_t *fmt_out,
                               const ft_drawing_functions *draw )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -655,18 +655,18 @@ static inline int RenderAXYZ( filter_t *p_filter,
     fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin;
     fmt.i_height         =
     fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin;
-    const unsigned regionnum = p_region->fmt.i_sar_num;
-    const unsigned regionden = p_region->fmt.i_sar_den;
     fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = fmt_out->transfer;
-    fmt.primaries = fmt_out->primaries;
-    fmt.space     = fmt_out->space;
-    fmt.mastering = fmt_out->mastering;
+    fmt.transfer  = p_region->fmt.transfer;
+    fmt.primaries = p_region->fmt.primaries;
+    fmt.space     = p_region->fmt.space;
+    fmt.mastering = p_region->fmt.mastering;
 
     picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
 
+    const unsigned regionnum = p_region->fmt.i_sar_num;
+    const unsigned regionden = p_region->fmt.i_sar_den;
     p_region->fmt = fmt;
     p_region->fmt.i_sar_num = regionnum;
     p_region->fmt.i_sar_den = regionden;
@@ -1168,7 +1168,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                              &regionbbox, &paddedbbox, &bbox,
                              *p_chroma,
-                             &p_region_out->fmt,
                              func );
         }
 
