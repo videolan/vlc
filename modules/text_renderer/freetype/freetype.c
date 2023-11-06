@@ -369,15 +369,9 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
     fmt.space     = p_region_in->fmt.space;
     fmt.mastering = p_region_in->fmt.mastering;
 
-    fmt.p_palette = p_region_in->fmt.p_palette ? p_region_in->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
-
     subpicture_region_t *p_region = subpicture_region_New(&fmt);
     if (unlikely(p_region == NULL))
-    {
-        if (p_region_in->fmt.p_palette == NULL)
-            free(fmt.p_palette);
         return NULL;
-    }
 
     p_region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
     p_region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
