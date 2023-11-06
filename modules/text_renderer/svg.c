@@ -348,12 +348,12 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_y = p_region_in->i_y;
 
     unsigned i_width = p_filter->fmt_out.video.i_visible_width;
-    if( (unsigned) p_region_out->i_x <= i_width )
-        i_width -= p_region_out->i_x;
+    if( (unsigned) p_region_in->i_x <= i_width )
+        i_width -= p_region_in->i_x;
 
     unsigned i_height = p_filter->fmt_out.video.i_visible_height;
-    if( (unsigned) p_region_out->i_y <= i_height )
-        i_height -= p_region_out->i_y;
+    if( (unsigned) p_region_in->i_y <= i_height )
+        i_height -= p_region_in->i_y;
 
     if( i_height == 0 || i_width == 0 )
         return VLC_EGENERIC;
