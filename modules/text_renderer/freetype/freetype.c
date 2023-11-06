@@ -360,9 +360,9 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
     /* Create a new subpicture region */
     video_format_Init( &fmt, VLC_CODEC_YUVP );
     fmt.i_width          =
-    fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin + 4;
+    fmt.i_visible_width  = p_regionbbox->xMax - p_regionbbox->xMin;
     fmt.i_height         =
-    fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin + 4;
+    fmt.i_visible_height = p_regionbbox->yMax - p_regionbbox->yMin;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.transfer  = p_region_in->fmt.transfer;
     fmt.primaries = p_region_in->fmt.primaries;
