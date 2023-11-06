@@ -344,8 +344,8 @@ error:
  *****************************************************************************/
 static int RenderYUVP( subpicture_region_t *p_region,
                        line_desc_t *p_line,
-                       FT_BBox *p_regionbbox,
-                       FT_BBox *p_bbox )
+                       const FT_BBox *p_regionbbox,
+                       const FT_BBox *p_bbox )
 {
     static const uint8_t pi_gamma[16] =
         {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
@@ -468,9 +468,9 @@ static int RenderYUVP( subpicture_region_t *p_region,
 
 static void RenderBackground( subpicture_region_t *p_region,
                                      line_desc_t *p_line_head,
-                                     FT_BBox *p_regionbbox,
-                                     FT_BBox *p_paddedbbox,
-                                     FT_BBox *p_textbbox,
+                                     const FT_BBox *p_regionbbox,
+                                     const FT_BBox *p_paddedbbox,
+                                     const FT_BBox *p_textbbox,
                                      picture_t *p_picture,
                                      const ft_drawing_functions *draw )
 {
@@ -638,9 +638,9 @@ static void RenderCharAXYZ( filter_t *p_filter,
 static inline int RenderAXYZ( filter_t *p_filter,
                               subpicture_region_t *p_region,
                               line_desc_t *p_line_head,
-                              FT_BBox *p_regionbbox,
-                              FT_BBox *p_paddedtextbbox,
-                              FT_BBox *p_textbbox,
+                              const FT_BBox *p_regionbbox,
+                              const FT_BBox *p_paddedtextbbox,
+                              const FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
                               const ft_drawing_functions *draw )
 {
