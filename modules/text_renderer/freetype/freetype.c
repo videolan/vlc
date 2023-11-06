@@ -1115,15 +1115,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         *        but update offsets to keep position and have same rendering */
 //        if( (bboxcolor & 0xFF) == 0 )
     {
-        p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
-        p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
         regionbbox = paddedbbox;
     }
-//        else /* case where the bounding box is larger and visible */
-//        {
-//            p_region_out->i_x = p_region_in->i_x;
-//            p_region_out->i_y = p_region_in->i_y;
-//        }
 
     rv = VLC_EGENERIC;
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
@@ -1172,6 +1165,20 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( rv == VLC_SUCCESS )
         {
             subpicture_region_TextMarkRendered( p_region_out );
+
+            /* Avoid useless pixels:
+                *        reshrink/trim Region Box to padded text one,
+                *        but update offsets to keep position and have same rendering */
+//          if( (bboxcolor & 0xFF) == 0 )
+            {
+                p_region_out->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
+                p_region_out->i_y = (regionbbox.yMax - paddedbbox.yMax) + p_region_in->i_y;
+            }
+//          else /* case where the bounding box is larger and visible */
+//          {
+//              p_region_out->i_x = p_region_in->i_x;
+//              p_region_out->i_y = p_region_in->i_y;
+//          }
             break;
         }
     }
