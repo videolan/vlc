@@ -342,13 +342,11 @@ error:
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
+static int RenderYUVP( subpicture_region_t *p_region,
                        line_desc_t *p_line,
-                       FT_BBox *p_regionbbox, FT_BBox *p_paddedbbox,
+                       FT_BBox *p_regionbbox,
                        FT_BBox *p_bbox )
 {
-    VLC_UNUSED(p_filter);
-    VLC_UNUSED(p_paddedbbox);
     static const uint8_t pi_gamma[16] =
         {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -1131,8 +1129,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
         if( *p_chroma == VLC_CODEC_YUVP )
-            rv = RenderYUVP( p_filter, p_region_out, text_block.p_laid,
-                                &regionbbox, &paddedbbox, &bbox );
+            rv = RenderYUVP( p_region_out, text_block.p_laid,
+                             &regionbbox, &bbox );
         else
         {
             const ft_drawing_functions *func;
