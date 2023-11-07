@@ -236,7 +236,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic,
     /* Blend subpictures */
     if (subpic != NULL)
     {
-        subpicture_region_t *r;
+        const subpicture_region_t *r;
         vlc_spu_regions_foreach(r, &subpic->regions)
             RenderRegion(vd, subpic, r);
     }

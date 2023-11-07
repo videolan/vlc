@@ -366,7 +366,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     if (subpicture) {
         int num_regions = 0;
-        subpicture_region_t *r;
+        const subpicture_region_t *r;
         vlc_spu_regions_foreach(r, &subpicture->regions)
             num_regions++;
 

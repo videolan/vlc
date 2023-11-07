@@ -873,7 +873,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
     vout_display_sys_t *sys = vd->sys;
 
     size_t count = 0;
-    subpicture_region_t *r;
+    const subpicture_region_t *r;
     vlc_spu_regions_foreach(r, &subpicture->regions)
         count++;
 

@@ -232,7 +232,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
 
     if (subpicture) {
         int count = 0;
-        subpicture_region_t *r;
+        const subpicture_region_t *r;
         vlc_spu_regions_foreach(r, &subpicture->regions)
             count++;
 

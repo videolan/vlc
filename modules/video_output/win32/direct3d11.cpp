@@ -1284,7 +1284,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         return VLC_EGENERIC;
 
     int count = 0;
-    subpicture_region_t *r;
+    const subpicture_region_t *r;
     vlc_spu_regions_foreach(r, &subpicture->regions)
         count++;
 

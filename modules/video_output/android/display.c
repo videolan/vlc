@@ -131,7 +131,7 @@ static bool subpicture_NeedDraw(vout_display_t *vd,
 
     sub->clear = true;
 
-    subpicture_region_t *r;
+    const subpicture_region_t *r;
     size_t count = 0;
     vlc_spu_regions_foreach(r, &subpicture->regions)
         count++;
