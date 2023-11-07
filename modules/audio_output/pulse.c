@@ -422,6 +422,38 @@ static void stream_overflow_cb(pa_stream *s, void *userdata)
     sys->last_date = VLC_TICK_INVALID;
 }
 
+static void stream_drain(pa_stream *s, audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    pa_operation *op = pa_stream_drain(s, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+
+    if (sys->last_date == VLC_TICK_INVALID)
+        aout_DrainedReport(aout);
+    else
+    {
+        sys->last_date = VLC_TICK_INVALID;
+        sys->flush_rt = 0;
+
+        /* XXX: Loosy drain emulation.
+         * See #18141: drain callback is never received */
+        sys->draining = true;
+
+        /* Trigger a latency update, that will update the drain timer */
+        op = pa_stream_update_timing_info(s, NULL, NULL);
+        if (op != NULL)
+            pa_operation_unref(op);
+        else
+        {
+            /* Timing failed, update the drain timer using the last known
+             * latency */
+            TriggerDrain(aout);
+        }
+    }
+}
+
 static void stream_started_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
@@ -651,32 +683,7 @@ static void Drain(audio_output_t *aout)
         stream_start_now(s, aout);
     }
 
-    pa_operation *op = pa_stream_drain(s, NULL, NULL);
-    if (op != NULL)
-        pa_operation_unref(op);
-
-    if (sys->last_date == VLC_TICK_INVALID)
-        aout_DrainedReport(aout);
-    else
-    {
-        sys->last_date = VLC_TICK_INVALID;
-        sys->flush_rt = 0;
-
-        /* XXX: Loosy drain emulation.
-         * See #18141: drain callback is never received */
-        sys->draining = true;
-
-        /* Trigger a latency update, that will update the drain timer */
-        op = pa_stream_update_timing_info(s, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
-        else
-        {
-            /* Timing failed, update the drain timer using the last known
-             * latency */
-            TriggerDrain(aout);
-        }
-    }
+    stream_drain(s, aout);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
