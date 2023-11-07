@@ -454,6 +454,11 @@ static void stream_drain(pa_stream *s, audio_output_t *aout)
     }
 }
 
+static void data_free(void *data)
+{
+    block_Release(data);
+}
+
 static void stream_started_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
@@ -558,11 +563,6 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
 
 
 /*** VLC audio output callbacks ***/
-
-static void data_free(void *data)
-{
-    block_Release(data);
-}
 
 /**
  * Queue one audio frame to the playback stream
