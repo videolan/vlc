@@ -281,18 +281,20 @@ static void Decoder_ChangeOutputPause( vlc_input_decoder_t *p_owner, bool paused
 
     decoder_t *p_dec = &p_owner->dec;
 
-    msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
     switch( p_dec->fmt_in->i_cat )
     {
         case VIDEO_ES:
+            msg_Dbg( p_dec, "%s video", paused ? "pausing" : "resuming" );
             if( p_owner->p_vout != NULL && p_owner->vout_started )
                 vout_ChangePause( p_owner->p_vout, paused, date );
             break;
         case AUDIO_ES:
+            msg_Dbg( p_dec, "%s audio", paused ? "pausing" : "resuming" );
             if( p_owner->p_astream != NULL )
                 vlc_aout_stream_ChangePause( p_owner->p_astream, paused, date );
             break;
         case SPU_ES:
+            msg_Dbg( p_dec, "not really %s SPU", paused ? "pausing" : "resuming" );
             break;
         default:
             vlc_assert_unreachable();
