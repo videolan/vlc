@@ -363,13 +363,9 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
 static void stream_overflow_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
-    pa_operation *op;
 
-    msg_Err(aout, "overflow, flushing");
-    op = pa_stream_flush(s, NULL, NULL);
-    if (unlikely(op == NULL))
-        return;
-    pa_operation_unref(op);
+    msg_Err(aout, "overflow");
+    (void) s;
 }
 
 static void stream_drain(pa_stream *s, audio_output_t *aout)
