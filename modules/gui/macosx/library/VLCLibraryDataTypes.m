@@ -304,7 +304,41 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @end
 
+@interface VLCAbstractMediaLibraryAudioGroup ()
+{
+    NSArray<VLCMediaLibraryGenre *> *_genres;
+}
+@end
+
 @implementation VLCAbstractMediaLibraryAudioGroup
+
+- (NSArray<VLCMediaLibraryGenre *> *)genres
+{
+    if (_genres == nil) {
+        NSMutableSet<NSNumber *> * const mutableGenreIDs = NSMutableSet.set;
+        NSMutableArray<VLCMediaLibraryGenre *> * const mutableGenres = NSMutableArray.array;
+
+        for (VLCMediaLibraryMediaItem * const mediaItem in self.mediaItems) {
+            const int64_t genreID = mediaItem.genreID;
+            NSNumber * const numberGenreID = @(mediaItem.genreID);
+            if ([mutableGenreIDs containsObject:numberGenreID]) {
+                continue;
+            }
+
+            VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:genreID];
+            if (genre == nil) {
+                continue;
+            }
+
+            [mutableGenreIDs addObject:numberGenreID];
+            [mutableGenres addObject:genre];
+        }
+
+        _genres = mutableGenres.copy;
+    }
+
+    return _genres;
+}
 
 - (NSArray<VLCMediaLibraryArtist *> *)artists
 {
@@ -616,6 +650,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 - (NSArray<VLCMediaLibraryArtist *> *)artists
 {
     return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, self.libraryID);
+}
+
+- (NSArray<VLCMediaLibraryGenre *> *)genres
+{
+    // Overloading superclass behaviour
+    return @[self];
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems

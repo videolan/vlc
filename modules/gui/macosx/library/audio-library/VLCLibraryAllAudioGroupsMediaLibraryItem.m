@@ -33,6 +33,7 @@
 
 @synthesize albums = _albums;
 @synthesize artists = _artists;
+@synthesize genres = _genres;
 @synthesize numberOfTracks = _numberOfTracks;
 @synthesize mediaItems = _mediaItems;
 @synthesize matchingParentType = _matchingParentType;

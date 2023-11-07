@@ -31,6 +31,7 @@ extern NSString * const VLCMediaLibraryMediaItemUTI;
 @class VLCMediaLibraryMediaItem;
 @class VLCMediaLibraryAlbum;
 @class VLCMediaLibraryArtist;
+@class VLCMediaLibraryGenre;
 @class VLCInputItem;
 
 extern const CGFloat VLCMediaLibrary4KWidth;
@@ -153,8 +154,9 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @protocol VLCMediaLibraryAudioGroupProtocol <VLCMediaLibraryItemProtocol>
 
 @property (readonly) unsigned int numberOfTracks;
-@property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
-@property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
+@property (readonly) NSArray<VLCMediaLibraryArtist *> *artists;
+@property (readonly) NSArray<VLCMediaLibraryAlbum *> *albums;
+@property (readonly) NSArray<VLCMediaLibraryGenre *> *genres;
 @property (readonly) VLCMediaLibraryParentGroupType matchingParentType;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
