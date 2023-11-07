@@ -337,7 +337,10 @@ static subpicture_region_t *RenderText( filter_t *p_filter,
         if( p_chroma_list[i] == VLC_CODEC_BGRA )
             break;
         if( p_chroma_list[i] == 0 )
+        {
+            msg_Warn( p_filter, "no output chroma supported for rendering" );
             return NULL;
+        }
     }
 
     unsigned i_width = p_filter->fmt_out.video.i_visible_width;

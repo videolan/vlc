@@ -1154,6 +1154,9 @@ static subpicture_region_t *Render( filter_t *p_filter,
         break;
     }
 
+    if (region == NULL)
+        msg_Warn( p_filter, "no output chroma supported for rendering" );
+
 done:
     FreeLines( text_block.p_laid );
 
