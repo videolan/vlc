@@ -393,7 +393,7 @@ FocusScope{
         Connections {
             target: csdDecorations.item
             enabled: csdDecorations.status === Loader.Ready
-            onHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.hovered)
+            onButtonHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.buttonHovered)
         }
     }
 

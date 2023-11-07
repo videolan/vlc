@@ -26,7 +26,7 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
-    readonly property bool hovered: {
+    readonly property bool buttonHovered: {
         for (let i = 0; i < loader.count; ++i) {
             const button = loader.itemAt(i)
             if (button.hovered) return true

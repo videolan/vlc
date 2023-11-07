@@ -33,7 +33,7 @@ Row {
     property color color: theme.fg.primary
     property color hoverColor: VLCStyle.setColorAlpha(theme.bg.primary, 0.5)
 
-    readonly property bool hovered: {
+    readonly property bool buttonHovered: {
         let h = false
         for (let i = 0; i < repeater.count; ++i) {
             const button = repeater.itemAt(i)
