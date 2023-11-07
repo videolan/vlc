@@ -299,17 +299,25 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
-        vlc_ml_artist_list_t *p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, NO);
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
-        for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
-            VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
+        vlc_ml_artist_list_t * const p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, NO);
+        const size_t numberOfArtists = p_artist_list->i_nb_items;
+        NSMutableArray * const mutableArtistArray = [[NSMutableArray alloc] initWithCapacity:numberOfArtists];
+        NSMutableDictionary * const mutableArtistDict = [NSMutableDictionary dictionaryWithCapacity:numberOfArtists];
+
+        for (size_t x = 0; x < numberOfArtists; x++) {
+            VLCMediaLibraryArtist * const artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
+
             if (artist != nil) {
-                [mutableArray addObject:artist];
+                [mutableArtistArray addObject:artist];
+                [mutableArtistDict setObject:artist.name forKey:@(artist.libraryID)];
             }
         }
+
         vlc_ml_artist_list_release(p_artist_list);
+
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedArtists = [mutableArray copy];
+            self.cachedArtists = mutableArtistArray.copy;
+            self->_artistDict = mutableArtistDict.copy;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
         });
     });

@@ -84,6 +84,8 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
+@property (readonly) NSDictionary<NSNumber *, NSString *> *artistDict;
+
 - (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType;
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(const VLCMediaLibraryParentGroupType)parentType;
