@@ -238,7 +238,7 @@ static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
     }
 
     /* Describe codecs from all the EXT-X-MEDIA tracks. */
-    hls_playlist_t *media;
+    const hls_playlist_t *media;
     vlc_list_foreach (media, media_list, node)
     {
         track = MediaGetTrack(media);
