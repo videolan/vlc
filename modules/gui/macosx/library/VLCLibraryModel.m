@@ -345,15 +345,22 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
-        vlc_ml_album_list_t *p_album_list = vlc_ml_list_albums(self->_p_mediaLibrary, &queryParams);
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_album_list->i_nb_items];
-        for (size_t x = 0; x < p_album_list->i_nb_items; x++) {
-            VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_album_list->p_items[x]];
-            [mutableArray addObject:album];
+        vlc_ml_album_list_t * const p_album_list = vlc_ml_list_albums(self->_p_mediaLibrary, &queryParams);
+        const size_t numberOfAlbums = p_album_list->i_nb_items;
+        NSMutableArray * const mutableAlbumArray = [[NSMutableArray alloc] initWithCapacity:numberOfAlbums];
+        NSMutableDictionary * const mutableAlbumDict = [NSMutableDictionary dictionaryWithCapacity:numberOfAlbums];
+
+        for (size_t x = 0; x < numberOfAlbums; x++) {
+            VLCMediaLibraryAlbum * const album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_album_list->p_items[x]];
+            [mutableAlbumArray addObject:album];
+            [mutableAlbumDict setObject:album.title forKey:@(album.libraryID)];
         }
+
         vlc_ml_album_list_release(p_album_list);
+
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedAlbums = [mutableArray copy];
+            self.cachedAlbums = mutableAlbumArray.copy;
+            self->_albumDict = mutableAlbumDict.copy;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
         });
     });
