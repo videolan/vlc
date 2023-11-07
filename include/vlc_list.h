@@ -209,7 +209,7 @@ struct vlc_list_it
 };
 
 static inline
-struct vlc_list_it vlc_list_it_start(const struct vlc_list *head)
+struct vlc_list_it vlc_list_it_start(struct vlc_list *head)
 {
     struct vlc_list *first = head->next;
 
@@ -218,7 +218,25 @@ struct vlc_list_it vlc_list_it_start(const struct vlc_list *head)
 }
 
 static inline
-struct vlc_list_it vlc_list_it_reverse_start(const struct vlc_list *head)
+struct vlc_list_it vlc_list_it_start_const(const struct vlc_list *head)
+{
+    struct vlc_list *first = head->next;
+
+    struct vlc_list_it it = { head, first, first->next };
+    return it;
+}
+
+static inline
+struct vlc_list_it vlc_list_it_reverse_start(struct vlc_list *head)
+{
+    struct vlc_list *first = head->prev;
+
+    struct vlc_list_it it = { head, first, first->prev };
+    return it;
+}
+
+static inline
+struct vlc_list_it vlc_list_it_reverse_start_const(const struct vlc_list *head)
 {
     struct vlc_list *first = head->prev;
 
@@ -267,6 +285,12 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
          vlc_list_it_continue(&(vlc_list_it__##pos)) \
           && ((pos) = container_of((vlc_list_it__##pos).current, \
                                    typeof (*(pos)), member), true); \
+         vlc_list_it_next(&(vlc_list_it__##pos)))
+#define vlc_list_foreach_const(pos, head, member) \
+    for (struct vlc_list_it vlc_list_it__##pos = vlc_list_it_start_const(head); \
+         vlc_list_it_continue(&(vlc_list_it__##pos)) \
+          && ((pos) = container_of((vlc_list_it__##pos).current, \
+                                   const typeof (*(pos)), member), true); \
          vlc_list_it_next(&(vlc_list_it__##pos)))
 
 /**

@@ -56,6 +56,8 @@ typedef struct
 
 #define hls_segment_queue_Foreach(queue, it)                                   \
     vlc_list_foreach (it, &(queue)->segments, priv_node)
+#define hls_segment_queue_Foreach_const(queue, it)                             \
+    vlc_list_foreach_const (it, &(queue)->segments, priv_node)
 #define hls_segment_GetFirst(queue)                                            \
     vlc_list_first_entry_or_null(&(queue)->segments, hls_segment_t, priv_node);
 

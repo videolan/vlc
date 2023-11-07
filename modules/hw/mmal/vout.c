@@ -756,7 +756,7 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
 
     // Attempt to import the subpics
     const subpicture_region_t *sreg;
-    vlc_spu_regions_foreach(sreg, &spic->regions) {
+    vlc_spu_regions_foreach_const(sreg, &spic->regions) {
         picture_t *const src = sreg->p_picture;
 
         // At this point I think the subtitles are being placed in the

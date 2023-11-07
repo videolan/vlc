@@ -224,7 +224,7 @@ static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
 
     /* Describe codecs from the playlist. */
     const hls_track_t *track;
-    vlc_list_foreach (track, &playlist->tracks, node)
+    vlc_list_foreach_const (track, &playlist->tracks, node)
     {
         if (IsCodecAlreadyDescribed(&already_described, &track->input->fmt))
             continue;
@@ -239,7 +239,7 @@ static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
 
     /* Describe codecs from all the EXT-X-MEDIA tracks. */
     const hls_playlist_t *media;
-    vlc_list_foreach (media, media_list, node)
+    vlc_list_foreach_const (media, media_list, node)
     {
         track = MediaGetTrack(media);
 
@@ -308,7 +308,7 @@ static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
     };
 
     const hls_playlist_t *playlist;
-    vlc_list_foreach (playlist, &sys->media_playlists, node)
+    vlc_list_foreach_const (playlist, &sys->media_playlists, node)
     {
         const hls_track_t *track = MediaGetTrack(playlist);
         const es_format_t *fmt = &track->input->fmt;
@@ -342,12 +342,12 @@ static struct hls_storage *GenerateMainManifest(const sout_stream_sys_t *sys)
     }
 
     /* Format EXT-X-STREAM-INF */
-    vlc_list_foreach (playlist, &sys->variant_playlists, node)
+    vlc_list_foreach_const (playlist, &sys->variant_playlists, node)
     {
         MANIFEST_START_TAG("#EXT-X-STREAM-INF")
             unsigned int bandwidth = 0;
             const hls_track_t *track;
-            vlc_list_foreach (track, &playlist->tracks, node)
+            vlc_list_foreach_const (track, &playlist->tracks, node)
                 bandwidth += track->input->fmt.i_bitrate;
             MANIFEST_ADD_ATTRIBUTE("BANDWIDTH=%u", bandwidth);
 
@@ -417,7 +417,7 @@ GeneratePlaylistManifest(const hls_playlist_t *playlist)
                      (first_seg == NULL) ? 0u : first_seg->id);
 
     const hls_segment_t *segment;
-    hls_segment_queue_Foreach(&playlist->segments, segment)
+    hls_segment_queue_Foreach_const(&playlist->segments, segment)
     {
         MANIFEST_ADD_TAG("#EXTINF:%.2f,", secf_from_vlc_tick(segment->length));
         MANIFEST_ADD_TAG("%s", segment->url);

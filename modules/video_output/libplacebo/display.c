@@ -367,7 +367,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     if (subpicture) {
         int num_regions = 0;
         const subpicture_region_t *r;
-        vlc_spu_regions_foreach(r, &subpicture->regions)
+        vlc_spu_regions_foreach_const(r, &subpicture->regions)
             num_regions++;
 
         // Grow the overlays array if needed
@@ -389,7 +389,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
         // Upload all of the regions
         int i = 0;
-        vlc_spu_regions_foreach(r, &subpicture->regions) {
+        vlc_spu_regions_foreach_const(r, &subpicture->regions) {
             assert(r->p_picture->i_planes == 1);
             struct pl_plane_data subdata[4];
             if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))

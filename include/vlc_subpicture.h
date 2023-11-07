@@ -96,6 +96,8 @@ typedef struct vlc_list vlc_spu_regions;
     vlc_list_append(&(reg)->node, (p_rs))
 #define vlc_spu_regions_foreach(reg,p_rs) \
     vlc_list_foreach(reg, (p_rs), node)
+#define vlc_spu_regions_foreach_const(reg,p_rs) \
+    vlc_list_foreach_const(reg, (p_rs), node)
 #define vlc_spu_regions_is_empty(p_rs) \
     vlc_list_is_empty((p_rs))
 #define vlc_spu_regions_first_or_null(p_rs) \
