@@ -54,9 +54,12 @@
     _numberOfTracks = _mediaItems.count;
 
     const NSUInteger numberOfAlbums = libraryModel.numberOfAlbums;
-    NSString * const detailString = [NSString stringWithFormat:_NS("%li albums, %li songs"), numberOfAlbums, _numberOfTracks];
+    NSString * const primaryDetailString = [NSString stringWithFormat:_NS("%li albums, %li songs"),
+                                                     numberOfAlbums,
+                                                     _numberOfTracks];
 
-    return [super initWithDisplayString:displayString withDetailString:detailString];
+    return [super initWithDisplayString:displayString
+                withPrimaryDetailString:primaryDetailString];
 }
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock

@@ -83,11 +83,11 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         self.representedImageView.image = thumbnail;
     }];
 
-    if(actualItem.detailString.length > 0) {
+    if(actualItem.primaryDetailString.length > 0) {
         self.primaryTitleTextField.hidden = NO;
         self.primaryTitleTextField.stringValue = actualItem.displayString;
         self.secondaryTitleTextField.hidden = NO;
-        self.secondaryTitleTextField.stringValue = actualItem.detailString;
+        self.secondaryTitleTextField.stringValue = actualItem.primaryDetailString;
     } else {
         self.singlePrimaryTitleTextField.hidden = NO;
         self.singlePrimaryTitleTextField.stringValue = actualItem.displayString;

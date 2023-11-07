@@ -262,7 +262,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @property (readwrite, assign) BOOL actionableDetail;
 @property (readwrite, atomic, strong) NSString *smallArtworkMRL;
 @property (readwrite, atomic, strong) NSString *displayString;
-@property (readwrite, atomic, strong) NSString *detailString;
+@property (readwrite, atomic, strong) NSString *primaryDetailString;
 @property (readwrite, atomic, strong) NSString *durationString;
 
 @end
@@ -405,7 +405,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _name;
 }
 
-- (NSString *)detailString
+- (NSString *)primaryDetailString
 {
     return [self durationString];
 }
@@ -504,7 +504,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _title;
 }
 
-- (NSString *)detailString
+- (NSString *)primaryDetailString
 {
     return _artistName;
 }
@@ -594,7 +594,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _name;
 }
 
-- (NSString *)detailString
+- (NSString *)primaryDetailString
 {
     return [self durationString];
 }
@@ -903,7 +903,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _title;
 }
 
-- (NSString *)detailString
+- (NSString *)primaryDetailString
 {
    if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
         VLCInputItem *inputItem = [self inputItem];
@@ -1236,7 +1236,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @implementation VLCMediaLibraryDummyItem
 
-@synthesize detailString = _detailString;
+@synthesize primaryDetailString = _primaryDetailString;
 @synthesize displayString = _displayString;
 @synthesize durationString = _durationString;
 @synthesize firstMediaItem = _firstMediaItem;
@@ -1248,12 +1248,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize actionableDetailLibraryItem = _actionableDetailLibraryItem;
 
 - (instancetype)initWithDisplayString:(NSString*)displayString
-                     withDetailString:(NSString*)detailString
+              withPrimaryDetailString:(NSString*)primaryDetailString
 {
     self = [super init];
     if (self) {
         _displayString = displayString;
-        _detailString = detailString;
+        _primaryDetailString = primaryDetailString;
         _durationString = @"";
         _libraryId = -1;
         _smallArtworkGenerated = NO;

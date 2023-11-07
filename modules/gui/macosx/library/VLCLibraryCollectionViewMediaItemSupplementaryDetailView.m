@@ -90,7 +90,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     NSAssert(actualItem != nil, @"represented item is not a media item", nil);
 
     _mediaItemTitleTextField.stringValue = actualItem.displayString;
-    _mediaItemDetailButton.title = actualItem.detailString;
+    _mediaItemDetailButton.title = actualItem.primaryDetailString;
     _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
     _mediaItemFileNameTextField.stringValue = actualItem.inputItem.name;
     _mediaItemPathTextField.stringValue = actualItem.inputItem.decodedMRL;

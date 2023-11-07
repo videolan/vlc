@@ -62,7 +62,7 @@
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     self.largeImageView.image = [VLCLibraryImageCache thumbnailForLibraryItem:actualItem];
     self.titleTextField.stringValue = actualItem.displayString;
-    self.detailTextField.stringValue = actualItem.detailString;
+    self.detailTextField.stringValue = actualItem.primaryDetailString;
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem

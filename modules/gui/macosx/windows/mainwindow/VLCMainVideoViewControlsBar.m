@@ -71,15 +71,15 @@
 
 - (void)updateDetailLabel:(NSNotification *)notification
 {
-    
+
     VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
     if (!mediaItem) {
         return;
     }
 
-    _detailLabel.hidden = [mediaItem.detailString isEqualToString:@""] ||
-                          [mediaItem.detailString isEqualToString:mediaItem.durationString];
-    _detailLabel.stringValue = mediaItem.detailString;
+    _detailLabel.hidden = [mediaItem.primaryDetailString isEqualToString:@""] ||
+                          [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
+    _detailLabel.stringValue = mediaItem.primaryDetailString;
 }
 
 - (IBAction)openBookmarks:(id)sender

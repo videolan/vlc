@@ -214,7 +214,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     _mediaTitleTextField.stringValue = actualItem.displayString;
-    _secondaryInfoTextField.stringValue = actualItem.detailString;
+    _secondaryInfoTextField.stringValue = actualItem.primaryDetailString;
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaImageView.image = thumbnail;
