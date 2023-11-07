@@ -200,6 +200,9 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     if (priv->module == NULL)
         goto error;
 
+    var_Create(p_demux, "module-name", VLC_VAR_STRING);
+    var_SetString(p_demux, "module-name", module_get_object(priv->module));
+
     return p_demux;
 error:
     free( p_demux->psz_filepath );
