@@ -53,7 +53,7 @@ static inline info_category_t *info_category_New(const char *name)
     return cat;
 }
 
-static inline info_t *info_category_FindInfo(const info_category_t *cat,
+static inline info_t *info_category_FindInfo(info_category_t *cat,
                                              const char *name)
 {
     info_t *info;

@@ -737,7 +737,7 @@ char *input_item_GetInfoLocked( input_item_t *p_i,
 {
     vlc_mutex_assert( &p_i->lock );
 
-    const info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
+    info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
     if( p_cat )
     {
         info_t *p_info = info_category_FindInfo( p_cat, psz_name );
