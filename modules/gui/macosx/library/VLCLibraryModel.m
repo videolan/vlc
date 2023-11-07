@@ -388,15 +388,22 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
-        vlc_ml_genre_list_t *p_genre_list = vlc_ml_list_genres(self->_p_mediaLibrary, &queryParams);
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_genre_list->i_nb_items];
-        for (size_t x = 0; x < p_genre_list->i_nb_items; x++) {
-            VLCMediaLibraryGenre *genre = [[VLCMediaLibraryGenre alloc] initWithGenre:&p_genre_list->p_items[x]];
-            [mutableArray addObject:genre];
+        vlc_ml_genre_list_t * const p_genre_list = vlc_ml_list_genres(self->_p_mediaLibrary, &queryParams);
+        const size_t numberOfGenres = p_genre_list->i_nb_items;
+        NSMutableArray * const mutableGenreArray = [[NSMutableArray alloc] initWithCapacity:numberOfGenres];
+        NSMutableDictionary * const mutableGenreDict = [NSMutableDictionary dictionaryWithCapacity:numberOfGenres];
+
+        for (size_t x = 0; x < numberOfGenres; x++) {
+            VLCMediaLibraryGenre * const genre = [[VLCMediaLibraryGenre alloc] initWithGenre:&p_genre_list->p_items[x]];
+            [mutableGenreArray addObject:genre];
+            [mutableGenreDict setObject:genre.name forKey:@(genre.libraryID)];
         }
+
         vlc_ml_genre_list_release(p_genre_list);
+
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedGenres = [mutableArray copy];
+            self.cachedGenres = mutableGenreArray.copy;
+            self->_genreDict = mutableGenreDict.copy;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
         });
     });
