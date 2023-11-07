@@ -1155,7 +1155,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         const subpicture_t *subpic = p_entries[i].subpic;
 
         size_t count = 0;
-        subpicture_region_t *p_head;
+        const subpicture_region_t *p_head;
         vlc_spu_regions_foreach(p_head, &subpic->regions)
             count++;
 
