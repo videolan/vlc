@@ -1290,7 +1290,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     subtitle_area[subtitle_area_count++] = area;
             }
         }
-        if (subpic->b_subtitle && vlc_spu_regions_is_empty(&subpic->regions))
+        if (subpic->b_subtitle && !vlc_spu_regions_is_empty(&subpic->regions))
             subpic->b_absolute = true;
     }
 
