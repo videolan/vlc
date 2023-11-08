@@ -142,8 +142,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 // If the info in detailString contains a library object that can be used for nav
 // We lazy load the actionable library item so avoid using the property until we
 // actually need to, resort to `actionableDetail` to know if there is one instead
-@property (readonly) BOOL actionableDetail;
-@property (readonly) id<VLCMediaLibraryItemProtocol> actionableDetailLibraryItem;
+@property (readonly) BOOL primaryActionableDetail;
+@property (readonly) id<VLCMediaLibraryItemProtocol> primaryActionableDetailLibraryItem;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 

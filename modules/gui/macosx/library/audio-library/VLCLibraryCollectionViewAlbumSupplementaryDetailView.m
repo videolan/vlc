@@ -113,10 +113,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumDetailsTextButton.title = album.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
 
-    const BOOL actionableDetail = album.actionableDetail;
-    self.albumDetailsTextButton.enabled = actionableDetail;
+    const BOOL primaryActionableDetail = album.primaryActionableDetail;
+    self.albumDetailsTextButton.enabled = primaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.albumDetailsTextButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.albumDetailsTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
@@ -146,12 +146,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 - (IBAction)detailAction:(id)sender
 {
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem;
-    if (album == nil || !album.actionableDetail) {
+    if (album == nil || !album.primaryActionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    id<VLCMediaLibraryItemProtocol> libraryItem = album.actionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = album.primaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 

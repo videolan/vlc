@@ -259,12 +259,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 - (void)detailAction:(id)sender
 {
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
-    if (album == nil || !album.actionableDetail) {
+    if (album == nil || !album.primaryActionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    const id<VLCMediaLibraryItemProtocol> libraryItem = album.actionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = album.primaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
@@ -299,10 +299,10 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.summaryTextField.stringValue = album.durationString;
     }
 
-    const BOOL actionableDetail = album.actionableDetail;
-    self.artistNameTextButton.enabled = actionableDetail;
+    const BOOL primaryActionableDetail = album.primaryActionableDetail;
+    self.artistNameTextButton.enabled = primaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.artistNameTextButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.artistNameTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {

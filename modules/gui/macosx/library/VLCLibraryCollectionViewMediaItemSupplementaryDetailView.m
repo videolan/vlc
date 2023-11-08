@@ -95,10 +95,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     _mediaItemFileNameTextField.stringValue = actualItem.inputItem.name;
     _mediaItemPathTextField.stringValue = actualItem.inputItem.decodedMRL;
 
-    const BOOL actionableDetail = actualItem.actionableDetail;
-    self.mediaItemDetailButton.enabled = actionableDetail;
+    const BOOL primaryActionableDetail = actualItem.primaryActionableDetail;
+    self.mediaItemDetailButton.enabled = primaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.mediaItemDetailButton.contentTintColor = actionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.mediaItemDetailButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
     self.mediaItemDetailButton.action = @selector(detailAction:);
 
@@ -120,12 +120,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (IBAction)detailAction:(id)sender
 {
     VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
-    if (actualItem == nil || !actualItem.actionableDetail) {
+    if (actualItem == nil || !actualItem.primaryActionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    const id<VLCMediaLibraryItemProtocol> libraryItem = actualItem.actionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = actualItem.primaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
