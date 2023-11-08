@@ -294,23 +294,23 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
             void *next_id = sout_StreamIdAdd( dup_stream->stream,
                                               p_fmt, dup_es_id );
-            if( next_id != NULL )
-            {
-                msg_Dbg( p_stream, "    - added for output %zu", idx );
-                const duplicated_id_t dup_id = {.id = next_id,
-                                                .es_id = dup_es_id,
-                                                .stream_owner =
-                                                    dup_stream->stream};
-                if( !vlc_vector_push(&id->dup_ids, dup_id) )
-                {
-                    sout_StreamIdDel( dup_stream->stream, next_id );
-                    free( dup_id.es_id );
-                    goto error;
-                }
-            }
-            else
+            if( next_id == NULL )
             {
                 msg_Dbg( p_stream, "    - failed for output %zu", idx);
+                continue;
+            }
+
+            msg_Dbg( p_stream, "    - added for output %zu", idx );
+            const duplicated_id_t dup_id = {
+                .id = next_id,
+                .es_id = dup_es_id,
+                .stream_owner = dup_stream->stream,
+            };
+            if( !vlc_vector_push(&id->dup_ids, dup_id) )
+            {
+                sout_StreamIdDel( dup_stream->stream, next_id );
+                free( dup_id.es_id );
+                goto error;
             }
         }
         else
