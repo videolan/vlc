@@ -296,6 +296,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
                                               p_fmt, dup_es_id );
             if( next_id == NULL )
             {
+                free(dup_es_id);
                 msg_Dbg( p_stream, "    - failed for output %zu", idx);
                 continue;
             }
