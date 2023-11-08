@@ -122,17 +122,14 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                                           vlc_tick_t system_now,
-                                          vlc_tick_t original_ts, double rate,
+                                          vlc_tick_t ts, double rate,
                                           unsigned frame_rate,
                                           unsigned frame_rate_base)
 {
     vlc_clock_main_t *main_clock = clock->owner;
 
-    if (unlikely(original_ts == VLC_TICK_INVALID
-     || system_now == VLC_TICK_INVALID))
+    if (unlikely(ts == VLC_TICK_INVALID || system_now == VLC_TICK_INVALID))
         return VLC_TICK_INVALID;
-
-    const vlc_tick_t ts = original_ts + clock->delay;
 
     vlc_mutex_lock(&main_clock->lock);
 
@@ -212,8 +209,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, system_now, original_ts, rate, frame_rate,
-                        frame_rate_base);
+    vlc_clock_on_update(clock, system_now, ts,
+                        rate, frame_rate, frame_rate_base);
     return VLC_TICK_INVALID;
 }
 
@@ -345,7 +342,7 @@ static vlc_tick_t vlc_clock_master_to_system_locked(vlc_clock_t *clock,
         system = vlc_clock_monotonic_to_system_locked(clock, now, ts, rate);
     }
 
-    return system + clock->delay * rate;
+    return system;
 }
 
 static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
