@@ -113,6 +113,25 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return [mutableArray copy];
 }
 
+static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const genres)
+{
+    const NSUInteger genreCount = genres.count;
+    if (genreCount == 0) {
+        return @"";
+    }
+
+    VLCMediaLibraryGenre * const firstGenre = genres.firstObject;
+    if (genreCount == 1) {
+        return firstGenre.name;
+    }
+
+    VLCMediaLibraryGenre * const secondGenre = [genres objectAtIndex:1];
+    return [NSString stringWithFormat:_NS("%@, %@, and %lli other genres"),
+                     firstGenre.name,
+                     secondGenre.name,
+                     genreCount - 2];
+}
+
 @implementation VLCMediaLibraryFile
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file
