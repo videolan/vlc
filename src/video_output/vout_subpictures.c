@@ -804,7 +804,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     *dst_area = spu_area_create(0,0, 0,0, scale_size);
 
     /* Render text region */
-    if (subpicture_region_IsText( region ))
+    if (unlikely(subpicture_region_IsText( region )))
     {
         subpicture_region_t *rendered_text =
             SpuRenderText(spu, region,
