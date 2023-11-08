@@ -927,10 +927,10 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                             const spu_scale_t scale_size,
                             const vlc_fourcc_t *chroma_list,
                             const video_format_t *fmt,
-                            int i_original_width, int i_original_height,
                             const spu_area_t *subtitle_area, size_t subtitle_area_count,
                             vlc_tick_t render_date)
 {
+    assert(!subpicture_region_IsText( region ));
     subpicture_t *subpic = entry->subpic;
     spu_private_t *sys = spu->p;
 
@@ -942,23 +942,6 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 
     /* Invalidate area by default */
     *dst_area = spu_area_create(0,0, 0,0, scale_size);
-
-    /* Render text region */
-    if (unlikely(subpicture_region_IsText( region )))
-    {
-        subpicture_region_t *rendered_text =
-            SpuRenderText(spu, region,
-                      i_original_width, i_original_height,
-                      chroma_list);
-        if ( rendered_text  == NULL)
-            // not a rendering error for Text-To-Speech
-            return NULL;
-        // replace the text region with the rendered region
-        vlc_list_replace(&region->node, &rendered_text->node);
-        subpicture_region_Delete(region);
-        region = rendered_text;
-        region_FixFmt(rendered_text);
-    }
 
     /* Force palette if requested
      * FIXME b_force_palette and force_crop are applied to all subpictures using palette
@@ -1296,16 +1279,32 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
 
+            /* last minute text rendering */
+            subpicture_region_t *rendered_region = region;
+            if (unlikely(subpicture_region_IsText( region )))
+            {
+                subpicture_region_t *rendered_text =
+                    SpuRenderText(spu, region,
+                            i_original_width, i_original_height,
+                            chroma_list);
+                if ( rendered_text  == NULL)
+                    // not a rendering error for Text-To-Speech
+                    continue;
+                rendered_region = rendered_text;
+                region_FixFmt(rendered_text);
+            }
+
             const bool do_external_scale = external_scale && !subpicture_region_IsText( region );
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
 
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
-                            entry, region, scaled_region_pic, virtual_scale,
+                            entry, rendered_region, scaled_region_pic, virtual_scale,
                             chroma_list, fmt_dst,
-                            i_original_width, i_original_height,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
+            if (rendered_region != region)
+                subpicture_region_Delete( rendered_region );
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
