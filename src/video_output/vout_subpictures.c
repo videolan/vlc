@@ -319,7 +319,7 @@ static void region_FixFmt(subpicture_region_t *region)
 }
 
 static subpicture_region_t *SpuRenderText(spu_t *spu,
-                          subpicture_region_t *region,
+                          const subpicture_region_t *region,
                           unsigned i_original_width,
                           unsigned i_original_height,
                           const vlc_fourcc_t *chroma_list)
