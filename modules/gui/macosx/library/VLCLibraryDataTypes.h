@@ -181,6 +181,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
 
 @property (readonly) NSString *name;
+@property (readonly) NSString *genreString; // Lazy loaded for performance
 @property (readonly) NSString *shortBiography;
 @property (readonly) NSString *musicBrainzID;
 @property (readonly) unsigned int numberOfAlbums;
@@ -195,6 +196,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) NSString *title;
 @property (readonly) NSString *summary;
 @property (readonly) NSString *artistName;
+@property (readonly) NSString *genreString; // Lazy loaded for performance
 @property (readonly) int64_t artistID;
 @property (readonly) unsigned int duration;
 @property (readonly) unsigned int year;

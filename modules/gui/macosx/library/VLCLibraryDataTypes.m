@@ -413,6 +413,12 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
+@interface VLCMediaLibraryArtist ()
+{
+    NSString *_genreString;
+}
+@end
+
 @implementation VLCMediaLibraryArtist
 
 @synthesize numberOfTracks = _numberOfTracks;
@@ -480,6 +486,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return countMetadataString;
 }
 
+- (NSString *)genreString
+{
+    if (_genreString == nil || [_genreString isEqualToString:@""]) {
+        _genreString = genreArrayDisplayString(self.genres);
+    }
+
+    return _genreString;
+}
+
 - (NSArray<VLCMediaLibraryArtist *> *)artists
 {
     return @[self];
@@ -507,6 +522,12 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 }
 
+@end
+
+@interface VLCMediaLibraryAlbum ()
+{
+    NSString *_genreString;
+}
 @end
 
 @implementation VLCMediaLibraryAlbum
@@ -560,6 +581,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (NSString *)primaryDetailString
 {
     return _artistName;
+}
+
+- (NSString *)genreString
+{
+    if (_genreString == nil || [_genreString isEqualToString:@""]) {
+        _genreString = genreArrayDisplayString(self.genres);
+    }
+
+    return _genreString;
 }
 
 - (NSString *)durationString
