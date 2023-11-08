@@ -1261,24 +1261,24 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                             i_original_width, i_original_height,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
-            if (output_last_ptr)
-            {
-                if (do_external_scale)
-                {
-                    if (scale.h != SCALE_UNIT)
-                    {
-                        output_last_ptr->zoom_v.num = scale.h;
-                        output_last_ptr->zoom_v.den = SCALE_UNIT;
-                    }
-                    if (scale.w != SCALE_UNIT)
-                    {
-                        output_last_ptr->zoom_h.num = scale.w;
-                        output_last_ptr->zoom_h.den = SCALE_UNIT;
-                    }
-                }
+            if (unlikely(output_last_ptr == NULL))
+                continue;
 
-                vlc_spu_regions_push(&output->regions, output_last_ptr);
+            if (do_external_scale)
+            {
+                if (scale.h != SCALE_UNIT)
+                {
+                    output_last_ptr->zoom_v.num = scale.h;
+                    output_last_ptr->zoom_v.den = SCALE_UNIT;
+                }
+                if (scale.w != SCALE_UNIT)
+                {
+                    output_last_ptr->zoom_h.num = scale.w;
+                    output_last_ptr->zoom_h.den = SCALE_UNIT;
+                }
             }
+
+            vlc_spu_regions_push(&output->regions, output_last_ptr);
 
             if (subpic->b_subtitle) {
                 area = spu_area_unscaled(area, scale);
