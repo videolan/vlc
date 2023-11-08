@@ -36,8 +36,6 @@ ListView {
     // NOTE: We want buttons to be centered vertically but configurable.
     property int buttonMargin: height / 2 - buttonLeft.height / 2
 
-    property bool keyNavigationWraps: false
-
     property ListSelectionModel selectionModel: ListSelectionModel {
         model: root.model
     }
@@ -77,6 +75,7 @@ ListView {
 
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
+    keyNavigationWraps: false
 
     ScrollBar.vertical: ScrollBar { }
     ScrollBar.horizontal: ScrollBar { }
