@@ -139,7 +139,7 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
         } );
 
         BwDebug( if( rep != prevRep )
-                    msg_Info(p_obj, "Stream %s new bandwidth usage %zu KiB/s",
+                    msg_Info(p_obj, "Stream %s new bandwidth usage %" PRId64 " KiB/s",
                          adaptSet->getID().str().c_str(), rep->getBandwidth() / 8000); );
 
         stats.segments_count++;
