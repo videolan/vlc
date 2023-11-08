@@ -337,8 +337,6 @@ static subpicture_region_t *SpuRenderText(spu_t *spu,
         return NULL;
     }
 
-    region_FixFmt(region);
-
     /* FIXME aspect ratio ? */
     text->fmt_out.video.i_width =
     text->fmt_out.video.i_visible_width  = i_original_width;
@@ -1208,6 +1206,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
+
+        vlc_spu_regions_foreach(region, &subpic->regions)
+            region_FixFmt(region);
 
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
