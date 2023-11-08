@@ -305,6 +305,19 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     return scale;
 }
 
+static void region_FixFmt(subpicture_region_t *region)
+{
+    // assume rendered text is in sRGB if nothing is set
+    if (region->fmt.transfer == TRANSFER_FUNC_UNDEF)
+        region->fmt.transfer = TRANSFER_FUNC_SRGB;
+    if (region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
+        region->fmt.primaries = COLOR_PRIMARIES_SRGB;
+    if (region->fmt.space == COLOR_SPACE_UNDEF)
+        region->fmt.space = COLOR_SPACE_SRGB;
+    if (region->fmt.color_range == COLOR_RANGE_UNDEF)
+        region->fmt.color_range = COLOR_RANGE_FULL;
+}
+
 static subpicture_region_t *SpuRenderText(spu_t *spu,
                           subpicture_region_t *region,
                           unsigned i_original_width,
@@ -324,15 +337,7 @@ static subpicture_region_t *SpuRenderText(spu_t *spu,
         return NULL;
     }
 
-    // assume rendered text is in sRGB if nothing is set
-    if (region->fmt.transfer == TRANSFER_FUNC_UNDEF)
-        region->fmt.transfer = TRANSFER_FUNC_SRGB;
-    if (region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
-        region->fmt.primaries = COLOR_PRIMARIES_SRGB;
-    if (region->fmt.space == COLOR_SPACE_UNDEF)
-        region->fmt.space = COLOR_SPACE_SRGB;
-    if (region->fmt.color_range == COLOR_RANGE_UNDEF)
-        region->fmt.color_range = COLOR_RANGE_FULL;
+    region_FixFmt(region);
 
     /* FIXME aspect ratio ? */
     text->fmt_out.video.i_width =
