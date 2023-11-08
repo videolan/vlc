@@ -156,9 +156,10 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     if (likely(p_region == NULL))
     {
         subpicture_Delete(p_subpic);
-        p_subpic = NULL;
+        return NULL;
     }
 
+    vlc_spu_regions_push( &p_subpic->regions, p_region );
     return p_subpic;
 }
 
