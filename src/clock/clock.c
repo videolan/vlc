@@ -209,6 +209,11 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     vlc_mutex_unlock(&main_clock->lock);
 
+    /* Fix the reported ts if both master and slaves source are delayed. This
+     * happens if we apply a positive delay to the master, and then lower it. */
+    if (clock->delay > 0 && main_clock->delay < 0 && ts > -main_clock->delay)
+        ts += main_clock->delay;
+
     vlc_clock_on_update(clock, system_now, ts,
                         rate, frame_rate, frame_rate_base);
     return VLC_TICK_INVALID;
