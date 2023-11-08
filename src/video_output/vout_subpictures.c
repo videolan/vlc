@@ -817,9 +817,8 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         vlc_list_replace(&region->node, &rendered_text->node);
         subpicture_region_Delete(region);
         region = rendered_text;
+        region_FixFmt(rendered_text);
     }
-
-    video_format_AdjustColorSpace(&region->fmt);
 
     /* Force palette if requested
      * FIXME b_force_palette and force_crop are applied to all subpictures using palette
