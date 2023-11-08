@@ -1937,7 +1937,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_t bits, *s = &bits;
     block_t *p_block;
 
-    if( !p_subpic || !vlc_spu_regions_is_empty(&p_subpic->regions) ) return NULL;
+    if( !p_subpic || vlc_spu_regions_is_empty(&p_subpic->regions) ) return NULL;
 
     /* FIXME: this is a hack to convert VLC_CODEC_YUVA into
      *  VLC_CODEC_YUVP
