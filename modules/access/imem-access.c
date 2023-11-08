@@ -28,6 +28,12 @@
 #include <vlc_access.h>
 #include <vlc_plugin.h>
 
+#ifdef _WIN32
+#include <basetsd.h> // ensure MSVC compatibility
+static_assert(sizeof(SSIZE_T) == sizeof(ssize_t),
+                "libvlc_media_read_cb type mismatch");
+#endif
+
 struct access_sys_t
 {
     void *opaque;

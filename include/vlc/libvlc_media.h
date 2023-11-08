@@ -30,6 +30,12 @@
 extern "C" {
 # endif
 
+#if defined(_MSC_VER)
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
+
 /** \defgroup libvlc_media LibVLC media
  * \ingroup libvlc
  * @ref libvlc_media_t is an abstract representation of a playable media.
