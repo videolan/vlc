@@ -159,6 +159,8 @@ static int Open( vlc_object_t *p_this )
 
     vlc_vector_init( &p_sys->streams );
 
+    p_stream->p_sys = p_sys;
+
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
         if( !strncmp( p_cfg->psz_name, "dst", strlen( "dst" ) ) )
@@ -230,11 +232,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_stream->p_sys = p_sys;
     p_stream->ops = &ops;
     return VLC_SUCCESS;
 nomem:
-    p_stream->p_sys = p_sys;
     Close( p_stream );
     return VLC_ENOMEM;
 }
