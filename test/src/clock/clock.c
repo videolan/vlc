@@ -51,6 +51,7 @@ struct clock_scenario
     vlc_tick_t system_start; /* VLC_TICK_INVALID for vlc_tick_now() */
     vlc_tick_t duration;
     vlc_tick_t stream_increment; /* VLC_TICK_INVALID for manual increment */
+    unsigned video_fps;
     vlc_tick_t total_drift_duration; /* VLC_TICK_INVALID for non-drift test */
     double coeff_epsilon; /* Valid for lowprecision/burst checks */
 
@@ -71,6 +72,7 @@ struct clock_ctx
 
 enum tracer_event_type {
     TRACER_EVENT_TYPE_UPDATE,
+    TRACER_EVENT_TYPE_RENDER_VIDEO,
     TRACER_EVENT_TYPE_STATUS,
 };
 
@@ -88,6 +90,11 @@ struct tracer_event
             double coeff;
             vlc_tick_t offset;
         } update;
+
+        struct {
+            vlc_tick_t play_date;
+            vlc_tick_t pts;
+        } render_video;
 
         enum tracer_event_status status;
     };
@@ -133,6 +140,20 @@ static void tracer_ctx_PushUpdate(struct tracer_ctx *ctx,
     assert(ret);
 }
 
+static void tracer_ctx_PushRenderVideo(struct tracer_ctx *ctx,
+                                       vlc_tick_t play_date, vlc_tick_t pts)
+{
+    struct tracer_event event = {
+        .type = TRACER_EVENT_TYPE_RENDER_VIDEO,
+        .render_video = {
+            .play_date = play_date,
+            .pts = pts,
+        },
+    };
+    bool ret = vlc_vector_push(&ctx->events, event);
+    assert(ret);
+}
+
 static void tracer_ctx_PushStatus(struct tracer_ctx *ctx,
                                   enum tracer_event_status status)
 {
@@ -161,10 +182,11 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
 
     struct vlc_tracer_entry entry = va_arg(entries, struct vlc_tracer_entry);
 
-    bool is_render = false, is_status = false;
+    bool is_render = false, is_render_video = false, is_status = false;
     unsigned nb_update = 0;
     double coeff = 0.0f;
     vlc_tick_t offset = VLC_TICK_INVALID;
+    vlc_tick_t render_video_pts = VLC_TICK_INVALID;
     enum tracer_event_status status = 0;
 
     while (entry.key != NULL)
@@ -181,6 +203,8 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
                     nb_update++;
                     offset = VLC_TICK_FROM_NS(entry.value.integer);
                 }
+                else if (strcmp(entry.key, "render_pts") == 0)
+                    render_video_pts = VLC_TICK_FROM_NS(entry.value.integer);
                 break;
             case VLC_TRACER_DOUBLE:
                 if (!is_render)
@@ -199,6 +223,12 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
                     if (strcmp(entry.value.string, "RENDER") == 0)
                         is_render = true;
                 }
+                else if (strcmp(entry.key, "id") == 0)
+                {
+                    if (strcmp(entry.value.string, "video") == 0)
+                        is_render_video= true;
+                }
+
                 if (!is_render)
                     continue;
                 /* Assert that there is no "reset_bad_source" */
@@ -229,6 +259,8 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
         assert(nb_update == 2);
         tracer_ctx_PushUpdate(&tracer_ctx, coeff, offset);
     }
+    else if (is_render_video && render_video_pts != VLC_TICK_INVALID)
+        tracer_ctx_PushRenderVideo(&tracer_ctx, ts, render_video_pts);
 }
 
 /* Used to check for some trace value and hack the ts to the user tracer */
@@ -294,6 +326,11 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     vlc_tick_t system = scenario->system_start;
     vlc_tick_t expected_system = scenario->system_start;
 
+    vlc_tick_t video_increment = 0;
+    vlc_tick_t video_ts = scenario->stream_start;
+    if (scenario->video_fps != 0)
+        video_increment = vlc_tick_rate_duration(scenario->video_fps);
+
     tracer_ctx.forced_ts = expected_system;
     size_t index = 0;
 
@@ -301,8 +338,23 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         stream += scenario->stream_increment, ++index)
     {
         scenario->update(&ctx, index, &system, stream);
-        expected_system += scenario->stream_increment;
 
+        vlc_tick_t video_system = expected_system;
+
+        if (video_increment > 0)
+        {
+            while (video_system < expected_system + scenario->stream_increment)
+            {
+                vlc_tick_t play_date =
+                    vlc_clock_ConvertToSystem(ctx.slave, video_system, video_ts,
+                                              1.0f);
+                vlc_clock_Update(ctx.slave, play_date, video_ts, 1.0f);
+                video_system += video_increment;
+                video_ts += video_increment;
+            }
+        }
+
+        expected_system += scenario->stream_increment;
         tracer_ctx.forced_ts = expected_system;
     }
 
@@ -375,11 +427,6 @@ static void normal_update(const struct clock_ctx *ctx, size_t index,
     /* The master can't drift */
     assert(drift == VLC_TICK_INVALID);
 
-    /* Check the slave is drifting (only system is moving) */
-    drift = vlc_clock_Update(ctx->slave, *system,
-                             VLC_TICK_0, 1.0f);
-    assert(drift == - (stream - VLC_TICK_0));
-
     *system += scenario->stream_increment;
 }
 
@@ -396,6 +443,8 @@ static void check_no_event_error(size_t expected_update_count)
         {
             case TRACER_EVENT_TYPE_UPDATE:
                 update_count++;
+                break;
+            case TRACER_EVENT_TYPE_RENDER_VIDEO:
                 break;
             case TRACER_EVENT_TYPE_STATUS:
                 switch (event.status)
