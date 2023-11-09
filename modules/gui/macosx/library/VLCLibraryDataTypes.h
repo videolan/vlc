@@ -133,6 +133,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) NSString *smallArtworkMRL;
 @property (readonly) NSString *displayString;
 @property (readonly) NSString *primaryDetailString;
+@property (readonly) NSString *secondaryDetailString;
 @property (readonly) NSString *durationString;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
 // Media items should be delivered album-wise. If it is required for derivative

@@ -282,6 +282,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @property (readwrite, atomic, strong) NSString *smallArtworkMRL;
 @property (readwrite, atomic, strong) NSString *displayString;
 @property (readwrite, atomic, strong) NSString *primaryDetailString;
+@property (readwrite, atomic, strong) NSString *secondaryDetailString;
 @property (readwrite, atomic, strong) NSString *durationString;
 
 @end
@@ -469,6 +470,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return [self durationString];
 }
 
+- (NSString *)secondaryDetailString
+{
+    return self.genreString;
+}
+
 - (NSString *)durationString
 {
     NSString *countMetadataString;
@@ -581,6 +587,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (NSString *)primaryDetailString
 {
     return _artistName;
+}
+
+- (NSString *)secondaryDetailString
+{
+    return self.genreString;
 }
 
 - (NSString *)genreString
@@ -747,6 +758,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @end
 
 @interface VLCMediaLibraryMediaItem ()
+{
+    NSString *_primaryDetailString;
+}
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
 
@@ -992,29 +1006,33 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return _title;
 }
 
+- (nullable NSString *)contextualPrimaryDetailString
+{
+    switch (self.mediaSubType) {
+    case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
+        return self.inputItem.showName;
+    case VLC_ML_MEDIA_SUBTYPE_MOVIE:
+        return self.inputItem.director;
+    case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
+    {
+        VLCMediaLibraryArtist * const artist = [VLCMediaLibraryArtist artistWithID:_artistID];
+        return artist.name;
+    }
+    default:
+        return nil;
+    }
+}
+
 - (NSString *)primaryDetailString
 {
-   if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
-        VLCInputItem *inputItem = [self inputItem];
-        if (inputItem) {
-            NSString *showName = inputItem.showName;
-            return showName.length > 0 ? showName : [self durationString];
-        }
-   } else if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
-        VLCInputItem *inputItem = [self inputItem];
-        if (inputItem) {
-            NSString *directorString = inputItem.director;
-            return directorString.length > 0 ? directorString : [self durationString];
-        }
-    } else if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
-        VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
-        if (artist) {
-            NSString *artistName = artist.name;
-            return artistName.length > 0 ? artistName : [self durationString];
-        }
+    if (_primaryDetailString == nil || [_primaryDetailString isEqualToString:@""]) {
+        NSString * const contextualString = [self contextualPrimaryDetailString];
+        const BOOL validContextualString = contextualString != nil && contextualString.length > 0;
+        _primaryDetailString = validContextualString ? contextualString : self.durationString;
     }
 
-    return [self durationString];
+    return _primaryDetailString;
+}
 }
 
 - (NSString *)durationString
