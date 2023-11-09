@@ -138,13 +138,15 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
 // Media items should be delivered album-wise. If it is required for derivative
 // types to provide media items in a different grouping or order, use methods
-// or properties specific to the type (e.g. like in VLCMeidaLibraryGenre)
+// or properties specific to the type (e.g. like in VLCMediaLibraryGenre)
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *mediaItems;
-// If the info in detailString contains a library object that can be used for nav
-// We lazy load the actionable library item so avoid using the property until we
-// actually need to, resort to `actionableDetail` to know if there is one instead
+// If the info in detailString contains a library object that can be used for nav,
+// we lazy load the actionable library item to avoid using the property until we
+// actually need to -- resort to `actionableDetail` to know if there is one instead
 @property (readonly) BOOL primaryActionableDetail;
 @property (readonly) id<VLCMediaLibraryItemProtocol> primaryActionableDetailLibraryItem;
+@property (readonly) BOOL secondaryActionableDetail;
+@property (readonly) id<VLCMediaLibraryItemProtocol> secondaryActionableDetailLibraryItem;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
