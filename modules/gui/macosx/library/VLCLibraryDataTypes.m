@@ -760,6 +760,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @interface VLCMediaLibraryMediaItem ()
 {
     NSString *_primaryDetailString;
+    NSString *_secondaryDetailString;
 }
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
@@ -1033,6 +1034,34 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
     return _primaryDetailString;
 }
+
+- (nullable NSString *)contextualSecondaryDetailString
+{
+    switch (self.mediaSubType) {
+    case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
+    {
+        VLCInputItem * const inputItem = self.inputItem;
+        return [NSString stringWithFormat:_NS("Season %u, Episode %u"),
+                         inputItem.season,
+                         inputItem.episode];
+    }
+    case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
+    {
+        VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:self.genreID];
+        return genreArrayDisplayString(@[genre]);
+    }
+    default:
+        return self.inputItem.date;
+    }
+}
+
+- (NSString *)secondaryDetailString
+{
+    if (_secondaryDetailString == nil || [_secondaryDetailString isEqualToString:@""]) {
+        _secondaryDetailString = [self contextualSecondaryDetailString];
+    }
+
+    return _secondaryDetailString;
 }
 
 - (NSString *)durationString
