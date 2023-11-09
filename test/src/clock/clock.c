@@ -273,7 +273,10 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
                                                       NULL, NULL);
     assert(master != NULL);
 
-    vlc_clock_t *slave = vlc_clock_main_CreateSlave(mainclk, NULL, VIDEO_ES,
+    char *slave_name;
+    int ret = asprintf(&slave_name, "%s/video", scenario->name);
+    assert(ret != -1);
+    vlc_clock_t *slave = vlc_clock_main_CreateSlave(mainclk, slave_name, VIDEO_ES,
                                                     NULL, NULL);
     assert(slave != NULL);
 
@@ -313,6 +316,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     if (master != NULL)
         vlc_clock_Delete(master);
     vlc_clock_Delete(slave);
+    free(slave_name);
     vlc_clock_main_Delete(mainclk);
 }
 
