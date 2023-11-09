@@ -67,6 +67,14 @@ typedef struct {
     sout_stream_t *stream;
     char *select_chain;
     char *es_id_suffix;
+
+    /* Reference on the PCR selector of the duplicated sout chain.
+     * Used in the PCR selector callbacks to distinguish from the other
+     * duplicated streams since the context is shared between all selectors. */
+    sout_stream_t *pcr_selector_ref;
+    /* Last PCR forwarded at the end of the stream chain or VLC_TICK_MIN when
+     * unset. */
+    vlc_tick_t pcr;
 } duplicated_stream_t;
 
 typedef struct
@@ -88,6 +96,85 @@ typedef struct
 
 static bool ESSelected( struct vlc_logger *, const es_format_t *fmt,
                         char *psz_select );
+
+/*****************************************************************************
+ * PCR Selector
+ *
+ * The PCR selector is the endpoint of each duplicated sout chains before they
+ * are linked back to the main pipeline. It is used to regroup PCR from each
+ * duplicated stream and select the lowest to forward it to the sink.
+ *****************************************************************************/
+
+static void *PCRSelectorAdd( sout_stream_t *stream, 
+                             const es_format_t *fmt,
+                             const char *es_id )
+{
+    return sout_StreamIdAdd( stream->p_next, fmt, es_id );
+}
+static void PCRSelectorDel( sout_stream_t *stream, void *id )
+{
+    sout_StreamIdDel( stream->p_next, id );
+}
+static int PCRSelectorControl( sout_stream_t *stream, int query, va_list args )
+{
+    return sout_StreamControlVa( stream->p_next, query, args );
+}
+static int PCRSelectorSend( sout_stream_t *stream,
+                            void *id,
+                            vlc_frame_t *frame )
+{
+    return sout_StreamIdSend( stream->p_next, id, frame );
+}
+static void PCRSelectorFlush( sout_stream_t *stream, void *id )
+{
+    sout_StreamFlush( stream->p_next, id );
+}
+static void PCRSelectorSetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    vlc_tick_t min_pcr = pcr;
+    duplicated_stream_t *dup;
+    vlc_vector_foreach_ref( dup, &sys->streams )
+    {
+        if( dup->pcr_selector_ref == stream )
+            dup->pcr = pcr;
+        else
+            min_pcr = __MIN( min_pcr, dup->pcr );
+    }
+
+    /* One of the selector has not received a PCR yet and was defaulted to
+     * VLC_TICK_MIN. */
+    if( min_pcr == VLC_TICK_MIN )
+        return;
+
+    sout_StreamSetPCR( stream->p_next, min_pcr );
+
+    /* Reset all selectors PCR values. */
+    vlc_vector_foreach_ref( dup, &sys->streams )
+        dup->pcr = VLC_TICK_MIN;
+}
+
+static sout_stream_t *PCRSelectorNew( sout_stream_t *parent )
+{
+    sout_stream_t *selector =
+        sout_StreamNew( VLC_OBJECT(parent), "duplicate-pcr-select{}" );
+    if( unlikely(selector == NULL) )
+        return NULL;
+    
+    static const struct sout_stream_operations ops = {
+        .add = PCRSelectorAdd,
+        .del = PCRSelectorDel,
+        .control = PCRSelectorControl,
+        .send = PCRSelectorSend,
+        .flush = PCRSelectorFlush,
+        .set_pcr = PCRSelectorSetPCR,
+    };
+    selector->ops = &ops;
+    selector->p_sys = parent->p_sys;
+    
+    return selector;
+}
 
 /*****************************************************************************
  * Control
@@ -165,11 +252,21 @@ static int Open( vlc_object_t *p_this )
     {
         if( !strncmp( p_cfg->psz_name, "dst", strlen( "dst" ) ) )
         {
-            duplicated_stream_t dup_stream = {0};
+            duplicated_stream_t dup_stream = { .pcr = VLC_TICK_MIN };
+
+            sout_stream_t *sink = NULL;
+            if( p_stream->p_next != NULL )
+            {
+                sink = PCRSelectorNew( p_stream );
+                if ( unlikely(sink == NULL) )
+                    goto nomem;
+                sink->p_next = p_stream->p_next;
+                dup_stream.pcr_selector_ref = sink;
+            }
 
             msg_Dbg( p_stream, " * adding `%s'", p_cfg->psz_value );
             dup_stream.stream = sout_StreamChainNew(
-                VLC_OBJECT(p_stream), p_cfg->psz_value, p_stream->p_next );
+                VLC_OBJECT(p_stream), p_cfg->psz_value, sink );
 
             if( dup_stream.stream != NULL )
             {
