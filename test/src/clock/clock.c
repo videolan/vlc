@@ -167,18 +167,9 @@ static void tracer_ctx_PushStatus(struct tracer_ctx *ctx,
 
 static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
 {
-    (void) ts;
     struct vlc_tracer *libvlc_tracer = opaque;
-    if (libvlc_tracer != NULL)
-    {
-        /* If the user specified a tracer, forward directly to it after faking
-         * the system ts */
-        assert(tracer_ctx.forced_ts != VLC_TICK_INVALID);
-        va_list copy;
-        va_copy(copy, entries);
-        vlc_tracer_vaTraceWithTs(libvlc_tracer, tracer_ctx.forced_ts, copy);
-        va_end(copy);
-    }
+    va_list copy;
+    va_copy(copy, entries);
 
     struct vlc_tracer_entry entry = va_arg(entries, struct vlc_tracer_entry);
 
@@ -248,6 +239,19 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
         }
         entry = va_arg(entries, struct vlc_tracer_entry);
     }
+
+    if (libvlc_tracer != NULL)
+    {
+        /* If the user specified a tracer, forward directly to it after faking
+         * the system ts */
+        assert(tracer_ctx.forced_ts != VLC_TICK_INVALID);
+
+        /* Use the original ts for the "render_pts" entry */
+        vlc_tick_t tracer_ts = render_video_pts != VLC_TICK_INVALID ?
+                               ts : tracer_ctx.forced_ts;
+        vlc_tracer_vaTraceWithTs(libvlc_tracer, tracer_ts, copy);
+    }
+    va_end(copy);
 
     if (!is_render)
         return;
