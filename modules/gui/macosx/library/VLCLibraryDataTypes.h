@@ -282,8 +282,9 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @interface VLCMediaLibraryDummyItem : NSObject<VLCMediaLibraryItemProtocol>
 
-- (instancetype)initWithDisplayString:(NSString*)displayString
-              withPrimaryDetailString:(NSString*)primaryDetailString;
+- (instancetype)initWithDisplayString:(NSString *)displayString
+              withPrimaryDetailString:(nullable NSString *)primaryDetailString
+            withSecondaryDetailString:(nullable NSString *)secondaryDetailString;
 
 @end
 

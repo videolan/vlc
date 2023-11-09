@@ -60,7 +60,8 @@
                                                      _numberOfTracks];
 
     return [super initWithDisplayString:displayString
-                withPrimaryDetailString:primaryDetailString];
+                withPrimaryDetailString:primaryDetailString
+              withSecondaryDetailString:nil];
 }
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock

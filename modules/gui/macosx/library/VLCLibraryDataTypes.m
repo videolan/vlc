@@ -1373,6 +1373,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @implementation VLCMediaLibraryDummyItem
 
 @synthesize primaryDetailString = _primaryDetailString;
+@synthesize secondaryDetailString = _secondaryDetailString;
 @synthesize displayString = _displayString;
 @synthesize durationString = _durationString;
 @synthesize firstMediaItem = _firstMediaItem;
@@ -1383,13 +1384,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize primaryActionableDetail = _primaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 
-- (instancetype)initWithDisplayString:(NSString*)displayString
-              withPrimaryDetailString:(NSString*)primaryDetailString
+- (instancetype)initWithDisplayString:(NSString *)displayString
+              withPrimaryDetailString:(nullable NSString *)primaryDetailString
+            withSecondaryDetailString:(nullable NSString *)secondaryDetailString
 {
     self = [super init];
     if (self) {
         _displayString = displayString;
         _primaryDetailString = primaryDetailString;
+        _secondaryDetailString = secondaryDetailString;
         _durationString = @"";
         _libraryId = -1;
         _smallArtworkGenerated = NO;
