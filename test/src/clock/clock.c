@@ -419,11 +419,16 @@ static void normal_check(const struct clock_ctx *ctx, size_t update_count,
     for (size_t i = 0; i < tracer_ctx.events.size; ++i)
     {
         struct tracer_event event = tracer_ctx.events.data[i];
-        if (event.type == TRACER_EVENT_TYPE_UPDATE)
+
+        switch (event.type)
         {
-            assert(event.update.coeff == 1.0f);
-            assert(event.update.offset ==
-                   scenario->system_start - scenario->stream_start);
+            case TRACER_EVENT_TYPE_UPDATE:
+                assert(event.update.coeff == 1.0f);
+                assert(event.update.offset ==
+                       scenario->system_start - scenario->stream_start);
+                break;
+            default:
+                break;
         }
     }
 
@@ -464,8 +469,14 @@ static void lowprecision_check(const struct clock_ctx *ctx, size_t update_count,
     for (size_t i = 0; i < tracer_ctx.events.size; ++i)
     {
         struct tracer_event event = tracer_ctx.events.data[i];
-        if (event.type == TRACER_EVENT_TYPE_UPDATE)
-            assert(fabs(event.update.coeff - 1.0f) <= scenario->coeff_epsilon);
+        switch (event.type)
+        {
+            case TRACER_EVENT_TYPE_UPDATE:
+                assert(fabs(event.update.coeff - 1.0f) <= scenario->coeff_epsilon);
+                break;
+            default:
+                break;
+        }
     }
 }
 
