@@ -769,9 +769,13 @@ static void sout_StreamDelete( sout_stream_t *p_stream )
 
     msg_Dbg( p_stream, "destroying chain... (name=%s)", psz_name ? psz_name
                                                                  : "(null)" );
+    if (p_stream->ops != NULL && p_stream->ops->close != NULL)
+        p_stream->ops->close(p_stream);
 
     if (priv->module != NULL)
-        module_unneed(p_stream, priv->module);
+        module_unneed(p_stream, priv->module); // Still needed for the modules on the old deactivate callback
+    else
+        vlc_objres_clear(VLC_OBJECT(p_stream));
 
     FREENULL( p_stream->psz_name );
 

@@ -263,6 +263,10 @@ struct sout_stream_operations {
      * \note Optional callback.
      */
     void (*set_pcr)(sout_stream_t *, vlc_tick_t);
+    /**
+     * \note Optional callback.
+     */
+    void (*close)(sout_stream_t *);
 };
 
 struct sout_stream_t
