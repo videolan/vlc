@@ -1416,6 +1416,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize primaryActionableDetail = _primaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
+@synthesize secondaryActionableDetail = _secondaryActionableDetail;
+@synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
               withPrimaryDetailString:(nullable NSString *)primaryDetailString
@@ -1432,6 +1434,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _smallArtworkMRL = @"";
         _primaryActionableDetail = NO;
         _primaryActionableDetailLibraryItem = nil;
+        _secondaryActionableDetail = NO;
+        _secondaryActionableDetailLibraryItem = nil;
     }
     return self;
 }
