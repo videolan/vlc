@@ -358,7 +358,7 @@ FocusScope {
 
             headerColor: theme.bg.secondary
 
-            backgroundColor: headerColor
+            fadingEdge.backgroundColor: headerColor
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 

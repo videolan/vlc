@@ -46,10 +46,10 @@ ListView {
 
     // Aliases
 
-    property alias backgroundColor: fadingEdge.backgroundColor
-    property alias enableEndFade: fadingEdge.enableEndFade
-    property alias enableBeginningFade: fadingEdge.enableBeginningFade
-    property alias fadeSize: fadingEdge.fadeSize
+    // TODO: Qt 7 try to assign the item inline if it is possible
+    //       to set it to null, so that the item is not created
+    //       if the effect is not wanted.
+    property alias fadingEdge: fadingEdge
 
     //forward view properties
 
@@ -70,8 +70,6 @@ ListView {
     focus: true
 
     activeFocusOnTab: true
-
-    backgroundColor: theme.bg.primary
 
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
@@ -269,6 +267,8 @@ ListView {
         anchors.fill: parent
 
         listView: root
+
+        backgroundColor: theme.bg.primary
     }
 
     Component {

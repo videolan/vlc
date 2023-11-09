@@ -26,5 +26,5 @@ Widgets.KeyNavigableTableView {
 
     displayMarginEnd: g_mainDisplay.displayMargin
 
-    enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+    fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
 }

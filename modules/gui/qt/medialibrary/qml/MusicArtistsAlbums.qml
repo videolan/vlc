@@ -155,8 +155,8 @@ FocusScope {
             visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
             focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
 
-            backgroundColor: artistListBackground.usingAcrylic ? "transparent"
-                                                               : artistListBackground.alternativeColor
+            fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
+                                                                          : artistListBackground.alternativeColor
 
             // To get blur effect while scrolling in mainview
             displayMarginEnd: g_mainDisplay.displayMargin

@@ -252,18 +252,18 @@ T.Pane {
 
             model: root.model
 
-            BindingCompat on enableBeginningFade {
+            BindingCompat on fadingEdge.enableBeginningFade {
                 when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Backward)
                 value: false
             }
 
-            BindingCompat on enableEndFade {
+            BindingCompat on fadingEdge.enableEndFade {
                 when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Forward)
                 value: false
             }
 
-            backgroundColor: root.background.usingAcrylic ? "transparent"
-                                                          : listView.colorContext.bg.primary
+            fadingEdge.backgroundColor: root.background.usingAcrylic ? "transparent"
+                                                                     : listView.colorContext.bg.primary
 
             contentWidth: width
 
