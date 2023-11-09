@@ -153,7 +153,10 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
         /* If the user specified a tracer, forward directly to it after faking
          * the system ts */
         assert(tracer_ctx.forced_ts != VLC_TICK_INVALID);
-        vlc_tracer_vaTraceWithTs(libvlc_tracer, tracer_ctx.forced_ts, entries);
+        va_list copy;
+        va_copy(copy, entries);
+        vlc_tracer_vaTraceWithTs(libvlc_tracer, tracer_ctx.forced_ts, copy);
+        va_end(copy);
     }
 
     struct vlc_tracer_entry entry = va_arg(entries, struct vlc_tracer_entry);
