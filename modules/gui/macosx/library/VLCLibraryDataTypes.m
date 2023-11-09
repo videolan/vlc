@@ -790,6 +790,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @implementation VLCMediaLibraryMediaItem
 
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
+@synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
 #pragma mark - initialization
 
@@ -849,7 +850,10 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.libraryID = p_mediaItem->i_id;
         self.smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
-        self.primaryActionableDetail = p_mediaItem->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
+
+        const BOOL isAlbumTrack = p_mediaItem->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
+        self.primaryActionableDetail = isAlbumTrack;
+        self.secondaryActionableDetail = isAlbumTrack;
 
         _p_mediaLibrary = p_mediaLibrary;
         _mediaType = p_mediaItem->i_type;
@@ -1113,11 +1117,20 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (id<VLCMediaLibraryItemProtocol>)primaryActionableDetailLibraryItem
 {
-    if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK && _primaryActionableDetailLibraryItem == nil) {
+    if (_primaryActionableDetailLibraryItem == nil && self.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
         _primaryActionableDetailLibraryItem = [VLCMediaLibraryAlbum albumWithID:self.albumID];
     }
 
     return _primaryActionableDetailLibraryItem;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)secondaryActionableDetailLibraryItem
+{
+    if (_secondaryActionableDetailLibraryItem == nil && self.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
+        _secondaryActionableDetailLibraryItem = [VLCMediaLibraryGenre genreWithID:self.genreID];
+    }
+
+    return _secondaryActionableDetailLibraryItem;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
