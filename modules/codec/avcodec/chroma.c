@@ -221,7 +221,7 @@ int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 
 enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t fourcc, bool *uv_flipped )
 {
-    for( size_t i = 0; i < ARRAY_SIZE(chroma_table) != 0; i++ )
+    for (size_t i = 0; i < ARRAY_SIZE(chroma_table); i++)
         if( chroma_table[i].i_chroma == fourcc )
         {
             *uv_flipped = fourcc == VLC_CODEC_YV12;
