@@ -90,18 +90,42 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
-                                    <rect key="frame" x="0.0" y="63" width="146" height="16"/>
-                                    <buttonCell key="cell" type="bevel" title="Media item detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="zkC-9p-xFn">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
-                                    </buttonCell>
-                                    <color key="contentTintColor" name="VLCAccentColor"/>
-                                    <connections>
-                                        <action selector="detailAction:" target="HAc-or-XD8" id="JiQ-Ss-fTO"/>
-                                    </connections>
-                                </button>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
+                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JzZ-K9-xaP">
+                                    <rect key="frame" x="0.0" y="63" width="417" height="16"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
+                                            <rect key="frame" x="0.0" y="0.0" width="196" height="16"/>
+                                            <buttonCell key="cell" type="bevel" title="Media item primary detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="zkC-9p-xFn">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="VLCAccentColor"/>
+                                            <connections>
+                                                <action selector="primaryDetailAction:" target="HAc-or-XD8" id="bFl-ro-arq"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9CH-03-Iu3">
+                                            <rect key="frame" x="204" y="0.0" width="213" height="16"/>
+                                            <buttonCell key="cell" type="bevel" title="Media item secondary detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="wPH-tu-Uw1">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <connections>
+                                                <action selector="secondaryDetailAction:" target="HAc-or-XD8" id="IAX-VG-Kpd"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <visibilityPriorities>
+                                        <integer value="1000"/>
+                                        <integer value="1000"/>
+                                    </visibilityPriorities>
+                                    <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
+                                        <real value="3.4028234663852886e+38"/>
+                                    </customSpacing>
+                                </stackView>
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
                                     <rect key="frame" x="-2" y="42" width="94" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                         <font key="font" metaFont="system"/>
