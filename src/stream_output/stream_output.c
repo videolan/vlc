@@ -827,30 +827,40 @@ void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *end)
     }
 }
 
-/* Create a "stream_out" module, which may forward its ES to p_next module */
-/*
- * XXX name and p_cfg are used (-> do NOT free them)
- */
-static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
-                               config_chain_t *p_cfg, sout_stream_t *p_next)
+static sout_stream_t *sout_StreamNewEmpty(vlc_object_t *parent, char *name)
 {
-    const char *cap = (p_next != NULL) ? "sout filter" : "sout output";
-    struct sout_stream_private *priv;
-    sout_stream_t *p_stream;
+    assert(name != NULL);
 
-    assert(psz_name);
-
-    priv = vlc_custom_create(parent, sizeof (*priv), "stream out");
+    struct sout_stream_private *priv =
+        vlc_custom_create(parent, sizeof(*priv), "stream out");
     if (unlikely(priv == NULL))
         return NULL;
 
     vlc_mutex_init(&priv->lock);
-    p_stream = &priv->stream;
-    p_stream->psz_name = psz_name;
+    priv->stream.psz_name = name;
+    priv->stream.p_cfg = NULL;
+    priv->stream.p_next = NULL;
+    priv->stream.ops = NULL;
+    priv->stream.p_sys = NULL;
+
+    return &priv->stream;
+}
+
+/* Create a "stream_out" module, which may forward its ES to p_next module */
+/*
+ * XXX name and p_cfg are used (-> do NOT free them)
+ */
+static sout_stream_t *sout_StreamNewModule( vlc_object_t *parent, char *psz_name,
+                               config_chain_t *p_cfg, sout_stream_t *p_next)
+{
+    const char *cap = (p_next != NULL) ? "sout filter" : "sout output";
+
+    sout_stream_t *p_stream = sout_StreamNewEmpty(parent, psz_name);
+    if (unlikely(p_stream == NULL))
+        return NULL;
+
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
-    p_stream->ops = NULL;
-    p_stream->p_sys = NULL;
 
     msg_Dbg( p_stream, "stream=`%s'", p_stream->psz_name );
 
@@ -905,8 +915,10 @@ sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
     {
         sout_stream_t *prev;
 
-        prev = sout_StreamNew(parent, vlc_array_item_at_index(&name, i),
-                              vlc_array_item_at_index(&cfg, i), front);
+        prev = sout_StreamNewModule(parent,
+                                    vlc_array_item_at_index(&name, i),
+                                    vlc_array_item_at_index(&cfg, i),
+                                    front);
         if (prev == NULL)
             goto error;
 
