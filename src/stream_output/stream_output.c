@@ -868,14 +868,6 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
     return p_stream;
 }
 
-/* Creates a complete "stream_out" modules chain
- *
- *  chain format: module1{option=*:option=*}[:module2{option=*:...}]
- *
- *  The modules are created starting from the last one and linked together
- *
- *  Returns a pointer to the first module.
- */
 sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
                                    sout_stream_t *sink)
 {

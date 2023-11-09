@@ -282,6 +282,17 @@ struct sout_stream_t
 };
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *first, sout_stream_t *end);
+
+/**
+ * Creates a complete "stream_out" modules chain
+ *
+ * Chain format: module1{option=*:option=*}[:module2{option=*:...}]
+ *
+ * The modules are created starting from the last one and linked together
+ *
+ * \retval A pointer to the first module.
+ * \retval NULL if the chain creation failed.
+ */
 VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
         const char *psz_chain, sout_stream_t *p_next) VLC_USED;
 
