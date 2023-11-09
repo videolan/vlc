@@ -80,6 +80,7 @@ typedef struct
     input_clock_t    *p_input_clock;
     struct {
         vlc_clock_main_t *main;
+        vlc_clock_t *input;
     } clocks;
 
     /* Weak reference to the master ES clock */
@@ -594,6 +595,8 @@ static void EsOutDelete( es_out_t *out )
 static void ProgramDelete( es_out_pgrm_t *p_pgrm )
 {
     input_clock_Delete( p_pgrm->p_input_clock );
+    if (p_pgrm->clocks.input)
+        vlc_clock_Delete(p_pgrm->clocks.input);
     vlc_clock_main_Delete(p_pgrm->clocks.main);
     if( p_pgrm->p_meta )
         vlc_meta_Delete( p_pgrm->p_meta );
@@ -1248,6 +1251,22 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action,
     });
 }
 
+static void
+ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
+                    vlc_tick_t ck_stream, double rate)
+{
+    es_out_pgrm_t *pgrm = opaque;
+    vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
+}
+
+static void
+ClockListenerReset(void *opaque)
+{
+    es_out_pgrm_t *pgrm = opaque;
+    vlc_clock_Reset(pgrm->clocks.input);
+}
+
+
 static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -1278,11 +1297,18 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
             /* Fall-through */
         case VLC_CLOCK_MASTER_INPUT:
         {
-            vlc_clock_t *p_master_clock =
+            p_pgrm->clocks.input =
                 vlc_clock_main_CreateInputMaster(p_pgrm->clocks.main);
 
-            if( p_master_clock != NULL )
-                input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
+            static const struct vlc_input_clock_cbs clock_cbs =
+            {
+                .update = ClockListenerUpdate,
+                .reset = ClockListenerReset,
+            };
+
+            if (p_pgrm->clocks.input == NULL)
+                break;
+            input_clock_AttachListener(p_pgrm->p_input_clock, &clock_cbs, p_pgrm);
             p_pgrm->active_clock_source = VLC_CLOCK_MASTER_INPUT;
             break;
         }
@@ -1448,6 +1474,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_input->obj );
+    p_pgrm->clocks.input = NULL;
     p_pgrm->clocks.main = vlc_clock_main_New(p_input->obj.logger, tracer);
     if (p_pgrm->clocks.main == NULL)
     {

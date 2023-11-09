@@ -101,7 +101,10 @@
 /* */
 struct input_clock_t
 {
-    vlc_clock_t *clock_listener;
+    struct {
+        const struct vlc_input_clock_cbs *cbs;
+        void *opaque;
+    } listener;
 
     /* Last point
      * It is used to detect unexpected stream discontinuities */
@@ -143,15 +146,15 @@ static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 
 static void UpdateListener( input_clock_t *cl )
 {
-    if (cl->clock_listener == NULL)
+    if (cl->listener.cbs == NULL)
         return;
 
     const vlc_tick_t system_expected =
         ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
         cl->i_pts_delay + ClockGetTsOffset( cl );
 
-    vlc_clock_Update(cl->clock_listener, system_expected, cl->last.stream,
-                     cl->rate);
+    cl->listener.cbs->update(cl->listener.opaque, system_expected,
+                             cl->last.stream, cl->rate);
 }
 
 /*****************************************************************************
@@ -162,7 +165,8 @@ input_clock_t *input_clock_New( float rate )
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
         return NULL;
-    cl->clock_listener = NULL;
+    cl->listener.cbs = NULL;
+    cl->listener.opaque = NULL;
 
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
@@ -193,17 +197,18 @@ input_clock_t *input_clock_New( float rate )
 void input_clock_Delete( input_clock_t *cl )
 {
     AvgClean( &cl->drift );
-    if( cl->clock_listener )
-        vlc_clock_Delete( cl->clock_listener );
     free( cl );
 }
 
-void input_clock_AttachListener( input_clock_t *cl, vlc_clock_t *clock_listener )
+void input_clock_AttachListener(input_clock_t *cl,
+                                const struct vlc_input_clock_cbs *cbs,
+                                void *opaque)
 {
-    assert( clock_listener && cl->clock_listener == NULL );
+    assert(cbs && cl->listener.cbs == NULL);
     assert( !cl->b_has_reference );
 
-    cl->clock_listener = clock_listener;
+    cl->listener.cbs = cbs;
+    cl->listener.opaque = opaque;
 }
 
 /*****************************************************************************
@@ -308,8 +313,8 @@ void input_clock_Reset( input_clock_t *cl )
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
 
-    if( cl->clock_listener )
-        vlc_clock_Reset( cl->clock_listener );
+    if (cl->listener.cbs != NULL && cl->listener.cbs->reset != NULL)
+        cl->listener.cbs->reset(cl->listener.opaque);
 }
 
 /*****************************************************************************

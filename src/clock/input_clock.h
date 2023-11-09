@@ -36,6 +36,33 @@
 typedef struct input_clock_t input_clock_t;
 
 /**
+ * Callbacks for the input_clock_t listener.
+ *
+ * \see input_clock_AttachListener
+ */
+struct vlc_input_clock_cbs {
+    /**
+     * Notify the listener that the buffering made progress.
+     *
+     * \param opaque        listener private data set from
+     *                      \ref input_clock_AttachListener
+     * \param ck_system     time reference for the buffering progress
+     * \param ck_stream     progress of the buffering in tick
+     * \param rate          current playback rate for the buffering
+     */
+    void (*update)(void *opaque, vlc_tick_t ck_system,
+                   vlc_tick_t ck_stream, double rate);
+
+    /**
+     * Notify the listener that the buffering needed a reset.
+     *
+     * \param opaque        listener private data set from
+     *                      \ref input_clock_AttachListener
+     */
+    void (*reset)(void *opaque);
+};
+
+/**
  * This function creates a new input_clock_t.
  *
  * You must use input_clock_Delete to delete it once unused.
@@ -49,11 +76,13 @@ input_clock_t *input_clock_New( float rate );
  * (input_clock_Update()).
  *
  * \param clock the input clock to attach the listener to
- * \param clock_listener clock created with vlc_clock_main_CreateInputMaster().
- * The input_clock_t will take ownership of this clock and drive the main
- * clock.
+ * \param listener an input clock listener virtual table
+ * \param opaque an opaque pointer forwarded to the listener
+ *
  */
-void input_clock_AttachListener( input_clock_t *clock, vlc_clock_t *clock_listener );
+void input_clock_AttachListener(input_clock_t *clock,
+                                const struct vlc_input_clock_cbs *clock_listener,
+                                void *opaque);
 
 /**
  * This function destroys a input_clock_t created by input_clock_New.
