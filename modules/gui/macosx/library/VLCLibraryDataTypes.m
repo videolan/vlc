@@ -495,7 +495,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (NSString *)genreString
 {
     if (_genreString == nil || [_genreString isEqualToString:@""]) {
-        _genreString = genreArrayDisplayString(self.genres);
+        _genreString = self.genres == nil ? @"" : genreArrayDisplayString(self.genres);
     }
 
     return _genreString;
