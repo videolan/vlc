@@ -281,6 +281,24 @@ struct sout_stream_t
     void              *p_sys;
 };
 
+/**
+ * Allocate an empty Stream Output object.
+ *
+ * The object is empty, operation callbacks should be populated manually by the
+ * caller. To create a stream output associated with a module, use
+ * ::sout_StreamChainNew() instead.
+ *
+ * \note The stream should be destroyed with ::sout_StreamChainDelete().
+ *
+ * \param parent The parent object of the stream output.
+ * \param config A valid config chain of the object, of the form
+ *               "objname{option=*,otion=*,...}"
+ *
+ * \retval An empty allocated Stream Output object.
+ * \retval NULL on allocation error.
+ */
+VLC_API sout_stream_t *sout_StreamNew(vlc_object_t *parent, const char *config) VLC_USED;
+
 VLC_API void sout_StreamChainDelete(sout_stream_t *first, sout_stream_t *end);
 
 /**

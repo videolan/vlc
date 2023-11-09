@@ -846,6 +846,24 @@ static sout_stream_t *sout_StreamNewEmpty(vlc_object_t *parent, char *name)
     return &priv->stream;
 }
 
+sout_stream_t *sout_StreamNew(vlc_object_t *parent, const char *config)
+{
+    assert(config != NULL);
+
+    char *name;
+    config_chain_t *parsed_conf;
+    char *leftover = config_ChainCreate(&name, &parsed_conf, config);
+    free(leftover);
+
+    sout_stream_t *stream = sout_StreamNewEmpty(parent, name);
+    if (unlikely(stream == NULL))
+        return NULL;
+
+    stream->p_cfg = parsed_conf;
+
+    return stream;
+}
+
 /* Create a "stream_out" module, which may forward its ES to p_next module */
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
