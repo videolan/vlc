@@ -88,7 +88,9 @@ struct sout_stream_id_sys_t
 #define BYTESPERSAMPLE 2
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
 };
 
 /*****************************************************************************

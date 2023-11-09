@@ -71,7 +71,9 @@ typedef struct
 } sout_stream_sys_t;
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
 };
 
 /*****************************************************************************

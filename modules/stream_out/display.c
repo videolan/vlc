@@ -209,7 +209,11 @@ static void SetPCR( sout_stream_t *p_stream, vlc_tick_t pcr )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, NULL, SetPCR
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .set_pcr = SetPCR,
 };
 
 /*****************************************************************************

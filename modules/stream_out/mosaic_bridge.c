@@ -197,7 +197,11 @@ static void Flush( sout_stream_t *stream, void *id)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, Flush, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .flush = Flush,
 };
 
 static const char *const ppsz_sout_options[] = {

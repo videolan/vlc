@@ -391,7 +391,12 @@ static void Flush( sout_stream_t *p_stream, void *_id)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, Flush, SetPCR,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .flush = Flush,
+    .set_pcr = SetPCR,
 };
 
 /*****************************************************************************

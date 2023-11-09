@@ -102,7 +102,10 @@ static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, SetPCR,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .set_pcr = SetPCR,
 };
 
 static const char *ppsz_sout_options[] = {

@@ -135,7 +135,10 @@ static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
 #define SOUT_CFG_PREFIX "sout-autodel-"
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, SetPCR,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .set_pcr = SetPCR,
 };
 
 static int Open( vlc_object_t *p_this )

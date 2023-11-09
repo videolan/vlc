@@ -255,7 +255,11 @@ static int Control(sout_stream_t *stream, int query, va_list args)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, Flush, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .flush = Flush,
 };
 
 /*****************************************************************************

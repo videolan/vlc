@@ -118,7 +118,11 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, NULL, SetPCR,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .set_pcr = SetPCR,
 };
 
 /*****************************************************************************

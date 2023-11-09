@@ -314,9 +314,14 @@ static void ProxyFlush(sout_stream_t *p_stream, void *id)
     sout_StreamFlush(p_stream->p_next, id);
 }
 
-static const struct sout_stream_operations proxy_ops = {
-    ProxyAdd, ProxyDel, ProxySend, nullptr, ProxyFlush, nullptr,
-};
+static const struct sout_stream_operations proxy_ops = [] {
+    struct sout_stream_operations ops{};
+    ops.add = ProxyAdd;
+    ops.del = ProxyDel;
+    ops.send = ProxySend;
+    ops.flush = ProxyFlush;
+    return ops;
+}();
 
 static int ProxyOpen(vlc_object_t *p_this)
 {
@@ -1240,9 +1245,14 @@ static void on_input_event_cb(void *data, enum cc_input_event event, union cc_in
     }
 }
 
-static const struct sout_stream_operations ops = {
-    Add, Del, Send, nullptr, Flush, nullptr
-};
+static const struct sout_stream_operations ops = [] {
+    struct sout_stream_operations ops{};
+    ops.add = Add;
+    ops.del = Del;
+    ops.send = Send;
+    ops.flush = Flush;
+    return ops;
+}();
 
 /*****************************************************************************
  * Open: connect to the Chromecast and initialize the sout

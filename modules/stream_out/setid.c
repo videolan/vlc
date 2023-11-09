@@ -124,7 +124,10 @@ static int OpenCommon( vlc_object_t *p_this )
 }
 
 static const struct sout_stream_operations id_ops = {
-    AddId, Del, Send, NULL, NULL, SetPCR,
+    .add = AddId,
+    .del = Del,
+    .send = Send,
+    .set_pcr = SetPCR,
 };
 
 static int OpenId( vlc_object_t *p_this )
@@ -149,7 +152,10 @@ static int OpenId( vlc_object_t *p_this )
 }
 
 static const struct sout_stream_operations lang_ops = {
-    AddLang, Del, Send, NULL, NULL, SetPCR,
+    .add = AddLang,
+    .del = Del,
+    .send = Send,
+    .set_pcr = SetPCR,
 };
 
 static int OpenLang( vlc_object_t *p_this )

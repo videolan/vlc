@@ -267,7 +267,9 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
 };
 
 #define SOUT_CFG_PREFIX "sout-es-"

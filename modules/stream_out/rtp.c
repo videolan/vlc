@@ -377,11 +377,17 @@ static int Control(sout_stream_t *stream, int query, va_list args)
 }
 
 static const struct sout_stream_operations stream_ops = {
-    Add, Del, Send, Control, NULL, NULL,
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
 };
 
 static const struct sout_stream_operations mux_ops = {
-    MuxAdd, MuxDel, MuxSend, Control, NULL, NULL,
+    .add = MuxAdd,
+    .del = MuxDel,
+    .send = MuxSend,
+    .control = Control,
 };
 
 /*****************************************************************************
