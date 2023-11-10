@@ -223,10 +223,29 @@ static vlc_tick_t ParseTime(const char *str)
     return -1;
 }
 
+static void Close(sout_stream_t *stream)
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    assert(vlc_list_is_empty(&sys->ids));
+
+    if (sys->stream != NULL)
+        sout_StreamChainDelete(sys->stream, stream->p_next);
+
+    for (sout_cycle_t *cycle = sys->start, *next; cycle != NULL; cycle = next)
+    {
+        next = cycle->next;
+        free(cycle);
+    }
+
+    free(sys);
+}
+
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
+    .close = Close,
 };
 
 static int Open(vlc_object_t *obj)
@@ -298,34 +317,15 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *obj)
-{
-    sout_stream_t *stream = (sout_stream_t *)obj;
-    sout_stream_sys_t *sys = stream->p_sys;
-
-    assert(vlc_list_is_empty(&sys->ids));
-
-    if (sys->stream != NULL)
-        sout_StreamChainDelete(sys->stream, stream->p_next);
-
-    for (sout_cycle_t *cycle = sys->start, *next; cycle != NULL; cycle = next)
-    {
-        next = cycle->next;
-        free(cycle);
-    }
-
-    free(sys);
-}
-
 vlc_module_begin()
     set_shortname(N_("cycle"))
     set_description(N_("Cyclic stream output"))
     set_capability("sout output", 0)
     set_subcategory(SUBCAT_SOUT_STREAM)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     add_shortcut("cycle")
     add_submodule()
     add_shortcut("cycle")
     set_capability("sout filter", 0)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
