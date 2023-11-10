@@ -173,7 +173,7 @@ static const char *const ppsz_protocols[] = {
                               "requested to access the stream." )
 
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX "sout-rtp-"
 #define MAX_EMPTY_BLOCKS 200
@@ -234,7 +234,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, RFC3016_TEXT,
                  RFC3016_LONGTEXT )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -381,6 +381,7 @@ static const struct sout_stream_operations stream_ops = {
     .del = Del,
     .send = Send,
     .control = Control,
+    .close = Close,
 };
 
 static const struct sout_stream_operations mux_ops = {
@@ -388,6 +389,7 @@ static const struct sout_stream_operations mux_ops = {
     .del = MuxDel,
     .send = MuxSend,
     .control = Control,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -591,7 +593,7 @@ static int Open( vlc_object_t *p_this )
         sout_stream_id_sys_t *id = Add( p_stream, NULL, NULL );
         if( id == NULL )
         {
-            Close( p_this );
+            Close( p_stream );
             return VLC_EGENERIC;
         }
     }
@@ -602,9 +604,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->p_mux )
