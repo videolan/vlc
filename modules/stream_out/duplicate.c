@@ -41,18 +41,17 @@
  * Module descriptor
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Duplicate stream output") )
     set_capability( "sout output", 50 )
     add_shortcut( "duplicate", "dup" )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_submodule()
     set_capability("sout filter", 0)
     add_shortcut("duplicate", "dup")
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end ()
 
 
@@ -117,12 +116,32 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     (void)p_stream;
 }
 
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( sout_stream_t * p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    duplicated_stream_t *dup_stream;
+    vlc_vector_foreach_ref( dup_stream, &p_sys->streams )
+    {
+        sout_StreamChainDelete( dup_stream->stream, p_stream->p_next );
+        free( dup_stream->select_chain );
+        free( dup_stream->es_id_suffix );
+    }
+    vlc_vector_destroy( &p_sys->streams );
+
+    free( p_sys );
+}
+
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
     .control = Control,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -216,29 +235,10 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 nomem:
     p_stream->p_sys = p_sys;
-    Close( p_this );
+    Close( p_stream );
     return VLC_ENOMEM;
 }
 
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    duplicated_stream_t *dup_stream;
-    vlc_vector_foreach_ref( dup_stream, &p_sys->streams )
-    {
-        sout_StreamChainDelete( dup_stream->stream, p_stream->p_next );
-        free( dup_stream->select_chain );
-        free( dup_stream->es_id_suffix );
-    }
-    vlc_vector_destroy( &p_sys->streams );
-
-    free( p_sys );
-}
 
 static char *
 SuffixESID( size_t stream_index, const char *es_id, const char *suffix )
