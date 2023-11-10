@@ -165,9 +165,8 @@ static void SoutCallback_Flush(sout_stream_t *, void *id)
     reinterpret_cast<sdi_sout::AbstractStream *>(id)->Flush();
 }
 
-static void CloseSDIOutput(vlc_object_t *p_this)
+static void SoutCallback_Close(sout_stream_t *p_stream)
 {
-    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sdi_sout::DBMSDIOutput *sdi =
             reinterpret_cast<sdi_sout::DBMSDIOutput *>(p_stream->p_sys);
     sdi->Process(); /* Drain */
@@ -181,6 +180,7 @@ static const sout_stream_operations ops = [] {
     ops.send = SoutCallback_Send;
     ops.flush = SoutCallback_Flush;
     ops.control = SoutCallback_Control;
+    ops.close = SoutCallback_Close;
     return ops;
 }();
 
@@ -210,7 +210,7 @@ vlc_module_begin ()
     set_capability("sout output", 0)
     add_shortcut("sdiout")
     set_subcategory(SUBCAT_SOUT_STREAM)
-    set_callbacks(OpenSDIOutput, CloseSDIOutput)
+    set_callback(OpenSDIOutput)
 
     set_section(N_("DeckLink General Options"), NULL)
     add_integer(CFG_PREFIX "card-index", 0,
