@@ -80,7 +80,6 @@ static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
  * Local prototypes
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
-static void Close   ( vlc_object_t * );
 static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
@@ -165,7 +164,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT )
     add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 static int Control(sout_stream_t *stream, int query, va_list args)
@@ -196,12 +195,32 @@ static void Flush( sout_stream_t *stream, void *id)
     }
 }
 
+/*****************************************************************************
+ * Close
+ *****************************************************************************/
+static void Close( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* Delete the callbacks */
+    var_DelCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "alpha", alphaCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "x", xCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
+
+    free( p_sys->psz_id );
+
+    free( p_sys );
+}
+
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
     .control = Control,
     .flush = Flush,
+    .close = Close,
 };
 
 static const char *const ppsz_sout_options[] = {
@@ -309,26 +328,6 @@ static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
 
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     return MosaicHoldDecoderDevice(p_owner);
-}
-
-/*****************************************************************************
- * Close
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    /* Delete the callbacks */
-    var_DelCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "alpha", alphaCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "x", xCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
-
-    free( p_sys->psz_id );
-
-    free( p_sys );
 }
 
 static void ReleaseDecoder( decoder_t *p_dec )
