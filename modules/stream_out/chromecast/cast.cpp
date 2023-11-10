@@ -182,7 +182,7 @@ static const char DEFAULT_MUXER_WEBM[] = "avformat{mux=webm,options={live=1},res
  * Local prototypes
  *****************************************************************************/
 static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static void Close(sout_stream_t *);
 static int ProxyOpen(vlc_object_t *);
 static int AccessOpen(vlc_object_t *);
 static void AccessClose(vlc_object_t *);
@@ -217,7 +217,7 @@ vlc_module_begin ()
     set_capability("sout output", 0)
     add_shortcut("chromecast")
     set_subcategory(SUBCAT_SOUT_STREAM)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 
     add_string(SOUT_CFG_PREFIX "ip", NULL, NULL, NULL)
         change_private()
@@ -1251,6 +1251,7 @@ static const struct sout_stream_operations ops = [] {
     ops.del = Del;
     ops.send = Send;
     ops.flush = Flush;
+    ops.close = Close;
     return ops;
 }();
 
@@ -1351,10 +1352,9 @@ error:
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-static void Close(vlc_object_t *p_this)
+static void Close(sout_stream_t *p_stream)
 {
-    vlc_object_t *parent = vlc_object_parent(p_this);
-    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
+    vlc_object_t *parent = vlc_object_parent(p_stream);
     sout_stream_sys_t *p_sys = reinterpret_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
     assert(p_sys->out_streams.empty() && p_sys->streams.empty());
