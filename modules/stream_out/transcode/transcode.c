@@ -144,7 +144,7 @@ static const char *const ppsz_deinterlace_type[] =
 };
 
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX "sout-transcode-"
 
@@ -153,7 +153,7 @@ vlc_module_begin ()
     set_description( N_("Transcode stream output") )
     set_capability( "sout filter", 50 )
     add_shortcut( "transcode" )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
     add_module(SOUT_CFG_PREFIX "venc", "video encoder", "none",
@@ -397,6 +397,7 @@ static const struct sout_stream_operations ops = {
     .control = Control,
     .flush = Flush,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -511,9 +512,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
     transcode_encoder_config_clean( &p_sys->venc_cfg );
