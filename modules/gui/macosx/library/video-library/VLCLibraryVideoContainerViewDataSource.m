@@ -35,6 +35,7 @@
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 
 #import "main/VLCMain.h"
@@ -364,7 +365,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         carouselItemView.frame = itemFrame;
     }
 
-    carouselItemView.representedItem = self.collectionArray[index];
+    // TODO: Find a more elegant way to do this
+    VLCLibraryVideoCarouselViewContainerView * const containerView = (VLCLibraryVideoCarouselViewContainerView *)carousel.superview;
+
+    const id<VLCMediaLibraryItemProtocol> libraryItem = self.collectionArray[index];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
+                                                                                             parentType:containerView.videoGroup];
+    carouselItemView.representedItem = representedItem;
     return carouselItemView;
  }
 

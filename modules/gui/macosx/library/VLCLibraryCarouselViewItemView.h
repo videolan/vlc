@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
-@protocol VLCMediaLibraryItemProtocol;
+@class VLCLibraryRepresentedItem;
 
 @interface VLCLibraryCarouselViewItemView : NSView
 
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
 @property (readwrite, weak) IBOutlet NSBox *highlightBox;
 
-@property (readwrite, strong, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
+@property (readwrite, strong, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 @property (readwrite, nonatomic) BOOL selected;
 

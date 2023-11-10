@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
@@ -104,15 +105,17 @@
 {
     [self prepareForReuse];
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:_representedItem withCompletion:^(NSImage * const thumbnail) {
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+
+    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self.imageView.image = thumbnail;
     }];
 
-    self.titleTextField.stringValue = self.representedItem.displayString;
-    self.detailTextField.stringValue = self.representedItem.detailString;
+    self.titleTextField.stringValue = actualItem.displayString;
+    self.detailTextField.stringValue = actualItem.detailString;
 
-    if ([_representedItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
-        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)self.representedItem;
+    if ([actualItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+        VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)actualItem;
 
         if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
@@ -121,8 +124,8 @@
 
         const CGFloat position = mediaItem.progress;
         if (position > 0.05 && position < 0.95) {
-            _progressIndicator.progress = position;
-            _progressIndicator.hidden = NO;
+            self.progressIndicator.progress = position;
+            self.progressIndicator.hidden = NO;
         }
     }
 }
@@ -138,7 +141,7 @@
     }
 }
 
-- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     if (representedItem == _representedItem) {
         return;
@@ -160,16 +163,7 @@
 
 - (void)playRepresentedItem
 {
-    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-
-     __block BOOL playImmediately = YES;
-    [self.representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const mediaItem) {
-        [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-
-        if(playImmediately) {
-            playImmediately = NO;
-        }
-    }];
+    [self.representedItem play];
 }
 
 @end
