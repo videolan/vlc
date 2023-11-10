@@ -88,10 +88,6 @@ Repeater {
             if (typeof item.activeFocusOnTab === "boolean")
                 item.activeFocusOnTab = true
 
-            // FIXME: Do we really need to enforce a defaultSize ?
-            if (item.size !== undefined)
-                item.size = Qt.binding(function() { return defaultSize; })
-
             item.visible = Qt.binding(function() { return loader.visible })
 
             if (item.requestLockUnlockAutoHide)

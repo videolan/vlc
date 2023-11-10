@@ -57,10 +57,6 @@ Widgets.IconToolButton {
             }
         }
 
-        font.pixelSize: control.size
-        font.family: VLCIcons.fontFamily
-        font.underline: control.font.underline
-
         Accessible.ignored: true
     }
 }

@@ -251,7 +251,7 @@ FocusScope{
                 anchors.left: parent.left
 
                 objectName: "IconToolButton"
-                size: VLCStyle.icon_banner
+                font.pixelSize: VLCStyle.icon_banner
                 iconText: VLCIcons.back
                 text: I18n.qtr("Back")
                 focus: true
@@ -418,7 +418,7 @@ FocusScope{
             visible: !root.showToolbar
             enabled: visible
             focus: visible
-            size: VLCStyle.icon_banner
+            font.pixelSize: VLCStyle.icon_banner
 
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
@@ -450,7 +450,7 @@ FocusScope{
 
             anchors.verticalCenter: parent.verticalCenter
             objectName: ControlListModel.PLAYLIST_BUTTON
-            size: VLCStyle.icon_banner
+            font.pixelSize: VLCStyle.icon_banner
             iconText: VLCIcons.playlist
             text: I18n.qtr("Playlist")
             focus: root.showToolbar

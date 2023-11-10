@@ -68,8 +68,8 @@ RowLayout {
         model: modelDefination
 
         delegate: Widgets.IconTrackButton {
-            size: (index === 0) ? VLCStyle.fontSize_large
-                                : VLCStyle.dp(40, VLCStyle.scale)
+            font.pixelSize: (index === 0) ? VLCStyle.fontSize_large
+                                          : VLCStyle.dp(40, VLCStyle.scale)
 
             x: (column.width - width) / 2
 
@@ -195,7 +195,7 @@ RowLayout {
                     Widgets.IconTrackButton {
                         id: button
 
-                        size: VLCStyle.icon_track
+                        font.pixelSize: VLCStyle.icon_track
 
                         focus: true
 

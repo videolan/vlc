@@ -24,5 +24,5 @@ import "qrc:///style/"
 
 IconToolButton {
     // Style
-    size: VLCStyle.icon_track
+    font.pixelSize: VLCStyle.icon_track
 }

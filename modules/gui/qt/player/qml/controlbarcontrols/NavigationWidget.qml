@@ -31,7 +31,7 @@ Templates.Pane {
 
     // Properties
 
-    property int size: VLCStyle.icon_toolbar
+    font.pixelSize: VLCStyle.icon_toolbar
 
     property bool paintOnly: false
 
@@ -111,8 +111,6 @@ Templates.Pane {
                 if (item === null) return
 
                 _applyItem(loaderA, item)
-
-                item.size = Qt.binding(function() { return root.size })
             }
         }
 

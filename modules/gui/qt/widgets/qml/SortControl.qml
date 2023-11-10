@@ -56,7 +56,7 @@ Widgets.IconToolButton {
     signal sortOrderSelected(int type)
 
 
-    size: VLCStyle.icon_normal
+    font.pixelSize: VLCStyle.icon_normal
 
     focus: true
 

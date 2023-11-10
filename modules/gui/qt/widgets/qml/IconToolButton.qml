@@ -31,8 +31,6 @@ T.ToolButton {
 
     property bool paintOnly: false
 
-    property int size: VLCStyle.icon_normal
-
     property string iconText: ""
 
     property color color: (control.checked) ? theme.accent : theme.fg.primary
@@ -51,6 +49,9 @@ T.ToolButton {
                              implicitContentHeight + topPadding + bottomPadding)
 
     baselineOffset: contentItem.y + contentItem.baselineOffset
+
+    font.pixelSize: VLCStyle.icon_normal
+    font.family: VLCIcons.fontFamily
 
     // Keys
 
@@ -87,8 +88,8 @@ T.ToolButton {
     }
 
     background: AnimatedBackground {
-        implicitWidth: size
-        implicitHeight: size
+        implicitWidth: control.font.pixelSize
+        implicitHeight: control.font.pixelSize
 
         enabled: theme.initialized
 
@@ -112,9 +113,7 @@ T.ToolButton {
             }
         }
 
-        font.pixelSize: control.size
-        font.family: VLCIcons.fontFamily
-        font.underline: control.font.underline
+        font: control.font
 
         Accessible.ignored: true
     }

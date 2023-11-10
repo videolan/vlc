@@ -140,7 +140,7 @@ T.ToolBar {
 
                             Widgets.IconToolButton {
                                  id: history_back
-                                 size: VLCStyle.icon_banner
+                                 font.pixelSize: VLCStyle.icon_banner
                                  iconText: VLCIcons.back
                                  text: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
@@ -262,7 +262,7 @@ T.ToolBar {
                                 visible: MainCtx.hasGridListMode
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
-                                size: VLCStyle.icon_banner
+                                font.pixelSize: VLCStyle.icon_banner
                                 iconText: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
                                 text: I18n.qtr("List/Grid")
                                 onClicked: MainCtx.gridView = !MainCtx.gridView
@@ -275,7 +275,7 @@ T.ToolBar {
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
 
-                                size: VLCStyle.icon_banner
+                                font.pixelSize: VLCStyle.icon_banner
 
                                 visible: MainCtx.sort.available
 
@@ -406,7 +406,7 @@ T.ToolBar {
 
                                 checked: MainCtx.playlistVisible
 
-                                size: VLCStyle.icon_banner
+                                font.pixelSize: VLCStyle.icon_banner
                                 iconText: VLCIcons.playlist
                                 text: I18n.qtr("Playlist")
                                 width: VLCStyle.bannerButton_width
@@ -460,7 +460,7 @@ T.ToolBar {
                                 id: menu_selector
 
                                 visible: !MainCtx.hasToolbarMenu
-                                size: VLCStyle.icon_banner
+                                font.pixelSize: VLCStyle.icon_banner
                                 iconText: VLCIcons.more
                                 text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width

@@ -222,7 +222,7 @@ T.Control {
 
                 iconText: VLCIcons.ellipsis
 
-                size: VLCStyle.icon_normal
+                font.pixelSize: VLCStyle.icon_normal
 
                 text: I18n.qtr("Menu")
 
