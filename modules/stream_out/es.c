@@ -266,10 +266,32 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     return sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 }
 
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+
+static void Close( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    free( p_sys->psz_access );
+    free( p_sys->psz_access_audio );
+    free( p_sys->psz_access_video );
+
+    free( p_sys->psz_mux );
+    free( p_sys->psz_mux_audio );
+    free( p_sys->psz_mux_video );
+
+    free( p_sys->psz_dst );
+    free( p_sys->psz_dst_audio );
+    free( p_sys->psz_dst_video );
+}
+
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
+    .close = Close,
 };
 
 #define SOUT_CFG_PREFIX "sout-es-"
@@ -314,28 +336,6 @@ static int Open( vlc_object_t *p_this )
     p_stream->p_sys = p_sys;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    free( p_sys->psz_access );
-    free( p_sys->psz_access_audio );
-    free( p_sys->psz_access_video );
-
-    free( p_sys->psz_mux );
-    free( p_sys->psz_mux_audio );
-    free( p_sys->psz_mux_video );
-
-    free( p_sys->psz_dst );
-    free( p_sys->psz_dst_audio );
-    free( p_sys->psz_dst_video );
 }
 
 /*****************************************************************************
@@ -400,5 +400,5 @@ vlc_module_begin()
     add_string(SOUT_CFG_PREFIX "dst-video", "", DESTV_TEXT,
                DESTV_LONGTEXT)
 
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
