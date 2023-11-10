@@ -47,7 +47,7 @@
 #define DELAY_LONGTEXT N_( "Introduces a delay in the display of the stream." )
 
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX "sout-display-"
 
@@ -64,7 +64,7 @@ vlc_module_begin()
               VIDEO_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "delay", 100, DELAY_TEXT,
                  DELAY_LONGTEXT )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end()
 
 
@@ -214,6 +214,7 @@ static const struct sout_stream_operations ops = {
     .send = Send,
     .control = Control,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -261,9 +262,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     input_resource_Release( p_sys->p_resource );
