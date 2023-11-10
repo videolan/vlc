@@ -237,9 +237,9 @@
             </constraints>
             <connections>
                 <outlet property="mediaItemArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
-                <outlet property="mediaItemDetailButton" destination="S5i-gd-zkt" id="SsE-11-GwE"/>
                 <outlet property="mediaItemFileNameTextField" destination="VxL-BW-3eh" id="fiL-3N-m3P"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
+                <outlet property="mediaItemPrimaryDetailButton" destination="S5i-gd-zkt" id="ssB-Jg-jcf"/>
                 <outlet property="mediaItemTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="mediaItemYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
                 <outlet property="playMediaItemButton" destination="ntd-VT-2KS" id="LJV-KL-cK4"/>

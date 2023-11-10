@@ -48,10 +48,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (void)awakeFromNib
 {
     _mediaItemTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    _mediaItemDetailButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    _mediaItemPrimaryDetailButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
 
     if (@available(macOS 10.14, *)) {
-        _mediaItemDetailButton.contentTintColor = NSColor.VLCAccentColor;
+        _mediaItemPrimaryDetailButton.contentTintColor = NSColor.VLCAccentColor;
     }
 
     if(@available(macOS 10.12.2, *)) {
@@ -90,17 +90,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     NSAssert(actualItem != nil, @"represented item is not a media item", nil);
 
     _mediaItemTitleTextField.stringValue = actualItem.displayString;
-    _mediaItemDetailButton.title = actualItem.primaryDetailString;
+    _mediaItemPrimaryDetailButton.title = actualItem.primaryDetailString;
     _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
     _mediaItemFileNameTextField.stringValue = actualItem.inputItem.name;
     _mediaItemPathTextField.stringValue = actualItem.inputItem.decodedMRL;
 
     const BOOL primaryActionableDetail = actualItem.primaryActionableDetail;
-    self.mediaItemDetailButton.enabled = primaryActionableDetail;
+    self.mediaItemPrimaryDetailButton.enabled = primaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.mediaItemDetailButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.mediaItemPrimaryDetailButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
-    self.mediaItemDetailButton.action = @selector(detailAction:);
+    self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaItemArtworkImageView.image = thumbnail;
@@ -117,7 +117,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     [self.representedItem queue];
 }
 
-- (IBAction)detailAction:(id)sender
+- (IBAction)primaryDetailAction:(id)sender
 {
     VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
     if (actualItem == nil || !actualItem.primaryActionableDetail) {
