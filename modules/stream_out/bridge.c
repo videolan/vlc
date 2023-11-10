@@ -81,9 +81,9 @@
     "the frequence of I frames in the streams." )
 
 static int  OpenOut ( vlc_object_t * );
-static void CloseOut( vlc_object_t * );
+static void CloseOut( sout_stream_t * );
 static int  OpenIn  ( vlc_object_t * );
-static void CloseIn ( vlc_object_t * );
+static void CloseIn ( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX_OUT "sout-bridge-out-"
 #define SOUT_CFG_PREFIX_IN "sout-bridge-in-"
@@ -100,7 +100,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX_OUT "id", NULL, ID_TEXT, ID_LONGTEXT )
     add_string( SOUT_CFG_PREFIX_OUT "in-name", "default",
                 DEST_TEXT, DEST_LONGTEXT )
-    set_callbacks( OpenOut, CloseOut )
+    set_callback( OpenOut )
 
     add_submodule ()
     set_section( N_("Bridge in"), NULL )
@@ -119,7 +119,7 @@ vlc_module_begin ()
                  PLACEHOLDER_DELAY_TEXT, PLACEHOLDER_DELAY_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true,
               PLACEHOLDER_IFRAME_TEXT, PLACEHOLDER_IFRAME_LONGTEXT )
-    set_callbacks( OpenIn, CloseIn )
+    set_callback( OpenIn )
 
 vlc_module_end ()
 
@@ -319,6 +319,7 @@ static const struct sout_stream_operations ops_out = {
     .del = DelOut,
     .send = SendOut,
     .control = ControlCommon,
+    .close = CloseOut,
 };
 
 /*****************************************************************************
@@ -357,9 +358,8 @@ static int OpenOut( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseOut:
  *****************************************************************************/
-static void CloseOut( vlc_object_t * p_this )
+static void CloseOut( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
 
     free( p_sys->psz_name );
@@ -649,6 +649,7 @@ static const struct sout_stream_operations ops_in = {
     .del = DelIn,
     .send = SendIn,
     .control = ControlCommon,
+    .close = CloseIn,
 };
 
 /*****************************************************************************
@@ -706,9 +707,8 @@ static int OpenIn( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIn:
  *****************************************************************************/
-static void CloseIn( vlc_object_t * p_this )
+static void CloseIn( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
     free( p_sys->psz_name );
