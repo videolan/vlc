@@ -189,16 +189,14 @@ static int Open( vlc_object_t *p_this )
     aout_FormatPrepare(&p_filter->fmt_in.audio);
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
 
-    static const struct FilterOperationInitializer {
+    static const struct vlc_filter_operations filter_ops = []{
         struct vlc_filter_operations ops {};
-        FilterOperationInitializer()
-        {
-            ops.filter_audio = DoWork;
-            ops.close = Close;
-        }
-    } filter_ops;
+        ops.filter_audio = DoWork;
+        ops.close = Close;
+        return ops;
+    }();
 
-    p_filter->ops = &filter_ops.ops;
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 
