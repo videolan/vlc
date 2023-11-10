@@ -32,7 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryRepresentedItem : NSObject
 
 @property (readonly) id<VLCMediaLibraryItemProtocol> item;
+// Parent media array is lazy loaded
 @property (readonly) NSArray<VLCMediaLibraryMediaItem *> *parentMediaArray;
+// If unknown, will always default to individual play mode
 @property (readonly) VLCMediaLibraryParentGroupType parentType;
 @property (readonly) NSInteger itemIndexInParent;
 
