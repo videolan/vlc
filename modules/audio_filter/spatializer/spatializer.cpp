@@ -128,7 +128,6 @@ static const callback_s callbacks[] = {
     { "spatializer-dry",      DryCallback,   &revmodel::setdry },
     { "spatializer-damp",     DampCallback,  &revmodel::setdamp }
 };
-enum { num_callbacks=sizeof(callbacks)/sizeof(callback_s) };
 
 static block_t *DoWork( filter_t *, block_t * );
 
@@ -141,7 +140,7 @@ static void Close( filter_t *p_filter )
     vlc_object_t *p_aout = vlc_object_parent(p_filter);
 
     /* Delete the callbacks */
-    for(unsigned i=0;i<num_callbacks;++i)
+    for(unsigned i=0; i<ARRAY_SIZE(callbacks); ++i)
     {
         var_DelCallback( p_aout, callbacks[i].psz_name,
                          callbacks[i].fp_callback, p_sys );
@@ -177,7 +176,7 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->lock );
 
-    for(unsigned i=0;i<num_callbacks;++i)
+    for(unsigned i=0; i<ARRAY_SIZE(callbacks); ++i)
     {
         /* NOTE: C++ pointer-to-member function call from table lookup. */
         (p_sys->p_reverbm->*(callbacks[i].fp_set))
