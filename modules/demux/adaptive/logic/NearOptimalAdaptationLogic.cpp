@@ -153,7 +153,7 @@ BaseRepresentation *NearOptimalAdaptationLogic::getNextRepresentation(BaseAdapta
         }
     }
 
-    BwDebug( msg_Info(p_obj, "buffering level %.2f% rep %ld kBps %zu kBps",
+    BwDebug( msg_Info(p_obj, "buffering level %.2f%% rep %" PRId64 " kBps %u kBps",
              (float) 100 * ctxcopy.buffering_level / ctxcopy.buffering_target, m->getBandwidth()/8000, bps / 8000); );
 
     return m;
@@ -220,7 +220,7 @@ void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
                 usedBps -= event.prev->getBandwidth();
             if(event.next)
                 usedBps += event.next->getBandwidth();
-                 BwDebug(msg_Info(p_obj, "New total bandwidth usage %zu kBps", (usedBps / 8000)));
+                 BwDebug(msg_Info(p_obj, "New total bandwidth usage %u kBps", (usedBps / 8000)));
             vlc_mutex_unlock(&lock);
         }
         break;

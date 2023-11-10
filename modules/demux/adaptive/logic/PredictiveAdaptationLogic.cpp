@@ -136,7 +136,7 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
         BwDebug( for(it=streams.begin(); it != streams.end(); ++it)
         {
             const PredictiveStats &s = (*it).second;
-            msg_Info(p_obj, "Stream %s buffering level %.2f%",
+            msg_Info(p_obj, "Stream %s buffering level %.2f%%",
                  (*it).first.str().c_str(), (double) s.buffering_level / s.buffering_target);
         } );
 
@@ -191,7 +191,7 @@ void PredictiveAdaptationLogic::trackerEvent(const TrackerEvent &ev)
             if(event.next)
                 usedBps += event.next->getBandwidth();
 
-            BwDebug(msg_Info(p_obj, "New total bandwidth usage %zu KiB/s", (usedBps / 8000)));
+            BwDebug(msg_Info(p_obj, "New total bandwidth usage %u KiB/s", (usedBps / 8000)));
             vlc_mutex_unlock(&lock);
         }
         break;
