@@ -132,9 +132,7 @@ static int TriggerDrain(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     assert(sys->drain_trigger == NULL);
 
-    vlc_tick_t delay = vlc_pa_get_latency(aout, sys->context, sys->stream);
-    if (delay == VLC_TICK_INVALID)
-        return VLC_EGENERIC;
+    vlc_tick_t delay = stream_get_interpolated_latency(sys->stream, aout, vlc_tick_now());
 
     delay += pa_rtclock_now();
     sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
@@ -317,14 +315,6 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
 
-    /* This callback is _never_ called while paused. */
-    if (sys->last_date == VLC_TICK_INVALID)
-    {
-        if (sys->draining && sys->drain_trigger == NULL)
-            TriggerDrain(aout);
-        return; /* nothing to do if buffers are (still) empty */
-    }
-
     if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout, sys->last_date);
 
@@ -460,16 +450,7 @@ static void stream_drain(pa_stream *s, audio_output_t *aout)
          * See #18141: drain callback is never received */
         sys->draining = true;
 
-        /* Trigger a latency update, that will update the drain timer */
-        op = pa_stream_update_timing_info(s, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
-        else
-        {
-            /* Timing failed, update the drain timer using the last known
-             * latency */
-            TriggerDrain(aout);
-        }
+        TriggerDrain(aout);
     }
 }
 
