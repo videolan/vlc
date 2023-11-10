@@ -216,10 +216,25 @@ static int OutputSend(sout_stream_t *stream, void *id, block_t *block)
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
+
+    if( p_sys->output )
+        fclose( p_sys->output );
+
+    free( p_sys->prefix );
+    free( p_sys );
+}
+
 static const struct sout_stream_operations output_ops = {
     .add = Add,
     .del = Del,
     .send = OutputSend,
+    .close = Close,
 };
 
 static int OutputOpen(vlc_object_t *obj)
@@ -270,6 +285,7 @@ static const struct sout_stream_operations filter_ops = {
     .del = FilterDel,
     .send = FilterSend,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 static int FilterOpen(vlc_object_t *obj)
@@ -288,21 +304,6 @@ static int FilterOpen(vlc_object_t *obj)
 }
 
 /*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    if( p_sys->output )
-        fclose( p_sys->output );
-
-    free( p_sys->prefix );
-    free( p_sys );
-}
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define OUTPUT_TEXT N_("Output file")
@@ -316,11 +317,11 @@ vlc_module_begin()
     set_capability( "sout output", 0 )
     add_shortcut( "stats" )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    set_callbacks( OutputOpen, Close )
+    set_callback( OutputOpen )
     add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "prefix", "stats", PREFIX_TEXT, NULL )
     add_submodule()
     set_capability( "sout filter", 0 )
     add_shortcut( "stats" )
-    set_callbacks( FilterOpen, Close )
+    set_callback( FilterOpen )
 vlc_module_end()
