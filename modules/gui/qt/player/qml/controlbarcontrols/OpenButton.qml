@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: openMediaBtn
-    iconText: VLCIcons.eject
+    text: VLCIcons.eject
     onClicked: DialogsProvider.openDialog()
-    text: I18n.qtr("Open media")
+    description: I18n.qtr("Open media")
 }

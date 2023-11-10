@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: playlistBtn
-    iconText: VLCIcons.playlist
+    text: VLCIcons.playlist
     onClicked: {
         MainCtx.playlistVisible = !MainCtx.playlistVisible
         if (MainCtx.playlistVisible && MainCtx.playlistDocked) {
@@ -34,5 +34,5 @@ Widgets.IconControlButton {
     }
     checked: MainCtx.playlistVisible
 
-    text: I18n.qtr("Playlist")
+    description: I18n.qtr("Playlist")
 }

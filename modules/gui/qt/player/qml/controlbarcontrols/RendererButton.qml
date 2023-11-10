@@ -30,8 +30,8 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    iconText: VLCIcons.renderer
-    text: I18n.qtr("Renderer")
+    text: VLCIcons.renderer
+    description: I18n.qtr("Renderer")
 
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)

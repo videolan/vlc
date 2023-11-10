@@ -141,8 +141,8 @@ T.ToolBar {
                             Widgets.IconToolButton {
                                  id: history_back
                                  font.pixelSize: VLCStyle.icon_banner
-                                 iconText: VLCIcons.back
-                                 text: I18n.qtr("Previous")
+                                 text: VLCIcons.back
+                                 description: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
                                  onClicked: History.previous()
@@ -263,8 +263,8 @@ T.ToolBar {
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 font.pixelSize: VLCStyle.icon_banner
-                                iconText: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
-                                text: I18n.qtr("List/Grid")
+                                text: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
+                                description: I18n.qtr("List/Grid")
                                 onClicked: MainCtx.gridView = !MainCtx.gridView
                                 enabled: true
                             }
@@ -407,8 +407,8 @@ T.ToolBar {
                                 checked: MainCtx.playlistVisible
 
                                 font.pixelSize: VLCStyle.icon_banner
-                                iconText: VLCIcons.playlist
-                                text: I18n.qtr("Playlist")
+                                text: VLCIcons.playlist
+                                description: I18n.qtr("Playlist")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 highlighted: MainCtx.playlistVisible
@@ -461,8 +461,8 @@ T.ToolBar {
 
                                 visible: !MainCtx.hasToolbarMenu
                                 font.pixelSize: VLCStyle.icon_banner
-                                iconText: VLCIcons.more
-                                text: I18n.qtr("Menu")
+                                text: VLCIcons.more
+                                description: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 checked: contextMenu.shown

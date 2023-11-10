@@ -27,5 +27,5 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     // Settings
 
-    iconText: VLCIcons.circle
+    text: VLCIcons.circle
 }

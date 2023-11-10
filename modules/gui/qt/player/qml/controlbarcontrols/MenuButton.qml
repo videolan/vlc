@@ -28,8 +28,8 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    iconText: VLCIcons.ellipsis
-    text: I18n.qtr("Menu")
+    text: VLCIcons.ellipsis
+    description: I18n.qtr("Menu")
     checked: contextMenu.shown
 
     onClicked: contextMenu.popup(this.mapToGlobal(0, 0))

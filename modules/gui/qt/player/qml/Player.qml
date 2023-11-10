@@ -513,24 +513,24 @@ FocusScope {
 
                 model: ObjectModel {
                     Widgets.IconToolButton {
-                        iconText: VLCIcons.skip_back
+                        text: VLCIcons.skip_back
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpBwd()
-                        text: I18n.qtr("Step back")
+                        description: I18n.qtr("Step back")
                     }
 
                     Widgets.IconToolButton {
-                        iconText: VLCIcons.visualization
+                        text: VLCIcons.visualization
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.toggleVisualization()
-                        text: I18n.qtr("Visualization")
+                        description: I18n.qtr("Visualization")
                     }
 
                     Widgets.IconToolButton{
-                        iconText: VLCIcons.skip_for
+                        text: VLCIcons.skip_for
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpFwd()
-                        text: I18n.qtr("Step forward")
+                        description: I18n.qtr("Step forward")
                     }
                 }
             }

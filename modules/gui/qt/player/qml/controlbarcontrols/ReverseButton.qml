@@ -28,8 +28,8 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     enabled: Player.rewindable
 
-    iconText: VLCIcons.play_reverse
-    text: I18n.qtr("Reverse")
+    text: VLCIcons.play_reverse
+    description: I18n.qtr("Reverse")
 
     onClicked: Player.reverse()
 }

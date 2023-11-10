@@ -28,7 +28,7 @@ Widgets.IconControlButton {
 
     enabled: Player.seekable
 
-    iconText: VLCIcons.skip_for
+    text: VLCIcons.skip_for
     onClicked: Player.jumpFwd()
-    text: I18n.qtr("Step forward")
+    description: I18n.qtr("Step forward")
 }

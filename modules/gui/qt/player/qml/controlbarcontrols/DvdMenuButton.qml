@@ -29,8 +29,8 @@ Widgets.IconControlButton {
 
     enabled: Player.hasMenu
 
-    iconText: VLCIcons.dvd_menu
-    text: I18n.qtr("Menu")
+    text: VLCIcons.dvd_menu
+    description: I18n.qtr("Menu")
 
     onClicked: Player.sectionMenu()
 }

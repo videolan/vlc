@@ -31,7 +31,7 @@ T.ToolButton {
 
     property bool paintOnly: false
 
-    property string iconText: ""
+    property string description
 
     property color color: (control.checked) ? theme.accent : theme.fg.primary
 
@@ -63,13 +63,15 @@ T.ToolButton {
 
     Accessible.onPressAction: control.clicked()
 
+    Accessible.name: description
+
     // Tooltip
 
     T.ToolTip.visible: (hovered || visualFocus)
 
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
-    T.ToolTip.text: text
+    T.ToolTip.text: description
 
     // Events
 
@@ -102,7 +104,7 @@ T.ToolButton {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
 
-        text: control.iconText
+        text: control.text
 
         color: control.color
 

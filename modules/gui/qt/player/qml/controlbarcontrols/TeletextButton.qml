@@ -33,9 +33,9 @@ PopupIconToolButton {
 
     enabled: Player.isTeletextAvailable
 
-    iconText: VLCIcons.tvtelx
+    text: VLCIcons.tvtelx
 
-    text: I18n.qtr("Teletext")
+    description: I18n.qtr("Teletext")
 
     popup.contentItem: TeletextWidget {
         colorContext.palette: root.colorContext.palette

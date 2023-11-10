@@ -30,8 +30,8 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    iconText: VLCIcons.bookmark
-    text: I18n.qtr("Bookmarks")
+    text: VLCIcons.bookmark
+    description: I18n.qtr("Bookmarks")
 
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)

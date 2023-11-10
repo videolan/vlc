@@ -26,10 +26,9 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: extdSettingsBtn
 
-    iconText: VLCIcons.effect_filter
+    text: VLCIcons.effect_filter
 
-    text: I18n.qtr("Extended settings")
+    description: I18n.qtr("Extended settings")
 
     onClicked: DialogsProvider.extendedDialog()
-    Accessible.name: text
 }

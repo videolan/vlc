@@ -220,11 +220,11 @@ T.Control {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                iconText: VLCIcons.ellipsis
+                text: VLCIcons.ellipsis
 
                 font.pixelSize: VLCStyle.icon_normal
 
-                text: I18n.qtr("Menu")
+                description: I18n.qtr("Menu")
 
                 visible: delegate.hovered
 

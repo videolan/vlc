@@ -73,13 +73,13 @@ RowLayout {
 
             x: (column.width - width) / 2
 
-            text: I18n.qtr("Playback Speed")
-            iconText: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
-                                    : modelData.icon
+            text: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
+                                : modelData.icon
 
             T.ToolTip.visible: (hovered || visualFocus)
-            T.ToolTip.text: modelData.tooltip
             T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
+            description: modelData.tooltip
 
             Navigation.parentItem: column
 
@@ -199,8 +199,8 @@ RowLayout {
 
                         focus: true
 
-                        text: modelData.menuText
-                        iconText: modelData.menuIcon
+                        description: modelData.menuText
+                        text: modelData.menuIcon
 
                         Navigation.parentItem: tracksListContainer
                         Navigation.downItem: tracksList

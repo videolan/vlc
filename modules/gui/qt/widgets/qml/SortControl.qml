@@ -60,9 +60,9 @@ Widgets.IconToolButton {
 
     focus: true
 
-    text: I18n.qtr("Sort")
+    description: I18n.qtr("Sort")
 
-    iconText: VLCIcons.topbar_sort
+    text: VLCIcons.topbar_sort
 
     checked: _menu && _menu.shown
 

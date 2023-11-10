@@ -232,8 +232,8 @@ Item {
                 Widgets.IconToolButton {
                     id: closeBtn
                     font.pixelSize: VLCStyle.icon_normal
-                    iconText: VLCIcons.clear
-                    text: I18n.qtr("Dismiss")
+                    text: VLCIcons.clear
+                    description: I18n.qtr("Dismiss")
                     Layout.rightMargin: VLCStyle.margin_xxsmall
 
                     color: closeBtn.colorContext.fg.negative

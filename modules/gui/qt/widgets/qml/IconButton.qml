@@ -27,7 +27,7 @@ T.Button {
     id: control
 
     property color color: "white"
-    property string iconText: ""
+    property string description
 
     width: content.implicitWidth
     height: content.implicitHeight
@@ -39,12 +39,18 @@ T.Button {
 
     //Accessible
     Accessible.onPressAction: control.clicked()
+    Accessible.name: description
+
+    // Tooltip
+    T.ToolTip.visible: (hovered || visualFocus)
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+    T.ToolTip.text: description
 
     contentItem: Item {
         T.Label {
             id: content
             anchors.centerIn: parent
-            text: control.iconText
+            text: control.text
             color: control.color
             font: control.font
 

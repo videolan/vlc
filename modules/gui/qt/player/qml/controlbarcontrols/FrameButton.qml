@@ -28,7 +28,7 @@ Widgets.IconControlButton {
 
     enabled: Player.ratechangable
 
-    iconText: VLCIcons.frame_by_frame
+    text: VLCIcons.frame_by_frame
     onClicked: Player.frameNext()
-    text: I18n.qtr("Next frame")
+    description: I18n.qtr("Next frame")
 }

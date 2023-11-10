@@ -178,9 +178,9 @@ FocusScope {
                     Widgets.IconToolButton {
                         id: closeButton
 
-                        iconText: VLCIcons.close
+                        text: VLCIcons.close
 
-                        text: I18n.qtr("Close")
+                        description: I18n.qtr("Close")
 
                         onClicked: root.retract()
 

@@ -63,7 +63,7 @@ T.Pane {
 
             focus: true
             paintOnly: root.paintOnly
-            iconText:
+            text:
                 if( _player.muted )
                     VLCIcons.volume_muted
                 else if ( _player.volume === 0 )
@@ -74,7 +74,7 @@ T.Pane {
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
-            text: I18n.qtr("Mute")
+            description: I18n.qtr("Mute")
             onClicked: Player.muted = !Player.muted
 
             Accessible.onIncreaseAction: {

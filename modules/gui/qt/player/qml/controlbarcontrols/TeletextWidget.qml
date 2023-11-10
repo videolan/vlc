@@ -105,8 +105,8 @@ T.Pane {
 
                 checked: Player.teletextTransparency
 
-                iconText: VLCIcons.transparency
-                text: I18n.qtr("Teletext transparency")
+                text: VLCIcons.transparency
+                description: I18n.qtr("Teletext transparency")
 
                 Navigation.parentItem: root
                 Navigation.leftItem: teleActivateBtn
@@ -179,8 +179,8 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.home
-                text: I18n.qtr("Index key")
+                text: VLCIcons.home
+                description: I18n.qtr("Index key")
 
                 Navigation.parentItem: root
                 Navigation.leftItem: telePageNumber

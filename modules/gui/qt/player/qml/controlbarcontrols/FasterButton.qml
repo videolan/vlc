@@ -28,7 +28,7 @@ Widgets.IconControlButton {
 
     enabled: Player.ratechangable
 
-    iconText: VLCIcons.faster
+    text: VLCIcons.faster
     onClicked: Player.faster()
-    text: I18n.qtr("Faster")
+    description: I18n.qtr("Faster")
 }

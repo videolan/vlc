@@ -44,11 +44,11 @@ Widgets.IconControlButton {
 
     // Settings
 
-    iconText: VLCIcons.audiosub
+    text: VLCIcons.audiosub
 
     enabled: menuLoader.status === Loader.Ready
 
-    text: I18n.qtr("Languages and tracks")
+    description: I18n.qtr("Languages and tracks")
 
     // Events
 

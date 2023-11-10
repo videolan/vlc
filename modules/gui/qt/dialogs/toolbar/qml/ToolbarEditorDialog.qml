@@ -140,8 +140,8 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    text: I18n.qtr("New Profile")
-                    iconText: VLCIcons.profile_new
+                    description: I18n.qtr("New Profile")
+                    text: VLCIcons.profile_new
 
                     onClicked: {
                         const npDialog = DialogsProvider.getTextDialog(null,
@@ -159,8 +159,8 @@ WindowDialog {
                 Widgets.IconToolButton {
                     id: useDefaultButton
 
-                    text: I18n.qtr("Use Default")
-                    iconText: VLCIcons.history
+                    description: I18n.qtr("Use Default")
+                    text: VLCIcons.history
 
                     onClicked: {
                         MainCtx.controlbarProfileModel.currentModel.injectDefaults(false)
@@ -168,8 +168,8 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    text: I18n.qtr("Delete the current profile")
-                    iconText: VLCIcons.del
+                    description: I18n.qtr("Delete the current profile")
+                    text: VLCIcons.del
 
                     onClicked: {
                           MainCtx.controlbarProfileModel.deleteSelectedProfile()

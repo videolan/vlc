@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: quitBtn
-    iconText: VLCIcons.clear
+    text: VLCIcons.clear
     onClicked: MainCtx.close()
-    text: I18n.qtr("Quit")
+    description: I18n.qtr("Quit")
 }

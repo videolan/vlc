@@ -49,8 +49,8 @@ RowLayout {
             anchors.centerIn: parent
 
             font.pixelSize: VLCStyle.icon_playlist
-            text: I18n.qtr("Loop")
-            iconText: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
+            description: I18n.qtr("Loop")
+            text: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)
                       ? VLCIcons.repeat_one
                       : VLCIcons.repeat_all
             checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
@@ -74,8 +74,8 @@ RowLayout {
 
             checked: MainPlaylistController.random
             font.pixelSize: VLCStyle.icon_playlist
-            text: I18n.qtr("Shuffle")
-            iconText: VLCIcons.shuffle
+            Accessible.name: I18n.qtr("Shuffle")
+            text: VLCIcons.shuffle
             onClicked: MainPlaylistController.toggleRandom()
             focusPolicy: Qt.NoFocus
         }
@@ -145,8 +145,8 @@ RowLayout {
 
             font.pixelSize: VLCStyle.icon_playlist
             enabled: !MainPlaylistController.empty
-            text: I18n.qtr("Clear playqueue")
-            iconText: VLCIcons.playlist_clear
+            description: I18n.qtr("Clear playqueue")
+            text: VLCIcons.playlist_clear
             onClicked: MainPlaylistController.clear()
             focusPolicy: Qt.NoFocus
         }

@@ -248,7 +248,7 @@ FocusScope {
                         }
 
                         Widgets.IconControlButton {
-                            iconText: VLCIcons.close
+                            text: VLCIcons.close
                             focus: true
 
                             Navigation.parentItem: headerFocusScope

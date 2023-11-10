@@ -114,8 +114,8 @@ FocusScope {
 
             font.pixelSize: VLCStyle.icon_banner
 
-            iconText: VLCIcons.search
-            text: I18n.qtr("Filter")
+            text: VLCIcons.search
+            description: I18n.qtr("Filter")
 
             focus: true
 
@@ -202,9 +202,9 @@ FocusScope {
                 anchors.rightMargin: VLCStyle.margin_xxsmall
 
                 font.pixelSize: VLCStyle.icon_banner
-                iconText: VLCIcons.close
+                text: VLCIcons.close
 
-                text: I18n.qtr("Clear")
+                description: I18n.qtr("Clear")
 
                 visible: (textField.text.length > 0)
 

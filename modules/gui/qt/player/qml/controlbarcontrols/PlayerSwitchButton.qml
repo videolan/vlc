@@ -23,7 +23,7 @@ import "qrc:///style/"
 import org.videolan.vlc 0.1
 
 Widgets.IconControlButton {
-    iconText: VLCIcons.fullscreen
+    text: VLCIcons.fullscreen
 
     onClicked: {
         if (History.match(History.viewPath, ["player"]))
@@ -32,5 +32,5 @@ Widgets.IconControlButton {
             History.push(["player"])
     }
 
-    text: I18n.qtr("Switch Player")
+    description: I18n.qtr("Switch Player")
 }
