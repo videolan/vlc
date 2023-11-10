@@ -194,9 +194,8 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     return total;
 }
 
-static void Close(vlc_object_t *obj)
+static void Close(sout_stream_t *stream)
 {
-    sout_stream_t *stream = (sout_stream_t *)obj;
     struct sout_stream_udp *sys = stream->p_sys;
 
     if (sys->sap != NULL)
@@ -214,6 +213,7 @@ static const struct sout_stream_operations ops = {
     .send = Send,
     .control = Control,
     .flush = Flush,
+    .close = Close,
 };
 
 static const char *const chain_options[] = {
@@ -367,5 +367,5 @@ vlc_module_begin()
     add_string(SOUT_CFG_PREFIX "name", "", NAME_TEXT, NAME_LONGTEXT)
     add_string(SOUT_CFG_PREFIX "description", "", DESC_TEXT, DESC_LONGTEXT)
 
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
