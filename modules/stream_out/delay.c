@@ -101,11 +101,20 @@ static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
     sout_StreamSetPCR( stream->p_next, pcr );
 }
 
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( sout_stream_t *p_stream )
+{
+    free( p_stream->p_sys );
+}
+
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 static const char *ppsz_sout_options[] = {
@@ -137,17 +146,6 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    free( p_sys );
-}
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define ID_TEXT N_("Elementary Stream ID")
@@ -165,7 +163,7 @@ vlc_module_begin()
     set_capability("sout filter", 50)
     add_shortcut("delay")
     set_subcategory(SUBCAT_SOUT_STREAM)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     add_integer(SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT)
     add_integer(SOUT_CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT)
 vlc_module_end()
