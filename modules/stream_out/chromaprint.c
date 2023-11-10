@@ -44,11 +44,11 @@
  * Exported prototypes
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
 
 static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
+static void  Close( sout_stream_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,7 +62,7 @@ vlc_module_begin ()
     add_shortcut( "chromaprint" )
     set_subcategory( SUBCAT_SOUT_STREAM )
     add_integer( "duration", 90, DURATION_TEXT, DURATION_LONGTEXT )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
@@ -91,6 +91,7 @@ static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -155,9 +156,8 @@ static void Finish( sout_stream_t *p_stream )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if ( !p_sys->b_done ) Finish( p_stream );
