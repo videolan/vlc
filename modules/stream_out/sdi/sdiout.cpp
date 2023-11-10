@@ -134,6 +134,37 @@ static_assert(ARRAY_SIZE(rgi_ar_values) == ARRAY_SIZE(rgsz_ar_text), "afd arrays
  * Sout callbacks
  *****************************************************************************/
 
+static void *SoutCallback_Add(sout_stream_t *p_stream,
+                       const es_format_t *fmt,
+                       const char *)
+{
+    auto *me = reinterpret_cast<sdi_sout::SDIOutput *>(p_stream->p_sys);
+    return me->Add(fmt);
+}
+
+static void SoutCallback_Del(sout_stream_t *p_stream, void *id)
+{
+    auto *me = reinterpret_cast<sdi_sout::SDIOutput *>(p_stream->p_sys);
+    me->Del(reinterpret_cast<sdi_sout::AbstractStream *>(id));
+}
+
+static int SoutCallback_Send(sout_stream_t *p_stream, void *id, block_t *p_block)
+{
+    auto *me = reinterpret_cast<sdi_sout::SDIOutput *>(p_stream->p_sys);
+    return me->Send(reinterpret_cast<sdi_sout::AbstractStream *>(id), p_block);
+}
+
+static int SoutCallback_Control(sout_stream_t *p_stream, int query, va_list args)
+{
+    auto *me = reinterpret_cast<sdi_sout::SDIOutput *>(p_stream->p_sys);
+    return me->Control(query, args);
+}
+
+static void SoutCallback_Flush(sout_stream_t *, void *id)
+{
+    reinterpret_cast<sdi_sout::AbstractStream *>(id)->Flush();
+}
+
 static void CloseSDIOutput(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
@@ -142,6 +173,16 @@ static void CloseSDIOutput(vlc_object_t *p_this)
     sdi->Process(); /* Drain */
     delete sdi;
 }
+
+static const sout_stream_operations ops = [] {
+    sout_stream_operations ops{};
+    ops.add = SoutCallback_Add;
+    ops.del = SoutCallback_Del;
+    ops.send = SoutCallback_Send;
+    ops.flush = SoutCallback_Flush;
+    ops.control = SoutCallback_Control;
+    return ops;
+}();
 
 static int OpenSDIOutput(vlc_object_t *p_this)
 {
@@ -154,6 +195,7 @@ static int OpenSDIOutput(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
     p_stream->p_sys = output;
+    p_stream->ops = &ops;
     return VLC_SUCCESS;
 }
 

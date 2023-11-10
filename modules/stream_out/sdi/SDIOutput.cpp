@@ -34,12 +34,6 @@ using namespace sdi_sout;
 SDIOutput::SDIOutput(sout_stream_t *p_stream_)
 {
     p_stream = p_stream_;
-    ops.add     = SoutCallback_Add;
-    ops.del     = SoutCallback_Del;
-    ops.send    = SoutCallback_Send;
-    ops.flush   = SoutCallback_Flush;
-    ops.control = SoutCallback_Control;
-    p_stream->ops = &ops;
 
     es_format_Init(&video.configuredfmt, VIDEO_ES, 0);
     video.tenbits = var_InheritBool(p_stream, CFG_PREFIX "tenbits");
@@ -216,33 +210,3 @@ AbstractStream *SDIOutput::createStream(const StreamID &id,
      return s;
 }
 
-void *SDIOutput::SoutCallback_Add(sout_stream_t *p_stream,
-                                  const es_format_t *fmt,
-                                  const char *)
-{
-    SDIOutput *me = reinterpret_cast<SDIOutput *>(p_stream->p_sys);
-    return me->Add(fmt);
-}
-
-void SDIOutput::SoutCallback_Del(sout_stream_t *p_stream, void *id)
-{
-    SDIOutput *me = reinterpret_cast<SDIOutput *>(p_stream->p_sys);
-    me->Del(reinterpret_cast<AbstractStream *>(id));
-}
-
-int SDIOutput::SoutCallback_Send(sout_stream_t *p_stream, void *id, block_t *p_block)
-{
-    SDIOutput *me = reinterpret_cast<SDIOutput *>(p_stream->p_sys);
-    return me->Send(reinterpret_cast<AbstractStream *>(id), p_block);
-}
-
-int SDIOutput::SoutCallback_Control(sout_stream_t *p_stream, int query, va_list args)
-{
-    SDIOutput *me = reinterpret_cast<SDIOutput *>(p_stream->p_sys);
-    return me->Control(query, args);
-}
-
-void SDIOutput::SoutCallback_Flush(sout_stream_t *, void *id)
-{
-    reinterpret_cast<AbstractStream *>(id)->Flush();
-}
