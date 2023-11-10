@@ -93,7 +93,7 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
         cache.pop_back();
         assert(cache_total >= purged->contentLength);
         cache_total -= purged->contentLength;
-        CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %u bytes",
+        CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %zu bytes",
                             purged->getStorageID().c_str(), cache_total));
         deleteSource(purged);
     }
@@ -184,7 +184,7 @@ AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
                     cache.remove(s);
                     assert(cache_total >= s->contentLength);
                     cache_total -= s->contentLength;
-                    CacheDebug(msg_Dbg(p_object, "Cache GET '%s' usage %u bytes",
+                    CacheDebug(msg_Dbg(p_object, "Cache GET '%s' usage %zu bytes",
                                        storageid.c_str(), cache_total));
                     return s;
                 }
@@ -225,13 +225,13 @@ void HTTPConnectionManager::recycleSource(AbstractChunkSource *source)
             cache.pop_back();
             assert(cache_total >= purged->contentLength);
             cache_total -= purged->contentLength;
-            CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %u bytes",
+            CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %zu bytes",
                                purged->getStorageID().c_str(), cache_total));
             deleteSource(purged);
         }
         cache.push_front(buf);
         cache_total += buf->contentLength;
-        CacheDebug(msg_Dbg(p_object, "Cache PUT '%s' usage %u bytes",
+        CacheDebug(msg_Dbg(p_object, "Cache PUT '%s' usage %zu bytes",
                            buf->getStorageID().c_str(), cache_total));
     }
     else
