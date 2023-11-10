@@ -32,14 +32,16 @@ RowLayout {
         colorSet: ColorContext.Window
     }
 
-    height: VLCStyle.heightBar_normal
     spacing: VLCStyle.margin_normal
 
     Accessible.role: Accessible.ToolBar
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: loop.height
+        Layout.fillHeight: true
+
+        implicitWidth: loop.implicitWidth
+        implicitHeight: loop.implicitHeight
 
         Widgets.IconToolButton {
             id: loop
@@ -60,7 +62,10 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: shuffle.height
+        Layout.fillHeight: true
+
+        implicitWidth: shuffle.implicitWidth
+        implicitHeight: shuffle.implicitHeight
 
         Widgets.IconToolButton {
             id: shuffle
@@ -78,7 +83,10 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: sort.height
+        Layout.fillHeight: true
+
+        implicitWidth: sort.implicitWidth
+        implicitHeight: sort.implicitHeight
 
         Widgets.SortControl {
             id: sort
@@ -125,7 +133,10 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: clear.height
+        Layout.fillHeight: true
+
+        implicitWidth: clear.implicitWidth
+        implicitHeight: clear.implicitHeight
 
         Widgets.IconToolButton {
             id: clear

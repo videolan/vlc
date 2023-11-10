@@ -55,8 +55,7 @@ T.Pane {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              contentHeight + topPadding + bottomPadding)
 
-    topPadding: VLCStyle.margin_normal
-    bottomPadding: VLCStyle.margin_normal
+    verticalPadding: VLCStyle.margin_normal
 
     Accessible.name: I18n.qtr("Playqueue")
 
@@ -144,7 +143,7 @@ T.Pane {
     }
 
     contentItem: ColumnLayout {
-        spacing: 0
+        spacing: VLCStyle.margin_xxsmall
 
         Layout.minimumWidth: noContentInfoColumn.implicitWidth
 
@@ -171,12 +170,16 @@ T.Pane {
             }
         }
 
+        Item {
+            // Spacer
+
+            implicitHeight: VLCStyle.margin_xsmall
+        }
+
         RowLayout {
             visible: model.count !== 0
 
             Layout.fillHeight: false
-            Layout.topMargin: VLCStyle.margin_normal
-            Layout.bottomMargin: VLCStyle.margin_xxsmall
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: Math.max(listView.ScrollBar.vertical.width, VLCStyle.margin_normal)
 
@@ -513,8 +516,11 @@ T.Pane {
         PlaylistToolbar {
             id: toolbar
 
+            Layout.preferredHeight: VLCStyle.heightBar_normal
             Layout.fillHeight: false
             Layout.fillWidth: true
+            Layout.leftMargin: VLCStyle.margin_normal
+            Layout.rightMargin: VLCStyle.margin_normal
         }
     }
 
