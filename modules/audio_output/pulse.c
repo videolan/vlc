@@ -77,7 +77,25 @@ typedef struct
     char *sink_force; /**< Forced sink name (stream must be NULL) */
 
     struct sink *sinks; /**< Locally-cached list of sinks */
+
+    vlc_tick_t timing_system_ts;
 } aout_sys_t;
+
+static vlc_tick_t stream_get_interpolated_latency(pa_stream *s,
+                                                  audio_output_t *aout,
+                                                  vlc_tick_t system_date)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (unlikely(sys->timing_system_ts == VLC_TICK_INVALID))
+        return 0;
+
+    vlc_tick_t latency = vlc_pa_get_latency(aout, sys->context, s);
+    if (unlikely(latency == VLC_TICK_INVALID))
+        return 0;
+
+    return latency + sys->timing_system_ts - system_date;
+}
 
 static void VolumeReport(audio_output_t *aout)
 {
@@ -325,17 +343,18 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         pa_usec_t rt;
         if (pa_stream_get_time(s, &rt) == 0 && rt > 0)
         {
+            /* Subtract the timestamp of the timing_info from the monotonic
+             * time */
+            pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
+            sys->timing_system_ts = vlc_tick_now()
+                                  - VLC_TICK_FROM_US(ti_age_us);
+
             if (likely(rt >= sys->flush_rt))
             {
-                /* Subtract the timestamp of the timing_info from the monotonic
-                 * time */
-                pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
-                vlc_tick_t system_ts = vlc_tick_now()
-                                     - VLC_TICK_FROM_US(ti_age_us);
-
                 rt -= sys->flush_rt;
 
-                aout_TimingReport(aout, system_ts, VLC_TICK_FROM_US(rt));
+                aout_TimingReport(aout, sys->timing_system_ts,
+                                  VLC_TICK_FROM_US(rt));
             }
 #ifndef NDEBUG
             else
@@ -654,6 +673,8 @@ static void Flush(audio_output_t *aout)
 
     stream_stop(s, aout);
 
+    sys->timing_system_ts = VLC_TICK_INVALID;
+
     const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
     const pa_timing_info *ti = pa_stream_get_timing_info(s);
     if (ti != NULL && !ti->read_index_corrupt)
@@ -915,6 +936,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     pa_cvolume_init(&sys->cvolume);
     sys->last_date = VLC_TICK_INVALID;
     sys->flush_rt = 0;
+
+    sys->timing_system_ts = VLC_TICK_INVALID;
 
     pa_format_info *formatv = pa_format_info_new();
     formatv->encoding = encoding;
