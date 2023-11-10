@@ -38,13 +38,12 @@
  * Module descriptor
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Gathering stream output") )
     set_capability( "sout filter", 50 )
     add_shortcut( "gather" )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -53,6 +52,7 @@ vlc_module_end ()
 static void *Add( sout_stream_t *, const es_format_t *, const char * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
+static void  Close( sout_stream_t * );
 
 typedef struct
 {
@@ -74,6 +74,7 @@ static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -96,9 +97,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id;
 
