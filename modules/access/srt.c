@@ -144,11 +144,11 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
                 passphrase_needs_free = false;
                 psz_passphrase = (char *) params.passphrase;
             }
-	    if (params.streamid != NULL ) {
-		free( psz_streamid );
-		streamid_needs_free = false;
-		psz_streamid = (char *) params.streamid;
-	    }
+            if (params.streamid != NULL ) {
+                free( psz_streamid );
+                streamid_needs_free = false;
+                psz_streamid = (char *) params.streamid;
+            }
         }
     }
 
@@ -217,7 +217,7 @@ out:
     if (passphrase_needs_free)
         free( psz_passphrase );
     if (streamid_needs_free)
-	free( psz_streamid );
+        free( psz_streamid );
     freeaddrinfo( res );
     free( url );
 
