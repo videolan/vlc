@@ -114,6 +114,11 @@ static void Flush(sout_stream_t *stream, void *id)
     sout_StreamFlush(stream->p_next, sys_id->next_id);
 }
 
+static void Close(sout_stream_t *stream)
+{
+    free(stream->p_sys);
+}
+
 #define SOUT_CFG_PREFIX "sout-trace-"
 
 static int Open(vlc_object_t *this)
@@ -135,16 +140,11 @@ static int Open(vlc_object_t *this)
         .set_pcr = SetPCR,
         .control = Control,
         .flush = Flush,
+        .close = Close,
     };
     stream->ops = &ops;
 
     return VLC_SUCCESS;
-}
-
-static void Close(vlc_object_t *this)
-{
-    sout_stream_t *stream = (sout_stream_t *)this;
-    free(stream->p_sys);
 }
 
 #define HELP_TEXT                                                              \
@@ -168,7 +168,7 @@ vlc_module_begin()
     set_capability("sout filter", 0)
     set_help(HELP_TEXT)
     add_shortcut("trace")
-    set_callbacks(Open, Close)
+    set_callback(Open)
 
     add_string(SOUT_CFG_PREFIX "name", NULL, NAME_TEXT, NAME_LONGTEXT)
 vlc_module_end()
