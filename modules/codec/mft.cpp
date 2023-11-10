@@ -1554,7 +1554,7 @@ static int FindMFT(decoder_t *p_dec)
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
         ListTransforms(p_dec, MFT_CATEGORY_VIDEO_DECODER, "video decoder");
     else
-        ListTransforms(p_dec, MFT_CATEGORY_VIDEO_DECODER, "audio decoder");
+        ListTransforms(p_dec, MFT_CATEGORY_AUDIO_DECODER, "audio decoder");
 
     UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
                  | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
