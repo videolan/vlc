@@ -868,6 +868,26 @@ error:
     return VLC_EGENERIC;
 }
 
+static void Close(sout_stream_t *stream)
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    if (sys->http_host != NULL)
+    {
+        httpd_UrlDelete(sys->http_manifest);
+        httpd_HostDelete(sys->http_host);
+    }
+
+    if (sys->manifest != NULL)
+        hls_storage_Destroy(sys->manifest);
+
+    hls_config_Clean(&sys->config);
+
+    hls_variant_maps_Destroy(&sys->variant_stream_maps);
+
+    free(sys);
+}
+
 #define SOUT_CFG_PREFIX "sout-hls-"
 
 static int Open(vlc_object_t *this)
@@ -962,6 +982,7 @@ static int Open(vlc_object_t *this)
         .send = Send,
         .set_pcr = SetPCR,
         .control = Control,
+        .close = Close,
     };
     stream->ops = &ops;
 
@@ -971,27 +992,6 @@ error:
     hls_config_Clean(&sys->config);
     free(sys);
     return status;
-}
-
-static void Close(vlc_object_t *this)
-{
-    sout_stream_t *stream = (sout_stream_t *)this;
-    sout_stream_sys_t *sys = stream->p_sys;
-
-    if (sys->http_host != NULL)
-    {
-        httpd_UrlDelete(sys->http_manifest);
-        httpd_HostDelete(sys->http_host);
-    }
-
-    if (sys->manifest != NULL)
-        hls_storage_Destroy(sys->manifest);
-
-    hls_config_Clean(&sys->config);
-
-    hls_variant_maps_Destroy(&sys->variant_stream_maps);
-
-    free(sys);
 }
 
 #define VARIANTS_LONGTEXT                                                      \
@@ -1044,5 +1044,5 @@ vlc_module_begin()
     add_bool(SOUT_CFG_PREFIX "pace", false, PACE_TEXT, PACE_LONGTEXT)
     add_integer(SOUT_CFG_PREFIX "seg-len", 4, SEGLEN_TEXT, SEGLEN_LONGTEXT)
 
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
