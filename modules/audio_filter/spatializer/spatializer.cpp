@@ -179,8 +179,9 @@ static int Open( vlc_object_t *p_this )
     for(unsigned i=0; i<ARRAY_SIZE(callbacks); ++i)
     {
         /* NOTE: C++ pointer-to-member function call from table lookup. */
-        (p_sys->p_reverbm->*(callbacks[i].fp_set))
-            (var_CreateGetFloatCommand(p_aout,callbacks[i].psz_name));
+        callback_s cb = callbacks[i];
+        float value = var_CreateGetFloatCommand(p_aout, cb.psz_name);
+        (p_sys->p_reverbm->*(cb.fp_set))(value);
         var_AddCallback( p_aout, callbacks[i].psz_name,
                          callbacks[i].fp_callback, p_sys );
     }
