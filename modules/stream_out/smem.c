@@ -86,7 +86,7 @@
                         "it will be rendered as fast as possible.")
 
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX "sout-smem-"
 #define SOUT_PREFIX_VIDEO SOUT_CFG_PREFIX"video-"
@@ -112,7 +112,7 @@ vlc_module_begin ()
         change_volatile()
     add_bool( SOUT_CFG_PREFIX "time-sync", true, T_TIME_SYNC, LT_TIME_SYNC )
         change_private()
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 
@@ -221,6 +221,7 @@ static const struct sout_stream_operations ops = {
     .del = Del,
     .send = Send,
     .control = Control,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -274,9 +275,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
     free( p_stream->p_sys );
 }
 
