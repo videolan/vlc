@@ -38,10 +38,15 @@
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
+#define GME_PLAYBACK_LIMIT N_("Automatically use track length metadata as the fadeout time")
+
 vlc_module_begin ()
     set_shortname ("GME")
     set_description ("Game Music Emu")
     set_subcategory (SUBCAT_INPUT_DEMUX)
+#if GME_VERSION >= 0x000603
+    add_bool("gme-playback-limit", false, GME_PLAYBACK_LIMIT, GME_PLAYBACK_LIMIT)
+#endif
     set_capability ("demux", 10)
     set_callbacks (Open, Close)
 vlc_module_end ()
@@ -106,6 +111,14 @@ static int Open (vlc_object_t *obj)
         free (sys);
         return VLC_ENOMEM;
     }
+
+    /* Autoload
+     * See https://github.com/libgme/game-music-emu/issues/77#issuecomment-1805027715 */
+#if GME_VERSION >= 0x000603
+    bool playback_limit = var_InheritBool(demux, "gme-playback-limit");
+    gme_set_autoload_playback_limit (sys->emu, playback_limit);
+#endif
+
     if (data)
     {
         gme_load_custom (sys->emu, ReaderBlock, data->i_buffer, data);
