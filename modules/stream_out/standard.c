@@ -57,7 +57,7 @@
   "Helper setting for dst, dst=bind+'/'+path. dst-parameter overrides this." )
 
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
+static void     Close   ( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX "sout-standard-"
 
@@ -86,7 +86,7 @@ vlc_module_begin ()
     add_obsolete_string( SOUT_CFG_PREFIX "email" ) /* since 4.0.0 */
     add_obsolete_string( SOUT_CFG_PREFIX "phone" ) /* since 3.0.0 */
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 
@@ -260,6 +260,7 @@ static const struct sout_stream_operations ops = {
     .send = Send,
     .control = Control,
     .flush = Flush,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -361,9 +362,8 @@ end:
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys    = p_stream->p_sys;
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
 
