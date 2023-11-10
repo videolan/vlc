@@ -53,7 +53,7 @@
 
 static int  OpenId    ( vlc_object_t * );
 static int  OpenLang  ( vlc_object_t * );
-static void Close     ( vlc_object_t * );
+static void Close     ( sout_stream_t * );
 
 #define SOUT_CFG_PREFIX_ID   "sout-setid-"
 #define SOUT_CFG_PREFIX_LANG "sout-setlang-"
@@ -65,7 +65,7 @@ vlc_module_begin()
     set_capability( "sout filter", 50 )
     add_shortcut( "setid" )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    set_callbacks( OpenId, Close )
+    set_callback( OpenId )
     add_integer( SOUT_CFG_PREFIX_ID "id", 0, ID_TEXT, ID_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX_ID "new-id", 0, NEWID_TEXT, NEWID_LONGTEXT )
 
@@ -75,7 +75,7 @@ vlc_module_begin()
     set_description( N_("Change the language of an elementary stream"))
     set_capability( "sout filter", 50 )
     add_shortcut( "setlang" )
-    set_callbacks( OpenLang, Close )
+    set_callback( OpenLang )
     add_integer( SOUT_CFG_PREFIX_LANG "id", 0, ID_TEXT, ID_LONGTEXT )
     add_string( SOUT_CFG_PREFIX_LANG "lang", "eng", LANG_TEXT, LANG_LONGTEXT )
 
@@ -156,6 +156,7 @@ static const struct sout_stream_operations lang_ops = {
     .del = Del,
     .send = Send,
     .set_pcr = SetPCR,
+    .close = Close,
 };
 
 static int OpenLang( vlc_object_t *p_this )
@@ -182,9 +183,8 @@ static int OpenLang( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
     free( p_sys->psz_language );
