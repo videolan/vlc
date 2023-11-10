@@ -43,7 +43,6 @@
  * Exported prototypes
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -65,7 +64,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "dst-prefix", "", DST_PREFIX_TEXT,
                 DST_PREFIX_LONGTEXT )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /* */
@@ -115,11 +114,13 @@ typedef struct
 
 static void OutputStart( sout_stream_t *p_stream );
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t * );
+static void Close( sout_stream_t * );
 
 static const struct sout_stream_operations ops = {
     .add = Add,
     .del = Del,
     .send = Send,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -168,9 +169,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( sout_stream_t *p_stream )
 {
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->p_out )
