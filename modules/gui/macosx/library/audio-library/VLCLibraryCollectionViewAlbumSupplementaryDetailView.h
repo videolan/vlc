@@ -36,6 +36,7 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAl
 
 @property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
 @property (readwrite, weak) IBOutlet NSButton *albumPrimaryDetailTextButton;
+@property (readwrite, weak) IBOutlet NSButton *albumSecondaryDetailTextButton;
 @property (readwrite, weak) IBOutlet NSTextField *albumYearAndDurationTextField;
 @property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
 @property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
@@ -44,6 +45,7 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAl
 - (IBAction)playAction:(id)sender;
 - (IBAction)enqueueAction:(id)sender;
 - (IBAction)primaryDetailAction:(id)sender;
+- (IBAction)secondaryDetailAction:(id)sender;
 
 @end
 

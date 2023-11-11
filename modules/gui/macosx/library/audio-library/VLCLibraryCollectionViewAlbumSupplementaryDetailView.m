@@ -68,12 +68,15 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
 
     _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    _albumPrimaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.albumPrimaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.albumSecondaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
 
     self.albumPrimaryDetailTextButton.action = @selector(primaryDetailAction:);
+    self.albumSecondaryDetailTextButton.action = @selector(secondaryDetailAction:);
 
     if (@available(macOS 10.14, *)) {
         self.albumPrimaryDetailTextButton.contentTintColor = NSColor.VLCAccentColor;
+        self.albumSecondaryDetailTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
     if(@available(macOS 10.12.2, *)) {
@@ -111,12 +114,16 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 
     _albumTitleTextField.stringValue = album.displayString;
     _albumPrimaryDetailTextButton.title = album.artistName;
+    _albumSecondaryDetailTextButton.title = album.genreString;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
 
     const BOOL primaryActionableDetail = album.primaryActionableDetail;
+    const BOOL secondaryActionableDetail = album.secondaryActionableDetail;
     self.albumPrimaryDetailTextButton.enabled = primaryActionableDetail;
+    self.albumSecondaryDetailTextButton.enabled = secondaryActionableDetail;
     if (@available(macOS 10.14, *)) {
         self.albumPrimaryDetailTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.albumSecondaryDetailTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
@@ -152,6 +159,18 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const id<VLCMediaLibraryItemProtocol> libraryItem = album.primaryActionableDetailLibraryItem;
+    [libraryWindow presentLibraryItem:libraryItem];
+}
+
+- (IBAction)secondaryDetailAction:(id)sender
+{
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
+    if (album == nil || !album.secondaryActionableDetail) {
+        return;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = album.secondaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 

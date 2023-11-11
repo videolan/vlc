@@ -112,6 +112,9 @@
                                                 <font key="font" metaFont="systemSemibold" size="17"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <connections>
+                                                <action selector="secondaryDetailAction:" target="HAc-or-XD8" id="cDV-Wr-lQD"/>
+                                            </connections>
                                         </button>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
                                             <rect key="frame" x="687" y="16" width="94" height="16"/>
@@ -225,6 +228,7 @@
             <connections>
                 <outlet property="albumArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
                 <outlet property="albumPrimaryDetailTextButton" destination="o9Q-0s-xRU" id="At9-hH-CJa"/>
+                <outlet property="albumSecondaryDetailTextButton" destination="jNq-xn-yIp" id="ESO-jC-EfW"/>
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="albumYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
