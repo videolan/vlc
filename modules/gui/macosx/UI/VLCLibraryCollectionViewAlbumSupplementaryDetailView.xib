@@ -105,7 +105,15 @@
                                                 <action selector="primaryDetailAction:" target="HAc-or-XD8" id="Afg-sr-HiT"/>
                                             </connections>
                                         </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jNq-xn-yIp">
+                                            <rect key="frame" x="225" y="0.0" width="469" height="48"/>
+                                            <buttonCell key="cell" type="bevel" title="Album secondary detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="3xV-LQ-O7O">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="systemSemibold" size="17"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        </button>
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
                                             <rect key="frame" x="687" y="16" width="94" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                                 <font key="font" metaFont="system"/>
@@ -115,11 +123,14 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="leading" secondItem="o9Q-0s-xRU" secondAttribute="trailing" constant="5" id="5IX-1t-Psn"/>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" constant="5" id="88t-Jp-57R"/>
                                         <constraint firstItem="o9Q-0s-xRU" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="QuO-Ev-i98"/>
-                                        <constraint firstItem="o9Q-0s-xRU" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="leading" id="R8I-I6-uGg"/>
                                         <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="SvO-zd-2zo" secondAttribute="centerY" id="TX6-cF-dnh"/>
                                         <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="15" id="Wfo-47-OGd"/>
+                                        <constraint firstItem="jNq-xn-yIp" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="eBH-UW-wtK"/>
                                         <constraint firstAttribute="bottom" secondItem="o9Q-0s-xRU" secondAttribute="bottom" id="lvh-r5-QzT"/>
+                                        <constraint firstAttribute="bottom" secondItem="jNq-xn-yIp" secondAttribute="bottom" id="msf-KD-aoJ"/>
                                         <constraint firstItem="o9Q-0s-xRU" firstAttribute="leading" secondItem="SvO-zd-2zo" secondAttribute="leading" id="nYc-fo-IyN"/>
                                     </constraints>
                                 </customView>
