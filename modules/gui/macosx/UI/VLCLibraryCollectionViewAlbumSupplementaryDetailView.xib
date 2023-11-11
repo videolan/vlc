@@ -94,15 +94,15 @@
                                     <rect key="frame" x="0.0" y="203" width="794" height="48"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-0s-xRU">
-                                            <rect key="frame" x="0.0" y="0.0" width="154" height="48"/>
-                                            <buttonCell key="cell" type="bevel" title="Album detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="SqJ-99-uiI">
+                                        <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-0s-xRU">
+                                            <rect key="frame" x="0.0" y="0.0" width="220" height="48"/>
+                                            <buttonCell key="cell" type="bevel" title="Album primary detail string" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="SqJ-99-uiI">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="systemSemibold" size="17"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="VLCAccentColor"/>
                                             <connections>
-                                                <action selector="detailAction:" target="HAc-or-XD8" id="gEr-Qz-9KQ"/>
+                                                <action selector="primaryDetailAction:" target="HAc-or-XD8" id="Afg-sr-HiT"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
@@ -213,7 +213,7 @@
             </constraints>
             <connections>
                 <outlet property="albumArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
-                <outlet property="albumDetailsTextButton" destination="o9Q-0s-xRU" id="vQv-Q6-HdR"/>
+                <outlet property="albumPrimaryDetailTextButton" destination="o9Q-0s-xRU" id="At9-hH-CJa"/>
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="albumYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>

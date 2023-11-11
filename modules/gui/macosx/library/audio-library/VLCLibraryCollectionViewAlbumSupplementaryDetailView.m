@@ -68,12 +68,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
 
     _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    _albumDetailsTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    _albumPrimaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
 
-    _albumDetailsTextButton.action = @selector(detailAction:);
+    self.albumPrimaryDetailTextButton.action = @selector(primaryDetailAction:);
 
     if (@available(macOS 10.14, *)) {
-        _albumDetailsTextButton.contentTintColor = NSColor.VLCAccentColor;
+        self.albumPrimaryDetailTextButton.contentTintColor = NSColor.VLCAccentColor;
     }
 
     if(@available(macOS 10.12.2, *)) {
@@ -110,13 +110,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     NSAssert(album != nil, @"represented item is not an album", nil);
 
     _albumTitleTextField.stringValue = album.displayString;
-    _albumDetailsTextButton.title = album.artistName;
+    _albumPrimaryDetailTextButton.title = album.artistName;
     _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
 
     const BOOL primaryActionableDetail = album.primaryActionableDetail;
-    self.albumDetailsTextButton.enabled = primaryActionableDetail;
+    self.albumPrimaryDetailTextButton.enabled = primaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.albumDetailsTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.albumPrimaryDetailTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
@@ -143,9 +143,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     [self.representedItem queue];
 }
 
-- (IBAction)detailAction:(id)sender
+- (IBAction)primaryDetailAction:(id)sender
 {
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem;
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
     if (album == nil || !album.primaryActionableDetail) {
         return;
     }
