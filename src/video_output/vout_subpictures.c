@@ -40,7 +40,6 @@
 
 #include "../libvlc.h"
 #include "vout_internal.h"
-#include "../misc/subpicture.h"
 #include "../input/input_internal.h"
 #include "../clock/clock.h"
 
@@ -52,6 +51,7 @@
 typedef struct {
     /* Shared with prerendering thread */
     subpicture_t *subpic; /* picture to be rendered */
+    struct VLC_VECTOR(picture_t *) scaled_region_pics;
     /* */
     vlc_tick_t orgstart; /* original picture timestamp, for conversion updates */
     vlc_tick_t orgstop;
@@ -152,6 +152,7 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
 {
     const spu_render_entry_t entry = {
         .subpic = subpic,
+        .scaled_region_pics = VLC_VECTOR_INITIALIZER,
         .orgstart = orgstart,
         .orgstop = orgstop,
         .start = subpic->i_start,
@@ -166,6 +167,15 @@ static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
     vlc_vector_foreach_ref(entry, &channel->entries)
     {
         assert(entry->subpic);
+
+        picture_t *pic;
+        vlc_vector_foreach(pic, &entry->scaled_region_pics)
+        {
+            if (pic != NULL)
+                picture_Release(pic);
+        }
+        vlc_vector_clear(&entry->scaled_region_pics);
+
         spu_PrerenderCancel(sys, entry->subpic);
         subpicture_Delete(entry->subpic);
     }
@@ -751,6 +761,23 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
                     is_rejected = true;
             }
 
+            if (!is_rejected)
+            {
+                size_t region_count = 0;
+                const subpicture_region_t *r;
+                vlc_spu_regions_foreach(r, &current->regions)
+                    region_count++;
+
+                while (region_count > render_entry->scaled_region_pics.size)
+                {
+                    if (!vlc_vector_push(&render_entry->scaled_region_pics, NULL))
+                    {
+                        is_rejected = true;
+                        break;
+                    }
+                }
+            }
+
             if (is_rejected)
             {
                 spu_PrerenderCancel(sys, current);
@@ -782,7 +809,9 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
  */
 static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                             spu_area_t *dst_area,
-                            const spu_render_entry_t *entry, subpicture_region_t *region,
+                            const spu_render_entry_t *entry,
+                            subpicture_region_t *region,
+                            picture_t **scaled_pic,
                             const spu_scale_t scale_size,
                             const vlc_fourcc_t *chroma_list,
                             const video_format_t *fmt,
@@ -959,30 +988,30 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
 
         /* Destroy the cache if unusable */
-        if (region->p_private) {
-            subpicture_region_private_t *private = region->p_private;
+        if (*scaled_pic) {
+            picture_t *private = *scaled_pic;
             bool is_changed = false;
 
             /* Check resize changes */
-            if (dst_width  != private->fmt.i_visible_width ||
-                dst_height != private->fmt.i_visible_height)
+            if (dst_width  != private->format.i_visible_width ||
+                dst_height != private->format.i_visible_height)
                 is_changed = true;
 
             /* Check forced palette changes */
             if (changed_palette)
                 is_changed = true;
 
-            if (convert_chroma && private->fmt.i_chroma != chroma_list[0])
+            if (convert_chroma && private->format.i_chroma != chroma_list[0])
                 is_changed = true;
 
             if (is_changed) {
-                subpicture_region_private_Delete(private);
-                region->p_private = NULL;
+                picture_Release(*scaled_pic);
+                *scaled_pic = NULL;
             }
         }
 
         /* Scale if needed into cache */
-        if (!region->p_private && dst_width > 0 && dst_height > 0) {
+        if (!*scaled_pic && dst_width > 0 && dst_height > 0) {
             filter_t *scale = sys->scale;
 
             picture_t *picture = region->p_picture;
@@ -1044,19 +1073,16 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 
             /* */
             if (picture) {
-                region->p_private = subpicture_region_private_New(&picture->format);
-                if (region->p_private) {
-                    region->p_private->p_picture = picture;
-                } else {
+                if (*scaled_pic)
                     picture_Release(picture);
-                }
+                *scaled_pic = picture;
             }
         }
 
         /* And use the scaled picture */
-        if (region->p_private) {
-            region_fmt     = region->p_private->fmt;
-            region_picture = region->p_private->p_picture;
+        if (*scaled_pic) {
+            region_fmt     = (*scaled_pic)->format;
+            region_picture = *scaled_pic;
         }
     }
 
@@ -1208,12 +1234,15 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         vlc_spu_regions_foreach(region, &subpic->regions)
             region_FixFmt(region);
 
+        size_t region_idx = 0;
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
          * first rendering to allow good subtitle overlap support.
          */
         vlc_spu_regions_foreach(region, &subpic->regions) {
             spu_area_t area;
+            picture_t **scaled_region_pic = &entry->scaled_region_pics.data[region_idx];
+            region_idx++;
 
             /* Compute region scale AR */
             vlc_rational_t region_sar = (vlc_rational_t) {
@@ -1259,7 +1288,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
-                            entry, region, virtual_scale,
+                            entry, region, scaled_region_pic, virtual_scale,
                             chroma_list, fmt_dst,
                             i_original_width, i_original_height,
                             subtitle_area, subtitle_area_count,
