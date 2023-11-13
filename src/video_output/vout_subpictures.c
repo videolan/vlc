@@ -803,7 +803,8 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 }
 
 static void SpuRescaleRegion(spu_t *spu,
-                             subpicture_region_t *region, picture_t **scaled_pic,
+                             const subpicture_region_t *region,
+                             picture_t **scaled_pic,
                              const spu_scale_t scale_size,
                              bool changed_palette, bool using_palette,
                              const vlc_fourcc_t *chroma_list)
@@ -922,7 +923,7 @@ static void SpuRescaleRegion(spu_t *spu,
 static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                             spu_area_t *dst_area,
                             const spu_render_entry_t *entry,
-                            subpicture_region_t *region,
+                            const subpicture_region_t *region,
                             picture_t **scaled_pic,
                             const spu_scale_t scale_size,
                             const vlc_fourcc_t *chroma_list,
