@@ -163,11 +163,13 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
 
 static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
 {
+    spu_render_entry_t *entry;
     for (size_t i = 0; i < channel->entries.size; i++)
     {
-        assert(channel->entries.data[i].subpic);
-        spu_PrerenderCancel(sys, channel->entries.data[i].subpic);
-        subpicture_Delete(channel->entries.data[i].subpic);
+        entry = &channel->entries.data[i];
+        assert(entry->subpic);
+        spu_PrerenderCancel(sys, entry->subpic);
+        subpicture_Delete(entry->subpic);
     }
     vlc_vector_clear(&channel->entries);
 }
@@ -2033,11 +2035,11 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         spu_render_entry_t *entry = &subpicture_array[i];
         subpicture_t *subpic = entry->subpic;
 
-        spu_PrerenderSync(sys, entry->subpic);
+        spu_PrerenderSync(sys, subpic);
 
         /* Update time to clock */
-        entry->subpic->i_start = entry->start;
-        entry->subpic->i_stop = entry->stop;
+        subpic->i_start = entry->start;
+        subpic->i_stop = entry->stop;
 
         subpicture_Update(subpic,
                           fmt_src, fmt_dst,
