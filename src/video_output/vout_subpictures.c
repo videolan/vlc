@@ -1294,7 +1294,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 region_FixFmt(rendered_text);
             }
 
-            const bool do_external_scale = external_scale && !subpicture_region_IsText( region );
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
 
             /* */
@@ -1308,7 +1307,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
-            if (do_external_scale)
+            if (external_scale)
             {
                 if (scale.h != SCALE_UNIT)
                 {
