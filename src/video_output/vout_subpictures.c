@@ -161,15 +161,6 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
     return vlc_vector_push(&channel->entries, entry) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void spu_channel_DeleteAt(struct spu_channel *channel, size_t index)
-{
-    assert(index < channel->entries.size);
-    assert(channel->entries.data[index].subpic);
-
-    subpicture_Delete(channel->entries.data[index].subpic);
-    vlc_vector_remove(&channel->entries, index);
-}
-
 static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
 {
     for (size_t i = 0; i < channel->entries.size; i++)
@@ -178,7 +169,7 @@ static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
         spu_PrerenderCancel(sys, channel->entries.data[i].subpic);
         subpicture_Delete(channel->entries.data[i].subpic);
     }
-    vlc_vector_destroy(&channel->entries);
+    vlc_vector_clear(&channel->entries);
 }
 
 static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
@@ -2104,22 +2095,12 @@ ssize_t spu_RegisterChannel(spu_t *spu)
     return spu_RegisterChannelInternal(spu, NULL, NULL);
 }
 
-static void spu_channel_Clear(spu_private_t *sys,
-                              struct spu_channel *channel)
-{
-    for (size_t i = 0; i < channel->entries.size; i++)
-    {
-        spu_PrerenderCancel(sys, channel->entries.data[i].subpic);
-        spu_channel_DeleteAt(channel, i);
-    }
-}
-
 void spu_ClearChannel(spu_t *spu, size_t channel_id)
 {
     spu_private_t *sys = spu->p;
     vlc_mutex_lock(&sys->lock);
     struct spu_channel *channel = spu_GetChannel(spu, channel_id);
-    spu_channel_Clear(sys, channel);
+    spu_channel_Clean(sys, channel);
     if (channel->clock)
     {
         vlc_clock_Reset(channel->clock);
