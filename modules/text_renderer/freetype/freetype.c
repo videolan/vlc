@@ -382,20 +382,20 @@ static subpicture_region_t *RenderYUVP( const subpicture_region_t *p_region_in,
     YUVFromXRGB( p_line->p_character[0].p_style->i_font_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
-    fmt.p_palette->i_entries = 16;
+    p_region->fmt.p_palette->i_entries = 16;
     for( i = 0; i < 8; i++ )
     {
-        fmt.p_palette->palette[i][0] = 0;
-        fmt.p_palette->palette[i][1] = 0x80;
-        fmt.p_palette->palette[i][2] = 0x80;
-        fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
+        p_region->fmt.p_palette->palette[i][0] = 0;
+        p_region->fmt.p_palette->palette[i][1] = 0x80;
+        p_region->fmt.p_palette->palette[i][2] = 0x80;
+        p_region->fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
-    for( i = 8; i < fmt.p_palette->i_entries; i++ )
+    for( i = 8; i < p_region->fmt.p_palette->i_entries; i++ )
     {
-        fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
-        fmt.p_palette->palette[i][1] = i_u;
-        fmt.p_palette->palette[i][2] = i_v;
-        fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
+        p_region->fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
+        p_region->fmt.p_palette->palette[i][1] = i_u;
+        p_region->fmt.p_palette->palette[i][2] = i_v;
+        p_region->fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
 
     p_dst = p_region->p_picture->Y_PIXELS;
