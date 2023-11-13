@@ -1692,6 +1692,9 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
             if( !es_format_IsSimilar( p_dec->fmt_in, &p_packetizer->fmt_out ) )
             {
                 msg_Dbg( p_dec, "restarting module due to input format change");
+                es_format_LogDifferences( vlc_object_logger(p_dec),
+                                          "decoder in", p_dec->fmt_in,
+                                          "packetizer out", &p_packetizer->fmt_out );
 
                 /* Drain the decoder module */
                 DecoderThread_DecodeBlock( p_owner, NULL );
