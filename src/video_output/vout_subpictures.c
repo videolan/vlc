@@ -164,9 +164,8 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
 static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
 {
     spu_render_entry_t *entry;
-    for (size_t i = 0; i < channel->entries.size; i++)
+    vlc_vector_foreach_ref(entry, &channel->entries)
     {
-        entry = &channel->entries.data[i];
         assert(entry->subpic);
         spu_PrerenderCancel(sys, entry->subpic);
         subpicture_Delete(entry->subpic);
@@ -596,9 +595,9 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
         goto end;
 
     vlc_clock_Lock(channel->clock);
-    for (size_t index = 0; index < channel->entries.size; index++)
+    spu_render_entry_t *entry;
+    vlc_vector_foreach_ref(entry, &channel->entries)
     {
-        spu_render_entry_t *entry = &channel->entries.data[index];
         assert(entry);
 
         vlc_tick_t ts;
@@ -684,8 +683,8 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             continue;
 
         /* Select available pictures */
-        for (size_t index = 0; index < channel->entries.size; index++) {
-            spu_render_entry_t *render_entry = &channel->entries.data[index];
+        spu_render_entry_t *render_entry;
+        vlc_vector_foreach_ref(render_entry, &channel->entries) {
             subpicture_t *current = render_entry->subpic;
             const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
@@ -725,7 +724,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
         /* Select pictures to be displayed */
         for (size_t index = 0; index < channel->entries.size; ) {
-            spu_render_entry_t *render_entry = &channel->entries.data[index];
+            render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
             bool is_late = render_entry->is_late;
 
