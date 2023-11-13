@@ -818,7 +818,9 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         if ( rendered_text  == NULL)
             // not a rendering error for Text-To-Speech
             return NULL;
-        // FIXME notify the caller it is allocated
+        // replace the text region with the rendered region
+        vlc_list_replace(&region->node, &rendered_text->node);
+        subpicture_region_Delete(region);
         region = rendered_text;
     }
 
