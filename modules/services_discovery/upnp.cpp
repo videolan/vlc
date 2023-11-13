@@ -170,7 +170,7 @@ vlc_module_begin()
         set_capability("sout output", 0)
         add_shortcut("dlna")
         set_subcategory(SUBCAT_SOUT_STREAM)
-        set_callbacks(DLNA::OpenSout, DLNA::CloseSout)
+        set_callback(DLNA::OpenSout)
 
         add_string(SOUT_CFG_PREFIX "ip", NULL, IP_ADDR_TEXT, IP_ADDR_LONGTEXT)
         add_integer(SOUT_CFG_PREFIX "port", 0, PORT_TEXT, PORT_LONGTEXT)

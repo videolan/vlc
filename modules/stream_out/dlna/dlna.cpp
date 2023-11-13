@@ -858,12 +858,22 @@ static void Del(sout_stream_t *p_stream, void *_id)
     }
 }
 
+static void CloseSout( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = static_cast<sout_stream_sys_t *>( p_stream->p_sys );
+
+    p_sys->renderer->ConnectionComplete();
+    p_sys->p_upnp->release();
+    delete p_sys;
+}
+
 static const struct sout_stream_operations ops = [] {
     struct sout_stream_operations ops {};
     ops.add = Add;
     ops.del = Del;
     ops.send = Send;
     ops.flush = Flush;
+    ops.close = CloseSout;
     return ops;
 }();
 
@@ -920,16 +930,6 @@ error:
     free(device_url);
     delete p_sys;
     return VLC_EGENERIC;
-}
-
-void CloseSout( vlc_object_t *p_this)
-{
-    sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>( p_this );
-    sout_stream_sys_t *p_sys = static_cast<sout_stream_sys_t *>( p_stream->p_sys );
-
-    p_sys->renderer->ConnectionComplete();
-    p_sys->p_upnp->release();
-    delete p_sys;
 }
 
 }
