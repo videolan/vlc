@@ -681,7 +681,6 @@ static void mrl_Clean( mrl_t *p_mrl )
 struct sout_stream_private {
     sout_stream_t stream;
     vlc_mutex_t lock;
-    module_t *module;
 };
 
 #define sout_stream_priv(s) \
@@ -772,16 +771,12 @@ static void sout_StreamDelete( sout_stream_t *p_stream )
     if (p_stream->ops != NULL && p_stream->ops->close != NULL)
         p_stream->ops->close(p_stream);
 
-    if (priv->module != NULL)
-        module_unneed(p_stream, priv->module); // Still needed for the modules on the old deactivate callback
-    else
-        vlc_objres_clear(VLC_OBJECT(p_stream));
-
     FREENULL( p_stream->psz_name );
 
     config_ChainDestroy( p_stream->p_cfg );
 
     msg_Dbg( p_stream, "destroying chain done" );
+    vlc_objres_clear(VLC_OBJECT(p_stream));
     vlc_object_delete(p_stream);
 }
 
@@ -859,9 +854,8 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
 
     msg_Dbg( p_stream, "stream=`%s'", p_stream->psz_name );
 
-    priv->module = module_need(p_stream, cap, p_stream->psz_name, true);
-
-    if (priv->module == NULL)
+    module_t *module = module_need(p_stream, cap, p_stream->psz_name, true);
+    if (module == NULL)
     {
         /* those must be freed by the caller if creation failed */
         p_stream->psz_name = NULL;
