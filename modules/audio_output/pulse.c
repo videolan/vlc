@@ -427,23 +427,24 @@ static void stream_drain(pa_stream *s, audio_output_t *aout)
         pa_operation_unref(op);
 
     if (sys->last_date == VLC_TICK_INVALID)
-        aout_DrainedReport(aout);
-    else
     {
-        sys->last_date = VLC_TICK_INVALID;
-        sys->flush_rt = 0;
-
-        /* XXX: Loosy drain emulation.
-         * See #18141: drain callback is never received */
-        sys->draining = true;
-        assert(sys->drain_trigger == NULL);
-        vlc_tick_t delay =
-            stream_get_interpolated_latency(s, aout, vlc_tick_now());
-
-        delay += pa_rtclock_now();
-        sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
-                                                   drain_trigger_cb, aout);
+        aout_DrainedReport(aout);
+        return;
     }
+
+    sys->last_date = VLC_TICK_INVALID;
+    sys->flush_rt = 0;
+
+    /* XXX: Loosy drain emulation.
+     * See #18141: drain callback is never received */
+    sys->draining = true;
+    assert(sys->drain_trigger == NULL);
+    vlc_tick_t delay =
+        stream_get_interpolated_latency(s, aout, vlc_tick_now());
+
+    delay += pa_rtclock_now();
+    sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
+                                               drain_trigger_cb, aout);
 }
 
 static void data_free(void *data)
