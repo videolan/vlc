@@ -85,7 +85,6 @@ struct subpicture_region_t
     vlc_rational_t  zoom_v;
 
     struct vlc_list node;             /**< for inclusion in a vlc_spu_regions */
-    subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
 
 typedef struct vlc_list vlc_spu_regions;

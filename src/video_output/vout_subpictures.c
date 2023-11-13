@@ -1925,11 +1925,6 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     if (subpic->i_channel == VOUT_SPU_CHANNEL_OSD)
         spu_ClearChannel(spu, VOUT_SPU_CHANNEL_OSD);
 
-    /* p_private is for spu only and cannot be non NULL here */
-    subpicture_region_t *r;
-    vlc_spu_regions_foreach(r, &subpic->regions)
-        assert(r->p_private == NULL);
-
     /* */
     vlc_mutex_lock(&sys->lock);
     struct spu_channel *channel = spu_GetChannel(spu, subpic->i_channel);

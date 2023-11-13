@@ -270,7 +270,6 @@ libvlccore_sources_base = files(
     'misc/text_style.c',
     'misc/sort.c',
     'misc/subpicture.c',
-    'misc/subpicture.h',
     'misc/medialibrary.c',
     'misc/viewpoint.c',
     'misc/rcu.c',
