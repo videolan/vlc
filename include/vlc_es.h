@@ -702,6 +702,21 @@ VLC_API void es_format_Clean( es_format_t *fmt );
 VLC_API bool es_format_IsSimilar( const es_format_t *, const es_format_t * );
 
 /**
+ * Log differences between 2 ES format.
+ * The difference checks the same fields as \ref es_format_IsSimilar
+ */
+VLC_API void es_format_LogDifferences(struct vlc_logger *,
+                                      const char *name_a, const es_format_t *a,
+                                      const char *name_b, const es_format_t *b);
+/**
+ * Log differences between 2 video format.
+ * The difference checks the same fields as \ref video_format_IsSimilar
+ */
+VLC_API void video_format_LogDifferences(struct vlc_logger *log,
+                                         const char *name_a, const video_format_t *a,
+                                         const char *name_b, const video_format_t *b);
+
+/**
  * Changes ES format to another category
  * Format must have been properly initialized
  */

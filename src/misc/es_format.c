@@ -239,6 +239,35 @@ bool video_format_IsSimilar( const video_format_t *f1,
     return true;
 }
 
+void video_format_LogDifferences(struct vlc_logger *log,
+                                 const char *name_a, const video_format_t *a,
+                                 const char *name_b, const video_format_t *b)
+{
+    if (a->i_chroma != b->i_chroma)
+        vlc_debug(log, "'%s/%s' category %4.4s / %4.4s", name_a, name_b, (char*)&a->i_chroma, (char*)&b->i_chroma);
+    if( a->i_width != b->i_width )
+        vlc_debug(log, "'%s/%s' i_width %u / %u", name_a, name_b, a->i_width, b->i_width);
+    if( a->i_height != b->i_height )
+        vlc_debug(log, "'%s/%s' i_height %u / %u", name_a, name_b, a->i_height, b->i_height);
+    if( a->i_visible_width != b->i_visible_width )
+        vlc_debug(log, "'%s/%s' i_visible_width %u / %u", name_a, name_b, a->i_visible_width, b->i_visible_width);
+    if( a->i_visible_height != b->i_visible_height )
+        vlc_debug(log, "'%s/%s' i_visible_height %u / %u", name_a, name_b, a->i_visible_height, b->i_visible_height);
+    if( a->i_x_offset != b->i_x_offset )
+        vlc_debug(log, "'%s/%s' i_x_offset %u / %u", name_a, name_b, a->i_x_offset, b->i_x_offset);
+    if( a->i_y_offset != b->i_y_offset )
+        vlc_debug(log, "'%s/%s' i_y_offset %u / %u", name_a, name_b, a->i_y_offset, b->i_y_offset);
+    if( (int64_t)a->i_sar_num * b->i_sar_den !=
+        (int64_t)b->i_sar_num * a->i_sar_den )
+        vlc_debug(log, "'%s/%s' SAR %u/%u / %u/%u", name_a, name_b, a->i_sar_den, a->i_sar_num, b->i_sar_den, b->i_sar_num);
+
+    if( a->orientation != b->orientation)
+        vlc_debug(log, "'%s/%s' orientation %d / %d", name_a, name_b, a->orientation, b->orientation);
+
+    if( a->multiview_mode!= b->multiview_mode )
+        vlc_debug(log, "'%s/%s' orientation %d / %d", name_a, name_b, a->multiview_mode, b->multiview_mode);
+}
+
 static const char *orient_to_string[] =
 {
     [ORIENT_NORMAL]             = "normal",
@@ -435,5 +464,62 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
     case SPU_ES:
     default:
         return true;
+    }
+}
+
+
+void es_format_LogDifferences(struct vlc_logger *log,
+                              const char *name_a, const es_format_t *a,
+                              const char *name_b, const es_format_t *b)
+{
+    if (a->i_cat != b->i_cat)
+        vlc_debug(log, "'%s/%s' category %d / %d", name_a, name_b, a->i_cat, b->i_cat);
+    if (a->i_codec != b->i_codec)
+    {
+        vlc_fourcc_t a_codec = vlc_fourcc_GetCodec(a->i_cat, a->i_codec);
+        vlc_fourcc_t b_codec = vlc_fourcc_GetCodec(a->i_cat, a->i_codec);
+        vlc_debug(log, "'%s/%s' codec %4.4s(%4.4s) / %4.4s(%4.4s)",
+                  name_a, name_b, (char*)&a_codec, (char*)&a->i_codec, (char*)&b_codec, (char*)&b->i_codec);
+    }
+    switch (a->i_cat)
+    {
+    case AUDIO_ES:
+    {
+        audio_format_t aa = a->audio;
+        audio_format_t ab = b->audio;
+
+        if( aa.i_format && ab.i_format && aa.i_format != ab.i_format )
+            vlc_debug(log, "'%s/%s' format %d / %d", name_a, name_b, aa.i_format, ab.i_format);
+        if( aa.channel_type != ab.channel_type)
+            vlc_debug(log, "'%s/%s' channel_type %d / %d",
+                      name_a, name_b, aa.channel_type, ab.channel_type);
+        if( aa.i_rate != ab.i_rate)
+            vlc_debug(log, "'%s/%s' i_rate %u / %u", name_a, name_b, aa.i_rate, ab.i_rate);
+        if( aa.i_channels != ab.i_channels)
+            vlc_debug(log, "'%s/%s' i_channels %" PRIu8 " / %" PRIu8 ,
+                      name_a, name_b, aa.i_channels, ab.i_channels);
+        if( aa.i_physical_channels != ab.i_physical_channels)
+            vlc_debug(log, "'%s/%s' i_physical_channels %" PRIu16 " / %" PRIu16 ,
+                      name_a, name_b, aa.i_physical_channels, ab.i_physical_channels);
+        if( aa.i_chan_mode != ab.i_chan_mode)
+            vlc_debug(log, "'%s/%s' i_chan_mode %" PRIu16 " / %" PRIu16 ,
+                      name_a, name_b, aa.i_chan_mode, ab.i_chan_mode);
+        if (a->i_profile != b->i_profile)
+            vlc_debug(log, "'%s/%s' profile %d / %d", name_a, name_b, a->i_profile, b->i_profile);
+        break;
+    }
+    case VIDEO_ES:
+        if (a->i_profile != b->i_profile)
+            vlc_debug(log, "'%s/%s' profile %d / %d", name_a, name_b, a->i_profile, b->i_profile);
+        video_format_t va = a->video;
+        video_format_t vb = b->video;
+        if( !va.i_chroma )
+            va.i_chroma = vlc_fourcc_GetCodec(a->i_cat, a->i_codec);
+        if( !vb.i_chroma )
+            vb.i_chroma = vlc_fourcc_GetCodec(b->i_cat, b->i_codec);
+        video_format_LogDifferences(log, name_a, &va, name_b, &vb);
+        break;
+    default:
+        break;
     }
 }
