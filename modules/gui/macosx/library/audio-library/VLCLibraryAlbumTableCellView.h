@@ -43,6 +43,7 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 @property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
 @property (readwrite, assign) IBOutlet NSTextField *albumNameTextField;
 @property (readwrite, assign) IBOutlet NSButton *artistNameTextButton;
+@property (readwrite, assign) IBOutlet NSButton *genreNameTextButton;
 @property (readwrite, assign) IBOutlet NSTextField *summaryTextField;
 @property (readwrite, assign) IBOutlet NSTextField *yearTextField;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
@@ -51,7 +52,8 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 @property (readwrite, assign, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
 - (IBAction)playInstantly:(id)sender;
-- (IBAction)detailAction:(id)sender;
+- (IBAction)primaryDetailAction:(id)sender;
+- (IBAction)secondaryDetailAction:(id)sender;
 
 @end
 

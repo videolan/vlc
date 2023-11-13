@@ -139,11 +139,14 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     [self setupTracksTableView];
     self.albumNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.artistNameTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
-    self.artistNameTextButton.action = @selector(detailAction:);
+    self.genreNameTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.artistNameTextButton.action = @selector(primaryDetailAction:);
+    self.genreNameTextButton.action = @selector(secondaryDetailAction:);
     self.trackingView.viewToHide = self.playInstantlyButton;
 
     if (@available(macOS 10.14, *)) {
         self.artistNameTextButton.contentTintColor = NSColor.VLCAccentColor;
+        self.genreNameTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
     [self prepareForReuse];
@@ -207,6 +210,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     self.representedImageView.image = nil;
     self.albumNameTextField.stringValue = @"";
     self.artistNameTextButton.title = @"";
+    self.genreNameTextButton.title = @"";
     self.yearTextField.stringValue = @"";
     self.summaryTextField.stringValue = @"";
     self.yearTextField.hidden = NO;
@@ -214,6 +218,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     if (@available(macOS 10.14, *)) {
         self.artistNameTextButton.contentTintColor = NSColor.VLCAccentColor;
+        self.genreNameTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
     _tracksDataSource.representedAlbum = nil;
@@ -256,7 +261,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     [self.representedItem play];
 }
 
-- (void)detailAction:(id)sender
+- (void)primaryDetailAction:(id)sender
 {
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
     if (album == nil || !album.primaryActionableDetail) {
@@ -265,6 +270,18 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const id<VLCMediaLibraryItemProtocol> libraryItem = album.primaryActionableDetailLibraryItem;
+    [libraryWindow presentLibraryItem:libraryItem];
+}
+
+- (void)secondaryDetailAction:(id)sender
+{
+    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
+    if (album == nil || !album.secondaryActionableDetail) {
+        return;
+    }
+
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = album.secondaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
@@ -286,6 +303,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     self.albumNameTextField.stringValue = album.title;
     self.artistNameTextButton.title = album.artistName;
+    self.genreNameTextButton.title = album.genreString;
 
     if (album.year > 0) {
         self.yearTextField.intValue = album.year;
@@ -300,9 +318,12 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }
 
     const BOOL primaryActionableDetail = album.primaryActionableDetail;
+    const BOOL secondaryActionableDetail = album.secondaryActionableDetail;
     self.artistNameTextButton.enabled = primaryActionableDetail;
+    self.genreNameTextButton.enabled = secondaryActionableDetail;
     if (@available(macOS 10.14, *)) {
         self.artistNameTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.genreNameTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {

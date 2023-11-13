@@ -35,25 +35,38 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kvo-td-z48">
+                        <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kvo-td-z48">
                             <rect key="frame" x="144" y="386" width="92" height="19"/>
-                            <buttonCell key="cell" type="bevel" title="Album artist" bezelStyle="rounded" alignment="left" imageScaling="proportionallyDown" inset="2" id="WVL-LH-ZiA">
+                            <buttonCell key="cell" type="bevel" title="Album artist" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" imageScaling="proportionallyDown" inset="2" id="WVL-LH-ZiA">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemSemibold" size="15"/>
                             </buttonCell>
                             <color key="contentTintColor" name="VLCAccentColor"/>
                             <connections>
-                                <action selector="detailAction:" target="c22-O7-iKe" id="Onc-S8-WGY"/>
+                                <action selector="primaryDetailAction:" target="c22-O7-iKe" id="Jo0-n2-tXc"/>
+                            </connections>
+                        </button>
+                        <button horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="VRD-00-4LN">
+                            <rect key="frame" x="241" y="386" width="96" height="19"/>
+                            <buttonCell key="cell" type="bevel" title="Album genre" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" imageScaling="proportionallyDown" inset="2" id="GDe-oq-fGP">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="systemSemibold" size="15"/>
+                            </buttonCell>
+                            <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                            <connections>
+                                <action selector="secondaryDetailAction:" target="c22-O7-iKe" id="9UB-E4-P5J"/>
                             </connections>
                         </button>
                     </subviews>
                     <constraints>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="VRD-00-4LN" secondAttribute="trailing" constant="20" id="1LW-wp-fJ6"/>
                         <constraint firstItem="lyR-U9-HKd" firstAttribute="top" secondItem="dd9-b1-XEf" secondAttribute="bottom" constant="5" id="36N-Cq-Zjf"/>
-                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="kvo-td-z48" secondAttribute="trailing" constant="20" id="Wg0-Tn-f2L"/>
+                        <constraint firstItem="VRD-00-4LN" firstAttribute="centerY" secondItem="kvo-td-z48" secondAttribute="centerY" id="5Va-uv-a7Y"/>
+                        <constraint firstItem="VRD-00-4LN" firstAttribute="leading" secondItem="kvo-td-z48" secondAttribute="trailing" constant="5" id="QSz-5D-E9n"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lyR-U9-HKd" secondAttribute="trailing" constant="20" id="dzL-hG-1nc"/>
                     </constraints>
                 </customView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
                     <rect key="frame" x="142" y="410" width="104" height="20"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Album name" id="aCe-ia-0Ww">
                         <font key="font" metaFont="systemSemibold" size="17"/>
@@ -102,6 +115,7 @@
             <connections>
                 <outlet property="albumNameTextField" destination="xJW-ps-ycn" id="nX9-SH-RZA"/>
                 <outlet property="artistNameTextButton" destination="kvo-td-z48" id="U94-du-RqP"/>
+                <outlet property="genreNameTextButton" destination="VRD-00-4LN" id="fqy-F2-oit"/>
                 <outlet property="playInstantlyButton" destination="KVh-Zn-l7I" id="Ri1-YF-Fe2"/>
                 <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>
                 <outlet property="summaryTextField" destination="dd9-b1-XEf" id="ne9-oA-zPw"/>
