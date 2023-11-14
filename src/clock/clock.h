@@ -209,6 +209,8 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
 
 /**
  * Wake up any vlc_clock_Wait()
+ *
+ * The clock mutex must be locked.
  */
 void vlc_clock_Wake(vlc_clock_t *clock);
 
