@@ -133,7 +133,6 @@ struct spu_private_t {
     vout_thread_t       *vout;
 };
 
-static void spu_PrerenderSync(spu_private_t *, const subpicture_t *);
 static void spu_PrerenderCancel(spu_private_t *, const subpicture_t *);
 
 static void spu_channel_Init(struct spu_channel *channel, size_t id,
