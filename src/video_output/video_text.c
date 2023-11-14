@@ -37,29 +37,16 @@ typedef struct {
     char *text;
 } osd_spu_updater_sys_t;
 
-static int OSDTextValidate(subpicture_t *subpic,
-                           bool has_src_changed, const video_format_t *fmt_src,
-                           bool has_dst_changed, const video_format_t *fmt_dst,
-                           vlc_tick_t ts)
-{
-    VLC_UNUSED(subpic); VLC_UNUSED(ts);
-    VLC_UNUSED(fmt_src); VLC_UNUSED(has_src_changed);
-    VLC_UNUSED(fmt_dst);
-
-    if( !has_dst_changed )
-        return VLC_SUCCESS;
-    return VLC_EGENERIC;
-}
-
 static void OSDTextUpdate(subpicture_t *subpic,
                           bool has_src_changed, const video_format_t *fmt_src,
                           bool has_dst_changed, const video_format_t *fmt_dst,
                           vlc_tick_t ts)
 {
     osd_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+    VLC_UNUSED(has_src_changed);
 
-    if (OSDTextValidate(subpic, has_src_changed, fmt_src,
-                                has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+    if (!has_dst_changed)
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );

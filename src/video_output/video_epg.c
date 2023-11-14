@@ -494,29 +494,16 @@ static void vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
                          regions );
 }
 
-static int OSDEpgValidate(subpicture_t *subpic,
-                          bool has_src_changed, const video_format_t *fmt_src,
-                          bool has_dst_changed, const video_format_t *fmt_dst,
-                          vlc_tick_t ts)
-{
-    VLC_UNUSED(subpic); VLC_UNUSED(ts);
-    VLC_UNUSED(fmt_src); VLC_UNUSED(has_src_changed);
-    VLC_UNUSED(fmt_dst);
-
-    if (!has_dst_changed)
-        return VLC_SUCCESS;
-    return VLC_EGENERIC;
-}
-
 static void OSDEpgUpdate(subpicture_t *subpic,
                          bool has_src_changed, const video_format_t *fmt_src,
                          bool has_dst_changed, const video_format_t *fmt_dst,
                          vlc_tick_t ts)
 {
     epg_spu_updater_sys_t *sys = subpic->updater.p_sys;
+    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+    VLC_UNUSED(has_src_changed);
 
-    if (OSDEpgValidate(subpic, has_src_changed, fmt_src,
-                               has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+    if (!has_dst_changed)
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );
