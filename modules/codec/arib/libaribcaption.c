@@ -69,8 +69,6 @@ typedef struct
 {
     decoder_sys_t         *p_dec_sys;
     vlc_tick_t             i_pts;
-    unsigned               i_render_area_width;
-    unsigned               i_render_area_height;
     aribcc_render_result_t render_result;
 } libaribcaption_spu_updater_sys_t;
 
@@ -127,14 +125,13 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
                          p_src_format->i_visible_height != prev_src->i_visible_height;
     bool b_dst_changed = !video_format_IsSimilar(prev_dst, p_dst_format);
 
+    unsigned i_render_area_width  = p_dst_format->i_visible_width;
+    unsigned i_render_area_height = p_src_format->i_visible_height * p_dst_format->i_visible_width /
+                                    p_src_format->i_visible_width;
     if (b_src_changed || b_dst_changed) {
-        const video_format_t *fmt = p_dst_format;
         /* don't let library freely scale using either the min of width or height ratio */
-        p_spusys->i_render_area_width = fmt->i_visible_width;
-        p_spusys->i_render_area_height = p_src_format->i_visible_height * fmt->i_visible_width /
-                                         p_src_format->i_visible_width;
-        aribcc_renderer_set_frame_size(p_sys->p_renderer, p_spusys->i_render_area_width,
-                                                          p_spusys->i_render_area_height);
+        aribcc_renderer_set_frame_size(p_sys->p_renderer, i_render_area_width,
+                                                          i_render_area_height);
     }
 
     const vlc_tick_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
@@ -166,8 +163,8 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     aribcc_image_t *p_images = p_spusys->render_result.images;
     uint32_t        i_image_count = p_spusys->render_result.image_count;
 
-    p_subpic->i_original_picture_width = p_spusys->i_render_area_width;
-    p_subpic->i_original_picture_height = p_spusys->i_render_area_height;
+    p_subpic->i_original_picture_width = i_render_area_width;
+    p_subpic->i_original_picture_height = i_render_area_height;
 
     if (!p_images || i_image_count == 0) {
         return;
