@@ -429,13 +429,9 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 
     vlc_mutex_lock( &p_sys->lock );
 
-    video_format_t fmt = *p_fmt_dst;
-    fmt.i_chroma         = VLC_CODEC_RGBA;
-    fmt.i_x_offset       = 0;
-    fmt.i_y_offset       = 0;
     if( b_fmt_src || b_fmt_dst )
     {
-        ass_set_frame_size( p_sys->p_renderer, fmt.i_visible_width, fmt.i_visible_height );
+        ass_set_frame_size( p_sys->p_renderer, p_fmt_dst->i_visible_width, p_fmt_dst->i_visible_height );
 #if LIBASS_VERSION > 0x01010000
         ass_set_storage_size( p_sys->p_renderer, p_fmt_src->i_visible_width, p_fmt_src->i_visible_height );
 #endif
@@ -460,8 +456,8 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     vlc_spu_regions_Clear( &p_subpic->regions );
 
     /* */
-    p_subpic->i_original_picture_height = fmt.i_visible_height;
-    p_subpic->i_original_picture_width = fmt.i_visible_width;
+    p_subpic->i_original_picture_height = p_fmt_dst->i_visible_height;
+    p_subpic->i_original_picture_width = p_fmt_dst->i_visible_width;
 
     /* XXX to improve efficiency we merge regions that are close minimizing
      * the lost surface.
@@ -471,7 +467,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
      */
     const int i_max_region = 4;
     rectangle_t region[i_max_region];
-    const int i_region = BuildRegions( region, i_max_region, p_img, fmt.i_width, fmt.i_height );
+    const int i_region = BuildRegions( region, i_max_region, p_img, p_fmt_dst->i_width, p_fmt_dst->i_height );
 
     if( i_region <= 0 )
     {
@@ -480,13 +476,16 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     }
 
     /* Allocate the regions and draw them */
+    video_format_t fmt_region;
+    fmt_region = *p_fmt_dst;
+    fmt_region.i_chroma   = VLC_CODEC_RGBA;
+    fmt_region.i_x_offset = 0;
+    fmt_region.i_y_offset = 0;
     for( int i = 0; i < i_region; i++ )
     {
         subpicture_region_t *r;
-        video_format_t fmt_region;
 
         /* */
-        fmt_region = fmt;
         fmt_region.i_width =
         fmt_region.i_visible_width  = region[i].x1 - region[i].x0;
         fmt_region.i_height =
