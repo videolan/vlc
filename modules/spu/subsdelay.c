@@ -970,20 +970,17 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, c
     }
 
     /* call source update */
-    if( p_entry->p_source->updater.pf_update )
-    {
-        i_new_ts = p_entry->p_source->i_start +
-                   ( (double)( p_entry->p_source->i_stop - p_entry->p_source->i_start ) * ( i_ts - p_entry->p_source->i_start ) ) /
-                   ( p_entry->i_new_stop - p_entry->p_source->i_start );
+    i_new_ts = p_entry->p_source->i_start +
+                ( (double)( p_entry->p_source->i_stop - p_entry->p_source->i_start ) * ( i_ts - p_entry->p_source->i_start ) ) /
+                ( p_entry->i_new_stop - p_entry->p_source->i_start );
 
-        p_entry->p_source->regions = p_entry->p_subpic->regions;
+    p_entry->p_source->regions = p_entry->p_subpic->regions;
 
-        p_entry->p_source->updater.pf_update( p_entry->p_source,
-                                              has_src_changed, p_fmt_src,
-                                              has_dst_changed, p_fmt_dst, i_new_ts );
+    p_entry->p_source->updater.pf_update( p_entry->p_source,
+                                          has_src_changed, p_fmt_src,
+                                          has_dst_changed, p_fmt_dst, i_new_ts );
 
-        p_entry->p_subpic->regions = p_entry->p_source->regions;
-    }
+    p_entry->p_subpic->regions = p_entry->p_source->regions;
 
     SubpicLocalUpdate( p_subpic, i_ts );
 }
