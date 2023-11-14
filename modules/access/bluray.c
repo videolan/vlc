@@ -1630,13 +1630,11 @@ static void updater_unlock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
     vlc_mutex_unlock(&p_upd_sys->lock);
 }
 
-static int subpictureUpdaterValidate(subpicture_t *p_subpic,
-                                      bool b_fmt_src, const video_format_t *p_fmt_src,
-                                      bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                                      vlc_tick_t i_ts)
+static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
+                                    bool b_fmt_src, const video_format_t *p_fmt_src,
+                                    bool b_fmt_dst, const video_format_t *p_fmt_dst,
+                                    vlc_tick_t i_ts)
 {
-    VLC_UNUSED(b_fmt_src);
-    VLC_UNUSED(b_fmt_dst);
     VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(p_fmt_dst);
     VLC_UNUSED(i_ts);
@@ -1645,33 +1643,16 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
     if (!p_overlay) {
-        return VLC_EGENERIC;
+        return;
     }
 
-    int res = p_overlay->status == Outdated ? VLC_EGENERIC : VLC_SUCCESS;
-
-    updater_unlock_overlay(p_upd_sys);
-
-    return res;
-}
-
-static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
-                                    bool b_fmt_src, const video_format_t *p_fmt_src,
-                                    bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                                    vlc_tick_t i_ts)
-{
-    bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
-    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
-
-    if (subpictureUpdaterValidate(p_subpic, b_fmt_src, p_fmt_src,
-                                            b_fmt_dst, p_fmt_dst, i_ts) == VLC_SUCCESS)
+    if (p_overlay->status != Outdated)
+    {
+        updater_unlock_overlay(p_upd_sys);
         return;
+    }
 
     vlc_spu_regions_Clear( &p_subpic->regions );
-
-    if (!p_overlay) {
-        return;
-    }
 
     /*
      * When this function is called, all p_subpic regions are gone.
