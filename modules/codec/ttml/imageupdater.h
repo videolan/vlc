@@ -73,27 +73,17 @@ static void TTML_ImageSpuAppendRegion(ttml_image_updater_sys_t *p_sys,
     p_sys->pp_append = &p_new->p_next;
 }
 
-static int TTML_ImageSpuValidate(subpicture_t *p_spu,
-                                 bool b_src_changed, const video_format_t *p_fmt_src,
-                                 bool b_dst_changed, const video_format_t *p_fmt_dst,
-                                 vlc_tick_t ts)
-{
-    VLC_UNUSED(p_spu);
-    VLC_UNUSED(b_src_changed); VLC_UNUSED(p_fmt_src);
-    VLC_UNUSED(p_fmt_dst);
-    VLC_UNUSED(ts);
-    return b_dst_changed ? VLC_EGENERIC: VLC_SUCCESS;
-}
-
 static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
                                 bool b_src_changed, const video_format_t *p_fmt_src,
                                 bool b_dst_changed, const video_format_t *p_fmt_dst,
                                 vlc_tick_t i_ts)
 {
+    VLC_UNUSED(p_fmt_src);
+    VLC_UNUSED(i_ts);
+    VLC_UNUSED(b_src_changed);
     ttml_image_updater_sys_t *p_sys = p_spu->updater.p_sys;
 
-    if (TTML_ImageSpuValidate(p_spu, b_src_changed, p_fmt_src,
-                                     b_dst_changed, p_fmt_dst, i_ts) == VLC_SUCCESS)
+    if (!b_dst_changed)
         return;
 
     vlc_spu_regions_Clear( &p_spu->regions );
