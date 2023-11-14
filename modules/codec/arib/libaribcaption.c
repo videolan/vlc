@@ -156,11 +156,15 @@ static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
 }
 
 static void SubpictureUpdate(subpicture_t *p_subpic,
-                             const video_format_t *p_src_format,
-                             const video_format_t *p_dst_format,
+                             bool b_src_changed, const video_format_t *p_src_format,
+                             bool b_dst_changed, const video_format_t *p_dst_format,
                              vlc_tick_t i_ts)
 {
-    VLC_UNUSED(p_src_format); VLC_UNUSED(p_dst_format); VLC_UNUSED(i_ts);
+    if (SubpictureValidate(p_subpic, b_src_changed, p_src_format,
+                                     b_dst_changed, p_dst_format, i_ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &p_subpic->regions );
 
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
 
@@ -258,7 +262,6 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     memset(&p_spusys->render_result, 0, sizeof(p_spusys->render_result));
 
     subpicture_updater_t updater = {
-        .pf_validate = SubpictureValidate,
         .pf_update   = SubpictureUpdate,
         .pf_destroy  = SubpictureDestroy,
         .p_sys       = p_spusys,

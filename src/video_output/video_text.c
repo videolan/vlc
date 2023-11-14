@@ -52,12 +52,17 @@ static int OSDTextValidate(subpicture_t *subpic,
 }
 
 static void OSDTextUpdate(subpicture_t *subpic,
-                          const video_format_t *fmt_src,
-                          const video_format_t *fmt_dst,
+                          bool has_src_changed, const video_format_t *fmt_src,
+                          bool has_dst_changed, const video_format_t *fmt_dst,
                           vlc_tick_t ts)
 {
     osd_spu_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+
+    if (OSDTextValidate(subpic, has_src_changed, fmt_src,
+                                has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &subpic->regions );
 
     if( fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0 )
         return;
@@ -116,7 +121,6 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     sys->text     = strdup(text);
 
     subpicture_updater_t updater = {
-        .pf_validate = OSDTextValidate,
         .pf_update   = OSDTextUpdate,
         .pf_destroy  = OSDTextDestroy,
         .p_sys       = sys,

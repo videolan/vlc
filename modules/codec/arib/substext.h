@@ -61,12 +61,17 @@ static int SubpictureTextValidate(subpicture_t *subpic,
     return VLC_EGENERIC;
 }
 static void SubpictureTextUpdate(subpicture_t *subpic,
-                                 const video_format_t *fmt_src,
-                                 const video_format_t *fmt_dst,
+                                 bool has_src_changed, const video_format_t *fmt_src,
+                                 bool has_dst_changed, const video_format_t *fmt_dst,
                                  vlc_tick_t ts)
 {
     arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+
+    if (SubpictureTextValidate(subpic, has_src_changed, fmt_src,
+                                       has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &subpic->regions );
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
     {
@@ -131,7 +136,6 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
     arib_spu_updater_sys_t *sys = (arib_spu_updater_sys_t*)
         calloc( 1, sizeof(arib_spu_updater_sys_t) );
     subpicture_updater_t updater = {
-        .pf_validate = SubpictureTextValidate,
         .pf_update   = SubpictureTextUpdate,
         .pf_destroy  = SubpictureTextDestroy,
         .p_sys       = sys,

@@ -268,13 +268,18 @@ static int OSDWidgetValidate(subpicture_t *subpic,
 }
 
 static void OSDWidgetUpdate(subpicture_t *subpic,
-                          const video_format_t *fmt_src,
-                          const video_format_t *fmt_dst,
-                          vlc_tick_t ts)
+                            bool has_src_changed, const video_format_t *fmt_src,
+                            bool has_dst_changed, const video_format_t *fmt_dst,
+                            vlc_tick_t ts)
 {
     osdwidget_spu_updater_sys_t *sys = subpic->updater.p_sys;
     subpicture_region_t *p_region;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+
+    if (OSDWidgetValidate(subpic, has_src_changed, fmt_src,
+                                  has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &subpic->regions );
 
     video_format_t fmt = *fmt_dst;
     fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
@@ -312,7 +317,6 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     sys->position = position;
 
     subpicture_updater_t updater = {
-        .pf_validate = OSDWidgetValidate,
         .pf_update   = OSDWidgetUpdate,
         .pf_destroy  = OSDWidgetDestroy,
         .p_sys       = sys,

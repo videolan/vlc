@@ -1656,15 +1656,18 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
 }
 
 static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
-                                    const video_format_t *p_fmt_src,
-                                    const video_format_t *p_fmt_dst,
+                                    bool b_fmt_src, const video_format_t *p_fmt_src,
+                                    bool b_fmt_dst, const video_format_t *p_fmt_dst,
                                     vlc_tick_t i_ts)
 {
-    VLC_UNUSED(p_fmt_src);
-    VLC_UNUSED(p_fmt_dst);
-    VLC_UNUSED(i_ts);
     bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
+
+    if (subpictureUpdaterValidate(p_subpic, b_fmt_src, p_fmt_src,
+                                            b_fmt_dst, p_fmt_dst, i_ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &p_subpic->regions );
 
     if (!p_overlay) {
         return;
@@ -1726,7 +1729,6 @@ static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
     p_upd_sys->p_overlay = p_ov;
 
     subpicture_updater_t updater = {
-        .pf_validate = subpictureUpdaterValidate,
         .pf_update   = subpictureUpdaterUpdate,
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,

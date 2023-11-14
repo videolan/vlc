@@ -509,12 +509,17 @@ static int OSDEpgValidate(subpicture_t *subpic,
 }
 
 static void OSDEpgUpdate(subpicture_t *subpic,
-                         const video_format_t *fmt_src,
-                         const video_format_t *fmt_dst,
+                         bool has_src_changed, const video_format_t *fmt_src,
+                         bool has_dst_changed, const video_format_t *fmt_dst,
                          vlc_tick_t ts)
 {
     epg_spu_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+
+    if (OSDEpgValidate(subpic, has_src_changed, fmt_src,
+                               has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &subpic->regions );
 
     video_format_t fmt = *fmt_dst;
     fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
@@ -622,7 +627,6 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
         sys->art = GetDefaultArtUri();
 
     subpicture_updater_t updater = {
-        .pf_validate = OSDEpgValidate,
         .pf_update   = OSDEpgUpdate,
         .pf_destroy  = OSDEpgDestroy,
         .p_sys       = sys

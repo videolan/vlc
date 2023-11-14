@@ -71,7 +71,6 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
     {
         p_subpic->p_private = NULL;
 
-        p_subpic->updater.pf_validate = NULL;
         p_subpic->updater.pf_update   = NULL;
         p_subpic->updater.pf_destroy  = NULL;
         p_subpic->updater.p_sys       = NULL;
@@ -171,19 +170,12 @@ void subpicture_Update( subpicture_t *p_subpicture,
     subpicture_updater_t *p_upd = &p_subpicture->updater;
     subpicture_private_t *p_private = p_subpicture->p_private;
 
-    if( !p_upd->pf_validate )
-        return;
-    if( !p_upd->pf_validate( p_subpicture,
-                          !video_format_IsSimilar( p_fmt_src,
-                                                   &p_private->src ), p_fmt_src,
-                          !video_format_IsSimilar( p_fmt_dst,
-                                                   &p_private->dst ), p_fmt_dst,
-                          i_ts ) )
-        return;
-
-    vlc_spu_regions_Clear( &p_subpicture->regions );
-
-    p_upd->pf_update( p_subpicture, p_fmt_src, p_fmt_dst, i_ts );
+    p_upd->pf_update( p_subpicture,
+                      !video_format_IsSimilar( &p_private->src,
+                                               p_fmt_src ), p_fmt_src,
+                      !video_format_IsSimilar( &p_private->dst,
+                                               p_fmt_dst ), p_fmt_dst,
+                      i_ts );
 
     video_format_Clean( &p_private->src );
     video_format_Clean( &p_private->dst );

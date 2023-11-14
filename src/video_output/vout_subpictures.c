@@ -2046,9 +2046,6 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         entry->subpic->i_start = entry->start;
         entry->subpic->i_stop = entry->stop;
 
-        if (!subpic->updater.pf_validate)
-            continue;
-
         subpicture_Update(subpic,
                           fmt_src, fmt_dst,
                           subpic->b_subtitle ? render_subtitle_date : system_now);

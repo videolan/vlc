@@ -840,8 +840,8 @@ exit:
    Looks good with white though since it's all luma. Hopefully that will be the
    common case. */
 static void TigerUpdateSubpicture( subpicture_t *p_subpic,
-                                   const video_format_t *p_fmt_src,
-                                   const video_format_t *p_fmt_dst,
+                                   bool b_fmt_src, const video_format_t *p_fmt_src,
+                                   bool b_fmt_dst, const video_format_t *p_fmt_dst,
                                    vlc_tick_t ts )
 {
     kate_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
@@ -850,6 +850,11 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
     kate_float t;
     int i_ret;
 
+    if (TigerValidateSubpicture(p_subpic, b_fmt_src, p_fmt_src,
+                                          b_fmt_dst, p_fmt_dst, ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &p_subpic->regions );
 
     /* time in seconds from the start of the stream */
     t = (p_spusys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
@@ -1030,7 +1035,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     }
     subpicture_updater_t updater = {
 #ifdef HAVE_TIGER
-        .pf_validate = TigerValidateSubpicture,
         .pf_update   = TigerUpdateSubpicture,
         .pf_destroy  = TigerDestroySubpicture,
 #endif

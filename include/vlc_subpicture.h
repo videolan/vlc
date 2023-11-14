@@ -177,19 +177,12 @@ VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
  */
 typedef struct
 {
-    /** Optional pre update callback, usually useful on video format change.
-      * Will skip pf_update on VLC_SUCCESS, or will delete every region before
-      * the call to pf_update */
-    int  (*pf_validate)( subpicture_t *,
-                         bool has_src_changed, const video_format_t *p_fmt_src,
-                         bool has_dst_changed, const video_format_t *p_fmt_dst,
-                         vlc_tick_t);
-    /** Mandatory callback called after pf_validate and doing
+    /** Mandatory callback doing
       * the main job of creating the subpicture regions for the
       * current video_format */
     void (*pf_update)  ( subpicture_t *,
-                         const video_format_t *p_fmt_src,
-                         const video_format_t *p_fmt_dst,
+                         bool has_src_changed, const video_format_t *p_fmt_src,
+                         bool has_dst_changed, const video_format_t *p_fmt_dst,
                          vlc_tick_t );
     /** Optional callback for subpicture private data cleanup */
     void (*pf_destroy) ( subpicture_t * );

@@ -86,13 +86,17 @@ static int TTML_ImageSpuValidate(subpicture_t *p_spu,
 }
 
 static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
-                                const video_format_t *p_fmt_src,
-                                const video_format_t *p_fmt_dst,
+                                bool b_src_changed, const video_format_t *p_fmt_src,
+                                bool b_dst_changed, const video_format_t *p_fmt_dst,
                                 vlc_tick_t i_ts)
 {
-    VLC_UNUSED(p_fmt_src);
-    VLC_UNUSED(i_ts);
     ttml_image_updater_sys_t *p_sys = p_spu->updater.p_sys;
+
+    if (TTML_ImageSpuValidate(p_spu, b_src_changed, p_fmt_src,
+                                     b_dst_changed, p_fmt_dst, i_ts) == VLC_SUCCESS)
+        return;
+
+    vlc_spu_regions_Clear( &p_spu->regions );
 
     /* !WARN: SMPTE-TT image profile requires no scaling, and even it
               would, it does not store the necessary original pic size */
@@ -138,7 +142,6 @@ static inline subpicture_t *decoder_NewTTML_ImageSpu(decoder_t *p_dec)
     if(!p_sys)
         return NULL;
     subpicture_updater_t updater = {
-        .pf_validate = TTML_ImageSpuValidate,
         .pf_update   = TTML_ImageSpuUpdate,
         .pf_destroy  = TTML_ImageSpuDestroy,
         .p_sys       = p_sys,
