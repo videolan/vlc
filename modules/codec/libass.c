@@ -86,7 +86,6 @@ typedef struct
     /* */
     ASS_Library    *p_library;
     ASS_Renderer   *p_renderer;
-    video_format_t fmt;
 
     /* */
     ASS_Track      *p_track;
@@ -142,7 +141,6 @@ static int Create( vlc_object_t *p_this )
     /* */
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
-    video_format_Init( &p_sys->fmt, 0 );
     p_sys->i_last_pts = VLC_TICK_INVALID;
     p_sys->i_max_stop = VLC_TICK_INVALID;
     p_sys->p_library  = NULL;
@@ -436,7 +434,6 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         const double src_ratio = (double)p_fmt_src->i_visible_width / p_fmt_src->i_visible_height;
         const double dst_ratio = (double)p_fmt_dst->i_visible_width / p_fmt_dst->i_visible_height;
         ass_set_aspect_ratio( p_sys->p_renderer, dst_ratio / src_ratio, 1 );
-        p_sys->fmt = fmt;
     }
 
     /* */
@@ -453,8 +450,6 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     }
 
     vlc_spu_regions_Clear( &p_subpic->regions );
-
-    fmt = p_sys->fmt;
 
     /* */
     p_subpic->i_original_picture_height = fmt.i_visible_height;
