@@ -43,6 +43,7 @@ typedef struct arib_text_region_s
 typedef struct
 {
     arib_text_region_t *p_region;
+    bool               first;
 } arib_spu_updater_sys_t;
 
 static void SubpictureTextUpdate(subpicture_t *subpic,
@@ -52,12 +53,12 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 {
     arib_spu_updater_sys_t *sys = subpic->updater.sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
-    VLC_UNUSED(prev_src);
+    VLC_UNUSED(prev_src); VLC_UNUSED(prev_dst);
 
-    if (video_format_IsSimilar(prev_dst, fmt_dst))
+    if ( !sys->first )
         return;
 
-    vlc_spu_regions_Clear( &subpic->regions );
+    assert( vlc_spu_regions_is_empty( &subpic->regions ) );
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
     {
@@ -100,6 +101,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         }
         r->p_text->style->i_spacing = p_region->i_horint;
     }
+    sys->first = false;
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
 {
@@ -127,6 +129,8 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         .update   = SubpictureTextUpdate,
         .destroy  = SubpictureTextDestroy,
     };
+
+    sys->first = true;
 
     subpicture_updater_t updater = {
         .sys = sys,
