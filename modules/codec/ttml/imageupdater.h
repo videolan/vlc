@@ -83,7 +83,8 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
     VLC_UNUSED(prev_src);
     ttml_image_updater_sys_t *p_sys = p_spu->updater.sys;
 
-    if (video_format_IsSimilar(prev_dst, p_fmt_dst))
+    if (p_fmt_dst->i_visible_width  == prev_dst->i_visible_width &&
+        p_fmt_dst->i_visible_height == prev_dst->i_visible_height)
         return;
 
     vlc_spu_regions_Clear( &p_spu->regions );
