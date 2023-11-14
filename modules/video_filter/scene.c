@@ -194,7 +194,7 @@ static int Create( filter_t *p_filter )
     p_sys->psz_prefix = var_CreateGetString( p_filter, CFG_PREFIX "prefix" );
     p_sys->psz_path = var_GetNonEmptyString( p_filter, CFG_PREFIX "path" );
     if( p_sys->psz_path == NULL )
-        p_sys->psz_path = config_GetUserDir( VLC_PICTURES_DIR );
+        p_sys->psz_path = config_GetUserDir( VLC_SNAPSHOTS_DIR );
 
     if (unlikely(p_sys->psz_path == NULL))
     {
