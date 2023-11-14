@@ -214,8 +214,10 @@ static bool SubsdelayIsTextEmpty( const subpicture_region_t * );
  * Subpicture functions
  *****************************************************************************/
 
-static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
-                                 bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts );
+static void SubpicUpdateWrapper( subpicture_t *p_subpic,
+                                 const video_format_t *prev_src, const video_format_t *p_fmt_src,
+                                 const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
+                                 vlc_tick_t i_ts );
 
 static void SubpicDestroyWrapper( subpicture_t *p_subpic );
 
@@ -914,8 +916,10 @@ static void SubsdelayRecalculateDelays( filter_t *p_filter )
 /*****************************************************************************
  * SubpicUpdateWrapper: Subpicture update callback wrapper
  *****************************************************************************/
-static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
-                                 bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts )
+static void SubpicUpdateWrapper( subpicture_t *p_subpic,
+                                 const video_format_t *prev_src, const video_format_t *p_fmt_src,
+                                 const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
+                                 vlc_tick_t i_ts )
 {
     subsdelay_heap_entry_t *p_entry;
     vlc_tick_t i_new_ts;
@@ -951,8 +955,8 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, c
 
     subpicture_updater_t *updater = &p_entry->p_source->updater;
     updater->ops->update( p_entry->p_source,
-                          has_src_changed, p_fmt_src,
-                          has_dst_changed, p_fmt_dst, i_new_ts );
+                          prev_src, p_fmt_src,
+                          prev_dst, p_fmt_dst, i_new_ts );
 
     p_entry->p_subpic->regions = p_entry->p_source->regions;
 

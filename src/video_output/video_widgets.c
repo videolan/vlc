@@ -254,16 +254,16 @@ typedef struct {
 } osdwidget_spu_updater_sys_t;
 
 static void OSDWidgetUpdate(subpicture_t *subpic,
-                            bool has_src_changed, const video_format_t *fmt_src,
-                            bool has_dst_changed, const video_format_t *fmt_dst,
+                            const video_format_t *prev_src, const video_format_t *fmt_src,
+                            const video_format_t *prev_dst, const video_format_t *fmt_dst,
                             vlc_tick_t ts)
 {
     osdwidget_spu_updater_sys_t *sys = subpic->updater.sys;
     subpicture_region_t *p_region;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
-    VLC_UNUSED(has_src_changed);
+    VLC_UNUSED(prev_src);
 
-    if (!has_dst_changed)
+    if (video_format_IsSimilar(prev_dst, fmt_dst))
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );

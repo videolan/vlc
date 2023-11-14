@@ -495,15 +495,15 @@ static void vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
 }
 
 static void OSDEpgUpdate(subpicture_t *subpic,
-                         bool has_src_changed, const video_format_t *fmt_src,
-                         bool has_dst_changed, const video_format_t *fmt_dst,
+                         const video_format_t *prev_src, const video_format_t *fmt_src,
+                         const video_format_t *prev_dst, const video_format_t *fmt_dst,
                          vlc_tick_t ts)
 {
     epg_spu_updater_sys_t *sys = subpic->updater.sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
-    VLC_UNUSED(has_src_changed);
+    VLC_UNUSED(prev_src);
 
-    if (!has_dst_changed)
+    if (video_format_IsSimilar(prev_dst, fmt_dst))
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );

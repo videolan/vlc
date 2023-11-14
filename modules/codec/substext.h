@@ -96,14 +96,14 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
 }
 
 static void SubpictureTextUpdate(subpicture_t *subpic,
-                                 bool has_src_changed, const video_format_t *fmt_src,
-                                 bool has_dst_changed, const video_format_t *fmt_dst,
+                                 const video_format_t *prev_src, const video_format_t *fmt_src,
+                                 const video_format_t *prev_dst, const video_format_t *fmt_dst,
                                  vlc_tick_t ts)
 {
     subtext_updater_sys_t *sys = subpic->updater.sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
 
-    if (!has_src_changed && !has_dst_changed &&
+    if (video_format_IsSimilar(prev_src, fmt_src) &&
+        video_format_IsSimilar(prev_dst, fmt_dst) &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > ts))
         return;
 

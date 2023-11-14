@@ -74,16 +74,16 @@ static void TTML_ImageSpuAppendRegion(ttml_image_updater_sys_t *p_sys,
 }
 
 static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
-                                bool b_src_changed, const video_format_t *p_fmt_src,
-                                bool b_dst_changed, const video_format_t *p_fmt_dst,
+                                const video_format_t *prev_src, const video_format_t *p_fmt_src,
+                                const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
                                 vlc_tick_t i_ts)
 {
     VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(i_ts);
-    VLC_UNUSED(b_src_changed);
+    VLC_UNUSED(prev_src);
     ttml_image_updater_sys_t *p_sys = p_spu->updater.sys;
 
-    if (!b_dst_changed)
+    if (video_format_IsSimilar(prev_dst, p_fmt_dst))
         return;
 
     vlc_spu_regions_Clear( &p_spu->regions );

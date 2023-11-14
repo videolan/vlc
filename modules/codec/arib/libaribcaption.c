@@ -116,12 +116,15 @@ static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
 }
 
 static void SubpictureUpdate(subpicture_t *p_subpic,
-                             bool b_src_changed, const video_format_t *p_src_format,
-                             bool b_dst_changed, const video_format_t *p_dst_format,
+                             const video_format_t *prev_src, const video_format_t *p_src_format,
+                             const video_format_t *prev_dst, const video_format_t *p_dst_format,
                              vlc_tick_t i_ts)
 {
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
+
+    bool b_src_changed = !video_format_IsSimilar(prev_src, p_src_format);
+    bool b_dst_changed = !video_format_IsSimilar(prev_dst, p_dst_format);
 
     if (b_src_changed || b_dst_changed) {
         const video_format_t *fmt = p_dst_format;

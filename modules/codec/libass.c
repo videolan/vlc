@@ -95,8 +95,8 @@ static void DecSysHold( decoder_sys_t *p_sys );
 
 /* */
 static void SubpictureUpdate( subpicture_t *,
-                              bool, const video_format_t *,
-                              bool, const video_format_t *,
+                              const video_format_t *, const video_format_t *,
+                              const video_format_t *, const video_format_t *,
                               vlc_tick_t );
 static void SubpictureDestroy( subpicture_t * );
 
@@ -417,12 +417,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
  *
  ****************************************************************************/
 static void SubpictureUpdate( subpicture_t *p_subpic,
-                              bool b_fmt_src, const video_format_t *p_fmt_src,
-                              bool b_fmt_dst, const video_format_t *p_fmt_dst,
+                              const video_format_t *prev_src, const video_format_t *p_fmt_src,
+                              const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
                               vlc_tick_t i_ts )
 {
     libass_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
+
+    bool b_fmt_src = !video_format_IsSimilar(prev_src, p_fmt_src);
+    bool b_fmt_dst = !video_format_IsSimilar(prev_dst, p_fmt_dst);
 
     vlc_mutex_lock( &p_sys->lock );
 

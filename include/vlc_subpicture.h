@@ -177,8 +177,8 @@ struct vlc_spu_updater_ops
       * the main job of creating the subpicture regions for the
       * current video_format */
     void (*update)(subpicture_t *,
-                   bool has_src_changed, const video_format_t *p_fmt_src,
-                   bool has_dst_changed, const video_format_t *p_fmt_dst,
+                   const video_format_t *prev_src, const video_format_t *p_fmt_src,
+                   const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
                    vlc_tick_t);
 
     /** Optional callback for subpicture private data cleanup */

@@ -175,10 +175,8 @@ void subpicture_Update( subpicture_t *p_subpicture,
         return;
 
     p_upd->ops->update(p_subpicture,
-                       !video_format_IsSimilar( &p_private->src,
-                                                p_fmt_src ), p_fmt_src,
-                       !video_format_IsSimilar( &p_private->dst,
-                                                p_fmt_dst ), p_fmt_dst,
+                       &p_private->src, p_fmt_src,
+                       &p_private->dst, p_fmt_dst,
                        i_ts);
 
     video_format_Clean( &p_private->src );
