@@ -1913,6 +1913,8 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     if (sys->spu)
         spu_Detach(sys->spu);
 
+    vlc_clock_RegisterEvents(sys->clock, NULL, NULL);
+
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;
     vlc_mutex_unlock(&sys->clock_lock);
@@ -2191,6 +2193,20 @@ static void vout_InitSource(vout_thread_sys_t *vout)
     }
 }
 
+static void clock_event_OnDiscontinuity(void *data)
+{
+    vout_thread_sys_t *vout = data;
+    vout_thread_sys_t *sys = vout;
+
+    /* The Render thread wait for a deadline that is either:
+     *  - VOUT_REDISPLAY_DELAY
+     *  - calculated from the clock
+     * In case of a clock discontinuity, we need to wake up the Render thread,
+     * in order to trigger the rendering of the next picture, if new timings
+     * require it. */
+    vout_control_Wake(&sys->control);
+}
+
 int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input)
 {
     vout_thread_sys_t *vout = VOUT_THREAD_TO_SYS(cfg->vout);
@@ -2242,6 +2258,11 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     sys->clock = cfg->clock;
     vlc_mutex_unlock(&sys->clock_lock);
 
+    static const struct vlc_clock_event_cbs clock_event_cbs = {
+        .on_discontinuity = clock_event_OnDiscontinuity,
+    };
+    vlc_clock_RegisterEvents(sys->clock, &clock_event_cbs, vout);
+
     sys->delay = 0;
 
     if (vout_Start(vout, vctx, cfg))
@@ -2262,6 +2283,7 @@ error_thread:
     vout_ReleaseDisplay(vout);
 error_display:
     vout_DisableWindow(vout);
+    vlc_clock_RegisterEvents(sys->clock, NULL, NULL);
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;
     vlc_mutex_unlock(&sys->clock_lock);
