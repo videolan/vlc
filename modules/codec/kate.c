@@ -816,24 +816,24 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
 
     if (!new_regions)
     {
-    PROFILE_START( TigerValidateSubpicture );
+        PROFILE_START( TigerValidateSubpicture );
 
-    /* it is likely that the current region (if any) can be kept as is; test for this */
-    vlc_mutex_lock( &p_sys->lock );
-    if( p_sys->b_dirty || tiger_renderer_is_dirty( p_sys->p_tr ) )
-    {
-        new_regions = true;
-        goto exit;
-    }
-    if( tiger_renderer_update( p_sys->p_tr, t, 1 ) >= 0 &&
-        tiger_renderer_is_dirty( p_sys->p_tr ) )
-    {
-        new_regions = true;
-        goto exit;
-    }
+        /* it is likely that the current region (if any) can be kept as is; test for this */
+        vlc_mutex_lock( &p_sys->lock );
+        if( p_sys->b_dirty || tiger_renderer_is_dirty( p_sys->p_tr ) )
+        {
+            new_regions = true;
+            goto exit;
+        }
+        if( tiger_renderer_update( p_sys->p_tr, t, 1 ) >= 0 &&
+            tiger_renderer_is_dirty( p_sys->p_tr ) )
+        {
+            new_regions = true;
+            goto exit;
+        }
 exit:
-    vlc_mutex_unlock( &p_sys->lock );
-    PROFILE_STOP( TigerValidateSubpicture );
+        vlc_mutex_unlock( &p_sys->lock );
+        PROFILE_STOP( TigerValidateSubpicture );
     }
 
     if (!new_regions)
