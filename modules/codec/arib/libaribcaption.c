@@ -155,11 +155,6 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
 
     vlc_spu_regions_Clear( &p_subpic->regions );
 
-    video_format_t  fmt = *p_dst_format;
-    fmt.i_chroma         = VLC_CODEC_RGBA;
-    fmt.i_x_offset       = 0;
-    fmt.i_y_offset       = 0;
-
     aribcc_image_t *p_images = p_spusys->render_result.images;
     uint32_t        i_image_count = p_spusys->render_result.image_count;
 
@@ -170,10 +165,14 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
         return;
     }
 
+    video_format_t fmt_region = *p_dst_format;
+    fmt_region.i_chroma       = VLC_CODEC_RGBA;
+    fmt_region.i_x_offset     = 0;
+    fmt_region.i_y_offset     = 0;
+
     /* Allocate the regions and draw them */
     for (uint32_t i = 0; i < i_image_count; i++) {
         aribcc_image_t *image = &p_images[i];
-        video_format_t  fmt_region = fmt;
 
         fmt_region.i_width =
         fmt_region.i_visible_width  = image->width;
