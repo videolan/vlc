@@ -102,7 +102,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 {
     subtext_updater_sys_t *sys = subpic->updater.sys;
 
-    if (video_format_IsSimilar(prev_src, fmt_src) &&
+    if (fmt_src->i_visible_height == prev_src->i_visible_height &&
         video_format_IsSimilar(prev_dst, fmt_dst) &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > ts))
         return;
