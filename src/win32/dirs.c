@@ -164,6 +164,8 @@ char *platform_GetUserDir (vlc_userdir_t type)
             return config_GetUserDir(VLC_HOME_DIR);
         case VLC_MUSIC_DIR:
             return config_GetKnownFolder (FOLDERID_Music);
+        case VLC_SNAPSHOTS_DIR:
+            return config_GetKnownFolder (FOLDERID_Screenshots);
         case VLC_PICTURES_DIR:
             return config_GetKnownFolder (FOLDERID_Pictures);
         case VLC_VIDEOS_DIR:

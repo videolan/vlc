@@ -303,6 +303,7 @@ typedef enum vlc_user_dir
     VLC_MUSIC_DIR,
     VLC_PICTURES_DIR,
     VLC_VIDEOS_DIR,
+    VLC_SNAPSHOTS_DIR,
 } vlc_userdir_t;
 
 VLC_API char * config_GetUserDir( vlc_userdir_t ) VLC_USED VLC_MALLOC;

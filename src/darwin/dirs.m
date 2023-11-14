@@ -221,6 +221,7 @@ char *platform_GetUserDir (vlc_userdir_t type)
         case VLC_MUSIC_DIR:
             psz_path = "%s/Music";
             break;
+        case VLC_SNAPSHOTS_DIR:
         case VLC_PICTURES_DIR:
             psz_path = "%s/Pictures";
             break;

@@ -338,6 +338,7 @@ char *platform_GetUserDir (vlc_userdir_t type)
             return config_GetCacheDir ();
         case VLC_MUSIC_DIR:
             return config_GetShellDir (VLC_MUSIC_DIR);
+        case VLC_SNAPSHOTS_DIR: // FIXME GetFolderForUserAsync / UserDataPath
         case VLC_PICTURES_DIR:
             return config_GetShellDir (VLC_PICTURES_DIR);
         case VLC_VIDEOS_DIR:

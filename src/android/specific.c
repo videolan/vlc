@@ -35,7 +35,7 @@
 #include <jni.h>
 
 static JavaVM *s_jvm = NULL;
-#define GENERIC_DIR_COUNT (VLC_VIDEOS_DIR - VLC_DESKTOP_DIR + 1)
+#define GENERIC_DIR_COUNT (VLC_SNAPSHOTS_DIR - VLC_DESKTOP_DIR + 1)
 static char *ppsz_generic_names[GENERIC_DIR_COUNT] = {};
 static struct {
     struct {
@@ -120,6 +120,7 @@ JNI_OnLoad(JavaVM *vm, void *reserved)
         "DIRECTORY_MUSIC",      /* VLC_MUSIC_DIR */
         "DIRECTORY_PICTURES",   /* VLC_PICTURES_DIR */
         "DIRECTORY_MOVIES",     /* VLC_VIDEOS_DIR */
+        "DIRECTORY_SCREENSHOTS",/* VLC_SNAPSHOTS_DIR */
     };
     for (size_t i = 0; i < GENERIC_DIR_COUNT; ++i)
     {
@@ -291,6 +292,7 @@ char *platform_GetUserDir (vlc_userdir_t type)
         case VLC_PUBLICSHARE_DIR:
         case VLC_DOCUMENTS_DIR:
         case VLC_MUSIC_DIR:
+        case VLC_SNAPSHOTS_DIR:
         case VLC_PICTURES_DIR:
         case VLC_VIDEOS_DIR:
         {
