@@ -508,19 +508,16 @@ static void OSDEpgUpdate(subpicture_t *subpic,
 
     vlc_spu_regions_Clear( &subpic->regions );
 
-    video_format_t fmt = *fmt_dst;
-    fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
-    fmt.i_visible_width = fmt.i_visible_width * fmt.i_sar_num / fmt.i_sar_den;
-    fmt.i_x_offset      = fmt.i_x_offset      * fmt.i_sar_num / fmt.i_sar_den;
+    unsigned i_x_offset = fmt_dst->i_x_offset * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
 
-    subpic->i_original_picture_width  = fmt.i_visible_width;
-    subpic->i_original_picture_height = fmt.i_visible_height;
+    subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+    subpic->i_original_picture_height = fmt_dst->i_visible_height;
 
     vout_BuildOSDEpg(sys, &subpic->regions,
-                                        fmt.i_x_offset,
-                                        fmt.i_y_offset,
-                                        fmt.i_visible_width,
-                                        fmt.i_visible_height);
+                                        i_x_offset,
+                                        fmt_dst->i_y_offset,
+                                        subpic->i_original_picture_width,
+                                        subpic->i_original_picture_height);
 }
 
 static void OSDEpgDestroy(subpicture_t *subpic)
