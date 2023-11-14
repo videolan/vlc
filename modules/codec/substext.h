@@ -95,17 +95,17 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
     *pp_next = p_new;
 }
 
-static int SubpictureTextValidate(subpicture_t *subpic,
-                                  bool has_src_changed, const video_format_t *fmt_src,
-                                  bool has_dst_changed, const video_format_t *fmt_dst,
-                                  vlc_tick_t ts)
+static void SubpictureTextUpdate(subpicture_t *subpic,
+                                 bool has_src_changed, const video_format_t *fmt_src,
+                                 bool has_dst_changed, const video_format_t *fmt_dst,
+                                 vlc_tick_t ts)
 {
     subtext_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
 
     if (!has_src_changed && !has_dst_changed &&
         (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > ts))
-        return VLC_SUCCESS;
+        return;
 
     substext_updater_region_t *p_updtregion = &sys->region;
 
@@ -124,21 +124,6 @@ static int SubpictureTextValidate(subpicture_t *subpic,
         p_updtregion->flags &= ~(UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO|
                                  UPDT_REGION_EXTENT_X_IS_RATIO|UPDT_REGION_EXTENT_Y_IS_RATIO);
     }
-
-    return VLC_EGENERIC;
-}
-
-static void SubpictureTextUpdate(subpicture_t *subpic,
-                                 bool has_src_changed, const video_format_t *fmt_src,
-                                 bool has_dst_changed, const video_format_t *fmt_dst,
-                                 vlc_tick_t ts)
-{
-    subtext_updater_sys_t *sys = subpic->updater.p_sys;
-
-    if (SubpictureTextValidate(subpic, has_src_changed, fmt_src,
-                                       has_dst_changed, fmt_dst, ts) == VLC_SUCCESS)
-        return;
-
     vlc_spu_regions_Clear( &subpic->regions );
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
