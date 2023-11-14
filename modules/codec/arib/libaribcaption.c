@@ -123,7 +123,8 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
 
-    bool b_src_changed = !video_format_IsSimilar(prev_src, p_src_format);
+    bool b_src_changed = p_src_format->i_visible_width  != prev_src->i_visible_width ||
+                         p_src_format->i_visible_height != prev_src->i_visible_height;
     bool b_dst_changed = !video_format_IsSimilar(prev_dst, p_dst_format);
 
     if (b_src_changed || b_dst_changed) {
