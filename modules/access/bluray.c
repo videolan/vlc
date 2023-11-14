@@ -1659,11 +1659,6 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
      * We need to duplicate our regions (stored internally) to this subpic.
      */
     const subpicture_region_t *p_src;
-    if (vlc_spu_regions_is_empty(&p_overlay->regions)) {
-        updater_unlock_overlay(p_upd_sys);
-        return;
-    }
-
     subpicture_region_t *p_dst;
     vlc_spu_regions_foreach_const(p_src, &p_overlay->regions) {
         p_dst = subpicture_region_ForPicture(&p_src->fmt, p_src->p_picture);
