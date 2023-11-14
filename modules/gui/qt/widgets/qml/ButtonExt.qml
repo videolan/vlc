@@ -92,12 +92,10 @@ T.Button {
         height: control.height
         width: control.width
 
-        active: control.visualFocus
-        animate: theme.initialized && !control.extBackgroundAnimation
+        enabled: theme.initialized && !control.extBackgroundAnimation
 
-        backgroundColor: theme.bg.primary
-        foregroundColor: control.color
-        activeBorderColor: control.colorFocus
+        color: theme.bg.primary
+        border.color: control.visualFocus ? control.colorFocus : "transparent"
     }
 
     contentItem: Item {

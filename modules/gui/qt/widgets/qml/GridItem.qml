@@ -169,13 +169,11 @@ T.ItemDelegate {
         x: - selectedBorderWidth
         y: - selectedBorderWidth
 
-        active: visualFocus
-        animate: theme.initialized
+        enabled: theme.initialized
 
         //don't show the backgroud unless selected
-        backgroundColor: root.selected ?  theme.bg.highlight : theme.bg.primary
-        activeBorderColor: theme.visualFocus
-        visible: animationRunning || active || root.selected || root.hovered
+        color: root.selected ?  theme.bg.highlight : theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: MouseArea {

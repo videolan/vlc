@@ -29,41 +29,24 @@ Rectangle {
     // Settings
     //---------------------------------------------------------------------------------------------
 
-    property bool active: activeFocus
-
-    // background of this component changes, set it in binding, the changes will be animated
-    property color backgroundColor: "transparent"
-
-    // `foregroundColor` property is not used in this component but is
-    // provided as a convenience as it gets animated with color property
-    property color foregroundColor
-
-    property color activeBorderColor
-
     property int animationDuration: VLCStyle.duration_long
 
-    property bool animationRunning: borderAnimation.running || bgAnimation.running
-
-    property bool animate: true
+    readonly property bool animationRunning: borderAnimation.running || bgAnimation.running
 
     //---------------------------------------------------------------------------------------------
     // Implementation
     //---------------------------------------------------------------------------------------------
 
-    color: backgroundColor
+    color: "transparent"
 
-    border.color: root.active
-                  ? root.activeBorderColor
-                  : VLCStyle.setColorAlpha(root.activeBorderColor, 0)
-
-    border.width: root.active ? VLCStyle.focus_border : 0
+    border.width: VLCStyle.focus_border
 
     //---------------------------------------------------------------------------------------------
     // Animations
     //---------------------------------------------------------------------------------------------
 
     Behavior on border.color {
-        enabled: root.animate
+        enabled: root.enabled
 
         ColorAnimation {
             id: borderAnimation
@@ -73,17 +56,11 @@ Rectangle {
     }
 
     Behavior on color {
-        enabled: root.animate
+        enabled: root.enabled
+        
         ColorAnimation {
             id: bgAnimation
 
-            duration: root.animationDuration
-        }
-    }
-
-    Behavior on foregroundColor {
-        enabled: root.animate
-        ColorAnimation {
             duration: root.animationDuration
         }
     }

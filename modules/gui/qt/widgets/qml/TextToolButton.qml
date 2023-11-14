@@ -66,9 +66,8 @@ T.ToolButton {
     }
 
     background: AnimatedBackground {
-        animate: theme.initialized
-        active: visualFocus
-        backgroundColor: theme.bg.primary
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        color: theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 }

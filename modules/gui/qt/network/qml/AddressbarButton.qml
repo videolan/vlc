@@ -65,12 +65,9 @@ T.AbstractButton {
 
 
     background: Widgets.AnimatedBackground {
-        active: visualFocus
-
-        animate: theme.initialized
-        backgroundColor: button.backgroundColor
-        foregroundColor: button.foregroundColor
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        color: button.backgroundColor
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: contentLoader.item
@@ -95,6 +92,13 @@ T.AbstractButton {
             color: button.foregroundColor
 
             font.pixelSize: button.font.pixelSize
+
+            Behavior on color {
+                enabled: theme.initialized
+                ColorAnimation {
+                    duration: VLCStyle.duration_long
+                }
+            }
         }
     }
 

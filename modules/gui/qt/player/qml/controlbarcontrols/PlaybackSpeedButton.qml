@@ -50,7 +50,6 @@ ControlButtonPopup {
         text: !root.paintOnly ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
                               : I18n.qtr("1x")
 
-        // IconToolButton.background is a AnimatedBackground
-        color: root.background.foregroundColor
+        color: root.color
     }
 }

@@ -109,11 +109,9 @@ Window {
 
                 // NOTE: We specify a dedicated background with borders to improve clarity.
                 background: Widgets.AnimatedBackground {
-                    animate: button.colorContext.initialized
-                    backgroundColor: button.colorContext.bg.primary
-                    activeBorderColor: button.colorContext.visualFocus
+                    enabled: button.colorContext.initialized
+                    color: button.colorContext.bg.primary
                     border.width: VLCStyle.border
-
                     border.color: button.colorContext.border
                 }
             }

@@ -109,12 +109,11 @@ T.ItemDelegate {
     }
 
     background: Widgets.AnimatedBackground {
-        backgroundColor: selected ? theme.bg.highlight : theme.bg.primary
+        color: selected ? theme.bg.highlight : theme.bg.primary
 
-        active: delegate.visualFocus
-        animate: theme.initialized
+        enabled: theme.initialized
 
-        activeBorderColor: theme.visualFocus
+        border.color: delegate.visualFocus ? theme.visualFocus : "transparent"
 
         Widgets.CurrentIndicator {
             id: currentIndicator

@@ -42,9 +42,8 @@ Control {
     }
 
     background: Widgets.AnimatedBackground {
-        active: visualFocus
-        animate: theme.initialized
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: Widgets.MenuLabel {

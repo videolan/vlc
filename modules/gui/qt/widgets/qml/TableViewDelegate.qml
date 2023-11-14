@@ -103,12 +103,10 @@ T.Control {
     }
 
     background: AnimatedBackground {
-        active: visualFocus
-
         animationDuration: VLCStyle.duration_short
-        animate: theme.initialized
-        backgroundColor: delegate.selected ? theme.bg.highlight : theme.bg.primary
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        color: delegate.selected ? theme.bg.highlight : theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
 
         MouseArea {
             id: hoverArea

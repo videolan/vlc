@@ -90,14 +90,11 @@ T.ToolButton {
         implicitWidth: size
         implicitHeight: size
 
-        animate: theme.initialized
+        enabled: theme.initialized
 
-        active: control.visualFocus
+        color: control.backgroundColor
 
-        backgroundColor: control.backgroundColor
-        foregroundColor: control.color
-
-        activeBorderColor: theme.visualFocus
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: T.Label {
@@ -108,7 +105,14 @@ T.ToolButton {
 
         text: control.iconText
 
-        color: control.background.foregroundColor
+        color: control.color
+
+        Behavior on color {
+            enabled: theme.initialized
+            ColorAnimation {
+                duration: VLCStyle.duration_long
+            }
+        }
 
         font.pixelSize: control.size
         font.family: VLCIcons.fontFamily

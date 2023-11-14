@@ -156,9 +156,8 @@ T.Switch {
     }
 
     background: AnimatedBackground {
-        active: root.visualFocus
-        animate: theme.initialized
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        border.color: root.visualFocus ? theme.visualFocus : "transparent"
     }
 
     indicator: Rectangle {

@@ -62,12 +62,10 @@ T.ToolButton {
         width: control.sourceSize.width
         height: control.sourceSize.height
 
-        active: control.visualFocus
-        animate: theme.initialized
+        enabled: theme.initialized
 
-        backgroundColor: theme.bg.primary
-        foregroundColor: theme.fg.primary
-        activeBorderColor: theme.visualFocus
+        color: theme.bg.primary
+        border.color: control.visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: Image {

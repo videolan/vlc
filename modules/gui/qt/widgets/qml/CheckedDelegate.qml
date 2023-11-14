@@ -49,11 +49,9 @@ T.ItemDelegate {
     }
 
     background: AnimatedBackground {
-        active: visualFocus
-
-        animate: theme.initialized
-        backgroundColor: control.checked ? theme.bg.highlight : theme.bg.primary
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        color: control.checked ? theme.bg.highlight : theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: Item { // don't use a row, it will move text when control is unchecked

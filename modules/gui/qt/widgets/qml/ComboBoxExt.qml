@@ -124,10 +124,9 @@ ComboBox {
             currentIndex: control.highlightedIndex
 
             highlight: Widgets.AnimatedBackground {
-                active: visualFocus
-                animate: theme.initialized
-                activeBorderColor: theme.visualFocus
-                backgroundColor: theme.bg.secondary
+                enabled: theme.initialized
+                border.color: visualFocus ? theme.visualFocus : "transparent"
+                color: theme.bg.secondary
             }
 
             ScrollIndicator.vertical: ScrollIndicator { }

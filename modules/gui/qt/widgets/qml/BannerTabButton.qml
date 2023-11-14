@@ -87,14 +87,12 @@ T.TabButton {
         height: control.height
         width: control.width
 
-        active: visualFocus
-        animate: theme.initialized
+        enabled: theme.initialized
 
         animationDuration: VLCStyle.duration_short
 
-        backgroundColor: theme.bg.primary
-        foregroundColor: control.selected ? theme.fg.secondary : theme.fg.primary
-        activeBorderColor: theme.visualFocus
+        color: theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: Item {
@@ -125,7 +123,15 @@ T.TabButton {
 
                 text: control.text
 
-                color: control.background.foregroundColor
+                color: control.selected ? theme.fg.secondary : theme.fg.primary
+
+                Behavior on color {
+                    enabled: theme.initialized
+
+                    ColorAnimation {
+                        duration: VLCStyle.duration_long
+                    }
+                }
 
                 font.pixelSize: VLCStyle.fontSize_normal
 

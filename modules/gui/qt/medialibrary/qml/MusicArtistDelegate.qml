@@ -76,11 +76,9 @@ T.ItemDelegate {
     }
 
     background: Widgets.AnimatedBackground {
-        active: visualFocus
-
-        animate: theme.initialized
-        backgroundColor: root.isCurrent ? theme.bg.highlight : theme.bg.primary
-        activeBorderColor: theme.visualFocus
+        enabled: theme.initialized
+        color: root.isCurrent ? theme.bg.highlight : theme.bg.primary
+        border.color: visualFocus ? theme.visualFocus : "transparent"
 
         Widgets.CurrentIndicator {
             length: parent.height - (margin * 2)
