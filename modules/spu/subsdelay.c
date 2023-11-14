@@ -214,9 +214,6 @@ static bool SubsdelayIsTextEmpty( const subpicture_region_t * );
  * Subpicture functions
  *****************************************************************************/
 
-static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
-                                  bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts );
-
 static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
                                  bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts );
 
@@ -910,19 +907,18 @@ static void SubsdelayRecalculateDelays( filter_t *p_filter )
 }
 
 /*****************************************************************************
- * SubpicValidateWrapper: Subpicture validate callback wrapper
+ * SubpicUpdateWrapper: Subpicture update callback wrapper
  *****************************************************************************/
-static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
-                                  bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts )
+static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
+                                 bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts )
 {
     subsdelay_heap_entry_t *p_entry;
     vlc_tick_t i_new_ts;
-    int i_result = VLC_SUCCESS;
 
     p_entry = p_subpic->updater.p_sys;
     if( !p_entry )
     {
-        return VLC_SUCCESS;
+        return;
     }
 
     p_entry->b_last_region_saved = false;
@@ -939,35 +935,7 @@ static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, 
         p_entry->b_last_region_saved = true;
     }
 
-    if( !i_result )
-    {
-        /* subpic update isn't necessary, so local update should be called here */
-        SubpicLocalUpdate( p_subpic, i_ts );
-    }
-
-    return i_result;
-}
-
-/*****************************************************************************
- * SubpicUpdateWrapper: Subpicture update callback wrapper
- *****************************************************************************/
-static void SubpicUpdateWrapper( subpicture_t *p_subpic, bool has_src_changed, const video_format_t *p_fmt_src,
-                                 bool has_dst_changed, const video_format_t *p_fmt_dst, vlc_tick_t i_ts )
-{
-    subsdelay_heap_entry_t *p_entry;
-    vlc_tick_t i_new_ts;
-
-    if (SubpicValidateWrapper(p_subpic, has_src_changed, p_fmt_src,
-                                        has_dst_changed, p_fmt_dst, i_ts) == VLC_SUCCESS)
-        return;
-
     vlc_spu_regions_Clear( &p_subpic->regions );
-
-    p_entry = p_subpic->updater.p_sys;
-    if( !p_entry )
-    {
-        return;
-    }
 
     /* call source update */
     i_new_ts = p_entry->p_source->i_start +
