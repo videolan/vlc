@@ -55,6 +55,22 @@ struct vlc_clock_cbs
 };
 
 /**
+ * Event callbacks for the user of a vlc_clock_t
+ */
+struct vlc_clock_event_cbs
+{
+    /**
+     * Called when the master source triggered a discontinuity.
+     *
+     * A discontinuity happens when:
+     *  - The first point is updated from the master source
+     *
+     * @param data opaque pointer set from vlc_clock_main_New()
+     */
+    void (*on_discontinuity)(void *data);
+};
+
+/**
  * This function creates the vlc_clock_main_t of the program
  */
 vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vlc_tracer *parent_tracer);
@@ -213,6 +229,18 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
  * The clock mutex must be locked.
  */
 void vlc_clock_Wake(vlc_clock_t *clock);
+
+/**
+ * Register for events
+ *
+ * @param clock the clock used by the source
+ * @param cbs valid pointer to register events or NULL to unregister
+ * @param data opaque data used by cbs
+ * @return 0 in case of success
+ */
+int vlc_clock_RegisterEvents(vlc_clock_t *clock,
+                             const struct vlc_clock_event_cbs *cbs,
+                             void *data);
 
 /**
  * This function converts a timestamp from stream to system

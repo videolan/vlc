@@ -26,10 +26,18 @@
 #include <assert.h>
 #include <limits.h>
 #include <vlc_tracer.h>
+#include <vlc_vector.h>
 #include "clock.h"
 #include "clock_internal.h"
 
 #define COEFF_THRESHOLD 0.2 /* between 0.8 and 1.2 */
+
+struct vlc_clock_event
+{
+    vlc_clock_t *clock;
+    const struct vlc_clock_event_cbs *cbs;
+    void *data;
+};
 
 struct vlc_clock_main_t
 {
@@ -61,6 +69,8 @@ struct vlc_clock_main_t
     clock_point_t first_pcr;
     vlc_tick_t output_dejitter; /* Delay used to absorb the output clock jitter */
     vlc_tick_t input_dejitter; /* Delay used to absorb the input jitter */
+
+    struct VLC_VECTOR(struct vlc_clock_event) events;
 };
 
 struct vlc_clock_t
@@ -81,6 +91,55 @@ struct vlc_clock_t
     const struct vlc_clock_cbs *cbs;
     void *cbs_data;
 };
+
+int vlc_clock_RegisterEvents(vlc_clock_t *clock,
+                             const struct vlc_clock_event_cbs *cbs,
+                             void *data)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+
+    vlc_mutex_lock(&main_clock->lock);
+    if (clock == main_clock->master || clock == main_clock->input_master)
+    {
+        /* Events are only from master to slaves */
+        vlc_mutex_unlock(&main_clock->lock);
+        return -EINVAL;
+    }
+
+    int ret;
+    if (cbs != NULL)
+    {
+        const struct vlc_clock_event event = {
+            .clock = clock,
+            .cbs = cbs,
+            .data = data,
+        };
+        ret = vlc_vector_push(&main_clock->events, event) ? 0 : -ENOMEM;
+    }
+    else
+    {
+        ret = -EINVAL;
+        const struct vlc_clock_event *event;
+        vlc_vector_foreach_ref(event, &main_clock->events)
+            if (event->clock == clock)
+            {
+                vlc_vector_remove(&main_clock->events, vlc_vector_idx_event);
+                ret = 0;
+                break;
+            }
+        assert(ret == 0);
+    }
+
+    vlc_mutex_unlock(&main_clock->lock);
+    return ret;
+}
+
+#define vlc_clock_SendEvent(main_clock, event) { \
+    const struct vlc_clock_event *event; \
+    vlc_vector_foreach_ref(event, &main_clock->events) \
+        if (event->cbs->on_##event != NULL) \
+            event->cbs->on_##event(event->data); \
+}
 
 static vlc_tick_t main_stream_to_system(vlc_clock_main_t *main_clock,
                                         vlc_tick_t ts)
@@ -172,6 +231,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                                               clock->track_str_id,
                                               "reset_bad_source");
 
+                    vlc_clock_SendEvent(main_clock, discontinuity);
+
                     /* Reset and continue (calculate the offset from the
                      * current point) */
                     vlc_clock_main_reset(main_clock);
@@ -188,6 +249,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
             main_clock->wait_sync_ref_priority = UINT_MAX;
             main_clock->wait_sync_ref =
                 clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
+
+            vlc_clock_SendEvent(main_clock, discontinuity);
         }
 
         main_clock->offset =
@@ -475,6 +538,8 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
     AvgInit(&main_clock->coeff_avg, 10);
     AvgResetAndFill(&main_clock->coeff_avg, main_clock->coeff);
 
+    vlc_vector_init(&main_clock->events);
+
     return main_clock;
 }
 
@@ -552,6 +617,10 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
     assert(main_clock->rc == 1);
     if (main_clock->logger != NULL)
         vlc_LogDestroy(main_clock->logger);
+
+    assert(main_clock->events.size == 0);
+    vlc_vector_destroy(&main_clock->events);
+
     free(main_clock);
 }
 
