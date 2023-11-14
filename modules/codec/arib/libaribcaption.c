@@ -158,12 +158,12 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
     aribcc_image_t *p_images = p_spusys->render_result.images;
     uint32_t        i_image_count = p_spusys->render_result.image_count;
 
-    p_subpic->i_original_picture_width = i_render_area_width;
-    p_subpic->i_original_picture_height = i_render_area_height;
-
     if (!p_images || i_image_count == 0) {
         return;
     }
+
+    p_subpic->i_original_picture_width = i_render_area_width;
+    p_subpic->i_original_picture_height = i_render_area_height;
 
     video_format_t fmt_region = *p_dst_format;
     fmt_region.i_chroma       = VLC_CODEC_RGBA;
