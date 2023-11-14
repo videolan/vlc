@@ -267,41 +267,40 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (sys->draining)
         return;
 
-    if (pa_stream_is_corked(s) == 0)
+    if (pa_stream_is_corked(s) != 0)
+        return;
+
+    pa_usec_t rt;
+    if (pa_stream_get_time(s, &rt) != 0 || rt == 0)
+        return;
+
+    /* Subtract the timestamp of the timing_info from the monotonic time */
+    pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
+    sys->timing_system_ts = vlc_tick_now()
+                          - VLC_TICK_FROM_US(ti_age_us);
+
+    const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
+    pa_usec_t silence_us =
+        pa_bytes_to_usec(sys->total_silence_bytes, ss);
+
+    if (sys->start_date_reached
+     && likely(rt >= sys->flush_rt + silence_us))
     {
-        pa_usec_t rt;
-        if (pa_stream_get_time(s, &rt) == 0 && rt > 0)
-        {
-            /* Subtract the timestamp of the timing_info from the monotonic
-             * time */
-            pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
-            sys->timing_system_ts = vlc_tick_now()
-                                  - VLC_TICK_FROM_US(ti_age_us);
+        vlc_tick_t audio_ts = VLC_TICK_0 +
+            VLC_TICK_FROM_US(rt - sys->flush_rt - silence_us);
 
-            const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
-            pa_usec_t silence_us =
-                pa_bytes_to_usec(sys->total_silence_bytes, ss);
-
-            if (sys->start_date_reached
-             && likely(rt >= sys->flush_rt + silence_us))
-            {
-                vlc_tick_t audio_ts = VLC_TICK_0 +
-                    VLC_TICK_FROM_US(rt - sys->flush_rt - silence_us);
-
-                aout_TimingReport(aout, sys->timing_system_ts, audio_ts);
-            }
-#ifndef NDEBUG
-            else
-            {
-                /* The time returned by pa_stream_get_time() might be smaller
-                 * than flush_rt just after a flush (depending on
-                 * transport_usec, sink_usec), but the current read index
-                 * should always be superior or equal. */
-                assert(pa_bytes_to_usec(ti->read_index, ss) >= sys->flush_rt);
-            }
-#endif
-        }
+        aout_TimingReport(aout, sys->timing_system_ts, audio_ts);
     }
+#ifndef NDEBUG
+    else
+    {
+        /* The time returned by pa_stream_get_time() might be smaller than
+         * flush_rt just after a flush (depending on transport_usec,
+         * sink_usec), but the current read index should always be superior or
+         * equal. */
+        assert(pa_bytes_to_usec(ti->read_index, ss) >= sys->flush_rt);
+    }
+#endif
 }
 
 
