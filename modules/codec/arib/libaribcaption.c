@@ -99,10 +99,26 @@ static void DecSysRelease(decoder_sys_t *p_sys)
 /****************************************************************************
  *
  ****************************************************************************/
-static int SubpictureValidate(subpicture_t *p_subpic,
-                              bool b_src_changed, const video_format_t *p_src_format,
-                              bool b_dst_changed, const video_format_t *p_dst_format,
-                              vlc_tick_t i_ts)
+static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
+{
+    if(image->pixel_format != ARIBCC_PIXELFORMAT_RGBA8888)
+        return;
+
+    plane_t *p_dstplane = &dst_pic->p[0];
+    plane_t srcplane;
+    srcplane.i_lines = image->height;
+    srcplane.i_pitch = image->stride;
+    srcplane.i_pixel_pitch = p_dstplane->i_pixel_pitch;
+    srcplane.i_visible_lines = image->height;
+    srcplane.i_visible_pitch = image->width /* in pixels */ * p_dstplane->i_pixel_pitch;
+    srcplane.p_pixels = image->bitmap;
+    plane_CopyPixels( p_dstplane, &srcplane );
+}
+
+static void SubpictureUpdate(subpicture_t *p_subpic,
+                             bool b_src_changed, const video_format_t *p_src_format,
+                             bool b_dst_changed, const video_format_t *p_dst_format,
+                             vlc_tick_t i_ts)
 {
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
@@ -125,7 +141,7 @@ static int SubpictureValidate(subpicture_t *p_subpic,
     if (status == ARIBCC_RENDER_STATUS_GOT_IMAGE_UNCHANGED) {
         /* Skip rendering since images were not changed */
         if (!b_src_changed && !b_dst_changed) {
-            return VLC_SUCCESS;
+            return;
         }
     }
 
@@ -133,40 +149,10 @@ static int SubpictureValidate(subpicture_t *p_subpic,
                                     MS_FROM_VLC_TICK(i_stream_date),
                                     &p_spusys->render_result);
     if (status == ARIBCC_RENDER_STATUS_ERROR) {
-        return VLC_SUCCESS;
+        return;
     }
 
-    return VLC_EGENERIC;
-}
-
-static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
-{
-    if(image->pixel_format != ARIBCC_PIXELFORMAT_RGBA8888)
-        return;
-
-    plane_t *p_dstplane = &dst_pic->p[0];
-    plane_t srcplane;
-    srcplane.i_lines = image->height;
-    srcplane.i_pitch = image->stride;
-    srcplane.i_pixel_pitch = p_dstplane->i_pixel_pitch;
-    srcplane.i_visible_lines = image->height;
-    srcplane.i_visible_pitch = image->width /* in pixels */ * p_dstplane->i_pixel_pitch;
-    srcplane.p_pixels = image->bitmap;
-    plane_CopyPixels( p_dstplane, &srcplane );
-}
-
-static void SubpictureUpdate(subpicture_t *p_subpic,
-                             bool b_src_changed, const video_format_t *p_src_format,
-                             bool b_dst_changed, const video_format_t *p_dst_format,
-                             vlc_tick_t i_ts)
-{
-    if (SubpictureValidate(p_subpic, b_src_changed, p_src_format,
-                                     b_dst_changed, p_dst_format, i_ts) == VLC_SUCCESS)
-        return;
-
     vlc_spu_regions_Clear( &p_subpic->regions );
-
-    libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
 
     video_format_t  fmt = *p_dst_format;
     fmt.i_chroma         = VLC_CODEC_RGBA;
