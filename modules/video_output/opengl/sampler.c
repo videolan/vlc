@@ -531,7 +531,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     bool has_texture_func =
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
-        (priv->gl->api_type = VLC_OPENGL_ES2 && priv->glsl_version >= 300);
+        (priv->gl->api_type == VLC_OPENGL_ES2 && priv->glsl_version >= 300);
 
     switch (tex_target)
     {
