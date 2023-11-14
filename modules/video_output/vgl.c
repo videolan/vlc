@@ -149,9 +149,21 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
     vout_display_sys_t * sys;
 
     libvlc_video_engine_t engineType = var_InheritInteger( gl, "vout-cb-type" );
-    if ( engineType != libvlc_video_engine_opengl &&
-         engineType != libvlc_video_engine_gles2 )
-        return VLC_ENOTSUP;
+    switch (engineType)
+    {
+        case libvlc_video_engine_opengl:
+            if (gl->api_type != VLC_OPENGL)
+                return VLC_ENOTSUP;
+            break;
+
+        case libvlc_video_engine_gles2:
+            if (gl->api_type != VLC_OPENGL_ES2)
+                return VLC_ENOTSUP;
+            break;
+
+        default:
+            return VLC_ENOTSUP;
+    }
 
     if (gl_cfg->need_alpha)
     {
