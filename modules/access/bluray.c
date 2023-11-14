@@ -1645,10 +1645,10 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
     if (!p_overlay) {
-        return 1;
+        return VLC_EGENERIC;
     }
 
-    int res = p_overlay->status == Outdated;
+    int res = p_overlay->status == Outdated ? VLC_EGENERIC : VLC_SUCCESS;
 
     updater_unlock_overlay(p_upd_sys);
 
