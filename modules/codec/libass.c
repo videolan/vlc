@@ -105,8 +105,6 @@ typedef struct
 {
     decoder_sys_t *p_dec_sys;
     vlc_tick_t    i_pts;
-
-    ASS_Image     *p_img;
 } libass_spu_updater_sys_t;
 
 typedef struct
@@ -382,7 +380,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             return VLCDEC_SUCCESS;
         }
 
-        p_spu_sys->p_img = NULL;
         p_spu_sys->p_dec_sys = p_sys;
         p_spu_sys->i_pts = p_block->i_pts;
         p_spu->i_start = p_block->i_pts;
@@ -454,7 +451,6 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         vlc_mutex_unlock( &p_sys->lock );
         return;
     }
-    p_spusys->p_img = p_img;
 
     vlc_spu_regions_Clear( &p_subpic->regions );
 
