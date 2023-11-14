@@ -129,8 +129,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
         return;
 
-    video_format_t fmt;
-    video_format_Init(&fmt, 0);
+    vlc_rational_t sar;
 
     /* NOTE about fmt_dst:
      * fmt_dst area and A/R will change to display once WxH of the
@@ -141,17 +140,17 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
     {
-        fmt.i_sar_num = 4;
-        fmt.i_sar_den = 3;
-        subpic->i_original_picture_width  = fmt_dst->i_visible_height * fmt.i_sar_num / fmt.i_sar_den;
+        sar.num = 4;
+        sar.den = 3;
+        subpic->i_original_picture_width  = fmt_dst->i_visible_height * sar.num / sar.den;
         subpic->i_original_picture_height = fmt_dst->i_visible_height;
     }
     else
     {
         subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
         subpic->i_original_picture_height = fmt_dst->i_height;
-        fmt.i_sar_num = 1;
-        fmt.i_sar_den = 1;
+        sar.num = 1;
+        sar.den = 1;
     }
 
     bool b_schedule_blink_update = false;
@@ -163,7 +162,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         if (!r)
             return;
         vlc_spu_regions_push(&subpic->regions, r);
-        video_format_Copy( &r->fmt, &fmt );
+        r->fmt.i_sar_num = sar.num;
+        r->fmt.i_sar_den = sar.den;
 
         r->p_text = text_segment_Copy( p_updtregion->p_segments );
         r->i_align = p_updtregion->align;
