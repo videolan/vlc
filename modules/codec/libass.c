@@ -416,10 +416,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 /****************************************************************************
  *
  ****************************************************************************/
-static int SubpictureValidate( subpicture_t *p_subpic,
-                               bool b_fmt_src, const video_format_t *p_fmt_src,
-                               bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                               vlc_tick_t i_ts )
+static void SubpictureUpdate( subpicture_t *p_subpic,
+                              bool b_fmt_src, const video_format_t *p_fmt_src,
+                              bool b_fmt_dst, const video_format_t *p_fmt_dst,
+                              vlc_tick_t i_ts )
 {
     libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
@@ -452,30 +452,13 @@ static int SubpictureValidate( subpicture_t *p_subpic,
         (p_img != NULL) == (!vlc_spu_regions_is_empty(&p_subpic->regions)) )
     {
         vlc_mutex_unlock( &p_sys->lock );
-        return VLC_SUCCESS;
+        return;
     }
     p_spusys->p_img = p_img;
 
-    /* The lock is released by SubpictureUpdate */
-    return VLC_EGENERIC;
-}
-
-static void SubpictureUpdate( subpicture_t *p_subpic,
-                              bool b_fmt_src, const video_format_t *p_fmt_src,
-                              bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                              vlc_tick_t i_ts )
-{
-    if (SubpictureValidate(p_subpic, b_fmt_src, p_fmt_src,
-                                     b_fmt_dst, p_fmt_dst, i_ts) == VLC_SUCCESS)
-        return;
-
     vlc_spu_regions_Clear( &p_subpic->regions );
 
-    libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
-    decoder_sys_t *p_sys = p_spusys->p_dec_sys;
-
-    video_format_t fmt = p_sys->fmt;
-    ASS_Image *p_img = p_spusys->p_img;
+    fmt = p_sys->fmt;
 
     /* */
     p_subpic->i_original_picture_height = fmt.i_visible_height;
