@@ -52,8 +52,9 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 {
     arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
+    VLC_UNUSED(has_src_changed);
 
-    if (!has_src_changed && !has_dst_changed)
+    if (!has_dst_changed)
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );
