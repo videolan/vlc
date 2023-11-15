@@ -389,21 +389,6 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
     aout->events->restart_request(aout, mode);
 }
 
-/**
- * Default implementation for audio_output_t.pause
- *
- * \warning This default callback implementation is suboptimal as it will
- * discard some audio samples.
- * Do not use this unless there are really no possible better alternatives.
- */
-static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
-                                     vlc_tick_t date)
-{
-    if (paused)
-        aout->flush(aout);
-    (void) date;
-}
-
 #define AOUT_RESTART_FILTERS        0x1
 #define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
 #define AOUT_RESTART_STEREOMODE     (AOUT_RESTART_OUTPUT|0x4)
