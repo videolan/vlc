@@ -848,7 +848,7 @@ void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_
         if (aout->pause != NULL)
             aout->pause(aout, paused, date);
         else if (paused)
-            aout->flush(aout);
+            vlc_aout_stream_Flush(stream);
 
         /* Update the rate point after the pause */
         if (aout->time_get == NULL && !paused
