@@ -628,7 +628,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         /* Equivalent to vlc_clock_Update() but we don't want to update points
          * (since there are already updated via aout_TimingReport()). */
         vlc_tick_t play_date =
-            vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay, dec_pts,
+            vlc_clock_ConvertToSystem(stream->sync.clock, system_now, dec_pts,
                                       stream->sync.rate);
         if (play_date == VLC_TICK_MAX)
             return; /* Paused, don't handle drift */
@@ -652,7 +652,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
              * manually insert silence that correspond to the clock jitter
              * value before updating the clock. */
             vlc_tick_t play_date =
-                vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
+                vlc_clock_ConvertToSystem(stream->sync.clock, system_now,
                                           dec_pts, stream->sync.rate);
             if (play_date == VLC_TICK_MAX)
                 return; /* Paused, don't handle drift */
