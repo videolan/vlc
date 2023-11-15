@@ -226,15 +226,14 @@ struct audio_output
       */
 
     void (*pause)( audio_output_t *, bool pause, vlc_tick_t date);
-    /**< Pauses or resumes playback (mandatory, cannot be NULL).
+    /**< Pauses or resumes playback (can be NULL).
       *
       * This callback pauses or resumes audio playback as quickly as possible.
       * When pausing, it is desirable to stop producing sound immediately, but
       * retain already queued audio samples in the buffer to play when later
       * when resuming.
       *
-      * If pausing is impossible, then aout_PauseDefault() can provide a
-      * fallback implementation of this callback.
+      * If pausing is impossible, the core will flush the module.
       *
       * \param pause pause if true, resume from pause if false
       * \param date timestamp when the pause or resume was requested
