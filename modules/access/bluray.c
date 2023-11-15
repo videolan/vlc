@@ -1674,17 +1674,26 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
      * When this function is called, all p_subpic regions are gone.
      * We need to duplicate our regions (stored internally) to this subpic.
      */
-    subpicture_region_t *p_src;
+    const subpicture_region_t *p_src;
     if (vlc_spu_regions_is_empty(&p_overlay->regions)) {
         updater_unlock_overlay(p_upd_sys);
         return;
     }
 
     subpicture_region_t *p_dst;
-    vlc_spu_regions_foreach(p_src, &p_overlay->regions) {
-        p_dst = subpicture_region_Copy(p_src);
+    vlc_spu_regions_foreach_const(p_src, &p_overlay->regions) {
+        p_dst = subpicture_region_ForPicture(&p_src->fmt, p_src->p_picture);
         if (p_dst == NULL)
             break;
+
+        p_dst->i_x      = p_src->i_x;
+        p_dst->i_y      = p_src->i_y;
+        // fields not modified on the source
+        p_dst->i_align  = p_src->i_align;
+        p_dst->i_alpha  = p_src->i_alpha;
+        p_dst->zoom_h   = p_src->zoom_h;
+        p_dst->zoom_v   = p_src->zoom_v;
+
         vlc_spu_regions_push(&p_subpic->regions, p_dst);
     }
     p_overlay->status = Displayed;
