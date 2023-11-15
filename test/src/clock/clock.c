@@ -629,7 +629,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "lowprecision",
     .desc = "low precision update has a coeff near 1.0f",
-    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_FROM_SEC(240), DEFAULT_STREAM_INCREMENT, 60),
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
     .coeff_epsilon = 0.005,
     .update = lowprecision_update,
     .check = lowprecision_check,
