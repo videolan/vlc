@@ -35,6 +35,7 @@ extern NSString *VLCWindowLevelKey;
 @interface VLCVideoOutputProvider : NSObject
 
 @property (readonly, nonatomic) NSInteger currentStatusWindowLevel;
+@property (readonly) NSDictionary *voutWindows;
 
 - (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;
 - (void)removeVoutForDisplay:(NSValue *)o_key;

@@ -608,4 +608,12 @@ int WindowOpen(vlc_window_t *p_wnd)
     [NSNotificationCenter.defaultCenter postNotificationName:VLCWindowShouldUpdateLevel object:self userInfo:@{VLCWindowLevelKey : @(_currentWindowLevel)}];
 }
 
+#pragma mark -
+#pragma mark Property methods
+
+- (NSDictionary *)voutWindows
+{
+    return _voutWindows.copy;
+}
+
 @end
