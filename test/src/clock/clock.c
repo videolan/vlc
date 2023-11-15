@@ -384,12 +384,24 @@ static void run_scenarios(int argc, const char *argv[],
     argv++;
 
     const char *scenario_name = NULL;
+    vlc_tick_t forced_duration = VLC_TICK_INVALID;
     if (argc > 0)
     {
         /* specific test run from the user with custom options */
         scenario_name = argv[0];
         argc--;
         argv++;
+
+        if (argc > 0)
+        {
+            long long val = atoll(argv[0]);
+            if (val > 0)
+            {
+                forced_duration = val;
+                argc--;
+                argv++;
+            }
+        }
     }
 
     libvlc_instance_t *vlc = libvlc_new(argc, argv);
@@ -405,7 +417,12 @@ static void run_scenarios(int argc, const char *argv[],
     {
         if (scenario_name == NULL
          || strcmp(scenario_name, scenarios[i].name) == 0)
-            play_scenario(vlc->p_libvlc_int, tracer, &scenarios[i]);
+        {
+            struct clock_scenario *scenario = &scenarios[i];
+            if (forced_duration != VLC_TICK_INVALID)
+                scenario->duration = forced_duration;
+            play_scenario(vlc->p_libvlc_int, tracer, scenario);
+        }
     }
 
     vlc_tracer_Destroy(tracer);
