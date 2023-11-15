@@ -44,6 +44,7 @@ struct aout_sys
 {
     vlc_tick_t first_play_date;
     vlc_tick_t last_timing_date;
+    vlc_tick_t paused_date;
 };
 
 static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
@@ -70,7 +71,14 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 
 static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
-    (void) aout; (void) paused; (void) date;
+    struct aout_sys *sys = aout->sys;
+    if (paused)
+        sys->paused_date = date;
+    else
+    {
+        sys->first_play_date -= sys->paused_date - date;
+        sys->paused_date = VLC_TICK_INVALID;
+    }
 }
 
 static void Flush(audio_output_t *aout)
@@ -78,6 +86,7 @@ static void Flush(audio_output_t *aout)
     struct aout_sys *sys = aout->sys;
 
     sys->first_play_date = sys->last_timing_date = VLC_TICK_INVALID;
+    sys->paused_date = VLC_TICK_INVALID;
 }
 
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
@@ -126,6 +135,7 @@ static int Open(vlc_object_t *obj)
     if (!sys)
         return VLC_ENOMEM;
     sys->first_play_date = sys->last_timing_date = VLC_TICK_INVALID;
+    sys->paused_date = VLC_TICK_INVALID;
 
     aout->start = Start;
     aout->play = Play;
