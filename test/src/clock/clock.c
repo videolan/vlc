@@ -622,14 +622,6 @@ static void drift_sudden_update(const struct clock_ctx *ctx, size_t index,
     .stream_increment = increment_, \
     .video_fps = video_fps_
 
-#define DRIFT_SCENARIO(name_, desc_, duration_, increment_, video_fps_, drift_) \
-    .name = name_, \
-    .desc = desc_, \
-    INIT_SYSTEM_STREAM_TIMING(duration_, increment_, video_fps_), \
-    .total_drift_duration = drift_, \
-    .update = drift_update, \
-    .check = drift_check,
-
 static struct clock_scenario clock_scenarios[] = {
 {
     .name = "normal",
@@ -647,43 +639,36 @@ static struct clock_scenario clock_scenarios[] = {
     .check = lowprecision_check,
 },
 {
-    DRIFT_SCENARIO(
-        "drift_72",
-        "a drift of 72ms in 2h is handled",
-        VLC_TICK_2H,
-        DEFAULT_STREAM_INCREMENT,
-        60,
-        VLC_TICK_FROM_MS(72)
-)},
-{
-    DRIFT_SCENARIO(
-        "drift_-72",
-        "a drift of -72ms in 2h is handled",
-        VLC_TICK_2H,
-        DEFAULT_STREAM_INCREMENT,
-        60,
-        -VLC_TICK_FROM_MS(72)
-    )
+    .name = "drift_72",
+    .desc = "a drift of 72ms in 2h is handled",
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
+    .total_drift_duration = VLC_TICK_FROM_MS(72),
+    .update = drift_update,
+    .check = drift_check,
 },
 {
-    DRIFT_SCENARIO(
-        "drift_864",
-        "a drift of 864ms in 24h is handled",
-        VLC_TICK_24H,
-        DEFAULT_STREAM_INCREMENT,
-        0, /* too long to test video */
-        VLC_TICK_FROM_MS(864)
-    )
+    .name = "drift_-72",
+    .desc = "a drift of -72ms in 2h is handled",
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
+    .total_drift_duration = -VLC_TICK_FROM_MS(72),
+    .update = drift_update,
+    .check = drift_check,
 },
 {
-    DRIFT_SCENARIO(
-        "drift_-864",
-        "a drift of -864ms in 24h is handled",
-        VLC_TICK_24H,
-        DEFAULT_STREAM_INCREMENT,
-        0, /* too long to test video */
-        -VLC_TICK_FROM_MS(864)
-    )
+    .name = "drift_864",
+    .desc = "a drift of 864ms in 24h is handled",
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
+    .total_drift_duration = VLC_TICK_FROM_MS(864),
+    .update = drift_update,
+    .check = drift_check,
+},
+{
+    .name = "drift_-864",
+    .desc = "a drift of -864ms in 24h is handled",
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
+    .total_drift_duration = -VLC_TICK_FROM_MS(864),
+    .update = drift_update,
+    .check = drift_check,
 },
 {
     .name = "drift_sudden",
