@@ -310,7 +310,8 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 void input_clock_Reset( input_clock_t *cl )
 {
     cl->b_has_reference = false;
-    cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
+    cl->ref = cl->last
+        = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
 
     if (cl->listener.cbs != NULL && cl->listener.cbs->reset != NULL)
