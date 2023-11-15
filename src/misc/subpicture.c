@@ -366,28 +366,3 @@ unsigned picture_BlendSubpicture(picture_t *dst,
     }
     return done;
 }
-
-subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
-{
-    if (!p_region_src)
-        return NULL;
-    subpicture_region_t *p_region_dst = subpicture_region_New(&p_region_src->fmt);
-    if (unlikely(!p_region_dst))
-        return NULL;
-
-    p_region_dst->i_x      = p_region_src->i_x;
-    p_region_dst->i_y      = p_region_src->i_y;
-    p_region_dst->i_align  = p_region_src->i_align;
-    p_region_dst->i_alpha  = p_region_src->i_alpha;
-
-    p_region_dst->text_flags      = p_region_src->text_flags;
-    p_region_dst->i_max_width     = p_region_src->i_max_width;
-    p_region_dst->i_max_height    = p_region_src->i_max_height;
-    p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );
-
-    p_region_dst->zoom_h   = p_region_src->zoom_h;
-    p_region_dst->zoom_v   = p_region_src->zoom_v;
-
-    picture_CopyPixels(p_region_dst->p_picture, p_region_src->p_picture);
-    return p_region_dst;
-}

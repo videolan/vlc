@@ -167,14 +167,6 @@ VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
 VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
 
 /**
- * This function will copy a subpicture region to a new allocated one
- * and transfer all the properties
- *
- * Provided for convenience.
- */
-VLC_API subpicture_region_t *subpicture_region_Copy( subpicture_region_t *p_region );
-
-/**
  * Tells if the region is a text-based region.
  */
 #define subpicture_region_IsText(r)  \
