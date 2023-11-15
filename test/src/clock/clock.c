@@ -376,25 +376,20 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     vlc_clock_main_Delete(mainclk);
 }
 
-static void run_scenarios(int main_argc, const char *main_argv[],
+static void run_scenarios(int argc, const char *argv[],
                           struct clock_scenario *scenarios, size_t count)
 {
-
-    int argc;
-    const char * const *argv;
+    /* Skip argv[0] */
+    argc--;
+    argv++;
 
     const char *scenario_name = NULL;
-    if (main_argc > 1)
+    if (argc > 0)
     {
         /* specific test run from the user with custom options */
-        scenario_name = main_argv[1];
-        argc = main_argc - 1;
-        argv = &main_argv[1];
-    }
-    else
-    {
-        argc = main_argc;
-        argv = main_argv;
+        scenario_name = argv[0];
+        argc--;
+        argv++;
     }
 
     libvlc_instance_t *vlc = libvlc_new(argc, argv);
