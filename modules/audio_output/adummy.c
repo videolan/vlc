@@ -40,8 +40,6 @@ vlc_module_begin ()
     add_shortcut( "dummy" )
 vlc_module_end ()
 
-#define A52_FRAME_NB 1536
-
 struct aout_sys
 {
     vlc_tick_t first_play_date;
