@@ -864,6 +864,15 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _splitViewBottomConstraintToSuperView.priority = 1;
 }
 
+- (void)presentExternalWindows
+{
+    VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
+    NSArray<NSWindow *> * const voutWindows = voutProvider.voutWindows.allValues;
+    for (NSWindow * const window in voutWindows) {
+        [window makeKeyAndOrderFront:self];
+    }
+}
+
 - (void)presentVideoView
 {
     for (NSView *subview in _libraryTargetView.subviews) {
@@ -912,6 +921,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)enableVideoPlaybackAppearance
 {
+    const BOOL isEmbedded = var_InheritBool(getIntf(), "embedded-video");
+    if (!isEmbedded) {
+        [self presentExternalWindows];
+        return;
+    }
+
     [self presentVideoView];
 
     [self.segmentedTitleControl setHidden:YES];
