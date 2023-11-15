@@ -630,6 +630,9 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         vlc_tick_t play_date =
             vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay, dec_pts,
                                       stream->sync.rate);
+        if (play_date == VLC_TICK_MAX)
+            return; /* Paused, don't handle drift */
+
         drift = play_date - system_now - delay;
     }
     else
@@ -651,6 +654,9 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
             vlc_tick_t play_date =
                 vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
                                           dec_pts, stream->sync.rate);
+            if (play_date == VLC_TICK_MAX)
+                return; /* Paused, don't handle drift */
+
             vlc_tick_t jitter = play_date - system_now;
             if (jitter > 0)
             {
