@@ -76,6 +76,8 @@ struct vlc_aout_stream
 
         vlc_tick_t system_ts;
         vlc_tick_t audio_ts;
+
+        vlc_tick_t pause_date;
         float rate;
     } timing;
 
@@ -165,6 +167,8 @@ static void stream_Discontinuity(vlc_aout_stream *stream)
     stream->timing.system_ts = VLC_TICK_INVALID;
     stream->timing.audio_ts = VLC_TICK_INVALID;
     vlc_mutex_unlock(&stream->timing.lock);
+
+    stream->timing.pause_date = VLC_TICK_INVALID;
     stream->timing.played_samples = 0;
 }
 
@@ -837,6 +841,24 @@ void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
                                   paused ? "paused" : "resumed");
+
+        if (paused)
+        {
+            assert(stream->timing.pause_date == VLC_TICK_INVALID);
+            stream->timing.pause_date = date;
+        }
+        else
+        {
+            assert(stream->timing.pause_date != VLC_TICK_INVALID);
+            /* Delay the last timing with the pause duration. This will be used
+             * by stream_GetDelay() until the module updates its next point
+             * after being resumed. */
+            vlc_mutex_lock(&stream->timing.lock);
+            if (stream->timing.system_ts != VLC_TICK_INVALID)
+                stream->timing.system_ts += date - stream->timing.pause_date;
+            vlc_mutex_unlock(&stream->timing.lock);
+            stream->timing.pause_date = VLC_TICK_INVALID;
+        }
 
         if (aout->pause != NULL)
             aout->pause(aout, paused, date);
