@@ -23,6 +23,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "."
 
 T.ToolButton {
     id: control
@@ -100,10 +101,7 @@ T.ToolButton {
         border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
-    contentItem: T.Label {
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-
+    contentItem: IconLabel {
         text: control.text
 
         color: control.color
@@ -116,7 +114,5 @@ T.ToolButton {
         }
 
         font: control.font
-
-        Accessible.ignored: true
     }
 }
