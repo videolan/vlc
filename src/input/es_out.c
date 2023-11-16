@@ -3455,6 +3455,8 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         if( ret != VLC_SUCCESS )
             return ret;
         es->fmt.i_id = i_id;
+        if( !es->fmt.i_original_fourcc )
+            es->fmt.i_original_fourcc = es->fmt.i_codec;
         EsOutFillEsFmt( out, &es->fmt );
         EsOutUpdateEsLanguageTitle(es, &es->fmt);
 
