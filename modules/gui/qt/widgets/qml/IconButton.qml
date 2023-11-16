@@ -22,6 +22,7 @@ import QtQuick.Templates 2.12 as T
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "."
 
 T.Button {
     id: control
@@ -29,8 +30,10 @@ T.Button {
     property color color: "white"
     property string description
 
-    width: content.implicitWidth
-    height: content.implicitHeight
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
     font.family: VLCIcons.fontFamily
 
@@ -46,17 +49,10 @@ T.Button {
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
     T.ToolTip.text: description
 
-    contentItem: Item {
-        T.Label {
-            id: content
-            anchors.centerIn: parent
-            text: control.text
-            color: control.color
-            font: control.font
-
-            //Button text is already exposed
-            Accessible.ignored: true
-        }
+    contentItem: IconLabel {
+        font: control.font
+        color: control.color
+        text: control.text
     }
 
     background: Item {
