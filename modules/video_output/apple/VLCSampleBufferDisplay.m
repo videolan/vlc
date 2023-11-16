@@ -447,7 +447,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
         CGImageRef image = CGImageCreate(
             r->fmt.i_visible_width, r->fmt.i_visible_height,
             8, 32, r->p_picture->p->i_pitch,
-            space, kCGImageByteOrderDefault | kCGImageAlphaFirst,
+            space, kCGImageAlphaFirst,
             provider, NULL, true, kCGRenderingIntentDefault
             );
         VLCSampleBufferSubpictureRegion *region;
