@@ -216,6 +216,9 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr)
     }
     free(sr->regions);
 
+    assert(sr->program_id);
+    sr->vt->DeleteProgram(sr->program_id);
+
     free(sr);
 }
 
