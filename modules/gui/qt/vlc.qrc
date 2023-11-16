@@ -31,7 +31,7 @@
         <file alias="network.svg">pixmaps/menu/network.svg</file>
         <file alias="ic_fluent_next.svg">pixmaps/menu/ic_fluent_next.svg</file>
         <file alias="ic_pause_filled.svg">pixmaps/menu/ic_pause_filled.svg</file>
-        <file alias="playlist.svg">pixmaps/menu/ic_playlist.svg</file>
+        <file alias="ic_playlist.svg">pixmaps/menu/ic_playlist.svg</file>
         <file alias="ic_fluent_play_filled.svg">pixmaps/menu/ic_fluent_play_filled.svg</file>
         <file alias="preferences.svg">pixmaps/menu/preferences.svg</file>
         <file alias="ic_fluent_previous.svg">pixmaps/menu/ic_fluent_previous.svg</file>
