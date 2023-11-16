@@ -227,6 +227,8 @@ Slider {
 
             hoverEnabled: true
 
+            preventStealing: true
+
             onPressed: fsm.pressControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier)
 
             onReleased: fsm.releaseControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier)
