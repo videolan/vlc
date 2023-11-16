@@ -42,14 +42,12 @@ T.TabButton {
     width: control.showText ? VLCStyle.bannerTabButton_width_large
                             : VLCStyle.icon_banner
 
-    height: implicitHeight
-
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    padding: 0
+    padding: VLCStyle.margin_xxsmall
 
     text: model.displayText
 
@@ -84,75 +82,92 @@ T.TabButton {
     }
 
     background: Widgets.AnimatedBackground {
-        height: control.height
-        width: control.width
-
         enabled: theme.initialized
 
         animationDuration: VLCStyle.duration_short
 
         color: theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
-    }
 
-    contentItem: Item {
-        implicitWidth: tabRow.implicitWidth + VLCStyle.margin_xxsmall * 2
-        implicitHeight: tabRow.implicitHeight
-
-        RowLayout {
-            id: tabRow
-
-            anchors.centerIn: parent
-            anchors.leftMargin: VLCStyle.margin_xxsmall
-            anchors.rightMargin: VLCStyle.margin_xxsmall
-
-            spacing: VLCStyle.margin_xsmall
-
-            Widgets.IconLabel {
-                text: control.iconTxt
-
-                color: (control.selected || control.activeFocus || control.hovered)
-                        ? theme.accent
-                        : theme.fg.primary
-
-                font.pixelSize: VLCStyle.icon_banner
+        Widgets.CurrentIndicator {
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: VLCStyle.margin_xxxsmall
+                horizontalCenter: parent.horizontalCenter
             }
 
-            T.Label {
-                visible: showText
+            width: control.contentItem ? control.contentItem.implicitWidth : 0
 
-                text: control.text
+            visible: (width > 0 && control.showCurrentIndicator && control.selected)
+        }
+    }
 
-                color: control.selected ? theme.fg.secondary : theme.fg.primary
+    contentItem: RowLayout {
+        spacing: 0
 
-                Behavior on color {
-                    enabled: theme.initialized
+        Item {
+            Layout.fillWidth: true
+        }
 
-                    ColorAnimation {
-                        duration: VLCStyle.duration_long
-                    }
+        Widgets.IconLabel {
+            id: iconLabel
+
+            visible: text.length > 0
+
+            text: control.iconTxt
+
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            color: (control.selected || control.activeFocus || control.hovered)
+                    ? theme.accent
+                    : theme.fg.primary
+
+            font.pixelSize: VLCStyle.icon_banner
+
+            Layout.fillWidth: !label.visible
+            Layout.fillHeight: true
+        }
+
+        T.Label {
+            id: label
+
+            visible: showText
+
+            text: control.text
+
+            verticalAlignment: Text.AlignVCenter
+
+            color: control.selected ? theme.fg.secondary : theme.fg.primary
+
+            elide: Text.ElideRight
+
+            font.pixelSize: VLCStyle.fontSize_normal
+
+            font.weight: (control.activeFocus ||
+                          control.hovered     ||
+                          control.selected) ? Font.DemiBold
+                                            : Font.Normal
+
+            //button text is already exposed
+            Accessible.ignored: true
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.maximumWidth: implicitWidth + 1
+            Layout.leftMargin: iconLabel.visible ? VLCStyle.margin_xsmall : 0
+
+            Behavior on color {
+                enabled: theme.initialized
+
+                ColorAnimation {
+                    duration: VLCStyle.duration_short
                 }
-
-                font.pixelSize: VLCStyle.fontSize_normal
-
-                font.weight: (control.activeFocus ||
-                              control.hovered     ||
-                              control.selected) ? Font.DemiBold
-                                                : Font.Normal
-
-                //button text is already exposed
-                Accessible.ignored: true
             }
         }
 
-        Widgets.CurrentIndicator {
-            length: tabRow.width
-
-            orientation: Qt.Horizontal
-
-            margin: VLCStyle.margin_xxsmall
-
-            visible: (control.showCurrentIndicator && control.selected)
+        Item {
+            Layout.fillWidth: true
         }
     }
 }

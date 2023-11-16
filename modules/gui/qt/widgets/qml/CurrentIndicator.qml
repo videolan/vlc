@@ -23,42 +23,12 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 Rectangle {
-    id: root
-
-    property int orientation: Qt.Vertical
-    property int margin: VLCStyle.margin_xxxsmall
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
     }
 
-    property Item source: parent
-
-    property int length: 0
-
-    property var _position: [
-        {
-            // for orientation == Qt.Vertical
-            "width" : VLCStyle.heightBar_xxxsmall,
-            "height": root.length,
-            "x": margin,
-            "y": !!source ? (source.height - root.length) / 2 : 0
-        },
-        {
-            // for orientation == Qt.Horizontal
-            "width": root.length,
-            "height": VLCStyle.heightBar_xxxsmall,
-            "x": !!source ? (source.width - root.length) / 2 : 0,
-            "y": !!source ? source.height - margin : 0,
-        }
-    ]
-
-    property var _currentPosition: (orientation === Qt.Vertical) ? _position[0] : _position[1]
-
     color: theme.accent
 
-    x: _currentPosition.x
-    y: _currentPosition.y
-    width: _currentPosition.width
-    height: _currentPosition.height
+    implicitWidth: VLCStyle.heightBar_xxxsmall
+    implicitHeight: VLCStyle.heightBar_xxxsmall
 }

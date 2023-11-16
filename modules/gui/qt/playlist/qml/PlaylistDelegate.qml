@@ -116,21 +116,13 @@ T.ItemDelegate {
         border.color: delegate.visualFocus ? theme.visualFocus : "transparent"
 
         Widgets.CurrentIndicator {
-            id: currentIndicator
-
             anchors {
                 left: parent.left
-                top: parent.top
-                bottom: parent.bottom
                 leftMargin: VLCStyle.margin_xxsmall
-                topMargin: VLCStyle.margin_xxsmall
-                bottomMargin: anchors.topMargin
+                verticalCenter: parent.verticalCenter
             }
 
-            // disable positioning via CurrentIndicator, manually position according to RowLayout
-            source: null
-
-            implicitWidth: VLCStyle.heightBar_xxxsmall
+            implicitHeight: parent.height * 3 / 4
 
             color: {
                 if (model.isCurrent)

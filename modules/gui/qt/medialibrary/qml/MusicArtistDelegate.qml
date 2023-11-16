@@ -81,9 +81,13 @@ T.ItemDelegate {
         border.color: visualFocus ? theme.visualFocus : "transparent"
 
         Widgets.CurrentIndicator {
-            length: parent.height - (margin * 2)
+            anchors {
+                left: parent.left
+                leftMargin: VLCStyle.margin_xxxsmall
+                verticalCenter: parent.verticalCenter
+            }
 
-            margin: VLCStyle.dp(2, VLCStyle.scale)
+            implicitHeight: parent.height * 3 / 4
 
             visible: isCurrent
         }
