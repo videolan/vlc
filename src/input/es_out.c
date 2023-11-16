@@ -2142,9 +2142,10 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
         break;
     }
     EsOutFillEsFmt( out, &es->fmt );
-    es->psz_language = LanguageGetName( es->fmt.psz_language ); /* remember so we only need to do it once */
-    es->psz_language_code = LanguageGetCode( es->fmt.psz_language );
-    es->psz_title = EsGetTitle(es);
+    es->psz_title = NULL;
+    es->psz_language = NULL;
+    es->psz_language_code = NULL;
+    EsOutUpdateEsLanguageTitle( es, &es->fmt ); /* remember so we only need to do it once */
     es->p_dec = NULL;
     es->p_dec_record = NULL;
     es->p_clock = NULL;
