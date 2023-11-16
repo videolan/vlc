@@ -19,7 +19,10 @@ import QtQuick 2.12
 import "qrc:///style/"
 
 Text {
-    elide: Text.ElideRight
+    elide: Text.ElideNone
+
+    verticalAlignment: Text.AlignVCenter
+    horizontalAlignment: Text.AlignHCenter
 
     font {
         pixelSize: VLCStyle.icon_normal
