@@ -33,14 +33,14 @@
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F6N-G1-ay4" customClass="VLCCustomWindowCloseButton">
                                 <rect key="frame" x="8" y="217" width="14" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="16" id="h5F-zc-xQI"/>
-                                    <constraint firstAttribute="width" constant="14" id="u5l-1z-YIF"/>
-                                </constraints>
                                 <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="window-close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="WwK-DC-6gz" customClass="VLCWindowButtonCell">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="h5F-zc-xQI"/>
+                                    <constraint firstAttribute="width" constant="14" id="u5l-1z-YIF"/>
+                                </constraints>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="239" height="65"/>
@@ -53,7 +53,7 @@
                                                 <subviews>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="11">
                                                         <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="backward-3btns" imagePosition="only" alignment="center" alternateImage="backward-3btns-pressed" continuous="YES" enabled="NO" id="14">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="backward-3btns" imagePosition="only" alignment="center" alternateImage="backward-3btns-pressed" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="14">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="label"/>
                                                         </buttonCell>
@@ -63,9 +63,9 @@
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="10">
                                                         <rect key="frame" x="29" y="0.0" width="27" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="play" imagePosition="only" alignment="center" alternateImage="play-pressed" id="15">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="play" imagePosition="only" alignment="center" alternateImage="play-pressed" imageScaling="proportionallyUpOrDown" id="15">
                                                             <behavior key="behavior" lightByContents="YES"/>
-                                                            <font key="font" metaFont="titleBar" size="12"/>
+                                                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="play:" target="3" id="39"/>
@@ -73,7 +73,7 @@
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="12">
                                                         <rect key="frame" x="56" y="0.0" width="29" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="forward-3btns" imagePosition="only" alignment="center" alternateImage="forward-3btns-pressed" continuous="YES" enabled="NO" id="13">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="forward-3btns" imagePosition="only" alignment="center" alternateImage="forward-3btns-pressed" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="13">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="label"/>
                                                         </buttonCell>
@@ -97,7 +97,7 @@
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCSlider">
-                                                <rect key="frame" x="10" y="42" width="172" height="16"/>
+                                                <rect key="frame" x="8" y="41" width="176" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
                                                 </constraints>
@@ -108,7 +108,7 @@
                                                     <action selector="timeSliderAction:" target="3" id="46"/>
                                                 </connections>
                                             </slider>
-                                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
+                                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
                                                 <rect key="frame" x="185" y="44" width="46" height="13"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="42" id="EvZ-Sy-m25"/>
