@@ -31,63 +31,49 @@
 
 @implementation VLCTrackingView
 
-- (void)handleMouseExit
+- (void)performTransition
 {
-    _mouseIn = NO;
-
     if (self.animatesTransition) {
-        [self.viewToHide setAlphaValue:1.0];
-        [self.viewToShow setAlphaValue:.0];
-        [self.viewToShow setHidden:NO];
+        const BOOL hideVTH = !_mouseIn;
+        const BOOL hideVTS = _mouseIn;
 
         __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
         __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
 
-        [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
-            [[NSAnimationContext currentContext] setDuration:0.9];
-            [[weakViewToHide animator] setAlphaValue:0.0];
-            [[weakViewToShow animator] setAlphaValue:1.0];
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context){
+            NSAnimationContext.currentContext.duration = 0.9;
+            weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
+            weakViewToShow.animator.alphaValue = hideVTS ? 0.0 : 1.0;
         } completionHandler:^{
-            [weakViewToHide setHidden:YES];
+            weakViewToHide.hidden = hideVTH;
+            weakViewToShow.hidden = hideVTS;
         }];
     } else {
-        self.viewToHide.hidden = YES;
-        self.viewToShow.hidden = NO;
+        self.viewToHide.hidden = !_mouseIn;
+        self.viewToShow.hidden = _mouseIn;
     }
 }
 
 - (void)handleMouseEnter
 {
     _mouseIn = YES;
-
-    if (self.animatesTransition) {
-        [self.viewToHide setAlphaValue:.0];
-        [self.viewToHide setHidden:NO];
-
-        __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
-        __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
-
-        [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
-            [[NSAnimationContext currentContext] setDuration:0.9];
-            [[weakViewToHide animator] setAlphaValue:1.0];
-            [[weakViewToShow animator] setAlphaValue:.0];
-        } completionHandler:^{
-            [weakViewToShow setHidden:YES];
-        }];
-    } else {
-        self.viewToHide.hidden = NO;
-        self.viewToShow.hidden = YES;
-    }
+    [self performTransition];
 }
 
-- (void)mouseExited:(NSEvent *)event
+- (void)handleMouseExit
 {
-    [self handleMouseExit];
+    _mouseIn = NO;
+    [self performTransition];
 }
 
 - (void)mouseEntered:(NSEvent *)event
 {
     [self handleMouseEnter];
+}
+
+- (void)mouseExited:(NSEvent *)event
+{
+    [self handleMouseExit];
 }
 
 - (void)updateTrackingAreas

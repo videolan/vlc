@@ -27,8 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCTrackingView : NSView
 
 @property (readwrite) BOOL animatesTransition;
-@property (readwrite, assign, nullable) NSView *viewToHide;
-@property (readwrite, assign, nullable) NSView *viewToShow;
+@property (readwrite, assign, nullable) NSView *viewToHide; // Hide when mouse out
+@property (readwrite, assign, nullable) NSView *viewToShow; // Show when mouse out
 
 @end
 
