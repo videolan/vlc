@@ -1029,7 +1029,7 @@ static void RequestReload( vlc_input_decoder_t *p_owner )
     atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
 }
 
-static void DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
+static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 {
     vlc_fifo_Assert(p_owner->p_fifo);
 
@@ -1041,6 +1041,8 @@ static void DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 
     while( p_owner->b_waiting && p_owner->b_has_data )
         vlc_fifo_WaitCond(p_owner->p_fifo, &p_owner->wait_request);
+
+    return VLC_SUCCESS;
 }
 
 static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const vlc_frame_t *p )
@@ -1350,7 +1352,12 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     }
     else
     {
-        DecoderWaitUnblock( p_owner );
+        int ret = DecoderWaitUnblock(p_owner);
+        if (ret != VLC_SUCCESS)
+        {
+            picture_Release(p_picture);
+            return ret;
+        }
     }
 
     if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
@@ -1487,7 +1494,12 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         vlc_aout_stream_Flush( p_astream );
     }
 
-    DecoderWaitUnblock( p_owner );
+    int ret = DecoderWaitUnblock(p_owner);
+    if (ret != VLC_SUCCESS)
+    {
+        block_Release(p_audio);
+        return ret;
+    }
 
     int status = vlc_aout_stream_Play( p_astream, p_audio );
     if( status == AOUT_DEC_CHANGED )
@@ -1550,10 +1562,10 @@ static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_
 
     /* */
     vlc_fifo_Lock(p_owner->p_fifo);
-    DecoderWaitUnblock( p_owner );
+    int ret = DecoderWaitUnblock(p_owner);
     vlc_fifo_Unlock(p_owner->p_fifo);
 
-    if( p_subpic->i_start == VLC_TICK_INVALID )
+    if (ret != VLC_SUCCESS || p_subpic->i_start == VLC_TICK_INVALID)
     {
         subpicture_Delete( p_subpic );
         return;
