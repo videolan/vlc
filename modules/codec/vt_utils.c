@@ -385,7 +385,7 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
             return kCVImageBufferTransferFunction_ITU_R_2100_HLG;
         break;
     case TRANSFER_FUNC_LINEAR:
-        if (__builtin_available(macOS 10.14, iOS 12, *))
+        if (__builtin_available(macOS 10.14, iOS 12, tvOS 12, watchOS 5, *))
             return kCVImageBufferTransferFunction_Linear;
         break;
     case TRANSFER_FUNC_SRGB:
@@ -403,7 +403,7 @@ cvpx_map_TransferFunction_from_vtf(video_transfer_func_t transfer_func)
 }
 
 bool cvpx_has_attachment(CVPixelBufferRef pixelBuffer, CFStringRef key) {
-    if (__builtin_available(macOS 10.12, iOS 15, tvOS 15.0, *)) {
+    if (__builtin_available(macOS 10.12, iOS 15, tvOS 15, watchOS 8, *)) {
         return CVBufferHasAttachment(pixelBuffer, key);
     }
 #pragma clang diagnostic push
