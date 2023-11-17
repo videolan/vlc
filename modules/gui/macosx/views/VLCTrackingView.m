@@ -40,6 +40,9 @@
         __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
         __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
 
+        weakViewToHide.hidden = NO;
+        weakViewToShow.hidden = NO;
+
         [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context){
             NSAnimationContext.currentContext.duration = 0.9;
             weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
