@@ -2186,6 +2186,9 @@ ctx_init(struct ctx *ctx, enum ctx_flags flags)
         (flags & DISABLE_VIDEO) ? "--no-video" : "--video",
         (flags & DISABLE_AUDIO) ? "--no-audio" : "--audio",
         "--text-renderer=tdummy",
+#ifdef TEST_CLOCK_MONOTONIC
+        "--clock-master=monotonic",
+#endif
     };
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
@@ -2425,6 +2428,12 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
         }
     }
 
+/* If there is no master source, we can't known which sources (audio or video)
+ * will feed the timer. Indeed the first source that trigger a clock update
+ * will be used as a timer source (and audio/video goes through decoder threads
+ * and output threads, adding more uncertainty). */
+#ifndef TEST_CLOCK_MONOTONIC
+
     /* Assertions for the regular timer that received all update points */
     if (track_count != 0)
     {
@@ -2474,6 +2483,7 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
             }
         }
     }
+#endif
 
     if (track_count > 0)
         test_timers_assert_smpte(&timers[SMPTE_TIMER_IDX], length, fps, false, 3);

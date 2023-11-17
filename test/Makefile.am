@@ -32,6 +32,7 @@ check_PROGRAMS = \
 	test_src_input_thumbnail \
 	test_src_input_decoder \
 	test_src_player \
+	test_src_player_monotonic_clock \
 	test_src_interface_dialog \
 	test_src_media_source \
 	test_src_misc_bits \
@@ -179,6 +180,9 @@ test_src_input_thumbnail_SOURCES = src/input/thumbnail.c
 test_src_input_thumbnail_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_player_SOURCES = src/player/player.c
 test_src_player_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+test_src_player_monotonic_clock_SOURCES = src/player/player.c
+test_src_player_monotonic_clock_CFLAGS = $(AM_CFLAGS) -DTEST_CLOCK_MONOTONIC
+test_src_player_monotonic_clock_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_misc_bits_SOURCES = src/misc/bits.c
 test_src_misc_bits_LDADD = $(LIBVLC)
 test_src_misc_epg_SOURCES = src/misc/epg.c
