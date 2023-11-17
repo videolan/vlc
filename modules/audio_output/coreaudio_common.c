@@ -648,6 +648,7 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                         "for 7.1 Rear Surround");
         }
 
+        size_t chans_out_idx = 0;
         for (unsigned i = 0; i < outlayout->mNumberChannelDescriptions; i++)
         {
             AudioChannelLabel chan =
@@ -659,15 +660,12 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 AudioChannelLabelToVlcChan(chan, swap_rear_surround == 2);
             if (mapped_chan != 0)
             {
-                chans_out[i] = mapped_chan;
+                chans_out[chans_out_idx++] = mapped_chan;
                 fmt->i_physical_channels |= mapped_chan;
             }
             else
-            {
-                chans_out[i] = 0;
                 msg_Dbg(p_aout, "found nonrecognized channel %d at index "
                         "%u", (int) chan, i);
-            }
         }
         if (fmt->i_physical_channels == 0)
         {
