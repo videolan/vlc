@@ -36,6 +36,7 @@
     if (self.animatesTransition) {
         const BOOL hideVTH = !_mouseIn;
         const BOOL hideVTS = _mouseIn;
+        const BOOL startMouseIn = _mouseIn;
 
         __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
         __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
@@ -48,6 +49,9 @@
             weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
             weakViewToShow.animator.alphaValue = hideVTS ? 0.0 : 1.0;
         } completionHandler:^{
+            if (startMouseIn != _mouseIn) {
+                return;
+            }
             weakViewToHide.hidden = hideVTH;
             weakViewToShow.hidden = hideVTS;
         }];
