@@ -40,6 +40,7 @@ FocusScope {
 
     BindingCompat on Layout.minimumWidth {
         delayed: true
+        when: controlLayout._componentCompleted
         value: {
             const count = repeater.count
 
@@ -63,6 +64,7 @@ FocusScope {
 
     BindingCompat on Layout.maximumWidth {
         delayed: true
+        when: controlLayout._componentCompleted
         value: {
             let maximumWidth = 0
             const count = repeater.count
@@ -86,6 +88,8 @@ FocusScope {
         id: theme
         colorSet: ColorContext.Window
     }
+
+    property bool _componentCompleted: false
 
     // Aliases
 
@@ -118,6 +122,8 @@ FocusScope {
     Component.onCompleted: {
         visibleChanged.connect(_handleFocus)
         activeFocusChanged.connect(_handleFocus)
+
+        _componentCompleted = true
     }
 
     // Functions

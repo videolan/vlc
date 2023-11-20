@@ -211,6 +211,7 @@ FocusScope {
 
         BindingCompat on width {
             delayed: true
+            when: loaderCenter._componentCompleted
             value: {
                 const item = loaderCenter.item
 
@@ -223,6 +224,12 @@ FocusScope {
                     return Math.min(loaderCenter.parent.width, maximumWidth)
                 }
             }
+        }
+
+        property bool _componentCompleted: false
+
+        Component.onCompleted: {
+            _componentCompleted = true
         }
 
         sourceComponent: ControlLayout {
