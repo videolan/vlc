@@ -169,6 +169,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     /* Released in RemoveAnnounce */
     p_input = input_item_NewStream(uri, p_sdp->name,
                                    INPUT_DURATION_INDEFINITE);
+    free(uri);
     if( unlikely(p_input == NULL) )
         goto error;
 
