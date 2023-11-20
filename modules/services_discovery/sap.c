@@ -148,19 +148,17 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     if (p_sdp == NULL)
         return NULL;
 
+    sap_announce_t *p_sap = malloc(sizeof (*p_sap));
+    if( p_sap == NULL )
+        goto error;
+
     char *uri = NULL;
 
     if (asprintf(&uri, "sdp://%s", psz_sdp) == -1)
-    {
-        vlc_sdp_free(p_sdp);
-        return NULL;
-    }
+        goto error;
 
     input_item_t *p_input;
     const char *psz_value;
-    sap_announce_t *p_sap = malloc(sizeof (*p_sap));
-    if( p_sap == NULL )
-        return NULL;
 
     p_sap->i_last = vlc_tick_now();
     p_sap->i_period = 0;
@@ -172,10 +170,8 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     p_input = input_item_NewStream(uri, p_sdp->name,
                                    INPUT_DURATION_INDEFINITE);
     if( unlikely(p_input == NULL) )
-    {
-        free( p_sap );
-        return NULL;
-    }
+        goto error;
+
     p_sap->p_item = p_input;
 
     vlc_meta_t *p_meta = vlc_meta_New();
@@ -213,6 +209,10 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
 
     vlc_sdp_free(p_sdp);
     return p_sap;
+error:
+    free(p_sap);
+    vlc_sdp_free(p_sdp);
+    return NULL;
 }
 
 typedef struct
