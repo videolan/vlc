@@ -329,8 +329,8 @@ static void region_FixFmt(subpicture_region_t *region)
 
 static subpicture_region_t *SpuRenderText(spu_t *spu,
                           const subpicture_region_t *region,
-                          unsigned i_original_width,
-                          unsigned i_original_height,
+                          unsigned output_width,
+                          unsigned output_height,
                           const vlc_fourcc_t *chroma_list)
 {
     spu_private_t *sys = spu->p;
@@ -348,10 +348,10 @@ static subpicture_region_t *SpuRenderText(spu_t *spu,
 
     /* FIXME aspect ratio ? */
     text->fmt_out.video.i_width =
-    text->fmt_out.video.i_visible_width  = i_original_width;
+    text->fmt_out.video.i_visible_width  = output_width;
 
     text->fmt_out.video.i_height =
-    text->fmt_out.video.i_visible_height = i_original_height;
+    text->fmt_out.video.i_visible_height = output_height;
 
     subpicture_region_t *rendered_region = text->ops->render(text, region, chroma_list);
     assert(rendered_region == NULL || !subpicture_region_IsText(rendered_region));
