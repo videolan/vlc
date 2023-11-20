@@ -649,6 +649,22 @@ spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
     return true;
 }
 
+static int spu_entry_EnsureScaledSize(spu_render_entry_t *render_entry)
+{
+    const subpicture_t *subpic = render_entry->subpic;
+    size_t region_count = 0;
+    const subpicture_region_t *r;
+    vlc_spu_regions_foreach_const(r, &subpic->regions)
+        region_count++;
+
+    while (region_count > render_entry->scaled_region_pics.size)
+    {
+        if (unlikely(!vlc_vector_push(&render_entry->scaled_region_pics, NULL)))
+            return VLC_ENOMEM;
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * spu_SelectSubpictures: find the subpictures to display
  *****************************************************************************
@@ -763,19 +779,8 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             if (!is_rejected)
             {
-                size_t region_count = 0;
-                const subpicture_region_t *r;
-                vlc_spu_regions_foreach(r, &current->regions)
-                    region_count++;
-
-                while (region_count > render_entry->scaled_region_pics.size)
-                {
-                    if (!vlc_vector_push(&render_entry->scaled_region_pics, NULL))
-                    {
-                        is_rejected = true;
-                        break;
-                    }
-                }
+                if (unlikely(spu_entry_EnsureScaledSize(render_entry) != VLC_SUCCESS))
+                    is_rejected = true;
             }
 
             if (is_rejected)
