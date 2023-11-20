@@ -1243,6 +1243,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
          */
         vlc_spu_regions_foreach(region, &subpic->regions) {
             spu_area_t area;
+            assert(region_idx < entry->scaled_region_pics.size);
             picture_t **scaled_region_pic = &entry->scaled_region_pics.data[region_idx];
             region_idx++;
 
