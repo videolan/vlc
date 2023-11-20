@@ -175,12 +175,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
 
     p_sap->p_item = p_input;
 
-    vlc_meta_t *p_meta = vlc_meta_New();
-    if( likely(p_meta != NULL) )
-    {
-        vlc_meta_Set(p_meta, vlc_meta_Description, p_sdp->info);
-        p_input->p_meta = p_meta;
-    }
+    input_item_SetMeta(p_input, vlc_meta_Description, p_sdp->info);
 
     psz_value = vlc_sdp_attr_value(p_sdp, "tool");
     if( psz_value != NULL )
