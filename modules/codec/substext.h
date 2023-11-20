@@ -155,8 +155,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     bool b_schedule_blink_update = false;
 
-    for( substext_updater_region_t *p_updtregion = &sys->region;
-                                          p_updtregion; p_updtregion = p_updtregion->p_next )
+    for( substext_updater_region_t *update_region = &sys->region;
+                                    update_region; update_region = update_region->p_next )
     {
         subpicture_region_t *r = subpicture_region_NewText();
         if (!r)
@@ -165,16 +165,16 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->fmt.i_sar_num = sar.num;
         r->fmt.i_sar_den = sar.den;
 
-        r->p_text = text_segment_Copy( p_updtregion->p_segments );
-        r->i_align = p_updtregion->align;
-        r->text_flags |= p_updtregion->inner_align & SUBPICTURE_ALIGN_MASK;
-        if (p_updtregion->flags & UPDT_REGION_IGNORE_BACKGROUND)
+        r->p_text = text_segment_Copy( update_region->p_segments );
+        r->i_align = update_region->align;
+        r->text_flags |= update_region->inner_align & SUBPICTURE_ALIGN_MASK;
+        if (update_region->flags & UPDT_REGION_IGNORE_BACKGROUND)
             r->text_flags |= VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG;
-        bool b_gridmode = (p_updtregion->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;
+        bool b_gridmode = (update_region->flags & UPDT_REGION_USES_GRID_COORDINATES) != 0;
         if (b_gridmode)
             r->text_flags |= VLC_SUBPIC_TEXT_FLAG_GRID_MODE;
 
-        if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE))
+        if (!(update_region->flags & UPDT_REGION_FIXED_DONE))
         {
             const float margin_ratio = sys->margin_ratio;
             const int   margin_h     = margin_ratio * ( b_gridmode ? subpic->i_original_picture_width
@@ -198,30 +198,30 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
             else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
                 r->i_y = margin_v + outerbottom_v;
 
-            if( p_updtregion->flags & UPDT_REGION_ORIGIN_X_IS_RATIO )
-                r->i_x += p_updtregion->origin.x * inner_w;
+            if( update_region->flags & UPDT_REGION_ORIGIN_X_IS_RATIO )
+                r->i_x += update_region->origin.x * inner_w;
             else
-                r->i_x += p_updtregion->origin.x;
+                r->i_x += update_region->origin.x;
 
-            if( p_updtregion->flags & UPDT_REGION_ORIGIN_Y_IS_RATIO )
-                r->i_y += p_updtregion->origin.y * inner_h;
+            if( update_region->flags & UPDT_REGION_ORIGIN_Y_IS_RATIO )
+                r->i_y += update_region->origin.y * inner_h;
             else
-                r->i_y += p_updtregion->origin.y;
+                r->i_y += update_region->origin.y;
 
-            if( p_updtregion->flags & UPDT_REGION_EXTENT_X_IS_RATIO )
-                r->i_max_width += p_updtregion->extent.x * inner_w;
+            if( update_region->flags & UPDT_REGION_EXTENT_X_IS_RATIO )
+                r->i_max_width += update_region->extent.x * inner_w;
             else
-                r->i_max_width += p_updtregion->extent.x;
+                r->i_max_width += update_region->extent.x;
 
-            if( p_updtregion->flags & UPDT_REGION_EXTENT_Y_IS_RATIO )
-                r->i_max_height += p_updtregion->extent.y * inner_h;
+            if( update_region->flags & UPDT_REGION_EXTENT_Y_IS_RATIO )
+                r->i_max_height += update_region->extent.y * inner_h;
             else
-                r->i_max_height += p_updtregion->extent.y;
+                r->i_max_height += update_region->extent.y;
 
         } else {
             /* FIXME it doesn't adapt on crop settings changes */
-            r->i_x = p_updtregion->origin.x * fmt_dst->i_width  / p_updtregion->extent.x;
-            r->i_y = p_updtregion->origin.y * fmt_dst->i_height / p_updtregion->extent.y;
+            r->i_x = update_region->origin.x * fmt_dst->i_width  / update_region->extent.x;
+            r->i_y = update_region->origin.y * fmt_dst->i_height / update_region->extent.y;
         }
 
         /* Add missing default style, if any, to all segments */
