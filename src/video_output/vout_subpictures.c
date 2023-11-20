@@ -2088,6 +2088,13 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         subpicture_Update(subpic,
                           fmt_src, fmt_dst,
                           subpic->b_subtitle ? render_subtitle_date : system_now);
+
+        if (unlikely(spu_entry_EnsureScaledSize(entry) != VLC_SUCCESS))
+        {
+            free(subpicture_array);
+            vlc_mutex_unlock(&sys->lock);
+            return NULL;
+        }
     }
 
     /* Now order the subpicture array
