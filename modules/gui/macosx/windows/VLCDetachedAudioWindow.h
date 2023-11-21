@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon *controlsBar;
 @property (nonatomic, weak) IBOutlet VLCBottomBarView *bottomBarView;
 
++ (instancetype)fromNibWithOwner:(id)owner;
+
 @end
 
 NS_ASSUME_NONNULL_END

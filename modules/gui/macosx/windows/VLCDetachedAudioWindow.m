@@ -20,17 +20,23 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
+#import "VLCDetachedAudioWindow.h"
+
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
+
+#import "library/VLCInputItem.h"
+
 #import "main/VLCMain.h"
-#import "windows/mainwindow/VLCControlsBarCommon.h"
+
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
-#import "library/VLCInputItem.h"
+
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "views/VLCBottomBarView.h"
 
-#import "VLCDetachedAudioWindow.h"
+#import "windows/mainwindow/VLCControlsBarCommon.h"
 
 @interface VLCDetachedAudioWindow()
 {
@@ -39,6 +45,13 @@
 @end
 
 @implementation VLCDetachedAudioWindow
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCDetachedAudioWindow *)[NSView fromNibNamed:VLCDetachedAudioWindow.className
+                                                withClass:VLCDetachedAudioWindow.class
+                                                withOwner:owner];
+}
 
 - (void)awakeFromNib
 {
