@@ -117,6 +117,7 @@ typedef struct decoder_sys_t
     bool                        (*pf_codec_init)(decoder_t *);
     void                        (*pf_codec_clean)(void *);
     bool                        (*pf_codec_supported)(decoder_t *);
+    void                        (*pf_codec_flush)(decoder_t *);
     bool                        (*pf_late_start)(decoder_t *);
     block_t*                    (*pf_process_block)(decoder_t *,
                                                     block_t *, bool *);
@@ -528,6 +529,13 @@ static bool CodecSupportedH264(decoder_t *p_dec)
     return true;
 }
 
+static void CodecFlushH264(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
+    h264_poc_context_init(&h264ctx->poc);
+}
+
 static bool LateStartH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -851,6 +859,13 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
     if (p_sys->i_cvpx_format == 0 && !p_sys->b_cvpx_format_forced)
         p_sys->i_cvpx_format = GetBestChromaFromHxxx(&hevcctx->hh);
     return true;
+}
+
+static void CodecFlushHEVC(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
+    hevc_poc_cxt_init(&hevcctx->poc);
 }
 
 #define ConfigureVoutHEVC ConfigureVoutH264
@@ -1563,6 +1578,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_codec_init = InitH264;
             p_sys->pf_codec_clean = CleanH264;
             p_sys->pf_codec_supported = CodecSupportedH264;
+            p_sys->pf_codec_flush = CodecFlushH264;
             p_sys->pf_late_start = LateStartH264;
             p_sys->pf_process_block = ProcessBlockH264;
             p_sys->pf_need_restart = VideoToolboxNeedsToRestartH264;
@@ -1578,6 +1594,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_codec_init = InitHEVC;
             p_sys->pf_codec_clean = CleanHEVC;
             p_sys->pf_codec_supported = CodecSupportedHEVC;
+            p_sys->pf_codec_flush = CodecFlushHEVC;
             p_sys->pf_late_start = LateStartHEVC;
             p_sys->pf_process_block = ProcessBlockHEVC;
             p_sys->pf_need_restart = VideoToolboxNeedsToRestartHEVC;
@@ -1935,6 +1952,8 @@ static void RequestFlush(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     Drain(p_dec, true);
     date_Set(&p_sys->pts, VLC_TICK_INVALID);
+    if(p_sys->pf_codec_flush)
+        p_sys->pf_codec_flush(p_dec);
 }
 
 static void Drain(decoder_t *p_dec, bool flush)
