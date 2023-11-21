@@ -145,8 +145,12 @@ MainInterface.MainTableView {
     function isDroppable(drop, index) {
         if (drop.source === dragItem) {
             return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
+        } else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) {
+            return true
+        } else if (drop.hasUrls) {
+            return true
         } else {
-            return Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)
+            return false
         }
     }
 
@@ -169,6 +173,12 @@ MainInterface.MainTableView {
                 .then(inputItems => {
                     model.insert(inputItems, destinationIndex)
                 })
+        } else if (drop.hasUrls) {
+            const urlList = []
+            for (let url in drop.urls)
+                urlList.push(drop.urls[url])
+
+            model.insert(urlList, destinationIndex)
         }
 
         root.forceActiveFocus()
