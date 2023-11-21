@@ -387,6 +387,15 @@ T.ToolBar {
 
                             Widgets.SearchBox {
                                 id: searchBox
+
+                                // set max width so that search field not overflows with small screens
+                                // assumes all other sibling is a button of 'VLCStyle.bannerButton_width' width
+                                maxSearchFieldWidth: root.width
+                                                     - (VLCStyle.bannerButton_width * playlistGroup.count)
+                                                     - (playlistGroup.spacing * (playlistGroup.count - 1))
+                                                     - playlistGroup.anchors.rightMargin
+                                                     - VLCStyle.margin_small // padding to left
+
                                 visible: MainCtx.search.available
                                 height: VLCStyle.bannerButton_height
                                 buttonWidth: VLCStyle.bannerButton_width

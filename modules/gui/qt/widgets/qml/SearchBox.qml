@@ -30,6 +30,7 @@ FocusScope {
     implicitWidth: content.implicitWidth
     implicitHeight: content.implicitHeight
 
+    property real maxSearchFieldWidth: Number.MAX_VALUE
     property alias buttonWidth: iconButton.implicitWidth
     property alias searchPattern: textField.text
 
@@ -62,7 +63,8 @@ FocusScope {
                 PropertyChanges {
                     target: textField
                     // Take care if SearchBox was set a specific width:
-                    width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+                    width: Math.min(root.maxSearchFieldWidth,
+                                    (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth))
                 }
 
                 PropertyChanges {
