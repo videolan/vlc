@@ -1568,6 +1568,24 @@ uint8_t * hevc_create_dcr( const struct hevc_dcr_params *p_params,
 #undef HEVC_DCR_ADD_NALS
 #undef HEVC_DCR_ADD_SIZES
 
+bool hevc_NAL_IsIRAP( uint8_t i_nal_type )
+{
+    return ( i_nal_type >= HEVC_NAL_BLA_W_LP &&
+             i_nal_type <= HEVC_NAL_IRAP_VCL23 );
+}
+
+bool hevc_get_IRAPNoRaslOutputFlag( uint8_t i_nal_type,
+                                    const hevc_poc_ctx_t *p_ctx )
+{
+    /* if( IRAP ) NoRaslOutputFlag = first || IDR || BLA || after(EOSNAL) */
+    return ( p_ctx->first_picture ||
+             i_nal_type == HEVC_NAL_IDR_N_LP ||
+             i_nal_type == HEVC_NAL_IDR_W_RADL ||
+             i_nal_type == HEVC_NAL_BLA_W_LP ||
+             i_nal_type == HEVC_NAL_BLA_W_RADL ||
+             i_nal_type == HEVC_NAL_BLA_N_LP ||
+             p_ctx->HandleCraAsBlaFlag );
+}
 
 /*
  * 8.3.1 Decoding process for POC
@@ -1582,25 +1600,9 @@ int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps
         int msb;
     } prevPicOrderCnt;
     int pocMSB;
-    bool NoRaslOutputFlag;
-    bool IsIRAP = ( p_slice->nal_type >= HEVC_NAL_BLA_W_LP &&
-                    p_slice->nal_type <= HEVC_NAL_IRAP_VCL23 );
-
-    if( IsIRAP )
-    {
-        /* if( IRAP ) NoRaslOutputFlag = first || IDR || BLA || after(EOSNAL) */
-        NoRaslOutputFlag =(p_ctx->first_picture ||
-                           p_slice->nal_type == HEVC_NAL_IDR_N_LP ||
-                           p_slice->nal_type == HEVC_NAL_IDR_W_RADL ||
-                           p_slice->nal_type == HEVC_NAL_BLA_W_LP ||
-                           p_slice->nal_type == HEVC_NAL_BLA_W_RADL ||
-                           p_slice->nal_type == HEVC_NAL_BLA_N_LP ||
-                           p_ctx->HandleCraAsBlaFlag );
-    }
-    else
-    {
-        NoRaslOutputFlag = false;
-    }
+    const bool IsIRAP = hevc_NAL_IsIRAP( p_slice->nal_type );
+    const bool NoRaslOutputFlag =
+        IsIRAP ? hevc_get_IRAPNoRaslOutputFlag( p_slice->nal_type, p_ctx ) : false;
 
 #ifdef HEVC_POC_DEBUG
     printf("slice lsb=%"PRIu32" irap=%d norasl=%d tid=%d msb=%d lsb=%d",

@@ -378,6 +378,10 @@ static inline void hevc_poc_cxt_init( hevc_poc_ctx_t *p_ctx )
 int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
                                        const hevc_slice_segment_header_t *slice,
                                        hevc_poc_ctx_t *ctx );
+bool hevc_NAL_IsIRAP( uint8_t i_nal_type );
+bool hevc_get_IRAPNoRaslOutputFlag( uint8_t nal_type,
+                                    const hevc_poc_ctx_t *);
+
 
 typedef struct hevc_sei_pic_timing_t hevc_sei_pic_timing_t;
 
