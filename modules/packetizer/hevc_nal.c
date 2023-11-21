@@ -1341,6 +1341,11 @@ bool hevc_get_slice_type( const hevc_slice_segment_header_t *p_sli, enum hevc_sl
     return false;
 }
 
+bool hevc_get_slice_pic_output( const hevc_slice_segment_header_t *p_sli )
+{
+    return p_sli->pic_output_flag;
+}
+
 bool hevc_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
                             uint8_t *pi_level, uint8_t *pi_nal_length_size)
 {
