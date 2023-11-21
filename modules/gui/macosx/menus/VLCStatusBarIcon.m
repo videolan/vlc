@@ -494,11 +494,7 @@
 
 - (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender
 {
-    if (!_detachedAudioWindow) {
-        _detachedAudioWindow = [VLCDetachedAudioWindow fromNibWithOwner:self];
-    }
-
-    [_detachedAudioWindow makeKeyAndOrderFront:sender];
+    [VLCMain.sharedInstance.detachedAudioWindow makeKeyAndOrderFront:sender];
 }
 
 @end
