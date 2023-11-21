@@ -84,7 +84,7 @@ static void Flush(sout_stream_t *stream, void *id)
 static session_descriptor_t *CreateSDP(vlc_object_t *obj, int fd)
 {
     vlc_sockaddr src, dst;
-    socklen_t srclen = sizeof (srclen), dstlen = sizeof (dst);
+    socklen_t srclen = sizeof (src), dstlen = sizeof (dst);
     char dhost[INET6_ADDRSTRLEN];
     unsigned short dport;
 
