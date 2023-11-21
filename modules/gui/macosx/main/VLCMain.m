@@ -43,14 +43,15 @@
 #include <vlc_url.h>
 #include <vlc_variables.h>
 
+#import "extensions/NSString+Helpers.h"
+
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowController.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain+OldPrefs.h"
 #import "main/VLCApplication.h"
-
-#import "extensions/NSString+Helpers.h"
 
 #import "menus/VLCMainMenu.h"
 #import "menus/VLCStatusBarIcon.h"
@@ -63,7 +64,6 @@
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
-#import "library/VLCLibraryController.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistModel.h"
@@ -72,11 +72,12 @@
 #import "preferences/prefs.h"
 #import "preferences/VLCSimplePrefsController.h"
 
-#import "windows/extensions/VLCExtensionsManager.h"
-#import "windows/logging/VLCLogWindowController.h"
-#import "windows/convertandsave/VLCConvertAndSaveWindowController.h"
+#import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCOpenInputMetadata.h"
+#import "windows/convertandsave/VLCConvertAndSaveWindowController.h"
+#import "windows/extensions/VLCExtensionsManager.h"
+#import "windows/logging/VLCLogWindowController.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 
@@ -115,6 +116,7 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
     VLCVideoEffectsWindowController *_videoEffectsPanel;
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
     VLCClickerManager *_clickerManager;
+    VLCDetachedAudioWindow *_detachedAudioWindow;
 
     bool _interfaceIsTerminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -260,7 +262,7 @@ static VLCMain *sharedInstance = nil;
     if (_libraryWindowController == nil) {
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
     }
-    
+
     [_libraryWindowController.window makeKeyAndOrderFront:nil];
 
     if (!_p_intf)
@@ -500,6 +502,15 @@ static VLCMain *sharedInstance = nil;
 - (VLCCoreDialogProvider *)coreDialogProvider
 {
     return _coredialogs;
+}
+
+- (VLCDetachedAudioWindow *)detachedAudioWindow
+{
+    if (_detachedAudioWindow == nil) {
+        _detachedAudioWindow = [VLCDetachedAudioWindow fromNibWithOwner:self];
+    }
+
+    return _detachedAudioWindow;
 }
 
 @end

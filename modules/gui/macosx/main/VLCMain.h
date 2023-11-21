@@ -60,6 +60,7 @@ extern NSString *VLCConfigurationChangedNotification;
 @class VLCLibraryController;
 @class VLCPlaylistController;
 @class VLCVideoOutputProvider;
+@class VLCDetachedAudioWindow;
 
 @interface VLCMain : NSObject
 
@@ -85,5 +86,6 @@ extern NSString *VLCConfigurationChangedNotification;
 @property (readonly) VLCTrackSynchronizationWindowController *trackSyncPanel;
 @property (readonly) VLCVideoEffectsWindowController *videoEffectsPanel;
 @property (readonly) VLCVideoOutputProvider *voutProvider;
+@property (readonly) VLCDetachedAudioWindow *detachedAudioWindow;
 
 @end
