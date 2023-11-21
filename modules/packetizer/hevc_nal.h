@@ -299,7 +299,6 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_transfer_func_t *p_transfer,
                            video_color_space_t *p_colorspace,
                            video_color_range_t *p_full_range );
-uint8_t hevc_get_max_num_reorder( const hevc_sequence_parameter_set_t *p_sps );
 void hevc_get_dpb_values( const hevc_sequence_parameter_set_t *, uint8_t *num_reorder_pics,
                           uint8_t *max_latency_pics, uint8_t *max_dec_pic_buffering );
 bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_type_e * );
