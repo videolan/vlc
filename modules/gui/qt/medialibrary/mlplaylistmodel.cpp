@@ -30,6 +30,9 @@
 #include "mlhelper.hpp"
 #include "mlplaylistmedia.hpp"
 
+#include "playlist/playlist_controller.hpp"
+#include "playlist/media.hpp"
+
 //-------------------------------------------------------------------------------------------------
 // Static variables
 
@@ -63,37 +66,31 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
     if (unlikely(m_transactionPending))
         return;
 
-    //build the list of MRL to insert in the playlist
-    std::vector<QString> mrlList;
-    for (const QVariant & variant : items)
-    {
-        if (variant.canConvert<SharedInputItem>() == false)
-            continue;
-
-
-        if (const char * psz_uri = ((variant.value<SharedInputItem>())->psz_uri))
-            mrlList.emplace_back(psz_uri);
-    }
+    QVector<vlc::playlist::Media> medias = vlc::playlist::toMediaList(items);
 
     m_transactionPending = true;
 
     m_mediaLib->runOnMLThread(this,
     //ML thread
-    [mrlList, id, at](vlc_medialibrary_t* ml) {
+    [medias, id, at](vlc_medialibrary_t* ml) {
         int insertPos = at;
-        for (const QString& uri : mrlList)
+        for (const auto& media : medias)
         {
-            vlc_ml_media_t * media = vlc_ml_get_media_by_mrl(ml, qtu(uri));
+            assert(media.raw());
 
-            if (media == nullptr)
+            const char * const uri = media.raw()->psz_uri;
+
+            vlc_ml_media_t * ml_media = vlc_ml_get_media_by_mrl(ml, uri);
+
+            if (ml_media == nullptr)
             {
-                media = vlc_ml_new_external_media(ml, qtu(uri));
-                if (media == nullptr)
+                ml_media = vlc_ml_new_external_media(ml, uri);
+                if (ml_media == nullptr)
                     continue;
             }
 
-            vlc_ml_playlist_insert(ml, id, media->i_id, insertPos);
-            vlc_ml_media_release(media);
+            vlc_ml_playlist_insert(ml, id, ml_media->i_id, insertPos);
+            vlc_ml_media_release(ml_media);
 
             insertPos++;
         }
