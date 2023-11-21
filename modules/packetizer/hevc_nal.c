@@ -1041,6 +1041,11 @@ uint8_t hevc_get_slice_pps_id( const hevc_slice_segment_header_t *p_slice )
     return p_slice->slice_pic_parameter_set_id;
 }
 
+bool hevc_get_slice_no_output_of_prior_pics_flag( const hevc_slice_segment_header_t *p_slice )
+{
+    return p_slice->no_output_of_prior_pics_flag;
+}
+
 bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *p_sps,
                                       uint8_t *pi_profile, uint8_t *pi_level)
 {

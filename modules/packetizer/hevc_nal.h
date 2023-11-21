@@ -277,6 +277,7 @@ void hevc_rbsp_release_slice_header( hevc_slice_segment_header_t * );
 uint8_t hevc_get_sps_vps_id( const hevc_sequence_parameter_set_t * );
 uint8_t hevc_get_pps_sps_id( const hevc_picture_parameter_set_t * );
 uint8_t hevc_get_slice_pps_id( const hevc_slice_segment_header_t * );
+bool hevc_get_slice_no_output_of_prior_pics_flag( const hevc_slice_segment_header_t * );
 
 bool hevc_get_xps_id(const uint8_t *p_nalbuf, size_t i_nalbuf, uint8_t *pi_id);
 bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *,
