@@ -369,6 +369,7 @@ static inline void hevc_poc_cxt_init( hevc_poc_ctx_t *p_ctx )
     p_ctx->prevTid0PicOrderCnt.lsb = 0;
     p_ctx->prevTid0PicOrderCnt.msb = 0;
     p_ctx->first_picture = true;
+    p_ctx->HandleCraAsBlaFlag = false;
 }
 
 int hevc_compute_picture_order_count( const hevc_sequence_parameter_set_t *p_sps,
