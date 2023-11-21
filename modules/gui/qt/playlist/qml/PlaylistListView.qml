@@ -71,8 +71,12 @@ T.Pane {
     function isDropAcceptable(drop, index) {
         if (drop.source === dragItem)
             return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
-        else
+        else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem))
             return true
+        else if (drop.hasUrls)
+            return true
+        else
+            return false
     }
 
     function acceptDrop(index, drop) {
