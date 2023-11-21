@@ -34,9 +34,11 @@
 #include "playlist_item.hpp"
 
 namespace vlc {
-  namespace playlist {
+namespace playlist {
 
-  using vlc_playlist_locker = vlc_locker<vlc_playlist_t, vlc_playlist_Lock, vlc_playlist_Unlock>;
+QVector<vlc::playlist::Media> toMediaList(const QVariantList &sources);
+
+using vlc_playlist_locker = vlc_locker<vlc_playlist_t, vlc_playlist_Lock, vlc_playlist_Unlock>;
 
 class PlaylistControllerPrivate;
 class PlaylistController : public QObject
@@ -194,7 +196,7 @@ private:
     QScopedPointer<PlaylistControllerPrivate> d_ptr;
 };
 
-  } // namespace playlist
+} // namespace playlist
 } // namespace vlc
 
 #endif
