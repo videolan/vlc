@@ -178,6 +178,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *videoeffects;
 @property (readwrite, weak) IBOutlet NSMenuItem *bookmarks;
 @property (readwrite, weak) IBOutlet NSMenuItem *playlist;
+@property (readwrite, weak) IBOutlet NSMenuItem *detachedAudioWindow;
 @property (readwrite, weak) IBOutlet NSMenuItem *info;
 @property (readwrite, weak) IBOutlet NSMenuItem *errorsAndWarnings;
 @property (readwrite, weak) IBOutlet NSMenuItem *messages;

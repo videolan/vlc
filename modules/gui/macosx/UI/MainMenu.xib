@@ -41,6 +41,7 @@
                 <outlet property="deinterlaceMenu" destination="1029" id="9d9-tf-Xo4"/>
                 <outlet property="deinterlace_mode" destination="4397" id="4OM-Cr-xZk"/>
                 <outlet property="deinterlace_modeMenu" destination="4398" id="jXJ-Ps-xTP"/>
+                <outlet property="detachedAudioWindow" destination="pI6-7D-CgE" id="HsR-ca-6zX"/>
                 <outlet property="dockMenumute" destination="1623" id="MAM-1R-OFR"/>
                 <outlet property="dockMenunext" destination="1621" id="VAd-Gc-6Xf"/>
                 <outlet property="dockMenuplay" destination="1618" id="GFN-3u-ZOS"/>
@@ -729,6 +730,12 @@
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showPlaylist:" target="-2" id="Kqz-Ng-6tj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Detached Audio Window..." keyEquivalent="a" id="pI6-7D-CgE">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showDetachedAudioWindow:" target="-2" id="vOc-az-9gg"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Media Information..." keyEquivalent="i" id="1192">

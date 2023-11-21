@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #import "VLCMainMenu.h"
-#import "main/VLCMain.h"
 
 #import "coreinteraction/VLCVideoFilterHelper.h"
 
@@ -30,6 +29,8 @@
 
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowController.h"
+
+#import "main/VLCMain.h"
 
 #import "menus/renderers/VLCRendererMenuController.h"
 
@@ -48,6 +49,7 @@
 #import "preferences/VLCSimplePrefsController.h"
 
 #import "windows/VLCAboutWindowController.h"
+#import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCErrorWindowController.h"
 #import "windows/VLCHelpWindowController.h"
@@ -480,6 +482,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_videoeffects setTitle: _NS("Video Effects...")];
     [_bookmarks setTitle: _NS("Bookmarks...")];
     [_playlist setTitle: _NS("Playlist...")];
+    [_detachedAudioWindow setTitle: _NS("Detached Audio Window...")];
     [_info setTitle: _NS("Media Information...")];
     [_messages setTitle: _NS("Messages...")];
     [_errorsAndWarnings setTitle: _NS("Errors and Warnings...")];
@@ -1519,6 +1522,11 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     NSURL *url = [NSURL URLWithString: @"https://www.videolan.org/contribute.html#paypal"];
 
     [NSWorkspace.sharedWorkspace openURL: url];
+}
+
+- (IBAction)showDetachedAudioWindow:(id)sender
+{
+    [VLCMain.sharedInstance.detachedAudioWindow makeKeyAndOrderFront:self];
 }
 
 - (IBAction)showInformationPanel:(id)sender
