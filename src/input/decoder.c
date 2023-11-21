@@ -1039,8 +1039,15 @@ static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
-    while( p_owner->b_waiting && p_owner->b_has_data )
+    while (p_owner->b_waiting && p_owner->b_has_data && !p_owner->flushing)
         vlc_fifo_WaitCond(p_owner->p_fifo, &p_owner->wait_request);
+
+    if (p_owner->flushing)
+    {
+        p_owner->b_has_data = false;
+        vlc_cond_signal(&p_owner->wait_acknowledge);
+        return VLC_ENOENT;
+    }
 
     return VLC_SUCCESS;
 }
@@ -2550,6 +2557,23 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
         }
     }
     vlc_fifo_Signal( p_owner->p_fifo );
+
+    if (unlikely(p_owner->b_waiting && p_owner->b_has_data))
+    {
+        /* Signal the output thread to stop waiting from DecoderWaitUnblock()
+         * and to discard the current frame (via 'flushing' = true). */
+        vlc_cond_signal(&p_owner->wait_request);
+
+        /* Flushing is fully asynchronous, but we need to wait for the output
+         * thread to unblock in DecoderWaitUnblock() otherwise there are no
+         * ways to know if the frame referenced when waiting comes from before
+         * or after the flush. Waiting here is almost instantaneous since we
+         * are sure that the output thread is waiting in DecoderWaitUnblock().
+         */
+        while (p_owner->b_has_data)
+            vlc_fifo_WaitCond(p_owner->p_fifo, &p_owner->wait_acknowledge);
+    }
+
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     if (vlc_input_decoder_IsSynchronous(p_owner))
