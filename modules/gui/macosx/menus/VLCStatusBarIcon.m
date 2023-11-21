@@ -495,9 +495,7 @@
 - (IBAction)statusBarIconShowMiniAudioPlayer:(id)sender
 {
     if (!_detachedAudioWindow) {
-        NSWindowController *windowController = [[NSWindowController alloc] initWithWindowNibName:@"VLCDetachedAudioWindow"];
-        [windowController loadWindow];
-        _detachedAudioWindow = (VLCDetachedAudioWindow *)[windowController window];
+        _detachedAudioWindow = [VLCDetachedAudioWindow fromNibWithOwner:self];
     }
 
     [_detachedAudioWindow makeKeyAndOrderFront:sender];
