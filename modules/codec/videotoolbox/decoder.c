@@ -777,7 +777,10 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
                 p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
-                p_info->i_max_reorder = hevc_get_max_num_reorder(p_sps);
+                uint8_t dummy;
+                hevc_get_dpb_values(p_sps, &p_info->i_max_reorder, &dummy, &dummy);
+                VLC_UNUSED(dummy);
+
                 p_info->b_flush = (POC == 0) ||
                                   (i_nal_type >= HEVC_NAL_IDR_N_LP &&
                                    i_nal_type <= HEVC_NAL_IRAP_VCL23);
