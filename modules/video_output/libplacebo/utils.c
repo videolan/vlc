@@ -46,7 +46,10 @@ static void Log(void *priv, enum pl_log_level level, const char *msg)
 pl_log vlc_placebo_CreateLog(vlc_object_t *obj)
 {
     return pl_log_create(PL_API_VER, &(struct pl_log_params) {
-        .log_level = PL_LOG_DEBUG,
+        // Print placebo DEBUG logs with "-vvv"
+        // Print placebo INFO logs with "-vv"
+        .log_level = var_InheritInteger(obj, "verbose") >= 3 ? PL_LOG_DEBUG
+                                                             : PL_LOG_INFO,
         .log_cb    = Log,
         .log_priv  = obj,
     });
