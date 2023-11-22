@@ -37,7 +37,7 @@ static void Log(void *priv, enum pl_log_level level, const char *msg)
     case PL_LOG_FATAL: // fall through
     case PL_LOG_ERR:   msg_Err(obj,  "%s", msg); break;
     case PL_LOG_WARN:  msg_Warn(obj, "%s", msg); break;
-    case PL_LOG_INFO:  msg_Info(obj, "%s", msg); break;
+    case PL_LOG_INFO: // fall through
     case PL_LOG_DEBUG: msg_Dbg(obj,  "%s", msg); break;
     default: break;
     }
