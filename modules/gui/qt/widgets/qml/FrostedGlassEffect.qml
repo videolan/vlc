@@ -27,12 +27,6 @@ import "qrc:///style/"
 //   even though it is only shown for the area denoted
 //   by effectRect. This is caused by FastBlur not
 //   accepting a source rectangle.
-// * The source is sampled and displayed as a whole,
-//   however it is stacked below of the blur effect
-//   so it is only partly seen as intended.
-// * As a corollary of the previous limitation, you should
-//   always have a solid background for the source item.
-//   otherwise, the effect can not work properly.
 Item {
     id: effect
 
@@ -48,12 +42,44 @@ Item {
     property real noiseStrength: 0.02
     property real exclusionStrength: 0.09
 
+    // Enable blending if background is not fully opaque:
+    // This comes with a performance penalty.
+    property bool blending: false
+
     ShaderEffect {
         anchors.fill: parent
 
         property alias source: effect.source
 
+        readonly property rect discardRect: {
+            if (effect.blending)
+                return Qt.rect(blurProxy.x / effect.width, blurProxy.y / effect.height,
+                               (blurProxy.x + blurProxy.width) / effect.width, (blurProxy.y + blurProxy.height) / effect.height)
+            else // If blending is not enabled, no need to make the normalization calculations
+                return Qt.rect(0, 0, 0, 0)
+        }
+
         cullMode: ShaderEffect.BackFaceCulling
+
+        blending: effect.blending
+
+        // Simple filter that is only enabled when blending is active.
+        // We do not want the source to be rendered below the frosted glass effect.
+        fragmentShader: blending ? "
+                varying highp vec2 qt_TexCoord0;
+                uniform sampler2D source;
+                uniform lowp float qt_Opacity;
+                uniform highp vec4 discardRect;
+
+                void main() {
+                    if (((qt_TexCoord0.x >= discardRect.x && qt_TexCoord0.x <= discardRect.w) &&
+                        (qt_TexCoord0.y >= discardRect.y && qt_TexCoord0.y <= discardRect.z)))
+                      discard;
+
+                    highp vec4 texel = texture2D(source, qt_TexCoord0);
+
+                    gl_FragColor = texel * qt_Opacity;
+                }" : ""
     }
 
     FastBlur {
@@ -96,6 +122,8 @@ Item {
             readonly property real exclusionStrength: effect.exclusionStrength
 
             cullMode: ShaderEffect.BackFaceCulling
+
+            blending: effect.blending
 
             fragmentShader: "
                 uniform lowp sampler2D source; // this item
