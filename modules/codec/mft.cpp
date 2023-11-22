@@ -352,8 +352,8 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
 
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
-        UINT64 width = p_dec->fmt_in->video.i_width;
-        UINT64 height = p_dec->fmt_in->video.i_height;
+        UINT32 width = p_dec->fmt_in->video.i_width;
+        UINT32 height = p_dec->fmt_in->video.i_height;
         hr = MFSetAttributeSize(input_media_type.Get(), MF_MT_FRAME_SIZE, width, height);
         if (FAILED(hr))
             goto error;
