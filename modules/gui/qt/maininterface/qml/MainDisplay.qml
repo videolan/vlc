@@ -239,6 +239,8 @@ FocusScope {
                         colorSet: ColorContext.Window
                     }
 
+                    blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
+
                     tint: frostedTheme.bg.secondary
 
                     effectRect: Qt.rect(0,
