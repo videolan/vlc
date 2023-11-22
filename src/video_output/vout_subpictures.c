@@ -1985,7 +1985,8 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         subpicture_Delete(subpic);
         return;
     }
-    spu_PrerenderEnqueue(sys, subpic);
+    if (subpic->i_start != VLC_TICK_MAX) /* Don't prerender when paused */
+        spu_PrerenderEnqueue(sys, subpic);
     vlc_mutex_unlock(&sys->lock);
 }
 
