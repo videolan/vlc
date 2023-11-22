@@ -847,9 +847,8 @@ void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_
             assert(stream->timing.pause_date == VLC_TICK_INVALID);
             stream->timing.pause_date = date;
         }
-        else
+        else if (stream->timing.pause_date != VLC_TICK_INVALID)
         {
-            assert(stream->timing.pause_date != VLC_TICK_INVALID);
             /* Delay the last timing with the pause duration. This will be used
              * by stream_GetDelay() until the module updates its next point
              * after being resumed. */
