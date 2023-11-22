@@ -616,13 +616,26 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
 
         ts = vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
                                              entry->orgstart, channel->rate);
-        if (ts != VLC_TICK_MAX) /* pause triggered before or during spu render */
+        if (ts != VLC_TICK_MAX)
         {
             entry->start = ts;
 
             entry->stop =
                 vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
                                                 entry->orgstop, channel->rate);
+        }
+        else
+        {
+            /* Pause triggered before or during spu render */
+
+            /* If currently rendered, display the current spu until the end of
+             * the pause. */
+            entry->stop = VLC_TICK_MAX;
+
+            /* Delay the start date only if not currently rendered. */
+            if (entry->start > system_now)
+                entry->start = VLC_TICK_MAX;
+
         }
     }
     vlc_clock_Unlock(channel->clock);
