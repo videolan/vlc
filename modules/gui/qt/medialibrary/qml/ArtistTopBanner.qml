@@ -65,6 +65,7 @@ FocusScope {
         mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
         visible: !blurLoader.active
+        cache: (source === VLCStyle.noArtArtist)
 
         // Single pass linear filtering, in case the effect is not available:
         layer.enabled: visible
