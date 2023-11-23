@@ -875,6 +875,9 @@ static void ChangeFilters(vout_thread_sys_t *vout)
     }
 
     if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
+        es_format_LogDifferences(vlc_object_logger(&vout->obj),
+                "current", p_fmt_current, "new", &fmt_target);
+
         /* Shallow local copy */
         es_format_t tmp = *p_fmt_current;
         /* Assign the same chroma to compare everything except the chroma */
@@ -2127,12 +2130,15 @@ int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original,
      /* TODO: If dimensions are equal or slightly smaller, update the aspect
      * ratio and crop settings, instead of recreating a display.
      */
-    if (video_format_IsSimilar(original, &sys->original)) {
-        /* It is assumed that the SPU input matches input already. */
-        return 0;
+    if (!video_format_IsSimilar(original, &sys->original))
+    {
+        msg_Dbg(&vout->obj, "vout format changed");
+        video_format_LogDifferences(vlc_object_logger(&vout->obj), "current", &sys->original, "new", original);
+        return -1;
     }
 
-    return -1;
+    /* It is assumed that the SPU input matches input already. */
+    return 0;
 }
 
 static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *original)
