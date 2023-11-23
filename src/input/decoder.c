@@ -2573,13 +2573,7 @@ vlc_input_decoder_CreateSubDec(vlc_input_decoder_t *p_owner,
         vlc_mutex_unlock(&p_owner->subdecs.lock);
         return NULL;
     }
-    else if( !p_ccowner->dec.p_module )
-    {
-        DecoderUnsupportedCodec( p_dec, cfg->fmt, true );
-        vlc_input_decoder_Delete(p_ccowner);
-        vlc_mutex_unlock(&p_owner->subdecs.lock);
-        return NULL;
-    }
+    assert(p_ccowner->dec.p_module != NULL);
 
     vlc_list_append(&p_ccowner->node, &p_owner->subdecs.list);
     p_owner->cc.count++;
