@@ -49,13 +49,11 @@
  * See the \link mrl MRL-specification\endlink for a detailed
  * explanation of how `payload` will be escaped.
  *
- * \param[out] out `*out` will refer to the created string on success,
- *                  and an unspecified value on error.
  * \param[in] payload the data to escape.
- * \return VLC_SUCCESS on success, an error-code on failure.
+ * \return he created string on success, and NULL on error.
  **/
-static inline int
-mrl_EscapeFragmentIdentifier( char** out, char const* payload )
+VLC_MALLOC static inline char *
+mrl_EscapeFragmentIdentifier( char const* payload )
 {
     struct vlc_memstream mstream;
 
@@ -69,7 +67,7 @@ mrl_EscapeFragmentIdentifier( char** out, char const* payload )
 #define RFC3986_FRAGMENT   RFC3986_PCHAR "/" "?"
 
     if( vlc_memstream_open( &mstream ) )
-        return VLC_EGENERIC;
+        return NULL;
 
     for( char const* p = payload; *p; ++p )
     {
@@ -86,10 +84,9 @@ mrl_EscapeFragmentIdentifier( char** out, char const* payload )
 #undef RFC3986_SUBDELIMS
 
     if( vlc_memstream_close( &mstream ) )
-        return VLC_EGENERIC;
+        return NULL;
 
-    *out = mstream.ptr;
-    return VLC_SUCCESS;
+    return mstream.ptr;
 }
 
 /**

@@ -92,7 +92,8 @@ StreamExtractorCreateMRL( char const* base, char const* subentry )
     struct vlc_memstream buffer;
     char* escaped;
 
-    if( mrl_EscapeFragmentIdentifier( &escaped, subentry ) )
+    escaped = mrl_EscapeFragmentIdentifier( subentry );
+    if ( escaped == NULL )
         return NULL;
 
     if( vlc_memstream_open( &buffer ) )

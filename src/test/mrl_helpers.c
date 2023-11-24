@@ -91,9 +91,8 @@ int main (void)
 
                 assert(strcmp(testcase[i].results[j], res) == 0);
 
-                char *res_escaped = NULL;
-                ret = mrl_EscapeFragmentIdentifier(&res_escaped, res);
-                assert(ret == VLC_SUCCESS && res_escaped != NULL);
+                char *res_escaped = mrl_EscapeFragmentIdentifier(res);
+                assert(res_escaped != NULL);
                 assert(strncmp(p, res_escaped, strlen(res_escaped)) == 0);
                 p += strlen(res_escaped) + 2;
 
