@@ -829,7 +829,7 @@ error:
     return ret;
 }
 
-static char *vlc_uri_fixup_inner(const char *str, const char *extras)
+VLC_MALLOC static char *vlc_uri_fixup_inner(const char *str, const char *extras)
 {
     assert(str && extras);
 

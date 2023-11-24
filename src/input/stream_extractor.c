@@ -85,7 +85,7 @@ struct stream_extractor_private {
  * within \ref base, see \ref mrl_helpers for further information.
  **/
 
-static char*
+VLC_MALLOC static char*
 StreamExtractorCreateMRL( char const* base, char const* subentry )
 {
     struct vlc_memstream buffer;

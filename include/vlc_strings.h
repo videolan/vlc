@@ -138,7 +138,7 @@ VLC_API char *vlc_strftime( const char * );
  *
  * Formats input and input item meta-informations into a heap-allocated string.
  */
-VLC_API char *vlc_strfinput( input_thread_t *, const char * );
+VLC_API char *vlc_strfinput( input_thread_t *, const char * ) VLC_MALLOC;
 
 static inline char *str_format( input_thread_t *input, const char *fmt )
 {
