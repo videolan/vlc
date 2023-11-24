@@ -2019,7 +2019,7 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
 #ifdef HAVE_CSS
         else if( ctx->b_css_memstream_opened )
         {
-            if( vlc_memstream_close( &ctx->css ) == VLC_SUCCESS )
+            if( vlc_memstream_close( &ctx->css ) == 0 )
             {
                 vlc_css_parser_t p;
                 vlc_css_parser_Init(&p);
