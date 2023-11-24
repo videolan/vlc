@@ -49,17 +49,26 @@ int vlc_memstream_close(struct vlc_memstream *ms)
     int ret;
 
     if (unlikely(stream == NULL))
+    {
+        // was never properly opened
+        ms->ptr = NULL;
         return EOF;
+    }
 
     ms->stream = NULL;
     ret = ferror(stream);
 
     if (fclose(stream))
+    {
+        // assuming it's free'd by the memstream
+        ms->ptr = NULL;
         return EOF;
+    }
 
     if (unlikely(ret))
     {
         free(ms->ptr);
+        ms->ptr = NULL;
         return EOF;
     }
     return 0;
@@ -123,7 +132,10 @@ int vlc_memstream_flush(struct vlc_memstream *ms)
 int vlc_memstream_close(struct vlc_memstream *ms)
 {
     if (ms->error)
+    {
         free(ms->ptr);
+        ms->ptr = NULL;
+    }
     return ms->error;
 } 
 
