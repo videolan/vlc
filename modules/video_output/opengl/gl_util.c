@@ -70,17 +70,16 @@ LogShader(vlc_object_t *obj, const char *prefix, const opengl_vtable_t *vt, GLui
         }
         line++;
     }
+    free(sources);
 
     ret = vlc_memstream_close(&stream);
     if (ret != 0)
     {
-        free(sources);
         return;
     }
 
     msg_Err(obj, "%s%s", prefix, stream.ptr);
     free(stream.ptr);
-    free(sources);
 }
 
 static void
