@@ -71,6 +71,9 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
     if (unlikely(ms->stream == NULL))
         return 0;
 
+    if (len == 0)
+        return 0;
+
     return fwrite(ptr, 1, len, ms->stream);
 }
 
@@ -128,6 +131,9 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
                            size_t len)
 {
     size_t newlen;
+
+    if (len == 0)
+        return 0;
 
     if (unlikely(add_overflow(ms->length, len, &newlen))
      || unlikely(add_overflow(newlen, 1, &newlen)))
