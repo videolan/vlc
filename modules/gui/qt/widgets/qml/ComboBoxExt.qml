@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Templates as T
 import QtQuick.Controls
 
 import org.videolan.vlc 0.1
@@ -23,11 +24,17 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-ComboBox {
+T.ComboBox {
     id: control
 
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + spacing + implicitIndicatorWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding,
+                             implicitIndicatorHeight + topPadding + bottomPadding)
+
+    padding: VLCStyle.margin_xxsmall
     font.pixelSize: VLCStyle.fontSize_large
-    leftPadding: 5
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -62,7 +69,7 @@ ComboBox {
 
     indicator: Canvas {
         id: canvas
-        x: control.width - width - control.rightPadding
+        x: control.availableWidth - width
         y: control.topPadding + (control.availableHeight - height) / 2
         width: 10
         height: 6
@@ -87,12 +94,10 @@ ComboBox {
         }
     }
 
-    contentItem: Text {
-        leftPadding: 5
-        rightPadding: control.indicator.width + control.spacing
+    contentItem: Widgets.ListLabel {
+        rightPadding: control.spacing + control.indicator.width
 
         text: control.displayText
-        font: control.font
         color: control.color
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
