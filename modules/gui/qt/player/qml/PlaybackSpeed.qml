@@ -276,7 +276,7 @@ ColumnLayout {
         }
     }
 
-    Item {
+    RowLayout {
         id: rowB
 
         Layout.fillWidth: true
@@ -287,10 +287,14 @@ ColumnLayout {
         Navigation.parentItem: root
         Navigation.upItem: slider
 
+        Widgets.ListLabel {
+            text: I18n.qtr("Presets")
+            color: colorContext.fg.primary
+            Layout.fillWidth: true
+        }
+
         Widgets.ComboBoxExt {
             id: comboBox
-
-            anchors.centerIn: parent
 
             width: VLCStyle.combobox_width_normal
             height: VLCStyle.combobox_height_normal
