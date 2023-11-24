@@ -213,8 +213,8 @@ static inline hls_track_t *MediaGetTrack(const hls_playlist_t *media_playlist)
     return track;
 }
 
-static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
-                                       const hls_playlist_t *playlist)
+VLC_MALLOC static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
+                                                  const hls_playlist_t *playlist)
 {
     es_format_vec_t already_described = VLC_VECTOR_INITIALIZER;
 

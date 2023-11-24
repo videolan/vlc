@@ -383,7 +383,7 @@ FileControl(stream_t *access, int i_query, va_list args)
     return VLC_SUCCESS;
 }
 
-static char *
+VLC_MALLOC static char *
 vlc_smb2_get_url(vlc_url_t *url, const char *file)
 {
     /* smb2://<psz_host><i_port><psz_path><file>?<psz_option> */
@@ -429,7 +429,7 @@ static int AddItem(stream_t *access, struct vlc_readdir_helper *rdh,
     if (url == NULL)
         return VLC_ENOMEM;
 
-    input_item_t *p_item; 
+    input_item_t *p_item;
     int ret = vlc_readdir_helper_additem(rdh, url, NULL, name, i_type,
                                          ITEM_NET, &p_item);
 

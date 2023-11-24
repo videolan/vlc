@@ -437,7 +437,7 @@ static void memstream_puts_xmlencoded(struct vlc_memstream* p_stream, const char
  *  - make tags and attributes upercase
  *  - escape strings when required
  */
-static char* ASXToXML( char* psz_source )
+VLC_MALLOC static char* ASXToXML( char* psz_source )
 {
     bool b_in_string= false;
     char *psz_source_cur = psz_source;

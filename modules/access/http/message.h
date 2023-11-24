@@ -459,7 +459,7 @@ static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
  *         or NULL on error
  */
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
-                          bool proxied, bool chunked) VLC_USED;
+                          bool proxied, bool chunked) VLC_USED VLC_MALLOC;
 
 /**
  * Parses an HTTP 1.1 message header.

@@ -108,7 +108,7 @@ typedef struct vlc_keystore_sys
 
 /* takes all values in the values of vlc_keystore_entry *
  * and formats them in a url key */
-static char*
+VLC_MALLOC static char*
 values2key( const char* const* ppsz_values, bool b_search )
 {
     char* psz_b64_realm = NULL;
