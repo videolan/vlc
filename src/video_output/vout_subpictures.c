@@ -1217,7 +1217,7 @@ static void spu_UpdateOriginalSize(spu_t *spu, subpicture_t *subpic,
                     subpic->i_original_picture_width,
                     subpic->i_original_picture_height);
         else
-            msg_Warn(spu, "original picture size is undefined");
+            msg_Dbg(spu, "original picture size is undefined");
 
         subpic->i_original_picture_width  = fmtsrc->i_visible_width;
         subpic->i_original_picture_height = fmtsrc->i_visible_height;
