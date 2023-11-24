@@ -64,7 +64,7 @@ static vlm_message_t *vlm_Show( vlm_t *, vlm_media_sys_t *, vlm_schedule_sys_t *
 
 static vlm_schedule_sys_t *vlm_ScheduleSearch( vlm_t *, const char * );
 
-static char *Save( vlm_t * );
+VLC_MALLOC static char *Save( vlm_t * );
 static int Load( vlm_t *, char * );
 
 static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name );
@@ -1573,7 +1573,7 @@ static int Load( vlm_t *vlm, char *file )
     return 0;
 }
 
-static char *Save( vlm_t *vlm )
+VLC_MALLOC static char *Save( vlm_t *vlm )
 {
     const char *psz_header = "\n"
                              "# VLC media player VLM command batch\n"

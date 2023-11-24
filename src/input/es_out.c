@@ -1991,8 +1991,8 @@ static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
     }
 }
 
-static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
-                               es_out_id_t *p_master )
+VLC_MALLOC static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
+                                          es_out_id_t *p_master )
 {
     struct vlc_memstream ms;
     if( vlc_memstream_open( &ms ) != 0 )

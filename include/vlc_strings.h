@@ -223,7 +223,7 @@ VLC_API char *vlc_strftime( const char * );
  * \return an allocated formatted string (must be free()'d), or NULL in case of error
  */
 VLC_API char *vlc_strfplayer( vlc_player_t *player, input_item_t *item,
-                              const char *fmt );
+                              const char *fmt ) VLC_MALLOC;
 
 static inline char *str_format( vlc_player_t *player, input_item_t *item,
                                 const char *fmt )
