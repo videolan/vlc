@@ -67,31 +67,15 @@ T.ComboBox {
         highlighted: control.highlightedIndex === index
     }
 
-    indicator: Canvas {
-        id: canvas
-        x: control.availableWidth - width
+    indicator: Widgets.IconLabel {
+        x: control.width - width - rightPadding
         y: control.topPadding + (control.availableHeight - height) / 2
-        width: 10
-        height: 6
-        contextType: "2d"
-
-        Connections {
-            target: control
-            function onPressedChanged() { canvas.requestPaint() }
-        }
-
-        onPaint: {
-            if (context === null)
-                return
-
-            context.reset();
-            context.moveTo(0, 0);
-            context.lineTo(width, 0);
-            context.lineTo(width / 2, height);
-            context.closePath();
-            context.fillStyle = control.activeFocus ? theme.accent : control.color;
-            context.fill();
-        }
+        font.pixelSize: VLCStyle.icon_normal
+        font.bold: true
+        text: VLCIcons.expand
+        color: control.color
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
     }
 
     contentItem: Widgets.ListLabel {
