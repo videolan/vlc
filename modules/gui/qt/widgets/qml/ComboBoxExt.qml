@@ -57,10 +57,9 @@ T.ComboBox {
         width: control.width
         leftPadding: control.leftPadding
         background: Item {}
-        contentItem: Text {
+        contentItem: Widgets.ListLabel {
             text: control.textRole ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
             color: control.color
-            font: control.font
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
         }
