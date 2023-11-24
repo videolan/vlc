@@ -295,6 +295,7 @@ void MLBaseModel::setParentId(MLItemId parentId)
 {
     m_parent = parentId;
     resetCache();
+    m_itemLoader.reset();
     emit parentIdChanged();
 }
 
