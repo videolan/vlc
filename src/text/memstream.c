@@ -118,28 +118,31 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
 
 int vlc_memstream_open(struct vlc_memstream *ms)
 {
-    ms->error = 0;
     ms->ptr = calloc(1, 1);
     if (unlikely(ms->ptr == NULL))
-        ms->error = EOF;
+    {
+        ms->length = SIZE_MAX;
+        return EOF;
+    }
     ms->length = 0;
-    return ms->error;
+    return 0;
 }
 
 int vlc_memstream_flush(struct vlc_memstream *ms)
 {
-    return ms->error;
+    return ms->length == SIZE_MAX ? EOF : 0;
 }
 
 int vlc_memstream_close(struct vlc_memstream *ms)
 {
-    if (ms->error)
+    if (ms->length == SIZE_MAX)
     {
         free(ms->ptr);
         ms->ptr = NULL;
+        return EOF;
     }
-    return ms->error;
-} 
+    return 0;
+}
 
 size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
                            size_t len)
@@ -164,7 +167,7 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
     return len;
 
 error:
-    ms->error = EOF;
+    ms->length = SIZE_MAX;
     return 0;
 }
 
@@ -206,7 +209,7 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
     return len;
 
 error:
-    ms->error = EOF;
+    ms->length = SIZE_MAX;
     return EOF;
 }
 #endif

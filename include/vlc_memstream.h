@@ -39,11 +39,7 @@
  */
 struct vlc_memstream
 {
-    union
-    {
-        FILE *stream;
-        int error;
-    };
+    FILE *stream;
     char *ptr; /**< Buffer start address */
     size_t length; /**< Buffer length in bytes */
 };
