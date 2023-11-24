@@ -53,10 +53,11 @@ T.ComboBox {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
-    delegate: ItemDelegate {
+    delegate: T.ItemDelegate {
         width: control.width
+        height: implicitContentHeight + topPadding + bottomPadding
+        padding: VLCStyle.margin_xsmall
         leftPadding: control.leftPadding
-        background: Item {}
         contentItem: Widgets.ListLabel {
             text: control.textRole ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
             color: control.color
