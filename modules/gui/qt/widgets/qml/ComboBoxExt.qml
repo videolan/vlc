@@ -103,7 +103,6 @@ T.ComboBox {
         z: 100
 
         width: control.width
-        implicitHeight: contentItem.implicitHeight
         padding: 1
 
         contentItem: ListView {
