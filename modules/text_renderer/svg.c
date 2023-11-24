@@ -314,7 +314,8 @@ static char * SegmentsToSVG( text_segment_t *p_segment, int i_height, int *pi_to
     {
         char *psz_prev = psz_result;
         char *psz_encoded = vlc_xml_encode( p_segment->psz_text );
-        if( asprintf( &psz_result, "%s<tspan x='0' dy='%upx'>%s</tspan>\n",
+        if( psz_encoded == NULL ||
+            asprintf( &psz_result, "%s<tspan x='0' dy='%upx'>%s</tspan>\n",
                                    (psz_prev) ? psz_prev : "",
                                     i_height,
                                     psz_encoded ) < 0 )
