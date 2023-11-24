@@ -87,13 +87,12 @@ T.ComboBox {
         elide: Text.ElideRight
     }
 
-    background: Rectangle {
-        implicitWidth: control.width
-        implicitHeight: control.height
+    background: Widgets.AnimatedBackground {
+        enabled: theme.initialized
         color: control.bgColor
-        border.color: control.borderColor
-        border.width: control.activeFocus ? 2 : 1
-        radius: 2
+        border.color: theme.border
+        border.width: VLCStyle.dp(2, VLCStyle.scale)
+        radius: VLCStyle.dp(2, VLCStyle.scale)
     }
 
     popup: Popup {
