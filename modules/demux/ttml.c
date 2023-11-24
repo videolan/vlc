@@ -377,7 +377,7 @@ static int Demux( demux_t* p_demux )
         tt_node_ToText( &stream, (tt_basenode_t *) p_sys->p_rootnode,
                         &p_sys->times.p_array[p_sys->times.i_current] );
 
-        if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
+        if( vlc_memstream_close( &stream ) == 0 )
         {
             block_t* p_block = block_heap_Alloc( stream.ptr, stream.length );
             if( p_block )
@@ -523,7 +523,7 @@ int tt_OpenDemux( vlc_object_t* p_this )
 
         vlc_memstream_putc( &stream, '\0' );
 
-        if( vlc_memstream_close( &stream ) == VLC_SUCCESS )
+        if( vlc_memstream_close( &stream ) == 0 )
         {
             msg_Dbg( p_demux, "%s", stream.ptr );
             free( stream.ptr );
