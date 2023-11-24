@@ -112,12 +112,11 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
         }
     };
 
-    struct vlc_memstream application_name;
+    const char *application_name = NULL;
     struct vlc_memstream cmdline;
     {
         int error;
-        error = vlc_memstream_open(&application_name);
-        error |= vlc_memstream_open(&cmdline);
+        error = vlc_memstream_open(&cmdline);
         if (unlikely(error))
             goto error;
     }
@@ -175,11 +174,10 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
             goto error;
         }
 
-        vlc_memstream_printf(&application_name, "%s", application_path);
-        free(application_path);
+        application_name = application_path;
 
     } else {
-        vlc_memstream_printf(&application_name, "%s", path);
+        application_name = path;
     }
 
     if (likely(argv[0])) {
@@ -188,7 +186,7 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
             vlc_memstream_printf(&cmdline, " %s", argv[argc]);
     }
 
-    BOOL bSuccess = CreateProcessA(application_name.ptr, cmdline.ptr, NULL,
+    BOOL bSuccess = CreateProcessA(application_name, cmdline.ptr, NULL,
                                    NULL, TRUE, EXTENDED_STARTUPINFO_PRESENT,
                                    NULL, NULL, &siEx.StartupInfo, &pi);
     if (!bSuccess)
@@ -222,8 +220,8 @@ error:
         free(siEx.lpAttributeList);
     }
 
-    if (!vlc_memstream_close(&application_name))
-        free(application_name.ptr);
+    if (application_name != path)
+        free((char*)application_name);
     if (!vlc_memstream_close(&cmdline))
         free(cmdline.ptr);
 
