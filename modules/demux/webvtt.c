@@ -156,11 +156,6 @@ static void memstream_Grab( struct memstream_wrap *mw, void **pp, size_t *pi )
 {
     if( mw->b_opened && vlc_memstream_close( &mw->memstream ) == 0 )
     {
-        if( mw->memstream.length == 0 )
-        {
-            free( mw->memstream.ptr );
-            mw->memstream.ptr = NULL;
-        }
         *pp = mw->memstream.ptr;
         *pi = mw->memstream.length;
     }
