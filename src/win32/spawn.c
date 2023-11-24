@@ -113,13 +113,7 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     };
 
     const char *application_name = NULL;
-    struct vlc_memstream cmdline;
-    {
-        int error;
-        error = vlc_memstream_open(&cmdline);
-        if (unlikely(error))
-            goto error;
-    }
+    char *cmdline = NULL;
 
     if (fdv[0] == -1 || fdv[1] == -1) {
         nulfd = vlc_open("\\\\.\\NUL", O_RDWR);
@@ -181,12 +175,18 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     }
 
     if (likely(argv[0])) {
-        vlc_memstream_printf(&cmdline, "%s", argv[0]);
+        struct vlc_memstream cmdline_s;
+        if (unlikely(vlc_memstream_open(&cmdline_s) != 0))
+            goto error;
+        vlc_memstream_printf(&cmdline_s, "%s", argv[0]);
         for (int argc = 1; argv[argc]; ++argc)
-            vlc_memstream_printf(&cmdline, " %s", argv[argc]);
+            vlc_memstream_printf(&cmdline_s, " %s", argv[argc]);
+        if (vlc_memstream_close(&cmdline_s) != 0)
+            goto error;
+        cmdline = cmdline_s.ptr;
     }
 
-    BOOL bSuccess = CreateProcessA(application_name, cmdline.ptr, NULL,
+    BOOL bSuccess = CreateProcessA(application_name, cmdline, NULL,
                                    NULL, TRUE, EXTENDED_STARTUPINFO_PRESENT,
                                    NULL, NULL, &siEx.StartupInfo, &pi);
     if (!bSuccess)
@@ -222,8 +222,7 @@ error:
 
     if (application_name != path)
         free((char*)application_name);
-    if (!vlc_memstream_close(&cmdline))
-        free(cmdline.ptr);
+    free(cmdline);
 
     return ret;
 }
