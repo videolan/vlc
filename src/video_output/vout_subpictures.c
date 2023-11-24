@@ -1206,6 +1206,24 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     return dst;
 }
 
+static void spu_UpdateOriginalSize(spu_t *spu, subpicture_t *subpic,
+                                   const video_format_t *fmtsrc)
+{
+    if (subpic->i_original_picture_width  == 0 ||
+        subpic->i_original_picture_height == 0) {
+        if (subpic->i_original_picture_width  > 0 ||
+            subpic->i_original_picture_height > 0)
+            msg_Err(spu, "original picture size %ux%u is unsupported",
+                    subpic->i_original_picture_width,
+                    subpic->i_original_picture_height);
+        else
+            msg_Warn(spu, "original picture size is undefined");
+
+        subpic->i_original_picture_width  = fmtsrc->i_visible_width;
+        subpic->i_original_picture_height = fmtsrc->i_visible_height;
+    }
+}
+
 /**
  * This function renders all sub picture units in the list.
  */
@@ -1264,19 +1282,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         if (vlc_spu_regions_is_empty(&subpic->regions))
             continue;
 
-        if (subpic->i_original_picture_width  == 0 ||
-            subpic->i_original_picture_height == 0) {
-            if (subpic->i_original_picture_width  > 0 ||
-                subpic->i_original_picture_height > 0)
-                msg_Err(spu, "original picture size %ux%u is unsupported",
-                         subpic->i_original_picture_width,
-                         subpic->i_original_picture_height);
-            else
-                msg_Warn(spu, "original picture size is undefined");
-
-            subpic->i_original_picture_width  = fmt_src->i_visible_width;
-            subpic->i_original_picture_height = fmt_src->i_visible_height;
-        }
+        spu_UpdateOriginalSize(spu, subpic, fmt_src);
 
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
@@ -1602,20 +1608,7 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
                               const video_format_t *fmtsrc, const video_format_t *fmtdst,
                               const vlc_fourcc_t *chroma_list)
 {
-    if (p_subpic->i_original_picture_width  == 0 ||
-        p_subpic->i_original_picture_height == 0) {
-        if (p_subpic->i_original_picture_width  > 0 ||
-            p_subpic->i_original_picture_height > 0)
-            msg_Err(spu, "original picture size %ux%u is unsupported",
-                     p_subpic->i_original_picture_width,
-                     p_subpic->i_original_picture_height);
-        else
-            msg_Warn(spu, "original picture size is undefined");
-
-        p_subpic->i_original_picture_width  = fmtsrc->i_visible_width;
-        p_subpic->i_original_picture_height = fmtsrc->i_visible_height;
-    }
-
+    spu_UpdateOriginalSize(spu, p_subpic, fmtsrc);
 
     subpicture_Update(p_subpic, fmtsrc, fmtdst,
                       p_subpic->b_subtitle ? p_subpic->i_start : vlc_tick_now());
