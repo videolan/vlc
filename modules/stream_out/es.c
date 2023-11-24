@@ -209,8 +209,8 @@ struct sout_stream_id_sys_t
     sout_mux_t   *p_mux;
 };
 
-static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
-                            const char *psz_access, const char *psz_mux )
+VLC_MALLOC static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
+                                       const char *psz_access, const char *psz_mux )
 {
     struct vlc_memstream stream;
     unsigned char c;
