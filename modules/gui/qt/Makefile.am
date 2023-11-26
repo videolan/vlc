@@ -1062,6 +1062,7 @@ libqt_plugin_la_QML = \
 	widgets/qml/DragItem.qml \
 	widgets/qml/DrawerExt.qml \
 	widgets/qml/ExpandGridView.qml \
+	widgets/qml/ExpandGridItemView.qml \
 	widgets/qml/EmptyLabel.qml \
 	widgets/qml/EmptyLabelButton.qml \
 	widgets/qml/EmptyLabelHint.qml \

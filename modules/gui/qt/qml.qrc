@@ -101,6 +101,7 @@
         <file alias="PartialEffect.qml">widgets/qml/PartialEffect.qml</file>
         <file alias="ViewHeader.qml">widgets/qml/ViewHeader.qml</file>
         <file alias="ProgressIndicator.qml">widgets/qml/ProgressIndicator.qml</file>
+        <file alias="ExpandGridItemView.qml">widgets/qml/ExpandGridItemView.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
