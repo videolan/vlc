@@ -303,7 +303,7 @@ static void RunDownloader(void *userdata)
 {
     vlc_thread_set_name("vlc-run-fetcher");
 
-    bool fetched = true;
+    bool fetched = false;
     struct task *task = userdata;
     input_fetcher_t *fetcher = task->fetcher;
 
@@ -313,16 +313,19 @@ static void RunDownloader(void *userdata)
 
     char *psz_arturl = input_item_GetArtURL( task->item );
     if( !psz_arturl )
-        goto error;
+        goto out;
 
     if( !strncasecmp( psz_arturl, "file://", 7 ) ||
         !strncasecmp( psz_arturl, "attachment://", 13 ) )
+    {
+        fetched = true;
         goto out; /* no fetch required */
+    }
 
     stream_t* source = vlc_stream_NewURL( fetcher->owner, psz_arturl );
 
     if( !source )
-        goto error;
+        goto out;
 
     struct vlc_memstream output_stream;
     vlc_memstream_open( &output_stream );
@@ -342,12 +345,12 @@ static void RunDownloader(void *userdata)
     vlc_stream_Delete( source );
 
     if( vlc_memstream_close( &output_stream ) )
-        goto error;
+        goto out;
 
     if( vlc_killed() )
     {
         free( output_stream.ptr );
-        goto error;
+        goto out;
     }
 
     input_SaveArt( fetcher->owner, task->item, output_stream.ptr,
@@ -355,9 +358,8 @@ static void RunDownloader(void *userdata)
 
     free( output_stream.ptr );
     AddAlbumCache( fetcher, task->item, true );
+    fetched = true;
 
-error:
-    fetched = false;
 out:
     vlc_interrupt_set(NULL);
 
