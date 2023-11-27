@@ -244,7 +244,7 @@ void video_format_LogDifferences(struct vlc_logger *log,
                                  const char *name_b, const video_format_t *b)
 {
     if (a->i_chroma != b->i_chroma)
-        vlc_debug(log, "'%s/%s' category %4.4s / %4.4s", name_a, name_b, (char*)&a->i_chroma, (char*)&b->i_chroma);
+        vlc_debug(log, "'%s/%s' i_chroma %4.4s / %4.4s", name_a, name_b, (char*)&a->i_chroma, (char*)&b->i_chroma);
     if( a->i_width != b->i_width )
         vlc_debug(log, "'%s/%s' i_width %u / %u", name_a, name_b, a->i_width, b->i_width);
     if( a->i_height != b->i_height )
@@ -265,7 +265,7 @@ void video_format_LogDifferences(struct vlc_logger *log,
         vlc_debug(log, "'%s/%s' orientation %d / %d", name_a, name_b, a->orientation, b->orientation);
 
     if( a->multiview_mode!= b->multiview_mode )
-        vlc_debug(log, "'%s/%s' orientation %d / %d", name_a, name_b, a->multiview_mode, b->multiview_mode);
+        vlc_debug(log, "'%s/%s' multiview_mode %d / %d", name_a, name_b, a->multiview_mode, b->multiview_mode);
 }
 
 static const char *orient_to_string[] =
