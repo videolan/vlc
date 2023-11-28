@@ -125,18 +125,24 @@
                    range:[unformattedTitle rangeOfString:item.userReadableType options:NSBackwardsSearch]];
     menuItem.attributedTitle = title;
 
-    [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
+    // The main menu must only be updated from the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_rendererMenu insertItem:menuItem atIndex:[_rendererMenu indexOfItem:_rendererNoneItem] + 1];
+    });
 }
 
 - (void)removeRendererItem:(VLCRendererItem *)item
 {
-    NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
-    if (index >= 0) {
-        NSMenuItem *menuItem = [_rendererMenu itemAtIndex:index];
-        // Don't remove selected item
-        if (menuItem != _selectedItem)
-            [_rendererMenu removeItemAtIndex:index];
-    }
+    // The main menu must only be updated from the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSInteger index = [_rendererMenu indexOfItemWithRepresentedObject:item];
+        if (index >= 0) {
+            NSMenuItem *menuItem = [_rendererMenu itemAtIndex:index];
+            // Don't remove selected item
+            if (menuItem != _selectedItem)
+                [_rendererMenu removeItemAtIndex:index];
+        }
+    });
 }
 
 - (void)startRendererDiscoveries
