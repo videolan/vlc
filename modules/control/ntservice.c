@@ -139,9 +139,9 @@ void Close( vlc_object_t *p_this )
 static void *Run( void *data )
 {
     intf_thread_t *p_intf = data;
-    SERVICE_TABLE_ENTRY dispatchTable[] =
+    const SERVICE_TABLE_ENTRYA dispatchTable[] =
     {
-        { (WCHAR*) TEXT(VLCSERVICENAME), (LPSERVICE_MAIN_FUNCTION) &ServiceDispatch },
+        { (LPSTR)VLCSERVICENAME, (LPSERVICE_MAIN_FUNCTIONA) &ServiceDispatch },
         { NULL, NULL }
     };
 
@@ -164,7 +164,7 @@ static void *Run( void *data )
         return NULL;
     }
 
-    if( StartServiceCtrlDispatcher( dispatchTable ) == 0 )
+    if( StartServiceCtrlDispatcherA( dispatchTable ) == 0 )
     {
         msg_Err( p_intf, "StartServiceCtrlDispatcher failed" ); /* str review */
     }
