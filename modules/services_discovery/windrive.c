@@ -60,19 +60,19 @@ static int Open (vlc_object_t *obj)
 
     LONG drives = GetLogicalDrives ();
     char mrl[12] = "file:///A:/", name[3] = "A:";
-    WCHAR path[4] = TEXT("A:\\");
+    CHAR path[4] = "A:\\";
 
     for (char d = 0; d < 26; d++)
     {
         input_item_t *item;
-        WCHAR letter = 'A' + d;
+        CHAR letter = 'A' + d;
 
         /* Does this drive actually exist? */
         if (!(drives & (1 << d)))
             continue;
         /* Is it a disc drive? */
         path[0] = letter;
-        if (GetDriveType (path) != DRIVE_CDROM)
+        if (GetDriveTypeA (path) != DRIVE_CDROM)
             continue;
 
         mrl[8] = name[0] = letter;
