@@ -398,8 +398,6 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
 VLC_API int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
                                vlc_tick_t deadline);
 
-int vlc_cond_timedwait_daytime(vlc_cond_t *, vlc_mutex_t *, time_t);
-
 /** @} */
 
 /**
@@ -567,50 +565,6 @@ VLC_API void vlc_latch_wait(vlc_latch_t *);
 
 /** @} */
 
-/*
- * Queued mutex
- *
- * A queued mutex is a type of thread-safe mutual exclusion lock that is
- * acquired in strict FIFO order.
- *
- * In most cases, a regular mutex (\ref vlc_mutex_t) should be used instead.
- * There are important differences:
- * - A queued mutex is generally slower, especially on the fast path.
- * - A queued mutex cannot be combined with a condition variable.
- *   Indeed, the scheduling policy of the condition variable would typically
- *   conflict with that of the queued mutex, leading to a dead lock.
- * - The try-lock operation is not implemented.
- */
-typedef struct {
-    atomic_uint head;
-    atomic_uint tail;
-    atomic_ulong owner;
-} vlc_queuedmutex_t;
-
-#define VLC_STATIC_QUEUEDMUTEX { ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0) }
-
-void vlc_queuedmutex_init(vlc_queuedmutex_t *m);
-
-void vlc_queuedmutex_lock(vlc_queuedmutex_t *m);
-
-void vlc_queuedmutex_unlock(vlc_queuedmutex_t *m);
-
-/**
- * Checks if a queued mutex is locked.
- *
- * This function checks if the calling thread holds a given queued mutual
- * exclusion lock. It has no side effects and is essentially intended for
- * run-time debugging.
- *
- * @note To assert that the calling thread holds a lock, the helper macro
- * vlc_queuedmutex_assert() should be used instead of this function.
- *
- * @retval false the mutex is not locked by the calling thread
- * @retval true the mutex is locked by the calling thread
- */
-bool vlc_queuedmutex_held(vlc_queuedmutex_t *m);
-
-#define vlc_queuedmutex_assert(m) assert(vlc_queuedmutex_held(m))
 /**
  * One-time initialization.
  *

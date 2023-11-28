@@ -60,6 +60,7 @@
 #include "snapshot.h"
 #include "video_window.h"
 #include "../misc/variables.h"
+#include "../misc/threads.h"
 #include "../clock/clock.h"
 #include "statistic.h"
 #include "chrono.h"

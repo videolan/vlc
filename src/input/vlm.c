@@ -47,6 +47,7 @@
 #include "vlm_event.h"
 #include <vlc_sout.h>
 #include <vlc_url.h>
+#include "../misc/threads.h"
 #include "../libvlc.h"
 
 /*****************************************************************************
@@ -976,4 +977,3 @@ int vlm_Control( vlm_t *p_vlm, int i_query, ... )
 
     return i_result;
 }
-

@@ -391,6 +391,7 @@ libvlccore_la_SOURCES = \
 	misc/rcu.c \
 	misc/renderer_discovery.c \
 	misc/threads.c \
+	misc/threads.h \
 	misc/cpu.c \
 	misc/diffutil.c \
 	misc/epg.c \
