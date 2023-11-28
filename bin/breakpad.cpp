@@ -42,20 +42,23 @@ static bool FilterCallback(void*, EXCEPTION_POINTERS*, MDRawAssertionInfo*)
 extern "C"
 {
 
+#define WIDEN_(x) L ## x
+#define WIDEN(x) WIDEN_(x)
+
 void CheckCrashDump( const wchar_t* path )
 {
     wchar_t pattern[MAX_PATH];
-    WIN32_FIND_DATA data;
+    WIN32_FIND_DATAW data;
     _snwprintf( pattern, MAX_PATH, L"%s/*.dmp", path );
-    HANDLE h = FindFirstFile( pattern, &data );
+    HANDLE h = FindFirstFileW( pattern, &data );
     if (h == INVALID_HANDLE_VALUE)
         return;
-    int answer = MessageBox( NULL, L"Ooops: VLC media player just crashed.\n" \
+    int answer = MessageBoxW( NULL, L"Ooops: VLC media player just crashed.\n" \
         "Would you like to send a bug report to the developers team?",
         L"VLC crash reporting", MB_YESNO);
     std::map<std::wstring, std::wstring> params;
     params[L"prod"] = L"VLC";
-    params[L"ver"] = TEXT(PACKAGE_VERSION);
+    params[L"ver"] = WIDEN(PACKAGE_VERSION);
     do
     {
         wchar_t fullPath[MAX_PATH];
@@ -65,18 +68,18 @@ void CheckCrashDump( const wchar_t* path )
             std::map<std::wstring, std::wstring> files;
             files[L"upload_file_minidump"] = fullPath;
             google_breakpad::HTTPUpload::SendRequest(
-                            TEXT( BREAKPAD_URL "/reports" ), params, files,
+                            WIDEN( BREAKPAD_URL "/reports" ), params, files,
                             NULL, NULL, NULL );
         }
-        DeleteFile( fullPath );
-    } while ( FindNextFile( h, &data ) );
+        DeleteFileW( fullPath );
+    } while ( FindNextFileW( h, &data ) );
     FindClose(h);
 }
 
 void* InstallCrashHandler( const wchar_t* crashdump_path )
 {
     // Breakpad needs the folder to exist to generate the crashdump
-    CreateDirectory( crashdump_path, NULL );
+    CreateDirectoryW( crashdump_path, NULL );
     return new(std::nothrow) ExceptionHandler( crashdump_path, FilterCallback,
                                 NULL, NULL, ExceptionHandler::HANDLER_ALL);
 }
