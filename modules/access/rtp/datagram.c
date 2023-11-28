@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_network.h>
+#include <vlc_poll.h>
 #include "vlc_dtls.h"
 
 #ifndef MSG_TRUNC

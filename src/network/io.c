@@ -49,6 +49,7 @@
 
 #include <vlc_common.h>
 #include <vlc_network.h>
+#include <vlc_poll.h>
 #include <vlc_interrupt.h>
 #if defined (_WIN32)
 #   undef EINPROGRESS

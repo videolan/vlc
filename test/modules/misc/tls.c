@@ -35,6 +35,7 @@
 #include <poll.h>
 
 #include <vlc_common.h>
+#include <vlc_poll.h>
 #include <vlc_modules.h>
 #include <vlc_tls.h>
 #include "../../../lib/libvlc_internal.h"

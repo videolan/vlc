@@ -41,6 +41,7 @@
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_demux.h>
+#include <vlc_poll.h>
 
 #include <vlc_fs.h>
 

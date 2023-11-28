@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist_legacy.h>
+#include <vlc_poll.h>
 
 #include <sys/types.h>
 #include <unistd.h>

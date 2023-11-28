@@ -33,6 +33,7 @@
 #endif
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_poll.h>
 #include <vlc_tls.h>
 #include "h2frame.h"
 #include "h2output.h"

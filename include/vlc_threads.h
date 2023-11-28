@@ -64,18 +64,6 @@ typedef struct vlc_thread *vlc_thread_t;
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
-static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
-{
-    int val;
-
-    vlc_testcancel();
-    val = poll(fds, nfds, timeout);
-    if (val < 0)
-        vlc_testcancel();
-    return val;
-}
-# define poll(u,n,t) vlc_poll(u, n, t)
-
 #elif defined (__OS2__)
 # include <errno.h>
 
@@ -87,26 +75,6 @@ typedef struct vlc_timer *vlc_timer_t;
 
 # define pthread_sigmask  sigprocmask
 
-static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
-{
-    static int (*vlc_poll_os2)(struct pollfd *, unsigned, int) = NULL;
-
-    if (!vlc_poll_os2)
-    {
-        HMODULE hmod;
-        CHAR szFailed[CCHMAXPATH];
-
-        if (DosLoadModule(szFailed, sizeof(szFailed), "vlccore", &hmod))
-            return -1;
-
-        if (DosQueryProcAddr(hmod, 0, "_vlc_poll_os2", (PFN *)&vlc_poll_os2))
-            return -1;
-    }
-
-    return (*vlc_poll_os2)(fds, nfds, timeout);
-}
-# define poll(u,n,t) vlc_poll(u, n, t)
-
 #elif defined (__ANDROID__)      /* pthreads subset without pthread_cancel() */
 # include <unistd.h>
 # include <pthread.h>
@@ -117,26 +85,6 @@ typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED ((void*) UINTPTR_MAX)
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
-
-static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
-{
-    int val;
-
-    do
-    {
-        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
-        if (timeout >= 0)
-            timeout -= ugly_timeout;
-
-        vlc_testcancel ();
-        val = poll (fds, nfds, ugly_timeout);
-    }
-    while (val == 0 && timeout != 0);
-
-    return val;
-}
-
-# define poll(u,n,t) vlc_poll(u, n, t)
 
 #else /* POSIX threads */
 # include <unistd.h> /* _POSIX_SPIN_LOCKS */

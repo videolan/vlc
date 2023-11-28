@@ -90,6 +90,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_playlist.h \
 	../include/vlc_playlist_export.h \
 	../include/vlc_plugin.h \
+	../include/vlc_poll.h \
 	../include/vlc_probe.h \
 	../include/vlc_preparser.h \
 	../include/vlc_queue.h \

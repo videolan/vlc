@@ -47,6 +47,7 @@ typedef xcb_atom_t Atom;
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_poll.h>
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 #include <vlc_window.h>

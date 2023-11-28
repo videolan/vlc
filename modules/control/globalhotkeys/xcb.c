@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_actions.h>
+#include <vlc_poll.h>
 #include <errno.h>
 
 #include <xcb/xcb.h>

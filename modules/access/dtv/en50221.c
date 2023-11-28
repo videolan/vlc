@@ -30,6 +30,7 @@
 #include <vlc_arrays.h>
 #include <vlc_tick.h>
 #include <vlc_threads.h>
+#include <vlc_poll.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 
