@@ -45,6 +45,10 @@
 #include "avcodec.h"
 #include "va.h"
 
+#if defined(_WIN32)
+# include <winapifamily.h>
+#endif
+
 #include <libavutil/stereo3d.h>
 
 #if LIBAVUTIL_VERSION_CHECK( 57, 16, 100 )
