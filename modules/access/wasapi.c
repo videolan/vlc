@@ -26,7 +26,6 @@
 
 #include <initguid.h>
 #define COBJMACROS
-#define CONST_VTABLE
 
 #include <assert.h>
 #include <stdlib.h>

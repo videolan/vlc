@@ -24,7 +24,6 @@
 
 #define INITGUID
 #define COBJMACROS
-#define CONST_VTABLE
 
 #include <stdatomic.h>
 #include <stdlib.h>
