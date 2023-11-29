@@ -254,11 +254,9 @@ static void SetAudioEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
     p_cfg->i_codec = 0;
     if( psz_string && *psz_string )
     {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( AUDIO_ES, fcc );
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( AUDIO_ES, psz_string );
         msg_Dbg( p_stream, "Checking codec mapping for %s got %4.4s ",
-                            fcc, (char*)&p_cfg->i_codec);
+                            psz_string, (char*)&p_cfg->i_codec);
     }
     free( psz_string );
 
@@ -304,11 +302,9 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vcodec" );
     if( psz_string && *psz_string )
     {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( VIDEO_ES, fcc );
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_string );
         msg_Dbg( p_stream, "Checking video codec mapping for %s got %4.4s ",
-                 fcc, (char*)&p_cfg->i_codec);
+                 psz_string, (char*)&p_cfg->i_codec);
     }
     free( psz_string );
 
@@ -346,10 +342,8 @@ static void SetSPUEncoderConfig( sout_stream_t *p_stream, transcode_encoder_conf
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "scodec" );
     if( psz_string && *psz_string )
     {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( SPU_ES, fcc );
-        msg_Dbg( p_stream, "Checking spu codec mapping for %s got %4.4s ", fcc, (char*)&p_cfg->i_codec);
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( SPU_ES, psz_string );
+        msg_Dbg( p_stream, "Checking spu codec mapping for %s got %4.4s ", psz_string, (char*)&p_cfg->i_codec);
     }
     free( psz_string );
 
