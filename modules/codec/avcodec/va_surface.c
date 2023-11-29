@@ -30,7 +30,6 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_codecs.h>
 #include <vlc_codec.h>
 #include <vlc_picture.h>
 

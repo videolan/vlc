@@ -42,7 +42,6 @@
 #   include <wine/windef.h>
 #endif
 
-#include <vlc_codecs.h>
 #include "dmo.h"
 
 static HRESULT STDCALL QueryInterface( IMediaBuffer *This,
