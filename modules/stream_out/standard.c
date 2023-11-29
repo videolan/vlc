@@ -101,7 +101,6 @@ static const char *const ppsz_sout_options[] = {
 typedef struct
 {
     sout_mux_t           *p_mux;
-    session_descriptor_t *p_session;
     bool                  synchronous;
 } sout_stream_sys_t;
 
@@ -308,7 +307,6 @@ static int Open( vlc_object_t *p_this )
         ret = VLC_ENOMEM;
         goto end;
     }
-    p_sys->p_session = NULL;
 
     if( fixAccessMux( p_stream, &psz_mux, &psz_access, psz_url ) )
         goto end;
@@ -366,9 +364,6 @@ static void Close( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys    = p_stream->p_sys;
     sout_access_out_t *p_access = p_sys->p_mux->p_access;
-
-    if( p_sys->p_session != NULL )
-        sout_AnnounceUnRegister( p_stream, p_sys->p_session );
 
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );
