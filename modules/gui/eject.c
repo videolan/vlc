@@ -124,14 +124,12 @@ static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
     VLC_UNUSED(p_this);
 
 #if defined(_WIN32)
-    MCI_OPEN_PARMS op;
+    MCI_OPEN_PARMSA op = {};
     DWORD i_flags;
-    WCHAR psz_drive[4];
+    CHAR psz_drive[] = "X:";
 
-    memset( &op, 0, sizeof(MCI_OPEN_PARMS) );
-    op.lpstrDeviceType = (LPCTSTR)MCI_DEVTYPE_CD_AUDIO;
+    op.lpstrDeviceType = (LPCSTR)MCI_DEVTYPE_CD_AUDIO;
 
-    wcscpy( psz_drive, TEXT("X:") );
     psz_drive[0] = psz_device[0];
     op.lpstrElementName = psz_drive;
 
@@ -139,7 +137,7 @@ static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
     i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
               MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE;
 
-    if( mciSendCommand( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
+    if( mciSendCommandA( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
         return VLC_EGENERIC;
 
     /* Eject disc */
