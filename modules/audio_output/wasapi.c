@@ -25,19 +25,21 @@
 #define INITGUID
 #define COBJMACROS
 #define CONST_VTABLE
-#define NONEWWAVE
 
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_codecs.h>
 #include <vlc_aout.h>
 #include <vlc_plugin.h>
 
+#include <windows.h>
+#include <mmreg.h>
 #include <audioclient.h>
 #include "mmdevice.h"
+
+#include <vlc_codecs.h>
 
 #define TIMING_REPORT_DELAY VLC_TICK_FROM_MS(1000)
 
@@ -504,8 +506,8 @@ static void LogWaveFormat(struct vlc_logger *l, const WAVEFORMATEX *restrict wf)
 {
     vlc_debug(l, "nChannels %d", wf->nChannels);
     vlc_debug(l, "wBitsPerSample %d", wf->wBitsPerSample);
-    vlc_debug(l, "nAvgBytesPerSec %d", wf->nAvgBytesPerSec);
-    vlc_debug(l, "nSamplesPerSec %d", wf->nSamplesPerSec);
+    vlc_debug(l, "nAvgBytesPerSec %lu", wf->nAvgBytesPerSec);
+    vlc_debug(l, "nSamplesPerSec %lu", wf->nSamplesPerSec);
     vlc_debug(l, "nBlockAlign %d", wf->nBlockAlign);
     vlc_debug(l, "cbSize %d", wf->cbSize);
     vlc_debug(l, "wFormatTag 0x%04X", wf->wFormatTag);
