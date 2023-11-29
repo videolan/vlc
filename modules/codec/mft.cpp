@@ -48,7 +48,7 @@ extern "C" {
 #include <codecapi.h>
 
 
-#include <vlc_codecs.h>
+#include <vlc_codecs.h> // wf_tag_to_fourcc
 
 #include <algorithm>
 #include <atomic>

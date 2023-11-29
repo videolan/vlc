@@ -39,7 +39,7 @@
 #include <audioclient.h>
 #include "mmdevice.h"
 
-#include <vlc_codecs.h>
+#include <vlc_codecs.h> // GUID_FMT/GUID_PRINT
 
 #define TIMING_REPORT_DELAY VLC_TICK_FROM_MS(1000)
 

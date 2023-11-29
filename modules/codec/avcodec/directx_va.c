@@ -44,7 +44,7 @@
 #endif
 
 #include "directx_va.h"
-#include <vlc_codecs.h>
+#include <vlc_codecs.h> // GUID_FMT/GUID_PRINT
 
 #include "../../packetizer/h264_nal.h"
 #include "../../packetizer/hevc_nal.h"

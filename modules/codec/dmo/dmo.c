@@ -40,7 +40,7 @@
 #include <amvideo.h>
 #include <mmreg.h>
 
-#include <vlc_codecs.h>
+#include <vlc_codecs.h> // fourcc_to_wf_tag
 #include "dmo.h"
 #include "../../video_chroma/copy.h"
 
