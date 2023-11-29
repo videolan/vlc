@@ -399,7 +399,7 @@ static int CALLBACK EnumFontCallback(const LOGFONTW *lp, const TEXTMETRICW *metr
 }
 
 static void FillLinkedFontsForFamily( vlc_font_select_t *fs,
-                                      LPTSTR name, vlc_family_t *p_family )
+                                      const WCHAR *name, vlc_family_t *p_family )
 {
     HDC hDC = GetDC( NULL );
     if( !hDC )
@@ -426,7 +426,7 @@ static int AddLinkedFonts( vlc_font_select_t *fs, const char *psz_family,
                              0, KEY_READ, &fontLinkKey )))
         return VLC_EGENERIC;
 
-    LPTSTR psz_buffer = ToWide( psz_family );
+    WCHAR *psz_buffer = ToWide( psz_family );
     if( !psz_buffer )
     {
         RegCloseKey( fontLinkKey );
@@ -494,7 +494,7 @@ int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_fa
     LOGFONTW lf;
     lf.lfCharSet = DEFAULT_CHARSET;
 
-    LPTSTR psz_fbuffer = ToWide( psz_lcname );
+    WCHAR *psz_fbuffer = ToWide( psz_lcname );
     wcsncpy( lf.lfFaceName, psz_fbuffer, ARRAY_SIZE(lf.lfFaceName) );
     free( psz_fbuffer );
 
