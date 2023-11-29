@@ -44,8 +44,14 @@ struct frame_info_t
     bool b_field;
     bool b_progressive;
     bool b_top_field_first;
+    bool b_output_needed;
+    bool b_no_output_of_prior_pics;
+    bool b_no_rasl_output;
     uint8_t i_num_ts;
     uint8_t i_max_pics_buffering;
+    uint8_t i_max_num_reorder;
+    uint8_t i_max_latency_pics;
+    uint8_t i_latency;
     unsigned i_length;
     frame_info_t *p_next;
 };
@@ -55,15 +61,23 @@ struct dpb_s
     frame_info_t *p_entries;
     uint8_t i_size; /* number of virtual buffers used (depends on i_fields_per_buffer) */
     uint8_t i_stored_fields;
+    uint8_t i_need_output_size;
     uint8_t i_max_pics;
     uint8_t i_fields_per_buffer; /* stores 2 fields or 1 field/frame per buffer */
     bool b_strict_reorder;
     bool b_invalid_pic_reorder_max;
     bool b_poc_based_reorder;
+    void (*pf_release)(picture_t *);
 };
 
 void InsertIntoDPB(struct dpb_s *, frame_info_t *);
 
-picture_t * OutputNextFrameFromDPB(struct dpb_s *, date_t *);
+void RemoveDPBSlot(struct dpb_s *, frame_info_t **);
+
+picture_t * EmptyDPB(struct dpb_s *, date_t *);
+
+picture_t * DPBOutputFrame(struct dpb_s *, date_t *, frame_info_t *);
+
+picture_t * DPBOutputAndRemoval(struct dpb_s *, date_t *, const frame_info_t *);
 
 #endif // VIDEOTOOLBOX_DPB_H

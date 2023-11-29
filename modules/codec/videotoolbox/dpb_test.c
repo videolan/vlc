@@ -71,23 +71,29 @@ static void VaCheckOutput(picture_t *output, va_list ap)
     for(;;)
     {
         int poc = va_arg(ap, int);
+        int outpoc;
+        if(output)
+        {
+            outpoc = ((uint64_t)output->p_sys);
+            fprintf(stderr, "output %d, ", outpoc);
+        }
+        else
+        {
+            fprintf(stderr, "no output, ");
+        }
         if(poc == -1)
         {
-            fprintf(stderr, "no output expected\n");
+            fprintf(stderr, "no output was expected\n");
             assert(output == NULL);
             break;
         }
+        fprintf(stderr, "%d was expected\n", poc);
         if(output == NULL)
-        {
-            fprintf(stderr, "no output, was expected %d", poc);
             abort();
-        }
-        int outpoc = ((uint64_t)output->p_sys);
-        fprintf(stderr, "output %d, expected %d\n", outpoc, poc);
         assert(outpoc == poc);
         picture_t *next = output->p_next;
         output->p_next = NULL;
-        pic_release(output);
+        free(output);
         output = next;
     };
     assert(output == NULL);
@@ -96,15 +102,7 @@ static void VaCheckOutput(picture_t *output, va_list ap)
 static void CheckDrain(struct dpb_s *dpb, date_t *ptsdate, ...)
 {
     fprintf(stderr,"drain\n");
-    picture_t *output = NULL;
-    picture_t **next = &output;
-    while(dpb->i_size)
-    {
-        *next = OutputNextFrameFromDPB(dpb, ptsdate);
-        if(!*next)
-            break;
-        next = &((*next)->p_next);
-    }
+    picture_t *output = EmptyDPB(dpb, ptsdate);
     va_list args;
     va_start(args, ptsdate);
     VaCheckOutput(output, args);
@@ -113,18 +111,9 @@ static void CheckDrain(struct dpb_s *dpb, date_t *ptsdate, ...)
 
 static void CheckOutput(struct dpb_s *dpb, date_t *ptsdate, frame_info_t *info, ...)
 {
-    fprintf(stderr, "enqueing foc %d flush %d dpb sz %d\n", info->i_foc,
-            info->b_flush, dpb->i_size);
-    dpb->i_max_pics = info->i_max_pics_buffering;
-    picture_t *output = NULL;
-    picture_t **next = &output;
-    while(info->b_flush || dpb->i_size >= dpb->i_max_pics)
-    {
-        *next = OutputNextFrameFromDPB(dpb, ptsdate);
-        if(!*next)
-            break;
-        next = &((*next)->p_next);
-    }
+    fprintf(stderr, "enqueing foc %d flush %d dpb sz %d ndsz %d\n", info->i_foc,
+            info->b_flush, dpb->i_size, dpb->i_need_output_size);
+    picture_t *output = DPBOutputAndRemoval(dpb, ptsdate, info);
     assert(dpb->i_size < DPB_MAX_PICS);
     va_list args;
     va_start(args, info);
@@ -139,14 +128,19 @@ static void CheckDPBWithFramesTest()
     dpb.b_strict_reorder = true;
     dpb.b_poc_based_reorder = true;
     dpb.i_fields_per_buffer = 2;
+    dpb.pf_release = pic_release;
 
     frame_info_t info = {0};
     info.field_rate_num = 30000;
     info.field_rate_den = 1000;
     info.b_progressive = true;
+    info.b_output_needed = true;
     info.b_top_field_first = true;
     info.i_num_ts = 2;
     info.i_max_pics_buffering = 4;
+    info.i_max_num_reorder = 0;
+    info.i_max_latency_pics = 0;
+    info.i_latency = 0;
 
     date_t pts;
     date_Init(&pts, info.field_rate_num, info.field_rate_den);
@@ -207,6 +201,99 @@ static void CheckDPBWithFramesTest()
     assert(dpb.i_size == 1);
 
     CheckDrain(&dpb, &pts, 0, -1);
+    assert(dpb.i_size == 0);
+
+    /* dual parameters */
+    info.i_max_pics_buffering = 10;
+    info.i_max_num_reorder = 2;
+
+    info.i_foc = 4;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 8;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1); /* dpb.i_size == max_num_reorder before enqueue */
+
+    info.i_foc = 6;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 2, -1); /* dpb.i_size > max_num_reorder before enqueue */
+
+    /* plain drained reorder output, no pre enqueue BUMP */
+    CheckDrain(&dpb, &pts, 4, 6, 8, -1);
+
+    /* RASL, non-needed slots */
+    info.i_max_pics_buffering = 10; /* let's trigger on needed output only */
+
+    info.i_foc = 22;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = false;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 20;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = true;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 24;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_size < info.i_max_pics_buffering);
+    assert(dpb.i_need_output_size == info.i_max_num_reorder);
+
+    info.i_foc = 26;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 28;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 20, -1);
+
+    CheckDrain(&dpb, &pts, 22, 24, 26, 28, -1);
+
+    assert(dpb.i_size == 0);
+
+    /* Max latency requirements */
+    info.i_max_pics_buffering = 10;
+    info.i_max_num_reorder = 7;
+    info.i_max_latency_pics = 3;
+    info.b_output_needed = true;
+
+    info.i_foc = 10;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1); /* latency == 0 */
+
+    info.i_foc = 8;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1); /* latency == 1 */
+
+    info.i_foc = 6;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1); /* latency == 2 */
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 6, 8, 10, -1); /* 10 has latency == 3 */
+
+    CheckDrain(&dpb, &pts, 2, -1);
 
     assert(dpb.i_size == 0);
 }

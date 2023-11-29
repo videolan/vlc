@@ -657,6 +657,16 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->b_keyframe |= (slice_type == HEVC_SLICE_TYPE_I);
             }
 
+            if( p_info->b_keyframe )
+            {
+                p_info->b_no_rasl_output = hevc_get_IRAPNoRaslOutputFlag( i_nal_type, &hevcctx->poc );
+                if ( i_nal_type == HEVC_NAL_CRA ) /* C.3.2 */
+                    p_info->b_no_output_of_prior_pics = true;
+                else
+                    p_info->b_no_output_of_prior_pics =
+                        hevc_get_slice_no_output_of_prior_pics_flag( p_sli );
+            }
+
             hevc_sequence_parameter_set_t *p_sps;
             hevc_picture_parameter_set_t *p_pps;
             hevc_video_parameter_set_t *p_vps;
@@ -677,9 +687,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
                 p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
-                uint8_t dummy;
-                hevc_get_dpb_values(p_sps, &p_info->i_max_pics_buffering, &dummy, &dummy);
-                VLC_UNUSED(dummy);
+                hevc_get_dpb_values(p_sps, &p_info->i_max_num_reorder,
+                                    &p_info->i_max_latency_pics, &p_info->i_max_pics_buffering);
                 p_info->b_flush = (POC == 0) ||
                                   (i_nal_type >= HEVC_NAL_IDR_N_LP &&
                                    i_nal_type <= HEVC_NAL_IRAP_VCL23);
@@ -702,6 +711,11 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
              * corrupted if the decoding start at an IRAP frame (IDR/CRA), VT
              * is likely failing to handle this case. */
             p_info->b_leading = ( i_nal_type == HEVC_NAL_RASL_N || i_nal_type == HEVC_NAL_RASL_R );
+
+            if(p_info->b_leading && p_sys->sync_state == STATE_BITSTREAM_DISCARD_LEADING)
+                p_info->b_output_needed = false;
+            else
+                p_info->b_output_needed = hevc_get_slice_pic_output(p_sli);
 
             hevc_rbsp_release_slice_header(p_sli);
             return true; /* No need to parse further NAL */
@@ -788,9 +802,11 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 static void DrainDPBLocked(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    while (p_sys->dpb.i_size > 0)
+    struct dpb_s *dpb = &p_sys->dpb;
+    while (dpb->i_size > 0)
     {
-        picture_t *p_output = OutputNextFrameFromDPB(&p_sys->dpb, &p_sys->pts);
+        picture_t *p_output = DPBOutputFrame(dpb, &p_sys->pts,
+                                             dpb->p_entries);
         if(p_output)
         {
             if (flush)
@@ -798,6 +814,7 @@ static void DrainDPBLocked(decoder_t *p_dec, bool flush)
             else
                 decoder_QueueVideo(p_dec, p_output);
         }
+        RemoveDPBSlot(dpb, &dpb->p_entries);
     }
 }
 
@@ -807,6 +824,12 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
     frame_info_t *p_info = calloc(1, sizeof(*p_info));
     if (!p_info)
         return NULL;
+
+    /* failsafe defaults */
+    p_info->b_output_needed = true;
+    p_info->i_max_num_reorder = 0;
+    p_info->i_max_latency_pics = 0;
+    p_info->i_latency = 0;
 
     if (p_sys->pf_fill_reorder_info)
     {
@@ -879,12 +902,13 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
         }
     }
 
-    while(p_info->b_flush || p_sys->dpb.i_size >= p_sys->dpb.i_max_pics)
+    for(picture_t *p_out = DPBOutputAndRemoval(&p_sys->dpb, &p_sys->pts, p_info);
+        p_out != NULL;)
     {
-        picture_t *p_output = OutputNextFrameFromDPB(&p_sys->dpb, &p_sys->pts);
-        if(!p_output)
-            break;
-        decoder_QueueVideo(p_dec, p_output);
+        picture_t *p_pic = p_out;
+        p_out = p_out->p_next;
+        p_pic->p_next = NULL;
+        decoder_QueueVideo(p_dec, p_pic);
     }
 
     InsertIntoDPB(&p_sys->dpb, p_info);
@@ -1233,7 +1257,7 @@ static void StopVideoToolbox(decoder_t *p_dec)
 
 static void pic_pacer_Destroy(void *priv)
 {
-    pic_pacer_Clean((struct pic_pacer *) priv);
+    pic_pacer_Clean((struct pic_pacer *)priv);
 }
 
 static int
@@ -1317,6 +1341,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->videoFormatDescription = NULL;
     p_sys->dpb.i_max_pics = 4;
     p_sys->dpb.i_fields_per_buffer = 1;
+    p_sys->dpb.pf_release = picture_Release;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
     /* will be fixed later */
