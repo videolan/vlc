@@ -24,7 +24,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 
 enum vlc_qt_theme_color_state {
     VQTC_STATE_NORMAL = 0,
