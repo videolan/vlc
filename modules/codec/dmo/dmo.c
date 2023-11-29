@@ -34,11 +34,11 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_codecs.h>
 
 #include <objbase.h>
 #include <strmif.h>
 #include <amvideo.h>
+#include <mmreg.h>
 
 #include <vlc_codecs.h>
 #include "dmo.h"
@@ -1265,7 +1265,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
             {
                 i_selected = i - 1;
                 i_last_byterate = p_wf->nAvgBytesPerSec;
-                msg_Dbg( p_enc, "selected entry %i (bitrate: %i)",
+                msg_Dbg( p_enc, "selected entry %i (bitrate: %lu)",
                          i_selected, p_wf->nAvgBytesPerSec * 8 );
             }
         }
