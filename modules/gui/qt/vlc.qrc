@@ -224,7 +224,7 @@
         <file alias="CSDThemeButtonSet.qml">widgets/qml/CSDThemeButtonSet.qml</file>
         <file alias="CSDThemeButton.qml">widgets/qml/CSDThemeButton.qml</file>
         <file alias="TextFieldExt.qml">widgets/qml/TextFieldExt.qml</file>
-        <file alias="Slider.qml">widgets/qml/Slider.qml</file>
+        <file alias="SliderExt.qml">widgets/qml/SliderExt.qml</file>
         <file alias="FadingEdge.qml">widgets/qml/FadingEdge.qml</file>
         <file alias="FadingEdgeForListView.qml">widgets/qml/FadingEdgeForListView.qml</file>
         <file alias="PopupIconToolButton.qml">widgets/qml/PopupIconToolButton.qml</file>

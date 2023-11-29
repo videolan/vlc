@@ -235,7 +235,7 @@ ColumnLayout {
         }
     }
 
-    Widgets.Slider {
+    Widgets.SliderExt {
         id: slider
 
         Layout.fillWidth: true

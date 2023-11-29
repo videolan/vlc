@@ -91,7 +91,7 @@ T.Pane {
             Navigation.rightItem: volControl
         }
 
-        Widgets.Slider {
+        Widgets.SliderExt {
             id: volControl
 
             // FIXME: use VLCStyle
