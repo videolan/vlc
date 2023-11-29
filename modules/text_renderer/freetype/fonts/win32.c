@@ -411,7 +411,7 @@ static void FillLinkedFontsForFamily( vlc_font_select_t *fs,
 
     LOGFONT lf = { 0 };
     lf.lfCharSet = DEFAULT_CHARSET;
-    wcsncpy( (LPTSTR)&lf.lfFaceName, name, LF_FACESIZE );
+    wcsncpy( lf.lfFaceName, name, ARRAY_SIZE(lf.lfFaceName) );
 
     EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0 );
     ReleaseDC( NULL, hDC );
@@ -494,7 +494,7 @@ int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_fa
     lf.lfCharSet = DEFAULT_CHARSET;
 
     LPTSTR psz_fbuffer = ToWide( psz_lcname );
-    wcsncpy( (LPTSTR)&lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
+    wcsncpy( lf.lfFaceName, psz_fbuffer, ARRAY_SIZE(lf.lfFaceName) );
     free( psz_fbuffer );
 
     /* */
@@ -554,7 +554,7 @@ static char *UniscribeFallback( const char *psz_lcname, uni_char_t codepoint )
     wchar_t *psz_fbuffer = ToWide( psz_lcname );
     if( !psz_fbuffer )
         goto error;
-    wcsncpy( ( LPTSTR ) &lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
+    wcsncpy( lf.lfFaceName, psz_fbuffer, ARRAY_SIZE(lf.lfFaceName) );
     free( psz_fbuffer );
 
     lf.lfCharSet = DEFAULT_CHARSET;
