@@ -62,6 +62,6 @@ struct dpb_s
 
 void InsertIntoDPB(struct dpb_s *, frame_info_t *);
 
-int RemoveOneFrameFromDPB(struct dpb_s *, date_t *, picture_t **);
+picture_t * OutputNextFrameFromDPB(struct dpb_s *, date_t *);
 
 #endif // VIDEOTOOLBOX_DPB_H

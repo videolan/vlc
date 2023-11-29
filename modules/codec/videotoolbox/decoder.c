@@ -787,20 +787,15 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 static void DrainDPBLocked(decoder_t *p_dec, bool flush)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    for ( ;; )
+    while (p_sys->dpb.i_size > 0)
     {
-        picture_t *p_fields;
-        if(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_fields) != VLC_SUCCESS)
-            break;
-        for ( ; p_fields; )
+        picture_t *p_output = OutputNextFrameFromDPB(&p_sys->dpb, &p_sys->pts);
+        if(p_output)
         {
-            picture_t *p_next = p_fields->p_next;
-            p_fields->p_next = NULL;
             if (flush)
-                picture_Release(p_fields);
+                picture_Release(p_output);
             else
-                decoder_QueueVideo(p_dec, p_fields);
-            p_fields = p_next;
+                decoder_QueueVideo(p_dec, p_output);
         }
     }
 }
@@ -885,16 +880,10 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 
     while(p_info->b_flush || p_sys->dpb.i_size >= p_sys->dpb.i_max_pics)
     {
-        picture_t *p_fields;
-        if(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_fields) != VLC_SUCCESS)
+        picture_t *p_output = OutputNextFrameFromDPB(&p_sys->dpb, &p_sys->pts);
+        if(!p_output)
             break;
-        for(; p_fields;)
-        {
-            picture_t *p_next = p_fields->p_next;
-            p_fields->p_next = NULL;
-            decoder_QueueVideo(p_dec, p_fields);
-            p_fields = p_next;
-        }
+        decoder_QueueVideo(p_dec, p_output);
     }
 
     InsertIntoDPB(&p_sys->dpb, p_info);
@@ -1767,8 +1756,8 @@ static void Drain(decoder_t *p_dec, bool flush)
 
     vlc_mutex_lock(&p_sys->lock);
     DrainDPBLocked(p_dec, flush);
-    picture_t *p_output;
-    assert(RemoveOneFrameFromDPB(&p_sys->dpb, &p_sys->pts, &p_output) == VLC_EGENERIC);
+    assert(p_sys->dpb.i_size == 0);
+    assert(p_sys->dpb.p_entries == NULL);
     p_sys->b_discard_decoder_output = false;
     p_sys->sync_state = p_sys->start_sync_state;
     vlc_mutex_unlock(&p_sys->lock);
