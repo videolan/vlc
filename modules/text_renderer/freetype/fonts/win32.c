@@ -338,12 +338,13 @@ struct enumFontCallbackContext
     WCHAR prevFullName[LF_FULLFACESIZE];
 };
 
-static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTMETRICEX *metric,
+static int CALLBACK EnumFontCallback(const LOGFONTW *lp, const TEXTMETRICW *metric,
                                      DWORD type, LPARAM lParam)
 {
     VLC_UNUSED( metric );
     if( (type & RASTER_FONTTYPE) ) return 1;
 
+    const ENUMLOGFONTEXW *lpelfe = container_of(lp, ENUMLOGFONTEXW, elfLogFont);
     struct enumFontCallbackContext *ctx = ( struct enumFontCallbackContext * ) lParam;
     vlc_family_t *p_family = ctx->p_family;
 
@@ -413,7 +414,7 @@ static void FillLinkedFontsForFamily( vlc_font_select_t *fs,
     lf.lfCharSet = DEFAULT_CHARSET;
     wcsncpy( lf.lfFaceName, name, ARRAY_SIZE(lf.lfFaceName) );
 
-    EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0 );
+    EnumFontFamiliesEx( hDC, &lf, &EnumFontCallback, (LPARAM)&ctx, 0 );
     ReleaseDC( NULL, hDC );
 }
 
@@ -503,7 +504,7 @@ int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_fa
     ctx.fs = fs;
     ctx.p_family = p_family;
     ctx.prevFullName[0] = 0;
-    EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
+    EnumFontFamiliesEx(hDC, &lf, &EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
 
     *pp_result = p_family;
@@ -709,4 +710,3 @@ char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )
 
     return psz_filepath;
 }
-
