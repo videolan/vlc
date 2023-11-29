@@ -77,7 +77,7 @@ typedef struct libvlc_title_description_t
 typedef struct libvlc_chapter_description_t
 {
     int64_t i_time_offset; /**< time-offset of the chapter in milliseconds */
-    int64_t i_duration; /**< duration of the chapter in milliseconds */
+    int64_t i_duration; /**< duration of the chapter in milliseconds, 0 if unknown */
     char *psz_name; /**< chapter name */
 } libvlc_chapter_description_t;
 
@@ -410,11 +410,18 @@ struct libvlc_media_player_cbs
      * available since version 0
      *
      * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param title description of the new selected title, valid only from this
+     * callback, do not release
      * \param title_idx index of the title
+     * \param chapter description of the new selected chapter, valid only from this
+     * callback, do not release
      * \param chapter_idx index of the new selected chapter
      */
     void (*on_chapter_selection_changed)( void *opaque,
-                                          unsigned title_idx, unsigned chapter_idx );
+                                          const libvlc_title_description_t *title,
+                                          unsigned title_idx,
+                                          const libvlc_chapter_description_t *chapter,
+                                          unsigned chapter_idx );
 
     /**
      * Callback prototype that notify when the player recording state changed

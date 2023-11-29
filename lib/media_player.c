@@ -351,6 +351,12 @@ on_titles_changed(vlc_player_t *player,
     .i_flags = title->flags, \
 }
 
+#define LIBVLC_CHAPTER_FROM_VLC(chapter) { \
+    .i_time_offset = MS_FROM_VLC_TICK(chapter->time), \
+    .i_duration = 0, \
+    .psz_name = (char *) chapter->name, \
+}
+
 static void
 on_title_selection_changed(vlc_player_t *player,
                            const struct vlc_player_title *new_title,
@@ -377,15 +383,17 @@ on_chapter_selection_changed(vlc_player_t *player,
                              void *data)
 {
     (void) player;
-    (void) title;
-    (void) new_chapter;
 
     libvlc_media_player_t *mp = data;
 
     if (mp->cbs == NULL || mp->cbs->on_chapter_selection_changed == NULL)
         return;
 
-    mp->cbs->on_chapter_selection_changed(mp->cbs_opaque, title_idx, new_chapter_idx);
+    const libvlc_title_description_t libtitle = LIBVLC_TITLE_FROM_VLC(title);
+    const libvlc_chapter_description_t libchapter = LIBVLC_CHAPTER_FROM_VLC(new_chapter);
+
+    mp->cbs->on_chapter_selection_changed(mp->cbs_opaque, &libtitle, title_idx,
+                                          &libchapter, new_chapter_idx);
 }
 
 static void on_media_meta_changed(vlc_player_t *player,
