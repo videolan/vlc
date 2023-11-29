@@ -524,8 +524,9 @@ static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
                 ( const EMREXTCREATEFONTINDIRECTW * ) record;
 
         *( ( LOGFONT * ) log_font ) = create_font_record->elfw.elfLogFont;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 /**
