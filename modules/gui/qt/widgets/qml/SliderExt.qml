@@ -24,6 +24,7 @@ import QtQuick.Templates 2.12 as T
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 T.Slider {
     id: control
@@ -152,7 +153,10 @@ T.Slider {
        text: {
            if (!visible) return ""
 
-           const v = control.valueAt(control.positionAt(pos.x))
+           // position is only measured till half of handle width
+           // pos.x may go beyond the position at the edges
+           const p = Helpers.clamp(control.positionAt(pos.x), 0.0, 1.0)
+           const v = control.valueAt(p)
            return control.toolTipTextProvider(v)
        }
 
