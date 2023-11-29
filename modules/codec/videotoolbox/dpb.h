@@ -53,8 +53,10 @@ struct frame_info_t
 struct dpb_s
 {
     frame_info_t *p_entries;
-    uint8_t i_size;
+    uint8_t i_size; /* number of virtual buffers used (depends on i_fields_per_buffer) */
+    uint8_t i_stored_fields;
     uint8_t i_max_pics;
+    uint8_t i_fields_per_buffer; /* stores 2 fields or 1 field/frame per buffer */
     bool b_strict_reorder;
     bool b_invalid_pic_reorder_max;
     bool b_poc_based_reorder;

@@ -45,7 +45,11 @@ void InsertIntoDPB(struct dpb_s *dpb, frame_info_t *p_info)
         {
             p_info->p_next = *pp_lead_in;
             *pp_lead_in = p_info;
-            dpb->i_size++;
+            dpb->i_stored_fields += (p_info->b_field ? 1 : 2);
+            if(dpb->i_fields_per_buffer == 2)
+                dpb->i_size = (dpb->i_stored_fields + 1)/2;
+            else
+                dpb->i_size++;
             break;
         }
     }
@@ -99,10 +103,14 @@ picture_t * OutputNextFrameFromDPB(struct dpb_s *dpb, date_t *ptsdate)
             p_info->p_picture->date = p_info->pts;
     }
 
-    dpb->i_size--;
+    dpb->i_stored_fields -= (p_info->b_field ? 1 : 2);
+    if(dpb->i_fields_per_buffer == 2)
+        dpb->i_size = (dpb->i_stored_fields + 1)/2;
+    else
+        dpb->i_size--;
+
     dpb->p_entries = p_info->p_next;
     free(p_info);
-    p_info = dpb->p_entries;
 
     return p_output;
 }

@@ -348,6 +348,7 @@ static bool InitH264(decoder_t *p_dec)
         return false;
     }
     p_sys->p_codec_context = ctx;
+    p_sys->dpb.i_fields_per_buffer = 2;
     return true;
 }
 
@@ -1315,6 +1316,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->codec = codec;
     p_sys->videoFormatDescription = NULL;
     p_sys->dpb.i_max_pics = 4;
+    p_sys->dpb.i_fields_per_buffer = 1;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
     /* will be fixed later */

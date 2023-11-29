@@ -138,6 +138,7 @@ static void CheckDPBWithFramesTest()
     struct dpb_s dpb = {0};
     dpb.b_strict_reorder = true;
     dpb.b_poc_based_reorder = true;
+    dpb.i_fields_per_buffer = 2;
 
     frame_info_t info = {0};
     info.field_rate_num = 30000;
@@ -210,8 +211,148 @@ static void CheckDPBWithFramesTest()
     assert(dpb.i_size == 0);
 }
 
+static void CheckDPBWithFieldsTest()
+{
+    struct dpb_s dpb = {0};
+    dpb.b_strict_reorder = true;
+    dpb.b_poc_based_reorder = true;
+    dpb.i_fields_per_buffer = 1;
+
+    frame_info_t info = {0};
+    info.field_rate_num = 30000;
+    info.field_rate_den = 1000;
+    info.b_progressive = true;
+    info.b_top_field_first = true;
+    info.i_num_ts = 1;
+    info.i_max_pics_buffering = 2;
+
+    /* Codec stores 1 field per buffer */
+    date_t pts;
+    date_Init(&pts, info.field_rate_num, info.field_rate_den);
+    date_Set(&pts, VLC_TICK_0);
+
+    info.b_field = true;
+
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 2);
+    assert(dpb.i_size == 2);
+
+    info.i_foc = 1;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 0, -1);
+
+    CheckDrain(&dpb, &pts, 1, 2, -1);
+
+    assert(dpb.i_stored_fields == 0);
+    assert(dpb.i_size == 0);
+
+    /* Codec stores 2 fields per buffer */
+    dpb.i_fields_per_buffer = 2;
+
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 2);
+    assert(dpb.i_size == 1);
+
+    info.i_foc = 1;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 3);
+    assert(dpb.i_size == 2);
+
+    CheckDrain(&dpb, &pts, 0, 1, 2, -1);
+
+    assert(dpb.i_stored_fields == 0);
+    assert(dpb.i_size == 0);
+
+    /* progressive/mbaff/field mix for fun 1 field per buffer */
+    dpb.i_fields_per_buffer = 1;
+    info.i_max_pics_buffering = 3;
+
+    info.b_field = false;
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.b_field = true;
+    info.i_foc = 3;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 3);
+    assert(dpb.i_size == 2);
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 4);
+    assert(dpb.i_size == 3);
+
+    CheckDrain(&dpb, &pts, 0, 2, 3, -1);
+
+    assert(dpb.i_stored_fields == 0);
+    assert(dpb.i_size == 0);
+
+    /* progressive/mbaff/field mix for fun 2 fields per buffer */
+    dpb.i_fields_per_buffer = 2;
+    info.i_max_pics_buffering = 3;
+
+    info.b_field = false;
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.b_field = true;
+    info.i_foc = 3;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 3);
+    assert(dpb.i_size == 2);
+
+    info.i_foc = 2;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    assert(dpb.i_stored_fields == 4);
+    assert(dpb.i_size == 2);
+
+    CheckDrain(&dpb, &pts, 0, 2, 3, -1);
+
+    assert(dpb.i_stored_fields == 0);
+    assert(dpb.i_size == 0);
+}
+
 int main(void)
 {
     CheckDPBWithFramesTest();
+    CheckDPBWithFieldsTest();
     return 0;
 }
