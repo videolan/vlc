@@ -62,8 +62,12 @@ T.Slider {
         return value
     }
 
-    readonly property real _tooltipX: toolTipFollowsMouse ? hoverHandler.point.position.x
-                                                          : (handle.x + handle.width / 2) // handle center
+    readonly property real _tooltipX: {
+        if (toolTipFollowsMouse && hoverHandler.hovered)
+            return  hoverHandler.point.position.x
+
+        return (handle.x + handle.width / 2) // handle center
+    }
 
     // find position under given x, can be used with Slider::valueAt()
     // x is coordinate in this control's coordinate space
@@ -132,6 +136,8 @@ T.Slider {
         acceptedPointerTypes: PointerDevice.Mouse
 
         enabled: true
+
+        target: background
     }
 
     PointingTooltip {
