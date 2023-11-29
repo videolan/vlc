@@ -345,6 +345,12 @@ on_titles_changed(vlc_player_t *player,
     mp->cbs->on_titles_changed(mp->cbs_opaque);
 }
 
+#define LIBVLC_TITLE_FROM_VLC(title) { \
+    .i_duration = MS_FROM_VLC_TICK(title->length), \
+    .psz_name = (char *) title->name, \
+    .i_flags = title->flags, \
+}
+
 static void
 on_title_selection_changed(vlc_player_t *player,
                            const struct vlc_player_title *new_title,
@@ -357,11 +363,7 @@ on_title_selection_changed(vlc_player_t *player,
     if (mp->cbs == NULL || mp->cbs->on_title_selection_changed == NULL)
         return;
 
-    const libvlc_title_description_t libtitle = {
-        .i_duration = MS_FROM_VLC_TICK(new_title->length),
-        .psz_name = (char *) new_title->name,
-        .i_flags = new_title->flags,
-    };
+    const libvlc_title_description_t libtitle = LIBVLC_TITLE_FROM_VLC(new_title);
 
     mp->cbs->on_title_selection_changed(mp->cbs_opaque, &libtitle, new_idx);
 }
