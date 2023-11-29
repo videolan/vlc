@@ -422,7 +422,7 @@ const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family 
     lf.lfCharSet = DEFAULT_CHARSET;
 
     LPTSTR psz_fbuffer = ToT( psz_family );
-    _tcsncpy( (LPTSTR)&lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
+    _tcsncpy( lf.lfFaceName, psz_fbuffer, ARRAY_SIZE(lf.lfFaceName) );
     free( psz_fbuffer );
 
     /* */
@@ -477,7 +477,7 @@ static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
     psz_fbuffer = ToT( psz_family );
     if( !psz_fbuffer )
         goto error;
-    _tcsncpy( ( LPTSTR ) &lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
+    _tcsncpy( lf.lfFaceName, psz_fbuffer, ARRAY_SIZE(lf.lfFaceName) );
     free( psz_fbuffer );
 
     lf.lfCharSet = DEFAULT_CHARSET;
