@@ -410,7 +410,10 @@ Item {
                 color: theme.bg.primary
 
                 DefaultShadow {
-                    anchors.fill: parent
+                    anchors.centerIn: parent
+
+                    rectWidth: bg.width
+                    rectHeight: bg.height
 
                     xRadius: bg.radius
                     yRadius: bg.radius
@@ -493,7 +496,10 @@ Item {
         }
 
         DefaultShadow {
-            anchors.fill: parent
+            anchors.centerIn: parent
+
+            rectWidth: extraCovers.width
+            rectHeight: extraCovers.height
 
             xRadius: extraCovers.radius
             yRadius: extraCovers.radius

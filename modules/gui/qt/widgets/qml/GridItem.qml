@@ -262,11 +262,12 @@ T.ItemDelegate {
                 DefaultShadow {
                     id: unselectedShadow
 
-                    anchors.fill: parent
-                    anchors.margins: VLCStyle.dp(1) // outside border (unselected)
+                    anchors.centerIn: parent
 
                     visible: opacity > 0
 
+                    rectWidth: parent.width
+                    rectHeight: parent.height
                     xRadius: parent.radius
                     yRadius: parent.radius
                 }
@@ -274,13 +275,13 @@ T.ItemDelegate {
                 DoubleShadow {
                     id: selectedShadow
 
-                    anchors.fill: parent
-                    anchors.margins: VLCStyle.dp(1)
-                    z: -1
+                    anchors.centerIn: parent
 
                     visible: opacity > 0
                     opacity: 0
 
+                    rectWidth: parent.width
+                    rectHeight: parent.height
                     xRadius: parent.radius
                     yRadius: parent.radius
 

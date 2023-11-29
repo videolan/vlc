@@ -51,16 +51,25 @@ public:
         , m_color(settings["color"].value<QColor>())
         , m_xOffset(settings["xOffset"].toReal())
         , m_yOffset(settings["yOffset"].toReal())
+        , m_width(settings["rectWidth"].toReal())
+        , m_height(settings["rectHeight"].toReal())
     { }
 
-    QImage generate(const QSize& size) const override
+    virtual void draw(QPainter& painter) const
     {
-        QImage mask(size, QImage::Format_ARGB32_Premultiplied);
-        mask.fill(m_color);
-        return generate(mask);
+        QPainterPath path;
+        QRect window = painter.window();
+        //center in window + offset
+        path.addRect(
+            (window.center().x() - (m_width / 2)) + m_xOffset,
+            (window.center().y() - (m_height / 2)) + m_yOffset,
+            m_width,
+            m_height);
+        painter.fillPath(path, m_color);
+        painter.drawPath(path);
     }
 
-    QImage generate(const QImage& mask) const
+    QImage generate(const QSize& size) const override
     {
         if (Q_UNLIKELY(!&qt_blurImage))
         {
@@ -69,7 +78,7 @@ public:
         }
 
         // Create a new image with boundaries containing the mask and effect.
-        QImage ret(boundingSize(mask.size()), QImage::Format_ARGB32_Premultiplied);
+        QImage ret(size, QImage::Format_ARGB32_Premultiplied);
         ret.fill(0);
 
         assert(!ret.isNull());
@@ -77,8 +86,7 @@ public:
             // Copy the mask
             QPainter painter(&ret);
             painter.setCompositionMode(QPainter::CompositionMode_Source);
-            const auto radius = m_blurRadius;
-            painter.drawImage(radius + m_xOffset, radius + m_yOffset, mask);
+            draw(painter);
         }
 
         // Blur the mask
@@ -87,18 +95,14 @@ public:
         return ret;
     }
 
-    constexpr QSize boundingSize(const QSize& size) const
-    {
-        // Size of bounding rectangle of the effect
-        const qreal diameter = m_blurRadius * 2;
-        return size + QSize(qAbs(m_xOffset) + diameter, qAbs(m_yOffset) + diameter);
-    }
 
 protected:
     qreal m_blurRadius = 1.0;
     QColor m_color {63, 63, 63, 180};
     qreal m_xOffset = 0.0;
     qreal m_yOffset = 0.0;
+    qreal m_width = 0.0;
+    qreal m_height = 0.0;
 };
 
 class RoundedRectDropShadowEffect : public RectDropShadowEffect
@@ -106,30 +110,27 @@ class RoundedRectDropShadowEffect : public RectDropShadowEffect
 public:
     explicit RoundedRectDropShadowEffect(const QVariantMap& settings)
         : RectDropShadowEffect(settings)
+
         , m_xRadius(settings["xRadius"].toReal())
         , m_yRadius(settings["yRadius"].toReal())
     { }
 
-    QImage generate(const QSize& size) const override
+    void draw(QPainter& painter) const override
     {
-        assert(!(qFuzzyIsNull(m_xRadius) && qFuzzyIsNull(m_yRadius))); // use RectDropShadowEffect instead
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(m_color);
 
-        QImage mask(size, QImage::Format_ARGB32_Premultiplied);
-        mask.fill(Qt::transparent);
-
-        assert(!mask.isNull());
-        {
-            QPainter painter(&mask);
-            painter.setRenderHint(QPainter::Antialiasing);
-            painter.setPen(m_color);
-
-            QPainterPath path;
-            path.addRoundedRect(mask.rect(), m_xRadius, m_yRadius);
-            painter.fillPath(path, m_color);
-            painter.drawPath(path);
-        }
-
-        return RectDropShadowEffect::generate(mask);
+        QPainterPath path;
+        QRect window = painter.window();
+        path.addRoundedRect(
+            (window.center().x() - (m_width / 2)) + m_xOffset,
+            (window.center().y() - (m_height / 2)) + m_yOffset,
+            m_width,
+            m_height,
+            m_xRadius,
+            m_yRadius);
+        painter.fillPath(path, m_color);
+        painter.drawPath(path);
     }
 
 protected:

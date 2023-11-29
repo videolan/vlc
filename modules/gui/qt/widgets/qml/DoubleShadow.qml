@@ -25,8 +25,10 @@ import "qrc:///style/"
 Item {
     id: root
 
-    property var xRadius: null
-    property var yRadius: null
+    /* required */ property real rectWidth: 0
+    /* required */ property real rectHeight: 0
+    /* required */ property real xRadius: 0
+    /* required */ property real yRadius: 0
 
     property alias primaryVerticalOffset: primaryShadow.yOffset
     property alias primaryHorizontalOffset: primaryShadow.xOffset
@@ -52,13 +54,14 @@ Item {
         anchors.centerIn: parent
         anchors.alignWhenCentered: false
 
-        color: Qt.rgba(0, 0, 0, .18)
-        xOffset: 0
-
+        rectWidth: root.rectWidth
+        rectHeight: root.rectHeight
         xRadius: root.xRadius
         yRadius: root.yRadius
 
-        sourceSize: Qt.size(parent.width, parent.height)
+        color: Qt.rgba(0, 0, 0, .18)
+        xOffset: 0
+
     }
 
     DropShadowImage {
@@ -67,13 +70,13 @@ Item {
         anchors.centerIn: parent
         anchors.alignWhenCentered: false
 
-        color: Qt.rgba(0, 0, 0, .22)
-        xOffset: 0
-
+        rectWidth: root.rectWidth
+        rectHeight: root.rectHeight
         xRadius: root.xRadius
         yRadius: root.yRadius
 
-        sourceSize: Qt.size(parent.width, parent.height)
+        color: Qt.rgba(0, 0, 0, .22)
+        xOffset: 0
 
         cache: root.cache
     }

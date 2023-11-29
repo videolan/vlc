@@ -118,7 +118,11 @@ FocusScope {
                             radius: VLCStyle.gridCover_radius
 
                             Widgets.DefaultShadow {
-                                anchors.fill: parent
+                                anchors.centerIn: parent
+
+                                rectWidth: parent.width
+                                rectHeight: parent.height
+
                                 visible: (parent.status === RoundImage.Ready)
 
                                 xRadius: parent.radius

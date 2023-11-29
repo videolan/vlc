@@ -102,12 +102,11 @@ Row {
         height: artwork.height
 
         Widgets.DefaultShadow {
-            // clip shadows to only the painted area of cover
-            x: (artwork.x + artwork.width - artwork.paintedWidth) / 2
-            y: (artwork.y + artwork.height - artwork.paintedHeight) / 2
-            width: artwork.paintedWidth
-            height: artwork.paintedHeight
+            anchors.centerIn: artwork
 
+            // clip shadows to only the painted area of cover
+            rectWidth: artwork.paintedWidth
+            rectHeight: artwork.paintedHeight
         }
 
         NetworkCustomCover {

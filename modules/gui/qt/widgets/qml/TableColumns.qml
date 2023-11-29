@@ -139,10 +139,13 @@ Item {
             }
 
             DefaultShadow {
-                anchors.fill: parent
+                anchors.centerIn: parent
 
                 xRadius: parent.radius
                 yRadius: parent.radius
+
+                rectWidth: parent.width
+                rectHeight: parent.height
             }
         }
 

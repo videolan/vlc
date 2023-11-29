@@ -244,10 +244,10 @@ T.Control {
 
             color: VLCStyle.setColorAlpha(theme.accent, 0.29)
 
+            rectWidth: parent.width
+            rectHeight: parent.height
             xRadius: parent.width
             yRadius: xRadius
-
-            sourceSize: Qt.size(xRadius, yRadius)
         }
 
         Widgets.DropShadowImage {
@@ -263,10 +263,11 @@ T.Control {
 
             color: VLCStyle.setColorAlpha(theme.accent, 1.0)
 
+            rectWidth: parent.width
+            rectHeight: parent.height
+
             xRadius: parent.width
             yRadius: xRadius
-
-            sourceSize: Qt.size(xRadius, yRadius)
         }
 
         Widgets.ScaledImage {
