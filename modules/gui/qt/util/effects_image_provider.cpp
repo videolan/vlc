@@ -138,6 +138,44 @@ protected:
     qreal m_yRadius = 0.0;
 };
 
+class DoubleShadowEffect : public IEffect
+{
+public:
+    explicit DoubleShadowEffect(const QVariantMap& settings)
+        : shadow1(adaptSettings(settings, "primary"))
+        , shadow2(adaptSettings(settings, "secondary"))
+    {
+    }
+
+    static QVariantMap adaptSettings(const QVariantMap& settings, const QString& prefix)
+    {
+        QVariantMap ret;
+        ret["blurRadius"] = settings[prefix + "BlurRadius"].toReal();
+        ret["color"]      = settings[prefix + "Color"].value<QColor>();
+        ret["xOffset"]    = settings[prefix + "XOffset"].toReal();
+        ret["yOffset"]    = settings[prefix + "YOffset"].toReal();
+        ret["rectWidth"]      = settings["rectWidth"].toReal();
+        ret["rectHeight"]     = settings["rectHeight"].toReal();
+        ret["xRadius"]    = settings["xRadius"].toReal();
+        ret["yRadius"]    = settings["yRadius"].toReal();
+        return ret;
+    }
+
+    QImage generate(const QSize& size) const override
+    {
+        QImage firstImage = shadow1.generate(size);
+        QImage secondImage = shadow2.generate(size);
+        QPainter painter(&firstImage);
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.drawImage(firstImage.rect(), secondImage);
+        return firstImage;
+    }
+
+protected:
+    RoundedRectDropShadowEffect shadow1;
+    RoundedRectDropShadowEffect shadow2;
+};
+
 }
 
 QImage EffectsImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
@@ -175,6 +213,11 @@ QImage EffectsImageProvider::requestImage(const QString &id, QSize *size, const 
 
         case EffectsImageProvider::RoundedRectDropShadow:
             effect = std::make_unique<RoundedRectDropShadowEffect>(queryToVariantMap(query));
+            break;
+
+
+        case EffectsImageProvider::DoubleRoundedRectDropShadow:
+            effect = std::make_unique<DoubleShadowEffect>(queryToVariantMap(query));
             break;
 
         default:

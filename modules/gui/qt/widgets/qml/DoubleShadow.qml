@@ -18,11 +18,13 @@
 
 import QtQuick 2.12
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 // A convenience file to encapsulate two drop shadow images stacked on top
 // of each other
-Item {
+ScaledImage {
     id: root
 
     /* required */ property real rectWidth: 0
@@ -30,54 +32,56 @@ Item {
     /* required */ property real xRadius: 0
     /* required */ property real yRadius: 0
 
-    property alias primaryVerticalOffset: primaryShadow.yOffset
-    property alias primaryHorizontalOffset: primaryShadow.xOffset
-    property alias primaryColor: primaryShadow.color
-    property alias primaryBlurRadius: primaryShadow.blurRadius
-    property alias primaryXRadius: primaryShadow.xRadius
-    property alias primaryYRadius: primaryShadow.yRadius
+    property color primaryColor: Qt.rgba(0, 0, 0, .18)
+    property real primaryVerticalOffset: 0
+    property real primaryHorizontalOffset: 0
+    property real primaryBlurRadius: 0
 
-    property alias secondaryVerticalOffset: secondaryShadow.yOffset
-    property alias secondaryHorizontalOffset: secondaryShadow.xOffset
-    property alias secondaryColor: secondaryShadow.color
-    property alias secondaryBlurRadius: secondaryShadow.blurRadius
-    property alias secondaryXRadius: secondaryShadow.xRadius
-    property alias secondaryYRadius: secondaryShadow.yRadius
+    property color secondaryColor: Qt.rgba(0, 0, 0, .22)
+    property real secondaryVerticalOffset: 0
+    property real secondaryHorizontalOffset: 0
+    property real secondaryBlurRadius: 0
 
-    property alias cache: primaryShadow.cache
+    property real _maxRadius: Math.max(primaryBlurRadius, secondaryBlurRadius)
+
+    sourceSize: Qt.size(
+        rectWidth + (_maxRadius + Math.max(Math.abs(primaryHorizontalOffset), Math.abs(secondaryHorizontalOffset)) ) * 2,
+        rectHeight + (_maxRadius + Math.max(Math.abs(primaryVerticalOffset), Math.abs(secondaryVerticalOffset))) * 2,
+        )
+
+    cache: true
+    asynchronous: true
+
+    fillMode: Image.Stretch
 
     visible: (width > 0 && height > 0)
 
-    DropShadowImage {
-        id: primaryShadow
+    z: -1
 
-        anchors.centerIn: parent
-        anchors.alignWhenCentered: false
+    onSourceSizeChanged: {
+        // Do not load the image when size is not valid:
+        if (sourceSize.width > 0 && sourceSize.height > 0)
+            source = Qt.binding(() => {
+                return Effects.url(
+                    Effects.DoubleRoundedRectDropShadow,
+                    {
+                        "rectWidth": rectWidth,
+                        "rectHeight": rectHeight,
+                        "xRadius": xRadius,
+                        "yRadius": yRadius,
 
-        rectWidth: root.rectWidth
-        rectHeight: root.rectHeight
-        xRadius: root.xRadius
-        yRadius: root.yRadius
+                        "primaryColor": primaryColor,
+                        "primaryBlurRadius": primaryBlurRadius,
+                        "primaryXOffset": primaryHorizontalOffset,
+                        "primaryYOffset": primaryVerticalOffset,
 
-        color: Qt.rgba(0, 0, 0, .18)
-        xOffset: 0
-
-    }
-
-    DropShadowImage {
-        id: secondaryShadow
-
-        anchors.centerIn: parent
-        anchors.alignWhenCentered: false
-
-        rectWidth: root.rectWidth
-        rectHeight: root.rectHeight
-        xRadius: root.xRadius
-        yRadius: root.yRadius
-
-        color: Qt.rgba(0, 0, 0, .22)
-        xOffset: 0
-
-        cache: root.cache
+                        "secondaryColor": secondaryColor,
+                        "secondaryBlurRadius": secondaryBlurRadius,
+                        "secondaryXOffset": secondaryHorizontalOffset,
+                        "secondaryYOffset": secondaryVerticalOffset,
+                    })
+            })
+        else
+            source = ""
     }
 }

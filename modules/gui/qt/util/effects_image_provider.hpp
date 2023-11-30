@@ -34,7 +34,8 @@ public:
     enum Effect
     {
         RectDropShadow = 1,
-        RoundedRectDropShadow
+        RoundedRectDropShadow,
+        DoubleRoundedRectDropShadow
     };
     Q_ENUM(Effect)
 
