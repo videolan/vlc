@@ -83,6 +83,7 @@ public:
 
     virtual ~mft_sys_t()
     {
+        assert(!streamStarted);
         CoUninitialize();
     }
 
@@ -103,30 +104,8 @@ public:
     /* Output stream */
     DWORD output_stream_id = 0;
     ComPtr<IMFSample> output_sample;
-};
 
-class mft_dec_sys_t : public mft_sys_t
-{
-public:
-    ~mft_dec_sys_t()
-    {
-        assert(!streamStarted);
-    }
-
-    // Direct3D
-    vlc_video_context  *vctx_out = nullptr;
-    const d3d_format_t *cfg = nullptr;
-    UINT dxgi_token = 0;
-    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
-    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
-
-    // D3D11
-    ComPtr<ID3D11Texture2D> cached_tex;
-    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
-
-    /* H264 only. */
-    struct hxxx_helper hh = {};
-    bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
+    virtual void DoRelease() = 0;
 
     std::atomic<size_t>  refcount{1};
 
@@ -178,8 +157,34 @@ public:
     }
 
 private:
+    bool streamStarted = false;
+};
 
-    void DoRelease()
+class mft_dec_sys_t : public mft_sys_t
+{
+public:
+    ~mft_dec_sys_t()
+    {
+    }
+
+    // Direct3D
+    vlc_video_context  *vctx_out = nullptr;
+    const d3d_format_t *cfg = nullptr;
+    UINT dxgi_token = 0;
+    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
+    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
+
+    // D3D11
+    ComPtr<ID3D11Texture2D> cached_tex;
+    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
+
+    /* H264 only. */
+    struct hxxx_helper hh = {};
+    bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
+
+private:
+
+    void DoRelease() override
     {
         if (mft.Get())
         {
@@ -210,8 +215,6 @@ private:
 
         MFShutdown();
     }
-
-    bool streamStarted = false;
 };
 
 struct mf_d3d11_pic_ctx
@@ -1652,6 +1655,7 @@ static int Open(vlc_object_t *p_this)
         CoUninitialize();
         return VLC_ENOMEM;
     }
+    p_dec->p_sys = p_sys;
 
     if (LoadMFTLibrary(vlc_object_logger(p_this), p_sys, p_dec->fmt_in))
     {
