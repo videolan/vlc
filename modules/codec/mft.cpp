@@ -305,6 +305,9 @@ static const pair_format_guid audio_format_table[] =
     { VLC_CODEC_MP4A, MFAudioFormat_AAC       },
     { VLC_CODEC_WMA2, MFAudioFormat_WMAudioV8 },
     { VLC_CODEC_A52,  MFAudioFormat_Dolby_AC3 },
+
+    { VLC_CODEC_F32L,  MFAudioFormat_Float },
+    { VLC_CODEC_S16L,  MFAudioFormat_PCM },
     { 0, GUID_NULL }
 };
 
