@@ -29,6 +29,8 @@ import "qrc:///util/Helpers.js" as Helpers
 ColumnLayout {
     id: root
 
+    property alias slider: slider
+
     // Private
 
     property var _model: [{ "value": 0.25 },

@@ -52,4 +52,55 @@ PopupIconToolButton {
 
         color: root.color
     }
+
+    // TODO: Qt 5.15 Use WheelHandler & TapHandler
+    MouseArea {
+        anchors.fill: parent
+
+        acceptedButtons: Qt.RightButton
+
+        onWheel: function(wheel) {
+            if (!root.popup.contentItem || !root.popup.contentItem.slider) {
+                wheel.accepted = false
+                return
+            }
+
+            let delta = 0
+
+            if (wheel.angleDelta.x)
+                delta = wheel.angleDelta.x
+            else if (wheel.angleDelta.y)
+                delta = wheel.angleDelta.y
+            else {
+                wheel.accepted = false
+                return
+            }
+
+            if (wheel.inverted)
+                delta = -delta
+
+            wheel.accepted = true
+
+            delta = delta / 8 / 15
+
+            let func
+            if (delta > 0)
+                func = root.popup.contentItem.slider.increase
+            else
+                func = root.popup.contentItem.slider.decrease
+
+            for (let i = 0; i < Math.ceil(Math.abs(delta)); ++i)
+                func()
+        }
+
+        onClicked: function(mouse) {
+            if (!root.popup.contentItem || !root.popup.contentItem.slider) {
+                mouse.accepted = false
+                return
+            }
+
+            mouse.accepted = true
+            root.popup.contentItem.slider.value = 0
+        }
+    }
 }
