@@ -24,6 +24,7 @@
 
 NSString * const VLCLibraryWindowPreferencePrefix = @"VLCLibraryWindow";
 
+NSString * const VLCLibraryHomeLibraryViewModePreferenceKey = @"HomeLibraryViewMode";
 NSString * const VLCLibraryVideoLibraryViewModePreferenceKey = @"VideoLibraryViewMode";
 NSString * const VLCLibraryAlbumLibraryViewModePreferenceKey = @"AlbumLibraryViewMode";
 NSString * const VLCLibraryGenreLibraryViewModePreferenceKey = @"GenreLibraryViewMode";
@@ -59,7 +60,7 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 
     if (viewModeValue <= VLCLibrarySmallestSentinelViewModeSegment ||
         viewModeValue >= VLCLibraryLargestSentinelViewModeSegment) {
-        
+
         NSLog(@"WARNING: Retrieved invalid values for library view mode. Resorting to default.");
         viewModeValue = VLCLibraryGridViewModeSegment; // Set to workable default
     }
@@ -76,6 +77,17 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
     NSUserDefaults * const standardUserDefaults = NSUserDefaults.standardUserDefaults;
     NSString * const fullKey = [self fullLibraryWindowKey:key];
     [standardUserDefaults setInteger:viewMode forKey:fullKey];
+}
+
+- (VLCLibraryViewModeSegment)homeLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryHomeLibraryViewModePreferenceKey];
+}
+
+- (void)setHomeLibraryViewMode:(VLCLibraryViewModeSegment)homeLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryHomeLibraryViewModePreferenceKey
+                                              value:homeLibraryViewMode];
 }
 
 - (VLCLibraryViewModeSegment)videoLibraryViewMode
