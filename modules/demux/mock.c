@@ -300,6 +300,7 @@ struct demux_sys
 
     int current_title;
     vlc_tick_t chapter_gap;
+    int current_chapter;
 
     uint8_t bar_colors[PICTURE_PLANE_MAX][PICTURE_PLANE_MAX];
     bool b_colors;
@@ -403,6 +404,7 @@ Control(demux_t *demux, int query, va_list args)
                 {
                     sys->pts = sys->audio_pts = sys->video_pts =
                         (seekpoint_idx * sys->chapter_gap) + VLC_TICK_0;
+                    sys->current_chapter = seekpoint_idx;
                     return VLC_SUCCESS;
                 }
             }
@@ -424,7 +426,7 @@ Control(demux_t *demux, int query, va_list args)
         case DEMUX_GET_SEEKPOINT:
             if (sys->chapter_gap != VLC_TICK_INVALID)
             {
-                *va_arg(args, int *) = sys->pts / sys->chapter_gap;
+                *va_arg(args, int *) = sys->current_chapter;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1085,6 +1087,16 @@ Demux(demux_t *demux)
     if (sys->pts > sys->length)
         sys->pts = sys->length;
 
+    if (sys->chapter_gap > 0)
+    {
+        int chapter_index = sys->pts / sys->chapter_gap;
+        if (chapter_index != sys->current_chapter)
+        {
+            sys->updates |= INPUT_UPDATE_SEEKPOINT;
+            sys->current_chapter = chapter_index;
+        }
+    }
+
     if (!sys->can_control_pace)
     {
         /* Simulate a live input */
@@ -1459,6 +1471,7 @@ Open(vlc_object_t *obj)
     sys->current_title = 0;
     sys->chapter_gap = sys->chapter_count > 0 ?
                        (sys->length / sys->chapter_count) : VLC_TICK_INVALID;
+    sys->current_chapter = 0;
     sys->updates = 0;
 
     demux->pf_control = Control;
