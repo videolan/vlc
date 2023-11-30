@@ -199,8 +199,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     _currentSelectedSegment = -1; // To enforce action on the selected segment
-    _segmentedTitleControl.segmentCount = 4;
+    _segmentedTitleControl.segmentCount = 5;
     [_segmentedTitleControl setTarget:self];
+    [_segmentedTitleControl setLabel:_NS("Home") forSegment:VLCLibraryHomeSegment];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:VLCLibraryVideoSegment];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:VLCLibraryMusicSegment];
     [_segmentedTitleControl setLabel:_NS("Browse") forSegment:VLCLibraryBrowseSegment];
@@ -412,18 +413,19 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)setViewForSelectedSegment
 {
     switch (_currentSelectedSegment) {
-        case VLCLibraryVideoSegment:
-            [self showVideoLibrary];
-            break;
-        case VLCLibraryMusicSegment:
-            [self showAudioLibrary];
-            break;
-        case VLCLibraryBrowseSegment:
-        case VLCLibraryStreamsSegment:
-            [self showMediaSourceLibraryWithSegment:_currentSelectedSegment];
-            break;
-        default:
-            break;
+    case VLCLibraryHomeSegment:
+    case VLCLibraryVideoSegment:
+        [self showVideoLibrary];
+        break;
+    case VLCLibraryMusicSegment:
+        [self showAudioLibrary];
+        break;
+    case VLCLibraryBrowseSegment:
+    case VLCLibraryStreamsSegment:
+        [self showMediaSourceLibraryWithSegment:_currentSelectedSegment];
+        break;
+    default:
+        break;
     }
 
     [self invalidateRestorableState];
