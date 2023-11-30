@@ -110,9 +110,6 @@ public:
 
     virtual void DoRelease() = 0;
 
-    std::atomic<size_t>  refcount{1};
-
-
     void AddRef()
     {
         refcount++;
@@ -161,6 +158,7 @@ public:
 
 private:
     bool streamStarted = false;
+    std::atomic<size_t>  refcount{1};
 };
 
 class mft_dec_sys_t : public mft_sys_t
