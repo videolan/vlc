@@ -737,8 +737,11 @@ VLC_API vlc_fourcc_t vlc_fourcc_GetCodec( int i_cat, vlc_fourcc_t i_fourcc );
  * It returns the codec associated to a fourcc stored in a zero terminated
  * string.
  *
- * If the string is NULL or does not have exactly 4 characters, it will
- * return 0, otherwise it behaves like vlc_fourcc_GetCodec.
+ * If the string is NULL or has more than 4 characters or doesn't correspond
+ * to a string associated with a VLC_CODEC_, it will return 0, otherwise it
+ * will one of the VLC_CODEC_ defined above.
+ *
+ * You may use UNKNOWN_ES for the ES category if you don't have the information.
  *
  * Provided for convenience.
  */
