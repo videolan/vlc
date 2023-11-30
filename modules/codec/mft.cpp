@@ -329,9 +329,9 @@ static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & gu
     return 0;
 }
 
-static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype, ComPtr<IMFMediaType> & result)
+static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
+                            DWORD stream_id, const GUID & req_subtype, ComPtr<IMFMediaType> & result)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -341,7 +341,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
     /* Search a suitable input type for the MFT. */
     for (int i = 0;; ++i)
     {
-        hr = p_sys->mft->GetInputAvailableType(stream_id, i, input_media_type.ReleaseAndGetAddressOf());
+        hr = mf_sys.mft->GetInputAvailableType(stream_id, i, input_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
             goto error;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -357,65 +357,65 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
         if (FAILED(hr))
             goto error;
 
-        if (subtype == mSubtype)
+        if (subtype == req_subtype)
             break;
     }
 
-    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+    if (fmt_in.i_cat == VIDEO_ES)
     {
-        UINT32 width = p_dec->fmt_in->video.i_width;
-        UINT32 height = p_dec->fmt_in->video.i_height;
+        UINT32 width = fmt_in.video.i_width;
+        UINT32 height = fmt_in.video.i_height;
         hr = MFSetAttributeSize(input_media_type.Get(), MF_MT_FRAME_SIZE, width, height);
         if (FAILED(hr))
             goto error;
 
         /* Some transforms like to know the frame rate and may reject the input type otherwise. */
-        UINT64 frame_ratio_num = p_dec->fmt_in->video.i_frame_rate;
-        UINT64 frame_ratio_dem = p_dec->fmt_in->video.i_frame_rate_base;
-        if(frame_ratio_num && frame_ratio_dem) {
-            hr = MFSetAttributeRatio(input_media_type.Get(), MF_MT_FRAME_RATE, frame_ratio_num, frame_ratio_dem);
+        UINT32 frame_ratio_num = fmt_in.video.i_frame_rate;
+        UINT32 frame_ratio_den = fmt_in.video.i_frame_rate_base;
+        if(frame_ratio_num && frame_ratio_den) {
+            hr = MFSetAttributeRatio(input_media_type.Get(), MF_MT_FRAME_RATE, frame_ratio_num, frame_ratio_den);
             if(FAILED(hr))
                 goto error;
         }
     }
     else
     {
-        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, mSubtype.Data1);
+        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, req_subtype.Data1);
         if (FAILED(hr))
             goto error;
-        if (p_dec->fmt_in->audio.i_rate)
+        if (fmt_in.audio.i_rate)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, p_dec->fmt_in->audio.i_rate);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, fmt_in.audio.i_rate);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->fmt_in->audio.i_channels)
+        if (fmt_in.audio.i_channels)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_NUM_CHANNELS, p_dec->fmt_in->audio.i_channels);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_NUM_CHANNELS, fmt_in.audio.i_channels);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->fmt_in->audio.i_bitspersample)
+        if (fmt_in.audio.i_bitspersample)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, p_dec->fmt_in->audio.i_bitspersample);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, fmt_in.audio.i_bitspersample);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->fmt_in->audio.i_blockalign)
+        if (fmt_in.audio.i_blockalign)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BLOCK_ALIGNMENT, p_dec->fmt_in->audio.i_blockalign);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BLOCK_ALIGNMENT, fmt_in.audio.i_blockalign);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->fmt_in->i_bitrate)
+        if (fmt_in.i_bitrate)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_AVG_BYTES_PER_SECOND, p_dec->fmt_in->i_bitrate / 8);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_AVG_BYTES_PER_SECOND, fmt_in.i_bitrate / 8);
             if (FAILED(hr))
                 goto error;
         }
     }
 
-    if (p_dec->fmt_in->i_extra > 0)
+    if (fmt_in.i_extra > 0)
     {
         UINT32 blob_size = 0;
         hr = input_media_type->GetBlobSize(MF_MT_USER_DATA, &blob_size);
@@ -426,23 +426,20 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, const GUID & mSubtype
         if (hr == MF_E_ATTRIBUTENOTFOUND)
         {
             hr = input_media_type->SetBlob(MF_MT_USER_DATA,
-                                      static_cast<const UINT8*>(p_dec->fmt_in->p_extra), p_dec->fmt_in->i_extra);
+                                      static_cast<const UINT8*>(fmt_in.p_extra), fmt_in.i_extra);
             if (FAILED(hr))
                 goto error;
         }
     }
 
-    hr = p_sys->mft->SetInputType(stream_id, input_media_type.Get(), 0);
+    hr = mf_sys.mft->SetInputType(stream_id, input_media_type.Get(), 0);
     if (FAILED(hr))
         goto error;
 
     result.Swap(input_media_type);
 
-    return VLC_SUCCESS;
-
 error:
-    msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
-    return VLC_EGENERIC;
+    return hr;
 }
 
 static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
@@ -1367,8 +1364,12 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
     else if (FAILED(hr))
         goto error;
 
-    if (SetInputType(p_dec, p_sys->input_stream_id, mSubtype, p_sys->input_type))
+    hr = SetInputType(*p_sys, *p_dec->fmt_in, p_sys->input_stream_id, mSubtype, p_sys->input_type);
+    if (FAILED(hr))
+    {
+        msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
         goto error;
+    }
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
@@ -1409,8 +1410,16 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
      * SetInputType, try again after setting the output type.
      */
     if (p_sys->input_type.Get() == nullptr)
-        if (SetInputType(p_dec, p_sys->input_stream_id, mSubtype, p_sys->input_type) || p_sys->input_type.Get() == nullptr)
+    {
+        hr = SetInputType(*p_sys, *p_dec->fmt_in, p_sys->input_stream_id, mSubtype, p_sys->input_type);
+        if (FAILED(hr))
+        {
+            msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
             goto error;
+        }
+        if (p_sys->input_type.Get() == nullptr)
+            goto error;
+    }
 
     /* This event is required for asynchronous MFTs, optional otherwise. */
     hr = p_sys->startStream();
