@@ -84,6 +84,9 @@ public:
     virtual ~mft_sys_t()
     {
         assert(!streamStarted);
+
+        MFShutdown();
+
         CoUninitialize();
     }
 
@@ -212,8 +215,6 @@ private:
 
         if (vctx_out)
             vlc_video_context_Release(vctx_out);
-
-        MFShutdown();
     }
 };
 
@@ -1613,10 +1614,6 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(struct vlc_logger *logger, mft_sys_t *p_sys, const es_format_t *fmt)
 {
-    HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
     if (fmt->i_cat != VIDEO_ES) // nothing left to do
         return VLC_SUCCESS;
 
@@ -1649,9 +1646,17 @@ static int Open(vlc_object_t *p_this)
     if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
         return VLC_EINVAL;
 
+    HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+    if (FAILED(hr))
+    {
+        CoUninitialize();
+        return VLC_ENOTSUP;
+    }
+
     mft_dec_sys_t *p_sys = new (std::nothrow) mft_dec_sys_t();
     if (unlikely(p_sys == nullptr))
     {
+        MFShutdown();
         CoUninitialize();
         return VLC_ENOMEM;
     }
