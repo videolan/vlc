@@ -508,6 +508,8 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
                     continue;
                 if (bits_per_sample == 32 && subtype == MFAudioFormat_Float)
                     output_type_index = i;
+                if (bits_per_sample == 16 && subtype == MFAudioFormat_PCM)
+                    output_type_index = i;
                 continue;
             }
             output_type_index = i;
