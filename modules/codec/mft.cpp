@@ -76,27 +76,13 @@ vlc_module_end()
 
 typedef HRESULT (WINAPI *pf_MFCreateDXGIDeviceManager)(UINT *, IMFDXGIDeviceManager **);
 
-class mft_dec_sys_t
+class mft_sys_t
 {
 public:
     ComPtr<IMFTransform> mft;
 
-    ~mft_dec_sys_t()
-    {
-        assert(!streamStarted);
-    }
-
     // Direct3D
-    vlc_video_context  *vctx_out = nullptr;
-    const d3d_format_t *cfg = nullptr;
     HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
-    UINT dxgi_token = 0;
-    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
-    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
-
-    // D3D11
-    ComPtr<ID3D11Texture2D> cached_tex;
-    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
 
     /* For asynchronous MFT */
     bool is_async = false;
@@ -111,6 +97,26 @@ public:
     /* Output stream */
     DWORD output_stream_id = 0;
     ComPtr<IMFSample> output_sample;
+};
+
+class mft_dec_sys_t : public mft_sys_t
+{
+public:
+    ~mft_dec_sys_t()
+    {
+        assert(!streamStarted);
+    }
+
+    // Direct3D
+    vlc_video_context  *vctx_out = nullptr;
+    const d3d_format_t *cfg = nullptr;
+    UINT dxgi_token = 0;
+    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
+    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
+
+    // D3D11
+    ComPtr<ID3D11Texture2D> cached_tex;
+    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
 
     /* H264 only. */
     struct hxxx_helper hh = {};
@@ -128,6 +134,9 @@ public:
     {
         if (--refcount == 0)
         {
+            if (output_sample.Get())
+                output_sample->RemoveAllBuffers();
+
             DoRelease();
             return true;
         }
@@ -165,9 +174,6 @@ private:
 
     void DoRelease()
     {
-        if (output_sample.Get())
-            output_sample->RemoveAllBuffers();
-
         if (mft.Get())
         {
             // mft->SetInputType(input_stream_id, nullptr, 0);
@@ -1467,7 +1473,7 @@ static void DestroyMFT(decoder_t *p_dec)
         hxxx_helper_clean(&p_sys->hh);
 }
 
-static int ListTransforms(decoder_t *p_dec, GUID category, const char *type)
+static int ListTransforms(struct vlc_logger *logger, GUID category, const char *type)
 {
     HRESULT hr;
 
@@ -1477,7 +1483,7 @@ static int ListTransforms(decoder_t *p_dec, GUID category, const char *type)
     IMFActivate **activate_objects = NULL;
     UINT32 count = 0;
     hr = MFTEnumEx(category, flags, nullptr, nullptr, &activate_objects, &count);
-    msg_Dbg(p_dec, "Listing %u %s%s", count, type, (count?"s":""));
+    vlc_debug(logger, "Listing %u %s%s", count, type, (count?"s":""));
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -1491,10 +1497,10 @@ static int ListTransforms(decoder_t *p_dec, GUID category, const char *type)
 #ifndef NDEBUG
         ComPtr<IMFTransform> mft;
         hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
-        msg_Dbg(p_dec, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
+        vlc_debug(logger, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
         mft.Reset();
 #else
-        msg_Dbg(p_dec, "found %s '%ls'", type, Name);
+        vlc_debug(logger, "found %s '%ls'", type, Name);
 #endif
         activate_objects[o]->ShutdownObject();
     }
@@ -1531,9 +1537,9 @@ static int FindMFT(decoder_t *p_dec)
         return VLC_EGENERIC;
 
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
-        ListTransforms(p_dec, MFT_CATEGORY_VIDEO_DECODER, "video decoder");
+        ListTransforms(vlc_object_logger(p_dec), category, "video decoder");
     else
-        ListTransforms(p_dec, MFT_CATEGORY_AUDIO_DECODER, "audio decoder");
+        ListTransforms(vlc_object_logger(p_dec), category, "audio decoder");
 
     UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
                  | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
@@ -1568,20 +1574,18 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
-static int LoadMFTLibrary(decoder_t *p_dec)
+static int LoadMFTLibrary(struct vlc_logger *logger, mft_sys_t *p_sys, const es_format_t *fmt)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
-
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    if (p_dec->fmt_in->i_cat != VIDEO_ES) // nothing left to do
+    if (fmt->i_cat != VIDEO_ES) // nothing left to do
         return VLC_SUCCESS;
 
-    if (p_dec->fmt_in->video.i_width == 0) // don't consume D3D resource for a fake decoder
+    if (fmt->video.i_width == 0) // don't consume D3D resource for a fake decoder
     {
-        msg_Dbg(p_dec, "skip D3D handling for dummy decoder");
+        vlc_debug(logger, "skip D3D handling for dummy decoder");
         return VLC_SUCCESS;
     }
 
@@ -1617,7 +1621,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    if (LoadMFTLibrary(p_dec))
+    if (LoadMFTLibrary(vlc_object_logger(p_this), p_sys, p_dec->fmt_in))
     {
         msg_Err(p_dec, "Failed to load MFT library.");
         goto error;
