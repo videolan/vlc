@@ -454,11 +454,11 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         if (hr == MF_E_NO_MORE_TYPES)
         {
             /*
-            * It's not an error if we don't find the output type we were
-            * looking for, in this case we use the first available type.
-            */
+             * It's not an error if we don't find the output type we were
+             * looking for, in this case we use the first available type.
+             */
             /* No output format found we prefer, just pick the first one preferred
-            * by the MFT */
+             * by the MFT */
             output_type_index = 0;
             break;
         }
@@ -1002,22 +1002,22 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             }
             else
             {
-            BYTE *buffer_start;
-            hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
-            if (FAILED(hr))
-            {
-                picture_Release(picture);
-                goto error;
-            }
+                BYTE *buffer_start;
+                hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
+                if (FAILED(hr))
+                {
+                    picture_Release(picture);
+                    goto error;
+                }
 
-            CopyPackedBufferToPicture(picture, buffer_start);
+                CopyPackedBufferToPicture(picture, buffer_start);
 
-            hr = output_media_buffer->Unlock();
-            if (FAILED(hr))
-            {
-                picture_Release(picture);
-                goto error;
-            }
+                hr = output_media_buffer->Unlock();
+                if (FAILED(hr))
+                {
+                    picture_Release(picture);
+                    goto error;
+                }
             }
 
             decoder_QueueVideo(p_dec, picture);
