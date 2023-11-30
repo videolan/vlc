@@ -179,8 +179,6 @@ ColumnLayout {
 
         Layout.alignment: Qt.AlignTop
 
-        implicitHeight: buttonReset.height
-
         Navigation.parentItem: root
         Navigation.downItem: slider
 
@@ -192,34 +190,6 @@ ColumnLayout {
             color: theme.fg.primary
 
             font.pixelSize: VLCStyle.fontSize_normal
-        }
-
-        Widgets.IconControlButton {
-            id: buttonReset
-
-            // NOTE: This needs to be wider to fully encapsulate the label.
-            width: VLCStyle.dp(64, VLCStyle.scale)
-
-            anchors.centerIn: parent
-
-            focus: true
-
-            text: I18n.qtr("Reset")
-
-            Navigation.parentItem: rowA
-            Navigation.downItem: slider
-
-            onClicked: slider.value = 0
-
-            Widgets.CaptionLabel {
-                anchors.centerIn: parent
-
-                text: I18n.qtr("1.00x")
-
-                color: theme.fg.primary
-
-                font.pixelSize: VLCStyle.fontSize_xlarge
-            }
         }
 
         Widgets.CaptionLabel {
@@ -239,6 +209,8 @@ ColumnLayout {
         id: slider
 
         Layout.fillWidth: true
+        Layout.topMargin: VLCStyle.margin_xsmall
+        topPadding: 0
 
         // NOTE: These values come from the VLC 3.x implementation.
         from: -34
@@ -255,7 +227,6 @@ ColumnLayout {
         toolTipFollowsMouse: true
 
         Navigation.parentItem: root
-        Navigation.upItem: buttonReset
         Navigation.downItem: comboBox
 
         Keys.priority: Keys.AfterItem
@@ -274,6 +245,20 @@ ColumnLayout {
                 root._shiftPressed = (mouse.modifiers === Qt.ShiftModifier)
             }
         }
+
+        Rectangle {
+            id: tickmark
+
+            parent: slider.background
+            x: parent.width * .5
+            width: VLCStyle.dp(1, VLCStyle.scale)
+            height: parent.height
+            visible: root.sliderToSpeed(slider.value) !== 1
+            color: {
+                const theme = slider.colorContext
+                return root.sliderToSpeed(slider.value) > 1 ? theme.fg.negative : theme.fg.primary
+            }
+        }
     }
 
     RowLayout {
@@ -281,8 +266,6 @@ ColumnLayout {
 
         Layout.fillWidth: true
         Layout.topMargin: VLCStyle.margin_xsmall
-
-        implicitHeight: comboBox.height
 
         Navigation.parentItem: root
         Navigation.upItem: slider
