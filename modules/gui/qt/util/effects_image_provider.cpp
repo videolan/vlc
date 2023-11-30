@@ -25,13 +25,7 @@
 
 #include <memory>
 
-#include "qt.hpp" // VLC_WEAK
-
-// Qt private exported function
-QT_BEGIN_NAMESPACE
-extern void VLC_WEAK qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed = 0);
-QT_END_NAMESPACE
-
+#include "fast_gaussian_blur_template.h"
 
 namespace {
 
@@ -71,28 +65,46 @@ public:
 
     QImage generate(const QSize& size) const override
     {
-        if (Q_UNLIKELY(!&qt_blurImage))
-        {
-            qWarning("qt_blurImage() is not available! Drop shadow will not work!");
+        //we need to generate packed image for the blur implementation
+        //default QImage constructor may not for enforce this
+        unsigned char* rawSource = (unsigned char*)malloc(size.width() * size.height() * 4);
+        if (!rawSource)
             return {};
-        }
+
+        //don't make the QImage hold the rawbuffer, as fast_gaussian_blur may swap input and output buffers
+        QImage source(rawSource,
+            size.width(), size.height(), size.width() * 4,
+            QImage::Format_ARGB32_Premultiplied);
 
         // Create a new image with boundaries containing the mask and effect.
-        QImage ret(size, QImage::Format_ARGB32_Premultiplied);
-        ret.fill(0);
-
-        assert(!ret.isNull());
+        source.fill(Qt::transparent);
         {
             // Copy the mask
-            QPainter painter(&ret);
+            QPainter painter(&source);
             painter.setCompositionMode(QPainter::CompositionMode_Source);
             draw(painter);
         }
 
-        // Blur the mask
-        qt_blurImage(ret, m_blurRadius, false);
+        unsigned char* rawDest = (unsigned char*)malloc(size.width() * size.height() * 4);
+        if (!rawDest)
+        {
+            free(rawSource);
+            return {};
+        }
 
-        return ret;
+        fast_gaussian_blur(
+            rawSource, rawDest,
+            size.width(), size.height(), 4, // 4 channels
+            m_blurRadius / 2, // sigma is radius/2, see https://drafts.csswg.org/css-backgrounds/#shadow-blur
+            3, Border::kMirror //3 passes
+            );
+
+        free(rawSource);
+        QImage dest(rawDest,
+                      size.width(), size.height(), size.width() * 4,
+                      QImage::Format_ARGB32_Premultiplied);
+
+        return dest;
     }
 
 
