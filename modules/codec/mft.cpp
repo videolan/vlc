@@ -442,9 +442,9 @@ error:
     return hr;
 }
 
-static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
+static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD stream_id,
+                         es_format_t & fmt_out)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFMediaType> output_media_type;
@@ -458,7 +458,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     int output_type_index = -1;
     for (int i = 0; output_type_index == -1; ++i)
     {
-        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, output_media_type.ReleaseAndGetAddressOf());
+        hr = mf_sys.mft->GetOutputAvailableType(stream_id, i, output_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
         {
             /*
@@ -482,7 +482,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         if (FAILED(hr))
             goto error;
 
-        if (p_dec->fmt_in->i_cat == VIDEO_ES)
+        if (fmt_out.i_cat == VIDEO_ES)
         {
             if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12
              || subtype == MFVideoFormat_I420 || subtype == MFVideoFormat_IYUV)
@@ -503,7 +503,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         }
     }
 
-    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.ReleaseAndGetAddressOf());
+    hr = mf_sys.mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.ReleaseAndGetAddressOf());
     if (FAILED(hr))
         goto error;
 
@@ -511,60 +511,56 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     if (FAILED(hr))
         goto error;
 
-    hr = p_sys->mft->SetOutputType(stream_id, output_media_type.Get(), 0);
+    hr = mf_sys.mft->SetOutputType(stream_id, output_media_type.Get(), 0);
     if (FAILED(hr))
     {
-        msg_Err(p_dec, "Failed to set the output. (hr=0x%lX)", hr);
+        vlc_error(logger, "Failed to set the output. (hr=0x%lX)", hr);
         goto error;
     }
 
-    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+    if (fmt_out.i_cat == VIDEO_ES)
     {
-        video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
-
         /* Transform might offer output in a D3DFMT proprietary FCC */
         vlc_fourcc_t fcc = GUIDToFormat(d3d_format_table, subtype);
         if(fcc) {
             /* D3D formats are upside down */
-            p_dec->fmt_out.video.orientation = ORIENT_VFLIPPED;
+            fmt_out.video.orientation = ORIENT_VFLIPPED;
         } else {
             if (subtype == MFVideoFormat_IYUV)
                 subtype = MFVideoFormat_I420;
-            fcc = vlc_fourcc_GetCodec(p_dec->fmt_in->i_cat, subtype.Data1);
+            fcc = vlc_fourcc_GetCodec(VIDEO_ES, subtype.Data1);
         }
 
-        p_dec->fmt_out.i_codec = fcc;
+        fmt_out.i_codec = fcc;
     }
     else
     {
-        p_dec->fmt_out.audio = p_dec->fmt_in->audio;
-
         UINT32 bitspersample = 0;
         hr = output_media_type->GetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, &bitspersample);
         if (SUCCEEDED(hr) && bitspersample)
-            p_dec->fmt_out.audio.i_bitspersample = bitspersample;
+            fmt_out.audio.i_bitspersample = bitspersample;
 
         UINT32 channels = 0;
         hr = output_media_type->GetUINT32(MF_MT_AUDIO_NUM_CHANNELS, &channels);
         if (SUCCEEDED(hr) && channels)
-            p_dec->fmt_out.audio.i_channels = channels;
+            fmt_out.audio.i_channels = channels;
 
         UINT32 rate = 0;
         hr = output_media_type->GetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, &rate);
         if (SUCCEEDED(hr) && rate)
-            p_dec->fmt_out.audio.i_rate = rate;
+            fmt_out.audio.i_rate = rate;
 
         vlc_fourcc_t fourcc;
         wf_tag_to_fourcc(subtype.Data1, &fourcc, NULL);
-        p_dec->fmt_out.i_codec = vlc_fourcc_GetCodecAudio(fourcc, p_dec->fmt_out.audio.i_bitspersample);
+        fmt_out.i_codec = vlc_fourcc_GetCodecAudio(fourcc, fmt_out.audio.i_bitspersample);
 
-        p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_dec->fmt_out.audio.i_channels];
+        fmt_out.audio.i_physical_channels = pi_channels_maps[fmt_out.audio.i_channels];
     }
 
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in SetOutputType()");
+    vlc_error(logger, "Error in SetOutputType()");
     return VLC_EGENERIC;
 }
 
@@ -844,7 +840,11 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
     if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
     {
-        if (SetOutputType(p_dec, p_sys->output_stream_id))
+        if (p_dec->fmt_in->i_cat == VIDEO_ES)
+            video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
+        else
+            p_dec->fmt_out.audio = p_dec->fmt_in->audio;
+        if (SetOutputType(vlc_object_logger(p_dec), *p_sys, p_sys->output_stream_id, p_dec->fmt_out))
             return VLC_EGENERIC;
 
         /* Reallocate output sample. */
@@ -1402,7 +1402,11 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
         }
     }
 
-    if (SetOutputType(p_dec, p_sys->output_stream_id))
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+        video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
+    else
+        p_dec->fmt_out.audio = p_dec->fmt_in->audio;
+    if (SetOutputType(vlc_object_logger(p_dec), *p_sys, p_sys->output_stream_id, p_dec->fmt_out))
         goto error;
 
     /*
