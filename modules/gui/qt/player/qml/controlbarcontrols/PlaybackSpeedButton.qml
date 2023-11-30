@@ -41,10 +41,9 @@ PopupIconToolButton {
         Navigation.rightItem: root
     }
 
-    // Children
-
-    T.Label {
-        anchors.centerIn: parent
+    contentItem: T.Label {
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
 
         font.pixelSize: VLCStyle.fontSize_normal
 
