@@ -320,6 +320,7 @@ libqt_plugin_la_SOURCES = \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
 	util/shared_input_item.hpp \
+	util/fast_gaussian_blur_template.h \
 	util/effects_image_provider.cpp \
 	util/effects_image_provider.hpp \
 	util/qsgroundedrectangularimagenode.cpp \
