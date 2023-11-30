@@ -98,8 +98,6 @@ T.ToolButton {
     }
 
     contentItem: T.Label {
-        anchors.centerIn: parent
-
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
 
