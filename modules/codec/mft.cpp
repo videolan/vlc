@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_charset.h> /* FromWide */
 extern "C" {
 #include "hxxx_helper.h"
 }
@@ -1506,17 +1505,15 @@ static int ListTransforms(decoder_t *p_dec, GUID category, const char *type)
         hr = activate_objects[o]->GetString(MFT_FRIENDLY_NAME_Attribute, Name, ARRAY_SIZE(Name), nullptr);
         if (FAILED(hr))
             wcscpy(Name,L"<unknown>");
-        char *name = FromWide(Name);
 
 #ifndef NDEBUG
         ComPtr<IMFTransform> mft;
         hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
-        msg_Dbg(p_dec, "%s '%s' is%s available", type, name, (FAILED(hr)?" not":""));
+        msg_Dbg(p_dec, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
         mft.Reset();
 #else
-        msg_Dbg(p_dec, "found %s '%s'", type, name);
+        msg_Dbg(p_dec, "found %s '%ls'", type, Name);
 #endif
-        free(name);
         activate_objects[o]->ShutdownObject();
     }
 
