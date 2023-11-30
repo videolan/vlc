@@ -81,6 +81,12 @@ class mft_sys_t
 public:
     ComPtr<IMFTransform> mft;
 
+    virtual ~mft_sys_t()
+    {
+        CoUninitialize();
+    }
+
+
     // Direct3D
     HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
 
@@ -138,6 +144,7 @@ public:
                 output_sample->RemoveAllBuffers();
 
             DoRelease();
+            delete this;
             return true;
         }
         return false;
@@ -200,8 +207,6 @@ private:
 
         if (vctx_out)
             vlc_video_context_Release(vctx_out);
-
-        delete this;
 
         MFShutdown();
     }
@@ -1637,17 +1642,15 @@ static int LoadMFTLibrary(struct vlc_logger *logger, mft_sys_t *p_sys, const es_
 static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    mft_dec_sys_t *p_sys;
-
-    p_sys = new (std::nothrow) mft_dec_sys_t();
-    if (unlikely(p_sys == nullptr))
-        return VLC_ENOMEM;
-    p_dec->p_sys = p_sys;
 
     if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+        return VLC_EINVAL;
+
+    mft_dec_sys_t *p_sys = new (std::nothrow) mft_dec_sys_t();
+    if (unlikely(p_sys == nullptr))
     {
-        delete p_sys;
-        return VLC_EGENERIC;
+        CoUninitialize();
+        return VLC_ENOMEM;
     }
 
     if (LoadMFTLibrary(vlc_object_logger(p_this), p_sys, p_dec->fmt_in))
@@ -1684,6 +1687,4 @@ static void Close(vlc_object_t *p_this)
     DestroyMFT(p_dec);
 
     p_sys->Release();
-
-    CoUninitialize();
 }
