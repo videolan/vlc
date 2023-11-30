@@ -373,38 +373,40 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (selectedLibrarySegment) {
-        case VLCLibraryVideoSegment:
-            _currentSelectedViewModeSegment = preferences.videoLibraryViewMode;
+    case VLCLibraryHomeSegment:
+        _currentSelectedViewModeSegment = preferences.homeLibraryViewMode;
+    case VLCLibraryVideoSegment:
+        _currentSelectedViewModeSegment = preferences.videoLibraryViewMode;
+        break;
+    case VLCLibraryMusicSegment:
+    {
+        const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
+        switch (selectedAudioSegment) {
+        case VLCAudioLibraryArtistsSegment:
+            _currentSelectedViewModeSegment = preferences.artistLibraryViewMode;
             break;
-        case VLCLibraryMusicSegment:
-        {
-            const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
-            switch (selectedAudioSegment) {
-                case VLCAudioLibraryArtistsSegment:
-                    _currentSelectedViewModeSegment = preferences.artistLibraryViewMode;
-                    break;
-                case VLCAudioLibraryGenresSegment:
-                    _currentSelectedViewModeSegment = preferences.genreLibraryViewMode;
-                    break;
-                case VLCAudioLibraryAlbumsSegment:
-                    _currentSelectedViewModeSegment = preferences.albumLibraryViewMode;
-                    break;
-                case VLCAudioLibrarySongsSegment:
-                    _currentSelectedViewModeSegment = preferences.songsLibraryViewMode;
-                    break;
-                default:
-                    break;
-            }
+        case VLCAudioLibraryGenresSegment:
+            _currentSelectedViewModeSegment = preferences.genreLibraryViewMode;
             break;
-        }
-        case VLCLibraryBrowseSegment:
-            _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
+        case VLCAudioLibraryAlbumsSegment:
+            _currentSelectedViewModeSegment = preferences.albumLibraryViewMode;
             break;
-        case VLCLibraryStreamsSegment:
-            _currentSelectedViewModeSegment = preferences.streamLibraryViewMode;
+        case VLCAudioLibrarySongsSegment:
+            _currentSelectedViewModeSegment = preferences.songsLibraryViewMode;
             break;
         default:
             break;
+        }
+        break;
+    }
+    case VLCLibraryBrowseSegment:
+        _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
+        break;
+    case VLCLibraryStreamsSegment:
+        _currentSelectedViewModeSegment = preferences.streamLibraryViewMode;
+        break;
+    default:
+        break;
     }
 
     _gridVsListSegmentedControl.selectedSegment = _currentSelectedViewModeSegment;
@@ -454,38 +456,41 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (selectedLibrarySegment) {
-        case VLCLibraryVideoSegment:
-            preferences.videoLibraryViewMode = _currentSelectedViewModeSegment;
+    case VLCLibraryHomeSegment:
+        preferences.homeLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    case VLCLibraryVideoSegment:
+        preferences.videoLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    case VLCLibraryMusicSegment:
+    {
+        const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
+        switch (selectedAudioSegment) {
+        case VLCAudioLibraryArtistsSegment:
+            preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
             break;
-        case VLCLibraryMusicSegment:
-        {
-            const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
-            switch (selectedAudioSegment) {
-                case VLCAudioLibraryArtistsSegment:
-                    preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
-                    break;
-                case VLCAudioLibraryGenresSegment:
-                    preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
-                    break;
-                case VLCAudioLibraryAlbumsSegment:
-                    preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
-                    break;
-                case VLCAudioLibrarySongsSegment:
-                    preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
-                    break;
-                default:
-                    break;
-            }
+        case VLCAudioLibraryGenresSegment:
+            preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
             break;
-        }
-        case VLCLibraryBrowseSegment:
-            preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
+        case VLCAudioLibraryAlbumsSegment:
+            preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
             break;
-        case VLCLibraryStreamsSegment:
-            preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
+        case VLCAudioLibrarySongsSegment:
+            preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
             break;
         default:
             break;
+        }
+        break;
+    }
+    case VLCLibraryBrowseSegment:
+        preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    case VLCLibraryStreamsSegment:
+        preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    default:
+        break;
     }
 
     [self setViewForSelectedSegment];
