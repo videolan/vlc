@@ -368,7 +368,6 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     p_sys->p_decoder = &p_owner->dec;
     decoder_Init( p_sys->p_decoder, &p_owner->fmt_in, p_fmt );
     p_sys->p_decoder->b_frame_drop_allowed = true;
-    p_sys->p_decoder->pf_decode = NULL;
 
     /* Create user specified video filters */
     static const struct filter_video_callbacks cbs =
