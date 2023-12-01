@@ -108,7 +108,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    char *psz_fourcc = var_CreateGetString( p_demux, "rawaud-fourcc" );
+    char *psz_fourcc = var_InheritString( p_demux, "rawaud-fourcc" );
     es_format_Init( &p_sys->fmt, AUDIO_ES,
                     vlc_fourcc_GetCodecFromString( AUDIO_ES, psz_fourcc ) );
     free( psz_fourcc );
