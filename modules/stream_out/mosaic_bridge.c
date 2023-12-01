@@ -382,7 +382,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     };
 
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "psz_chain: '%s'", psz_chain ? psz_chain : "");
+    msg_Dbg( p_stream, "User filter config chain: '%s'", psz_chain ? psz_chain : "");
     if( psz_chain )
     {
         filter_owner_t owner = {
