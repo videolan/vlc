@@ -60,7 +60,7 @@ typedef struct
 
     vlc_fourcc_t i_chroma; /* force image format chroma */
 
-    filter_chain_t *p_vf2;
+    filter_chain_t *filters;
 } sout_stream_sys_t;
 
 struct decoder_owner
@@ -192,8 +192,8 @@ static void Flush( sout_stream_t *stream, void *id)
 
     if ( p_sys == (sout_stream_sys_t *)id )
     {
-        if (p_sys->p_vf2 != NULL)
-            filter_chain_VideoFlush(p_sys->p_vf2);
+        if (p_sys->filters != NULL)
+            filter_chain_VideoFlush(p_sys->filters);
     }
 }
 
@@ -390,12 +390,12 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
             .sys = p_owner,
         };
 
-        p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );
+        p_sys->filters = filter_chain_NewVideo( p_stream, false, &owner );
         free( psz_chain );
     }
     else
     {
-        p_sys->p_vf2 = NULL;
+        p_sys->filters = NULL;
     }
 
     static const struct decoder_owner_callbacks dec_cbs =
@@ -498,8 +498,8 @@ static void Del( sout_stream_t *p_stream, void *id )
     ReleaseDecoder( p_sys->p_decoder );
 
     /* Destroy user specified video filters */
-    if( p_sys->p_vf2 )
-        filter_chain_Delete( p_sys->p_vf2 );
+    if( p_sys->filters )
+        filter_chain_Delete( p_sys->filters );
 
     vlc_global_lock( VLC_MOSAIC_MUTEX );
 
@@ -612,8 +612,8 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     }
     picture_Release( p_pic );
 
-    if( p_sys->p_vf2 )
-        p_new_pic = filter_chain_VideoFilter( p_sys->p_vf2, p_new_pic );
+    if( p_sys->filters )
+        p_new_pic = filter_chain_VideoFilter( p_sys->filters, p_new_pic );
 
     /* push the picture in the mosaic-struct structure */
     bridged_es_t *p_es = p_sys->p_es;
@@ -656,7 +656,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     if ( vctx != NULL )
         p_owner->vctx = vlc_video_context_Hold( vctx );
 
-    if ( p_sys->p_vf2 )
+    if ( p_sys->filters )
     {
         // update the filter after the format changed/is known
         char *psz_chain = var_GetNonEmptyString( p_owner->p_stream, CFG_PREFIX "vfilter" );
@@ -671,9 +671,9 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
                 fmt.video.i_chroma = p_sys->i_chroma;
                 vctx = NULL; // CPU chroma, no video context
             }
-            filter_chain_Reset( p_sys->p_vf2, &fmt, vctx, &fmt );
+            filter_chain_Reset( p_sys->filters, &fmt, vctx, &fmt );
             es_format_Clean( &fmt );
-            filter_chain_AppendFromString( p_sys->p_vf2, psz_chain );
+            filter_chain_AppendFromString( p_sys->filters, psz_chain );
             free( psz_chain );
         }
     }
