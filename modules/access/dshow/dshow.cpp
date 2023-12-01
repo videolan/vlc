@@ -440,7 +440,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     free( psz_val );
 
     /* Chroma */
-    psz_val = var_CreateGetString( p_this, "dshow-chroma" );
+    psz_val = var_InheritString( p_this, "dshow-chroma" );
     i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_val );
     free( psz_val );
 
