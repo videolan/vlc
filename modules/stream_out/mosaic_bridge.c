@@ -69,6 +69,7 @@ struct decoder_owner
     es_format_t fmt_in;
     es_format_t fmt_out;
     vlc_decoder_device *dec_dev;
+    vlc_video_context *vctx;
     sout_stream_t *p_stream;
 };
 
@@ -341,7 +342,10 @@ static void ReleaseDecoder( decoder_t *p_dec )
     }
     es_format_Clean( &p_owner->fmt_in );
     es_format_Clean( &p_owner->fmt_out );
-    decoder_Destroy( p_dec );
+    decoder_Clean( p_dec );
+    if ( p_owner->vctx != NULL )
+        vlc_video_context_Release( p_owner->vctx );
+    vlc_object_delete( p_dec );
 }
 
 static vlc_decoder_device * video_filter_hold_device(vlc_object_t *o, void *sys)
@@ -406,6 +410,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
     es_format_Init( &p_owner->fmt_out, VIDEO_ES, 0 );
     p_owner->p_stream = p_stream;
+    p_owner->vctx = NULL;
 
     p_sys->p_decoder->p_module =
         module_need_var( p_sys->p_decoder, "video decoder", "codec" );
@@ -636,8 +641,20 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_sys_t *p_sys = p_owner->p_stream->p_sys;
 
+    if ( video_format_IsSimilar(&p_dec->fmt_out.video,
+                                &p_owner->fmt_out.video) &&
+         vctx == p_owner->vctx )
+        return VLC_SUCCESS;
+
     es_format_Clean( &p_owner->fmt_out );
     es_format_Copy( &p_owner->fmt_out, &p_dec->fmt_out );
+    if ( p_owner->vctx != NULL )
+    {
+        vlc_video_context_Release( p_owner->vctx );
+        p_owner->vctx = NULL;
+    }
+    if ( vctx != NULL )
+        p_owner->vctx = vlc_video_context_Hold( vctx );
 
     if ( p_sys->p_vf2 )
     {
