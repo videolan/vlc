@@ -134,18 +134,12 @@ static GstMemory* gst_vlc_picture_plane_copy(
 
 vlc_fourcc_t gst_vlc_to_map_format( const char* psz_fourcc )
 {
-    if( !psz_fourcc )
-        return VLC_CODEC_UNKNOWN;
+    vlc_fourcc_t res = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_fourcc );
 
-    if( strlen( psz_fourcc ) != 4 )
-    {
-        return GetGstVLCFourcc( psz_fourcc );
-    }
-    else
-    {
-        return vlc_fourcc_GetCodecFromString(
-                VIDEO_ES, psz_fourcc );
-    }
+    if( res == 0 )
+        res = GetGstVLCFourcc( psz_fourcc );
+
+    return res;
 }
 
 void gst_vlc_picture_plane_allocator_release(
