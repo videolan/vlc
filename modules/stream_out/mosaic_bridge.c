@@ -67,6 +67,7 @@ struct decoder_owner
 {
     decoder_t dec;
     es_format_t fmt_in;
+    es_format_t fmt_out;
     vlc_decoder_device *dec_dev;
     sout_stream_t *p_stream;
 };
@@ -339,6 +340,7 @@ static void ReleaseDecoder( decoder_t *p_dec )
         p_owner->dec_dev = NULL;
     }
     es_format_Clean( &p_owner->fmt_in );
+    es_format_Clean( &p_owner->fmt_out );
     decoder_Destroy( p_dec );
 }
 
@@ -402,8 +404,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     };
     p_sys->p_decoder->cbs = &dec_cbs;
 
+    es_format_Init( &p_owner->fmt_out, VIDEO_ES, 0 );
     p_owner->p_stream = p_stream;
-    //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
         module_need_var( p_sys->p_decoder, "video decoder", "codec" );
@@ -541,7 +543,8 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     sout_stream_t *p_stream = p_owner->p_stream;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     picture_t *p_new_pic;
-    const video_format_t *p_fmt_in = &p_sys->p_decoder->fmt_out.video;
+
+    const video_format_t *p_fmt_in = &p_owner->fmt_out.video;
 
     if( p_sys->i_height || p_sys->i_width )
     {
@@ -632,6 +635,10 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_sys_t *p_sys = p_owner->p_stream->p_sys;
+
+    es_format_Clean( &p_owner->fmt_out );
+    es_format_Copy( &p_owner->fmt_out, &p_dec->fmt_out );
+
     if ( p_sys->p_vf2 )
     {
         // update the filter after the format changed/is known
