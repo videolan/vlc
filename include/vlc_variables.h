@@ -114,6 +114,15 @@ enum vlc_var_atomic_op {
     VLC_VAR_INTEGER_NAND,/**< Binary NAND over an integer bits field */
 };
 
+/*****************************************************************************
+ * List callbacks: called when elements are added/removed from the list
+ *****************************************************************************/
+typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's object */
+                                        char const *,            /* variable name */
+                                        int,                  /* VLC_VAR_* action */
+                                        vlc_value_t *,      /* new/deleted value  */
+                                        void *);                 /* callback data */
+
 /**
  * Creates a VLC object variable.
  *

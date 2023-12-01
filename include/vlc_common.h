@@ -528,15 +528,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                                    void * );                /* callback data */
 
 /*****************************************************************************
- * List callbacks: called when elements are added/removed from the list
- *****************************************************************************/
-typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's object */
-                                        char const *,            /* variable name */
-                                        int,                  /* VLC_VAR_* action */
-                                        vlc_value_t *,      /* new/deleted value  */
-                                        void *);                 /* callback data */
-
-/*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
 #if defined( _WIN32 )
