@@ -81,11 +81,12 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
             m_cond.wait( m_mutex );
         m_currentContext = nullptr;
     }
-    if ( ctx.thumbnail == nullptr )
-        return false;
 
     vlc_thumbnailer_DestroyRequest(m_thumbnailer.get(), ctx.request);
     ctx.request = NULL;
+
+    if ( ctx.thumbnail == nullptr )
+        return false;
 
     block_t* block;
     if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
@@ -106,8 +107,6 @@ void Thumbnailer::stop()
     vlc::threads::mutex_locker lock{ m_mutex };
     if ( m_currentContext != nullptr )
     {
-        vlc_thumbnailer_DestroyRequest( m_thumbnailer.get(),
-                                        m_currentContext->request );
         m_currentContext->done = true;
         m_cond.signal();
     }
