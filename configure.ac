@@ -3991,9 +3991,9 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       PKG_CHECK_MODULES([QT5_QUICK_TEST], [Qt5QuickTest], [
-          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py --qmake "${QMAKE}" --modules QtTest=1.12], [], [
+          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py --qmake "${QMAKE}" --modules QtTest=1.12], [
               have_qt5_quick_test="yes"
-          ])
+          ], [])
       ],[
       ])
 
