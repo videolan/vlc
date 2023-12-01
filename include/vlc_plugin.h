@@ -117,21 +117,21 @@ enum vlc_module_properties
 #define CONFIG_SECTION                      0x08 /* Start of new section */
 
 /* Configuration item types */
-#define CONFIG_ITEM_FLOAT                   0x20  /* Float option */
-#define CONFIG_ITEM_INTEGER                 0x40  /* Integer option */
-#define CONFIG_ITEM_RGB                     0x41  /* RGB color option */
-#define CONFIG_ITEM_BOOL                    0x60  /* Bool option */
-#define CONFIG_ITEM_STRING                  0x80  /* String option */
-#define CONFIG_ITEM_PASSWORD                0x81  /* Password option (*) */
-#define CONFIG_ITEM_KEY                     0x82  /* Hot key option */
-#define CONFIG_ITEM_MODULE                  0x84  /* Module option */
-#define CONFIG_ITEM_MODULE_CAT              0x85  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST             0x86  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST_CAT         0x87  /* Module option */
-#define CONFIG_ITEM_LOADFILE                0x8C  /* Read file option */
-#define CONFIG_ITEM_SAVEFILE                0x8D  /* Written file option */
-#define CONFIG_ITEM_DIRECTORY               0x8E  /* Directory option */
-#define CONFIG_ITEM_FONT                    0x8F  /* Font option */
+#define CONFIG_ITEM_FLOAT                   (1 << 5)  /* Float option */
+#define CONFIG_ITEM_INTEGER                 (2 << 5)  /* Integer option */
+#define CONFIG_ITEM_RGB                     (CONFIG_ITEM_INTEGER | 0x01)  /* RGB color option */
+#define CONFIG_ITEM_BOOL                    (3 << 5)  /* Bool option */
+#define CONFIG_ITEM_STRING                  (4 << 5)  /* String option */
+#define CONFIG_ITEM_PASSWORD                (CONFIG_ITEM_STRING | 0x01)  /* Password option (*) */
+#define CONFIG_ITEM_KEY                     (CONFIG_ITEM_STRING | 0x02)  /* Hot key option */
+#define CONFIG_ITEM_MODULE                  (CONFIG_ITEM_STRING | 0x04)  /* Module option */
+#define CONFIG_ITEM_MODULE_CAT              (CONFIG_ITEM_STRING | 0x05)  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST             (CONFIG_ITEM_STRING | 0x06)  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST_CAT         (CONFIG_ITEM_STRING | 0x07)  /* Module option */
+#define CONFIG_ITEM_LOADFILE                (CONFIG_ITEM_STRING | 0x0C)  /* Read file option */
+#define CONFIG_ITEM_SAVEFILE                (CONFIG_ITEM_STRING | 0x0D)  /* Written file option */
+#define CONFIG_ITEM_DIRECTORY               (CONFIG_ITEM_STRING | 0x0E)  /* Directory option */
+#define CONFIG_ITEM_FONT                    (CONFIG_ITEM_STRING | 0x0F)  /* Font option */
 
 /* reduce specific type to type class */
 #define CONFIG_CLASS(x) ((x) & ~0x1F)
