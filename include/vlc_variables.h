@@ -114,6 +114,20 @@ enum vlc_var_atomic_op {
     VLC_VAR_INTEGER_NAND,/**< Binary NAND over an integer bits field */
 };
 
+/**
+ * VLC value structure
+ */
+typedef union
+{
+    int64_t         i_int;
+    bool            b_bool;
+    float           f_float;
+    char *          psz_string;
+    void *          p_address;
+    struct { int32_t x; int32_t y; } coords;
+
+} vlc_value_t;
+
 /*****************************************************************************
  * Variable callbacks: called when the value is modified
  *****************************************************************************/

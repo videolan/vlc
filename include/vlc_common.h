@@ -481,20 +481,6 @@ typedef struct addon_entry_t addon_entry_t;
 typedef struct update_t update_t;
 
 /**
- * VLC value structure
- */
-typedef union
-{
-    int64_t         i_int;
-    bool            b_bool;
-    float           f_float;
-    char *          psz_string;
-    void *          p_address;
-    struct { int32_t x; int32_t y; } coords;
-
-} vlc_value_t;
-
-/**
  * \defgroup errors Error codes
  * \ingroup cext
  * @{
