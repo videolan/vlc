@@ -77,6 +77,8 @@ FSMState {
 
     property bool running: true
 
+    property bool started: false
+
     /**
      * @param {FSMState} state state handling the event
      * @param {string} event name of the event
@@ -318,5 +320,6 @@ FSMState {
         }
 
         _changeState(fsm)
+        fsm.started = true
     }
 }
