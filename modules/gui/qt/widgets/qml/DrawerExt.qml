@@ -53,7 +53,7 @@ FocusScope {
         focus: true
     }
 
-    state: "hidden"
+    state: ""
     states: [
         State {
             name: "visible"
@@ -101,6 +101,7 @@ FocusScope {
 
     transitions: [
         Transition {
+            from: "visible"
             to: "hidden"
             SequentialAnimation {
                 NumberAnimation {
@@ -118,6 +119,7 @@ FocusScope {
             }
         },
         Transition {
+            from: "hidden"
             to: "visible"
             SequentialAnimation {
                 PropertyAction {
