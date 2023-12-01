@@ -336,6 +336,8 @@ int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
                         var_Create( p_this, psz_name, VLC_VAR_BOOL );
                         var_SetBool( p_this, psz_name, !flag );
                         break;
+                    default:
+                        vlc_assert_unreachable();
                 }
                 continue;
             }
@@ -372,6 +374,8 @@ int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
                     var_Create( p_this, name, VLC_VAR_BOOL );
                     var_SetBool( p_this, name, true );
                     break;
+                default:
+                    vlc_assert_unreachable();
             }
 
             continue;
