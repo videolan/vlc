@@ -115,6 +115,15 @@ enum vlc_var_atomic_op {
 };
 
 /*****************************************************************************
+ * Variable callbacks: called when the value is modified
+ *****************************************************************************/
+typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
+                                   char const *,            /* variable name */
+                                   vlc_value_t,                 /* old value */
+                                   vlc_value_t,                 /* new value */
+                                   void * );                /* callback data */
+
+/*****************************************************************************
  * List callbacks: called when elements are added/removed from the list
  *****************************************************************************/
 typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's object */
