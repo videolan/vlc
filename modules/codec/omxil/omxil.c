@@ -133,7 +133,8 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
         {
             /* I420 xvideo is slow on OMAP */
             def->format.video.eColorFormat = OMX_COLOR_FormatCbYCrY;
-            p_fmt->i_codec = GetVlcChromaFormat( def->format.video.eColorFormat );
+            p_fmt->i_codec =
+                p_fmt->video.i_chroma = GetVlcChromaFormat( def->format.video.eColorFormat );
             GetVlcChromaSizes( p_fmt->i_codec,
                                def->format.video.nFrameWidth,
                                def->format.video.nFrameHeight,

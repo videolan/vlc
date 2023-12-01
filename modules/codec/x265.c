@@ -147,7 +147,7 @@ static int  Open (vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma = VLC_CODEC_I420;
 
     x265_param *param = &p_sys->param;
     x265_param_default(param);

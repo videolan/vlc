@@ -221,18 +221,19 @@ static int OpenEncoder(vlc_object_t *this)
     {
         case 2:
             chroma_sampling = RA_CHROMA_SAMPLING_CS422;
-            enc->fmt_in.i_codec = bitdepth == 8 ? VLC_CODEC_I422 : VLC_CODEC_I422_10L;
+            enc->fmt_in.video.i_chroma = bitdepth == 8 ? VLC_CODEC_I422 : VLC_CODEC_I422_10L;
             break;
         case 1:
             chroma_sampling = RA_CHROMA_SAMPLING_CS444;
-            enc->fmt_in.i_codec = bitdepth == 8 ? VLC_CODEC_I444 : VLC_CODEC_I444_10L;
+            enc->fmt_in.video.i_chroma = bitdepth == 8 ? VLC_CODEC_I444 : VLC_CODEC_I444_10L;
             break;
         default:
         case 0:
             chroma_sampling = RA_CHROMA_SAMPLING_CS420;
-            enc->fmt_in.i_codec = bitdepth == 8 ? VLC_CODEC_I420 : VLC_CODEC_I420_10L;
+            enc->fmt_in.video.i_chroma = bitdepth == 8 ? VLC_CODEC_I420 : VLC_CODEC_I420_10L;
             break;
     }
+    enc->fmt_in.i_codec = enc->fmt_in.video.i_chroma;
 
     RaChromaSamplePosition sample_pos;
     switch (enc->fmt_in.video.chroma_location)

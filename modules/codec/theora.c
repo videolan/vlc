@@ -689,7 +689,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( ( p_sys = malloc(sizeof(encoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     p_enc->fmt_out.i_codec = VLC_CODEC_THEORA;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );

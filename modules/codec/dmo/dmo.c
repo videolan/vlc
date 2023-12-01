@@ -1211,7 +1211,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     i_err = IMediaObject_SetOutputType( p_dmo, 0, &dmo_type, 0 );
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec = VLC_CODEC_I420;
 
     DMOFreeMediaType( &dmo_type );
     if( i_err )

@@ -440,7 +440,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         goto error;
     }
 
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma = VLC_CODEC_I420;
     config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg);
 
     /* Deadline (in ms) to spend in encoder */

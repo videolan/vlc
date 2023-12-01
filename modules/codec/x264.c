@@ -808,17 +808,17 @@ static int  Open ( vlc_object_t *p_this )
 
         if( !strcmp( psz_profile, "high10" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
+            p_enc->fmt_in.video.i_chroma = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
             p_sys->i_colorspace = X264_CSP_I420 | mask;
         }
         else if( !strcmp( psz_profile, "high422" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I422_10L : VLC_CODEC_I422;
+            p_enc->fmt_in.video.i_chroma = mask ? VLC_CODEC_I422_10L : VLC_CODEC_I422;
             p_sys->i_colorspace = X264_CSP_I422 | mask;
         }
         else if( !strcmp( psz_profile, "high444" ) )
         {
-            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : VLC_CODEC_I444;
+            p_enc->fmt_in.video.i_chroma = mask ? VLC_CODEC_I444_10L : VLC_CODEC_I444;
             p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
         else
@@ -828,7 +828,7 @@ static int  Open ( vlc_object_t *p_this )
             free( psz_profile );
             return VLC_EGENERIC;
 # else
-            p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+            p_enc->fmt_in.video.i_chroma = VLC_CODEC_I420;
             p_sys->i_colorspace = X264_CSP_I420;
 # endif
         }
@@ -840,10 +840,12 @@ static int  Open ( vlc_object_t *p_this )
         msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
         return VLC_EGENERIC;
 # else
-        p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+        p_enc->fmt_in.video.i_chroma = VLC_CODEC_I420;
         p_sys->i_colorspace = X264_CSP_I420;
 # endif
     }
+
+    p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma;
 
     p_sys->psz_stat_name = NULL;
     p_sys->i_sei_size = 0;
