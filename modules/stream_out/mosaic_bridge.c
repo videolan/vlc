@@ -192,8 +192,7 @@ static void Flush( sout_stream_t *stream, void *id)
 {
     struct decoder_owner *owner = id;
 
-    if (owner->filters != NULL)
-        filter_chain_VideoFlush(owner->filters);
+    filter_chain_VideoFlush( owner->filters );
 
     (void)stream;
 }
@@ -391,18 +390,15 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     msg_Dbg( p_stream,
              "User filter config chain: '%s'",
              (p_sys->filters_config != NULL) ? p_sys->filters_config : "" );
-    if( p_sys->filters_config != NULL )
+    filter_owner_t owner = {
+        .video = &cbs,
+        .sys = p_owner,
+    };
+    p_owner->filters = filter_chain_NewVideo( p_stream, false, &owner );
+    if( unlikely(p_owner->filters == NULL) )
     {
-        filter_owner_t owner = {
-            .video = &cbs,
-            .sys = p_owner,
-        };
-
-        p_owner->filters = filter_chain_NewVideo( p_stream, false, &owner );
-    }
-    else
-    {
-        p_owner->filters = NULL;
+        ReleaseDecoder(&p_owner->dec);
+        return NULL;
     }
 
     static const struct decoder_owner_callbacks dec_cbs =
@@ -615,8 +611,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     }
     picture_Release( p_pic );
 
-    if( p_owner->filters )
-        p_new_pic = filter_chain_VideoFilter( p_owner->filters, p_new_pic );
+    p_new_pic = filter_chain_VideoFilter( p_owner->filters, p_new_pic );
 
     /* push the picture in the mosaic-struct structure */
     bridged_es_t *p_es = p_owner->p_es;
@@ -654,25 +649,21 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     if ( vctx != NULL )
         p_owner->vctx = vlc_video_context_Hold( vctx );
 
-    if ( p_owner->filters )
+    if ( p_sys->filters_config != NULL )
     {
         // update the filter after the format changed/is known
-        const char *psz_chain = p_sys->filters_config;
         msg_Dbg( p_owner->p_stream, "Update filter: '%s'",
-                 psz_chain ?  psz_chain : "" );
-        if( psz_chain )
+                 p_sys->filters_config );
+        es_format_t fmt;
+        es_format_InitFromVideo( &fmt, &p_dec->fmt_out.video );
+        if( p_sys->i_chroma )
         {
-            es_format_t fmt;
-            es_format_InitFromVideo( &fmt, &p_dec->fmt_out.video );
-            if( p_sys->i_chroma )
-            {
-                fmt.video.i_chroma = p_sys->i_chroma;
-                vctx = NULL; // CPU chroma, no video context
-            }
-            filter_chain_Reset( p_owner->filters, &fmt, vctx, &fmt );
-            es_format_Clean( &fmt );
-            filter_chain_AppendFromString( p_owner->filters, psz_chain );
+            fmt.video.i_chroma = p_sys->i_chroma;
+            vctx = NULL; // CPU chroma, no video context
         }
+        filter_chain_Reset( p_owner->filters, &fmt, vctx, &fmt );
+        es_format_Clean( &fmt );
+        filter_chain_AppendFromString( p_owner->filters, p_sys->filters_config );
     }
     return 0;
 }
