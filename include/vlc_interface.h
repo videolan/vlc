@@ -270,7 +270,6 @@ typedef struct interaction_dialog_t
 
     char           *psz_returned[1];    ///< returned responses from the user
 
-    vlc_value_t     val;                ///< value coming from core for dialogue
     int             i_timeToGo;         ///< time (in sec) until shown progress is finished
     bool      b_cancelled;        ///< was the dialogue cancelled ?
 
