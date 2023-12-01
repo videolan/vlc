@@ -60,6 +60,7 @@ typedef struct
 
     vlc_fourcc_t i_chroma; /* force image format chroma */
 
+    char *filters_config;
     filter_chain_t *filters;
 } sout_stream_sys_t;
 
@@ -212,6 +213,7 @@ static void Close( sout_stream_t *p_stream )
     var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
 
     free( p_sys->psz_id );
+    free( p_sys->filters_config );
 
     free( p_sys );
 }
@@ -299,6 +301,8 @@ static int Open( vlc_object_t *p_this )
     }
     free( val.psz_string );
 
+    p_sys->filters_config = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
+
 #define INT_COMMAND( a ) do { \
     var_Create( p_stream, CFG_PREFIX #a, \
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND ); \
@@ -361,7 +365,6 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridge_t *p_bridge;
     bridged_es_t *p_es;
-    char *psz_chain;
     int i;
 
     if( p_sys->b_inited || p_fmt->i_cat != VIDEO_ES )
@@ -381,9 +384,10 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
         video_new_buffer_filter, video_filter_hold_device,
     };
 
-    psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "User filter config chain: '%s'", psz_chain ? psz_chain : "");
-    if( psz_chain )
+    msg_Dbg( p_stream,
+             "User filter config chain: '%s'",
+             (p_sys->filters_config != NULL) ? p_sys->filters_config : "" );
+    if( p_sys->filters_config != NULL )
     {
         filter_owner_t owner = {
             .video = &cbs,
@@ -391,7 +395,6 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
         };
 
         p_sys->filters = filter_chain_NewVideo( p_stream, false, &owner );
-        free( psz_chain );
     }
     else
     {
@@ -659,8 +662,8 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     if ( p_sys->filters )
     {
         // update the filter after the format changed/is known
-        char *psz_chain = var_GetNonEmptyString( p_owner->p_stream, CFG_PREFIX "vfilter" );
-        msg_Dbg( p_owner->p_stream, "update filter: '%s'",
+        const char *psz_chain = p_sys->filters_config;
+        msg_Dbg( p_owner->p_stream, "Update filter: '%s'",
                  psz_chain ?  psz_chain : "" );
         if( psz_chain )
         {
@@ -674,7 +677,6 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
             filter_chain_Reset( p_sys->filters, &fmt, vctx, &fmt );
             es_format_Clean( &fmt );
             filter_chain_AppendFromString( p_sys->filters, psz_chain );
-            free( psz_chain );
         }
     }
     return 0;
