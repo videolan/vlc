@@ -604,7 +604,12 @@ FocusScope {
 
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
-        state: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
+
+        Binding on state {
+            when: playlistVisibility.started
+            value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
+        }
+
         component: Rectangle {
             width: Helpers.clamp(rootPlayer.width / resizeHandle.widthFactor
                                  , playlistView.minimumWidth
