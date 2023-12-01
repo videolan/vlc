@@ -83,7 +83,6 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     }
 
     vlc_thumbnailer_DestroyRequest(m_thumbnailer.get(), ctx.request);
-    ctx.request = NULL;
 
     if ( ctx.thumbnail == nullptr )
         return false;
