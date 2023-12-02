@@ -141,6 +141,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryAudioViewController *libraryAudioViewController;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
 @property (readonly) VLCLibraryVideoViewController *libraryVideoViewController;
+@property (readonly) VLCLibraryVideoViewController *libraryHomeViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCPlaylistDataSource *playlistDataSource;
 @property (readonly) VLCPlaylistSortingMenuController *playlistSortingMenuController;

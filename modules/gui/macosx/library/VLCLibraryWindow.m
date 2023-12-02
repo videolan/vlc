@@ -227,6 +227,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _playlistTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     [_playlistTableView reloadData];
 
+    _libraryHomeViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
