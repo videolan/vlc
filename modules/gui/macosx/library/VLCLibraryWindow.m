@@ -417,6 +417,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     switch (_currentSelectedSegment) {
     case VLCLibraryHomeSegment:
+        [self showHomeLibrary];
+        break;
     case VLCLibraryVideoSegment:
         [self showVideoLibrary];
         break;
@@ -583,6 +585,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     _playQueueToggle.state = [_mainSplitView isSubviewCollapsed:_playlistView] ?
         NSControlStateValueOff : NSControlStateValueOn;
+}
+
+- (void)showHomeLibrary
+{
+    [self setForwardsBackwardsToolbarItemsVisible:NO];
+    [self setSortOrderToolbarItemVisible:YES];
+    [self setLibrarySearchToolbarItemVisible:YES];
+    _optionBarView.hidden = YES;
+
+    [_libraryHomeViewController presentVideoView];
 }
 
 - (void)showVideoLibrary
