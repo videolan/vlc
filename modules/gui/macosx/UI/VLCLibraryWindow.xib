@@ -765,6 +765,9 @@
                 <outlet property="forwardsNavigationButton" destination="jzy-je-h2k" id="for-Wa-rd"/>
                 <outlet property="forwardsToolbarItem" destination="g2e-7o-Qet" id="3qp-rg-t2P"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
+                <outlet property="homeLibraryStackView" destination="p8n-RC-fWF" id="jcF-ny-9D7"/>
+                <outlet property="homeLibraryStackViewScrollView" destination="HXH-MZ-tkf" id="fzR-fb-nyS"/>
+                <outlet property="homeLibraryView" destination="mMj-Qb-bS1" id="WeM-ZY-knV"/>
                 <outlet property="librarySearchField" destination="ab6-kR-8Io" id="Qf7-UM-lol"/>
                 <outlet property="librarySearchToolbarItem" destination="dv4-Il-y8X" id="Um3-s4-Ax4"/>
                 <outlet property="librarySortButton" destination="Rja-6g-wNZ" id="FQ7-MU-hsk"/>
@@ -834,6 +837,55 @@
                 <outlet property="volumeUpButton" destination="75c-FF-mgb" id="xRz-F4-n0Z"/>
             </connections>
         </customObject>
+        <customView id="mMj-Qb-bS1">
+            <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HXH-MZ-tkf">
+                    <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+                    <clipView key="contentView" id="EeU-rT-tSP">
+                        <rect key="frame" x="1" y="1" width="867" height="806"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view translatesAutoresizingMaskIntoConstraints="NO" id="OxL-Q0-VBh">
+                                <rect key="frame" x="0.0" y="806" width="851" height="0.0"/>
+                                <subviews>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p8n-RC-fWF">
+                                        <rect key="frame" x="0.0" y="0.0" width="851" height="0.0"/>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="p8n-RC-fWF" firstAttribute="top" secondItem="OxL-Q0-VBh" secondAttribute="top" id="0YQ-y9-a5w"/>
+                                    <constraint firstAttribute="trailing" secondItem="p8n-RC-fWF" secondAttribute="trailing" id="0oW-O7-Yve"/>
+                                    <constraint firstAttribute="bottom" secondItem="p8n-RC-fWF" secondAttribute="bottom" id="YIE-2d-rL8"/>
+                                    <constraint firstItem="p8n-RC-fWF" firstAttribute="leading" secondItem="OxL-Q0-VBh" secondAttribute="leading" id="zcE-LR-Epz"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="OxL-Q0-VBh" secondAttribute="trailing" constant="16" id="0DO-Qi-CxU"/>
+                            <constraint firstItem="OxL-Q0-VBh" firstAttribute="leading" secondItem="EeU-rT-tSP" secondAttribute="leading" id="fDQ-Jn-PXr"/>
+                            <constraint firstItem="OxL-Q0-VBh" firstAttribute="top" secondItem="EeU-rT-tSP" secondAttribute="top" id="tBs-XJ-NLF"/>
+                        </constraints>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="gt4-fg-GA9">
+                        <rect key="frame" x="-100" y="-100" width="852" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="hFC-od-Ugv">
+                        <rect key="frame" x="852" y="1" width="16" height="806"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="HXH-MZ-tkf" secondAttribute="bottom" id="DeU-ZN-q9d"/>
+                <constraint firstItem="HXH-MZ-tkf" firstAttribute="top" secondItem="mMj-Qb-bS1" secondAttribute="top" id="FkE-VG-2Q2"/>
+                <constraint firstItem="HXH-MZ-tkf" firstAttribute="leading" secondItem="mMj-Qb-bS1" secondAttribute="leading" id="QkA-CM-HM7"/>
+                <constraint firstAttribute="trailing" secondItem="HXH-MZ-tkf" secondAttribute="trailing" id="S85-L9-hKa"/>
+            </constraints>
+            <point key="canvasLocation" x="748.5" y="10"/>
+        </customView>
         <customView id="vak-Gp-ljo">
             <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
