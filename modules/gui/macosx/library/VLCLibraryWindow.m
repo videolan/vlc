@@ -45,6 +45,8 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 
+#import "library/home-library/VLCLibraryHomeViewController.h"
+
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoViewController.h"
@@ -227,7 +229,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _playlistTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     [_playlistTableView reloadData];
 
-    _libraryHomeViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
+    _libraryHomeViewController = [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
@@ -589,12 +591,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showHomeLibrary
 {
+    // Only collection view mode
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     _optionBarView.hidden = YES;
 
-    [_libraryHomeViewController presentVideoView];
+    [_libraryHomeViewController presentHomeView];
 }
 
 - (void)showVideoLibrary
