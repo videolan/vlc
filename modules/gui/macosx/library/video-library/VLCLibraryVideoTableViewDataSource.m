@@ -395,4 +395,10 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return item;
 }
 
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    _priorNumVideoSections = [self recentItemsPresent] ? 2 : 1;
+    return _priorNumVideoSections;
+}
+
 @end
