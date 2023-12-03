@@ -66,7 +66,6 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableViewDataSource];
         [self setupTableViews];
-        [self setupGridViewController];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
 
@@ -91,8 +90,8 @@
     _libraryTargetView = libraryWindow.libraryTargetView;
     _videoLibraryView = libraryWindow.videoLibraryView;
     _videoLibrarySplitView = libraryWindow.videoLibrarySplitView;
-    _videoLibraryCollectionViewsStackViewScrollView = libraryWindow.videoLibraryCollectionViewsStackViewScrollView;
-    _videoLibraryCollectionViewsStackView = libraryWindow.videoLibraryCollectionViewsStackView;
+    _videoLibraryCollectionViewScrollView = libraryWindow.videoLibraryCollectionViewScrollView;
+    _videoLibraryCollectionView = libraryWindow.videoLibraryCollectionView;
     _videoLibraryGroupSelectionTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
     _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
@@ -107,10 +106,10 @@
 - (void)setupTableViewDataSource
 {
     _videoLibrarySplitView.delegate = _splitViewDelegate;
-    _libraryVideoTableViewDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
-    _libraryVideoTableViewDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
-    _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+    _libraryVideoDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
+    _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
+    _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
@@ -119,20 +118,13 @@
 
 - (void)setupTableViews
 {
-    _videoLibraryGroupsTableView.dataSource = _libraryVideoTableViewDataSource;
-    _videoLibraryGroupsTableView.target = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupsTableView.dataSource = _libraryVideoDataSource;
+    _videoLibraryGroupsTableView.target = _libraryVideoDataSource;
     _videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
 
-    _videoLibraryGroupSelectionTableView.dataSource = _libraryVideoTableViewDataSource;
-    _videoLibraryGroupSelectionTableView.target = _libraryVideoTableViewDataSource;
+    _videoLibraryGroupSelectionTableView.dataSource = _libraryVideoDataSource;
+    _videoLibraryGroupSelectionTableView.target = _libraryVideoDataSource;
     _videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
-}
-
-- (void)setupGridViewController
-{
-    _libraryVideoCollectionViewsStackViewController = [[VLCLibraryVideoCollectionViewsStackViewController alloc] init];
-    _libraryVideoCollectionViewsStackViewController.collectionsStackViewScrollView = _videoLibraryCollectionViewsStackViewScrollView;
-    _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
 }
 
 - (void)setupVideoPlaceholderView
@@ -163,9 +155,9 @@
     const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
-    _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryCollectionViewsStackViewScrollView.scrollerInsets = scrollerInsets;
+    _videoLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryCollectionViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryCollectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _videoLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
@@ -179,7 +171,7 @@
 
 - (void)updatePresentedView
 {
-    if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
+    if (_libraryVideoDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
         [self presentPlaceholderVideoLibraryView];
     } else {
         [self presentVideoLibraryView];
@@ -224,15 +216,14 @@
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         _videoLibrarySplitView.hidden = YES;
-        _videoLibraryCollectionViewsStackViewScrollView.hidden = NO;
-        [_libraryVideoCollectionViewsStackViewController reloadData];
+        _videoLibraryCollectionViewScrollView.hidden = NO;
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         _videoLibrarySplitView.hidden = NO;
-        _videoLibraryCollectionViewsStackViewScrollView.hidden = YES;
-        [_libraryVideoTableViewDataSource reloadData];
+        _videoLibraryCollectionViewScrollView.hidden = YES;
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
+    [self.libraryVideoDataSource reloadData];
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
@@ -254,9 +245,9 @@
 {
     [NSNotificationCenter.defaultCenter removeObserver:self
                                                   name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
-                                                object:self.libraryVideoTableViewDataSource];
+                                                object:self.libraryVideoDataSource];
 
-    [self.libraryVideoCollectionViewsStackViewController presentLibraryItem:_awaitingPresentingLibraryItem];
+    // TODO: Present for collection view
     _awaitingPresentingLibraryItem = nil;
 }
 
@@ -264,9 +255,9 @@
 {
     [NSNotificationCenter.defaultCenter removeObserver:self
                                                   name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
-                                             object:self.libraryVideoTableViewDataSource];
+                                             object:self.libraryVideoDataSource];
 
-    const NSInteger rowForLibraryItem = [self.libraryVideoTableViewDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
+    const NSInteger rowForLibraryItem = [self.libraryVideoDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
     if (rowForLibraryItem != NSNotFound) {
         NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
         [self.videoLibraryGroupsTableView selectRowIndexes:indexSet byExtendingSelection:NO];
@@ -290,13 +281,13 @@
         [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
                                                name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
-                                             object:self.libraryVideoTableViewDataSource];
+                                             object:self.libraryVideoDataSource];
 
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
                                                name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
-                                             object:self.libraryVideoTableViewDataSource];
+                                             object:self.libraryVideoDataSource];
 
     } else {
         NSAssert(false, @"View mode must be grid or list mode");

@@ -24,7 +24,6 @@
 
 @class VLCLibraryWindow;
 @class VLCLibraryVideoTableViewDataSource;
-@class VLCLibraryVideoCollectionViewsStackViewController;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -38,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *videoLibraryView;
 @property (readonly) NSSplitView *videoLibrarySplitView;
-@property (readonly) NSScrollView *videoLibraryCollectionViewsStackViewScrollView;
-@property (readonly) NSStackView *videoLibraryCollectionViewsStackView;
+@property (readonly) NSScrollView *videoLibraryCollectionViewScrollView;
+@property (readonly) NSCollectionView *videoLibraryCollectionView;
 @property (readonly) NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
 @property (readonly) NSTableView *videoLibraryGroupSelectionTableView;
 @property (readonly) NSScrollView *videoLibraryGroupsTableViewScrollView;
@@ -49,8 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
 
-@property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
-@property (readonly) VLCLibraryVideoCollectionViewsStackViewController *libraryVideoCollectionViewsStackViewController;
+@property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoDataSource;
 
 @property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
