@@ -22,17 +22,19 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryTableView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryVideoTableViewDataSource : NSObject <VLCLibraryTableViewDataSource>
+@interface VLCLibraryVideoTableViewDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
 extern NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification;
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
+@property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) NSTableView *groupsTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 
