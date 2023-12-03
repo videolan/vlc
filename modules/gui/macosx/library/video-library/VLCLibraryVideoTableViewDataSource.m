@@ -425,4 +425,26 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return viewItem;
 }
 
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryCollectionViewSupplementaryElementView * const sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibrarySupplementaryElementViewIdentifier forIndexPath:indexPath];
+        sectionHeadingView.stringValue = @"placeholder";
+        return sectionHeadingView;
+
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
+        const id<VLCMediaLibraryItemProtocol> item = [self itemForIndexPath:indexPath];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+
+        mediaItemSupplementaryDetailView.representedItem = representedItem;
+        mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return mediaItemSupplementaryDetailView;
+    }
+
+    return nil;
+}
+
 @end
