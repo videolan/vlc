@@ -28,6 +28,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
@@ -374,6 +375,24 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     return VLCMediaLibraryParentGroupTypeVideoLibrary;
+}
+
+# pragma mark - collection view data source and delegation
+
+- (id<VLCMediaLibraryItemProtocol>)itemForIndexPath:(NSIndexPath *)indexPath
+{
+    const NSInteger videoGroup = [self rowToVideoGroup:indexPath.section];
+    id<VLCMediaLibraryItemProtocol> item;
+    switch (videoGroup) {
+    case VLCMediaLibraryParentGroupTypeRecentVideos:
+        item = _recentsArray[indexPath.item];
+        break;
+    case VLCMediaLibraryParentGroupTypeVideoLibrary:
+        item = _libraryArray[indexPath.item];
+        break;
+    }
+    NSAssert(item != nil, @"item should not be nil");
+    return item;
 }
 
 @end
