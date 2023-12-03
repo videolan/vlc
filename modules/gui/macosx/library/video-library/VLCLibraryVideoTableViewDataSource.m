@@ -415,4 +415,14 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return NSNotFound;
 }
 
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> item = [self itemForIndexPath:indexPath];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+    viewItem.representedItem = representedItem;
+    return viewItem;
+}
+
 @end
