@@ -401,4 +401,18 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return _priorNumVideoSections;
 }
 
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    const NSInteger videoGroup = [self rowToVideoGroup:section];
+    switch (videoGroup) {
+    case VLCMediaLibraryParentGroupTypeRecentVideos:
+        return _recentsArray.count;
+    case VLCMediaLibraryParentGroupTypeVideoLibrary:
+        return _libraryArray.count;
+    }
+    NSAssert(NO, @"Unknown video group received.");
+    return NSNotFound;
+}
+
 @end
