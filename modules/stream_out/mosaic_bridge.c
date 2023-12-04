@@ -47,11 +47,22 @@
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
+
+struct decoder_owner
+{
+    decoder_t dec;
+    es_format_t fmt_in;
+    es_format_t fmt_out;
+    vlc_decoder_device *dec_dev;
+    vlc_video_context *vctx;
+    sout_stream_t *p_stream;
+};
+
 typedef struct
 {
     bridged_es_t *p_es;
 
-    decoder_t       *p_decoder;
+    struct decoder_owner *decoder_ref;
     image_handler_t *p_image; /* filter for resizing */
     int i_height, i_width;
     unsigned int i_sar_num, i_sar_den;
@@ -63,16 +74,6 @@ typedef struct
     char *filters_config;
     filter_chain_t *filters;
 } sout_stream_sys_t;
-
-struct decoder_owner
-{
-    decoder_t dec;
-    es_format_t fmt_in;
-    es_format_t fmt_out;
-    vlc_decoder_device *dec_dev;
-    vlc_video_context *vctx;
-    sout_stream_t *p_stream;
-};
 
 static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 {
@@ -251,6 +252,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
 
+    p_sys->decoder_ref = NULL;
+
     p_sys->i_height =
         var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
     var_AddCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
@@ -373,9 +376,8 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     struct decoder_owner *p_owner = vlc_object_create( p_stream, sizeof( *p_owner ) );
     if( !p_owner )
         return NULL;
-    p_sys->p_decoder = &p_owner->dec;
-    decoder_Init( p_sys->p_decoder, &p_owner->fmt_in, p_fmt );
-    p_sys->p_decoder->b_frame_drop_allowed = true;
+    decoder_Init( &p_owner->dec, &p_owner->fmt_in, p_fmt );
+    p_owner->dec.b_frame_drop_allowed = true;
 
     /* Create user specified video filters */
     static const struct filter_video_callbacks cbs =
@@ -408,19 +410,20 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
             .queue = decoder_queue_video,
         },
     };
-    p_sys->p_decoder->cbs = &dec_cbs;
+    p_owner->dec.cbs = &dec_cbs;
 
     es_format_Init( &p_owner->fmt_out, VIDEO_ES, 0 );
     p_owner->p_stream = p_stream;
     p_owner->vctx = NULL;
 
-    p_sys->p_decoder->p_module =
-        module_need_var( p_sys->p_decoder, "video decoder", "codec" );
+    p_owner->dec.p_module =
+        module_need_var( &p_owner->dec, "video decoder", "codec" );
 
-    if( !p_sys->p_decoder->p_module )
+    if( p_owner->dec.p_module == NULL )
     {
         msg_Err( p_stream, "cannot find decoder" );
-        ReleaseDecoder( p_sys->p_decoder );
+        filter_chain_Delete( p_sys->filters );
+        ReleaseDecoder( &p_owner->dec );
         return NULL;
     }
 
@@ -458,6 +461,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     }
 
     p_sys->p_es = p_es = p_bridge->pp_es[i];
+    p_sys->decoder_ref = p_owner;
 
     p_es->i_alpha = var_GetInteger( p_stream, CFG_PREFIX "alpha" );
     p_es->i_x = var_GetInteger( p_stream, CFG_PREFIX "x" );
@@ -481,20 +485,20 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
-    return p_sys;
+    return p_owner;
     (void)es_id;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )
 {
-    VLC_UNUSED(id);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    struct decoder_owner *owner = id;
     bridge_t *p_bridge;
     bridged_es_t *p_es;
     bool b_last_es = true;
     int i;
 
-    ReleaseDecoder( p_sys->p_decoder );
+    ReleaseDecoder( &owner->dec );
 
     /* Destroy user specified video filters */
     if( p_sys->filters )
@@ -531,6 +535,7 @@ static void Del( sout_stream_t *p_stream, void *id )
         var_Destroy( p_libvlc, "mosaic-struct" );
     }
 
+    p_sys->decoder_ref = NULL;
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 
     if ( p_sys->p_image )
@@ -623,11 +628,11 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
 static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    struct decoder_owner *owner = id;
 
-
-    int ret = p_sys->p_decoder->pf_decode( p_sys->p_decoder, p_buffer );
+    int ret = owner->dec.pf_decode( &owner->dec, p_buffer );
     return ret == VLCDEC_SUCCESS ? VLC_SUCCESS : VLC_EGENERIC;
+    (void)p_stream;
 }
 
 static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
