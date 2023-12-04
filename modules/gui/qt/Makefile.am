@@ -1064,7 +1064,6 @@ libqt_plugin_la_QML = \
 	widgets/qml/HorizontalResizeHandle.qml \
 	widgets/qml/IconLabel.qml \
 	widgets/qml/IconButton.qml \
-	widgets/qml/IconControlButton.qml \
 	widgets/qml/IconToolButton.qml \
 	widgets/qml/IconTrackButton.qml \
 	widgets/qml/ImageToolButton.qml \

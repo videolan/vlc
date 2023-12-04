@@ -215,7 +215,6 @@
         <file alias="CoverShadow.qml">widgets/qml/CoverShadow.qml</file>
         <file alias="DefaultShadow.qml">widgets/qml/DefaultShadow.qml</file>
         <file alias="OverlayMenu.qml">widgets/qml/OverlayMenu.qml</file>
-        <file alias="IconControlButton.qml">widgets/qml/IconControlButton.qml</file>
         <file alias="ToolTipExt.qml">widgets/qml/ToolTipExt.qml</file>
         <file alias="MLDragItem.qml">widgets/qml/MLDragItem.qml</file>
         <file alias="ScaledImage.qml">widgets/qml/ScaledImage.qml</file>
