@@ -27,7 +27,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     id: control
 
     // Aliases
@@ -43,6 +43,8 @@ Widgets.IconControlButton {
     // Settings
 
     color: (popup.visible) ? control.colorContext.accent : control.colorContext.fg.primary
+
+    size: VLCStyle.icon_toolbar
 
     // FIXME: We can't use upItem because a Popup is not an Item.
     Navigation.upAction: function() {

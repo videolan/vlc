@@ -939,7 +939,6 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/BookmarkButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml \
-	gui/qt/player/qml/controlbarcontrols/ControlButtonPopup.qml \
 	gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml \
@@ -1069,7 +1068,8 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/DropShadowImage.qml \
 	gui/qt/widgets/qml/DoubleShadow.qml \
 	gui/qt/widgets/qml/FadingEdge.qml \
-	gui/qt/widgets/qml/FadingEdgeForListView.qml
+	gui/qt/widgets/qml/FadingEdgeForListView.qml \
+	gui/qt/widgets/qml/PopupIconToolButton.qml
 
 lib_qt_plugin_la_QRC = gui/qt/vlc.qrc
 

@@ -24,8 +24,9 @@ import QtQuick.Controls 2.12
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///widgets/"
 
-ControlButtonPopup {
+PopupIconToolButton {
     id: root
 
     // Settings

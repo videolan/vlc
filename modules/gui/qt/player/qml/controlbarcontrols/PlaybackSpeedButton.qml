@@ -23,8 +23,9 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///player/" as P
+import "qrc:///widgets/"
 
-ControlButtonPopup {
+PopupIconToolButton {
     id: root
 
     popup.width: VLCStyle.dp(256, VLCStyle.scale)
