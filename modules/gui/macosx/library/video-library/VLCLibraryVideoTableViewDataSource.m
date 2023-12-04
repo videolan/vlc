@@ -275,6 +275,11 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return row + [self rowToVideoGroupAdjustment];
 }
 
+- (NSUInteger)videoGroupToRow:(NSInteger)videoGroup
+{
+    return videoGroup - [self rowToVideoGroupAdjustment];
+}
+
 - (void)checkRecentsSection
 {
     const BOOL recentsPresent = [self recentItemsPresent];
