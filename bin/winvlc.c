@@ -213,7 +213,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     void* eh = NULL;
     if(crash_handling)
     {
-        static wchar_t path[MAX_PATH];
+        wchar_t path[MAX_PATH];
         if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                     NULL, SHGFP_TYPE_CURRENT, path ) )
             fprintf( stderr, "Can't open the vlc conf PATH\n" );
