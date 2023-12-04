@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQml 2.11
+import QtQml 2.12
 
 import org.videolan.vlc 0.1
 
@@ -24,7 +24,7 @@ import org.videolan.vlc 0.1
 // @brief - a class that can be used to create native menus with support
 // to asyncronously retreive data from MLBaseModel like model
 
-VanillaObject {
+QtObject {
     id: root
 
     /**
@@ -97,7 +97,7 @@ VanillaObject {
     }
 
 
-    StringListMenu {
+    readonly property StringListMenu _menu: StringListMenu {
         id: menu
 
         onSelected: {

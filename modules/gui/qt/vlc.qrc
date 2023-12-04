@@ -76,7 +76,6 @@
         <file alias="ViewDragAutoScrollHandler.qml">util/qml/ViewDragAutoScrollHandler.qml</file>
         <file alias="BindingRev8.qml">util/qml/BindingRev8.qml</file>
         <file alias="BindingRev14.qml">util/qml/BindingRev14.qml</file>
-        <file alias="VanillaObject.qml">util/qml/VanillaObject.qml</file>
         <file alias="NativeMenu.qml">util/qml/NativeMenu.qml</file>
         <file alias="MLContextMenu.qml">util/qml/MLContextMenu.qml</file>
         <file alias="ListViewRev15.qml">util/qml/ListViewRev15.qml</file>

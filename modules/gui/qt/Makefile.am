@@ -992,7 +992,6 @@ libqt_plugin_la_QML = \
 	gui/qt/util/qml/BindingRev14.qml \
 	gui/qt/util/qml/FSM.qml \
 	gui/qt/util/qml/FSMState.qml \
-	gui/qt/util/qml/VanillaObject.qml \
 	gui/qt/util/qml/NativeMenu.qml \
 	gui/qt/util/qml/MLContextMenu.qml \
 	gui/qt/util/qml/ListViewRev15.qml \
