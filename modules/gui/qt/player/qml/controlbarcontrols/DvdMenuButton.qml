@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 import org.videolan.vlc 0.1
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
 
     enabled: Player.hasMenu
 

@@ -23,7 +23,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     id: repeatBtn
     checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
     text: (MainPlaylistController.repeatMode === PlaylistController.PLAYBACK_REPEAT_CURRENT)

@@ -244,7 +244,7 @@ FocusScope{
             implicitHeight: VLCStyle.icon_banner + VLCStyle.margin_xxsmall * 2
             implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall
 
-            Widgets.IconControlButton {
+            Widgets.IconToolButton {
                 id: backBtn
 
                 anchors.verticalCenter: parent.verticalCenter
@@ -411,7 +411,7 @@ FocusScope{
 
         visible: root._showTopBar
 
-        Widgets.IconControlButton {
+        Widgets.IconToolButton {
             id: menuSelector
 
             anchors.verticalCenter: parent.verticalCenter
@@ -445,7 +445,7 @@ FocusScope{
             }
         }
 
-        Widgets.IconControlButton {
+        Widgets.IconToolButton {
             id: playlistButton
 
             anchors.verticalCenter: parent.verticalCenter

@@ -23,7 +23,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     id: infoBtn
     enabled: Player.isPlaying
     text: VLCIcons.info

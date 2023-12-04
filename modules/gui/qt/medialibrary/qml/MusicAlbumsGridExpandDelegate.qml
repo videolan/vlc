@@ -247,7 +247,7 @@ FocusScope {
                             Layout.fillWidth: true
                         }
 
-                        Widgets.IconControlButton {
+                        Widgets.IconToolButton {
                             text: VLCIcons.close
                             focus: true
 

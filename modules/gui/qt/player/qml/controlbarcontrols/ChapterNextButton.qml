@@ -23,7 +23,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     id: chapterNextBtn
     text: VLCIcons.dvd_next
     onClicked: Player.chapterNext()

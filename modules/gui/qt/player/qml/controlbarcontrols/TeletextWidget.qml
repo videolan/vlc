@@ -98,7 +98,7 @@ T.Pane {
 
             spacing: VLCStyle.margin_small
 
-            Widgets.IconControlButton{
+            Widgets.IconToolButton {
                 id: teleTransparencyBtn
 
                 enabled: teleActivateBtn.checked
@@ -168,7 +168,7 @@ T.Pane {
         Row {
             spacing: VLCStyle.margin_small
 
-            Widgets.IconControlButton{
+            Widgets.IconToolButton {
                 id: indexKeyBtn
 
                 anchors.verticalCenter: parent.verticalCenter

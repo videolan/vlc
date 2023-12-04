@@ -51,7 +51,7 @@ T.ToolButton {
 
     baselineOffset: contentItem.y + contentItem.baselineOffset
 
-    font.pixelSize: VLCStyle.icon_normal
+    font.pixelSize: VLCStyle.icon_toolbar
     font.family: VLCIcons.fontFamily
 
     // Keys

@@ -24,7 +24,7 @@ import QtQuick.Templates 2.12 as T
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     // Settings
 
     text: VLCIcons.circle

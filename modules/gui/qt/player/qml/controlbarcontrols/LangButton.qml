@@ -24,7 +24,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///player/" as Player
 
-Widgets.IconControlButton {
+Widgets.IconToolButton {
     id: root
 
     // Proprerties
