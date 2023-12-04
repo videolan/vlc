@@ -395,6 +395,18 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return item;
 }
 
+- (NSString *)titleForVideoGroup:(NSInteger)videoGroup
+{
+    switch (videoGroup) {
+    case VLCMediaLibraryParentGroupTypeRecentVideos:
+        return _NS("Recents");
+    case VLCMediaLibraryParentGroupTypeVideoLibrary:
+        return _NS("Library");
+    }
+    NSAssert(NO, @"Received unknown video group");
+    return @"";
+}
+
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
     _priorNumVideoSections = [self recentItemsPresent] ? 2 : 1;
@@ -431,7 +443,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 {
     if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
         VLCLibraryCollectionViewSupplementaryElementView * const sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibrarySupplementaryElementViewIdentifier forIndexPath:indexPath];
-        sectionHeadingView.stringValue = @"placeholder";
+        const NSInteger videoGroup = [self rowToVideoGroup:indexPath.section];
+        sectionHeadingView.stringValue = [self titleForVideoGroup:videoGroup];
         return sectionHeadingView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
