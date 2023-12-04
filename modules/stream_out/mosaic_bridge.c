@@ -191,11 +191,10 @@ static void Flush( sout_stream_t *stream, void *id)
 {
     sout_stream_sys_t *p_sys = stream->p_sys;
 
-    if ( p_sys == (sout_stream_sys_t *)id )
-    {
-        if (p_sys->filters != NULL)
-            filter_chain_VideoFlush(p_sys->filters);
-    }
+    if (p_sys->filters != NULL)
+        filter_chain_VideoFlush(p_sys->filters);
+
+    (void)id;
 }
 
 /*****************************************************************************
@@ -495,9 +494,6 @@ static void Del( sout_stream_t *p_stream, void *id )
     bool b_last_es = true;
     int i;
 
-    if( !p_sys->b_inited )
-        return;
-
     ReleaseDecoder( p_sys->p_decoder );
 
     /* Destroy user specified video filters */
@@ -629,11 +625,6 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if ( (sout_stream_sys_t *)id != p_sys )
-    {
-        block_ChainRelease( p_buffer );
-        return VLC_SUCCESS;
-    }
 
     int ret = p_sys->p_decoder->pf_decode( p_sys->p_decoder, p_buffer );
     return ret == VLCDEC_SUCCESS ? VLC_SUCCESS : VLC_EGENERIC;
