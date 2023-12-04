@@ -1396,7 +1396,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>VLC media player</string>
+	<string>VLC</string>
 	<key>CFBundleDisplayName</key>
 	<string>VLC</string>
 	<key>CFBundleShortVersionString</key>
