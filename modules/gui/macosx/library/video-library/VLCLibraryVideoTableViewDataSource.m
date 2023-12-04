@@ -389,7 +389,8 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 # pragma mark - collection view data source and delegation
 
-- (id<VLCMediaLibraryItemProtocol>)itemForIndexPath:(NSIndexPath *)indexPath
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
 {
     const NSInteger videoGroup = [self rowToVideoGroup:indexPath.section];
     id<VLCMediaLibraryItemProtocol> item;
@@ -441,7 +442,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    const id<VLCMediaLibraryItemProtocol> item = [self itemForIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
     viewItem.representedItem = representedItem;
     return viewItem;
@@ -459,7 +460,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
-        const id<VLCMediaLibraryItemProtocol> item = [self itemForIndexPath:indexPath];
+        const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
