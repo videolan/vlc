@@ -22,22 +22,19 @@ import QtQuick 2.12
 
 import "qrc:///style/"
 
-Loader {
+StateGroup {
     id: root
 
-    // Settings
+    state: target ? target.state : ""
 
-    // NOTE: We could consider applying 'layer.enabled' during transitions since it removes overlap
-    //       artifacts when applying opacity.
-
-    // States
+    property Item target
 
     states: [
         State {
             name: "hidden"
 
             PropertyChanges {
-                target: root
+                target: root.target
 
                 visible: false
                 opacity: 0.0
@@ -47,7 +44,7 @@ Loader {
             name: "visible"
 
             PropertyChanges {
-                target: root
+                target: root.target
 
                 visible: true
                 opacity: 1.0
@@ -61,17 +58,13 @@ Loader {
 
             SequentialAnimation {
                 NumberAnimation {
-                    target: root
-
                     property: "opacity"
 
                     duration: VLCStyle.duration_long
                     easing.type: Easing.InSine
                 }
 
-                PropertyAction{
-                    target: root
-
+                PropertyAction {
                     property: "visible"
                 }
             }
@@ -81,14 +74,10 @@ Loader {
 
             SequentialAnimation {
                 PropertyAction {
-                    target: root
-
                     property: "visible"
                 }
 
                 NumberAnimation {
-                    target: root
-
                     property: "opacity"
 
                     duration: VLCStyle.duration_long
