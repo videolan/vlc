@@ -158,8 +158,10 @@ FocusScope {
             availableWidth: rowLayout.width
             availableHeight: rowLayout.height
 
-            requestLockUnlockAutoHide: controlLayout.requestLockUnlockAutoHide
-            menuOpened: controlLayout.menuOpened
+            Component.onCompleted: {
+                requestLockUnlockAutoHide.connect(controlLayout.requestLockUnlockAutoHide)
+                menuOpened.connect(controlLayout.menuOpened)
+            }
         }
 
         Item {

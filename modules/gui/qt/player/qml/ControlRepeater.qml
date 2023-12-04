@@ -30,8 +30,8 @@ Repeater {
     property real availableWidth: Number.MAX_VALUE
     property real availableHeight: Number.MAX_VALUE
 
-    property var menuOpened
-    property var requestLockUnlockAutoHide
+    signal requestLockUnlockAutoHide(bool lock)
+    signal menuOpened(var menu)
 
     // NOTE: We apply the 'navigation chain' after adding the item.
     onItemAdded: item.applyNavigation()

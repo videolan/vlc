@@ -110,6 +110,11 @@ FocusScope {
 
                 availableWidth: loaderLeftRight.width
                 availableHeight: loaderLeftRight.height
+
+                Component.onCompleted: {
+                    requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
+                    menuOpened.connect(playerControlLayout.menuOpened)
+                }
             }
 
             Item {
@@ -151,6 +156,11 @@ FocusScope {
 
                 availableWidth: loaderLeftRight.width
                 availableHeight: loaderLeftRight.height
+
+                Component.onCompleted: {
+                    requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
+                    menuOpened.connect(playerControlLayout.menuOpened)
+                }
             }
         }
     }
@@ -191,9 +201,10 @@ FocusScope {
             Navigation.parentItem: playerControlLayout
             Navigation.rightItem: loaderCenter.item
 
-            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
-
-            onMenuOpened: playerControlLayout.menuOpened(menu)
+            Component.onCompleted: {
+                requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
+                menuOpened.connect(playerControlLayout.menuOpened)
+            }
         }
     }
 
@@ -248,9 +259,10 @@ FocusScope {
             Navigation.leftItem: loaderLeft.item
             Navigation.rightItem: loaderRight.item
 
-            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
-
-            onMenuOpened: playerControlLayout.menuOpened(menu)
+            Component.onCompleted: {
+                requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
+                menuOpened.connect(playerControlLayout.menuOpened)
+            }
         }
     }
 
