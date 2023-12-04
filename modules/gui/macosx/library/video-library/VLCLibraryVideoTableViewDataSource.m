@@ -158,7 +158,8 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     self->_recentsArray = [self.libraryModel listOfRecentMedia];
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
-    [self->_groupSelectionTableView reloadData];
+    [self.groupSelectionTableView reloadData];
+    [self.collectionView reloadData];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self
                                                     userInfo:nil];
@@ -227,6 +228,10 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
+        const NSInteger section = [self videoGroupToRow:group];
+        NSSet<NSIndexPath *> * const indexPathSet = [self indexPathSetWithIndexSet:rowIndexSet withSection:section];
+        [self.collectionView insertItemsAtIndexPaths:indexPathSet];
+
         const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
         if (selectedTableViewVideoGroup == group) {
             // Don't regenerate the groups by index as these do not change according to the notification
@@ -249,6 +254,9 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     } completionHandler:^(NSIndexSet * const rowIndexSet){
 
+        const NSInteger section = [self videoGroupToRow:group];
+        NSSet<NSIndexPath *> * const indexPathSet = [self indexPathSetWithIndexSet:rowIndexSet withSection:section];
+        [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
 
         const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
         if (selectedTableViewVideoGroup == group) {
