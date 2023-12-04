@@ -29,15 +29,8 @@ import "qrc:///util/Helpers.js" as Helpers
 
 Widgets.IconControlButton {
     id: control
-    // Properties
-
-    // Private
-
-    readonly property bool _isCurrentViewPlayer: History.match(History.viewPath, ["player"])
 
     // Aliases
-
-    property alias popupContent: popup.contentItem
 
     property alias popup: popup
 
@@ -69,48 +62,21 @@ Widgets.IconControlButton {
 
     onClicked: popup.open()
 
-    // Connections
-
-    Connections {
-        target: (popup.visible) ? popup.parent : null
-
-        onWidthChanged: _updatePosition()
-        onHeightChanged: _updatePosition()
-    }
-
-    // Functions
-
-    // Private
-
-    // NOTE: coordinates are based on the popup parent view.
-    function _updatePosition() {
-        const parent = popup.parent
-
-        const position = parent.mapFromItem(root, x, y)
-
-        const popupX = Math.round(position.x - ((popup.width - width) / 2))
-
-        const minimum = VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
-
-        const maximum = parent.width - popup.width - minimum
-
-        popup.x = Helpers.clamp(popupX, minimum, maximum)
-
-        popup.y = position.y - popup.height - VLCStyle.margin_xxsmall
-    }
-
     // Children
 
     Popup {
         id: popup
 
-        parent: (root._isCurrentViewPlayer) ? rootPlayer : g_mainInterface
+        x: (parent.width - width) / 2
+        y: -height - VLCStyle.margin_xxxsmall
 
         padding: VLCStyle.margin_small
 
-        z: 1
-
         focus: true
+
+        // This popup should not exceed the boundaries of the scene.
+        // Setting margins to >=0 makes it sure that this is satisfied.
+        margins: 0
 
         modal: true
 
@@ -122,23 +88,18 @@ Widgets.IconControlButton {
         // Events
 
         onOpened: {
-            root._updatePosition()
+            control.requestLockUnlockAutoHide(true)
 
-            root.requestLockUnlockAutoHide(true)
-
-            root.menuOpened(popup)
+            control.menuOpened(popup)
         }
 
         onClosed: {
-            root.requestLockUnlockAutoHide(false)
+            control.requestLockUnlockAutoHide(false)
 
-            root.forceActiveFocus()
+            control.forceActiveFocus()
 
-            root.menuOpened(null)
+            control.menuOpened(null)
         }
-
-        onWidthChanged: if (visible) root._updatePosition()
-        onHeightChanged: if (visible) root._updatePosition()
 
         background: Rectangle {
             ColorContext {

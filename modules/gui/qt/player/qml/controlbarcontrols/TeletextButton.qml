@@ -36,7 +36,7 @@ ControlButtonPopup {
 
     text: I18n.qtr("Teletext")
 
-    popupContent: TeletextWidget {
+    popup.contentItem: TeletextWidget {
         colorContext.palette: root.colorContext.palette
 
         Navigation.parentItem: root

@@ -31,7 +31,7 @@ ControlButtonPopup {
 
     text: I18n.qtr("Playback Speed")
 
-    popupContent: P.PlaybackSpeed {
+    popup.contentItem: P.PlaybackSpeed {
         colorContext.palette: root.colorContext.palette
 
         Navigation.parentItem: root
