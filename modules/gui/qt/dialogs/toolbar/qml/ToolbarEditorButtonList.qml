@@ -41,6 +41,8 @@ GridView {
     cellWidth: VLCStyle.cover_small
     cellHeight: cellWidth
 
+    boundsBehavior: Flickable.StopAtBounds
+
     property alias removeInfoRectVisible: removeInfoRect.visible
 
     signal dragStarted(int id)

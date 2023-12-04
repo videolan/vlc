@@ -83,6 +83,8 @@ ListView {
     highlightMoveDuration: 300 //ms
     highlightMoveVelocity: 1000 //px/s
 
+    boundsBehavior: Flickable.StopAtBounds
+
     section.property: ""
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading

@@ -34,6 +34,7 @@ ListView {
 
     currentIndex: -1
     highlightFollowsCurrentItem: false
+    boundsBehavior: Flickable.StopAtBounds
 
     property bool containsDrag: footerItem.dropVisible
 

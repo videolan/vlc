@@ -621,6 +621,8 @@ FocusScope {
 
         flickableDirection: Flickable.VerticalFlick
 
+        boundsBehavior: Flickable.StopAtBounds
+
         ScrollBar.vertical: ScrollBar {
             id: flickableScrollBar
         }
