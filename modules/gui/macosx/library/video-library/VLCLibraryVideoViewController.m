@@ -24,6 +24,9 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -64,7 +67,8 @@
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
-        [self setupTableViewDataSource];
+        [self setupDataSource];
+        [self setupCollectionView];
         [self setupTableViews];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
@@ -103,17 +107,35 @@
     _emptyLibraryView = libraryWindow.emptyLibraryView;
 }
 
-- (void)setupTableViewDataSource
+- (void)setupDataSource
 {
     _videoLibrarySplitView.delegate = _splitViewDelegate;
     _libraryVideoDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+    _libraryVideoDataSource.collectionView = _videoLibraryCollectionView;
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
     [_videoLibraryGroupSelectionTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+}
+
+- (void)setupCollectionView
+{
+    self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
+
+    [self.videoLibraryCollectionView registerClass:VLCLibraryCollectionViewItem.class
+                             forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    [self.videoLibraryCollectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
+                        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
+    [self.videoLibraryCollectionView registerNib:mediaItemSupplementaryDetailView
+                      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
 - (void)setupTableViews
