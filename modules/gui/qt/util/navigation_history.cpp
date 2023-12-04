@@ -82,6 +82,8 @@ static bool isNodeValid(const QVariant& value)
         }
         return true;
     }
+    else if ( value.isNull() )
+        return true;
 
     assert(false);
     return false;
