@@ -194,6 +194,8 @@ FocusScope {
 
             alignment: (Qt.AlignVCenter | Qt.AlignLeft)
 
+            spacing: playerControlLayout.spacing
+
             focus: true
 
             altFocusAction: Navigation.defaultNavigationRight
@@ -253,6 +255,8 @@ FocusScope {
 
             focus: true
 
+            spacing: playerControlLayout.spacing
+
             altFocusAction: Navigation.defaultNavigationUp
 
             Navigation.parentItem: playerControlLayout
@@ -291,6 +295,8 @@ FocusScope {
             }
 
             alignment: (Qt.AlignVCenter | Qt.AlignRight)
+
+            spacing: playerControlLayout.spacing
 
             focus: true
 

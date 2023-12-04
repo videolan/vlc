@@ -95,6 +95,8 @@ FocusScope {
 
     property alias model: repeater.model
 
+    property alias spacing: rowLayout.spacing
+
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
@@ -142,8 +144,6 @@ FocusScope {
         id: rowLayout
 
         anchors.fill: parent
-
-        spacing: playerControlLayout.spacing
 
         Item {
             Layout.fillWidth: visible
