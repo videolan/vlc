@@ -406,6 +406,16 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     return item;
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    const NSInteger row = [self rowForLibraryItem:libraryItem];
+    if (row == NSNotFound) {
+        return nil;
+    }
+    const NSInteger section = [self videoGroupToRow:VLCMediaLibraryParentGroupTypeVideoLibrary];
+    return [NSIndexPath indexPathForItem:row inSection:section];
+}
+
 - (NSString *)titleForVideoGroup:(NSInteger)videoGroup
 {
     switch (videoGroup) {
