@@ -24,6 +24,8 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -51,6 +53,8 @@
 {
     VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
+    VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
+    VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
 
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 }
@@ -123,6 +127,25 @@
 
 - (void)setupCollectionView
 {
+     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+    _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
+    _collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    _collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    _collectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    self.videoLibraryCollectionView.collectionViewLayout = _collectionViewLayout;
+    self.videoLibraryCollectionView.selectable = YES;
+    self.videoLibraryCollectionView.allowsEmptySelection = YES;
+    self.videoLibraryCollectionView.allowsMultipleSelection = NO;
+
+    _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
+    _collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
+    self.videoLibraryCollectionView.delegate = _collectionViewDelegate;
+
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
 
     [self.videoLibraryCollectionView registerClass:VLCLibraryCollectionViewItem.class
