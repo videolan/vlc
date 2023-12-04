@@ -31,6 +31,7 @@
 #endif
 
 #include <cassert>
+#include <vector>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -555,6 +556,8 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
         goto error;
     }
 
+    mft->GetOutputCurrentType(output_stream_id, output_media_type.ReleaseAndGetAddressOf());
+
     if (fmt_out.i_cat == VIDEO_ES)
     {
         /* Transform might offer output in a D3DFMT proprietary FCC */
@@ -589,6 +592,26 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
         fmt_out.i_codec = vlc_fourcc_GetCodecAudio(fourcc, fmt_out.audio.i_bitspersample);
 
         fmt_out.audio.i_physical_channels = pi_channels_maps[fmt_out.audio.i_channels];
+
+        if (fmt_out.i_codec == VLC_CODEC_MP4A)
+        {
+            UINT32 blob_size = 0;
+            hr = output_media_type->GetBlobSize(MF_MT_USER_DATA, &blob_size);
+            if (SUCCEEDED(hr))
+            {
+                size_t aac_info = sizeof(HEAACWAVEINFO) - sizeof(WAVEFORMATEX);
+                if (blob_size > aac_info) // AudioSpecificConfig after HEAACWAVEINFO
+                {
+                    fmt_out.i_extra = blob_size - aac_info;
+                    fmt_out.p_extra = malloc(fmt_out.i_extra);
+                    if (unlikely(fmt_out.p_extra == nullptr))
+                        goto error;
+                    std::vector<UINT8> tmp(blob_size);
+                    output_media_type->GetBlob(MF_MT_USER_DATA, tmp.data(), blob_size, nullptr);
+                    memcpy(fmt_out.p_extra, &tmp[aac_info], fmt_out.i_extra);
+                }
+            }
+        }
     }
 
     return VLC_SUCCESS;
