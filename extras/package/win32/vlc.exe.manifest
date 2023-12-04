@@ -6,6 +6,11 @@
         name="VideoLAN.VLC"
         type="win32"
     />
+    <asmv3:application>
+        <asmv3:windowsSettings xmlns:ws2="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+            <ws2:longPathAware>true</ws2:longPathAware>
+        </asmv3:windowsSettings>
+    </asmv3:application>
     <description>see https://www.videolan.org/</description>
     <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
         <security>
