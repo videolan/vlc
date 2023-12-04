@@ -205,6 +205,17 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
                                                     userInfo:nil];
 }
 
+- (NSSet<NSIndexPath *> *)indexPathSetWithIndexSet:(NSIndexSet *)indexSet
+                                       withSection:(NSInteger)section
+{
+    NSMutableSet<NSIndexPath *> * const indexPathSet = NSMutableSet.set;
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop){
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:idx inSection:section];
+        [indexPathSet addObject:indexPath];
+    }];
+    return indexPathSet.copy;
+}
+
 - (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
                   inVideoGroup:(const VLCMediaLibraryParentGroupType)group
 {
