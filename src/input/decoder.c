@@ -1301,7 +1301,7 @@ static void ModuleThread_QueueCc( decoder_t *p_videodec, vlc_frame_t *p_cc,
         return;
 
     if (!p_owner->cc.b_supported ||
-       (p_owner->p_packetizer != NULL && p_owner->p_packetizer->pf_get_cc == NULL))
+       (p_owner->p_packetizer != NULL && p_owner->p_packetizer->pf_get_cc != NULL))
     {
         block_Release(p_cc);
         return;
