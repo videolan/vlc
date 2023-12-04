@@ -88,8 +88,9 @@ Item {
 
         smooth: false
 
-        visible: effectCompatible && (root.enableBeginningFade || root.enableEndFade) ||
-                 ((shaderEffect) && (shaderEffect.beginningFadeSize > 0 || shaderEffect.endFadeSize > 0))
+        visible: effectCompatible &&
+                 ((root.enableBeginningFade || root.enableEndFade) ||
+                 ((shaderEffect) && (shaderEffect.beginningFadeSize > 0 || shaderEffect.endFadeSize > 0)))
 
         property ShaderEffect shaderEffect
 
