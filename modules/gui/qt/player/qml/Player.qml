@@ -30,6 +30,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///dialogs/" as DG
+import "qrc:///util/" as Util
 
 FocusScope {
     id: rootPlayer
@@ -316,7 +317,7 @@ FocusScope {
             History.previous()
         }
 
-        Widgets.LoaderFade {
+        Util.FadeControllerStateGroup {
             target: topBar
         }
 
@@ -785,7 +786,7 @@ FocusScope {
             color: windowTheme.bg.primary
         }
 
-        Widgets.LoaderFade {
+        Util.FadeControllerStateGroup {
             target: controlBar
         }
     }

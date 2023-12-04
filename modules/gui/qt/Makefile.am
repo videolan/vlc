@@ -999,6 +999,7 @@ libqt_plugin_la_QML = \
 	util/qml/MLContextMenu.qml \
 	util/qml/ListViewRev15.qml \
 	util/qml/ListViewRev11.qml \
+	util/qml/FadeControllerStateGroup.qml \
 	widgets/qml/ActionButtonOverlay.qml \
 	widgets/qml/ActionButtonPrimary.qml \
 	widgets/qml/BannerTabButton.qml \
@@ -1037,7 +1038,6 @@ libqt_plugin_la_QML = \
 	widgets/qml/TableViewDelegate.qml \
 	widgets/qml/ListCoverShadow.qml \
 	widgets/qml/ListLabel.qml \
-	widgets/qml/LoaderFade.qml \
 	widgets/qml/LocalTabBar.qml \
 	widgets/qml/MediaCover.qml \
 	widgets/qml/SubtitleLabel.qml \

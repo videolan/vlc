@@ -81,6 +81,7 @@
         <file alias="ListViewRev11.qml">util/qml/ListViewRev11.qml</file>
         <file alias="FSM.qml">util/qml/FSM.qml</file>
         <file alias="FSMState.qml">util/qml/FSMState.qml</file>
+        <file alias="FadeControllerStateGroup.qml">util/qml/FadeControllerStateGroup.qml</file>
     </qresource>
     <qresource prefix="/sd">
         <file alias="capture-card.svg">pixmaps/sd/capture-card.svg</file>
@@ -171,7 +172,6 @@
         <file alias="TrackDelayButton.qml">widgets/qml/TrackDelayButton.qml</file>
         <file alias="CurrentIndicator.qml">widgets/qml/CurrentIndicator.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
-        <file alias="LoaderFade.qml">widgets/qml/LoaderFade.qml</file>
         <file alias="DrawerExt.qml">widgets/qml/DrawerExt.qml</file>
         <file alias="KeyNavigableListView.qml">widgets/qml/KeyNavigableListView.qml</file>
         <file alias="KeyNavigableTableView.qml">widgets/qml/KeyNavigableTableView.qml</file>
