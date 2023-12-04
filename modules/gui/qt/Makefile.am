@@ -984,7 +984,6 @@ libqt_plugin_la_QML = \
 	gui/qt/style/qmldir \
 	gui/qt/util/qml/Helpers.js \
 	gui/qt/util/qml/ModelSortSettingHandler.qml \
-	gui/qt/util/qml/MultipleBinding.qml \
 	gui/qt/util/qml/FlickableScrollHandler.qml \
 	gui/qt/util/qml/ViewDragAutoScrollHandler.qml \
 	gui/qt/util/qml/BindingRev8.qml \

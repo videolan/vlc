@@ -16,8 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQml 2.11
-import QtQml.Models 2.12
+import QtQml 2.12
 
 import org.videolan.vlc 0.1 as VLC
 
@@ -27,29 +26,4 @@ VLC.FlickableScrollHandler {
     scaleFactor: VLC.MainCtx.intfScaleFactor
 
     enabled: !VLC.MainCtx.smoothScroll
-
-    Component.onCompleted: {
-        if (!enabled) {
-            // QTBUG-56075
-            // Note that this workaround is not effective when enabled dynamically changes
-            const qtVersion = VLC.MainCtx.qtVersion()
-            if ((qtVersion >= VLC.MainCtx.qtVersionCheck(6, 0, 0) && qtVersion < VLC.MainCtx.qtVersionCheck(6, 2, 0)) ||
-                (qtVersion < VLC.MainCtx.qtVersionCheck(5, 15, 8))) {
-                handler.enabled = true
-                const smoothScroll = Qt.binding(function() { return VLC.MainCtx.smoothScroll })
-                handler.handleOnlyPixelDelta = smoothScroll
-                _behaviorAdjuster.when = smoothScroll
-                _behaviorAdjuster.model.append( {property: "flickDeceleration", value: 3500} )
-            }
-        }
-    }
-
-    readonly property MultipleBinding _behaviorAdjuster: MultipleBinding {
-        target: handler.parent
-        when: !handler.enabled
-
-        model: ListModel {
-            ListElement {property: "boundsBehavior"; value: 0 /* Flickable.StopAtBounds */}
-        }
-    }
 }
