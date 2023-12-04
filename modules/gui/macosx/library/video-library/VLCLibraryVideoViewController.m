@@ -146,19 +146,7 @@
     _collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
     self.videoLibraryCollectionView.delegate = _collectionViewDelegate;
 
-    self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
-
-    [self.videoLibraryCollectionView registerClass:VLCLibraryCollectionViewItem.class
-                             forItemWithIdentifier:VLCLibraryCellIdentifier];
-
-    [self.videoLibraryCollectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
-                        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-
-    NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
-    [self.videoLibraryCollectionView registerNib:mediaItemSupplementaryDetailView
-                      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
-                                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+    [self.libraryVideoDataSource setupCollectionView:self.videoLibraryCollectionView];
 }
 
 - (void)setupTableViews

@@ -39,6 +39,7 @@ extern NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionCha
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 
 - (void)reloadData;
+- (void)setupCollectionView:(NSCollectionView *)collectionView;
 
 @end
 
