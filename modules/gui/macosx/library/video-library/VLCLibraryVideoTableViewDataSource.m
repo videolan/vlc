@@ -97,23 +97,11 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 - (void)libraryModelVideoListReset:(NSNotification * const)aNotification
 {
-    if (self.groupsTableView.selectedRow == -1 ||
-        [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
-
-        return;
-    }
-
     [self reloadData];
 }
 
 - (void)libraryModelVideoItemUpdated:(NSNotification * const)aNotification
 {
-    if (_groupsTableView.selectedRow == -1 ||
-        [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
-
-        return;
-    }
-
     NSParameterAssert(aNotification);
     VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
@@ -124,12 +112,6 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 - (void)libraryModelVideoItemDeleted:(NSNotification * const)aNotification
 {
-    if (self.groupsTableView.selectedRow == -1 ||
-       [self rowToVideoGroup:self.groupsTableView.selectedRow] != VLCMediaLibraryParentGroupTypeVideoLibrary) {
-
-        return;
-    }
-
     NSParameterAssert(aNotification);
     VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item deleted notification should carry valid media item");
@@ -141,24 +123,11 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 - (void)libraryModelRecentsListReset:(NSNotification * const)aNotification
 {
     [self checkRecentsSection];
-
-    if (self.groupsTableView.selectedRow == -1 ||
-        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
-
-        return;
-    }
-
     [self reloadData];
 }
 
 - (void)libraryModelRecentsItemUpdated:(NSNotification * const)aNotification
 {
-    if (self.groupsTableView.selectedRow == -1 ||
-        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
-
-        return;
-    }
-
     NSParameterAssert(aNotification);
     VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
     NSAssert(notificationMediaItem != nil, @"Media item updated notification should carry valid media item");
@@ -170,12 +139,6 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 - (void)libraryModelRecentsItemDeleted:(NSNotification * const)aNotification
 {
     [self checkRecentsSection];
-
-    if (_groupsTableView.selectedRow == -1 ||
-        [self rowToVideoGroup:self.groupsTableView.selectedRow], VLCMediaLibraryParentGroupTypeRecentVideos) {
-
-        return;
-    }
 
     NSParameterAssert(aNotification);
     VLCMediaLibraryMediaItem * const notificationMediaItem = aNotification.object;
@@ -253,12 +216,14 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
-        // Don't regenerate the groups by index as these do not change according to the notification
-        // Stick to the selection table view
-        const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
-        NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
-        [self->_groupSelectionTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
-
+        const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
+        if (selectedTableViewVideoGroup == group) {
+            // Don't regenerate the groups by index as these do not change according to the notification
+            // Stick to the selection table view
+            const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
+            NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
+            [self.groupSelectionTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
+        }
     }];
 }
 
@@ -273,10 +238,13 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     } completionHandler:^(NSIndexSet * const rowIndexSet){
 
-        // Don't regenerate the groups by index as these do not change according to the notification
-        // Stick to the selection table view
-        [self->_groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
 
+        const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
+        if (selectedTableViewVideoGroup == group) {
+            // Don't regenerate the groups by index as these do not change according to the notification
+        // Stick to the selection table view
+        [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+        }
     }];
 }
 
