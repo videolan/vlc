@@ -217,9 +217,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                     NULL, SHGFP_TYPE_CURRENT, path ) )
             fprintf( stderr, "Can't open the vlc conf PATH\n" );
-        _snwprintf( path+wcslen( path ), MAX_PATH,  L"%s", L"\\vlc\\crashdump" );
-        CheckCrashDump( &path[0] );
-        eh = InstallCrashHandler( &path[0] );
+        if ( !wcscat_s( path, MAX_PATH, L"\\vlc\\crashdump" ) )
+        {
+            CheckCrashDump( path );
+            eh = InstallCrashHandler( path );
+        }
     }
 #else
     (void)crash_handling;
