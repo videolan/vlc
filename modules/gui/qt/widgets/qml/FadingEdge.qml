@@ -112,6 +112,22 @@ Item {
             property real endFadeSize: root.enableEndFade ? normalFadeSize : 0
             readonly property real endFadePos: 1.0 - endFadeSize
 
+            onBeginningFadeSizeChanged: {
+                if (!beginningFadeBehavior.enabled) {
+                    Qt.callLater(() => {
+                        beginningFadeBehavior.enabled = true
+                    })
+                }
+            }
+
+            onEndFadeSizeChanged: {
+                if (!endFadeBehavior.enabled) {
+                    Qt.callLater(() => {
+                        endFadeBehavior.enabled = true
+                    })
+                }
+            }
+
             Component.onCompleted: {
                 console.assert(shaderEffectSource.shaderEffect === null)
                 shaderEffectSource.shaderEffect = this
@@ -124,6 +140,10 @@ Item {
 
             // TODO: Qt >= 5.15 use inline component
             Behavior on beginningFadeSize {
+                id: beginningFadeBehavior
+
+                enabled: false
+
                 // Qt Bug: UniformAnimator does not work...
                 NumberAnimation {
                     duration: VLCStyle.duration_veryShort
@@ -132,6 +152,10 @@ Item {
             }
 
             Behavior on endFadeSize {
+                id: endFadeBehavior
+
+                enabled: false
+
                 // Qt Bug: UniformAnimator does not work...
                 NumberAnimation {
                     duration: VLCStyle.duration_veryShort
