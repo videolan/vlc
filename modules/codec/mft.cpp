@@ -684,31 +684,12 @@ error:
 
 static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_block)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr = S_OK;
     ComPtr<IMFSample> input_sample;
 
-    block_t *p_xps_blocks = NULL;
     DWORD alloc_size = p_block->i_buffer;
     vlc_tick_t ts;
     ComPtr<IMFMediaBuffer> input_media_buffer;
-
-    if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
-    {
-        /* in-place NAL to annex B conversion. */
-        p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
-
-        if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed)
-        {
-            p_xps_blocks = hxxx_helper_get_extradata_block(&p_sys->hh);
-            if (p_xps_blocks)
-            {
-                size_t extrasize;
-                block_ChainProperties(p_xps_blocks, NULL, &extrasize, NULL);
-                alloc_size += extrasize;
-            }
-        }
-    }
 
     if (AllocateInputSample(p_dec, stream_id, input_sample, alloc_size))
         goto error;
@@ -722,10 +703,6 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (FAILED(hr))
         goto error;
 
-    if (p_xps_blocks) {
-        buffer_start += block_ChainExtract(p_xps_blocks, buffer_start, alloc_size);
-        p_sys->b_xps_pushed = true;
-    }
     memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
 
     hr = input_media_buffer->Unlock();
@@ -750,13 +727,10 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
         goto error;
     }
 
-    block_ChainRelease(p_xps_blocks);
-
     return VLC_SUCCESS;
 
 error:
     msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)", hr);
-    block_ChainRelease(p_xps_blocks);
     return VLC_EGENERIC;
 }
 
@@ -1157,6 +1131,29 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 
     if (p_block != NULL )
     {
+        if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
+        {
+            /* in-place NAL to annex B conversion. */
+            p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
+
+            if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed)
+            {
+                block_t *p_xps_blocks = hxxx_helper_get_extradata_block(&p_sys->hh);
+                if (p_xps_blocks)
+                {
+                    size_t extrasize;
+                    block_ChainProperties(p_xps_blocks, NULL, &extrasize, NULL);
+                    if (ProcessInputStream(vlc_object_logger(p_dec), *p_sys, p_sys->input_stream_id, p_xps_blocks))
+                    {
+                        block_ChainRelease(p_xps_blocks);
+                        goto error;
+                    }
+                    p_sys->b_xps_pushed = true;
+                    block_ChainRelease(p_xps_blocks);
+                }
+            }
+        }
+
         if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
             goto error;
         block_Release(p_block);
