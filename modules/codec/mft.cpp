@@ -584,9 +584,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
+static int AllocateInputSample(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -596,7 +595,7 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSamp
     DWORD allocation_size;
 
     MFT_INPUT_STREAM_INFO input_info;
-    hr = p_sys->mft->GetInputStreamInfo(stream_id, &input_info);
+    hr = mft->GetInputStreamInfo(stream_id, &input_info);
     if (FAILED(hr))
         goto error;
 
@@ -618,7 +617,7 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSamp
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in AllocateInputSample()");
+    vlc_error(logger, "Error in AllocateInputSample(). (hr=0x%lX)", hr);
     return VLC_EGENERIC;
 }
 
@@ -682,7 +681,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_block)
+static int ProcessInputStream(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, block_t *p_block)
 {
     HRESULT hr = S_OK;
     ComPtr<IMFSample> input_sample;
@@ -691,7 +690,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     vlc_tick_t ts;
     ComPtr<IMFMediaBuffer> input_media_buffer;
 
-    if (AllocateInputSample(p_dec, stream_id, input_sample, alloc_size))
+    if (AllocateInputSample(logger, mft, stream_id, input_sample, alloc_size))
         goto error;
 
     hr = input_sample->GetBufferByIndex(0, &input_media_buffer);
@@ -720,17 +719,17 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (FAILED(hr))
         goto error;
 
-    hr = p_sys->mft->ProcessInput(stream_id, input_sample.Get(), 0);
+    hr = mft->ProcessInput(stream_id, input_sample.Get(), 0);
     if (FAILED(hr))
     {
-        msg_Dbg(p_dec, "Failed to process input stream %lu (error 0x%lX)", stream_id, hr);
+        vlc_debug(logger, "Failed to process input stream %lu (error 0x%lX)", stream_id, hr);
         goto error;
     }
 
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)", hr);
+    vlc_error(logger, "Error in ProcessInputStream(). (hr=0x%lX)", hr);
     return VLC_EGENERIC;
 }
 
@@ -1143,7 +1142,7 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
                 {
                     size_t extrasize;
                     block_ChainProperties(p_xps_blocks, NULL, &extrasize, NULL);
-                    if (ProcessInputStream(vlc_object_logger(p_dec), *p_sys, p_sys->input_stream_id, p_xps_blocks))
+                    if (ProcessInputStream(vlc_object_logger(p_dec), p_sys->mft, p_sys->input_stream_id, p_xps_blocks))
                     {
                         block_ChainRelease(p_xps_blocks);
                         goto error;
@@ -1154,7 +1153,7 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
             }
         }
 
-        if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
+        if (ProcessInputStream(vlc_object_logger(p_dec), p_sys->mft, p_sys->input_stream_id, p_block))
             goto error;
         block_Release(p_block);
     }
@@ -1253,7 +1252,7 @@ static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
     }
 
     p_sys->pending_input_events -= 1;
-    if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
+    if (ProcessInputStream(vlc_object_logger(p_dec), p_sys->mft, p_sys->input_stream_id, p_block))
         goto error;
 
     block_Release(p_block);
