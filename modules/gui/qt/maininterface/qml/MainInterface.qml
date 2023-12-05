@@ -168,6 +168,9 @@ Item {
 
             onMediaLibraryVisibleChanged: {
                 if (MainCtx.mediaLibraryVisible) {
+                    if (History.match(History.viewPath, ["mc"]))
+                        return
+
                     // NOTE: Useful when we started the application on the 'player' view.
                     if (History.previousEmpty) {
                         if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
@@ -177,9 +180,6 @@ Item {
 
                         return
                     }
-
-                    if (History.match(History.viewPath, ["player"]))
-                        return
 
                     if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
                         MainPlaylistController.stop()
