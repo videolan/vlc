@@ -516,9 +516,9 @@ static void RenderBackground( const subpicture_region_t *p_region_in,
                     {
                         .xMin = __MAX(0, segmentbgbox.xMin - p_regionbbox->xMin),
                         .xMax = VLC_CLIP(segmentbgbox.xMax - p_regionbbox->xMin,
-                                         0, p_region_in->fmt.i_visible_width),
+                                         0, p_picture->format.i_visible_width),
                         .yMin = VLC_CLIP(p_regionbbox->yMax - segmentbgbox.yMin,
-                                         0, p_region_in->fmt.i_visible_height),
+                                         0, p_picture->format.i_visible_height),
                         .yMax = __MAX(0, p_regionbbox->yMax - segmentbgbox.yMax),
                     };
 
