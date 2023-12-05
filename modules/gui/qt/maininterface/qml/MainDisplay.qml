@@ -188,10 +188,13 @@ FocusScope {
             plListView: playlist
 
             onItemClicked: {
-                if (selectedIndex === index)
-                    return
-
                 const name = g_mainDisplay.tabModel.get(index).name
+
+                //don't add the ["mc"] prefix as we are only testing subviers from MainDisplay
+                if (stackView.isDefaulLoadedForPath([name])) {
+                    return
+                }
+
                 selectedIndex = index
                 History.push(["mc", name])
             }

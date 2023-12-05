@@ -51,7 +51,12 @@ Widgets.PageLoader {
 
         model: tabModel
 
-        onClicked: (index) => History.push([...root.pagePrefix, root.pageModel[index].name])
+        onClicked: (index) => {
+            const pageName = root.pageModel[index].name
+            if (root.isDefaulLoadedForPath([pageName]))
+                return
+            History.push([...root.pagePrefix, pageName])
+        }
     }
 
     //---------------------------------------------------------------------------------------------

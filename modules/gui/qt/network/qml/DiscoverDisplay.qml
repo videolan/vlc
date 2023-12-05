@@ -47,9 +47,11 @@ Widgets.PageLoader {
     Accessible.name: I18n.qtr("Discover view")
 
     function loadIndex(index) {
-        History.push([...root.pagePrefix, root.pageModel[index].name])
+        const pageName = root.pageModel[index].name
+        if (root.isDefaulLoadedForPath([pageName]))
+            return
+        History.push([...root.pagePrefix, pageName])
     }
-
 
     property ListModel tabModel: ListModel {
         Component.onCompleted: {
@@ -69,12 +71,7 @@ Widgets.PageLoader {
             currentView: root.pageName
             model: tabModel
 
-            onClicked: {
-                if (root.pageModel[index].name === root.pageName)
-                    return
-
-                root.loadIndex(index)
-            }
+            onClicked: (index) => root.loadIndex(index)
         }
     }
 }
