@@ -287,7 +287,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_sar_num = p_sys->i_sar_den = 1;
     }
 
-    p_sys->i_chroma = 0;
+    p_sys->i_chroma = VLC_CODEC_I420;
     val.psz_string = var_GetNonEmptyString( p_stream, CFG_PREFIX "chroma" );
     if( val.psz_string && strlen( val.psz_string ) >= 4 )
     {
@@ -584,7 +584,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     {
         video_format_t fmt_out;
 
-        video_format_Init( &fmt_out, p_sys->i_chroma ? p_sys->i_chroma : VLC_CODEC_I420 );
+        video_format_Init( &fmt_out, p_sys->i_chroma );
 
         ApplyRescale( &fmt_out, p_fmt_in, p_sys );
 
