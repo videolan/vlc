@@ -165,7 +165,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     char *argv[argc + 3];
     BOOL crash_handling = TRUE;
     int j = 0;
-    char *lang = NULL;
+    WCHAR *lang = NULL;
 
     argv[j++] = strdup("--media-library");
     argv[j++] = strdup("--no-ignore-config");
@@ -179,7 +179,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if (!wcsncmp(wargv[i], L"--language", 10) )
         {
             if (i < argc - 1 && wcsncmp( wargv[i + 1], L"--", 2 ))
-                lang = FromWide (wargv[++i]);
+                lang = _wcsdup (wargv[++i]);
             continue;
         }
 
@@ -220,14 +220,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
             WCHAR szData[256];
             DWORD len = 256;
             if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS )
-                lang = FromWide( szData );
+                lang = _wcsdup( szData );
         }
     }
 
-    if (lang && strncmp( lang, "auto", 4 ) )
+    if (lang && wcsncmp( lang, L"auto", 4 ) )
     {
         char tmp[11];
-        snprintf(tmp, 11, "LANG=%s", lang);
+        snprintf(tmp, 11, "LANG=%ls", lang);
         putenv(tmp);
     }
     free(lang);
