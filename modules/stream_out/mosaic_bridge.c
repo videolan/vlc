@@ -541,6 +541,36 @@ static void Del( sout_stream_t *p_stream, void *id )
     p_sys->b_inited = false;
 }
 
+static void ApplyRescale( video_format_t *dst,
+                          const video_format_t *src,
+                          const sout_stream_sys_t *sys )
+{
+    const unsigned dec_out_aspect = (int64_t)VOUT_ASPECT_FACTOR *
+                                    src->i_sar_num * src->i_width /
+                                    (src->i_sar_den * src->i_height);
+    if ( sys->i_height == 0 )
+    {
+        dst->i_width = sys->i_width;
+        dst->i_height = (sys->i_width * VOUT_ASPECT_FACTOR * sys->i_sar_num /
+                         sys->i_sar_den / dec_out_aspect) &
+                        ~0x1;
+    }
+    else if ( sys->i_width == 0 )
+    {
+        dst->i_height = sys->i_height;
+        dst->i_width = (sys->i_height * dec_out_aspect * sys->i_sar_den /
+                        sys->i_sar_num / VOUT_ASPECT_FACTOR) &
+                       ~0x1;
+    }
+    else
+    {
+        dst->i_width = sys->i_width;
+        dst->i_height = sys->i_height;
+    }
+    dst->i_visible_width = dst->i_width;
+    dst->i_visible_height = dst->i_height;
+}
+
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -556,31 +586,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
         video_format_Init( &fmt_out, p_sys->i_chroma ? p_sys->i_chroma : VLC_CODEC_I420 );
 
-        const unsigned i_fmt_in_aspect =
-            (int64_t)VOUT_ASPECT_FACTOR *
-            p_fmt_in->i_sar_num * p_fmt_in->i_width /
-            (p_fmt_in->i_sar_den * p_fmt_in->i_height);
-        if ( !p_sys->i_height )
-        {
-            fmt_out.i_width = p_sys->i_width;
-            fmt_out.i_height = (p_sys->i_width * VOUT_ASPECT_FACTOR
-                * p_sys->i_sar_num / p_sys->i_sar_den / i_fmt_in_aspect)
-                  & ~0x1;
-        }
-        else if ( !p_sys->i_width )
-        {
-            fmt_out.i_height = p_sys->i_height;
-            fmt_out.i_width = (p_sys->i_height * i_fmt_in_aspect
-                * p_sys->i_sar_den / p_sys->i_sar_num / VOUT_ASPECT_FACTOR)
-                  & ~0x1;
-        }
-        else
-        {
-            fmt_out.i_width = p_sys->i_width;
-            fmt_out.i_height = p_sys->i_height;
-        }
-        fmt_out.i_visible_width = fmt_out.i_width;
-        fmt_out.i_visible_height = fmt_out.i_height;
+        ApplyRescale( &fmt_out, p_fmt_in, p_sys );
 
         p_new_pic = image_Convert( p_owner->p_image,
                                    p_pic, p_fmt_in, &fmt_out );
