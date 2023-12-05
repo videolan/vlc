@@ -65,11 +65,12 @@ StackViewExt {
             currentItem.dismiss()
 
         if (path.length === 0) {
-            path = _getDefaultPage()
-            if (path.length === 0) {
+            const defaultPage = _getDefaultPage()
+            if (defaultPage === undefined) {
                 console.assert("trying to load an empty view path")
                 return false
             }
+            path = [defaultPage]
         }
 
         const head = path[0]
@@ -135,14 +136,47 @@ StackViewExt {
         return true
     }
 
+    /**
+     * @brief return true if the PageLoader is on the default page for
+     * the subpath @a path
+     * @arg {string[]} path - the (sub) path to check
+     * @return {boolean}
+     */
+    function isDefaulLoadedForPath(path) {
+        console.assert(Array.isArray(path))
+
+        let subPageName
+        if (path.length === 0) {
+            subPageName = _getDefaultPage()
+        } else {
+            //pops the first element of path, path now contains the tail of the list
+            subPageName = path.shift()
+        }
+
+        if (subPageName === undefined )
+            return false
+
+        if (subPageName !== root.pageName)
+            return false
+
+        if (!currentItem)
+            return false
+
+        if (typeof currentItem.isDefaulLoadedForPath === "function") {
+            return currentItem.isDefaulLoadedForPath(path)
+        }
+
+        return path.length === 0
+    }
+
     function _getDefaultPage() {
         for (let tab = 0; tab < pageModel.length; tab++ ) {
             if (pageModel[tab].default) {
-                return [pageModel[tab].name]
+                return pageModel[tab].name
             }
         }
         console.assert("no default page set")
-        return []
+        return undefined
     }
 
     function _reloadPage(path, properties, focusReason)
