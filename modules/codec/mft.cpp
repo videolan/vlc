@@ -621,9 +621,10 @@ error:
     return VLC_EGENERIC;
 }
 
-static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result)
+static int AllocateOutputSample(vlc_logger *logger, es_format_category_e cat,
+                                ComPtr<IMFTransform> & mft, DWORD stream_id,
+                                ComPtr<IMFSample> & result)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -635,7 +636,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSam
     DWORD allocation_size;
     DWORD alignment;
 
-    hr = p_sys->mft->GetOutputStreamInfo(stream_id, &output_info);
+    hr = mft->GetOutputStreamInfo(stream_id, &output_info);
     if (FAILED(hr))
         goto error;
 
@@ -645,7 +646,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSam
         return VLC_SUCCESS;
     }
 
-    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+    if (cat == VIDEO_ES)
     {
         const DWORD expected_flags =
                           MFT_OUTPUT_STREAM_WHOLE_SAMPLES
@@ -677,7 +678,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSam
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in AllocateOutputSample()");
+    vlc_error(logger, "Error in AllocateOutputSample(). (hr=0x%lX)", hr);
     return VLC_EGENERIC;
 }
 
@@ -841,7 +842,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             return VLC_EGENERIC;
 
         /* Reallocate output sample. */
-        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
+        if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat,
+                                 p_sys->mft, p_sys->output_stream_id, p_sys->output_sample))
             return VLC_EGENERIC;
         // there's an output ready, keep trying
         keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
@@ -1669,7 +1671,8 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Only one output sample is needed, we can allocate one and reuse it. */
-    if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
+    if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat, 
+                             p_sys->mft, p_sys->output_stream_id, p_sys->output_sample))
         goto error;
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
