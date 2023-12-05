@@ -467,10 +467,15 @@ T.Pane {
 
                 anchors.centerIn: parent
 
-                visible: (model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
+                visible: false
                 enabled: visible
 
                 opacity: (listView.activeFocus) ? 1.0 : 0.4
+
+                BindingCompat on visible {
+                    delayed: true
+                    value: (listView.model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
+                }
 
                 Widgets.IconLabel {
                     id: label
