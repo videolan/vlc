@@ -67,6 +67,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSFont+VLCAdditions.m \
 	gui/macosx/extensions/NSImage+VLCAdditions.h \
 	gui/macosx/extensions/NSImage+VLCAdditions.m \
+	gui/macosx/extensions/NSIndexSet+VLCAdditions.h \
+	gui/macosx/extensions/NSIndexSet+VLCAdditions.m \
 	gui/macosx/extensions/NSMenu+VLCAdditions.h \
 	gui/macosx/extensions/NSMenu+VLCAdditions.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
