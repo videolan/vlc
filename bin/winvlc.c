@@ -104,7 +104,11 @@ static void PrioritizeSystem32(void)
 #endif
     PROCESS_MITIGATION_IMAGE_LOAD_POLICY m = { .Flags = 0 };
     m.PreferSystem32Images = 1;
-    SetProcessMitigationPolicy( 10 /* ProcessImageLoadPolicy */, &m, sizeof( m ) );
+#if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
+    SetProcessMitigationPolicy( (PROCESS_MITIGATION_POLICY)10, &m, sizeof( m ) );
+#else
+    SetProcessMitigationPolicy( ProcessImageLoadPolicy, &m, sizeof( m ) );
+#endif
 }
 
 static void vlc_kill(void *data)
