@@ -167,8 +167,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     int j = 0;
     char *lang = NULL;
 
-    argv[j++] = FromWide( L"--media-library" );
-    argv[j++] = FromWide( L"--no-ignore-config" );
+    argv[j++] = strdup("--media-library");
+    argv[j++] = strdup("--no-ignore-config");
     for (int i = 1; i < argc; i++)
     {
         if(!wcscmp(wargv[i], L"--no-crashdump"))
