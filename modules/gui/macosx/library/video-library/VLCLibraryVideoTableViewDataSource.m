@@ -36,6 +36,7 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
+#import "extensions/NSIndexSet+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
@@ -224,17 +225,6 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
                                                     userInfo:nil];
 }
 
-- (NSSet<NSIndexPath *> *)indexPathSetWithIndexSet:(NSIndexSet *)indexSet
-                                       withSection:(NSInteger)section
-{
-    NSMutableSet<NSIndexPath *> * const indexPathSet = NSMutableSet.set;
-    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop){
-        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:idx inSection:section];
-        [indexPathSet addObject:indexPath];
-    }];
-    return indexPathSet.copy;
-}
-
 - (void)reloadDataForMediaItem:(VLCMediaLibraryMediaItem * const)mediaItem
                   inVideoGroup:(const VLCMediaLibraryParentGroupType)group
 {
@@ -247,7 +237,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
         const NSInteger section = [self videoGroupToRow:group];
-        NSSet<NSIndexPath *> * const indexPathSet = [self indexPathSetWithIndexSet:rowIndexSet withSection:section];
+        NSSet<NSIndexPath *> * const indexPathSet = [rowIndexSet indexPathSetWithSection:section];
         [self.collectionView insertItemsAtIndexPaths:indexPathSet];
 
         const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
@@ -273,14 +263,14 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     } completionHandler:^(NSIndexSet * const rowIndexSet){
 
         const NSInteger section = [self videoGroupToRow:group];
-        NSSet<NSIndexPath *> * const indexPathSet = [self indexPathSetWithIndexSet:rowIndexSet withSection:section];
+        NSSet<NSIndexPath *> * const indexPathSet = [rowIndexSet indexPathSetWithSection:section];
         [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
 
         const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
         if (selectedTableViewVideoGroup == group) {
             // Don't regenerate the groups by index as these do not change according to the notification
-        // Stick to the selection table view
-        [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+            // Stick to the selection table view
+            [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
         }
     }];
 }
