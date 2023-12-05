@@ -39,7 +39,6 @@
 #include <fcntl.h>
 #include <io.h>
 #include <shlobj.h>
-#define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 
 #ifdef HAVE_BREAKPAD
 void CheckCrashDump( const wchar_t* crashdump_path );
