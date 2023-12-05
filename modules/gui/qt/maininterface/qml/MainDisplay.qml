@@ -56,7 +56,6 @@ FocusScope {
     }
 
     property bool _showMiniPlayer: false
-    property var _oldViewProperties: ({}) // saves last state of the views
 
     // functions
 
@@ -194,10 +193,7 @@ FocusScope {
 
                 const name = g_mainDisplay.tabModel.get(index).name
                 selectedIndex = index
-                if (_oldViewProperties[name] === undefined)
-                    History.push(["mc", name])
-                else
-                    History.push(["mc", name], _oldViewProperties[name])
+                History.push(["mc", name])
             }
 
             Navigation.parentItem: mainColumn
