@@ -72,6 +72,7 @@ using Microsoft::WRL::ComPtr;
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 static int OpenMFTAudioEncoder(vlc_object_t *);
+static int OpenMFTVideoEncoder(vlc_object_t *);
 
 #define MFT_DEBUG_TEXT N_("Extra MFT Debug")
 #define MFT_DEBUG_LONGTEXT N_( "Show more MediaFoundation debug info, may be slower to load" )
@@ -93,6 +94,11 @@ vlc_module_begin()
     add_shortcut("mft")
     set_capability("audio encoder", 10) // less than DMO for now
     set_callback(OpenMFTAudioEncoder)
+
+    add_submodule()
+    add_shortcut("mft")
+    set_capability("video encoder", 10) // less than DMO for now
+    set_callback(OpenMFTVideoEncoder)
 vlc_module_end()
 
 class mft_sys_t : public vlc_mft_ref
@@ -116,6 +122,7 @@ public:
     ComPtr<IMFMediaEventGenerator> event_generator;
     int pending_input_events = 0;
     int pending_output_events = 0;
+    int pending_drain_events = 0;
     HRESULT DequeueMediaEvent(vlc_logger *, bool wait = false);
 
     /* Input stream */
@@ -238,6 +245,19 @@ protected:
     }
 
     bool IsEncoder() const final { return true; }
+};
+
+class mft_enc_video : public vlc_mft_d3d
+{
+public:
+
+    HRESULT ProcessInputPicture(struct vlc_logger *, picture_t *);
+    HRESULT ProcessOutput(vlc_logger *, block_t * & output);
+
+    bool IsEncoder() const final { return true; }
+
+private:
+    bool is_first_picture = true;
 };
 
 static const int pi_channels_maps[9] =
@@ -378,6 +398,27 @@ static HRESULT MFTypeFromAudio(vlc_fourcc_t audio_format, MFT_REGISTER_TYPE_INFO
 
     return E_INVALIDARG;
 }
+static vlc_fourcc_t MFFormatToCodec(const pair_format_guid table[], const GUID & guid)
+{
+    for (int i = 0; table[i].fourcc; ++i)
+        if (table[i].guid == guid)
+            return table[i].fourcc;
+
+    return 0;
+}
+
+static HRESULT MFTypeFromChroma(vlc_fourcc_t chroma, MFT_REGISTER_TYPE_INFO & info)
+{
+    for (int i = 0; chroma_format_table[i].fourcc; ++i)
+        if (chroma_format_table[i].fourcc == chroma)
+        {
+            info.guidMajorType = MFMediaType_Video;
+            info.guidSubtype = chroma_format_table[i].guid;
+            return S_OK;
+        }
+
+    return E_INVALIDARG;
+}
 
 HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO & type)
 {
@@ -415,8 +456,8 @@ HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_T
 
     if (fmt_in.i_cat == VIDEO_ES)
     {
-        UINT32 width = fmt_in.video.i_width;
-        UINT32 height = fmt_in.video.i_height;
+        UINT32 width = fmt_in.video.i_visible_width;
+        UINT32 height = fmt_in.video.i_visible_height;
         hr = MFSetAttributeSize(input_media_type.Get(), MF_MT_FRAME_SIZE, width, height);
         if (FAILED(hr))
             goto error;
@@ -543,8 +584,16 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
 
         if (fmt_out.i_cat == VIDEO_ES)
         {
-            if(MFFormatToChroma(subtype) != 0)
-                output_type_index = i;
+            if (IsEncoder())
+            {
+                if (MFFormatToCodec(video_codec_table, subtype) != 0)
+                    output_type_index = i;
+            }
+            else
+            {
+                if(MFFormatToChroma(subtype) != 0)
+                    output_type_index = i;
+            }
         }
         else
         {
@@ -593,6 +642,56 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
     if (FAILED(hr))
         goto error;
 
+    if (fmt_out.i_cat == VIDEO_ES)
+    {
+        if (IsEncoder())
+        {
+            fmt_out.i_codec = MFFormatToCodec(video_codec_table, subtype);
+        }
+        else
+        {
+            /* Transform might offer output in a D3DFMT proprietary FCC */
+            fmt_out.i_codec = MFFormatToChroma(subtype);
+            if(!fmt_out.i_codec) {
+                if (subtype == MFVideoFormat_IYUV)
+                    subtype = MFVideoFormat_I420;
+                fmt_out.i_codec = vlc_fourcc_GetCodec(VIDEO_ES, subtype.Data1);
+            }
+        }
+    }
+
+    if (fmt_out.i_cat == VIDEO_ES && fmt_out.i_codec == VLC_CODEC_H264)
+    {
+        if (fmt_out.i_bitrate != 0)
+            output_media_type->SetUINT32(MF_MT_AVG_BITRATE, fmt_out.i_bitrate);
+        else
+            output_media_type->SetUINT32(MF_MT_AVG_BITRATE, 1000000);
+
+        if (fmt_out.video.i_frame_rate && fmt_out.video.i_frame_rate_base)
+        {
+            hr = MFSetAttributeRatio(output_media_type.Get(), MF_MT_FRAME_RATE,
+                                     fmt_out.video.i_frame_rate,
+                                     fmt_out.video.i_frame_rate_base);
+        }
+
+        hr = MFSetAttributeRatio(output_media_type.Get(), MF_MT_FRAME_SIZE,
+                                    fmt_out.video.i_visible_width,
+                                    fmt_out.video.i_visible_height);
+
+        hr = output_media_type->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
+
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+        bool isWin81OrGreater = false;
+        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        if (likely(hKernel32 != NULL))
+            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+        eAVEncH264VProfile profile = isWin81OrGreater ? eAVEncH264VProfile_High : eAVEncH264VProfile_Main;
+#else
+        eAVEncH264VProfile profile = eAVEncH264VProfile_High;
+#endif
+        hr = output_media_type->SetUINT32(MF_MT_MPEG2_PROFILE, profile);
+    }
+
     hr = mft->SetOutputType(output_stream_id, output_media_type.Get(), 0);
     if (FAILED(hr))
     {
@@ -604,16 +703,6 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
 
     if (fmt_out.i_cat == VIDEO_ES)
     {
-        /* Transform might offer output in a D3DFMT proprietary FCC */
-        vlc_fourcc_t fcc = MFFormatToChroma(subtype);
-        if(!fcc) {
-            if (subtype == MFVideoFormat_IYUV)
-                subtype = MFVideoFormat_I420;
-            fcc = vlc_fourcc_GetCodec(VIDEO_ES, subtype.Data1);
-        }
-
-        fmt_out.i_codec = fcc;
-
         if (fmt_out.i_codec == VLC_CODEC_H264)
         {
             UINT32 blob_size = 0;
@@ -740,7 +829,7 @@ HRESULT mft_sys_t::AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSamp
         return S_FALSE;
     }
 
-    if (cat == VIDEO_ES)
+    if (cat == VIDEO_ES && !IsEncoder())
     {
         const DWORD expected_flags =
                           MFT_OUTPUT_STREAM_WHOLE_SAMPLES
@@ -770,6 +859,92 @@ HRESULT mft_sys_t::AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSamp
     result.Swap(output_sample);
 
     return S_OK;
+}
+
+HRESULT mft_enc_video::ProcessInputPicture(vlc_logger *logger, picture_t *p_pic)
+{
+    HRESULT hr;
+    ComPtr<IMFSample> input_sample;
+
+    const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( p_pic->format.i_chroma );
+    if( !p_chroma_desc )
+        return E_INVALIDARG;
+
+    plane_t dst_planes[PICTURE_PLANE_MAX];
+    DWORD alloc_size = 0;
+    for( unsigned i = 0; i < p_chroma_desc->plane_count; i++ )
+    {
+        plane_t *p = &dst_planes[i];
+
+        p->i_lines         =
+        p->i_visible_lines = p_pic->format.i_visible_height * p_chroma_desc->p[i].h.num / p_chroma_desc->p[i].h.den;
+        p->i_pitch         =
+        p->i_visible_pitch = p_pic->format.i_visible_width * p_chroma_desc->p[i].w.num / p_chroma_desc->p[i].w.den * p_chroma_desc->pixel_size;
+        alloc_size += p->i_pitch * p->i_lines;
+    }
+
+    vlc_tick_t ts;
+    ComPtr<IMFMediaBuffer> input_media_buffer;
+    UINT64 frame_ratio_num = p_pic->format.i_frame_rate;
+    UINT64 frame_ratio_den = p_pic->format.i_frame_rate_base;
+
+    hr = AllocateInputSample(logger, mft, input_stream_id, input_sample, alloc_size);
+    if (FAILED(hr))
+        goto error;
+
+    hr = input_sample->GetBufferByIndex(0, &input_media_buffer);
+    if (FAILED(hr))
+        goto error;
+
+    BYTE *buffer_start;
+    hr = input_media_buffer->Lock(&buffer_start, NULL, NULL);
+    if (FAILED(hr))
+        goto error;
+
+    alloc_size = 0;
+    for( unsigned i = 0; i < p_chroma_desc->plane_count; i++ )
+    {
+        plane_t *p = &dst_planes[i];
+        p->p_pixels = &buffer_start[alloc_size];
+        plane_CopyPixels(p, &p_pic->p[i]);
+        alloc_size += p->i_pitch * p->i_lines;
+    }
+
+    hr = input_media_buffer->Unlock();
+    if (FAILED(hr))
+        goto error;
+
+    hr = input_media_buffer->SetCurrentLength(alloc_size);
+    if (FAILED(hr))
+        goto error;
+
+    ts = p_pic->date;
+
+    /* Convert from microseconds to 100 nanoseconds unit. */
+    hr = input_sample->SetSampleTime(MSFTIME_FROM_VLC_TICK(ts));
+    if (FAILED(hr))
+        goto error;
+
+    hr = input_sample->SetSampleDuration(INT64_C(10000000) * frame_ratio_den / frame_ratio_num);
+
+    if (is_first_picture)
+    {
+        input_sample->SetUINT32(MFSampleExtension_Discontinuity, TRUE);
+        is_first_picture = false;
+    }
+
+    hr = mft->ProcessInput(input_stream_id, input_sample.Get(), 0);
+    if (FAILED(hr))
+    {
+        vlc_debug(logger, "Failed to process input stream %lu (error 0x%lX)", input_stream_id, hr);
+        goto error;
+    }
+
+    return hr;
+
+error:
+    vlc_error(logger, "Error in ProcessInputStream(). (hr=0x%lX)", hr);
+    return hr;
 }
 
 static int ProcessInputStream(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, block_t *p_block)
@@ -1152,6 +1327,8 @@ HRESULT mft_sys_t::DequeueMediaEvent(vlc_logger *logger, bool wait)
         pending_input_events += 1;
     else if (event_type == METransformHaveOutput)
         pending_output_events += 1;
+    else if (event_type == METransformDrainComplete)
+        pending_drain_events += 1;
     else
         vlc_error(logger, "Unsupported asynchronous event %lu.", event_type);
 
@@ -1581,6 +1758,256 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
+HRESULT mft_enc_video::ProcessOutput(vlc_logger *logger, block_t * & output)
+{
+    output = nullptr;
+    HRESULT hr;
+    while (!is_async || pending_output_events > 0)
+    {
+        ComPtr<IMFSample> output_sample;
+        hr = AllocateOutputSample(VIDEO_ES, output_sample);
+        if (FAILED(hr))
+        {
+            vlc_error(logger, "Error in AllocateOutputSample(). (hr=0x%lX)", hr);
+            break;
+        }
+
+        DWORD output_status = 0;
+        MFT_OUTPUT_DATA_BUFFER output_buffer = { output_stream_id, output_sample.Get(), 0, NULL };
+        hr = mft->ProcessOutput(0, 1, &output_buffer, &output_status);
+        if (output_buffer.pEvents)
+            output_buffer.pEvents->Release();
+        if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
+            break;
+        pending_output_events--;
+
+        if (FAILED(hr))
+        {
+            vlc_debug(logger, "Failed to process video output stream %lu (error 0x%lX)", output_stream_id, hr);
+            return hr;
+        }
+
+        if (output_buffer.pSample == nullptr)
+            break;
+
+        LONGLONG sample_time;
+        hr = output_buffer.pSample->GetSampleTime(&sample_time);
+        if (FAILED(hr))
+        {
+            vlc_debug(logger, "Failed to get output time. (hr=0x%lX)", hr);
+            // if (output_sample.Get() == nullptr)
+            //     output_buffer.pSample->Release();
+            return hr;
+        }
+
+        DWORD output_count = 0;
+        hr = output_buffer.pSample->GetBufferCount(&output_count);
+        if (unlikely(FAILED(hr)))
+        {
+            vlc_debug(logger, "Failed to get output buffer count. (hr=0x%lX)", hr);
+            // if (output_sample.Get() == nullptr)
+            //     output_buffer.pSample->Release();
+            return hr;
+        }
+
+        for (DWORD buf_index = 0; buf_index < output_count; buf_index++)
+        {
+            ComPtr<IMFMediaBuffer> output_media_buffer;
+            hr = output_buffer.pSample->GetBufferByIndex(buf_index, &output_media_buffer);
+            if (FAILED(hr))
+            {
+                vlc_debug(logger, "Failed to get output buffer %lu. (hr=0x%lX)", buf_index, hr);
+                // if (output_sample.Get() == nullptr)
+                //     output_buffer.pSample->Release();
+                return hr;
+            }
+
+            DWORD total_length = 0;
+            hr = output_media_buffer->GetCurrentLength(&total_length);
+            if (FAILED(hr))
+            {
+                vlc_debug(logger, "Failed to get output buffer %lu length. (hr=0x%lX)", buf_index, hr);
+                // if (output_sample.Get() == nullptr)
+                //     output_buffer.pSample->Release();
+                return hr;
+            }
+
+            block_t *vout_buffer = block_Alloc(total_length);
+            if (unlikely(vout_buffer == nullptr))
+            {
+                // if (output_sample.Get() == nullptr)
+                //     output_buffer.pSample->Release();
+                hr = E_OUTOFMEMORY;
+                return hr;
+            }
+
+            BYTE *buffer_start;
+            hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
+            if (FAILED(hr))
+            {
+                vlc_debug(logger, "Failed to lock output buffer %lu. (hr=0x%lX)", buf_index, hr);
+                // if (output_sample.Get() == nullptr)
+                //     output_buffer.pSample->Release();
+                block_Release(vout_buffer);
+                return hr;
+            }
+
+            memcpy(vout_buffer->p_buffer, buffer_start, total_length);
+
+            hr = output_media_buffer->Unlock();
+
+            if (output_sample.Get() == nullptr)
+                /* Sample is not provided by the MFT: clear its content. */
+                output_media_buffer->SetCurrentLength(0);
+
+            if (FAILED(hr))
+            {
+                vlc_debug(logger, "Failed to unlock output buffer %lu. (hr=0x%lX)", buf_index, hr);
+                // if (output_sample.Get() == nullptr)
+                //     output_buffer.pSample->Release();
+                block_Release(vout_buffer);
+                return hr;
+            }
+
+            // Convert from 100 nanoseconds unit to vlc ticks.
+            vout_buffer->i_dts = vout_buffer->i_pts = VLC_TICK_FROM_MSFTIME(sample_time);
+            UINT64 decode_timestamp;
+            hr = output_buffer.pSample->GetUINT64(MFSampleExtension_DecodeTimestamp, &decode_timestamp);
+            if (SUCCEEDED(hr))
+                vout_buffer->i_dts = VLC_TICK_FROM_MSFTIME(decode_timestamp);
+
+            UINT32 is_keyframe = FALSE;
+            hr = output_buffer.pSample->GetUINT32(MFSampleExtension_CleanPoint, &is_keyframe);
+            if (SUCCEEDED(hr) && is_keyframe)
+                vout_buffer->i_flags |= BLOCK_FLAG_TYPE_I;
+
+            if (output == nullptr)
+                output = vout_buffer;
+            else
+                block_ChainAppend(&output, vout_buffer);
+        }
+    }
+    return S_OK;
+}
+
+static block_t *EncodeVideoAsync(encoder_t *p_enc, picture_t *p_pic)
+{
+    mft_enc_video *p_sys = static_cast<mft_enc_video*>(p_enc->p_sys);
+    block_t *output = nullptr;
+
+    if (p_pic == nullptr)
+    {
+        HRESULT hr;
+        hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
+        if (FAILED(hr))
+        {
+            msg_Warn(p_enc, "draining failed (hr=0x%lX)", hr);
+            return nullptr;
+        }
+        while (p_sys->pending_drain_events == 0)
+        {
+            hr = p_sys->DequeueMediaEvent(vlc_object_logger(p_enc), true);
+            if (FAILED(hr))
+                goto error;
+
+            while (p_sys->pending_output_events > 0)
+            {
+                hr = p_sys->ProcessOutput(vlc_object_logger(p_enc), output);
+                if (FAILED(hr))
+                {
+                    goto error;
+                }
+            }
+        }
+        p_sys->pending_drain_events = 0;
+        return output;
+    }
+
+    HRESULT hr;
+    /* Dequeue all pending media events. */
+    while ((hr = p_sys->DequeueMediaEvent(vlc_object_logger(p_enc))) == S_OK)
+        continue;
+    if (hr != MF_E_NO_EVENTS_AVAILABLE && FAILED(hr))
+        goto error;
+
+    /* Drain the output stream of the MFT before sending the input packet. */
+    while (p_sys->pending_output_events > 0)
+    {
+        hr = p_sys->ProcessOutput(vlc_object_logger(p_enc), output);
+        if (FAILED(hr))
+        {
+            break;
+        }
+    }
+
+    if (p_pic != nullptr)
+    {
+        /* Poll the MFT and return decoded frames until the input stream is ready. */
+        while (p_sys->pending_input_events == 0)
+        {
+            hr = p_sys->DequeueMediaEvent(vlc_object_logger(p_enc), true);
+            if (FAILED(hr))
+                goto error;
+
+            while (p_sys->pending_output_events > 0)
+            {
+                hr = p_sys->ProcessOutput(vlc_object_logger(p_enc), output);
+                if (FAILED(hr))
+                {
+                    goto error;
+                }
+            }
+        }
+
+        p_sys->pending_input_events -= 1;
+        hr = p_sys->ProcessInputPicture(vlc_object_logger(p_enc), p_pic);
+        if (FAILED(hr))
+            goto error;
+    }
+
+error:
+    return output;
+}
+
+static block_t * EncodeVideo(encoder_t *p_enc, picture_t *p_pic)
+{
+    mft_enc_video *p_sys = static_cast<mft_enc_video*>(p_enc->p_sys);
+
+    if (p_pic == nullptr)
+    {
+        HRESULT hr;
+        hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
+        if (FAILED(hr))
+        {
+            msg_Warn(p_enc, "draining failed (hr=0x%lX)", hr);
+            return nullptr;
+        }
+    }
+
+    /* Drain the output stream before sending the input packet. */
+    block_t *output = nullptr;
+    HRESULT hr = p_sys->ProcessOutput(vlc_object_logger(p_enc), output);
+    if (FAILED(hr))
+    {
+        if (output)
+            block_Release(output);
+        return nullptr;
+    }
+
+    if (p_pic != nullptr)
+    {
+        hr = p_sys->ProcessInputPicture(vlc_object_logger(p_enc), p_pic);
+        if (FAILED(hr))
+        {
+            if (output)
+                block_Release(output);
+            return nullptr;
+        }
+    }
+
+    return output;
+}
+
 static block_t * EncodeAudio(encoder_t *p_enc, block_t *p_aout_buffer)
 {
     mft_enc_audio *p_sys = static_cast<mft_enc_audio*>(p_enc->p_sys);
@@ -1627,7 +2054,7 @@ static block_t * EncodeAudio(encoder_t *p_enc, block_t *p_aout_buffer)
         if (FAILED(hr))
         {
             msg_Dbg(p_enc, "Failed to process audio output stream %lu (error 0x%lX)", p_sys->output_stream_id, hr);
-    return nullptr;
+            return nullptr;
         }
 
         if (output_buffer.pSample == nullptr)
@@ -1823,6 +2250,145 @@ error:
     return VLC_ENOTSUP;
 }
 
+static int OpenMFTVideoEncoder(vlc_object_t *p_this)
+{
+    encoder_t *p_enc = (encoder_t*)p_this;
+
+    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+        return VLC_EINVAL;
+
+    HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+    if (FAILED(hr))
+    {
+        CoUninitialize();
+        return VLC_ENOTSUP;
+    }
+
+    mft_enc_video *p_sys = new (std::nothrow) mft_enc_video();
+    if (unlikely(p_sys == nullptr))
+    {
+        MFShutdown();
+        CoUninitialize();
+        return VLC_ENOMEM;
+    }
+    p_enc->p_sys = p_sys;
+
+    GUID category = MFT_CATEGORY_VIDEO_ENCODER;
+    MFT_REGISTER_TYPE_INFO input_type, output_type;
+    IMFActivate **activate_objects = nullptr;
+    UINT32 activate_objects_count = 0;
+    UINT32 flags;
+    bool found = false;
+
+    hr = MFTypeFromChroma(p_enc->fmt_in.video.i_chroma, input_type);
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_this, "Input codec %4.4s not supported by MediaFoundation",
+                (char*)&p_enc->fmt_in.i_codec);
+        goto error;
+    }
+
+    hr = MFTypeFromCodec(MFMediaType_Video, p_enc->fmt_out.i_codec, output_type);
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_this, "Output codec %4.4s not supported by MediaFoundation",
+                (char*)&p_enc->fmt_out.i_codec);
+        goto error;
+    }
+
+    ListTransforms(vlc_object_logger(p_this), category, "video encoder", var_InheritBool(p_this, "mft-debug"));
+
+    flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
+            | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
+            | MFT_ENUM_FLAG_HARDWARE;
+
+    hr = MFTEnumEx(category, flags, &input_type, &output_type, &activate_objects, &activate_objects_count);
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_enc, "Failed to enumerate MFT modules for %4.4s", (const char*)&p_enc->fmt_out.i_codec);
+        goto error;
+    }
+    if (activate_objects_count == 0)
+    {
+        // try the other raw input format
+        input_type.guidSubtype = MFVideoFormat_NV12;
+        hr = MFTEnumEx(category, flags, &input_type, &output_type, &activate_objects, &activate_objects_count);
+        if (FAILED(hr))
+        {
+            msg_Dbg(p_enc, "Failed to enumerate MFT modules for %4.4s", (const char*)&p_enc->fmt_out.i_codec);
+            goto error;
+        }
+    }
+    msg_Dbg(p_enc, "Found %d available MFT module(s) for %4.4s to %4.4s", activate_objects_count,
+            (const char*)&p_enc->fmt_in.i_codec, (const char*)&p_enc->fmt_out.i_codec);
+    if (activate_objects_count == 0)
+        goto error;
+
+    for (UINT32 i = 0; i < activate_objects_count; ++i)
+    {
+        WCHAR Name[256];
+        hr = activate_objects[i]->GetString(MFT_FRIENDLY_NAME_Attribute, Name, ARRAY_SIZE(Name), nullptr);
+        if (FAILED(hr))
+            wcsncpy(Name, L"<unknown>", ARRAY_SIZE(Name));
+        hr = activate_objects[i]->ActivateObject(IID_PPV_ARGS(p_sys->mft.ReleaseAndGetAddressOf()));
+        if (FAILED(hr))
+        {
+            msg_Warn(p_enc, "Failed to initialize %ls encoder", Name);
+            continue;
+        }
+
+        if (InitializeEncoder(vlc_object_logger(p_this), *p_sys) == VLC_SUCCESS)
+        {
+            msg_Dbg(p_enc, "Using video encoder %ls", Name);
+            found = true;
+            break;
+        }
+    }
+    for (UINT32 i = 0; i < activate_objects_count; ++i)
+        activate_objects[i]->Release();
+    CoTaskMemFree(activate_objects);
+    if (!found)
+        goto error;
+
+    p_enc->fmt_in.i_codec = MFFormatToChroma(input_type.guidSubtype);
+    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
+
+    if (p_sys->SetOutputType(vlc_object_logger(p_this),
+                             output_type.guidSubtype, p_enc->fmt_out))
+        goto error;
+
+    hr = p_sys->SetInputType(p_enc->fmt_in, input_type);
+    if (FAILED(hr))
+    {
+        msg_Err(p_enc, "Error in SetInputType(). (hr=0x%lX)", hr);
+        goto error;
+    }
+
+    /* This event is required for asynchronous MFTs, optional otherwise. */
+    hr = p_sys->startStream();
+    if (FAILED(hr))
+        goto error;
+
+    static const struct vlc_encoder_operations video_ops = []{
+        struct vlc_encoder_operations cbs{};
+        cbs.close = EncoderClose;
+        cbs.encode_video = EncodeVideo;
+        return cbs;
+    }();
+    static const struct vlc_encoder_operations video_async_ops = []{
+        struct vlc_encoder_operations cbs{};
+        cbs.close = EncoderClose;
+        cbs.encode_video = EncodeVideoAsync;
+        return cbs;
+    }();
+    p_enc->ops = p_sys->is_async ? &video_async_ops : &video_ops;
+
+    return VLC_SUCCESS;
+
+error:
+    EncoderClose(p_enc);
+    return VLC_ENOTSUP;
+}
 
 static int OpenMFTAudioEncoder(vlc_object_t *p_this)
 {
@@ -1933,7 +2499,7 @@ static int OpenMFTAudioEncoder(vlc_object_t *p_this)
                              output_type.guidSubtype, p_enc->fmt_out))
         goto error;
 
-    hr = p_sys->SetInputType(p_enc->fmt_in, input_type.guidSubtype);
+    hr = p_sys->SetInputType(p_enc->fmt_in, input_type);
     if (FAILED(hr))
     {
         msg_Err(p_enc, "Error in SetInputType(). (hr=0x%lX)", hr);
