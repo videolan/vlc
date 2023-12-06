@@ -569,6 +569,21 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
         }
 
         fmt_out.i_codec = fcc;
+
+        if (fmt_out.i_codec == VLC_CODEC_H264)
+        {
+            UINT32 blob_size = 0;
+            hr = output_media_type->GetBlobSize(MF_MT_MPEG_SEQUENCE_HEADER, &blob_size);
+            if (SUCCEEDED(hr) && blob_size != 0)
+            {
+                fmt_out.i_extra = blob_size;
+                fmt_out.p_extra = malloc(fmt_out.i_extra);
+                if (unlikely(fmt_out.p_extra == nullptr))
+                    goto error;
+                output_media_type->GetBlob(MF_MT_MPEG_SEQUENCE_HEADER,
+                    static_cast<UINT8*>(fmt_out.p_extra), fmt_out.i_extra, nullptr);
+            }
+        }
     }
     else
     {
