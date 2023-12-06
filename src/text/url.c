@@ -892,7 +892,8 @@ static int IdnToAscii(DWORD flags, LPCWSTR str, int len, LPWSTR buf, int size)
     int (WINAPI *IdnToAsciiReal)(DWORD, LPCWSTR, int, LPWSTR, int);
     int ret = 0;
 
-    IdnToAsciiReal = GetProcAddress(h, "IdnToAscii");
+    IdnToAsciiReal = (int (WINAPI *)(DWORD, LPCWSTR, int, LPWSTR, int))
+                     GetProcAddress(h, "IdnToAscii");
     if (IdnToAsciiReal != NULL)
         ret = IdnToAsciiReal(flags, str, len, buf, size);
     else

@@ -45,7 +45,8 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
 
     BOOL (WINAPI *SetThreadErrorModeReal)(DWORD, DWORD *);
 
-    SetThreadErrorModeReal = GetProcAddress(h, "SetThreadErrorMode");
+    SetThreadErrorModeReal = (BOOL (WINAPI *)(DWORD, DWORD *))
+                              GetProcAddress(h, "SetThreadErrorMode");
     if (SetThreadErrorModeReal != NULL)
         return SetThreadErrorModeReal(mode, oldmode);
 
