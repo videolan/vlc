@@ -710,13 +710,13 @@ static int ProcessInputStream(struct vlc_logger *logger, ComPtr<IMFTransform> & 
     if (FAILED(hr))
         goto error;
 
-    memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
+    memcpy(buffer_start, p_block->p_buffer, alloc_size);
 
     hr = input_media_buffer->Unlock();
     if (FAILED(hr))
         goto error;
 
-    hr = input_media_buffer->SetCurrentLength(p_block->i_buffer);
+    hr = input_media_buffer->SetCurrentLength(alloc_size);
     if (FAILED(hr))
         goto error;
 
