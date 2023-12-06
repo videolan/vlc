@@ -2182,11 +2182,11 @@ ctx_init(struct ctx *ctx, enum ctx_flags flags)
         /* Avoid leaks from various dlopen... */
         "--codec=araw,rawvideo,subsdec,"TELETEXT_DECODER"none",
         "--dec-dev=none",
-        (flags & DISABLE_VIDEO_OUTPUT) ? "--vout=none" : "--vout=dummy",
-        (flags & DISABLE_AUDIO_OUTPUT) ? "--aout=none" : "--aout=test_src_player",
+        (flags & DISABLE_VIDEO_OUTPUT) ? "--vout=none" : "--vout=dummy,none",
+        (flags & DISABLE_AUDIO_OUTPUT) ? "--aout=none" : "--aout=test_src_player,none",
         (flags & DISABLE_VIDEO) ? "--no-video" : "--video",
         (flags & DISABLE_AUDIO) ? "--no-audio" : "--audio",
-        "--text-renderer=tdummy",
+        "--text-renderer=tdummy,none",
 #ifdef TEST_CLOCK_MONOTONIC
         "--clock-master=monotonic",
 #endif
