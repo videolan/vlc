@@ -157,8 +157,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
-	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.m \
+	gui/macosx/library/video-library/VLCLibraryVideoDataSource.h \
+	gui/macosx/library/video-library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDelegate.h \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDelegate.m \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h \

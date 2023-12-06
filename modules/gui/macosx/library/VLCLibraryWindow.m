@@ -48,7 +48,7 @@
 #import "library/home-library/VLCLibraryHomeViewController.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
-#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"

@@ -27,7 +27,6 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
@@ -41,7 +40,7 @@
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
-#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 
 #import "main/VLCMain.h"
@@ -114,7 +113,7 @@
 - (void)setupDataSource
 {
     _videoLibrarySplitView.delegate = _splitViewDelegate;
-    _libraryVideoDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
+    _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
@@ -287,7 +286,7 @@
 - (void)presentLibraryItemWaitForTableViewDataSourceFinished:(NSNotification *)notification
 {
     [NSNotificationCenter.defaultCenter removeObserver:self
-                                                  name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                                  name:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                              object:self.libraryVideoDataSource];
 
     const NSInteger rowForLibraryItem = [self.libraryVideoDataSource rowForLibraryItem:_awaitingPresentingLibraryItem];
@@ -313,7 +312,7 @@
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForTableViewDataSourceFinished:)
-                                               name:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+                                               name:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                              object:self.libraryVideoDataSource];
 
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {

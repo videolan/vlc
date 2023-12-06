@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoTableViewDataSource.m: MacOS X interface module
+ * VLCLibraryVideoDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoTableViewDataSource.h"
+#import "VLCLibraryVideoDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -40,9 +40,9 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
-NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification";
+NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification";
 
-@interface VLCLibraryVideoTableViewDataSource ()
+@interface VLCLibraryVideoDataSource ()
 {
     NSArray *_recentsArray;
     NSArray *_libraryArray;
@@ -52,7 +52,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
 @end
 
-@implementation VLCLibraryVideoTableViewDataSource
+@implementation VLCLibraryVideoDataSource
 
 - (instancetype)init
 {
@@ -179,7 +179,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
     [self.groupSelectionTableView reloadData];
     [self.collectionView reloadData];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                                       object:self
                                                     userInfo:nil];
 }
@@ -220,7 +220,7 @@ NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNot
 
     NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:mediaItemIndex];
     completionHandler(rowIndexSet);
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                                       object:self
                                                     userInfo:nil];
 }

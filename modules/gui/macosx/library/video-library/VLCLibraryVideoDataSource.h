@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VVLCLibraryVideoTableViewDataSource.h: MacOS X interface module
+ * VVLCLibraryVideoDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -29,9 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryVideoTableViewDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryVideoDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
-extern NSString * const VLCLibraryVideoTableViewDataSourceDisplayedCollectionChangedNotification;
+extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification;
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSCollectionView *collectionView;

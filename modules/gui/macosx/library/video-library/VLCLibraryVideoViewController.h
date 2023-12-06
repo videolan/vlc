@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCLibraryWindow;
-@class VLCLibraryVideoTableViewDataSource;
+@class VLCLibraryVideoDataSource;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
 
-@property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoDataSource;
+@property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
 
 @property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 

@@ -22,7 +22,7 @@
 
 #import "VLCLibraryVideoTableViewDelegate.h"
 
-#import "VLCLibraryVideoTableViewDataSource.h"
+#import "VLCLibraryVideoDataSource.h"
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -56,8 +56,8 @@
 
     VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
 
-    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoTableViewDataSource class]]) {
-        VLCLibraryVideoTableViewDataSource * const videoTableViewDataSource = (VLCLibraryVideoTableViewDataSource *)vlcDataSource;
+    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
+        VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
         NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
 
         if (tableView == groupsTableView) {
@@ -82,8 +82,8 @@
     NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
     NSAssert(vlcDataSource != nil, @"Should be a valid data source");
 
-    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoTableViewDataSource class]]) {
-        VLCLibraryVideoTableViewDataSource * const videoTableViewDataSource = (VLCLibraryVideoTableViewDataSource *)vlcDataSource;
+    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
+        VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
         NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
 
         if (tableView == videoTableViewDataSource.groupsTableView) {
