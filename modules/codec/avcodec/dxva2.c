@@ -84,12 +84,12 @@ DEFINE_GUID(DXVA_Intel_H264_NoFGT_ClearVideo,       0x604F8E68, 0x4951, 0x4c54, 
 
 /* XXX Preferred format must come first */
 static const d3d9_format_t d3d_formats[] = {
-    { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
-    { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
-    //{ "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
-    { "P010",   MAKEFOURCC('P','0','1','0'),    VLC_CODEC_P010 },
+    { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12, 0,0,0 },
+    { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12, 0,0,0 },
+    //{ "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12, 0,0,0 },
+    { "P010",   MAKEFOURCC('P','0','1','0'),    VLC_CODEC_P010, 0,0,0 },
 
-    { NULL, 0, 0 }
+    { NULL, 0, 0, 0,0,0 }
 };
 
 static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
