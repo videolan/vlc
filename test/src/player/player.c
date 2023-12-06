@@ -27,6 +27,7 @@
 #include <vlc_player.h>
 #include <vlc_vector.h>
 #include <vlc_modules.h>
+#include <vlc_filter.h>
 
 #if defined(ZVBI_COMPILED)
 # define TELETEXT_DECODER "zvbi,"
@@ -3072,6 +3073,26 @@ static int aout_Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+static block_t *resampler_Resample(filter_t *filter, block_t *in)
+{
+    VLC_UNUSED(filter);
+    return in;
+}
+
+static void resampler_Close(filter_t *filter)
+{
+    VLC_UNUSED(filter);
+}
+
+static int resampler_Open(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+    static const struct vlc_filter_operations filter_ops =
+    { .filter_audio = resampler_Resample, .close = resampler_Close, };
+    filter->ops = &filter_ops;
+    return VLC_SUCCESS;
+}
+
 vlc_module_begin()
     /* This aout module will report audio timings perfectly, but without any
      * delay, in order to be usable for player tests. Indeed, this aout will
@@ -3079,6 +3100,11 @@ vlc_module_begin()
      * future (like when aout->time_get() is used). */
     set_capability("audio output", 0)
     set_callbacks(aout_Open, aout_Close)
+    add_submodule ()
+    /* aout will insert a resampler that can have samples delay, even for 1:1
+     * Insert our own resampler that keeps blocks and pts untouched. */
+        set_capability ("audio resampler", 9999)
+        set_callback (resampler_Open)
 vlc_module_end()
 
 VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
