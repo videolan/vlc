@@ -286,6 +286,13 @@ static const pair_format_guid video_format_table[] =
     { VLC_CODEC_WMV3, MFVideoFormat_WMV3 },
     { VLC_CODEC_VC1,  MFVideoFormat_WVC1 },
     { VLC_CODEC_AV1,  MFVideoFormat_AV1 },
+
+    { VLC_CODEC_NV12,  MFVideoFormat_NV12 },
+    { VLC_CODEC_I420,  MFVideoFormat_I420 },
+    { VLC_CODEC_YV12,  MFVideoFormat_YV12 },
+    { VLC_CODEC_YV12,  MFVideoFormat_IYUV },
+    { VLC_CODEC_YUYV,  MFVideoFormat_YUY2 },
+
     { 0, GUID_NULL }
 };
 
