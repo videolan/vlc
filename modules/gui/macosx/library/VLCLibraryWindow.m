@@ -583,6 +583,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self insertToolbarItem:_librarySearchToolbarItem inFrontOf:reversedCurrentToolbarItems];
 }
 
+- (void)setViewModeToolbarItemVisible:(BOOL)visible
+{
+    if (!visible) {
+        [self hideToolbarItem:_libraryViewModeToolbarItem];
+        return;
+    }
+
+    [self insertToolbarItem:_libraryViewModeToolbarItem inFrontOf:@[_forwardsToolbarItem, _backwardsToolbarItem]];
+}
+
 - (void)updatePlayqueueToggleState
 {
     _playQueueToggle.state = [_mainSplitView isSubviewCollapsed:_playlistView] ?
@@ -595,6 +605,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
+    [self setViewModeToolbarItemVisible:NO];
     _optionBarView.hidden = YES;
 
     [_libraryHomeViewController presentHomeView];
@@ -605,6 +616,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
+    [self setViewModeToolbarItemVisible:YES];
     _optionBarView.hidden = YES;
 
     [_libraryVideoViewController presentVideoView];
@@ -615,6 +627,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
+    [self setViewModeToolbarItemVisible:YES];
     _optionBarView.hidden = NO;
 
     [_libraryAudioViewController presentAudioView];
@@ -628,6 +641,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setForwardsBackwardsToolbarItemsVisible:YES];
     [self setSortOrderToolbarItemVisible:NO];
     [self setLibrarySearchToolbarItemVisible:NO];
+    [self setViewModeToolbarItemVisible:YES];
     _optionBarView.hidden = YES;
 
     if (segment == VLCLibraryBrowseSegment) {
