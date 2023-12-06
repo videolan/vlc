@@ -528,29 +528,29 @@ VLC_API void libvlc_MetadataCancel( libvlc_int_t *, void * );
 struct input_stats_t
 {
     /* Input */
-    int64_t i_read_packets;
-    int64_t i_read_bytes;
+    uint64_t i_read_packets;
+    uint64_t i_read_bytes;
     float f_input_bitrate;
 
     /* Demux */
-    int64_t i_demux_read_packets;
-    int64_t i_demux_read_bytes;
+    uint64_t i_demux_read_packets;
+    uint64_t i_demux_read_bytes;
     float f_demux_bitrate;
-    int64_t i_demux_corrupted;
-    int64_t i_demux_discontinuity;
+    uint64_t i_demux_corrupted;
+    uint64_t i_demux_discontinuity;
 
     /* Decoders */
-    int64_t i_decoded_audio;
-    int64_t i_decoded_video;
+    uint64_t i_decoded_audio;
+    uint64_t i_decoded_video;
 
     /* Vout */
-    int64_t i_displayed_pictures;
-    int64_t i_late_pictures;
-    int64_t i_lost_pictures;
+    uint64_t i_displayed_pictures;
+    uint64_t i_late_pictures;
+    uint64_t i_lost_pictures;
 
     /* Aout */
-    int64_t i_played_abuffers;
-    int64_t i_lost_abuffers;
+    uint64_t i_played_abuffers;
+    uint64_t i_lost_abuffers;
 };
 
 /**
