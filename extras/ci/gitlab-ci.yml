@@ -20,7 +20,6 @@ default:
 
 variables:
     VLC_TEST_TIMEOUT: 60
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20240122094311
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20240122094311
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20231104025754
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20231104025754
@@ -152,10 +151,10 @@ variables:
           cmake --build ${CI_PROJECT_DIR}/doc/libvlc/build
         fi
 
-win32:
+win32-llvm:
     extends: .win-common
     image:
-        name: $VLC_WIN32_IMAGE
+        name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables:
         <<: *variables-win32
         LIBVLC_EXTRA_BUILD_FLAGS: -x
@@ -209,10 +208,10 @@ uwp64-libvlc-llvm:
         paths:
             - nightlies/*
 
-nightly-win32:
+nightly-win32-llvm:
     extends: .nightly-win-common
     image:
-        name: $VLC_WIN32_IMAGE
+        name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables: *variables-win32
 
 nightly-win64:
