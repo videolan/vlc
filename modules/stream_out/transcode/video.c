@@ -283,7 +283,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
              "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
              (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
-    vlc_picture_chain_Init( &id->fifo.pic );
     id->output_fifo = block_FifoNew();
     if( id->output_fifo == NULL )
         return VLC_ENOMEM;
