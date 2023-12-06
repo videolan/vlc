@@ -103,27 +103,27 @@ enum
 typedef struct libvlc_media_stats_t
 {
     /* Input */
-    int         i_read_bytes;
+    uint64_t     i_read_bytes;
     float       f_input_bitrate;
 
     /* Demux */
-    int         i_demux_read_bytes;
+    uint64_t     i_demux_read_bytes;
     float       f_demux_bitrate;
-    int         i_demux_corrupted;
-    int         i_demux_discontinuity;
+    uint64_t     i_demux_corrupted;
+    uint64_t     i_demux_discontinuity;
 
     /* Decoders */
-    int         i_decoded_video;
-    int         i_decoded_audio;
+    uint64_t     i_decoded_video;
+    uint64_t     i_decoded_audio;
 
     /* Video Output */
-    int         i_displayed_pictures;
-    int         i_late_pictures;
-    int         i_lost_pictures;
+    uint64_t     i_displayed_pictures;
+    uint64_t     i_late_pictures;
+    uint64_t     i_lost_pictures;
 
     /* Audio output */
-    int         i_played_abuffers;
-    int         i_lost_abuffers;
+    uint64_t     i_played_abuffers;
+    uint64_t     i_lost_abuffers;
 } libvlc_media_stats_t;
 
 /**
