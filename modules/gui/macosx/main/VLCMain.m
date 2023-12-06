@@ -507,7 +507,9 @@ static VLCMain *sharedInstance = nil;
 - (VLCDetachedAudioWindow *)detachedAudioWindow
 {
     if (_detachedAudioWindow == nil) {
-        _detachedAudioWindow = [VLCDetachedAudioWindow fromNibWithOwner:self];
+        NSWindowController * const windowController = [[NSWindowController alloc] initWithWindowNibName:NSStringFromClass(VLCDetachedAudioWindow.class)];
+        [windowController loadWindow];
+        _detachedAudioWindow = (VLCDetachedAudioWindow *)windowController.window;
     }
 
     return _detachedAudioWindow;
