@@ -604,16 +604,10 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
     return mp4mux_track_AddEdit(p_stream->tinfo, &newedit);
 }
 
-static int BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream, block_t **out)
+static int BlockConvert(mp4_stream_t *p_stream, block_t **out)
 {
     assert(out);
-
-    block_t *p_block = block_FifoGet(p_input->p_fifo);
-    if(unlikely(!p_block))
-    {
-        *out = NULL;
-        return VLC_SUCCESS;
-    }
+    block_t *p_block = *out;
 
     /* Create on the fly extradata as packetizer is not in the loop */
     if(p_stream->extrabuilder && !mp4mux_track_HasSamplePriv(p_stream->tinfo))
@@ -889,6 +883,13 @@ static int Mux(sout_mux_t *p_mux)
         vlc_fifo_Lock( p_input->p_fifo );
         block_t *p_data = vlc_fifo_DequeueUnlocked( p_input->p_fifo );
         vlc_fifo_Unlock( p_input->p_fifo );
+        if (unlikely(p_data == NULL))
+            continue;
+
+        int ret = BlockConvert(p_stream, &p_data);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
         if (unlikely(p_data == NULL))
             continue;
 
@@ -1469,8 +1470,11 @@ static int MuxFrag(sout_mux_t *p_mux)
     sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
     mp4_stream_t *p_stream = (mp4_stream_t*) p_input->p_sys;
 
-    block_t *p_currentblock;
-    int ret = BlockDequeue(p_input, p_stream, &p_currentblock);
+    block_t *p_currentblock = block_FifoGet(p_input->p_fifo);
+    if(unlikely(!p_currentblock))
+        return VLC_EGENERIC;
+
+    int ret = BlockConvert(p_stream, &p_currentblock);
     if (ret != VLC_SUCCESS)
         return ret;
 
