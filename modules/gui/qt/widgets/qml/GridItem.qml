@@ -268,6 +268,9 @@ T.ItemDelegate {
 
                     sourceItem: parent
 
+                    width: viewportWidth
+                    height: viewportHeight
+                    sourceSize: Qt.size(128, 128)
                 }
 
                 DoubleShadow {
@@ -280,6 +283,10 @@ T.ItemDelegate {
 
                     sourceItem: parent
 
+                    width: viewportWidth
+                    height: viewportHeight
+
+                    sourceSize: Qt.size(128, 128)
 
                     primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                     primaryBlurRadius: VLCStyle.dp(18, VLCStyle.scale)
