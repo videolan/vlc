@@ -20,9 +20,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MSC_VER // including mfapi with mingw-w64 is not clean for UWP yet
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
