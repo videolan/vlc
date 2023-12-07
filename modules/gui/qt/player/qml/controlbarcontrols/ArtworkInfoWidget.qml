@@ -125,8 +125,7 @@ AbstractButton {
             Widgets.DefaultShadow {
                 anchors.centerIn: coverImage
 
-                rectWidth: coverImage.paintedWidth
-                rectHeight: coverImage.paintedHeight
+                sourceItem: coverImage
 
             }
         }

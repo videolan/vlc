@@ -21,14 +21,19 @@ import QtQuick 2.12
 import org.videolan.vlc 0.1
 
 ScaledImage {
-    /* required */ property real blurRadius: 0
-    /* required */ property color color
-    /* required */ property real rectWidth: 0
-    /* required */ property real rectHeight: 0
+
+    property Item sourceItem: null
+
+    property real blurRadius: 0
+    property color color
+
+    property real rectWidth: sourceItem ? sourceItem.width : 0
+    property real rectHeight: sourceItem ? sourceItem.height : 0
+
     property real xOffset: 0
     property real yOffset: 0
-    property real xRadius: 0
-    property real yRadius: 0
+    property real xRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
+    property real yRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
 
     sourceSize: Qt.size(
                     rectWidth + (blurRadius + Math.abs(xOffset)) * 2,

@@ -171,8 +171,7 @@ T.ItemDelegate {
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
 
-                    rectWidth: parent.width
-                    rectHeight: parent.height
+                    sourceItem: parent
 
                     visible: (artwork.status === Image.Ready)
                 }

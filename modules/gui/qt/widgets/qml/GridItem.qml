@@ -266,10 +266,8 @@ T.ItemDelegate {
 
                     visible: opacity > 0
 
-                    rectWidth: parent.width
-                    rectHeight: parent.height
-                    xRadius: parent.radius
-                    yRadius: parent.radius
+                    sourceItem: parent
+
                 }
 
                 DoubleShadow {
@@ -280,10 +278,8 @@ T.ItemDelegate {
                     visible: opacity > 0
                     opacity: 0
 
-                    rectWidth: parent.width
-                    rectHeight: parent.height
-                    xRadius: parent.radius
-                    yRadius: parent.radius
+                    sourceItem: parent
+
 
                     primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                     primaryBlurRadius: VLCStyle.dp(18, VLCStyle.scale)

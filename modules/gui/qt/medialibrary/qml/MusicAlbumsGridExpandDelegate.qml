@@ -130,13 +130,9 @@ FocusScope {
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
 
-                    rectWidth: parent.width
-                    rectHeight: parent.height
+                    sourceItem: parent
 
                     visible: (parent.status === RoundImage.Ready)
-
-                    xRadius: parent.radius
-                    yRadius: parent.radius
                 }
             }
         }

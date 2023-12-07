@@ -27,10 +27,12 @@ import "qrc:///style/"
 ScaledImage {
     id: root
 
-    /* required */ property real rectWidth: 0
-    /* required */ property real rectHeight: 0
-    /* required */ property real xRadius: 0
-    /* required */ property real yRadius: 0
+    property Item sourceItem: null
+
+    property real rectWidth: sourceItem ? sourceItem.width : 0
+    property real rectHeight: sourceItem ? sourceItem.height : 0
+    property real xRadius: (sourceItem && sourceItem.radius !== undefined ) ? sourceItem.radius : 0
+    property real yRadius: (sourceItem && sourceItem.radius !== undefined ) ? sourceItem.radius : 0
 
     property color primaryColor: Qt.rgba(0, 0, 0, .18)
     property real primaryVerticalOffset: 0

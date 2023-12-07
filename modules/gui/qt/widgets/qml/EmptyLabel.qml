@@ -86,8 +86,7 @@ T.Control {
 
                 Widgets.DefaultShadow {
                     anchors.centerIn: cover
-                    rectWidth: cover.width
-                    rectHeight: cover.height
+                    sourceItem: parent
                 }
             }
 
