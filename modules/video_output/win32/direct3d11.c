@@ -305,7 +305,9 @@ static int Open(vlc_object_t *object)
         return ret;
 #endif
 
-    if (!external_device && CommonInit(vd) != VLC_SUCCESS)
+    if (external_device)
+        sys->sys.src_fmt = &vd->source;
+    else if (CommonInit(vd) != VLC_SUCCESS)
         goto error;
 
     vd->sys->sys.pf_GetPictureWidth  = GetPictureWidth;
