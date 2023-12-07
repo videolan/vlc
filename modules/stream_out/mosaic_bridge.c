@@ -34,7 +34,6 @@
 #include <vlc_configuration.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
-#include <vlc_block.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
 
@@ -418,11 +417,11 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 
-static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *id, vlc_frame_t *frame )
 {
     struct decoder_owner *owner = id;
 
-    int ret = owner->dec.pf_decode( &owner->dec, p_buffer );
+    int ret = owner->dec.pf_decode( &owner->dec, frame );
     return ret == VLCDEC_SUCCESS ? VLC_SUCCESS : VLC_EGENERIC;
     (void)p_stream;
 }
