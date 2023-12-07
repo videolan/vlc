@@ -622,7 +622,8 @@ endif
 endif
 
 libmft_plugin_la_SOURCES = codec/mft.cpp \
-    codec/mft_d3d.cpp codec/mft_d3d.h
+    codec/mft_d3d.cpp codec/mft_d3d.h \
+    codec/mft_d3d11.cpp codec/mft_d3d11.h
 libmft_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 if HAVE_WIN32
 libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la

@@ -40,7 +40,7 @@ extern "C" {
 }
 
 #include "mft_d3d.h"
-#include "../video_chroma/d3d11_fmt.h"
+#include "mft_d3d11.h"
 
 #include <initguid.h>
 #include <mfapi.h>
@@ -55,6 +55,7 @@ extern "C" {
 #include <algorithm>
 #include <atomic>
 #include <new>
+#include <memory>
 
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
@@ -171,23 +172,10 @@ protected:
 class mft_dec_video : public mft_sys_t
 {
 public:
-    mft_dec_video(bool use_d3d)
-    {
-        if (use_d3d)
-            d3d.Init();
-    }
-
+    mft_dec_video() = default;
     virtual ~mft_dec_video() = default;
 
-    // Direct3D
-    vlc_mf_d3d d3d;
-
-    vlc_video_context  *vctx_out = nullptr;
-    const d3d_format_t *cfg = nullptr;
-
-    // D3D11
-    ComPtr<ID3D11Texture2D> cached_tex;
-    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
+    std::unique_ptr<MFHW_d3d11> hw_d3d;
 
     /* H264 only. */
     struct hxxx_helper hh = {};
@@ -196,30 +184,10 @@ public:
 protected:
     void DoRelease() override
     {
-        for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
-        {
-            for (size_t j=0; j < ARRAY_SIZE(cachedSRV[i]); j++)
-            {
-                if (cachedSRV[i][j] != nullptr)
-                    cachedSRV[i][j]->Release();
-            }
-        }
-
-        d3d.ReleaseD3D(mft);
-
-        if (vctx_out)
-            vlc_video_context_Release(vctx_out);
+        if (hw_d3d)
+            hw_d3d->Release(mft);
     }
 };
-
-struct mf_d3d11_pic_ctx
-{
-    struct d3d11_pic_context ctx;
-    IMFMediaBuffer *out_media;
-    mft_dec_video  *mfdec;
-};
-#define MF_D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
-    container_of(pic_ctx, mf_d3d11_pic_ctx, ctx.s)
 
 static const int pi_channels_maps[9] =
 {
@@ -762,64 +730,6 @@ static void CopyPackedBufferToPicture(picture_t *p_pic, const uint8_t *p_src)
     }
 }
 
-static void d3d11mf_pic_context_destroy(picture_context_t *ctx)
-{
-    mf_d3d11_pic_ctx *pic_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
-    mft_dec_video *mfdec = pic_ctx->mfdec;
-    pic_ctx->out_media->Release();
-    static_assert(offsetof(mf_d3d11_pic_ctx, ctx.s) == 0, "Cast assumption failure");
-    d3d11_pic_context_destroy(ctx);
-    mfdec->Release();
-}
-
-static picture_context_t *d3d11mf_pic_context_copy(picture_context_t *ctx)
-{
-    mf_d3d11_pic_ctx *src_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
-    mf_d3d11_pic_ctx *pic_ctx = static_cast<mf_d3d11_pic_ctx *>(malloc(sizeof(*pic_ctx)));
-    if (unlikely(pic_ctx==nullptr))
-        return nullptr;
-    *pic_ctx = *src_ctx;
-    vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
-    pic_ctx->out_media->AddRef();
-    pic_ctx->mfdec->AddRef();
-    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
-    {
-        pic_ctx->ctx.picsys.resource[i]  = src_ctx->ctx.picsys.resource[i];
-        pic_ctx->ctx.picsys.renderSrc[i] = src_ctx->ctx.picsys.renderSrc[i];
-    }
-    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
-    return &pic_ctx->ctx.s;
-}
-
-static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
-                                          ComPtr<IMFMediaBuffer> &media_buffer,
-                                          mft_dec_video *mfdec,
-                                          ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
-                                          vlc_video_context *vctx)
-{
-    mf_d3d11_pic_ctx *pic_ctx = static_cast<mf_d3d11_pic_ctx *>(calloc(1, sizeof(*pic_ctx)));
-    if (unlikely(pic_ctx==nullptr))
-        return nullptr;
-
-    media_buffer.CopyTo(&pic_ctx->out_media);
-    pic_ctx->mfdec = mfdec;
-    pic_ctx->mfdec->AddRef();
-
-    pic_ctx->ctx.s.copy = d3d11mf_pic_context_copy;
-    pic_ctx->ctx.s.destroy = d3d11mf_pic_context_destroy;
-    pic_ctx->ctx.s.vctx = vlc_video_context_Hold(vctx);
-
-    pic_ctx->ctx.picsys.slice_index = slice;
-    pic_ctx->ctx.picsys.sharedHandle = INVALID_HANDLE_VALUE;
-    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
-    {
-        pic_ctx->ctx.picsys.texture[i] = texture;
-        pic_ctx->ctx.picsys.renderSrc[i] = renderSrc ? renderSrc[i] : NULL;
-    }
-    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
-    return pic_ctx;
-}
-
 static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_reading)
 {
     auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
@@ -888,101 +798,28 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
             auto *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
-            mf_d3d11_pic_ctx *pic_ctx = nullptr;
-            UINT sliceIndex = 0;
-            ComPtr<IMFDXGIBuffer> spDXGIBuffer;
-            hr = output_media_buffer.As(&spDXGIBuffer);
-            if (SUCCEEDED(hr))
+            picture_context_t *pic_ctx = nullptr;
+            if (vidsys->hw_d3d != nullptr)
             {
-                ID3D11Texture2D *d3d11Res;
-                hr = spDXGIBuffer->GetResource(IID_PPV_ARGS(&d3d11Res));
-                if (SUCCEEDED(hr))
+                ComPtr<IMFDXGIBuffer> spDXGIBuffer;
+                hr = output_media_buffer.As(&spDXGIBuffer);
+                if (vidsys->hw_d3d->vctx_out == nullptr)
                 {
-                    D3D11_TEXTURE2D_DESC desc;
-                    d3d11Res->GetDesc(&desc);
-
-                    hr = spDXGIBuffer->GetSubresourceIndex(&sliceIndex);
-                    if (!vidsys->vctx_out)
-                    {
-                        vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
-                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueDevice(dec_dev);
-                        if (dev_sys != NULL)
-                        {
-                            vidsys->vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
-                            vlc_decoder_device_Release(dec_dev);
-                            if (unlikely(vidsys->vctx_out == NULL))
-                            {
-                                msg_Err(p_dec, "failed to create a video context");
-                                d3d11Res->Release();
-                                return VLC_EGENERIC;
-                            }
-                            p_dec->fmt_out.video.i_width = desc.Width;
-                            p_dec->fmt_out.video.i_height = desc.Height;
-
-                            vidsys->cfg = D3D11_RenderFormat(desc.Format ,true);
-
-                            p_dec->fmt_out.i_codec = vidsys->cfg->fourcc;
-                            p_dec->fmt_out.video.i_chroma = vidsys->cfg->fourcc;
-
-                            // pre allocate all the SRV for that texture
-                            for (size_t slice=0; slice < desc.ArraySize; slice++)
-                            {
-                                ID3D11Texture2D *tex[DXGI_MAX_SHADER_VIEW] = {
-                                    d3d11Res, d3d11Res, d3d11Res, d3d11Res
-                                };
-
-                                if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, vidsys->cfg,
-                                                                tex, slice, vidsys->cachedSRV[slice]) != VLC_SUCCESS)
-                                {
-                                    d3d11Res->Release();
-                                    goto error;
-                                }
-                            }
-                            vidsys->cached_tex = d3d11Res;
-                        }
-                    }
-                    else if (desc.ArraySize == 1)
-                    {
-                        assert(sliceIndex == 0);
-
-                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vidsys->vctx_out);
-
-                        ID3D11Texture2D *tex[DXGI_MAX_SHADER_VIEW] = {
-                            d3d11Res, d3d11Res, d3d11Res, d3d11Res
-                        };
-
-                        for (size_t j=0; j < ARRAY_SIZE(vidsys->cachedSRV[sliceIndex]); j++)
-                        {
-                            if (vidsys->cachedSRV[sliceIndex][j] != nullptr)
-                                vidsys->cachedSRV[sliceIndex][j]->Release();
-                        }
-
-                        if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, vidsys->cfg,
-                                                       tex, sliceIndex, vidsys->cachedSRV[sliceIndex]) != VLC_SUCCESS)
-                        {
-                            d3d11Res->Release();
-                            goto error;
-                        }
-                    }
-                    else if (vidsys->cached_tex.Get() != d3d11Res)
-                    {
-                        msg_Err(p_dec, "separate texture not supported");
-                        d3d11Res->Release();
-                        goto error;
-                    }
-
-                    pic_ctx = CreatePicContext(d3d11Res, sliceIndex, output_media_buffer, vidsys, vidsys->cachedSRV[sliceIndex], vidsys->vctx_out);
-                    d3d11Res->Release();
-
-                    if (unlikely(pic_ctx == nullptr))
+                    hr = vidsys->hw_d3d->SetupVideoContext(vlc_object_logger(p_dec), spDXGIBuffer, p_dec->fmt_out);
+                    if (FAILED(hr))
                         goto error;
                 }
+
+                pic_ctx = vidsys->hw_d3d->CreatePicContext(vlc_object_logger(p_dec), spDXGIBuffer, p_sys);
+                if (unlikely(pic_ctx == nullptr))
+                    goto error;
             }
 
-            if (decoder_UpdateVideoOutput(p_dec, vidsys->vctx_out))
+            if (decoder_UpdateVideoOutput(p_dec, vidsys->hw_d3d ? vidsys->hw_d3d->vctx_out : nullptr))
             {
                 if (pic_ctx)
-                    d3d11mf_pic_context_destroy(&pic_ctx->ctx.s);
+                    pic_ctx->destroy(pic_ctx);
+
                 return VLC_EGENERIC;
             }
 
@@ -990,7 +827,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             if (!picture)
             {
                 if (pic_ctx)
-                    d3d11mf_pic_context_destroy(&pic_ctx->ctx.s);
+                    pic_ctx->destroy(pic_ctx);
                 return VLC_EGENERIC;
             }
 
@@ -1005,7 +842,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
             if (pic_ctx)
             {
-                picture->context = &pic_ctx->ctx.s;
+                picture->context = pic_ctx;
             }
             else
             {
@@ -1305,19 +1142,21 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
 
 static void DestroyMFT(decoder_t *p_dec);
 
-static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
+static int SetD3D11(decoder_t *p_dec, vlc_decoder_device & dec_dev)
 {
-    if (!(d3d_dev->d3ddevice->GetCreationFlags() & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+    mft_dec_video *vidsys = static_cast<mft_dec_video*>(p_dec->p_sys);
+    assert(vidsys->hw_d3d == nullptr);
+    vidsys->hw_d3d = std::make_unique<MFHW_d3d11>();
+    if (unlikely(vidsys->hw_d3d == nullptr))
+        return VLC_EGENERIC;
+
+    HRESULT hr;
+    hr = vidsys->hw_d3d->SetD3D(vlc_object_logger(p_dec), dec_dev, vidsys->mft);
+    if (FAILED(hr))
     {
-        msg_Warn(p_dec, "the provided D3D11 device doesn't support decoding");
+        vidsys->hw_d3d.reset();
         return VLC_EGENERIC;
     }
-
-    mft_dec_video *p_sys = static_cast<mft_dec_video*>(p_dec->p_sys);
-    HRESULT hr;
-    hr = p_sys->d3d.SetD3D(vlc_object_logger(p_dec), d3d_dev->d3ddevice, p_sys->mft);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -1384,21 +1223,20 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
-        mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
+        // mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
         EnableHardwareAcceleration(p_dec, attributes);
-        if (p_dec->fmt_in->video.i_width != 0 && vidsys->d3d.CanUseD3D())
+        if (p_dec->fmt_in->video.i_width != 0 /*&& vidsys->d3d.CanUseD3D()*/)
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
             if (dec_dev != nullptr)
             {
-                d3d11_decoder_device_t *devsys11 = GetD3D11OpaqueDevice(dec_dev);
-                if (devsys11 != nullptr)
+                if (dec_dev->type == VLC_DECODER_DEVICE_D3D11VA)
                 {
                     UINT32 can_d3d11;
                     hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
                     if (SUCCEEDED(hr) && can_d3d11)
                     {
-                        if (SetD3D11(p_dec, &devsys11->d3d_dev) == VLC_SUCCESS)
+                        if (SetD3D11(p_dec, *dec_dev) == VLC_SUCCESS)
                         {
                             IMFAttributes *outputAttr = NULL;
                             hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
@@ -1620,7 +1458,7 @@ static int Open(vlc_object_t *p_this)
 
     mft_sys_t *p_sys;
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
-        p_sys = new (std::nothrow) mft_dec_video(p_dec->fmt_in->video.i_width != 0);
+        p_sys = new (std::nothrow) mft_dec_video();
     else
         p_sys = new (std::nothrow) mft_dec_audio();
     if (unlikely(p_sys == nullptr))
