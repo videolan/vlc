@@ -27,7 +27,6 @@
 #include <dxgiformat.h>
 
 #include <vlc_common.h>
-#include <vlc_fourcc.h>
 
 #ifdef __cplusplus
 extern "C" {
