@@ -524,7 +524,7 @@ static void Win32AddConnection( stream_t *p_access, const char *psz_server,
                                 const char *psz_pwd, const char *psz_domain )
 {
     char psz_remote[MAX_PATH];
-    NETRESOURCE net_resource;
+    NETRESOURCEA net_resource;
     DWORD i_result;
     VLC_UNUSED( psz_domain );
 
@@ -544,7 +544,7 @@ static void Win32AddConnection( stream_t *p_access, const char *psz_server,
 
     net_resource.lpRemoteName = psz_remote;
 
-    i_result = WNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
+    i_result = WNetAddConnection2A( &net_resource, psz_pwd, psz_user, 0 );
 
     if( i_result != NO_ERROR )
     {
