@@ -39,6 +39,7 @@ extern "C" {
 #include "hxxx_helper.h"
 }
 
+#include "mft_d3d.h"
 #include "../video_chroma/d3d11_fmt.h"
 
 #include <initguid.h>
@@ -74,8 +75,6 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-typedef HRESULT (WINAPI *pf_MFCreateDXGIDeviceManager)(UINT *, IMFDXGIDeviceManager **);
-
 class mft_sys_t
 {
 public:
@@ -92,7 +91,7 @@ public:
 
 
     // Direct3D
-    HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
+    vlc_mf_d3d d3d;
 
     /* For asynchronous MFT */
     bool is_async = false;
@@ -171,9 +170,6 @@ public:
     // Direct3D
     vlc_video_context  *vctx_out = nullptr;
     const d3d_format_t *cfg = nullptr;
-    UINT dxgi_token = 0;
-    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
-    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
 
     // D3D11
     ComPtr<ID3D11Texture2D> cached_tex;
@@ -187,15 +183,6 @@ private:
 
     void DoRelease() override
     {
-        if (mft.Get())
-        {
-            // mft->SetInputType(input_stream_id, nullptr, 0);
-            // mft->SetOutputType(output_stream_id, nullptr, 0);
-
-            if (vctx_out)
-                mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)0);
-        }
-
         for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
         {
             for (size_t j=0; j < ARRAY_SIZE(cachedSRV[i]); j++)
@@ -205,11 +192,7 @@ private:
             }
         }
 
-        if (vctx_out && dxgi_manager.Get())
-        {
-            if (d3d_handle != INVALID_HANDLE_VALUE)
-                dxgi_manager->CloseDeviceHandle(d3d_handle);
-        }
+        d3d.ReleaseD3D(mft);
 
         if (vctx_out)
             vlc_video_context_Release(vctx_out);
@@ -1317,19 +1300,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
-    hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, &p_sys->dxgi_manager);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    hr = p_sys->dxgi_manager->ResetDevice(d3d_dev->d3ddevice, p_sys->dxgi_token);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    hr = p_sys->dxgi_manager->OpenDeviceHandle(&p_sys->d3d_handle);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)p_sys->dxgi_manager.Get());
+    hr = p_sys->d3d.SetD3D(vlc_object_logger(p_dec), d3d_dev->d3ddevice, p_sys->mft);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -1399,7 +1370,7 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         EnableHardwareAcceleration(p_dec, attributes);
-        if (p_sys->fptr_MFCreateDXGIDeviceManager)
+        if (p_sys->d3d.CanUseD3D())
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
             if (dec_dev != nullptr)
@@ -1626,18 +1597,7 @@ static int LoadMFTLibrary(struct vlc_logger *logger, mft_sys_t *p_sys, const es_
         return VLC_SUCCESS;
     }
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
-    HINSTANCE mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
-    if (mfplat_dll)
-    {
-        p_sys->fptr_MFCreateDXGIDeviceManager =  reinterpret_cast<pf_MFCreateDXGIDeviceManager>(
-            GetProcAddress(mfplat_dll, "MFCreateDXGIDeviceManager") );
-        // we still have the DLL automatically loaded after this
-        FreeLibrary(mfplat_dll);
-    }
-#else // Win8+
-    p_sys->fptr_MFCreateDXGIDeviceManager = &MFCreateDXGIDeviceManager;
-#endif // Win8+
+    p_sys->d3d.Init();
 
     return VLC_SUCCESS;
 }
@@ -1678,7 +1638,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Only one output sample is needed, we can allocate one and reuse it. */
-    if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat, 
+    if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat,
                              p_sys->mft, p_sys->output_stream_id, p_sys->output_sample))
         goto error;
 
