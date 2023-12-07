@@ -26,7 +26,7 @@ typedef struct bridged_es_t
     es_format_t fmt;
     vlc_picture_chain_t pictures;
     bool b_empty;
-    char *psz_id;
+    const char *psz_id;
 
     int i_alpha;
     int i_x;
