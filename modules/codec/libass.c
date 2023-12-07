@@ -776,7 +776,7 @@ static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track *p_track )
             else if( !strncmp( s, "PlayResX: ", 10 ) ||
                      !strncmp( s, "PlayResY: ", 10 ) )
             {
-                playres['Y' - s[7]] = atoi( &s[9] );
+                playres[s[7] - 'X'] = atoi( &s[9] );
             }
             else if( !strncmp( s, "Original Script: ", 17 ) )
             {
