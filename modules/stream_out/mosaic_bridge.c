@@ -76,6 +76,8 @@ typedef struct
     vlc_mutex_t var_lock;
 } sout_stream_sys_t;
 
+#define CFG_PREFIX "sout-mosaic-bridge-"
+
 static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 {
     return container_of( p_dec, struct decoder_owner, dec );
@@ -84,93 +86,10 @@ static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void *Add( sout_stream_t *, const es_format_t *, const char * );
-static void  Del( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t * );
 
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic );
 static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context * );
 static picture_t *video_new_buffer_filter( filter_t * );
-
-static int HeightCallback( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
-static int WidthCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
-static int alphaCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
-static int xCallback( vlc_object_t *, char const *,
-                      vlc_value_t, vlc_value_t, void * );
-static int yCallback( vlc_object_t *, char const *,
-                      vlc_value_t, vlc_value_t, void * );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define ID_TEXT N_("ID")
-#define ID_LONGTEXT N_( \
-    "Specify an identifier string for this subpicture" )
-
-#define WIDTH_TEXT N_("Video width")
-#define WIDTH_LONGTEXT N_( \
-    "Output video width." )
-#define HEIGHT_TEXT N_("Video height")
-#define HEIGHT_LONGTEXT N_( \
-    "Output video height." )
-#define RATIO_TEXT N_("Sample aspect ratio")
-#define RATIO_LONGTEXT N_( \
-    "Sample aspect ratio of the destination (1:1, 3:4, 2:3)." )
-
-#define VFILTER_TEXT N_("Video filter")
-#define VFILTER_LONGTEXT N_( \
-    "Video filters will be applied to the video stream." )
-
-#define CHROMA_TEXT N_("Image chroma")
-#define CHROMA_LONGTEXT N_( \
-    "Force the use of a specific chroma. Use YUVA if you're planning " \
-    "to use the Alphamask or Bluescreen video filter." )
-
-#define ALPHA_TEXT N_("Transparency")
-#define ALPHA_LONGTEXT N_( \
-    "Transparency of the mosaic picture." )
-
-#define X_TEXT N_("X offset")
-#define X_LONGTEXT N_( \
-    "X coordinate of the upper left corner in the mosaic if non negative." )
-
-#define Y_TEXT N_("Y offset")
-#define Y_LONGTEXT N_( \
-    "Y coordinate of the upper left corner in the mosaic if non negative." )
-
-#define CFG_PREFIX "sout-mosaic-bridge-"
-
-vlc_module_begin ()
-    set_shortname( N_( "Mosaic bridge" ) )
-    set_description(N_("Mosaic bridge stream output") )
-    set_capability( "sout output", 0 )
-    add_shortcut( "mosaic-bridge" )
-
-    set_subcategory( SUBCAT_SOUT_STREAM )
-
-    add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT )
-    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT,
-                 WIDTH_LONGTEXT )
-    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT )
-    add_string( CFG_PREFIX "sar", "1:1", RATIO_TEXT,
-                RATIO_LONGTEXT )
-    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
-
-    add_module_list(CFG_PREFIX "vfilter", "video filter", NULL,
-                    VFILTER_TEXT, VFILTER_LONGTEXT)
-
-    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
-                            ALPHA_TEXT, ALPHA_LONGTEXT )
-    add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT )
-    add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT )
-
-    set_callback( Open )
-vlc_module_end ()
 
 static int Control(sout_stream_t *stream, int query, va_list args)
 {
@@ -196,129 +115,6 @@ static void Flush( sout_stream_t *stream, void *id)
     filter_chain_VideoFlush( owner->filters );
 
     (void)stream;
-}
-
-/*****************************************************************************
- * Close
- *****************************************************************************/
-static void Close( sout_stream_t *p_stream )
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    /* Delete the callbacks */
-    var_DelCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "alpha", alphaCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "x", xCallback, p_stream );
-    var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
-
-    free( p_sys->psz_id );
-    free( p_sys->filters_config );
-
-    free( p_sys );
-}
-
-static const struct sout_stream_operations ops = {
-    .add = Add,
-    .del = Del,
-    .send = Send,
-    .control = Control,
-    .flush = Flush,
-    .close = Close,
-};
-
-static const char *const ppsz_sout_options[] = {
-    "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL
-};
-
-/*****************************************************************************
- * Open
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t        *p_stream = (sout_stream_t *)p_this;
-    sout_stream_sys_t    *p_sys;
-    vlc_value_t           val;
-
-    config_ChainParse( p_stream, CFG_PREFIX, ppsz_sout_options,
-                       p_stream->p_cfg );
-
-    p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    if( !p_sys )
-        return VLC_ENOMEM;
-
-    p_stream->p_sys = p_sys;
-
-    p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
-
-    p_sys->decoder_ref = NULL;
-
-    p_sys->i_height =
-        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
-    var_AddCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
-
-    p_sys->i_width =
-        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "width" );
-    var_AddCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
-
-    var_Get( p_stream, CFG_PREFIX "sar", &val );
-    if( val.psz_string )
-    {
-        char *psz_parser = strchr( val.psz_string, ':' );
-
-        if( psz_parser )
-        {
-            *psz_parser++ = '\0';
-            p_sys->i_sar_num = atoi( val.psz_string );
-            p_sys->i_sar_den = atoi( psz_parser );
-            vlc_ureduce( &p_sys->i_sar_num, &p_sys->i_sar_den,
-                         p_sys->i_sar_num, p_sys->i_sar_den, 0 );
-        }
-        else
-        {
-            msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
-            p_sys->i_sar_num = p_sys->i_sar_den = 1;
-        }
-
-        free( val.psz_string );
-    }
-    else
-    {
-        p_sys->i_sar_num = p_sys->i_sar_den = 1;
-    }
-
-    p_sys->i_chroma = VLC_CODEC_I420;
-    val.psz_string = var_GetNonEmptyString( p_stream, CFG_PREFIX "chroma" );
-    if( val.psz_string && strlen( val.psz_string ) >= 4 )
-    {
-        memcpy( &p_sys->i_chroma, val.psz_string, 4 );
-        msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
-        if ( vlc_fourcc_GetChromaDescription( p_sys->i_chroma ) == NULL )
-        {
-            msg_Err( p_stream, "Unknown chroma" );
-            free( p_sys );
-            return VLC_EINVAL;
-        }
-    }
-    free( val.psz_string );
-
-    p_sys->filters_config = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-
-    vlc_mutex_init( &p_sys->var_lock );
-
-#define INT_COMMAND( a ) do { \
-    var_Create( p_stream, CFG_PREFIX #a, \
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND ); \
-    var_AddCallback( p_stream, CFG_PREFIX #a, a ## Callback, \
-                     p_stream ); } while(0)
-    INT_COMMAND( alpha );
-    INT_COMMAND( x );
-    INT_COMMAND( y );
-
-#undef INT_COMMAND
-
-    p_stream->ops = &ops;
-    return VLC_SUCCESS;
 }
 
 static vlc_decoder_device * MosaicHoldDecoderDevice( struct decoder_owner *p_owner )
@@ -748,3 +544,192 @@ static int yCallback( vlc_object_t *p_this, char const *psz_var,
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Close
+ *****************************************************************************/
+static void Close( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* Delete the callbacks */
+    var_DelCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "alpha", alphaCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "x", xCallback, p_stream );
+    var_DelCallback( p_stream, CFG_PREFIX "y", yCallback, p_stream );
+
+    free( p_sys->psz_id );
+    free( p_sys->filters_config );
+
+    free( p_sys );
+}
+
+static const struct sout_stream_operations ops = {
+    .add = Add,
+    .del = Del,
+    .send = Send,
+    .control = Control,
+    .flush = Flush,
+    .close = Close,
+};
+
+static const char *const ppsz_sout_options[] = {
+    "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL
+};
+
+/*****************************************************************************
+ * Open
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t        *p_stream = (sout_stream_t *)p_this;
+    sout_stream_sys_t    *p_sys;
+    vlc_value_t           val;
+
+    config_ChainParse( p_stream, CFG_PREFIX, ppsz_sout_options,
+                       p_stream->p_cfg );
+
+    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    p_stream->p_sys = p_sys;
+
+    p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
+
+    p_sys->decoder_ref = NULL;
+
+    p_sys->i_height =
+        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
+    var_AddCallback( p_stream, CFG_PREFIX "height", HeightCallback, p_stream );
+
+    p_sys->i_width =
+        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "width" );
+    var_AddCallback( p_stream, CFG_PREFIX "width", WidthCallback, p_stream );
+
+    var_Get( p_stream, CFG_PREFIX "sar", &val );
+    if( val.psz_string )
+    {
+        char *psz_parser = strchr( val.psz_string, ':' );
+
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            p_sys->i_sar_num = atoi( val.psz_string );
+            p_sys->i_sar_den = atoi( psz_parser );
+            vlc_ureduce( &p_sys->i_sar_num, &p_sys->i_sar_den,
+                         p_sys->i_sar_num, p_sys->i_sar_den, 0 );
+        }
+        else
+        {
+            msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
+            p_sys->i_sar_num = p_sys->i_sar_den = 1;
+        }
+
+        free( val.psz_string );
+    }
+    else
+    {
+        p_sys->i_sar_num = p_sys->i_sar_den = 1;
+    }
+
+    p_sys->i_chroma = VLC_CODEC_I420;
+    val.psz_string = var_GetNonEmptyString( p_stream, CFG_PREFIX "chroma" );
+    if( val.psz_string && strlen( val.psz_string ) >= 4 )
+    {
+        memcpy( &p_sys->i_chroma, val.psz_string, 4 );
+        msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
+        if ( vlc_fourcc_GetChromaDescription( p_sys->i_chroma ) == NULL )
+        {
+            msg_Err( p_stream, "Unknown chroma" );
+            free( p_sys );
+            return VLC_EINVAL;
+        }
+    }
+    free( val.psz_string );
+
+    p_sys->filters_config = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
+
+    vlc_mutex_init( &p_sys->var_lock );
+
+#define INT_COMMAND( a ) do { \
+    var_Create( p_stream, CFG_PREFIX #a, \
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND ); \
+    var_AddCallback( p_stream, CFG_PREFIX #a, a ## Callback, \
+                     p_stream ); } while(0)
+    INT_COMMAND( alpha );
+    INT_COMMAND( x );
+    INT_COMMAND( y );
+
+#undef INT_COMMAND
+
+    p_stream->ops = &ops;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ID_TEXT N_("ID")
+#define ID_LONGTEXT N_( \
+    "Specify an identifier string for this subpicture" )
+
+#define WIDTH_TEXT N_("Video width")
+#define WIDTH_LONGTEXT N_( \
+    "Output video width." )
+#define HEIGHT_TEXT N_("Video height")
+#define HEIGHT_LONGTEXT N_( \
+    "Output video height." )
+#define RATIO_TEXT N_("Sample aspect ratio")
+#define RATIO_LONGTEXT N_( \
+    "Sample aspect ratio of the destination (1:1, 3:4, 2:3)." )
+
+#define VFILTER_TEXT N_("Video filter")
+#define VFILTER_LONGTEXT N_( \
+    "Video filters will be applied to the video stream." )
+
+#define CHROMA_TEXT N_("Image chroma")
+#define CHROMA_LONGTEXT N_( \
+    "Force the use of a specific chroma. Use YUVA if you're planning " \
+    "to use the Alphamask or Bluescreen video filter." )
+
+#define ALPHA_TEXT N_("Transparency")
+#define ALPHA_LONGTEXT N_( \
+    "Transparency of the mosaic picture." )
+
+#define X_TEXT N_("X offset")
+#define X_LONGTEXT N_( \
+    "X coordinate of the upper left corner in the mosaic if non negative." )
+
+#define Y_TEXT N_("Y offset")
+#define Y_LONGTEXT N_( \
+    "Y coordinate of the upper left corner in the mosaic if non negative." )
+
+vlc_module_begin ()
+    set_shortname( N_( "Mosaic bridge" ) )
+    set_description(N_("Mosaic bridge stream output") )
+    set_capability( "sout output", 0 )
+    add_shortcut( "mosaic-bridge" )
+
+    set_subcategory( SUBCAT_SOUT_STREAM )
+
+    add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT )
+    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT,
+                 WIDTH_LONGTEXT )
+    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT,
+                 HEIGHT_LONGTEXT )
+    add_string( CFG_PREFIX "sar", "1:1", RATIO_TEXT,
+                RATIO_LONGTEXT )
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
+
+    add_module_list(CFG_PREFIX "vfilter", "video filter", NULL,
+                    VFILTER_TEXT, VFILTER_LONGTEXT)
+
+    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
+                            ALPHA_TEXT, ALPHA_LONGTEXT )
+    add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT )
+    add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT )
+
+    set_callback( Open )
+vlc_module_end ()
