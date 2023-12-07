@@ -24,6 +24,9 @@ ScaledImage {
 
     property Item sourceItem: null
 
+    property real viewportWidth: rectWidth + (blurRadius + Math.abs(xOffset)) * 2
+    property real viewportHeight: rectHeight + (blurRadius + Math.abs(yOffset)) * 2
+
     property real blurRadius: 0
     property color color
 
@@ -35,10 +38,7 @@ ScaledImage {
     property real xRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
     property real yRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
 
-    sourceSize: Qt.size(
-                    rectWidth + (blurRadius + Math.abs(xOffset)) * 2,
-                    rectHeight + (blurRadius + Math.abs(yOffset)) * 2,
-                    )
+    sourceSize: Qt.size(viewportWidth, viewportHeight)
 
     cache: true
     asynchronous: true
@@ -51,7 +51,11 @@ ScaledImage {
             source = Qt.binding(function() {
                 return Effects.url((xRadius > 0 || yRadius > 0) ? Effects.RoundedRectDropShadow
                                                                 : Effects.RectDropShadow,
-                                   {"blurRadius": blurRadius,
+                                   {
+                                    "viewportWidth" : viewportWidth,
+                                    "viewportHeight" :viewportHeight,
+
+                                    "blurRadius": blurRadius,
                                     "color": color,
                                     "rectWidth": rectWidth,
                                     "rectHeight": rectHeight,

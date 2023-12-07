@@ -29,6 +29,9 @@ ScaledImage {
 
     property Item sourceItem: null
 
+    property real viewportWidth: rectWidth + (Math.max(Math.abs(primaryHorizontalOffset) + primaryBlurRadius, Math.abs(secondaryHorizontalOffset) + secondaryBlurRadius)) * 2
+    property real viewportHeight: rectHeight + (Math.max(Math.abs(primaryVerticalOffset) + primaryBlurRadius, Math.abs(secondaryVerticalOffset) + secondaryBlurRadius)) * 2
+
     property real rectWidth: sourceItem ? sourceItem.width : 0
     property real rectHeight: sourceItem ? sourceItem.height : 0
     property real xRadius: (sourceItem && sourceItem.radius !== undefined ) ? sourceItem.radius : 0
@@ -44,12 +47,8 @@ ScaledImage {
     property real secondaryHorizontalOffset: 0
     property real secondaryBlurRadius: 0
 
-    property real _maxRadius: Math.max(primaryBlurRadius, secondaryBlurRadius)
-
-    sourceSize: Qt.size(
-        rectWidth + (_maxRadius + Math.max(Math.abs(primaryHorizontalOffset), Math.abs(secondaryHorizontalOffset)) ) * 2,
-        rectHeight + (_maxRadius + Math.max(Math.abs(primaryVerticalOffset), Math.abs(secondaryVerticalOffset))) * 2,
-        )
+    //by default we request
+    sourceSize: Qt.size(viewportWidth, viewportHeight)
 
     cache: true
     asynchronous: true
@@ -67,6 +66,9 @@ ScaledImage {
                 return Effects.url(
                     Effects.DoubleRoundedRectDropShadow,
                     {
+                        "viewportWidth" : viewportWidth,
+                        "viewportHeight" :viewportHeight,
+
                         "rectWidth": rectWidth,
                         "rectHeight": rectHeight,
                         "xRadius": xRadius,

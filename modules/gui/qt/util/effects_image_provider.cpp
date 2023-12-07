@@ -41,39 +41,45 @@ class RectDropShadowEffect : public IEffect
 
 public:
     explicit RectDropShadowEffect(const QVariantMap& settings)
-        : m_blurRadius(settings["blurRadius"].toReal())
+        : m_viewport(settings["viewportWidth"].toReal(), settings["viewportHeight"].toReal())
         , m_color(settings["color"].value<QColor>())
+        , m_blurRadius(settings["blurRadius"].toReal())
         , m_xOffset(settings["xOffset"].toReal())
         , m_yOffset(settings["yOffset"].toReal())
-        , m_width(settings["rectWidth"].toReal())
+        , m_recWidth(settings["rectWidth"].toReal())
         , m_height(settings["rectHeight"].toReal())
-    { }
+    {
+    }
 
-    virtual void draw(QPainter& painter) const
+    virtual void draw(QPainter& painter, qreal xscale, qreal yscale) const
     {
         QPainterPath path;
-        QRect window = painter.window();
         //center in window + offset
         path.addRect(
-            (window.center().x() - (m_width / 2)) + m_xOffset,
-            (window.center().y() - (m_height / 2)) + m_yOffset,
-            m_width,
-            m_height);
+            ((m_viewport.width() / 2.)  - (m_recWidth / 2.) + m_xOffset) * xscale,
+            ((m_viewport.height() / 2.) - (m_height / 2.)   + m_yOffset) * yscale,
+            m_recWidth * xscale,
+            m_height * yscale);
         painter.fillPath(path, m_color);
         painter.drawPath(path);
     }
 
     QImage generate(const QSize& size) const override
     {
+        //scale image to fit in the requested size
+        QSize viewport = m_viewport.scaled(size, Qt::KeepAspectRatio);
+        qreal xscale = viewport.width() / (qreal)m_viewport.width();
+        qreal yscale = viewport.height() / (qreal)m_viewport.height();
+
         //we need to generate packed image for the blur implementation
         //default QImage constructor may not for enforce this
-        unsigned char* rawSource = (unsigned char*)malloc(size.width() * size.height() * 4);
+        unsigned char* rawSource = (unsigned char*)malloc(viewport.width() * viewport.height() * 4);
         if (!rawSource)
             return {};
 
         //don't make the QImage hold the rawbuffer, as fast_gaussian_blur may swap input and output buffers
         QImage source(rawSource,
-            size.width(), size.height(), size.width() * 4,
+            viewport.width(), viewport.height(), viewport.width() * 4,
             QImage::Format_ARGB32_Premultiplied);
 
         // Create a new image with boundaries containing the mask and effect.
@@ -82,10 +88,11 @@ public:
             // Copy the mask
             QPainter painter(&source);
             painter.setCompositionMode(QPainter::CompositionMode_Source);
-            draw(painter);
+            //note: can we use painter.scale here?
+            draw(painter, xscale, yscale);
         }
 
-        unsigned char* rawDest = (unsigned char*)malloc(size.width() * size.height() * 4);
+        unsigned char* rawDest = (unsigned char*)malloc(viewport.width() * viewport.height() * 4);
         if (!rawDest)
         {
             free(rawSource);
@@ -94,26 +101,29 @@ public:
 
         fast_gaussian_blur(
             rawSource, rawDest,
-            size.width(), size.height(), 4, // 4 channels
-            m_blurRadius / 2, // sigma is radius/2, see https://drafts.csswg.org/css-backgrounds/#shadow-blur
+            viewport.width(), viewport.height(), 4, // 4 channels
+            m_blurRadius * xscale / 2, // sigma is radius/2, see https://drafts.csswg.org/css-backgrounds/#shadow-blur
             3, Border::kMirror //3 passes
             );
 
         free(rawSource);
         QImage dest(rawDest,
-                      size.width(), size.height(), size.width() * 4,
-                      QImage::Format_ARGB32_Premultiplied);
+            viewport.width(), viewport.height(), viewport.width() * 4,
+            QImage::Format_ARGB32_Premultiplied,
+            free, rawDest);
 
         return dest;
     }
 
 
 protected:
-    qreal m_blurRadius = 1.0;
+    QSize m_viewport;
+
     QColor m_color {63, 63, 63, 180};
+    qreal m_blurRadius = 1.0;
     qreal m_xOffset = 0.0;
     qreal m_yOffset = 0.0;
-    qreal m_width = 0.0;
+    qreal m_recWidth = 0.0;
     qreal m_height = 0.0;
 };
 
@@ -127,20 +137,19 @@ public:
         , m_yRadius(settings["yRadius"].toReal())
     { }
 
-    void draw(QPainter& painter) const override
+    void draw(QPainter& painter, qreal xscale, qreal yscale) const override
     {
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setPen(m_color);
 
         QPainterPath path;
-        QRect window = painter.window();
         path.addRoundedRect(
-            (window.center().x() - (m_width / 2)) + m_xOffset,
-            (window.center().y() - (m_height / 2)) + m_yOffset,
-            m_width,
-            m_height,
-            m_xRadius,
-            m_yRadius);
+            ((m_viewport.width() / 2.)  - (m_recWidth / 2.) + m_xOffset) * xscale,
+            ((m_viewport.height() / 2.) - (m_height / 2.)   + m_yOffset) * yscale,
+            m_recWidth * xscale,
+            m_height * yscale,
+            m_xRadius * xscale,
+            m_yRadius * yscale);
         painter.fillPath(path, m_color);
         painter.drawPath(path);
     }
@@ -162,14 +171,16 @@ public:
     static QVariantMap adaptSettings(const QVariantMap& settings, const QString& prefix)
     {
         QVariantMap ret;
-        ret["blurRadius"] = settings[prefix + "BlurRadius"].toReal();
-        ret["color"]      = settings[prefix + "Color"].value<QColor>();
-        ret["xOffset"]    = settings[prefix + "XOffset"].toReal();
-        ret["yOffset"]    = settings[prefix + "YOffset"].toReal();
+        ret["viewportWidth"]  = settings["viewportWidth"].toReal();
+        ret["viewportHeight"] = settings["viewportHeight"].toReal();
+        ret["blurRadius"]     = settings[prefix + "BlurRadius"].toReal();
+        ret["color"]          = settings[prefix + "Color"].value<QColor>();
+        ret["xOffset"]        = settings[prefix + "XOffset"].toReal();
+        ret["yOffset"]        = settings[prefix + "YOffset"].toReal();
         ret["rectWidth"]      = settings["rectWidth"].toReal();
         ret["rectHeight"]     = settings["rectHeight"].toReal();
-        ret["xRadius"]    = settings["xRadius"].toReal();
-        ret["yRadius"]    = settings["yRadius"].toReal();
+        ret["xRadius"]        = settings["xRadius"].toReal();
+        ret["yRadius"]        = settings["yRadius"].toReal();
         return ret;
     }
 
