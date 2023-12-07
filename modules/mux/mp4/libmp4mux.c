@@ -2345,8 +2345,20 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_AV1:
         break;
     case VLC_CODEC_H264:
-        if(!p_fmt->i_extra && p_obj)
+        if(p_fmt->i_extra)
+        {
+            /* we only accept annexB for now */
+            if(((const uint8_t*)p_fmt->p_extra)[0] == 0x01)
+            {
+                if(p_obj)
+                    msg_Err(p_obj, "H264 input is not annexB. Missing packetizer ?");
+                return false;
+            }
+        }
+        else if(p_obj)
+        {
             msg_Warn(p_obj, "H264 muxing from AnnexB source will set an incorrect default profile");
+        }
         break;
     case VLC_CODEC_HEVC:
         if(!p_fmt->i_extra)
