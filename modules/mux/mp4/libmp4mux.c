@@ -2317,7 +2317,6 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_A52:
     case VLC_CODEC_DTS:
     case VLC_CODEC_EAC3:
-    case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
     case VLC_CODEC_MP2:
@@ -2343,6 +2342,14 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_VC1:
     case VLC_CODEC_WMAP:
     case VLC_CODEC_AV1:
+        break;
+    case VLC_CODEC_MP4A:
+        if(!p_fmt->i_extra)
+        {
+            if(p_obj)
+                msg_Err(p_obj, "Missing AudioDescriptor for AAC");
+            return false;
+        }
         break;
     case VLC_CODEC_H264:
         if(p_fmt->i_extra)
