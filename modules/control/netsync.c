@@ -181,7 +181,7 @@ static void *Master(void *handle)
     intf_sys_t *sys = intf->p_sys;
     for (;;) {
         struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
-        uint64_t data[2];
+        char data[16];
 
         if (poll(&ufd, 1, -1) < 0)
             continue;
@@ -198,8 +198,8 @@ static void *Master(void *handle)
         if (master_system < 0)
             continue;
 
-        data[0] = hton64(mdate());
-        data[1] = hton64(master_system);
+        SetQWBE(&data[0], mdate());
+        SetQWBE(&data[8], master_system);
 
         /* Reply to the sender */
         sendto(sys->fd, data, 16, 0,
@@ -224,7 +224,7 @@ static void *Slave(void *handle)
 
     for (;;) {
         struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
-        uint64_t data[2];
+        char data[16];
 
         vlc_tick_t system = GetPcrSystem(sys->input);
         if (system < 0)
@@ -233,7 +233,7 @@ static void *Slave(void *handle)
         /* Send clock request to the master */
         const vlc_tick_t send_date = mdate();
 
-        data[0] = hton64(system);
+        SetQWBE(&data[0], system);
         send(sys->fd, data, 8, 0);
 
         /* Don't block */
@@ -244,8 +244,8 @@ static void *Slave(void *handle)
         if (recv(sys->fd, data, 16, 0) < 16)
             goto wait;
 
-        const vlc_tick_t master_date   = ntoh64(data[0]);
-        const vlc_tick_t master_system = ntoh64(data[1]);
+        const vlc_tick_t master_date   = GetQWBE(&data[0]);
+        const vlc_tick_t master_system = GetQWBE(&data[8]);
         const vlc_tick_t diff_date = receive_date -
                                   ((receive_date - send_date) / 2 + master_date);
 
