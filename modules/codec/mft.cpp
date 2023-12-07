@@ -90,9 +90,6 @@ public:
     }
 
 
-    // Direct3D
-    vlc_mf_d3d d3d;
-
     /* For asynchronous MFT */
     bool is_async = false;
     ComPtr<IMFMediaEventGenerator> event_generator;
@@ -160,14 +157,31 @@ private:
     std::atomic<size_t>  refcount{1};
 };
 
-class mft_dec_sys_t : public mft_sys_t
+class mft_dec_audio : public mft_sys_t
 {
 public:
-    ~mft_dec_sys_t()
+    virtual ~mft_dec_audio() = default;
+
+protected:
+    void DoRelease() override
     {
     }
+};
+
+class mft_dec_video : public mft_sys_t
+{
+public:
+    mft_dec_video(bool use_d3d)
+    {
+        if (use_d3d)
+            d3d.Init();
+    }
+
+    virtual ~mft_dec_video() = default;
 
     // Direct3D
+    vlc_mf_d3d d3d;
+
     vlc_video_context  *vctx_out = nullptr;
     const d3d_format_t *cfg = nullptr;
 
@@ -179,8 +193,7 @@ public:
     struct hxxx_helper hh = {};
     bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
 
-private:
-
+protected:
     void DoRelease() override
     {
         for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
@@ -203,7 +216,7 @@ struct mf_d3d11_pic_ctx
 {
     struct d3d11_pic_context ctx;
     IMFMediaBuffer *out_media;
-    mft_dec_sys_t  *mfdec;
+    mft_dec_video  *mfdec;
 };
 #define MF_D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
     container_of(pic_ctx, mf_d3d11_pic_ctx, ctx.s)
@@ -752,7 +765,7 @@ static void CopyPackedBufferToPicture(picture_t *p_pic, const uint8_t *p_src)
 static void d3d11mf_pic_context_destroy(picture_context_t *ctx)
 {
     mf_d3d11_pic_ctx *pic_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
-    mft_dec_sys_t *mfdec = pic_ctx->mfdec;
+    mft_dec_video *mfdec = pic_ctx->mfdec;
     pic_ctx->out_media->Release();
     static_assert(offsetof(mf_d3d11_pic_ctx, ctx.s) == 0, "Cast assumption failure");
     d3d11_pic_context_destroy(ctx);
@@ -780,7 +793,7 @@ static picture_context_t *d3d11mf_pic_context_copy(picture_context_t *ctx)
 
 static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
                                           ComPtr<IMFMediaBuffer> &media_buffer,
-                                          mft_dec_sys_t *mfdec,
+                                          mft_dec_video *mfdec,
                                           ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
                                           vlc_video_context *vctx)
 {
@@ -809,7 +822,7 @@ static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
 
 static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_reading)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     DWORD output_status = 0;
@@ -874,6 +887,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
+            auto *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
             mf_d3d11_pic_ctx *pic_ctx = nullptr;
             UINT sliceIndex = 0;
             ComPtr<IMFDXGIBuffer> spDXGIBuffer;
@@ -888,15 +902,15 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                     d3d11Res->GetDesc(&desc);
 
                     hr = spDXGIBuffer->GetSubresourceIndex(&sliceIndex);
-                    if (!p_sys->vctx_out)
+                    if (!vidsys->vctx_out)
                     {
                         vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
                         d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueDevice(dec_dev);
                         if (dev_sys != NULL)
                         {
-                            p_sys->vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
+                            vidsys->vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
                             vlc_decoder_device_Release(dec_dev);
-                            if (unlikely(p_sys->vctx_out == NULL))
+                            if (unlikely(vidsys->vctx_out == NULL))
                             {
                                 msg_Err(p_dec, "failed to create a video context");
                                 d3d11Res->Release();
@@ -905,10 +919,10 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                             p_dec->fmt_out.video.i_width = desc.Width;
                             p_dec->fmt_out.video.i_height = desc.Height;
 
-                            p_sys->cfg = D3D11_RenderFormat(desc.Format ,true);
+                            vidsys->cfg = D3D11_RenderFormat(desc.Format ,true);
 
-                            p_dec->fmt_out.i_codec = p_sys->cfg->fourcc;
-                            p_dec->fmt_out.video.i_chroma = p_sys->cfg->fourcc;
+                            p_dec->fmt_out.i_codec = vidsys->cfg->fourcc;
+                            p_dec->fmt_out.video.i_chroma = vidsys->cfg->fourcc;
 
                             // pre allocate all the SRV for that texture
                             for (size_t slice=0; slice < desc.ArraySize; slice++)
@@ -917,47 +931,47 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                                     d3d11Res, d3d11Res, d3d11Res, d3d11Res
                                 };
 
-                                if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
-                                                                tex, slice, p_sys->cachedSRV[slice]) != VLC_SUCCESS)
+                                if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, vidsys->cfg,
+                                                                tex, slice, vidsys->cachedSRV[slice]) != VLC_SUCCESS)
                                 {
                                     d3d11Res->Release();
                                     goto error;
                                 }
                             }
-                            p_sys->cached_tex = d3d11Res;
+                            vidsys->cached_tex = d3d11Res;
                         }
                     }
                     else if (desc.ArraySize == 1)
                     {
                         assert(sliceIndex == 0);
 
-                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(p_sys->vctx_out);
+                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vidsys->vctx_out);
 
                         ID3D11Texture2D *tex[DXGI_MAX_SHADER_VIEW] = {
                             d3d11Res, d3d11Res, d3d11Res, d3d11Res
                         };
 
-                        for (size_t j=0; j < ARRAY_SIZE(p_sys->cachedSRV[sliceIndex]); j++)
+                        for (size_t j=0; j < ARRAY_SIZE(vidsys->cachedSRV[sliceIndex]); j++)
                         {
-                            if (p_sys->cachedSRV[sliceIndex][j] != nullptr)
-                                p_sys->cachedSRV[sliceIndex][j]->Release();
+                            if (vidsys->cachedSRV[sliceIndex][j] != nullptr)
+                                vidsys->cachedSRV[sliceIndex][j]->Release();
                         }
 
-                        if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
-                                                       tex, sliceIndex, p_sys->cachedSRV[sliceIndex]) != VLC_SUCCESS)
+                        if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, vidsys->cfg,
+                                                       tex, sliceIndex, vidsys->cachedSRV[sliceIndex]) != VLC_SUCCESS)
                         {
                             d3d11Res->Release();
                             goto error;
                         }
                     }
-                    else if (p_sys->cached_tex.Get() != d3d11Res)
+                    else if (vidsys->cached_tex.Get() != d3d11Res)
                     {
                         msg_Err(p_dec, "separate texture not supported");
                         d3d11Res->Release();
                         goto error;
                     }
 
-                    pic_ctx = CreatePicContext(d3d11Res, sliceIndex, output_media_buffer, p_sys, p_sys->cachedSRV[sliceIndex], p_sys->vctx_out);
+                    pic_ctx = CreatePicContext(d3d11Res, sliceIndex, output_media_buffer, vidsys, vidsys->cachedSRV[sliceIndex], vidsys->vctx_out);
                     d3d11Res->Release();
 
                     if (unlikely(pic_ctx == nullptr))
@@ -965,7 +979,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 }
             }
 
-            if (decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out))
+            if (decoder_UpdateVideoOutput(p_dec, vidsys->vctx_out))
             {
                 if (pic_ctx)
                     d3d11mf_pic_context_destroy(&pic_ctx->ctx.s);
@@ -1085,14 +1099,14 @@ error:
 
 static void Flush(decoder_t *p_dec)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     if (SUCCEEDED(p_sys->flushStream()))
         p_sys->startStream();
 }
 
 static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
     {
@@ -1125,11 +1139,12 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
         if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
         {
             /* in-place NAL to annex B conversion. */
-            p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
+            auto *vidsys = dynamic_cast<mft_dec_video*>(p_sys);
+            p_block = hxxx_helper_process_block(&vidsys->hh, p_block);
 
-            if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed)
+            if (vidsys->hh.i_input_nal_length_size && !vidsys->b_xps_pushed)
             {
-                block_t *p_xps_blocks = hxxx_helper_get_extradata_block(&p_sys->hh);
+                block_t *p_xps_blocks = hxxx_helper_get_extradata_block(&vidsys->hh);
                 if (p_xps_blocks)
                 {
                     size_t extrasize;
@@ -1139,7 +1154,7 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
                         block_ChainRelease(p_xps_blocks);
                         goto error;
                     }
-                    p_sys->b_xps_pushed = true;
+                    vidsys->b_xps_pushed = true;
                     block_ChainRelease(p_xps_blocks);
                 }
             }
@@ -1161,7 +1176,7 @@ error:
 
 static HRESULT DequeueMediaEvent(decoder_t *p_dec)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFMediaEvent> event;
@@ -1185,7 +1200,7 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
 
 static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     if (!p_block) /* No Drain */
@@ -1298,7 +1313,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
         return VLC_EGENERIC;
     }
 
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    mft_dec_video *p_sys = static_cast<mft_dec_video*>(p_dec->p_sys);
     HRESULT hr;
     hr = p_sys->d3d.SetD3D(vlc_object_logger(p_dec), d3d_dev->d3ddevice, p_sys->mft);
     if (FAILED(hr))
@@ -1309,7 +1324,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 
 static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFAttributes> attributes;
@@ -1369,8 +1384,9 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
+        mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
         EnableHardwareAcceleration(p_dec, attributes);
-        if (p_sys->d3d.CanUseD3D())
+        if (p_dec->fmt_in->video.i_width != 0 && vidsys->d3d.CanUseD3D())
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
             if (dec_dev != nullptr)
@@ -1428,8 +1444,9 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 
     if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
     {
-        hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec), p_dec->fmt_in->i_codec, 0, 0);
-        hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra);
+        auto *vidsys = dynamic_cast<mft_dec_video*>(p_sys);
+        hxxx_helper_init(&vidsys->hh, VLC_OBJECT(p_dec), p_dec->fmt_in->i_codec, 0, 0);
+        hxxx_helper_set_extra(&vidsys->hh, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra);
     }
     return VLC_SUCCESS;
 
@@ -1441,7 +1458,7 @@ error:
 
 static void DestroyMFT(decoder_t *p_dec)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
 
     if (p_sys->mft.Get())
     {
@@ -1481,8 +1498,9 @@ static void DestroyMFT(decoder_t *p_dec)
         p_sys->flushStream();
     }
 
-    if (p_sys->hh.p_obj)
-        hxxx_helper_clean(&p_sys->hh);
+    auto *vidsys = dynamic_cast<mft_dec_video*>(p_sys);
+    if (vidsys && vidsys->hh.p_obj)
+        hxxx_helper_clean(&vidsys->hh);
 }
 
 static int ListTransforms(struct vlc_logger *logger, GUID category, const char *type)
@@ -1522,7 +1540,7 @@ static int ListTransforms(struct vlc_logger *logger, GUID category, const char *
 
 static int FindMFT(decoder_t *p_dec)
 {
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     /* Try to create a MFT using MFTEnumEx. */
@@ -1586,22 +1604,6 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
-static int LoadMFTLibrary(struct vlc_logger *logger, mft_sys_t *p_sys, const es_format_t *fmt)
-{
-    if (fmt->i_cat != VIDEO_ES) // nothing left to do
-        return VLC_SUCCESS;
-
-    if (fmt->video.i_width == 0) // don't consume D3D resource for a fake decoder
-    {
-        vlc_debug(logger, "skip D3D handling for dummy decoder");
-        return VLC_SUCCESS;
-    }
-
-    p_sys->d3d.Init();
-
-    return VLC_SUCCESS;
-}
-
 static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
@@ -1616,7 +1618,11 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOTSUP;
     }
 
-    mft_dec_sys_t *p_sys = new (std::nothrow) mft_dec_sys_t();
+    mft_sys_t *p_sys;
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
+        p_sys = new (std::nothrow) mft_dec_video(p_dec->fmt_in->video.i_width != 0);
+    else
+        p_sys = new (std::nothrow) mft_dec_audio();
     if (unlikely(p_sys == nullptr))
     {
         MFShutdown();
@@ -1624,12 +1630,6 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
     p_dec->p_sys = p_sys;
-
-    if (LoadMFTLibrary(vlc_object_logger(p_this), p_sys, p_dec->fmt_in))
-    {
-        msg_Err(p_dec, "Failed to load MFT library.");
-        goto error;
-    }
 
     if (FindMFT(p_dec))
     {
@@ -1655,7 +1655,7 @@ error:
 static void Close(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
+    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
 
     DestroyMFT(p_dec);
 
