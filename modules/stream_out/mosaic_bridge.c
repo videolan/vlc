@@ -68,7 +68,6 @@ typedef struct
     int i_height, i_width;
     unsigned int i_sar_num, i_sar_den;
     char *psz_id;
-    bool b_inited;
 
     vlc_fourcc_t i_chroma; /* force image format chroma */
 
@@ -249,7 +248,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_stream->p_sys = p_sys;
-    p_sys->b_inited = false;
 
     p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
 
@@ -375,7 +373,7 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
     bridged_es_t *p_es;
     int i;
 
-    if( p_sys->b_inited || p_fmt->i_cat != VIDEO_ES )
+    if( p_sys->decoder_ref != NULL || p_fmt->i_cat != VIDEO_ES )
         return NULL;
 
     /* Create decoder object */
@@ -431,7 +429,6 @@ Add( sout_stream_t *p_stream, const es_format_t *p_fmt, const char *es_id )
         return NULL;
     }
 
-    p_sys->b_inited = true;
     vlc_global_lock( VLC_MOSAIC_MUTEX );
 
     p_bridge = GetBridge( p_stream );
@@ -532,8 +529,6 @@ static void Del( sout_stream_t *p_stream, void *id )
     ReleaseDecoder( &owner->dec );
 
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
-
-    p_sys->b_inited = false;
 }
 
 static void ApplyRescale( video_format_t *dst,
