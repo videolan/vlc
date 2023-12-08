@@ -38,6 +38,16 @@ class IMFDXGIDeviceManager;
 
 struct vlc_logger;
 
+class vlc_mft_ref
+{
+public:
+    virtual void AddRef() = 0;
+    /**
+     * \return true if the object was deleted
+     */
+    virtual bool Release() = 0;
+};
+
 class vlc_mf_d3d
 {
 public:

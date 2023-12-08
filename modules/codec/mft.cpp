@@ -75,7 +75,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-class mft_sys_t
+class mft_sys_t : public vlc_mft_ref
 {
 public:
     ComPtr<IMFTransform> mft;
@@ -109,12 +109,12 @@ public:
 
     virtual void DoRelease() = 0;
 
-    void AddRef()
+    void AddRef() final
     {
         refcount++;
     }
 
-    bool Release()
+    bool Release() final
     {
         if (--refcount == 0)
         {
