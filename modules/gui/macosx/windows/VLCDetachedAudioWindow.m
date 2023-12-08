@@ -46,13 +46,6 @@
 
 @implementation VLCDetachedAudioWindow
 
-+ (instancetype)fromNibWithOwner:(id)owner
-{
-    return (VLCDetachedAudioWindow *)[NSView fromNibNamed:VLCDetachedAudioWindow.className
-                                                withClass:VLCDetachedAudioWindow.class
-                                                withOwner:owner];
-}
-
 - (void)awakeFromNib
 {
     self.title = @"";
