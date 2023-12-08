@@ -36,7 +36,13 @@ static const CGFloat kBackgroundCornerRadius = 10.;
 
 @implementation VLCLibraryCollectionViewSupplementaryDetailView
 
-- (void)drawRect:(NSRect)dirtyRect {
+- (void)mouseDown:(NSEvent *)event
+{
+    // Do not propagate the event as this will lead to subject collection view item being deselected
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
     if(NSEqualSizes(_arrowSize, NSZeroSize)) {
         _arrowSize = NSMakeSize(kArrowWidth, kArrowHeight);
     }
