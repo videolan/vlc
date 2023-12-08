@@ -37,6 +37,7 @@
 #include <cassert>
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 
 #include "../video_chroma/dxgi_fmt.h"
 
@@ -134,5 +135,36 @@ void vlc_mf_d3d::ReleaseD3D(ComPtr<IMFTransform> & mft)
             d3d_handle = INVALID_HANDLE_VALUE;
         }
         dxgi_manager.Reset();
+    }
+}
+
+MFHW_d3d::MFHW_d3d()
+{
+    d3d.Init();
+}
+
+HRESULT MFHW_d3d::SetD3D(vlc_logger *logger, vlc_decoder_device & dec_dev, IGraphicsUnknown *device, ComPtr<IMFTransform> & mft)
+{
+    HRESULT hr = d3d.SetD3D(logger, device, mft);
+    if (SUCCEEDED(hr))
+    {
+        this->dec_dev = &dec_dev;
+        vlc_decoder_device_Hold(this->dec_dev);
+    }
+    return hr;
+}
+
+void MFHW_d3d::Release(ComPtr<IMFTransform> & mft)
+{
+    d3d.ReleaseD3D(mft);
+    if (vctx_out != nullptr)
+    {
+        vlc_video_context_Release(vctx_out);
+        vctx_out = nullptr;
+    }
+    if (dec_dev != nullptr)
+    {
+        vlc_decoder_device_Release(dec_dev);
+        dec_dev = nullptr;
     }
 }

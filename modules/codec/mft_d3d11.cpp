@@ -103,11 +103,6 @@ static picture_context_t *NewPicContext(ComPtr<ID3D11Texture2D> & texture, UINT 
     return &pic_ctx->ctx.s;
 }
 
-MFHW_d3d11::MFHW_d3d11()
-{
-    d3d.Init();
-}
-
 HRESULT MFHW_d3d11::SetupVideoContext(vlc_logger *logger, ComPtr<IMFDXGIBuffer> &spDXGIBuffer,
                                       es_format_t & fmt_out)
 {
@@ -221,13 +216,7 @@ HRESULT MFHW_d3d11::SetD3D(vlc_logger *logger, vlc_decoder_device & dec_dev, Com
         return E_NOINTERFACE;
     }
 
-    HRESULT hr = d3d.SetD3D(logger, devsys->d3d_dev.d3ddevice, mft);
-    if (SUCCEEDED(hr))
-    {
-        this->dec_dev = &dec_dev;
-        vlc_decoder_device_Hold(this->dec_dev);
-    }
-    return hr;
+    return MFHW_d3d::SetD3D(logger, dec_dev, devsys->d3d_dev.d3ddevice, mft);
 }
 
 void MFHW_d3d11::Release(ComPtr<IMFTransform> & mft)
@@ -243,15 +232,5 @@ void MFHW_d3d11::Release(ComPtr<IMFTransform> & mft)
             }
         }
     }
-    d3d.ReleaseD3D(mft);
-    if (vctx_out != nullptr)
-    {
-        vlc_video_context_Release(vctx_out);
-        vctx_out = nullptr;
-    }
-    if (dec_dev != nullptr)
-    {
-        vlc_decoder_device_Release(dec_dev);
-        dec_dev = nullptr;
-    }
+    MFHW_d3d::Release(mft);
 }

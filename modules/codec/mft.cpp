@@ -175,7 +175,7 @@ public:
     mft_dec_video() = default;
     virtual ~mft_dec_video() = default;
 
-    std::unique_ptr<MFHW_d3d11> hw_d3d;
+    std::unique_ptr<MFHW_d3d> hw_d3d;
 
     /* H264 only. */
     struct hxxx_helper hh = {};
@@ -1142,8 +1142,7 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
 
 static void DestroyMFT(decoder_t *p_dec);
 
-static HRESULT SetD3D11(vlc_logger *logger, vlc_decoder_device & dec_dev,
-                        std::unique_ptr<MFHW_d3d11> & hw_d3d, ComPtr<IMFTransform> & mft)
+static HRESULT SetD3D11(vlc_logger *logger, vlc_decoder_device & dec_dev, std::unique_ptr<MFHW_d3d> & hw_d3d, ComPtr<IMFTransform> & mft)
 {
     assert(hw_d3d == nullptr);
     hw_d3d = std::make_unique<MFHW_d3d11>();

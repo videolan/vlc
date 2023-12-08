@@ -35,8 +35,13 @@
 
 class IMFTransform;
 class IMFDXGIDeviceManager;
+class IMFDXGIBuffer;
 
 struct vlc_logger;
+struct picture_context_t;
+struct es_format_t;
+struct vlc_video_context;
+struct vlc_decoder_device;
 
 class vlc_mft_ref
 {
@@ -68,6 +73,30 @@ private:
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
     HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
 #endif
+};
+
+class MFHW_d3d
+{
+public:
+    MFHW_d3d();
+    virtual ~MFHW_d3d() = default;
+    virtual HRESULT SetD3D(vlc_logger *, vlc_decoder_device & dec_dev, Microsoft::WRL::ComPtr<IMFTransform> & mft) = 0;
+    virtual void Release(Microsoft::WRL::ComPtr<IMFTransform> & mft);
+
+
+    virtual picture_context_t *CreatePicContext(vlc_logger *, Microsoft::WRL::ComPtr<IMFDXGIBuffer> &,
+                                                vlc_mft_ref *) = 0;
+
+    virtual HRESULT SetupVideoContext(vlc_logger *, Microsoft::WRL::ComPtr<IMFDXGIBuffer> &, es_format_t & fmt_out) = 0;
+
+    vlc_video_context *vctx_out = nullptr;
+    vlc_decoder_device *dec_dev = nullptr;
+
+protected:
+    HRESULT SetD3D(vlc_logger *, vlc_decoder_device &, IGraphicsUnknown *, Microsoft::WRL::ComPtr<IMFTransform> &);
+
+private:
+    vlc_mf_d3d d3d;
 };
 
 #endif // VLC_MFT_D3D_H

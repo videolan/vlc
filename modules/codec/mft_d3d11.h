@@ -28,27 +28,18 @@
 #include "../video_chroma/d3d11_fmt.h"
 #include "mft_d3d.h"
 
-class MFHW_d3d11
+class MFHW_d3d11 : public MFHW_d3d
 {
 public:
-    MFHW_d3d11();
     virtual ~MFHW_d3d11() = default;
 
-    HRESULT SetD3D(vlc_logger *, vlc_decoder_device &, Microsoft::WRL::ComPtr<IMFTransform> &);
-    void Release(Microsoft::WRL::ComPtr<IMFTransform> &);
+    HRESULT SetD3D(vlc_logger *, vlc_decoder_device &, Microsoft::WRL::ComPtr<IMFTransform> &) final;
+    void Release(Microsoft::WRL::ComPtr<IMFTransform> &) final;
     picture_context_t *CreatePicContext(struct vlc_logger *, Microsoft::WRL::ComPtr<IMFDXGIBuffer> &,
-                                        vlc_mft_ref *);
+                                        vlc_mft_ref *) final;
 
-    HRESULT SetupVideoContext(vlc_logger *, Microsoft::WRL::ComPtr<IMFDXGIBuffer> &, es_format_t & fmt_out);
+    HRESULT SetupVideoContext(vlc_logger *, Microsoft::WRL::ComPtr<IMFDXGIBuffer> &, es_format_t & fmt_out) final;
 
-    vlc_video_context *vctx_out = nullptr;
-
-protected:
-    HRESULT SetD3D(vlc_logger *, vlc_decoder_device &, IUnknown *, Microsoft::WRL::ComPtr<IMFTransform> &);
-    vlc_decoder_device *dec_dev = nullptr;
-
-private:
-    vlc_mf_d3d d3d;
 private:
     const d3d_format_t *cfg = nullptr;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> cached_tex;
