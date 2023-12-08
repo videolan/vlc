@@ -939,6 +939,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
         p_owner->p_vout = p_vout;
         p_owner->vout_order = channel_order;
+        Decoder_UpdateOutState(p_owner);
         vlc_fifo_Unlock(p_owner->p_fifo);
 
         assert(channel_order != VLC_VOUT_ORDER_NONE);
