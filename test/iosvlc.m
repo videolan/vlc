@@ -99,13 +99,13 @@
 
     /* Store startup arguments to forward them to libvlc */
     NSArray *arguments = [[NSProcessInfo processInfo] arguments];
-    unsigned vlc_argc = [arguments count];
+    unsigned vlc_argc = [arguments count] - 1;
     const char **vlc_argv = malloc(vlc_argc * sizeof *vlc_argv);
     if (vlc_argv == NULL)
         return NO;
 
     for (unsigned i = 0; i < vlc_argc; i++)
-         vlc_argv[i] = [[arguments objectAtIndex:i] UTF8String];
+        vlc_argv[i] = [[arguments objectAtIndex:i + 1] UTF8String];
 
     /* Initialize libVLC */
     _libvlc = libvlc_new(vlc_argc, (const char * const*)vlc_argv);
