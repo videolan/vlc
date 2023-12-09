@@ -1,0 +1,25 @@
+From 47370dc3c47615e4a02e490f077780a3122839f4 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Sat, 9 Dec 2023 09:35:05 +0100
+Subject: [PATCH] disable documentation
+
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8a4850384..bdb608a21 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -126,7 +126,7 @@ EXTRA_DIST += \
+ 
+ # Most work delegated to sub-dir makefile fragments.
+ include $(srcdir)/bin/local.mk
+-include $(srcdir)/doc/local.mk
++# include $(srcdir)/doc/local.mk
+ include $(srcdir)/lib/local.mk
+ include $(srcdir)/lib/Automake/local.mk
+ include $(srcdir)/lib/am/local.mk
+-- 
+2.39.3 (Apple Git-145)
+
