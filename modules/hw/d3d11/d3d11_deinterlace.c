@@ -39,7 +39,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "../../video_filter/deinterlace/common.h"
 
-#ifdef __MINGW32__
+#ifndef HAVE_D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS
 typedef UINT D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS;
 #define D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BLEND               0x1
 #define D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BOB                 0x2
