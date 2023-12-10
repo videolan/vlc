@@ -2181,8 +2181,15 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
 
         vout_display_cfg_t place_cfg = *vd->cfg;
-        place_cfg.display.width  = RECTWidth(sys->sys.rect_dest_clipped);
-        place_cfg.display.height = RECTHeight(sys->sys.rect_dest_clipped);
+        if (sys->sys.rect_display.right && sys->sys.rect_display.bottom)
+        {
+            place_cfg.display.width  = sys->sys.rect_display.right;
+            place_cfg.display.height = sys->sys.rect_display.bottom;
+        } else {
+            place_cfg.display.width  = RECTWidth(sys->sys.rect_dest_clipped);
+            place_cfg.display.height = RECTHeight(sys->sys.rect_dest_clipped);
+        }
+        
         vout_display_place_t place;
         vout_display_PlacePicture(&place, &vd->source, &place_cfg, false);
 
