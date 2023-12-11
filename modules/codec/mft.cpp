@@ -493,12 +493,7 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
 
         if (fmt_out.i_cat == VIDEO_ES)
         {
-            if (subtype == MFVideoFormat_NV12 || subtype == MFVideoFormat_YV12
-             || subtype == MFVideoFormat_I420 || subtype == MFVideoFormat_IYUV)
-                output_type_index = i;
-            /* Transform might offer output in a D3DFMT proprietary FCC. If we can
-             * use it, fall back to it in case we do not find YV12 or I420 */
-            else if(output_type_index < 0 && MFFormatToChroma(subtype) > 0)
+            if(MFFormatToChroma(subtype) != 0)
                 output_type_index = i;
         }
         else
