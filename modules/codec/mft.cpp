@@ -302,13 +302,18 @@ static const pair_format_guid audio_codec_table[] =
     { 0, GUID_NULL }
 };
 
-static const GUID & MFFormatFromCodec(const pair_format_guid table[], vlc_fourcc_t codec)
+static HRESULT MFTypeFromCodec(const GUID & type, vlc_fourcc_t codec, MFT_REGISTER_TYPE_INFO & info)
 {
+    const pair_format_guid *table = type == MFMediaType_Video ? video_codec_table : audio_codec_table;
     for (int i = 0; table[i].fourcc; ++i)
         if (table[i].fourcc == codec)
-            return table[i].guid;
+        {
+            info.guidMajorType = type;
+            info.guidSubtype = table[i].guid;
+            return S_OK;
+        }
 
-    return GUID_NULL;
+    return E_INVALIDARG;
 }
 
 static vlc_fourcc_t MFFormatToChroma(const GUID & guid)
@@ -320,14 +325,22 @@ static vlc_fourcc_t MFFormatToChroma(const GUID & guid)
     return 0;
 }
 
-static const GUID & MFFormatFromAudio(vlc_fourcc_t audio_format)
+static HRESULT MFTypeFromAudio(vlc_fourcc_t audio_format, MFT_REGISTER_TYPE_INFO & info)
 {
     if (audio_format == VLC_CODEC_F32L)
-        return MFAudioFormat_Float;
+    {
+        info.guidMajorType = MFMediaType_Audio;
+        info.guidSubtype = MFAudioFormat_Float;
+        return S_OK;
+    }
     if (audio_format == VLC_CODEC_S16L)
-        return MFAudioFormat_PCM;
+    {
+        info.guidMajorType = MFMediaType_Audio;
+        info.guidSubtype = MFAudioFormat_PCM;
+        return S_OK;
+    }
 
-    return GUID_NULL;
+    return E_INVALIDARG;
 }
 
 HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO & type)
@@ -1411,9 +1424,8 @@ static int FindMFT(decoder_t *p_dec)
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         category = MFT_CATEGORY_VIDEO_DECODER;
-        input_type.guidMajorType = MFMediaType_Video;
-        input_type.guidSubtype = MFFormatFromCodec(video_codec_table, p_dec->fmt_in->i_codec);
-        if(input_type.guidSubtype == GUID_NULL) {
+        hr = MFTypeFromCodec(MFMediaType_Video, p_dec->fmt_in->i_codec, input_type);
+        if(FAILED(hr)) {
             /* Codec is not well known. Construct a MF transform subtype from the fourcc */
             input_type.guidSubtype = MFVideoFormat_Base;
             input_type.guidSubtype.Data1 = p_dec->fmt_in->i_codec;
@@ -1422,13 +1434,12 @@ static int FindMFT(decoder_t *p_dec)
     else
     {
         category = MFT_CATEGORY_AUDIO_DECODER;
-        input_type.guidMajorType = MFMediaType_Audio;
-        input_type.guidSubtype  = MFFormatFromCodec(audio_codec_table, p_dec->fmt_in->i_codec);
-        if (input_type.guidSubtype == GUID_NULL)
+        hr = MFTypeFromCodec(MFMediaType_Audio, p_dec->fmt_in->i_codec, input_type);
+        if(FAILED(hr))
             // not a codec, maybe a raw format
-            input_type.guidSubtype = MFFormatFromAudio(p_dec->fmt_in->i_codec);
+            hr = MFTypeFromAudio(p_dec->fmt_in->i_codec, input_type);
     }
-    if (input_type.guidSubtype == GUID_NULL)
+    if (FAILED(hr))
         return VLC_EGENERIC;
 
     const char *dec_str;
