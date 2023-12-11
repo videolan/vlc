@@ -116,6 +116,8 @@ public:
     DWORD output_stream_id = 0;
     ComPtr<IMFSample> output_sample;
 
+    HRESULT AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result);
+
     virtual void DoRelease() = 0;
 
     void AddRef() final
@@ -603,9 +605,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int AllocateOutputSample(vlc_logger *logger, es_format_category_e cat,
-                                ComPtr<IMFTransform> & mft, DWORD stream_id,
-                                ComPtr<IMFSample> & result)
+HRESULT mft_sys_t::AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result)
 {
     HRESULT hr;
 
@@ -618,14 +618,14 @@ static int AllocateOutputSample(vlc_logger *logger, es_format_category_e cat,
     DWORD allocation_size;
     DWORD alignment;
 
-    hr = mft->GetOutputStreamInfo(stream_id, &output_info);
+    hr = mft->GetOutputStreamInfo(output_stream_id, &output_info);
     if (FAILED(hr))
-        goto error;
+        return hr;
 
     if (output_info.dwFlags & (MFT_OUTPUT_STREAM_PROVIDES_SAMPLES | MFT_OUTPUT_STREAM_CAN_PROVIDE_SAMPLES))
     {
         /* The MFT will provide an allocated sample. */
-        return VLC_SUCCESS;
+        return S_FALSE;
     }
 
     if (cat == VIDEO_ES)
@@ -635,12 +635,12 @@ static int AllocateOutputSample(vlc_logger *logger, es_format_category_e cat,
                         | MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER
                         | MFT_OUTPUT_STREAM_FIXED_SAMPLE_SIZE;
         if ((output_info.dwFlags & expected_flags) != expected_flags)
-            goto error;
+            return E_UNEXPECTED;
     }
 
     hr = MFCreateSample(&output_sample);
     if (FAILED(hr))
-        goto error;
+        return hr;
 
     allocation_size = output_info.cbSize;
     alignment = output_info.cbAlignment;
@@ -649,19 +649,15 @@ static int AllocateOutputSample(vlc_logger *logger, es_format_category_e cat,
     else
         hr = MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
     if (FAILED(hr))
-        goto error;
+        return hr;
 
     hr = output_sample->AddBuffer(output_media_buffer.Get());
     if (FAILED(hr))
-        goto error;
+        return hr;
 
     result.Swap(output_sample);
 
-    return VLC_SUCCESS;
-
-error:
-    vlc_error(logger, "Error in AllocateOutputSample(). (hr=0x%lX)", hr);
-    return VLC_EGENERIC;
+    return S_OK;
 }
 
 static int ProcessInputStream(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, block_t *p_block)
@@ -758,6 +754,9 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
     if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
     {
+        // there's an output ready, keep trying
+        keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
+
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
             video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
         else
@@ -766,11 +765,12 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             return VLC_EGENERIC;
 
         /* Reallocate output sample. */
-        if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat,
-                                 p_sys->mft, p_sys->output_stream_id, p_sys->output_sample))
+        hr = p_sys->AllocateOutputSample(p_dec->fmt_in->i_cat, p_sys->output_sample);
+        if (FAILED(hr))
+        {
+            msg_Err(p_dec, "Error in AllocateOutputSample(). (hr=0x%lX)", hr);
             return VLC_EGENERIC;
-        // there's an output ready, keep trying
-        keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
+        }
         return VLC_SUCCESS;
     }
 
@@ -1498,9 +1498,12 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Only one output sample is needed, we can allocate one and reuse it. */
-    if (AllocateOutputSample(vlc_object_logger(p_dec), p_dec->fmt_in->i_cat,
-                             p_sys->mft, p_sys->output_stream_id, p_sys->output_sample))
+    hr = p_sys->AllocateOutputSample(p_dec->fmt_in->i_cat, p_sys->output_sample);
+    if (FAILED(hr))
+    {
+        msg_Err(p_dec, "Error in AllocateOutputSample(). (hr=0x%lX)", hr);
         goto error;
+    }
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
     p_dec->pf_flush = p_sys->is_async ? NULL : Flush;
