@@ -142,6 +142,8 @@ MainInterface.MainViewLoader {
             basePictureWidth: VLCStyle.gridCover_network_width
             basePictureHeight: VLCStyle.gridCover_network_height
             subtitleHeight: 0
+
+            maxNbItemPerRow: 12
             
             selectionModel: root.selectionModel
             model: root.model

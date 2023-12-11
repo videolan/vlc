@@ -187,6 +187,8 @@ FocusScope {
             basePictureWidth: VLCStyle.gridCover_network_width
             basePictureHeight: VLCStyle.gridCover_network_height
 
+            maxNbItemPerRow: 12
+
             readonly property int maximumCount: (root.maximumRows === -1)
                                                 ? -1
                                                 : root.maximumRows * nbItemPerRow
