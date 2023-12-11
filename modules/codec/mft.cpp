@@ -311,11 +311,11 @@ static const GUID & MFFormatFromCodec(const pair_format_guid table[], vlc_fourcc
     return GUID_NULL;
 }
 
-static vlc_fourcc_t MFFormatToChroma(const pair_format_guid table[], const GUID & guid)
+static vlc_fourcc_t MFFormatToChroma(const GUID & guid)
 {
-    for (int i = 0; table[i].fourcc; ++i)
-        if (table[i].guid == guid)
-            return table[i].fourcc;
+    for (int i = 0; chroma_format_table[i].fourcc; ++i)
+        if (chroma_format_table[i].guid == guid)
+            return chroma_format_table[i].fourcc;
 
     return 0;
 }
@@ -498,7 +498,7 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
                 output_type_index = i;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
-            else if(output_type_index < 0 && MFFormatToChroma(chroma_format_table, subtype) > 0)
+            else if(output_type_index < 0 && MFFormatToChroma(subtype) > 0)
                 output_type_index = i;
         }
         else
@@ -537,7 +537,7 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
     if (fmt_out.i_cat == VIDEO_ES)
     {
         /* Transform might offer output in a D3DFMT proprietary FCC */
-        vlc_fourcc_t fcc = MFFormatToChroma(chroma_format_table, subtype);
+        vlc_fourcc_t fcc = MFFormatToChroma(subtype);
         if(!fcc) {
             if (subtype == MFVideoFormat_IYUV)
                 subtype = MFVideoFormat_I420;
