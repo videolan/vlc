@@ -118,6 +118,7 @@ public:
 
     HRESULT AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result);
     int SetOutputType(vlc_logger *, const GUID & req_subtype, es_format_t & fmt_out);
+    HRESULT SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO &);
 
     virtual void DoRelease() = 0;
 
@@ -321,10 +322,12 @@ static vlc_fourcc_t MFFormatToChroma(const pair_format_guid table[], const GUID 
     return 0;
 }
 
-static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
-                            DWORD stream_id, const GUID & req_subtype, ComPtr<IMFMediaType> & result)
+HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO & type)
 {
     HRESULT hr;
+
+    DWORD stream_id = input_stream_id;
+    ComPtr<IMFMediaType> & result = input_type;
 
     result.Reset();
 
@@ -333,7 +336,7 @@ static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
     /* Search a suitable input type for the MFT. */
     for (int i = 0;; ++i)
     {
-        hr = mf_sys.mft->GetInputAvailableType(stream_id, i, input_media_type.ReleaseAndGetAddressOf());
+        hr = mft->GetInputAvailableType(stream_id, i, input_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
             goto error;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -349,7 +352,7 @@ static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
         if (FAILED(hr))
             goto error;
 
-        if (subtype == req_subtype)
+        if (subtype == type.guidSubtype)
             break;
     }
 
@@ -372,7 +375,7 @@ static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
     }
     else
     {
-        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, req_subtype.Data1);
+        hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, type.guidSubtype.Data1);
         if (FAILED(hr))
             goto error;
         if (fmt_in.audio.i_rate)
@@ -424,7 +427,7 @@ static HRESULT SetInputType(mft_sys_t &mf_sys, const es_format_t & fmt_in,
         }
     }
 
-    hr = mf_sys.mft->SetInputType(stream_id, input_media_type.Get(), 0);
+    hr = mft->SetInputType(stream_id, input_media_type.Get(), 0);
     if (FAILED(hr))
         goto error;
 
@@ -1164,7 +1167,7 @@ static HRESULT SetD3D11(vlc_logger *logger, vlc_decoder_device & dec_dev, std::u
     return hr;
 }
 
-static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
+static int InitializeMFT(decoder_t *p_dec, const MFT_REGISTER_TYPE_INFO & type)
 {
     auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
@@ -1217,7 +1220,7 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
     else if (FAILED(hr))
         goto error;
 
-    hr = SetInputType(*p_sys, *p_dec->fmt_in, p_sys->input_stream_id, mSubtype, p_sys->input_type);
+    hr = p_sys->SetInputType(*p_dec->fmt_in, type);
     if (FAILED(hr))
     {
         msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
@@ -1269,7 +1272,7 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
      */
     if (p_sys->input_type.Get() == nullptr)
     {
-        hr = SetInputType(*p_sys, *p_dec->fmt_in, p_sys->input_stream_id, mSubtype, p_sys->input_type);
+        hr = p_sys->SetInputType(*p_dec->fmt_in, type);
         if (FAILED(hr))
         {
             msg_Err(p_dec, "Error in SetInputType(). (hr=0x%lX)", hr);
@@ -1452,7 +1455,7 @@ static int FindMFT(decoder_t *p_dec)
         if (FAILED(hr))
             continue;
 
-        if (InitializeMFT(p_dec, input_type.guidSubtype) == VLC_SUCCESS)
+        if (InitializeMFT(p_dec, input_type) == VLC_SUCCESS)
         {
             for (++i; i < activate_objects_count; ++i)
                 activate_objects[i]->Release();
