@@ -302,7 +302,7 @@ static const GUID & MFFormatFromCodec(const pair_format_guid table[], vlc_fourcc
     return GUID_NULL;
 }
 
-static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & guid)
+static vlc_fourcc_t MFFormatToChroma(const pair_format_guid table[], const GUID & guid)
 {
     for (int i = 0; table[i].fourcc; ++i)
         if (table[i].guid == guid)
@@ -477,7 +477,7 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
                 output_type_index = i;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
-            else if(output_type_index < 0 && GUIDToFormat(d3d_format_table, subtype) > 0)
+            else if(output_type_index < 0 && MFFormatToChroma(d3d_format_table, subtype) > 0)
                 output_type_index = i;
         }
         else
@@ -516,7 +516,7 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
     if (fmt_out.i_cat == VIDEO_ES)
     {
         /* Transform might offer output in a D3DFMT proprietary FCC */
-        vlc_fourcc_t fcc = GUIDToFormat(d3d_format_table, subtype);
+        vlc_fourcc_t fcc = MFFormatToChroma(d3d_format_table, subtype);
         if(fcc) {
             /* D3D formats are upside down */
             fmt_out.video.orientation = ORIENT_VFLIPPED;
