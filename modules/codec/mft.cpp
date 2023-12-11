@@ -50,6 +50,13 @@ extern "C" {
 #include <codecapi.h>
 
 
+#if !defined(CODECAPI_AVDecVideoAcceleration_H264) // MINGW < 8
+#define CODECAPI_AVDecVideoAcceleration_H264  DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_H264)
+#define CODECAPI_AVDecVideoAcceleration_VC1   DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_VC1)
+#define CODECAPI_AVDecVideoAcceleration_MPEG2 DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_MPEG2)
+#endif
+
+
 #include <vlc_codecs.h> // wf_tag_to_fourcc
 
 #include <algorithm>
@@ -1116,8 +1123,7 @@ error:
 static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & attributes)
 {
     HRESULT hr = S_OK;
-#if defined(STATIC_CODECAPI_AVDecVideoAcceleration_H264)
-    switch (p_dec->fmt_in->i_codec)
+    switch (fmt_in.i_codec)
     {
         case VLC_CODEC_H264:
             hr = attributes->SetUINT32(CODECAPI_AVDecVideoAcceleration_H264, TRUE);
@@ -1136,10 +1142,6 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
             hr = S_OK;
             break;
     }
-#else
-    VLC_UNUSED(p_dec);
-    VLC_UNUSED(attributes);
-#endif // STATIC_CODECAPI_AVDecVideoAcceleration_H264
 
     return SUCCEEDED(hr) ? VLC_SUCCESS : VLC_EGENERIC;
 }
