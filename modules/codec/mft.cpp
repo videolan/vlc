@@ -1120,9 +1120,9 @@ error:
     return VLCDEC_SUCCESS;
 }
 
-static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & attributes)
+static HRESULT EnableHardwareAcceleration(const es_format_t & fmt_in, ComPtr<IMFAttributes> & attributes)
 {
-    HRESULT hr = S_OK;
+    HRESULT hr;
     switch (fmt_in.i_codec)
     {
         case VLC_CODEC_H264:
@@ -1143,7 +1143,7 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
             break;
     }
 
-    return SUCCEEDED(hr) ? VLC_SUCCESS : VLC_EGENERIC;
+    return hr;
 }
 
 static void DestroyMFT(decoder_t *p_dec);
@@ -1225,8 +1225,8 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
+        EnableHardwareAcceleration(*p_dec->fmt_in, attributes);
         mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
-        EnableHardwareAcceleration(p_dec, attributes);
         if (p_dec->fmt_in->video.i_width != 0 /*&& vidsys->d3d.CanUseD3D()*/)
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
