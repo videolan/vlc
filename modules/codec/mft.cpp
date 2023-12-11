@@ -290,7 +290,7 @@ static const pair_format_guid d3d_format_table[] = {
  * We cannot use the FOURCC code for audio either since the
  * WAVE_FORMAT value is used to create the GUID.
  */
-static const pair_format_guid audio_format_table[] =
+static const pair_format_guid audio_codec_table[] =
 {
     { VLC_CODEC_MPGA, MFAudioFormat_MPEG      },
     { VLC_CODEC_MP3,  MFAudioFormat_MP3       },
@@ -299,8 +299,6 @@ static const pair_format_guid audio_format_table[] =
     { VLC_CODEC_WMA2, MFAudioFormat_WMAudioV8 },
     { VLC_CODEC_A52,  MFAudioFormat_Dolby_AC3 },
 
-    { VLC_CODEC_F32L,  MFAudioFormat_Float },
-    { VLC_CODEC_S16L,  MFAudioFormat_PCM },
     { 0, GUID_NULL }
 };
 
@@ -320,6 +318,16 @@ static vlc_fourcc_t MFFormatToChroma(const pair_format_guid table[], const GUID 
             return table[i].fourcc;
 
     return 0;
+}
+
+static const GUID & MFFormatFromAudio(vlc_fourcc_t audio_format)
+{
+    if (audio_format == VLC_CODEC_F32L)
+        return MFAudioFormat_Float;
+    if (audio_format == VLC_CODEC_S16L)
+        return MFAudioFormat_PCM;
+
+    return GUID_NULL;
 }
 
 HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO & type)
@@ -1423,7 +1431,10 @@ static int FindMFT(decoder_t *p_dec)
     {
         category = MFT_CATEGORY_AUDIO_DECODER;
         input_type.guidMajorType = MFMediaType_Audio;
-        input_type.guidSubtype  = MFFormatFromCodec(audio_format_table, p_dec->fmt_in->i_codec);
+        input_type.guidSubtype  = MFFormatFromCodec(audio_codec_table, p_dec->fmt_in->i_codec);
+        if (input_type.guidSubtype == GUID_NULL)
+            // not a codec, maybe a raw format
+            input_type.guidSubtype = MFFormatFromAudio(p_dec->fmt_in->i_codec);
     }
     if (input_type.guidSubtype == GUID_NULL)
         return VLC_EGENERIC;
