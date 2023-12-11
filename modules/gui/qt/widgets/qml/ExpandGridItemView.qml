@@ -55,6 +55,8 @@ Widgets.ExpandGridView {
     cellWidth: gridHelper.cellWidth
     cellHeight: gridHelper.cellHeight
 
+    horizontalSpacing: gridHelper.horizontalSpacing
+
     // Children
 
     Util.GridSizeHelper {

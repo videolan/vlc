@@ -40,10 +40,14 @@ QtObject{
     readonly property int textHeight: (titleHeight ? titleHeight + titleTopMargin + VLCStyle.dp(1): 0) +
                                       (subtitleHeight ? subtitleHeight + subtitleTopMargin + VLCStyle.dp(1) : 0)
 
-    property int horizontalSpacing: VLCStyle.column_spacing
+    property int horizontalSpacing: nbItemPerRow === 2 ? VLCStyle.margin_large + VLCStyle.margin_xxxsmall
+                                                       : (nbItemPerRow === 3 ? VLCStyle.margin_large + VLCStyle.margin_xxsmall
+                                                                             : _defaultHorizontalSpacing)
 
-    readonly property int nbItemPerRow: Math.max(Math.floor((availableWidth + horizontalSpacing) /
-                                                            (basePictureWidth + horizontalSpacing)), 1)
+    readonly property int _defaultHorizontalSpacing: VLCStyle.column_spacing
+
+    readonly property int nbItemPerRow: Math.max(Math.floor((availableWidth + _defaultHorizontalSpacing) /
+                                                            (basePictureWidth + _defaultHorizontalSpacing)), 1)
 
     // NOTE: Responsive cell sizing based on available width
     readonly property int cellWidth: (availableWidth + horizontalSpacing) / nbItemPerRow - horizontalSpacing
@@ -51,7 +55,7 @@ QtObject{
 
     // NOTE: Find the maximum picture size for nbItemPerRow == 1, so that we always downscale
     //       formula for maxPictureWidth depended on nbItemPerRow would be:
-    //       (basePictureWidth + horizontalSpacing) * (1 + 1 / nbItemPerRow) - horizontalSpacing
-    readonly property int maxPictureWidth: 2 * basePictureWidth + horizontalSpacing
+    //       (basePictureWidth + _defaultHorizontalSpacing) * (1 + 1 / nbItemPerRow) - _defaultHorizontalSpacing
+    readonly property int maxPictureWidth: 2 * basePictureWidth + _defaultHorizontalSpacing
     readonly property int maxPictureHeight: (basePictureHeight / basePictureWidth) * maxPictureWidth
 }
