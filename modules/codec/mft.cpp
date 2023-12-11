@@ -253,7 +253,7 @@ DEFINE_MEDIATYPE_GUID (MFVideoFormat_AV1, FCC('AV01'));
  * We need this table since the FOURCC used for GUID is not the same
  * as the FOURCC used by VLC, for instance h264 vs H264.
  */
-static const pair_format_guid video_format_table[] =
+static const pair_format_guid video_codec_table[] =
 {
     { VLC_CODEC_H264, MFVideoFormat_H264 },
     { VLC_CODEC_MPGV, MFVideoFormat_MPEG2 },
@@ -266,23 +266,23 @@ static const pair_format_guid video_format_table[] =
     { VLC_CODEC_VC1,  MFVideoFormat_WVC1 },
     { VLC_CODEC_AV1,  MFVideoFormat_AV1 },
 
+    { 0, GUID_NULL }
+};
+
+/*
+ * Table to map MF Transform raw chroma output formats to native VLC FourCC
+ */
+static const pair_format_guid chroma_format_table[] = {
     { VLC_CODEC_NV12,  MFVideoFormat_NV12 },
     { VLC_CODEC_I420,  MFVideoFormat_I420 },
     { VLC_CODEC_YV12,  MFVideoFormat_YV12 },
     { VLC_CODEC_YV12,  MFVideoFormat_IYUV },
     { VLC_CODEC_YUYV,  MFVideoFormat_YUY2 },
-
-    { 0, GUID_NULL }
-};
-
-/*
- * Table to map MF Transform raw 3D3 output formats to native VLC FourCC
- */
-static const pair_format_guid d3d_format_table[] = {
     { VLC_CODEC_BGRX,  MFVideoFormat_RGB32  },
     { VLC_CODEC_BGR24, MFVideoFormat_RGB24  },
     { VLC_CODEC_BGRA,  MFVideoFormat_ARGB32 },
     { VLC_CODEC_GREY,  MFVideoFormat_L8 },
+
     { 0, GUID_NULL }
 };
 
@@ -498,7 +498,7 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
                 output_type_index = i;
             /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
-            else if(output_type_index < 0 && MFFormatToChroma(d3d_format_table, subtype) > 0)
+            else if(output_type_index < 0 && MFFormatToChroma(chroma_format_table, subtype) > 0)
                 output_type_index = i;
         }
         else
@@ -537,11 +537,8 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
     if (fmt_out.i_cat == VIDEO_ES)
     {
         /* Transform might offer output in a D3DFMT proprietary FCC */
-        vlc_fourcc_t fcc = MFFormatToChroma(d3d_format_table, subtype);
-        if(fcc) {
-            /* D3D formats are upside down */
-            fmt_out.video.orientation = ORIENT_VFLIPPED;
-        } else {
+        vlc_fourcc_t fcc = MFFormatToChroma(chroma_format_table, subtype);
+        if(!fcc) {
             if (subtype == MFVideoFormat_IYUV)
                 subtype = MFVideoFormat_I420;
             fcc = vlc_fourcc_GetCodec(VIDEO_ES, subtype.Data1);
@@ -1420,7 +1417,7 @@ static int FindMFT(decoder_t *p_dec)
     {
         category = MFT_CATEGORY_VIDEO_DECODER;
         input_type.guidMajorType = MFMediaType_Video;
-        input_type.guidSubtype = MFFormatFromCodec(video_format_table, p_dec->fmt_in->i_codec);
+        input_type.guidSubtype = MFFormatFromCodec(video_codec_table, p_dec->fmt_in->i_codec);
         if(input_type.guidSubtype == GUID_NULL) {
             /* Codec is not well known. Construct a MF transform subtype from the fourcc */
             input_type.guidSubtype = MFVideoFormat_Base;
