@@ -102,6 +102,7 @@ public:
         CoUninitialize();
     }
 
+    virtual bool IsEncoder() const = 0;
 
     /* For asynchronous MFT */
     bool is_async = false;
@@ -180,6 +181,8 @@ class mft_dec_audio : public mft_sys_t
 public:
     virtual ~mft_dec_audio() = default;
 
+    bool IsEncoder() const final { return false; }
+
 protected:
     void DoRelease() override
     {
@@ -212,6 +215,8 @@ class mft_dec_video : public vlc_mft_d3d
 public:
     mft_dec_video() = default;
     virtual ~mft_dec_video() = default;
+
+    bool IsEncoder() const final { return false; }
 
     /* H264 only. */
     struct hxxx_helper hh = {};
