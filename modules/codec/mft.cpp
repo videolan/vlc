@@ -293,10 +293,10 @@ static const pair_format_guid audio_format_table[] =
     { 0, GUID_NULL }
 };
 
-static const GUID & FormatToGUID(const pair_format_guid table[], vlc_fourcc_t fourcc)
+static const GUID & MFFormatFromCodec(const pair_format_guid table[], vlc_fourcc_t codec)
 {
     for (int i = 0; table[i].fourcc; ++i)
-        if (table[i].fourcc == fourcc)
+        if (table[i].fourcc == codec)
             return table[i].guid;
 
     return GUID_NULL;
@@ -1406,7 +1406,7 @@ static int FindMFT(decoder_t *p_dec)
     {
         category = MFT_CATEGORY_VIDEO_DECODER;
         input_type.guidMajorType = MFMediaType_Video;
-        input_type.guidSubtype = FormatToGUID(video_format_table, p_dec->fmt_in->i_codec);
+        input_type.guidSubtype = MFFormatFromCodec(video_format_table, p_dec->fmt_in->i_codec);
         if(input_type.guidSubtype == GUID_NULL) {
             /* Codec is not well known. Construct a MF transform subtype from the fourcc */
             input_type.guidSubtype = MFVideoFormat_Base;
@@ -1417,7 +1417,7 @@ static int FindMFT(decoder_t *p_dec)
     {
         category = MFT_CATEGORY_AUDIO_DECODER;
         input_type.guidMajorType = MFMediaType_Audio;
-        input_type.guidSubtype  = FormatToGUID(audio_format_table, p_dec->fmt_in->i_codec);
+        input_type.guidSubtype  = MFFormatFromCodec(audio_format_table, p_dec->fmt_in->i_codec);
     }
     if (input_type.guidSubtype == GUID_NULL)
         return VLC_EGENERIC;
