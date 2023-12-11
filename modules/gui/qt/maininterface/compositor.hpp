@@ -58,7 +58,8 @@ public:
         DummyCompositor,
         Win7Compositor,
         DirectCompositionCompositor,
-        X11Compositor
+        X11Compositor,
+        WaylandCompositor
     };
 
     typedef void (*VoutDestroyCb)(vlc_window_t *p_wnd);

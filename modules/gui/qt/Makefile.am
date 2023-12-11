@@ -63,17 +63,18 @@ endif
 endif
 endif
 
-if HAVE_WAYLAND
-libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND
-libqt_plugin_la_CXXFLAGS += $(WAYLAND_CLIENT_CFLAGS)
-libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
-endif
 if HAVE_QT5_WAYLAND
+if HAVE_WAYLAND
+if HAVE_QT5_GUI_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND_COMPOSITOR
+endif
+endif
 libqt_plugin_la_CPPFLAGS += $(QT5_WAYLAND_CFLAGS)
 libqt_plugin_la_LIBADD += $(QT5_WAYLAND_LIBS)
 vlc_qt_check_CPPFLAGS += $(QT5_WAYLAND_CFLAGS) -DQT5_HAS_WAYLAND
 vlc_qt_check_LDADD += $(QT5_WAYLAND_LIBS)
 endif
+
 if HAVE_WIN32
 libqt_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ld3d11 -ldwmapi
@@ -399,6 +400,16 @@ endif
 endif
 endif
 
+if HAVE_WAYLAND
+if HAVE_QT5_WAYLAND
+if HAVE_QT5_GUI_PRIVATE
+libqt_plugin_la_SOURCES += \
+	maininterface/compositor_wayland.cpp \
+	maininterface/compositor_wayland.hpp
+endif
+endif
+endif
+
 # Meta-object compilation
 
 moc_verbose = $(moc_verbose_$(V))
@@ -564,6 +575,15 @@ nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_x11_uisurface.moc.cpp \
 	maininterface/compositor_x11_utils.moc.cpp
 endif
+endif
+endif
+endif
+
+if HAVE_WAYLAND
+if HAVE_QT5_WAYLAND
+if HAVE_QT5_GUI_PRIVATE
+nodist_libqt_plugin_la_SOURCES += \
+	maininterface/compositor_wayland.moc.cpp
 endif
 endif
 endif
@@ -1141,6 +1161,21 @@ EXTRA_DIST += $(libqt_plugin_la_QML)
 resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
 	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
 
+endif
+
+if HAVE_QT5_WAYLAND
+if HAVE_WAYLAND
+if HAVE_QT5_GUI_PRIVATE
+libqt_wayland_plugin_la_CFLAGS = $(AM_CFLAGS) $(WAYLAND_CLIENT_CFLAGS)
+libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS)
+libqt_wayland_plugin_la_SOURCES = \
+	maininterface/compositor_wayland_module.c \
+	maininterface/compositor_wayland_module.h
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_wayland_plugin.la
+endif
+endif
+endif
 endif
 
 if HAVE_QT5_GTK
