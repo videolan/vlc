@@ -63,12 +63,16 @@ using Microsoft::WRL::ComPtr;
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
+#define MFT_DEBUG_TEXT N_("Extra MFT Debug")
+#define MFT_DEBUG_LONGTEXT N_( "Show more MediaFoundation debug info, may be slower to load" )
+
 vlc_module_begin()
     set_description(N_("Media Foundation Transform decoder"))
     add_shortcut("mft")
     set_capability("video decoder", 1)
     set_callbacks(Open, Close)
     set_subcategory(SUBCAT_INPUT_VCODEC)
+    add_bool("mft-debug", false, MFT_DEBUG_TEXT, MFT_DEBUG_LONGTEXT)
 
     add_submodule()
     add_shortcut("mft")
@@ -1338,7 +1342,7 @@ static void DestroyMFT(decoder_t *p_dec)
         hxxx_helper_clean(&vidsys->hh);
 }
 
-static int ListTransforms(struct vlc_logger *logger, GUID category, const char *type)
+static int ListTransforms(struct vlc_logger *logger, GUID category, const char *type, bool do_test)
 {
     HRESULT hr;
 
@@ -1359,14 +1363,15 @@ static int ListTransforms(struct vlc_logger *logger, GUID category, const char *
         if (FAILED(hr))
             wcscpy(Name,L"<unknown>");
 
-#ifndef NDEBUG
-        ComPtr<IMFTransform> mft;
-        hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
-        vlc_debug(logger, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
-        mft.Reset();
-#else
-        vlc_debug(logger, "found %s '%ls'", type, Name);
-#endif
+        if (do_test)
+        {
+            ComPtr<IMFTransform> mft;
+            hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
+            vlc_debug(logger, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
+        }
+        else
+            vlc_debug(logger, "found %s '%ls'", type, Name);
+
         activate_objects[o]->ShutdownObject();
     }
 
@@ -1401,10 +1406,12 @@ static int FindMFT(decoder_t *p_dec)
     if (input_type.guidSubtype == GUID_NULL)
         return VLC_EGENERIC;
 
+    const char *dec_str;
     if (p_dec->fmt_in->i_cat == VIDEO_ES)
-        ListTransforms(vlc_object_logger(p_dec), category, "video decoder");
+        dec_str = "video decoder";
     else
-        ListTransforms(vlc_object_logger(p_dec), category, "audio decoder");
+        dec_str = "audio decoder";
+    ListTransforms(vlc_object_logger(p_dec), category, dec_str, var_InheritBool(p_dec, "mft-debug"));
 
     UINT32 flags = MFT_ENUM_FLAG_SORTANDFILTER | MFT_ENUM_FLAG_LOCALMFT
                  | MFT_ENUM_FLAG_SYNCMFT | MFT_ENUM_FLAG_ASYNCMFT
