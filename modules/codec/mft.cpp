@@ -117,6 +117,7 @@ public:
     ComPtr<IMFSample> output_sample;
 
     HRESULT AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result);
+    int SetOutputType(vlc_logger *, const GUID & req_subtype, es_format_t & fmt_out);
 
     virtual void DoRelease() = 0;
 
@@ -433,8 +434,8 @@ error:
     return hr;
 }
 
-static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD stream_id,
-                         const GUID & req_subtype, es_format_t & fmt_out)
+int mft_sys_t::SetOutputType(vlc_logger *logger,
+                             const GUID & req_subtype, es_format_t & fmt_out)
 {
     HRESULT hr;
 
@@ -449,7 +450,7 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
     int output_type_index = -1;
     for (int i = 0; output_type_index == -1; ++i)
     {
-        hr = mf_sys.mft->GetOutputAvailableType(stream_id, i, output_media_type.ReleaseAndGetAddressOf());
+        hr = mft->GetOutputAvailableType(output_stream_id, i, output_media_type.ReleaseAndGetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
         {
             /*
@@ -507,7 +508,7 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
         }
     }
 
-    hr = mf_sys.mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.ReleaseAndGetAddressOf());
+    hr = mft->GetOutputAvailableType(output_stream_id, output_type_index, output_media_type.ReleaseAndGetAddressOf());
     if (FAILED(hr))
         goto error;
 
@@ -515,7 +516,7 @@ static int SetOutputType(struct vlc_logger *logger, mft_sys_t &mf_sys, DWORD str
     if (FAILED(hr))
         goto error;
 
-    hr = mf_sys.mft->SetOutputType(stream_id, output_media_type.Get(), 0);
+    hr = mft->SetOutputType(output_stream_id, output_media_type.Get(), 0);
     if (FAILED(hr))
     {
         vlc_error(logger, "Failed to set the output. (hr=0x%lX)", hr);
@@ -761,7 +762,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
         else
             p_dec->fmt_out.audio = p_dec->fmt_in->audio;
-        if (SetOutputType(vlc_object_logger(p_dec), *p_sys, p_sys->output_stream_id, GUID_NULL, p_dec->fmt_out))
+        if (p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out))
             return VLC_EGENERIC;
 
         /* Reallocate output sample. */
@@ -1259,7 +1260,7 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
         video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
     else
         p_dec->fmt_out.audio = p_dec->fmt_in->audio;
-    if (SetOutputType(vlc_object_logger(p_dec), *p_sys, p_sys->output_stream_id, GUID_NULL, p_dec->fmt_out))
+    if (p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out))
         goto error;
 
     /*
