@@ -238,6 +238,8 @@ QtObject {
     property int appHeight: 0
 
     readonly property int smallWidth: MainCtx.dp(600, scale)
+    readonly property int mediumWidth: MainCtx.dp(1000, scale)
+
     readonly property bool isScreenSmall: appWidth <= smallWidth
 
     //global application margin "safe area"
@@ -338,5 +340,16 @@ QtObject {
             _scrollBarComponent = null
             resizeHandleWidth = (scrollBarWidth / 2)
         }
+    }
+
+    //dynamic margins based on screen width
+    function dynamicAppMargins(width : int) : int {
+        if (width < smallWidth)
+            return margin_normal;
+        else if(width > mediumWidth)
+            return margin_large;
+        else
+            return margin_normal + (width - smallWidth) * (margin_large - margin_normal) /
+                    (mediumWidth - smallWidth);
     }
 }

@@ -58,7 +58,7 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
-    readonly property int extraMargin: Math.max(0, (width - usedRowSpace) / 2)
+    readonly property int extraMargin: VLCStyle.dynamicAppMargins(width)
 
     // NOTE: The list margins for the item(s) horizontal positioning.
     readonly property int contentLeftMargin: extraMargin + leftMargin
