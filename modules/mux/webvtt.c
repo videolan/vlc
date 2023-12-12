@@ -142,7 +142,8 @@ static int Control(sout_mux_t *mux, int query, va_list args)
 static int AddStream(sout_mux_t *mux, sout_input_t *input)
 {
     sout_mux_sys_t *sys = mux->p_sys;
-    if (input->fmt.i_codec != VLC_CODEC_WEBVTT ||
+    if ((input->fmt.i_codec != VLC_CODEC_WEBVTT &&
+         input->fmt.i_codec != VLC_CODEC_TEXT) ||
         sys->input)
         return VLC_ENOTSUP;
     sys->input = input;
@@ -207,8 +208,12 @@ static int Mux(sout_mux_t *mux)
         }
 
         webvtt_cue_t cue = {};
-        
-        UnpackISOBMFF(chain, &cue);
+
+        if (sys->input->fmt.i_codec != VLC_CODEC_WEBVTT)
+            cue.psz_text = strndup((char *)chain->p_buffer, chain->i_buffer);
+        else
+            UnpackISOBMFF(chain, &cue);
+
         if (unlikely(cue.psz_text == NULL))
         {
             webvtt_cue_Clean(&cue);
