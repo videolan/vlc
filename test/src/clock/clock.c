@@ -629,6 +629,69 @@ static void drift_sudden_update(const struct clock_ctx *ctx, size_t index,
     }
 }
 
+static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
+{
+    const vlc_tick_t system_start = vlc_tick_now();
+    const vlc_tick_t pause_duration = VLC_TICK_FROM_MS(20);
+    vlc_tick_t system = system_start;
+
+    vlc_clock_Update(updater, system, 1, 1.0f);
+
+    system += VLC_TICK_FROM_MS(10);
+
+    vlc_clock_main_ChangePause(ctx->mainclk, system, true);
+    system += pause_duration;
+    vlc_clock_main_ChangePause(ctx->mainclk, system, false);
+    system += 1;
+
+    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    assert(converted == system_start + pause_duration);
+}
+
+static void master_pause_run(const struct clock_ctx *ctx)
+{
+    pause_common(ctx, ctx->master);
+}
+
+static void monotonic_pause_run(const struct clock_ctx *ctx)
+{
+    /* Don't add any delay for the first monotonic ref point  */
+    vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
+    vlc_clock_main_SetDejitter(ctx->mainclk, 0);
+
+    pause_common(ctx, ctx->slave);
+}
+
+static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
+{
+    const vlc_tick_t system_start = vlc_tick_now();
+    vlc_tick_t system = system_start;
+
+    vlc_clock_Update(updater, system_start, 1, 1.0f);
+
+    system += VLC_TICK_FROM_MS(10);
+
+    vlc_clock_main_ChangePause(ctx->mainclk, system, true);
+    system += 1;
+
+    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    assert(converted == system_start);
+}
+
+static void master_convert_paused_run(const struct clock_ctx *ctx)
+{
+    convert_paused_common(ctx, ctx->master);
+}
+
+static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
+{
+    /* Don't add any delay for the first monotonic ref point  */
+    vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
+    vlc_clock_main_SetDejitter(ctx->mainclk, 0);
+
+    convert_paused_common(ctx, ctx->slave);
+}
+
 #define VLC_TICK_24H VLC_TICK_FROM_SEC(24 * 60 * 60)
 #define VLC_TICK_2H VLC_TICK_FROM_SEC(2 * 60 * 60)
 #define DEFAULT_STREAM_INCREMENT VLC_TICK_FROM_MS(100)
@@ -702,6 +765,30 @@ static struct clock_scenario clock_scenarios[] = {
     .total_drift_duration = VLC_TICK_FROM_MS(864),
     .update = drift_sudden_update,
     .check = drift_check,
+},
+{
+    .name = "master_pause",
+    .desc = "pause + resume is delaying the next conversion",
+    .type = CLOCK_SCENARIO_RUN,
+    .run = master_pause_run,
+},
+{
+    .name = "monotonic_pause",
+    .desc = "pause + resume is delaying the next conversion",
+    .type = CLOCK_SCENARIO_RUN,
+    .run = monotonic_pause_run,
+},
+{
+    .name = "master_convert_paused",
+    .desc = "it is possible de convert ts while paused",
+    .type = CLOCK_SCENARIO_RUN,
+    .run = master_convert_paused_run,
+},
+{
+    .name = "monotonic_convert_paused",
+    .desc = "it is possible de convert ts while paused",
+    .type = CLOCK_SCENARIO_RUN,
+    .run = monotonic_convert_paused_run,
 },
 };
 
