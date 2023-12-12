@@ -56,6 +56,7 @@ typedef struct
 
 const char *DxgiFormatToStr(DXGI_FORMAT format);
 vlc_fourcc_t DxgiFormatFourcc(DXGI_FORMAT format);
+DXGI_FORMAT DxgiFourccFormat(vlc_fourcc_t format);
 const d3d_format_t *DxgiGetRenderFormatList(void);
 const char *DxgiVendorStr(unsigned int gpu_vendor);
 UINT DxgiResourceCount(const d3d_format_t *);
