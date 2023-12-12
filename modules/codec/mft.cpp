@@ -235,19 +235,6 @@ static const int pi_channels_maps[9] =
 # define MF_E_NO_EVENTS_AVAILABLE _HRESULT_TYPEDEF_(0xC00D3E80L)
 #endif
 
-/*
- * The MFTransformXXX values might not be defined in mingw headers,
- * thus we use our own enum with the VLC prefix.
- */
-enum
-{
-    VLC_METransformUnknown = 600,
-    VLC_METransformNeedInput,
-    VLC_METransformHaveOutput,
-    VLC_METransformDrainComplete,
-    VLC_METransformMarker,
-};
-
 typedef struct
 {
     vlc_fourcc_t fourcc;
@@ -1170,9 +1157,9 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
     if (FAILED(hr))
         return hr;
 
-    if (event_type == VLC_METransformNeedInput)
+    if (event_type == METransformNeedInput)
         p_sys->pending_input_events += 1;
-    else if (event_type == VLC_METransformHaveOutput)
+    else if (event_type == METransformHaveOutput)
         p_sys->pending_output_events += 1;
     else
         msg_Err(p_dec, "Unsupported asynchronous event.");
