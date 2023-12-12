@@ -647,31 +647,12 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
     {
         assert(entry);
 
-        vlc_tick_t ts;
+        entry->start = vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
+                                                       entry->orgstart, channel->rate);
 
-        ts = vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                             entry->orgstart, channel->rate);
-        if (ts != VLC_TICK_MAX)
-        {
-            entry->start = ts;
-
-            entry->stop =
-                vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                                entry->orgstop, channel->rate);
-        }
-        else
-        {
-            /* Pause triggered before or during spu render */
-
-            /* If currently rendered, display the current spu until the end of
-             * the pause. */
-            entry->stop = VLC_TICK_MAX;
-
-            /* Delay the start date only if not currently rendered. */
-            if (entry->start > system_now)
-                entry->start = VLC_TICK_MAX;
-
-        }
+        entry->stop =
+            vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
+                                            entry->orgstop, channel->rate);
     }
     vlc_clock_Unlock(channel->clock);
 
@@ -2023,8 +2004,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         subpicture_Delete(subpic);
         return;
     }
-    if (subpic->i_start != VLC_TICK_MAX) /* Don't prerender when paused */
-        spu_PrerenderEnqueue(sys, subpic);
+    spu_PrerenderEnqueue(sys, subpic);
     vlc_mutex_unlock(&sys->lock);
 }
 
