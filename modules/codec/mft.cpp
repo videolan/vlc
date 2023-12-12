@@ -107,6 +107,7 @@ public:
     ComPtr<IMFMediaEventGenerator> event_generator;
     int pending_input_events = 0;
     int pending_output_events = 0;
+    HRESULT DequeueMediaEvent(vlc_logger *);
 
     /* Input stream */
     DWORD input_stream_id = 0;
@@ -1051,13 +1052,12 @@ error:
     return VLCDEC_SUCCESS;
 }
 
-static HRESULT DequeueMediaEvent(decoder_t *p_dec)
+HRESULT mft_sys_t::DequeueMediaEvent(vlc_logger *logger)
 {
-    auto *p_sys = static_cast<mft_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFMediaEvent> event;
-    hr = p_sys->event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, &event);
+    hr = event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, &event);
     if (FAILED(hr))
         return hr;
     MediaEventType event_type;
@@ -1066,11 +1066,11 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
         return hr;
 
     if (event_type == METransformNeedInput)
-        p_sys->pending_input_events += 1;
+        pending_input_events += 1;
     else if (event_type == METransformHaveOutput)
-        p_sys->pending_output_events += 1;
+        pending_output_events += 1;
     else
-        msg_Err(p_dec, "Unsupported asynchronous event.");
+        vlc_error(logger, "Unsupported asynchronous event %lu.", event_type);
 
     return S_OK;
 }
@@ -1090,7 +1090,7 @@ static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
     }
 
     /* Dequeue all pending media events. */
-    while ((hr = DequeueMediaEvent(p_dec)) == S_OK)
+    while ((hr = p_sys->DequeueMediaEvent(vlc_object_logger(p_dec))) == S_OK)
         continue;
     if (hr != MF_E_NO_EVENTS_AVAILABLE && FAILED(hr))
         goto error;
@@ -1111,7 +1111,7 @@ static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
     /* Poll the MFT and return decoded frames until the input stream is ready. */
     while (p_sys->pending_input_events == 0)
     {
-        hr = DequeueMediaEvent(p_dec);
+        hr = p_sys->DequeueMediaEvent(vlc_object_logger(p_dec));
         if (hr == MF_E_NO_EVENTS_AVAILABLE)
         {
             /* Sleep for 1 ms to avoid excessive polling. */
