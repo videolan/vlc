@@ -469,6 +469,8 @@ void ListCache<T>::asyncCountAndLoad()
             if (m_countTask != taskId)
                 return;
 
+            m_countTask = 0;
+
             //quite unlikley but model may change between count and load
             if (unlikely(list.size() > maximumCount))
             {
@@ -504,7 +506,6 @@ void ListCache<T>::asyncCountAndLoad()
                     emit localSizeChanged(0, m_cachedData->maximumCount);
             }
 
-            m_countTask = 0;
             if (m_needReload)
             {
                 m_needReload  = false;
