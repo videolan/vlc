@@ -369,8 +369,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         scenario->check(&ctx, index, expected_system, stream_end);
     }
 
-    if (master != NULL)
-        vlc_clock_Delete(master);
+    vlc_clock_Delete(master);
     vlc_clock_Delete(slave);
     free(slave_name);
     vlc_clock_main_Delete(mainclk);
