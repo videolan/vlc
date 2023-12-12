@@ -47,18 +47,29 @@ struct clock_scenario
 {
     const char *name;
     const char *desc;
-    vlc_tick_t stream_start;
-    vlc_tick_t system_start; /* VLC_TICK_INVALID for vlc_tick_now() */
-    vlc_tick_t duration;
-    vlc_tick_t stream_increment; /* VLC_TICK_INVALID for manual increment */
-    unsigned video_fps;
-    vlc_tick_t total_drift_duration; /* VLC_TICK_INVALID for non-drift test */
-    double coeff_epsilon; /* Valid for lowprecision/burst checks */
 
-    void (*update)(const struct clock_ctx *ctx, size_t index,
-                   vlc_tick_t *system, vlc_tick_t stream);
-    void (*check)(const struct clock_ctx *ctx, size_t update_count,
-                  vlc_tick_t expected_system_end, vlc_tick_t stream_end);
+    enum {
+        CLOCK_SCENARIO_UPDATE,
+        CLOCK_SCENARIO_RUN,
+    } type;
+
+    union {
+        struct {
+            vlc_tick_t stream_start;
+            vlc_tick_t system_start; /* VLC_TICK_INVALID for vlc_tick_now() */
+            vlc_tick_t duration;
+            vlc_tick_t stream_increment; /* VLC_TICK_INVALID for manual increment */
+            unsigned video_fps;
+            vlc_tick_t total_drift_duration; /* VLC_TICK_INVALID for non-drift test */
+
+            double coeff_epsilon; /* Valid for lowprecision/burst checks */
+            void (*update)(const struct clock_ctx *ctx, size_t index,
+                           vlc_tick_t *system, vlc_tick_t stream);
+            void (*check)(const struct clock_ctx *ctx, size_t update_count,
+                          vlc_tick_t expected_system_end, vlc_tick_t stream_end);
+        };
+        void (*run)(const struct clock_ctx *ctx);
+    };
 };
 
 struct clock_ctx
@@ -296,7 +307,8 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
 {
     fprintf(stderr, "[%s]: checking that %s\n", scenario->name, scenario->desc);
 
-    assert(scenario->update != NULL);
+    assert((scenario->type == CLOCK_SCENARIO_UPDATE && scenario->update != NULL)
+        || (scenario->type == CLOCK_SCENARIO_RUN && scenario->run != NULL));
 
     tracer_ctx_Reset(&tracer_ctx);
 
@@ -322,6 +334,12 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         .slave = slave,
         .scenario = scenario,
     };
+
+    if (scenario->type == CLOCK_SCENARIO_RUN)
+    {
+        scenario->run(&ctx);
+        goto end;
+    }
 
     vlc_tick_t stream_end = scenario->stream_start + scenario->duration;
     vlc_tick_t stream = scenario->stream_start;
@@ -369,6 +387,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         scenario->check(&ctx, index, expected_system, stream_end);
     }
 
+end:
     vlc_clock_Delete(master);
     vlc_clock_Delete(slave);
     free(slave_name);
@@ -625,6 +644,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "normal",
     .desc = "normal update has a coeff of 1.0f",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
     .update = normal_update,
     .check = normal_check,
@@ -632,6 +652,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "lowprecision",
     .desc = "low precision update has a coeff near 1.0f",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
     .coeff_epsilon = 0.005,
     .update = lowprecision_update,
@@ -640,6 +661,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "drift_72",
     .desc = "a drift of 72ms in 2h is handled",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
     .total_drift_duration = VLC_TICK_FROM_MS(72),
     .update = drift_update,
@@ -648,6 +670,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "drift_-72",
     .desc = "a drift of -72ms in 2h is handled",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_2H, DEFAULT_STREAM_INCREMENT, 60),
     .total_drift_duration = -VLC_TICK_FROM_MS(72),
     .update = drift_update,
@@ -656,6 +679,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "drift_864",
     .desc = "a drift of 864ms in 24h is handled",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
     .total_drift_duration = VLC_TICK_FROM_MS(864),
     .update = drift_update,
@@ -664,6 +688,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "drift_-864",
     .desc = "a drift of -864ms in 24h is handled",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
     .total_drift_duration = -VLC_TICK_FROM_MS(864),
     .update = drift_update,
@@ -672,6 +697,7 @@ static struct clock_scenario clock_scenarios[] = {
 {
     .name = "drift_sudden",
     .desc = "a sudden drift is handled",
+    .type = CLOCK_SCENARIO_UPDATE,
     INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
     .total_drift_duration = VLC_TICK_FROM_MS(864),
     .update = drift_sudden_update,
