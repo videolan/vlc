@@ -471,8 +471,8 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
 
     float rate = stream->sync.rate;
 
-    if (unlikely(drift == VLC_TICK_MAX) || owner->bitexact)
-        return; /* cf. VLC_TICK_MAX comment in vlc_aout_stream_Play() */
+    if (owner->bitexact)
+        return;
 
     struct vlc_tracer *tracer = aout_stream_tracer(stream);
     if (tracer != NULL)
@@ -773,14 +773,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(stream->sync.clock, system_now, original_pts,
                                   stream->sync.rate);
-    if (unlikely(play_date == VLC_TICK_MAX))
-    {
-        /* The clock is paused but not the output, play the audio anyway since
-         * we can't delay audio playback from here. */
-        play_date = system_now;
-    }
-    else
-        stream_Synchronize(stream, system_now, play_date, original_pts);
+    stream_Synchronize(stream, system_now, play_date, original_pts);
 
     vlc_audio_meter_Process(&owner->meter, block, play_date);
 
