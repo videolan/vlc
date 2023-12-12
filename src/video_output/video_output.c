@@ -984,8 +984,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                         vlc_clock_ConvertToSystem(sys->clock, system_now,
                                                   decoded->date, sys->rate);
 
-                    if (system_pts != VLC_TICK_MAX &&
-                        IsPictureLate(vout, decoded, system_now, system_pts))
+                    if (IsPictureLate(vout, decoded, system_now, system_pts))
                     {
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
@@ -1128,7 +1127,7 @@ static vlc_render_subpicture *RenderSPUs(vout_thread_sys_t *sys,
 }
 
 static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
-                            bool *render_now, picture_t **out_pic,
+                            picture_t **out_pic,
                             vlc_render_subpicture **out_subpic)
 {
     vout_display_t *vd = sys->display;
@@ -1145,15 +1144,6 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         render_subtitle_date = filtered->date <= VLC_TICK_0 ? system_now :
             vlc_clock_ConvertToSystem(sys->clock, system_now, filtered->date,
                                       sys->rate);
-
-        /* The clock is paused, it's too late to fallback to the previous
-         * picture, display the current picture anyway and force the rendering
-         * to now. */
-        if (unlikely(render_subtitle_date == VLC_TICK_MAX))
-        {
-            render_subtitle_date = system_now;
-            *render_now = true;
-        }
     }
 
     /*
@@ -1310,7 +1300,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
     picture_t *todisplay;
     vlc_render_subpicture *subpic;
-    int ret = PrerenderPicture(sys, filtered, &render_now, &todisplay, &subpic);
+    int ret = PrerenderPicture(sys, filtered, &todisplay, &subpic);
     if (ret != VLC_SUCCESS)
     {
         vlc_queuedmutex_unlock(&sys->display_lock);
@@ -1321,14 +1311,6 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     const vlc_tick_t pts = todisplay->date;
     vlc_tick_t system_pts = render_now ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
-    if (unlikely(system_pts == VLC_TICK_MAX))
-    {
-        /* The clock is paused, it's too late to fallback to the previous
-         * picture, display the current picture anyway and force the rendering
-         * to now. */
-        system_pts = system_now;
-        render_now = true;
-    }
 
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
@@ -1477,9 +1459,6 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
     const vlc_tick_t system_swap_current =
         vlc_clock_ConvertToSystem(sys->clock, system_now,
                                   sys->displayed.current->date, sys->rate);
-    if (unlikely(system_swap_current == VLC_TICK_MAX))
-        // the clock is paused but the vout thread is not ?
-        return false;
 
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     vlc_tick_t system_prepare_current = system_swap_current - render_delay;
