@@ -184,17 +184,16 @@ protected:
     }
 };
 
-class mft_dec_video : public mft_sys_t
+/**
+ * Generic class to handle Direct3D with MediaFoundation
+ */
+class vlc_mft_d3d : public mft_sys_t
 {
 public:
-    mft_dec_video() = default;
-    virtual ~mft_dec_video() = default;
+    vlc_mft_d3d() = default;
+    virtual ~vlc_mft_d3d() = default;
 
     std::unique_ptr<MFHW_d3d> hw_d3d;
-
-    /* H264 only. */
-    struct hxxx_helper hh = {};
-    bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
 
 protected:
     void DoRelease() override
@@ -202,6 +201,17 @@ protected:
         if (hw_d3d)
             hw_d3d->Release(mft);
     }
+};
+
+class mft_dec_video : public vlc_mft_d3d
+{
+public:
+    mft_dec_video() = default;
+    virtual ~mft_dec_video() = default;
+
+    /* H264 only. */
+    struct hxxx_helper hh = {};
+    bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
 };
 
 static const int pi_channels_maps[9] =
@@ -825,7 +835,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
         if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
-            auto *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
+            auto *vidsys = dynamic_cast<vlc_mft_d3d*>(p_sys);
             picture_context_t *pic_ctx = nullptr;
             if (vidsys->hw_d3d != nullptr)
             {
@@ -1243,7 +1253,7 @@ static int InitializeMFT(decoder_t *p_dec, const MFT_REGISTER_TYPE_INFO & type)
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         EnableHardwareAcceleration(*p_dec->fmt_in, attributes);
-        mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
+        auto *vidsys = dynamic_cast<vlc_mft_d3d*>(p_sys);
         if (p_dec->fmt_in->video.i_width != 0 /*&& vidsys->d3d.CanUseD3D()*/)
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
