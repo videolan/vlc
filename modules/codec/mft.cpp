@@ -1142,23 +1142,20 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
 
 static void DestroyMFT(decoder_t *p_dec);
 
-static int SetD3D11(decoder_t *p_dec, vlc_decoder_device & dec_dev)
+static HRESULT SetD3D11(vlc_logger *logger, vlc_decoder_device & dec_dev,
+                        std::unique_ptr<MFHW_d3d11> & hw_d3d, ComPtr<IMFTransform> & mft)
 {
-    mft_dec_video *vidsys = static_cast<mft_dec_video*>(p_dec->p_sys);
-    assert(vidsys->hw_d3d == nullptr);
-    vidsys->hw_d3d = std::make_unique<MFHW_d3d11>();
-    if (unlikely(vidsys->hw_d3d == nullptr))
-        return VLC_EGENERIC;
+    assert(hw_d3d == nullptr);
+    hw_d3d = std::make_unique<MFHW_d3d11>();
+    if (unlikely(hw_d3d == nullptr))
+        return E_OUTOFMEMORY;
 
     HRESULT hr;
-    hr = vidsys->hw_d3d->SetD3D(vlc_object_logger(p_dec), dec_dev, vidsys->mft);
+    hr = hw_d3d->SetD3D(logger, dec_dev, mft);
     if (FAILED(hr))
-    {
-        vidsys->hw_d3d.reset();
-        return VLC_EGENERIC;
-    }
+        hw_d3d.reset();
 
-    return VLC_SUCCESS;
+    return hr;
 }
 
 static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
@@ -1223,7 +1220,7 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
 
     if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
-        // mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
+        mft_dec_video *vidsys = reinterpret_cast<mft_dec_video*>(p_sys);
         EnableHardwareAcceleration(p_dec, attributes);
         if (p_dec->fmt_in->video.i_width != 0 /*&& vidsys->d3d.CanUseD3D()*/)
         {
@@ -1236,7 +1233,8 @@ static int InitializeMFT(decoder_t *p_dec, const GUID & mSubtype)
                     hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
                     if (SUCCEEDED(hr) && can_d3d11)
                     {
-                        if (SetD3D11(p_dec, *dec_dev) == VLC_SUCCESS)
+                        hr = SetD3D11(vlc_object_logger(p_dec), *dec_dev, vidsys->hw_d3d, vidsys->mft);
+                        if (SUCCEEDED(hr))
                         {
                             IMFAttributes *outputAttr = NULL;
                             hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
