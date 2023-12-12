@@ -387,8 +387,6 @@ static vlc_tick_t vlc_clock_slave_to_system_locked(vlc_clock_t *clock,
                                                    vlc_tick_t ts, double rate)
 {
     vlc_clock_main_t *main_clock = clock->owner;
-    if (main_clock->pause_date != VLC_TICK_INVALID)
-        return VLC_TICK_MAX;
 
     vlc_tick_t system = main_stream_to_system(main_clock, ts);
     if (system == VLC_TICK_INVALID)

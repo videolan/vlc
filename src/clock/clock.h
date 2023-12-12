@@ -162,7 +162,7 @@ void vlc_clock_Delete(vlc_clock_t *clock);
  * @param rate the current playback speed
  *
  * @return a valid drift relative time, VLC_TICK_INVALID if there is no drift
- * (clock is master) or VLC_TICK_MAX if the clock is paused
+ * (clock is master)
  */
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate);
@@ -247,7 +247,7 @@ int vlc_clock_RegisterEvents(vlc_clock_t *clock,
  *
  * The clock mutex must be locked.
  *
- * @return the valid system time or VLC_TICK_MAX when the clock is paused
+ * @return the valid system time
  */
 vlc_tick_t vlc_clock_ConvertToSystemLocked(vlc_clock_t *clock,
                                            vlc_tick_t system_now, vlc_tick_t ts,
