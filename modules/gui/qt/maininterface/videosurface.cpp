@@ -22,6 +22,11 @@
 #include <QThreadPool>
 #include <vlc_window.h>
 
+#include <QQuickRenderControl>
+#ifdef QT5_DECLARATIVE_PRIVATE
+#  include <QtGui/qpa/qplatformwindow.h>
+#endif
+
 WindowResizer::WindowResizer(vlc_window_t* window):
     m_requestedWidth(0),
     m_requestedHeight(0),
@@ -367,14 +372,34 @@ void VideoSurface::onProviderVideoChanged(bool hasVideo)
     updatePositionAndSize();
 }
 
+static qreal dprForWindow(QQuickWindow* quickWindow)
+{
+    if (!quickWindow)
+        return 1.0;
+
+    QWindow* window = QQuickRenderControl::renderWindowFor(quickWindow);
+    if (!window)
+        window = quickWindow;
+
+    qreal dpr = window->devicePixelRatio();
+
+#ifdef QT5_DECLARATIVE_PRIVATE
+    QPlatformWindow* nativeWindow = window->handle();
+    if (nativeWindow)
+        dpr /= nativeWindow->devicePixelRatio();
+#endif
+
+    return dpr;
+}
+
 void VideoSurface::onSurfaceSizeChanged()
 {
     if (!isEnabled())
         return;
-    QQuickWindow* window = this->window();
-    if (!window)
-        return;
-    emit surfaceSizeChanged(size() * window->effectiveDevicePixelRatio());
+
+    qreal dpr = dprForWindow(window());
+
+    emit surfaceSizeChanged(size() * dpr);
 }
 
 void VideoSurface::onSurfacePositionChanged()
@@ -382,11 +407,10 @@ void VideoSurface::onSurfacePositionChanged()
     if (!isEnabled())
         return;
 
+    qreal dpr = dprForWindow(window());
+
     QPointF scenePosition = this->mapToScene(QPointF(0,0));
-    QQuickWindow* window = this->window();
-    if (!window)
-        return;
-    qreal dpr = window->effectiveDevicePixelRatio();
+
     emit surfacePositionChanged(scenePosition * dpr);
 }
 
@@ -395,10 +419,8 @@ void VideoSurface::updatePositionAndSize()
     if (!isEnabled())
         return;
 
-    QQuickWindow* window = this->window();
-    if (!window)
-        return;
-    qreal dpr = window->effectiveDevicePixelRatio();
+    qreal dpr = dprForWindow(window());
+
     emit surfaceSizeChanged(size() * dpr);
     QPointF scenePosition = this->mapToScene(QPointF(0, 0));
     emit surfacePositionChanged(scenePosition * dpr);
