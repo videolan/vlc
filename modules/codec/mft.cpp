@@ -195,6 +195,8 @@ public:
 
     std::unique_ptr<MFHW_d3d> hw_d3d;
 
+    HRESULT SetD3D(vlc_logger *, vlc_decoder_device &);
+
 protected:
     void DoRelease() override
     {
@@ -1175,14 +1177,26 @@ static HRESULT EnableHardwareAcceleration(const es_format_t & fmt_in, ComPtr<IMF
 
 static void DestroyMFT(decoder_t *p_dec);
 
-static HRESULT SetD3D11(vlc_logger *logger, vlc_decoder_device & dec_dev, std::unique_ptr<MFHW_d3d> & hw_d3d, ComPtr<IMFTransform> & mft)
+HRESULT vlc_mft_d3d::SetD3D(vlc_logger *logger, vlc_decoder_device & dec_dev)
 {
-    assert(hw_d3d == nullptr);
-    hw_d3d = std::make_unique<MFHW_d3d11>();
-    if (unlikely(hw_d3d == nullptr))
-        return E_OUTOFMEMORY;
-
     HRESULT hr;
+    assert(hw_d3d == nullptr);
+    if (dec_dev.type == VLC_DECODER_DEVICE_D3D11VA)
+    {
+        ComPtr<IMFAttributes> attributes;
+        hr = mft->GetAttributes(&attributes);
+        if (SUCCEEDED(hr))
+        {
+            UINT32 can_d3d11;
+            hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
+            if (SUCCEEDED(hr) && can_d3d11)
+                hw_d3d = std::make_unique<MFHW_d3d11>();
+        }
+    }
+
+    if (unlikely(hw_d3d == nullptr))
+        return E_ABORT;
+
     hr = hw_d3d->SetD3D(logger, dec_dev, mft);
     if (FAILED(hr))
         hw_d3d.reset();
@@ -1259,22 +1273,14 @@ static int InitializeMFT(decoder_t *p_dec, const MFT_REGISTER_TYPE_INFO & type)
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
             if (dec_dev != nullptr)
             {
-                if (dec_dev->type == VLC_DECODER_DEVICE_D3D11VA)
+                hr = vidsys->SetD3D(vlc_object_logger(p_dec), *dec_dev);
+                if (SUCCEEDED(hr) && dec_dev->type == VLC_DECODER_DEVICE_D3D11VA)
                 {
-                    UINT32 can_d3d11;
-                    hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
-                    if (SUCCEEDED(hr) && can_d3d11)
+                    IMFAttributes *outputAttr = NULL;
+                    hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
+                    if (SUCCEEDED(hr))
                     {
-                        hr = SetD3D11(vlc_object_logger(p_dec), *dec_dev, vidsys->hw_d3d, vidsys->mft);
-                        if (SUCCEEDED(hr))
-                        {
-                            IMFAttributes *outputAttr = NULL;
-                            hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
-                            if (SUCCEEDED(hr))
-                            {
-                                hr = outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE);
-                            }
-                        }
+                        hr = outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE);
                     }
                 }
                 vlc_decoder_device_Release(dec_dev);
