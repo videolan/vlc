@@ -598,7 +598,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int AllocateInputSample(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
+static HRESULT AllocateInputSample(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
 {
     HRESULT hr;
 
@@ -628,11 +628,11 @@ static int AllocateInputSample(struct vlc_logger *logger, ComPtr<IMFTransform> &
 
     result.Swap(input_sample);
 
-    return VLC_SUCCESS;
+    return hr;
 
 error:
     vlc_error(logger, "Error in AllocateInputSample(). (hr=0x%lX)", hr);
-    return VLC_EGENERIC;
+    return hr;
 }
 
 HRESULT mft_sys_t::AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result)
@@ -692,14 +692,15 @@ HRESULT mft_sys_t::AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSamp
 
 static int ProcessInputStream(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, block_t *p_block)
 {
-    HRESULT hr = S_OK;
+    HRESULT hr;
     ComPtr<IMFSample> input_sample;
 
     DWORD alloc_size = p_block->i_buffer;
     vlc_tick_t ts;
     ComPtr<IMFMediaBuffer> input_media_buffer;
 
-    if (AllocateInputSample(logger, mft, stream_id, input_sample, alloc_size))
+    hr = AllocateInputSample(logger, mft, stream_id, input_sample, alloc_size);
+    if (FAILED(hr))
         goto error;
 
     hr = input_sample->GetBufferByIndex(0, &input_media_buffer);
