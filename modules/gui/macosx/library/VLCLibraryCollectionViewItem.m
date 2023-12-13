@@ -27,6 +27,8 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
@@ -290,6 +292,18 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
         [_menuController setRepresentedItem:self.representedItem];
         [_menuController popupMenuWithEvent:theEvent forView:self.view];
+    } else if (self.deselectWhenClickedIfSelected && 
+               self.selected &&
+               [self.collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
+        NSObject<VLCLibraryCollectionViewDataSource> * const dataSource = (NSObject<VLCLibraryCollectionViewDataSource> *)self.collectionView.dataSource;
+        NSIndexPath * const indexPath = [dataSource indexPathForLibraryItem:self.representedItem.item];
+        NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
+        [self.collectionView deselectItemsAtIndexPaths:indexPathSet];
+        
+        if ([self.collectionView.collectionViewLayout isKindOfClass:[VLCLibraryCollectionViewFlowLayout class]]) {
+            VLCLibraryCollectionViewFlowLayout * const flowLayout = (VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
+            [flowLayout collapseDetailSectionAtIndex:indexPath];
+        }
     }
 
     [super mouseDown:theEvent];
