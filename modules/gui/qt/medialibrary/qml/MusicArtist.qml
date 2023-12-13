@@ -484,6 +484,8 @@ FocusScope {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
+            dragItem: tableDragItem
+
             Navigation.parentItem: root
 
             Navigation.upAction: function() {
@@ -496,7 +498,11 @@ FocusScope {
             onContextMenuButtonClicked: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
             onRightClick: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
 
-            dragItem: Widgets.MLDragItem {
+            onDragItemChanged: console.assert(tableView_id.dragItem === tableDragItem)
+
+            Widgets.MLDragItem {
+                id: tableDragItem
+
                 mlModel: trackModel
 
                 indexes: indexesFlat ? tableView_id.selectionModel.selectedIndexesFlat

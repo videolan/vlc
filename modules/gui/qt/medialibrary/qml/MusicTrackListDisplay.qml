@@ -180,12 +180,18 @@ Widgets.KeyNavigableTableView {
     model: rootmodel
     rowHeight: VLCStyle.tableCoverRow_height
 
+    dragItem: tableDragItem
+
+    onDragItemChanged: console.assert(root.dragItem === tableDragItem)
+
     onActionForSelection:  model.addAndPlay(selection)
     onItemDoubleClicked: MediaLib.addAndPlay(model.id)
     onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
-    dragItem: Widgets.MLDragItem {
+    Widgets.MLDragItem {
+        id: tableDragItem
+
         indexes: indexesFlat ? root.selectionModel.selectedIndexesFlat
                              : root.selectionModel.selectedIndexes
         indexesFlat: !!root.selectionModel.selectedIndexesFlat
