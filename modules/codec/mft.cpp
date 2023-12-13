@@ -107,7 +107,7 @@ public:
     ComPtr<IMFMediaEventGenerator> event_generator;
     int pending_input_events = 0;
     int pending_output_events = 0;
-    HRESULT DequeueMediaEvent(vlc_logger *);
+    HRESULT DequeueMediaEvent(vlc_logger *, bool wait = false);
 
     /* Input stream */
     DWORD input_stream_id = 0;
@@ -1053,12 +1053,12 @@ error:
     return VLCDEC_SUCCESS;
 }
 
-HRESULT mft_sys_t::DequeueMediaEvent(vlc_logger *logger)
+HRESULT mft_sys_t::DequeueMediaEvent(vlc_logger *logger, bool wait)
 {
     HRESULT hr;
 
     ComPtr<IMFMediaEvent> event;
-    hr = event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, &event);
+    hr = event_generator->GetEvent(wait ? 0 : MF_EVENT_FLAG_NO_WAIT, &event);
     if (FAILED(hr))
         return hr;
     MediaEventType event_type;
