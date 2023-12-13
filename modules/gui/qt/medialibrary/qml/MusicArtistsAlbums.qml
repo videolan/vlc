@@ -209,21 +209,7 @@ FocusScope {
 
                 dragTarget: musicArtistDragItem
 
-                onItemClicked: {
-                    selectionModel.updateSelection(mouse.modifiers, artistList.currentIndex,
-                                                   index);
-
-                    artistList.currentIndex = index;
-
-                    artistList.forceActiveFocus(Qt.MouseFocusReason);
-                }
-
-                onItemDoubleClicked: {
-                    if (mouse.buttons === Qt.LeftButton)
-                        MediaLib.addAndPlay(model.id);
-                    else
-                        albumSubView.forceActiveFocus();
-                }
+                selected: selectionModel.selectedIndexesFlat.includes(index)
             }
 
             Widgets.HorizontalResizeHandle {

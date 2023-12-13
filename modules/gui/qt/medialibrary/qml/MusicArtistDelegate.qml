@@ -21,6 +21,7 @@
 import QtQuick 2.12
 import QtQuick.Templates 2.12 as T
 import QtQuick.Layouts 1.12
+import QtQml.Models 2.12
 
 import org.videolan.medialib 0.1
 import org.videolan.controls 0.1
@@ -34,9 +35,13 @@ T.ItemDelegate {
 
     // Properties
 
+    property ItemView view: ListView.view
+
     /* required */ property MLModel mlModel
 
     property bool isCurrent: false
+
+    property bool selected: false
 
     /* required */ property Item dragTarget
 
@@ -44,12 +49,6 @@ T.ItemDelegate {
     // Private
 
     readonly property bool _isHover: contentItem.containsMouse || root.activeFocus
-
-    // Signals
-
-    signal itemClicked(var mouse)
-
-    signal itemDoubleClicked(var mouse)
 
     // Settings
 
@@ -79,7 +78,7 @@ T.ItemDelegate {
 
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized
-        color: root.isCurrent ? theme.bg.highlight : theme.bg.primary
+        color: (root.isCurrent || root.selected) ? theme.bg.highlight : theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
 
         Widgets.CurrentIndicator {
@@ -104,17 +103,36 @@ T.ItemDelegate {
         drag.target: root.dragTarget
 
         drag.onActiveChanged: {
-            const dragItem = drag.target;
+            if (drag.target) {
+                const target = drag.target
+                if (drag.active) {
+                    if (!selected) {
+                        view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                        view.currentIndex = index
+                    }
 
-            if (drag.active == false)
-                dragItem.Drag.drop();
-
-            dragItem.Drag.active = drag.active;
+                    target.Drag.active = true
+                } else {
+                    target.Drag.drop()
+                }
+            }
         }
 
-        onClicked: itemClicked(mouse)
+        onClicked: function(mouse) {
+            if (!(root.selected && mouse.button === Qt.RightButton)) {
+                view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
+                view.currentIndex = index
+            }
+        }
 
-        onDoubleClicked: itemDoubleClicked(mouse)
+        onDoubleClicked: function(mouse) {
+            if (mouse.button !== Qt.RightButton)
+                MediaLib.addAndPlay(model.id);
+        }
+
+        onPressed: {
+            root.forceActiveFocus(Qt.MouseFocusReason)
+        }
     }
 
     contentItem: RowLayout {
