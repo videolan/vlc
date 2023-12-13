@@ -1367,7 +1367,23 @@ static int ListTransforms(struct vlc_logger *logger, GUID category, const char *
         {
             ComPtr<IMFTransform> mft;
             hr = activate_objects[o]->ActivateObject(IID_PPV_ARGS(mft.GetAddressOf()));
-            vlc_debug(logger, "%s '%ls' is%s available", type, Name, (FAILED(hr)?" not":""));
+            bool available = SUCCEEDED(hr);
+
+            const char *async = "";
+            if (available)
+            {
+                ComPtr<IMFAttributes> attributes;
+                hr = mft->GetAttributes(&attributes);
+                if (SUCCEEDED(hr))
+                {
+                    UINT32 is_async = FALSE;
+                    hr = attributes->GetUINT32(MF_TRANSFORM_ASYNC, &is_async);
+                    if (SUCCEEDED(hr))
+                        async = is_async ? " (async)" : " (sync)";
+                }
+            }
+
+            vlc_debug(logger, "%s '%ls'%s is%s available", type, Name, async, available?"":" not");
         }
         else
             vlc_debug(logger, "found %s '%ls'", type, Name);
