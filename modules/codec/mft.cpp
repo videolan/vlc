@@ -407,8 +407,15 @@ static vlc_fourcc_t MFFormatToCodec(const pair_format_guid table[], const GUID &
     return 0;
 }
 
-static HRESULT MFTypeFromChroma(vlc_fourcc_t chroma, MFT_REGISTER_TYPE_INFO & info)
+static HRESULT MFTypeFromChroma(vlc_fourcc_t chroma, vlc_video_context *vctx, MFT_REGISTER_TYPE_INFO & info)
 {
+    if (vctx && vlc_video_context_GetType(vctx) == VLC_VIDEO_CONTEXT_D3D11VA)
+    {
+        assert(is_d3d11_opaque(chroma));
+        auto *dev_sys = GetD3D11ContextPrivate(vctx);
+        chroma = DxgiFormatFourcc(dev_sys->format);
+        assert(chroma != 0);
+    }
     for (int i = 0; chroma_format_table[i].fourcc; ++i)
         if (chroma_format_table[i].fourcc == chroma)
         {
@@ -2280,7 +2287,7 @@ static int OpenMFTVideoEncoder(vlc_object_t *p_this)
     UINT32 flags;
     bool found = false;
 
-    hr = MFTypeFromChroma(p_enc->fmt_in.video.i_chroma, input_type);
+    hr = MFTypeFromChroma(p_enc->fmt_in.video.i_chroma, p_enc->vctx_in, input_type);
     if (FAILED(hr))
     {
         msg_Dbg(p_this, "Input codec %4.4s not supported by MediaFoundation",
