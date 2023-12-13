@@ -188,6 +188,16 @@ FocusScope {
                 topPadding: VLCStyle.margin_xlarge
             }
 
+            Widgets.MLDragItem {
+                id: musicArtistDragItem
+
+                mlModel: artistModel
+
+                indexes: indexesFlat ? selectionModel.selectedIndexesFlat
+                                     : selectionModel.selectedIndexes
+                indexesFlat: !!selectionModel.selectedIndexesFlat
+            }
+
             delegate: MusicArtistDelegate {
                 width: artistList.width
 
@@ -196,6 +206,8 @@ FocusScope {
                 isCurrent: ListView.isCurrentItem
 
                 mlModel: artistModel
+
+                dragTarget: musicArtistDragItem
 
                 onItemClicked: {
                     selectionModel.updateSelection(mouse.modifiers, artistList.currentIndex,

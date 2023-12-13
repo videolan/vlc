@@ -38,6 +38,8 @@ T.ItemDelegate {
 
     property bool isCurrent: false
 
+    /* required */ property Item dragTarget
+
     // Aliases
     // Private
 
@@ -99,19 +101,7 @@ T.ItemDelegate {
         drag.axis: Drag.XAndYAxis
         drag.smoothed: false
 
-        drag.target: Widgets.DragItem {
-            indexes: [index]
-
-            onRequestData: {
-                console.assert(indexes[0] === index)
-                resolve([model])
-            }
-
-            onRequestInputItems: {
-                const idList = data.map((o) => o.id)
-                MediaLib.mlInputItem(idList, resolve)
-            }
-        }
+        drag.target: root.dragTarget
 
         drag.onActiveChanged: {
             const dragItem = drag.target;
