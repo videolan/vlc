@@ -112,6 +112,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)awakeFromNib
 {
+    _deselectWhenClickedIfSelected = YES;
     _videoImageViewAspectRatioConstraint = [NSLayoutConstraint constraintWithItem:_mediaImageView
                                                                         attribute:NSLayoutAttributeHeight
                                                                         relatedBy:NSLayoutRelationEqual

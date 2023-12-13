@@ -40,6 +40,8 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (class, readonly) const CGFloat bottomTextViewsHeight;
 @property (class, readonly) const CGFloat videoHeightAspectRatioMultiplier;
 
+@property (readwrite, assign) BOOL deselectWhenClickedIfSelected;
+
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
 @property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
