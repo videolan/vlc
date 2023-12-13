@@ -21,6 +21,8 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_strings.h>
+#include <vlc_codec.h>
+#include <vlc_demux.h>
 
 #include "rtp.h"
 
@@ -33,6 +35,7 @@ struct rtp_h26x_sys
     block_t *p_packets;
     block_t *xps;
     struct vlc_rtp_es *es;
+    decoder_t *p_packetizer;
 };
 
 static void rtp_h26x_clear(struct rtp_h26x_sys *sys)
@@ -49,6 +52,7 @@ static void rtp_h26x_init(struct rtp_h26x_sys *sys)
     sys->pp_packets_next = &sys->p_packets;
     sys->xps = NULL;
     sys->es = NULL;
+    sys->p_packetizer = NULL;
 }
 
 static void h26x_extractbase64xps(const char *psz64,
@@ -123,7 +127,17 @@ static void h26x_output(struct rtp_h26x_sys *sys,
     block->i_dts = VLC_TICK_INVALID; /* RTP does not specify this */
     if(au_end)
         block->i_flags |= BLOCK_FLAG_AU_END;
-    vlc_rtp_es_send(sys->es, block);
+
+    block_t *p_out;
+    for(int i=0; i<(1+!!au_end); i++)
+    {
+        while((p_out = sys->p_packetizer->pf_packetize(sys->p_packetizer,
+                                                       block ? &block : NULL)))
+        {
+            vlc_rtp_es_send(sys->es, p_out);
+        }
+        block = NULL; // for drain iteration
+    }
 }
 
 static void h26x_output_blocks(struct rtp_h26x_sys *sys, bool b_annexb)

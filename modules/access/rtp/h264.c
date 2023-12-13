@@ -29,9 +29,16 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
+struct h264_pt_opaque
+{
+    block_t *sdpxps;
+    vlc_object_t *obj;
+};
+
 static void *rtp_h264_init(struct vlc_rtp_pt *pt)
 {
-    block_t *sdpparams = pt->opaque;
+    struct h264_pt_opaque *opaque = pt->opaque;
+    block_t *sdpparams = opaque->sdpxps;
     struct rtp_h26x_sys *sys = malloc(sizeof(*sys));
     if(!sys)
         return NULL;
@@ -41,7 +48,14 @@ static void *rtp_h264_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_H264);
     fmt.b_packetized = false;
 
-    sys->es = vlc_rtp_pt_request_es(pt, &fmt);
+    sys->p_packetizer = demux_PacketizerNew(opaque->obj, &fmt, "rtp packetizer");
+    if(!sys->p_packetizer)
+    {
+        free(sys);
+        return NULL;
+    }
+
+    sys->es = vlc_rtp_pt_request_es(pt, &sys->p_packetizer->fmt_out);
     if(sdpparams)
         sys->xps = block_Duplicate(sdpparams);
 
@@ -54,6 +68,8 @@ static void rtp_h264_destroy(struct vlc_rtp_pt *pt, void *data)
     struct rtp_h26x_sys *sys = data;
     if(sys)
     {
+        if(sys->p_packetizer)
+            demux_PacketizerDestroy(sys->p_packetizer);
         vlc_rtp_es_destroy(sys->es);
         rtp_h26x_clear(sys);
         free(sys);
@@ -237,9 +253,10 @@ drop:
 
 static void rtp_h264_release(struct vlc_rtp_pt *pt)
 {
-    block_t *sdpparams = pt->opaque;
-    if(sdpparams)
-        block_Release(sdpparams);
+    struct h264_pt_opaque *opaque = pt->opaque;
+    if(opaque->sdpxps)
+        block_Release(opaque->sdpxps);
+    free(opaque);
 }
 
 static const struct vlc_rtp_pt_operations rtp_h264_ops = {
@@ -263,12 +280,18 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     else
         return VLC_ENOTSUP;
 
-    pt->opaque = NULL;
+    struct h264_pt_opaque *opaque = calloc(1, sizeof(*opaque));
+    if(!opaque)
+        return VLC_ENOMEM;
+    pt->opaque = opaque;
+
+    opaque->obj = obj;
+
     if(desc->parameters)
     {
         psz = strstr(desc->parameters, "sprop-parameter-sets=");
         if(psz)
-            pt->opaque = h26x_fillextradata(psz + 21);
+            opaque->sdpxps = h26x_fillextradata(psz + 21);
     }
 
     return VLC_SUCCESS;
