@@ -117,8 +117,6 @@ T.Pane {
     Widgets.DragItem {
         id: dragItem
 
-        parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
-
         onRequestData: {
             resolve(indexes.map((index) => {
                 const item = root.model.itemAt(index)

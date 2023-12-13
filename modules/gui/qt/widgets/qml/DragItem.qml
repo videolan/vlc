@@ -63,6 +63,7 @@ Item {
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
+        palette: VLCStyle.palette
         colorSet: ColorContext.Window
     }
 
@@ -121,6 +122,8 @@ Item {
     // always keep drag item out of view
     z: -1
 
+    parent: T.Overlay.overlay
+
     x: parent.width + VLCStyle.margin_large
 
     y: parent.height + VLCStyle.margin_large
@@ -132,8 +135,6 @@ Item {
     Drag.hotSpot.x: - VLCStyle.dragDelta
 
     Drag.hotSpot.y: - VLCStyle.dragDelta
-
-    parent: g_mainDisplay
 
     width: padding * 2
            + coversXPos(_displayedCoversCount - 1) + coverSize + VLCStyle.margin_small
