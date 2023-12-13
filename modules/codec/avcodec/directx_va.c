@@ -35,9 +35,9 @@
 
 #include <initguid.h>
 
-#if HAVE_LIBAVCODEC_DXVA2_H
+#if defined(HAVE_LIBAVCODEC_DXVA2_H)
 # include <libavcodec/dxva2.h>
-#elif HAVE_LIBAVCODEC_D3D11VA_H
+#elif defined(HAVE_LIBAVCODEC_D3D11VA_H)
 # include <libavcodec/d3d11va.h>
 #else
 # error bogus libavcodec DXVA support
@@ -76,9 +76,9 @@ static const int PROF_AV1_HIGH[]    = { FF_PROFILE_AV1_HIGH, FF_PROFILE_AV1_MAIN
 
 #if defined(__MINGW64_VERSION_MAJOR) // mingw-w64 doesn't have all the standard GUIDs
 
-# if HAVE_LIBAVCODEC_DXVA2_H
+# if defined(HAVE_LIBAVCODEC_DXVA2_H)
 // do nothing, we have redirected DXVA_xxx to DXVA2_xxx
-# elif HAVE_LIBAVCODEC_D3D11VA_H && __MINGW64_VERSION_MAJOR > 11
+# elif defined(HAVE_LIBAVCODEC_D3D11VA_H) && __MINGW64_VERSION_MAJOR > 11
 // do nothing, we have redirected DXVA_xxx to D3D11_DECODER_PROFILE_xxx
 # else // !HAVE_LIBAVCODEC_DXVA2_H && !HAVE_LIBAVCODEC_D3D11VA_H
 // define missing GUIDs from D3D11-only builds with old mingw-w64

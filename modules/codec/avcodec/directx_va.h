@@ -85,11 +85,11 @@ bool directx_va_canUseDecoder(vlc_va_t *, UINT VendorId, UINT DeviceId, const GU
 #ifdef _MSC_VER
 // MSVC should have all the DXVA_xxx GUIDs but not the few DXVA2_xxx ones we
 // need depending on the configuration (they don't have DXVA_xxx equivalents)
-# if HAVE_LIBAVCODEC_DXVA2_H
+# if defined(HAVE_LIBAVCODEC_DXVA2_H)
 
 // nothing to do, dxva2api.h will have them
 
-# elif HAVE_LIBAVCODEC_D3D11VA_H
+# elif defined(HAVE_LIBAVCODEC_D3D11VA_H)
 
 #  define DXVA2_ModeMPEG2_VLD     D3D11_DECODER_PROFILE_MPEG2_VLD
 #  define DXVA2_ModeMPEG2_MoComp  D3D11_DECODER_PROFILE_MPEG2_MOCOMP
@@ -98,7 +98,7 @@ bool directx_va_canUseDecoder(vlc_va_t *, UINT VendorId, UINT DeviceId, const GU
 # endif // !HAVE_LIBAVCODEC_xxx
 
 #elif defined(__MINGW64_VERSION_MAJOR) // mingw-w64 doesn't have all the standard GUIDs
-# if HAVE_LIBAVCODEC_DXVA2_H
+# if defined(HAVE_LIBAVCODEC_DXVA2_H)
 
 // redirect missing DXVA_xxx to existing DXVA2_xxx variants
 #  define DXVA_ModeMPEG1_VLD       DXVA2_ModeMPEG1_VLD
@@ -139,7 +139,7 @@ bool directx_va_canUseDecoder(vlc_va_t *, UINT VendorId, UINT DeviceId, const GU
 #  define DXVA_ModeVP9_VLD_Profile0        DXVA2_ModeVP9_VLD_Profile0
 #  define DXVA_ModeVP9_VLD_10bit_Profile2  DXVA2_ModeVP9_VLD_10bit_Profile2
 
-# elif HAVE_LIBAVCODEC_D3D11VA_H && __MINGW64_VERSION_MAJOR > 11
+# elif defined(HAVE_LIBAVCODEC_D3D11VA_H) && __MINGW64_VERSION_MAJOR > 11
 
 // redirect missing DXVA_xxx to existing D3D11_DECODER_PROFILE_xxx variants
 #  define DXVA2_ModeMPEG2_VLD     D3D11_DECODER_PROFILE_MPEG2_VLD
