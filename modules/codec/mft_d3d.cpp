@@ -39,8 +39,6 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 
-#include "../video_chroma/dxgi_fmt.h"
-
 using Microsoft::WRL::ComPtr;
 
 vlc_mf_d3d::~vlc_mf_d3d()
