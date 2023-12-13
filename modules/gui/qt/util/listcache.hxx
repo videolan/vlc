@@ -482,8 +482,6 @@ void ListCache<T>::asyncCountAndLoad()
                 ? std::min(m_limit, maximumCount)
                 : maximumCount;
 
-            if (queryCount == 0)
-                return;
             //note: should we drop items past queryCount?
             m_cachedData = std::make_unique<CacheData>(std::move(list),
                                                        queryCount,
