@@ -33,9 +33,9 @@
 #define IGraphicsUnknown IUnknown
 #endif // !_GAMING_XBOX_XBOXONE && !_GAMING_XBOX_XBOXONE
 
-class IMFTransform;
-class IMFDXGIDeviceManager;
-class IMFDXGIBuffer;
+struct IMFTransform;
+struct IMFDXGIDeviceManager;
+struct IMFDXGIBuffer;
 
 struct vlc_logger;
 struct picture_context_t;
