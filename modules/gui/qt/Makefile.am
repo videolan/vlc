@@ -15,6 +15,7 @@ include ../../common.am
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
+TEST_EXTENSIONS = .qml
 EXTRA_DIST =
 
 vlc_qt_libs = $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS) $(QT5_XCB_PLUGINS_LIBS) $(QT5_WAYLAND_PLUGINS_LIBS) $(QT_LIBS) $(LIBS_qt)
@@ -1152,6 +1153,8 @@ pkglibexec_PROGRAMS = vlc-qt-check
 endif
 endif
 
+QML_LOG_COMPILER = $(builddir)/qml_test -input
+
 if HAVE_QT5_QUICK_TEST
 qml_test_SOURCES = tests/qml_test.cpp
 nodist_qml_test_SOURCES = resources.cpp
@@ -1162,6 +1165,6 @@ qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT5_QUICK
 qml_test_LDADD = $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
 check_PROGRAMS = qml_test
 EXTRA_DIST += tests/tst_FSM.qml
-TESTS = qml_test
+TESTS = tests/tst_FSM.qml
 endif
 endif
