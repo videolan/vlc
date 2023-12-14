@@ -462,6 +462,62 @@ static int UpdatePlaylistManifest(hls_playlist_t *playlist)
     return VLC_SUCCESS;
 }
 
+static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
+                                        vlc_tick_t max_segment_length)
+{
+    hls_block_chain_t segment = {.begin = playlist->muxed_output.begin};
+
+    block_t *prev = NULL;
+    for (block_t *it = playlist->muxed_output.begin; it != NULL;
+         it = it->p_next)
+    {
+        if (segment.length + it->i_length > max_segment_length)
+        {
+            playlist->muxed_output.begin = it;
+
+            if (prev != NULL)
+                prev->p_next = NULL;
+            return segment;
+        }
+        segment.length += it->i_length;
+        prev = it;
+    }
+
+    hls_block_chain_Reset(&playlist->muxed_output);
+    return segment;
+}
+
+static void ExtractAndAddSegment(hls_playlist_t *playlist,
+                                 vlc_tick_t max_segment_length)
+{
+    hls_block_chain_t segment = ExtractSegment(playlist, max_segment_length);
+
+    if (hls_config_IsMemStorageEnabled(playlist->config) &&
+        hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
+    {
+        const hls_segment_t *to_be_removed =
+            hls_segment_GetFirst(&playlist->segments);
+        *playlist->current_memory_cached_ref -=
+            hls_storage_GetSize(to_be_removed->storage);
+    }
+
+    const int status = hls_segment_queue_NewSegment(
+        &playlist->segments, segment.begin, segment.length);
+    if (unlikely(status != VLC_SUCCESS))
+    {
+        vlc_error(playlist->logger,
+                  "Segment '%u' creation failed",
+                  playlist->segments.total_segments + 1);
+        return;
+    }
+
+    vlc_debug(playlist->logger,
+              "Segment '%u' created",
+              playlist->segments.total_segments);
+
+    UpdatePlaylistManifest(playlist);
+}
+
 static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
 {
     hls_playlist_t *playlist = access->p_sys;
@@ -709,61 +765,6 @@ error:
     return NULL;
 }
 
-static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
-                                        vlc_tick_t max_segment_length)
-{
-    hls_block_chain_t segment = {.begin = playlist->muxed_output.begin};
-
-    block_t *prev = NULL;
-    for (block_t *it = playlist->muxed_output.begin; it != NULL;
-         it = it->p_next)
-    {
-        if (segment.length + it->i_length > max_segment_length)
-        {
-            playlist->muxed_output.begin = it;
-
-            if (prev != NULL)
-                prev->p_next = NULL;
-            return segment;
-        }
-        segment.length += it->i_length;
-        prev = it;
-    }
-
-    hls_block_chain_Reset(&playlist->muxed_output);
-    return segment;
-}
-
-static void ExtractAndAddSegment(hls_playlist_t *playlist,
-                                 vlc_tick_t last_segment_time)
-{
-    hls_block_chain_t segment = ExtractSegment(playlist, last_segment_time);
-
-    if (hls_config_IsMemStorageEnabled(playlist->config) &&
-        hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
-    {
-        const hls_segment_t *to_be_removed =
-            hls_segment_GetFirst(&playlist->segments);
-        *playlist->current_memory_cached_ref -=
-            hls_storage_GetSize(to_be_removed->storage);
-    }
-
-    const int status = hls_segment_queue_NewSegment(
-        &playlist->segments, segment.begin, segment.length);
-    if (unlikely(status != VLC_SUCCESS))
-    {
-        vlc_error(playlist->logger,
-                  "Segment '%u' creation failed",
-                  playlist->segments.total_segments + 1);
-        return;
-    }
-
-    vlc_debug(playlist->logger,
-              "Segment '%u' created",
-              playlist->segments.total_segments);
-
-    UpdatePlaylistManifest(playlist);
-}
 static void Del(sout_stream_t *stream, void *id)
 {
     sout_stream_sys_t *sys = stream->p_sys;
