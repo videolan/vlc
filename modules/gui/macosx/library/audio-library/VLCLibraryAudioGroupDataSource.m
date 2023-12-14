@@ -225,4 +225,14 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return self.representedListOfAlbums[indexPathItem];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return nil;
+    }
+
+    const NSInteger arrayIdx = [self rowForLibraryItem:libraryItem];
+    return [NSIndexPath indexPathForItem:arrayIdx inSection:0];
+}
+
 @end
