@@ -2290,9 +2290,12 @@ static int OpenMFTVideoEncoder(vlc_object_t *p_this)
     hr = MFTypeFromChroma(p_enc->fmt_in.video.i_chroma, p_enc->vctx_in, input_type);
     if (FAILED(hr))
     {
-        msg_Dbg(p_this, "Input codec %4.4s not supported by MediaFoundation",
+        msg_Dbg(p_this, "Input chroma %4.4s not supported by MediaFoundation, forcing NV12",
                 (char*)&p_enc->fmt_in.i_codec);
-        goto error;
+        p_enc->fmt_in.video.i_chroma = VLC_CODEC_NV12;
+        p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma;
+        hr = MFTypeFromChroma(p_enc->fmt_in.video.i_chroma, nullptr, input_type);
+        assert(SUCCEEDED(hr));
     }
 
     hr = MFTypeFromCodec(MFMediaType_Video, p_enc->fmt_out.i_codec, output_type);
