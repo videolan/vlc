@@ -579,7 +579,7 @@ static int Demux(demux_t *demux)
 
         if (sys->source.get(sys->source.data, sys->source.cookie,
                             &dts, &pts, &flags, &buffer_size, &buffer))
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         if (dts < 0)
             dts = pts;
@@ -602,7 +602,7 @@ static int Demux(demux_t *demux)
                             buffer_size, buffer);
     }
     sys->deadline = VLC_TICK_INVALID;
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /**
