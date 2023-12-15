@@ -2336,6 +2336,24 @@ have_dvbpsi="no"
 PKG_WITH_MODULES([DVBPSI], [libdvbpsi >= 1.2.0], [have_dvbpsi="yes"])
 AM_CONDITIONAL([HAVE_DVBPSI], [test "${have_dvbpsi}" = "yes"])
 
+dnl
+dnl  libdvbcsa check for ts mux/demux
+dnl
+dnl doesn't provide pkgconfig yet (as for 1.1.0)
+PKG_WITH_MODULES([DVBCSA], [dvbcsa], [have_dvbcsa="yes"], [
+  VLC_SAVE_FLAGS
+  CPPFLAGS="${CPPFLAGS} ${DVBCSA_CFLAGS}"
+  LDFLAGS="${LDFLAGS} ${DVBCSA_LIBS}"
+  AC_CHECK_HEADER([dvbcsa/dvbcsa.h], [
+    AC_CHECK_LIB([dvbcsa], [dvbcsa_decrypt], [
+      have_dvbcsa="yes"
+      DVBCSA_LIBS="${DVBCSA_LIBS} -ldvbcsa"
+      AC_SUBST([DVBCSA_LIBS])
+    ])
+  ])
+  VLC_RESTORE_FLAGS
+])
+AS_IF([test "${have_dvbcsa}" = "yes"], [AC_DEFINE(HAVE_DVBCSA, 1, [Define if libdvbcsa is available.])])
 
 dnl
 dnl  GME demux plugin

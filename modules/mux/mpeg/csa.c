@@ -88,6 +88,7 @@ int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, bool set_odd )
     if( strlen( psz_ck ) != 16 )
     {
         msg_Warn( p_caller, "invalid csa ck (it must be 16 chars long)" );
+        assert(0);
         return VLC_EINVAL;
     }
     else
