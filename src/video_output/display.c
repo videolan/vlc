@@ -206,12 +206,12 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
             y = wx;
             break;
         case ORIENT_LEFT_BOTTOM:
-            x = wy;
-            y = place.width - wx;
-            break;
-        case ORIENT_RIGHT_TOP:
             x = place.height - wy;
             y = wx;
+            break;
+        case ORIENT_RIGHT_TOP:
+            x = wy;
+            y = place.width - wx;
             break;
         case ORIENT_RIGHT_BOTTOM:
             x = place.height - wy;
