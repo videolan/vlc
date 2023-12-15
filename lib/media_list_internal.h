@@ -45,6 +45,8 @@ struct libvlc_media_list_t
 };
 
 /* Media List */
+void libvlc_media_list_internal_clear( libvlc_media_list_t *p_mlist );
+
 void libvlc_media_list_internal_add_media(
         libvlc_media_list_t * p_mlist,
         libvlc_media_t * p_md );
