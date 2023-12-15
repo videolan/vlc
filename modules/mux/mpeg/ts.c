@@ -458,25 +458,30 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream, bool b_pcr );
 static void TSSetPCR( block_t *p_ts, vlc_tick_t i_dts );
 
-static csa_t *csaSetup( vlc_object_t *p_this )
+static void csaSetup( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     char *csack = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa-ck" );
     if( !csack )
-        return NULL;
+        return;
 
     csa_t *csa = csa_New();
 
     if( unlikely(csa == NULL) )
-        return NULL;
+    {
+        free(csack);
+        return;
+    }
 
     if( csa_SetCW( p_this, csa, csack, true ) )
     {
         free(csack);
         csa_Delete( csa );
-        return NULL;
+        return;
     }
+
+    p_sys->csa = csa;
 
     vlc_mutex_init( &p_sys->csa_lock );
     p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
@@ -509,8 +514,6 @@ static csa_t *csaSetup( vlc_object_t *p_this )
     msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
 
     free(csack);
-
-    return csa;
 }
 
 /*****************************************************************************
@@ -701,7 +704,7 @@ static int Open( vlc_object_t *p_this )
 
     p_mux->p_sys        = p_sys;
 
-    p_sys->csa = csaSetup(p_this);
+    csaSetup( p_this );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
