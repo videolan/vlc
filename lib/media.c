@@ -112,9 +112,7 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
 
     /* Add this to our media list */
     p_subitems = p_md->p_subitems;
-    libvlc_media_list_lock( p_subitems );
     libvlc_media_list_internal_add_media( p_subitems, p_md_child );
-    libvlc_media_list_unlock( p_subitems );
 
     return p_md_child;
 }
@@ -146,6 +144,7 @@ static void input_item_add_subnode( libvlc_media_t *md,
     /* Retain the media because we don't want the search algorithm to release
      * it when its subitems get parsed. */
     libvlc_media_retain(md);
+    libvlc_media_list_lock(md->p_subitems);
 
     struct vlc_item_list *node_root = wrap_item_in_list( md, root );
     if( node_root == NULL )
@@ -177,6 +176,8 @@ static void input_item_add_subnode( libvlc_media_t *md,
             if( md_child == NULL )
                 goto error;
 
+            /* No need to lock subitems of the submedia since the submedia is
+             * not yet exposed */
             struct vlc_item_list *submedia =
                 wrap_item_in_list( md_child, child );
             if (submedia == NULL)
@@ -192,6 +193,8 @@ static void input_item_add_subnode( libvlc_media_t *md,
         libvlc_media_release( node->media );
         free( node );
     }
+
+    libvlc_media_list_unlock(md->p_subitems);
     return;
 
 error:
@@ -204,6 +207,8 @@ error:
             libvlc_media_release( node->media );
         free( node );
     }
+
+    libvlc_media_list_unlock(md->p_subitems);
 }
 
 void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *node)
