@@ -179,9 +179,11 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
                                        const video_format_t *restrict source,
                                        const struct vout_display_placement *restrict dp)
 {
-    vout_display_place_t place;
+    video_format_t source_rot;
+    video_format_ApplyRotation(&source_rot, source);
 
-    vout_display_PlacePicture(&place, source, dp);
+    vout_display_place_t place;
+    vout_display_PlaceRotatedPicture(&place, &source_rot, dp);
 
     if (place.width <= 0 || place.height <= 0)
         return;
@@ -226,10 +228,10 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
             vlc_assert_unreachable();
     }
 
-    x = source->i_x_offset
-        + (int64_t)(x - place.x) * source->i_visible_width / place.width;
-    y = source->i_y_offset
-        + (int64_t)(y - place.y) * source->i_visible_height / place.height;
+    x = source_rot.i_x_offset
+        + (int64_t)(x - place.x) * source_rot.i_visible_width / place.width;
+    y = source_rot.i_y_offset
+        + (int64_t)(y - place.y) * source_rot.i_visible_height / place.height;
     *xp = x;
     *yp = y;
 }
