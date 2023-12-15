@@ -78,22 +78,16 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
     }
 }
 
-/* */
-void vout_display_PlacePicture(vout_display_place_t *restrict place,
-                               const video_format_t *restrict source,
-                               const struct vout_display_placement *restrict dp)
+static void vout_display_PlaceRotatedPicture(vout_display_place_t *restrict place,
+                                             const video_format_t *restrict source,
+                                             const struct vout_display_placement *restrict dp)
 {
     memset(place, 0, sizeof(*place));
     if (dp->width == 0 || dp->height == 0)
         return;
 
-    /* */
     unsigned display_width;
     unsigned display_height;
-
-    video_format_t source_rot;
-    video_format_ApplyRotation(&source_rot, source);
-    source = &source_rot;
 
     if (dp->fitting != VLC_VIDEO_FIT_NONE) {
         display_width  = dp->width;
@@ -167,6 +161,17 @@ void vout_display_PlacePicture(vout_display_place_t *restrict place,
         place->y = ((int)dp->height - (int)place->height) / 2;
         break;
     }
+
+}
+
+/* */
+void vout_display_PlacePicture(vout_display_place_t *restrict place,
+                               const video_format_t *restrict source,
+                               const struct vout_display_placement *restrict dp)
+{
+    video_format_t source_rot;
+    video_format_ApplyRotation(&source_rot, source);
+    vout_display_PlaceRotatedPicture(place, &source_rot, dp);
 }
 
 /** Translates window coordinates to video coordinates */
