@@ -145,6 +145,7 @@
     _playlistButtonBottomConstraint.active = NO;
 
     [self setupAudioDecorativeView];
+    [self.controlsBar update];
 }
 
 - (void)playerCurrentMediaItemChanged:(NSNotification *)notification
