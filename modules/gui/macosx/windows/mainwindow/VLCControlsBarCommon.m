@@ -324,6 +324,15 @@
 #pragma mark -
 #pragma mark Updaters
 
+- (void)update 
+{
+    [self updateTimeSlider:nil];
+    [self updateVolumeSlider:nil];
+    [self updateMuteVolumeButtonImage];
+    [self updatePlaybackControls:nil];
+    [self updateCurrentItemDisplayControls:nil];
+}
+
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
     VLCInputItem *inputItem = _playerController.currentMedia;
