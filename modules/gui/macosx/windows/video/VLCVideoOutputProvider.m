@@ -245,7 +245,6 @@ int WindowOpen(vlc_window_t *p_wnd)
     newVideoWindow.acceptsMouseMovedEvents = !asVideoWallpaper;
     newVideoWindow.movableByWindowBackground = !asVideoWallpaper;
 
-    newVideoWindow.videoViewController = [[VLCMainVideoViewController alloc] init];
     newVideoWindow.videoViewController.displayLibraryControls = NO;
     newVideoWindow.videoViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     newVideoWindow.videoViewController.view.frame = newVideoWindow.contentView.frame;
@@ -300,7 +299,6 @@ int WindowOpen(vlc_window_t *p_wnd)
     newVideoWindow.minSize = NSMakeSize(VLCVideoWindowCommonMinimalHeight, VLCVideoWindowCommonMinimalHeight);
     newVideoWindow.titlebarAppearsTransparent = YES;
 
-    newVideoWindow.videoViewController = [[VLCMainVideoViewController alloc] init];
     newVideoWindow.videoViewController.displayLibraryControls = NO;
     newVideoWindow.videoViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     newVideoWindow.videoViewController.view.frame = newVideoWindow.contentView.frame;
