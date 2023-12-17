@@ -74,6 +74,12 @@
 {
     [self addObserver:self forKeyPath:@"collectionViews" options:NSKeyValueObservingOptionNew context:nil];
     [self addObserver:self forKeyPath:@"tableViews" options:NSKeyValueObservingOptionNew context:nil];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemsReset:)
+                               name:VLCLibraryModelAudioMediaListReset
+                             object:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -90,6 +96,11 @@
     } else if ([keyPath isEqualToString:@"tableViews"]) {
         [self reloadTableViews];
     }
+}
+
+- (void)libraryModelAudioMediaItemsReset:(NSNotification *)notification
+{
+    [self updateRepresentedListOfAlbums];
 }
 
 - (void)reloadTableViews
