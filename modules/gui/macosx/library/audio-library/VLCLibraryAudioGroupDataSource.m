@@ -61,15 +61,26 @@
                  withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
 }
 
-- (void)reloadViews
+- (void)reloadTableViews
 {
-    for (NSTableView * const tableView in _tableViews) {
+    NSArray<NSTableView *> * const tableViews = self.tableViews;
+    for (NSTableView * const tableView in tableViews) {
         [tableView reloadData];
     }
+}
 
-    for (NSCollectionView * const collectionView in _collectionViews) {
+- (void)reloadCollectionViews
+{
+    NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
+    for (NSCollectionView * const collectionView in collectionViews) {
         [collectionView reloadData];
     }
+}
+
+- (void)reloadViews
+{
+    [self reloadTableViews];
+    [self reloadCollectionViews];
 }
 
 - (void)updateRepresentedListOfAlbums
