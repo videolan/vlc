@@ -61,6 +61,22 @@
                  withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+    if (object != self) {
+        return;
+    }
+
+    if ([keyPath isEqualToString:@"collectionViews"]) {
+        [self reloadCollectionViews];
+    } else if ([keyPath isEqualToString:@"tableViews"]) {
+        [self reloadTableViews];
+    }
+}
+
 - (void)reloadTableViews
 {
     NSArray<NSTableView *> * const tableViews = self.tableViews;
