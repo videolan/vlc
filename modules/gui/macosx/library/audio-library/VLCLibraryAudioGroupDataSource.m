@@ -61,6 +61,21 @@
                  withIdentifier:VLCLibraryAudioGroupHeaderViewIdentifier];
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    [self addObserver:self forKeyPath:@"collectionViews" options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:@"tableViews" options:NSKeyValueObservingOptionNew context:nil];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary *)change
