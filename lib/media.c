@@ -145,6 +145,7 @@ static void input_item_add_subnode( libvlc_media_t *md,
      * it when its subitems get parsed. */
     libvlc_media_retain(md);
     libvlc_media_list_lock(md->p_subitems);
+    libvlc_media_list_internal_clear(md->p_subitems);
 
     struct vlc_item_list *node_root = wrap_item_in_list( md, root );
     if( node_root == NULL )
