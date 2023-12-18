@@ -27,6 +27,7 @@ typedef struct
     uint8_t         i_stream_type;
     uint8_t         i_continuity_counter;
     bool            b_discontinuity;
+    bool            b_scramble;
 
 } tsmux_stream_t;
 

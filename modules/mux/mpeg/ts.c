@@ -920,6 +920,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Update pcr_pid */
     SelectPCRStream( p_mux, NULL );
 
+    /* Set scramble flag / mode (CSA for now) */
+    switch( p_input->p_fmt->i_cat )
+    {
+    case VIDEO_ES:
+        p_stream->ts.b_scramble = p_sys->b_crypt_video && p_sys->csa;
+        break;
+    case AUDIO_ES:
+        p_stream->ts.b_scramble = p_sys->b_crypt_audio && p_sys->csa;
+        break;
+    default:
+        p_stream->ts.b_scramble = false;
+        break;
+    }
+
     return VLC_SUCCESS;
 
 oom:
@@ -1478,12 +1492,9 @@ static int MuxStreams( sout_mux_t *p_mux )
 
         /* Build the TS packet */
         block_t *p_ts = TSNew( p_mux, p_stream, b_pcr );
-        if( p_sys->csa != NULL &&
-             (p_input->p_fmt->i_cat != AUDIO_ES || p_sys->b_crypt_audio) &&
-             (p_input->p_fmt->i_cat != VIDEO_ES || p_sys->b_crypt_video) )
-        {
+        if( p_stream->ts.b_scramble )
             p_ts->i_flags |= BLOCK_FLAG_SCRAMBLED;
-        }
+
         i_packet_pos++;
 
         /* Write PAT/PMT before every keyframe if use-key-frames is enabled,
