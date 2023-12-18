@@ -83,7 +83,6 @@ static void services_discovery_item_added( services_discovery_t *sd,
             libvlc_media_t * p_catmd;
             p_catmd = libvlc_media_new_as_node( psz_cat );
             p_mlist = libvlc_media_subitems( p_catmd );
-            p_mlist->b_read_only = true;
 
             /* Insert the newly created mlist in our dictionary */
             vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist );
