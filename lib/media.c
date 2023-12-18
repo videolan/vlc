@@ -135,26 +135,6 @@ static_assert(
     MULTIVIEW_STEREO_CHECKERBOARD   == (int) libvlc_video_multiview_stereo_checkerboard,
     "Mismatch between libvlc_video_multiview_t and video_multiview_mode_t");
 
-static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
-                                                bool b_create )
-{
-    libvlc_media_list_t *p_subitems = NULL;
-
-    vlc_mutex_lock( &p_md->subitems_lock );
-    if( p_md->p_subitems == NULL && b_create )
-    {
-        p_md->p_subitems = libvlc_media_list_new();
-        if( p_md->p_subitems != NULL )
-        {
-            p_md->p_subitems->b_read_only = true;
-            p_md->p_subitems->p_internal_md = p_md;
-        }
-    }
-    p_subitems = p_md->p_subitems;
-    vlc_mutex_unlock( &p_md->subitems_lock );
-    return p_subitems;
-}
-
 static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
                                                input_item_t *item )
 {
@@ -165,13 +145,10 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
     p_md_child = libvlc_media_new_from_input_item( item );
 
     /* Add this to our media list */
-    p_subitems = media_get_subitems( p_md, true );
-    if( p_subitems != NULL )
-    {
-        libvlc_media_list_lock( p_subitems );
-        libvlc_media_list_internal_add_media( p_subitems, p_md_child );
-        libvlc_media_list_unlock( p_subitems );
-    }
+    p_subitems = p_md->p_subitems;
+    libvlc_media_list_lock( p_subitems );
+    libvlc_media_list_internal_add_media( p_subitems, p_md_child );
+    libvlc_media_list_unlock( p_subitems );
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemAdded;
@@ -375,14 +352,11 @@ static void send_parsed_changed( libvlc_media_t *p_md,
     /* Send the event */
     libvlc_event_send( &p_md->event_manager, &event );
 
-    libvlc_media_list_t *p_subitems = media_get_subitems( p_md, false );
-    if( p_subitems != NULL )
-    {
-        /* notify the media list */
-        libvlc_media_list_lock( p_subitems );
-        libvlc_media_list_internal_end_reached( p_subitems );
-        libvlc_media_list_unlock( p_subitems );
-    }
+    libvlc_media_list_t *p_subitems = p_md->p_subitems;
+    /* notify the media list */
+    libvlc_media_list_lock( p_subitems );
+    libvlc_media_list_internal_end_reached( p_subitems );
+    libvlc_media_list_unlock( p_subitems );
 }
 
 /**
@@ -484,15 +458,20 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
         return NULL;
     }
 
+    p_md->p_subitems = libvlc_media_list_new();
+    if( p_md->p_subitems == NULL )
+    {
+        free( p_md );
+        return NULL;
+    }
+    p_md->p_subitems->b_read_only = true;
+    p_md->p_subitems->p_internal_md = p_md;
+
     p_md->p_input_item      = p_input_item;
     vlc_atomic_rc_init(&p_md->rc);
 
-    vlc_mutex_init(&p_md->subitems_lock);
     atomic_init(&p_md->worker_count, 0);
 
-    /* A media descriptor can be a playlist. When you open a playlist
-     * It can give a bunch of item to read. */
-    p_md->p_subitems        = NULL;
     p_md->p_input_item->libvlc_owner = p_md;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
 
@@ -575,7 +554,6 @@ libvlc_media_t * libvlc_media_new_as_node(const char *psz_name)
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
-    libvlc_media_list_t * p_subitems;
 
     p_input_item = input_item_New( INPUT_ITEM_URI_NOP, psz_name );
 
@@ -587,12 +565,6 @@ libvlc_media_t * libvlc_media_new_as_node(const char *psz_name)
 
     p_md = libvlc_media_new_from_input_item( p_input_item );
     input_item_Release( p_input_item );
-
-    p_subitems = media_get_subitems( p_md, true );
-    if( p_subitems == NULL) {
-        libvlc_media_release( p_md );
-        return NULL;
-    }
 
     return p_md;
 }
@@ -740,10 +712,8 @@ int libvlc_media_save_meta( libvlc_instance_t *inst, libvlc_media_t *p_md )
 libvlc_media_list_t *
 libvlc_media_subitems( libvlc_media_t * p_md )
 {
-    libvlc_media_list_t *p_subitems = media_get_subitems( p_md, true );
-    if( p_subitems )
-        libvlc_media_list_retain( p_subitems );
-    return p_subitems;
+    libvlc_media_list_retain( p_md->p_subitems );
+    return p_md->p_subitems;
 }
 
 // Getter for statistics information
