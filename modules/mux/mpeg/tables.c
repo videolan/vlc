@@ -663,6 +663,16 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                 p_stream->pes->lang);
         }
 
+        if( p_stream->ts->b_scramble )
+        {
+            if( standard == TS_MUX_STANDARD_DVB )
+            {
+                /* scrambling_descriptor() */
+                uint8_t data[1] = { 0x01 /* CSA1 */ };
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x65, 1, data );
+            }
+        }
+
         if( p_sdt )
         {
             UpdateServiceType( &pi_service_cats[p_stream->i_mapped_prog],
