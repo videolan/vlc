@@ -289,8 +289,8 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         codec/jpeg2000.h codec/scte18.h \
         codec/atsc_a65.c codec/atsc_a65.h \
 	codec/opus_header.c
-libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
-libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
+libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS) $(DVBCSA_CFLAGS)
+libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS) $(DVBCSA_LIBS)
 if HAVE_ARIBB24
 libts_plugin_la_CFLAGS += $(ARIBB24_CFLAGS)
 libts_plugin_la_LIBADD += $(ARIBB24_LIBS)

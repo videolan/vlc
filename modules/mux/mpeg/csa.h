@@ -24,12 +24,6 @@
 #define VLC_MPEG_CSA_H_
 
 typedef struct csa_t csa_t;
-#define csa_New     __csa_New
-#define csa_Delete  __csa_Delete
-#define csa_SetCW  __csa_SetCW
-#define csa_UseKey  __csa_UseKey
-#define csa_Decrypt __csa_decrypt
-#define csa_Encrypt __csa_encrypt
 
 csa_t *csa_New( void );
 void   csa_Delete( csa_t * );
