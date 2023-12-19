@@ -223,6 +223,7 @@ var_Read_float(const char *psz)
     X(chapter_count, ssize_t, add_integer, Ssize, 0) \
     X(null_names, bool, add_bool, Bool, false) \
     X(program_count, ssize_t, add_integer, Ssize, 0) \
+    X(attachment_count, ssize_t, add_integer, Ssize, 0) \
     X(can_seek, bool, add_bool, Bool, true) \
     X(can_pause, bool, add_bool, Bool, true) \
     X(can_control_pace, bool, add_bool, Bool, true) \
@@ -359,6 +360,76 @@ CreateTitle(demux_t *demux, size_t idx)
     return t;
 }
 
+static input_attachment_t *
+CreateAttachment(demux_t *demux, const char *prefix_name, size_t index)
+{
+    input_attachment_t *attach = NULL;
+    picture_t *pic = NULL;
+    block_t *block = NULL;
+
+    char *name;
+    int ret = asprintf(&name, "%s %zu", prefix_name, index);
+    if (ret < 0)
+        return NULL;
+
+    pic = picture_New(VLC_CODEC_RGB24, 100, 100, 1, 1);
+    if (pic == NULL)
+        goto end;
+
+    memset(pic->p[0].p_pixels, 0x80, pic->p[0].i_lines * pic->p[0].i_pitch);
+
+    ret = picture_Export(VLC_OBJECT(demux), &block, NULL, pic, VLC_CODEC_BMP,
+                         0, 0, false);
+    if (ret != VLC_SUCCESS)
+        goto end;
+
+    attach = vlc_input_attachment_New(name, "image/bmp", "Mock Attach Desc",
+                                      block->p_buffer, block->i_buffer);
+
+end:
+    if (block != NULL)
+        block_Release(block);
+    if (pic != NULL)
+        picture_Release(pic);
+    free(name);
+    return attach;
+}
+
+static int
+GetAttachments(demux_t *demux, input_attachment_t ***attach_array_p,
+               int *attach_count_p)
+{
+    struct demux_sys *sys = demux->p_sys;
+    assert(sys->attachment_count > 0);
+    size_t attachment_count = sys->attachment_count;
+
+    input_attachment_t **attach_array =
+        vlc_alloc(sys->attachment_count, sizeof(*attach_array));
+    if (attach_array == NULL)
+        return VLC_ENOMEM;
+
+    for (size_t i = 0; i < attachment_count; i++)
+    {
+        attach_array[i] = CreateAttachment(demux, "Mock Attach", i);
+
+        if (attach_array[i] == NULL)
+        {
+            if (i == 0)
+            {
+                free(attach_array);
+                return VLC_ENOMEM;
+            }
+            *attach_array_p = attach_array;
+            *attach_count_p = i;
+            return VLC_SUCCESS;
+        }
+    }
+
+    *attach_array_p = attach_array;
+    *attach_count_p = sys->attachment_count;
+
+    return VLC_SUCCESS;
+}
 static int
 Control(demux_t *demux, int query, va_list args)
 {
@@ -492,7 +563,14 @@ Control(demux_t *demux, int query, va_list args)
         case DEMUX_HAS_UNSUPPORTED_META:
             return VLC_EGENERIC;
         case DEMUX_GET_ATTACHMENTS:
-            return VLC_EGENERIC;
+        {
+            input_attachment_t ***attach_array_p = va_arg(args, input_attachment_t***);
+            int *attach_count_p = va_arg(args, int *);
+            if (sys->attachment_count <= 0)
+                return VLC_EGENERIC;
+
+            return GetAttachments(demux, attach_array_p, attach_count_p);
+        }
         case DEMUX_CAN_RECORD:
             *va_arg(args, bool *) = sys->can_record;
             return VLC_SUCCESS;
