@@ -172,6 +172,15 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
 }
 
 static void
+SetItemPreparsed(struct task *task)
+{
+    int status = atomic_load_explicit(&task->preparse_status,
+                                      memory_order_relaxed);
+    if (status == ITEM_PREPARSE_DONE)
+        input_item_SetPreparsed(task->item);
+}
+
+static void
 OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
 {
     VLC_UNUSED(item);
@@ -180,7 +189,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     struct task *task = userdata;
 
     if (!atomic_load(&task->interrupted))
-        input_item_SetPreparsed(task->item);
+        SetItemPreparsed(task);
 
     NotifyPreparseEnded(task, fetched);
     TaskDelete(task);
@@ -268,7 +277,7 @@ RunnableRun(void *userdata)
         return; /* Remove the task and notify from the fetcher callback */
 
     if (!atomic_load(&task->interrupted))
-        input_item_SetPreparsed(task->item);
+        SetItemPreparsed(task);
 
 end:
     NotifyPreparseEnded(task, false);
