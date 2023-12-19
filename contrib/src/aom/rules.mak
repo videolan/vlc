@@ -1,5 +1,5 @@
 # aom
-AOM_VERSION := 3.7.0
+AOM_VERSION := 3.8.0
 AOM_URL := https://storage.googleapis.com/aom-releases/libaom-$(AOM_VERSION).tar.gz
 
 PKGS += aom
@@ -14,7 +14,6 @@ $(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
 
 aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	$(UNPACK)
-	$(APPLY) $(SRC)/aom/0001-Use-the-pthread-library-found-by-CMake-in-the-pkg-co.patch
 	$(APPLY) $(SRC)/aom/0002-cmake-win-fix-asm-flag-appending.patch
 	$(MOVE)
 
