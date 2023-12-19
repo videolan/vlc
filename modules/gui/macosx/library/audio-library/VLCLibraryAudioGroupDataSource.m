@@ -129,8 +129,12 @@
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-        if (self.representedAudioGroup == nil) {
+        if (self.representedAudioGroup == nil || self.currentParentType == VLCMediaLibraryParentGroupTypeUnknown) {
             self.representedListOfAlbums = libraryModel.listOfAlbums;
+        } else if (self.representedAudioGroup.albums.count == 0) {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self.representedListOfAlbums = [libraryModel listAlbumsOfParentType:self.currentParentType forID:self.representedAudioGroup.libraryID];
+            });
         } else {
             self.representedListOfAlbums = self.representedAudioGroup.albums;
         }
