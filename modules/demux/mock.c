@@ -311,6 +311,8 @@ struct demux_sys
     struct mock_video_options video;
     struct mock_audio_options audio;
     struct mock_sub_options sub;
+
+    char *art_url;
 };
 #undef X
 
@@ -423,6 +425,11 @@ GetAttachments(demux_t *demux, input_attachment_t ***attach_array_p,
             *attach_count_p = i;
             return VLC_SUCCESS;
         }
+
+        if (sys->art_url == NULL
+         && asprintf(&sys->art_url, "attachment://%s",
+                     attach_array[i]->psz_name) == -1)
+            sys->art_url = NULL;
     }
 
     *attach_array_p = attach_array;
@@ -430,6 +437,25 @@ GetAttachments(demux_t *demux, input_attachment_t ***attach_array_p,
 
     return VLC_SUCCESS;
 }
+
+static vlc_meta_t *
+CreateMeta(demux_t *demux)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    vlc_meta_t *meta = vlc_meta_New();
+    if (meta == NULL)
+        return NULL;
+
+    vlc_meta_SetArtist(meta, "VideoLAN");
+    vlc_meta_SetGenre(meta, "Best Media Player");
+
+    if (sys->art_url != NULL)
+        vlc_meta_SetArtURL(meta, sys->art_url);
+
+    return meta;
+}
+
 static int
 Control(demux_t *demux, int query, va_list args)
 {
@@ -450,7 +476,15 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, vlc_tick_t *) = sys->pts_delay;
             return VLC_SUCCESS;
         case DEMUX_GET_META:
-            return VLC_EGENERIC;
+        {
+            vlc_meta_t *meta_out = va_arg(args, vlc_meta_t *);
+            vlc_meta_t *meta = CreateMeta(demux);
+            if (meta == NULL)
+                return VLC_ENOMEM;
+            vlc_meta_Merge(meta_out, meta);
+            vlc_meta_Delete(meta);
+            return VLC_SUCCESS;
+        }
         case DEMUX_GET_SIGNAL:
             return VLC_EGENERIC;
         case DEMUX_SET_PAUSE_STATE:
@@ -1391,6 +1425,8 @@ Close(vlc_object_t *obj)
         DeleteTrack(demux, track);
     }
     vlc_vector_clear(&sys->tracks);
+
+    free(sys->art_url);
 }
 
 static int
@@ -1415,6 +1451,7 @@ Open(vlc_object_t *obj)
     OPTIONS_AUDIO(READ_SUBOPTION)
     OPTIONS_VIDEO(READ_SUBOPTION)
     OPTIONS_SUB(READ_SUBOPTION)
+    sys->art_url = NULL;
 
     if (sys->node_count > 0)
     {
