@@ -185,7 +185,7 @@ bool ExternalPaletteImpl::init()
         preferedProvider = "qt-themeprovider-gtk";
 #endif
 
-    m_provider = static_cast<vlc_qt_theme_provider_t*>(vlc_object_create(m_ctx->getIntf(), sizeof(vlc_qt_theme_provider_t)));
+    m_provider = vlc_object_create<vlc_qt_theme_provider_t>(m_ctx->getIntf());
     if (!m_provider)
         return false;
 
