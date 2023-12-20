@@ -16,6 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "compositor_win7.hpp"
+
+#include <QApplication>
+#include <QLibrary>
+
 #include "mainctx_win32.hpp"
 #include "mainui.hpp"
 
@@ -25,7 +29,6 @@
 #include <d3d11.h>
 
 #include <dwmapi.h>
-#include <QLibrary>
 
 using namespace vlc;
 
@@ -97,6 +100,12 @@ bool CompositorWin7::preInit(qt_intf_t *p_intf)
 
 bool CompositorWin7::init()
 {
+    {
+        const QString& platformName = qApp->platformName();
+        if (!(platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d")))
+            return false;
+    }
+
     return true;
 }
 

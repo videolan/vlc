@@ -198,6 +198,12 @@ bool CompositorDirectComposition::preInit(qt_intf_t * p_intf)
 
 bool CompositorDirectComposition::init()
 {
+    {
+        const QString& platformName = qApp->platformName();
+        if (!(platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d")))
+            return false;
+    }
+
     //import DirectComposition API (WIN8+)
     m_dcomp_dll = LoadLibrary(TEXT("DCOMP.dll"));
     if (!m_dcomp_dll)
