@@ -530,6 +530,9 @@ struct vlc_metadata_cbs {
     void (*on_preparse_ended)(input_item_t *, enum input_item_preparse_status status, void *userdata);
     void (*on_art_fetch_ended)(input_item_t *, bool fetched, void *userdata);
     void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
+    void (*on_attachments_added)(input_item_t *item,
+                                 input_attachment_t *const *array,
+                                 size_t count, void *userdata);
 };
 
 VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,

@@ -172,6 +172,18 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
 }
 
 static void
+OnParserAttachmentsAdded(input_item_t *item,
+                         input_attachment_t *const *array,
+                         size_t count, void *task_)
+{
+    VLC_UNUSED(item);
+    struct task *task = task_;
+
+    if (task->cbs && task->cbs->on_attachments_added)
+        task->cbs->on_attachments_added(task->item, array, count, task->userdata);
+}
+
+static void
 SetItemPreparsed(struct task *task)
 {
     int status = atomic_load_explicit(&task->preparse_status,
@@ -205,6 +217,7 @@ Parse(struct task *task, vlc_tick_t deadline)
     static const input_item_parser_cbs_t cbs = {
         .on_ended = OnParserEnded,
         .on_subtree_added = OnParserSubtreeAdded,
+        .on_attachments_added = OnParserAttachmentsAdded,
     };
 
     vlc_object_t *obj = task->preparser->owner;
