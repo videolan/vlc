@@ -102,8 +102,12 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
             date_Init( &p_sys->end_date, p_sys->frame.i_rate, 1 );
     }
 
-    if( p_sys->bytestream.p_block->i_pts != date_Get( &p_sys->end_date ) &&
-        p_sys->bytestream.p_block->i_pts != VLC_TICK_INVALID )
+    block_t *p_bshead = p_sys->bytestream.p_block;
+    /* Ensure we can recover if there's only dts set */
+    if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID && p_bshead->i_pts == VLC_TICK_INVALID )
+        p_bshead->i_pts = p_bshead->i_dts;
+
+    if( p_bshead->i_pts != VLC_TICK_INVALID && p_bshead->i_pts != date_Get( &p_sys->end_date ) )
     {
         /* Make sure we don't reuse the same pts twice
          * as A/52 in PES sends multiple times the same pts */
