@@ -26,37 +26,6 @@
 
 #import "library/VLCInputItem.h"
 
-// Taken from item.c:bsearch_strcmp_cb
-static int bsearch_strcmp_cb(const void *a, const void *b)
-{
-    const char *const *entry = b;
-    return strcasecmp(a, *entry);
-}
-
-static BOOL file_is_playable(const char * const psz_filename)
-{
-    if (psz_filename == NULL) {
-        return NO;
-    }
-
-    // Reimplement item.c:input_item_IsMaster
-    static const char *const ppsz_master_exts[] = { MASTER_EXTENSIONS };
-
-    const char *psz_ext = strrchr(psz_filename, '.');
-    if (psz_ext == NULL || *(++psz_ext) == '\0') {
-        return NO;
-    }
-
-    enum slave_type unused;
-
-    return input_item_slave_GetType(psz_filename, &unused) ||
-           bsearch(psz_ext,
-                   ppsz_master_exts,
-                   ARRAY_SIZE(ppsz_master_exts),
-                   sizeof(const char *),
-                   bsearch_strcmp_cb) != NULL;
-}
-
 @interface VLCMediaSource ()
 {
     BOOL _respondsToDiskChanges;
@@ -431,7 +400,7 @@ static const char *const myFoldersDescription = "My Folders";
         const char * const psz_name = url.lastPathComponent.UTF8String;
         
         input_item_t *urlInputItem = input_item_NewExt(psz_filename, psz_name, 0, inputType, netType);
-        if (urlInputItem != NULL && (inputType != ITEM_TYPE_FILE || file_is_playable(psz_filename))) {
+        if (urlInputItem != NULL && (inputType != ITEM_TYPE_FILE || input_item_Playable(psz_filename))) {
             input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
             if (urlNode) {
                 input_item_node_AppendNode(directoryNode, urlNode);
