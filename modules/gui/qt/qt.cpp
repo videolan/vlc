@@ -596,6 +596,8 @@ static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
 {
     auto intfThread = reinterpret_cast<intf_thread_t*>(p_this);
     libvlc_int_t *libvlc = vlc_object_instance( p_this );
+
+    /* Ensure initialization of objects in qt_intf_t. */
     auto p_intf = vlc_object_create<qt_intf_t>( libvlc );
     if (!p_intf)
         return VLC_ENOMEM;
@@ -609,6 +611,7 @@ static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
     p_intf->b_isDialogProvider = dialogProvider;
     p_intf->isShuttingDown = false;
     p_intf->refCount = 1;
+
     int ret = OpenInternal(p_intf);
     if (ret != VLC_SUCCESS)
     {
@@ -819,15 +822,14 @@ static void *Thread( void *obj )
     {
         bool ret = false;
         do {
-            p_intf->p_compositor = compositorFactory.createCompositor();
+            p_intf->p_compositor.reset(compositorFactory.createCompositor());
             if (! p_intf->p_compositor)
                 break;
             ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi);
             if (!ret)
             {
                 p_intf->p_compositor->destroyMainInterface();
-                delete p_intf->p_compositor;
-                p_intf->p_compositor = nullptr;
+                p_intf->p_compositor.reset();
             }
         } while(!ret);
 
@@ -939,8 +941,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
             delete p_intf->mainSettings;
             p_intf->mainSettings = nullptr;
 
-            delete p_intf->p_compositor;
-            p_intf->p_compositor = nullptr;
+            p_intf->p_compositor.reset();
         }
     }
 

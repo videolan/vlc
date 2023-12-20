@@ -32,6 +32,8 @@
 #include <vlc_configuration.h>
 #include <vlc_threads.h>
 
+#include <memory>
+
 #include <qconfig.h>
 
 #define QT_NO_CAST_TO_ASCII
@@ -106,7 +108,7 @@ struct qt_intf_t
     vlc_player_t *p_player; /* player */
     vlc::playlist::PlaylistController* p_mainPlaylistController;
     PlayerController* p_mainPlayerController;
-    vlc::Compositor*  p_compositor;
+    std::unique_ptr<vlc::Compositor>  p_compositor;
 
 #ifdef _WIN32
     bool disable_volume_keys;
