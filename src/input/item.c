@@ -797,11 +797,6 @@ int input_item_AddInfo( input_item_t *p_i,
 
     vlc_mutex_unlock( &p_i->lock );
 
-
-    if( !i_ret )
-        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-            .type = vlc_InputItemInfoChanged } );
-
     return i_ret;
 }
 
@@ -835,9 +830,6 @@ int input_item_DelInfo( input_item_t *p_i,
     }
     vlc_mutex_unlock( &p_i->lock );
 
-    vlc_event_send( &p_i->event_manager,
-                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
-
     return VLC_SUCCESS;
 }
 void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
@@ -853,9 +845,6 @@ void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
     else
         vlc_list_append( &p_cat->node, &p_item->categories );
     vlc_mutex_unlock( &p_item->lock );
-
-    vlc_event_send( &p_item->event_manager,
-                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
 
 void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
@@ -874,14 +863,10 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
     else
         vlc_list_append( &p_cat->node, &p_item->categories );
     vlc_mutex_unlock( &p_item->lock );
-
-    vlc_event_send( &p_item->event_manager,
-                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
 
 void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_evt )
 {
-    bool b_changed = false;
     vlc_mutex_lock( &p_item->lock );
 
     for( int i = 0; i < p_item->i_epg; i++ )
@@ -899,19 +884,12 @@ void input_item_SetEpgEvent( input_item_t *p_item, const vlc_epg_event_t *p_epg_
                         p_epg->p_current = p_dup;
                     vlc_epg_event_Delete( p_epg->pp_event[j] );
                     p_epg->pp_event[j] = p_dup;
-                    b_changed = true;
                 }
                 break;
             }
         }
     }
     vlc_mutex_unlock( &p_item->lock );
-
-    if ( b_changed )
-    {
-        vlc_event_send( &p_item->event_manager,
-                        &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
-    }
 }
 
 //#define EPG_DEBUG
@@ -972,7 +950,7 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update, bool b_
 #ifdef EPG_DEBUG
     char *psz_epg;
     if( asprintf( &psz_epg, "EPG %s", p_epg->psz_name ? p_epg->psz_name : "unknown" ) < 0 )
-        goto signal;
+        return;
 
     input_item_DelInfo( p_item, psz_epg, NULL );
 
@@ -1002,10 +980,7 @@ void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_update, bool b_
     }
     vlc_mutex_unlock( &p_item->lock );
     free( psz_epg );
-signal:
 #endif
-    vlc_event_send( &p_item->event_manager,
-                    &(vlc_event_t){ .type = vlc_InputItemInfoChanged, } );
 }
 
 void input_item_ChangeEPGSource( input_item_t *p_item, int i_source_id )
@@ -1064,9 +1039,6 @@ void input_item_SetEpgOffline( input_item_t *p_item )
     else
         vlc_mutex_unlock( &p_item->lock );
 #endif
-
-    vlc_event_send( &p_item->event_manager,
-                    &(vlc_event_t) { .type = vlc_InputItemInfoChanged } );
 }
 
 input_item_t *

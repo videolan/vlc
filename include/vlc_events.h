@@ -101,7 +101,6 @@ typedef enum vlc_event_type_t {
     vlc_InputItemDurationChanged,
     vlc_InputItemPreparsedChanged,
     vlc_InputItemNameChanged,
-    vlc_InputItemInfoChanged,
     vlc_InputItemErrorWhenReadingChanged,
     vlc_InputItemAttachmentsFound,
 } vlc_event_type_t;
@@ -153,10 +152,6 @@ typedef struct vlc_event_t
         {
             const char * new_name;
         } input_item_name_changed;
-        struct vlc_input_item_info_changed
-        {
-            void * unused;
-        } input_item_info_changed;
         struct input_item_error_when_reading_changed
         {
             bool new_value;
