@@ -142,6 +142,9 @@ typedef enum input_event_type_e
 
     /* Thumbnail generation */
     INPUT_EVENT_THUMBNAIL_READY,
+
+    /* Attachments */
+    INPUT_EVENT_ATTACHMENTS,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -256,6 +259,12 @@ struct vlc_input_event_vout
     vlc_es_id_t *id;
 };
 
+struct vlc_input_event_attachments
+{
+    input_attachment_t *const* array;
+    size_t count;
+};
+
 struct vlc_input_event
 {
     input_event_type_e type;
@@ -299,6 +308,8 @@ struct vlc_input_event
         float subs_fps;
         /* INPUT_EVENT_THUMBNAIL_READY */
         picture_t *thumbnail;
+        /* INPUT_EVENT_ATTACHMENTS */
+        struct vlc_input_event_attachments attachments;
     };
 };
 

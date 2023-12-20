@@ -3116,6 +3116,12 @@ static void AppendAttachment( input_thread_t *p_input, int i_new,
             .type = vlc_InputItemAttachmentsFound,
             .u.input_item_attachments_found.attachments = pp_new,
             .u.input_item_attachments_found.count = i_new } );
+
+        input_SendEvent(p_input, &(struct vlc_input_event) {
+            .type = INPUT_EVENT_ATTACHMENTS,
+            .attachments = { .array = pp_new, .count = i_new },
+        });
+
         free( pp_new );
         return;
     }
