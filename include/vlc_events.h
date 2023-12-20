@@ -99,10 +99,9 @@ typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
     vlc_InputItemDurationChanged,
-    vlc_InputItemPreparsedChanged,
 } vlc_event_type_t;
 
-#define VLC_EVENT_TYPE_COUNT (vlc_InputItemPreparsedChanged + 1)
+#define VLC_EVENT_TYPE_COUNT (vlc_InputItemDurationChanged + 1)
 
 typedef struct vlc_event_listeners_group_t
 {
@@ -141,14 +140,6 @@ typedef struct vlc_event_t
         {
             vlc_tick_t new_duration;
         } input_item_duration_changed;
-        struct vlc_input_item_preparsed_changed
-        {
-            int new_status;
-        } input_item_preparsed_changed;
-        struct input_item_preparse_ended
-        {
-            int new_status;
-        } input_item_preparse_ended;
     } u;
 } vlc_event_t;
 

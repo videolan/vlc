@@ -50,26 +50,14 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
 
 void input_item_SetPreparsed( input_item_t *p_i )
 {
-    bool b_send_event = false;
-
     vlc_mutex_lock( &p_i->lock );
 
     int status = vlc_meta_GetStatus(p_i->p_meta);
     int new_status = status | ITEM_PREPARSED;
     if( status != new_status )
-    {
         vlc_meta_SetStatus(p_i->p_meta, new_status);
-        b_send_event = true;
-    }
 
     vlc_mutex_unlock( &p_i->lock );
-
-    if( b_send_event )
-    {
-        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-            .type = vlc_InputItemPreparsedChanged,
-            .u.input_item_preparsed_changed.new_status = new_status } );
-    }
 }
 
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found )
