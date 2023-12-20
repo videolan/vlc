@@ -26,7 +26,6 @@
 #include "input_interface.h"
 #include <vlc_atomic.h>
 
-void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error );
 void input_item_UpdateTracksInfo( input_item_t *item, const es_format_t *fmt,
                                   const char *es_id, bool stable );
 bool input_item_ShouldPreparseSubItems( input_item_t *p_i );

@@ -199,7 +199,6 @@ input_item_GetName
 input_item_GetNowPlayingFb
 input_item_GetTitleFbName
 input_item_GetURI
-input_item_HasErrorWhenReading
 input_item_IsArtFetched
 input_item_IsPreparsed
 input_item_MetaMatch

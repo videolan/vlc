@@ -48,24 +48,6 @@ struct input_item_opaque
 
 static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net );
 
-void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
-{
-    bool b_changed;
-
-    vlc_mutex_lock( &p_i->lock );
-
-    b_changed = p_i->b_error_when_reading != b_error;
-    p_i->b_error_when_reading = b_error;
-
-    vlc_mutex_unlock( &p_i->lock );
-
-    if( b_changed )
-    {
-        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-            .type = vlc_InputItemErrorWhenReadingChanged,
-            .u.input_item_error_when_reading_changed.new_value = b_error } );
-    }
-}
 void input_item_SetPreparsed( input_item_t *p_i )
 {
     bool b_send_event = false;
@@ -212,17 +194,6 @@ void input_item_CopyOptions( input_item_t *p_child,
 
     free( flagv );
     free( optv );
-}
-
-bool input_item_HasErrorWhenReading( input_item_t *p_item )
-{
-    vlc_mutex_lock( &p_item->lock );
-
-    bool b_error = p_item->b_error_when_reading;
-
-    vlc_mutex_unlock( &p_item->lock );
-
-    return b_error;
 }
 
 bool input_item_MetaMatch( input_item_t *p_i,
@@ -1092,7 +1063,6 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
 
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;
-    p_input->b_error_when_reading = false;
 
     if( i_net != ITEM_NET_UNKNOWN )
         p_input->b_net = i_net == ITEM_NET;

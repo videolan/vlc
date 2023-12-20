@@ -132,7 +132,6 @@ struct input_item_t
     enum input_item_type_e i_type;   /**< Type (file, disc, ... see input_item_type_e) */
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
-    bool        b_error_when_reading;/**< Error When Reading */
 
     int         i_preparse_depth;    /**< How many level of sub items can be preparsed:
                                           -1: recursive, 0: none, >0: n levels */
@@ -294,7 +293,6 @@ VLC_API input_item_slave_t *input_item_slave_New(const char *, enum slave_type,
 VLC_API int input_item_AddSlave(input_item_t *, input_item_slave_t *);
 
 /* */
-VLC_API bool input_item_HasErrorWhenReading( input_item_t * );
 VLC_API void input_item_SetMeta( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val );
 VLC_API bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz );
 VLC_API char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type ) VLC_USED;
