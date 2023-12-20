@@ -26,6 +26,37 @@
 
 #import "library/VLCInputItem.h"
 
+// Taken from item.c:bsearch_strcmp_cb
+static int bsearch_strcmp_cb(const void *a, const void *b)
+{
+    const char *const *entry = b;
+    return strcasecmp(a, *entry);
+}
+
+static BOOL file_is_playable(const char * const psz_filename)
+{
+    if (psz_filename == NULL) {
+        return NO;
+    }
+
+    // Reimplement item.c:input_item_IsMaster
+    static const char *const ppsz_master_exts[] = { MASTER_EXTENSIONS };
+
+    const char *psz_ext = strrchr(psz_filename, '.');
+    if (psz_ext == NULL || *(++psz_ext) == '\0') {
+        return NO;
+    }
+
+    enum slave_type unused;
+
+    return input_item_slave_GetType(psz_filename, &unused) ||
+           bsearch(psz_ext,
+                   ppsz_master_exts,
+                   ARRAY_SIZE(ppsz_master_exts),
+                   sizeof(const char *),
+                   bsearch_strcmp_cb) != NULL;
+}
+
 @interface VLCMediaSource ()
 {
     BOOL _respondsToDiskChanges;
@@ -380,7 +411,7 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
-    for (NSURL *url in subDirectories) {
+    for (NSURL * const url in subDirectories) {
         NSNumber *isDirectory;
         NSNumber *isVolume;
         NSNumber *isEjectable;
@@ -395,10 +426,13 @@ static const char *const myFoldersDescription = "My Folders";
         
         const enum input_item_type_e inputType = isDirectory.boolValue ? isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
         const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+
+        const char * const psz_filename = url.absoluteString.UTF8String;
+        const char * const psz_name = url.lastPathComponent.UTF8String;
         
-        input_item_t *urlInputItem = input_item_NewExt(url.absoluteString.UTF8String, url.lastPathComponent.UTF8String, 0, inputType, netType);
-        if (urlInputItem != NULL) {
-            input_item_node_t *urlNode = input_item_node_Create(urlInputItem);
+        input_item_t *urlInputItem = input_item_NewExt(psz_filename, psz_name, 0, inputType, netType);
+        if (urlInputItem != NULL && file_is_playable(psz_filename)) {
+            input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
             if (urlNode) {
                 input_item_node_AppendNode(directoryNode, urlNode);
             }
