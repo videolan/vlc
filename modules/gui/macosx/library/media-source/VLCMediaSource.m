@@ -387,7 +387,7 @@ static const char *const myFoldersDescription = "My Folders";
         NSNumber *isInternal;
         NSNumber *isLocal;
 
-	[url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+	    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
         [url getResourceValue:&isVolume forKey:NSURLIsVolumeKey error:nil];
         [url getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
         [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
