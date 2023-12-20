@@ -208,7 +208,7 @@ libvlc_time_t libvlc_picture_get_time( const libvlc_picture_t* pic )
     return pic->time;
 }
 
-libvlc_picture_list_t* libvlc_picture_list_from_attachments( input_attachment_t** attachments,
+libvlc_picture_list_t* libvlc_picture_list_from_attachments( input_attachment_t* const* attachments,
                                                              size_t nb_attachments )
 {
     size_t size = 0;
