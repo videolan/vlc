@@ -431,7 +431,7 @@ static const char *const myFoldersDescription = "My Folders";
         const char * const psz_name = url.lastPathComponent.UTF8String;
         
         input_item_t *urlInputItem = input_item_NewExt(psz_filename, psz_name, 0, inputType, netType);
-        if (urlInputItem != NULL && file_is_playable(psz_filename)) {
+        if (urlInputItem != NULL && (inputType != ITEM_TYPE_FILE || file_is_playable(psz_filename))) {
             input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
             if (urlNode) {
                 input_item_node_AppendNode(directoryNode, urlNode);
