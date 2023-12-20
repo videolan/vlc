@@ -26,6 +26,10 @@
 
 #include <vlc_input_item.h>
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 extern const char psz_vlc_changeset[];
 
 typedef struct variable_t variable_t;
@@ -209,5 +213,9 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
  * Variables stuff
  */
 void var_OptionParse (vlc_object_t *, const char *, bool trusted);
+
+# ifdef __cplusplus
+} // extern "C"
+# endif
 
 #endif
