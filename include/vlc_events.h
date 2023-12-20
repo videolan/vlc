@@ -100,10 +100,9 @@ typedef enum vlc_event_type_t {
     vlc_InputItemMetaChanged,
     vlc_InputItemDurationChanged,
     vlc_InputItemPreparsedChanged,
-    vlc_InputItemAttachmentsFound,
 } vlc_event_type_t;
 
-#define VLC_EVENT_TYPE_COUNT (vlc_InputItemAttachmentsFound + 1)
+#define VLC_EVENT_TYPE_COUNT (vlc_InputItemPreparsedChanged + 1)
 
 typedef struct vlc_event_listeners_group_t
 {
@@ -150,11 +149,6 @@ typedef struct vlc_event_t
         {
             int new_status;
         } input_item_preparse_ended;
-        struct input_item_attachments_found
-        {
-            input_attachment_t** attachments;
-            size_t count;
-        } input_item_attachments_found;
     } u;
 } vlc_event_t;
 
