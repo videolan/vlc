@@ -27,7 +27,7 @@ vlc_qt_check_LDADD = $(vlc_qt_libs)
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DQT_STRICT_ITERATORS \
-	-I$(srcdir)/gui/qt -I$(builddir)/ \
+	-I$(srcdir) -I$(builddir) \
 	-I$(builddir)/dialogs/extended \
 	-I$(builddir)/dialogs/fingerprint \
 	-I$(builddir)/dialogs/firstrun \
