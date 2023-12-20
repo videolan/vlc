@@ -92,12 +92,15 @@ Compositor* CompositorFactory::createCompositor()
     {
         if (m_compositorName == "auto" || m_compositorName == compositorList[m_compositorIndex].name)
         {
-            Compositor* compositor = compositorList[m_compositorIndex].instantiate(m_intf);
+            std::unique_ptr<Compositor> compositor {
+                compositorList[m_compositorIndex].instantiate(m_intf)
+            };
+
             if (compositor->init())
             {
                 //avoid looping over the same compositor if the current ones fails further initialisation steps
                 m_compositorIndex++;
-                return compositor;
+                return compositor.release();
             }
         }
     }
