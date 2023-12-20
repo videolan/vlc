@@ -310,15 +310,16 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
     libvlc_event_send( &p_md->event_manager, &event );
 }
 
-static void input_item_attachments_found( const vlc_event_t *p_event,
-                                                 void * user_data )
+static void input_item_attachments_added( input_item_t *item,
+                                          input_attachment_t *const *array,
+                                          size_t count, void *user_data )
 {
+    VLC_UNUSED(item);
     libvlc_media_t * p_md = user_data;
     libvlc_event_t event;
 
-    libvlc_picture_list_t* list = libvlc_picture_list_from_attachments(
-                p_event->u.input_item_attachments_found.attachments,
-                p_event->u.input_item_attachments_found.count );
+    libvlc_picture_list_t* list =
+        libvlc_picture_list_from_attachments(array, count);
     if( !list )
         return;
     if( !libvlc_picture_list_count(list) )
@@ -409,10 +410,6 @@ static void install_input_item_observer( libvlc_media_t *p_md )
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
                       p_md );
-    vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemAttachmentsFound,
-                      input_item_attachments_found,
-                      p_md );
 }
 
 /**
@@ -428,10 +425,6 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
-                      p_md );
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemAttachmentsFound,
-                      input_item_attachments_found,
                       p_md );
 }
 
@@ -826,6 +819,7 @@ libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
 static const struct vlc_metadata_cbs preparser_callbacks = {
     .on_preparse_ended = input_item_preparse_ended,
     .on_subtree_added = input_item_subtree_added,
+    .on_attachments_added = input_item_attachments_added,
 };
 
 int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
