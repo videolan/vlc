@@ -206,6 +206,7 @@ input_item_MetaMatch
 input_item_MergeInfos
 input_item_NewExt
 input_item_Hold
+input_item_Playable
 input_item_Release
 input_item_node_AppendItem
 input_item_node_AppendNode

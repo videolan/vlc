@@ -275,6 +275,12 @@ VLC_API int input_item_AddOpaque(input_item_t *, const char *, void *);
 
 void input_item_ApplyOptions(vlc_object_t *, input_item_t *);
 
+/**
+ * This function checks whether the input item is of a type that can be played.
+ * It does this by checking the extension of the input item.
+ */
+VLC_API bool input_item_Playable(const char *);
+
 VLC_API bool input_item_slave_GetType(const char *, enum slave_type *);
 
 VLC_API input_item_slave_t *input_item_slave_New(const char *, enum slave_type,

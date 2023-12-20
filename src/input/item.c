@@ -708,6 +708,16 @@ static info_category_t *InputItemFindCat( input_item_t *p_item,
     return NULL;
 }
 
+bool input_item_Playable(const char *psz_filename)
+{
+    if (psz_filename == NULL) {
+        return false;
+    }
+
+    enum slave_type unused;
+    return input_item_slave_GetType(psz_filename, &unused) || input_item_IsMaster(psz_filename);
+}
+
 /**
  * Get a info item from a given category in a given input item.
  *
