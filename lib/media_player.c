@@ -49,9 +49,6 @@ static int
 snapshot_was_taken( vlc_object_t *p_this, char const *psz_cmd,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-static void media_attach_preparsed_event(libvlc_media_t *);
-static void media_detach_preparsed_event(libvlc_media_t *);
-
 static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
 
 // player callbacks
@@ -426,6 +423,28 @@ on_chapter_selection_changed(vlc_player_t *player,
 }
 
 static void
+on_media_meta_changed(vlc_player_t *player, input_item_t *media, void *data)
+{
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+    input_item_t *current = mp->p_md ? mp->p_md->p_input_item : NULL;
+    if (media != current)
+        return;
+
+    libvlc_media_parsed_status_t status = libvlc_media_parsed_status_done;
+    if (atomic_exchange(&mp->p_md->parsed_status, status) == status)
+        return;
+
+    /* Send the event */
+    libvlc_event_t event;
+    event.type = libvlc_MediaParsedChanged;
+    event.u.media_parsed_changed.new_status = status;
+    libvlc_event_send( &mp->p_md->event_manager, &event );
+}
+
+
+static void
 on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
                           input_item_node_t *new_subitems, void *data)
 {
@@ -541,6 +560,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_titles_changed = on_titles_changed,
     .on_title_selection_changed = on_title_selection_changed,
     .on_chapter_selection_changed = on_chapter_selection_changed,
+    .on_media_meta_changed = on_media_meta_changed,
     .on_media_subitems_changed = on_media_subitems_changed,
     .on_cork_changed = on_cork_changed,
     .on_vout_changed = on_vout_changed,
@@ -570,35 +590,6 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     libvlc_event_send(&mp->event_manager, &event);
 
     return VLC_SUCCESS;
-}
-
-static void input_item_preparsed_changed( const vlc_event_t *p_event,
-                                          void * user_data )
-{
-    libvlc_media_t *p_md = user_data;
-    if( p_event->u.input_item_preparsed_changed.new_status & ITEM_PREPARSED )
-    {
-        /* Send the event */
-        libvlc_event_t event;
-        event.type = libvlc_MediaParsedChanged;
-        event.u.media_parsed_changed.new_status = libvlc_media_parsed_status_done;
-        libvlc_event_send( &p_md->event_manager, &event );
-    }
-}
-
-static void media_attach_preparsed_event( libvlc_media_t *p_md )
-{
-    vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemPreparsedChanged,
-                      input_item_preparsed_changed, p_md );
-}
-
-static void media_detach_preparsed_event( libvlc_media_t *p_md )
-{
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemPreparsedChanged,
-                      input_item_preparsed_changed,
-                      p_md );
 }
 
 /**************************************************************************
@@ -826,7 +817,6 @@ libvlc_media_player_new_from_media( libvlc_instance_t *inst,
 
     libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
-    media_attach_preparsed_event(p_md);
 
     vlc_player_Lock(p_mi->player);
     int ret = vlc_player_SetCurrentMedia(p_mi->player, p_md->p_input_item);
@@ -834,7 +824,6 @@ libvlc_media_player_new_from_media( libvlc_instance_t *inst,
 
     if (ret != VLC_SUCCESS)
     {
-        media_detach_preparsed_event(p_md);
         libvlc_media_release(p_md);
         p_mi->p_md = NULL;
         return NULL;
@@ -863,8 +852,6 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     vlc_player_Delete(p_mi->player);
 
-    if (p_mi->p_md)
-        media_detach_preparsed_event(p_mi->p_md);
     libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
 
@@ -910,16 +897,10 @@ void libvlc_media_player_set_media(
 {
     vlc_player_Lock(p_mi->player);
 
-    if (p_mi->p_md)
-        media_detach_preparsed_event(p_mi->p_md);
-
     libvlc_media_release( p_mi->p_md );
 
     if( p_md )
-    {
         libvlc_media_retain( p_md );
-        media_attach_preparsed_event(p_md);
-    }
     p_mi->p_md = p_md;
 
     vlc_player_SetCurrentMedia(p_mi->player, p_md ? p_md->p_input_item : NULL);
