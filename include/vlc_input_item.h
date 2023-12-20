@@ -444,6 +444,23 @@ typedef struct input_item_parser_cbs_t
      * @param userdata user data set by input_item_Parse()
      */
     void (*on_subtree_added)(input_item_t *item, input_item_node_t *subtree, void *userdata);
+
+    /**
+     * Event received when new attachments are added
+     *
+     * @note This callback is optional. It can be called several times for one
+     * parse request. The array contains only new elements after a second call.
+     *
+     * @param item the parsed item
+     * @param array valid array containing new elements, should only be used
+     * within the callback. One and all elements can be held and stored on a
+     * new variable or new array.
+     * @param count number of elements in the array
+     * @param userdata user data set by input_item_Parse()
+     */
+    void (*on_attachments_added)(input_item_t *item,
+                                 input_attachment_t *const *array,
+                                 size_t count, void *userdata);
 } input_item_parser_cbs_t;
 
 /**

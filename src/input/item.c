@@ -1414,6 +1414,13 @@ input_item_parser_InputEvent(input_thread_t *input,
                 parser->cbs->on_subtree_added(input_GetItem(input),
                                               event->subitems, parser->userdata);
             break;
+        case INPUT_EVENT_ATTACHMENTS:
+            if (parser->cbs->on_attachments_added != NULL)
+                parser->cbs->on_attachments_added(input_GetItem(input),
+                                                  event->attachments.array,
+                                                  event->attachments.count,
+                                                  parser->userdata);
+            break;
         default:
             break;
     }

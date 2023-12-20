@@ -403,7 +403,9 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
                     }, Qt::QueuedConnection );
             },
             // on_subtree_added
-            NULL
+            NULL,
+            // on_attachments_added
+            NULL,
         };
 
         input_item_parser_id_t * const parser = input_item_Parse( inputItem, VLC_OBJECT( p_intf ), &cbs, this );
