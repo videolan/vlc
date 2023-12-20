@@ -187,12 +187,14 @@ void MetadataExtractor::onParserSubtreeAdded( input_item_t *,
     ctx->mde->addSubtree( *ctx, subtree );
 }
 
-void MetadataExtractor::onAttachmentFound( const vlc_event_t* p_event, void* data )
+void MetadataExtractor::onAttachmentsAdded( input_item_t *,
+                                            input_attachment_t *const *array,
+                                            size_t count, void *data )
 {
     auto ctx = static_cast<ParseContext*>( data );
-    for ( auto i = 0u; i < p_event->u.input_item_attachments_found.count; ++i )
+    for ( auto i = 0u; i < count; ++i )
     {
-        auto a = p_event->u.input_item_attachments_found.attachments[i];
+        auto a = array[i];
         auto fcc = image_Mime2Fourcc( a->psz_mime );
         if ( fcc != VLC_CODEC_PNG && fcc != VLC_CODEC_JPEG )
             continue;
@@ -222,13 +224,10 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( ctx.inputItem == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    if ( vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
-                      &MetadataExtractor::onAttachmentFound, &ctx ) != VLC_SUCCESS )
-        return medialibrary::parser::Status::Fatal;
-
     const input_item_parser_cbs_t cbs = {
         &MetadataExtractor::onParserEnded,
         &MetadataExtractor::onParserSubtreeAdded,
+        &MetadataExtractor::onAttachmentsAdded,
     };
     m_currentCtx = &ctx;
     ctx.inputItem->i_preparse_depth = 1;
@@ -239,8 +238,6 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     };
     if ( ctx.inputParser == nullptr )
     {
-        vlc_event_detach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
-                          &MetadataExtractor::onAttachmentFound, &ctx );
         m_currentCtx = nullptr;
         return medialibrary::parser::Status::Fatal;
     }
@@ -260,8 +257,6 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         }
         m_currentCtx = nullptr;
     }
-    vlc_event_detach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
-                      &MetadataExtractor::onAttachmentFound, &ctx );
 
     if ( !ctx.success || ctx.inputParser == nullptr )
         return medialibrary::parser::Status::Fatal;

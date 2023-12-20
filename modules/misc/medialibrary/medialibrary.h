@@ -106,7 +106,9 @@ private:
     static void onParserEnded( input_item_t *, int status, void *user_data );
     static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
                                       void *user_data );
-    static void onAttachmentFound( const vlc_event_t* p_event, void* data );
+    static void onAttachmentsAdded( input_item_t *,
+                                    input_attachment_t *const *array,
+                                    size_t count, void *data );
 
 private:
     vlc::threads::condition_variable m_cond;
