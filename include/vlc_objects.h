@@ -24,6 +24,7 @@
 #define VLC_OBJECTS_H 1
 
 #ifdef __cplusplus
+#include <new>
 extern "C" {
 #endif
 
@@ -314,8 +315,22 @@ template<typename T, typename O> VLC_MALLOC VLC_USED
 static inline T* vlc_object_create(O *obj)
 {
     static_assert(std::is_pointer<T>::value == false, "vlc_object_create can only create objects");
-    return static_cast<T*>(vlc_object_create(VLC_OBJECT(obj), sizeof(T)));
+    void *object = vlc_object_create(VLC_OBJECT(obj), sizeof(T));
+    if (object == nullptr)
+        return nullptr;
+
+    return new(object) T;
 }
+
+#undef vlc_object_delete
+template<typename O>
+static inline void vlc_object_delete(O *obj)
+{
+    if (!std::is_trivially_destructible<O>::value)
+        obj->~O();
+    vlc_object_delete(VLC_OBJECT(obj));
+}
+
 #endif
 
 /** @} */
