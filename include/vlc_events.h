@@ -123,14 +123,6 @@ typedef struct vlc_event_t
     union vlc_event_type_specific
     {
         /* Input item events */
-        struct vlc_input_item_subitem_added
-        {
-            input_item_t * p_new_child;
-        } input_item_subitem_added;
-        struct vlc_input_item_subitem_tree_added
-        {
-            input_item_node_t * p_root;
-        } input_item_subitem_tree_added;
         struct vlc_input_item_duration_changed
         {
             vlc_tick_t new_duration;
