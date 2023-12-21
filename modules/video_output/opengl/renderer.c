@@ -733,6 +733,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     const opengl_vtable_t *vt = renderer->vt;
 
+    vt->ClearColor(0.f,0.f,0.f,1.f);
     vt->Clear(GL_COLOR_BUFFER_BIT);
     GL_ASSERT_NOERROR(vt);
 
