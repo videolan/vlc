@@ -362,22 +362,10 @@ vlc_tick_t input_item_GetDuration( input_item_t *p_i )
 
 void input_item_SetDuration( input_item_t *p_i, vlc_tick_t i_duration )
 {
-    bool b_send_event = false;
-
     vlc_mutex_lock( &p_i->lock );
     if( p_i->i_duration != i_duration )
-    {
         p_i->i_duration = i_duration;
-        b_send_event = true;
-    }
     vlc_mutex_unlock( &p_i->lock );
-
-    if( b_send_event )
-    {
-        vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-            .type = vlc_InputItemDurationChanged,
-            .u.input_item_duration_changed.new_duration = i_duration } );
-    }
 }
 
 char *input_item_GetNowPlayingFb( input_item_t *p_item )

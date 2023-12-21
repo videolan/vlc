@@ -97,10 +97,10 @@
 /* List of event */
 typedef enum vlc_event_type_t {
     /* Input item events */
-    vlc_InputItemDurationChanged,
+    vlc_InputItemInvalid,
 } vlc_event_type_t;
 
-#define VLC_EVENT_TYPE_COUNT (vlc_InputItemDurationChanged + 1)
+#define VLC_EVENT_TYPE_COUNT 1
 
 typedef struct vlc_event_listeners_group_t
 {
