@@ -118,6 +118,12 @@ struct report_media_subitems
     input_item_t **items;
 };
 
+struct report_media_attachments
+{
+    input_attachment_t **array;
+    size_t count;
+};
+
 #define REPORT_LIST \
     X(input_item_t *, on_current_media_changed) \
     X(enum vlc_player_state, on_state_changed) \
@@ -146,6 +152,7 @@ struct report_media_subitems
     X(input_item_t *, on_media_meta_changed) \
     X(input_item_t *, on_media_epg_changed) \
     X(struct report_media_subitems, on_media_subitems_changed) \
+    X(struct report_media_attachments, on_media_attachments_added) \
 
 struct report_timer
 {
@@ -204,6 +211,7 @@ struct media_params
 
     size_t title_count;
     size_t chapter_count;
+    size_t attachment_count;
 
     bool can_seek;
     bool can_pause;
@@ -227,6 +235,7 @@ struct media_params
     .video_frame_rate_base = 1, \
     .title_count = 0, \
     .chapter_count = 0, \
+    .attachment_count = 0, \
     .can_seek = true, \
     .can_pause = true, \
     .error = false, \
@@ -583,6 +592,25 @@ player_on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
     VEC_PUSH(on_media_subitems_changed, report);
 }
 
+static void
+player_on_media_attachments_added(vlc_player_t *player,
+                                  input_item_t *media,
+                                  input_attachment_t *const *array, size_t count,
+                                  void *data)
+{
+    (void) media;
+    struct ctx *ctx = get_ctx(player, data);
+
+    struct report_media_attachments report = {
+        .array = vlc_alloc(count, sizeof(input_attachment_t *)),
+        .count = count,
+    };
+    assert(report.array);
+    for (size_t i = 0; i < count; ++i)
+        report.array[i] = vlc_input_attachment_Hold(array[i]);
+    VEC_PUSH(on_media_attachments_added, report);
+}
+
 #define VEC_LAST(vec) (vec)->data[(vec)->size - 1]
 #define assert_position(ctx, report) do { \
     assert(fabs((report)->pos - (report)->time / (float) ctx->params.length) < 0.001); \
@@ -713,6 +741,16 @@ ctx_reset(struct ctx *ctx)
             free(report.items);
         }
     }
+
+    {
+        struct report_media_attachments report;
+        FOREACH_VEC(report, on_media_attachments_added)
+        {
+            for (size_t i = 0; i < report.count; ++i)
+                vlc_input_attachment_Release(report.array[i]);
+            free(report.array);
+        }
+    }
 #undef CLEAN_MEDIA_VEC
 #undef FOREACH_VEC
 
@@ -755,7 +793,7 @@ create_mock_media(const char *name, const struct media_params *params)
         "video_frame_rate=%u;video_frame_rate_base=%u;"
         "title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d;"
-        "config=%s",
+        "config=%s;attachment_count=%zu",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
         params->video_packetized, params->audio_packetized,
@@ -763,7 +801,7 @@ create_mock_media(const char *name, const struct media_params *params)
         params->video_frame_rate, params->video_frame_rate_base,
         params->title_count, params->chapter_count,
         params->can_seek, params->can_pause, params->error, params->null_names,
-        params->config ? params->config : "");
+        params->config ? params->config : "", params->attachment_count);
     assert(ret != -1);
     input_item_t *item = input_item_New(url, name);
     assert(item);
@@ -2844,6 +2882,45 @@ test_teletext(struct ctx *ctx)
 }
 
 static void
+test_attachments(struct ctx *ctx)
+{
+    test_log("attachments\n");
+
+    vlc_player_t *player = ctx->player;
+
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(1));
+    params.attachment_count = 99;
+    player_set_next_mock_media(ctx, "media1", &params);
+
+    player_start(ctx);
+
+    vec_on_media_attachments_added *vec = &ctx->report.on_media_attachments_added;
+
+    while (vec->size == 0)
+        vlc_player_CondWait(player, &ctx->wait);
+
+    input_attachment_t **array = vec->data[0].array;
+    size_t count = vec->data[0].count;
+
+    assert(count == params.attachment_count);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        input_attachment_t *attach = array[i];
+        assert(strcmp(attach->psz_mime, "image/bmp") == 0);
+        assert(strcmp(attach->psz_description, "Mock Attach Desc") == 0);
+
+        char *name;
+        int ret = asprintf(&name, "Mock Attach %zu", i);
+        assert(ret > 0);
+        assert(strcmp(attach->psz_name, name) == 0);
+        free(name);
+    }
+
+    test_end(ctx);
+}
+
+static void
 test_audio_loudness_meter_cb(vlc_tick_t date, double momentary_loudness,
                              void *data)
 {
@@ -2994,6 +3071,7 @@ main(void)
     test_programs(&ctx);
     test_timers(&ctx);
     test_teletext(&ctx);
+    test_attachments(&ctx);
 
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), true);
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);
