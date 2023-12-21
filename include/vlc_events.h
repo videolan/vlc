@@ -97,7 +97,6 @@
 /* List of event */
 typedef enum vlc_event_type_t {
     /* Input item events */
-    vlc_InputItemMetaChanged,
     vlc_InputItemDurationChanged,
 } vlc_event_type_t;
 
@@ -124,10 +123,6 @@ typedef struct vlc_event_t
     union vlc_event_type_specific
     {
         /* Input item events */
-        struct vlc_input_item_meta_changed
-        {
-            vlc_meta_type_t meta_type;
-        } input_item_meta_changed;
         struct vlc_input_item_subitem_added
         {
             input_item_t * p_new_child;

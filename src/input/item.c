@@ -97,11 +97,6 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     vlc_mutex_lock( &p_i->lock );
     vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
     vlc_mutex_unlock( &p_i->lock );
-
-    /* Notify interested third parties */
-    vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-        .type = vlc_InputItemMetaChanged,
-        .u.input_item_meta_changed.meta_type = meta_type } );
 }
 
 void input_item_SetMetaExtra( input_item_t *p_i, const char *psz_name, const char *psz_value )
