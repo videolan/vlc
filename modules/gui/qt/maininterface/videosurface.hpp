@@ -21,6 +21,7 @@
 #include "widgets/native/viewblockingrectangle.hpp"
 #include <QMutex>
 #include <QRunnable>
+#include <QPointer>
 #include "qt.hpp"
 
 #include <vlc_threads.h>
@@ -148,7 +149,7 @@ private:
 
     QPointF m_oldHoverPos;
 
-    VideoSurfaceProvider* m_provider = nullptr;
+    QPointer<VideoSurfaceProvider> m_provider;
 };
 
 #endif // VIDEOSURFACE_HPP

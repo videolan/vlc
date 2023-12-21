@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QWindow>
+#include <QPointer>
 
 class MainCtx;
 class InterfaceWindowHandler : public QObject
@@ -69,7 +70,7 @@ private:
 
 protected:
     qt_intf_t* p_intf = nullptr;
-    QWindow* m_window = nullptr;
+    QPointer<QWindow> m_window;
 
     MainCtx* m_mainCtx = nullptr;
 

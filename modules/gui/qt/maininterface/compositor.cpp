@@ -309,7 +309,7 @@ void CompositorVideo::commonGUIDestroy()
 
 void CompositorVideo::commonIntfDestroy()
 {
-    unloadGUI();
     m_videoWindowHandler.reset();
     m_videoSurfaceProvider.reset();
+    unloadGUI();
 }
