@@ -70,8 +70,7 @@ enum libvlc_event_e {
      */
     libvlc_MediaSubItemAdded,
     /**
-     * Duration of a \link #libvlc_media_t media item\endlink changed
-     * \see libvlc_media_get_duration()
+     * Deprecated, use libvlc_MediaParsedChanged or libvlc_MediaPlayerLengthChanged.
      */
     libvlc_MediaDurationChanged,
     /**
