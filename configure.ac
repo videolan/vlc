@@ -3970,6 +3970,8 @@ AC_ARG_ENABLE([qt],
 have_qt5_x11="no"
 have_qt5_gtk="no"
 have_qt5_quick_test="no"
+have_qt5_declarative_private="no"
+have_qt5_gui_private="no"
 AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], [Qt5Core >= 5.12.0 Qt5Widgets Qt5Gui Qt5Quick Qt5QuickWidgets Qt5QuickControls2 Qt5Svg], [
       PKG_CHECK_MODULES([QT5_X11], [Qt5X11Extras], [
@@ -4037,7 +4039,9 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       AC_LANG_PUSH([C++])
       AC_CHECK_HEADERS([private/qquickitem_p.h private/qquickwindow_p.h],
-         [have_declarative_private="yes"], [])
+         [have_qt5_declarative_private="yes"], [])
+      AC_CHECK_HEADERS([QtGui/qpa/qplatformnativeinterface.h],
+         [have_qt5_gui_private="yes"], [])
       AC_LANG_POP([C++])
       VLC_RESTORE_FLAGS
 
@@ -4110,7 +4114,8 @@ AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_WAYLAND], [test "${have_qt5_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_GTK], [test "${have_qt5_gtk}" = "yes"])
-AM_CONDITIONAL([HAVE_QT5_DECLARATIVE_PRIVATE], [test "${have_declarative_private}" = "yes"])
+AM_CONDITIONAL([HAVE_QT5_DECLARATIVE_PRIVATE], [test "${have_qt5_declarative_private}" = "yes"])
+AM_CONDITIONAL([HAVE_QT5_GUI_PRIVATE], [test "${have_qt5_gui_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_QUICK_TEST], [test "${have_qt5_quick_test}" = "yes"])
 
 dnl

@@ -27,7 +27,10 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 
-#include QPNI_HEADER
+#ifndef QT5_GUI_PRIVATE
+#warning "qplatformnativeinterface.h header is required for DirectComposiiton compositor"
+#endif
+#include <QtGui/qpa/qplatformnativeinterface.h>
 
 #include <d3d11_1.h>
 #include <d3dcompiler.h>

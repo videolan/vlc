@@ -40,8 +40,11 @@
 #include <cassert>
 
 #include <QWindow>
-#include QPNI_HEADER
 
+#ifndef QT5_GUI_PRIVATE
+#warning "qplatformnativeinterface.h header is required for MainCtxWin32"
+#endif
+#include <QtGui/qpa/qplatformnativeinterface.h>
 #include <dwmapi.h>
 
 #define WM_APPCOMMAND 0x0319
