@@ -243,24 +243,6 @@ void libvlc_media_add_subtree(libvlc_media_t *p_md, input_item_node_t *node)
 
 /**
  * \internal
- * input_item_meta_changed (Private) (vlc event Callback)
- */
-static void input_item_meta_changed( const vlc_event_t *p_event,
-                                     void * user_data )
-{
-    libvlc_media_t * p_md = user_data;
-    libvlc_event_t event;
-
-    /* Construct the event */
-    event.type = libvlc_MediaMetaChanged;
-    event.u.media_meta_changed.meta_type = 0;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
-}
-
-/**
- * \internal
  * input_item_duration_changed (Private) (vlc event Callback)
  */
 static void input_item_duration_changed( const vlc_event_t *p_event,
@@ -314,11 +296,14 @@ static void send_parsed_changed( libvlc_media_t *p_md,
     if (atomic_exchange(&p_md->parsed_status, new_status) == new_status)
         return;
 
-    /* Construct the event */
+    /* Meta event */
+    event.type = libvlc_MediaMetaChanged;
+    event.u.media_meta_changed.meta_type = 0;
+    libvlc_event_send( &p_md->event_manager, &event );
+
+    /* Parsed event */
     event.type = libvlc_MediaParsedChanged;
     event.u.media_parsed_changed.new_status = new_status;
-
-    /* Send the event */
     libvlc_event_send( &p_md->event_manager, &event );
 
     libvlc_media_list_t *p_subitems = p_md->p_subitems;
@@ -371,10 +356,6 @@ static void input_item_preparse_ended(input_item_t *item,
 static void install_input_item_observer( libvlc_media_t *p_md )
 {
     vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemMetaChanged,
-                      input_item_meta_changed,
-                      p_md );
-    vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,
                       p_md );
@@ -386,10 +367,6 @@ static void install_input_item_observer( libvlc_media_t *p_md )
  */
 static void uninstall_input_item_observer( libvlc_media_t *p_md )
 {
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemMetaChanged,
-                      input_item_meta_changed,
-                      p_md );
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemDurationChanged,
                       input_item_duration_changed,

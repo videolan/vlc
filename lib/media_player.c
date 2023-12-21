@@ -432,12 +432,17 @@ on_media_meta_changed(vlc_player_t *player, input_item_t *media, void *data)
     if (media != current)
         return;
 
+    /* Meta event */
+    libvlc_event_t event;
+    event.type = libvlc_MediaMetaChanged;
+    event.u.media_meta_changed.meta_type = 0;
+    libvlc_event_send( &mp->p_md->event_manager, &event );
+
     libvlc_media_parsed_status_t status = libvlc_media_parsed_status_done;
     if (atomic_exchange(&mp->p_md->parsed_status, status) == status)
         return;
 
-    /* Send the event */
-    libvlc_event_t event;
+    /* Parsed event */
     event.type = libvlc_MediaParsedChanged;
     event.u.media_parsed_changed.new_status = status;
     libvlc_event_send( &mp->p_md->event_manager, &event );
