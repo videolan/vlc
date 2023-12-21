@@ -338,22 +338,6 @@ static void input_item_preparse_ended(input_item_t *item,
 
 /**
  * \internal
- * Install event handler (Private)
- */
-static void install_input_item_observer( libvlc_media_t *p_md )
-{
-}
-
-/**
- * \internal
- * Uninstall event handler (Private)
- */
-static void uninstall_input_item_observer( libvlc_media_t *p_md )
-{
-}
-
-/**
- * \internal
  * Create a new media descriptor object from an input_item (Private)
  *
  * That's the generic constructor
@@ -396,7 +380,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 
     input_item_Hold( p_md->p_input_item );
 
-    install_input_item_observer( p_md );
     return p_md;
 }
 
@@ -512,8 +495,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     if( !vlc_atomic_rc_dec(&p_md->rc) )
         return;
-
-    uninstall_input_item_observer( p_md );
 
     /* Wait for all async tasks to stop. */
     while ((ref = atomic_load_explicit(&p_md->worker_count,
