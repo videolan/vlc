@@ -51,6 +51,8 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+static const uint8_t startcode[2] = { 0x0b, 0x77 };
+
 typedef struct
 {
     /*
@@ -177,14 +179,15 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         switch( p_sys->i_state )
         {
         case STATE_NOSYNC:
-            while( block_PeekBytes( &p_sys->bytestream, p_header, 2 )
+            while( block_PeekBytes( &p_sys->bytestream, p_header, sizeof(startcode) )
                    == VLC_SUCCESS )
             {
-                if( p_header[0] == 0x0b && p_header[1] == 0x77 )
+                if( !memcmp(p_header, startcode, sizeof(startcode)) )
                 {
                     p_sys->i_state = STATE_SYNC;
                     break;
                 }
+
                 block_SkipByte( &p_sys->bytestream );
             }
             if( p_sys->i_state != STATE_SYNC )
@@ -255,13 +258,25 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_header[0] != 0x0b || p_header[1] != 0x77 )
+            if( memcmp(p_header, startcode, sizeof(startcode)) )
             {
                 msg_Dbg( p_dec, "emulated sync word "
                          "(no sync on following frame)" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_SkipByte( &p_sys->bytestream );
-                break;
+                size_t offset = VLC_A52_MIN_HEADER_SIZE;
+                if( !block_FindStartcodeFromOffset( &p_sys->bytestream, &offset,
+                                                    startcode, sizeof(startcode),
+                                                    NULL, NULL ) )
+                {
+                    if( offset < p_sys->i_input_size )
+                        p_sys->i_input_size = offset;
+                    /* else will resync after read */
+                }
+                else
+                {
+                    p_sys->i_state = STATE_NOSYNC;
+                    block_SkipByte( &p_sys->bytestream );
+                    break;
+                }
             }
 
             vlc_a52_header_t a52;
