@@ -31,7 +31,6 @@
 
 #include <vlc_meta.h>
 #include <vlc_epg.h>
-#include <vlc_events.h>
 #include <vlc_list.h>
 #include <vlc_vector.h>
 #include <vlc_threads.h>
@@ -124,8 +123,6 @@ struct input_item_t
     int         i_slaves;            /**< Number of slaves */
     input_item_slave_t **pp_slaves;  /**< Slave entries that will be loaded by
                                           the input_thread */
-
-    vlc_event_manager_t event_manager;
 
     vlc_mutex_t lock;                 /**< Lock for the item */
 
