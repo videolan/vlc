@@ -1,3 +1,18 @@
+Changes between 3.0.20 and 3.0.21:
+------------------------------------
+
+Decoders:
+ - Improve Opus ambisonic support
+ - Fix some ASS subtitle rendering issues
+
+Audio Output:
+ - Fix regression on macOS causing crashes when using audio devices
+   with more than 9 channels
+
+Contrib:
+ - Update FFmpeg to 4.4.4
+
+
 Changes between 3.0.19 and 3.0.20:
 ----------------------------------
 
