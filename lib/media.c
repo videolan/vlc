@@ -241,25 +241,6 @@ void libvlc_media_add_subtree(libvlc_media_t *p_md, input_item_node_t *node)
     libvlc_event_send( &p_md->event_manager, &event );
 }
 
-/**
- * \internal
- * input_item_duration_changed (Private) (vlc event Callback)
- */
-static void input_item_duration_changed( const vlc_event_t *p_event,
-                                         void * user_data )
-{
-    libvlc_media_t * p_md = user_data;
-    libvlc_event_t event;
-
-    /* Construct the event */
-    event.type = libvlc_MediaDurationChanged;
-    event.u.media_duration_changed.new_duration =
-        libvlc_time_from_vlc_tick(p_event->u.input_item_duration_changed.new_duration);
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
-}
-
 static void input_item_attachments_added( input_item_t *item,
                                           input_attachment_t *const *array,
                                           size_t count, void *user_data )
@@ -295,6 +276,12 @@ static void send_parsed_changed( libvlc_media_t *p_md,
 
     if (atomic_exchange(&p_md->parsed_status, new_status) == new_status)
         return;
+
+    /* Duration event */
+    event.type = libvlc_MediaDurationChanged;
+    event.u.media_duration_changed.new_duration =
+        input_item_GetDuration( p_md->p_input_item );
+    libvlc_event_send( &p_md->event_manager, &event );
 
     /* Meta event */
     event.type = libvlc_MediaMetaChanged;
@@ -355,10 +342,6 @@ static void input_item_preparse_ended(input_item_t *item,
  */
 static void install_input_item_observer( libvlc_media_t *p_md )
 {
-    vlc_event_attach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemDurationChanged,
-                      input_item_duration_changed,
-                      p_md );
 }
 
 /**
@@ -367,10 +350,6 @@ static void install_input_item_observer( libvlc_media_t *p_md )
  */
 static void uninstall_input_item_observer( libvlc_media_t *p_md )
 {
-    vlc_event_detach( &p_md->p_input_item->event_manager,
-                      vlc_InputItemDurationChanged,
-                      input_item_duration_changed,
-                      p_md );
 }
 
 /**

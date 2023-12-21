@@ -238,6 +238,16 @@ on_length_changed(vlc_player_t *player, vlc_tick_t new_length, void *data)
 
     libvlc_event_t event;
 
+    libvlc_media_t *md = mp->p_md;
+    if (md != NULL)
+    {
+        /* Duration event */
+        event.type = libvlc_MediaDurationChanged;
+        event.u.media_duration_changed.new_duration =
+            input_item_GetDuration( md->p_input_item );
+        libvlc_event_send( &md->event_manager, &event );
+    }
+
     event.type = libvlc_MediaPlayerLengthChanged;
     event.u.media_player_length_changed.new_length =
         MS_FROM_VLC_TICK(new_length);
