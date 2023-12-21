@@ -24,6 +24,7 @@
 #ifndef VLC_MKV_CHAPTER_COMMAND_HPP_
 #define VLC_MKV_CHAPTER_COMMAND_HPP_
 
+#include <vlc_arrays.h>
 #include "mkv.hpp"
 
 namespace mkv {
