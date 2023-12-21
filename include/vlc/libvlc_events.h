@@ -61,7 +61,7 @@ enum libvlc_event_e {
      */
 
     /**
-     * Metadata of a \link #libvlc_media_t media item\endlink changed
+     * 1 or several Metadata of a \link #libvlc_media_t media item\endlink changed
      */
     libvlc_MediaMetaChanged=0,
     /**
@@ -267,7 +267,7 @@ typedef struct libvlc_event_t
         /* media descriptor */
         struct
         {
-            libvlc_meta_t meta_type;
+            libvlc_meta_t meta_type; /**< Deprecated, any meta_type can change */
         } media_meta_changed;
         struct
         {

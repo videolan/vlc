@@ -77,37 +77,6 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_DiscTotal]    = vlc_meta_DiscTotal
 };
 
-static const libvlc_meta_t vlc_to_libvlc_meta[] =
-{
-    [vlc_meta_Title]        = libvlc_meta_Title,
-    [vlc_meta_Artist]       = libvlc_meta_Artist,
-    [vlc_meta_Genre]        = libvlc_meta_Genre,
-    [vlc_meta_Copyright]    = libvlc_meta_Copyright,
-    [vlc_meta_Album]        = libvlc_meta_Album,
-    [vlc_meta_TrackNumber]  = libvlc_meta_TrackNumber,
-    [vlc_meta_Description]  = libvlc_meta_Description,
-    [vlc_meta_Rating]       = libvlc_meta_Rating,
-    [vlc_meta_Date]         = libvlc_meta_Date,
-    [vlc_meta_Setting]      = libvlc_meta_Setting,
-    [vlc_meta_URL]          = libvlc_meta_URL,
-    [vlc_meta_Language]     = libvlc_meta_Language,
-    [vlc_meta_NowPlaying]   = libvlc_meta_NowPlaying,
-    [vlc_meta_ESNowPlaying] = libvlc_meta_NowPlaying,
-    [vlc_meta_Publisher]    = libvlc_meta_Publisher,
-    [vlc_meta_EncodedBy]    = libvlc_meta_EncodedBy,
-    [vlc_meta_ArtworkURL]   = libvlc_meta_ArtworkURL,
-    [vlc_meta_TrackID]      = libvlc_meta_TrackID,
-    [vlc_meta_TrackTotal]   = libvlc_meta_TrackTotal,
-    [vlc_meta_Director]     = libvlc_meta_Director,
-    [vlc_meta_Season]       = libvlc_meta_Season,
-    [vlc_meta_Episode]      = libvlc_meta_Episode,
-    [vlc_meta_ShowName]     = libvlc_meta_ShowName,
-    [vlc_meta_Actors]       = libvlc_meta_Actors,
-    [vlc_meta_AlbumArtist]  = libvlc_meta_AlbumArtist,
-    [vlc_meta_DiscNumber]   = libvlc_meta_DiscNumber,
-    [vlc_meta_DiscTotal]    = libvlc_meta_DiscTotal
-};
-
 static_assert(
     ORIENT_TOP_LEFT     == (int) libvlc_video_orient_top_left &&
     ORIENT_TOP_RIGHT    == (int) libvlc_video_orient_top_right &&
@@ -284,8 +253,7 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
 
     /* Construct the event */
     event.type = libvlc_MediaMetaChanged;
-    event.u.media_meta_changed.meta_type =
-        vlc_to_libvlc_meta[p_event->u.input_item_meta_changed.meta_type];
+    event.u.media_meta_changed.meta_type = 0;
 
     /* Send the event */
     libvlc_event_send( &p_md->event_manager, &event );
