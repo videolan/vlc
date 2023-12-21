@@ -30,7 +30,6 @@
 #include <vlc_threads.h>
 #include <vlc_fs.h>
 #include <vlc_input_item.h>
-#include <vlc_events.h>
 
 static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 {
