@@ -24,6 +24,8 @@
 #ifndef VLC_ARRAYS_H_
 #define VLC_ARRAYS_H_
 
+#include <vlc_common.h>
+
 /**
  * \file
  * This file defines functions, structures and macros for handling arrays in vlc
