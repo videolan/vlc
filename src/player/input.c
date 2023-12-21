@@ -888,6 +888,12 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_SendEvent(player, on_teletext_transparency_changed,
                                  input->teletext_transparent);
             break;
+        case INPUT_EVENT_ATTACHMENTS:
+            vlc_player_SendEvent(player, on_media_attachments_added,
+                                 input_GetItem(input->thread),
+                                 event->attachments.array,
+                                 event->attachments.count);
+            break;
         default:
             break;
     }

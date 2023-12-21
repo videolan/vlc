@@ -3187,6 +3187,24 @@ struct vlc_player_cbs
         input_item_t *media, input_item_node_t *new_subitems, void *data);
 
     /**
+     * Called when new attachments are added to the media
+     *
+     * @note It can be called several times for one parse request. The array
+     * contains only new elements after a second call.
+     *
+     * @param player locked player instance
+     * @param media current media
+     * @param array valid array containing new elements, should only be used
+     * within the callback. One and all elements can be held and stored on a
+     * new variable or new array.
+     * @param count number of elements in the array
+     * @param data opaque pointer set by vlc_player_AddListener()
+     */
+    void (*on_media_attachments_added)(vlc_player_t *player,
+        input_item_t *media, input_attachment_t *const *array, size_t count,
+        void *data);
+
+    /**
      * Called when a vout is started or stopped
      *
      * @note In case, several media with only one video track are played

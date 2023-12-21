@@ -1024,6 +1024,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_media_meta_changed,
     on_player_media_epg_changed,
     on_player_subitems_changed,
+    nullptr, // on_media_attachments_added: not used
     on_player_vout_changed,
     on_player_corks_changed,
     on_player_playback_restore_queried,
