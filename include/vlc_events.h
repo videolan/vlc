@@ -100,7 +100,6 @@ typedef enum vlc_event_type_t {
     vlc_InputItemMetaChanged,
     vlc_InputItemDurationChanged,
     vlc_InputItemPreparsedChanged,
-    vlc_InputItemErrorWhenReadingChanged,
     vlc_InputItemAttachmentsFound,
 } vlc_event_type_t;
 
@@ -147,10 +146,6 @@ typedef struct vlc_event_t
         {
             int new_status;
         } input_item_preparsed_changed;
-        struct input_item_error_when_reading_changed
-        {
-            bool new_value;
-        } input_item_error_when_reading_changed;
         struct input_item_preparse_ended
         {
             int new_status;
