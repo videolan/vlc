@@ -46,7 +46,6 @@ install_headers(
     'vlc_epg.h',
     'vlc_es.h',
     'vlc_es_out.h',
-    'vlc_events.h',
     'vlc_extensions.h',
     'vlc_filter.h',
     'vlc_fingerprinter.h',

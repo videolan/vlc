@@ -18,7 +18,6 @@ include/vlc/deprecated.h
 include/vlc_epg.h
 include/vlc_es.h
 include/vlc_es_out.h
-include/vlc_events.h
 include/vlc_filter.h
 include/vlc_fixups.h
 include/vlc_frame.h
@@ -90,7 +89,6 @@ src/libvlc-module.c
 src/misc/actions.c
 src/misc/cpu.c
 src/misc/es_format.c
-src/misc/events.c
 src/misc/filter_chain.c
 src/misc/frame.c
 src/misc/image.c

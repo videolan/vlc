@@ -252,7 +252,6 @@ libvlccore_sources_base = files(
     'misc/diffutil.c',
     'misc/epg.c',
     'misc/exit.c',
-    'misc/events.c',
     'misc/image.c',
     'misc/messages.c',
     'misc/mime.c',

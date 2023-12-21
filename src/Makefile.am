@@ -50,7 +50,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_epg.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
-	../include/vlc_events.h \
 	../include/vlc_executor.h \
 	../include/vlc_filter.h \
 	../include/vlc_fingerprinter.h \
@@ -396,7 +395,6 @@ libvlccore_la_SOURCES = \
 	misc/diffutil.c \
 	misc/epg.c \
 	misc/exit.c \
-	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
 	misc/tracer.c \
