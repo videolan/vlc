@@ -1,0 +1,57 @@
+#include <vlc/vlc.h>
+
+int main(int argc, char *argv[]) {
+    // Initialize LibVLC
+    libvlc_instance_t *vlcInstance = libvlc_new(argc, argv);
+    if (!vlcInstance) {
+        fprintf(stderr, "Failed to initialize LibVLC\n");
+        return -1;
+    }
+
+    // Set up media player options
+    const char *mediaUrl = "screen://";  // Screen capture URL
+    const char *mediaOptions[] = {
+        "--no-xlib",  // Disable X11 output (useful for headless environments)
+        "--screen-fps=30",  // Set the frames per second
+        "--sout", "#transcode{vcodec=MJPG}:standard{access=http,mux=mpjpeg,dst=:8080/}", // Transcode to MJPEG for HTTP streaming
+        NULL
+    };
+
+    // Create a media player
+    libvlc_media_player_t *mediaPlayer = libvlc_media_player_new(vlcInstance);
+    if (!mediaPlayer) {
+        fprintf(stderr, "Failed to create media player\n");
+        libvlc_release(vlcInstance);
+        return -1;
+    }
+
+    // Create a media object
+    libvlc_media_t *media = libvlc_media_new_location(vlcInstance, mediaUrl);
+    if (!media) {
+        fprintf(stderr, "Failed to create media\n");
+        libvlc_media_player_release(mediaPlayer);
+        libvlc_release(vlcInstance);
+        return -1;
+    }
+
+    // Set media options
+    libvlc_media_add_option(media, mediaOptions);
+
+    // Set the media to the media player
+    libvlc_media_player_set_media(mediaPlayer, media);
+
+    // Play the media
+    libvlc_media_player_play(mediaPlayer);
+
+    // Wait for user input to stop the program
+    printf("Press Enter to exit...\n");
+    getchar();
+
+    // Release resources
+    libvlc_media_player_stop(mediaPlayer);
+    libvlc_media_player_release(mediaPlayer);
+    libvlc_media_release(media);
+    libvlc_release(vlcInstance);
+
+    return 0;
+}
