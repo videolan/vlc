@@ -35,6 +35,7 @@
 #include "upnp.hpp"
 
 #include <vlc_access.h>
+#include <vlc_arrays.h>
 #include <vlc_plugin.h>
 #include <vlc_interrupt.h>
 #include <vlc_services_discovery.h>
