@@ -321,12 +321,15 @@ struct service_info
 {
     uint8_t cat;
     uint8_t type;
+    bool b_scrambled;
 };
 
 static void UpdateServiceType( struct service_info *info,
                                const tsmux_stream_t *p_ts, const es_format_t *fmt )
 {
     uint8_t i_type = 0x00;
+
+    info->b_scrambled |= p_ts->b_scramble;
 
     switch( p_ts->i_stream_type )
     {
@@ -710,7 +713,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                                                                       false,     /* eit schedule */
                                                                       false,     /* eit present */
                                                                       4,         /* running status ("4=RUNNING") */
-                                                                      false );   /* free ca */
+                                                                      p_service_infos[i].b_scrambled ); /* free ca */
 
             const char *psz_sdtprov = p_sdt->desc[i].psz_provider;
             const char *psz_sdtserv = p_sdt->desc[i].psz_service_name;
