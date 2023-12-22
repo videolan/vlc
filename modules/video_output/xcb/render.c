@@ -607,7 +607,6 @@ static int Open(vout_display_t *vd,
 
     for (unsigned i = 0; i < pic_fmt_r->num_formats; i++) {
         const xcb_render_pictforminfo_t *const pic_fmt = pic_fmts + i;
-        const xcb_render_directformat_t *const d = &pic_fmt->direct;
 
         if (pic_fmt->depth == 8 && pic_fmt->direct.alpha_mask == 0xff) {
             /* Alpha mask format */
