@@ -31,9 +31,10 @@ Image {
 
     sourceSize.width: VLCStyle.icon_normal
     sourceSize.height: VLCStyle.icon_normal
-    source: SVGColorImage.colorize("qrc:///misc/cone.svg")
-                    .accent(root.color)
-                    .uri()
+
+    mipmap: MainCtx.useXmasCone()
+    source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone for designs?
+                                  : SVGColorImage.colorize("qrc:///misc/cone.svg").accent(root.color).uri()
 
     focus: false
 
