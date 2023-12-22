@@ -51,24 +51,9 @@ if HAVE_XCB
 libqt_plugin_la_CXXFLAGS += $(XCB_CFLAGS)  -DQT5_HAS_X11
 libqt_plugin_la_LIBADD += $(XCB_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
 vlc_qt_check_CXXFLAGS += $(XCB_CFLAGS) -DQT5_HAS_X11
-
-if HAVE_QT5_X11
-if HAVE_XCB_DAMAGE
-if HAVE_XCB_XFIXES
-libqt_plugin_la_CXXFLAGS += -DQT5_HAS_X11_COMPOSITOR \
-	$(QT5_X11_CFLAGS) $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XLCB_DAMAGE_CFLAGS) $(XCB_XFIXES_CFLAGS)
-libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS) $(XCB_XFIXES_LIBS)
-endif
-endif
-endif
 endif
 
 if HAVE_QT5_WAYLAND
-if HAVE_WAYLAND
-if HAVE_QT5_GUI_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND_COMPOSITOR
-endif
-endif
 libqt_plugin_la_CPPFLAGS += $(QT5_WAYLAND_CFLAGS)
 libqt_plugin_la_LIBADD += $(QT5_WAYLAND_LIBS)
 vlc_qt_check_CPPFLAGS += $(QT5_WAYLAND_CFLAGS) -DQT5_HAS_WAYLAND
@@ -359,56 +344,6 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/roundimage.cpp widgets/native/roundimage.hpp widgets/native/roundimage_p.hpp \
 	widgets/native/searchlineedit.cpp widgets/native/searchlineedit.hpp \
 	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp
-if HAVE_WIN32
-libqt_plugin_la_SOURCES += \
-	maininterface/mainctx_win32.cpp \
-	maininterface/mainctx_win32.hpp \
-	maininterface/compositor_win7.cpp \
-	maininterface/compositor_win7.hpp \
-	style/windowsthemeprovider.cpp
-
-if HAVE_DCOMP
-libqt_plugin_la_SOURCES += \
-	maininterface/compositor_dcomp.cpp \
-	maininterface/compositor_dcomp.hpp \
-	maininterface/compositor_dcomp_error.hpp \
-	maininterface/compositor_dcomp_acrylicsurface.hpp \
-	maininterface/compositor_dcomp_acrylicsurface.cpp \
-	maininterface/compositor_dcomp_uisurface.cpp \
-	maininterface/compositor_dcomp_uisurface.hpp
-endif
-
-endif
-
-if HAVE_QT5_X11
-if HAVE_XCB
-if HAVE_XCB_DAMAGE
-if HAVE_XCB_XFIXES
-libqt_plugin_la_SOURCES += \
-	maininterface/compositor_x11.cpp \
-	maininterface/compositor_x11.hpp \
-	maininterface/compositor_x11_renderclient.cpp \
-	maininterface/compositor_x11_renderclient.hpp \
-	maininterface/compositor_x11_renderwindow.cpp \
-	maininterface/compositor_x11_renderwindow.hpp \
-	maininterface/compositor_x11_uisurface.cpp \
-	maininterface/compositor_x11_uisurface.hpp \
-	maininterface/compositor_x11_utils.cpp \
-	maininterface/compositor_x11_utils.hpp
-endif
-endif
-endif
-endif
-
-if HAVE_WAYLAND
-if HAVE_QT5_WAYLAND
-if HAVE_QT5_GUI_PRIVATE
-libqt_plugin_la_SOURCES += \
-	maininterface/compositor_wayland.cpp \
-	maininterface/compositor_wayland.hpp
-endif
-endif
-endif
 
 # Meta-object compilation
 
@@ -551,43 +486,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/searchlineedit.moc.cpp \
 	widgets/native/viewblockingrectangle.moc.cpp
 
-if HAVE_WIN32
-nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
-	maininterface/compositor_win7.moc.cpp
-
-if HAVE_DCOMP
-nodist_libqt_plugin_la_SOURCES += \
-	maininterface/compositor_dcomp_acrylicsurface.moc.cpp \
-	maininterface/compositor_dcomp.moc.cpp \
-	maininterface/compositor_dcomp_uisurface.moc.cpp
-endif
-
-endif
-
-if HAVE_QT5_X11
-if HAVE_XCB
-if HAVE_XCB_DAMAGE
-if HAVE_XCB_XFIXES
-nodist_libqt_plugin_la_SOURCES += \
-	maininterface/compositor_x11.moc.cpp \
-	maininterface/compositor_x11_renderclient.moc.cpp \
-	maininterface/compositor_x11_renderwindow.moc.cpp \
-	maininterface/compositor_x11_uisurface.moc.cpp \
-	maininterface/compositor_x11_utils.moc.cpp
-endif
-endif
-endif
-endif
-
-if HAVE_WAYLAND
-if HAVE_QT5_WAYLAND
-if HAVE_QT5_GUI_PRIVATE
-nodist_libqt_plugin_la_SOURCES += \
-	maininterface/compositor_wayland.moc.cpp
-endif
-endif
-endif
-
 nodist_libqt_plugin_la_SOURCES += \
 	dialogs/extended/ui_equalizer.h \
 	dialogs/extended/ui_video_effects.h \
@@ -611,6 +509,105 @@ nodist_libqt_plugin_la_SOURCES += \
 	dialogs/sout/ui_profiles.h \
 	dialogs/sout/ui_sout.h \
 	dialogs/vlm/ui_vlm.h
+
+
+# windows compositor
+
+if HAVE_WIN32
+
+libqt_plugin_la_SOURCES += \
+	maininterface/mainctx_win32.cpp \
+	maininterface/mainctx_win32.hpp \
+	maininterface/compositor_win7.cpp \
+	maininterface/compositor_win7.hpp \
+	style/windowsthemeprovider.cpp
+
+nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
+	maininterface/compositor_win7.moc.cpp
+
+if HAVE_DCOMP
+libqt_plugin_la_SOURCES += \
+	maininterface/compositor_dcomp.cpp \
+	maininterface/compositor_dcomp.hpp \
+	maininterface/compositor_dcomp_error.hpp \
+	maininterface/compositor_dcomp_acrylicsurface.hpp \
+	maininterface/compositor_dcomp_acrylicsurface.cpp \
+	maininterface/compositor_dcomp_uisurface.cpp \
+	maininterface/compositor_dcomp_uisurface.hpp
+
+nodist_libqt_plugin_la_SOURCES += \
+	maininterface/compositor_dcomp_acrylicsurface.moc.cpp \
+	maininterface/compositor_dcomp.moc.cpp \
+	maininterface/compositor_dcomp_uisurface.moc.cpp
+
+endif
+endif
+
+# X11 compositor
+
+if HAVE_QT5_X11
+if HAVE_XCB
+if HAVE_XCB_DAMAGE
+if HAVE_XCB_XFIXES
+
+libqt_plugin_la_CXXFLAGS += -DQT5_HAS_X11_COMPOSITOR \
+	$(QT5_X11_CFLAGS) $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XLCB_DAMAGE_CFLAGS) $(XCB_XFIXES_CFLAGS)
+
+libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS) $(XCB_XFIXES_LIBS)
+
+libqt_plugin_la_SOURCES += \
+	maininterface/compositor_x11.cpp \
+	maininterface/compositor_x11.hpp \
+	maininterface/compositor_x11_renderclient.cpp \
+	maininterface/compositor_x11_renderclient.hpp \
+	maininterface/compositor_x11_renderwindow.cpp \
+	maininterface/compositor_x11_renderwindow.hpp \
+	maininterface/compositor_x11_uisurface.cpp \
+	maininterface/compositor_x11_uisurface.hpp \
+	maininterface/compositor_x11_utils.cpp \
+	maininterface/compositor_x11_utils.hpp
+
+nodist_libqt_plugin_la_SOURCES += \
+	maininterface/compositor_x11.moc.cpp \
+	maininterface/compositor_x11_renderclient.moc.cpp \
+	maininterface/compositor_x11_renderwindow.moc.cpp \
+	maininterface/compositor_x11_uisurface.moc.cpp \
+	maininterface/compositor_x11_utils.moc.cpp
+
+endif
+endif
+endif
+endif
+
+# wayland compositor
+
+if HAVE_WAYLAND
+if HAVE_QT5_WAYLAND
+if HAVE_QT5_GUI_PRIVATE
+
+libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND_COMPOSITOR
+
+libqt_plugin_la_SOURCES += \
+	maininterface/compositor_wayland.cpp \
+	maininterface/compositor_wayland.hpp
+
+
+nodist_libqt_plugin_la_SOURCES += \
+	maininterface/compositor_wayland.moc.cpp
+
+libqt_wayland_plugin_la_CFLAGS = $(AM_CFLAGS) $(WAYLAND_CLIENT_CFLAGS)
+libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS)
+libqt_wayland_plugin_la_SOURCES = \
+	maininterface/compositor_wayland_module.c \
+	maininterface/compositor_wayland_module.h
+
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_wayland_plugin.la
+endif
+
+endif
+endif
+endif
 
 # User interface compilation
 
@@ -1161,21 +1158,6 @@ EXTRA_DIST += $(libqt_plugin_la_QML)
 resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
 	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
 
-endif
-
-if HAVE_QT5_WAYLAND
-if HAVE_WAYLAND
-if HAVE_QT5_GUI_PRIVATE
-libqt_wayland_plugin_la_CFLAGS = $(AM_CFLAGS) $(WAYLAND_CLIENT_CFLAGS)
-libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS)
-libqt_wayland_plugin_la_SOURCES = \
-	maininterface/compositor_wayland_module.c \
-	maininterface/compositor_wayland_module.h
-if ENABLE_QT
-gui_LTLIBRARIES += libqt_wayland_plugin.la
-endif
-endif
-endif
 endif
 
 if HAVE_QT5_GTK
