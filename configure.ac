@@ -1762,8 +1762,7 @@ AC_ARG_ENABLE([branch-protection],
 ])
 AS_IF([test "${enable_branch_protection}" != "no"], [
   AX_CHECK_COMPILE_FLAG([-mbranch-protection=standard], [
-    AX_APPEND_FLAG([-mbranch-protection=standard], [CFLAGS])
-    AX_APPEND_FLAG([-mbranch-protection=standard], [CXXFLAGS])
+    AX_APPEND_FLAG([-mbranch-protection=standard], [CPPFLAGS])
   ])
 ])
 
