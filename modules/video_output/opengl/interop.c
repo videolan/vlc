@@ -199,6 +199,7 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
         char *interop_name = var_InheritString(interop, "glinterop");
         interop->module = vlc_module_load(logger, "glinterop", interop_name,
                                           true, LoadInterop, interop);
+        free(interop_name);
     }
     else
     {
