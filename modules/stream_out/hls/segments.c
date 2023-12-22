@@ -42,6 +42,18 @@ static void hls_segment_Destroy(hls_segment_t *segment)
     free(segment);
 }
 
+static const char *
+hls_segment_queue_GetFileExtension(enum hls_playlist_type type)
+{
+    switch (type)
+    {
+        case HLS_PLAYLIST_TYPE_TS:
+            return "ts";
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 void hls_segment_queue_Init(hls_segment_queue_t *queue,
                             const struct hls_segment_queue_config *config,
                             const struct hls_config *hls_config)
@@ -51,6 +63,9 @@ void hls_segment_queue_Init(hls_segment_queue_t *queue,
 
     queue->httpd_ref = config->httpd_ref;
     queue->httpd_callback = config->httpd_callback;
+
+    queue->file_extension =
+        hls_segment_queue_GetFileExtension(config->playlist_type);
 
     queue->hls_config = hls_config;
 
@@ -75,10 +90,11 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     segment->length = length;
 
     if (asprintf(&segment->url,
-                 "%s/playlist-%u-%u.ts",
+                 "%s/playlist-%u-%u.%s",
                  queue->hls_config->base_url,
                  queue->playlist_id,
-                 segment->id) == -1)
+                 segment->id,
+                 queue->file_extension) == -1)
     {
         segment->url = NULL;
         goto nomem;

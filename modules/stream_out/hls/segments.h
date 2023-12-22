@@ -39,6 +39,7 @@ typedef struct hls_segment
 struct hls_segment_queue_config
 {
     unsigned int playlist_id;
+    enum hls_playlist_type playlist_type;
 
     httpd_host_t *httpd_ref;
     httpd_callback_t httpd_callback;
@@ -51,6 +52,8 @@ typedef struct
 
     httpd_host_t *httpd_ref;
     httpd_callback_t httpd_callback;
+
+    const char *file_extension;
 
     const struct hls_config *hls_config;
 

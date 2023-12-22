@@ -583,7 +583,19 @@ static inline char *FormatPlaylistManifestURL(const hls_playlist_t *playlist)
     return url;
 }
 
-static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
+static sout_mux_t *CreatePlaylistMuxer(sout_access_out_t *access,
+                                       enum hls_playlist_type type)
+{
+    switch(type)
+    {
+        case HLS_PLAYLIST_TYPE_TS:
+            return sout_MuxNew(access, "ts");
+    }
+    return NULL;
+}
+
+static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
+                                      enum hls_playlist_type type)
 {
     sout_stream_sys_t *sys = stream->p_sys;
 
@@ -595,7 +607,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
     if (unlikely(playlist->access == NULL))
         goto access_err;
 
-    playlist->mux = sout_MuxNew(playlist->access, "ts");
+    playlist->mux = CreatePlaylistMuxer(playlist->access, type);
     if (unlikely(playlist->mux == NULL))
         goto mux_err;
 
@@ -616,6 +628,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream)
 
     struct hls_segment_queue_config config = {
         .playlist_id = playlist->id,
+        .playlist_type = type,
         .httpd_ref = sys->http_host,
         .httpd_callback = HTTPCallback,
     };
@@ -682,9 +695,11 @@ static void DeletePlaylist(hls_playlist_t *playlist)
     free(playlist);
 }
 
-static hls_playlist_t *AddPlaylist(sout_stream_t *stream, struct vlc_list *head)
+static hls_playlist_t *AddPlaylist(sout_stream_t *stream,
+                                   enum hls_playlist_type type,
+                                   struct vlc_list *head)
 {
-    hls_playlist_t *variant = CreatePlaylist(stream);
+    hls_playlist_t *variant = CreatePlaylist(stream, type);
     if (variant == NULL)
         return NULL;
 
@@ -710,11 +725,12 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
     if (map != NULL)
     {
         if (map->playlist_ref == NULL)
-            map->playlist_ref = AddPlaylist(stream, &sys->variant_playlists);
+            map->playlist_ref = AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->variant_playlists);
         playlist = map->playlist_ref;
     }
     else
-        playlist = AddPlaylist(stream, &sys->media_playlists);
+        playlist =
+            AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->media_playlists);
 
     if (playlist == NULL)
         return NULL;

@@ -20,6 +20,11 @@
 #ifndef HLS_H
 #define HLS_H
 
+enum hls_playlist_type
+{
+    HLS_PLAYLIST_TYPE_TS,
+};
+
 struct hls_config
 {
     char *base_url;
