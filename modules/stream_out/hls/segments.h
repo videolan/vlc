@@ -46,8 +46,11 @@ struct hls_segment_queue_config
 
 typedef struct
 {
-    struct hls_segment_queue_config config;
+    unsigned int playlist_id;
     unsigned int total_segments;
+
+    httpd_host_t *httpd_ref;
+    httpd_callback_t httpd_callback;
 
     const struct hls_config *hls_config;
 

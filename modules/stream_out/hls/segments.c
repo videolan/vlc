@@ -46,8 +46,12 @@ void hls_segment_queue_Init(hls_segment_queue_t *queue,
                             const struct hls_segment_queue_config *config,
                             const struct hls_config *hls_config)
 {
-    memcpy(&queue->config, config, sizeof(*config));
+    queue->playlist_id = config->playlist_id;
     queue->total_segments = 0;
+
+    queue->httpd_ref = config->httpd_ref;
+    queue->httpd_callback = config->httpd_callback;
+
     queue->hls_config = hls_config;
 
     vlc_list_init(&queue->segments);
@@ -73,7 +77,7 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     if (asprintf(&segment->url,
                  "%s/playlist-%u-%u.ts",
                  queue->hls_config->base_url,
-                 queue->config.playlist_id,
+                 queue->playlist_id,
                  segment->id) == -1)
     {
         segment->url = NULL;
@@ -89,16 +93,16 @@ int hls_segment_queue_NewSegment(hls_segment_queue_t *queue,
     if (unlikely(segment->storage == NULL))
         goto nomem;
 
-    if (queue->config.httpd_ref != NULL)
+    if (queue->httpd_ref != NULL)
     {
         segment->http_url =
-            httpd_UrlNew(queue->config.httpd_ref, segment->url, NULL, NULL);
+            httpd_UrlNew(queue->httpd_ref, segment->url, NULL, NULL);
         if (segment->http_url == NULL)
             goto nomem;
 
         httpd_UrlCatch(segment->http_url,
                        HTTPD_MSG_GET,
-                       queue->config.httpd_callback,
+                       queue->httpd_callback,
                        (httpd_callback_sys_t *)segment->storage);
     }
     else
