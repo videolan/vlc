@@ -609,7 +609,7 @@ VideoSurfaceProvider* MainCtx::getVideoSurfaceProvider() const
 void MainCtx::createSystray()
 {
     QIcon iconVLC;
-    if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
+    if( useXmasCone() )
         iconVLC = QIcon::fromTheme( "vlc-xmas", QIcon( ":/logo/vlc128-xmas.png" ) );
     else
         iconVLC = QIcon::fromTheme( "vlc", QIcon( ":/logo/vlc256.png" ) );
@@ -924,6 +924,12 @@ double MainCtx::dp(const double px, const double scale)
 double MainCtx::dp(const double px) const
 {
     return dp(px, m_intfScaleFactor);
+}
+
+bool MainCtx::useXmasCone() const
+{
+    return (QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY)
+            && var_InheritBool( p_intf, "qt-icon-change" );
 }
 
 bool WindowStateHolder::holdFullscreen(QWindow *window, Source source, bool hold)

@@ -257,6 +257,8 @@ public:
     Q_INVOKABLE static double dp(const double px, const double scale);
     Q_INVOKABLE double dp(const double px) const;
 
+    Q_INVOKABLE bool useXmasCone() const;
+
 protected:
     /* Systray */
     void createSystray();
