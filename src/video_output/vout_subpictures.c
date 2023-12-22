@@ -814,8 +814,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             if (is_rejected)
             {
-                spu_PrerenderCancel(sys, current);
-                subpicture_Delete(current);
+                spu_Channel_CleanEntry(sys, render_entry);
                 vlc_vector_remove(&channel->entries, index);
             }
             else
