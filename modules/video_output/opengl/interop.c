@@ -153,6 +153,7 @@ static int GetTexFormatSize(struct vlc_gl_interop *interop, GLenum target,
 static int
 LoadInterop(void *func, bool forced, va_list args)
 {
+    (void)forced;
     vlc_gl_interop_probe start = func;
     struct vlc_gl_interop *interop = va_arg(args, struct vlc_gl_interop *);
     return start(interop);
