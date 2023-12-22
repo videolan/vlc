@@ -118,7 +118,7 @@ LogProgramErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
     GLsizei shader_count;
     GLuint shaders[3];
     vt->GetAttachedShaders(id, 2, &shader_count, shaders);
-    for (size_t i=0; i<shader_count; ++i)
+    for (GLsizei i = 0; i < shader_count; ++i)
     {
         GLint shader_type;
         vt->GetShaderiv(shaders[i], GL_SHADER_TYPE, &shader_type);
