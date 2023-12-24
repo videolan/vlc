@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -93,7 +94,6 @@
     _homeLibraryStackViewScrollView = libraryWindow.homeLibraryStackViewScrollView;
     _homeLibraryStackView = libraryWindow.homeLibraryStackView;
 
-    _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
@@ -202,7 +202,7 @@
     NSArray<NSView *> * const targetViewSubViews = self.libraryTargetView.subviews;
     const BOOL emptyLibraryViewPresent = [targetViewSubViews containsObject:self.emptyLibraryView];
     const BOOL homeLibraryViewPresent = [targetViewSubViews containsObject:self.homeLibraryView];
-    if (self.segmentedTitleControl.selectedSegment == VLCLibraryHomeSegment &&
+    if (self.libraryWindow.librarySegmentType == VLCLibraryHomeSegment &&
         ((videoCount == 0 && !emptyLibraryViewPresent) ||
          (videoCount > 0 && !homeLibraryViewPresent) ||
          (audioCount == 0 && !emptyLibraryViewPresent) ||
