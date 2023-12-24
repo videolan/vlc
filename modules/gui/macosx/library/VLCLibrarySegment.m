@@ -29,6 +29,7 @@
 + (NSArray<VLCLibrarySegment *> *)librarySegments
 {
     return @[
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
@@ -66,6 +67,8 @@
 - (NSString *)displayStringForType:(VLCLibrarySegmentType)segmentType
 {
     switch (segmentType) {
+        case VLCLibraryHomeSegment:
+            return _NS("Home");
         case VLCLibraryMusicSegment:
             return _NS("Music");
         case VLCLibraryVideoSegment:
@@ -85,6 +88,8 @@
 - (NSImage *)oldIconImageForType:(VLCLibrarySegmentType)segmentType
 {
     switch (segmentType) {
+        case VLCLibraryHomeSegment:
+            return [NSImage imageNamed:@"bw-home"];
         case VLCLibraryMusicSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryVideoSegment:
@@ -103,21 +108,24 @@
 {
     if (@available(macOS 11.0, *)) {
         switch (segmentType) {
-            case VLCLibraryMusicSegment:
-                return [NSImage imageWithSystemSymbolName:@"music.note"
-                                 accessibilityDescription:@"Music icon"];
-            case VLCLibraryVideoSegment:
-                return [NSImage imageWithSystemSymbolName:@"film.stack"
-                                 accessibilityDescription:@"Video icon"];
-            case VLCLibraryBrowseSegment:
-                return [NSImage imageWithSystemSymbolName:@"folder"
-                                 accessibilityDescription:@"Browse icon"];
-            case VLCLibraryStreamsSegment:
-                return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
-                                 accessibilityDescription:@"Streams icon"];
-            default:
-                NSAssert(true, @"Invalid segment value");
-                return nil;
+        case VLCLibraryHomeSegment:
+            return [NSImage imageWithSystemSymbolName:@"house"
+                             accessibilityDescription:@"Home icon"];
+        case VLCLibraryMusicSegment:
+            return [NSImage imageWithSystemSymbolName:@"music.note"
+                              accessibilityDescription:@"Music icon"];
+        case VLCLibraryVideoSegment:
+            return [NSImage imageWithSystemSymbolName:@"film.stack"
+                             accessibilityDescription:@"Video icon"];
+        case VLCLibraryBrowseSegment:
+            return [NSImage imageWithSystemSymbolName:@"folder"
+                             accessibilityDescription:@"Browse icon"];
+        case VLCLibraryStreamsSegment:
+            return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
+                             accessibilityDescription:@"Streams icon"];
+        default:
+            NSAssert(true, @"Invalid segment value");
+            return nil;
         }
     } else {
         return nil;
