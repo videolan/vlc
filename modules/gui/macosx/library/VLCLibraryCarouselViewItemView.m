@@ -112,7 +112,7 @@
     }];
 
     self.titleTextField.stringValue = actualItem.displayString;
-    self.detailTextField.stringValue = actualItem.detailString;
+    self.detailTextField.stringValue = actualItem.primaryDetailString;
 
     if ([actualItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)actualItem;
