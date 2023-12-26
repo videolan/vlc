@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCInputNodePathControl *pathControl;
 @property (readonly) NSVisualEffectView *pathControlVisualEffectView;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
+@property (readonly) NSTextField *placeholderLabel;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
 

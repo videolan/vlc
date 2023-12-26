@@ -24,6 +24,8 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
@@ -42,6 +44,7 @@
         [self setupBaseDataSource];
         [self setupCollectionView];
         [self setupMediaSourceLibraryViews];
+        [self setupPlaceholderLabel];
     }
     return self;
 }
@@ -102,6 +105,23 @@
     _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
     _tableViewScrollView.contentInsets = defaultInsets;
     _tableViewScrollView.scrollerInsets = scrollerInsets;
+}
+
+- (void)setupPlaceholderLabel
+{
+    if (@available(macOS 10.12, *)) {
+        _placeholderLabel = [NSTextField labelWithString:_NS("No files")];
+    } else {
+        _placeholderLabel = [[NSTextField alloc] init];
+        self.placeholderLabel.stringValue = _NS("No files");
+        self.placeholderLabel.editable = NO;
+    }
+    self.placeholderLabel.textColor = NSColor.secondaryLabelColor;
+    self.placeholderLabel.alignment = NSTextAlignmentCenter;
+    self.placeholderLabel.backgroundColor = NSColor.clearColor;
+    self.placeholderLabel.bezeled = NO;
+    self.placeholderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.mediaSourceView addSubview:self.placeholderLabel];
 }
 
 - (void)presentBrowseView
