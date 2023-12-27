@@ -161,7 +161,7 @@
 
     self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     self.libraryTargetView.subviews = @[self.emptyLibraryView];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(self.emptyLibraryView);
+    NSDictionary * const dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
