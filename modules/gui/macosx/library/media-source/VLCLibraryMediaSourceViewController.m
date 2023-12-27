@@ -122,6 +122,10 @@
     self.placeholderLabel.bezeled = NO;
     self.placeholderLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.mediaSourceView addSubview:self.placeholderLabel];
+    [self.mediaSourceView addConstraints:@[
+        [self.placeholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
+        [self.placeholderLabel.centerYAnchor constraintEqualToAnchor:self.mediaSourceView.centerYAnchor],
+    ]];
 }
 
 - (void)presentBrowseView
