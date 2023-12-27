@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCInputNodePathControl;
 @class VLCMediaSource;
 
+extern NSString * const VLCMediaSourceDataSourceNodeChanged;
+
 @interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource,
                                                 NSCollectionViewDelegate,
                                                 NSCollectionViewDelegateFlowLayout,

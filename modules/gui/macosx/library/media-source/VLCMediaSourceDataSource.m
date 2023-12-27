@@ -41,6 +41,8 @@
 
 #import "views/VLCImageView.h"
 
+NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourceNodeChanged";
+
 @interface VLCMediaSourceDataSource()
 {
     VLCInputItem *_childRootInput;
@@ -217,6 +219,9 @@
     if(!_tableView.hidden) {
         [_tableView reloadData];
     }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceDataSourceNodeChanged
+                                                      object:self];
 }
 
 @end
