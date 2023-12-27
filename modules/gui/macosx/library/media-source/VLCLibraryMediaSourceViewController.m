@@ -24,6 +24,7 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -116,6 +117,7 @@
         self.placeholderLabel.stringValue = _NS("No files");
         self.placeholderLabel.editable = NO;
     }
+    self.placeholderLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.placeholderLabel.textColor = NSColor.secondaryLabelColor;
     self.placeholderLabel.alignment = NSTextAlignmentCenter;
     self.placeholderLabel.backgroundColor = NSColor.clearColor;
