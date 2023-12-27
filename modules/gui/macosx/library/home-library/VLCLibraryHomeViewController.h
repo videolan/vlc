@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCLibraryWindow;
-@class VLCLibraryVideoCollectionViewsStackViewController;
+@class VLCLibraryHomeStackViewController;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
 
-@property (readonly) VLCLibraryVideoCollectionViewsStackViewController *stackViewController;
+@property (readonly) VLCLibraryHomeStackViewController *stackViewController;
 
 @property (readonly) NSArray<NSLayoutConstraint *> *homePlaceholderImageViewSizeConstraints;
 

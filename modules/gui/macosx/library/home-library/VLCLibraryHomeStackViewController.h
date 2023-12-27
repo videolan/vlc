@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryVideoCarouselViewContainerView;
 @protocol VLCMediaLibraryItemProtocol;
 
-@interface VLCLibraryVideoCollectionViewsStackViewController : NSObject
+@interface VLCLibraryHomeStackViewController : NSObject
 
 @property (readwrite, assign, nonatomic) NSSize collectionViewItemSize;
 @property (readwrite, assign, nonatomic) CGFloat collectionViewMinimumLineSpacing;

@@ -23,7 +23,6 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataTypes.h"
-#import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
