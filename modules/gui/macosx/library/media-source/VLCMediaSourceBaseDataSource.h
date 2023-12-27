@@ -22,15 +22,17 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
     VLCMediaSourceModeLAN,
     VLCMediaSourceModeInternet,
 };
 
-NS_ASSUME_NONNULL_BEGIN
-
 @class VLCInputNodePathControl;
 @class VLCMediaSourceDataSource;
+
+extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 
 @interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource,
                                                     NSCollectionViewDelegate,

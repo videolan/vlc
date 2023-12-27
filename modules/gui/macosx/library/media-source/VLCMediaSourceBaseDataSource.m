@@ -44,6 +44,8 @@
 
 #import "views/VLCImageView.h"
 
+NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
+
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
@@ -552,6 +554,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     } else {
         [self.tableView reloadData];
     }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceBaseDataSourceNodeChanged
+                                                      object:self];
 }
 
 - (void)reloadData
@@ -561,6 +566,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     } else {
         [self.tableView reloadData];
     }
+
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceBaseDataSourceNodeChanged
+                                                      object:self];
 }
 
 @end
