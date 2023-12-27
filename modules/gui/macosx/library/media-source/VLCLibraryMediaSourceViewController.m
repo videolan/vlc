@@ -23,6 +23,7 @@
 #import "VLCLibraryMediaSourceViewController.h"
 
 #import "VLCMediaSourceBaseDataSource.h"
+#import "VLCMediaSourceDataSource.h"
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -46,6 +47,16 @@
         [self setupCollectionView];
         [self setupMediaSourceLibraryViews];
         [self setupPlaceholderLabel];
+
+        NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+        [defaultCenter addObserver:self 
+                          selector:@selector(updatePlaceholderLabel:) 
+                              name:VLCMediaSourceBaseDataSourceNodeChanged 
+                            object:nil];
+        [defaultCenter addObserver:self 
+                          selector:@selector(updatePlaceholderLabel:) 
+                              name:VLCMediaSourceDataSourceNodeChanged 
+                            object:nil];
     }
     return self;
 }
@@ -128,6 +139,12 @@
         [self.placeholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
         [self.placeholderLabel.centerYAnchor constraintEqualToAnchor:self.mediaSourceView.centerYAnchor],
     ]];
+    [self updatePlaceholderLabel:nil];
+}
+
+- (void)updatePlaceholderLabel:(NSNotification *)notification
+{
+    self.placeholderLabel.hidden = self.mediaSourceTableView.numberOfRows > 0;
 }
 
 - (void)presentBrowseView
