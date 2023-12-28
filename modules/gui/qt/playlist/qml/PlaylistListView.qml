@@ -67,50 +67,6 @@ T.Pane {
         enabled: root.enabled
     }
 
-    function isDropAcceptable(drop, index) {
-        if (drop.source === dragItem)
-            return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
-        else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem))
-            return true
-        else if (drop.hasUrls)
-            return true
-        else
-            return false
-    }
-
-    function acceptDrop(index, drop) {
-        const item = drop.source;
-
-        // NOTE: Move implementation.
-        if (dragItem === item) {
-            model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
-            listView.forceActiveFocus();
-        // NOTE: Dropping medialibrary content into the queue.
-        } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            return item.getSelectedInputItem().then((inputItems) => {
-                    if (!Helpers.isArray(inputItems) || inputItems.length === 0) {
-                        console.warn("can't convert items to input items");
-                        return
-                    }
-                    MainPlaylistController.insert(index, inputItems, false)
-                }).then(() => { listView.forceActiveFocus(); })
-        // NOTE: Dropping an external item (i.e. filesystem) into the queue.
-        } else if (drop.hasUrls) {
-            const urlList = [];
-
-            for (let url in drop.urls)
-                urlList.push(drop.urls[url]);
-
-            MainPlaylistController.insert(index, urlList, false);
-
-            // NOTE This is required otherwise backend may handle the drop as well yielding double addition.
-            drop.accept(Qt.IgnoreAction);
-            listView.forceActiveFocus();
-        }
-
-        return Promise.resolve()
-    }
-
     Widgets.DragItem {
         id: dragItem
 
@@ -267,6 +223,50 @@ T.Pane {
             fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                              : "transparent"
 
+            isDropAcceptableFunc: function(drop, index) {
+                if (drop.source === dragItem)
+                    return Helpers.itemsMovable(selectionModel.sortedSelectedIndexesFlat, index)
+                else if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem))
+                    return true
+                else if (drop.hasUrls)
+                    return true
+                else
+                    return false
+            }
+
+            acceptDropFunc: function(index, drop) {
+                const item = drop.source;
+
+                // NOTE: Move implementation.
+                if (dragItem === item) {
+                    model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
+                    listView.forceActiveFocus();
+                // NOTE: Dropping medialibrary content into the queue.
+                } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
+                    return item.getSelectedInputItem().then((inputItems) => {
+                            if (!Helpers.isArray(inputItems) || inputItems.length === 0) {
+                                console.warn("can't convert items to input items");
+                                return
+                            }
+                            MainPlaylistController.insert(index, inputItems, false)
+                        }).then(() => { listView.forceActiveFocus(); })
+                // NOTE: Dropping an external item (i.e. filesystem) into the queue.
+                } else if (drop.hasUrls) {
+                    const urlList = [];
+
+                    for (let url in drop.urls)
+                        urlList.push(drop.urls[url]);
+
+                    MainPlaylistController.insert(index, urlList, false);
+
+                    // NOTE This is required otherwise backend may handle the drop as well yielding double addition.
+                    drop.accept(Qt.IgnoreAction);
+                    listView.forceActiveFocus();
+                }
+
+                return Promise.resolve()
+            }
+
             property int shiftIndex: -1
 
             onShowContextMenu: (globalPos) => {
@@ -299,81 +299,6 @@ T.Pane {
                 }
             }
 
-            footer: Item {
-                implicitWidth: parent.width
-
-                Binding on implicitHeight {
-                    delayed: true
-                    value: Math.max(VLCStyle.icon_normal, listView.height - y)
-                }
-
-                property alias firstItemIndicatorVisible: firstItemIndicator.visible
-
-                readonly property bool containsDrag: dropArea.containsDrag
-
-                readonly property point drag: Qt.point(dropArea.drag.x, dropArea.drag.y)
-
-                readonly property bool topContainsDrag: containsDrag
-                readonly property bool bottomContainsDrag: false
-
-                onContainsDragChanged: {
-                    if (root.model.count > 0) {
-                        listView.updateItemContainsDrag(this, containsDrag)
-                    } else if (!containsDrag && listView.itemContainsDrag === this) {
-                        // In case model count is changed somehow while
-                        // containsDrag is set
-                        listView.updateItemContainsDrag(this, false)
-                    }
-                }
-
-                Rectangle {
-                    id: firstItemIndicator
-
-                    anchors.fill: parent
-                    anchors.margins: VLCStyle.margin_small
-
-                    border.width: VLCStyle.dp(2)
-                    border.color: theme.accent
-
-                    color: "transparent"
-
-                    visible: (root.model.count === 0 && (dropArea.containsDrag || dropArea.dropOperationOngoing))
-
-                    opacity: 0.8
-
-                    Widgets.IconLabel {
-                        anchors.centerIn: parent
-
-                        text: VLCIcons.add
-
-                        font.pixelSize: VLCStyle.fontHeight_xxxlarge
-
-                        color: theme.accent
-                    }
-                }
-
-                DropArea {
-                    id: dropArea
-
-                    anchors.fill: parent
-
-                    property bool dropOperationOngoing: false
-
-                    onEntered: (drag) => {
-                        if(!root.isDropAcceptable(drag, root.model.count)) {
-                            drag.accepted = false
-                            return
-                        }
-                    }
-
-                    onDropped: (drop) => {
-                        dropOperationOngoing = true
-                        root.acceptDrop(root.model.count, drop)
-                            .then(() => { dropOperationOngoing = false })
-                    }
-                }
-            }
-
             delegate: PlaylistDelegate {
                 id: delegate
 
@@ -384,8 +309,8 @@ T.Pane {
 
                 dragItem: root.dragItem
 
-                isDropAcceptable: root.isDropAcceptable
-                acceptDrop: root.acceptDrop
+                isDropAcceptable: listView.isDropAcceptableFunc
+                acceptDrop: listView.acceptDropFunc
 
                 onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
             }

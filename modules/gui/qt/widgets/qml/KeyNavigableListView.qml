@@ -24,6 +24,7 @@ import Qt5Compat.GraphicalEffects
 import VLC.MainInterface
 import VLC.Style
 import VLC.Util
+import VLC.Widgets
 
 ListView {
     id: root
@@ -39,6 +40,10 @@ ListView {
 
     // Optional property for drop indicator placement:
     property var itemContainsDrag: undefined
+    
+    // Optional functions for the optional drag accessory footer:
+    property var isDropAcceptableFunc
+    property var acceptDropFunc
 
     // Private
 
@@ -95,6 +100,92 @@ ListView {
     // If the delegate does not obey it, calculate
     // the content width appropriately.
     contentWidth: width
+    
+    footer: !!root.acceptDropFunc ? footerDragAccessoryComponent : null
+
+    Component {
+        id: footerDragAccessoryComponent
+
+        Item {
+            id: footerItem
+
+            implicitWidth: root.contentWidth
+
+            Binding on implicitHeight {
+                delayed: true
+                value: Math.max(VLCStyle.icon_normal, root.height - y - (root.headerItem?.height ?? 0))
+            }
+
+            property alias firstItemIndicatorVisible: firstItemIndicator.visible
+
+            readonly property bool containsDrag: dropArea.containsDrag
+            readonly property bool topContainsDrag: containsDrag
+            readonly property bool bottomContainsDrag: false
+
+            onContainsDragChanged: {
+                if (root.model.count > 0) {
+                    root.updateItemContainsDrag(this, containsDrag)
+                } else if (!containsDrag && root.itemContainsDrag === this) {
+                    // In case model count is changed somehow while
+                    // containsDrag is set
+                    root.updateItemContainsDrag(this, false)
+                }
+            }
+
+            property alias drag: dropArea.drag
+
+            Rectangle {
+                id: firstItemIndicator
+
+                anchors.fill: parent
+                anchors.margins: VLCStyle.margin_small
+
+                border.width: VLCStyle.dp(2)
+                border.color: theme.accent
+
+                color: "transparent"
+
+                visible: (root.model.count === 0 && (dropArea.containsDrag || dropArea.dropOperationOngoing))
+
+                opacity: 0.8
+
+                IconLabel {
+                    anchors.centerIn: parent
+
+                    text: VLCIcons.add
+
+                    font.pixelSize: VLCStyle.fontHeight_xxxlarge
+
+                    color: theme.accent
+                }
+            }
+
+            DropArea {
+                id: dropArea
+
+                anchors.fill: parent
+
+                property bool dropOperationOngoing: false
+
+                onEntered: function(drag) {
+                    if (!root.isDropAcceptableFunc || !root.isDropAcceptableFunc(drag, root.model.rowCount())
+                            || !root.acceptDropFunc) {
+                        drag.accepted = false
+                        return
+                    }
+
+                    drag.accepted = true
+                }
+
+                onDropped: function(drop) {
+                    console.assert(!!root.acceptDropFunc)
+                    dropOperationOngoing = true
+                    root.acceptDropFunc(root.model.count, drop)
+                        .then(() => { dropOperationOngoing = false })
+                }
+            }
+        }
+    }
 
     Accessible.role: Accessible.List
 

@@ -166,7 +166,7 @@ MainTableView {
     function applyDrop(drop, index, delegate, before) {
         if (root.isDroppable(drop, index + (before ? 0 : 1)) === false) {
             root.hideLine(delegate)
-            return
+            return Promise.resolve()
         }
 
         const item = drop.source;
@@ -176,23 +176,27 @@ MainTableView {
         // NOTE: Move implementation.
         if (dragItem === item) {
             model.move(selectionModel.selectedRows(), destinationIndex)
+            root.forceActiveFocus()
+            root.hideLine(delegate)
         // NOTE: Dropping medialibrary content into the playlist.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            item.getSelectedInputItem()
-                .then(inputItems => {
-                    model.insert(inputItems, destinationIndex)
-                })
+            return item.getSelectedInputItem()
+                        .then(inputItems => {
+                            model.insert(inputItems, destinationIndex)
+                        })
+                        .then(() => { root.forceActiveFocus(); root.hideLine(delegate); })
         } else if (drop.hasUrls) {
             const urlList = []
             for (let url in drop.urls)
                 urlList.push(drop.urls[url])
 
             model.insert(urlList, destinationIndex)
+
+            root.forceActiveFocus()
+            root.hideLine(delegate)
         }
 
-        root.forceActiveFocus()
-
-        root.hideLine(delegate)
+        return Promise.resolve()
     }
 
     function _dropUpdatePosition(drag, index, delegate, before) {
