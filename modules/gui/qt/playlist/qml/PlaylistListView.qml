@@ -267,8 +267,6 @@ T.Pane {
             fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
                                                                                              : "transparent"
 
-            contentWidth: width
-
             property int shiftIndex: -1
 
             onShowContextMenu: (globalPos) => {

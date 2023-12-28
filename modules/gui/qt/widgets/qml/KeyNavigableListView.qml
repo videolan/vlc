@@ -91,6 +91,11 @@ ListView {
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
 
+    // Content width is set to the width by default
+    // If the delegate does not obey it, calculate
+    // the content width appropriately.
+    contentWidth: width
+
     Accessible.role: Accessible.List
 
     add: Transition {
