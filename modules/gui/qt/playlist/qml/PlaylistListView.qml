@@ -392,24 +392,6 @@ T.Pane {
                 onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
             }
 
-            add: Transition {
-                OpacityAnimator {
-                    from: 0.0
-                    to: 1.0
-                    duration: VLCStyle.duration_long
-                    easing.type: Easing.OutSine
-                }
-            }
-
-            displaced: Transition {
-                NumberAnimation {
-                    // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
-                    property: "y"
-                    duration: VLCStyle.duration_long
-                    easing.type: Easing.OutSine
-                }
-            }
-
             Keys.onDeletePressed: model.removeItems(selectionModel.selectedIndexesFlat)
 
             Navigation.parentItem: root
