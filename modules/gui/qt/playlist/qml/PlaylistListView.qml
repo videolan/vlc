@@ -270,7 +270,6 @@ T.Pane {
             contentWidth: width
 
             property int shiftIndex: -1
-            property Item itemContainsDrag: null
 
             onShowContextMenu: (globalPos) => {
                 contextMenu.popup(-1, globalPos)
@@ -315,6 +314,9 @@ T.Pane {
                 readonly property bool containsDrag: dropArea.containsDrag
 
                 readonly property point drag: Qt.point(dropArea.drag.x, dropArea.drag.y)
+
+                readonly property bool topContainsDrag: containsDrag
+                readonly property bool bottomContainsDrag: false
 
                 onContainsDragChanged: {
                     if (root.model.count > 0) {
@@ -371,43 +373,6 @@ T.Pane {
                         root.acceptDrop(root.model.count, drop)
                             .then(() => { dropOperationOngoing = false })
                     }
-                }
-            }
-
-            Rectangle {
-                id: dropIndicator
-
-                parent: listView.itemContainsDrag
-
-                z: 99
-
-                anchors {
-                    left: !!parent ? parent.left : undefined
-                    right: !!parent ? parent.right : undefined
-                    top: !!parent ? (parent.bottomContainsDrag === true ? parent.bottom : parent.top)
-                                  : undefined
-                }
-
-                implicitHeight: VLCStyle.dp(1)
-
-                visible: !!parent
-                color: theme.accent
-            }
-
-            function updateItemContainsDrag(item, set) {
-                if (set) {
-                    // This callLater is needed because in Qt 5.15,
-                    // an item might set itemContainsDrag, before
-                    // the owning item releases it.
-                    Qt.callLater(function() {
-                        if (itemContainsDrag)
-                            console.debug(item + " set itemContainsDrag before it was released!")
-                        itemContainsDrag = item
-                    })
-                } else {
-                    if (itemContainsDrag !== item)
-                        console.debug(item + " released itemContainsDrag that is not owned!")
-                    itemContainsDrag = null
                 }
             }
 

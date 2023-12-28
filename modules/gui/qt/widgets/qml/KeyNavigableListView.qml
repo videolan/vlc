@@ -37,6 +37,9 @@ ListView {
         model: root.model
     }
 
+    // Optional property for drop indicator placement:
+    property var itemContainsDrag: undefined
+
     // Private
 
     property bool _keyPressed: false
@@ -163,6 +166,23 @@ ListView {
     function updateSelection(modifiers, oldIndex, newIndex) {
         if (selectionModel)
             selectionModel.updateSelection(modifiers, oldIndex, newIndex)
+    }
+
+    function updateItemContainsDrag(item, set) {
+        if (set) {
+            // This callLater is needed because in Qt 5.15,
+            // an item might set itemContainsDrag, before
+            // the owning item releases it.
+            Qt.callLater(function() {
+                if (itemContainsDrag)
+                    console.debug(item + " set itemContainsDrag before it was released!")
+                itemContainsDrag = item
+            })
+        } else {
+            if (itemContainsDrag !== item)
+                console.debug(item + " released itemContainsDrag that is not owned!")
+            itemContainsDrag = null
+        }
     }
 
     Keys.onPressed: (event) => {
@@ -328,6 +348,39 @@ ListView {
                     selectionModel.clearSelection()
             }
         }
+    }
+
+    Rectangle {
+        id: dropIndicator
+
+        parent: {
+            const item = root.itemContainsDrag
+            if (!item || item.topContainsDrag === undefined || item.bottomContainsDrag === undefined)
+              return null
+            return item
+        }
+
+        z: 99
+
+        anchors {
+            left: !!parent ? parent.left : undefined
+            right: !!parent ? parent.right : undefined
+            top: {
+                if (parent === null)
+                    return undefined
+                else if (parent.topContainsDrag === true)
+                    return parent.top
+                else if (parent.bottomContainsDrag === true)
+                    return parent.bottom
+                else
+                    return undefined
+            }
+        }
+
+        implicitHeight: VLCStyle.dp(1)
+
+        visible: !!parent
+        color: theme.accent
     }
 
     // FIXME: We probably need to upgrade these RoundButton(s) eventually. And we probably need
