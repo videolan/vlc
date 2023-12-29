@@ -1192,6 +1192,19 @@ $(builddir)/../../vlc-qt-check: vlc-qt-check
 endif
 endif
 
+base_model_test_SOURCES = tests/test_base_model.cpp \
+        util/base_model.cpp util/base_model.hpp util/base_model_p.hpp
+
+nodist_base_model_test_SOURCES = util/base_model.moc.cpp \
+        util/listcache.moc.cpp \
+        util/locallistcacheloader.moc.cpp
+
+base_model_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
+base_model_test_LDADD = $(QT5_PLUGINS_LIBS) $(QT_LIBS) $(LIBS_qt)
+check_PROGRAMS = base_model_test
+TESTS = base_model_test
+
+
 QML_LOG_COMPILER = $(builddir)/qml_test -input
 
 if HAVE_QT5_QUICK_TEST
@@ -1202,8 +1215,8 @@ nodist_qml_test_SOURCES += qmlcache_loader.cpp $(libqt_plugin_la_QML)
 endif
 qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT5_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/tests\""
 qml_test_LDADD = $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
-check_PROGRAMS = qml_test
+check_PROGRAMS += qml_test
 EXTRA_DIST += tests/tst_FSM.qml
-TESTS = tests/tst_FSM.qml
+TESTS += tests/tst_FSM.qml
 endif
 endif
