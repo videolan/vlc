@@ -95,13 +95,11 @@ AbstractButton {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
 
-        Image {
+        Widgets.ScaledImage {
             id: coverImage
 
             Layout.fillHeight: true
             Layout.preferredWidth: root.height
-
-            sourceSize.width: root.height
 
             source: {
                 if (!paintOnly && Player.artwork && Player.artwork.toString())
