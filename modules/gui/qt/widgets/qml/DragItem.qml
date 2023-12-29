@@ -119,14 +119,7 @@ Item {
     // Implementation
     //---------------------------------------------------------------------------------------------
 
-    // always keep drag item out of view
-    z: -1
-
     parent: T.Overlay.overlay
-
-    x: parent.width + VLCStyle.margin_large
-
-    y: parent.height + VLCStyle.margin_large
 
     visible: false
 
@@ -143,6 +136,10 @@ Item {
     height: coverSize + padding * 2
 
     enabled: false
+
+    // Offscreen render:
+    layer.enabled: true
+    layer.effect: Item { }
 
     function _setData(data) {
         console.assert(data.length === indexes.length)
