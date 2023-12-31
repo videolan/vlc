@@ -438,7 +438,11 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 #endif
         const double src_ratio = (double)p_fmt_src->i_visible_width / p_fmt_src->i_visible_height;
         const double dst_ratio = (double)p_fmt_dst->i_visible_width / p_fmt_dst->i_visible_height;
+#if LIBASS_VERSION >= 0x01020000
+        ass_set_pixel_aspect( p_sys->p_renderer, dst_ratio / src_ratio );
+#else
         ass_set_aspect_ratio( p_sys->p_renderer, dst_ratio / src_ratio, 1 );
+#endif
     }
 
     /* */
