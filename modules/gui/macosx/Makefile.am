@@ -149,6 +149,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/home-library/VLCLibraryHomeStackViewController.h \
 	gui/macosx/library/home-library/VLCLibraryHomeStackViewController.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewContainerView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCarouselViewContainerView.h \
