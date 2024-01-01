@@ -23,6 +23,8 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/video-library/VLCLibraryVideoViewContainerView.h"
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
 @class VLCSubScrollView;
 @class VLCLibraryCollectionViewDelegate;

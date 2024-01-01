@@ -22,17 +22,17 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/home-library/VLCLibraryHomeViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 @class VLCLibraryVideoContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLCLibraryVideoViewContainerView <NSObject>
+@protocol VLCLibraryVideoViewContainerView <VLCLibraryHomeViewContainerView>
 
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;
-@property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
 @property (readonly) VLCLibraryVideoContainerViewDataSource *dataSource;
 
 - (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group;
