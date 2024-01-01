@@ -71,7 +71,7 @@ static void Parse(vlc_object_t *obj, void *priv, block_t *data,
 
 #define PKT_FROM(a) PKT_FROMSZ(a, 0)
 
-int main()
+int main(void)
 {
     block_t *pkt;
     block_t *output = NULL;

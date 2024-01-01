@@ -143,7 +143,7 @@ VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
 };
 
 
-int main()
+int main(void)
 {
     test_init();
 

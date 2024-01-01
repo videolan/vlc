@@ -235,7 +235,7 @@ static int test_any(struct hxxx_helper *hlpr,
         if(ret) return ret;\
     } while(0)
 
-static int test_annexb()
+static int test_annexb(void)
 {
     int ret;
     fprintf(stderr,"H264\n");

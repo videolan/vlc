@@ -199,7 +199,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     vlc_thumbnailer_Release( p_thumbnailer );
 }
 
-int main()
+int main( void )
 {
     test_init();
 

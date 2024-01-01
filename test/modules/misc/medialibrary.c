@@ -104,7 +104,7 @@ static int cleanup_tmpdir(const char *dirpath, const struct stat *sb,
     return remove(dirpath);
 }
 
-int main()
+int main(void)
 {
     char template[] = "/tmp/vlc.test." MODULE_STRING ".XXXXXX";
     const char *tempdir = mkdtemp(template);

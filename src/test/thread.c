@@ -91,7 +91,7 @@ static void *thread_func_noop(void *data)
     return &thread_return_magic;
 }
 
-static void test__thread_create()
+static void test__thread_create(void)
 {
     vlc_thread_t th;
     TEST_THREAD_CLONE_MAGIC(&th, thread_func_noop);
@@ -111,7 +111,7 @@ static void *thread_func_loop(void *data)
     return &thread_return_magic;
 }
 
-static void test__thread_cancelation()
+static void test__thread_cancelation(void)
 {
     vlc_thread_t th;
     TEST_THREAD_CLONE_MAGIC(&th, thread_func_loop);
@@ -143,7 +143,7 @@ static void *thread_func_loop_cleanup(void *data)
     return &thread_return_magic;
 }
 
-static void test__thread_cancelation_with_cleanup()
+static void test__thread_cancelation_with_cleanup(void)
 {
     vlc_thread_t th;
     int th_cleanup_state = 0;
@@ -177,7 +177,7 @@ static void *thread_func_cond(void *ptr)
     return &thread_return_magic;
 }
 
-static void test__cond_broadcast()
+static void test__cond_broadcast(void)
 {
     struct cond_data data;
     vlc_thread_t threads[20];
@@ -208,7 +208,7 @@ static void test__cond_broadcast()
     }
 }
 
-static void test__cond_wait()
+static void test__cond_wait(void)
 {
     struct cond_data data;
     cond_data_init(&data, 1);
@@ -263,7 +263,7 @@ static void *thread_func_cond_timeout(void *ptr)
     return &thread_return_magic;
 }
 
-static void test__cond_wait_timeout()
+static void test__cond_wait_timeout(void)
 {
     struct cond_data data;
     cond_data_init(&data, 1);
@@ -334,7 +334,7 @@ static void *thread_func_tick_sleep(void *data)
     return &thread_return_magic;
 }
 
-static void test__vlc_tick_sleep_cancelation()
+static void test__vlc_tick_sleep_cancelation(void)
 {
     vlc_thread_t th;
     TEST_THREAD_CLONE_MAGIC(&th, thread_func_tick_sleep);
@@ -345,7 +345,7 @@ static void test__vlc_tick_sleep_cancelation()
 /*
  * Test sleeping for delay with vlc_tick_sleep
  */
-static void test__vlc_tick_sleep()
+static void test__vlc_tick_sleep(void)
 {
     vlc_tick_t now = vlc_tick_now();
 

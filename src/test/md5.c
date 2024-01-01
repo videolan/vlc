@@ -52,7 +52,7 @@ static const md5_sample_t md5_samples[] =
     { NULL,         NULL            }
 };
 
-static void test_vlc_hash_md5()
+static void test_vlc_hash_md5( void )
 {
     for( int i = 0; md5_samples[i].psz_string; i++ )
     {

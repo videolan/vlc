@@ -131,7 +131,7 @@ static void testannexbin( const uint8_t *p_data, size_t i_data,
     testfunction( test##number##_annexbdata, sizeof(test##number##_annexbdata), \
                   p_res, rgi_res )
 
-static void test_annexb()
+static void test_annexb( void )
 {
     const uint8_t *p_res[3];
     size_t rgi_res[3];

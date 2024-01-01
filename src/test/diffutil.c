@@ -194,7 +194,7 @@ static void check_changelist(const char* oldInput, const char* newInput, int fla
     CHECK_CHANGELIST(from, to, VLC_DIFFUTIL_RESULT_MOVE | VLC_DIFFUTIL_RESULT_AGGREGATE, __VA_ARGS__)
 
 
-int main()
+int main(void)
 {
     check_snake("", "", "");
     check_snake("unchanged", "unchanged", "=u=n=c=h=a=n=g=e=d");

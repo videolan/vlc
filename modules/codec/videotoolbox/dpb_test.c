@@ -122,7 +122,7 @@ static void CheckOutput(struct dpb_s *dpb, date_t *ptsdate, frame_info_t *info, 
     InsertIntoDPB(dpb, info);
 }
 
-static void CheckDPBWithFramesTest()
+static void CheckDPBWithFramesTest(void)
 {
     struct dpb_s dpb = {0};
     dpb.b_strict_reorder = true;
@@ -298,7 +298,7 @@ static void CheckDPBWithFramesTest()
     assert(dpb.i_size == 0);
 }
 
-static void CheckDPBWithFieldsTest()
+static void CheckDPBWithFieldsTest(void)
 {
     struct dpb_s dpb = {0};
     dpb.b_strict_reorder = true;

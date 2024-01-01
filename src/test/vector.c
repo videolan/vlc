@@ -269,7 +269,7 @@ static void test_vector_foreach(void)
     vlc_vector_destroy(&vec);
 }
 
-static void test_vector_grow()
+static void test_vector_grow(void)
 {
     struct VLC_VECTOR(int) vec = VLC_VECTOR_INITIALIZER;
 

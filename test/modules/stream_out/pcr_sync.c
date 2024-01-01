@@ -495,7 +495,7 @@ static void test_PCRHelperIOMismatch(vlc_pcr_sync_t *sync,
     assert(pcr == VLC_TICK_INVALID);
 }
 
-int main()
+int main(void)
 {
     test_Run(test_Simple);
     test_Run(test_MultipleTracks);
