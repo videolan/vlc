@@ -228,6 +228,7 @@
         <file alias="FadingEdge.qml">widgets/qml/FadingEdge.qml</file>
         <file alias="FadingEdgeForListView.qml">widgets/qml/FadingEdgeForListView.qml</file>
         <file alias="PopupIconToolButton.qml">widgets/qml/PopupIconToolButton.qml</file>
+        <file alias="PartialEffect.qml">widgets/qml/PartialEffect.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

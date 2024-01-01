@@ -1073,7 +1073,8 @@ libqt_plugin_la_QML = \
 	widgets/qml/DoubleShadow.qml \
 	widgets/qml/FadingEdge.qml \
 	widgets/qml/FadingEdgeForListView.qml \
-	widgets/qml/PopupIconToolButton.qml
+	widgets/qml/PopupIconToolButton.qml \
+	widgets/qml/PartialEffect.qml
 
 lib_qt_plugin_la_QRC = vlc.qrc
 
