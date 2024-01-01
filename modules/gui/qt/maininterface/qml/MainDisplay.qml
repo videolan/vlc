@@ -231,21 +231,29 @@ FocusScope {
                                ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString))) &&
                                (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
 
-                layer.effect: Widgets.FrostedGlassEffect {
-                    ColorContext {
-                        id: frostedTheme
-                        palette: VLCStyle.palette
-                        colorSet: ColorContext.Window
-                    }
+                layer.effect: Widgets.PartialEffect {
+                    id: stackViewParentLayerEffect
 
                     blending: stackViewParent.color.a < (1.0 - Number.EPSILON)
-
-                    tint: frostedTheme.bg.secondary
 
                     effectRect: Qt.rect(0,
                                         stackView.height,
                                         width,
                                         height - stackView.height)
+
+                    effectLayer.effect: Component {
+                        Widgets.FrostedGlassEffect {
+                            ColorContext {
+                                id: frostedTheme
+                                palette: VLCStyle.palette
+                                colorSet: ColorContext.Window
+                            }
+
+                            blending: stackViewParentLayerEffect.blending
+
+                            tint: frostedTheme.bg.secondary
+                        }
+                    }
                 }
 
                 Widgets.PageLoader {
