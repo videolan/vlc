@@ -52,27 +52,27 @@ FastBlur {
 
             uniform lowp float qt_Opacity;
 
-            uniform lowp vec4  tint;
+            uniform lowp vec4 tint;
 
             uniform lowp float exclusionStrength;
             uniform lowp float noiseStrength;
             uniform lowp float tintStrength;
 
-            mediump float rand(highp vec2 co){
+            highp float rand(highp vec2 co){
                 return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
             }
 
-            mediump vec4 exclude(mediump vec4 src, mediump vec4 dst)
+            highp vec4 exclude(highp vec4 src, highp vec4 dst)
             {
                 return src + dst - 2.0 * src * dst;
             }
 
             void main() {
-               mediump float r = rand(qt_TexCoord0) - 0.5;
-               mediump vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
-               mediump vec4 blurred  = texture2D(source, qt_TexCoord0);
+               highp float r = rand(qt_TexCoord0) - 0.5;
+               highp vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+               highp vec4 blurred  = texture2D(source, qt_TexCoord0);
 
-               mediump vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
+               highp vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
 
                blurred = exclude(blurred, exclColor);
 
