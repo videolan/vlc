@@ -73,7 +73,7 @@ static void cancellable_interrupted(void *p_data)
     g_cancellable_cancel(p_canc);
 }
 
-static GCancellable *cancellable_register()
+static GCancellable *cancellable_register(void)
 {
     GCancellable *p_canc = g_cancellable_new();
     if (!p_canc)

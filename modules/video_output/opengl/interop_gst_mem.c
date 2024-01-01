@@ -54,7 +54,7 @@ struct priv
     struct
     {
         EGLDisplay display;
-        EGLDisplay (*getCurrentDisplay)();
+        EGLDisplay (*getCurrentDisplay)(void);
         const char *(*queryString)(EGLDisplay, EGLint);
         EGLImage (*createImageKHR)(EGLDisplay, EGLContext, EGLenum target, EGLClientBuffer buffer,
                 const EGLint *attrib_list);

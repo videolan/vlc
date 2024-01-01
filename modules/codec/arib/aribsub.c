@@ -193,7 +193,7 @@ static void messages_callback_handler( void *p_opaque, const char *psz_message )
     msg_Dbg( p_dec, "%s", psz_message );
 }
 
-static char* get_arib_base_dir()
+static char* get_arib_base_dir( void )
 {
     char *psz_data_dir = config_GetUserDir( VLC_USERDATA_DIR );
     if( psz_data_dir == NULL )

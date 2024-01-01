@@ -84,7 +84,7 @@ static void *extra_dll_handle;
 static void (*pf_host_init)(void);
 static void (*pf_host_deinit)(void);
 
-static void CloseExtraDll()
+static void CloseExtraDll(void)
 {
     if (pf_host_deinit)
         pf_host_deinit();

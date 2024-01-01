@@ -27,7 +27,7 @@
 #include "scan.h"
 #include "scan_list.h"
 
-static scan_list_entry_t * scan_list_entry_New()
+static scan_list_entry_t * scan_list_entry_New( void )
 {
     scan_list_entry_t *p_entry = calloc(1, sizeof(scan_list_entry_t));
     if( likely(p_entry) )

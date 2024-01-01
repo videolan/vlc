@@ -91,7 +91,7 @@ void ts_psip_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
         dvbpsi_packet_push( p_pid->u.p_psip->handle, (uint8_t *) p_pktbuffer );
 }
 
-ts_psip_context_t * ts_psip_context_New()
+ts_psip_context_t * ts_psip_context_New( void )
 {
     ts_psip_context_t *p_ctx = malloc(sizeof(*p_ctx));
     if(likely(p_ctx))
