@@ -30,6 +30,9 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
+
+#import "library/home-library/VLCLibraryHomeViewContainerView.h"
+
 #import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
@@ -181,8 +184,8 @@
     return constraintsWithSuperview;
 }
 
-- (void)setupContainerView:(NSView<VLCLibraryVideoViewContainerView> *)containerView
-             withStackView:(NSStackView *)stackView
+- (void)setupContainerView:(NSView<VLCLibraryHomeViewContainerView> *)containerView
+              forStackView:(NSStackView *)stackView
 {
     if (containerView == nil || stackView == nil) {
         return;
@@ -203,7 +206,7 @@
     [self setupViewConstraints:view withStackView:stackView];
 }
 
-- (void)addContainerView:(NSView<VLCLibraryVideoViewContainerView> *)containerView
+- (void)addContainerView:(NSView<VLCLibraryHomeViewContainerView> *)containerView
              toStackView:(NSStackView *)stackView
 {
     if (containerView == nil || stackView == nil) {
