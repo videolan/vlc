@@ -282,19 +282,19 @@ static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, vlc_fourc
         *pb_has_a = true;
         break;
     case VLC_CODEC_RGBA:
-        *pi_fmt = AV_PIX_FMT_BGR32;
+        *pi_fmt = AV_PIX_FMT_RGBA;
         *pb_has_a = true;
         break;
     case VLC_CODEC_ARGB:
-        *pi_fmt = AV_PIX_FMT_BGR32_1;
+        *pi_fmt = AV_PIX_FMT_ARGB;
         *pb_has_a = true;
         break;
     case VLC_CODEC_BGRA:
-        *pi_fmt = AV_PIX_FMT_RGB32;
+        *pi_fmt = AV_PIX_FMT_BGRA;
         *pb_has_a = true;
         break;
     case VLC_CODEC_ABGR:
-        *pi_fmt = AV_PIX_FMT_RGB32_1;
+        *pi_fmt = AV_PIX_FMT_ABGR;
         *pb_has_a = true;
         break;
     default:
