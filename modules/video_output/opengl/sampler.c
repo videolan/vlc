@@ -775,6 +775,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
         char *lut_file = var_InheritString(priv->gl, "gl-lut-file");
         struct pl_custom_lut *lut = LoadCustomLUT(sampler, lut_file);
+        free(lut_file);
         if (lut) {
             // Transform from the video input to the LUT input color space,
             // defaulting to a no-op if LUT input color space info is unknown
