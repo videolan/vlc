@@ -110,28 +110,32 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->green_mask == 0x0000ff00 &&
                     vt->blue_mask  == 0x000000ff)
                 {
-                    f->i_chroma = VLC_CODEC_XRGB;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_XRGB : VLC_CODEC_BGRX;
                 }
                 else
                 if (vt->red_mask   == 0x000000ff &&
                     vt->green_mask == 0x0000ff00 &&
                     vt->blue_mask  == 0x00ff0000)
                 {
-                    f->i_chroma = VLC_CODEC_XBGR;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_XBGR : VLC_CODEC_RGBX;
                 }
                 else
                 if (vt->red_mask   == 0xff000000 &&
                     vt->green_mask == 0x00ff0000 &&
                     vt->blue_mask  == 0x0000ff00)
                 {
-                    f->i_chroma = VLC_CODEC_RGBX;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_RGBX : VLC_CODEC_XBGR;
                 }
                 else
                 if (vt->red_mask   == 0x0000ff00 &&
                     vt->green_mask == 0x00ff0000 &&
                     vt->blue_mask  == 0xff000000)
                 {
-                    f->i_chroma = VLC_CODEC_BGRX;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_BGRX : VLC_CODEC_XRGB;
                 }
                 else
                     return false;
@@ -142,14 +146,16 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
                     vt->green_mask == 0x00ff00 &&
                     vt->blue_mask  == 0x0000ff)
                 {
-                    f->i_chroma = VLC_CODEC_RGB24;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_RGB24 : VLC_CODEC_BGR24;
                 }
                 else
                 if (vt->red_mask   == 0x0000ff &&
                     vt->green_mask == 0x00ff00 &&
                     vt->blue_mask  == 0xff0000)
                 {
-                    f->i_chroma = VLC_CODEC_BGR24;
+                    f->i_chroma = setup->image_byte_order == XCB_IMAGE_ORDER_MSB_FIRST ?
+                                  VLC_CODEC_BGR24 : VLC_CODEC_RGB24;
                 }
                 else
                     return false;
