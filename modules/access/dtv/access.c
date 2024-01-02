@@ -692,7 +692,9 @@ static const char *var_InheritModulation (vlc_object_t *obj, const char *var)
         case 64:  str = "64QAM";  break;
         case 128: str = "128QAM"; break;
         case 256: str = "256QAM"; break;
-        default:  return "";
+        default:
+            free (mod);
+            return "";
     }
 
     msg_Warn (obj, "\"modulation=%s\" option is obsolete. "
