@@ -90,11 +90,6 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 #endif
 
 #if defined (_WIN32)
-# ifndef IPV6_PROTECTION_LEVEL
-#  warning Please update your C library headers.
-#  define IPV6_PROTECTION_LEVEL 23
-#  define PROTECTION_LEVEL_UNRESTRICTED 10
-# endif
     if (family == AF_INET6)
         setsockopt (fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
                     &(int){ PROTECTION_LEVEL_UNRESTRICTED }, sizeof (int));
