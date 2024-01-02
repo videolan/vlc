@@ -140,6 +140,7 @@ static int FindMeta( vlc_object_t *p_this )
             }
     }
 
+    free(filename);
     free(psz_basedir);
     return ret;
 }
