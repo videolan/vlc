@@ -94,7 +94,20 @@ static void SwapBuffers (vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    glXSwapBuffers (sys->display, sys->win);
+    Display *previous_display = glXGetCurrentDisplay();
+    GLXContext previous_context = glXGetCurrentContext();
+    if (previous_display != sys->display || previous_context != sys->ctx) {
+        GLXWindow s_read = glXGetCurrentReadDrawable();
+        GLXWindow s_draw = glXGetCurrentDrawable();
+        glXMakeContextCurrent(sys->display, sys->win, sys->win, sys->ctx);
+        glXSwapBuffers (sys->display, sys->win);
+        if (previous_display)
+            glXMakeContextCurrent(previous_display, s_draw, s_read, previous_context);
+        else
+            glXMakeContextCurrent(sys->display, None, None, NULL);
+    }
+    else
+        glXSwapBuffers (sys->display, sys->win);
 }
 
 static void *GetSymbol(vlc_gl_t *gl, const char *procname)
