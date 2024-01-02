@@ -274,10 +274,11 @@ int (net_ConnectTCP)(vlc_object_t *obj, const char *host, int serv)
     }
 
     int fd = net_Connect(obj, realhost, realserv, SOCK_STREAM, IPPROTO_TCP);
+    free(socks);
 
     if (socks != NULL && fd != -1)
     {
-        /* NOTE: psz_socks already free'd! */
+        /* NOTE: socks already free'd! */
         char *user = var_InheritString(obj, "socks-user");
         char *pwd = var_InheritString(obj, "socks-pwd");
 
