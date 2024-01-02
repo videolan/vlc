@@ -434,6 +434,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     }
     if (strcmp(p_mode->psz_mode, psz_mode))
         msg_Dbg(filter, "using %s deinterlacing mode", p_mode->psz_mode);
+    free(psz_mode);
 
     DXVA2_VideoProcessorCaps caps, best_caps;
     unsigned best_score = 0;
