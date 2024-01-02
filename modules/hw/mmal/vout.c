@@ -1135,6 +1135,7 @@ static int OpenMmalVout(vout_display_t *vd,
         else
             msg_Dbg(vd, "Display device: %s, qt=%d id=%d display=%d", display_name,
                     qt_num, display_id, sys->display_id);
+        free(display_name);
     }
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);
