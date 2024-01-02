@@ -476,7 +476,7 @@ static musicbrainz_recording_t * GetMusicbrainzInfo( vlc_object_t *obj,
     musicbrainz_recording_t *recording = NULL;
 
     char *psz_mbserver = var_InheritString( obj, "musicbrainz-server" );
-    if( !psz_mbserver || !*psz_mbserver )
+    if( !psz_mbserver )
         return NULL;
 
     musicbrainz_config_t cfg = { .obj = obj,
