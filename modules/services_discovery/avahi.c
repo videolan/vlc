@@ -254,9 +254,9 @@ static void resolve_callback(
 
     if( event == AVAHI_RESOLVER_FAILURE )
     {
-        msg_Err( p_sys->parent,
-                 "failed to resolve service '%s' of type '%s' in domain '%s'",
-                 name, type, domain );
+        msg_Warn( p_sys->parent,
+                  "failed to resolve service '%s' of type '%s' in domain '%s'",
+                  name, type, domain );
     }
     else if( event == AVAHI_RESOLVER_FOUND )
     {
@@ -266,8 +266,8 @@ static void resolve_callback(
         AvahiStringList *asl = NULL;
         input_item_t *p_input = NULL;
 
-        msg_Info( p_sys->parent, "service '%s' of type '%s' in domain '%s' port %i",
-                  name, type, domain, port );
+        msg_Dbg( p_sys->parent, "service '%s' of type '%s' in domain '%s' port %i",
+                 name, type, domain, port );
 
         avahi_address_snprint(a, (sizeof(a)/sizeof(a[0]))-1, address);
         if( protocol == AVAHI_PROTO_INET6 )
