@@ -110,6 +110,11 @@ public:
     {
         assert(!streamStarted);
 
+        event_generator.Reset();
+        mft.Reset();
+        input_type.Reset();
+        output_sample.Reset();
+
         MFShutdown();
 
         CoUninitialize();
