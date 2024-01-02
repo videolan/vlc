@@ -586,13 +586,17 @@ static void SwapBuffers (vlc_gl_t *gl)
 
     if (!sys->is_current)
     {
+        EGLDisplay previous_display = eglGetCurrentDisplay();
         EGLSurface s_read = eglGetCurrentSurface(EGL_READ);
         EGLSurface s_draw = eglGetCurrentSurface(EGL_DRAW);
         EGLContext previous_context = eglGetCurrentContext();
 
         eglMakeCurrent(sys->display, sys->surface, sys->surface, sys->context);
         eglSwapBuffers (sys->display, sys->surface);
-        eglMakeCurrent(sys->display, s_read, s_draw, previous_context);
+        if (previous_display != EGL_NO_DISPLAY)
+            eglMakeCurrent(previous_display, s_draw, s_read, previous_context);
+        else
+            eglMakeCurrent(sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     }
     else
         eglSwapBuffers (sys->display, sys->surface);
