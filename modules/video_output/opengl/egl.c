@@ -223,7 +223,7 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
         if (old_display != EGL_NO_DISPLAY)
             eglMakeCurrent(old_display, old_draw, old_read, old_ctx);
         else
-            eglMakeCurrent(sys->display, NULL, NULL, NULL);
+            eglMakeCurrent(sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     }
     if (LastKnownRequestProcessed(sys->x11) - init_serial < resize_serial - init_serial)
         XSync(sys->x11, False);
