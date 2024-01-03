@@ -531,11 +531,11 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
         if (*playlist->current_memory_cached_ref >=
             playlist->config->max_memory)
         {
-            vlc_error(playlist->logger,
-                      "Maximum memory capacity (%zuKb) for segment storage was "
-                      "reached. The HLS server will stop creating segments. "
-                      "Please refer to the max-memory option for more info.",
-                      BYTES_TO_KB(playlist->config->max_memory));
+            msg_Err(access,
+                    "Maximum memory capacity (%zuKb) for segment storage was "
+                    "reached. The HLS server will stop creating segments. "
+                    "Please refer to the max-memory option for more info.",
+                    BYTES_TO_KB(playlist->config->max_memory));
             block_ChainRelease(block);
             return -1;
         }
