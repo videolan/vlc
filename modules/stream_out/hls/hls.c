@@ -479,6 +479,7 @@ static hls_block_chain_t ExtractSegment(hls_block_chain_t *muxed_output,
             return segment;
         }
         segment.length += it->i_length;
+        muxed_output->length -= it->i_length;
         prev = it;
     }
 
@@ -523,7 +524,8 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     sout_stream_sys_t *sys = access->p_sys;
 
     size_t size = 0;
-    block_ChainProperties(block, NULL, &size, NULL);
+    vlc_tick_t length;
+    block_ChainProperties(block, NULL, &size, &length);
 
     if (hls_config_IsMemStorageEnabled(&sys->config))
     {
@@ -546,6 +548,7 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     assert(playlist != NULL);
 
     block_ChainLastAppend(&playlist->muxed_output.end, block);
+    playlist->muxed_output.length += length;
     return size;
 }
 
