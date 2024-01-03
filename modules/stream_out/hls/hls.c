@@ -487,8 +487,8 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
     return segment;
 }
 
-static void ExtractAndAddSegment(hls_playlist_t *playlist,
-                                 vlc_tick_t max_segment_length)
+static int ExtractAndAddSegment(hls_playlist_t *playlist,
+                                vlc_tick_t max_segment_length)
 {
     hls_block_chain_t segment = ExtractSegment(playlist, max_segment_length);
 
@@ -508,14 +508,14 @@ static void ExtractAndAddSegment(hls_playlist_t *playlist,
         vlc_error(playlist->logger,
                   "Segment '%u' creation failed",
                   playlist->segments.total_segments + 1);
-        return;
+        return status;
     }
 
     vlc_debug(playlist->logger,
               "Segment '%u' created",
               playlist->segments.total_segments);
 
-    UpdatePlaylistManifest(playlist);
+    return UpdatePlaylistManifest(playlist);
 }
 
 static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
