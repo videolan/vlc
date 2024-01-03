@@ -316,6 +316,9 @@ static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
+    if ( p_dec->fmt_in->i_cat != VIDEO_ES )
+        return VLC_ENOTSUP;
+
     int ret = OpenCommon( p_dec );
     if( ret == VLC_SUCCESS )
     {
