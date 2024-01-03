@@ -145,8 +145,6 @@ typedef struct
     httpd_url_t *http_manifest;
 
     vlc_tick_t first_pcr;
-    vlc_tick_t last_pcr;
-    vlc_tick_t last_segment;
 
     size_t current_memory_cached;
 } sout_stream_sys_t;
@@ -542,13 +540,34 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
         }
     }
 
-    hls_playlist_t *playlist = NULL;
-    hls_playlists_foreach(playlist)
-        if (playlist->access == access) break;
-    assert(playlist != NULL);
+    bool segments_ready = true;
+    hls_playlist_t *it;
+    hls_playlists_foreach(it)
+    {
+        /* Append the muxed output to the playlist tied to this access call. */
+        if (it->access == access)
+        {
+            block_ChainLastAppend(&it->muxed_output.end, block);
+            it->muxed_output.length += length;
+        }
 
-    block_ChainLastAppend(&playlist->muxed_output.end, block);
-    playlist->muxed_output.length += length;
+        /* Check if muxed outputs have enough data to output a segment. */
+        if (it->muxed_output.length < sys->config.segment_length)
+        {
+            segments_ready = false;
+        }
+    }
+
+
+    if (segments_ready)
+    {
+        hls_playlists_foreach (it)
+        {
+            if (ExtractAndAddSegment(it, sys->config.segment_length) !=
+                VLC_SUCCESS)
+                return -1;
+        }
+    }
     return size;
 }
 
@@ -819,41 +838,15 @@ static int Send(sout_stream_t *stream, void *id, vlc_frame_t *frame)
     (void)stream;
 }
 
-/**
- * PCR events are used to have a reliable stream time status. Segmenting is done
- * after a PCR testifying that we are above the segment limit arrives.
- */
+/** PCR events are used to have a reliable stream time status. */
 static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
 {
     sout_stream_sys_t *sys = stream->p_sys;
-
-    const vlc_tick_t last_pcr = sys->last_pcr;
-    sys->last_pcr = pcr;
 
     if (sys->first_pcr == VLC_TICK_INVALID)
     {
         sys->first_pcr = pcr;
         return;
-    }
-
-    const vlc_tick_t stream_time = pcr - sys->first_pcr;
-    const vlc_tick_t current_seglen = stream_time - sys->last_segment;
-
-    const vlc_tick_t pcr_gap = pcr - last_pcr;
-    /* PCR and segment length aren't necessarily aligned. Testing segment length
-     * with a **next** PCR  approximation will avoid piling up data:
-     *
-     * |------x#|-----x##|----x###| time
-     * ^ PCR  ^ Segment end     ^ Buffer expanding
-     *
-     * The segments are then a little shorter than they could be.
-     */
-    if (current_seglen + pcr_gap >= sys->config.segment_length)
-    {
-        hls_playlist_t *playlist;
-        hls_playlists_foreach (playlist)
-            ExtractAndAddSegment(playlist, sys->config.segment_length);
-        sys->last_segment = stream_time;
     }
 }
 
@@ -997,8 +990,6 @@ static int Open(vlc_object_t *this)
     vlc_list_init(&sys->media_playlists);
 
     sys->first_pcr = VLC_TICK_INVALID;
-    sys->last_pcr = VLC_TICK_INVALID;
-    sys->last_segment = 0;
 
     sys->current_memory_cached = 0;
 
