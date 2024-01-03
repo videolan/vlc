@@ -520,33 +520,36 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
 
 static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
 {
-    hls_playlist_t *playlist = access->p_sys;
+    sout_stream_sys_t *sys = access->p_sys;
 
     size_t size = 0;
     block_ChainProperties(block, NULL, &size, NULL);
 
-    if (hls_config_IsMemStorageEnabled(playlist->config))
+    if (hls_config_IsMemStorageEnabled(&sys->config))
     {
-        *playlist->current_memory_cached_ref += size;
-        if (*playlist->current_memory_cached_ref >=
-            playlist->config->max_memory)
+        sys->current_memory_cached += size;
+        if (sys->current_memory_cached >= sys->config.max_memory)
         {
             msg_Err(access,
                     "Maximum memory capacity (%zuKb) for segment storage was "
                     "reached. The HLS server will stop creating segments. "
                     "Please refer to the max-memory option for more info.",
-                    BYTES_TO_KB(playlist->config->max_memory));
+                    BYTES_TO_KB(sys->config.max_memory));
             block_ChainRelease(block);
             return -1;
         }
     }
 
+    hls_playlist_t *playlist = NULL;
+    hls_playlists_foreach(playlist)
+        if (playlist->access == access) break;
+    assert(playlist != NULL);
+
     block_ChainLastAppend(&playlist->muxed_output.end, block);
     return size;
 }
 
-static sout_access_out_t *CreateAccessOut(sout_stream_t *stream,
-                                          hls_playlist_t *sys)
+static sout_access_out_t *CreateAccessOut(sout_stream_t *stream)
 {
     sout_access_out_t *access = vlc_object_create(stream, sizeof(*access));
     if (unlikely(access == NULL))
@@ -561,7 +564,7 @@ static sout_access_out_t *CreateAccessOut(sout_stream_t *stream,
 
     access->p_cfg = NULL;
     access->p_module = NULL;
-    access->p_sys = sys;
+    access->p_sys = stream->p_sys;
     access->psz_path = NULL;
 
     access->pf_control = NULL;
@@ -603,7 +606,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
     if (unlikely(playlist == NULL))
         return NULL;
 
-    playlist->access = CreateAccessOut(stream, playlist);
+    playlist->access = CreateAccessOut(stream);
     if (unlikely(playlist->access == NULL))
         goto access_err;
 
