@@ -4360,22 +4360,20 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             case VLC_CODEC_AMR_WB:
                 i_max_v0_samples = 16;
                 break;
-            case VLC_CODEC_MPGA:
-            case VLC_CODEC_MP2:
-            case VLC_CODEC_MP3:
-            case VLC_CODEC_DTS:
-            case VLC_CODEC_MP4A:
-            case VLC_CODEC_A52:
-            case VLC_CODEC_OPUS:
-                i_max_v0_samples = 1;
-                break;
-                /* fixme, reverse using a list of uncompressed codecs */
             default:
-                /* Read 25ms of samples (uncompressed) */
-                i_max_v0_samples = p_track->fmt.audio.i_rate / 40 *
-                                   p_track->fmt.audio.i_channels;
-                if( i_max_v0_samples < 1 )
+                if( aout_BitsPerSample(p_track->fmt.i_codec) )
+                {
+                    /* Read 25ms of samples (uncompressed) */
+                    i_max_v0_samples = p_track->fmt.audio.i_rate / 40 *
+                                       p_track->fmt.audio.i_channels;
+                    if( i_max_v0_samples < 1 )
+                        i_max_v0_samples = 1;
+                }
+                else
+                {
+                    /* compressed codecs */
                     i_max_v0_samples = 1;
+                }
                 break;
         }
 
