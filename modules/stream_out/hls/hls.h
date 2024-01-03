@@ -50,4 +50,9 @@ hls_config_IsMemStorageEnabled(const struct hls_config *config)
     return config->outdir == NULL;
 }
 
+struct hls_sub_segmenter;
+sout_mux_t *CreateSubtitleSegmenter(sout_access_out_t *access,
+                                    const struct hls_config *config);
+void hls_sub_segmenter_SignalStreamUpdate(sout_mux_t *, vlc_tick_t);
+
 #endif
