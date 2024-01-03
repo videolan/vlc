@@ -462,18 +462,17 @@ static int UpdatePlaylistManifest(hls_playlist_t *playlist)
     return VLC_SUCCESS;
 }
 
-static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
+static hls_block_chain_t ExtractSegment(hls_block_chain_t *muxed_output,
                                         vlc_tick_t max_segment_length)
 {
-    hls_block_chain_t segment = {.begin = playlist->muxed_output.begin};
+    hls_block_chain_t segment = {.begin = muxed_output->begin};
 
     block_t *prev = NULL;
-    for (block_t *it = playlist->muxed_output.begin; it != NULL;
-         it = it->p_next)
+    for (block_t *it = muxed_output->begin; it != NULL; it = it->p_next)
     {
         if (segment.length + it->i_length > max_segment_length)
         {
-            playlist->muxed_output.begin = it;
+            muxed_output->begin = it;
 
             if (prev != NULL)
                 prev->p_next = NULL;
@@ -483,14 +482,15 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist,
         prev = it;
     }
 
-    hls_block_chain_Reset(&playlist->muxed_output);
+    hls_block_chain_Reset(muxed_output);
     return segment;
 }
 
 static int ExtractAndAddSegment(hls_playlist_t *playlist,
                                 vlc_tick_t max_segment_length)
 {
-    hls_block_chain_t segment = ExtractSegment(playlist, max_segment_length);
+    hls_block_chain_t segment =
+        ExtractSegment(&playlist->muxed_output, max_segment_length);
 
     if (hls_config_IsMemStorageEnabled(playlist->config) &&
         hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
