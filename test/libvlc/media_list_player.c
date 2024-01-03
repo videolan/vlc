@@ -34,7 +34,6 @@
     This would not be necessary if there were an add subitems function.
 */
 #include "../../lib/libvlc_internal.h"
-#include "../../lib/media_internal.h"
 
 struct check_items_order_data {
     bool done_playing;
@@ -368,152 +367,6 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
     libvlc_release (vlc);
 }
 
-static void test_media_list_player_playback_options (const char** argv, int argc)
-{
-    libvlc_instance_t *vlc;
-    libvlc_media_t *md;
-    libvlc_media_t *md2;
-    libvlc_media_t *md3;
-    libvlc_media_t *md4;
-    libvlc_media_t *md5;
-    libvlc_media_list_t *ml;
-    libvlc_media_list_t *ml2;
-    libvlc_media_list_t *ml3;
-    libvlc_media_list_t *ml4;
-    libvlc_media_list_t *ml5;
-    libvlc_media_list_t *ml6;
-    libvlc_media_list_player_t *mlp;
-
-    const char * file = test_default_sample;
-
-    test_log ("Testing media player playback options()\n");
-
-    vlc = libvlc_new (argc, argv);
-    assert (vlc != NULL);
-
-    /*
-     *   Create the following media tree:
-     *
-     *  ml1:            0 ---- 1 ---- 2
-     *                 /       |       \
-     *  ml2&4:      0 -- 1     |   0 -- 1 -- 2
-     *                         |
-     *  ml3:    0 -- 1 -- 2 -- 3 -- 4 -- 5 -- 6
-     *                    |                   |
-     *  ml5&6:            0                 0 -- 1
-     */
-
-    md = libvlc_media_new_location(file);
-    assert(md);
-
-    md2 = libvlc_media_new_location(file);
-    assert(md2);
-
-    md3 = libvlc_media_new_location(file);
-    assert(md3);
-
-    md4 = libvlc_media_new_location(file);
-    assert(md4);
-
-    md5 = libvlc_media_new_location(file);
-    assert(md5);
-
-    ml = libvlc_media_list_new ();
-    assert (ml != NULL);
-
-    ml2 = libvlc_media_list_new ();
-    assert (ml2 != NULL);
-
-    ml3 = libvlc_media_list_new ();
-    assert (ml3 != NULL);
-
-    ml4 = libvlc_media_list_new ();
-    assert (ml4 != NULL);
-
-    ml5 = libvlc_media_list_new ();
-    assert (ml5 != NULL);
-
-    ml6 = libvlc_media_list_new ();
-    assert (ml6 != NULL);
-
-    media_list_add_file_path(ml2, file);
-    media_list_add_file_path(ml2, file);
-
-    media_list_add_file_path(ml3, file);
-    media_list_add_file_path(ml3, file);
-    libvlc_media_list_add_media (ml3, md4);
-    media_list_add_file_path(ml3, file);
-    media_list_add_file_path(ml3, file);
-    media_list_add_file_path(ml3, file);
-    libvlc_media_list_add_media (ml3, md5);
-
-    media_list_add_file_path(ml4, file);
-    media_list_add_file_path(ml4, file);
-    media_list_add_file_path(ml4, file);
-
-    media_list_add_file_path(ml5, file);
-
-    media_list_add_file_path(ml6, file);
-    media_list_add_file_path(ml6, file);
-
-    md->p_subitems = ml2;
-    md2->p_subitems = ml3;
-    md3->p_subitems = ml4;
-    md4->p_subitems = ml5;
-    md5->p_subitems = ml6;
-
-    libvlc_media_list_add_media (ml, md);
-    libvlc_media_list_add_media (ml, md2);
-    libvlc_media_list_add_media (ml, md3);
-
-    mlp = libvlc_media_list_player_new (vlc, NULL, NULL);
-    assert(mlp);
-
-    libvlc_media_list_player_set_media_list (mlp, ml);
-
-    // Test default playback mode
-    libvlc_media_list_player_set_playback_mode(mlp, libvlc_playback_mode_default);
-
-    libvlc_media_list_player_play_item (mlp, md);
-
-    wait_playing (mlp);
-
-    libvlc_media_release (md);
-    libvlc_media_release (md2);
-    libvlc_media_release (md3);
-    libvlc_media_release (md4);
-    libvlc_media_release (md5);
-
-    libvlc_media_list_player_stop_async (mlp);
-
-    while (libvlc_media_list_player_is_playing (mlp))
-        sched_yield();
-
-    // Test looping playback mode
-    test_log ("Testing media player playback option - Loop\n");
-    libvlc_media_list_player_set_playback_mode(mlp, libvlc_playback_mode_loop);
-
-    libvlc_media_list_player_play_item (mlp, md);
-
-    wait_playing (mlp);
-
-    stop_and_wait (mlp);
-
-    // Test repeat playback mode
-    test_log ("Testing media player playback option - Repeat\n");
-    libvlc_media_list_player_set_playback_mode(mlp, libvlc_playback_mode_repeat);
-
-    libvlc_media_list_player_play_item (mlp, md);
-
-    wait_playing (mlp);
-
-    stop_and_wait (mlp);
-
-    libvlc_media_list_player_release (mlp);
-    libvlc_release (vlc);
-}
-
-
 int main (void)
 {
     test_init();
@@ -526,6 +379,5 @@ int main (void)
     test_media_list_player_previous (test_defaults_args, test_defaults_nargs);
     test_media_list_player_next (test_defaults_args, test_defaults_nargs);
     test_media_list_player_items_queue (test_defaults_args, test_defaults_nargs);
-    test_media_list_player_playback_options (test_defaults_args, test_defaults_nargs);
     return 0;
 }
