@@ -148,7 +148,10 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     /* Allocate structure */
     p_aout->sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->sys == NULL )
+    {
+        free( psz_name );
         return VLC_ENOMEM;
+    }
 
     if( !strcmp( psz_name, "-" ) )
         p_aout->sys->p_file = stdout;
