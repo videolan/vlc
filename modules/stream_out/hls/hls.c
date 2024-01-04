@@ -629,8 +629,13 @@ static void DeletePlaylist(hls_playlist_t *playlist)
 static hls_playlist_t *AddPlaylist(sout_stream_t *stream, struct vlc_list *head)
 {
     hls_playlist_t *variant = CreatePlaylist(stream);
-    if (variant != NULL)
-        vlc_list_append(&variant->node, head);
+    if (variant == NULL)
+        return NULL;
+
+    vlc_list_append(&variant->node, head);
+
+    sout_stream_sys_t *sys = stream->p_sys;
+    ++sys->playlist_created_count;
     return variant;
 }
 
@@ -657,8 +662,6 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 
     if (playlist == NULL)
         return NULL;
-
-    ++sys->playlist_created_count;
 
     sout_input_t *input = sout_MuxAddStream(playlist->mux, fmt);
     if (input == NULL)
