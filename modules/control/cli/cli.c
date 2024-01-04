@@ -878,6 +878,7 @@ static int Activate( vlc_object_t *p_this )
         if (len >= sizeof (addr.sun_path))
         {
             msg_Err( p_intf, "rc-unix value is longer than expected" );
+            free(psz_unix_path);
             goto error;
         }
         memcpy(addr.sun_path, psz_unix_path, len + 1);
