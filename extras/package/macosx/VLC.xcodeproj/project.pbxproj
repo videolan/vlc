@@ -114,11 +114,17 @@
 		53A1F1172AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A1F1162AB7168000686BAA /* VLCLibraryAllAudioGroupsMediaLibraryItem.m */; };
 		53B40FD72AA878E400C814E4 /* VLCLibraryHeroView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B40FD62AA878E400C814E4 /* VLCLibraryHeroView.m */; };
 		53B447CA2939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */; };
+<<<<<<< HEAD
 		53B447F6293BB47B00857588 /* VLCLibraryVideoCollectionViewContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */; };
 		53B447F7293BB47B00857588 /* VLCLibraryVideoContainerViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447ED293BB47A00857588 /* VLCLibraryVideoContainerViewDataSource.m */; };
 		53B447F8293BB47B00857588 /* VLCLibraryVideoCollectionViewsStackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447EF293BB47A00857588 /* VLCLibraryVideoCollectionViewsStackViewController.m */; };
+=======
+>>>>>>> 5c85b45abe (macosx: Move video container into home library folder, rename appropriately)
 		53B447F9293BB47B00857588 /* VLCLibraryVideoDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447F3293BB47A00857588 /* VLCLibraryVideoDataSource.m */; };
 		53B447FA293BB47B00857588 /* VLCLibraryVideoGroupDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B447F4293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.m */; };
+		53C1EF8B2B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C1EF852B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m */; };
+		53C1EF8C2B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C1EF862B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m */; };
+		53C1EF8D2B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C1EF892B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.m */; };
 		53ED472329C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */; };
 		53ED472629C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472529C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m */; };
 		53ED472B29C8FF9D00795DB1 /* VLCLibraryAlbumTracksTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472A29C8FF9D00795DB1 /* VLCLibraryAlbumTracksTableViewDelegate.m */; };
@@ -351,17 +357,28 @@
 		53B40FD62AA878E400C814E4 /* VLCLibraryHeroView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHeroView.m; sourceTree = "<group>"; };
 		53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySongsTableViewSongPlayingTableCellView.h; sourceTree = "<group>"; };
 		53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySongsTableViewSongPlayingTableCellView.m; sourceTree = "<group>"; };
+<<<<<<< HEAD
 		53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewContainerView.m; sourceTree = "<group>"; };
 		53B447ED293BB47A00857588 /* VLCLibraryVideoContainerViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoContainerViewDataSource.m; sourceTree = "<group>"; };
+=======
+>>>>>>> 5c85b45abe (macosx: Move video container into home library folder, rename appropriately)
 		53B447EE293BB47A00857588 /* VLCLibraryVideoDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoDataSource.h; sourceTree = "<group>"; };
-		53B447EF293BB47A00857588 /* VLCLibraryVideoCollectionViewsStackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewsStackViewController.m; sourceTree = "<group>"; };
 		53B447F0293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoGroupDescriptor.h; sourceTree = "<group>"; };
+<<<<<<< HEAD
 		53B447F1293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoCollectionViewContainerView.h; sourceTree = "<group>"; };
 		53B447F2293BB47A00857588 /* VLCLibraryVideoContainerViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoContainerViewDataSource.h; sourceTree = "<group>"; };
+=======
+>>>>>>> 5c85b45abe (macosx: Move video container into home library folder, rename appropriately)
 		53B447F3293BB47A00857588 /* VLCLibraryVideoDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoDataSource.m; sourceTree = "<group>"; };
 		53B447F4293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoGroupDescriptor.m; sourceTree = "<group>"; };
-		53B447F5293BB47B00857588 /* VLCLibraryVideoCollectionViewsStackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoCollectionViewsStackViewController.h; sourceTree = "<group>"; };
 		53BFB1E02A6A72160065EA7A /* VLCLibraryAudioGroupHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryAudioGroupHeaderView.xib; sourceTree = "<group>"; };
+		53C1EF842B466B13001AEEF5 /* VLCLibraryHomeViewContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewContainerView.h; sourceTree = "<group>"; };
+		53C1EF852B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewVideoGridContainerView.m; sourceTree = "<group>"; };
+		53C1EF862B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeStackViewController.m; sourceTree = "<group>"; };
+		53C1EF872B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewVideoGridContainerViewDataSource.h; sourceTree = "<group>"; };
+		53C1EF882B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewVideoGridContainerView.h; sourceTree = "<group>"; };
+		53C1EF892B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewVideoGridContainerViewDataSource.m; sourceTree = "<group>"; };
+		53C1EF8A2B466B13001AEEF5 /* VLCLibraryHomeStackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeStackViewController.h; sourceTree = "<group>"; };
 		53ED472129C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioTableViewDelegate.h; sourceTree = "<group>"; };
 		53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioTableViewDelegate.m; sourceTree = "<group>"; };
 		53ED472429C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioGroupTableViewDelegate.h; sourceTree = "<group>"; };
@@ -1452,8 +1469,15 @@
 		5350E4EB2B1B210E00F276CB /* home-library */ = {
 			isa = PBXGroup;
 			children = (
+				53C1EF8A2B466B13001AEEF5 /* VLCLibraryHomeStackViewController.h */,
+				53C1EF862B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m */,
+				53C1EF842B466B13001AEEF5 /* VLCLibraryHomeViewContainerView.h */,
 				5350E4EC2B1B21A700F276CB /* VLCLibraryHomeViewController.h */,
 				5350E4ED2B1B21A700F276CB /* VLCLibraryHomeViewController.m */,
+				53C1EF882B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.h */,
+				53C1EF852B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m */,
+				53C1EF872B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.h */,
+				53C1EF892B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.m */,
 			);
 			path = "home-library";
 			sourceTree = "<group>";
@@ -1463,6 +1487,7 @@
 			children = (
 				536EFC37295E521600F4CB13 /* VLCLibraryVideoViewController.h */,
 				536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */,
+<<<<<<< HEAD
 				53F3997E2AC6D67F00B86241 /* VLCLibraryVideoCarouselViewContainerView.h */,
 				53F3997F2AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m */,
 				53B447F1293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.h */,
@@ -1471,6 +1496,8 @@
 				53B447ED293BB47A00857588 /* VLCLibraryVideoContainerViewDataSource.m */,
 				53B447F5293BB47B00857588 /* VLCLibraryVideoCollectionViewsStackViewController.h */,
 				53B447EF293BB47A00857588 /* VLCLibraryVideoCollectionViewsStackViewController.m */,
+=======
+>>>>>>> 5c85b45abe (macosx: Move video container into home library folder, rename appropriately)
 				53B447F0293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.h */,
 				53B447F4293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.m */,
 				53B447EE293BB47A00857588 /* VLCLibraryVideoDataSource.h */,
@@ -2007,6 +2034,7 @@
 				1CCC88F72078A3D500E5626F /* ConvertAndSave.xib in Sources */,
 				1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */,
 				1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */,
+				53C1EF8B2B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m in Sources */,
 				1CCC88FB2078A3D500E5626F /* Help.xib in Sources */,
 				1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */,
 				1CCC88FD2078A3D500E5626F /* Open.xib in Sources */,
@@ -2083,6 +2111,7 @@
 				6BBB05E01EEFF165003A1019 /* VLCHUDTableCornerView.m in Sources */,
 				1C31139D1E508C6900D4DD76 /* VLCControlsBarCommon.m in Sources */,
 				7DD2F5C52081B73B007EE187 /* VLCRemoteControlService.m in Sources */,
+				53C1EF8D2B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerViewDataSource.m in Sources */,
 				1C31139F1E508C6900D4DD76 /* VLCMainWindowControlsBar.m in Sources */,
 				1C3113A11E508C6900D4DD76 /* VLCConvertAndSaveWindowController.m in Sources */,
 				5352B37629E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.m in Sources */,
@@ -2117,13 +2146,11 @@
 				6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */,
 				5350E4EE2B1B21A700F276CB /* VLCLibraryHomeViewController.m in Sources */,
 				1C3113C71E508C6900D4DD76 /* VLCOpenWindowController.m in Sources */,
-				53B447F8293BB47B00857588 /* VLCLibraryVideoCollectionViewsStackViewController.m in Sources */,
 				7D0F64062202047900FDB91F /* VLCLibraryCollectionViewItem.m in Sources */,
 				7D713D322201AE350042BEB7 /* VLCLibraryWindow.m in Sources */,
 				7D22A8F422BC14F80063ECD2 /* VLCLibrarySortingMenuController.m in Sources */,
 				1C3113C91E508C6900D4DD76 /* VLCOutput.m in Sources */,
 				1C1C62011F8260A90052DD4F /* VLCWrappableTextField.m in Sources */,
-				53B447F6293BB47B00857588 /* VLCLibraryVideoCollectionViewContainerView.m in Sources */,
 				6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */,
 				7D445D842202524D00263D34 /* VLCPlaylistItem.m in Sources */,
 				1C3113CF1E508C6900D4DD76 /* prefs_widgets.m in Sources */,
@@ -2138,7 +2165,10 @@
 				536283F8291146BC00640C15 /* VLCLibrarySongTableCellView.m in Sources */,
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,
 				53628403291147C500640C15 /* VLCSubScrollView.m in Sources */,
+<<<<<<< HEAD
 				53B447F7293BB47B00857588 /* VLCLibraryVideoContainerViewDataSource.m in Sources */,
+=======
+>>>>>>> 5c85b45abe (macosx: Move video container into home library folder, rename appropriately)
 				1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */,
 				7DF0994F23E71E76007CA6EE /* NSMenu+VLCAdditions.m in Sources */,
 				7D445D8B22032B9200263D34 /* VLCPlaylistTableView.m in Sources */,
@@ -2148,6 +2178,7 @@
 				6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */,
 				53F399802AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m in Sources */,
 				7DE2F0472282D5D10040DD0A /* VLCLibraryTableCellView.m in Sources */,
+				53C1EF8C2B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m in Sources */,
 				538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */,
 				7D2E0EDB20CD204D0033A221 /* VLCWindow.m in Sources */,
 				6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */,

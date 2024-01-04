@@ -25,19 +25,19 @@
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "views/iCarousel/iCarousel.h"
 
-@class VLCLibraryVideoCollectionViewContainerView;
+@class VLCLibraryHomeViewVideoGridContainerView;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
 
-@interface VLCLibraryVideoContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, iCarouselDataSource>
+@interface VLCLibraryHomeViewVideoContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) iCarousel *carouselView;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign) VLCLibraryVideoCollectionViewContainerView *parentCell;
+@property (readwrite, assign) VLCLibraryHomeViewVideoGridContainerView *parentCell;
 
 - (void)setup;
 - (void)reloadData;

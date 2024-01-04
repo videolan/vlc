@@ -32,10 +32,10 @@
 
 
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
-#import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
-#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
@@ -134,7 +134,7 @@
     NSUInteger i = VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
     for (; i <= VLCMediaLibraryParentGroupTypeVideoLibrary; ++i) {
-        NSView<VLCLibraryVideoViewContainerView> *containerView = [[VLCLibraryVideoCollectionViewContainerView alloc] init];
+        NSView<VLCLibraryVideoViewContainerView> * const containerView = [[VLCLibraryHomeViewVideoGridContainerView alloc] init];
         containerView.videoGroup = i;
         [mutableContainers addObject:containerView];
     }
@@ -185,7 +185,7 @@
 }
 
 - (void)setupContainerView:(NSView<VLCLibraryHomeViewContainerView> *)containerView
-              forStackView:(NSStackView *)stackView
+              withStackView:(NSStackView *)stackView
 {
     if (containerView == nil || stackView == nil) {
         return;
@@ -222,7 +222,7 @@
     NSParameterAssert(collectionsStackView);
 
     if (_collectionsStackView) {
-        for (NSView<VLCLibraryVideoViewContainerView> * const containerView in _containers) {
+        for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
             if (containerView.constraintsWithSuperview.count > 0) {
                 [_collectionsStackView removeConstraints:containerView.constraintsWithSuperview];
             }
@@ -241,7 +241,7 @@
     [self addView:self.heroView toStackView:_collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 
-    for (NSView<VLCLibraryVideoViewContainerView> * const containerView in _containers) {
+    for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];
     }
 }
@@ -252,9 +252,9 @@
 
     _collectionsStackViewScrollView = newScrollView;
 
-    for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
-            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+    for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
+            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
             collectionViewContainerView.scrollView.parentScrollView = _collectionsStackViewScrollView;
         }
     }
@@ -264,9 +264,9 @@
 {
     _collectionViewItemSize = collectionViewItemSize;
 
-     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
-            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+     for (NSView<VLCLibraryHomeViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
+            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
             collectionViewContainerView.collectionViewDelegate.staticItemSize = collectionViewItemSize;
         }
     }
@@ -276,9 +276,9 @@
 {
     _collectionViewSectionInset = collectionViewSectionInset;
 
-     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
-            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+     for (NSView<VLCLibraryHomeViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
+            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
             collectionViewContainerView.collectionViewLayout.sectionInset = collectionViewSectionInset;
         }
      }
@@ -288,9 +288,9 @@
 {
     _collectionViewMinimumLineSpacing = collectionViewMinimumLineSpacing;
 
-     for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
-            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+     for (NSView<VLCLibraryHomeViewContainerView> *containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
+            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
             collectionViewContainerView.collectionViewLayout.minimumLineSpacing = collectionViewMinimumLineSpacing;
         }
     }
@@ -300,9 +300,9 @@
 {
     _collectionViewMinimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
 
-    for (NSView<VLCLibraryVideoViewContainerView> *containerView in _containers) {
-        if ([containerView isKindOfClass:VLCLibraryVideoCollectionViewContainerView.class]) {
-            VLCLibraryVideoCollectionViewContainerView * const collectionViewContainerView = (VLCLibraryVideoCollectionViewContainerView *)containerView;
+    for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
+        if ([containerView isKindOfClass:VLCLibraryHomeViewVideoGridContainerView.class]) {
+            VLCLibraryHomeViewVideoGridContainerView * const collectionViewContainerView = (VLCLibraryHomeViewVideoGridContainerView *)containerView;
             collectionViewContainerView.collectionViewLayout.minimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
         }
     }
@@ -311,8 +311,12 @@
 
 - (NSView<VLCLibraryVideoViewContainerView> *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
 {
-    const NSUInteger index = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryVideoViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
-        return container.videoGroup == group;
+    const NSUInteger index = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryHomeViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
+        if ([container conformsToProtocol:@protocol(VLCLibraryVideoViewContainerView)]) {
+            NSView<VLCLibraryVideoViewContainerView> * const videoContainer = (NSView<VLCLibraryVideoViewContainerView> *)container;
+            return videoContainer.videoGroup == group;
+        }
+        return NO;
     }];
 
     if (index == NSNotFound) {
@@ -328,7 +332,9 @@
         return;
     }
 
+    // TODO: Make this work agnostically of video type
     NSView<VLCLibraryVideoViewContainerView> * const containerView = [self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
+
     if (containerView == nil) {
         return;
     }

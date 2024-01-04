@@ -38,7 +38,8 @@
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
-#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 

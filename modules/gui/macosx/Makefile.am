@@ -152,14 +152,14 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewContainerView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.m \
+    gui/macosx/library/home-library/VLCLibraryHomeViewVideoGridContainerView.h \
+    gui/macosx/library/home-library/VLCLibraryHomeViewVideoGridContainerView.m \
+    gui/macosx/library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h \
+    gui/macosx/library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCarouselViewContainerView.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCarouselViewContainerView.m \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.h \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.m \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.m \
-	gui/macosx/library/video-library/VLCLibraryVideoContainerViewDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
 	gui/macosx/library/video-library/VLCLibraryVideoDataSource.h \

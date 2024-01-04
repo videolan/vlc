@@ -30,7 +30,7 @@
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
-#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
@@ -265,9 +265,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
-
-    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoContainerViewDataSource class]]) {
-        VLCLibraryVideoContainerViewDataSource *videoDataSource = (VLCLibraryVideoContainerViewDataSource *)self.collectionView.dataSource;
+        
+    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryHomeViewVideoContainerViewDataSource class]]) {
+        VLCLibraryHomeViewVideoContainerViewDataSource *videoDataSource = (VLCLibraryHomeViewVideoContainerViewDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
 

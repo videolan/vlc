@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewContainerView.m: MacOS X interface module
+ * VLCLibraryHomeViewVideoGridContainerView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCollectionViewContainerView.h"
+#import "VLCLibraryHomeViewVideoGridContainerView.h"
 
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -29,11 +29,13 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 
-#import "library/video-library/VLCLibraryVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
 
-@implementation VLCLibraryVideoCollectionViewContainerView
+@implementation VLCLibraryHomeViewVideoGridContainerView
 
 @synthesize groupDescriptor = _groupDescriptor;
 @synthesize videoGroup = _videoGroup;
@@ -141,7 +143,7 @@
 
 - (void)setupDataSource
 {
-    _dataSource = [[VLCLibraryVideoContainerViewDataSource alloc] init];
+    _dataSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
     _dataSource.collectionView = _collectionView;
     [_dataSource setup];
 }

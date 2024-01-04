@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewContainerView.h: MacOS X interface module
+ * VLCLibraryHomeViewVideoGridContainerView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -29,10 +29,11 @@
 @class VLCSubScrollView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
+@class VLCLibraryVideoCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewContainerView : NSView<VLCLibraryVideoViewContainerView>
+@interface VLCLibraryHomeViewVideoGridContainerView : NSView<VLCLibraryVideoViewContainerView>
 
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;

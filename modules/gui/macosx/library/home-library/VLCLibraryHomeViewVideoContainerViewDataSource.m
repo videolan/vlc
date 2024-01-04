@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoContainerViewDataSource.m: MacOS X interface module
+ * VLCLibraryHomeViewVideoContainerViewDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoContainerViewDataSource.h"
+#import "VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -34,16 +34,16 @@
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryUIUnits.h"
 
+#import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
+
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
-#import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 
 #import "main/VLCMain.h"
 
 NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
 
-
-@interface VLCLibraryVideoContainerViewDataSource ()
+@interface VLCLibraryHomeViewVideoContainerViewDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     VLCLibraryModel *_libraryModel;
@@ -53,7 +53,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 @end
 
-@implementation VLCLibraryVideoContainerViewDataSource
+@implementation VLCLibraryHomeViewVideoContainerViewDataSource
 
 - (instancetype)init
 {
@@ -285,7 +285,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
     // TODO: Find a more elegant way to do this
-    VLCLibraryVideoCollectionViewContainerView * const containerView = (VLCLibraryVideoCollectionViewContainerView *)collectionView.superview.superview.superview;
+    VLCLibraryHomeViewVideoGridContainerView * const containerView = (VLCLibraryHomeViewVideoGridContainerView *)collectionView.superview.superview.superview;
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
 
     viewItem.representedItem = representedItem;
@@ -309,7 +309,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
         // TODO: Find a more elegant way to do this
-        VLCLibraryVideoCollectionViewContainerView * const containerView = (VLCLibraryVideoCollectionViewContainerView *)collectionView.superview.superview.superview;
+        VLCLibraryHomeViewVideoGridContainerView * const containerView = (VLCLibraryHomeViewVideoGridContainerView *)collectionView.superview.superview.superview;
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
