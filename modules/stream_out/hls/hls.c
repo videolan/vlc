@@ -67,7 +67,6 @@ typedef struct hls_playlist
 
     const struct hls_config *config;
     enum hls_playlist_type type;
-    size_t *current_memory_cached_ref;
 
     sout_access_out_t *access;
     sout_mux_t *mux;
@@ -524,16 +523,16 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
 }
 
 static int ExtractAndAddSegment(hls_playlist_t *playlist,
-                                vlc_tick_t max_segment_length)
+                                sout_stream_sys_t *sys)
 {
     hls_block_chain_t segment = ExtractSegment(playlist);
 
-    if (hls_config_IsMemStorageEnabled(playlist->config) &&
+    if (hls_config_IsMemStorageEnabled(&sys->config) &&
         hls_segment_queue_IsAtMaxCapacity(&playlist->segments))
     {
         const hls_segment_t *to_be_removed =
             hls_segment_GetFirst(&playlist->segments);
-        *playlist->current_memory_cached_ref -=
+        sys->current_memory_cached -=
             hls_storage_GetSize(to_be_removed->storage);
     }
 
@@ -614,8 +613,7 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     {
         hls_playlists_foreach (it)
         {
-            if (ExtractAndAddSegment(it, sys->config.segment_length) !=
-                VLC_SUCCESS)
+            if (ExtractAndAddSegment(it, sys) != VLC_SUCCESS)
                 return -1;
         }
     }
@@ -694,7 +692,6 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
     playlist->type = type;
     playlist->config = &sys->config;
     playlist->ended = false;
-    playlist->current_memory_cached_ref = &sys->current_memory_cached;
 
     playlist->url = FormatPlaylistManifestURL(playlist);
     if (unlikely(playlist->url == NULL))
@@ -880,7 +877,7 @@ static void Del(sout_stream_t *stream, void *id)
             map->playlist_ref = NULL;
 
         track->playlist_ref->ended = true;
-        ExtractAndAddSegment(track->playlist_ref, sys->config.segment_length);
+        ExtractAndAddSegment(track->playlist_ref, sys);
         UpdatePlaylistManifest(track->playlist_ref);
 
         DeletePlaylist(track->playlist_ref);
