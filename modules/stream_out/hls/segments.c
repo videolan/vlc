@@ -49,6 +49,8 @@ hls_segment_queue_GetFileExtension(enum hls_playlist_type type)
     {
         case HLS_PLAYLIST_TYPE_TS:
             return "ts";
+        case HLS_PLAYLIST_TYPE_WEBVTT:
+            return "vtt";
         default:
             vlc_assert_unreachable();
     }

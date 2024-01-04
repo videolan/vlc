@@ -55,6 +55,12 @@ static int FormatMP4A(struct vlc_memstream *ms, const es_format_t *fmt)
     return (wrote == -1) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
+static int FormatWebVTT(struct vlc_memstream *ms)
+{
+    const int written = vlc_memstream_puts(ms, "wvtt");
+    return (written <= 0) ? VLC_ENOMEM : VLC_SUCCESS;
+}
+
 int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
 {
     switch (fmt->i_codec)
@@ -63,6 +69,9 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
             return FormatAVC1(ms, fmt);
         case VLC_CODEC_MP4A:
             return FormatMP4A(ms, fmt);
+        case VLC_CODEC_TEXT:
+        case VLC_CODEC_WEBVTT:
+            return FormatWebVTT(ms);
         default:
             return VLC_ENOTSUP;
     }
@@ -70,5 +79,6 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
 
 bool hls_codec_IsSupported(const es_format_t *fmt)
 {
-    return fmt->i_codec == VLC_CODEC_H264 || fmt->i_codec == VLC_CODEC_MP4A;
+    return fmt->i_codec == VLC_CODEC_H264 || fmt->i_codec == VLC_CODEC_MP4A ||
+           fmt->i_codec == VLC_CODEC_TEXT || fmt->i_codec == VLC_CODEC_WEBVTT;
 }

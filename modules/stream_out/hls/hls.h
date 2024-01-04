@@ -23,6 +23,7 @@
 enum hls_playlist_type
 {
     HLS_PLAYLIST_TYPE_TS,
+    HLS_PLAYLIST_TYPE_WEBVTT,
 };
 
 struct hls_config
