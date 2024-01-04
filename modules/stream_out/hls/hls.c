@@ -930,7 +930,7 @@ static int Open(vlc_object_t *this)
         msg_Err(stream,
                 "At least one variant mapping needs to be specified with the "
                 "\"" SOUT_CFG_PREFIX "variants\" option");
-        goto error;
+        goto variant_error;
     }
     status = hls_variant_maps_Parse(variants, &sys->variant_stream_maps);
     free(variants);
@@ -940,7 +940,7 @@ static int Open(vlc_object_t *this)
             msg_Err(stream,
                     "Wrong variant mapping syntax. It should look like: "
                     "\"{id1,id2},{id3,id4},...\"");
-        goto error;
+        goto variant_error;
     }
 
     if (var_GetBool(stream, SOUT_CFG_PREFIX "host-http"))
@@ -989,6 +989,7 @@ static int Open(vlc_object_t *this)
     return VLC_SUCCESS;
 error:
     hls_variant_maps_Destroy(&sys->variant_stream_maps);
+variant_error:
     hls_config_Clean(&sys->config);
     free(sys);
     return status;
