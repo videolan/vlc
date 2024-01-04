@@ -57,6 +57,16 @@ public:
         : Parent(pub)
     {}
 
+    void validateCache() const
+    {
+        Q_Q(const MLBaseModel);
+
+        // this will cancel all queued up loadItemsTask and related ML specific operations
+        q->m_itemLoader = nullptr;
+
+        Parent::validateCache();
+    }
+
     virtual std::unique_ptr<ListCacheLoader<std::unique_ptr<MLItem>>> createLoader() const override
     {
         Q_Q(const MLBaseModel);

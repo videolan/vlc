@@ -142,7 +142,7 @@ protected:
 
 
     //loader used to load single items
-    std::shared_ptr<MLListCacheLoader> m_itemLoader;
+    mutable std::shared_ptr<MLListCacheLoader> m_itemLoader;
 
     friend class MLListCacheLoader;
 
