@@ -1,6 +1,6 @@
 # rav1e
 
-RAV1E_VERSION := 0.6.6
+RAV1E_VERSION := 0.7.1
 RAV1E_URL := https://crates.io/api/v1/crates/rav1e/$(RAV1E_VERSION)/download
 
 ifdef BUILD_RUST
