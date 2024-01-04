@@ -310,6 +310,7 @@ static int Activate( vlc_object_t *p_this )
             if( asprintf( &psz_backward_compat_host, "//%s", psz_host ) < 0 )
             {
                 free( psz_host );
+                free( psz_unix_path );
                 return VLC_EGENERIC;
             }
             free( psz_host );
@@ -326,6 +327,7 @@ static int Activate( vlc_object_t *p_this )
                       url.psz_host, url.i_port );
             vlc_UrlClean( &url );
             free( psz_host );
+            free( psz_unix_path );
             return VLC_EGENERIC;
         }
 
