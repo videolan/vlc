@@ -1156,6 +1156,17 @@ vlc_player_Start(vlc_player_t *player)
             player->started = true;
             return VLC_SUCCESS;
         }
+        else if (unlikely(player->media != NULL))
+        {
+            /* The current media is being stopped while the user requested to
+             * play it again. Tell the thread to play the same media when
+             * ready. */
+            player->started = true;
+            player->next_media = input_item_Hold(player->media);
+            player->releasing_media = false;
+            player->next_media_requested = true;
+            return VLC_SUCCESS;
+        }
         else
             return VLC_EGENERIC;
     }
