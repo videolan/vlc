@@ -139,7 +139,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     if( !psz_name )
     {
         msg_Err( p_aout, "you need to specify an output file name" );
-        free( psz_name );
         return VLC_EGENERIC;
     }
 
