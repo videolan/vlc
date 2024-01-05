@@ -32,10 +32,10 @@
 
 
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
-#import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
 
-#import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
@@ -107,7 +107,7 @@
     NSMutableArray<NSView<VLCLibraryVideoViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
 
     if (shouldShowRecentsContainer) {
-        _recentsView = [[VLCLibraryVideoCarouselViewContainerView alloc] init];
+        _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];
         self.recentsView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
 
         // Insert as last leading container

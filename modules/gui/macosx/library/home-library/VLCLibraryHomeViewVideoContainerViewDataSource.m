@@ -34,10 +34,10 @@
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryUIUnits.h"
 
+#import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
-#import "library/video-library/VLCLibraryVideoCarouselViewContainerView.h"
 
 #import "main/VLCMain.h"
 
@@ -366,7 +366,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     // TODO: Find a more elegant way to do this
-    VLCLibraryVideoCarouselViewContainerView * const containerView = (VLCLibraryVideoCarouselViewContainerView *)carousel.superview;
+    VLCLibraryHomeViewVideoCarouselContainerView * const containerView = (VLCLibraryHomeViewVideoCarouselContainerView *)carousel.superview;
 
     const id<VLCMediaLibraryItemProtocol> libraryItem = self.collectionArray[index];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem

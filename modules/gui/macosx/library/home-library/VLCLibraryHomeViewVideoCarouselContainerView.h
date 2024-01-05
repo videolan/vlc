@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCarouselViewContainerView.h: MacOS X interface module
+ * VLCLibraryHomeViewVideoCarouselContainerView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -27,7 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCarouselViewContainerView : NSView<VLCLibraryVideoViewContainerView, iCarouselDelegate>
+@interface VLCLibraryHomeViewVideoCarouselContainerView : NSView<VLCLibraryVideoViewContainerView, iCarouselDelegate>
 
 @property (readonly) NSTextField *titleView;
 @property (readonly) iCarousel *carouselView;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCarouselViewContainerView.m: MacOS X interface module
+ * VLCLibraryHomeViewVideoCarouselContainerView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCarouselViewContainerView.h"
+#import "VLCLibraryHomeViewVideoCarouselContainerView.h"
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -31,16 +31,15 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
-
 #import "views/iCarousel/iCarousel.h"
 
-@interface VLCLibraryVideoCarouselViewContainerView ()
+@interface VLCLibraryHomeViewVideoCarouselContainerView ()
 
 @property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;
 
 @end
 
-@implementation VLCLibraryVideoCarouselViewContainerView
+@implementation VLCLibraryHomeViewVideoCarouselContainerView
 
 @synthesize groupDescriptor = _groupDescriptor;
 @synthesize videoGroup = _videoGroup;

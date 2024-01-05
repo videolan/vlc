@@ -127,7 +127,7 @@
 		53ED473C29CBC64200795DB1 /* NSPasteboardItem+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED473B29CBC64200795DB1 /* NSPasteboardItem+VLCAdditions.m */; };
 		53F0E92D299B002300491D49 /* VLCInputNodePathControlItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F0E92C299B002300491D49 /* VLCInputNodePathControlItem.m */; };
 		53F0E930299B17DF00491D49 /* VLCInputNodePathControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F0E92F299B17DF00491D49 /* VLCInputNodePathControl.m */; };
-		53F399802AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F3997F2AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m */; };
+		53F399802AC6D6B400B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F3997F2AC6D6B400B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
 		6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */; };
@@ -381,8 +381,8 @@
 		53F0E92E299B17DF00491D49 /* VLCInputNodePathControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCInputNodePathControl.h; sourceTree = "<group>"; };
 		53F0E92F299B17DF00491D49 /* VLCInputNodePathControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCInputNodePathControl.m; sourceTree = "<group>"; };
 		53F3997D2AC6D50500B86241 /* VLCLibraryVideoViewContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoViewContainerView.h; sourceTree = "<group>"; };
-		53F3997E2AC6D67F00B86241 /* VLCLibraryVideoCarouselViewContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoCarouselViewContainerView.h; sourceTree = "<group>"; };
-		53F3997F2AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCarouselViewContainerView.m; sourceTree = "<group>"; };
+		53F3997E2AC6D67F00B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewVideoCarouselContainerView.h; sourceTree = "<group>"; };
+		53F3997F2AC6D6B400B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewVideoCarouselContainerView.m; sourceTree = "<group>"; };
 		5CCED71014C0D4A90057F8D1 /* VLCExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCExtensionsDialogProvider.h; sourceTree = "<group>"; };
 		5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCExtensionsDialogProvider.m; sourceTree = "<group>"; };
 		5CCED71214C0D4A90057F8D1 /* VLCExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCExtensionsManager.h; sourceTree = "<group>"; };
@@ -1462,6 +1462,8 @@
 				5350E4ED2B1B21A700F276CB /* VLCLibraryHomeViewController.m */,
 				53C1EF882B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.h */,
 				53C1EF852B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m */,
+				53F3997E2AC6D67F00B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.h */,
+				53F3997F2AC6D6B400B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.m */,
 			);
 			path = "home-library";
 			sourceTree = "<group>";
@@ -1471,8 +1473,6 @@
 			children = (
 				536EFC37295E521600F4CB13 /* VLCLibraryVideoViewController.h */,
 				536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */,
-				53F3997E2AC6D67F00B86241 /* VLCLibraryVideoCarouselViewContainerView.h */,
-				53F3997F2AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m */,
 				53B447F0293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.h */,
 				53B447F4293BB47A00857588 /* VLCLibraryVideoGroupDescriptor.m */,
 				53B447EE293BB47A00857588 /* VLCLibraryVideoDataSource.h */,
@@ -2147,7 +2147,7 @@
 				1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */,
 				7DFBDCC4226E445500B700A5 /* VLCMediaSourceBaseDataSource.m in Sources */,
 				6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */,
-				53F399802AC6D6B400B86241 /* VLCLibraryVideoCarouselViewContainerView.m in Sources */,
+				53F399802AC6D6B400B86241 /* VLCLibraryHomeViewVideoCarouselContainerView.m in Sources */,
 				7DE2F0472282D5D10040DD0A /* VLCLibraryTableCellView.m in Sources */,
 				53C1EF8C2B466B13001AEEF5 /* VLCLibraryHomeStackViewController.m in Sources */,
 				538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */,
