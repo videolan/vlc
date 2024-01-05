@@ -1150,6 +1150,16 @@ fail:
     return VLC_EGENERIC;
 }
 
+static void server_info_cb(pa_context *ctx, const pa_server_info *info,
+                           void *userdata)
+{
+    audio_output_t *aout = userdata;
+
+    msg_Dbg(aout, "server %s version %s on %s@%s", info->server_name,
+            info->server_version, info->user_name, info->host_name);
+    (void) ctx;
+}
+
 /**
  * Removes a PulseAudio playback stream
  */
@@ -1216,6 +1226,10 @@ static int Open(vlc_object_t *obj)
     aout->device_select = StreamMove;
 
     pa_threaded_mainloop_lock(sys->mainloop);
+    op = pa_context_get_server_info(sys->context, server_info_cb, aout);
+    if (likely(op != NULL))
+        pa_operation_unref(op);
+
     /* Sinks (output devices) list */
     op = pa_context_get_sink_info_list(sys->context, sink_add_cb, aout);
     if (likely(op != NULL))
