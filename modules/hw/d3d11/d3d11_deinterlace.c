@@ -292,6 +292,7 @@ int D3D11OpenDeinterlace(filter_t *filter)
     }
     if (psz_mode == NULL || strcmp(p_mode->psz_mode, psz_mode))
         msg_Dbg(filter, "using %s deinterlacing mode", p_mode->psz_mode);
+    free(psz_mode);
 
     D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
     for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
