@@ -4258,6 +4258,22 @@ static inline uint32_t MP4_GetAudioFrameInfo( const mp4_track_t *p_track,
         i_samples_per_frame = p_soun->i_constLPCMframesperaudiopacket;
         i_bytes_per_frame = p_soun->i_constbytesperaudiopacket;
     }
+
+    /* handle v0 or v1 MPGA having bytesperssample and samplesize and
+     * compression being 0.
+     * ends up reading samplesperframe instead of the number of
+     * stored samples units */
+    if( p_soun->i_compressionid == 0 && p_soun->i_qt_version <= 1 &&
+        p_track->i_sample_size > 0 &&
+        (
+            p_track->fmt.i_codec == VLC_CODEC_MP3 ||
+            p_track->fmt.i_codec == VLC_CODEC_MP2 ||
+            p_track->fmt.i_codec == VLC_CODEC_MPGA
+        ) )
+    {
+        i_bytes_per_frame = 0;
+    }
+
 #ifdef MP4_DEBUG_AUDIO_SAMPLES
     printf("qtv%d comp%x ss %d chan %d ba %d spp %d bpf %d / %d %d\n",
            p_soun->i_qt_version, p_soun->i_compressionid,
