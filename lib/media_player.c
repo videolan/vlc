@@ -44,6 +44,7 @@
 #include "libvlc_internal.h"
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
+#include "picture_internal.h"
 
 #define ES_INIT (-2) /* -1 is reserved for ES deselect */
 
@@ -435,6 +436,33 @@ on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
 }
 
 static void
+on_media_attachments_added(vlc_player_t *player, input_item_t *media,
+                           input_attachment_t *const *array, size_t count,
+                           void *data)
+{
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+
+    input_item_t *current = mp->p_md ? mp->p_md->p_input_item : NULL;
+    if (media == current && mp->cbs != NULL
+     && mp->cbs->on_media_attachments_added != NULL)
+    {
+        libvlc_picture_list_t *list =
+            libvlc_picture_list_from_attachments(array, count);
+        if (list == NULL)
+            return;
+        if (libvlc_picture_list_count(list) == 0)
+        {
+            libvlc_picture_list_destroy(list);
+            return;
+        }
+        mp->cbs->on_media_attachments_added(mp->cbs_opaque, mp->p_md, list);
+        libvlc_picture_list_destroy(list);
+    }
+}
+
+static void
 on_cork_changed(vlc_player_t *player, unsigned cork_count, void *data)
 {
     (void) player;
@@ -536,6 +564,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_chapter_selection_changed = on_chapter_selection_changed,
     .on_media_meta_changed = on_media_meta_changed,
     .on_media_subitems_changed = on_media_subitems_changed,
+    .on_media_attachments_added = on_media_attachments_added,
     .on_cork_changed = on_cork_changed,
     .on_vout_changed = on_vout_changed,
     .on_recording_changed = on_recording_changed,

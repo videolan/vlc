@@ -44,6 +44,7 @@ typedef struct libvlc_media_tracklist_t libvlc_media_tracklist_t;
 typedef enum libvlc_track_type_t libvlc_track_type_t;
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 typedef enum libvlc_state_t libvlc_state_t;
+typedef struct libvlc_picture_list_t libvlc_picture_list_t;
 
 /** \defgroup libvlc_media_player LibVLC media player
  * \ingroup libvlc
@@ -488,6 +489,23 @@ struct libvlc_media_player_cbs
      */
     void (*on_media_subitems_changed)( void *opaque, libvlc_media_t *media );
 
+
+    /**
+     * Callback protootype that notify when the player added new attachments to
+     * the current media.
+     *
+     * \note It can be called several times for one playback. The array
+     * contains only new elements after a second call.
+     * Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param media media being played/parsed
+     * \param list list of pictures, the list is only valid from this callback,
+     * each pictures can be held separatly with libvlc_picture_retain().
+     */
+    void (*on_media_attachments_added)( void *opaque, libvlc_media_t *media,
+                                        libvlc_picture_list_t *list );
 
     /**
      * Callback prototype that notify when a new player vout is added or removed
