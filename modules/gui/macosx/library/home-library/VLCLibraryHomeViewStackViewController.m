@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryHomeStackViewController.h"
+#import "VLCLibraryHomeViewStackViewController.h"
 
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -43,14 +43,14 @@
 
 #import "views/VLCSubScrollView.h"
 
-@interface VLCLibraryHomeStackViewController()
+@interface VLCLibraryHomeViewStackViewController()
 {
     NSArray<NSView<VLCLibraryVideoViewContainerView> *> *_containers;
     NSUInteger _leadingContainerCount;
 }
 @end
 
-@implementation VLCLibraryHomeStackViewController
+@implementation VLCLibraryHomeViewStackViewController
 
 - (instancetype)init
 {

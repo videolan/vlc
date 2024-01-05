@@ -33,7 +33,7 @@
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
-#import "library/home-library/VLCLibraryHomeStackViewController.h"
+#import "library/home-library/VLCLibraryHomeViewStackViewController.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/video-library/VLCLibraryVideoDataSource.h"
@@ -94,7 +94,7 @@
 
 - (void)setupGridViewController
 {
-    _stackViewController = [[VLCLibraryHomeStackViewController alloc] init];
+    _stackViewController = [[VLCLibraryHomeViewStackViewController alloc] init];
     self.stackViewController.collectionsStackViewScrollView = _homeLibraryStackViewScrollView;
     self.stackViewController.collectionsStackView = _homeLibraryStackView;
 }
