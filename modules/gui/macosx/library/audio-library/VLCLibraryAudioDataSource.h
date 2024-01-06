@@ -65,6 +65,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, assign) NSTableView *collectionSelectionTableView;
 @property (readwrite, assign) NSTableView *songsTableView;
 @property (readwrite, assign) NSCollectionView *collectionView;
+@property (readwrite, assign) iCarousel *carouselView;
 @property (readwrite, assign) NSTableView *gridModeListTableView;
 
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;

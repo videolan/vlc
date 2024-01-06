@@ -518,6 +518,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             [self.gridModeListTableView reloadData];
             [self.collectionSelectionTableView reloadData];
             [self.songsTableView reloadData];
+            [self.carouselView reloadData];
         }];
 
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];
@@ -555,6 +556,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
         // Don't update gridModeListSelectionCollectionView, let its VLCLibraryAudioGroupDataSource do it.
         // Also don't update collectionSelectionTableView, as this will only show artists/genres/albums
+
+        [self.carouselView reloadData];
     }];
 }
 
@@ -577,6 +580,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         [self.songsTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
 
         // Comment in reloadDataForMediaLibraryItem will be informative
+
+        [self.carouselView reloadData];
     }];
 }
 
