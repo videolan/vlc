@@ -22,6 +22,32 @@
 
 #import "VLCLibraryHomeViewAudioCarouselContainerView.h"
 
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
+
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
+
+#import "main/VLCMain.h"
+
 @implementation VLCLibraryHomeViewAudioCarouselContainerView
+
+@synthesize dataSource = _dataSource;
+
+- (void)setup
+{
+    [super setup];
+    [self setupDataSource];
+}
+
+- (void)setupDataSource
+{
+    VLCLibraryAudioDataSource * const audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
+    audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    audioDataSource.carouselView = self.carouselView;
+    audioDataSource.audioLibrarySegment = VLCAudioLibrarySongsSegment; // TODO: placehilder
+    [audioDataSource setup];
+    self.carouselView.dataSource = audioDataSource;
+    _dataSource = audioDataSource;
+}
 
 @end

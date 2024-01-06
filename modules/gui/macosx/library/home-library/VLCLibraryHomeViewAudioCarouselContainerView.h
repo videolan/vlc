@@ -26,6 +26,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryAudioDataSource;
+
 @interface VLCLibraryHomeViewAudioCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
 
 @end
