@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *titleView;
 @property (readonly) iCarousel *carouselView;
 @property (readonly) NSObject<iCarouselDelegate> *delegate;
-@property (readonly) NSObject<VLCLibraryCollectionViewDataSource> *dataSource;
+@property (readonly) NSObject<VLCLibraryCollectionViewDataSource, iCarouselDataSource> *dataSource;
 
 - (void)setup;
 
