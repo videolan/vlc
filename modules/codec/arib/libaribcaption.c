@@ -89,6 +89,7 @@ static void DecSysRelease(decoder_sys_t *p_sys)
         aribcc_decoder_free(p_sys->p_decoder);
     if (p_sys->p_context)
         aribcc_context_free(p_sys->p_context);
+    free(p_sys->psz_cfg_font_name);
 
     free(p_sys);
 }
