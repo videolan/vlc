@@ -25,6 +25,7 @@
 #import "main/VLCMain.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryController.h"
@@ -35,6 +36,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
@@ -42,6 +44,8 @@
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
+
+#import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
@@ -834,5 +838,33 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
     return [NSIndexPath indexPathForItem:libraryItemRow inSection:0];
 }
+
+// pragma mark: iCarouselDataSource methods
+- (NSInteger)numberOfItemsInCarousel:(iCarousel *)carousel
+{
+    return self.displayedCollection.count;
+}
+
+- (NSView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
+{
+    VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)view;
+    if (carouselItemView == nil) {
+        const NSRect itemFrame = NSMakeRect(0,
+                                            0,
+                                            VLCLibraryUIUnits.carouselViewItemViewWidth,
+                                            VLCLibraryUIUnits.carouselViewVideoItemViewHeight);
+        carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
+        carouselItemView.frame = itemFrame;
+    }
+
+    // TODO: Find a more elegant way to do this
+    VLCLibraryHomeViewBaseCarouselContainerView * const containerView = (VLCLibraryHomeViewBaseCarouselContainerView *)carousel.superview;
+
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:index forTableView:nil];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
+                                                                                             parentType:self.currentParentType];
+    carouselItemView.representedItem = representedItem;
+    return carouselItemView;
+ }
 
 @end

@@ -25,6 +25,8 @@
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryCollectionViewDataSource.h"
 
+#include "views/iCarousel/iCarousel.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
@@ -56,7 +58,7 @@ extern NSString * const VLCLibraryYearSortDescriptorKey;
 
 extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification;
 
-@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
