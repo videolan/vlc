@@ -24,11 +24,17 @@
 
 #import "VLCLibraryHomeViewContainerView.h"
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
 #import "views/iCarousel/iCarousel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHomeViewBaseCarouselContainerView : NSView<VLCLibraryHomeViewContainerView, iCarouselDelegate>
+
+@property (readonly) NSTextField *titleView;
+@property (readonly) iCarousel *carouselView;
+@property (readonly) NSObject<iCarouselDelegate> *delegate;
+@property (readonly) NSObject<VLCLibraryCollectionViewDataSource> *dataSource;
 
 @end
 
