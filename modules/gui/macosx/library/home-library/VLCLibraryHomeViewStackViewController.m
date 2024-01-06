@@ -45,7 +45,7 @@
 
 @interface VLCLibraryHomeViewStackViewController()
 {
-    NSArray<NSView<VLCLibraryHomeViewVideoContainerView> *> *_containers;
+    NSArray<NSView<VLCLibraryHomeViewContainerView> *> *_containers;
     NSUInteger _leadingContainerCount;
 }
 @end
@@ -104,7 +104,7 @@
         return;
     }
 
-    NSMutableArray<NSView<VLCLibraryHomeViewVideoContainerView> *> * const mutableContainers = _containers.mutableCopy;
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
 
     if (shouldShowRecentsContainer) {
         _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];
@@ -130,11 +130,11 @@
 
 - (void)generateGenericCollectionViewContainers
 {
-    NSMutableArray<NSView<VLCLibraryHomeViewVideoContainerView> *> * const mutableContainers = _containers.mutableCopy;
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
     NSUInteger i = VLCMediaLibraryParentGroupTypeRecentVideos + 1;
 
     for (; i <= VLCMediaLibraryParentGroupTypeVideoLibrary; ++i) {
-        NSView<VLCLibraryHomeViewVideoContainerView> * const containerView = [[VLCLibraryHomeViewVideoGridContainerView alloc] init];
+        VLCLibraryHomeViewVideoGridContainerView * const containerView = [[VLCLibraryHomeViewVideoGridContainerView alloc] init];
         containerView.videoGroup = i;
         [mutableContainers addObject:containerView];
     }
@@ -145,9 +145,13 @@
 - (void)reloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSView<VLCLibraryHomeViewVideoContainerView> *containerView in self->_containers) {
+        for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
             [self.heroView setOptimalRepresentedItem];
-            [containerView.dataSource reloadData];
+
+            if ([containerView isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
+                VLCLibraryHomeViewBaseCarouselContainerView * const baseContainerView = (VLCLibraryHomeViewBaseCarouselContainerView *)containerView;
+                [baseContainerView.dataSource reloadData];
+            }
         }
     });
 }
@@ -309,7 +313,7 @@
 }
 
 
-- (NSView<VLCLibraryHomeViewVideoContainerView> *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
+- (NSView<VLCLibraryHomeViewContainerView> *)containerViewForGroup:(VLCMediaLibraryParentGroupType)group
 {
     const NSUInteger index = [_containers indexOfObjectPassingTest:^BOOL(NSView<VLCLibraryHomeViewContainerView> * const container, const NSUInteger idx, BOOL * const stop) {
         if ([container conformsToProtocol:@protocol(VLCLibraryHomeViewVideoContainerView)]) {
