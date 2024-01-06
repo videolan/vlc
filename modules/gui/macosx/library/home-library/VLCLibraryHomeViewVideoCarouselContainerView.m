@@ -31,8 +31,6 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
-#import "views/iCarousel/iCarousel.h"
-
 @interface VLCLibraryHomeViewVideoCarouselContainerView ()
 
 @property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;

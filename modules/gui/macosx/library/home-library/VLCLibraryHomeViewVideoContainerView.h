@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoViewContainerView.h: MacOS X interface module
+ * VLCLibraryHomeViewVideoContainerView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -29,7 +29,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLCLibraryVideoViewContainerView <VLCLibraryHomeViewContainerView>
+@protocol VLCLibraryHomeViewVideoContainerView <VLCLibraryHomeViewContainerView>
 
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;

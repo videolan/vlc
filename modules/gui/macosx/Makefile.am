@@ -156,6 +156,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewContainerView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewController.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewVideoContainerView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.m \
     gui/macosx/library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h \
@@ -170,7 +171,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDelegate.h \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDelegate.m \
-	gui/macosx/library/video-library/VLCLibraryVideoViewContainerView.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.h \

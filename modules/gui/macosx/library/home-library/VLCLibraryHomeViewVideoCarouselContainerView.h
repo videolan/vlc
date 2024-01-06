@@ -22,12 +22,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoViewContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
 #import "views/iCarousel/iCarousel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewVideoCarouselContainerView : NSView<VLCLibraryVideoViewContainerView, iCarouselDelegate>
+@interface VLCLibraryHomeViewVideoCarouselContainerView : NSView<VLCLibraryHomeViewVideoContainerView, iCarouselDelegate>
 
 @property (readonly) NSTextField *titleView;
 @property (readonly) iCarousel *carouselView;

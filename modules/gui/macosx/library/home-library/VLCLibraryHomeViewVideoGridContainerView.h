@@ -22,9 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoViewContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
-#import "library/video-library/VLCLibraryVideoViewContainerView.h"
 
 @class VLCSubScrollView;
 @class VLCLibraryCollectionViewDelegate;
@@ -33,7 +32,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewVideoGridContainerView : NSView<VLCLibraryVideoViewContainerView>
+@interface VLCLibraryHomeViewVideoGridContainerView : NSView<VLCLibraryHomeViewVideoContainerView>
 
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
