@@ -30,7 +30,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
-
+#import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
@@ -87,12 +87,18 @@
     [self.heroView setOptimalRepresentedItem];
 
     [self recentsChanged:nil];
+    [self audioRecentsChanged:nil];
 }
 
 - (BOOL)recentMediaPresent
 {
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     return model.numberOfRecentMedia > 0;
+}
+
+- (BOOL)recentAudioMediaPresent
+{
+    return YES; // TODO: Placeholder
 }
 
 - (void)recentsChanged:(NSNotification *)notification
@@ -122,6 +128,39 @@
         [self.collectionsStackView removeArrangedSubview:self.recentsView];
         [mutableContainers removeObject:self.recentsView];
         _recentsView = nil;
+        --_leadingContainerCount;
+    }
+
+    _containers = mutableContainers.copy;
+}
+
+// TODO: integrate into recentsChanged
+- (void)audioRecentsChanged:(NSNotification *)notification
+{
+    const BOOL shouldShowAudioRecentsContainer = [self recentAudioMediaPresent];
+    const BOOL audioRecentsContainerPresent = self.audioRecentsView != nil;
+
+    if (audioRecentsContainerPresent == shouldShowAudioRecentsContainer) {
+        return;
+    }
+
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
+
+    if (shouldShowAudioRecentsContainer) {
+        _audioRecentsView = [[VLCLibraryHomeViewAudioCarouselContainerView alloc] init];
+
+        // Insert as last leading container
+        [self.collectionsStackView insertArrangedSubview:self.audioRecentsView
+                                                 atIndex:_leadingContainerCount];
+        [self setupContainerView:self.audioRecentsView
+                   withStackView:_collectionsStackView];
+        [mutableContainers insertObject:self.audioRecentsView atIndex:0];
+        ++_leadingContainerCount;
+    } else {
+        [self.collectionsStackView removeConstraints:self.audioRecentsView.constraintsWithSuperview];
+        [self.collectionsStackView removeArrangedSubview:self.audioRecentsView];
+        [mutableContainers removeObject:self.audioRecentsView];
+        _audioRecentsView = nil;
         --_leadingContainerCount;
     }
 
