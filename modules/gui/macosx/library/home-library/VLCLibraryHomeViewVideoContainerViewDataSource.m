@@ -373,6 +373,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                                                                              parentType:containerView.videoGroup];
     carouselItemView.representedItem = representedItem;
     return carouselItemView;
- }
+}
 
 @end
