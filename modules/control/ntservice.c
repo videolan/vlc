@@ -154,12 +154,14 @@ static void *Run( void *data )
     if( var_InheritBool( p_intf, "ntservice-install" ) )
     {
         NTServiceInstall( p_intf );
+        free( p_intf->p_sys->psz_service );
         return NULL;
     }
 
     if( var_InheritBool( p_intf, "ntservice-uninstall" ) )
     {
         NTServiceUninstall( p_intf );
+        free( p_intf->p_sys->psz_service );
         return NULL;
     }
 
