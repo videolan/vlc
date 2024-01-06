@@ -265,6 +265,8 @@ static void Destroy( filter_t* p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
     ReleaseImages( p_filter );
 
+    free( p_sys->psz_inner_name );
+
     // Release the internal OpenCV filter.
     filter_Close( p_sys->p_opencv );
     module_unneed( p_sys->p_opencv, p_sys->p_opencv->p_module );
