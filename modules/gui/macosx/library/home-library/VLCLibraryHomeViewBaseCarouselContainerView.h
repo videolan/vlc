@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSObject<iCarouselDelegate> *delegate;
 @property (readonly) NSObject<VLCLibraryCollectionViewDataSource> *dataSource;
 
+- (void)setup;
+
 @end
 
 NS_ASSUME_NONNULL_END

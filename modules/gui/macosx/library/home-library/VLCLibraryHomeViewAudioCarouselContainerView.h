@@ -22,11 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VLCLibraryHomeViewContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewAudioCarouselContainerView : NSView<VLCLibraryHomeViewContainerView>
+@interface VLCLibraryHomeViewAudioCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
 
 @end
 
