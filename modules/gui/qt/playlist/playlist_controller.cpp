@@ -518,18 +518,16 @@ void PlaylistController::explore(const PlaylistItem& pItem)
 
         if( uri && uri[0] != '\0')
         {
-            char * const path = vlc_uri2path( uri );
+            auto path = vlc::wrap_cptr( vlc_uri2path( uri ) );
 
             if( !path )
                 return;
 
-            QString containingDir = QFileInfo( path ).absolutePath();
+            QString containingDir = QFileInfo( path.get() ).absolutePath();
             if( !QFileInfo( containingDir ).isDir() )
                 return;
 
             QUrl file = QUrl::fromLocalFile( containingDir );
-            free( path );
-
             if( !file.isLocalFile() )
                 return;
 
