@@ -48,16 +48,18 @@ struct vlc_pw_stream {
     struct {
         vlc_frame_t *head;
         vlc_frame_t **tailp;
-        size_t depth;
     } queue;
 
     struct {
         vlc_tick_t pts;
         ptrdiff_t frames;
         unsigned int rate;
+        uint64_t injected;
+        vlc_tick_t next_update;
     } time;
 
     vlc_tick_t start;
+    vlc_tick_t first_pts;
     bool starting;
     bool draining;
 
@@ -125,12 +127,8 @@ static int stream_update_latency(struct vlc_pw_stream *s)
 
     s->time.pts = VLC_TICK_FROM_NS(ts.now);
     s->time.pts += vlc_tick_from_frac(ts.delay * ts.rate.num, ts.rate.denom);
-    s->time.frames = ts.buffered + ts.queued + s->queue.depth;
-#ifndef NDEBUG
-    size_t bytes;
-    vlc_frame_ChainProperties(s->queue.head, NULL, &bytes, NULL);
-    assert(bytes == s->queue.depth * s->stride);
-#endif
+    s->time.frames = ts.buffered + ts.queued;
+
     return 0;
 }
 
@@ -159,13 +157,15 @@ static void stream_process(void *data)
         chunk->stride = s->stride;
         chunk->size = 0;
 
+        vlc_tick_t now = vlc_tick_now();
+
         /* Adjust start time */
         if (s->starting) {
             /*
              * If timing data is not available (val != 0), we can at least
              * assume that the playback delay is no less than zero.
              */
-            vlc_tick_t pts = (val == 0) ? s->time.pts : vlc_tick_now();
+            vlc_tick_t pts = (val == 0) ? s->time.pts : now;
             vlc_tick_t gap = s->start - pts;
             vlc_tick_t span = vlc_tick_from_samples(frame_room, s->time.rate);
             size_t skip;
@@ -191,6 +191,17 @@ static void stream_process(void *data)
             memset(dst, 0, skip);
             dst += skip;
             room -= skip;
+        } else if (s->time.pts != VLC_TICK_INVALID && now >= s->time.next_update) {
+            vlc_tick_t elapsed = now - s->time.pts;
+            /* A sample injected now would be delayed by the following amount of vlc_tick_t */
+            vlc_tick_t delay = vlc_tick_from_samples(s->time.frames, s->time.rate)
+                             - elapsed;
+            vlc_tick_t audio_ts = vlc_tick_from_samples(s->time.injected, s->time.rate)
+                                + s->first_pts;
+            aout_TimingReport(s->aout, now + delay, audio_ts);
+            /* Once we have enough points to initiate the clock we can delay the reports */
+            if (now >= s->start + VLC_TICK_FROM_SEC(1))
+                s->time.next_update = now + VLC_TICK_FROM_SEC(1);
         }
 
         while ((block = s->queue.head) != NULL) {
@@ -204,7 +215,8 @@ static void stream_process(void *data)
             room -= length;
             chunk->size += length;
             assert((length % s->stride) == 0);
-            s->queue.depth -= length / s->stride;
+            const size_t written = length / s->stride;
+            s->time.injected += written;
 
             if (block->i_buffer > 0) {
                 assert(room == 0);
@@ -223,7 +235,7 @@ static void stream_process(void *data)
     }
 
     if (s->queue.head == NULL && s->draining) {
-        s->start = VLC_TICK_INVALID;
+        s->first_pts = s->start = VLC_TICK_INVALID;
         s->starting = false;
         s->draining = false;
         pw_stream_flush(s->stream, true);
@@ -259,30 +271,12 @@ static const struct pw_stream_events stream_events = {
     .trigger_done = stream_trigger_done,
 };
 
-static int vlc_pw_stream_get_time(struct vlc_pw_stream *s,
-                                  vlc_tick_t *restrict delay)
-{
-    int ret = -1;
-
-    vlc_pw_lock(s->context);
-    if (pw_stream_get_state(s->stream, NULL) == PW_STREAM_STATE_STREAMING
-     && s->time.pts != VLC_TICK_INVALID) {
-        vlc_tick_t elapsed = vlc_tick_now() - s->time.pts;
-        *delay = vlc_tick_from_samples(s->time.frames, s->time.rate) - elapsed;
-        ret = 0;
-    }
-    vlc_pw_unlock(s->context);
-    return ret;
-}
-
 /**
  * Queues an audio buffer for playback.
  */
 static void vlc_pw_stream_play(struct vlc_pw_stream *s, vlc_frame_t *block,
                                vlc_tick_t date)
 {
-    size_t frames = block->i_buffer / s->stride;
-
     assert((block->i_buffer % s->stride) == 0);
     vlc_pw_lock(s->context);
     if (pw_stream_get_state(s->stream, NULL) == PW_STREAM_STATE_ERROR) {
@@ -297,13 +291,12 @@ static void vlc_pw_stream_play(struct vlc_pw_stream *s, vlc_frame_t *block,
         assert(!s->starting);
         s->starting = true;
         s->start = date;
-
+        s->time.next_update = date;
+        s->first_pts = block->i_pts;
     }
 
     *(s->queue.tailp) = block;
     s->queue.tailp = &block->p_next;
-    s->queue.depth += frames;
-    s->time.frames += frames;
 out:
     s->draining = false;
     vlc_pw_unlock(s->context);
@@ -337,9 +330,9 @@ static void vlc_pw_stream_flush(struct vlc_pw_stream *s)
     vlc_frame_ChainRelease(s->queue.head);
     s->queue.head = NULL;
     s->queue.tailp = &s->queue.head;
-    s->queue.depth = 0;
     s->time.pts = VLC_TICK_INVALID;
-    s->start = VLC_TICK_INVALID;
+    s->time.injected = 0;
+    s->first_pts = s->start = VLC_TICK_INVALID;
     s->starting = false;
     s->draining = false;
     pw_stream_flush(s->stream, false);
@@ -355,7 +348,7 @@ static void vlc_pw_stream_flush(struct vlc_pw_stream *s)
 static void vlc_pw_stream_drain(struct vlc_pw_stream *s)
 {
     vlc_pw_lock(s->context);
-    s->start = VLC_TICK_INVALID;
+    s->first_pts = s->start = VLC_TICK_INVALID;
     if (pw_stream_get_state(s->stream, NULL) == PW_STREAM_STATE_ERROR)
         stream_drained(s); /* Don't wait on a failed stream */
     else if (s->queue.head == NULL)
@@ -584,10 +577,10 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     s->stride = fmt->i_bytes_per_frame;
     s->queue.head = NULL;
     s->queue.tailp = &s->queue.head;
-    s->queue.depth = 0;
     s->time.pts = VLC_TICK_INVALID;
     s->time.rate = fmt->i_rate;
-    s->start = VLC_TICK_INVALID;
+    s->time.injected = 0;
+    s->first_pts = s->start = VLC_TICK_INVALID;
     s->starting = false;
     s->draining = false;
     s->aout = aout;
@@ -643,12 +636,6 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
         sys->initial.volume = NAN;
     }
     return s;
-}
-
-static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
-{
-    struct vlc_pw_aout *sys = aout->sys;
-    return vlc_pw_stream_get_time(sys->stream, delay);
 }
 
 static void Play(audio_output_t *aout, vlc_frame_t *block, vlc_tick_t date)
@@ -870,7 +857,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = TimeGet;
+    aout->time_get = NULL;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
