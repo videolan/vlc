@@ -630,7 +630,7 @@ vlc_actions_get_keycodes(vlc_object_t *p_obj, const char *psz_key_name,
 {
     assert(strlen( psz_key_name ) <= MAXACTION);
     char varname[12 /* "global-key-" */ + MAXACTION];
-    sprintf( varname, "%skey-%s", b_global ? "global-" : "", psz_key_name );
+    snprintf( varname, ARRAY_SIZE(varname), "%skey-%s", b_global ? "global-" : "", psz_key_name );
 
     *pp_keycodes = NULL;
 
