@@ -416,7 +416,7 @@ static int Open(vlc_object_t *p_this)
     aribcc_renderer_set_force_no_ruby(p_renderer, p_sys->b_cfg_ignore_ruby);
     aribcc_renderer_set_stroke_width(p_renderer, p_sys->f_cfg_stroke_width);
 
-    if (p_sys->psz_cfg_font_name && strlen(p_sys->psz_cfg_font_name) > 0) {
+    if (p_sys->psz_cfg_font_name) {
         const char* font_families[] = { p_sys->psz_cfg_font_name };
         aribcc_renderer_set_default_font_family(p_renderer, font_families, 1, true);
     }
