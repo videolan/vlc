@@ -303,15 +303,24 @@ struct audio_output
 /**
  * Report a new timing point
  *
- * system_ts doesn't have to be close to vlc_tick_now(). Any valid { system_ts,
- * audio_ts } points in the past are sufficient to update the clock.
- *
- * \note audio_ts starts at 0 and should not take the block PTS into account.
- *
  * It is important to report the first point as soon as possible (and the
  * following points if the audio delay take some time to be stabilized). Once
- * the audio is stabilized, it is recommended to report timing points every few
+ * the audio is stabilized, it is recommended to report timing points every
  * seconds.
+ *
+ * This function can be called from the play() callback or from any threads
+ * after the first play(). This should not be called after a flush(), a stop(),
+ * a drain() or while paused. After a flush(), play() need to be called again
+ * before reporting a new timing. In that case, audio_ts should start again at
+ * 0 (for the first sample played).
+ *
+ * \param aout the audio output instance
+ * \param system_ts system timestamp when audio_ts is played, based on
+ * vlc_tick_now(), can be now, in the past or in the future.
+ * \param audio_ts audio timestamp played at system_ts, starts at 0 for the
+ * first sample played (must not take block->i_pts, passed in play(), into
+ * account).
+ *
  */
 static inline void aout_TimingReport(audio_output_t *aout, vlc_tick_t system_ts,
                                      vlc_tick_t audio_ts)
