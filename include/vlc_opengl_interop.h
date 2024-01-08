@@ -48,6 +48,16 @@ struct vlc_gl_interop_ops {
             const int32_t tex_height[]);
 
     /**
+     * Callback to deallocate data for bound texture
+     *
+     * This function pointer can be NULL. it will be called before calling glDeleteTextures
+     *
+     * \param interop the OpenGL interop
+     * \param textures array of textures to bind (one per plane)
+     */
+    void (*deallocate_textures)(const struct vlc_gl_interop *interop, uint32_t textures[]);
+
+    /**
      * Callback to update a picture
      *
      * This function pointer cannot be NULL. The implementation should upload

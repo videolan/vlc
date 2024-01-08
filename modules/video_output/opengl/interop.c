@@ -98,6 +98,8 @@ vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
 {
     struct vlc_gl_interop_private *priv =
         container_of(interop, struct vlc_gl_interop_private, interop);
+    if (interop->ops->deallocate_textures != NULL)
+        interop->ops->deallocate_textures(interop, textures);
     priv->gl.DeleteTextures(interop->tex_count, textures);
     memset(textures, 0, interop->tex_count * sizeof(GLuint));
 }
