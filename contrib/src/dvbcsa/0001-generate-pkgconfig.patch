@@ -1,0 +1,61 @@
+From 8dfac6b239475deb7889e9c91d889703dc16be23 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Mon, 18 Dec 2023 17:43:56 +0100
+Subject: [PATCH] generate pkgconfig
+
+---
+ configure.ac     |  1 +
+ src/Makefile.am  |  3 +++
+ src/dvbcsa.pc.in | 17 +++++++++++++++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 src/dvbcsa.pc.in
+
+diff --git a/configure.ac b/configure.ac
+index da1ebe5..a98035a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -102,6 +102,7 @@ AC_CONFIG_FILES([
+   Makefile
+   src/Makefile
+   src/dvbcsa/Makefile
++  src/dvbcsa.pc
+   test/Makefile
+ ])
+ AC_OUTPUT
+diff --git a/src/Makefile.am b/src/Makefile.am
+index fa2ddbf..224210d 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -23,3 +23,6 @@ endif
+ 
+ libdvbcsa_la_LDFLAGS = -version-info 1:1:0 $(libtool_flags)
+ 
++pkgconfigdir = $(libdir)/pkgconfig
++
++pkgconfig_DATA = dvbcsa.pc
+diff --git a/src/dvbcsa.pc.in b/src/dvbcsa.pc.in
+new file mode 100644
+index 0000000..09a78fc
+--- /dev/null
++++ b/src/dvbcsa.pc.in
+@@ -0,0 +1,17 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++includedir=@includedir@
++datarootdir=@datarootdir@
++libdir=@libdir@
++datadir=@datadir@
++pkgincludedir=@includedir@/@PACKAGE@
++pkgdatadir=${datadir}/@PACKAGE@
++pkglibdir=${libdir}/@PACKAGE@
++pluginsdir=${pkglibdir}/plugins
++
++Name: DVB CSA Library
++Description: implementation of the DVB Common Scrambling Algorithm
++Version: @VERSION@
++Cflags: -I${includedir}
++Requires.private:
++Libs: -L${libdir} -ldvbcsa
+-- 
+2.43.0
+
