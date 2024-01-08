@@ -165,3 +165,11 @@ vlc_tests += {
     'link_with' : [libvlccore],
     'module_depends' : vlc_plugins_targets.keys()
 }
+
+vlc_tests += {
+    'name' : 'test_modules_mux_webvtt',
+    'sources' : files('mux/webvtt.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}

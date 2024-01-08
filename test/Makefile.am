@@ -56,6 +56,7 @@ check_PROGRAMS = \
 	test_modules_stream_out_pcr_sync \
 	test_modules_tls \
 	test_modules_stream_out_transcode \
+	test_modules_mux_webvtt \
 	$(NULL)
 
 if HAVE_GL
@@ -298,6 +299,9 @@ test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_helper.h \
 	../modules/stream_out/transcode/pcr_helper.c
 test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
+
+test_modules_mux_webvtt_SOURCES = modules/mux/webvtt.c
+test_modules_mux_webvtt_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
