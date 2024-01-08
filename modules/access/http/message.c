@@ -443,7 +443,7 @@ struct vlc_h2_frame *vlc_http_msg_h2_frame(const struct vlc_http_msg *m,
     if (m->status >= 0)
     {
         assert(m->status < 1000);
-        sprintf(status, "%hd", m->status);
+        snprintf(status, ARRAY_SIZE(status), "%hd", m->status);
         headers[i][0] = ":status";
         headers[i][1] = status;
         i++;
