@@ -393,7 +393,7 @@ static void
 ReportDevice(audio_output_t *p_aout, UInt32 i_id, const char *name)
 {
     char deviceid[10];
-    sprintf(deviceid, "%i", i_id);
+    snprintf(deviceid, ARRAY_SIZE(deviceid), "%i", i_id);
 
     aout_HotplugReport(p_aout, deviceid, name);
 }
@@ -1782,7 +1782,7 @@ static int Open(vlc_object_t *obj)
     }
 
     char deviceid[10];
-    sprintf(deviceid, "%i", p_sys->i_new_selected_dev);
+    snprintf(deviceid, ARRAY_SIZE(deviceid), "%i", p_sys->i_new_selected_dev);
     aout_DeviceReport(p_aout, deviceid);
 
     /* remember the volume */
