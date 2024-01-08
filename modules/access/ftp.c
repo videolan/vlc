@@ -1199,7 +1199,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
             return VLC_EGENERIC;
         }
 
-        sprintf( psz_ipv4, "%u.%u.%u.%u", a1, a2, a3, a4 );
+        snprintf( psz_ipv4, ARRAY_SIZE(psz_ipv4), "%u.%u.%u.%u", a1, a2, a3, a4 );
         psz_ip = psz_ipv4;
         i_port = (p1 << 8) | p2;
     }
