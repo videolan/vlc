@@ -95,7 +95,7 @@ vlc_player_AddMetadataLoudnessListener(vlc_player_t *player,
 
         unsigned mode = listener_id->option == VLC_PLAYER_METADATA_LOUDNESS_FULL ? 4 : 0;
         char chain[sizeof("ebur128{mode=X}")];
-        sprintf(chain, "ebur128{mode=%1u}", mode);
+        snprintf(chain, ARRAY_SIZE(chain), "ebur128{mode=%1u}", mode);
 
         const struct vlc_audio_meter_plugin_owner meter_plugin_owner =
         {
