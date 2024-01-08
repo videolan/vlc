@@ -94,7 +94,6 @@ if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
     # extra POSIX headers not found in the Windows SDK
     list_inc_dirs += 'compat/windows'
 endif
-vlc_include_dirs = include_directories(list_inc_dirs)
 
 if host_system == 'darwin'
     add_languages('objc', native: false)
@@ -266,8 +265,9 @@ foreach header : check_cpp_headers
 endforeach
 
 if not cdata.has('HAVE_STDBIT_H')
-    vlc_include_dirs += include_directories('compat/stdbit')
+    list_inc_dirs += 'compat/stdbit'
 endif
+vlc_include_dirs = include_directories(list_inc_dirs)
 
 #
 # Darwin specific checks
