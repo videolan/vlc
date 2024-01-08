@@ -290,7 +290,7 @@ int D3D11OpenDeinterlace(filter_t *filter)
         msg_Dbg(filter, "unknown mode %s, trying blend", psz_mode);
         p_mode = GetFilterMode("blend");
     }
-    if (strcmp(p_mode->psz_mode, psz_mode))
+    if (psz_mode == NULL || strcmp(p_mode->psz_mode, psz_mode))
         msg_Dbg(filter, "using %s deinterlacing mode", p_mode->psz_mode);
 
     D3D11_VIDEO_PROCESSOR_RATE_CONVERSION_CAPS rateCaps;
@@ -365,4 +365,3 @@ error:
 
     return VLC_EGENERIC;
 }
-
