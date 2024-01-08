@@ -415,7 +415,7 @@ void libvlc_video_set_crop_ratio(libvlc_media_player_t *mp,
     if (den == 0)
         geometry[0] = '\0';
     else
-        sprintf(geometry, "%u:%u", num, den);
+        snprintf(geometry, ARRAY_SIZE(geometry), "%u:%u", num, den);
 
     libvlc_video_set_crop(mp, geometry);
 }
@@ -427,7 +427,7 @@ void libvlc_video_set_crop_window(libvlc_media_player_t *mp,
     char geometry[4 * (3 * sizeof (unsigned) + 1)];
 
     assert(width != 0 && height != 0);
-    sprintf(geometry, "%ux%u+%u+%u", x, y, width, height);
+    snprintf(geometry, ARRAY_SIZE(geometry), "%ux%u+%u+%u", x, y, width, height);
     libvlc_video_set_crop(mp, geometry);
 }
 
@@ -437,7 +437,7 @@ void libvlc_video_set_crop_border(libvlc_media_player_t *mp,
 {
     char geometry[4 * (3 * sizeof (unsigned) + 1)];
 
-    sprintf(geometry, "%u+%u+%u+%u", left, top, right, bottom);
+    snprintf(geometry, ARRAY_SIZE(geometry), "%u+%u+%u+%u", left, top, right, bottom);
     libvlc_video_set_crop(mp, geometry);
 }
 
