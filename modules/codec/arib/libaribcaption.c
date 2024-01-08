@@ -49,7 +49,6 @@ typedef struct
     vlc_atomic_rc_t    rc;
 
     int                i_cfg_rendering_backend;
-    char*              psz_cfg_font_name;
     bool               b_cfg_replace_drcs;
     bool               b_cfg_force_stroke_text;
     bool               b_cfg_ignore_background;
@@ -89,7 +88,6 @@ static void DecSysRelease(decoder_sys_t *p_sys)
         aribcc_decoder_free(p_sys->p_decoder);
     if (p_sys->p_context)
         aribcc_context_free(p_sys->p_context);
-    free(p_sys->psz_cfg_font_name);
 
     free(p_sys);
 }
@@ -345,7 +343,6 @@ static int Open(vlc_object_t *p_this)
     vlc_atomic_rc_init(&p_sys->rc);
 
     p_sys->i_cfg_rendering_backend = var_InheritInteger(p_this, ARIBCAPTION_CFG_PREFIX "rendering-backend");
-    p_sys->psz_cfg_font_name = var_InheritString(p_this, ARIBCAPTION_CFG_PREFIX "font");
     p_sys->b_cfg_replace_drcs = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "replace-drcs");
     p_sys->b_cfg_force_stroke_text = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "force-stroke-text");
     p_sys->b_cfg_ignore_background = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "ignore-background");
@@ -416,12 +413,14 @@ static int Open(vlc_object_t *p_this)
     aribcc_renderer_set_force_no_ruby(p_renderer, p_sys->b_cfg_ignore_ruby);
     aribcc_renderer_set_stroke_width(p_renderer, p_sys->f_cfg_stroke_width);
 
-    if (p_sys->psz_cfg_font_name) {
-        const char* font_families[] = { p_sys->psz_cfg_font_name };
+    char *psz_cfg_font_name = var_InheritString(p_this, ARIBCAPTION_CFG_PREFIX "font");
+    if (psz_cfg_font_name) {
+        const char* font_families[] = { psz_cfg_font_name };
         aribcc_renderer_set_default_font_family(p_renderer,
                                                 font_families,
                                                 ARRAY_SIZE(font_families),
                                                 true);
+        free(psz_cfg_font_name);
     }
 
     p_dec->p_sys = p_sys;
