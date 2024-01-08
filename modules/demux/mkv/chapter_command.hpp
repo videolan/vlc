@@ -160,7 +160,7 @@ protected:
     {
         std::string result;
         char s_value[6], s_reg_value[6];
-        sprintf( s_value, "%.5d", value );
+        snprintf( s_value, ARRAY_SIZE(s_value), "%.5d", value );
 
         if ( b_value )
         {
@@ -170,7 +170,7 @@ protected:
         }
         else if ( value < 0x80 )
         {
-            sprintf( s_reg_value, "%.5d", GetPRM( value ) );
+            snprintf( s_reg_value, ARRAY_SIZE(s_reg_value), "%.5d", GetPRM( value ) );
             result = "GPreg[";
             result += s_value;
             result += "] (";
@@ -179,7 +179,7 @@ protected:
         }
         else
         {
-            sprintf( s_reg_value, "%.5d", GetPRM( value ) );
+            snprintf( s_reg_value, ARRAY_SIZE(s_reg_value), "%.5d", GetPRM( value ) );
             result = "SPreg[";
             result += s_value;
             result += "] (";

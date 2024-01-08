@@ -117,7 +117,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
         else */ if ( p_data[0] == MATROSKA_DVD_LEVEL_LU )
         {
             char psz_str[11];
-            sprintf( psz_str, " (%c%c)  ---", p_data[1], p_data[2] );
+            snprintf( psz_str, ARRAY_SIZE(psz_str), " (%c%c)  ---", p_data[1], p_data[2] );
             result = "---  DVD Menu";
             result += psz_str;
         }
@@ -131,7 +131,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
             {
                 uint16_t i_title = (p_data[2] << 8) + p_data[3];
                 char psz_str[20];
-                sprintf( psz_str, " %d -----", i_title );
+                snprintf( psz_str, ARRAY_SIZE(psz_str), " %d -----", i_title );
                 result = "----- Title";
                 result += psz_str;
             }
