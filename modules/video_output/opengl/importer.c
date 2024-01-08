@@ -274,9 +274,7 @@ vlc_gl_importer_Delete(struct vlc_gl_importer *importer)
 
     if (interop && !interop->handle_texs_gen)
     {
-        void (*DeleteTextures)(uint32_t, uint32_t*) =
-            vlc_gl_GetProcAddress(interop->gl, "glDeleteTextures");
-        (*DeleteTextures)(interop->tex_count, importer->pic.textures);
+        vlc_gl_interop_DeleteTextures(interop, importer->pic.textures);
     }
 
     free(importer);
