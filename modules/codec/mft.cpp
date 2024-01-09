@@ -672,7 +672,7 @@ HRESULT mft_sys_t::SetOutputType(vlc_logger *logger,
         }
     }
 
-    if (fmt_out.i_cat == VIDEO_ES && fmt_out.i_codec == VLC_CODEC_H264)
+    if (fmt_out.i_cat == VIDEO_ES && IsEncoder())
     {
         if (fmt_out.i_bitrate != 0)
             fmt_out.i_bitrate = 1'000'000;
@@ -691,16 +691,23 @@ HRESULT mft_sys_t::SetOutputType(vlc_logger *logger,
 
         hr = output_media_type->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
 
+        if (fmt_out.i_codec == VLC_CODEC_H264)
+        {
+            eAVEncH264VProfile profile;
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-        bool isWin81OrGreater = false;
-        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-        if (likely(hKernel32 != NULL))
-            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-        eAVEncH264VProfile profile = isWin81OrGreater ? eAVEncH264VProfile_High : eAVEncH264VProfile_Main;
+            bool isWin81OrGreater = false;
+            HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+            if (likely(hKernel32 != NULL))
+                isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+            profile = isWin81OrGreater ? eAVEncH264VProfile_High : eAVEncH264VProfile_Main;
 #else
-        eAVEncH264VProfile profile = eAVEncH264VProfile_High;
+            profile = eAVEncH264VProfile_High;
 #endif
-        hr = output_media_type->SetUINT32(MF_MT_MPEG2_PROFILE, profile);
+            hr = output_media_type->SetUINT32(MF_MT_MPEG2_PROFILE, profile);
+
+            //hr = output_media_type->SetUINT32(MF_MT_MPEG2_LEVEL, eAVEncH264VLevel4);
+        }
+
     }
 
     hr = mft->SetOutputType(output_stream_id, output_media_type.Get(), 0);
