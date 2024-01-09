@@ -23,6 +23,8 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include <vlc_codecs.h>
+
+#include <assert.h>
 #include <limits.h>
 
 /* biCompression / Others are FourCC */
@@ -320,8 +322,9 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
     p_bih->biClrUsed = 0;
     if( biCompression == BI_BITFIELDS )
     {
-        uint32_t i_rmask = 0,i_gmask,i_bmask, i_amask;
-        for( size_t i=0; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
+        uint32_t i_rmask, i_gmask, i_bmask, i_amask;
+        size_t i=0;
+        for( ; i<ARRAY_SIZE(bitmap_rgb_masks); i++ )
         {
             if ( bitmap_rgb_masks[i].codec == fmt->i_codec )
             {
@@ -332,6 +335,9 @@ static inline int CreateBitmapInfoHeader( const es_format_t *fmt,
                 break;
             }
         }
+        if (i == ARRAY_SIZE(bitmap_rgb_masks))
+            vlc_assert_unreachable();
+
         SetDWLE( &p_bmiColors[0], i_rmask );
         SetDWLE( &p_bmiColors[4], i_gmask );
         SetDWLE( &p_bmiColors[8], i_bmask );
