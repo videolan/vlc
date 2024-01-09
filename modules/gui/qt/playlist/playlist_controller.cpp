@@ -514,11 +514,11 @@ void PlaylistController::explore(const PlaylistItem& pItem)
     if( playlistItem )
     {
         input_item_t * const p_input = vlc_playlist_item_GetMedia(playlistItem);
-        char * const uri = input_item_GetURI(p_input);
+        auto uri = vlc::wrap_cptr( input_item_GetURI(p_input) );
 
-        if( uri && uri[0] != '\0')
+        if( uri && uri.get()[0] != '\0')
         {
-            auto path = vlc::wrap_cptr( vlc_uri2path( uri ) );
+            auto path = vlc::wrap_cptr( vlc_uri2path( uri.get() ) );
 
             if( !path )
                 return;
