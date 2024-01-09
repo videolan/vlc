@@ -53,6 +53,7 @@ _add_environ_val('CMAKE_FIND_ROOT_PATH', 'FIND_ROOT_PATH')
 args.file.write("set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)\n")
 _add_environ_val('CMAKE_FIND_ROOT_PATH_MODE_LIBRARY', 'PATH_MODE_LIBRARY')
 _add_environ_val('CMAKE_FIND_ROOT_PATH_MODE_INCLUDE', 'PATH_MODE_INCLUDE')
+_add_environ_val('CMAKE_FIND_ROOT_PATH_MODE_PACKAGE', 'PATH_MODE_PACKAGE')
 
 # final includes
 env_value = os.environ.get('EXTRA_INCLUDE')
