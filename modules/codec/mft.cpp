@@ -675,9 +675,8 @@ HRESULT mft_sys_t::SetOutputType(vlc_logger *logger,
     if (fmt_out.i_cat == VIDEO_ES && fmt_out.i_codec == VLC_CODEC_H264)
     {
         if (fmt_out.i_bitrate != 0)
-            output_media_type->SetUINT32(MF_MT_AVG_BITRATE, fmt_out.i_bitrate);
-        else
-            output_media_type->SetUINT32(MF_MT_AVG_BITRATE, 1000000);
+            fmt_out.i_bitrate = 1'000'000;
+        output_media_type->SetUINT32(MF_MT_AVG_BITRATE, fmt_out.i_bitrate);
 
         if (fmt_out.video.i_frame_rate && fmt_out.video.i_frame_rate_base)
         {
