@@ -82,9 +82,9 @@
 #endif
 
 #ifndef NDEBUG
-# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status-win-x86"
+# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status"
 #else
-# define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status" UPDATE_OS_SUFFIX
+# define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
 #endif
 
 #define dialog_FatalWait( p_obj, psz_title, psz_fmt, ... ) \
@@ -179,11 +179,12 @@ static void EmptyRelease( update_t *p_update )
  */
 static bool GetUpdateFile( update_t *p_update )
 {
+    static const char url[] = UPDATE_VLC_STATUS UPDATE_OS_SUFFIX;
     stream_t *p_stream = NULL;
     char *psz_version_line = NULL;
     char *psz_update_data = NULL;
 
-    p_stream = vlc_stream_NewURL( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
+    p_stream = vlc_stream_NewURL( p_update->p_libvlc, url );
     if( !p_stream )
     {
         msg_Err( p_update->p_libvlc, "Failed to open %s for reading",
