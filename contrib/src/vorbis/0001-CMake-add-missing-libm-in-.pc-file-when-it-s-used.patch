@@ -1,0 +1,26 @@
+From fac2505acea83d038bbe9e45c4504a6800c46726 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Tue, 9 Jan 2024 09:19:41 +0100
+Subject: [PATCH] CMake: add missing libm in .pc file when it's used
+
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 33f684f5..ea79c4aa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,6 +52,9 @@ function(configure_pkg_config_file pkg_config_file_in)
+     set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+     set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+     set(VERSION ${PROJECT_VERSION})
++    if(HAVE_LIBM)
++        set(VORBIS_LIBS "-lm")
++    endif()
+     string(REPLACE ".in" "" pkg_config_file ${pkg_config_file_in})
+     configure_file(${pkg_config_file_in} ${pkg_config_file} @ONLY)
+ endfunction()
+-- 
+2.39.3 (Apple Git-145)
+
