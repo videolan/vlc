@@ -1298,21 +1298,22 @@ static int  mms_ParsePacket( stream_t *p_access,
 #endif
     }
     p_sys->i_packet_seq_num = i_packet_seq_num + 1;
+    i_packet_length -= 8; // don't bother with preheader
 
     if( i_packet_id == p_sys->i_header_packet_id_type )
     {
         uint8_t *p_reaced = realloc( p_sys->p_header,
-                                     p_sys->i_header + i_packet_length - 8 );
+                                     p_sys->i_header + i_packet_length );
         if( !p_reaced )
             return VLC_ENOMEM;
 
-        memcpy( &p_reaced[p_sys->i_header], p_data + 8, i_packet_length - 8 );
+        memcpy( &p_reaced[p_sys->i_header], p_data + 8, i_packet_length );
         p_sys->p_header = p_reaced;
-        p_sys->i_header += i_packet_length - 8;
+        p_sys->i_header += i_packet_length;
 
 /*        msg_Dbg( p_access,
                  "receive header packet (%d bytes)",
-                 i_packet_length - 8 ); */
+                 i_packet_length ); */
 
         return MMS_PACKET_HEADER;
     }
@@ -1322,15 +1323,15 @@ static int  mms_ParsePacket( stream_t *p_access,
         p_sys->i_media = 0;
         p_sys->i_media_used = 0;
 
-        p_sys->p_media = malloc( i_packet_length - 8 ); // don't bother with preheader
+        p_sys->p_media = malloc( i_packet_length );
         if( !p_sys->p_media )
             return VLC_ENOMEM;
 
-        p_sys->i_media = i_packet_length - 8;
+        p_sys->i_media = i_packet_length;
         memcpy( p_sys->p_media, p_data + 8, p_sys->i_media );
 /*        msg_Dbg( p_access,
                  "receive media packet (%d bytes)",
-                 i_packet_length - 8 ); */
+                 i_packet_length ); */
 
         return MMS_PACKET_MEDIA;
     }
