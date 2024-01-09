@@ -1305,7 +1305,7 @@ static int  mms_ParsePacket( stream_t *p_access,
         uint8_t *p_reaced = realloc( p_sys->p_header,
                                      p_sys->i_header + i_packet_length );
         if( !p_reaced )
-            return VLC_ENOMEM;
+            return -1;
 
         memcpy( &p_reaced[p_sys->i_header], p_data + 8, i_packet_length );
         p_sys->p_header = p_reaced;
@@ -1325,7 +1325,7 @@ static int  mms_ParsePacket( stream_t *p_access,
 
         p_sys->p_media = malloc( i_packet_length );
         if( !p_sys->p_media )
-            return VLC_ENOMEM;
+            return -1;
 
         p_sys->i_media = i_packet_length;
         memcpy( p_sys->p_media, p_data + 8, p_sys->i_media );
