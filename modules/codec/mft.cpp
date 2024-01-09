@@ -452,7 +452,7 @@ HRESULT mft_sys_t::SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_T
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
         {
             /* The output type must be set before setting the input type for this MFT. */
-            return VLC_SUCCESS;
+            return hr;
         }
         else if (FAILED(hr))
             goto error;
