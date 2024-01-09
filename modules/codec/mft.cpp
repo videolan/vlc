@@ -689,7 +689,11 @@ HRESULT mft_sys_t::SetOutputType(vlc_logger *logger,
                                     fmt_out.video.i_visible_width,
                                     fmt_out.video.i_visible_height);
 
+        hr = MFSetAttributeRatio(output_media_type.Get(), MF_MT_PIXEL_ASPECT_RATIO, 1, 1);
+
         hr = output_media_type->SetUINT32(MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive);
+        hr = output_media_type->SetUINT32(MF_MT_FIXED_SIZE_SAMPLES, 0);
+        hr = output_media_type->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
 
         if (fmt_out.i_codec == VLC_CODEC_H264)
         {
