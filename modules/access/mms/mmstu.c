@@ -1302,14 +1302,16 @@ static int  mms_ParsePacket( stream_t *p_access,
 
     if( i_packet_id == p_sys->i_header_packet_id_type )
     {
-        uint8_t *p_reaced = realloc( p_sys->p_header,
-                                     p_sys->i_header + i_packet_length );
+        size_t new_header_size;
+        if( add_overflow( p_sys->i_header, i_packet_length, &new_header_size ) )
+            return -1;
+        uint8_t *p_reaced = realloc( p_sys->p_header, new_header_size );
         if( !p_reaced )
             return -1;
 
         memcpy( &p_reaced[p_sys->i_header], p_data + 8, i_packet_length );
         p_sys->p_header = p_reaced;
-        p_sys->i_header += i_packet_length;
+        p_sys->i_header = new_header_size;
 
 /*        msg_Dbg( p_access,
                  "receive header packet (%d bytes)",
