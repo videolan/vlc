@@ -139,7 +139,7 @@ public:
     ComPtr<IMFSample> output_sample;
 
     HRESULT AllocateOutputSample(es_format_category_e cat, ComPtr<IMFSample> & result);
-    int SetOutputType(vlc_logger *, const GUID & req_subtype, es_format_t & fmt_out);
+    HRESULT SetOutputType(vlc_logger *, const GUID & req_subtype, es_format_t & fmt_out);
     HRESULT SetInputType(const es_format_t & fmt_in, const MFT_REGISTER_TYPE_INFO &);
 
     virtual void DoRelease() = 0;
@@ -547,7 +547,7 @@ error:
     return hr;
 }
 
-int mft_sys_t::SetOutputType(vlc_logger *logger,
+HRESULT mft_sys_t::SetOutputType(vlc_logger *logger,
                              const GUID & req_subtype, es_format_t & fmt_out)
 {
     HRESULT hr;
@@ -579,7 +579,7 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
         {
             /* The input type must be set before setting the output type for this MFT. */
-            return VLC_SUCCESS;
+            return hr;
         }
         else if (FAILED(hr))
             goto error;
@@ -774,11 +774,11 @@ int mft_sys_t::SetOutputType(vlc_logger *logger,
         }
     }
 
-    return VLC_SUCCESS;
+    return S_OK;
 
 error:
     vlc_error(logger, "Error in SetOutputType()");
-    return VLC_EGENERIC;
+    return hr;
 }
 
 static HRESULT AllocateInputSample(struct vlc_logger *logger, ComPtr<IMFTransform> & mft, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
@@ -1061,7 +1061,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
         else
             p_dec->fmt_out.audio = p_dec->fmt_in->audio;
-        if (p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out))
+        hr = p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out);
+        if (FAILED(hr))
             return VLC_EGENERIC;
 
         /* Reallocate output sample. */
@@ -1564,7 +1565,8 @@ static int InitializeMFT(decoder_t *p_dec, const MFT_REGISTER_TYPE_INFO & type)
         video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
     else
         p_dec->fmt_out.audio = p_dec->fmt_in->audio;
-    if (p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out))
+    hr = p_sys->SetOutputType(vlc_object_logger(p_dec), GUID_NULL, p_dec->fmt_out);
+    if (FAILED(hr))
         goto error;
 
     /*
@@ -2368,10 +2370,13 @@ static int OpenMFTVideoEncoder(vlc_object_t *p_this)
     p_enc->fmt_in.i_codec = MFFormatToChroma(input_type.guidSubtype);
     p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
 
-    if (p_sys->SetOutputType(vlc_object_logger(p_this),
-                             output_type.guidSubtype, p_enc->fmt_out))
+    hr = p_sys->SetOutputType(vlc_object_logger(p_this),
+                              output_type.guidSubtype, p_enc->fmt_out);
+    if (FAILED(hr))
+    {
+        msg_Err(p_enc, "Error in SetOutputType(). (hr=0x%lX)", hr);
         goto error;
-
+    }
     hr = p_sys->SetInputType(p_enc->fmt_in, input_type);
     if (FAILED(hr))
     {
