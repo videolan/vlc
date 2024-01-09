@@ -73,14 +73,6 @@
  * Remaining text is a required description of the update
  */
 
-#if defined( _WIN64 )
-# define UPDATE_OS_SUFFIX "-win-x64"
-#elif defined( _WIN32 )
-# define UPDATE_OS_SUFFIX "-win-x86"
-#else
-# define UPDATE_OS_SUFFIX ""
-#endif
-
 #ifndef NDEBUG
 # define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status"
 #else
@@ -179,7 +171,21 @@ static void EmptyRelease( update_t *p_update )
  */
 static bool GetUpdateFile( update_t *p_update )
 {
-    static const char url[] = UPDATE_VLC_STATUS UPDATE_OS_SUFFIX;
+#if defined(_WIN64)
+    static const char url[] = UPDATE_VLC_STATUS_URL "-win-x64";
+#elif defined(_WIN32)
+    static const char *urls[] = {
+        UPDATE_VLC_STATUS_URL "-win-x86", UPDATE_VLC_STATUS_URL "-win-x64"
+    };
+    BOOL sixtyfour;
+
+    if (!IsWow64Process(GetCurrentProcess(), &sixtyfour))
+        sixtyfour = FALSE; // not clear how this can fail but MSDN says so
+
+    const char *url = urls[sixtyfour != FALSE];
+#else
+    static const char url[] = UPDATE_VLC_STATUS_URL;
+#endif
     stream_t *p_stream = NULL;
     char *psz_version_line = NULL;
     char *psz_update_data = NULL;
