@@ -418,7 +418,10 @@ static int Open(vlc_object_t *p_this)
 
     if (p_sys->psz_cfg_font_name) {
         const char* font_families[] = { p_sys->psz_cfg_font_name };
-        aribcc_renderer_set_default_font_family(p_renderer, font_families, 1, true);
+        aribcc_renderer_set_default_font_family(p_renderer,
+                                                font_families,
+                                                ARRAY_SIZE(font_families),
+                                                true);
     }
 
     p_dec->p_sys = p_sys;
