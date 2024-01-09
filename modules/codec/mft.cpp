@@ -1588,7 +1588,10 @@ static int InitializeMFT(decoder_t *p_dec, const MFT_REGISTER_TYPE_INFO & type)
     /* This event is required for asynchronous MFTs, optional otherwise. */
     hr = p_sys->startStream();
     if (FAILED(hr))
+    {
+        msg_Err(p_dec, "Error in startStream(). (hr=0x%lX)", hr);
         goto error;
+    }
 
     if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
     {
@@ -2387,7 +2390,10 @@ static int OpenMFTVideoEncoder(vlc_object_t *p_this)
     /* This event is required for asynchronous MFTs, optional otherwise. */
     hr = p_sys->startStream();
     if (FAILED(hr))
+    {
+        msg_Err(p_enc, "Error in startStream(). (hr=0x%lX)", hr);
         goto error;
+    }
 
     static const struct vlc_encoder_operations video_ops = []{
         struct vlc_encoder_operations cbs{};
@@ -2529,7 +2535,10 @@ static int OpenMFTAudioEncoder(vlc_object_t *p_this)
     /* This event is required for asynchronous MFTs, optional otherwise. */
     hr = p_sys->startStream();
     if (FAILED(hr))
+    {
+        msg_Err(p_enc, "Error in startStream(). (hr=0x%lX)", hr);
         goto error;
+    }
 
     static const struct vlc_encoder_operations audio_ops = []{
         struct vlc_encoder_operations cbs{};
