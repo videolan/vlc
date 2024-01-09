@@ -157,7 +157,7 @@ int main(void)
     ASSERT(outputsize == 256);
     RESET;
 
-    /* no packets assembly from unit start */
+    /* no packets assembly from unit start, early termination by fixed size */
     PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
@@ -168,6 +168,21 @@ int main(void)
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2);
+    RESET;
+
+    /* no packets assembly from unit start, early termination by undef size  */
+    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    SetWBE(&pkt->p_buffer[4], 250);
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    ASSERT(!output);
+    ASSERT(pes.gather.i_data_size == 256);
+    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    SetWBE(&pkt->p_buffer[4], 0);
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    ASSERT(output);
+    block_ChainProperties(output, &outputcount, &outputsize, NULL);
+    ASSERT(outputcount == 1);
+    ASSERT(outputsize == 188);
     RESET;
 
     /* packets assembly, payload undef, use next sync code from another payload undef */
