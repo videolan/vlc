@@ -14,7 +14,7 @@ EXTRA_DIST = \
 	nls.m4 \
 	po.m4 \
 	progtest.m4 \
-	stdcxx_14.m4 \
+	ax_cxx_compile_stdcxx.m4 \
+	ax_cxx_compile_stdcxx_17.m4 \
 	vlc.m4 \
 	$(NULL)
-
