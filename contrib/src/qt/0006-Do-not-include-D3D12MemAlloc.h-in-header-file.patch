@@ -1,0 +1,77 @@
+From 354c2ed8c581d9b0fc0bf776f653c270f307f075 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Mon, 22 Jan 2024 21:19:55 +0200
+Subject: [PATCH 6/8] Do not include D3D12MemAlloc.h in header file
+
+---
+ src/gui/rhi/qrhid3d12.cpp | 11 +++++++++++
+ src/gui/rhi/qrhid3d12_p.h | 17 +++++++----------
+ 2 files changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
+index 4a5e52bfc6..0787b9a0c8 100644
+--- a/src/gui/rhi/qrhid3d12.cpp
++++ b/src/gui/rhi/qrhid3d12.cpp
+@@ -2,6 +2,7 @@
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
+ #include "qrhid3d12_p.h"
++#include "D3D12MemAlloc.h"
+ #include "qshader.h"
+ #include <QWindow>
+ #include <qmath.h>
+@@ -124,6 +125,16 @@ QT_BEGIN_NAMESPACE
+ // https://learn.microsoft.com/en-us/windows/win32/direct3d12/hardware-feature-levels
+ static const D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL = D3D_FEATURE_LEVEL_11_0;
+ 
++void QD3D12Resource::releaseResources()
++{
++    if (owns) {
++        // order matters: resource first, then the allocation
++        resource->Release();
++        if (allocation)
++            allocation->Release();
++    }
++}
++
+ QRhiD3D12::QRhiD3D12(QRhiD3D12InitParams *params, QRhiD3D12NativeHandles *importParams)
+ {
+     debugLayer = params->enableDebugLayer;
+diff --git a/src/gui/rhi/qrhid3d12_p.h b/src/gui/rhi/qrhid3d12_p.h
+index a6954d279c..ef13cc214a 100644
+--- a/src/gui/rhi/qrhid3d12_p.h
++++ b/src/gui/rhi/qrhid3d12_p.h
+@@ -28,7 +28,12 @@
+ #include <dxgi1_6.h>
+ #include <dcomp.h>
+ 
+-#include "D3D12MemAlloc.h"
++namespace D3D12MA {
++    struct Budget;
++    struct Statistics;
++    class Allocation;
++    class Allocator;
++}
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -291,15 +296,7 @@ struct QD3D12Resource
+         return pool->add({ resource, state, resource->GetDesc(), nullptr, nullptr, 0, false });
+     }
+ 
+-    void releaseResources()
+-    {
+-        if (owns) {
+-            // order matters: resource first, then the allocation
+-            resource->Release();
+-            if (allocation)
+-                allocation->Release();
+-        }
+-    }
++    void releaseResources();
+ };
+ 
+ struct QD3D12Pipeline
+-- 
+2.43.1
+

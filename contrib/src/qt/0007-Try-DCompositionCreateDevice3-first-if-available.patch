@@ -1,0 +1,36 @@
+From 944575ba8b8e7817fd11cddbae2c2fc20eabd556 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Wed, 24 Jan 2024 16:31:06 +0200
+Subject: [PATCH 7/8] Try DCompositionCreateDevice3() first if available
+
+---
+ src/gui/rhi/qrhid3dhelpers_p.h | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/rhi/qrhid3dhelpers_p.h b/src/gui/rhi/qrhid3dhelpers_p.h
+index f20c042860..d78c5a2bb2 100644
+--- a/src/gui/rhi/qrhid3dhelpers_p.h
++++ b/src/gui/rhi/qrhid3dhelpers_p.h
+@@ -45,7 +45,18 @@ inline IDCompositionDevice *createDirectCompositionDevice()
+         _In_ REFIID iid,
+         _Outptr_ void **dcompositionDevice);
+     DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
+-        dcomplib.resolve("DCompositionCreateDevice"));
++        dcomplib.resolve("DCompositionCreateDevice3"));
++
++    if (!func) {
++        qDebug("Could not resolve DCompositionCreateDevice3, dcomp.dll missing or old. Trying DCompositionCreateDevice2...");
++        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice2"));
++    }
++
++    if (!func) {
++        qDebug("Could not resolve DCompositionCreateDevice2, dcomp.dll missing or old. Trying DCompositionCreateDevice...");
++        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice"));
++    }
++
+     if (!func) {
+         qWarning("Unable to resolve DCompositionCreateDevice, perhaps dcomp.dll is missing?");
+         return nullptr;
+-- 
+2.43.1
+

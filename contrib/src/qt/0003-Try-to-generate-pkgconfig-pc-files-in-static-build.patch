@@ -1,0 +1,30 @@
+From d9d290432bfc482ba970bf215f1dcec59fa7da01 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Mon, 8 Jan 2024 21:52:41 +0200
+Subject: [PATCH 3/8] Try to generate pkgconfig pc files in static build
+
+---
+ cmake/QtPkgConfigHelpers.cmake | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/cmake/QtPkgConfigHelpers.cmake b/cmake/QtPkgConfigHelpers.cmake
+index dbe736c438..caacd4e8ed 100644
+--- a/cmake/QtPkgConfigHelpers.cmake
++++ b/cmake/QtPkgConfigHelpers.cmake
+@@ -26,9 +26,10 @@ function(qt_internal_generate_pkg_config_file module)
+         AND NOT MINGW OR CMAKE_VERSION VERSION_LESS "3.20" OR ANDROID)
+         return()
+     endif()
+-    if(NOT BUILD_SHARED_LIBS)
+-        return()
+-    endif()
++	# Try to generate pc files also in static build
++    #if(NOT BUILD_SHARED_LIBS)
++    #    return()
++    #endif()
+ 
+     set(pkgconfig_file "${QT_CMAKE_EXPORT_NAMESPACE}${module}")
+     set(pkgconfig_name "${QT_CMAKE_EXPORT_NAMESPACE} ${module}")
+-- 
+2.43.1
+

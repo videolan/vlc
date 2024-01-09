@@ -1,0 +1,156 @@
+From 13ced07c50bc04b7f67001aa6521aee09f3cbfb8 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Sun, 14 Jan 2024 23:34:29 +0200
+Subject: [PATCH 4/8] Revert "QMutex: remove qmutex_win.cpp"
+
+This reverts commit b6e30e9fee98f9cdfec4c54c980864f65632519c.
+---
+ src/corelib/CMakeLists.txt            |  2 ++
+ src/corelib/thread/qlocking_p.h       |  7 ++++---
+ src/corelib/thread/qmutex.cpp         |  4 +++-
+ src/corelib/thread/qmutex_p.h         |  9 +++++---
+ src/corelib/thread/qmutex_win.cpp     | 30 +++++++++++++++++++++++++++
+ src/corelib/thread/qwaitcondition_p.h |  7 ++++---
+ 6 files changed, 49 insertions(+), 10 deletions(-)
+ create mode 100644 src/corelib/thread/qmutex_win.cpp
+
+diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
+index dff023581c..d43ece2b9f 100644
+--- a/src/corelib/CMakeLists.txt
++++ b/src/corelib/CMakeLists.txt
+@@ -499,6 +499,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
+ # from the wrong DLL at runtime and crash!
+ qt_internal_extend_target(Core CONDITION QT_FEATURE_thread AND WIN32
+     SOURCES
++        thread/qmutex_win.cpp
+         thread/qwaitcondition_win.cpp
+     LIBRARIES
+         synchronization
+@@ -1313,6 +1314,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_ctf AND QT_FEATURE_library
+ set_source_files_properties(
+     thread/qmutex_mac.cpp
+     thread/qmutex_unix.cpp
++    thread/qmutex_win.cpp
+     PROPERTIES HEADER_FILE_ONLY ON)
+ 
+ # Remove QT_NO_CAST_TO_ASCII to ensure that the symbols are included in the library.
+diff --git a/src/corelib/thread/qlocking_p.h b/src/corelib/thread/qlocking_p.h
+index 9fa7e70da9..0c205fff66 100644
+--- a/src/corelib/thread/qlocking_p.h
++++ b/src/corelib/thread/qlocking_p.h
+@@ -8,9 +8,10 @@
+ //  W A R N I N G
+ //  -------------
+ //
+-// This file is not part of the Qt API. It exists for the convenience of
+-// qmutex.cpp and qmutex_unix.cpp. This header file may change from version to
+-// version without notice, or even be removed.
++// This file is not part of the Qt API.  It exists for the convenience
++// of qmutex.cpp, qmutex_unix.cpp, and qmutex_win.cpp.  This header
++// file may change from version to version without notice, or even be
++// removed.
+ //
+ // We mean it.
+ //
+diff --git a/src/corelib/thread/qmutex.cpp b/src/corelib/thread/qmutex.cpp
+index b794d79e23..1a30b25ad5 100644
+--- a/src/corelib/thread/qmutex.cpp
++++ b/src/corelib/thread/qmutex.cpp
+@@ -913,10 +913,12 @@ void QMutexPrivate::derefWaiters(int value) noexcept
+ 
+ QT_END_NAMESPACE
+ 
+-#if defined(QT_ALWAYS_USE_FUTEX)
++#if defined(Q_OS_LINUX) && defined(QT_ALWAYS_USE_FUTEX)
+ // nothing
+ #elif defined(Q_OS_DARWIN)
+ #  include "qmutex_mac.cpp"
++#elif defined(Q_OS_WIN)
++#  include "qmutex_win.cpp"
+ #else
+ #  include "qmutex_unix.cpp"
+ #endif
+diff --git a/src/corelib/thread/qmutex_p.h b/src/corelib/thread/qmutex_p.h
+index aabb66fa55..99b0406eb7 100644
+--- a/src/corelib/thread/qmutex_p.h
++++ b/src/corelib/thread/qmutex_p.h
+@@ -10,9 +10,10 @@
+ //  W A R N I N G
+ //  -------------
+ //
+-// This file is not part of the Qt API. It exists for the convenience of
+-// qmutex.cpp and qmutex_unix.cpp. This header file may change from version to
+-// version without notice, or even be removed.
++// This file is not part of the Qt API.  It exists for the convenience
++// of qmutex.cpp, qmutex_unix.cpp, and qmutex_win.cpp.  This header
++// file may change from version to version without notice, or even be
++// removed.
+ //
+ // We mean it.
+ //
+@@ -86,6 +87,8 @@ public:
+     semaphore_t mach_semaphore;
+ #elif defined(Q_OS_UNIX)
+     sem_t semaphore;
++#elif defined(Q_OS_WIN)
++    Qt::HANDLE event;
+ #endif
+ };
+ 
+diff --git a/src/corelib/thread/qmutex_win.cpp b/src/corelib/thread/qmutex_win.cpp
+new file mode 100644
+index 0000000000..8c7741c113
+--- /dev/null
++++ b/src/corelib/thread/qmutex_win.cpp
+@@ -0,0 +1,30 @@
++// Copyright (C) 2016 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#include "qmutex.h"
++#include <qatomic.h>
++#include "qmutex_p.h"
++#include <qt_windows.h>
++
++QT_BEGIN_NAMESPACE
++
++QMutexPrivate::QMutexPrivate()
++{
++    event = CreateEvent(0, FALSE, FALSE, 0);
++
++    if (!event)
++        qWarning("QMutexPrivate::QMutexPrivate: Cannot create event");
++}
++
++QMutexPrivate::~QMutexPrivate()
++{ CloseHandle(event); }
++
++bool QMutexPrivate::wait(int timeout)
++{
++    return (WaitForSingleObjectEx(event, timeout < 0 ? INFINITE : timeout, FALSE) == WAIT_OBJECT_0);
++}
++
++void QMutexPrivate::wakeUp() noexcept
++{ SetEvent(event); }
++
++QT_END_NAMESPACE
+diff --git a/src/corelib/thread/qwaitcondition_p.h b/src/corelib/thread/qwaitcondition_p.h
+index cfb36ca30b..01bb000366 100644
+--- a/src/corelib/thread/qwaitcondition_p.h
++++ b/src/corelib/thread/qwaitcondition_p.h
+@@ -7,9 +7,10 @@
+ //  W A R N I N G
+ //  -------------
+ //
+-// This file is not part of the Qt API. It exists for the convenience of
+-// qmutex.cpp and qmutex_unix.cpp. This header file may change from version to
+-// version without notice, or even be removed.
++// This file is not part of the Qt API.  It exists for the convenience
++// of qmutex.cpp, qmutex_unix.cpp, and qmutex_win.cpp.  This header
++// file may change from version to version without notice, or even be
++// removed.
+ //
+ // We mean it.
+ //
+-- 
+2.43.1
+
