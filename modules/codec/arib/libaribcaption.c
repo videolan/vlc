@@ -48,13 +48,7 @@ typedef struct
     /* The following fields of decoder_sys_t are shared between decoder and spu units */
     vlc_atomic_rc_t    rc;
 
-    int                i_cfg_rendering_backend;
-    bool               b_cfg_replace_drcs;
-    bool               b_cfg_force_stroke_text;
-    bool               b_cfg_ignore_background;
-    bool               b_cfg_ignore_ruby;
     bool               b_cfg_fadeout;
-    float              f_cfg_stroke_width;
 
     aribcc_context_t  *p_context;
     aribcc_decoder_t  *p_decoder;
@@ -342,13 +336,7 @@ static int Open(vlc_object_t *p_this)
 
     vlc_atomic_rc_init(&p_sys->rc);
 
-    p_sys->i_cfg_rendering_backend = var_InheritInteger(p_this, ARIBCAPTION_CFG_PREFIX "rendering-backend");
-    p_sys->b_cfg_replace_drcs = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "replace-drcs");
-    p_sys->b_cfg_force_stroke_text = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "force-stroke-text");
-    p_sys->b_cfg_ignore_background = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "ignore-background");
-    p_sys->b_cfg_ignore_ruby = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "ignore-ruby");
     p_sys->b_cfg_fadeout = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "fadeout");
-    p_sys->f_cfg_stroke_width = var_InheritFloat(p_this, ARIBCAPTION_CFG_PREFIX "stroke-width");
 
     vlc_mutex_init(&p_sys->dec_lock);
     p_sys->p_dec = p_dec;
@@ -397,21 +385,30 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
+    int i_cfg_rendering_backend =
+        var_InheritInteger(p_this, ARIBCAPTION_CFG_PREFIX "rendering-backend");
     b_succ = aribcc_renderer_initialize(p_renderer,
                                         ARIBCC_CAPTIONTYPE_CAPTION,
                                         ARIBCC_FONTPROVIDER_TYPE_AUTO,
-                                        (aribcc_textrenderer_type_t)p_sys->i_cfg_rendering_backend);
+                                        (aribcc_textrenderer_type_t)i_cfg_rendering_backend);
     if (!b_succ) {
         msg_Err(p_dec, "libaribcaption renderer initialization failed");
         DecSysRelease(p_sys);
         return VLC_EGENERIC;
     }
+
     aribcc_renderer_set_storage_policy(p_renderer, ARIBCC_CAPTION_STORAGE_POLICY_MINIMUM, 0);
-    aribcc_renderer_set_replace_drcs(p_renderer, p_sys->b_cfg_replace_drcs);
-    aribcc_renderer_set_force_stroke_text(p_renderer, p_sys->b_cfg_force_stroke_text);
-    aribcc_renderer_set_force_no_background(p_renderer, p_sys->b_cfg_ignore_background);
-    aribcc_renderer_set_force_no_ruby(p_renderer, p_sys->b_cfg_ignore_ruby);
-    aribcc_renderer_set_stroke_width(p_renderer, p_sys->f_cfg_stroke_width);
+
+    bool b_cfg_replace_drcs = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "replace-drcs");
+    bool b_cfg_force_stroke_text = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "force-stroke-text");
+    bool b_cfg_ignore_background = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "ignore-background");
+    bool b_cfg_ignore_ruby = var_InheritBool(p_this, ARIBCAPTION_CFG_PREFIX "ignore-ruby");
+    float f_cfg_stroke_width = var_InheritFloat(p_this, ARIBCAPTION_CFG_PREFIX "stroke-width");
+    aribcc_renderer_set_replace_drcs(p_renderer, b_cfg_replace_drcs);
+    aribcc_renderer_set_force_stroke_text(p_renderer, b_cfg_force_stroke_text);
+    aribcc_renderer_set_force_no_background(p_renderer, b_cfg_ignore_background);
+    aribcc_renderer_set_force_no_ruby(p_renderer, b_cfg_ignore_ruby);
+    aribcc_renderer_set_stroke_width(p_renderer, f_cfg_stroke_width);
 
     char *psz_cfg_font_name = var_InheritString(p_this, ARIBCAPTION_CFG_PREFIX "font");
     if (psz_cfg_font_name) {
