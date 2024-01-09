@@ -217,14 +217,19 @@ static void spu_channel_EarlyRemoveLate(spu_private_t *sys,
     }
 }
 
-static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
+static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id, size_t *index)
 {
     spu_private_t *sys = spu->p;
 
     for (size_t i = 0; i < sys->channels.size; ++i)
+    {
         if (sys->channels.data[i].id == channel_id)
+        {
+            if (index)
+                *index = i;
             return &sys->channels.data[i];
-
+        }
+    }
     vlc_assert_unreachable();
 }
 
@@ -1859,7 +1864,7 @@ void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay)
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
-    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id, NULL);
     assert(channel->clock);
     vlc_clock_SetDelay(channel->clock, delay);
     channel->delay = delay;
@@ -1871,7 +1876,7 @@ void spu_SetClockRate(spu_t *spu, size_t channel_id, float rate)
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
-    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id, NULL);
     assert(channel->clock);
     channel->rate = rate;
     vlc_mutex_unlock(&sys->lock);
@@ -1966,7 +1971,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     /* */
     vlc_mutex_lock(&sys->lock);
-    struct spu_channel *channel = spu_GetChannel(spu, subpic->i_channel);
+    struct spu_channel *channel = spu_GetChannel(spu, subpic->i_channel, NULL);
 
 
     /* Convert all spu ts */
@@ -2184,7 +2189,7 @@ void spu_ClearChannel(spu_t *spu, size_t channel_id)
 {
     spu_private_t *sys = spu->p;
     vlc_mutex_lock(&sys->lock);
-    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id, NULL);
     spu_channel_Clean(sys, channel);
     if (channel->clock)
     {
@@ -2199,9 +2204,10 @@ void spu_UnregisterChannel(spu_t *spu, size_t channel_id)
     spu_private_t *sys = spu->p;
 
     vlc_mutex_lock(&sys->lock);
-    struct spu_channel *channel = spu_GetChannel(spu, channel_id);
+    size_t channel_index = 0;
+    struct spu_channel *channel = spu_GetChannel(spu, channel_id, &channel_index);
     spu_channel_Clean(sys, channel);
-    vlc_vector_remove(&sys->channels, channel_id);
+    vlc_vector_remove(&sys->channels, channel_index);
     vlc_mutex_unlock(&sys->lock);
 }
 
