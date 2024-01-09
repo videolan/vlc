@@ -1509,7 +1509,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     else if (sys->wait_interrupted)
     {
         sys->wait_interrupted = false;
-        RenderPicture(vout, true);
+        if (likely(sys->displayed.current != NULL))
+            RenderPicture(vout, true);
         return VLC_TICK_INVALID;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
