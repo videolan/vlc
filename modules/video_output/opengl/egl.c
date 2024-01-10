@@ -164,32 +164,32 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 static EGLDisplay OpenDisplay(vlc_gl_t *gl)
 {
     vlc_window_t *surface = gl->surface;
-    EGLint ref_attr = EGL_NONE;
-
-# ifdef EGL_KHR_display_reference
-    if (CheckClientExt("EGL_KHR_display_reference"))
-        ref_attr = EGL_TRACK_REFERENCES_KHR;
-# endif
 
     if (surface->type != VLC_WINDOW_TYPE_WAYLAND)
         return EGL_NO_DISPLAY;
+    if (!CheckClientExt("EGL_KHR_display_reference")) {
+        msg_Warn(gl, "EGL display reference counting not supported");
+        return EGL_NO_DISPLAY;
+    }
 
-    const EGLAttrib attrs[] = {
-        ref_attr, EGL_TRUE,
+# ifdef EGL_KHR_display_reference
+    static const EGLAttrib attrs[] = {
+        EGL_TRACK_REFERENCES_KHR, EGL_TRUE,
         EGL_NONE
     };
 
-# if defined(EGL_VERSION_1_5)
-#  ifdef EGL_KHR_platform_wayland
+#  if defined(EGL_VERSION_1_5)
+#   ifdef EGL_KHR_platform_wayland
     if (CheckClientExt("EGL_KHR_platform_wayland"))
         return eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR,
                                      surface->display.wl, attrs);
-#  endif
+#   endif
 
-# elif defined(EGL_EXT_platform_wayland)
+#  elif defined(EGL_EXT_platform_wayland)
     if (CheckClientExt("EGL_EXT_platform_wayland"))
         return getPlatformDisplayEXT(EGL_PLATFORM_WAYLAND_EXT,
                                      surface->display.wl, attrs);
+#  endif
 # endif
     return EGL_NO_DISPLAY;
 }
