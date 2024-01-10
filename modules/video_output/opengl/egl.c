@@ -61,6 +61,7 @@ typedef struct vlc_gl_sys_t
     EGLContext context;
 #if defined (USE_PLATFORM_X11)
     Display *x11;
+    Screen *x11_scr;
     Window x11_win;
 #endif
 #if defined (USE_PLATFORM_XCB)
@@ -237,9 +238,20 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
-    Window win = sys->x11_win;
-
-    XResizeWindow(sys->x11, win, width, height);
+    unsigned long mask =
+        CWBackPixel | CWBorderPixel | CWBitGravity | CWColormap;
+    XSetWindowAttributes swa = {
+        .background_pixel = BlackPixelOfScreen(sys->x11_scr),
+        .border_pixel = BlackPixelOfScreen(sys->x11_scr),
+        .bit_gravity = NorthWestGravity,
+        .colormap = DefaultColormapOfScreen(sys->x11_scr),
+    };
+    Window win = XCreateWindow(sys->x11, gl->surface->handle.xid, 0, 0, width,
+                               height, 0, DefaultDepthOfScreen(sys->x11_scr),
+                               InputOutput,
+                               DefaultVisualOfScreen(sys->x11_scr), mask,
+                               &swa);
+    sys->x11_win = win;
     XMapWindow(sys->x11, win);
 
 # if defined(EGL_VERSION_1_5)
@@ -312,20 +324,8 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
     if (display == EGL_NO_DISPLAY)
         goto error;
 
-    unsigned long mask =
-        CWBackPixel | CWBorderPixel | CWBitGravity | CWColormap;
-    XSetWindowAttributes swa = {
-        .background_pixel = BlackPixelOfScreen(wa.screen),
-        .border_pixel = BlackPixelOfScreen(wa.screen),
-        .bit_gravity = NorthWestGravity,
-        .colormap = DefaultColormapOfScreen(wa.screen),
-    };
-
     sys->x11 = x11;
-    sys->x11_win = XCreateWindow(x11, surface->handle.xid, 0, 0, wa.width,
-                                 wa.height, 0, DefaultDepthOfScreen(wa.screen),
-                                 InputOutput, DefaultVisualOfScreen(wa.screen),
-                                 mask, &swa);
+    sys->x11_scr = wa.screen;
     return display;
 error:
     XCloseDisplay(x11);
