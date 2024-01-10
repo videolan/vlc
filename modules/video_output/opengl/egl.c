@@ -174,24 +174,22 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
     if (surface->type != VLC_WINDOW_TYPE_WAYLAND)
         return EGL_NO_DISPLAY;
 
+    const EGLAttrib attrs[] = {
+        ref_attr, EGL_TRUE,
+        EGL_NONE
+    };
+
 # if defined(EGL_VERSION_1_5)
 #  ifdef EGL_KHR_platform_wayland
-    if (CheckClientExt("EGL_KHR_platform_wayland")) {
-        const EGLAttrib attrs[] = { ref_attr, EGL_TRUE, EGL_NONE };
-
+    if (CheckClientExt("EGL_KHR_platform_wayland"))
         return eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR,
                                      surface->display.wl, attrs);
-    }
 #  endif
 
 # elif defined(EGL_EXT_platform_wayland)
-    if (CheckClientExt("EGL_EXT_platform_wayland")) {
-        const EGLint attrs[] = { ref_attr, EGL_TRUE, EGL_NONE };
-
+    if (CheckClientExt("EGL_EXT_platform_wayland"))
         return getPlatformDisplayEXT(EGL_PLATFORM_WAYLAND_EXT,
                                      surface->display.wl, attrs);
-    }
-
 # endif
     return EGL_NO_DISPLAY;
 }
