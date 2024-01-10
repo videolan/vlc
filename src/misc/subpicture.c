@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_image.h>
 #include <vlc_subpicture.h>
+#include "subpicture.h"
 
 struct subpicture_private_t
 {
@@ -185,6 +186,32 @@ void subpicture_Update( subpicture_t *p_subpicture,
     video_format_Copy( &p_private->dst, p_fmt_dst );
 }
 
+
+subpicture_region_private_t *subpicture_region_private_New( video_format_t *p_fmt )
+{
+    subpicture_region_private_t *p_private = malloc( sizeof(*p_private) );
+
+    if( !p_private )
+        return NULL;
+
+    if ( video_format_Copy( &p_private->fmt, p_fmt ) != VLC_SUCCESS )
+    {
+        free( p_private );
+        return NULL;
+    }
+
+    p_private->p_picture = NULL;
+    return p_private;
+}
+
+void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
+{
+    if( p_private->p_picture )
+        picture_Release( p_private->p_picture );
+    video_format_Clean( &p_private->fmt );
+    free( p_private );
+}
+
 static subpicture_region_t * subpicture_region_NewInternal( void )
 {
     subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
@@ -287,6 +314,9 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
 {
     if( !p_region )
         return;
+
+    if( p_region->p_private )
+        subpicture_region_private_Delete( p_region->p_private );
 
     if( p_region->p_picture )
         picture_Release( p_region->p_picture );
