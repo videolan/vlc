@@ -66,6 +66,7 @@ typedef struct vlc_gl_sys_t
 #endif
 #if defined (USE_PLATFORM_XCB)
     xcb_connection_t *conn;
+    const xcb_screen_t *xcb_scr;
     xcb_window_t xcb_win;
 #endif
 #if defined (USE_PLATFORM_WAYLAND)
@@ -388,12 +389,29 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
 # ifdef EGL_EXT_platform_base
     vlc_gl_sys_t *sys = gl->sys;
     xcb_connection_t *conn = sys->conn;
-    xcb_window_t win = sys->xcb_win;
-    uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
-    const uint32_t values[] = { width, height, };
 
-    xcb_configure_window(conn, win, mask, values);
+    xcb_window_t win = xcb_generate_id(conn);
+    uint32_t mask =
+        XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXEL |
+        XCB_CW_BIT_GRAVITY |
+        XCB_CW_COLORMAP;
+    const uint32_t values[] = {
+        /* XCB_CW_BACK_PIXEL */
+        sys->xcb_scr->black_pixel,
+        /* XCB_CW_BORDER_PIXEL */
+        sys->xcb_scr->black_pixel,
+        /* XCB_CW_BIT_GRAVITY */
+        XCB_GRAVITY_NORTH_WEST,
+        /* XCB_CW_COLORMAP */
+        sys->xcb_scr->default_colormap,
+    };
+    xcb_create_window(conn, sys->xcb_scr->root_depth, win,
+                      gl->surface->handle.xid, 0, 0, width, height, 0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, sys->xcb_scr->root_visual,
+                      mask, values);
     xcb_map_window(conn, win);
+    sys->xcb_win = win;
 
     assert(CheckClientExt("EGL_EXT_platform_xcb"));
     return createPlatformWindowSurfaceEXT(dpy, config, &win, NULL);
@@ -437,28 +455,8 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
         goto out;
     }
 
-    xcb_window_t win = xcb_generate_id(conn);
-    uint32_t mask =
-        XCB_CW_BACK_PIXEL |
-        XCB_CW_BORDER_PIXEL |
-        XCB_CW_BIT_GRAVITY |
-        XCB_CW_COLORMAP;
-    const uint32_t values[] = {
-        /* XCB_CW_BACK_PIXEL */
-        scr->black_pixel,
-        /* XCB_CW_BORDER_PIXEL */
-        scr->black_pixel,
-        /* XCB_CW_BIT_GRAVITY */
-        XCB_GRAVITY_NORTH_WEST,
-        /* XCB_CW_COLORMAP */
-        scr->default_colormap,
-    };
-
-    xcb_create_window(conn, scr->root_depth, win, surface->handle.xid, 0, 0, 1,
-                      1, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
-                      mask, values);
     sys->conn = conn;
-    sys->xcb_win = win;
+    sys->xcb_scr = scr;
 out:
     return display;
 # else
