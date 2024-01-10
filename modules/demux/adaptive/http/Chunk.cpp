@@ -255,7 +255,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
 
 void HTTPChunkSource::recycle()
 {
-    connManager->recycleSource(this);
+    delete this;
 }
 
 StorageID HTTPChunkSource::makeStorageID(const std::string &s, const BytesRange &r)
@@ -470,7 +470,7 @@ void HTTPChunkBufferedSource::recycle()
     p_read = p_head;
     inblockreadoffset = 0;
     consumed = 0;
-    HTTPChunkSource::recycle();
+    connManager->recycleSource(this);
 }
 
 block_t * HTTPChunkBufferedSource::readBlock()
