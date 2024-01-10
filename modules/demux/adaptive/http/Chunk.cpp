@@ -470,6 +470,7 @@ void HTTPChunkBufferedSource::recycle()
     p_read = p_head;
     inblockreadoffset = 0;
     consumed = 0;
+    contentLength = buffered;
     connManager->recycleSource(this);
 }
 
