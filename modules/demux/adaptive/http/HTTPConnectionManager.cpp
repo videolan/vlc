@@ -217,7 +217,7 @@ void HTTPConnectionManager::recycleSource(AbstractChunkSource *source)
 
     HTTPChunkBufferedSource *buf = dynamic_cast<HTTPChunkBufferedSource *>(source);
     if(buf && b_cacheable && !buf->getStorageID().empty() &&
-       buf->contentLength < cache_max)
+       buf->contentLength && buf->contentLength < cache_max)
     {
         while(cache_max < cache_total + buf->contentLength)
         {
