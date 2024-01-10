@@ -835,119 +835,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
     return subpicture_array;
 }
 
-static void SpuRescaleRegion(spu_t *spu,
-                             subpicture_region_t *region, picture_t **scaled_pic,
-                             const spu_scale_t scale_size,
-                             bool changed_palette, bool using_palette,
-                             const vlc_fourcc_t *chroma_list)
-{
-    spu_private_t *sys = spu->p;
 
-    bool convert_chroma = true;
-    for (int i = 0; chroma_list[i] && convert_chroma; i++) {
-        if (region->fmt.i_chroma == chroma_list[i])
-            convert_chroma = false;
-    }
-
-    /* Scale from rendered size to destination size */
-    if (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || convert_chroma)
-    {
-        const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
-        const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
-
-        /* Destroy the cache if unusable */
-        if (*scaled_pic) {
-            picture_t *private = *scaled_pic;
-            bool is_changed = false;
-
-            /* Check resize changes */
-            if (dst_width  != private->format.i_visible_width ||
-                dst_height != private->format.i_visible_height)
-                is_changed = true;
-
-            /* Check forced palette changes */
-            if (changed_palette)
-                is_changed = true;
-
-            if (convert_chroma && private->format.i_chroma != chroma_list[0])
-                is_changed = true;
-
-            if (is_changed) {
-                picture_Release(*scaled_pic);
-                *scaled_pic = NULL;
-            }
-        }
-
-        /* Scale if needed into cache */
-        if (!*scaled_pic && dst_width > 0 && dst_height > 0) {
-            filter_t *scale = sys->scale;
-
-            picture_t *picture = region->p_picture;
-            picture_Hold(picture);
-
-            /* Convert YUVP to YUVA/RGBA first for better scaling quality */
-            if (using_palette) {
-                filter_t *scale_yuvp = sys->scale_yuvp;
-
-                scale_yuvp->fmt_in.video = region->fmt;
-
-                scale_yuvp->fmt_out.video = region->fmt;
-                scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
-                scale_yuvp->fmt_out.video.p_palette = NULL;
-
-                picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
-
-                scale_yuvp->fmt_in.video.p_palette = NULL;
-                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
-                if (!picture) {
-                    /* Well we will try conversion+scaling */
-                    msg_Warn(spu, "%4.4s to %4.4s conversion failed",
-                             (const char*)&scale_yuvp->fmt_in.video.i_chroma,
-                             (const char*)&scale_yuvp->fmt_out.video.i_chroma);
-                }
-            }
-
-            /* Conversion(except from YUVP)/Scaling */
-            if (picture &&
-                (picture->format.i_visible_width  != dst_width ||
-                 picture->format.i_visible_height != dst_height ||
-                 (convert_chroma && !using_palette)))
-            {
-                scale->fmt_in.video  = picture->format;
-                scale->fmt_out.video = picture->format;
-                if (using_palette)
-                {
-                    scale->fmt_in.video.i_chroma = chroma_list[0];
-                }
-                if (convert_chroma)
-                {
-                    scale->fmt_out.i_codec        =
-                    scale->fmt_out.video.i_chroma = chroma_list[0];
-                }
-
-                scale->fmt_out.video.i_width  = dst_width;
-                scale->fmt_out.video.i_height = dst_height;
-
-                scale->fmt_out.video.i_visible_width =
-                    spu_scale_w(region->fmt.i_visible_width, scale_size);
-                scale->fmt_out.video.i_visible_height =
-                    spu_scale_h(region->fmt.i_visible_height, scale_size);
-
-                picture = scale->ops->filter_video(scale, picture);
-                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
-                if (!picture)
-                    msg_Err(spu, "scaling failed");
-            }
-
-            /* */
-            if (picture) {
-                if (*scaled_pic)
-                    picture_Release(picture);
-                *scaled_pic = picture;
-            }
-        }
-    }
-}
 
 /**
  * It will transform the provided region into another region suitable for rendering.
@@ -1100,19 +988,118 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     }
 
     /* */
-    SpuRescaleRegion( spu, region, scaled_pic, scale_size,
-                      changed_palette, using_palette,
-                      chroma_list );
+    region_fmt = region->fmt;
+    region_picture = region->p_picture;
 
-    if (*scaled_pic == NULL)
-    {
-        region_fmt = region->fmt;
-        region_picture = region->p_picture;
+    bool convert_chroma = true;
+    for (int i = 0; chroma_list[i] && convert_chroma; i++) {
+        if (region_fmt.i_chroma == chroma_list[i])
+            convert_chroma = false;
     }
-    else
+
+    /* Scale from rendered size to destination size */
+    if (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || convert_chroma)
     {
-        region_picture = *scaled_pic;
-        region_fmt = region_picture->format;
+        const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
+        const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
+
+        /* Destroy the cache if unusable */
+        if (*scaled_pic) {
+            picture_t *private = *scaled_pic;
+            bool is_changed = false;
+
+            /* Check resize changes */
+            if (dst_width  != private->format.i_visible_width ||
+                dst_height != private->format.i_visible_height)
+                is_changed = true;
+
+            /* Check forced palette changes */
+            if (changed_palette)
+                is_changed = true;
+
+            if (convert_chroma && private->format.i_chroma != chroma_list[0])
+                is_changed = true;
+
+            if (is_changed) {
+                picture_Release(*scaled_pic);
+                *scaled_pic = NULL;
+            }
+        }
+
+        /* Scale if needed into cache */
+        if (!*scaled_pic && dst_width > 0 && dst_height > 0) {
+            filter_t *scale = sys->scale;
+
+            picture_t *picture = region->p_picture;
+            picture_Hold(picture);
+
+            /* Convert YUVP to YUVA/RGBA first for better scaling quality */
+            if (using_palette) {
+                filter_t *scale_yuvp = sys->scale_yuvp;
+
+                scale_yuvp->fmt_in.video = region->fmt;
+
+                scale_yuvp->fmt_out.video = region->fmt;
+                scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
+                scale_yuvp->fmt_out.video.p_palette = NULL;
+
+                picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
+
+                scale_yuvp->fmt_in.video.p_palette = NULL;
+                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
+                if (!picture) {
+                    /* Well we will try conversion+scaling */
+                    msg_Warn(spu, "%4.4s to %4.4s conversion failed",
+                             (const char*)&scale_yuvp->fmt_in.video.i_chroma,
+                             (const char*)&scale_yuvp->fmt_out.video.i_chroma);
+                }
+            }
+
+            /* Conversion(except from YUVP)/Scaling */
+            if (picture &&
+                (picture->format.i_visible_width  != dst_width ||
+                 picture->format.i_visible_height != dst_height ||
+                 (convert_chroma && !using_palette)))
+            {
+                scale->fmt_in.video  = picture->format;
+                scale->fmt_out.video = picture->format;
+                if (using_palette)
+                {
+                    scale->fmt_in.video.i_chroma = chroma_list[0];
+                }
+                if (convert_chroma)
+                {
+                    scale->fmt_out.i_codec        =
+                    scale->fmt_out.video.i_chroma = chroma_list[0];
+                }
+
+                scale->fmt_out.video.i_width  = dst_width;
+                scale->fmt_out.video.i_height = dst_height;
+
+                scale->fmt_out.video.i_visible_width =
+                    spu_scale_w(region->fmt.i_visible_width, scale_size);
+                scale->fmt_out.video.i_visible_height =
+                    spu_scale_h(region->fmt.i_visible_height, scale_size);
+
+                picture = scale->ops->filter_video(scale, picture);
+                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
+                if (!picture)
+                    msg_Err(spu, "scaling failed");
+            }
+
+            /* */
+            if (picture) {
+                if (*scaled_pic)
+                    picture_Release(picture);
+                *scaled_pic = picture;
+            }
+        }
+
+        /* And use the scaled picture */
+        if (*scaled_pic) {
+            region_fmt     = (*scaled_pic)->format;
+            region_picture = *scaled_pic;
+        }
     }
 
     /* Force cropping if requested */
