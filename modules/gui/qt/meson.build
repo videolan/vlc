@@ -2,9 +2,6 @@
 # Qt-based interface module
 #
 
-# Qt is temporarily disabled
-subdir_done()
-
 qt6 = import('qt6')
 
 qt_include_dir = include_directories('.')

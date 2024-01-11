@@ -3987,8 +3987,7 @@ dnl QT
 dnl
 AC_ARG_ENABLE([qt],
   AS_HELP_STRING([--disable-qt], [Qt UI support (default enabled)]),, [
-  dnl Disable Qt temporarily
-  AS_IF([test "${enable_vlc}" != "no"], [enable_qt="no"])
+  AS_IF([test "${enable_vlc}" != "no"], [enable_qt="yes"])
   AS_IF([test "${SYS}" = "darwin"], [
     enable_qt="no"
   ])
