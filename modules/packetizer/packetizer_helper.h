@@ -181,6 +181,11 @@ static block_t *packetizer_PacketizeBlock( packetizer_t *p_pack, block_t **pp_bl
             block_t *p_block_bytestream = p_pack->bytestream.p_block;
 
             p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
+            if( p_pic == NULL )
+            {
+                p_pack->i_state = STATE_NOSYNC;
+                return NULL;
+            }
             p_pic->i_pts = p_block_bytestream->i_pts;
             p_pic->i_dts = p_block_bytestream->i_dts;
 
