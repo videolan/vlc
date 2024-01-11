@@ -84,9 +84,12 @@ protected:
         Q_Q(BaseModel);
         emit q->beginResetModel();
         // 'abandon' existing cache and queue it for deletion
-        cache->disconnect(q);
-        cache->deleteLater();
-        cache.release();
+        if (cache)
+        {
+            cache->disconnect(q);
+            cache->deleteLater();
+            cache.release();
+        }
         emit q->endResetModel();
         validateCache();
     }
