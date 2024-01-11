@@ -294,7 +294,7 @@ se_AttachWrapper( struct stream_extractor_private* priv, stream_t* source )
 
     priv->source = source;
 
-    priv->wrapper = stream_FilterChainNew( priv->wrapper, "cache" );
+    priv->wrapper = stream_FilterChainNew( priv->wrapper, "prefetch,cache" );
     return VLC_SUCCESS;
 }
 
