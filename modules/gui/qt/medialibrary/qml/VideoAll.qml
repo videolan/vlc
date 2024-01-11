@@ -35,7 +35,8 @@ MainInterface.MainViewLoader {
 
     // Properties
 
-    readonly property int contentMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
+    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
+    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
     // NOTE: Specify an optional header for the view.
     property Component header: null

@@ -43,6 +43,9 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
+    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
+    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
+
     property alias searchPattern: playlistModel.searchPattern
     property alias sortOrder: playlistModel.sortOrder
     property alias sortCriteria: playlistModel.sortCriteria

@@ -63,8 +63,8 @@ FocusScope {
 
         anchors.fill: parent
 
-        anchors.leftMargin: root.view.contentMargin
-        anchors.rightMargin: anchors.leftMargin
+        anchors.leftMargin: root.view.contentLeftMargin
+        anchors.rightMargin: root.view.contentRightMargin
 
         Widgets.SubtitleLabel {
             id: label

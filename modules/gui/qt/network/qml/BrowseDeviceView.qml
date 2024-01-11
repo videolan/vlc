@@ -38,7 +38,8 @@ FocusScope {
 
     readonly property int contentHeight: (_currentView) ? _currentView.contentHeight : 0
 
-    readonly property int contentMargin: (_currentView) ? _currentView.contentLeftMargin : 0
+    readonly property int contentLeftMargin: (_currentView) ? _currentView.contentLeftMargin : 0
+    readonly property int contentRightMargin: (_currentView) ? _currentView.contentRightMargin : 0
 
     property int displayMarginEnd: 0
 

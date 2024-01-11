@@ -35,6 +35,9 @@ MainInterface.MainViewLoader {
 
     readonly property var currentIndex: _currentView.currentIndex
 
+    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
+    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
+
      // 'loading' property is not available with NetworkDevicesModel
     readonly property bool loading: Helpers.get(model, "loading", false)
 
@@ -145,8 +148,8 @@ MainInterface.MainViewLoader {
             headerDelegate: BrowseTreeHeader {
                 providerModel: root.model
 
-                // align header content with grid content
-                leftPadding: gridView.rowX
+                leftPadding: root.contentLeftMargin
+                rightPadding: root.contentRightMargin
 
                 width: gridView.width
 
@@ -279,6 +282,9 @@ MainInterface.MainViewLoader {
 
             header: BrowseTreeHeader {
                 providerModel: root.model
+
+                leftPadding: root.contentLeftMargin
+                rightPadding: root.contentRightMargin
 
                 width: tableView.width
 

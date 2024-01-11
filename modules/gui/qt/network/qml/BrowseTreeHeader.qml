@@ -43,8 +43,6 @@ T.Control {
     height: implicitHeight
     implicitHeight: layout.implicitHeight + topPadding + bottomPadding
 
-    leftPadding: VLCStyle.margin_large
-    rightPadding: VLCStyle.margin_small
     topPadding: VLCStyle.margin_large
     bottomPadding: VLCStyle.margin_normal
 

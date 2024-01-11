@@ -35,6 +35,9 @@ MainInterface.MainViewLoader {
     // Properties
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
+    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
+    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
+
     property alias searchPattern: genreModel.searchPattern
     property alias sortOrder: genreModel.sortOrder
     property alias sortCriteria: genreModel.sortCriteria
