@@ -145,7 +145,6 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
 
     m_qmlView = std::make_unique<QQuickView>();
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
-    m_qmlView->setClearBeforeRendering(true);
     m_qmlView->setColor(QColor(Qt::transparent));
 
     m_qmlView->installEventFilter(this);
