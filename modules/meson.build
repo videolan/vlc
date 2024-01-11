@@ -280,16 +280,17 @@ subdir('lua')
 # This has to be declared here as it needs to end up
 # in the modules folder, not in gui/qt/ subfolder as
 # vlc-static would not find it there.
-if qt5_dep.found()
+if qt6_dep.found()
     executable('vlc-qt-check',
         files('gui/qt/vlc-qt-check.cpp'),
-        dependencies: [qt5_dep, qt_extra_deps],
+        dependencies: [qt6_dep, qt_extra_deps],
         include_directories: [vlc_include_dirs],
         build_by_default: true,
         install: true,
         install_dir: get_option('libexecdir'),
         c_args : qt_extra_flags,
         cpp_args : qt_extra_flags,
+        link_args : qt_link_args,
     )
 endif
 

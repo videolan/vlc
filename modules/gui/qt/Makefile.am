@@ -18,14 +18,14 @@ SUFFIXES += .ui .h .hpp .moc.cpp .qml
 TEST_EXTENSIONS = .qml
 EXTRA_DIST =
 
-vlc_qt_libs = $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS) $(QT5_XCB_PLUGINS_LIBS) $(QT5_WAYLAND_PLUGINS_LIBS) $(QT_LIBS) $(LIBS_qt)
+vlc_qt_libs = $(QT_LIBS) $(VLCQTDEPS_LIBS)
 
 vlc_qt_check_SOURCES = vlc-qt-check.cpp plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
-vlc_qt_check_CPPFLAGS = $(AM_CPPFLAGS)
+vlc_qt_check_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt)
 vlc_qt_check_LDADD = $(vlc_qt_libs)
 
-libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-DQT_STRICT_ITERATORS \
 	-I$(srcdir) -I$(builddir) \
 	-I$(builddir)/dialogs/extended \
@@ -38,7 +38,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(builddir)/dialogs/preferences \
 	-I$(builddir)/dialogs/sout \
 	-I$(builddir)/dialogs/vlm \
-	-DQPNI_HEADER=\<$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h\>
+	-DQPNI_HEADER=\<$(QT_VERSION_GUI)/QtGui/qpa/qplatformnativeinterface.h\>
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(vlc_qt_libs)
@@ -47,22 +47,24 @@ if HAVE_DARWIN
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
 
+if HAVE_X
 if HAVE_XCB
-libqt_plugin_la_CXXFLAGS += $(XCB_CFLAGS)  -DQT5_HAS_X11
+libqt_plugin_la_CXXFLAGS += $(XCB_CFLAGS) -DQT_HAS_X11
 libqt_plugin_la_LIBADD += $(XCB_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
-vlc_qt_check_CXXFLAGS += $(XCB_CFLAGS) -DQT5_HAS_X11
+vlc_qt_check_CXXFLAGS += $(XCB_CFLAGS) -DQT_HAS_X11
+endif
 endif
 
-if HAVE_QT5_WAYLAND
-libqt_plugin_la_CPPFLAGS += $(QT5_WAYLAND_CFLAGS)
-libqt_plugin_la_LIBADD += $(QT5_WAYLAND_LIBS)
-vlc_qt_check_CPPFLAGS += $(QT5_WAYLAND_CFLAGS) -DQT5_HAS_WAYLAND
-vlc_qt_check_LDADD += $(QT5_WAYLAND_LIBS)
+if HAVE_QT_WAYLAND
+libqt_plugin_la_CPPFLAGS += $(QT_WAYLAND_CFLAGS)
+libqt_plugin_la_LIBADD += $(QT_WAYLAND_LIBS)
+vlc_qt_check_CPPFLAGS += $(QT_WAYLAND_CFLAGS) -DQT_HAS_WAYLAND
+vlc_qt_check_LDADD += $(QT_WAYLAND_LIBS)
 endif
 
 if HAVE_WIN32
 libqt_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
-libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ld3d11 -ldwmapi
+libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ldwmapi
 endif
 if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
@@ -70,28 +72,32 @@ endif
 if QT_QML_DEBUG
 libqt_plugin_la_CPPFLAGS += -DQT_QML_DEBUG
 endif
-if HAVE_QT5_GTK
-libqt_plugin_la_CPPFLAGS += -DQT5_HAS_GTK
+if HAVE_QT_GTK
+libqt_plugin_la_CPPFLAGS += -DQT_HAS_GTK
 endif
 
-if HAVE_QT5_GUI_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT5_GUI_PRIVATE \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION)/QtCore \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION)/QtGui
+if HAVE_QT_CORE_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT_CORE_PRIVATE
 endif
 
-if HAVE_QT5_DECLARATIVE_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT5_DECLARATIVE_PRIVATE \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION)/QtCore \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION)/QtGui \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION)/QtQml \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION)/QtQuick
+if HAVE_QT_GUI_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT_GUI_PRIVATE \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE)/QtCore \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI)/QtGui
+endif
+
+if HAVE_QT_DECLARATIVE_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT_DECLARATIVE_PRIVATE \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE)/QtCore \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI)/QtGui \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION_QML) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION_QML)/QtQml \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION_QUICK) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION_QUICK)/QtQuick
 
 endif
 
@@ -544,15 +550,15 @@ endif
 
 # X11 compositor
 
-if HAVE_QT5_X11
+if HAVE_X
 if HAVE_XCB
 if HAVE_XCB_DAMAGE
 if HAVE_XCB_XFIXES
 
-libqt_plugin_la_CXXFLAGS += -DQT5_HAS_X11_COMPOSITOR \
-	$(QT5_X11_CFLAGS) $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XLCB_DAMAGE_CFLAGS) $(XCB_XFIXES_CFLAGS)
+libqt_plugin_la_CXXFLAGS += -DQT_HAS_X11_COMPOSITOR \
+	$(QT_X11_CFLAGS) $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XLCB_DAMAGE_CFLAGS) $(XCB_XFIXES_CFLAGS)
 
-libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS) $(XCB_XFIXES_LIBS)
+libqt_plugin_la_LIBADD += $(QT_X11_LIBS) $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS) $(XCB_XFIXES_LIBS)
 
 libqt_plugin_la_SOURCES += \
 	maininterface/compositor_x11.cpp \
@@ -581,10 +587,10 @@ endif
 # wayland compositor
 
 if HAVE_WAYLAND
-if HAVE_QT5_WAYLAND
-if HAVE_QT5_GUI_PRIVATE
+if HAVE_QT_WAYLAND
+if HAVE_QT_GUI_PRIVATE
 
-libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND_COMPOSITOR
+libqt_plugin_la_CPPFLAGS += -DQT_HAS_WAYLAND_COMPOSITOR
 
 libqt_plugin_la_SOURCES += \
 	maininterface/compositor_wayland.cpp \
@@ -1119,22 +1125,22 @@ if ENABLE_VLM
 nodist_libqt_plugin_la_SOURCES += dialogs/vlm/vlm.moc.cpp
 endif
 
-if HAVE_QMLCACHE
+if HAVE_QMLCACHEGEN
 
 nodist_libqt_plugin_la_SOURCES += qmlcache_loader.cpp
 libqt_plugin_la_SOURCES += $(libqt_plugin_la_QML)
 
 .qml.cpp:
-	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/vlc.qrc -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
 
 .js.cpp:
-	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/vlc.qrc -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
 
 .mjs.cpp:
-	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/vlc.qrc -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
 
 qml_cache.qrc: vlc.qrc
-	$(AM_V_GEN)$(QMLCACHE) --filter-resource-file -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --filter-resource-file -o $@ $<
 
 QRCS_EXCEPT_VLC_QRC = $(filter-out vlc.qrc, $(lib_qt_plugin_la_QRC))
 QRCS_EXCEPT_VLC_QRC += qml_cache.qrc
@@ -1144,7 +1150,7 @@ resources.cpp: $(QRCS_EXCEPT_VLC_QRC) $(libqt_plugin_la_RES)
 
 #output name matters here
 qmlcache_loader.cpp: vlc.qrc qml_cache.qrc $(libqt_plugin_la_QML)
-	$(AM_V_GEN)$(QMLCACHE) --resource-file-mapping=$<=qml_cache.qrc $< -o $@
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource-file-mapping=$<=qml_cache.qrc $< -o $@
 
 else
 
@@ -1155,7 +1161,7 @@ resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_
 
 endif
 
-if HAVE_QT5_GTK
+if HAVE_QT_GTK
 libqt_gtktheme_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(GTK3_CFLAGS)
 libqt_gtktheme_CPPFLAGS = $(AM_CPPFLAGS)
 libqt_gtktheme_plugin_la_LDFLAGS = $(AM_LDFLAGS)
@@ -1202,14 +1208,14 @@ TESTS = base_model_test
 
 QML_LOG_COMPILER = $(builddir)/qml_test -input
 
-if HAVE_QT5_QUICK_TEST
+if HAVE_QT_QUICK_TEST
 qml_test_SOURCES = tests/qml_test.cpp
 nodist_qml_test_SOURCES = resources.cpp
-if HAVE_QMLCACHE
+if HAVE_QMLCACHEGEN
 nodist_qml_test_SOURCES += qmlcache_loader.cpp $(libqt_plugin_la_QML)
 endif
-qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT5_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/tests\""
-qml_test_LDADD = $(QT5_PLUGINS_LIBS) ${QT5_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
+qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/tests\""
+qml_test_LDADD = $(QT_INDIRECT_LIBS) ${QT_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
 check_PROGRAMS += qml_test
 EXTRA_DIST += tests/tst_FSM.qml
 TESTS += tests/tst_FSM.qml

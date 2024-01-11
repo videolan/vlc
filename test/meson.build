@@ -56,10 +56,10 @@ foreach vlc_test: vlc_tests
     endif
 
     moc_sources = []
-    if vlc_test.has_key('moc_headers') and qt5_dep.found()
-        moc_sources += qt5.preprocess(moc_headers: vlc_test['moc_headers'],
+    if vlc_test.has_key('moc_headers') and qt6_dep.found()
+        moc_sources += qt6.preprocess(moc_headers: vlc_test['moc_headers'],
         include_directories: qt_include_dir,
-        dependencies: qt5_dep)
+        dependencies: qt6_dep)
     endif
 
     test(vlc_test['name'],

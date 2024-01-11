@@ -5,19 +5,22 @@
 # Qt is temporarily disabled
 subdir_done()
 
-qt5 = import('qt5')
+qt6 = import('qt6')
 
 qt_include_dir = include_directories('.')
 
 qt_extra_deps = []
 qt_extra_flags = ['-DQT_STRICT_ITERATORS']
 qt_cppargs = []
+qt_link_args = []
 
-qt5_dep = dependency('qt5',
-    version: '>=5.12.0',
+qt6_dep = dependency('qt6',
+    # Note that Qt < 6.2.5 does not provide pc files!
+    version: '>=6.2',
     modules: [
-        'Core', 'Gui', 'Widgets', 'Svg', 'Qml',
-        'Quick', 'QuickWidgets', 'QuickControls2',
+        'Core', 'Gui', 'Widgets', 'Svg', 'Qml', 'QmlModels',
+        'Network', 'QuickLayouts', 'QuickTemplates2',
+        'Quick', 'QuickControls2', 'ShaderTools'
         ],
     private_headers: true,
     required: get_option('qt'))
@@ -165,7 +168,8 @@ if host_system == 'windows'
     endif
 endif
 
-if (xcb_dep.found() and
+if (x11_dep.found() and
+    xcb_dep.found() and
     xcb_damage_dep.found() and
     xcb_xfixes_dep.found())
     moc_headers += files(
@@ -492,13 +496,12 @@ if host_system == 'windows'
     if cdata.has('HAVE_DCOMP_H')
         some_sources += files(
             'maininterface/compositor_dcomp.cpp',
-            'maininterface/compositor_dcomp_acrylicsurface.cpp',
-            'maininterface/compositor_dcomp_uisurface.cpp',
         )
     endif
 endif
 
-if (xcb_dep.found() and
+if (x11_dep.found() and
+    xcb_dep.found() and
     xcb_damage_dep.found() and
     xcb_xfixes_dep.found())
     some_sources += files(
@@ -544,17 +547,18 @@ qml_tests = {
     'tst_FSM': files('tests/tst_FSM.qml'),
 }
 
-if qt5_dep.found()
-    qt5pre_qrc = qt5.preprocess(
+if qt6_dep.found()
+    qt6pre_qrc = qt6.preprocess(
         qresources: qrc_files,
         include_directories: qt_include_dir,
-        dependencies: qt5_dep)
+        dependencies: qt6_dep)
 
-
-    qt5pre_files = qt5.preprocess(ui_files: ui_sources,
+    qt6pre_files = qt6.preprocess(ui_files: ui_sources,
         moc_headers: moc_headers,
         include_directories: qt_include_dir,
-        dependencies: qt5_dep)
+        dependencies: qt6_dep)
+
+    qt_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir')
 
     qt_sources = files('qt.cpp')
 
@@ -565,68 +569,21 @@ if qt5_dep.found()
     #error Qt using shared libraries
     #endif
     '''
-    if cpp.compiles(qt_static_check, dependencies: qt5_dep, name: 'Qt5 compiled with static libraries')
-        qt_extra_deps += [
-            dependency('qtgraphicaleffectsplugin',  required: false),
-            dependency('qtquick2plugin ',           required: false),
-            dependency('qtquickcontrols2plugin',    required: false),
-            dependency('qtquicktemplates2plugin',   required: false),
-            dependency('qquicklayoutsplugin',       required: false),
-            dependency('windowplugin',              required: false),
-            dependency('qmlshapesplugin',           required: false),
-            dependency('qmlplugin',                 required: false),
-            dependency('modelsplugin',              required: false),
-            dependency('qsvg',                      required: false),
-            dependency('qsvgicon',                  required: false),
-            dependency('qtgraphicaleffectsprivate', required: false),
-            dependency('qjpeg',                     required: false),
-        ]
-
-        qt_extra_deps += [
-            dependency('qxcb-glx-integration',      required: false),
-            dependency('qxcb',                      required: false),
-        ]
-
-        qt_extra_deps += [
-            dependency('qwayland-generic',          required: false),
-            dependency('qwayland-egl',              required: false),
-            dependency('xdg-shell',                 required: false),
-        ]
-
-        if host_system == 'windows'
-            qt_extra_deps += [
-                dependency('qwindows',              required: false),
-                dependency('qwindowsvistastyle',    required: false),
-            ]
-        endif
-
-        if host_system == 'darwin'
-            qt_extra_deps += [
-                dependency('qcocoa',                required: false),
-            ]
-        endif
+    if cpp.compiles(qt_static_check, dependencies: qt6_dep, name: 'Qt6 compiled with static libraries')
+        qt_extra_deps += dependency('qtvlcdeps', required: true)
     endif
 
     if host_system == 'windows'
         qt_extra_deps += [
             cc.find_library('dwmapi'),
             cc.find_library('comctl32'),
-            cc.find_library('d3d11'),
         ]
     endif
 
-    if x11_dep.found()
-        qt5_x11_dep = dependency('qt5',
-            modules: ['X11Extras'],
-            required: get_option('qt'))
-
-        qt_extra_flags += '-DQT5_HAS_X11'
-        qt_extra_deps += [x11_dep, qt5_x11_dep]
-    endif
-
-    if xcb_dep.found()
+    if x11_dep.found() and xcb_dep.found()
         qt_extra_deps += xcb_dep
-        qt_extra_flags += '-DQT5_HAS_XCB'
+        qt_extra_deps += x11_dep
+        qt_extra_flags += '-DQT_HAS_XCB'
         if xcb_damage_dep.found() and xcb_xfixes_dep.found()
             qt_extra_deps += [
                 xcb_render_dep,
@@ -634,16 +591,8 @@ if qt5_dep.found()
                 xcb_damage_dep,
                 xcb_xfixes_dep
             ]
-            qt_extra_flags += '-DQT5_HAS_X11_COMPOSITOR'
+            qt_extra_flags += '-DQT_HAS_X11_COMPOSITOR'
         endif
-    endif
-
-    # Qt5 wayland
-    wayland_qt5_dep = dependency('qt5', modules: ['WaylandClient'], required: false)
-
-    if wayland_qt5_dep.found()
-        qt_extra_deps += [wayland_qt5_dep]
-        qt_extra_flags += '-DQT5_HAS_WAYLAND'
     endif
 
     if get_option('qt_qml_debug')
@@ -651,14 +600,22 @@ if qt5_dep.found()
     endif
 
     #check private headers
-    if cpp.has_header('private/qquickitem_p.h', dependencies: qt5_dep) \
-      and cpp.has_header('private/qquickwindow_p.h', dependencies: qt5_dep)
-        qt_extra_flags += '-DQT5_DECLARATIVE_PRIVATE'
+    if cpp.has_header('private/qquickitem_p.h', dependencies: qt6_dep) \
+      and cpp.has_header('private/qquickwindow_p.h', dependencies: qt6_dep)
+        qt_extra_flags += '-DQT_DECLARATIVE_PRIVATE'
+    endif
+
+    if cpp.has_header('qpa/qplatformnativeinterface.h', dependencies: qt6_dep)
+        qt_extra_flags += '-DQT_GUI_PRIVATE'
+    endif
+
+    if cpp.has_header('private/qobject_p.h', dependencies: qt6_dep)
+        qt_extra_flags += '-DQT_CORE_PRIVATE'
     endif
 
     if host_system == 'windows'
         qt_cppargs += libcom_cppflags
-        qt_extra_flags += '-DQPNI_HEADER=<' + qt5_dep.version() + '/QtGui/qpa/qplatformnativeinterface.h>'
+        qt_extra_flags += '-DQPNI_HEADER=<' + qt6_dep.version() + '/QtGui/qpa/qplatformnativeinterface.h>'
     endif
 
     if not (host_system in ['windows', 'darwin'])
@@ -685,7 +642,7 @@ if qt5_dep.found()
                 'dependencies' : [gtk_dep]
             }
 
-            qt_extra_flags += '-DQT5_HAS_GTK'
+            qt_extra_flags += '-DQT_HAS_GTK'
         endif
     endif
 
@@ -693,21 +650,22 @@ if qt5_dep.found()
 
     vlc_modules += {
         'name' : 'qt',
-        'sources' : [qt5pre_files, qt5pre_qrc, qt_sources, some_sources],
-        'dependencies' : [qt_extra_deps, qt5_dep],
+        'sources' : [qt6pre_files, qt6pre_qrc, qt_sources, some_sources],
+        'dependencies' : [qt_extra_deps, qt6_dep],
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
-        'cpp_args' : [qt_extra_flags, qt_cppargs]
+        'cpp_args' : [qt_extra_flags, qt_cppargs],
+        'link_args' : qt_link_args
     }
 
-    test_qt5_dep = dependency('qt5', modules: ['QuickTest'], required: false)
-    if test_qt5_dep.found()
+    test_qt6_dep = dependency('qt6', modules: ['QuickTest'], required: false)
+    if test_qt6_dep.found()
         qml_test = executable(
           'qml_test',
           files('tests/qml_test.cpp'),
-          qt5pre_qrc,
+          qt6pre_qrc,
           build_by_default: false,
-          dependencies: [test_qt5_dep],
+          dependencies: [test_qt6_dep],
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
         foreach test_name, test_file : qml_tests
@@ -728,7 +686,7 @@ if qt5_dep.found()
             'util/locallistcacheloader.hpp'),
         'suite': ['qt'],
         'link_with': [libvlccore],
-        'dependencies': [qt5_dep, qt_extra_deps],
+        'dependencies': [qt6_dep, qt_extra_deps],
     }
 endif
 
