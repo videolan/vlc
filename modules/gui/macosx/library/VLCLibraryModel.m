@@ -23,6 +23,7 @@
 #import "VLCLibraryModel.h"
 
 #import "main/VLCMain.h"
+#import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 NSString * const VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
@@ -257,21 +258,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParams = [self queryParams];
-        vlc_ml_media_list_t *p_media_list = vlc_ml_list_audio_media(self->_p_mediaLibrary, &queryParams);
-        if (!p_media_list) {
+        vlc_ml_media_list_t * const p_media_list = vlc_ml_list_audio_media(self->_p_mediaLibrary, &queryParams);
+        NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
+        if (mediaArray == nil) {
             return;
-        }
-
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
-        for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
-            VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
-            if (mediaItem != nil) {
-                [mutableArray addObject:mediaItem];
-            }
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedAudioMedia = [mutableArray copy];
+            self.cachedAudioMedia = mediaArray;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
         });
     });
@@ -466,19 +460,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         // we don't set the sorting criteria here as they are not applicable to history
         // we only show videos for recents
         vlc_ml_media_list_t *p_media_list = vlc_ml_list_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_VIDEO);
-        if (p_media_list == NULL) {
+        NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
+        if (mediaArray == nil) {
             return;
-        }
-        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
-        for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
-            VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
-            if (mediaItem != nil) {
-                [mutableArray addObject:mediaItem];
-            }
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedRecentMedia = [mutableArray copy];
+            self.cachedRecentMedia = mediaArray;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
         });
     });

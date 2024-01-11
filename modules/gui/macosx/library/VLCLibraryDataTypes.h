@@ -51,6 +51,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
     VLCMediaLibraryParentGroupTypePlaylist = VLC_ML_PARENT_PLAYLIST,
     // Additional types over vlc_ml_parent_type below
     VLCMediaLibraryParentGroupTypeAudioLibrary,
+    VLCMediaLibraryParentGroupTypeRecentAudios,
     // Video library-specific entries.
     // Please define these in the order the are expected to be presented
     VLCMediaLibraryParentGroupTypeRecentVideos,
