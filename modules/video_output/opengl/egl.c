@@ -67,7 +67,7 @@ typedef struct vlc_gl_sys_t
 #endif
 #if defined (USE_PLATFORM_XCB)
     xcb_connection_t *conn;
-    const xcb_screen_t *xcb_scr;
+    uint32_t xcb_black_pixel;
     xcb_window_t xcb_win;
 #endif
 #if defined (USE_PLATFORM_WAYLAND)
@@ -397,12 +397,40 @@ static void DestroySurface(vlc_gl_t *gl)
     xcb_unmap_window(sys->conn, sys->xcb_win);
 }
 
+static uint8_t VisualIdToDepth(xcb_connection_t *conn, xcb_visualid_t vid)
+{
+    xcb_screen_iterator_t si = xcb_setup_roots_iterator (xcb_get_setup (conn));
+    for (; si.rem; xcb_screen_next (&si)) {
+        xcb_depth_iterator_t di = xcb_screen_allowed_depths_iterator (si.data);
+        for (; di.rem; xcb_depth_next (&di)) {
+            xcb_visualtype_iterator_t vi = xcb_depth_visuals_iterator (di.data);
+            for (; vi.rem; xcb_visualtype_next (&vi)) {
+                if (vid == vi.data->visual_id) {
+                    return di.data->depth;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
 # ifdef EGL_EXT_platform_base
     vlc_gl_sys_t *sys = gl->sys;
     xcb_connection_t *conn = sys->conn;
+
+    EGLint val;
+    if (eglGetConfigAttrib(dpy, config, EGL_NATIVE_VISUAL_ID, &val) == EGL_FALSE)
+        return EGL_NO_SURFACE;
+    xcb_visualid_t vid = (xcb_visualid_t) val;
+    xcb_colormap_t cmap = xcb_generate_id(conn);
+    xcb_create_colormap(conn, XCB_COLORMAP_ALLOC_NONE,
+                        cmap, gl->surface->handle.xid, vid);
+    uint8_t depth = VisualIdToDepth(conn, vid);
+    if (depth == 0)
+        return EGL_NO_SURFACE;
 
     xcb_window_t win = xcb_generate_id(conn);
     uint32_t mask =
@@ -412,17 +440,16 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
         XCB_CW_COLORMAP;
     const uint32_t values[] = {
         /* XCB_CW_BACK_PIXEL */
-        sys->xcb_scr->black_pixel,
+        sys->xcb_black_pixel,
         /* XCB_CW_BORDER_PIXEL */
-        sys->xcb_scr->black_pixel,
+        sys->xcb_black_pixel,
         /* XCB_CW_BIT_GRAVITY */
         XCB_GRAVITY_NORTH_WEST,
         /* XCB_CW_COLORMAP */
-        sys->xcb_scr->default_colormap,
+        cmap,
     };
-    xcb_create_window(conn, sys->xcb_scr->root_depth, win,
-                      gl->surface->handle.xid, 0, 0, width, height, 0,
-                      XCB_WINDOW_CLASS_INPUT_OUTPUT, sys->xcb_scr->root_visual,
+    xcb_create_window(conn, depth, win, gl->surface->handle.xid, 0, 0,
+                      width, height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, vid,
                       mask, values);
     xcb_map_window(conn, win);
     sys->xcb_win = win;
@@ -470,7 +497,7 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
     }
 
     sys->conn = conn;
-    sys->xcb_scr = scr;
+    sys->xcb_black_pixel = scr->black_pixel;
 out:
     return display;
 # else
