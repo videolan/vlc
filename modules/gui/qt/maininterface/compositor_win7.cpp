@@ -25,8 +25,10 @@
 
 #include <vlc_window.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #define D3D11_NO_HELPERS  // avoid tons of warnings
 #include <d3d11.h>
+#endif
 
 #include <dwmapi.h>
 
@@ -55,6 +57,7 @@ CompositorWin7::~CompositorWin7()
 
 bool CompositorWin7::preInit(qt_intf_t *p_intf)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     //check whether D3DCompiler is available. whitout it Angle won't work
     QLibrary d3dCompilerDll;
     for (int i = 47; i > 41; --i)
@@ -94,6 +97,7 @@ bool CompositorWin7::preInit(qt_intf_t *p_intf)
         msg_Info(p_intf, "no D3D support, use software backend");
         QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
     }
+#endif
 
     return true;
 }
