@@ -34,7 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCMediaLibraryAlbum;
 
 typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
-    VLCAudioLibraryArtistsSegment = 0,
+    VLCAudioLibraryUnknownSegment = 0,
+    VLCAudioLibraryRecentsSegment,
+    VLCAudioLibraryArtistsSegment,
     VLCAudioLibraryAlbumsSegment,
     VLCAudioLibrarySongsSegment,
     VLCAudioLibraryGenresSegment

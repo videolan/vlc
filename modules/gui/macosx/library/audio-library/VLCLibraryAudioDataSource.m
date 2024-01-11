@@ -184,6 +184,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     switch(_currentParentType) {
     case VLCMediaLibraryParentGroupTypeAudioLibrary:
         return self.libraryModel.listOfAudioMedia;
+    case VLCMediaLibraryParentGroupTypeRecentAudios:
+        return self.libraryModel.listOfRecentAudioMedia;
     case VLCMediaLibraryParentGroupTypeAlbum:
         return self.libraryModel.listOfAlbums;
     case VLCMediaLibraryParentGroupTypeArtist:
@@ -207,7 +209,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemsReset:(NSNotification * const)aNotification
 {
-    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
+        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
@@ -256,7 +259,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemUpdated:(NSNotification * const)aNotification
 {
-    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
+        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
@@ -305,7 +309,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
 {
-    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary) {
+    if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
+        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
@@ -604,6 +609,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         case VLCAudioLibrarySongsSegment:
             _currentParentType = VLCMediaLibraryParentGroupTypeAudioLibrary;
             break;
+        case VLCAudioLibraryRecentsSegment:
+            _currentParentType = VLCMediaLibraryParentGroupTypeRecentAudios;
+            break;
         case VLCAudioLibraryGenresSegment:
             _currentParentType = VLCMediaLibraryParentGroupTypeGenre;
             break;
@@ -671,6 +679,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     }
 
     if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary ||
+        self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios ||
         selectedRow < 0 ||
         self.displayedCollectionUpdating) {
         self.audioGroupDataSource.representedAudioGroup = nil;
