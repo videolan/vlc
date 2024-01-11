@@ -78,6 +78,7 @@
 		5307A6F52967859F001E0C6A /* NSImage+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5307A6F42967859F001E0C6A /* NSImage+VLCAdditions.m */; };
 		5307A6F82969904D001E0C6A /* VLCLibraryMediaSourceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5307A6F72969904D001E0C6A /* VLCLibraryMediaSourceViewController.m */; };
 		53088E152AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53088E142AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m */; };
+		5310AFB12B4FE72700E75F9A /* NSArray+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */; };
 		5317FE04294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5317FE03294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m */; };
 		5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */; };
 		533B5D2C29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */; };
@@ -272,6 +273,8 @@
 		53088E122AD6EADF00C21358 /* VLCLibraryCarouselViewItemView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryCarouselViewItemView.xib; sourceTree = "<group>"; };
 		53088E132AD7802C00C21358 /* VLCLibraryCarouselViewItemView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCarouselViewItemView.h; sourceTree = "<group>"; };
 		53088E142AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryCarouselViewItemView.m; sourceTree = "<group>"; };
+		5310AFAF2B4FE72700E75F9A /* NSArray+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+VLCAdditions.h"; sourceTree = "<group>"; };
+		5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+VLCAdditions.m"; sourceTree = "<group>"; };
 		5317FE02294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDelegate.h; sourceTree = "<group>"; };
 		5317FE03294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryCollectionViewDelegate.m; sourceTree = "<group>"; };
 		5317FE05294E8D1A001702F0 /* VLCLibraryCollectionViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDataSource.h; sourceTree = "<group>"; };
@@ -1183,28 +1186,30 @@
 		1C1ED5112204B08E00811EC0 /* extensions */ = {
 			isa = PBXGroup;
 			children = (
-				6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */,
-				6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */,
-				6B397C4D216C8EB200403ED0 /* NSString+Helpers.h */,
-				6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */,
-				7DE7232C22A51F8C00D72616 /* VLCPositionFormatter.h */,
-				7DE7232D22A51F8D00D72616 /* VLCPositionFormatter.m */,
-				6B7F1FDD1F07DA920002BDD8 /* VLCHexNumberFormatter.h */,
-				6B7F1FDE1F07DA920002BDD8 /* VLCHexNumberFormatter.m */,
+				5310AFAF2B4FE72700E75F9A /* NSArray+VLCAdditions.h */,
+				5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */,
 				7D28E6342275B4820098D30E /* NSColor+VLCAdditions.h */,
 				7D28E6352275B4820098D30E /* NSColor+VLCAdditions.m */,
 				7D28E6372275B7340098D30E /* NSFont+VLCAdditions.h */,
 				7D28E6382275B7340098D30E /* NSFont+VLCAdditions.m */,
-				7D404ABD2281892C00B28EF4 /* NSView+VLCAdditions.h */,
-				7D404ABE2281892C00B28EF4 /* NSView+VLCAdditions.m */,
-				7DF0994D23E71E5B007CA6EE /* NSMenu+VLCAdditions.h */,
-				7DF0994E23E71E76007CA6EE /* NSMenu+VLCAdditions.m */,
 				5307A6F32967859F001E0C6A /* NSImage+VLCAdditions.h */,
 				5307A6F42967859F001E0C6A /* NSImage+VLCAdditions.m */,
+				7DF0994D23E71E5B007CA6EE /* NSMenu+VLCAdditions.h */,
+				7DF0994E23E71E76007CA6EE /* NSMenu+VLCAdditions.m */,
 				53ED473A29CBC64200795DB1 /* NSPasteboardItem+VLCAdditions.h */,
 				53ED473B29CBC64200795DB1 /* NSPasteboardItem+VLCAdditions.m */,
+				6B4D50A51E7AB52C004479B5 /* NSScreen+VLCAdditions.h */,
+				6B4D50A61E7AB52C004479B5 /* NSScreen+VLCAdditions.m */,
+				6B397C4D216C8EB200403ED0 /* NSString+Helpers.h */,
+				6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */,
+				7D404ABD2281892C00B28EF4 /* NSView+VLCAdditions.h */,
+				7D404ABE2281892C00B28EF4 /* NSView+VLCAdditions.m */,
 				5387FFF32A15127100A3A70A /* NSWindow+VLCAdditions.h */,
 				5387FFF42A15127100A3A70A /* NSWindow+VLCAdditions.m */,
+				6B7F1FDD1F07DA920002BDD8 /* VLCHexNumberFormatter.h */,
+				6B7F1FDE1F07DA920002BDD8 /* VLCHexNumberFormatter.m */,
+				7DE7232C22A51F8C00D72616 /* VLCPositionFormatter.h */,
+				7DE7232D22A51F8D00D72616 /* VLCPositionFormatter.m */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -2164,6 +2169,7 @@
 				53C1EF8C2B466B13001AEEF5 /* VLCLibraryHomeViewStackViewController.m in Sources */,
 				538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */,
 				7D2E0EDB20CD204D0033A221 /* VLCWindow.m in Sources */,
+				5310AFB12B4FE72700E75F9A /* NSArray+VLCAdditions.m in Sources */,
 				6B4D50A71E7AB52C004479B5 /* NSScreen+VLCAdditions.m in Sources */,
 				1C3113DD1E508C6900D4DD76 /* VLCTrackSynchronizationWindowController.m in Sources */,
 				7D0F5A9B2264EB410009C48A /* VLCHotkeysController.m in Sources */,
