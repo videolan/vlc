@@ -669,28 +669,32 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         };
 
         // Recents can contain media items the other two do
-        NSMutableArray * const recentsMutable = [self.cachedRecentMedia mutableCopy];
+        NSMutableArray * const recentsMutable = self.cachedRecentMedia.mutableCopy;
         const NSUInteger recentsIndex = [recentsMutable indexOfObjectPassingTest:idCheckBlock];
-        BOOL isInRecents = recentsIndex != NSNotFound;
+        const BOOL isInRecents = recentsIndex != NSNotFound;
 
-        NSMutableArray * const videoMutable = [self.cachedVideoMedia mutableCopy];
+        NSMutableArray * const videoMutable = self.cachedVideoMedia.mutableCopy;
         const NSUInteger videoIndex = [videoMutable indexOfObjectPassingTest:idCheckBlock];
         if (videoIndex != NSNotFound) {
             dispatch_sync(dispatch_get_main_queue(), ^{
                 action(videoMutable, videoIndex, recentsMutable, recentsIndex);
-                self.cachedVideoMedia = [videoMutable copy];
-                self.cachedRecentMedia = [recentsMutable copy];
+                self.cachedVideoMedia = videoMutable.copy;
+                self.cachedRecentMedia = recentsMutable.copy;
             });
             return;
         }
 
-        NSMutableArray * const audioMutable = [self.cachedAudioMedia mutableCopy];
+        NSMutableArray * const recentAudiosMutable = self.cachedRecentAudioMedia.mutableCopy;
+        const NSUInteger recentAudiosIndex = [recentAudiosMutable indexOfObjectPassingTest:idCheckBlock];
+        const BOOL isInRecentAudios = recentAudiosIndex != NSNotFound;
+
+        NSMutableArray * const audioMutable = self.cachedAudioMedia.mutableCopy;
         const NSUInteger audioIndex = [self.cachedAudioMedia indexOfObjectPassingTest:idCheckBlock];
         if (audioIndex != NSNotFound) {
             dispatch_sync(dispatch_get_main_queue(), ^{
-                action(audioMutable, audioIndex, recentsMutable, recentsIndex);
-                self.cachedAudioMedia = [audioMutable copy];
-                self.cachedRecentMedia = [recentsMutable copy];
+                action(audioMutable, audioIndex, recentAudiosMutable, recentAudiosIndex);
+                self.cachedAudioMedia = audioMutable.copy;
+                self.cachedRecentAudioMedia = recentsMutable.copy;
             });
             return;
         }
