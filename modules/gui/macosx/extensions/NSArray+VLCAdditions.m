@@ -24,4 +24,20 @@
 
 @implementation NSArray (VLCAdditions)
 
++ (NSArray<VLCMediaLibraryMediaItem *> *)arrayFromVlcMediaList:(vlc_ml_media_list_t *)p_media_list
+{
+    if (p_media_list == NULL) {
+        return nil;
+    }
+
+    NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
+    for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
+        VLCMediaLibraryMediaItem * const mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
+        if (mediaItem != nil) {
+            [mutableArray addObject:mediaItem];
+        }
+    }
+    return mutableArray.copy;
+}
+
 @end
