@@ -42,6 +42,7 @@ extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 extern NSString * const VLCLibraryModelAudioMediaListReset;
 extern NSString * const VLCLibraryModelVideoMediaListReset;
 extern NSString * const VLCLibraryModelRecentsMediaListReset;
+extern NSString * const VLCLibraryModelRecentAudioMediaListReset;
 
 extern NSString * const VLCLibraryModelAudioMediaItemDeleted;
 extern NSString * const VLCLibraryModelVideoMediaItemDeleted;
@@ -81,6 +82,9 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 @property (readwrite) uint32_t recentMediaLimit;
 @property (readonly) size_t numberOfRecentMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentMedia;
+
+@property (readwrite) uint32_t recentAudioMediaLimit;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentAudioMedia;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 

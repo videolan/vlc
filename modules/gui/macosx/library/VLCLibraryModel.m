@@ -35,6 +35,7 @@ NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelM
 NSString * const VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMediaListReset";
 NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
 NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
+NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRecentAudioMediaListReset";
 
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
@@ -67,6 +68,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     size_t _initialArtistCount;
     size_t _initialGenreCount;
     size_t _initialRecentsCount;
+    size_t _initialRecentAudioCount;
 
     dispatch_queue_t _mediaItemCacheModificationQueue;
     dispatch_queue_t _albumCacheModificationQueue;
@@ -80,6 +82,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 @property (readwrite, atomic) NSArray *cachedGenres;
 @property (readwrite, atomic) NSArray *cachedVideoMedia;
 @property (readwrite, atomic) NSArray *cachedRecentMedia;
+@property (readwrite, atomic) NSArray *cachedRecentAudioMedia;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
 
 - (void)resetCachedMediaItemLists;
@@ -213,6 +216,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialArtistCount = vlc_ml_count_artists(self->_p_mediaLibrary, &queryParameters, true);
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
             self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = self->_recentMediaLimit }), VLC_ML_MEDIA_TYPE_VIDEO);
+            self->_initialRecentAudioCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = self->_recentMediaLimit }), VLC_ML_MEDIA_TYPE_AUDIO);
         });
     }
     return self;
@@ -490,9 +494,49 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedRecentMedia;
 }
 
+// TODO: Can be merged with other recent media resetter
+- (void)resetCachedListOfRecentAudioMedia
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        const vlc_ml_query_params_t queryParameters = { .i_nbResults = self->_recentMediaLimit };
+        // we don't set the sorting criteria here as they are not applicable to history
+        // we only show videos for recents
+        vlc_ml_media_list_t * const p_media_list = vlc_ml_list_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_AUDIO);
+        NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
+        if (mediaArray == nil) {
+            return;
+        }
+        vlc_ml_media_list_release(p_media_list);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.cachedRecentAudioMedia = mediaArray;
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
+        });
+    });
+}
+
+// TODO: See above
+- (size_t)numberOfRecentAudioMedia
+{
+    if (!_cachedRecentAudioMedia) {
+        [self resetCachedListOfRecentAudioMedia];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialRecentAudioCount;
+    }
+    return _cachedRecentAudioMedia.count;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentAudioMedia
+{
+    if (!_cachedRecentAudioMedia) {
+        [self resetCachedListOfRecentAudioMedia];
+    }
+    return _cachedRecentAudioMedia;
+}
+
 - (void)resetCachedMediaItemLists
 {
     [self resetCachedListOfRecentMedia];
+    [self resetCachedListOfRecentAudioMedia];
     [self resetCachedListOfAudioMedia];
     [self resetCachedListOfVideoMedia];
 }
