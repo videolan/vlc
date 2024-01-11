@@ -157,6 +157,15 @@ void test_invalidate_on_invalidate()
     assert(!m.loading());
 }
 
+
+void test_null_reset()
+{
+    Model m;
+    // should not crash or give out warning
+    // bug of MR!4786
+    m.resetCache();
+}
+
 void test_sanity()
 {
     Model m;
@@ -187,6 +196,7 @@ int main(int argc, char **argv)
     QCoreApplication a(argc, argv);
     QMetaObject::invokeMethod(&a, [&a]()
     {
+        test_null_reset();
         test_invalidate_on_invalidate();
         test_sanity();
 
