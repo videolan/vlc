@@ -21,7 +21,6 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -162,7 +161,7 @@ AbstractButton {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                BindingCompat on visible {
+                Binding on visible {
                     delayed: (MainCtx.qtVersion() < MainCtx.qtVersionCheck(5, 15, 8))
                     value: (infoColumn.height > infoColumn.implicitHeight) && (artistLabel.text.length > 0)
                 }

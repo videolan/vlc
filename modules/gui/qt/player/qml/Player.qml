@@ -23,7 +23,6 @@ import QtGraphicalEffects 1.12
 import QtQuick.Window 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -443,7 +442,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_xxlarge
 
-                BindingCompat on visible {
+                Binding on visible {
                     delayed: true
                     when: albumLabel.componentCompleted
                     value: centerContent.height > (albumLabel.y + albumLabel.height)
@@ -468,7 +467,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_small
 
-                BindingCompat on visible {
+                Binding on visible {
                     delayed: true
                     when: artistLabel.componentCompleted
                     value: centerContent.height > (artistLabel.y + artistLabel.height)
@@ -493,7 +492,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_large
 
-                BindingCompat on visible {
+                Binding on visible {
                     delayed: true
                     when: audioControls.componentCompleted
                     value: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)

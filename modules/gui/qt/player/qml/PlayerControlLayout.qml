@@ -20,7 +20,6 @@ import QtQuick 2.12
 import QtQuick.Layouts 1.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -220,7 +219,7 @@ FocusScope {
         // TODO: "ControlListFilter"'s count......
         active: !!playerControlLayout.model && !!playerControlLayout.model.center && (playerControlLayout.model.center.count > 0)
 
-        BindingCompat on width {
+        Binding on width {
             delayed: true
             when: loaderCenter._componentCompleted
             value: {

@@ -17,8 +17,6 @@
  *****************************************************************************/
 import QtQuick 2.12
 
-import org.videolan.compat 0.1
-
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 

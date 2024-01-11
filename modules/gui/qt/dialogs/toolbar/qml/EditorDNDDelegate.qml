@@ -22,7 +22,6 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///player/"
 import "qrc:///widgets/" as Widgets
@@ -108,7 +107,7 @@ Control {
         }
     }
 
-    BindingCompat {
+    Binding {
         when: dragActive
         value: true
 

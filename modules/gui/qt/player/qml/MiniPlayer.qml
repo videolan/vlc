@@ -18,7 +18,6 @@
 import QtQuick 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 
@@ -54,7 +53,7 @@ ControlBar {
         }
     }
 
-    BindingCompat on _delayedImplicitHeight {
+    Binding on _delayedImplicitHeight {
         // eliminate intermediate adjustments until implicit height is calculated fully
         // we can not delay on component load because we do not want twitching
         // NOTE: The delay here can be removed, as long as a direct height is set

@@ -22,7 +22,6 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -38,7 +37,7 @@ FocusScope {
     // The wise thing to do would be to not
     // delay if the sizes are ready.
 
-    BindingCompat on Layout.minimumWidth {
+    Binding on Layout.minimumWidth {
         delayed: true
         when: controlLayout._componentCompleted
         value: {
@@ -62,7 +61,7 @@ FocusScope {
         }
     }
 
-    BindingCompat on Layout.maximumWidth {
+    Binding on Layout.maximumWidth {
         delayed: true
         when: controlLayout._componentCompleted
         value: {

@@ -25,7 +25,6 @@ import QtQml.Models 2.12
 import QtQuick.Window 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///playlist/" as PL
@@ -69,7 +68,7 @@ T.ToolBar {
         colorSet: ColorContext.Window
     }
 
-    BindingCompat {
+    Binding {
         target: MainCtx.search
         property: "pattern"
         value: searchBox.searchPattern

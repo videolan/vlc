@@ -20,7 +20,6 @@ import QtQuick.Controls 2.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///util/" as Util
@@ -118,7 +117,7 @@ ListView {
 
         implicitHeight: VLCStyle.icon_medium
 
-        BindingCompat on implicitWidth {
+        Binding on implicitWidth {
             delayed: true
             value: Math.max(implicitHeight, playerBtnDND.width - x)
         }
@@ -167,7 +166,7 @@ ListView {
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         dndView: playerBtnDND
 
-        BindingCompat {
+        Binding {
             when: dropArea.containsDrag
             value: true
 

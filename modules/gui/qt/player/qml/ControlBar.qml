@@ -23,7 +23,6 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets

@@ -321,31 +321,6 @@ void MainUI::registerQMLTypes()
     }
 
     {
-        const char* const uri = "org.videolan.compat";
-        const int versionMajor = 0;
-        const int versionMinor = 1;
-
-        qmlRegisterModule(uri, versionMajor, versionMinor);
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        qmlRegisterType(QUrl("qrc:///util/BindingRev14.qml"), uri, versionMajor, versionMinor, "BindingCompat");
-#else
-        qmlRegisterType(QUrl("qrc:///util/BindingRev8.qml"), uri, versionMajor, versionMinor, "BindingCompat");
-#endif
-
-        qmlRegisterType(QUrl(QStringLiteral(
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-                            "qrc:///util/ListViewRev15.qml"
-#else
-                            "qrc:///util/ListViewRev11.qml"
-#endif
-                            )),
-                        uri, versionMajor, versionMinor, "ListViewCompat");
-
-        qmlProtectModule(uri, versionMajor);
-    }
-
-    {
         // Custom controls
 
         const char* uri = "org.videolan.controls";

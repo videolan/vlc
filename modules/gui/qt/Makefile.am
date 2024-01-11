@@ -1025,14 +1025,10 @@ libqt_plugin_la_QML = \
 	util/qml/ModelSortSettingHandler.qml \
 	util/qml/FlickableScrollHandler.qml \
 	util/qml/ViewDragAutoScrollHandler.qml \
-	util/qml/BindingRev8.qml \
-	util/qml/BindingRev14.qml \
 	util/qml/FSM.qml \
 	util/qml/FSMState.qml \
 	util/qml/NativeMenu.qml \
 	util/qml/MLContextMenu.qml \
-	util/qml/ListViewRev15.qml \
-	util/qml/ListViewRev11.qml \
 	util/qml/FadeControllerStateGroup.qml \
 	widgets/qml/ActionButtonOverlay.qml \
 	widgets/qml/ActionButtonPrimary.qml \

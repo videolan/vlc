@@ -23,7 +23,6 @@ import QtQuick.Window 2.12
 import QtGraphicalEffects 1.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -91,19 +90,19 @@ Item {
         anchors.rightMargin: MainCtx.windowExtendedMargin
         anchors.bottomMargin: MainCtx.windowExtendedMargin
 
-        BindingCompat {
+        Binding {
             target: VLCStyle
             property: "appWidth"
             value: g_mainInterface.width
         }
 
-        BindingCompat {
+        Binding {
             target: VLCStyle
             property: "appHeight"
             value: g_mainInterface.height
         }
 
-        BindingCompat {
+        Binding {
             target: MainCtx
             property: "windowExtendedMargin"
             value: _extendedFrameVisible ? VLCStyle.dp(20, VLCStyle.scale) : 0

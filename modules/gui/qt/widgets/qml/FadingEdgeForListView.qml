@@ -17,8 +17,6 @@
  *****************************************************************************/
 import QtQuick 2.12
 
-import org.videolan.compat 0.1
-
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 
@@ -109,12 +107,12 @@ FadingEdge {
                    (!lastVisibleItem.activeFocus &&
                     !Helpers.get(lastVisibleItem, "hovered", true)))
 
-    BindingCompat on enableBeginningFade {
+    Binding on enableBeginningFade {
         when: !!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)
         value: false
     }
 
-    BindingCompat on enableEndFade {
+    Binding on enableEndFade {
         when: !!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)
         value: false
     }

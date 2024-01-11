@@ -22,7 +22,6 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.12
 
 import org.videolan.vlc 0.1
-import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util" as Util
@@ -256,12 +255,12 @@ T.Pane {
 
             model: root.model
 
-            BindingCompat on fadingEdge.enableBeginningFade {
+            Binding on fadingEdge.enableBeginningFade {
                 when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Backward)
                 value: false
             }
 
-            BindingCompat on fadingEdge.enableEndFade {
+            Binding on fadingEdge.enableEndFade {
                 when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Forward)
                 value: false
             }
@@ -307,7 +306,7 @@ T.Pane {
             footer: Item {
                 implicitWidth: parent.width
 
-                BindingCompat on implicitHeight {
+                Binding on implicitHeight {
                     delayed: true
                     value: Math.max(VLCStyle.icon_normal, listView.height - y)
                 }
@@ -472,7 +471,7 @@ T.Pane {
 
                 opacity: (listView.activeFocus) ? 1.0 : 0.4
 
-                BindingCompat on visible {
+                Binding on visible {
                     delayed: true
                     value: (listView.model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
                 }
