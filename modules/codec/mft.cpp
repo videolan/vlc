@@ -50,6 +50,7 @@ extern "C" {
 #include <mferror.h>
 #include <mfobjects.h>
 #include <codecapi.h>
+#include <mfidl.h>
 
 
 #if !defined(CODECAPI_AVDecVideoAcceleration_H264) // MINGW < 8
@@ -188,6 +189,16 @@ public:
         if (SUCCEEDED(hr))
             streamStarted = false;
         return hr;
+    }
+
+    /// Required for Async MFTs
+    HRESULT shutdownStream()
+    {
+        ComPtr<IMFShutdown> shutdownObj;
+        HRESULT hr = mft.As(&shutdownObj);
+        if (FAILED(hr))
+            return hr;
+        return shutdownObj->Shutdown();
     }
 
 private:
@@ -1657,6 +1668,8 @@ static void DestroyMFT(decoder_t *p_dec)
 
         // make sure don't have any input pending
         p_sys->flushStream();
+
+        p_sys->shutdownStream();
     }
 
     auto *vidsys = dynamic_cast<mft_dec_video*>(p_sys);
@@ -2215,6 +2228,8 @@ static void EncoderClose(encoder_t *p_enc)
 
         // make sure don't have any input pending
         p_sys->flushStream();
+
+        p_sys->shutdownStream();
     }
 
     p_sys->Release();
