@@ -36,6 +36,7 @@
 #include <vlc_window.h>
 #ifdef USE_PLATFORM_X11
 # include <vlc_xlib.h>
+# include <X11/Xutil.h>
 #endif
 #ifdef USE_PLATFORM_XCB
 # include <xcb/xcb.h>
@@ -61,7 +62,7 @@ typedef struct vlc_gl_sys_t
     EGLContext context;
 #if defined (USE_PLATFORM_X11)
     Display *x11;
-    Screen *x11_scr;
+    unsigned long x11_black_pixel;
     Window x11_win;
 #endif
 #if defined (USE_PLATFORM_XCB)
@@ -239,18 +240,31 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
+
+    EGLint val;
+    if (eglGetConfigAttrib(dpy, config, EGL_NATIVE_VISUAL_ID, &val) == EGL_FALSE)
+        return EGL_NO_SURFACE;
+    XVisualInfo vinfo_template;
+    int vinfoc;
+    vinfo_template.visualid = (VisualID) val;
+    XVisualInfo *vinfov = XGetVisualInfo(sys->x11, VisualIDMask, &vinfo_template, &vinfoc);
+    if (vinfov == NULL || vinfoc == 0)
+        return EGL_NO_SURFACE;
+    Visual *visual = vinfov[0].visual;
+    int depth = vinfov[0].depth;
+    XFree(vinfov);
+
     unsigned long mask =
         CWBackPixel | CWBorderPixel | CWBitGravity | CWColormap;
     XSetWindowAttributes swa = {
-        .background_pixel = BlackPixelOfScreen(sys->x11_scr),
-        .border_pixel = BlackPixelOfScreen(sys->x11_scr),
+        .background_pixel = sys->x11_black_pixel,
+        .border_pixel = sys->x11_black_pixel,
         .bit_gravity = NorthWestGravity,
-        .colormap = DefaultColormapOfScreen(sys->x11_scr),
+        .colormap = XCreateColormap(sys->x11, gl->surface->handle.xid, visual,
+                                    AllocNone),
     };
     Window win = XCreateWindow(sys->x11, gl->surface->handle.xid, 0, 0, width,
-                               height, 0, DefaultDepthOfScreen(sys->x11_scr),
-                               InputOutput,
-                               DefaultVisualOfScreen(sys->x11_scr), mask,
+                               height, 0, depth, InputOutput, visual, mask,
                                &swa);
     sys->x11_win = win;
     XMapWindow(sys->x11, win);
@@ -326,7 +340,7 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
         goto error;
 
     sys->x11 = x11;
-    sys->x11_scr = wa.screen;
+    sys->x11_black_pixel = BlackPixelOfScreen(wa.screen);
     return display;
 error:
     XCloseDisplay(x11);
