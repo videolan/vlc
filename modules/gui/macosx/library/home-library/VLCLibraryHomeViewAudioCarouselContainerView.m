@@ -22,6 +22,8 @@
 
 #import "VLCLibraryHomeViewAudioCarouselContainerView.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 
@@ -58,6 +60,28 @@
 {
     if (audioLibrarySegment == self.audioLibrarySegment) {
         return;
+    }
+
+    switch (audioLibrarySegment) {
+        case VLCAudioLibraryRecentsSegment:
+            self.titleView.stringValue = _NS("Recent music");
+            break;
+        case VLCAudioLibraryArtistsSegment:
+            self.titleView.stringValue = _NS("Artists");
+            break;
+        case VLCAudioLibraryAlbumsSegment:
+            self.titleView.stringValue = _NS("Albums");
+            break;
+        case VLCAudioLibrarySongsSegment:
+            self.titleView.stringValue = _NS("Songs");
+            break;
+        case VLCAudioLibraryGenresSegment:
+            self.titleView.stringValue = _NS("Genres");
+            break;
+        case VLCAudioLibraryUnknownSegment:
+        default:
+            self.titleView.stringValue = _NS("Unknown");
+            break;
     }
 
     ((VLCLibraryAudioDataSource *)self.dataSource).audioLibrarySegment = audioLibrarySegment;
