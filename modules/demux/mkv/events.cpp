@@ -94,6 +94,20 @@ void event_thread_t::ResetPci()
     is_running = false;
 }
 
+int event_thread_t::SendEventNav( int nav_query )
+{
+    if( !is_running )
+        return VLC_EGENERIC;
+
+    vlc_mutex_locker lock_guard( &lock );
+
+    pending_events.push_back( EventInfo( nav_query ) );
+
+    vlc_cond_signal( &wait );
+
+    return VLC_SUCCESS;
+}
+
 void event_thread_t::EventMouse( vlc_mouse_t const* new_state, void* userdata )
 {
     ESInfo* info = static_cast<ESInfo*>( userdata );
@@ -109,30 +123,11 @@ void event_thread_t::EventMouse( vlc_mouse_t const* new_state, void* userdata )
     info->mouse_state = *new_state;
 }
 
-int event_thread_t::EventKey( vlc_object_t *p_this, char const *,
-                              vlc_value_t, vlc_value_t newval, void *p_data )
-{
-    event_thread_t* owner = static_cast<event_thread_t*>( p_data );
-    vlc_mutex_locker lock_guard( &owner->lock );
-
-    owner->pending_events.push_back(
-        EventInfo( static_cast<vlc_action_id_t>( newval.i_int ) ) );
-
-    vlc_cond_signal( &owner->wait );
-    msg_Dbg( p_this, "Event Key");
-
-    return VLC_SUCCESS;
-}
-
 void event_thread_t::EventThread()
 {
     vlc_thread_set_name("vlc-mkv-events");
 
-    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_demux));
     int canc = vlc_savecancel ();
-
-    /* catch all key event */
-    var_AddCallback( vlc, "key-action", EventKey, this );
 
     for( vlc_mutex_locker guard( &lock );; )
     {
@@ -161,7 +156,6 @@ void event_thread_t::EventThread()
         }
     }
 
-    var_DelCallback( vlc, "key-action", EventKey, this );
     vlc_restorecancel (canc);
 }
 
@@ -207,13 +201,13 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 
     btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
 
-    switch( ev.action.id )
+    switch( ev.nav.query )
     {
-    case ACTIONID_NAV_LEFT: return ProcessNavAction( button_ptr.left, pci );
-    case ACTIONID_NAV_RIGHT: return ProcessNavAction( button_ptr.right, pci );
-    case ACTIONID_NAV_UP: return ProcessNavAction( button_ptr.up, pci );
-    case ACTIONID_NAV_DOWN: return ProcessNavAction( button_ptr.down, pci );
-    case ACTIONID_NAV_ACTIVATE:
+    case DEMUX_NAV_LEFT: return ProcessNavAction( button_ptr.left, pci );
+    case DEMUX_NAV_RIGHT: return ProcessNavAction( button_ptr.right, pci );
+    case DEMUX_NAV_UP: return ProcessNavAction( button_ptr.up, pci );
+    case DEMUX_NAV_DOWN: return ProcessNavAction( button_ptr.down, pci );
+    case DEMUX_NAV_ACTIVATE:
         {
             vlc_mutex_unlock( &lock );
             vlc_mutex_lock( &p_sys->lock_demuxer );

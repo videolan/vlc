@@ -475,6 +475,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             msg_Dbg(p_demux,"SET_TIME to %" PRId64, i64 );
             return Seek( p_demux, i64, -1, NULL, b );
 
+        case DEMUX_NAV_ACTIVATE:
+        case DEMUX_NAV_UP:
+        case DEMUX_NAV_DOWN:
+        case DEMUX_NAV_LEFT:
+        case DEMUX_NAV_RIGHT:
+        case DEMUX_NAV_POPUP:
+        case DEMUX_NAV_MENU:
+            return p_sys->ev.SendEventNav( i_query );
+
         case DEMUX_CAN_PAUSE:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:

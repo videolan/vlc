@@ -45,6 +45,7 @@ public:
 
     void SetPci(const pci_t *data);
     void ResetPci();
+    int SendEventNav( int );
 
     bool AddES( es_out_id_t* es, int category );
     void DelES( es_out_id_t* es );
@@ -83,10 +84,10 @@ private:
             mouse.state_new = state_new;
         }
 
-        EventInfo( vlc_action_id_t id )
+        EventInfo( int query )
             : type( ActionEvent )
         {
-            action.id = id;
+            nav.query = query;
         }
 
         union {
@@ -97,8 +98,8 @@ private:
             } mouse;
 
             struct {
-                vlc_action_id_t id;
-            } action;
+                int query;
+            } nav;
         };
     };
 
@@ -106,7 +107,6 @@ private:
     static void *EventThread(void *);
 
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
-    static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
     void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
