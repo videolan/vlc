@@ -106,6 +106,13 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
     {
         block_t *p_datachain = p_pes->gather.p_data;
         uint32_t i_flags = p_pes->gather.i_block_flags;
+        if( p_pes->gather.i_data_size &&
+            p_pes->gather.i_gathered != p_pes->gather.i_data_size )
+        {
+            /* too early unit start resulting from packet loss */
+            /* or ending on a pkt not belonging to PES (%15 packets loss) */
+            i_flags |= BLOCK_FLAG_CORRUPTED;
+        }
         /* Flush the pes from pid */
         p_pes->gather.p_data = NULL;
         p_pes->gather.i_data_size = 0;
@@ -199,14 +206,14 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
         if( p_pes->p_es )
             p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
-    /* On dropped blocks discontinuity */
+    /* On dropped packets, detected by continuity counter */
     else if( p_pkt->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         /* If we know the final size and didn't gather enough bytes it is corrupted
            or if the discontinuity doesn't carry the start code */
-        if( p_pes->gather.i_gathered && (p_pes->gather.i_data_size ||
-                                         (b_aligned_ts_payload && !b_unit_start) ) )
-            p_pes->gather.i_block_flags |= BLOCK_FLAG_CORRUPTED;
+       if( p_pes->gather.i_gathered && (p_pes->gather.i_data_size ||
+                                        (b_aligned_ts_payload && !b_unit_start) ) )
+           p_pes->gather.i_block_flags |= BLOCK_FLAG_CORRUPTED;
         b_ret |= ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
 
         /* it can't match the target size and need to resync on sync code */
@@ -217,6 +224,13 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
         if( p_pes->p_es )
             p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_pes->gather.i_block_flags|= BLOCK_FLAG_DISCONTINUITY;
+    }
+    /* On dropped packets, detected by continuity counter */
+    else if( p_pkt->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        p_pes->gather.i_block_flags |= BLOCK_FLAG_CORRUPTED;
+        /* can't reuse prev bytes to lookup sync code */
+        p_pes->gather.i_saved = 0;
     }
 
     if ( unlikely(p_pes->gather.i_saved > 0) )

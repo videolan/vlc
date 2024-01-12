@@ -160,6 +160,7 @@ int main(void)
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
     ASSERT(outputsize == 256);
+    ASSERT(output->i_flags == 0);
     RESET;
 
     /* packets assembly, incorrect size, overflow by %15 pkt loss or size field corruption */
@@ -174,6 +175,7 @@ int main(void)
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
     ASSERT(outputsize == 300);
+    ASSERT(output->i_flags & BLOCK_FLAG_CORRUPTED);
     RESET;
 
     /* no packets assembly from unit start, early termination by fixed size */
@@ -187,6 +189,7 @@ int main(void)
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2);
+    ASSERT(output->i_flags & BLOCK_FLAG_CORRUPTED);
     RESET;
 
     /* no packets assembly from unit start, early termination by undef size  */
@@ -202,6 +205,7 @@ int main(void)
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
     ASSERT(outputsize == 188);
+    ASSERT(output->i_flags & BLOCK_FLAG_CORRUPTED);
     RESET;
 
     /* packets assembly, payload undef, use next sync code from another payload undef */
@@ -217,6 +221,7 @@ int main(void)
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
     ASSERT(outputsize == 150);
+    ASSERT(output->i_flags == 0);
     RESET;
 
     /* packets assembly, payload undef, use next sync code from fixed size */
