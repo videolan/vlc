@@ -40,7 +40,7 @@ FocusScope {
 
         Accessible.ignored: true
 
-        text: model.text || ""
+        text: colModel.text || ""
         color: parent.colorContext.fg.secondary
     }
 
@@ -308,10 +308,13 @@ FocusScope {
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
 
-                                property var model: modelData.model
+                                property var colModel: modelData.model
+
                                 readonly property ColorContext colorContext: view.colorContext
 
-                                sourceComponent: model.headerDelegate || root.tableHeaderDelegate
+                                height: parent.height
+
+                                sourceComponent: colModel.headerDelegate || root.tableHeaderDelegate
                             }
 
                             Text {

@@ -200,8 +200,7 @@ T.Control {
 
                 height: parent.height
 
-                sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
-                                                        : delegate.defaultDelegate
+                sourceComponent: colModel.colDelegate || delegate.defaultDelegate
             }
         }
 
