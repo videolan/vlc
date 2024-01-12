@@ -193,14 +193,18 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
         int create(const char *uri,const std::string &ua,
                    const std::string &ref, const BytesRange &range)
         {
-            struct restuple *tpl = new struct restuple;
+            auto *tpl = static_cast<struct restuple *>(
+                std::malloc(sizeof(struct restuple)));
+            if (unlikely(tpl == nullptr))
+                return -1;
+
             tpl->source = this;
             this->range = range;
             if (vlc_http_res_init(&tpl->resource, &this->callbacks, http_mgr, uri,
                                   ua.empty() ? nullptr : ua.c_str(),
                                   ref.empty() ? nullptr : ref.c_str()))
             {
-                delete tpl;
+                std::free(tpl);
                 return -1;
             }
             http_res = &tpl->resource;
