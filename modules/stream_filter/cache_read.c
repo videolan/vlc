@@ -492,7 +492,7 @@ static int Open(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
 
-    if (s->s->pf_read == NULL)
+    if (s->s->pf_read == NULL && s->s->pf_block == NULL)
         return VLC_EGENERIC;
 
     stream_sys_t *sys = malloc(sizeof (*sys));
