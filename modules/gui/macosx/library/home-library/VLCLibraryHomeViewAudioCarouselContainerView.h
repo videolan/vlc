@@ -22,13 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryAudioDataSource;
-
 @interface VLCLibraryHomeViewAudioCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
+
+@property (readwrite) VLCAudioLibrarySegment audioLibrarySegment;
 
 @end
 

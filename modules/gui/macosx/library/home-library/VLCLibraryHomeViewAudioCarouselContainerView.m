@@ -42,12 +42,26 @@
 - (void)setupDataSource
 {
     VLCLibraryAudioDataSource * const audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
+    self.carouselView.dataSource = audioDataSource;
     audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     audioDataSource.carouselView = self.carouselView;
-    audioDataSource.audioLibrarySegment = VLCAudioLibrarySongsSegment; // TODO: placehilder
     [audioDataSource setup];
-    self.carouselView.dataSource = audioDataSource;
     _dataSource = audioDataSource;
+}
+
+- (VLCAudioLibrarySegment)audioLibrarySegment
+{
+    return ((VLCLibraryAudioDataSource *)self.dataSource).audioLibrarySegment;
+}
+
+- (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
+{
+    if (audioLibrarySegment == self.audioLibrarySegment) {
+        return;
+    }
+
+    ((VLCLibraryAudioDataSource *)self.dataSource).audioLibrarySegment = audioLibrarySegment;
+    [self.carouselView reloadData];
 }
 
 @end
