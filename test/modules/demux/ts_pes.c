@@ -148,7 +148,21 @@ int main(void)
     ASSERT(!output);
     RESET;
 
-    /* packets assembly, payload > 150 - TS_PES_HEADER_SIZE - 4 */
+    /* packets assembly, exact size, payload > 150 - TS_PES_HEADER_SIZE - 4 */
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
+    SetWBE(&pkt->p_buffer[4], 250);
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    ASSERT(!output);
+    ASSERT(pes.gather.i_data_size == 256);
+    PKT_FROMSZ(dummy0, 106-sizeof(dummy0));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
+    ASSERT(output);
+    block_ChainProperties(output, &outputcount, &outputsize, NULL);
+    ASSERT(outputcount == 1);
+    ASSERT(outputsize == 256);
+    RESET;
+
+    /* packets assembly, incorrect size, overflow by %15 pkt loss or size field corruption */
     PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
