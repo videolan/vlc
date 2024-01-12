@@ -148,6 +148,7 @@
 
     if (shouldShowAudioRecentsContainer) {
         _audioRecentsView = [[VLCLibraryHomeViewAudioCarouselContainerView alloc] init];
+        self.audioRecentsView.audioLibrarySegment = VLCAudioLibraryRecentsSegment;
 
         // Insert as last leading container
         [self.collectionsStackView insertArrangedSubview:self.audioRecentsView
