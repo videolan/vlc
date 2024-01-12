@@ -143,13 +143,13 @@ int main(void)
     ASSERT(!output);
     RESET;
 
-    /* packets assembly, payload > 188 - TS_PES_HEADER_SIZE - 4 */
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    /* packets assembly, payload > 150 - TS_PES_HEADER_SIZE - 4 */
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 256);
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
@@ -158,12 +158,12 @@ int main(void)
     RESET;
 
     /* no packets assembly from unit start */
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 256);
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
@@ -171,27 +171,27 @@ int main(void)
     RESET;
 
     /* packets assembly, payload undef, use next sync code from another payload undef */
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 0);
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
     ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
-    ASSERT(outputsize == 188);
+    ASSERT(outputsize == 150);
     RESET;
 
     /* packets assembly, payload undef, use next sync code from fixed size */
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 0);
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
@@ -199,7 +199,7 @@ int main(void)
     RESET;
 
     /* packets assembly, payload undef, use next sync code from fixed size but uncomplete */
-    PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
+    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
