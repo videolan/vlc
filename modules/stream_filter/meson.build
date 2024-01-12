@@ -3,11 +3,6 @@ vlc_modules += {
     'sources' : files('cache_read.c')
 }
 
-vlc_modules += {
-    'name' : 'cache_block',
-    'sources' : files('cache_block.c')
-}
-
 if host_system != 'windows' and not have_tvos
   vlc_modules += {
       'name' : 'decomp',

@@ -5,9 +5,6 @@ stream_filter_LTLIBRARIES =
 libcache_read_plugin_la_SOURCES = stream_filter/cache_read.c
 stream_filter_LTLIBRARIES += libcache_read_plugin.la
 
-libcache_block_plugin_la_SOURCES = stream_filter/cache_block.c
-stream_filter_LTLIBRARIES += libcache_block_plugin.la
-
 libdecomp_plugin_la_SOURCES = stream_filter/decomp.c
 if !HAVE_WIN32
 if !HAVE_TVOS
