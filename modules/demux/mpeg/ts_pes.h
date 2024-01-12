@@ -22,6 +22,8 @@
 
 #define BLOCK_FLAG_SOURCE_RANDOM_ACCESS (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
+#define TS_PES_HEADER_SIZE 6
+
 typedef struct
 {
     vlc_object_t *p_obj;

@@ -102,7 +102,7 @@ int main(void)
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
-    ASSERT(outputsize == 6+3);
+    ASSERT(outputsize == TS_PES_HEADER_SIZE+3);
     ASSERT(!memcmp(aligned0, output->p_buffer, outputsize));
     RESET;
     /* no output if not unit start */
@@ -127,7 +127,7 @@ int main(void)
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
-    ASSERT(outputsize == 6+3+6);
+    ASSERT(outputsize == TS_PES_HEADER_SIZE+3+6);
     ASSERT(!memcmp(aligned1, output->p_buffer, outputsize));
     RESET;
     /* no output if not unit start */
@@ -143,7 +143,7 @@ int main(void)
     ASSERT(!output);
     RESET;
 
-    /* packets assembly, payload > 188 - 6 - 4 */
+    /* packets assembly, payload > 188 - TS_PES_HEADER_SIZE - 4 */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));

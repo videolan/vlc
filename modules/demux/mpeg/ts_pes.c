@@ -213,7 +213,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
     if ( unlikely(p_pes->gather.i_saved > 0) )
     {
         /* Saved from previous packet end */
-        assert(p_pes->gather.i_saved < 6);
+        assert(p_pes->gather.i_saved < TS_PES_HEADER_SIZE);
         if( !b_aligned_ts_payload )
         {
             p_pkt = block_Realloc( p_pkt, p_pes->gather.i_saved, p_pkt->i_buffer );
@@ -227,7 +227,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
     {
         assert( p_pes->gather.i_saved == 0 );
 
-        if( p_pes->gather.p_data == NULL && b_unit_start && !b_first_sync_done && p_pkt->i_buffer >= 6 )
+        if( p_pes->gather.p_data == NULL && b_unit_start && !b_first_sync_done && p_pkt->i_buffer >= TS_PES_HEADER_SIZE )
         {
             if( likely(b_aligned_ts_payload) )
             {
@@ -260,7 +260,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             /* now points to PES header */
             p_pes->gather.i_data_size = GetWBE(&p_pkt->p_buffer[4]);
             if( p_pes->gather.i_data_size > 0 )
-                p_pes->gather.i_data_size += 6;
+                p_pes->gather.i_data_size += TS_PES_HEADER_SIZE;
             b_first_sync_done = true; /* Because if size is 0, we would not look for second sync */
         }
         else
@@ -297,11 +297,11 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                 {
                     b_ret |= ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
                     /* now points to PES header */
-                    if( p_pkt->i_buffer >= 6 )
+                    if( p_pkt->i_buffer >= TS_PES_HEADER_SIZE )
                     {
                         p_pes->gather.i_data_size = GetWBE(&p_pkt->p_buffer[4]);
                         if( p_pes->gather.i_data_size > 0 )
-                            p_pes->gather.i_data_size += 6;
+                            p_pes->gather.i_data_size += TS_PES_HEADER_SIZE;
                     }
                 }
                 /* Append or finish current/start new PES depending on unit_start */
@@ -310,7 +310,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             }
         }
 
-        if( unlikely(p_pkt && p_pkt->i_buffer < 6) )
+        if( unlikely(p_pkt && p_pkt->i_buffer < TS_PES_HEADER_SIZE) )
         {
             /* save and prepend to next packet */
             assert(!b_single_payload);
