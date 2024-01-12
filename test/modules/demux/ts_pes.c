@@ -92,6 +92,11 @@ int main(void)
     pes.transport = TS_TRANSPORT_PES;
     pes.gather.pp_last = &pes.gather.p_data;
 
+    /* filler packet */
+    const uint8_t dummy0[] = {
+        0xFF,
+    };
+
     /* General case, aligned payloads */
     /* payload == 0 */
     const uint8_t aligned0[] = {
@@ -149,7 +154,7 @@ int main(void)
     ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 256);
-    PKT_FROMSZ(aligned1, 150-sizeof(aligned1));
+    PKT_FROMSZ(dummy0, 150-sizeof(dummy0));
     ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
