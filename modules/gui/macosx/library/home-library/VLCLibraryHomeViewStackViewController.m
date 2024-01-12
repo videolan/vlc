@@ -98,7 +98,8 @@
 
 - (BOOL)recentAudioMediaPresent
 {
-    return YES; // TODO: Placeholder
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
+    return model.numberOfRecentAudioMedia > 0;
 }
 
 - (void)recentsChanged:(NSNotification *)notification
