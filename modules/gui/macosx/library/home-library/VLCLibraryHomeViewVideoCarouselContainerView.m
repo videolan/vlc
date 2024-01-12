@@ -57,7 +57,11 @@
     _groupDescriptor = groupDescriptor;
     _videoGroup = groupDescriptor.group;
     self.dataSource.groupDescriptor = groupDescriptor;
-    self.titleView.stringValue = groupDescriptor.name;
+    if (groupDescriptor.group == VLCMediaLibraryParentGroupTypeRecentVideos) {
+        self.titleView.stringValue = _NS("Recent videos");
+    } else {
+        self.titleView.stringValue = groupDescriptor.name;
+    }
  }
 
 - (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group
