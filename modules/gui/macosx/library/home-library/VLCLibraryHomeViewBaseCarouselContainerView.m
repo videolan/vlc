@@ -31,6 +31,7 @@
 
 @interface VLCLibraryHomeViewBaseCarouselContainerView ()
 
+@property (readonly) NSLayoutConstraint *heightConstraint;
 @property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;
 
 @end
@@ -104,13 +105,22 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
+    [self updateCarouselViewHeight];
+    [self updateCarouselOffset];
+}
+
+- (void)updateCarouselViewHeight
+{
     const CGFloat viewHeight = self.titleView.frame.size.height +
                                VLCLibraryUIUnits.largeSpacing * 2 +
                                VLCLibraryUIUnits.carouselViewVideoItemViewHeight;
-    NSLayoutConstraint * const heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:viewHeight];
-    heightConstraint.active = YES;
-
-    [self updateCarouselOffset];
+    
+    if (self.heightConstraint == nil) {
+        _heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:viewHeight];
+        self.heightConstraint.active = YES;
+    } else {
+        self.heightConstraint.constant = viewHeight;
+    }
 }
 
 - (void)updateCarouselOffset
