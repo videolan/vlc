@@ -112,6 +112,17 @@
     _containers = mutableContainers.copy;
 }
 
+- (void)removeRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
+{
+    [self.collectionsStackView removeConstraints:container.constraintsWithSuperview];
+    [self.collectionsStackView removeArrangedSubview:container];
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
+    [mutableContainers removeObject:container];
+    container = nil; // Important to detect whether the view is presented or not
+    --_leadingContainerCount;
+    _containers = mutableContainers.copy;
+}
+
 - (void)recentsChanged:(NSNotification *)notification
 {
     const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
@@ -119,20 +130,12 @@
 
     if (recentsContainerPresent == shouldShowRecentsContainer) {
         return;
-    }
-
-    if (shouldShowRecentsContainer) {
+    } else if (shouldShowRecentsContainer) {
         _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];
         self.recentsView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
         [self prependRecentItemsContainer:self.recentsView];
     } else {
-        [self.collectionsStackView removeConstraints:self.recentsView.constraintsWithSuperview];
-        [self.collectionsStackView removeArrangedSubview:self.recentsView];
-        NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
-        [mutableContainers removeObject:self.recentsView];
-        _recentsView = nil;
-        --_leadingContainerCount;
-        _containers = mutableContainers.copy;
+        [self removeRecentItemsContainer:_recentsView];
     }
 }
 
@@ -143,22 +146,12 @@
 
     if (audioRecentsContainerPresent == shouldShowAudioRecentsContainer) {
         return;
-    }
-
-    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
-
-    if (shouldShowAudioRecentsContainer) {
+    } else if (shouldShowAudioRecentsContainer) {
         _audioRecentsView = [[VLCLibraryHomeViewAudioCarouselContainerView alloc] init];
         self.audioRecentsView.audioLibrarySegment = VLCAudioLibraryRecentsSegment;
         [self prependRecentItemsContainer:self.audioRecentsView];
     } else {
-        [self.collectionsStackView removeConstraints:self.audioRecentsView.constraintsWithSuperview];
-        [self.collectionsStackView removeArrangedSubview:self.audioRecentsView];
-        NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
-        [mutableContainers removeObject:self.audioRecentsView];
-        _audioRecentsView = nil;
-        --_leadingContainerCount;
-        _containers = mutableContainers.copy;
+        [self removeRecentItemsContainer:_audioRecentsView];
     }
 }
 
