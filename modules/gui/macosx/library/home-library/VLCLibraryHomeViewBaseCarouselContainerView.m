@@ -134,7 +134,6 @@
         return;
     }
 
-    const int64_t itemId = libraryItem.libraryID;
     NSIndexPath * const itemIndexPath = [self.dataSource indexPathForLibraryItem:libraryItem];
     if (itemIndexPath == nil) {
         return;
