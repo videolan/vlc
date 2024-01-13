@@ -33,13 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryAudioGroupDataSource;
 @class VLCMediaLibraryAlbum;
 
-typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
-    VLCAudioLibraryUnknownSegment = 0,
-    VLCAudioLibraryRecentsSegment,
+typedef NS_ENUM(NSInteger, VLCAudioLibrarySegment) {
+    VLCAudioLibraryUnknownSegment = -1,
     VLCAudioLibraryArtistsSegment,
     VLCAudioLibraryAlbumsSegment,
     VLCAudioLibrarySongsSegment,
-    VLCAudioLibraryGenresSegment
+    VLCAudioLibraryGenresSegment,
+    VLCAudioLibraryRecentsSegment
 };
 
 extern NSString * const VLCLibrarySongsTableViewSongPlayingColumnIdentifier;
