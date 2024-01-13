@@ -679,7 +679,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     }
 
     if (self.currentParentType == VLCMediaLibraryParentGroupTypeAudioLibrary ||
-        self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios ||
+        self.currentParentType == VLCMediaLibraryParentGroupTypeRecentAudios ||
         selectedRow < 0 ||
         self.displayedCollectionUpdating) {
         self.audioGroupDataSource.representedAudioGroup = nil;
