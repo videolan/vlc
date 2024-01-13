@@ -69,6 +69,7 @@ Access:
  * Deprecates Audio CD CDDB lookups in favor of more accurate Musicbrainz
  * Improved CD-TEXT and added Shift-JIS encoding support
  * Support for YoutubeDL (where available).
+ * On-the-fly Zstandard (zstd) file decompression (where available).
 
 Access output:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
