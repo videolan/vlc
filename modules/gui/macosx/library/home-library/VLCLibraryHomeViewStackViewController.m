@@ -102,6 +102,16 @@
     return model.numberOfRecentAudioMedia > 0;
 }
 
+- (void)prependRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
+{
+    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
+    [self.collectionsStackView insertArrangedSubview:container atIndex:_leadingContainerCount];
+    [self setupContainerView:container withStackView:_collectionsStackView];
+    [mutableContainers insertObject:container atIndex:0];
+    ++_leadingContainerCount;
+    _containers = mutableContainers.copy;
+}
+
 - (void)recentsChanged:(NSNotification *)notification
 {
     const BOOL shouldShowRecentsContainer = [self recentMediaPresent];
@@ -111,31 +121,21 @@
         return;
     }
 
-    NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
-
     if (shouldShowRecentsContainer) {
         _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];
         self.recentsView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
-
-        // Insert as last leading container
-        [self.collectionsStackView insertArrangedSubview:self.recentsView
-                                                 atIndex:_leadingContainerCount];
-        [self setupContainerView:self.recentsView
-                   withStackView:_collectionsStackView];
-        [mutableContainers insertObject:self.recentsView atIndex:0];
-        ++_leadingContainerCount;
+        [self prependRecentItemsContainer:self.recentsView];
     } else {
         [self.collectionsStackView removeConstraints:self.recentsView.constraintsWithSuperview];
         [self.collectionsStackView removeArrangedSubview:self.recentsView];
+        NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
         [mutableContainers removeObject:self.recentsView];
         _recentsView = nil;
         --_leadingContainerCount;
+        _containers = mutableContainers.copy;
     }
-
-    _containers = mutableContainers.copy;
 }
 
-// TODO: integrate into recentsChanged
 - (void)audioRecentsChanged:(NSNotification *)notification
 {
     const BOOL shouldShowAudioRecentsContainer = [self recentAudioMediaPresent];
@@ -150,23 +150,16 @@
     if (shouldShowAudioRecentsContainer) {
         _audioRecentsView = [[VLCLibraryHomeViewAudioCarouselContainerView alloc] init];
         self.audioRecentsView.audioLibrarySegment = VLCAudioLibraryRecentsSegment;
-
-        // Insert as last leading container
-        [self.collectionsStackView insertArrangedSubview:self.audioRecentsView
-                                                 atIndex:_leadingContainerCount];
-        [self setupContainerView:self.audioRecentsView
-                   withStackView:_collectionsStackView];
-        [mutableContainers insertObject:self.audioRecentsView atIndex:0];
-        ++_leadingContainerCount;
+        [self prependRecentItemsContainer:self.audioRecentsView];
     } else {
         [self.collectionsStackView removeConstraints:self.audioRecentsView.constraintsWithSuperview];
         [self.collectionsStackView removeArrangedSubview:self.audioRecentsView];
+        NSMutableArray<NSView<VLCLibraryHomeViewContainerView> *> * const mutableContainers = _containers.mutableCopy;
         [mutableContainers removeObject:self.audioRecentsView];
         _audioRecentsView = nil;
         --_leadingContainerCount;
+        _containers = mutableContainers.copy;
     }
-
-    _containers = mutableContainers.copy;
 }
 
 - (void)generateGenericCollectionViewContainers
