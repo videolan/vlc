@@ -22,6 +22,7 @@ if host_system == 'windows'
     freetype_cppargs += libcom_cppflags
     # TODO: Don't add this file for UWP builds
     freetype_srcs += files('freetype/fonts/win32.c')
+    freetype_deps += [ cc.find_library('dwrite', required: true) ]
 elif host_system == 'darwin'
     freetype_srcs += files('freetype/fonts/darwin.c')
     freetype_deps += [corefoundation_dep, coretext_dep]
