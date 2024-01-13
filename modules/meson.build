@@ -279,6 +279,7 @@ foreach module : vlc_modules
         'c_args',
         'cpp_args',
         'objc_args',
+        'extra_files',
     ]
     foreach key : module.keys()
         if key not in valid_dict_keys
@@ -309,6 +310,7 @@ foreach module : vlc_modules
         c_args: [module.get('c_args', []), common_args],
         cpp_args: [module.get('cpp_args', []), common_args],
         objc_args: [module.get('objc_args', []), common_args],
+        extra_files: module.get('extra_files', []),
         build_by_default: true,
         install: true,
         install_dir: get_option('libdir') / 'vlc/plugins',
