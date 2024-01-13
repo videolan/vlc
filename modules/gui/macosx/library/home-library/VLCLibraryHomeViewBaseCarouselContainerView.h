@@ -35,6 +35,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) iCarousel *carouselView;
 @property (readonly) NSObject<iCarouselDelegate> *delegate;
 @property (readonly) NSObject<VLCLibraryCollectionViewDataSource, iCarouselDataSource> *dataSource;
+// We want the carousel view to be packed tight around the actual items and not have excess space.
+// To do this we need to be aware of the carousel view item height so we can resize the view.
+// Changing this property DOES NOT affect the actual sie of the carousel view items, though!
+// This is decided in the carousel view data sources' method:
+// carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
+@property (readwrite, nonatomic) CGFloat itemHeight;
 
 - (void)setup;
 

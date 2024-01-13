@@ -30,6 +30,9 @@
 #import "library/VLCLibraryUIUnits.h"
 
 @interface VLCLibraryHomeViewBaseCarouselContainerView ()
+{
+    CGFloat _itemHeight;
+}
 
 @property (readonly) NSLayoutConstraint *heightConstraint;
 @property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;
@@ -105,6 +108,8 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
+    _itemHeight = VLCLibraryUIUnits.carouselViewVideoItemViewHeight;
+
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];
 }
@@ -113,8 +118,8 @@
 {
     const CGFloat viewHeight = self.titleView.frame.size.height +
                                VLCLibraryUIUnits.largeSpacing * 2 +
-                               VLCLibraryUIUnits.carouselViewVideoItemViewHeight;
-    
+                               _itemHeight;
+
     if (self.heightConstraint == nil) {
         _heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:viewHeight];
         self.heightConstraint.active = YES;
@@ -151,6 +156,21 @@
 
     const NSInteger itemIndex = itemIndexPath.item;
     [self.carouselView scrollToItemAtIndex:itemIndex animated:YES];
+}
+
+- (CGFloat)itemHeight
+{
+    return _itemHeight;
+}
+
+- (void)setItemHeight:(CGFloat)itemHeight
+{
+    if (itemHeight == self.itemHeight) {
+        return;
+    }
+
+    _itemHeight = itemHeight;
+    [self updateCarouselViewHeight];
 }
 
 // pragma mark - iCarousel delegate methods
