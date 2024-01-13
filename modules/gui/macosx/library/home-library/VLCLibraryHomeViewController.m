@@ -71,7 +71,14 @@
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelVideoMediaItemDeleted
                                  object:nil];
-        // TODO: Hook up audio signals
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAudioMediaListReset
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAudioMediaItemDeleted
+                                 object:nil];
     }
 
     return self;
@@ -190,11 +197,16 @@
     NSParameterAssert(aNotification);
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger videoCount = model.numberOfVideoMedia;
+    const NSUInteger audioCount = model.numberOfAudioMedia;
 
     NSArray<NSView *> * const targetViewSubViews = self.libraryTargetView.subviews;
+    const BOOL emptyLibraryViewPresent = [targetViewSubViews containsObject:self.emptyLibraryView];
+    const BOOL homeLibraryViewPresent = [targetViewSubViews containsObject:self.homeLibraryView];
     if (self.segmentedTitleControl.selectedSegment == VLCLibraryHomeSegment &&
-        ((videoCount == 0 && ![targetViewSubViews containsObject:self.emptyLibraryView]) ||
-         (videoCount > 0 && ![targetViewSubViews containsObject:self.homeLibraryView])) &&
+        ((videoCount == 0 && !emptyLibraryViewPresent) ||
+         (videoCount > 0 && !homeLibraryViewPresent) ||
+         (audioCount == 0 && !emptyLibraryViewPresent) ||
+         (audioCount > 0 && !homeLibraryViewPresent)) &&
         _libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
