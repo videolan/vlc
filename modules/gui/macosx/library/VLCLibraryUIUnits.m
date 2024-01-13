@@ -149,14 +149,14 @@
     return NSMakeSize(itemWidth, itemHeight);
 }
 
-+ (const CGFloat)carouselViewItemViewWidth
++ (const CGFloat)carouselViewVideoItemViewWidth
 {
-    return 300;
+    return self.carouselViewItemViewHeight / 9 * 16;
 }
 
-+ (const CGFloat)carouselViewVideoItemViewHeight
++ (const CGFloat)carouselViewItemViewHeight
 {
-    return VLCLibraryUIUnits.carouselViewItemViewWidth / 16 * 9;
+    return 180;
 }
 
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets

@@ -108,7 +108,7 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
-    _itemHeight = VLCLibraryUIUnits.carouselViewVideoItemViewHeight;
+    _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
 
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];

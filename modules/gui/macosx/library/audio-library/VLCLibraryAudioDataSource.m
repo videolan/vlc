@@ -865,8 +865,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     if (carouselItemView == nil) {
         const NSRect itemFrame = NSMakeRect(0,
                                             0,
-                                            VLCLibraryUIUnits.carouselViewVideoItemViewHeight,
-                                            VLCLibraryUIUnits.carouselViewVideoItemViewHeight);
+                                            VLCLibraryUIUnits.carouselViewItemViewHeight,
+                                            VLCLibraryUIUnits.carouselViewItemViewHeight);
         carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
         carouselItemView.frame = itemFrame;
     }
