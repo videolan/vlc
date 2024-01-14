@@ -72,6 +72,14 @@
                             selector:@selector(recentsChanged:)
                                 name:VLCLibraryModelRecentsMediaItemDeleted
                                 object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(audioRecentsChanged:)
+                               name:VLCLibraryModelRecentAudioMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(audioRecentsChanged:)
+                               name:VLCLibraryModelRecentAudioMediaItemDeleted
+                             object:nil];
 
     _containers = @[];
     _leadingContainerCount = 0;
@@ -86,8 +94,8 @@
     [self addView:self.heroView toStackView:self.collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 
-    [self recentsChanged:nil];
     [self audioRecentsChanged:nil];
+    [self recentsChanged:nil];
 }
 
 - (BOOL)recentMediaPresent
