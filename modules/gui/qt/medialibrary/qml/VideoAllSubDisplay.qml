@@ -259,8 +259,6 @@ VideoAll {
     header: VideoRecentVideos {
         width: root.width
 
-        // spacing between header and content
-        bottomPadding: VLCStyle.margin_normal
         leftPadding: root.leftPadding
         rightPadding: root.rightPadding
 

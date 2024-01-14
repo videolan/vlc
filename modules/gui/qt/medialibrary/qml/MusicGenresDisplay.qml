@@ -62,15 +62,12 @@ Widgets.PageLoader {
             property string genreName: ""
 
             gridViewMarginTop: 0
+            tableViewPaddingTop: 0
 
-            header: Widgets.SubtitleLabel {
+            header: Widgets.ViewHeader {
+                view: albumsView
+
                 text: I18n.qtr("Genres - %1").arg(genreName)
-                leftPadding: albumsView.contentLeftMargin
-                rightPadding: albumsView.contentRightMargin
-                topPadding: VLCStyle.margin_large
-                bottomPadding: VLCStyle.margin_normal
-                width: root.width
-                color: colorContext.fg.primary
             }
 
             searchPattern: MainCtx.search.pattern

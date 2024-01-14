@@ -43,8 +43,8 @@ T.Control {
     height: implicitHeight
     implicitHeight: layout.implicitHeight + topPadding + bottomPadding
 
-    topPadding: VLCStyle.margin_large
-    bottomPadding: VLCStyle.margin_normal
+    topPadding: VLCStyle.layoutTitle_top_padding
+    bottomPadding: VLCStyle.layoutTitle_bottom_padding
 
     focus: medialibraryBtn.visible
 

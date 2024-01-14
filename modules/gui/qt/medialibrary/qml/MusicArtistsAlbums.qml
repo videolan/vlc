@@ -182,13 +182,14 @@ FocusScope {
                 artistList.setCurrentItem(0)
             }
 
-            header: Widgets.SubtitleLabel {
-                text: I18n.qtr("Artists")
-                font.pixelSize: VLCStyle.fontSize_large
-                color: artistList.colorContext.fg.primary
+            header: Widgets.ViewHeader {
+                view: artistList
+
                 leftPadding: root.leftPadding + VLCStyle.margin_normal
-                bottomPadding: VLCStyle.margin_small
                 topPadding: VLCStyle.margin_xlarge
+                bottomPadding: VLCStyle.margin_small
+
+                text: I18n.qtr("Artists")
             }
 
             Widgets.MLDragItem {

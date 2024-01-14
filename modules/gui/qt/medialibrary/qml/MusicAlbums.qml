@@ -32,6 +32,8 @@ MainInterface.MainViewLoader {
     // Properties
 
     property int gridViewMarginTop: VLCStyle.margin_large
+    property int tableViewPaddingTop: VLCStyle.margin_normal
+
     property var gridViewRowX: Helpers.get(currentItem, "rowX", 0)
 
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
@@ -241,7 +243,7 @@ MainInterface.MainViewLoader {
             header: root.header
             dragItem: albumDragItem
             rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
+            headerTopPadding: root.tableViewPaddingTop
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium

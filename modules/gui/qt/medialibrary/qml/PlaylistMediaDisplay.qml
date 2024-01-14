@@ -45,6 +45,8 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
+    property alias playlistView: view
+
     readonly property int currentIndex: view.currentIndex
     property string name: ""
 
@@ -168,20 +170,11 @@ FocusScope {
 
         isMusic: root.isMusic
 
-        header: Widgets.SubtitleLabel {
-            id: label
-
-            leftPadding: view.contentLeftMargin
-            rightPadding: view.contentRightMargin
-            topPadding: VLCStyle.margin_normal
-            bottomPadding: VLCStyle.margin_xsmall
+        header: Widgets.ViewHeader {
+            view: root.playlistView
 
             text: root.name
-            color: view.colorContext.fg.primary
         }
-
-
-        headerTopPadding: VLCStyle.margin_normal
 
         Navigation.parentItem: root
 

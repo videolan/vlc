@@ -47,15 +47,9 @@ VideoAll {
 
     contextMenu: Util.MLContextMenu { model: recentModel; showPlayAsAudioAction: true }
 
-    header: Widgets.SubtitleLabel {
-        width: root.width
-
-        // NOTE: We want this to be properly aligned with the grid items.
-        leftPadding: root.contentLeftMargin
-        topPadding: VLCStyle.margin_large
-        bottomPadding: VLCStyle.margin_normal
+    header: Widgets.ViewHeader {
+        view: root
 
         text: I18n.qtr("Continue Watching")
-        color: root.colorContext.fg.primary
     }
 }

@@ -37,7 +37,6 @@ FocusScope {
 
     property alias subtitleText: subtitleLabel.text
 
-    property int bottomPadding: recentVideosColumn.bottomPadding
     property int leftPadding: VLCStyle.margin_xsmall
     property int rightPadding: VLCStyle.margin_xsmall
 
@@ -80,52 +79,30 @@ FocusScope {
 
         width: root.width
 
-        topPadding: VLCStyle.margin_large
+        topPadding: VLCStyle.layoutTitle_top_padding
 
-        spacing: VLCStyle.margin_normal
+        Widgets.ViewHeader {
+            id: viewHeader
 
-        bottomPadding: root.bottomPadding
+            view: root
 
-        RowLayout {
-            anchors.left: parent.left
-            anchors.right: parent.right
+            visible: recentModel.count > 0
+            seeAllButton.visible: recentModel.maximumCount > recentModel.count
 
-            anchors.leftMargin: view.currentItem.contentLeftMargin
-            anchors.rightMargin: view.currentItem.contentRightMargin
+            Layout.fillWidth: true
 
-            Widgets.SubtitleLabel {
-                id: label
+            leftPadding: Helpers.get(view.currentItem, "contentLeftMargin", 0)
+            rightPadding: Helpers.get(view.currentItem, "contentRightMargin", 0)
+            topPadding: 0
 
-                Layout.fillWidth: true
+            text: I18n.qtr("Continue Watching")
 
-                text: I18n.qtr("Continue Watching")
+            onSeeAllButtonClicked: History.push(["mc", "video", "all", "recentVideos"]);
 
-                // NOTE: Setting this to gridView.visible seems to causes unnecessary implicitHeight
-                //       calculations in the Column parent.
-                visible: recentModel.count > 0
-                color: theme.fg.primary
-            }
+            Navigation.parentItem: root
 
-            Widgets.TextToolButton {
-                id: button
-
-                visible: recentModel.maximumCount > recentModel.count
-
-                Layout.preferredWidth: implicitWidth
-
-                focus: true
-
-                text: I18n.qtr("See All")
-
-                font.pixelSize: VLCStyle.fontSize_large
-
-                Navigation.parentItem: root
-
-                Navigation.downAction: function() {
-                    view.setCurrentItemFocus(Qt.TabFocusReason)
-                }
-
-                onClicked: History.push(["mc", "video", "all", "recentVideos"]);
+            Navigation.downAction: function() {
+                view.setCurrentItemFocus(Qt.TabFocusReason)
             }
         }
 
@@ -159,17 +136,20 @@ FocusScope {
 
             Navigation.parentItem: root
 
-            Navigation.upItem: button
+            Navigation.upItem: viewHeader.seeAllButton
         }
 
-        Widgets.SubtitleLabel {
+        Widgets.ViewHeader {
             id: subtitleLabel
 
             visible: text !== ""
-            color: theme.fg.primary
 
-            leftPadding: view.currentItem.contentLeftMargin
-            rightPadding: view.currentItem.contentRightMargin
+            view: root
+
+            leftPadding: Helpers.get(view.currentItem, "contentLeftMargin", 0)
+            topPadding: 0
+
+            text: view.title
         }
     }
 }

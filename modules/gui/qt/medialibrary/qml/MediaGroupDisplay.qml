@@ -54,15 +54,9 @@ VideoAll {
 
     contextMenu: Util.MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
 
-    header: Widgets.SubtitleLabel {
-        width: root.width
+    header: Widgets.ViewHeader {
+        view: root
 
-        // NOTE: We want this to be properly aligned with the grid items.
-        leftPadding: root.contentLeftMargin
-        topPadding: VLCStyle.margin_large
-        bottomPadding: VLCStyle.margin_normal
-
-        text: root.title
-        color: root.colorContext.fg.primary
+        text: view.title
     }
 }
