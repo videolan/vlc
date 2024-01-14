@@ -457,13 +457,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedVideoMedia;
 }
 
-- (void)resetCachedListOfRecentMedia:(NSArray *)array 
-                              ofType:(vlc_ml_media_type_t)type
-                      withCountLimit:(size_t)countLimit
-             postingNotificationName:(NSString *)notificationName
-
+- (void)getListOfRecentMediaOfType:(vlc_ml_media_type_t)type
+                    withCountLimit:(size_t)countLimit
+                    withCompletion:(void (^)(NSArray *recentMediaArray))completionHandler
 {
-    __block NSArray *blockArray = array;
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParameters = { .i_nbResults = countLimit };
         // we don't set the sorting criteria here as they are not applicable to history
@@ -474,18 +471,19 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
-            blockArray = mediaArray;
-            [self->_defaultNotificationCenter postNotificationName:notificationName object:self];
+            completionHandler(mediaArray);
         });
     });
 }
 
 - (void)resetCachedListOfRecentMedia
 {
-    [self resetCachedListOfRecentMedia:self.cachedRecentMedia
-                                ofType:VLC_ML_MEDIA_TYPE_VIDEO
-                        withCountLimit:_recentMediaLimit
-               postingNotificationName:VLCLibraryModelRecentsMediaListReset];
+    [self getListOfRecentMediaOfType:VLC_ML_MEDIA_TYPE_VIDEO
+                      withCountLimit:_recentMediaLimit
+                      withCompletion:^(NSArray * const mediaArray) {
+        self.cachedRecentMedia = mediaArray;
+        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+    }];
 }
 
 - (size_t)numberOfRecentMedia
@@ -508,10 +506,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfRecentAudioMedia
 {
-    [self resetCachedListOfRecentMedia:self.cachedRecentAudioMedia
-                                ofType:VLC_ML_MEDIA_TYPE_AUDIO
-                        withCountLimit:_recentAudioMediaLimit
-               postingNotificationName:VLCLibraryModelRecentAudioMediaListReset];
+    [self getListOfRecentMediaOfType:VLC_ML_MEDIA_TYPE_AUDIO
+                      withCountLimit:_recentAudioMediaLimit
+                      withCompletion:^(NSArray * const mediaArray) {
+        self.cachedRecentAudioMedia = mediaArray;
+        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
+    }];
 }
 
 // TODO: See above
