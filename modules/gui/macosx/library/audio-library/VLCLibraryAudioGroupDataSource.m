@@ -119,7 +119,7 @@
     }
 }
 
-- (void)reloadViews
+- (void)reloadData
 {
     [self reloadTableViews];
     [self reloadCollectionViews];
@@ -140,7 +140,7 @@
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self reloadViews];
+            [self reloadData];
         });
     });
 }
