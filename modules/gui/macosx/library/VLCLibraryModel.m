@@ -40,6 +40,7 @@ NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRec
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
 NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
+NSString * const VLCLibraryModelRecentAudioMediaItemDeleted = @"VLCLibraryModelRecentAudioMediaItemDeleted";
 NSString * const VLCLibraryModelAlbumDeleted = @"VLCLibraryModelAlbumDeleted";
 NSString * const VLCLibraryModelArtistDeleted = @"VLCLibraryModelArtistDeleted";
 NSString * const VLCLibraryModelGenreDeleted = @"VLCLibraryModelGenreDeleted";
@@ -47,6 +48,7 @@ NSString * const VLCLibraryModelGenreDeleted = @"VLCLibraryModelGenreDeleted";
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
 NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
+NSString * const VLCLibraryModelRecentAudioMediaItemUpdated = @"VLCLibraryModelRecentAudioMediaItemUpdated";
 NSString * const VLCLibraryModelAlbumUpdated = @"VLCLibraryModelAlbumUpdated";
 NSString * const VLCLibraryModelArtistUpdated = @"VLCLibraryModelArtistUpdated";
 NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
@@ -727,7 +729,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [cachedMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated object:mediaItem];
+            switch (mediaItem.mediaType) {
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated object:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaItemUpdated object:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                    NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                    break;
+            }
         }
 
         switch (mediaItem.mediaType) {
@@ -757,13 +769,23 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        VLCMediaLibraryMediaItem * mediaItem = cachedMediaArray[cachedMediaIndex];
+        VLCMediaLibraryMediaItem * const mediaItem = cachedMediaArray[cachedMediaIndex];
         // Notify what happened
         [cachedMediaArray removeObjectAtIndex:cachedMediaIndex];
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray removeObjectAtIndex:recentMediaIndex];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted object:mediaItem];
+            switch (mediaItem.mediaType) {
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted object:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaItemDeleted object:mediaItem];
+                    break;
+                case VLC_ML_MEDIA_TYPE_UNKNOWN:
+                    NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
+                    break;
+            }
         }
 
         switch (mediaItem.mediaType) {
