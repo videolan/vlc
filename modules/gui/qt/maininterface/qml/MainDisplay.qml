@@ -373,7 +373,7 @@ FocusScope {
                     focus: true
 
                     rightPadding: VLCStyle.applicationHorizontalMargin
-                    topPadding: VLCStyle.margin_xlarge // NOTE: why the design mandates such large top padding?
+                    topPadding: VLCStyle.layoutTitle_top_padding
                     bottomPadding: VLCStyle.margin_normal + Math.max(VLCStyle.applicationVerticalMargin - g_mainDisplay.displayMargin, 0)
 
                     Navigation.parentItem: mainColumn
