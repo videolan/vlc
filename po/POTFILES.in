@@ -921,6 +921,7 @@ modules/gui/qt/widgets/qml/ScanProgressBar.qml
 modules/gui/qt/widgets/qml/SearchBox.qml
 modules/gui/qt/widgets/qml/SortControl.qml
 modules/gui/qt/widgets/qml/TableColumns.qml
+modules/gui/qt/widgets/qml/ViewHeader.qml
 modules/gui/skins2/commands/async_queue.cpp
 modules/gui/skins2/commands/async_queue.hpp
 modules/gui/skins2/commands/cmd_add_item.cpp

@@ -217,6 +217,9 @@ QtObject {
     readonly property int column_margin: MainCtx.dp(32, scale)
     readonly property int column_spacing: column_margin
 
+    readonly property int layoutTitle_top_padding: margin_large
+    readonly property int layoutTitle_bottom_padding: margin_normal
+
     readonly property int table_cover_border: MainCtx.dp(2, scale)
 
     readonly property int tableHeaderText_height: fontHeight_normal
