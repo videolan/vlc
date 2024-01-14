@@ -372,8 +372,7 @@
     }
 
     // TODO: Make this work agnostically of video type
-    NSView<VLCLibraryHomeViewVideoContainerView> * const containerView = [self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
-
+    NSView<VLCLibraryHomeViewVideoContainerView> * const containerView = (NSView<VLCLibraryHomeViewVideoContainerView> *)[self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
     if (containerView == nil) {
         return;
     }
