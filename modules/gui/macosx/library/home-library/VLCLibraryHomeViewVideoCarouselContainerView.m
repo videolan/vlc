@@ -74,4 +74,18 @@
     [self setGroupDescriptor:descriptor];
 }
 
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return;
+    }
+
+    NSIndexPath * const indexPath = [self.dataSource indexPathForLibraryItem:libraryItem];
+    if (indexPath == nil) {
+        return;
+    }
+
+    [self.carouselView scrollToItemAtIndex:indexPath.item animated:YES];
+}
+
 @end
