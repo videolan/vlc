@@ -383,80 +383,6 @@ static inline unsigned int stdc_first_trailing_zero_uc(unsigned char value)
         __stdbit_generic_type_func(first_trailing_zero, value)
 
 #if defined (__GNUC__) || defined (__clang__)
-static inline unsigned int stdc_count_zeros_ull(unsigned long long value)
-{
-    return __builtin_popcountll(~value);
-}
-
-static inline unsigned int stdc_count_zeros_ul(unsigned long value)
-{
-    return __builtin_popcountl(~value);
-}
-
-static inline unsigned int stdc_count_zeros_ui(unsigned int value)
-{
-    return __builtin_popcount(~value);
-}
-
-static inline unsigned int stdc_count_zeros_us(unsigned short value)
-{
-    return __builtin_popcount((unsigned short)~value);
-}
-
-static inline unsigned int stdc_count_zeros_uc(unsigned char value)
-{
-    return __builtin_popcount((unsigned char)~value);
-}
-#else
-static inline unsigned int __stdc_count_ones(unsigned long long value,
-                                             unsigned int size)
-{
-    unsigned int ones = 0;
-
-    for (unsigned int c = 0; c < (size * CHAR_BIT); c++) {
-         ones += value & 1;
-         value >>= 1;
-    }
-
-    return ones;
-}
-
-static inline unsigned int __stdc_count_zeros(unsigned long long value,
-                                              unsigned int size)
-{
-    return __stdc_count_ones(~value, size);
-}
-
-static inline unsigned int stdc_count_zeros_ull(unsigned long long value)
-{
-    return __stdc_count_zeros(value, sizeof (value));
-}
-
-static inline unsigned int stdc_count_zeros_ul(unsigned long value)
-{
-    return __stdc_count_zeros(value, sizeof (value));
-}
-
-static inline unsigned int stdc_count_zeros_ui(unsigned int value)
-{
-    return __stdc_count_zeros(value, sizeof (value));
-}
-
-static inline unsigned int stdc_count_zeros_us(unsigned short value)
-{
-    return __stdc_count_zeros(value, sizeof (value));
-}
-
-static inline unsigned int stdc_count_zeros_uc(unsigned char value)
-{
-    return __stdc_count_zeros(value, sizeof (value));
-}
-#endif
-
-#define stdc_count_zeros(value) \
-        __stdbit_generic_type_func(count_zeros, value)
-
-#if defined (__GNUC__) || defined (__clang__)
 static inline unsigned int stdc_count_ones_ull(unsigned long long value)
 {
     return __builtin_popcountll(value);
@@ -482,6 +408,19 @@ static inline unsigned int stdc_count_ones_uc(unsigned char value)
     return __builtin_popcount(value);
 }
 #else
+static inline unsigned int __stdc_count_ones(unsigned long long value,
+                                             unsigned int size)
+{
+    unsigned int ones = 0;
+
+    for (unsigned int c = 0; c < (size * CHAR_BIT); c++) {
+         ones += value & 1;
+         value >>= 1;
+    }
+
+    return ones;
+}
+
 static inline unsigned int stdc_count_ones_ull(unsigned long long value)
 {
     return __stdc_count_ones(value, sizeof (value));
@@ -510,6 +449,34 @@ static inline unsigned int stdc_count_ones_uc(unsigned char value)
 
 #define stdc_count_ones(value) \
         __stdbit_generic_type_func(count_ones, value)
+
+static inline unsigned int stdc_count_zeros_ull(unsigned long long value)
+{
+    return stdc_count_ones_ull(~value);
+}
+
+static inline unsigned int stdc_count_zeros_ul(unsigned long value)
+{
+    return stdc_count_ones_ul(~value);
+}
+
+static inline unsigned int stdc_count_zeros_ui(unsigned int value)
+{
+    return stdc_count_ones_ui(~value);
+}
+
+static inline unsigned int stdc_count_zeros_us(unsigned short value)
+{
+    return stdc_count_ones_us(~value);
+}
+
+static inline unsigned int stdc_count_zeros_uc(unsigned char value)
+{
+    return stdc_count_ones_uc(~value);
+}
+
+#define stdc_count_zeros(value) \
+        __stdbit_generic_type_func(count_zeros, value)
 
 static inline bool stdc_has_single_bit_ull(unsigned long long value)
 {
