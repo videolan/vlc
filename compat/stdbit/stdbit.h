@@ -508,27 +508,27 @@ static inline bool stdc_has_single_bit_uc(unsigned char value)
 
 static inline unsigned int stdc_bit_width_ull(unsigned long long value)
 {
-    return stdc_first_leading_one_ull(value);
+    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ull(value);
 }
 
 static inline unsigned int stdc_bit_width_ul(unsigned long value)
 {
-    return stdc_first_leading_one_ul(value);
+    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ul(value);
 }
 
 static inline unsigned int stdc_bit_width_ui(unsigned int value)
 {
-    return stdc_first_leading_one_ui(value);
+    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ui(value);
 }
 
 static inline unsigned int stdc_bit_width_us(unsigned short value)
 {
-    return stdc_first_leading_one_us(value);
+    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_us(value);
 }
 
 static inline unsigned int stdc_bit_width_uc(unsigned char value)
 {
-    return stdc_first_leading_one_uc(value);
+    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_uc(value);
 }
 
 #define stdc_bit_width(value) \
