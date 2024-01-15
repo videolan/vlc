@@ -53,12 +53,12 @@ FocusScope {
 
     property bool isSearchable: true
 
-    property Component header: BrowseDeviceHeader {
+    property Component header: Widgets.ViewHeader {
         view: root
 
         text: root.title
 
-        button.visible: root.model.count < root.model.maximumCount
+        seeAllButton.visible: root.model.count < root.model.maximumCount
 
         Navigation.parentItem: root
 
@@ -66,7 +66,7 @@ FocusScope {
             view.setCurrentItemFocus(Qt.TabFocusReason)
         }
 
-        onClicked: root.seeAll(reason)
+        onSeeAllButtonClicked: root.seeAll(reason)
     }
 
     property string title

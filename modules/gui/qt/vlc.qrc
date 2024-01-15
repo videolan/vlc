@@ -232,7 +232,6 @@
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
-        <file alias="BrowseDeviceHeader.qml">network/qml/BrowseDeviceHeader.qml</file>
         <file alias="BrowseDeviceView.qml">network/qml/BrowseDeviceView.qml</file>
         <file alias="BrowseDisplay.qml">network/qml/BrowseDisplay.qml</file>
         <file alias="BrowseHomeDisplay.qml">network/qml/BrowseHomeDisplay.qml</file>

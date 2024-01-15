@@ -141,6 +141,8 @@ FocusScope {
             width: foldersSection.width
             height: implicitHeight
 
+            topPadding: VLCStyle.layoutTitle_top_padding
+
             spacing: VLCStyle.margin_small
 
             BrowseDeviceView {

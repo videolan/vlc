@@ -931,7 +931,6 @@ libqt_plugin_la_QML = \
 	menus/qml/Menubar.qml \
 	menus/qml/ShortcutExt.qml \
 	network/qml/AddressbarButton.qml \
-	network/qml/BrowseDeviceHeader.qml \
 	network/qml/BrowseDeviceView.qml \
 	network/qml/BrowseDisplay.qml \
 	network/qml/BrowseHomeDisplay.qml \
