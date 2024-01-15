@@ -310,6 +310,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                         block_Release( p_pkt );
                         return false;
                     }
+                    p_pes->gather.i_block_flags |= BLOCK_FLAG_CORRUPTED;
                     b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL, i_append_pcr );
                     p_pkt = p_split;
                     b_first_sync_done = false;
