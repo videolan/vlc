@@ -181,7 +181,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
 
     /* Seek discontinuity, we need to drop or output currently
      * gathered data */
-    if( p_pkt->i_flags & BLOCK_FLAG_SOURCE_RANDOM_ACCESS )
+    if( p_pkt->i_flags & BLOCK_FLAG_PRIVATE_SOURCE_RANDOM_ACCESS )
     {
         p_pes->gather.i_saved = 0;
         /* Flush/output current */
