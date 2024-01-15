@@ -656,10 +656,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedArtists = nil;
     _cachedAudioMedia = nil;
     _cachedRecentMedia = nil;
+    _cachedRecentAudioMedia = nil;
 
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId action:(void (^)(const NSMutableArray*, const NSUInteger, const NSMutableArray*, const NSUInteger))action
