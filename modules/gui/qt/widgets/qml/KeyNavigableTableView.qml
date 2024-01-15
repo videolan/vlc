@@ -68,7 +68,7 @@ FocusScope {
         return size + Math.max(VLCStyle.column_spacing * (sortModel.length - 1), 0)
     }
 
-    property Component header: Item{}
+    property Component header: null
     property Item headerItem: view.headerItem ? view.headerItem.loadedHeader : null
     property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0

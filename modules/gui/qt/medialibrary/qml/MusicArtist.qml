@@ -87,7 +87,6 @@ FocusScope {
 
             height: implicitHeight
             width: headerFs.width
-            bottomPadding: MainCtx.gridView ? VLCStyle.layoutTitle_top_padding : 0
 
             ArtistTopBanner {
                 id: artistBanner
@@ -115,6 +114,16 @@ FocusScope {
                 }
             }
 
+            Widgets.ViewHeader {
+                view: root
+
+                leftPadding: VLCStyle.margin_xlarge
+                bottomPadding: VLCStyle.layoutTitle_bottom_padding -
+                               (MainCtx.gridView ? 0 : VLCStyle.gridItemSelectedBorder)
+
+                text: I18n.qtr("Albums")
+            }
+
             Loader {
                 id: albumsLoader
 
@@ -133,15 +142,6 @@ FocusScope {
                     width: albumsList.width
                     height: implicitHeight
 
-                    Widgets.ViewHeader {
-                        view: root
-
-                        leftPadding: VLCStyle.margin_xlarge
-                        bottomPadding: VLCStyle.layoutTitle_bottom_padding - VLCStyle.gridItemSelectedBorder
-
-                        text: I18n.qtr("Albums")
-                    }
-
                     Widgets.KeyNavigableListView {
                         id: albumsList
 
@@ -151,8 +151,8 @@ FocusScope {
                         width: root.width - root.rightPadding
 
                         leftMargin: VLCStyle.margin_xlarge
-                        topMargin: VLCStyle.margin_xsmall
-                        bottomMargin: VLCStyle.margin_xsmall
+                        topMargin: VLCStyle.gridItemSelectedBorder
+                        bottomMargin: VLCStyle.gridItemSelectedBorder
                         model: albumModel
                         selectionModel: albumSelectionModel
                         orientation: ListView.Horizontal

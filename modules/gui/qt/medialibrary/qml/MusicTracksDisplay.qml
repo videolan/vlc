@@ -62,8 +62,12 @@ FocusScope {
 
         visible: model.count > 0
         focus: model.count > 0
-        headerTopPadding: VLCStyle.margin_normal
 
+        header: Widgets.ViewHeader {
+            view: tracklistdisplay_id
+
+            text: I18n.qtr("Tracks")
+        }
 
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order

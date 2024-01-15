@@ -51,6 +51,14 @@ Widgets.PageLoader {
         id: componentAll
 
         PlaylistMediaList {
+            id: playlistView
+
+            header: Widgets.ViewHeader {
+                view: playlistView
+
+                text: I18n.qtr("Playlists")
+            }
+
             isMusic: true
 
             searchPattern: MainCtx.search.pattern

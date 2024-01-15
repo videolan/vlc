@@ -46,6 +46,13 @@ Widgets.PageLoader {
         id: allArtistsComponent
 
         MusicAllArtists {
+            id: artistsView
+
+            header: Widgets.ViewHeader {
+                view: artistsView
+
+                text: I18n.qtr("Artists")
+            }
 
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order

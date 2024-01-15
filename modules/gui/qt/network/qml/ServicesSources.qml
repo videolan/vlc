@@ -44,9 +44,14 @@ MainInterface.MainGridView {
     //settings
 
     model: sourcesModel
-    topMargin: VLCStyle.margin_large
     cellWidth: VLCStyle.gridItem_network_width
     cellHeight: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
+
+    headerDelegate: Widgets.ViewHeader {
+        view: root
+
+        text: I18n.qtr("Services")
+    }
 
     delegate: Widgets.GridItem {
 

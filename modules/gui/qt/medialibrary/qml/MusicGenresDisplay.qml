@@ -41,6 +41,14 @@ Widgets.PageLoader {
         id: genresComponent
         /* List View */
         MusicGenres {
+            id: genresView
+
+            header: Widgets.ViewHeader {
+                view: genresView
+
+                text: I18n.qtr("Genres")
+            }
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             searchPattern: MainCtx.search.pattern
@@ -60,9 +68,6 @@ Widgets.PageLoader {
             id: albumsView
 
             property string genreName: ""
-
-            gridViewMarginTop: 0
-            tableViewPaddingTop: 0
 
             header: Widgets.ViewHeader {
                 view: albumsView

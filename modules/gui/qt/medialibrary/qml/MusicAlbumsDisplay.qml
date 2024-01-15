@@ -26,6 +26,12 @@ import "qrc:///widgets/" as Widgets
 MusicAlbums {
     id: root
 
+    header: Widgets.ViewHeader {
+        view: root
+
+        text: I18n.qtr("Albums")
+    }
+
     searchPattern: MainCtx.search.pattern
     sortCriteria: MainCtx.sort.criteria
     sortOrder: MainCtx.sort.order

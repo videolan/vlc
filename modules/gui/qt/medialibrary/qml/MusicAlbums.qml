@@ -31,14 +31,11 @@ MainInterface.MainViewLoader {
 
     // Properties
 
-    property int gridViewMarginTop: VLCStyle.margin_large
-    property int tableViewPaddingTop: VLCStyle.margin_normal
-
     property var gridViewRowX: Helpers.get(currentItem, "rowX", 0)
 
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
-    property Component header: Item {}
+    property Component header: null
     readonly property Item headerItem: Helpers.get(currentItem, "headerItem", null)
 
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
@@ -102,7 +99,6 @@ MainInterface.MainViewLoader {
             id: gridView_id
 
             activeFocusOnTab:true
-            topMargin: root.gridViewMarginTop
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
 
@@ -243,7 +239,6 @@ MainInterface.MainViewLoader {
             header: root.header
             dragItem: albumDragItem
             rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: root.tableViewPaddingTop
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium

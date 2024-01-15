@@ -35,6 +35,8 @@ MainInterface.MainViewLoader {
     // Properties
     readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
+    property Component header: null
+    
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
@@ -121,9 +123,10 @@ MainInterface.MainViewLoader {
 
             selectionModel: root.selectionModel
             model: genreModel
-            topMargin: VLCStyle.margin_large
 
-           delegate: Widgets.GridItem {
+            headerDelegate: root.header
+
+            delegate: Widgets.GridItem {
                 id: item
 
                 property var model: ({})
@@ -264,7 +267,8 @@ MainInterface.MainViewLoader {
             Navigation.parentItem: root
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
+
+            header: root.header
 
             onItemDoubleClicked: (index, model) => {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)

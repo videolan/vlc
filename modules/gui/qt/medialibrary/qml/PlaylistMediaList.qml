@@ -43,6 +43,8 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
+    property Component header: null
+    
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
@@ -174,11 +176,11 @@ MainInterface.MainViewLoader {
             cellWidth : _width
             cellHeight: _height
 
-            topMargin: VLCStyle.margin_large
-
             model: root.model
 
             selectionModel: root.selectionModel
+
+            headerDelegate: root.header
 
             Navigation.parentItem: root
 
@@ -307,8 +309,6 @@ MainInterface.MainViewLoader {
 
             rowHeight: VLCStyle.tableCoverRow_height
 
-            headerTopPadding: VLCStyle.margin_normal
-
             model: root.model
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
@@ -317,6 +317,8 @@ MainInterface.MainViewLoader {
             selectionModel: root.selectionModel
 
             dragItem: dragItemPlaylist
+
+            header: root.header
 
             Navigation.parentItem: root
 

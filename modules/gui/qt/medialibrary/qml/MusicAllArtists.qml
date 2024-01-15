@@ -34,6 +34,8 @@ MainInterface.MainViewLoader {
 
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
+    property Component header: null
+    
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
@@ -82,13 +84,13 @@ MainInterface.MainViewLoader {
         MainInterface.MainGridView {
             id: artistGrid
 
-            topMargin: VLCStyle.margin_large
             selectionModel: root.selectionModel
             model: artistModel
             focus: true
             cellWidth: VLCStyle.colWidth(1)
             cellHeight: VLCStyle.gridItem_music_height
 
+            headerDelegate: root.header
             Navigation.parentItem: root
 
             onActionAtIndex: (index) => {
@@ -187,8 +189,8 @@ MainInterface.MainViewLoader {
             focus: true
             dragItem: artistsDragItem
             rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
 
+            header: root.header
             Navigation.parentItem: root
 
             onActionForSelection: (selection) => {
