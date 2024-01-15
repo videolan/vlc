@@ -172,6 +172,15 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
 
     }
 
+    /* Deal with explicit packet loss */
+    if( p_pkt->i_flags & BLOCK_FLAG_PRIVATE_PACKET_LOSS )
+    {
+        /* Flag unfinished unit as corrupted */
+        if ( p_pes->gather.i_gathered )
+            p_pes->gather.i_block_flags |= BLOCK_FLAG_CORRUPTED;
+        p_pkt->i_flags &= ~BLOCK_FLAG_PRIVATE_PACKET_LOSS;
+    }
+
     /* We'll cannot parse any pes data */
     if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) && b_valid_scrambling )
     {
