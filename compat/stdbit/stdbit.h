@@ -243,61 +243,61 @@ static inline unsigned int stdc_trailing_ones_uc(unsigned char value)
 #define stdc_trailing_ones(value) \
         __stdbit_generic_type_func(trailing_ones, value)
 
-static inline unsigned int stdc_first_leading_zero_ull(unsigned long long value)
-{
-    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ull(value);
-}
-
-static inline unsigned int stdc_first_leading_zero_ul(unsigned long value)
-{
-    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ul(value);
-}
-
-static inline unsigned int stdc_first_leading_zero_ui(unsigned int value)
-{
-    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_ui(value);
-}
-
-static inline unsigned int stdc_first_leading_zero_us(unsigned short value)
-{
-    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_us(value);
-}
-
-static inline unsigned int stdc_first_leading_zero_uc(unsigned char value)
-{
-    return (CHAR_BIT * sizeof (value)) - stdc_leading_zeros_uc(value);
-}
-
-#define stdc_first_leading_zero(value) \
-        __stdbit_generic_type_func(first_leading_zero, value)
-
 static inline unsigned int stdc_first_leading_one_ull(unsigned long long value)
 {
-    return stdc_first_leading_zero_ull(~value);
+    return value ? (stdc_leading_zeros_ull(value) + 1) : 0;
 }
 
 static inline unsigned int stdc_first_leading_one_ul(unsigned long value)
 {
-    return stdc_first_leading_zero_ul(~value);
+    return value ? (stdc_leading_zeros_ul(value) + 1) : 0;
 }
 
 static inline unsigned int stdc_first_leading_one_ui(unsigned int value)
 {
-    return stdc_first_leading_zero_ui(~value);
+    return value ? (stdc_leading_zeros_ui(value) + 1) : 0;
 }
 
 static inline unsigned int stdc_first_leading_one_us(unsigned short value)
 {
-    return stdc_first_leading_zero_us(~value);
+    return value ? (stdc_leading_zeros_us(value) + 1) : 0;
 }
 
 static inline unsigned int stdc_first_leading_one_uc(unsigned char value)
 {
-    return stdc_first_leading_zero_uc(~value);
+    return value ? (stdc_leading_zeros_uc(value) + 1) : 0;
 }
 
 #define stdc_first_leading_one(value) \
         __stdbit_generic_type_func(first_leading_one, value)
+
+static inline unsigned int stdc_first_leading_zero_ull(unsigned long long value)
+{
+    return stdc_leading_ones_ull(~value);
+}
+
+static inline unsigned int stdc_first_leading_zero_ul(unsigned long value)
+{
+    return stdc_leading_ones_ul(~value);
+}
+
+static inline unsigned int stdc_first_leading_zero_ui(unsigned int value)
+{
+    return stdc_leading_ones_ui(~value);
+}
+
+static inline unsigned int stdc_first_leading_zero_us(unsigned short value)
+{
+    return stdc_leading_ones_us(~value);
+}
+
+static inline unsigned int stdc_first_leading_zero_uc(unsigned char value)
+{
+    return stdc_leading_ones_uc(~value);
+}
+
+#define stdc_first_leading_zero(value) \
+        __stdbit_generic_type_func(first_leading_zero, value)
 
 #if defined (__GNUC__) || defined (__clang__)
 static inline unsigned int stdc_first_trailing_zero_ull(unsigned long long value)
