@@ -300,61 +300,6 @@ static inline unsigned int stdc_first_leading_zero_uc(unsigned char value)
         __stdbit_generic_type_func(first_leading_zero, value)
 
 #if defined (__GNUC__) || defined (__clang__)
-static inline unsigned int stdc_first_trailing_zero_ull(unsigned long long value)
-{
-    return __builtin_ffsll(~value);
-}
-
-static inline unsigned int stdc_first_trailing_zero_ul(unsigned long value)
-{
-    return __builtin_ffsl(~value);
-}
-
-static inline unsigned int stdc_first_trailing_zero_ui(unsigned int value)
-{
-    return __builtin_ffs(~value);
-}
-
-static inline unsigned int stdc_first_trailing_zero_us(unsigned short value)
-{
-    return __builtin_ffs((unsigned short)~value);
-}
-
-static inline unsigned int stdc_first_trailing_zero_uc(unsigned char value)
-{
-    return __builtin_ffs((unsigned char)~value);
-}
-#else
-static inline unsigned int stdc_first_trailing_zero_ull(unsigned long long value)
-{
-    return (~value) ? (1 + stdc_trailing_ones_ull(value)) : 0;
-}
-
-static inline unsigned int stdc_first_trailing_zero_ul(unsigned long value)
-{
-    return (~value) ? (1 + stdc_trailing_ones_ul(value)) : 0;
-}
-
-static inline unsigned int stdc_first_trailing_zero_ui(unsigned int value)
-{
-    return (~value) ? (1 + stdc_trailing_ones_ui(value)) : 0;
-}
-
-static inline unsigned int stdc_first_trailing_zero_us(unsigned short value)
-{
-    return ((unsigned short)~value) ? (1 + stdc_trailing_ones_us(value)) : 0;
-}
-
-static inline unsigned int stdc_first_trailing_zero_uc(unsigned char value)
-{
-    return ((unsigned char)~value) ? (1 + stdc_trailing_ones_uc(value)) : 0;
-}
-#endif
-
-#define stdc_first_trailing_zero(value) \
-        __stdbit_generic_type_func(first_trailing_zero, value)
-
-#if defined (__GNUC__) || defined (__clang__)
 static inline unsigned int stdc_first_trailing_one_ull(unsigned long long value)
 {
     return __builtin_ffsll(value);
@@ -408,6 +353,34 @@ static inline unsigned int stdc_first_trailing_one_uc(unsigned char value)
 
 #define stdc_first_trailing_one(value) \
         __stdbit_generic_type_func(first_trailing_one, value)
+
+static inline unsigned int stdc_first_trailing_zero_ull(unsigned long long value)
+{
+    return stdc_first_trailing_one_ull(~value);
+}
+
+static inline unsigned int stdc_first_trailing_zero_ul(unsigned long value)
+{
+    return stdc_first_trailing_one_ul(~value);
+}
+
+static inline unsigned int stdc_first_trailing_zero_ui(unsigned int value)
+{
+    return stdc_first_trailing_one_ui(~value);
+}
+
+static inline unsigned int stdc_first_trailing_zero_us(unsigned short value)
+{
+    return stdc_first_trailing_one_us(~value);
+}
+
+static inline unsigned int stdc_first_trailing_zero_uc(unsigned char value)
+{
+    return stdc_first_trailing_one_uc(~value);
+}
+
+#define stdc_first_trailing_zero(value) \
+        __stdbit_generic_type_func(first_trailing_zero, value)
 
 #if defined (__GNUC__) || defined (__clang__)
 static inline unsigned int stdc_count_zeros_ull(unsigned long long value)
