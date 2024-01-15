@@ -41,6 +41,8 @@ FocusScope {
     property int rightPadding: VLCStyle.margin_xsmall
 
     property int nbItemPerRow
+    
+    property alias model: recentModel
 
     // Settings
 

@@ -60,6 +60,8 @@ VideoAll {
 
     sectionProperty: !!_meta && !!_meta.sectionProperty ? _meta.sectionProperty : ""
 
+    headerPositioning: headerItem.model.count > 0 ? ListView.InlineHeader : ListView.OverlayHeader
+
     // Functions
 
     function _updateMetaModel(groupping) {

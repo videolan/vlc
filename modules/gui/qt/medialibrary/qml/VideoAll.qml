@@ -43,6 +43,8 @@ MainInterface.MainViewLoader {
 
     property Item headerItem: Helpers.get(currentItem, "headerItem", null)
 
+    property int headerPositioning: ListView.OverlayHeader
+
     readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
     // 'role' used for tableview's section text
@@ -186,7 +188,7 @@ MainInterface.MainViewLoader {
 
             header: root.header
 
-            headerPositioning: ListView.InlineHeader
+            headerPositioning: root.headerPositioning
 
             activeFocusOnTab: true
 
