@@ -26,9 +26,9 @@
 #import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
-NSString * const VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
-NSString * const VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
-NSString * const VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
+NSString * const VLCLibraryModelArtistListReset = @"VLCLibraryModelArtistListReset";
+NSString * const VLCLibraryModelAlbumListReset = @"VLCLibraryModelAlbumListReset";
+NSString * const VLCLibraryModelGenreListReset = @"VLCLibraryModelGenreListReset";
 NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
 NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
@@ -318,7 +318,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedArtists = mutableArtistArray.copy;
             self->_artistDict = mutableArtistDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListReset object:self];
         });
     });
 }
@@ -361,7 +361,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAlbums = mutableAlbumArray.copy;
             self->_albumDict = mutableAlbumDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListReset object:self];
         });
     });
 }
@@ -404,7 +404,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedGenres = mutableGenreArray.copy;
             self->_genreDict = mutableGenreDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListReset object:self];
         });
     });
 }
@@ -659,9 +659,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedRecentAudioMedia = nil;
 
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListReset object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListReset object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListReset object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];

@@ -108,7 +108,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelArtistsReset:)
-                                   name:VLCLibraryModelArtistListUpdated
+                                   name:VLCLibraryModelArtistListReset
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelArtistUpdated:)
@@ -122,7 +122,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelAlbumsReset:)
-                                   name:VLCLibraryModelAlbumListUpdated
+                                   name:VLCLibraryModelAlbumListReset
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelAlbumUpdated:)
@@ -135,7 +135,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelGenresReset:)
-                                   name:VLCLibraryModelGenreListUpdated
+                                   name:VLCLibraryModelGenreListReset
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelGenreUpdated:)

@@ -33,9 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCMediaLibraryEntryPoint;
 @protocol VLCMediaLibraryItemProtocol;
 
-extern NSString * const VLCLibraryModelArtistListUpdated;
-extern NSString * const VLCLibraryModelAlbumListUpdated;
-extern NSString * const VLCLibraryModelGenreListUpdated;
+extern NSString * const VLCLibraryModelArtistListReset;
+extern NSString * const VLCLibraryModelAlbumListReset;
+extern NSString * const VLCLibraryModelGenreListReset;
 extern NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated;
 extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 
