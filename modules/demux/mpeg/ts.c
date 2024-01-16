@@ -753,13 +753,13 @@ static int Demux( demux_t *p_demux )
             break;
 
         case TYPE_SI:
-            if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED|BLOCK_FLAG_CORRUPTED)) == 0 )
+            if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) == 0 )
                 ts_si_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
 
         case TYPE_PSIP:
-            if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED|BLOCK_FLAG_CORRUPTED)) == 0 )
+            if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) == 0 )
                 ts_psip_Packet_Push( p_pid, p_pkt->p_buffer );
             block_Release( p_pkt );
             break;
@@ -2703,7 +2703,7 @@ static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *p_pid, block_t *p_pk
         ts_sections_processor_Reset( p_pid->u.p_stream->p_sections_proc );
     }
 
-    if( (p_pkt->i_flags & (BLOCK_FLAG_SCRAMBLED | BLOCK_FLAG_CORRUPTED)) == 0 )
+    if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) == 0 )
     {
         ts_sections_processor_Push( p_pid->u.p_stream->p_sections_proc, p_pkt->p_buffer );
         b_ret = true;
