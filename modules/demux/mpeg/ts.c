@@ -691,7 +691,8 @@ static int Demux( demux_t *p_demux )
         if( !p_pkt )
             continue;
 
-        if( !SCRAMBLED(*p_pid) != !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) )
+        if( !SCRAMBLED(*p_pid) != !(p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) &&
+            ( p_pkt->p_buffer[1] & 0x40 ) ) /* update on payload start */
         {
             UpdatePIDScrambledState( p_demux, p_pid, p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED );
         }
@@ -1921,7 +1922,7 @@ static void UpdatePIDScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool b_s
     /* avoid flapping descrambled state on partial scrambling */
     if( b_scrambled )
     {
-        p_pid->i_scramble_counter = 50;
+        p_pid->i_scramble_counter = 4;
     }
     else if( p_pid->i_scramble_counter != 0 )
     {
