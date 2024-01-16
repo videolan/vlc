@@ -142,6 +142,8 @@ FocusScope {
                     width: albumsList.width
                     height: implicitHeight
 
+                    spacing: VLCStyle.tableView_spacing
+
                     Widgets.KeyNavigableListView {
                         id: albumsList
 
@@ -213,6 +215,7 @@ FocusScope {
                         view: root
 
                         leftPadding: VLCStyle.margin_xlarge
+                        topPadding: 0
 
                         text: I18n.qtr("Tracks")
                     }

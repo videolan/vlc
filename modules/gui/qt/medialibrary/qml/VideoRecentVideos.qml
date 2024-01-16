@@ -116,8 +116,7 @@ FocusScope {
             visible: recentModel.count > 0
 
             width: root.width
-            height: MainCtx.gridView ? VLCStyle.gridItem_video_height + VLCStyle.gridItemSelectedBorder + VLCStyle.margin_xlarge
-                                     : VLCStyle.margin_xxlarge + Math.min(recentModel.count, 5) * VLCStyle.tableCoverRow_height
+            height: currentItem.contentHeight
 
             leftPadding: root.leftPadding
             rightPadding: root.rightPadding
@@ -149,7 +148,8 @@ FocusScope {
             view: root
 
             leftPadding: Helpers.get(view.currentItem, "contentLeftMargin", 0)
-            topPadding: 0
+            topPadding: MainCtx.gridView ? VLCStyle.gridView_spacing + VLCStyle.margin_xsmall + VLCStyle.margin_xxxsmall
+                                         : VLCStyle.tableView_spacing
 
             text: view.title
         }

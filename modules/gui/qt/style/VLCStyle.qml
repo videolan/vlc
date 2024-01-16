@@ -217,6 +217,10 @@ QtObject {
     readonly property int column_margin: MainCtx.dp(32, scale)
     readonly property int column_spacing: column_margin
 
+    // NOTE: For the grid layout, there is an additional spacing, defined by the verticalSpacing of the ExpandGridView
+    readonly property int gridView_spacing: margin_small + margin_xxxsmall
+    readonly property int tableView_spacing: gridView_spacing + margin_large
+
     readonly property int layoutTitle_top_padding: margin_large
     readonly property int layoutTitle_bottom_padding: margin_normal
 

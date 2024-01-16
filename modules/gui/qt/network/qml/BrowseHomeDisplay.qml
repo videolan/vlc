@@ -141,9 +141,8 @@ FocusScope {
             width: foldersSection.width
             height: implicitHeight
 
-            topPadding: VLCStyle.layoutTitle_top_padding
-
-            spacing: VLCStyle.margin_small
+            spacing: (MainCtx.gridView ? VLCStyle.gridView_spacing : VLCStyle.tableView_spacing) -
+                     VLCStyle.layoutTitle_top_padding
 
             BrowseDeviceView {
                 id: foldersSection
