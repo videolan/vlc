@@ -516,7 +516,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }];
 }
 
-// TODO: See above
 - (size_t)numberOfRecentAudioMedia
 {
     if (!_cachedRecentAudioMedia) {
