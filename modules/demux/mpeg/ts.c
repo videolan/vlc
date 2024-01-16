@@ -1918,6 +1918,17 @@ static void UpdatePIDScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool b_s
     if( !SCRAMBLED(*p_pid) == !b_scrambled )
         return;
 
+    /* avoid flapping descrambled state on partial scrambling */
+    if( b_scrambled )
+    {
+        p_pid->i_scramble_counter = 50;
+    }
+    else if( p_pid->i_scramble_counter != 0 )
+    {
+        p_pid->i_scramble_counter--;
+        return;
+    }
+
     msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
               p_pid->i_pid, !!SCRAMBLED(*p_pid), b_scrambled );
 

@@ -175,6 +175,7 @@ static void PIDReset( ts_pid_t *pid )
     pid->i_dup      = 0;
     pid->i_flags    &= ~FLAG_SCRAMBLED;
     pid->type = TYPE_FREE;
+    pid->i_scramble_counter = 0;
     memset(pid->prevpktbytes, 0, PREVPKTKEEPBYTES);
 }
 

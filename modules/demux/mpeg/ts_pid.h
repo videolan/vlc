@@ -60,6 +60,7 @@ struct ts_pid_t
     uint8_t     i_dup;  /* duplicate counter */
     uint8_t     type;
     uint8_t     prevpktbytes[PREVPKTKEEPBYTES];
+    uint8_t     i_scramble_counter;
 
     uint16_t    i_refcount;
 
