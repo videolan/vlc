@@ -268,8 +268,9 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             assert( p_pes->gather.i_data_size > p_pes->gather.i_gathered ||
                     p_pes->gather.i_data_size == 0 );
 
-            /* If we started reading a fixed size */
-            if( p_pes->gather.i_data_size > p_pes->gather.i_gathered && !b_single_payload )
+            /* If we started reading a fixed size that might not end on boundary */
+            if( unlikely(!b_aligned_ts_payload) &&
+                p_pes->gather.i_data_size > p_pes->gather.i_gathered )
             {
                 const size_t i_remain = p_pes->gather.i_data_size - p_pes->gather.i_gathered;
                 /* Append whole block */

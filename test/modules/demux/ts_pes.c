@@ -173,7 +173,7 @@ int main(void)
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
-    ASSERT(outputsize == 256);
+    ASSERT(outputsize == 300);
     RESET;
 
     /* no packets assembly from unit start, early termination by fixed size */
