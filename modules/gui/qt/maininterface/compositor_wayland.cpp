@@ -107,7 +107,6 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     if (m_mainCtx->useClientSideDecoration())
         m_qmlView->setFlag(Qt::FramelessWindowHint);
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
-    m_qmlView->setClearBeforeRendering(true);
     m_qmlView->setColor(QColor(Qt::transparent));
 
     m_qmlView->show();
