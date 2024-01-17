@@ -174,7 +174,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.buildautoconf: autoconf .pkg-config
+.buildautoconf: autoconf .pkg-config .m4
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
