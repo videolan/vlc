@@ -904,6 +904,9 @@ static void on_player_timer_update(const struct vlc_player_timer_point *point,
                                    void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
+    if (that->seeking)
+        return;
+
     that->callAsync([that,point_copy = *point](){
         PlayerController* q = that->q_func();
 
@@ -974,6 +977,32 @@ static void on_player_timer_discontinuity(vlc_tick_t system_date, void *data)
     });
 }
 
+static void on_player_timer_seek(const struct vlc_player_timer_point *point,
+                                 void *data)
+{
+    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
+    if (point != NULL)
+    {
+        that->seeking = true;
+        that->callAsync([that,point_copy = *point](){
+            PlayerController* q = that->q_func();
+
+            that->m_player_time = point_copy;
+            if (that->m_player_time.position > 0)
+                that->m_position = that->m_player_time.position;
+            if (that->m_player_time.ts != VLC_TICK_INVALID)
+                that->m_time = that->m_player_time.ts - VLC_TICK_0;
+
+            q->updatePosition();
+            q->updateTime(VLC_TICK_INVALID, false);
+
+            that->m_position_timer.stop();
+            that->m_time_timer.stop();
+        });
+    }
+    else
+        that->seeking = false;
+}
 static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_timecode *tc,
                                          void *data)
 {
@@ -1049,6 +1078,7 @@ static const vlc_player_timer_cbs player_timer_cbs = []{
     struct vlc_player_timer_cbs cbs {};
     cbs.on_update = on_player_timer_update;
     cbs.on_discontinuity = on_player_timer_discontinuity;
+    cbs.on_seek = on_player_timer_seek;
     return cbs;
 }();
 
@@ -1734,7 +1764,8 @@ void PlayerController::updateTime(vlc_tick_t system_now, bool forceUpdate)
         d->m_remainingTime = VLC_TICK_INVALID;
     emit remainingTimeChanged(d->m_remainingTime);
 
-    if (d->m_player_time.system_date != VLC_TICK_MAX
+    if (system_now != VLC_TICK_INVALID
+     && d->m_player_time.system_date != VLC_TICK_MAX
      && (forceUpdate || !d->m_time_timer.isActive()))
     {
         // Tell the timer to wait until the next second is reached.
