@@ -59,25 +59,27 @@ vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input, vlc_tick_t time,
 }
 
 vlc_tick_t
-vlc_player_input_GetTime(struct vlc_player_input *input, vlc_tick_t system_now)
+vlc_player_input_GetTime(struct vlc_player_input *input, bool seeking,
+                         vlc_tick_t system_now)
 {
     vlc_player_t *player = input->player;
     vlc_tick_t ts;
 
     if (input == player->input
-     && vlc_player_GetTimerPoint(player, false, system_now, &ts, NULL) == 0)
+     && vlc_player_GetTimerPoint(player, seeking, system_now, &ts, NULL) == 0)
         return ts;
     return input->time;
 }
 
 double
-vlc_player_input_GetPos(struct vlc_player_input *input, vlc_tick_t system_now)
+vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
+                        vlc_tick_t system_now)
 {
     vlc_player_t *player = input->player;
     double pos;
 
     if (input == player->input
-     && vlc_player_GetTimerPoint(player, false, system_now, NULL, &pos) == 0)
+     && vlc_player_GetTimerPoint(player, seeking, system_now, NULL, &pos) == 0)
         return pos;
     return input->position;
 }
@@ -89,8 +91,8 @@ vlc_player_input_UpdateTime(struct vlc_player_input *input)
     {
         vlc_tick_t now = vlc_tick_now();
         vlc_player_input_HandleAtoBLoop(input,
-                                        vlc_player_input_GetTime(input, now),
-                                        vlc_player_input_GetPos(input, now));
+                                        vlc_player_input_GetTime(input, false, now),
+                                        vlc_player_input_GetPos(input, false, now));
     }
 }
 

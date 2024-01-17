@@ -138,7 +138,7 @@ vlc_player_osd_Position(vlc_player_t *player,
     {
         if (whence == VLC_PLAYER_WHENCE_RELATIVE)
         {
-            time += vlc_player_input_GetTime(input, now);
+            time += vlc_player_input_GetTime(input, false, now);
             if (time < 0)
                 time = 0;
         }
@@ -159,7 +159,7 @@ vlc_player_osd_Position(vlc_player_t *player,
     {
         if (whence == VLC_PLAYER_WHENCE_RELATIVE)
         {
-            position += vlc_player_input_GetPos(input, now);
+            position += vlc_player_input_GetPos(input, false, now);
             if (position < 0.f)
                 position = 0.f;
         }

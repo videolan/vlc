@@ -440,10 +440,12 @@ vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
                                            enum es_format_category_e cat) VLC_MALLOC;
 
 vlc_tick_t
-vlc_player_input_GetTime(struct vlc_player_input *input, vlc_tick_t system_now);
+vlc_player_input_GetTime(struct vlc_player_input *input, bool seeking,
+                         vlc_tick_t system_now);
 
 double
-vlc_player_input_GetPos(struct vlc_player_input *input, vlc_tick_t system_now);
+vlc_player_input_GetPos(struct vlc_player_input *input, bool seeking,
+                        vlc_tick_t system_now);
 
 int
 vlc_player_input_Start(struct vlc_player_input *input);
