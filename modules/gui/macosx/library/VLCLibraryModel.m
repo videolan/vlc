@@ -22,9 +22,12 @@
 
 #import "VLCLibraryModel.h"
 
-#import "main/VLCMain.h"
 #import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCLibraryModelChangeDelegate.h"
+
+#import "main/VLCMain.h"
 
 NSString * const VLCLibraryModelArtistListReset = @"VLCLibraryModelArtistListReset";
 NSString * const VLCLibraryModelAlbumListReset = @"VLCLibraryModelAlbumListReset";
@@ -188,6 +191,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     self = [super init];
     if (self) {
+        _changeDelegate = [[VLCLibraryModelChangeDelegate alloc] initWithLibraryModel:self];
         _sortCriteria = VLC_ML_SORTING_DEFAULT;
         _sortDescending = NO;
         _filterString = @"";

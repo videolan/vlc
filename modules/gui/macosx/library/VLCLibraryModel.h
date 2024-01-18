@@ -26,6 +26,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryModelChangeDelegate;
+
 @class VLCMediaLibraryMediaItem;
 @class VLCMediaLibraryArtist;
 @class VLCMediaLibraryAlbum;
@@ -65,6 +67,8 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 + (NSUInteger)modelIndexFromModelItemNotification:(NSNotification * const)aNotification;
 
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
+
+@property (readonly) VLCLibraryModelChangeDelegate *changeDelegate;
 
 @property (readonly) size_t numberOfAudioMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfAudioMedia;
