@@ -312,8 +312,6 @@ FocusScope {
 
                                 readonly property ColorContext colorContext: view.colorContext
 
-                                height: parent.height
-
                                 sourceComponent: colModel.headerDelegate || root.tableHeaderDelegate
                             }
 
