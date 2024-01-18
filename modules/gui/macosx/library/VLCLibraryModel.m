@@ -242,7 +242,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem
 {
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelMediaItemThumbnailGenerated object:mediaItem];
+    [self.changeDelegate notifyChange:VLCLibraryModelMediaItemThumbnailGenerated withObject:mediaItem];
 }
 
 - (size_t)numberOfAudioMedia
@@ -276,7 +276,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAudioMedia = mediaArray;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
         });
     });
 }
@@ -322,7 +322,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedArtists = mutableArtistArray.copy;
             self->_artistDict = mutableArtistDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListReset object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
         });
     });
 }
@@ -365,7 +365,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAlbums = mutableAlbumArray.copy;
             self->_albumDict = mutableAlbumDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListReset object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
         });
     });
 }
@@ -408,7 +408,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedGenres = mutableGenreArray.copy;
             self->_genreDict = mutableGenreDict.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListReset object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
         });
     });
 }
@@ -450,7 +450,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedVideoMedia = [mutableArray copy];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
         });
     });
 }
@@ -488,7 +488,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                       withCountLimit:_recentMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
         self.cachedRecentMedia = mediaArray;
-        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+        [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
     }];
 }
 
@@ -516,7 +516,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                       withCountLimit:_recentAudioMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
         self.cachedRecentAudioMedia = mediaArray;
-        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
+        [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
     }];
 }
 
@@ -567,7 +567,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedListOfMonitoredFolders = [mutableArray copy];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelListOfMonitoredFoldersUpdated object:self];
+            [self.changeDelegate notifyChange:VLCLibraryModelListOfMonitoredFoldersUpdated withObject:self];
         });
     });
 }
@@ -661,13 +661,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedRecentMedia = nil;
     _cachedRecentAudioMedia = nil;
 
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
+    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId action:(void (^)(const NSMutableArray*, const NSUInteger, const NSMutableArray*, const NSUInteger))action
@@ -739,10 +739,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [cachedMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
-                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemUpdated object:mediaItem];
+                    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemUpdated 
+                                           withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_AUDIO:
-                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaItemUpdated object:mediaItem];
+                    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemUpdated 
+                                           withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_UNKNOWN:
                     NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
@@ -752,10 +754,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         switch (mediaItem.mediaType) {
             case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemUpdated object:mediaItem];
+                [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemUpdated 
+                                       withObject:mediaItem];
                 break;
             case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemUpdated object:mediaItem];
+                [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemUpdated 
+                                       withObject:mediaItem];
                 break;
             case VLC_ML_MEDIA_TYPE_UNKNOWN:
                 NSLog(@"Unknown type of media type encountered, don't know what to do in update");
@@ -785,10 +789,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [recentMediaArray removeObjectAtIndex:recentMediaIndex];
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
-                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentsMediaItemDeleted object:mediaItem];
+                    [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemDeleted
+                                           withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_AUDIO:
-                    [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelRecentAudioMediaItemDeleted object:mediaItem];
+                    [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaItemDeleted 
+                                           withObject:mediaItem];
                     break;
                 case VLC_ML_MEDIA_TYPE_UNKNOWN:
                     NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
@@ -798,10 +804,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         switch (mediaItem.mediaType) {
             case VLC_ML_MEDIA_TYPE_VIDEO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaItemDeleted object:mediaItem];
+                [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemDeleted
+                                       withObject:mediaItem];
                 break;
             case VLC_ML_MEDIA_TYPE_AUDIO:
-                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaItemDeleted object:mediaItem];
+                [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaItemDeleted
+                                       withObject:mediaItem];
                 break;
             case VLC_ML_MEDIA_TYPE_UNKNOWN:
                 NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
@@ -845,8 +853,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
             cacheSetterFunction(self, setterSelector, immutableCopy);
 
-            [self->_defaultNotificationCenter postNotificationName:notificationName
-                                                            object:audioGroupItem];
+            [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
         });
     });
 }
@@ -879,8 +886,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
             cacheSetterFunction(self, setterSelector, immutableCopy);
 
-            [self->_defaultNotificationCenter postNotificationName:notificationName
-                                                            object:audioGroupItem];
+            [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
         });
     });
 }
