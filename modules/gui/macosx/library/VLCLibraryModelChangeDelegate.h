@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryModelChangeDelegate : NSObject
 
 @property (readonly) VLCLibraryModel *model;
+@property (readwrite) NSTimeInterval throttleInterval;
 
 - (instancetype)initWithLibraryModel:(VLCLibraryModel *)model;
 - (void)notifyChange:(NSString *)notificationName withObject:(id)object;

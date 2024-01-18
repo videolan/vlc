@@ -22,6 +22,16 @@
 
 #import "VLCLibraryModelChangeDelegate.h"
 
+NSString * const VLCTimerNotificationNameUserInfoKey = @"notificationName";
+NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
+
+@interface VLCLibraryModelChangeDelegate ()
+
+@property (readonly) NSNotificationCenter *notificationCenter;
+@property (readonly) NSMutableDictionary<NSString *, NSTimer*> *recentNotifications;
+
+@end
+
 @implementation VLCLibraryModelChangeDelegate
 
 - (instancetype)initWithLibraryModel:(VLCLibraryModel *)model
@@ -29,12 +39,38 @@
     self = [super init];
     if (self) {
         _model = model;
+        _notificationCenter = NSNotificationCenter.defaultCenter;
+        _throttleInterval = 0.5;
     }
     return self;
 }
 
 - (void)notifyChange:(NSString *)notificationName withObject:(nonnull id)object
 {
+    NSDictionary<NSString *, NSString *> * const userInfo = @{
+        VLCTimerNotificationNameUserInfoKey: notificationName,
+        VLCTimerNotificationObjectUserInfoKey: object,
+    };
+    NSTimer * const throttleTimer = [NSTimer scheduledTimerWithTimeInterval:self.throttleInterval
+                                                                     target:self
+                                                                   selector:@selector(throttleTimerFired:)
+                                                                   userInfo:userInfo
+                                                                    repeats:NO];
+    NSTimer * const existingTimer = [self.recentNotifications objectForKey:notificationName];
+    [existingTimer invalidate];
+    [self.recentNotifications setObject:throttleTimer forKey:notificationName];
+}
+
+- (void)throttleTimerFired:(NSTimer *)timer
+{
+    if (timer == nil) {
+        return;
+    }
+
+    NSDictionary * const userInfo = timer.userInfo;
+    NSString * const notificationName = [userInfo objectForKey:VLCTimerNotificationNameUserInfoKey];
+    const id notificationObject = [userInfo objectForKey:VLCTimerNotificationObjectUserInfoKey];
+    [self.recentNotifications removeObjectForKey:notificationName];
     [self.notificationCenter postNotificationName:notificationName object:notificationObject];
 }
 
