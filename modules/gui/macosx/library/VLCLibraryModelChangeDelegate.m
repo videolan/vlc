@@ -33,4 +33,9 @@
     return self;
 }
 
+- (void)notifyChange:(NSString *)notificationName withObject:(nonnull id)object
+{
+    [self.notificationCenter postNotificationName:notificationName object:notificationObject];
+}
+
 @end

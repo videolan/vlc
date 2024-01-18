@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryModel *model;
 
 - (instancetype)initWithLibraryModel:(VLCLibraryModel *)model;
+- (void)notifyChange:(NSString *)notificationName withObject:(id)object;
 
 @end
 
