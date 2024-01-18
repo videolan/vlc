@@ -732,7 +732,13 @@ void
 vlc_dialog_release(vlc_object_t *p_obj, vlc_dialog_id *p_id)
 {
     assert(p_obj != NULL && p_id != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    /* We can't use get_dialog_provider here because when vlc_killed is true,
+     * get_dialog_provider returns NULL, and we can't release the dialog
+     * properly. Moreover, since the dialog has been created by the provider,
+     * we can be sure that one exists. */
+    vlc_dialog_provider *p_provider =
+        libvlc_priv(vlc_object_instance(p_obj))->p_dialog_provider;
+    assert(p_provider != NULL);
 
     vlc_mutex_lock(&p_provider->lock);
     dialog_cancel_locked(p_provider, p_id);
