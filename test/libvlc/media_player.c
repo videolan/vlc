@@ -412,9 +412,9 @@ static void test_media_player_tracks(const char** argv, int argc)
     assert(tracklist);
 
     libvlc_media_track_t *vtrack1 =
-        libvlc_media_track_hold(libvlc_media_tracklist_at(tracklist, 1));
+        libvlc_media_track_retain(libvlc_media_tracklist_at(tracklist, 1));
     libvlc_media_track_t *vtrack2 =
-        libvlc_media_track_hold(libvlc_media_tracklist_at(tracklist, 2));
+        libvlc_media_track_retain(libvlc_media_tracklist_at(tracklist, 2));
     libvlc_media_tracklist_delete(tracklist);
 
     const libvlc_media_track_t *selecttracks[] = {

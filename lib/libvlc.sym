@@ -72,7 +72,7 @@ libvlc_media_get_tracklist
 libvlc_media_get_type
 libvlc_media_get_user_data
 libvlc_media_is_parsed
-libvlc_media_track_hold
+libvlc_media_track_retain
 libvlc_media_track_release
 libvlc_media_tracklist_at
 libvlc_media_tracklist_count

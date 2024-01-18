@@ -146,7 +146,7 @@ static void libvlc_media_track_clean( libvlc_media_track_t *track )
 }
 
 libvlc_media_track_t *
-libvlc_media_track_hold( libvlc_media_track_t *track )
+libvlc_media_track_retain( libvlc_media_track_t *track )
 {
     libvlc_media_trackpriv_t *trackpriv =
         container_of( track, libvlc_media_trackpriv_t, t );

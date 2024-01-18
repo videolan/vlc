@@ -184,7 +184,7 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
  * \return the same track, need to be released with libvlc_media_track_release()
  */
 LIBVLC_API libvlc_media_track_t *
-libvlc_media_track_hold( libvlc_media_track_t *track );
+libvlc_media_track_retain( libvlc_media_track_t *track );
 
 /**
  * Release a single track
@@ -195,7 +195,7 @@ libvlc_media_track_hold( libvlc_media_track_t *track );
  * libvlc_media_tracklist_delete().
  *
  * \note You only need to release tracks previously held with
- * libvlc_media_track_hold() or returned by
+ * libvlc_media_track_retain() or returned by
  * libvlc_media_player_get_selected_track() and
  * libvlc_media_player_get_track_from_id()
  *
