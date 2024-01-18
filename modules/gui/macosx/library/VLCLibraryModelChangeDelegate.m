@@ -24,4 +24,13 @@
 
 @implementation VLCLibraryModelChangeDelegate
 
+- (instancetype)initWithLibraryModel:(VLCLibraryModel *)model
+{
+    self = [super init];
+    if (self) {
+        _model = model;
+    }
+    return self;
+}
+
 @end

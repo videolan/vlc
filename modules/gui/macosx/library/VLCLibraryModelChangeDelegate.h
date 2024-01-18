@@ -24,7 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryModel;
+
 @interface VLCLibraryModelChangeDelegate : NSObject
+
+@property (readonly) VLCLibraryModel *model;
+
+- (instancetype)initWithLibraryModel:(VLCLibraryModel *)model;
 
 @end
 
