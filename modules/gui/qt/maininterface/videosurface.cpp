@@ -381,15 +381,7 @@ static qreal dprForWindow(QQuickWindow* quickWindow)
     if (!window)
         window = quickWindow;
 
-    qreal dpr = window->devicePixelRatio();
-
-#ifdef QT5_DECLARATIVE_PRIVATE
-    QPlatformWindow* nativeWindow = window->handle();
-    if (nativeWindow)
-        dpr /= nativeWindow->devicePixelRatio();
-#endif
-
-    return dpr;
+    return window->devicePixelRatio();
 }
 
 void VideoSurface::onSurfaceSizeChanged()

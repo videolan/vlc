@@ -34,6 +34,15 @@
 
 namespace vlc {
 
+static qreal dprForWindow(QQuickWindow* window)
+{
+    QPlatformWindow* nativeWindow = window->handle();
+    if (!nativeWindow)
+        return 1.0;
+
+    return nativeWindow->devicePixelRatio();
+}
+
 CompositorWayland::CompositorWayland(qt_intf_t *p_intf, QObject* parent)
     : CompositorVideo(p_intf, parent)
 {
@@ -108,7 +117,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     if (!interfaceSurface)
         return false;
 
-    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface);
+    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, dprForWindow(m_qmlView.get()));
 
     return commonGUICreate(m_qmlView.get(), m_qmlView.get(),
                     CompositorVideo::CAN_SHOW_PIP);
@@ -175,33 +184,27 @@ void CompositorWayland::windowDisable()
     commonWindowDisable();
 }
 
-static qreal dprForWindow(QQuickWindow* window)
-{
-    qreal dpr = window->devicePixelRatio();
-
-    QPlatformWindow* nativeWindow = window->handle();
-    if (nativeWindow)
-        dpr /= nativeWindow->devicePixelRatio();
-
-    return dpr;
-}
-
 void CompositorWayland::onSurfacePositionChanged(const QPointF& position)
 {
     QMargins margins = m_qmlView->frameMargins();
 
-    qreal dpr = dprForWindow(m_qmlView.get());
+    qreal qtDpr = m_qmlView.get()->effectiveDevicePixelRatio();
+    qreal nativeDpr = dprForWindow(m_qmlView.get());
 
-    m_waylandImpl->move(m_waylandImpl,
-        margins.left() * dpr + position.x(),
-        margins.top() * dpr + position.y());
+    m_waylandImpl->move(
+        m_waylandImpl,
+        (margins.left() * qtDpr + position.x() ) / nativeDpr,
+        (margins.top()  * qtDpr + position.y() ) / nativeDpr
+    );
 }
 
 void CompositorWayland::onSurfaceSizeChanged(const QSizeF& size)
 {
+    qreal nativeDpr = dprForWindow(m_qmlView.get());
+
     m_waylandImpl->resize(m_waylandImpl,
-                        size.width(),
-                        size.height());
+                        size.width() / nativeDpr,
+                        size.height() / nativeDpr);
 }
 
 }

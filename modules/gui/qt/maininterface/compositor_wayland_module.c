@@ -38,6 +38,8 @@ typedef struct
 
     struct wl_surface* video_surface;
     struct wl_subsurface* video_subsurface;
+
+    int buffer_scale;
 } qtwayland_priv_t;
 
 static void registry_global_cb(void* data, struct wl_registry* registry,
@@ -66,7 +68,7 @@ static const struct wl_registry_listener registry_cbs = {
     registry_global_remove_cb,
 };
 
-static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface)
+static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface, int scale)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
 
@@ -74,6 +76,7 @@ static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface)
         return VLC_EGENERIC;
 
     sys->interface_surface = (struct wl_surface*)qpni_interface_surface;
+    sys->buffer_scale = scale;
 
     return VLC_SUCCESS;
 }
@@ -86,6 +89,8 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
     sys->video_surface = wl_compositor_create_surface(sys->compositor);
     if (!sys->video_surface)
         return VLC_EGENERIC;
+
+    wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
 
     struct wl_region* region = wl_compositor_create_region(sys->compositor);
     if (!region)
