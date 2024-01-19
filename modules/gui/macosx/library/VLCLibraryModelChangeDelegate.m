@@ -47,6 +47,13 @@ NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
 
 - (void)notifyChange:(NSString *)notificationName withObject:(nonnull id)object
 {
+    // If the object received is not the model then we are dealing with a notification carrying
+    // a specific object (i.e. a media item) that is updated or deleted, do not throttle
+    if (object != self.model) {
+        [self.notificationCenter postNotificationName:notificationName object:object];
+        return;
+    }
+    
     NSDictionary<NSString *, NSString *> * const userInfo = @{
         VLCTimerNotificationNameUserInfoKey: notificationName,
         VLCTimerNotificationObjectUserInfoKey: object,
