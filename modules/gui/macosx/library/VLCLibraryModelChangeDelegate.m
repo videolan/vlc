@@ -24,11 +24,14 @@
 
 NSString * const VLCTimerNotificationNameUserInfoKey = @"notificationName";
 NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
+NSString * const VLCLongNotificationNameStartSuffix = @"Loading";
+NSString * const VLCLongNotificationNameFinishSuffix = @"Finished";
 
 @interface VLCLibraryModelChangeDelegate ()
 
 @property (readonly) NSNotificationCenter *notificationCenter;
 @property (readonly) NSMutableDictionary<NSString *, NSTimer*> *recentNotifications;
+@property (readonly) NSMutableSet<NSString *> *longNotifications;
 
 @end
 
@@ -41,6 +44,8 @@ NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
         _model = model;
         _notificationCenter = NSNotificationCenter.defaultCenter;
         _throttleInterval = 0.5;
+        _recentNotifications = NSMutableDictionary.dictionary;
+        _longNotifications = NSMutableSet.set;
     }
     return self;
 }
@@ -53,7 +58,15 @@ NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
         [self.notificationCenter postNotificationName:notificationName object:object];
         return;
     }
-    
+
+    NSTimer * const existingTimer = [self.recentNotifications objectForKey:notificationName];
+    if (existingTimer != nil) {
+        [existingTimer invalidate];
+        NSString * const loadingNotification = [notificationName stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        [self.notificationCenter postNotificationName:loadingNotification object:object];
+        [self.longNotifications addObject:loadingNotification];
+    }
+
     NSDictionary<NSString *, NSString *> * const userInfo = @{
         VLCTimerNotificationNameUserInfoKey: notificationName,
         VLCTimerNotificationObjectUserInfoKey: object,
@@ -63,8 +76,6 @@ NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
                                                                    selector:@selector(throttleTimerFired:)
                                                                    userInfo:userInfo
                                                                     repeats:NO];
-    NSTimer * const existingTimer = [self.recentNotifications objectForKey:notificationName];
-    [existingTimer invalidate];
     [self.recentNotifications setObject:throttleTimer forKey:notificationName];
 }
 
@@ -79,6 +90,11 @@ NSString * const VLCTimerNotificationObjectUserInfoKey = @"notificationObject";
     const id notificationObject = [userInfo objectForKey:VLCTimerNotificationObjectUserInfoKey];
     [self.recentNotifications removeObjectForKey:notificationName];
     [self.notificationCenter postNotificationName:notificationName object:notificationObject];
+
+    if ([self.longNotifications containsObject:notificationName]) {
+        NSString * const finishedName = [notificationName stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        [self.notificationCenter postNotificationName:finishedName object:notificationObject];
+    }
 }
 
 @end
