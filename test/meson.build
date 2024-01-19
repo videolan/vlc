@@ -14,6 +14,7 @@ foreach vlc_test: vlc_tests
     valid_dict_keys = [
         'name',
         'sources',
+        'moc_headers',
         'suite',
         'link_with',
         'module_depends',
@@ -45,8 +46,15 @@ foreach vlc_test: vlc_tests
         test_modules_deps += vlc_plugins_targets[module_name]
     endforeach
 
+    moc_sources = []
+    if vlc_test.has_key('moc_headers') and qt5_dep.found()
+        moc_sources += qt5.preprocess(moc_headers: vlc_test['moc_headers'],
+        include_directories: qt_include_dir,
+        dependencies: qt5_dep)
+    endif
+
     test(vlc_test['name'],
-        executable(vlc_test['name'], vlc_test['sources'],
+        executable(vlc_test['name'], vlc_test['sources'], moc_sources,
             build_by_default: false,
             link_with: [vlc_test.get('link_with', []),
                 vlc_libcompat],
