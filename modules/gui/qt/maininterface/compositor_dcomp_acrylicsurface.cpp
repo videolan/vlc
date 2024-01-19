@@ -18,6 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+// Win 8.1 for IDCompositionDevice3/IDCompositionVisual2
+# if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0603) // _WIN32_WINNT_WINBLUE
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x0603
+# endif
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <dcomp.h>
+
 #include "compositor_dcomp_acrylicsurface.hpp"
 
 #include <QWindow>
@@ -90,14 +100,20 @@ bool isWinPreIron()
 namespace vlc
 {
 
-CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_intf_t *intf, CompositorDirectComposition *compositor, MainCtx *mainCtx, ID3D11Device *device, QObject *parent)
+CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_intf_t *intf, CompositorDirectComposition *compositor, MainCtx *mainCtx, IDCompositionDevice *device, QObject *parent)
     : QObject(parent)
     , m_intf {intf}
     , m_compositor {compositor}
     , m_mainCtx {mainCtx}
 {
-    if (!init(device))
-        return;
+    assert(device);
+    device->QueryInterface(__uuidof(IDCompositionDevice3), (void**)&m_dcompDevice);
+
+    if (!m_dcompDevice)
+        throw std::runtime_error("DCompositionDevice is not DCompositionDevice3.");
+
+    if (!init())
+        throw std::exception();
 
     qApp->installNativeEventFilter(this);
 
@@ -167,12 +183,12 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &,
 }
 
 
-bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
+bool CompositorDCompositionAcrylicSurface::init()
 {
     if (!loadFunctions())
         return false;
 
-    if (!createDevice(device))
+    if (!initializeEffects())
         return false;
 
     if (!createDesktopVisual())
@@ -238,29 +254,10 @@ catch (std::exception &err)
     return false;
 }
 
-bool CompositorDCompositionAcrylicSurface::createDevice(Microsoft::WRL::ComPtr<ID3D11Device> device)
+bool CompositorDCompositionAcrylicSurface::initializeEffects()
 try
 {
-    QLibrary dcompDll("DCOMP.dll");
-    if (!dcompDll.load())
-        throw DXError("failed to load DCOMP.dll",  static_cast<HRESULT>(GetLastError()));
-
-    DCompositionCreateDeviceFun myDCompositionCreateDevice3 =
-            reinterpret_cast<DCompositionCreateDeviceFun>(dcompDll.resolve("DCompositionCreateDevice3"));
-    if (!myDCompositionCreateDevice3)
-        throw DXError("failed to load DCompositionCreateDevice3 function",  static_cast<HRESULT>(GetLastError()));
-
-    using namespace Microsoft::WRL;
-
-    ComPtr<IDXGIDevice> dxgiDevice;
-    HR(device.As(&dxgiDevice), "query dxgi device");
-
-    ComPtr<IDCompositionDevice> dcompDevice1;
-    HR(myDCompositionCreateDevice3(
-                dxgiDevice.Get(),
-                IID_PPV_ARGS(&dcompDevice1)), "create composition device");
-
-    HR(dcompDevice1.As(&m_dcompDevice), "dcompdevice not an IDCompositionDevice3");
+    assert(m_dcompDevice);
 
     HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");
 
@@ -308,7 +305,7 @@ try
     thumbnail.rcSource = RECT{ 0, 0, desktopWidth, desktopHeight };
 
     HTHUMBNAIL desktopThumbnail;
-    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice.Get(), &m_desktopVisual, &desktopThumbnail), "create desktop visual");
+    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice, &m_desktopVisual, &desktopThumbnail), "create desktop visual");
     HR(m_rootVisual->AddVisual(m_desktopVisual.Get(), FALSE, nullptr), "Add desktop visual");
 
     return true;
@@ -340,7 +337,7 @@ try
     lSetWindowCompositionAttribute(m_dummyWindow, &CompositionAttribute);
 
     vlc_assert(!m_backHostVisual);
-    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice.Get(), &m_backHostVisual, &m_backHostThumbnail)
+    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice, &m_backHostVisual, &m_backHostThumbnail)
        , "failed to create shared multi visual");
 
     updateVisual();
@@ -437,7 +434,7 @@ void CompositorDCompositionAcrylicSurface::setActive(const bool newActive)
     m_active = newActive;
     if (m_active)
     {
-        m_compositor->addVisual(m_rootVisual);
+        m_compositor->addVisual(m_rootVisual.Get());
 
         updateVisual();
         sync();
@@ -445,7 +442,7 @@ void CompositorDCompositionAcrylicSurface::setActive(const bool newActive)
     }
     else
     {
-        m_compositor->removeVisual(m_rootVisual);
+        m_compositor->removeVisual(m_rootVisual.Get());
     }
 }
 

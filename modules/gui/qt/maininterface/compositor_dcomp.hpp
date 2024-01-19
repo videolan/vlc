@@ -21,16 +21,23 @@
 #include "compositor.hpp"
 
 #include "../maininterface/mainui.hpp"
-#include "compositor_dcomp_acrylicsurface.hpp"
-#include "compositor_dcomp_uisurface.hpp"
-#include "videosurface.hpp"
 #include "interface_window_handler.hpp"
 #include "video_window_handler.hpp"
 
-#include <QOpenGLContext>
+#include <QPointer>
+
+#include <memory>
+
+#include <wrl.h>
 
 class MainCtx;
 class WinTaskbarWidget;
+
+class QQuickView;
+
+class IDCompositionVisual;
+class IDCompositionDevice;
+class IDCompositionTarget;
 
 namespace vlc {
 
@@ -53,8 +60,8 @@ public:
 
     Type type() const override;
 
-    void addVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
-    void removeVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
+    void addVisual(IDCompositionVisual *visual);
+    void removeVisual(IDCompositionVisual *visual);
 
     QQuickItem * activeFocusItem() const override;
 
@@ -62,27 +69,25 @@ private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
     void onSurfaceSizeChanged(const QSizeF& size) override;
 
+    void setup();
+
 protected:
     int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
     void windowDestroy() override;
 
 private:
-    DCompRenderWindow* m_rootWindow = nullptr;
+    std::unique_ptr<QQuickView> m_quickView;
 
-    std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
-
-    std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
-    std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;
-
-    //main window composition
-    HINSTANCE m_dcomp_dll = nullptr;
-    Microsoft::WRL::ComPtr<ID3D11Device> m_d3d11Device;
-    Microsoft::WRL::ComPtr<IDCompositionDevice> m_dcompDevice;
-    Microsoft::WRL::ComPtr<IDCompositionTarget> m_dcompTarget;
+    IDCompositionDevice *m_dcompDevice = nullptr;
+    IDCompositionTarget *m_dcompTarget = nullptr;
     Microsoft::WRL::ComPtr<IDCompositionVisual> m_rootVisual;
-    Microsoft::WRL::ComPtr<IDCompositionVisual> m_uiVisual;
     Microsoft::WRL::ComPtr<IDCompositionVisual> m_videoVisual;
+    IDCompositionVisual *m_uiVisual = nullptr;
+
+    bool m_nativeAcrylicAvailable = false;
+
+    QPointer<class CompositorDCompositionAcrylicSurface> m_acrylicSurface;
 };
 
 }

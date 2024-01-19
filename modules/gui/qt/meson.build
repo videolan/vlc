@@ -163,7 +163,6 @@ if host_system == 'windows'
         moc_headers += files(
             'maininterface/compositor_dcomp.hpp',
             'maininterface/compositor_dcomp_acrylicsurface.hpp',
-            'maininterface/compositor_dcomp_uisurface.hpp',
         )
     endif
 endif
@@ -496,6 +495,7 @@ if host_system == 'windows'
     if cdata.has('HAVE_DCOMP_H')
         some_sources += files(
             'maininterface/compositor_dcomp.cpp',
+            'maininterface/compositor_dcomp_acrylicsurface.cpp',
         )
     endif
 endif

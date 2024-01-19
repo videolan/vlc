@@ -33,7 +33,7 @@
 #  include "compositor_x11_renderwindow.hpp"
 #endif
 #ifdef HAVE_DCOMP_H
-#  include "compositor_dcomp_uisurface.hpp"
+#  include "compositor_dcomp.hpp"
 #endif
 
 namespace vlc {
@@ -262,16 +262,6 @@ QAccessibleInterface* compositionAccessibleFactory(const QString &classname, QOb
     {
 
         CompositorX11RenderWindow* renderWindow =  qobject_cast<CompositorX11RenderWindow *>(object);
-        assert(renderWindow);
-        return new QAccessibleRenderWindow(renderWindow, renderWindow);
-    }
-#endif
-
-#ifdef HAVE_DCOMP_H
-    if (classname == QLatin1String("vlc::DCompRenderWindow"))
-    {
-
-        DCompRenderWindow* renderWindow =  qobject_cast<DCompRenderWindow *>(object);
         assert(renderWindow);
         return new QAccessibleRenderWindow(renderWindow, renderWindow);
     }

@@ -536,14 +536,11 @@ libqt_plugin_la_SOURCES += \
 	maininterface/compositor_dcomp.hpp \
 	maininterface/compositor_dcomp_error.hpp \
 	maininterface/compositor_dcomp_acrylicsurface.hpp \
-	maininterface/compositor_dcomp_acrylicsurface.cpp \
-	maininterface/compositor_dcomp_uisurface.cpp \
-	maininterface/compositor_dcomp_uisurface.hpp
+	maininterface/compositor_dcomp_acrylicsurface.cpp
 
 nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_dcomp_acrylicsurface.moc.cpp \
-	maininterface/compositor_dcomp.moc.cpp \
-	maininterface/compositor_dcomp_uisurface.moc.cpp
+	maininterface/compositor_dcomp.moc.cpp
 
 endif
 endif
