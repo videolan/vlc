@@ -1,5 +1,3 @@
-vlc_tests = []
-
 subdir('src')
 subdir('modules')
 subdir('libvlc')

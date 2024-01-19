@@ -116,6 +116,8 @@ foreach d : feature_defines
     vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
 endforeach
 
+vlc_tests = []
+
 #
 # SIMD support
 #
