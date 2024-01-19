@@ -192,19 +192,42 @@ static void spu_channel_EarlyRemoveLate(spu_private_t *sys,
                                         struct spu_channel *channel,
                                         vlc_tick_t system_now)
 {
-    /* Trying to have a reasonable hint to remove early from queue
-     * SPU that have no chance to be rendered */
+    if(channel->entries.size == 0)
+        return;
+    /* Find first display time that will expire ephemer SPU and store it's enqueue
+     * order. Ephemer really expires on next SPU activation, or if it has a valid
+     * stop time */
+    const spu_render_entry_t *last = &channel->entries.data[channel->entries.size-1];
+    vlc_tick_t minactivespu = last->start;
+    int64_t minactivespuorder = last->subpic->i_order;
+    for (size_t i = 0; i < channel->entries.size - 1; i++)
+    {
+        const spu_render_entry_t *entry = &channel->entries.data[i];
+        if(spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
+            continue;
+        if(minactivespu <= entry->start)
+        {
+            minactivespu = entry->start;
+            if(minactivespuorder > entry->subpic->i_order)
+                minactivespuorder = entry->subpic->i_order;
+        }
+    }
+
     for (size_t i = 0; i < channel->entries.size;)
     {
         const spu_render_entry_t *entry = &channel->entries.data[i];
-
-        if(spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
+        /* !warn: do not simplify using order only. There can be multiple SPU
+         * lines active at a same time, while ephemer ones are always expired
+         * by next activated SPU in enqueue order */
+        if((entry->subpic->b_ephemer &&
+            entry->subpic->i_order < minactivespuorder) ||
+            spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
         {
             spu_Channel_CleanEntry(sys, &channel->entries.data[i]);
             vlc_vector_remove(&channel->entries, i);
+            continue;
         }
-        else
-            i++;
+        i++;
     }
 }
 
