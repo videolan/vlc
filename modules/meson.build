@@ -292,13 +292,18 @@ foreach module : vlc_modules
         '-DVLC_DYNAMIC_PLUGIN'
     ]
 
+    kwargs = {}
+
+    if module.has_key('link_language')
+      kwargs += { link_language: module.get('link_language') }
+    endif
+
     vlc_plugin = library(
         module['name'] + '_plugin',
         module['sources'],
         link_with: [module.get('link_with', []), vlc_libcompat],
         link_args: module.get('link_args', []),
         link_depends: module.get('link_depends', []),
-        link_language: module.get('link_language', []),
         include_directories: [module.get('include_directories', []), vlc_include_dirs],
         dependencies: [module.get('dependencies', []), libvlccore_dep],
         c_args: [module.get('c_args', []), common_args],
@@ -306,7 +311,8 @@ foreach module : vlc_modules
         objc_args: [module.get('objc_args', []), common_args],
         build_by_default: true,
         install: true,
-        install_dir: get_option('libdir') / 'vlc/plugins'
+        install_dir: get_option('libdir') / 'vlc/plugins',
+        kwargs: kwargs
     )
     vlc_plugins_targets += {
         module['name']: vlc_plugin
