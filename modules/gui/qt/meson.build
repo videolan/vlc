@@ -707,4 +707,21 @@ if qt5_dep.found()
         )
         test('qml_test', qml_test, suite:'qt')
     endif
+
+    vlc_tests += {
+        'name': 'base_model_test',
+        'sources': files(
+            'tests/test_base_model.cpp',
+            'util/base_model.cpp',
+            'util/base_model.hpp',
+            'util/base_model_p.hpp'),
+        'moc_headers': files(
+            'util/base_model.hpp',
+            'util/listcache.hpp',
+            'util/locallistcacheloader.hpp'),
+        'suite': ['qt'],
+        'link_with': [libvlccore],
+        'dependencies': [qt5_dep, qt_extra_deps],
+    }
 endif
+
