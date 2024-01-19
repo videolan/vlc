@@ -539,6 +539,10 @@ if host_system == 'windows'
   qrc_files += files('windows.qrc')
 endif
 
+qml_tests = {
+    'tst_FSM': files('tests/tst_FSM.qml'),
+}
+
 if qt5_dep.found()
     qt5pre_qrc = qt5.preprocess(
         qresources: qrc_files,
@@ -705,7 +709,9 @@ if qt5_dep.found()
           dependencies: [test_qt5_dep],
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
-        test('qml_test', qml_test, suite:'qt')
+        foreach test_name, test_file : qml_tests
+              test(test_name, qml_test, args: ['-input', test_file], suite:'qt')
+        endforeach
     endif
 
     vlc_tests += {
