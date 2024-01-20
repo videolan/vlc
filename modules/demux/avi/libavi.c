@@ -582,13 +582,13 @@ static void AVI_ChunkFree_strf( avi_chunk_t *p_chk )
 
 static int AVI_ChunkRead_strd( stream_t *s, avi_chunk_t *p_chk )
 {
+    AVI_READCHUNK_ENTER;
     if ( p_chk->common.i_chunk_size == 0 )
     {
         msg_Dbg( s, "Zero sized pre-JUNK section met" );
-        return AVI_ZEROSIZED_CHUNK;
+        AVI_READCHUNK_EXIT(AVI_ZEROSIZED_CHUNK);
     }
 
-    AVI_READCHUNK_ENTER;
     p_chk->strd.p_data = malloc( p_chk->common.i_chunk_size );
     if( p_chk->strd.p_data )
         memcpy( p_chk->strd.p_data, p_buff + 8, p_chk->common.i_chunk_size );
