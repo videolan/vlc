@@ -240,9 +240,12 @@ struct subpicture_t
     /** \name Date properties */
     /**@{*/
     vlc_tick_t      i_start;                  /**< beginning of display date */
-    vlc_tick_t      i_stop;                         /**< end of display date */
+    vlc_tick_t      i_stop;                   /**< end of display date. Will be
+                                      considered invalid if set to TICK_INVALID
+                                      or less than i_start. See b_ephemer */
     bool            b_ephemer;    /**< If this flag is set to true the subtitle
-                                will be displayed until the next one appear */
+                                   will be displayed until the next one appears
+                                   or if i_stop is reached when it is valid */
     bool            b_fade;                               /**< enable fading */
     /**@}*/
 
