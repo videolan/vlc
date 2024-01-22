@@ -270,7 +270,7 @@ FocusScope {
     Connections {
         target: selectionModel
 
-        onSelectionChanged: {
+        onSelectionChanged: (selected, deselected) => {
             for (let i = 0; i < selected.length; ++i) {
                 _updateSelectedRange(selected[i].topLeft, selected[i].bottomRight, true)
             }
