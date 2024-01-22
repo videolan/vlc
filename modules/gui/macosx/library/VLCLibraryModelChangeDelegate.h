@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
+extern NSString * const VLCLongNotificationNameStartSuffix;
+extern NSString * const VLCLongNotificationNameFinishSuffix;
+
 @interface VLCLibraryModelChangeDelegate : NSObject
 
 @property (readonly) VLCLibraryModel *model;

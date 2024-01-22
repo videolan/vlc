@@ -23,10 +23,9 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModelChangeDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-@class VLCLibraryModelChangeDelegate;
 
 @class VLCMediaLibraryMediaItem;
 @class VLCMediaLibraryArtist;

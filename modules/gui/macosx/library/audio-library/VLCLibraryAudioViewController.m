@@ -100,6 +100,19 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelAudioMediaItemDeleted
                                  object:nil];
+
+        NSString * const audioMediaLongLoadStartNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const audioMediaLongLoadFinishNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadStarted:)
+                                   name:audioMediaLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:audioMediaLongLoadFinishNotification
+                                 object:nil];
+
     }
 
     return self;
@@ -537,6 +550,16 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
         [self updatePresentedView];
     }
+}
+
+- (void)libraryModelLongLoadStarted:(NSNotification *)notification
+{
+    NSLog(@"Audio long load started");
+}
+
+- (void)libraryModelLongLoadFinished:(NSNotification *)notification
+{
+    NSLog(@"Audio long load finished");
 }
 
 @end

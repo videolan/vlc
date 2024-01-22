@@ -25,8 +25,6 @@
 #import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
-#import "library/VLCLibraryModelChangeDelegate.h"
-
 #import "main/VLCMain.h"
 
 NSString * const VLCLibraryModelArtistListReset = @"VLCLibraryModelArtistListReset";
