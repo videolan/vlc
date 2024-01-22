@@ -901,7 +901,7 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
 
             vout_Release(p_owner->p_vout);
             p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
-            vlc_fifo_Lock( p_owner->p_fifo );
+            vlc_fifo_Unlock( p_owner->p_fifo );
         }
         return NULL;
     }
