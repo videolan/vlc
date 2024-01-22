@@ -33,7 +33,7 @@ Widgets.BannerTabButton {
     DropArea {
         anchors.fill: parent
 
-        onEntered: {
+        onEntered: (drag) => {
             root.dropEnterred()
         }
     }

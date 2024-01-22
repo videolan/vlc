@@ -432,7 +432,7 @@ T.ToolBar {
                                         }
                                     }
 
-                                    onEntered: {
+                                    onEntered: (drag) => {
                                         if (drag.hasUrls || Helpers.isValidInstanceOf(drag.source, Widgets.DragItem)) {
                                             drag.accept() // Not actually necessary, as it is accepted by default
                                         } else {
@@ -440,7 +440,7 @@ T.ToolBar {
                                         }
                                     }
 
-                                    onDropped: {
+                                    onDropped: (drop) => {
                                         if (plListView)
                                             plListView.acceptDrop(plListView.model.count, drop)
                                     }

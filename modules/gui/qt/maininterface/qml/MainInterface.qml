@@ -203,7 +203,7 @@ Item {
 
         DropArea {
             anchors.fill: parent
-            onDropped: {
+            onDropped: (drop) => {
                 let urls = []
                 if (drop.hasUrls) {
 

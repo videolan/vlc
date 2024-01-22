@@ -250,13 +250,13 @@ T.Control {
             return drag.y < height/2
         }
 
-        onEntered: delegate.dropEntered(drag, isBefore(drag))
+        onEntered: (drag) => { delegate.dropEntered(drag, isBefore(drag)) }
 
-        onPositionChanged: delegate.dropUpdatePosition(drag, isBefore(drag))
+        onPositionChanged: (drag) => { delegate.dropUpdatePosition(drag, isBefore(drag)) }
 
         onExited:delegate.dropExited(drag, isBefore(drag))
 
-        onDropped: delegate.dropEvent(drag, drop, isBefore(drag))
+        onDropped: (drop) => { delegate.dropEvent(drag, drop, isBefore(drag)) }
 
     }
 }

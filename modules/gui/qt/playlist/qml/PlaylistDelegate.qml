@@ -310,7 +310,7 @@ T.ItemDelegate {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            onEntered: {
+            onEntered: (drag) => {
                 if (!acceptDrop) {
                     drag.accept = false
                     return
@@ -322,7 +322,7 @@ T.ItemDelegate {
                 }
             }
 
-            onDropped: {
+            onDropped: (drop) => {
                 console.assert(acceptDrop)
                 acceptDrop(index, drop)
             }
@@ -334,7 +334,7 @@ T.ItemDelegate {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            onEntered: {
+            onEntered: (drag) =>  {
                 if (!acceptDrop) {
                     drag.accept = false
                     return
@@ -346,7 +346,7 @@ T.ItemDelegate {
                 }
             }
 
-            onDropped: {
+            onDropped: (drop) => {
                 console.assert(acceptDrop)
                 acceptDrop(index + 1, drop)
             }

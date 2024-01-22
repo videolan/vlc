@@ -89,7 +89,7 @@ Control {
         id: dropArea
         anchors.fill: parent
 
-        onEntered: {
+        onEntered: (drag) => {
             if ((drag.source === null ||
                  (drag.source.dndView === dndView &&
                   (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))) ||
@@ -97,7 +97,7 @@ Control {
                 drag.accepted = false
         }
 
-        onDropped: {
+        onDropped: (drop) => {
             let destIndex = parent.DelegateModel.itemsIndex
 
             if((drag.source.dndView === dndView)

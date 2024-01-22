@@ -76,7 +76,7 @@ GridView {
                 return false
         }
 
-        onDropped: {
+        onDropped: (drop) => {
             if (isFromList())
                 return
 

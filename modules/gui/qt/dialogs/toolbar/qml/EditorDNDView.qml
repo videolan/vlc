@@ -143,14 +143,14 @@ ListView {
 
             anchors.fill: parent
 
-            onEntered: {
+            onEntered: (drag) => {
                 if (drag.source.dndView === playerBtnDND &&
                         drag.source.DelegateModel.itemsIndex === playerBtnDND.count - 1) {
                     drag.accepted = false
                 }
             }
 
-            onDropped: {
+            onDropped: (drop) => {
                 let destIndex = playerBtnDND.count
 
                 if (drag.source.dndView === playerBtnDND)

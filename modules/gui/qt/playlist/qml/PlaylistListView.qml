@@ -357,14 +357,14 @@ T.Pane {
 
                     anchors.fill: parent
 
-                    onEntered: {
+                    onEntered: (drag) => {
                         if(!root.isDropAcceptable(drag, root.model.count)) {
                             drag.accepted = false
                             return
                         }
                     }
 
-                    onDropped: {
+                    onDropped: (drop) => {
                         root.acceptDrop(root.model.count, drop)
                     }
                 }
