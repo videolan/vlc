@@ -117,7 +117,7 @@ T.Pane {
     Widgets.DragItem {
         id: dragItem
 
-        onRequestData: {
+        onRequestData: (indexes, resolve, reject) => {
             resolve(indexes.map((index) => {
                 const item = root.model.itemAt(index)
                 return {
@@ -127,7 +127,7 @@ T.Pane {
             }))
         }
 
-        onRequestInputItems: {
+        onRequestInputItems: (indexes, data, resolve, reject) => {
             resolve(root.model.getItemsForIndexes(root.selectionModel.selectedIndexesFlat))
         }
     }

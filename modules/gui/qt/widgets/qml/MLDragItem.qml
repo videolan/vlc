@@ -31,14 +31,14 @@ DragItem {
     // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for SharedInputItem
     property string mlIDRole: "id"
 
-    onRequestData: {
+    onRequestData: (indexes, resolve, reject) =>  {
         if (indexesFlat)
             mlModel.getDataFlat(indexes, resolve)
         else
             mlModel.getData(indexes, resolve)
     }
 
-    onRequestInputItems: {
+    onRequestInputItems: (indexes, data, resolve, reject) => {
         console.assert(mlIDRole)
         const inputIdList = data.map(o => o[root.mlIDRole])
         MediaLib.mlInputItem(inputIdList, resolve)

@@ -101,13 +101,13 @@ MainInterface.MainViewLoader {
             return {"indexData": data, "cover": custom_cover}
         }
 
-        onRequestData: {
+        onRequestData: (indexes, resolve, reject) => {
             resolve(
                 indexes.map(x => model.getDataAt(x.row))
             )
         }
 
-        onRequestInputItems: {
+        onRequestInputItems: (indexes, data, resolve, reject) => {
             resolve(
                 model.getItemsForIndexes(indexes)
             )
