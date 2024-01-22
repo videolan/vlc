@@ -88,21 +88,21 @@ MainInterface.MainGridView {
                 .uri()
         }
 
-        onItemDoubleClicked: {
+        onItemDoubleClicked: (_, _, modifier) => {
             if (is_dummy)
                 root.browseServiceManage(Qt.MouseFocusReason)
             else
                 root.browseSourceRoot(model.name, Qt.TabFocusReason)
         }
 
-        onItemClicked : {
+        onItemClicked : (_, _, modifier) => {
             root.selectionModel.updateSelection(modifier, root.currentIndex, index)
             root.currentIndex = index
             root.forceActiveFocus()
         }
     }
 
-    onActionAtIndex: {
+    onActionAtIndex: (index) => {
         const itemData = sourcesModel.getDataAt(index);
 
         if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)

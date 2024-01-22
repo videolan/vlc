@@ -79,10 +79,14 @@ Widgets.KeyNavigableTableView {
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
-    onActionForSelection: model.addAndPlay( selection )
-    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-    onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    onActionForSelection: (selection) => model.addAndPlay( selection )
+    onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
+    onContextMenuButtonClicked: (_,_,globalMousePos) => {
+        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    }
+    onRightClick: (_,_,globalMousePos) => {
+        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    }
 
     MLUrlModel {
         id: urlModel

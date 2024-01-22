@@ -232,9 +232,9 @@ FocusScope {
 
         Navigation.parentItem: root
 
-        onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
+        onActionAtIndex: (index) => { root.actionForSelection( selectionModel.selectedIndexes ) }
 
-        onShowContextMenu: {
+        onShowContextMenu: (globalPos) => {
             if (selectionModel.hasSelection)
                 root.rightClick(null, null, globalPos);
         }

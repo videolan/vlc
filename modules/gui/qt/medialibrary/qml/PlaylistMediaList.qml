@@ -205,13 +205,13 @@ MainInterface.MainViewLoader {
                 //---------------------------------------------------------------------------------
                 // Events
 
-                onItemClicked: gridView.leftClickOnItem(modifier, index)
+                onItemClicked: (_,_,modifier) => { gridView.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
+                onItemDoubleClicked: (_,_,modifier) => { showList(model, Qt.MouseFocusReason) }
 
                 onPlayClicked: if (model.id) MediaLib.addAndPlay(model.id)
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     gridView.rightClickOnItem(index);
 
                     contextMenu.popup(selectionModel.selectedRows(), globalMousePos);
@@ -322,12 +322,15 @@ MainInterface.MainViewLoader {
 
             onActionForSelection: _actionAtIndex()
 
-            onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
+            onItemDoubleClicked: (_, model) => showList(model, Qt.MouseFocusReason)
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedRows(),
-                                                          globalMousePos)
+            onContextMenuButtonClicked: (_, _, globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            }
 
-            onRightClick: contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            onRightClick: (_, _, globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            }
 
             //-------------------------------------------------------------------------------------
             // Childs

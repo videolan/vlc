@@ -88,7 +88,7 @@ MainInterface.MainViewLoader {
 
             Navigation.parentItem: root
 
-            onActionAtIndex: {
+            onActionAtIndex: (index) => {
                 if (selectionModel.selectedIndexes.length > 1) {
                     artistModel.addAndPlay( selectionModel.selectedIndexes )
                 } else {
@@ -115,11 +115,11 @@ MainInterface.MainViewLoader {
                 width: VLCStyle.colWidth(1)
                 dragItem: artistsDragItem
 
-                onItemClicked: artistGrid.leftClickOnItem(modifier, index)
+                onItemClicked: (_,_, modifier) => { artistGrid.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
+                onItemDoubleClicked: (_,_, modifier) => { root.requestArtistAlbumView(Qt.MouseFocusReason) }
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     artistGrid.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
@@ -188,7 +188,7 @@ MainInterface.MainViewLoader {
 
             Navigation.parentItem: root
 
-            onActionForSelection: {
+            onActionForSelection: (selection) => {
                 artistModel.addAndPlay( selection )
                 if ( selection.length === 1)
                     requestArtistAlbumView(Qt.TabFocusReason)
@@ -199,8 +199,12 @@ MainInterface.MainViewLoader {
 
             onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: (_,_, globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+            onRightClick: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
 
             Widgets.TableColumns {
                 id: tableColumns

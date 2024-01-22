@@ -136,15 +136,15 @@ MainInterface.MainViewLoader {
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
 
-                onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
-                onItemClicked: gridView_id.leftClickOnItem(modifier, item.index)
+                onItemDoubleClicked: (_,_,modifier) => { root.showAlbumView(model.id, model.name, Qt.MouseFocusReason) }
+                onItemClicked: (_,_,modifier) => { gridView_id.leftClickOnItem(modifier, item.index) }
 
                 onPlayClicked: {
                     if (model.id)
                         MediaLib.addAndPlay(model.id)
                 }
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     gridView_id.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
@@ -192,7 +192,7 @@ MainInterface.MainViewLoader {
             cellWidth: VLCStyle.colWidth(2)
             cellHeight: cellWidth / 2
 
-            onActionAtIndex: _actionAtIndex(index)
+            onActionAtIndex: (index) => { _actionAtIndex(index) }
 
             Navigation.parentItem: root
         }
@@ -263,12 +263,17 @@ MainInterface.MainViewLoader {
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal
 
-            onItemDoubleClicked: {
+            onItemDoubleClicked: (index, model) => {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
             }
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+
+            onRightClick: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
 
             Widgets.TableColumns {
                 id: tableColumns

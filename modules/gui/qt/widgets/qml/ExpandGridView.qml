@@ -251,7 +251,7 @@ FocusScope {
 
     Connections {
         target: model
-        onDataChanged: {
+        onDataChanged: (topLeft, bottomRigth, roles) => {
             const iMin = topLeft.row
             const iMax = bottomRight.row + 1 // [] => [)
             const f_l = _currentRange

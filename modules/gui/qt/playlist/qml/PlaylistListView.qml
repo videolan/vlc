@@ -272,7 +272,7 @@ T.Pane {
             property int shiftIndex: -1
             property Item itemContainsDrag: null
 
-            onShowContextMenu: {
+            onShowContextMenu: (globalPos) => {
                 contextMenu.popup(-1, globalPos)
             }
 
@@ -453,7 +453,7 @@ T.Pane {
 
             Navigation.parentItem: root
 
-            onActionAtIndex: {
+            onActionAtIndex: (index) => {
                 if (index < 0)
                     return
 

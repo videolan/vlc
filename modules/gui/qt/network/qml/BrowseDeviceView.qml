@@ -203,12 +203,12 @@ FocusScope {
 
             Navigation.upItem: headerItem
 
-            onActionAtIndex: root.onAction(index)
+            onActionAtIndex: (index) => { root.onAction(index) }
 
             delegate: NetworkGridItem {
-                onItemClicked: root.onClicked(model, index, modifier)
+                onItemClicked: (_, _, modifier) => { root.onClicked(model, index, modifier) }
 
-                onItemDoubleClicked: root.onDoubleClicked(model, index)
+                onItemDoubleClicked: (_, _, modifier) => { root.onDoubleClicked(model, index) }
 
                 onPlayClicked: root.playAt(index)
             }

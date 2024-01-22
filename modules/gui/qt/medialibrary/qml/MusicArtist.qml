@@ -188,7 +188,7 @@ FocusScope {
                             onPlayClicked: play()
                             onItemDoubleClicked: play()
 
-                            onItemClicked: {
+                            onItemClicked: (_,_, modifier) => {
                                 albumsList.selectionModel.updateSelection( modifier , albumsList.currentIndex, index )
                                 albumsList.currentIndex = index
                                 albumsList.forceActiveFocus()
@@ -207,7 +207,7 @@ FocusScope {
                             }
                         }
 
-                        onActionAtIndex: albumModel.addAndPlay( new Array(index) )
+                        onActionAtIndex: (index) => { albumModel.addAndPlay( new Array(index) ) }
                     }
 
                     Widgets.SubtitleLabel {
@@ -350,13 +350,15 @@ FocusScope {
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
 
-                onItemClicked : gridView_id.leftClickOnItem(modifier, index)
+                onItemClicked : (_,_,modifier) => {
+                    gridView_id.leftClickOnItem(modifier, index)
+                }
 
                 onItemDoubleClicked: {
                     gridView_id.switchExpandItem(index)
                 }
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     gridView_id.rightClickOnItem(index)
                     contextMenu.popup(albumSelectionModel.selectedIndexes, globalMousePos, { "information" : index})
                 }
@@ -387,7 +389,7 @@ FocusScope {
                 Navigation.downAction: function() {}
             }
 
-            onActionAtIndex: {
+            onActionAtIndex: (index) => {
                 if (albumSelectionModel.selectedIndexes.length === 1) {
                     switchExpandItem(index);
 

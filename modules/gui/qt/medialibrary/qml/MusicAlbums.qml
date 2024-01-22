@@ -114,13 +114,13 @@ MainInterface.MainViewLoader {
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
-                onItemClicked : gridView_id.leftClickOnItem(modifier, index)
+                onItemClicked : (_,_,modifier) => { gridView_id.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: {
+                onItemDoubleClicked: (_,_,modifier) => {
                     gridView_id.switchExpandItem(index)
                 }
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     gridView_id.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
                         "information": index
@@ -153,7 +153,7 @@ MainInterface.MainViewLoader {
                 Navigation.downAction: function() {}
             }
 
-            onActionAtIndex: {
+            onActionAtIndex: (index) => {
                 if (selectionModel.selectedIndexes.length === 1) {
                     switchExpandItem(index);
 
@@ -246,9 +246,13 @@ MainInterface.MainViewLoader {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onItemDoubleClicked: MediaLib.addAndPlay( model.id )
+            onContextMenuButtonClicked: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+            onRightClick: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+            onItemDoubleClicked: (index, model) => MediaLib.addAndPlay( model.id )
 
             Widgets.TableColumns {
                 id: tableColumns

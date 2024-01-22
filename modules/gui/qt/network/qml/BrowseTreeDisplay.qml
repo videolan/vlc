@@ -168,22 +168,24 @@ MainInterface.MainViewLoader {
                 dragItem: networkDragItem
 
                 onPlayClicked: playAt(index)
-                onItemClicked : gridView.leftClickOnItem(modifier, index)
+                onItemClicked : (_, _, modifier) => {
+                    gridView.leftClickOnItem(modifier, index)
+                }
 
-                onItemDoubleClicked: {
+                onItemDoubleClicked: (_, _, modifier) => {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         browse(model.tree, Qt.MouseFocusReason)
                     else
                         playAt(index)
                 }
 
-                onContextMenuButtonClicked: {
+                onContextMenuButtonClicked: (_, globalMousePos) => {
                     gridView.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
             }
 
-            onActionAtIndex: _actionAtIndex(index)
+            onActionAtIndex: (index) => { _actionAtIndex(index) }
 
             Navigation.parentItem: root
             Navigation.upItem: gridView.headerItem
@@ -287,10 +289,14 @@ MainInterface.MainViewLoader {
                 }
             }
 
-            onActionForSelection: _actionAtIndex(selection[0].row)
-            onItemDoubleClicked: _actionAtIndex(index)
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onActionForSelection: (selection) => _actionAtIndex(selection[0].row)
+            onItemDoubleClicked: (index, model) => _actionAtIndex(index)
+            onContextMenuButtonClicked: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+            onRightClick: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
         }
     }
 

@@ -194,10 +194,13 @@ FocusScope {
 
         // Events
 
-        onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedRows(),
-                                                      globalMousePos)
+        onContextMenuButtonClicked: (_,_,globalMousePos) => {
+            contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+        }
 
-        onRightClick: contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+        onRightClick: (_,_,globalMousePos) => {
+            contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+        }
 
         // Keys
 

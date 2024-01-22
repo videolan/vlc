@@ -193,13 +193,19 @@ MainInterface.MainViewLoader {
 
             // Events
 
-            onActionForSelection: root.onAction(selectionModel.selectedIndexes)
+            onActionForSelection: (selection) => {
+                root.onAction(selectionModel.selectedIndexes)
+            }
 
-            onItemDoubleClicked: root.onDoubleClick(model)
+            onItemDoubleClicked: (index, model) => root.onDoubleClick(model)
 
-            onContextMenuButtonClicked: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: (_,_,globalMousePos) => {
+                root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
 
-            onRightClick: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onRightClick: (_,_,globalMousePos) => {
+                root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
 
             coverLabels: root.listLabels
         }

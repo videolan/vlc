@@ -184,10 +184,14 @@ Widgets.KeyNavigableTableView {
 
     onDragItemChanged: console.assert(root.dragItem === tableDragItem)
 
-    onActionForSelection:  model.addAndPlay(selection)
-    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-    onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    onActionForSelection: (selection) => model.addAndPlay(selection)
+    onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
+    onContextMenuButtonClicked: (_,_, globalMousePos) => {
+        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    }
+    onRightClick: (_,_, globalMousePos) => {
+        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+    }
 
     Widgets.MLDragItem {
         id: tableDragItem
