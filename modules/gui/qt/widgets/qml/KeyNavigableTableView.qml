@@ -377,16 +377,30 @@ FocusScope {
 
             acceptDrop: root.acceptDrop
 
-            onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
-            onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
-            onItemDoubleClicked: root.itemDoubleClicked(index, model)
+            onContextMenuButtonClicked: (menuParent, menuModel, globalMousePos) => {
+                root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
+            }
+            onRightClick: (menuParent, menuModel, globalMousePos) => {
+                root.rightClick(menuParent, menuModel, globalMousePos)
+            }
+            onItemDoubleClicked: (index, model) => {
+                root.itemDoubleClicked(index, model)
+            }
 
-            onDropEntered: root.dropEntered(tableDelegate, index, drag, before)
-            onDropUpdatePosition: root.dropUpdatePosition(tableDelegate, index, drag, before)
-            onDropExited: root.dropExited(tableDelegate, index, drag, before)
-            onDropEvent: root.dropEvent(tableDelegate, index, drag, drop, before)
+            onDropEntered: (drag, before) => {
+                root.dropEntered(tableDelegate, index, drag, before)
+            }
+            onDropUpdatePosition:  (drag, before) => {
+                root.dropUpdatePosition(tableDelegate, index, drag, before)
+            }
+            onDropExited:  (drag, before) => {
+                root.dropExited(tableDelegate, index, drag, before)
+            }
+            onDropEvent:  (drag, drop, before) => {
+                root.dropEvent(tableDelegate, index, drag, drop, before)
+            }
 
-            onSelectAndFocus:  {
+            onSelectAndFocus: (modifiers, focusReason) => {
                 selectionModel.updateSelection(modifiers, view.currentIndex, index)
 
                 view.currentIndex = index

@@ -118,13 +118,21 @@ MainInterface.MainTableView {
     onItemDoubleClicked: MediaLib.addAndPlay(model.id)
 
 
-    onDropEntered: root._dropUpdatePosition(drag, index, delegate, before)
+    onDropEntered: (delegate, index, drag, before) => {
+        root._dropUpdatePosition(drag, index, delegate, before)
+    }
 
-    onDropUpdatePosition: root._dropUpdatePosition(drag, index, delegate, before)
+    onDropUpdatePosition: (delegate, index, drag, before) => {
+        root._dropUpdatePosition(drag, index, delegate, before)
+    }
 
-    onDropExited: root.hideLine(delegate)
+    onDropExited: (delegate, index, drag, before) => {
+        root.hideLine(delegate)
+    }
 
-    onDropEvent: root.applyDrop(drop, index, delegate, before)
+    onDropEvent: (delegate, index, drag, drop, before) => {
+        root.applyDrop(drop, index, delegate, before)
+    }
 
     //---------------------------------------------------------------------------------------------
     // Connections
