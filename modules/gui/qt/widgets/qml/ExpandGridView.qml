@@ -634,7 +634,7 @@ FocusScope {
             preventStealing: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onPressed: {
+            onPressed: (mouse) => {
                 Helpers.enforceFocus(flickable, Qt.MouseFocusReason)
 
                 if (!(mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
@@ -643,7 +643,7 @@ FocusScope {
                 }
             }
 
-            onReleased: {
+            onReleased: (mouse) => {
                 if (mouse.button & Qt.RightButton) {
                     root.showContextMenu(mapToGlobal(mouse.x, mouse.y))
                 }

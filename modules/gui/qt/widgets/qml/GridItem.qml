@@ -188,7 +188,7 @@ T.ItemDelegate {
 
         drag.smoothed: false
 
-        onClicked: {
+        onClicked: (mouse) => {
             if (mouse.button === Qt.RightButton)
                 contextMenuButtonClicked(picture, root.mapToGlobal(mouse.x,mouse.y));
             else {
@@ -196,12 +196,12 @@ T.ItemDelegate {
             }
         }
 
-        onDoubleClicked: {
+        onDoubleClicked: (mouse) => {
             if (mouse.button === Qt.LeftButton)
                 root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             _modifiersOnLastPress = mouse.modifiers
         }
 
@@ -252,7 +252,7 @@ T.ItemDelegate {
                 Layout.preferredWidth: pictureWidth
                 Layout.preferredHeight: pictureHeight
 
-                onPlayIconClicked: {
+                onPlayIconClicked: (mouse) => {
                     // emulate a mouse click before delivering the play signal as to select the item
                     // this helps in updating the selection and restore of initial index in the parent views
                     root.itemClicked(picture, mouse.button, mouse.modifiers)

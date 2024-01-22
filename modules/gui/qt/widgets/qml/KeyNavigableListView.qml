@@ -314,7 +314,7 @@ ListView {
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onPressed: {
+        onPressed: (mouse) => {
             focus = true // Grab the focus from delegate
             root.forceActiveFocus(Qt.MouseFocusReason) // Re-focus the list
 
@@ -326,7 +326,7 @@ ListView {
             mouse.accepted = true
         }
 
-        onReleased: {
+        onReleased: (mouse) => {
             if (mouse.button & Qt.RightButton) {
                 root.showContextMenu(mapToGlobal(mouse.x, mouse.y))
             }

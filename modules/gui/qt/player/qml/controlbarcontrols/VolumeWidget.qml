@@ -238,7 +238,7 @@ T.Pane {
 
                     anchors.margins: -(VLCStyle.dp(4, VLCStyle.scale))
 
-                    onPressed: {
+                    onPressed: (mouse) => {
                         mouse.accepted = false
 
                         if (mouse.modifiers === Qt.ShiftModifier)
@@ -256,7 +256,7 @@ T.Pane {
 
                 acceptedButtons: (Qt.LeftButton | Qt.RightButton)
 
-                onPressed: {
+                onPressed: (mouse) => {
                     if (root.paintOnly) {
                         mouse.accepted = true
                         return
@@ -273,9 +273,12 @@ T.Pane {
                     adjustVolume(mouse)
                 }
 
-                onPositionChanged: if (mouse.buttons & Qt.RightButton) adjustVolume(mouse)
+                onPositionChanged: (mouse) => {
+                    if (mouse.buttons & Qt.RightButton)
+                        adjustVolume(mouse)
+                }
 
-                onWheel: {
+                onWheel: (wheel) => {
                     let delta = 0, fineControl = false
 
                     if ((Math.abs(wheel.pixelDelta.x) % 120 > 0) || (Math.abs(wheel.pixelDelta.y) % 120 > 0)) {

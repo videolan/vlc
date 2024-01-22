@@ -229,11 +229,11 @@ Slider {
 
             preventStealing: true
 
-            onPressed: fsm.pressControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier)
+            onPressed: (mouse) => { fsm.pressControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
 
-            onReleased: fsm.releaseControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier)
+            onReleased: (mouse) => { fsm.releaseControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
 
-            onPositionChanged: fsm.moveControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier)
+            onPositionChanged: (mouse) => { fsm.moveControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
 
             onEntered: {
                 if(Player.hasChapters)

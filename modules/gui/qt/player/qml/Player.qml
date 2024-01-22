@@ -360,7 +360,7 @@ FocusScope {
 
         visible: !rootPlayer.hasEmbededVideo
 
-        onWheel: {
+        onWheel: (wheel) => {
             if (rootPlayer.hasEmbededVideo) {
                 wheel.accepted = false
 

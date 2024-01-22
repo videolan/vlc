@@ -159,7 +159,7 @@ GridView {
             }
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             const pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
             buttonDragItem.y = pos.y + VLCStyle.dragDelta
             buttonDragItem.x = pos.x + VLCStyle.dragDelta

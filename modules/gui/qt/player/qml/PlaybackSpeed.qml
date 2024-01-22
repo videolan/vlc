@@ -241,7 +241,7 @@ ColumnLayout {
 
             acceptedButtons: Qt.LeftButton
 
-            onPressed: {
+            onPressed: (mouse) => {
                 mouse.accepted = false
 
                 root._shiftPressed = (mouse.modifiers === Qt.ShiftModifier)

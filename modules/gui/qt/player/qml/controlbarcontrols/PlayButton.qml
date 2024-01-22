@@ -173,7 +173,7 @@ T.Control {
             }
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             if (!cursorInside) {
                 mouse.accepted = false
                 return
@@ -182,12 +182,12 @@ T.Control {
             root.forceActiveFocus(Qt.MouseFocusReason)
         }
 
-        onClicked: {
+        onClicked: (mouse) => {
             MainPlaylistController.togglePlayPause()
             mouse.accepted = true
         }
 
-        onPressAndHold: {
+        onPressAndHold: (mouse) => {
             _pressAndHoldAction()
             mouse.accepted = true
         }

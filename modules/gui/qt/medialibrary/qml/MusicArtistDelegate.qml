@@ -118,19 +118,19 @@ T.ItemDelegate {
             }
         }
 
-        onClicked: function(mouse) {
+        onClicked: (mouse) => {
             if (!(root.selected && mouse.button === Qt.RightButton)) {
                 view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
                 view.currentIndex = index
             }
         }
 
-        onDoubleClicked: function(mouse) {
+        onDoubleClicked: (mouse) => {
             if (mouse.button !== Qt.RightButton)
                 MediaLib.addAndPlay(model.id);
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             root.forceActiveFocus(Qt.MouseFocusReason)
         }
     }

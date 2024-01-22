@@ -78,7 +78,7 @@ Control {
             }
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             const pos = mapToItem(control.contentItem.target.parent, mouseX, mouseY)
             control.contentItem.target.y = pos.y + VLCStyle.dragDelta
             control.contentItem.target.x = pos.x + VLCStyle.dragDelta

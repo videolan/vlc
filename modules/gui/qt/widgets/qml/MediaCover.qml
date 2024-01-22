@@ -105,7 +105,7 @@ Rectangle {
         sourceComponent: Widgets.PlayCover {
             width: playIconSize
 
-            onClicked: playIconClicked(mouse)
+            onClicked: (mouse) => playIconClicked(mouse)
         }
 
         asynchronous: true

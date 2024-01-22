@@ -127,11 +127,11 @@ T.Control {
 
             // Events
 
-            onPressed: {
+            onPressed: (mouse) => {
                 _modifiersOnLastPress = mouse.modifiers
             }
 
-            onClicked: {
+            onClicked: (mouse) => {
                 if ((mouse.button === Qt.LeftButton) || !delegate.selected) {
                     delegate.selectAndFocus(mouse.modifiers, Qt.MouseFocusReason)
                 }
@@ -140,7 +140,7 @@ T.Control {
                     delegate.rightClick(delegate, delegate.rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
             }
 
-            onDoubleClicked: {
+            onDoubleClicked: (mouse) => {
                 if (mouse.button === Qt.LeftButton)
                     delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
             }

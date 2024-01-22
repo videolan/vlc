@@ -245,7 +245,7 @@ T.ItemDelegate {
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onClicked: {
+        onClicked: (mouse) => {
             /* to receive keys events */
             if (!(delegate.selected && mouse.button === Qt.RightButton)) {
                 view.selectionModel.updateSelection(mouse.modifiers, view.currentIndex, index)
@@ -256,12 +256,12 @@ T.ItemDelegate {
                 contextMenu.popup(index, this.mapToGlobal(mouse.x, mouse.y))
         }
 
-        onDoubleClicked: {
+        onDoubleClicked: (mouse) => {
             if (mouse.button !== Qt.RightButton)
                 MainPlaylistController.goTo(index, true)
         }
 
-        onPressed: {
+        onPressed: (mouse) => {
             delegate.forceActiveFocus(Qt.MouseFocusReason)
         }
 
