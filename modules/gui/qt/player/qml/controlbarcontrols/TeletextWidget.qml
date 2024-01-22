@@ -37,7 +37,7 @@ T.Pane {
     contentHeight: column.implicitHeight
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     function _teletextButtonColor(item, base)
     {

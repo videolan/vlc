@@ -135,7 +135,7 @@ FocusScope {
         Navigation.parentItem: resumePanel
         Navigation.rightItem: closeBtn
         Keys.priority: Keys.AfterItem
-        Keys.onPressed:  continueBtn.Navigation.defaultKeyAction(event)
+        Keys.onPressed: (event) =>  continueBtn.Navigation.defaultKeyAction(event)
     }
 
     Widgets.ButtonExt {
@@ -152,7 +152,7 @@ FocusScope {
         Navigation.parentItem: resumePanel
         Navigation.leftItem: continueBtn
         Keys.priority: Keys.AfterItem
-        Keys.onPressed: closeBtn.Navigation.defaultKeyAction(event)
+        Keys.onPressed: (event) => closeBtn.Navigation.defaultKeyAction(event)
     }
 
     states: [

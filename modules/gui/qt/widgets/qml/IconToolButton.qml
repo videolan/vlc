@@ -56,7 +56,7 @@ T.ToolButton {
 
     Keys.priority: Keys.AfterItem
 
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     // Accessible
 

@@ -102,7 +102,7 @@ ModalDialog {
 
                     Navigation.rightItem: okBtn
                     Keys.priority: Keys.AfterItem
-                    Keys.onPressed: okBtn.Navigation.defaultKeyAction(event)
+                    Keys.onPressed: (event) => okBtn.Navigation.defaultKeyAction(event)
                 }
 
                 Widgets.TextToolButton {
@@ -114,7 +114,7 @@ ModalDialog {
 
                     Navigation.leftItem: cancelBtn
                     Keys.priority: Keys.AfterItem
-                    Keys.onPressed: cancelBtn.Navigation.defaultKeyAction(event)
+                    Keys.onPressed: (event) => cancelBtn.Navigation.defaultKeyAction(event)
                 }
             }
         }

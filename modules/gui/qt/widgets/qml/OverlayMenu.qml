@@ -72,7 +72,7 @@ FocusScope {
         focus = false
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (KeyHelper.matchCancel(event)) {
             close()
             event.accepted = true
@@ -177,7 +177,7 @@ FocusScope {
                 listView.currentModel = _model
             }
 
-            Keys.onPressed: {
+            Keys.onPressed: (event) => {
                 if (root.isRight ? KeyHelper.matchLeft(event)
                                  : KeyHelper.matchRight(event)) {
                     goBack()
@@ -232,7 +232,7 @@ FocusScope {
 
                 onClicked: trigger(true)
 
-                Keys.onPressed: {
+                Keys.onPressed: (event) => {
                     if (root.isRight ? KeyHelper.matchRight(event)
                                      : KeyHelper.matchLeft(event)) {
                         trigger(false)

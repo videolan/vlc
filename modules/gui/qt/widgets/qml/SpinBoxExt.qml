@@ -60,7 +60,7 @@ T.SpinBox {
     bottomPadding: padding + control.borderWidth
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     //ideally we should use Keys.onShortcutOverride but it doesn't
     //work with TextField before 5.13 see QTBUG-68711

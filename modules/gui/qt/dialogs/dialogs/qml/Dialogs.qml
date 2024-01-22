@@ -281,7 +281,7 @@ Item {
 
                 Navigation.downItem: password
                 Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
+                Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
             }
 
             Text {
@@ -300,7 +300,7 @@ Item {
                 Navigation.upItem: username
                 Navigation.downItem: savePassword
                 Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
+                Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
             }
 
             Text {
@@ -314,7 +314,7 @@ Item {
                 Navigation.upItem: password
                 Navigation.downItem: loginButtons
                 Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
+                Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
             }
         }
 
@@ -345,7 +345,7 @@ Item {
                         Navigation.upItem: savePassword
                         Navigation.rightItem: loginOk
                         Keys.priority: Keys.AfterItem
-                        Keys.onPressed: Navigation.defaultKeyAction(event)
+                        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
                             loginDialog.reject()
@@ -362,7 +362,7 @@ Item {
                         Navigation.upItem: savePassword
                         Navigation.leftItem: loginCancel
                         Keys.priority: Keys.AfterItem
-                        Keys.onPressed: Navigation.defaultKeyAction(event)
+                        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
                             loginDialog.accept()
@@ -438,7 +438,7 @@ Item {
 
                         Navigation.rightItem: action1
                         Keys.priority: Keys.AfterItem
-                        Keys.onPressed: Navigation.defaultKeyAction(event)
+                        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
                             dialogModel.dismiss(questionDialog.dialogId)
@@ -457,7 +457,7 @@ Item {
                         Navigation.leftItem: cancel
                         Navigation.rightItem: action2
                         Keys.priority: Keys.AfterItem
-                        Keys.onPressed: Navigation.defaultKeyAction(event)
+                        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
                             dialogModel.post_action1(questionDialog.dialogId)
@@ -474,7 +474,7 @@ Item {
 
                         Navigation.leftItem: action1
                         Keys.priority: Keys.AfterItem
-                        Keys.onPressed: Navigation.defaultKeyAction(event)
+                        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
                             dialogModel.post_action2(questionDialog.dialogId)

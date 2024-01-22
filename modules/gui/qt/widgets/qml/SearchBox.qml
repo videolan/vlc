@@ -171,7 +171,7 @@ FocusScope {
 
             Keys.priority: Keys.AfterItem
 
-            Keys.onPressed: {
+            Keys.onPressed: (event) => {
                 _keyPressed = true
 
                 //we don't want Navigation.cancelAction to match Backspace
@@ -181,7 +181,7 @@ FocusScope {
                 Navigation.defaultKeyAction(event)
             }
 
-            Keys.onReleased: {
+            Keys.onReleased: (event) => {
                 if (_keyPressed === false)
                     return
 

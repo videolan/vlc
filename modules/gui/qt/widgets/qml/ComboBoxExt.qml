@@ -44,7 +44,7 @@ ComboBox {
     property color borderColor: theme.border
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     delegate: ItemDelegate {
         width: control.width

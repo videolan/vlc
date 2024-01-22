@@ -232,7 +232,7 @@ ColumnLayout {
         Navigation.downItem: comboBox
 
         Keys.priority: Keys.AfterItem
-        Keys.onPressed: Navigation.defaultKeyAction(event)
+        Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
         onValueChanged: root._applyPlayer(value)
 

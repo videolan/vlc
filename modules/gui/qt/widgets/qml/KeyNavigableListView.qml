@@ -173,7 +173,7 @@ ListView {
             selectionModel.updateSelection(modifiers, oldIndex, newIndex)
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         let newIndex = -1
 
         if (orientation === ListView.Vertical)
@@ -242,7 +242,7 @@ ListView {
         }
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (_keyPressed === false)
             return
 

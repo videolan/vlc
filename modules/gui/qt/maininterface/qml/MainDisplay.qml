@@ -93,7 +93,7 @@ FocusScope {
         History.previous(Qt.BacktabFocusReason)
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (KeyHelper.matchSearch(event)) {
             MainCtx.search.askShow()
             event.accepted = true

@@ -45,13 +45,13 @@ EmptyLabel {
 
     Keys.priority: Keys.AfterItem
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         _keyPressed = true
 
         Navigation.defaultKeyAction(event)
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (_keyPressed === false)
             return
 

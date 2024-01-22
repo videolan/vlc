@@ -110,7 +110,7 @@ T.Control {
 
     // Keys
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (KeyHelper.matchOk(event) ) {
             if (!event.isAutoRepeat) {
                 _keyOkPressed = true
@@ -121,7 +121,7 @@ T.Control {
         Navigation.defaultKeyAction(event)
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (KeyHelper.matchOk(event)) {
             if (!event.isAutoRepeat) {
                 _keyOkPressed = false

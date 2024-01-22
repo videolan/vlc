@@ -58,7 +58,7 @@ AbstractButton {
 
     // Keys
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (KeyHelper.matchOk(event)) {
             event.accepted = true
 
@@ -68,7 +68,7 @@ AbstractButton {
         }
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (_keyPressed === false)
             return
 

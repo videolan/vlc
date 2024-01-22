@@ -533,5 +533,5 @@ T.Pane {
 
     Keys.priority: Keys.AfterItem
     Keys.forwardTo: listView
-    Keys.onPressed: root.Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => root.Navigation.defaultKeyAction(event)
 }

@@ -83,7 +83,7 @@ FocusScope {
     Component.onDestruction: MainCtx.preferHotkeys = false
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (event.accepted)
             return
 
@@ -96,7 +96,7 @@ FocusScope {
             MainCtx.sendHotkey(event.key, event.modifiers);
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (event.accepted || _keyPressed === false)
             return
 
@@ -882,7 +882,7 @@ FocusScope {
         target: MainCtx.intfMainWindow
         enabled: controlBar.state === "visible"
                  && (controlBar.focus || topBar.focus)
-        Keys.onPressed: toolbarAutoHide.setVisible(5000)
+        Keys.onPressed: (event) => toolbarAutoHide.setVisible(5000)
     }
 
     Connections {

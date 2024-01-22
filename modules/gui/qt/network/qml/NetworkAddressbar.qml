@@ -103,7 +103,7 @@ T.Control {
                     contentRepeater.itemAt(0).forceActiveFocus(Qt.TabFocusReason)
             }
             Keys.priority: Keys.AfterItem
-            Keys.onPressed: Navigation.defaultKeyAction(event)
+            Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
             onClicked: control.homeButtonClicked(focusReason)
         }
@@ -123,7 +123,7 @@ T.Control {
                 contentRepeater.itemAt(0).forceActiveFocus(Qt.TabFocusReason)
             }
             Keys.priority: Keys.AfterItem
-            Keys.onPressed: Navigation.defaultKeyAction(event)
+            Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
             onClicked: popup.show()
         }
@@ -158,7 +158,7 @@ T.Control {
                 }
 
                 Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
+                Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                 AddressbarButton {
                     id: btn

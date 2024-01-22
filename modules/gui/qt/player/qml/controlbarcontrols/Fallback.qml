@@ -32,7 +32,7 @@ Control {
     padding: VLCStyle.focus_border
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     property bool paintOnly: false
 

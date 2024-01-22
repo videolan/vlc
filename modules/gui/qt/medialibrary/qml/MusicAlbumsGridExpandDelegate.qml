@@ -470,5 +470,5 @@ FocusScope {
 
 
     Keys.priority:  Keys.AfterItem
-    Keys.onPressed:  root.Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) =>  root.Navigation.defaultKeyAction(event)
 }

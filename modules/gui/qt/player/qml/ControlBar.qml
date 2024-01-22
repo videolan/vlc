@@ -62,7 +62,7 @@ T.Pane {
     enabled: visible
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: root.Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => root.Navigation.defaultKeyAction(event)
     Navigation.cancelAction: function() { History.previous(Qt.BacktabFocusReason) }
 
     Accessible.name: I18n.qtr("Player controls")
@@ -156,7 +156,7 @@ T.Pane {
 
                 focus: true
 
-                Keys.onPressed: {
+                Keys.onPressed: (event) => {
                     Navigation.defaultKeyAction(event)
                 }
             },

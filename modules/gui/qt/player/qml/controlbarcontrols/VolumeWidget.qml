@@ -50,7 +50,7 @@ T.Pane {
     contentHeight: volumeWidget.implicitHeight
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     RowLayout {
         id: volumeWidget
@@ -128,7 +128,7 @@ T.Pane {
 
             Accessible.name: I18n.qtr("Volume")
 
-            Keys.onPressed: {
+            Keys.onPressed: (event) => {
                 if (KeyHelper.matchOk(event)) {
                     event.accepted = true
 
@@ -138,7 +138,7 @@ T.Pane {
                 }
             }
 
-            Keys.onReleased: {
+            Keys.onReleased: (event) => {
                 if (_keyPressed === false)
                     return
 
@@ -193,12 +193,12 @@ T.Pane {
             Navigation.leftItem: volumeBtn
             Navigation.parentItem: root
 
-            Keys.onUpPressed: {
+            Keys.onUpPressed: (event) => {
                 Player.muted = false
                 Player.setVolumeUp()
             }
 
-            Keys.onDownPressed: {
+            Keys.onDownPressed: (event) => {
                 Player.muted = false
                 Player.setVolumeDown()
             }

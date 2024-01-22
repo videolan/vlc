@@ -177,7 +177,7 @@ FocusScope {
 
     // Keys
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         let newIndex = -1
         if (KeyHelper.matchRight(event)) {
             if ((currentIndex + 1) % nbItemPerRow !== 0) {//are we not at the end of line
@@ -233,7 +233,7 @@ FocusScope {
         }
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (!_releaseActionButtonPressed)
             return
 

@@ -230,7 +230,7 @@ RowLayout {
                     Navigation.parentItem: tracksListContainer
                     Navigation.upItem: button
                     Keys.priority: Keys.AfterItem
-                    Keys.onPressed: Navigation.defaultKeyAction(event)
+                    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                     delegate: Widgets.CheckedDelegate {
                         readonly property bool isModelChecked: model.checked
