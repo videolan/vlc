@@ -64,7 +64,7 @@ NSString * const VLCLongNotificationNameFinishSuffix = @"Finished";
         [existingTimer invalidate];
         NSString * const loadingNotification = [notificationName stringByAppendingString:VLCLongNotificationNameStartSuffix];
         [self.notificationCenter postNotificationName:loadingNotification object:object];
-        [self.longNotifications addObject:loadingNotification];
+        [self.longNotifications addObject:notificationName];
     }
 
     NSDictionary<NSString *, NSString *> * const userInfo = @{
