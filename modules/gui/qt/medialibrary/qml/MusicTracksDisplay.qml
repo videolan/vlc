@@ -31,6 +31,8 @@ FocusScope {
 
     readonly property bool hasGridListMode: false
 
+    property var pagePrefix: []
+
     property var sortModel: [
         { text: I18n.qtr("Title"),    criteria: "title"},
         { text: I18n.qtr("Album"),    criteria: "album_title" },

@@ -37,6 +37,9 @@ FocusScope {
 
     // Properties
 
+    //behave like a Page
+    property var pagePrefix: []
+
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
 
     readonly property int positionSliderY: controlBar.y + controlBar.sliderY

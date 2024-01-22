@@ -53,6 +53,9 @@ FocusScope {
     readonly property bool hasGridListMode: true
     readonly property bool isSearchable: true
 
+    //behave like a Page
+    property var pagePrefix: []
+
     // Aliases
 
     property alias model: foldersSection.model

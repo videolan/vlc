@@ -49,6 +49,9 @@ Widgets.StackViewExt {
     // view's model
     /* required */ property var model
 
+    // behave like a Page
+    property var pagePrefix: []
+
     // optional, loaded when isLoading is true
     property Component loadingComponent: null
 

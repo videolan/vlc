@@ -34,6 +34,8 @@ Widgets.KeyNavigableTableView {
 
     readonly property bool isSearchable: true
 
+    property var pagePrefix: []
+
     property alias searchPattern: rootmodel.searchPattern
     property alias sortOrder: rootmodel.sortOrder
     property alias sortCriteria: rootmodel.sortCriteria

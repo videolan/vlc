@@ -30,6 +30,9 @@ FocusScope {
 
     // Properties
 
+    //behave like a Page
+    property var pagePrefix: []
+
     readonly property bool hasGridListMode: false
     readonly property bool isSearchable: urlListDisplay.active
                                     && urlListDisplay.item.isSearchable !== undefined

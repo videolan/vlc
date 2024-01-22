@@ -30,6 +30,8 @@ Widgets.KeyNavigableListView {
     readonly property bool hasGridListMode: false
     readonly property bool isSearchable: true
 
+    property var pagePrefix: []
+
     model: ServicesDiscoveryModel {
         id: discoveryModel
 

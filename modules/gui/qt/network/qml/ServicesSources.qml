@@ -34,6 +34,8 @@ MainInterface.MainGridView {
     readonly property bool hasGridListMode: false
     readonly property bool isSearchable: true
 
+    property var pagePrefix: []
+
     //signals
 
     signal browseServiceManage(int reason)

@@ -45,6 +45,9 @@ FocusScope {
     property int initialIndex: 0
     property int initialAlbumIndex: 0
 
+    //behave like a page
+    property var pagePrefix: []
+
     readonly property bool hasGridListMode: true
     readonly property bool isSearchable: true
 

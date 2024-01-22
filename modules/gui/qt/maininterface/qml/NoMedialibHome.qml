@@ -28,6 +28,9 @@ FocusScope {
     Accessible.role: Accessible.Client
     Accessible.name: I18n.qtr("Home view")
 
+    //behave like a Page
+    property var pagePrefix: []
+
     ColorContext {
         id: theme
         colorSet: ColorContext.View
