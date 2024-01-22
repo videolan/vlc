@@ -305,7 +305,7 @@ FocusScope {
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: loaderCenter.item
 
-            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
+            onRequestLockUnlockAutoHide: (lock) => playerControlLayout.requestLockUnlockAutoHide(lock)
 
             onMenuOpened: playerControlLayout.menuOpened(menu)
         }

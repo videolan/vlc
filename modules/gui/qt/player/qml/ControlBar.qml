@@ -243,13 +243,13 @@ T.Pane {
             Layout.rightMargin: VLCStyle.margin_large
 
             identifier: root.identifier
-            
+
             implicitHeight: MainCtx.pinVideoControls ? VLCStyle.controlLayoutHeightPinned
                                                      : VLCStyle.controlLayoutHeight
 
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
-            onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock)
+            onRequestLockUnlockAutoHide: (lock) => root.requestLockUnlockAutoHide(lock)
 
             onMenuOpened: root.applyMenu(menu)
         }

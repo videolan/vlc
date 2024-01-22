@@ -309,7 +309,7 @@ FocusScope {
 
         onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
-        onRequestLockUnlockAutoHide: {
+        onRequestLockUnlockAutoHide: (lock) => {
             rootPlayer.lockUnlockAutoHide(lock)
         }
 
@@ -810,7 +810,7 @@ FocusScope {
             return topBar
         }
 
-        onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
+        onRequestLockUnlockAutoHide: (lock) => rootPlayer.lockUnlockAutoHide(lock)
 
         identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
                                             : PlayerControlbarModel.Audioplayer
