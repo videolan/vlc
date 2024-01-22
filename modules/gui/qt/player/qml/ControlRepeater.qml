@@ -34,9 +34,11 @@ Repeater {
     signal menuOpened(var menu)
 
     // NOTE: We apply the 'navigation chain' after adding the item.
-    onItemAdded: item.applyNavigation()
+    onItemAdded: (index, item) => {
+        item.applyNavigation()
+    }
 
-    onItemRemoved: {
+    onItemRemoved: (index, item) => {
         // NOTE: We update the 'navigation chain' after removing the item.
         item.removeNavigation()
 

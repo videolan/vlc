@@ -144,7 +144,7 @@ T.Control {
         Repeater{
             id: repeater
 
-            onItemAdded: {
+            onItemAdded: (index, item) => {
                 if (item.enabled) root._countEnabled += 1;
 
                 enabledConnection.createObject(item, { target: item });
@@ -180,7 +180,9 @@ T.Control {
                 }
             }
 
-            onItemRemoved: if (item.enabled) root._countEnabled -= 1
+            onItemRemoved: (index, item) => {
+                if (item.enabled) root._countEnabled -= 1
+            }
         }
     }
 }
