@@ -82,7 +82,8 @@ FocusScope {
 
     property alias alignment: repeater.alignment
 
-    property var altFocusAction: Navigation.defaultNavigationUp
+    //function
+    /* required */ property var altFocusAction
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -135,7 +136,7 @@ FocusScope {
             return
 
         if (activeFocus && (!visible || model.count === 0))
-            altFocusAction()
+            controlLayout.altFocusAction()
     }
 
     // Children

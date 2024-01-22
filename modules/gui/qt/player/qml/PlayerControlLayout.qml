@@ -198,7 +198,7 @@ FocusScope {
 
             focus: true
 
-            altFocusAction: Navigation.defaultNavigationRight
+            altFocusAction: () => Navigation.defaultNavigationRight()
 
             Navigation.parentItem: playerControlLayout
             Navigation.rightItem: loaderCenter.item
@@ -257,7 +257,7 @@ FocusScope {
 
             spacing: playerControlLayout.spacing
 
-            altFocusAction: Navigation.defaultNavigationUp
+            altFocusAction: () => Navigation.defaultNavigationUp()
 
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: loaderLeft.item
@@ -300,7 +300,7 @@ FocusScope {
 
             focus: true
 
-            altFocusAction: Navigation.defaultNavigationLeft
+            altFocusAction: () => Navigation.defaultNavigationLeft()
 
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: loaderCenter.item
