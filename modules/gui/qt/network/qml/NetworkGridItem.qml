@@ -54,17 +54,17 @@ Widgets.GridItem {
         const f = function(type) {
             switch (type) {
             case NetworkMediaModel.TYPE_DISC:
-                return "qrc://sd/disc.svg"
+                return "qrc:///sd/disc.svg"
             case NetworkMediaModel.TYPE_CARD:
-                return "qrc://sd/capture-card.svg"
+                return "qrc:///sd/capture-card.svg"
             case NetworkMediaModel.TYPE_STREAM:
-                return "qrc://sd/stream.svg"
+                return "qrc:///sd/stream.svg"
             case NetworkMediaModel.TYPE_PLAYLIST:
-                return "qrc://sd/playlist.svg"
+                return "qrc:///sd/playlist.svg"
             case NetworkMediaModel.TYPE_FILE:
-                return "qrc://sd/file.svg"
+                return "qrc:///sd/file.svg"
             default:
-                return "qrc://sd/directory.svg"
+                return "qrc:///sd/directory.svg"
             }
         }
 
