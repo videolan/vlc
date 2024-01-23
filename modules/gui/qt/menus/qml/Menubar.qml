@@ -38,14 +38,14 @@ Item {
         colorSet: ColorContext.MenuBar
     }
 
-    Action{ id: mediaMenu;    text: I18n.qtr("&Media")    ; onTriggered: menubar.popupMediaMenu(source);   }
-    Action{ id: playbackMenu; text: I18n.qtr("&Playback") ; onTriggered: menubar.popupPlaybackMenu(source);}
-    Action{ id: videoMenu;    text: I18n.qtr("&Video")    ; onTriggered: menubar.popupVideoMenu(source);   }
-    Action{ id: audioMenu;    text: I18n.qtr("&Audio")    ; onTriggered: menubar.popupAudioMenu(source);   }
-    Action{ id: subtitleMenu; text: I18n.qtr("&Subtitle") ; onTriggered: menubar.popupSubtitleMenu(source);}
-    Action{ id: toolMenu;     text: I18n.qtr("&Tools")    ; onTriggered: menubar.popupToolsMenu(source);   }
-    Action{ id: viewMenu;     text: I18n.qtr("V&iew")     ; onTriggered: menubar.popupViewMenu(source);    }
-    Action{ id: helpMenu;     text: I18n.qtr("&Help")     ; onTriggered: menubar.popupHelpMenu(source);    }
+    Action{ id: mediaMenu;    text: I18n.qtr("&Media")    ; onTriggered: (source) => menubar.popupMediaMenu(source);   }
+    Action{ id: playbackMenu; text: I18n.qtr("&Playback") ; onTriggered: (source) => menubar.popupPlaybackMenu(source);}
+    Action{ id: videoMenu;    text: I18n.qtr("&Video")    ; onTriggered: (source) => menubar.popupVideoMenu(source);   }
+    Action{ id: audioMenu;    text: I18n.qtr("&Audio")    ; onTriggered: (source) => menubar.popupAudioMenu(source);   }
+    Action{ id: subtitleMenu; text: I18n.qtr("&Subtitle") ; onTriggered: (source) => menubar.popupSubtitleMenu(source);}
+    Action{ id: toolMenu;     text: I18n.qtr("&Tools")    ; onTriggered: (source) => menubar.popupToolsMenu(source);   }
+    Action{ id: viewMenu;     text: I18n.qtr("V&iew")     ; onTriggered: (source) => menubar.popupViewMenu(source);    }
+    Action{ id: helpMenu;     text: I18n.qtr("&Help")     ; onTriggered: (source) => menubar.popupHelpMenu(source);    }
 
     property var toolbarModel: [
         mediaMenu,
@@ -85,11 +85,10 @@ Item {
         menubar: menubarLayout
 
         onMenuClosed: _menuIndex = -1
-        onNavigateMenu: {
+        onNavigateMenu: (direction) => {
             const i =  (root._menuIndex + root.toolbarModel.length + direction) % root.toolbarModel.length
             root.openMenu(menubarLayout.visibleChildren[i], root.toolbarModel[i], i)
         }
-
     }
 
     RowLayout {

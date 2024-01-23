@@ -173,9 +173,9 @@ FocusScope {
                         root.Navigation.defaultNavigationDown()
                 }
 
-                onBrowse: root.browse(tree, reason)
+                onBrowse: (tree, reason) => root.browse(tree, reason)
 
-                onSeeAll: root.seeAllFolders(title, reason)
+                onSeeAll: (reason) => root.seeAllFolders(title, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
@@ -223,9 +223,9 @@ FocusScope {
                         root.Navigation.defaultNavigationDown()
                 }
 
-                onBrowse: root.browse(tree, reason)
+                onBrowse: (tree, reason) => root.browse(tree, reason)
 
-                onSeeAll: root.seeAllDevices(title, model.sd_source, reason)
+                onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
@@ -267,9 +267,9 @@ FocusScope {
                         root.Navigation.defaultNavigationUp()
                 }
 
-                onBrowse: root.browse(tree, reason)
+                onBrowse: (tree, reason) => root.browse(tree, reason)
 
-                onSeeAll: root.seeAllDevices(title, model.sd_source, reason)
+                onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
                 onActiveFocusChanged: _centerFlickableOnItem(lanSection)
                 onCurrentIndexChanged: _centerFlickableOnItem(lanSection)

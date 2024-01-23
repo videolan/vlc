@@ -139,7 +139,7 @@ Widgets.PageLoader {
                 }
             }
 
-            onBrowse:  root._showServiceNode(tree, source_name, reason)
+            onBrowse: (tree, reason) => root._showServiceNode(tree, source_name, reason)
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
