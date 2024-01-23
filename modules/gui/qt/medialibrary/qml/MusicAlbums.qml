@@ -167,7 +167,7 @@ MainInterface.MainViewLoader {
 
             Connections {
                 target: contextMenu
-                onShowMediaInformation: gridView_id.switchExpandItem( index )
+                onShowMediaInformation: (index) => gridView_id.switchExpandItem( index )
             }
         }
     }
