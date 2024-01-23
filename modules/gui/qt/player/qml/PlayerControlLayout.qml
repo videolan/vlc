@@ -307,7 +307,7 @@ FocusScope {
 
             onRequestLockUnlockAutoHide: (lock) => playerControlLayout.requestLockUnlockAutoHide(lock)
 
-            onMenuOpened: playerControlLayout.menuOpened(menu)
+            onMenuOpened: (menu) => playerControlLayout.menuOpened(menu)
         }
     }
 }

@@ -95,7 +95,7 @@ NativeMenu {
 
     // Events
 
-    onRequestData: {
+    onRequestData: (requestID, indexes) => {
         model.getData(indexes, function (data) {
             setData(requestID, data)
         })

@@ -251,7 +251,7 @@ T.Pane {
 
             onRequestLockUnlockAutoHide: (lock) => root.requestLockUnlockAutoHide(lock)
 
-            onMenuOpened: root.applyMenu(menu)
+            onMenuOpened: (menu) => root.applyMenu(menu)
         }
     }
 }
