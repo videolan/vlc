@@ -41,6 +41,8 @@ FocusScope {
     property int leftPadding: VLCStyle.margin_xsmall
     property int rightPadding: VLCStyle.margin_xsmall
 
+    property int nbItemPerRow
+
     // Settings
 
     implicitHeight: recentVideosColumn.height
@@ -62,8 +64,7 @@ FocusScope {
 
         ml: MediaLib
 
-        limit: MainCtx.gridView ? view.currentItem.nbItemPerRow ?
-                                              view.currentItem.nbItemPerRow : 0
+        limit: MainCtx.gridView ? root.nbItemPerRow
                                 : 5
 
         searchPattern: MainCtx.search.pattern
