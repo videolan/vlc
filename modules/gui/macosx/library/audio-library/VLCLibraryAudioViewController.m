@@ -359,7 +359,11 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 
     _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    _libraryTargetView.subviews = @[_emptyLibraryView];
+    if ([self.libraryTargetView.subviews containsObject:_loadingOverlayView]) {
+        _libraryTargetView.subviews = @[_emptyLibraryView, _loadingOverlayView];
+    } else {
+        _libraryTargetView.subviews = @[_emptyLibraryView];
+    }
     NSDictionary * const dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
@@ -370,7 +374,11 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)prepareAudioLibraryView
 {
     _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    _libraryTargetView.subviews = @[_audioLibraryView];
+    if ([self.libraryTargetView.subviews containsObject:_loadingOverlayView]) {
+        _libraryTargetView.subviews = @[_audioLibraryView, _loadingOverlayView];
+    } else {
+        _libraryTargetView.subviews = @[_audioLibraryView];
+    }
     NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
@@ -597,11 +605,26 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
     NSLog(@"Audio long load started");
+    if ([self.libraryTargetView.subviews containsObject:_loadingOverlayView]) {
+        return;
+    }
+
+    NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:_loadingOverlayView];
+    self.libraryTargetView.subviews = views;
+    [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
 }
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
     NSLog(@"Audio long load finished");
+    if (![self.libraryTargetView.subviews containsObject:_loadingOverlayView]) {
+        return;
+    }
+
+    [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+    NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
+    [views removeObject:_loadingOverlayView];
+    self.libraryTargetView.subviews = views.copy;
 }
 
 @end
