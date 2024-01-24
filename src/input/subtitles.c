@@ -230,22 +230,26 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     if( !psz_name_org )
         return VLC_EGENERIC;
 
-    char *psz_fname = vlc_uri2path( psz_name_org );
-    if( !psz_fname )
+    char *psz_fname_ext = vlc_uri2path( psz_name_org );
+    if( !psz_fname_ext )
         return VLC_EGENERIC;
 
-    /* extract filename & dirname from psz_fname */
-    char *f_dir = strdup( psz_fname );
-    if( f_dir == 0 )
+    char *psz_fname = strdup( psz_fname_ext );
+    char *f_dir = strdup( psz_fname_ext );
+    if( psz_fname == NULL || f_dir == NULL )
     {
+        free( psz_fname_ext );
         free( psz_fname );
+        free( f_dir );
         return VLC_ENOMEM;
     }
 
+    /* extract filename & dirname from psz_fname */
     char *f_fname_trim = strrchr( psz_fname, DIR_SEP_CHAR );
     if( !f_fname_trim )
     {
         free( f_dir );
+        free( psz_fname_ext );
         free( psz_fname );
         return VLC_EGENERIC;
     }
@@ -332,7 +336,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
                 if( asprintf( &path, psz_format, psz_dir, psz_name ) < 0 )
                     continue;
 
-                if( strcmp( path, psz_fname )
+                if( strcmp( path, psz_fname_ext )
                  && vlc_stat( path, &st ) == 0
                  && S_ISREG( st.st_mode ) )
                 {
@@ -363,6 +367,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
     }
     free( f_dir );
     free( psz_fname );
+    free( psz_fname_ext );
 
     for( int i = 0; i < i_slaves; i++ )
     {
