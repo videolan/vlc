@@ -63,6 +63,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryAudioTableViewDelegate *_audioLibraryTableViewDelegate;
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
+
+    NSVisualEffectView *_loadingOverlayView;
+    NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 }
 @end
 
@@ -86,6 +89,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupAudioPlaceholderView];
+        [self setupLoadingOverlayView];
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
@@ -255,6 +259,42 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _NS("Your favorite albums will appear here.\nGo to the Browse section to add albums you love."),
         _NS("Your favorite tracks will appear here.\nGo to the Browse section to add tracks you love."),
         _NS("Your favorite genres will appear here.\nGo to the Browse section to add genres you love."),
+    ];
+}
+
+- (void)setupLoadingOverlayView
+{
+    _loadingOverlayView = [[NSVisualEffectView alloc] init];
+    _loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    _loadingOverlayViewConstraints = @[
+        [NSLayoutConstraint constraintWithItem:_loadingOverlayView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:_loadingOverlayView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:_loadingOverlayView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:_loadingOverlayView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1
+                                      constant:0]
     ];
 }
 
