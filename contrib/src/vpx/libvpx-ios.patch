@@ -1,11 +1,17 @@
---- libvpx-1.13.0/build/make/configure.sh	2023-02-07 20:33:51.000000000 -0500
-+++ libvpx-1.13.0-new/build/make/configure.sh	2023-03-24 11:22:57.841614048 -0400
-@@ -858,103 +858,6 @@
+--- libvpx-1.14.0/build/make/configure.sh	2024-01-09 16:12:22.000000000 -0500
++++ libvpx-1.14.0-new/build/make/configure.sh	2024-01-24 16:12:30.986695507 -0500
+@@ -863,109 +863,6 @@
        ;;
    esac
  
--  # PIC is probably what we want when building shared libs
+-  # Position independent code (PIC) is probably what we want when building
+-  # shared libs or position independent executable (PIE) targets.
 -  enabled shared && soft_enable pic
+-  check_cpp << EOF || soft_enable pic
+-#if !(__pie__ || __PIE__)
+-#error Neither __pie__ or __PIE__ are set
+-#endif
+-EOF
 -
 -  # Minimum iOS version for all target platforms (darwin and iphonesimulator).
 -  # Shared library framework builds are only possible on iOS 8 and later.
@@ -86,7 +92,7 @@
 -      add_cflags  "-mmacosx-version-min=10.15"
 -      add_ldflags "-mmacosx-version-min=10.15"
 -      ;;
--    *-darwin2[0-2]-*)
+-    *-darwin2[0-3]-*)
 -      add_cflags  "-arch ${toolchain%%-*}"
 -      add_ldflags "-arch ${toolchain%%-*}"
 -      ;;
@@ -104,7 +110,7 @@
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1143,12 +1046,6 @@
+@@ -1170,12 +1067,6 @@
                add_cflags -isysroot ${alt_libc}
              fi
  
