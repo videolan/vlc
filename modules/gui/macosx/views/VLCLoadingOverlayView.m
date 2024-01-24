@@ -24,10 +24,37 @@
 
 @implementation VLCLoadingOverlayView
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    self.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+    self.material = NSVisualEffectMaterialPopover;
 }
 
 @end
