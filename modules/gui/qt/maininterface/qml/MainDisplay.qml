@@ -187,7 +187,7 @@ FocusScope {
 
             plListView: playlist
 
-            onItemClicked: {
+            onItemClicked: (index) => {
                 const name = g_mainDisplay.tabModel.get(index).name
 
                 //don't add the ["mc"] prefix as we are only testing subviers from MainDisplay
