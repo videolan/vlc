@@ -46,6 +46,35 @@ int webvtt_OpenEncoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static void bo_add_escaped( bo_t *box, size_t len, const char *psz )
+{
+    if( likely(strcspn(psz, "&<>") >= len) )
+    {
+        bo_add_mem( box, len, psz );
+    }
+    else
+    {
+        for( size_t i=0; i<len; i++ )
+        {
+            switch(*psz)
+            {
+            case '&':
+                bo_add_mem( box, 6, "&#x26;" );
+                break;
+            case '<':
+                bo_add_mem( box, 6, "&#x3c;" );
+                break;
+            case '>': /* escapes forbidden --> sequence */
+                bo_add_mem( box, 6, "&#x3e;" );
+                break;
+            default:
+                bo_add_8( box, *psz );
+                break;
+            }
+            psz++;
+        }
+    }
+}
 
 static void WriteText( const char *psz, bo_t *box, char *c_last )
 {
@@ -56,7 +85,7 @@ static void WriteText( const char *psz, bo_t *box, char *c_last )
         const char *p = strchr( psz, '\n' );
         if( p )
         {
-            bo_add_mem( box, p - psz, psz );
+            bo_add_escaped( box, p - psz, psz );
             if( (*c_last == '\n' || *c_last == '\0') && *psz == '\n' )
                 bo_add_mem( box, 8, "&#x2028;" ); /* Add space for empty line */
             bo_add_8( box, '\n' );
@@ -66,7 +95,7 @@ static void WriteText( const char *psz, bo_t *box, char *c_last )
         else
         {
             size_t len = strlen(psz);
-            bo_add_mem( box, len, psz );
+            bo_add_escaped( box, len, psz );
             *c_last = (len > 0) ? psz[len - 1] : '\0';
             break;
         }
