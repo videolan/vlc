@@ -78,7 +78,7 @@ Widgets.PageLoader {
         currentView: root.pageName
         model: tabModel
 
-        onClicked: {
+        onClicked: (index) => {
             root.loadIndex(index)
         }
     }
