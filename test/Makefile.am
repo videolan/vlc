@@ -57,6 +57,7 @@ check_PROGRAMS = \
 	test_modules_tls \
 	test_modules_stream_out_transcode \
 	test_modules_mux_webvtt \
+	test_modules_stream_out_hls_subtitles_segmenter \
 	$(NULL)
 
 if HAVE_GL
@@ -302,6 +303,12 @@ test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
 
 test_modules_mux_webvtt_SOURCES = modules/mux/webvtt.c
 test_modules_mux_webvtt_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_stream_out_hls_subtitles_segmenter_SOURCES = \
+	modules/stream_out/hls/subtitles_segmenter.c \
+	../modules/stream_out/hls/hls.h \
+	../modules/stream_out/hls/subtitles_segmenter.c
+test_modules_stream_out_hls_subtitles_segmenter_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
