@@ -47,6 +47,8 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCLoadingOverlayView.h"
+
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
 
@@ -64,7 +66,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
 
-    NSVisualEffectView *_loadingOverlayView;
+    VLCLoadingOverlayView *_loadingOverlayView;
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 }
 @end
@@ -264,9 +266,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)setupLoadingOverlayView
 {
-    _loadingOverlayView = [[NSVisualEffectView alloc] init];
-    _loadingOverlayView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
-    _loadingOverlayView.material = NSVisualEffectMaterialPopover;
+    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
     _loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
     _loadingOverlayViewConstraints = @[
         [NSLayoutConstraint constraintWithItem:_loadingOverlayView
