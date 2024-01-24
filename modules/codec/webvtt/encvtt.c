@@ -58,7 +58,7 @@ static void WriteText( const char *psz, bo_t *box, char *c_last )
         {
             bo_add_mem( box, p - psz, psz );
             if( (*c_last == '\n' || *c_last == '\0') && *psz == '\n' )
-                bo_add_8( box, '!' ); /* Add space */
+                bo_add_mem( box, 8, "&#x2028;" ); /* Add space for empty line */
             bo_add_8( box, '\n' );
             *c_last = '\n';
             psz = p + 1;
