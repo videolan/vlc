@@ -205,14 +205,14 @@ Item {
                                     target: root
                                     enabled: dndView.model === layout.model.center
 
-                                    onDragStarted: {
+                                    onDragStarted: (controlId) => {
                                         // extending spacer widget should not be placed in the
                                         // central alignment view
                                         if (controlId === ControlListModel.WIDGET_SPACER_EXTEND)
                                             visible = false
                                     }
 
-                                    onDragStopped: {
+                                    onDragStopped: (controlId) => {
                                         if (controlId === ControlListModel.WIDGET_SPACER_EXTEND)
                                             visible = true
                                     }
