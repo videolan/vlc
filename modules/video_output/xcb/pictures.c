@@ -92,6 +92,8 @@ bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
         if (depth != 8)
             return false;
     }
+    else
+        return false; /* unsupported visual class */
 
     const xcb_format_t *fmt = vlc_xcb_DepthToPixmapFormat(setup, depth);
     if (unlikely(fmt == NULL))
