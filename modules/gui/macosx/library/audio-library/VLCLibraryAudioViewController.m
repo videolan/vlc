@@ -265,6 +265,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupLoadingOverlayView
 {
     _loadingOverlayView = [[NSVisualEffectView alloc] init];
+    _loadingOverlayView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+    _loadingOverlayView.material = NSVisualEffectMaterialPopover;
     _loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
     _loadingOverlayViewConstraints = @[
         [NSLayoutConstraint constraintWithItem:_loadingOverlayView
