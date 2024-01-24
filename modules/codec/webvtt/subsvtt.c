@@ -1217,6 +1217,22 @@ static webvtt_region_t * webvtt_region_GetByID( decoder_sys_t *p_sys,
 /*****************************************************************************
  *
  *****************************************************************************/
+static char * DuplicateUnescaped( const char *psz )
+{
+    char *s = strdup( psz );
+    if( s )
+        vlc_xml_decode( s );
+    return s;
+}
+
+static char * NDuplicateUnescaped( const char *psz, size_t len )
+{
+    char *s = strndup( psz, len );
+    if( s )
+        vlc_xml_decode( s );
+    return s;
+}
+
 static unsigned CountNewLines( const char *psz )
 {
     unsigned i = 0;
@@ -1243,7 +1259,7 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                 webvtt_dom_text_t *p_node = webvtt_dom_text_New( p_parent );
                 if( p_node )
                 {
-                    p_node->psz_text = strndup( psz_text, psz_tag - psz_text );
+                    p_node->psz_text = NDuplicateUnescaped( psz_text, psz_tag - psz_text );
                     *pi_lines += ((*pi_lines == 0) ? 1 : 0) + CountNewLines( p_node->psz_text );
                     *pp_append = (webvtt_dom_node_t *) p_node;
                     pp_append = &p_node->p_next;
@@ -1258,9 +1274,9 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                     const char *psz_attrs = NULL;
                     size_t i_name;
                     const char *psz_name = SplitTag( psz_tag, &i_name, &psz_attrs );
-                    p_node->psz_tag = strndup( psz_name, i_name );
+                    p_node->psz_tag = NDuplicateUnescaped( psz_name, i_name );
                     if( psz_attrs != psz_taglast )
-                        p_node->psz_attrs = strndup( psz_attrs, psz_taglast - psz_attrs );
+                        p_node->psz_attrs = NDuplicateUnescaped( psz_attrs, psz_taglast - psz_attrs );
                     /* <hh:mm::ss:fff> time tags */
                     if( p_node->psz_attrs && isdigit(p_node->psz_attrs[0]) )
                         (void) webvtt_scan_time( p_node->psz_attrs, &p_node->i_nzstart );
@@ -1276,7 +1292,7 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
                     const char *psz_attrs = NULL;
                     size_t i_name;
                     const char *psz_name = SplitTag( psz_tag, &i_name, &psz_attrs );
-                    char *psz_tagname = strndup( psz_name, i_name );
+                    char *psz_tagname = NDuplicateUnescaped( psz_name, i_name );
 
                     /* Close at matched parent node level due to unclosed tags
                      * like <b><v stuff>foo</b> */
@@ -1302,7 +1318,7 @@ static webvtt_dom_node_t * CreateDomNodes( const char *psz_text, unsigned *pi_li
             webvtt_dom_text_t *p_node = webvtt_dom_text_New( p_parent );
             if( p_node )
             {
-                p_node->psz_text = strdup( psz_text );
+                p_node->psz_text = DuplicateUnescaped( psz_text );
                 *pi_lines += ((*pi_lines == 0) ? 1 : 0) + CountNewLines( p_node->psz_text );
                 *pp_append = (webvtt_dom_node_t *) p_node;
             }
@@ -1559,8 +1575,6 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
             *pp_append = text_segment_New( p_textnode->psz_text );
             if( *pp_append )
             {
-                if( (*pp_append)->psz_text )
-                    vlc_xml_decode( (*pp_append)->psz_text );
                 (*pp_append)->style = ComputeStyle( p_dec, p_node );
             }
         }
