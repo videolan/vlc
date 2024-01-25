@@ -600,6 +600,12 @@ static void ReleaseDisplay(vlc_gl_t* gl)
 {
     vlc_gl_sys_t* sys = gl->sys;
 
+    if (sys->wayland.feedback != NULL)
+        zwp_linux_dmabuf_feedback_v1_destroy(sys->wayland.feedback);
+
+    if (sys->wayland.dmabuf != NULL)
+        zwp_linux_dmabuf_v1_destroy(sys->wayland.dmabuf);
+
     if (sys->gbm.device)
     {
         int fd = gbm_device_get_fd(sys->gbm.device);
