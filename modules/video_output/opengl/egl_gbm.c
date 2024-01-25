@@ -392,13 +392,14 @@ static bool OpenDrmDevice(vlc_gl_t* gl, drmDevice* device)
 
     msg_Dbg(gl, "open drm device %s", render_node);
     int fd = vlc_open(render_node, O_RDWR);
-    free(render_node);
 
     if (fd < 0)
     {
         msg_Err(gl, "can't open drm device %s", render_node);
+        free(render_node);
         return false;
     }
+    free(render_node);
 
     sys->gbm.device = gbm_create_device(fd);
     return sys->gbm.device != NULL;
