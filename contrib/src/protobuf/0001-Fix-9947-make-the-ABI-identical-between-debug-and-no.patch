@@ -1,0 +1,76 @@
+From 0ec6d488e784dd3d94567f35abc56a8da454d9f9 Mon Sep 17 00:00:00 2001
+From: Antoine Pitrou <antoine@python.org>
+Date: Tue, 19 Jul 2022 16:40:28 +0200
+Subject: [PATCH] Fix #9947: make the ABI identical between debug and non-debug
+ builds
+
+---
+ src/google/protobuf/message_lite.cc |  8 ++------
+ src/google/protobuf/metadata_lite.h | 13 ++++++++++---
+ 2 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/src/google/protobuf/message_lite.cc b/src/google/protobuf/message_lite.cc
+index 3a1b67bf6..da66c1965 100644
+--- a/src/google/protobuf/message_lite.cc
++++ b/src/google/protobuf/message_lite.cc
+@@ -520,18 +520,14 @@ void GenericTypeHandler<std::string>::Merge(const std::string& from,
+   *to = from;
+ }
+ 
+-// Non-inline implementations of InternalMetadata routines
+-#if defined(NDEBUG) || defined(_MSC_VER)
+-// for opt and MSVC builds, the destructor is defined in the header.
+-#else
++// Non-inline implementations of InternalMetadata destructor
+ // This is moved out of the header because the GOOGLE_DCHECK produces a lot of code.
+-InternalMetadata::~InternalMetadata() {
++void InternalMetadata::CheckedDestruct() {
+   if (HasMessageOwnedArenaTag()) {
+     GOOGLE_DCHECK(!HasUnknownFieldsTag());
+     delete reinterpret_cast<Arena*>(ptr_ - kMessageOwnedArenaTagMask);
+   }
+ }
+-#endif
+ 
+ // Non-inline variants of std::string specializations for
+ // various InternalMetadata routines.
+diff --git a/src/google/protobuf/metadata_lite.h b/src/google/protobuf/metadata_lite.h
+index 11faba69f..0c31517f0 100644
+--- a/src/google/protobuf/metadata_lite.h
++++ b/src/google/protobuf/metadata_lite.h
+@@ -74,15 +74,19 @@ class PROTOBUF_EXPORT InternalMetadata {
+     GOOGLE_DCHECK(!is_message_owned || arena != nullptr);
+   }
+ 
+-#if defined(NDEBUG) || defined(_MSC_VER)
++  // To keep the ABI identical between debug and non-debug builds,
++  // the destructor is always defined here even though it may delegate
++  // to a non-inline private method.
++  // (see https://github.com/protocolbuffers/protobuf/issues/9947)
+   ~InternalMetadata() {
++#if defined(NDEBUG) || defined(_MSC_VER)
+     if (HasMessageOwnedArenaTag()) {
+       delete reinterpret_cast<Arena*>(ptr_ - kMessageOwnedArenaTagMask);
+     }
+-  }
+ #else
+-  ~InternalMetadata();
++    CheckedDestruct();
+ #endif
++  }
+ 
+   template <typename T>
+   void Delete() {
+@@ -261,6 +265,9 @@ class PROTOBUF_EXPORT InternalMetadata {
+   PROTOBUF_NOINLINE void DoSwap(T* other) {
+     mutable_unknown_fields<T>()->Swap(other);
+   }
++
++  // Private helper with debug checks for ~InternalMetadata()
++  void CheckedDestruct();
+ };
+ 
+ // String Template specializations.
+-- 
+2.37.3.windows.1
+
