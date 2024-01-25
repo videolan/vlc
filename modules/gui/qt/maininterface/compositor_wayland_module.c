@@ -165,6 +165,9 @@ static void Close(qtwayland_t* obj)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)(obj->p_sys);
     wl_display_flush(sys->display);
+
+    wl_subcompositor_destroy(sys->subcompositor);
+    wl_compositor_destroy(sys->compositor);
     wl_event_queue_destroy(sys->queue);
 }
 
@@ -198,8 +201,16 @@ static bool Init(qtwayland_t* obj, void* qpni_display)
     return true;
 
 error:
+    if (sys->subcompositor)
+        wl_subcompositor_destroy(sys->subcompositor);
+    if (sys->compositor)
+        wl_compositor_destroy(sys->compositor);
     if (sys->queue)
         wl_event_queue_destroy(sys->queue);
+    sys->compositor = NULL;
+    sys->subcompositor = NULL;
+    sys->queue = NULL;
+
     return false;
 }
 
