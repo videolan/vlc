@@ -119,7 +119,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, dprForWindow(m_qmlView.get()));
 
     return commonGUICreate(m_qmlView.get(), m_qmlView.get(),
-                    CompositorVideo::CAN_SHOW_PIP);
+                    CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC);
 }
 
 QWindow* CompositorWayland::interfaceMainWindow() const
