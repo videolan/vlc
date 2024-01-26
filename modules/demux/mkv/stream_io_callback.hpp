@@ -57,11 +57,11 @@ class vlc_stream_io_callback: public IOCallback
 
     bool IsEOF() const { return mb_eof; }
 
-    virtual uint32_t read            ( void *p_buffer, size_t i_size);
-    virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning );
-    virtual size_t   write           ( const void *p_buffer, size_t i_size);
-    virtual uint64_t getFilePointer  ( void );
-    virtual void     close           ( void ) { return; }
+    virtual uint32_t read            ( void *p_buffer, size_t i_size) override;
+    virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning ) override;
+    virtual size_t   write           ( const void *p_buffer, size_t i_size) override;
+    virtual uint64_t getFilePointer  ( void ) override;
+    virtual void     close           ( void ) override { return; }
 };
 
 } // namespace
