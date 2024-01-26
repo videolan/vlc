@@ -1710,60 +1710,6 @@ void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
     vlc_player_Unlock(player);
 }
 
-/* internal function, used by audio, video */
-libvlc_track_description_t *
-        libvlc_get_track_description( libvlc_media_player_t *p_mi,
-                                      enum es_format_category_e cat )
-{
-    vlc_player_t *player = p_mi->player;
-    vlc_player_Lock(player);
-
-    libvlc_track_description_t *ret, **pp = &ret;
-
-    size_t count = vlc_player_GetTrackCount(player, cat);
-    for (size_t i = 0; i < count; i++)
-    {
-        libvlc_track_description_t *tr = malloc(sizeof (*tr));
-        if (unlikely(tr == NULL))
-        {
-            libvlc_printerr("Not enough memory");
-            continue;
-        }
-
-        const struct vlc_player_track *track =
-            vlc_player_GetTrackAt(player, cat, i);
-
-        *pp = tr;
-        tr->i_id = vlc_es_id_GetInputId(track->es_id);
-        tr->psz_name = strdup(track->name);
-        if (unlikely(!tr->psz_name))
-        {
-            free(tr);
-            continue;
-        }
-        pp = &tr->p_next;
-    }
-
-    *pp = NULL;
-
-    vlc_player_Unlock(player);
-    return ret;
-}
-
-void libvlc_track_description_list_release( libvlc_track_description_t *p_td )
-{
-    libvlc_track_description_t *p_actual, *p_before;
-    p_actual = p_td;
-
-    while ( p_actual )
-    {
-        free( p_actual->psz_name );
-        p_before = p_actual;
-        p_actual = p_before->p_next;
-        free( p_before );
-    }
-}
-
 bool libvlc_media_player_can_pause(libvlc_media_player_t *p_mi)
 {
     vlc_player_t *player = p_mi->player;

@@ -54,10 +54,6 @@ struct libvlc_media_player_t
     } timer;
 };
 
-libvlc_track_description_t * libvlc_get_track_description(
-        libvlc_media_player_t *p_mi,
-        enum es_format_category_e cat );
-
 /**
  * Internal equalizer structure.
  */
