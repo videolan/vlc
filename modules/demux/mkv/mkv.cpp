@@ -842,7 +842,7 @@ static int Demux( demux_t *p_demux)
     /* set pts */
     {
         p_sys->i_pts = p_sys->i_mk_chapter_time + VLC_TICK_0;
-        p_sys->i_pts += VLC_TICK_FROM_NS(internal_block.GlobalTimecode());
+        p_sys->i_pts += VLC_TICK_FROM_NS(internal_block.GlobalTimestamp());
     }
 
     if ( p_vsegment->CurrentEdition() &&

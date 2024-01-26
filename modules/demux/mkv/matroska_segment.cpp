@@ -1064,7 +1064,7 @@ void matroska_segment_c::EnsureDuration()
         ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA ) )
     {
         // use the last block + duration
-        uint64_t i_last_timecode = p_last_cluster->GlobalTimecode();
+        uint64_t i_last_timecode = p_last_cluster->GlobalTimestamp();
         for( unsigned int i = 0; i < p_last_cluster->ListSize(); i++ )
         {
             EbmlElement *l = (*p_last_cluster)[i];
@@ -1072,7 +1072,7 @@ void matroska_segment_c::EnsureDuration()
             if( MKV_CHECKED_PTR_DECL ( simpleblock, KaxSimpleBlock, l ) )
             {
                 simpleblock->SetParent( *p_last_cluster );
-                i_last_timecode = std::max(i_last_timecode, simpleblock->GlobalTimecode());
+                i_last_timecode = std::max(i_last_timecode, simpleblock->GlobalTimestamp());
             }
             else if( MKV_CHECKED_PTR_DECL ( group, KaxBlockGroup, l ) )
             {
@@ -1084,7 +1084,7 @@ void matroska_segment_c::EnsureDuration()
                     if( MKV_CHECKED_PTR_DECL ( block, KaxBlock, g ) )
                     {
                         block->SetParent( *p_last_cluster );
-                        i_group_timecode += block->GlobalTimecode();
+                        i_group_timecode += block->GlobalTimestamp();
                     }
                     else if( MKV_CHECKED_PTR_DECL ( kbd_ptr, KaxBlockDuration, g ) )
                     {
@@ -1095,7 +1095,7 @@ void matroska_segment_c::EnsureDuration()
             }
         }
 
-        i_duration = VLC_TICK_FROM_NS( i_last_timecode - cluster->GlobalTimecode() );
+        i_duration = VLC_TICK_FROM_NS( i_last_timecode - cluster->GlobalTimestamp() );
         msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, SEC_FROM_VLC_TICK(i_duration) );
     }
 
@@ -1228,10 +1228,10 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
     {
         MKV_SWITCH_INIT();
 
-        E_CASE( KaxClusterTimecode, ktimecode )
+        E_CASE( KaxClusterTimestamp, ktimecode )
         {
             ktimecode.ReadData( vars.obj->es.I_O(), SCOPE_ALL_DATA );
-            vars.obj->cluster->InitTimecode( static_cast<uint64_t>( ktimecode ), vars.obj->i_timescale );
+            vars.obj->cluster->InitTimestamp( static_cast<uint64_t>( ktimecode ), vars.obj->i_timescale );
             vars.obj->_seeker.add_cluster( vars.obj->cluster );
             vars.b_cluster_timecode = true;
         }
@@ -1263,7 +1263,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 bool const b_valid_track = vars.obj->FindTrackByBlock( NULL, &ksblock ) != NULL;
                 if (b_valid_track)
                     vars.obj->_seeker.add_seekpoint( ksblock.TrackNum(),
-                        SegmentSeeker::Seekpoint( ksblock.GetElementPosition(), VLC_TICK_FROM_NS(ksblock.GlobalTimecode()) ) );
+                        SegmentSeeker::Seekpoint( ksblock.GetElementPosition(), VLC_TICK_FROM_NS(ksblock.GlobalTimestamp()) ) );
             }
         }
     };
@@ -1282,7 +1282,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             if( p_track != NULL && p_track->fmt.i_cat == SPU_ES )
             {
                 vars.obj->_seeker.add_seekpoint( kblock.TrackNum(),
-                    SegmentSeeker::Seekpoint( kblock.GetElementPosition(), VLC_TICK_FROM_NS(kblock.GlobalTimecode()) ) );
+                    SegmentSeeker::Seekpoint( kblock.GetElementPosition(), VLC_TICK_FROM_NS(kblock.GlobalTimestamp()) ) );
             }
 
             vars.ep->Keep ();

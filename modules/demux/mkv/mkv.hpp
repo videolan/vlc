@@ -80,6 +80,12 @@
 #include <matroska/KaxTrackEntryData.h>
 #include <matroska/KaxContentEncoding.h>
 
+#define GlobalTimestamp()   GlobalTimecode()
+#define InitTimestamp(t,s)  InitTimecode(t,s)
+using KaxClusterTimestamp    = libmatroska::KaxClusterTimecode;
+using KaxTimestampScale      = libmatroska::KaxTimecodeScale;
+using KaxTrackTimestampScale = libmatroska::KaxTrackTimecodeScale;
+
 #include "stream_io_callback.hpp"
 
 #ifdef HAVE_ZLIB_H

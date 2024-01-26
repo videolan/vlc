@@ -67,7 +67,7 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
 {
     Cluster cinfo = {
         /* fpos     */ p_cluster->GetElementPosition(),
-        /* pts      */ vlc_tick_t( VLC_TICK_FROM_NS( p_cluster->GlobalTimecode() ) ),
+        /* pts      */ vlc_tick_t( VLC_TICK_FROM_NS( p_cluster->GlobalTimestamp() ) ),
         /* duration */ vlc_tick_t( -1 ),
         /* size     */ p_cluster->IsFiniteSize()
             ? p_cluster->GetEndPosition() - p_cluster->GetElementPosition()
@@ -379,7 +379,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
             : static_cast<KaxInternalBlock&>( *block );
 
         block_pos = internal_block.GetElementPosition();
-        block_pts = VLC_TICK_FROM_NS(internal_block.GlobalTimecode());
+        block_pts = VLC_TICK_FROM_NS(internal_block.GlobalTimestamp());
         track_id  = internal_block.TrackNum();
 
         bool const b_valid_track = ms.FindTrackByBlock( block, simpleblock ) != NULL;
@@ -512,10 +512,10 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
 
     while( EbmlElement * el = ms.ep.Get() )
     {
-        if( MKV_CHECKED_PTR_DECL( p_tc, KaxClusterTimecode, el ) )
+        if( MKV_CHECKED_PTR_DECL( p_tc, KaxClusterTimestamp, el ) )
         {
             p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA );
-            ms.cluster->InitTimecode( static_cast<uint64_t>( *p_tc ), ms.i_timescale );
+            ms.cluster->InitTimestamp( static_cast<uint64_t>( *p_tc ), ms.i_timescale );
             add_cluster(ms.cluster);
             break;
         }
@@ -525,7 +525,7 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
         }
     }
 
-    /* TODO: add error handling; what if we never get a KaxCluster and/or KaxClusterTimecode? */
+    /* TODO: add error handling; what if we never get a KaxCluster and/or KaxClusterTimestamp? */
 
     mark_range_as_searched( Range( i_cluster_pos, ms.es.I_O().getFilePointer() ) );
 

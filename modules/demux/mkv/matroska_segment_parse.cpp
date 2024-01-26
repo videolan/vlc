@@ -335,7 +335,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             vars.tk->i_default_duration = VLC_TICK_FROM_NS(static_cast<uint64_t>(defd));
             debug( vars, "Track Default Duration=%" PRId64, vars.tk->i_default_duration );
         }
-        E_CASE( KaxTrackTimecodeScale, ttcs )
+        E_CASE( KaxTrackTimestampScale, ttcs )
         {
             vars.tk->f_timecodescale = static_cast<float>( ttcs );
             if ( vars.tk->f_timecodescale <= 0 ) vars.tk->f_timecodescale = 1.0;
@@ -1213,7 +1213,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             }
             debug( vars, "NextUID=%" PRIx64, *reinterpret_cast<uint64_t*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
         }
-        E_CASE( KaxTimecodeScale, tcs )
+        E_CASE( KaxTimestampScale, tcs )
         {
             vars.obj->i_timescale = static_cast<uint64_t>( tcs );
             debug( vars, "TimecodeScale=%" PRId64, vars.obj->i_timescale );
@@ -1642,7 +1642,7 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 
     for( unsigned int i = 0; i < cluster->ListSize(); ++i )
     {
-        if( MKV_CHECKED_PTR_DECL( p_ctc, KaxClusterTimecode, (*cluster)[i] ) )
+        if( MKV_CHECKED_PTR_DECL( p_ctc, KaxClusterTimestamp, (*cluster)[i] ) )
         {
             cluster->InitTimestamp( static_cast<uint64_t>( *p_ctc ), i_timescale );
             _seeker.add_cluster( cluster );
@@ -1658,7 +1658,7 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
     }
 
     if( b_update_start_time )
-        i_mk_start_time = VLC_TICK_FROM_NS( cluster->GlobalTimecode() );
+        i_mk_start_time = VLC_TICK_FROM_NS( cluster->GlobalTimestamp() );
 
     return true;
 }
