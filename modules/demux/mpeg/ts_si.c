@@ -37,6 +37,7 @@
 #include <dvbpsi/tot.h> /* TDT support */
 #include <dvbpsi/dr.h>
 #include <dvbpsi/psi.h>
+#include "../../mux/mpeg/dvbpsi_compat.h" /* dvbpsi_messages */
 
 #include "ts_si.h"
 #include "ts_arib.h"
@@ -54,6 +55,12 @@
 #include <time.h>
 #include <assert.h>
 #include <limits.h>
+
+struct ts_si_context_t
+{
+    dvbpsi_t *p_handle;
+    int       i_version;
+};
 
 #ifndef SI_DEBUG_EIT
  #define SI_DEBUG_TIMESHIFT(t)
@@ -74,8 +81,8 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
 void ts_si_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
 {
     if( likely(p_pid->type == TYPE_SI) &&
-        dvbpsi_decoder_present( p_pid->u.p_si->handle ) )
-        dvbpsi_packet_push( p_pid->u.p_si->handle, (uint8_t *) p_pktbuffer );
+        dvbpsi_decoder_present( p_pid->u.p_si->p_ctx->p_handle ) )
+        dvbpsi_packet_push( p_pid->u.p_si->p_ctx->p_handle, (uint8_t *) p_pktbuffer );
 }
 
 static char *EITConvertToUTF8( demux_t *p_demux,
@@ -154,14 +161,14 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 
     if( p_sys->es_creation != CREATE_ES ||
        !p_sdt->b_current_next ||
-        p_sdt->i_version == sdt->u.p_si->i_version )
+        p_sdt->i_version == sdt->u.p_si->p_ctx->i_version )
     {
         dvbpsi_sdt_delete( p_sdt );
         return;
     }
 
     /* First callback */
-    if( sdt->u.p_si->i_version == -1 )
+    if( sdt->u.p_si->p_ctx->i_version == -1 )
     {
         attach_SI_decoders( TS_SI_EIT_PID, "EIT", eitpid );
         attach_SI_decoders( TS_SI_TDT_PID, "TDT", tdtpid );
@@ -333,7 +340,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         vlc_meta_Delete( p_meta );
     }
 
-    sdt->u.p_si->i_version = p_sdt->i_version;
+    sdt->u.p_si->p_ctx->i_version = p_sdt->i_version;
     dvbpsi_sdt_delete( p_sdt );
 }
 
@@ -396,7 +403,7 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
     /* Because libdvbpsi is broken and deduplicating timestamp tables,
      * we need to reset it to get next timestamp callback */
     ts_pid_t *pid = ts_pid_Get( &p_sys->pids, TS_SI_TDT_PID );
-    dvbpsi_decoder_reset( pid->u.p_si->handle->p_decoder, true );
+    dvbpsi_decoder_reset( pid->u.p_si->p_ctx->p_handle->p_decoder, true );
     dvbpsi_tot_delete(p_tdt);
 
     es_out_Control( p_demux->out, ES_OUT_SET_EPG_TIME, (int64_t) p_sys->i_network_time );
@@ -806,8 +813,33 @@ bool ts_attach_SI_Tables_Decoders( ts_pid_t *p_pid )
     if( p_pid->type != TYPE_SI )
         return false;
 
-    if( dvbpsi_decoder_present( p_pid->u.p_si->handle ) )
+    if( dvbpsi_decoder_present( p_pid->u.p_si->p_ctx->p_handle ) )
         return true;
 
-    return dvbpsi_AttachDemux( p_pid->u.p_si->handle, SINewTableCallBack, p_pid );
+    return dvbpsi_AttachDemux( p_pid->u.p_si->p_ctx->p_handle, SINewTableCallBack, p_pid );
+}
+
+void ts_si_context_Delete( ts_si_context_t *p_ctx )
+{
+    if( dvbpsi_decoder_present( p_ctx->p_handle ) )
+        dvbpsi_DetachDemux( p_ctx->p_handle );
+    dvbpsi_delete( p_ctx->p_handle );
+    free( p_ctx );
+}
+
+ts_si_context_t * ts_si_context_New( demux_t *p_demux )
+{
+    ts_si_context_t *p_ctx = malloc(sizeof(*p_ctx));
+    if(likely(p_ctx))
+    {
+        p_ctx->p_handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+        if( !p_ctx->p_handle )
+        {
+            free( p_ctx );
+            return NULL;
+        }
+        p_ctx->p_handle->p_sys = (void *) p_demux;
+        p_ctx->i_version = -1;
+    }
+    return p_ctx;
 }

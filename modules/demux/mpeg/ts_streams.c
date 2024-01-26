@@ -45,6 +45,7 @@
 #include "ts_pid.h"
 #include "ts.h"
 
+#include "ts_si.h"
 #include "ts_psip.h"
 
 static inline bool handle_Init( demux_t *p_demux, dvbpsi_t **handle )
@@ -326,13 +327,13 @@ ts_si_t *ts_si_New( demux_t *p_demux )
     if( !si )
         return NULL;
 
-    if( !handle_Init( p_demux, &si->handle ) )
+    si->p_ctx = ts_si_context_New( p_demux );
+    if( !si->p_ctx )
     {
         free( si );
         return NULL;
     }
 
-    si->i_version  = -1;
     si->eitpid = NULL;
     si->tdtpid = NULL;
     si->cdtpid = NULL;
@@ -342,9 +343,7 @@ ts_si_t *ts_si_New( demux_t *p_demux )
 
 void ts_si_Del( demux_t *p_demux, ts_si_t *si )
 {
-    if( dvbpsi_decoder_present( si->handle ) )
-        dvbpsi_DetachDemux( si->handle );
-    dvbpsi_delete( si->handle );
+    ts_si_context_Delete( si->p_ctx );
     if( si->eitpid )
         PIDRelease( p_demux, si->eitpid );
     if( si->tdtpid )
@@ -381,7 +380,6 @@ ts_psip_t *ts_psip_New( demux_t *p_demux )
     }
 
     ARRAY_INIT( psip->eit );
-    psip->i_version  = -1;
     psip->p_eas_es = NULL;
 
     return psip;

@@ -150,8 +150,7 @@ typedef struct ts_si_context_t ts_si_context_t;
 
 struct ts_si_t
 {
-    dvbpsi_t *handle;
-    int       i_version;
+    ts_si_context_t *p_ctx;
     /* Track successfully set pid */
     ts_pid_t *eitpid;
     ts_pid_t *tdtpid;
@@ -162,9 +161,8 @@ typedef struct ts_psip_context_t ts_psip_context_t;
 
 struct ts_psip_t
 {
-    int             i_version;
-    ts_es_t    *p_eas_es;
     ts_psip_context_t *p_ctx;
+    ts_es_t    *p_eas_es;
     /* Used to track list of active pid for eit/ett, to call PIDRelease on them.
        VCT table could have been used, but PIDSetup can fail, and we can't alter
        the VCT table accordingly without going ahead of more troubles */

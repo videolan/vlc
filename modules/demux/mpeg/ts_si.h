@@ -37,7 +37,12 @@
 #define TS_SI_RUNSTATUS_RUNNING   0x04
 #define TS_SI_RUNSTATUS_OFF_AIR   0x05
 
+typedef struct ts_si_context_t ts_si_context_t;
+
 void ts_si_Packet_Push( ts_pid_t *, const uint8_t * );
+
+ts_si_context_t * ts_si_context_New( demux_t * );
+void ts_si_context_Delete( ts_si_context_t * );
 
 bool ts_attach_SI_Tables_Decoders( ts_pid_t * );
 
