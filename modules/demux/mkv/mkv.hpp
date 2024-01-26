@@ -112,7 +112,7 @@ enum
 #define MKV_CHECKED_PTR_DECL_CONST( name, type, src ) const type * name = MKV_IS_ID(src, type) ? static_cast<const type*>(src) : NULL
 
 
-using namespace LIBMATROSKA_NAMESPACE;
+using namespace libmatroska;
 
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   KaxBlockAdditions *additions,

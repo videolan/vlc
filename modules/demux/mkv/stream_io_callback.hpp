@@ -32,7 +32,7 @@
 
 #include <ebml/IOCallback.h>
 
-using namespace LIBEBML_NAMESPACE;
+using namespace libebml;
 
 namespace mkv {
 
