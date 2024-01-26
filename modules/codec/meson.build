@@ -683,6 +683,8 @@ if host_system == 'windows'
         'name' : 'mft',
         'sources' : files(
                 'mft.cpp',
+                'mft_d3d.cpp',
+                'mft_d3d11.cpp',
                 'hxxx_helper.c',
                 '../packetizer/hxxx_nal.c',
                 '../packetizer/hxxx_sei.c',
