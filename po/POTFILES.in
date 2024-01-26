@@ -14,7 +14,6 @@ include/vlc_config.h
 include/vlc_config_cat.h
 include/vlc_configuration.h
 include/vlc_demux.h
-include/vlc/deprecated.h
 include/vlc_epg.h
 include/vlc_es.h
 include/vlc_es_out.h

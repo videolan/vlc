@@ -8,7 +8,6 @@ BUILT_SOURCES = $(nodist_pkginclude_HEADERS)
 CLEANFILES = $(BUILT_SOURCES) $(pkgconfig_DATA)
 
 pkginclude_HEADERS = \
-	../include/vlc/deprecated.h \
 	../include/vlc/libvlc.h \
 	../include/vlc/libvlc_dialog.h \
 	../include/vlc/libvlc_events.h \

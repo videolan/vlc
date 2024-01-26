@@ -47,7 +47,6 @@ extern "C" {
 #include "libvlc_events.h"
 #include "libvlc_dialog.h"
 #include "libvlc_version.h"
-#include "deprecated.h"
 
 # ifdef __cplusplus
 }
