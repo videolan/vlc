@@ -123,11 +123,13 @@ static const EbmlSemanticContext & GetEbmlNoGlobal_Context()
 }
 
 // the Segment Context should not allow Void or CRC32 elements to avoid lookup false alarm
-const EbmlSemanticContext Context_KaxSegmentVLC = EbmlSemanticContext(KaxSegment_Context.GetSize(),
-                                                                      KaxSegment_Context.MyTable,
-                                                                      KaxSegment_Context.Parent(),
-                                                                      GetEbmlNoGlobal_Context,
-                                                                      KaxSegment_Context.GetMaster());
+DEFINE_START_SEMANTIC(KaxSegmentVLC)
+DEFINE_SEMANTIC_ITEM(true, true, EbmlHead)
+DEFINE_SEMANTIC_ITEM(false, false, KaxSegment)
+DEFINE_END_SEMANTIC(KaxSegmentVLC)
+
+DEFINE_xxx_CONTEXT(KaxSegmentVLC,GetEbmlNoGlobal_Context)
+
 
 EbmlElement *EbmlParser::Get( bool allow_overshoot )
 {
