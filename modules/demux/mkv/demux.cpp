@@ -129,7 +129,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
         if (p_l0->IsFiniteSize() )
         {
-            p_l0->SkipData(p_stream1->estream, KaxMatroska_Context);
+            p_l0->SkipData(p_stream1->estream, Context_KaxMatroska);
             p_l0 = p_stream1->estream.FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
         }
         else
