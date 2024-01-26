@@ -29,7 +29,8 @@
 namespace mkv {
 
 /* FIXME move this, it's demux_sys_t::FindSegment */
-matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matroska_segment_c*> & segments )
+template<typename T>
+matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*> & segments )
 {
     for( size_t i = 0; i < segments.size(); i++ )
     {
@@ -54,7 +55,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
 
     matroska_segment_c * p_segment = &main_segment;
     if( p_chap->p_segment_uid &&
-       ( !( p_segment = getSegmentbyUID( (KaxSegmentUID*) p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
+       ( !( p_segment = getSegmentbyUID( p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
     {
         msg_Warn( &main_segment.sys.demuxer,
                   "Couldn't find segment 0x%x or not ordered... - ignoring chapter %s",
