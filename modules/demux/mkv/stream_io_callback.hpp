@@ -62,7 +62,6 @@ class vlc_stream_io_callback: public IOCallback
     virtual size_t   write           ( const void *p_buffer, size_t i_size);
     virtual uint64_t getFilePointer  ( void );
     virtual void     close           ( void ) { return; }
-    uint64           toRead          ( void );
 };
 
 } // namespace

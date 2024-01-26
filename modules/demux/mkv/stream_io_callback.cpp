@@ -99,19 +99,4 @@ size_t vlc_stream_io_callback::write(const void *, size_t )
     return 0;
 }
 
-uint64 vlc_stream_io_callback::toRead( void )
-{
-    uint64_t i_size;
-
-    if( s == NULL)
-        return 0;
-
-    i_size = stream_Size( s );
-
-    if( i_size <= 0 )
-        return UINT64_MAX;
-
-    return static_cast<uint64>( i_size - vlc_stream_Tell( s ) );
-}
-
 } // namespace
