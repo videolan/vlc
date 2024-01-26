@@ -295,7 +295,7 @@ bool matroska_segment_c::ParseSimpleTags( SimpleTag* pout_simple, KaxTagSimple *
         }
         E_CASE( KaxTagLangue, entry )
         {
-            vars.out.lang = entry;
+            vars.out.lang = entry.GetValue();
         }
         E_CASE( KaxTagDefault, unused )
         {
