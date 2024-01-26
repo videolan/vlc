@@ -25,8 +25,8 @@
 
 #include "dispatcher.hpp"
 
-#include "ebml/EbmlElement.h"
-#include "ebml/EbmlId.h"
+#include <ebml/EbmlElement.h>
+#include <ebml/EbmlId.h>
 
 #include <vlc_threads.h>
 
