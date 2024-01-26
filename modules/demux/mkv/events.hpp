@@ -111,7 +111,7 @@ private:
     void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
 
-    void ProcessNavAction( uint16 button, pci_t* pci );
+    void ProcessNavAction( uint16_t button, pci_t* pci );
 
     demux_t      *p_demux;
 

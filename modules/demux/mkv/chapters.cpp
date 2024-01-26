@@ -108,7 +108,7 @@ std::string chapter_item_c::GetCodecName( bool f_for_title ) const
     return result;
 }
 
-int16 chapter_item_c::GetTitleNumber( ) const
+int16_t chapter_item_c::GetTitleNumber( ) const
 {
     int result = -1;
 

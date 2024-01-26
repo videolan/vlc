@@ -87,7 +87,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     return;
 }
 
-uint64 vlc_stream_io_callback::getFilePointer( void )
+uint64_t vlc_stream_io_callback::getFilePointer( void )
 {
     if ( s == NULL )
         return 0;

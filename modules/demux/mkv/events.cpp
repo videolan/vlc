@@ -60,10 +60,10 @@ void event_thread_t::SetPci(const pci_t *data)
         btni_t *button_ptr = &(pci_packet.hli.btnit[button-1]);
         binary *p_data = (binary*) button_ptr;
 
-        uint16 i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
-        uint16 i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
-        uint16 i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
-        uint16 i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
+        uint16_t i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
+        uint16_t i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
+        uint16_t i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
+        uint16_t i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
         button_ptr->x_start = i_x_start;
         button_ptr->x_end   = i_x_end;
         button_ptr->y_start = i_y_start;
@@ -165,7 +165,7 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
-void event_thread_t::ProcessNavAction( uint16 button, pci_t* pci )
+void event_thread_t::ProcessNavAction( uint16_t button, pci_t* pci )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
@@ -194,7 +194,7 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
     pci_t *pci = &pci_packet;
 
-    uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
+    uint16_t i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
 
     if( i_curr_button <= 0 || i_curr_button > pci->hli.hl_gi.btn_ns )
         return;
@@ -270,7 +270,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
         if ( best != 0)
         {
             btni_t button_ptr = pci->hli.btnit[best-1];
-            uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
+            uint16_t i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
 
             msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
             vlc_mutex_unlock( &lock );

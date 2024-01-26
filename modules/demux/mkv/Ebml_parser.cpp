@@ -167,8 +167,8 @@ next:
             if ( mi_level > 1 && m_el[mi_level-2]->IsFiniteSize() &&
                  m_el[mi_level-1]->GetEndPosition() < m_el[mi_level-2]->GetEndPosition() )
             {
-                uint64 top = m_el[mi_level-2]->GetEndPosition();
-                uint64 bom = m_el[mi_level-1]->GetEndPosition();
+                uint64_t top = m_el[mi_level-2]->GetEndPosition();
+                uint64_t bom = m_el[mi_level-1]->GetEndPosition();
                 i_max_read = top - bom;
             }
         }
@@ -187,8 +187,8 @@ next:
         else if (size_lvl == 0 || !m_el[size_lvl-1]->IsFiniteSize() || !m_el[size_lvl]->IsFiniteSize() )
             i_max_read = UINT64_MAX;
         else {
-            uint64 top = m_el[size_lvl-1]->GetEndPosition();
-            uint64 bom = m_el[mi_level]->GetEndPosition();
+            uint64_t top = m_el[size_lvl-1]->GetEndPosition();
+            uint64_t bom = m_el[mi_level]->GetEndPosition();
             i_max_read = top - bom;
         }
     }

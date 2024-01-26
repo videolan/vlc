@@ -71,7 +71,7 @@ public:
                                     size_t i_cookie_size );
     std::string                 GetCodecName( bool f_for_title = false ) const;
     bool                        ParentOf( const chapter_item_c & item ) const;
-    int16                       GetTitleNumber( ) const;
+    int16_t                     GetTitleNumber( ) const;
 
     vlc_tick_t                  i_start_time, i_end_time;
     std::vector<chapter_item_c*> sub_chapters;

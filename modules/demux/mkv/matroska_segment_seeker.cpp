@@ -515,7 +515,7 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
         if( MKV_CHECKED_PTR_DECL( p_tc, KaxClusterTimecode, el ) )
         {
             p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA );
-            ms.cluster->InitTimecode( static_cast<uint64>( *p_tc ), ms.i_timescale );
+            ms.cluster->InitTimecode( static_cast<uint64_t>( *p_tc ), ms.i_timescale );
             add_cluster(ms.cluster);
             break;
         }

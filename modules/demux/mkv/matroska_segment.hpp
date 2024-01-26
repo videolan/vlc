@@ -110,7 +110,7 @@ public:
     int64_t                 i_attachments_position;
 
     KaxCluster              *cluster;
-    uint64                  i_block_pos;
+    uint64_t                i_block_pos;
     KaxSegmentUID           *p_segment_uid;
     KaxPrevUID              *p_prev_segment_uid;
     KaxNextUID              *p_next_segment_uid;
@@ -141,7 +141,7 @@ public:
 
     bool Preload();
     bool PreloadFamily( const matroska_segment_c & segment );
-    bool PreloadClusters( uint64 i_cluster_position );
+    bool PreloadClusters( uint64_t i_cluster_position );
     void InformationCreate();
 
     bool Seek( demux_t &, vlc_tick_t i_mk_date, vlc_tick_t i_mk_time_offset, bool b_accurate );

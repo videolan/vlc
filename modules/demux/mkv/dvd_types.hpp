@@ -218,41 +218,41 @@ typedef struct {
  */
 typedef struct {
 #ifdef WORDS_BIGENDIAN
-  uint32        btn_coln         : 2;  /**< button color number */
-  uint32        x_start          : 10; /**< x start offset within the overlay */
-  uint32        zero1            : 2;  /**< reserved */
-  uint32        x_end            : 10; /**< x end offset within the overlay */
+  uint32_t      btn_coln         : 2;  /**< button color number */
+  uint32_t      x_start          : 10; /**< x start offset within the overlay */
+  uint32_t      zero1            : 2;  /**< reserved */
+  uint32_t      x_end            : 10; /**< x end offset within the overlay */
 
-  uint32        zero3            : 2;  /**< reserved */
-  uint32        up               : 6;  /**< button index when pressing up */
+  uint32_t      zero3            : 2;  /**< reserved */
+  uint32_t      up               : 6;  /**< button index when pressing up */
 
-  uint32        auto_action_mode : 2;  /**< 0: no, 1: activated if selected */
-  uint32        y_start          : 10; /**< y start offset within the overlay */
-  uint32        zero2            : 2;  /**< reserved */
-  uint32        y_end            : 10; /**< y end offset within the overlay */
+  uint32_t      auto_action_mode : 2;  /**< 0: no, 1: activated if selected */
+  uint32_t      y_start          : 10; /**< y start offset within the overlay */
+  uint32_t      zero2            : 2;  /**< reserved */
+  uint32_t      y_end            : 10; /**< y end offset within the overlay */
 
-  uint32        zero4            : 2;  /**< reserved */
-  uint32        down             : 6;  /**< button index when pressing down */
+  uint32_t      zero4            : 2;  /**< reserved */
+  uint32_t      down             : 6;  /**< button index when pressing down */
   unsigned char zero5            : 2;  /**< reserved */
   unsigned char left             : 6;  /**< button index when pressing left */
   unsigned char zero6            : 2;  /**< reserved */
   unsigned char right            : 6;  /**< button index when pressing right */
 #else
-  uint32        x_end            : 10;
-  uint32        zero1            : 2;
-  uint32        x_start          : 10;
-  uint32        btn_coln         : 2;
+  uint32_t      x_end            : 10;
+  uint32_t      zero1            : 2;
+  uint32_t      x_start          : 10;
+  uint32_t      btn_coln         : 2;
 
-  uint32        up               : 6;
-  uint32        zero3            : 2;
+  uint32_t      up               : 6;
+  uint32_t      zero3            : 2;
 
-  uint32        y_end            : 10;
-  uint32        zero2            : 2;
-  uint32        y_start          : 10;
-  uint32        auto_action_mode : 2;
+  uint32_t      y_end            : 10;
+  uint32_t      zero2            : 2;
+  uint32_t      y_start          : 10;
+  uint32_t      auto_action_mode : 2;
 
-  uint32        down             : 6;
-  uint32        zero4            : 2;
+  uint32_t      down             : 6;
+  uint32_t      zero4            : 2;
   unsigned char left             : 6;
   unsigned char zero5            : 2;
   unsigned char right            : 6;

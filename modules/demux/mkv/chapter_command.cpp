@@ -29,12 +29,12 @@ namespace mkv {
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
-    uint32 codec_time = uint32(-1);
+    uint32_t codec_time = uint32_t(-1);
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
         if( MKV_CHECKED_PTR_DECL_CONST( p_cpt, KaxChapterProcessTime, command[i] ) )
         {
-            codec_time = static_cast<uint32>( *p_cpt );
+            codec_time = static_cast<uint32_t>( *p_cpt );
             break;
         }
     }
@@ -55,14 +55,14 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
     }
 }
 
-int16 dvd_chapter_codec_c::GetTitleNumber()
+int16_t dvd_chapter_codec_c::GetTitleNumber()
 {
     if ( p_private_data->GetSize() >= 3)
     {
         const binary* p_data = p_private_data->GetBuffer();
         if ( p_data[0] == MATROSKA_DVD_LEVEL_SS )
         {
-            return int16( (p_data[2] << 8) + p_data[3] );
+            return int16_t( (p_data[2] << 8) + p_data[3] );
         }
     }
     return -1;
@@ -152,19 +152,19 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     virtual_segment_c *p_vsegment = NULL;
     virtual_chapter_c *p_vchapter = NULL;
     bool f_result = false;
-    uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
+    uint16_t i_command = ( p_command[0] << 8 ) + p_command[1];
 
     // handle register tests if there are some
     if ( (i_command & 0xF0) != 0 )
     {
         bool b_test_positive = true;//(i_command & CMD_DVD_IF_NOT) == 0;
         bool b_test_value    = (i_command & CMD_DVD_TEST_VALUE) != 0;
-        uint8 i_test = i_command & 0x70;
-        uint16 i_value;
+        uint8_t i_test = i_command & 0x70;
+        uint16_t i_value;
 
         // see http://dvd.sourceforge.net/dvdinfo/vmi.html
-        uint8  i_cr1;
-        uint16 i_cr2;
+        uint8_t  i_cr1;
+        uint16_t i_cr2;
         switch ( i_command >> 12 )
         {
         default:
@@ -281,7 +281,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_JUMP_TT:
         {
-            uint8 i_title = p_command[5];
+            uint8_t i_title = p_command[5];
             msg_Dbg( &sys.demuxer, "JumpTT %d", i_title );
 
             // find in the ChapProcessPrivate matching this Title level
@@ -289,7 +289,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             if ( p_vsegment != NULL && p_vchapter != NULL )
             {
                 /* enter via the First Cell */
-                uint8 i_cell = 1;
+                uint8_t i_cell = 1;
                 p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
                 if ( p_vchapter != NULL )
                 {
@@ -338,7 +338,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
                         /* enter via the first Cell */
-                        uint8 i_cell = 1;
+                        uint8_t i_cell = 1;
                         p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
                         if ( p_vchapter != NULL )
                         {
@@ -462,8 +462,8 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_JUMPVTS_PTT:
         {
-            uint8 i_title = p_command[5];
-            uint8 i_ptt = p_command[3];
+            uint8_t i_title = p_command[5];
+            uint8_t i_ptt = p_command[3];
 
             msg_Dbg( &sys.demuxer, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
 
@@ -471,7 +471,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_vchapter = sys.p_current_vsegment->BrowseCodecPrivate( 1, MatchIsDomain, NULL, 0 );
             if ( p_vchapter != NULL )
             {
-                int16 i_curr_title = ( p_vchapter->p_chapter )? p_vchapter->p_chapter->GetTitleNumber() : 0;
+                int16_t i_curr_title = ( p_vchapter->p_chapter )? p_vchapter->p_chapter->GetTitleNumber() : 0;
                 if ( i_curr_title > 0 )
                 {
                     p_vchapter = sys.BrowseCodecPrivate( 1, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_vsegment );
@@ -513,7 +513,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_LINKPGCN:
         {
-            uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
+            uint16_t i_pgcn = (p_command[6] << 8) + p_command[7];
 
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
             p_vchapter = sys.p_current_vsegment->BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2 );
@@ -526,7 +526,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_LINKCN:
         {
-            uint8 i_cn = p_command[7];
+            uint8_t i_cn = p_command[7];
 
             p_vchapter = sys.p_current_vsegment->CurrentChapter();
 
@@ -592,8 +592,8 @@ bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x80 )
         return false;
 
-    uint16 i_gtitle = (data.p_private_data->GetBuffer()[2] << 8 ) + data.p_private_data->GetBuffer()[3];
-    uint16 i_title = *static_cast<uint16 const*>( p_cookie );
+    uint16_t i_gtitle = (data.p_private_data->GetBuffer()[2] << 8 ) + data.p_private_data->GetBuffer()[3];
+    uint16_t i_title = *static_cast<uint16_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
@@ -606,8 +606,8 @@ bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &dat
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x40 )
         return false;
 
-    uint8 i_gtitle = data.p_private_data->GetBuffer()[3];
-    uint8 i_title = *static_cast<uint8 const*>( p_cookie );
+    uint8_t i_gtitle = data.p_private_data->GetBuffer()[3];
+    uint8_t i_title = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
@@ -620,8 +620,8 @@ bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &da
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
         return false;
 
-    uint16 i_gtitle = (data.p_private_data->GetBuffer()[1] << 8 ) + data.p_private_data->GetBuffer()[2];
-    uint8 i_title = *static_cast<uint8 const*>( p_cookie );
+    uint16_t i_gtitle = (data.p_private_data->GetBuffer()[1] << 8 ) + data.p_private_data->GetBuffer()[2];
+    uint8_t i_title = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
@@ -634,8 +634,8 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
-    uint8 i_pgc_type = data.p_private_data->GetBuffer()[3] & 0x0F;
-    uint8 i_pgc = *static_cast<uint8 const*>( p_cookie );
+    uint8_t i_pgc_type = data.p_private_data->GetBuffer()[3] & 0x0F;
+    uint8_t i_pgc = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_pgc_type == i_pgc);
 }
@@ -648,8 +648,8 @@ bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
-    uint16 const* i_pgc_n = static_cast<uint16 const*>( p_cookie );
-    uint16 i_pgc_num = (data.p_private_data->GetBuffer()[1] << 8) + data.p_private_data->GetBuffer()[2];
+    uint16_t const* i_pgc_n = static_cast<uint16_t const*>( p_cookie );
+    uint16_t i_pgc_num = (data.p_private_data->GetBuffer()[1] << 8) + data.p_private_data->GetBuffer()[2];
 
     return (i_pgc_num == *i_pgc_n);
 }
@@ -662,8 +662,8 @@ bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
         return false;
 
-    uint8 i_chapter = data.p_private_data->GetBuffer()[1];
-    uint8 i_ptt = *static_cast<uint8 const*>( p_cookie );
+    uint8_t i_chapter = data.p_private_data->GetBuffer()[1];
+    uint8_t i_ptt = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_chapter == i_ptt);
 }
@@ -676,8 +676,8 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
         return false;
 
-    uint8 const* i_cell_n = static_cast<uint8 const*>( p_cookie );
-    uint8 i_cell_num = data.p_private_data->GetBuffer()[3];
+    uint8_t const* i_cell_n = static_cast<uint8_t const*>( p_cookie );
+    uint8_t i_cell_num = data.p_private_data->GetBuffer()[3];
 
     return (i_cell_num == *i_cell_n);
 }
