@@ -38,6 +38,7 @@
 #include <dvbpsi/atsc_ett.h>
 #include <dvbpsi/atsc_stt.h>
 #include <dvbpsi/dr_a0.h>
+#include "../../mux/mpeg/dvbpsi_compat.h" /* dvbpsi_messages */
 /* Custom decoders */
 #include <dvbpsi/psi.h>
 #include "ts_decoders.h"
@@ -76,6 +77,8 @@ static inline char *grab_notempty( char **ppsz )
 
 struct ts_psip_context_t
 {
+    dvbpsi_t *p_handle;
+    int       i_version;
     dvbpsi_atsc_mgt_t *p_mgt; /* Used to match (EITx,ETTx)<->PIDn */
     dvbpsi_atsc_stt_t *p_stt; /* Time reference for EIT/EAS */
     dvbpsi_atsc_vct_t *p_vct; /* Required for EIT vchannel -> program remapping */
@@ -85,17 +88,28 @@ struct ts_psip_context_t
     DECL_ARRAY(dvbpsi_atsc_eit_t *) eits; /* For EIT pid, used on new ETT update */
 };
 
+static void ATSC_Detach_Dvbpsi_Decoders( dvbpsi_t *p_handle );
+
 void ts_psip_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
 {
-    if( p_pid->u.p_psip->handle->p_decoder && likely(p_pid->type == TYPE_PSIP) )
-        dvbpsi_packet_push( p_pid->u.p_psip->handle, (uint8_t *) p_pktbuffer );
+    ts_psip_context_t *p_ctx = p_pid->u.p_psip->p_ctx;
+    if( p_ctx->p_handle->p_decoder && likely(p_pid->type == TYPE_PSIP) )
+        dvbpsi_packet_push( p_ctx->p_handle, (uint8_t *) p_pktbuffer );
 }
 
-ts_psip_context_t * ts_psip_context_New( void )
+ts_psip_context_t * ts_psip_context_New( demux_t *p_demux )
 {
     ts_psip_context_t *p_ctx = malloc(sizeof(*p_ctx));
     if(likely(p_ctx))
     {
+        p_ctx->p_handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+        if( !p_ctx->p_handle )
+        {
+            free( p_ctx );
+            return NULL;
+        }
+        p_ctx->p_handle->p_sys = (void *) p_demux;
+        p_ctx->i_version = -1;
         p_ctx->p_mgt = NULL;
         p_ctx->p_stt = NULL;
         p_ctx->p_vct = NULL;
@@ -111,6 +125,9 @@ void ts_psip_context_Delete( ts_psip_context_t *p_ctx )
 {
     assert( !p_ctx->p_mgt || !p_ctx->etts.i_size );
     assert( !p_ctx->p_vct || !p_ctx->eits.i_size );
+
+    ATSC_Detach_Dvbpsi_Decoders( p_ctx->p_handle );
+    dvbpsi_delete( p_ctx->p_handle );
 
     if( p_ctx->p_mgt )
         dvbpsi_atsc_DeleteMGT( p_ctx->p_mgt );
@@ -269,7 +286,7 @@ static bool ATSC_Ready_SubDecoders( dvbpsi_t *p_handle, void *p_cb_pid )
     return true;
 }
 
-void ATSC_Detach_Dvbpsi_Decoders( dvbpsi_t *p_handle )
+static void ATSC_Detach_Dvbpsi_Decoders( dvbpsi_t *p_handle )
 {
     if( dvbpsi_decoder_present( p_handle ) )
         dvbpsi_DetachDemux( p_handle );
@@ -422,7 +439,7 @@ static void ATSC_EIT_Callback( void *p_pid, dvbpsi_atsc_eit_t* p_eit )
         return;
     }
 
-    demux_t *p_demux = (demux_t *) p_eit_pid->u.p_psip->handle->p_sys;
+    demux_t *p_demux = (demux_t *) p_eit_pid->u.p_psip->p_ctx->p_handle->p_sys;
     demux_sys_t *p_sys = p_demux->p_sys;
     ts_pid_t *p_base_pid = GetPID(p_sys, ATSC_BASE_PID);
     ts_psip_t *p_basepsip = p_base_pid->u.p_psip;
@@ -521,7 +538,7 @@ static void ATSC_ETT_Callback( void *p_pid, dvbpsi_atsc_ett_t *p_ett )
         return;
     }
 
-    demux_t *p_demux = (demux_t *) p_ett_pid->u.p_psip->handle->p_sys;
+    demux_t *p_demux = (demux_t *) p_ett_pid->u.p_psip->p_ctx->p_handle->p_sys;
     demux_sys_t *p_sys = p_demux->p_sys;
     ts_pid_t *p_base_pid = GetPID(p_sys, ATSC_BASE_PID);
     ts_psip_t *p_basepsip = p_base_pid->u.p_psip;
@@ -598,7 +615,7 @@ static void ATSC_VCT_Callback( void *p_cb_basepid, dvbpsi_atsc_vct_t* p_vct )
         dvbpsi_atsc_DeleteVCT( p_vct );
         return;
     }
-    demux_t *p_demux = (demux_t *) p_base_pid->u.p_psip->handle->p_sys;
+    demux_t *p_demux = (demux_t *) p_base_pid->u.p_psip->p_ctx->p_handle->p_sys;
     ts_psip_context_t *p_ctx = p_base_pid->u.p_psip->p_ctx;
 
     if( !p_ctx->p_a65 && !(p_ctx->p_a65 = atsc_a65_handle_New( NULL )) )
@@ -674,10 +691,10 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
         return;
     }
     ts_psip_t *p_mgtpsip = p_base_pid->u.p_psip;
-    demux_t *p_demux = (demux_t *) p_mgtpsip->handle->p_sys;
+    demux_t *p_demux = (demux_t *) p_mgtpsip->p_ctx->p_handle->p_sys;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( ( p_mgtpsip->i_version != -1 && p_mgtpsip->i_version == p_mgt->i_version ) ||
+    if( ( p_mgtpsip->p_ctx->i_version != -1 && p_mgtpsip->p_ctx->i_version == p_mgt->i_version ) ||
           p_mgt->b_current_next == 0 )
     {
         dvbpsi_atsc_DeleteMGT( p_mgt );
@@ -686,7 +703,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
 
     /* Easy way, delete and recreate every child if any new version comes
      * (We don't need to keep PID active as with video/PMT update) */
-    if( p_mgtpsip->i_version != -1 )
+    if( p_mgtpsip->p_ctx->i_version != -1 )
     {
         if( p_mgtpsip->p_ctx->p_vct )
         {
@@ -703,7 +720,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
         ARRAY_RESET(p_mgtpsip->eit);
 
         /* Remove EAS */
-        dvbpsi_demux_t *p_dvbpsi_demux = (dvbpsi_demux_t *) p_mgtpsip->handle->p_decoder;
+        dvbpsi_demux_t *p_dvbpsi_demux = (dvbpsi_demux_t *) p_mgtpsip->p_ctx->p_handle->p_decoder;
         dvbpsi_demux_subdec_t *p_subdec = dvbpsi_demuxGetSubDec( p_dvbpsi_demux, SCTE18_TABLE_ID, 0x00 );
         if( p_subdec )
         {
@@ -715,7 +732,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
     if( p_mgtpsip->p_ctx->p_mgt )
         dvbpsi_atsc_DeleteMGT( p_mgtpsip->p_ctx->p_mgt );
     p_mgtpsip->p_ctx->p_mgt = p_mgt;
-    p_mgtpsip->i_version = p_mgt->i_version;
+    p_mgtpsip->p_ctx->i_version = p_mgt->i_version;
 
     for( const dvbpsi_atsc_mgt_table_t *p_tab = p_mgt->p_first_table;
                                         p_tab; p_tab = p_tab->p_next )
@@ -726,7 +743,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
             const uint8_t i_table_id = (p_tab->i_table_type == ATSC_TABLE_TYPE_CVCT)
                                      ? ATSC_CVCT_TABLE_ID
                                      : ATSC_TVCT_TABLE_ID;
-            if( !ATSC_ATTACH( p_mgtpsip->handle, VCT, i_table_id,
+            if( !ATSC_ATTACH( p_mgtpsip->p_ctx->p_handle, VCT, i_table_id,
                               GetPID(p_sys, 0)->u.p_pat->i_ts_id, p_base_pid ) )
                 msg_Dbg( p_demux, "  * pid=%d listening for ATSC VCT", p_base_pid->i_pid );
         }
@@ -740,7 +757,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
             {
                 SetPIDFilter( p_demux->p_sys, pid, true );
                 pid->u.p_psip->p_ctx->i_tabletype = p_tab->i_table_type;
-                ATSC_Ready_SubDecoders( pid->u.p_psip->handle, pid );
+                ATSC_Ready_SubDecoders( pid->u.p_psip->p_ctx->p_handle, pid );
                 msg_Dbg( p_demux, "  * pid=%d reserved for ATSC EIT", pid->i_pid );
                 ARRAY_APPEND( p_mgtpsip->eit, pid );
             }
@@ -755,7 +772,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
             {
                 SetPIDFilter( p_sys, pid, true );
                 pid->u.p_psip->p_ctx->i_tabletype = p_tab->i_table_type;
-                ATSC_Ready_SubDecoders( pid->u.p_psip->handle, pid );
+                ATSC_Ready_SubDecoders( pid->u.p_psip->p_ctx->p_handle, pid );
                 msg_Dbg( p_demux, "  * pid=%d reserved for ATSC ETT", pid->i_pid );
                 ARRAY_APPEND( p_mgtpsip->eit, pid );
             }
@@ -765,7 +782,7 @@ static void ATSC_MGT_Callback( void *p_cb_basepid, dvbpsi_atsc_mgt_t* p_mgt )
     }
 
     if( SCTE18_SI_BASE_PID == ATSC_BASE_PID &&
-        ts_dvbpsi_AttachRawSubDecoder( p_mgtpsip->handle, SCTE18_TABLE_ID, 0x00,
+        ts_dvbpsi_AttachRawSubDecoder( p_mgtpsip->p_ctx->p_handle, SCTE18_TABLE_ID, 0x00,
                                        SCTE18_Section_Callback, p_base_pid ) )
     {
         msg_Dbg( p_demux, "  * pid=%d listening for EAS", p_base_pid->i_pid );
@@ -782,10 +799,10 @@ static void ATSC_STT_Callback( void *p_cb_basepid, dvbpsi_atsc_stt_t* p_stt )
         dvbpsi_atsc_DeleteSTT( p_stt );
         return;
     }
-    demux_t *p_demux = (demux_t *) p_base_pid->u.p_psip->handle->p_sys;
+    demux_t *p_demux = (demux_t *) p_base_pid->u.p_psip->p_ctx->p_handle->p_sys;
     demux_sys_t *p_sys = p_demux->p_sys;
     ts_psip_context_t *p_ctx = p_base_pid->u.p_psip->p_ctx;
-    dvbpsi_t *p_handle = p_base_pid->u.p_psip->handle;
+    dvbpsi_t *p_handle = p_base_pid->u.p_psip->p_ctx->p_handle;
 
     if( !p_ctx->p_stt ) /* First call */
     {
@@ -828,11 +845,11 @@ static void ATSC_STT_RawCallback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t
     }
 }
 
-bool ATSC_Attach_Dvbpsi_Base_Decoders( dvbpsi_t *p_handle, void *p_base_pid )
+bool ATSC_Attach_Dvbpsi_Base_Decoders( ts_psip_context_t *p_ctx, void *p_base_pid )
 {
-    if( !ATSC_ATTACH_WITH_FIXED_DECODER( p_handle, STT, ATSC_STT_TABLE_ID, 0x00, p_base_pid ) )
+    if( !ATSC_ATTACH_WITH_FIXED_DECODER( p_ctx->p_handle, STT, ATSC_STT_TABLE_ID, 0x00, p_base_pid ) )
     {
-        ATSC_Detach_Dvbpsi_Decoders( p_handle ); /* shouldn't be any, except demux */
+        ATSC_Detach_Dvbpsi_Decoders( p_ctx->p_handle ); /* shouldn't be any, except demux */
         return false;
     }
     return true;

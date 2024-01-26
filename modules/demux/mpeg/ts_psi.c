@@ -2124,7 +2124,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         if ( PIDSetup( p_demux, TYPE_PSIP, atsc_base_pid, pmtpid ) )
         {
             ts_psip_t *p_psip = atsc_base_pid->u.p_psip;
-            if( !ATSC_Attach_Dvbpsi_Base_Decoders( p_psip->handle, atsc_base_pid ) )
+            if( !ATSC_Attach_Dvbpsi_Base_Decoders( p_psip->p_ctx, atsc_base_pid ) )
             {
                 msg_Err( p_demux, "dvbpsi_atsc_AttachMGT/STT failed for program %d",
                          p_pmt->i_number );

@@ -162,7 +162,6 @@ typedef struct ts_psip_context_t ts_psip_context_t;
 
 struct ts_psip_t
 {
-    dvbpsi_t       *handle;
     int             i_version;
     ts_es_t    *p_eas_es;
     ts_psip_context_t *p_ctx;

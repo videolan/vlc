@@ -356,16 +356,9 @@ void ts_si_Del( demux_t *p_demux, ts_si_t *si )
 
 void ts_psip_Del( demux_t *p_demux, ts_psip_t *psip )
 {
-    if( psip->p_ctx )
-        ts_psip_context_Delete( psip->p_ctx );
+    ts_psip_context_Delete( psip->p_ctx );
 
     ts_pes_ChainDelete_es( p_demux, psip->p_eas_es );
-
-    if( psip->handle )
-    {
-        ATSC_Detach_Dvbpsi_Decoders( psip->handle );
-        dvbpsi_delete( psip->handle );
-    }
 
     for( int i=0; i<psip->eit.i_size; i++ )
         PIDRelease( p_demux, psip->eit.p_elems[i] );
@@ -380,7 +373,8 @@ ts_psip_t *ts_psip_New( demux_t *p_demux )
     if( !psip )
         return NULL;
 
-    if( !handle_Init( p_demux, &psip->handle ) )
+    psip->p_ctx = ts_psip_context_New( p_demux );
+    if( !psip->p_ctx )
     {
         free( psip );
         return NULL;
@@ -389,12 +383,6 @@ ts_psip_t *ts_psip_New( demux_t *p_demux )
     ARRAY_INIT( psip->eit );
     psip->i_version  = -1;
     psip->p_eas_es = NULL;
-    psip->p_ctx = ts_psip_context_New();
-    if( !psip->p_ctx )
-    {
-        ts_psip_Del( p_demux, psip );
-        psip = NULL;
-    }
 
     return psip;
 }

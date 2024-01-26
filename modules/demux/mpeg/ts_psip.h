@@ -60,10 +60,9 @@ typedef struct ts_psip_context_t ts_psip_context_t;
 
 void ts_psip_Packet_Push( ts_pid_t *, const uint8_t * );
 
-ts_psip_context_t * ts_psip_context_New( void );
+ts_psip_context_t * ts_psip_context_New( demux_t * );
 void ts_psip_context_Delete( ts_psip_context_t * );
 
-bool ATSC_Attach_Dvbpsi_Base_Decoders( dvbpsi_t *p_handle, void *p_cb_data );
-void ATSC_Detach_Dvbpsi_Decoders( dvbpsi_t *p_handle );
+bool ATSC_Attach_Dvbpsi_Base_Decoders( ts_psip_context_t *, void *p_cb_data );
 
 #endif
