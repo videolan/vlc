@@ -50,13 +50,14 @@
 #include <stdexcept>
 
 /* libebml and matroska */
+#include <ebml/EbmlVersion.h>
 #include <ebml/EbmlHead.h>
 #include <ebml/EbmlSubHead.h>
 #include <ebml/EbmlStream.h>
 #include <ebml/EbmlContexts.h>
 #include <ebml/EbmlVoid.h>
-#include <ebml/EbmlVersion.h>
 
+#include <matroska/KaxVersion.h>
 #include <matroska/KaxAttachments.h>
 #include <matroska/KaxAttached.h>
 #include <matroska/KaxBlock.h>
@@ -78,7 +79,6 @@
 #include <matroska/KaxTrackVideo.h>
 #include <matroska/KaxTrackEntryData.h>
 #include <matroska/KaxContentEncoding.h>
-#include <matroska/KaxVersion.h>
 
 #include "stream_io_callback.hpp"
 
