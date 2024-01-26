@@ -87,7 +87,7 @@ static void renderer_discovery_item_removed( vlc_renderer_discovery_t *rd,
 }
 
 libvlc_renderer_item_t *
-libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item)
+libvlc_renderer_item_retain(libvlc_renderer_item_t *p_item)
 {
     vlc_renderer_item_hold( (vlc_renderer_item_t *) p_item );
     return p_item;

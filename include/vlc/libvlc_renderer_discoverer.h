@@ -71,12 +71,12 @@ typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
  * callback if the libvlc user wants to use this item after. (for display or
  * for passing it to the mediaplayer for example).
  *
- * \version LibVLC 3.0.0 or later
+ * \version LibVLC 4.0.0 or later
  *
  * \return the current item
  */
 LIBVLC_API libvlc_renderer_item_t *
-libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item);
+libvlc_renderer_item_retain(libvlc_renderer_item_t *p_item);
 
 /**
  * Releases a renderer item, i.e. decrements its reference counter
