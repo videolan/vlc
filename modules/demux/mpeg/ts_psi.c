@@ -31,6 +31,7 @@
 #include <dvbpsi/pat.h>
 #include <dvbpsi/pmt.h>
 #include <dvbpsi/dr.h>
+#include "../../mux/mpeg/dvbpsi_compat.h" /* dvbpsi_messages */
 
 #include <vlc_demux.h>
 #include <vlc_bits.h>
@@ -61,6 +62,12 @@
 #include "ts_streamwrapper.h"
 
 #include <assert.h>
+
+struct ts_psi_context_t
+{
+    dvbpsi_t *p_handle;
+    void (*pf_detach)(dvbpsi_t *);
+};
 
 static void PIDFillFormat( demux_t *, ts_stream_t *p_pes, int i_stream_type, ts_transport_type_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt );
@@ -178,11 +185,12 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         if( !b_existing || pmtpid->u.p_pmt->i_number != p_program->i_number )
         {
             if( b_existing && pmtpid->u.p_pmt->i_number != p_program->i_number )
-                dvbpsi_pmt_detach(pmtpid->u.p_pmt->handle);
+                dvbpsi_pmt_detach(pmtpid->u.p_pmt->p_ctx->p_handle);
 
-            if( !dvbpsi_pmt_attach( pmtpid->u.p_pmt->handle, p_program->i_number, PMTCallBack, p_demux ) )
+            if( !dvbpsi_pmt_attach( pmtpid->u.p_pmt->p_ctx->p_handle, p_program->i_number, PMTCallBack, p_demux ) )
                 msg_Err( p_demux, "PATCallback failed attaching PMTCallback to program %d",
                          p_program->i_number );
+            pmtpid->u.p_pmt->p_ctx->pf_detach = dvbpsi_pmt_detach;
         }
 
         pmtpid->u.p_pmt->i_number = p_program->i_number;
@@ -2249,7 +2257,7 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
     /* Dummy PMT */
     ts_pmt_t *p_pmt = pmtpid->u.p_pmt;
     p_pmt->i_number   = i_number != 0 ? i_number : TS_USER_PMT_NUMBER;
-    if( !dvbpsi_pmt_attach( p_pmt->handle,
+    if( !dvbpsi_pmt_attach( p_pmt->p_ctx->p_handle,
                             ((i_number != TS_USER_PMT_NUMBER ? i_number : 1)),
                             PMTCallBack, p_demux ) )
     {
@@ -2350,13 +2358,42 @@ bool ts_psi_PAT_Attach( ts_pid_t *patpid, void *cbdata )
 {
     if( unlikely(patpid->type != TYPE_PAT || patpid->i_pid != TS_PSI_PAT_PID) )
         return false;
-    return dvbpsi_pat_attach( patpid->u.p_pat->handle, PATCallBack, cbdata );
+    patpid->u.p_pat->p_ctx->pf_detach = dvbpsi_pat_detach;
+    return dvbpsi_pat_attach( patpid->u.p_pat->p_ctx->p_handle, PATCallBack, cbdata );
 }
 
 void ts_psi_Packet_Push( ts_pid_t *p_pid, const uint8_t *p_pktbuffer )
 {
     if( p_pid->type == TYPE_PAT )
-        dvbpsi_packet_push( p_pid->u.p_pat->handle, (uint8_t *) p_pktbuffer );
+        dvbpsi_packet_push( p_pid->u.p_pat->p_ctx->p_handle, (uint8_t *) p_pktbuffer );
     else if( p_pid->type == TYPE_PMT )
-        dvbpsi_packet_push( p_pid->u.p_pmt->handle, (uint8_t *) p_pktbuffer );
+        dvbpsi_packet_push( p_pid->u.p_pmt->p_ctx->p_handle, (uint8_t *) p_pktbuffer );
+}
+
+void ts_psi_context_Delete( ts_psi_context_t *p_ctx )
+{
+    if( dvbpsi_decoder_present( p_ctx->p_handle ) )
+    {
+        assert( p_ctx->pf_detach );
+        p_ctx->pf_detach( p_ctx->p_handle );
+    }
+    dvbpsi_delete( p_ctx->p_handle );
+    free( p_ctx );
+}
+
+ts_psi_context_t * ts_psi_context_New( demux_t *p_demux )
+{
+    ts_psi_context_t *p_ctx = malloc(sizeof(*p_ctx));
+    if(likely(p_ctx))
+    {
+        p_ctx->p_handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
+        if( !p_ctx->p_handle )
+        {
+            free( p_ctx );
+            return NULL;
+        }
+        p_ctx->p_handle->p_sys = (void *) p_demux;
+        p_ctx->pf_detach = NULL;
+    }
+    return p_ctx;
 }

@@ -19,7 +19,7 @@
 #ifndef VLC_TS_STREAMS_PRIVATE_H
 #define VLC_TS_STREAMS_PRIVATE_H
 
-typedef struct dvbpsi_s dvbpsi_t;
+typedef struct ts_psi_context_t ts_psi_context_t;
 typedef struct ts_sections_processor_t ts_sections_processor_t;
 
 #include "mpeg4_iod.h"
@@ -31,17 +31,17 @@ typedef struct ts_sections_processor_t ts_sections_processor_t;
 
 struct ts_pat_t
 {
+    ts_psi_context_t *p_ctx;
     int             i_version;
     int             i_ts_id;
     bool            b_generated;
-    dvbpsi_t       *handle;
     DECL_ARRAY(ts_pid_t *) programs;
 
 };
 
 struct ts_pmt_t
 {
-    dvbpsi_t       *handle;
+    ts_psi_context_t *p_ctx;
     int             i_version;
     int             i_number;
     int             i_pid_pcr;

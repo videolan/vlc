@@ -26,17 +26,6 @@
 #include "ts_streams.h"
 #include "ts_streams_private.h"
 
-#ifndef _DVBPSI_DVBPSI_H_
- #include <dvbpsi/dvbpsi.h>
-#endif
-#ifndef _DVBPSI_DEMUX_H_
- #include <dvbpsi/demux.h>
-#endif
-#include <dvbpsi/descriptor.h>
-#include <dvbpsi/pat.h>
-#include <dvbpsi/pmt.h>
-#include "../../mux/mpeg/dvbpsi_compat.h" /* dvbpsi_messages */
-
 #include <vlc_demux.h>
 #include <vlc_es.h>
 #include <vlc_es_out.h>
@@ -45,17 +34,9 @@
 #include "ts_pid.h"
 #include "ts.h"
 
+#include "ts_psi.h"
 #include "ts_si.h"
 #include "ts_psip.h"
-
-static inline bool handle_Init( demux_t *p_demux, dvbpsi_t **handle )
-{
-    *handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
-    if( !*handle )
-        return false;
-    (*handle)->p_sys = (void *) p_demux;
-    return true;
-}
 
 ts_pat_t *ts_pat_New( demux_t *p_demux )
 {
@@ -63,7 +44,8 @@ ts_pat_t *ts_pat_New( demux_t *p_demux )
     if( !pat )
         return NULL;
 
-    if( !handle_Init( p_demux, &pat->handle ) )
+    pat->p_ctx = ts_psi_context_New( p_demux );
+    if( !pat->p_ctx )
     {
         free( pat );
         return NULL;
@@ -79,9 +61,7 @@ ts_pat_t *ts_pat_New( demux_t *p_demux )
 
 void ts_pat_Del( demux_t *p_demux, ts_pat_t *pat )
 {
-    if( dvbpsi_decoder_present( pat->handle ) )
-        dvbpsi_pat_detach( pat->handle );
-    dvbpsi_delete( pat->handle );
+    ts_psi_context_Delete( pat->p_ctx );
     for( int i=0; i<pat->programs.i_size; i++ )
         PIDRelease( p_demux, pat->programs.p_elems[i] );
     ARRAY_RESET( pat->programs );
@@ -106,7 +86,8 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     if( !pmt )
         return NULL;
 
-    if( !handle_Init( p_demux, &pmt->handle ) )
+    pmt->p_ctx = ts_psi_context_New( p_demux );
+    if( !pmt->p_ctx )
     {
         free( pmt );
         return NULL;
@@ -147,9 +128,7 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 
 void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
 {
-    if( dvbpsi_decoder_present( pmt->handle ) )
-        dvbpsi_pmt_detach( pmt->handle );
-    dvbpsi_delete( pmt->handle );
+    ts_psi_context_Delete( pmt->p_ctx );
     for( int i=0; i<pmt->e_streams.i_size; i++ )
         PIDRelease( p_demux, pmt->e_streams.p_elems[i] );
     ARRAY_RESET( pmt->e_streams );
