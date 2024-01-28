@@ -152,6 +152,10 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     assert(!(p_client->height & ~0xffff)); // fits in 16 bits
     uint16_t i_height = p_client->height;
 
+    if (p_client->format.bitsPerPixel == 8 &&
+            strstr(p_client->appData.encodingsString, "tight"))
+        p_client->format.bitsPerPixel = 16; // libvnc does not support tight at 8 bpp
+
     uint8_t i_bits_per_pixel = p_client->format.bitsPerPixel;
     assert((i_bits_per_pixel & 0x7) == 0); // multiple of 8
 
