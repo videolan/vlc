@@ -158,23 +158,32 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     switch( i_bits_per_pixel )
     {
         case 8:
-            i_chroma = VLC_CODEC_RGB233;
+            i_chroma = VLC_CODEC_BGR233;
             break;
-        default:
         case 16:
-            i_chroma = p_client->format.bigEndian ? VLC_CODEC_RGB565BE : VLC_CODEC_RGB565LE;
+            i_chroma = VLC_CODEC_RGB565LE;
             break;
         case 24:
-            i_chroma = VLC_CODEC_RGB24;
+            i_chroma = VLC_CODEC_BGR24;
             break;
+        default:
         case 32:
-            i_chroma = VLC_CODEC_XRGB;
+            i_chroma = VLC_CODEC_BGRX;
             break;
     }
 
+    p_client->format.bigEndian = 0; // we expect LE byte order regardless of native endianness
+
     switch( i_chroma )
     {
-        case VLC_CODEC_RGB565BE:
+        case VLC_CODEC_BGR233:
+            p_client->format.redShift   =  0;
+            p_client->format.greenShift =  3;
+            p_client->format.blueShift  =  6;
+            p_client->format.redMax     = 0x7;
+            p_client->format.greenMax   = 0x7;
+            p_client->format.blueMax    = 0x3;
+            break;
         case VLC_CODEC_RGB565LE:
             p_client->format.redShift   = 11;
             p_client->format.greenShift =  5;
@@ -183,8 +192,8 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
             p_client->format.greenMax   = 0x3f;
             p_client->format.blueMax    = 0x1f;
             break;
-        case VLC_CODEC_RGB24:
-        case VLC_CODEC_XRGB:
+        case VLC_CODEC_BGR24:
+        case VLC_CODEC_BGRX:
             p_client->format.redShift   = 16;
             p_client->format.greenShift =  8;
             p_client->format.blueShift  =  0;
