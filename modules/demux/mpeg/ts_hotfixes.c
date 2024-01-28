@@ -214,7 +214,7 @@ codecprobingend:
 static void BuildPATCallback( void *p_opaque, block_t *p_block )
 {
     ts_pid_t *pat_pid = (ts_pid_t *) p_opaque;
-    dvbpsi_packet_push( pat_pid->u.p_pat->handle, p_block->p_buffer );
+    ts_psi_Packet_Push( pat_pid, p_block->p_buffer );
     block_Release( p_block );
 }
 
@@ -224,8 +224,7 @@ static void BuildPMTCallback( void *p_opaque, block_t *p_block )
     assert(program_pid->type == TYPE_PMT);
     while( p_block )
     {
-        dvbpsi_packet_push( program_pid->u.p_pmt->handle,
-                            p_block->p_buffer );
+        ts_psi_Packet_Push( program_pid, p_block->p_buffer );
         block_t *p_next = p_block->p_next;
         block_Release( p_block );
         p_block = p_next;
@@ -304,7 +303,11 @@ void MissingPATPMTFixup( demux_t *p_demux )
         .b_discontinuity = false
     };
 
-    BuildPAT( GetPID(p_sys, 0)->u.p_pat->handle,
+    dvbpsi_t *handle = dvbpsi_new( NULL, DVBPSI_MSG_DEBUG );
+    if( !handle )
+        return;
+
+    BuildPAT( handle,
             &p_sys->pids.pat, BuildPATCallback,
             0, 1,
             &patstream,
@@ -313,6 +316,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
     /* PAT callback should have been triggered */
     if( p_program_pid->type != TYPE_PMT )
     {
+        dvbpsi_delete( handle );
         msg_Err( p_demux, "PAT creation failed" );
         return;
     }
@@ -359,7 +363,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
             j++;
         }
 
-        BuildPMT( GetPID(p_sys, 0)->u.p_pat->handle, VLC_OBJECT(p_demux),
+        BuildPMT( handle, VLC_OBJECT(p_demux),
                  mux_standard,
                 p_program_pid, BuildPMTCallback,
                 0, 1,
@@ -374,4 +378,6 @@ void MissingPATPMTFixup( demux_t *p_demux )
     }
     free(esstreams);
     free(mapped);
+
+    dvbpsi_delete( handle );
 }
