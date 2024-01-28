@@ -117,6 +117,10 @@ ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 else
 VPX_CONF += --extra-cflags="-mstackrealign"
+ifeq ($(ARCH),arm)
+# As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for Windows armv7
+VPX_CONF += --disable-runtime-cpu-detect
+endif
 endif
 ifdef HAVE_MACOSX
 VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
