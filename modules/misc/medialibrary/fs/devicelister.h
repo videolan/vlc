@@ -46,9 +46,9 @@ private:
      * Only used by the media library through the IDeviceLister interface, so
      * it's fine to keep those private for the implementation
      */
-    virtual void refresh() override;
-    virtual bool start( ml::IDeviceListerCb* cb ) override;
-    virtual void stop() override;
+    void refresh() override;
+    bool start( ml::IDeviceListerCb* cb ) override;
+    void stop() override;
 
     static void onChildrenReset( vlc_media_tree_t* tree, input_item_node_t* node,
                                  void* data );

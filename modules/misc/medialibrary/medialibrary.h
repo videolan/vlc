@@ -50,10 +50,10 @@ class EmbeddedThumbnail : public medialibrary::parser::IEmbeddedThumbnail
 public:
     EmbeddedThumbnail( input_attachment_t* a, vlc_fourcc_t fcc );
     virtual ~EmbeddedThumbnail();
-    virtual bool save(const std::string& path) override;
-    virtual size_t size() const override;
-    virtual std::string hash() const override;
-    virtual std::string extension() const override;
+    bool save(const std::string& path) override;
+    size_t size() const override;
+    std::string hash() const override;
+    std::string extension() const override;
 private:
     input_attachment_t* m_attachment;
     vlc_fourcc_t m_fcc;
@@ -91,13 +91,13 @@ public:
     // All methods are meant to be accessed through IParserService, not directly
     // hence they are all private
 private:
-    virtual medialibrary::parser::Status run( medialibrary::parser::IItem& item ) override;
-    virtual const char*name() const override;
-    virtual medialibrary::parser::Step targetedStep() const override;
-    virtual bool initialize( medialibrary::IMediaLibrary* ml ) override;
-    virtual void onFlushing() override;
-    virtual void onRestarted() override;
-    virtual void stop() override;
+    medialibrary::parser::Status run( medialibrary::parser::IItem& item ) override;
+    const char*name() const override;
+    medialibrary::parser::Step targetedStep() const override;
+    bool initialize( medialibrary::IMediaLibrary* ml ) override;
+    void onFlushing() override;
+    void onRestarted() override;
+    void stop() override;
 
     void onParserEnded( ParseContext& ctx, int status );
     void addSubtree( ParseContext& ctx, input_item_node_t *root );
@@ -133,10 +133,10 @@ class Thumbnailer : public medialibrary::IThumbnailer
     };
 public:
     Thumbnailer(vlc_medialibrary_module_t* ml);
-    virtual bool generate( const medialibrary::IMedia&, const std::string& mrl,
-                           uint32_t desiredWidth, uint32_t desiredHeight,
-                           float position, const std::string& dest ) override;
-    virtual void stop() override;
+    bool generate( const medialibrary::IMedia&, const std::string& mrl,
+                   uint32_t desiredWidth, uint32_t desiredHeight,
+                   float position, const std::string& dest ) override;
+    void stop() override;
 
 private:
     static void onThumbnailComplete( void* data, picture_t* thumbnail );
@@ -201,45 +201,45 @@ private:
 
     // IMediaLibraryCb interface
 public:
-    virtual void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;
-    virtual void onMediaModified(std::set<int64_t> media) override;
-    virtual void onMediaDeleted(std::set<int64_t> mediaIds) override;
-    virtual void onArtistsAdded(std::vector<medialibrary::ArtistPtr> artists) override;
-    virtual void onArtistsModified(std::set<int64_t> artists) override;
-    virtual void onArtistsDeleted(std::set<int64_t> artistsIds) override;
-    virtual void onAlbumsAdded(std::vector<medialibrary::AlbumPtr> albums) override;
-    virtual void onAlbumsModified(std::set<int64_t> albums) override;
-    virtual void onAlbumsDeleted(std::set<int64_t> albumsIds) override;
-    virtual void onPlaylistsAdded(std::vector<medialibrary::PlaylistPtr> playlists) override;
-    virtual void onPlaylistsModified(std::set<int64_t> playlists) override;
-    virtual void onPlaylistsDeleted(std::set<int64_t> playlistIds) override;
-    virtual void onGenresAdded(std::vector<medialibrary::GenrePtr> genres) override;
-    virtual void onGenresModified(std::set<int64_t> genres) override;
-    virtual void onGenresDeleted(std::set<int64_t> genreIds) override;
-    virtual void onMediaGroupsAdded( std::vector<medialibrary::MediaGroupPtr> mediaGroups ) override;
-    virtual void onMediaGroupsModified( std::set<int64_t> mediaGroupsIds ) override;
-    virtual void onMediaGroupsDeleted( std::set<int64_t> mediaGroupsIds ) override;
-    virtual void onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks ) override;
-    virtual void onBookmarksModified( std::set<int64_t> bookmarksIds ) override;
-    virtual void onBookmarksDeleted( std::set<int64_t> bookmarksIds ) override;
-    virtual void onFoldersAdded( std::vector<medialibrary::FolderPtr> folders ) override;
-    virtual void onFoldersModified( std::set<int64_t> foldersIds ) override;
-    virtual void onFoldersDeleted( std::set<int64_t> foldersIds ) override;
-    virtual void onDiscoveryStarted() override;
-    virtual void onDiscoveryProgress(const std::string& entryPoint) override;
-    virtual void onDiscoveryCompleted() override;
-    virtual void onDiscoveryFailed( const std::string& entryPoint ) override;
-    virtual void onEntryPointAdded(const std::string& entryPoint, bool success) override;
-    virtual void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
-    virtual void onEntryPointBanned(const std::string& entryPoint, bool success) override;
-    virtual void onEntryPointUnbanned(const std::string& entryPoint, bool success) override;
-    virtual void onParsingStatsUpdated(uint32_t done, uint32_t scheduled) override;
-    virtual void onBackgroundTasksIdleChanged(bool isIdle) override;
-    virtual void onMediaThumbnailReady(medialibrary::MediaPtr media,
-                                       medialibrary::ThumbnailSizeType sizeType,
-                                       bool success) override;
-    virtual void onHistoryChanged( medialibrary::HistoryType historyType ) override;
-    virtual void onRescanStarted() override;
+    void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;
+    void onMediaModified(std::set<int64_t> media) override;
+    void onMediaDeleted(std::set<int64_t> mediaIds) override;
+    void onArtistsAdded(std::vector<medialibrary::ArtistPtr> artists) override;
+    void onArtistsModified(std::set<int64_t> artists) override;
+    void onArtistsDeleted(std::set<int64_t> artistsIds) override;
+    void onAlbumsAdded(std::vector<medialibrary::AlbumPtr> albums) override;
+    void onAlbumsModified(std::set<int64_t> albums) override;
+    void onAlbumsDeleted(std::set<int64_t> albumsIds) override;
+    void onPlaylistsAdded(std::vector<medialibrary::PlaylistPtr> playlists) override;
+    void onPlaylistsModified(std::set<int64_t> playlists) override;
+    void onPlaylistsDeleted(std::set<int64_t> playlistIds) override;
+    void onGenresAdded(std::vector<medialibrary::GenrePtr> genres) override;
+    void onGenresModified(std::set<int64_t> genres) override;
+    void onGenresDeleted(std::set<int64_t> genreIds) override;
+    void onMediaGroupsAdded( std::vector<medialibrary::MediaGroupPtr> mediaGroups ) override;
+    void onMediaGroupsModified( std::set<int64_t> mediaGroupsIds ) override;
+    void onMediaGroupsDeleted( std::set<int64_t> mediaGroupsIds ) override;
+    void onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks ) override;
+    void onBookmarksModified( std::set<int64_t> bookmarksIds ) override;
+    void onBookmarksDeleted( std::set<int64_t> bookmarksIds ) override;
+    void onFoldersAdded( std::vector<medialibrary::FolderPtr> folders ) override;
+    void onFoldersModified( std::set<int64_t> foldersIds ) override;
+    void onFoldersDeleted( std::set<int64_t> foldersIds ) override;
+    void onDiscoveryStarted() override;
+    void onDiscoveryProgress(const std::string& entryPoint) override;
+    void onDiscoveryCompleted() override;
+    void onDiscoveryFailed( const std::string& entryPoint ) override;
+    void onEntryPointAdded(const std::string& entryPoint, bool success) override;
+    void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
+    void onEntryPointBanned(const std::string& entryPoint, bool success) override;
+    void onEntryPointUnbanned(const std::string& entryPoint, bool success) override;
+    void onParsingStatsUpdated(uint32_t done, uint32_t scheduled) override;
+    void onBackgroundTasksIdleChanged(bool isIdle) override;
+    void onMediaThumbnailReady(medialibrary::MediaPtr media,
+                               medialibrary::ThumbnailSizeType sizeType,
+                               bool success) override;
+    void onHistoryChanged( medialibrary::HistoryType historyType ) override;
+    void onRescanStarted() override;
 };
 
 bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output );

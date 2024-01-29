@@ -52,23 +52,23 @@ public:
     Logger( vlc_object_t* obj ) : m_obj( obj ) {}
 
 private:
-    virtual void Error( const std::string& msg ) override
+    void Error( const std::string& msg ) override
     {
         msg_Err( m_obj, "%s", msg.c_str() );
     }
-    virtual void Warning( const std::string& msg ) override
+    void Warning( const std::string& msg ) override
     {
         msg_Warn( m_obj, "%s", msg.c_str() );
     }
-    virtual void Info( const std::string& msg ) override
+    void Info( const std::string& msg ) override
     {
         msg_Dbg( m_obj, "%s", msg.c_str() );
     }
-    virtual void Debug( const std::string& msg ) override
+    void Debug( const std::string& msg ) override
     {
         msg_Dbg( m_obj, "%s", msg.c_str() );
     }
-    virtual void Verbose( const std::string& msg ) override
+    void Verbose( const std::string& msg ) override
     {
         msg_Dbg( m_obj, "%s", msg.c_str() );
     }
