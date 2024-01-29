@@ -152,23 +152,21 @@ static void Display(vout_display_t *vd, picture_t *pic)
 
 static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
 {
-    vout_display_place_t place;
     video_format_t src;
     vout_display_sys_t *sys = vd->sys;
     assert(sys->viewport == NULL);
 
-    vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
     video_format_ApplyRotation(&src, vd->source);
 
-    fmt->i_width  = src.i_width * place.width
+    fmt->i_width  = src.i_width * vd->place->width
                                 / src.i_visible_width;
-    fmt->i_height = src.i_height * place.height
+    fmt->i_height = src.i_height * vd->place->height
                                     / src.i_visible_height;
-    fmt->i_visible_width  = place.width;
-    fmt->i_visible_height = place.height;
-    fmt->i_x_offset = src.i_x_offset * place.width
+    fmt->i_visible_width  = vd->place->width;
+    fmt->i_visible_height = vd->place->height;
+    fmt->i_x_offset = src.i_x_offset * vd->place->width
                                         / src.i_visible_width;
-    fmt->i_y_offset = src.i_y_offset * place.height
+    fmt->i_y_offset = src.i_y_offset * vd->place->height
                                         / src.i_visible_height;
     return VLC_SUCCESS;
 }
@@ -181,11 +179,8 @@ static int UpdateViewport(vout_display_t *vd)
         return VLC_EGENERIC;
 
     video_format_t fmt;
-    vout_display_place_t place;
 
     video_format_ApplyRotation(&fmt, vd->source);
-    vout_display_PlacePicture(&place, vd->source,
-                              &vd->cfg->display);
 
     wp_viewport_set_source(sys->viewport,
                     wl_fixed_from_int(fmt.i_x_offset),
@@ -193,7 +188,7 @@ static int UpdateViewport(vout_display_t *vd)
                     wl_fixed_from_int(fmt.i_visible_width),
                     wl_fixed_from_int(fmt.i_visible_height));
     wp_viewport_set_destination(sys->viewport,
-                                place.width, place.height);
+                                vd->place->width, vd->place->height);
     return VLC_SUCCESS;
 }
 
