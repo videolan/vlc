@@ -173,6 +173,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     }
 
     p_client->format.bigEndian = 0; // we expect LE byte order regardless of native endianness
+    p_client->format.trueColour = 1; // we do not support color maps
 
     switch( i_chroma )
     {
