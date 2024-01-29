@@ -102,18 +102,15 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vlc_window_t *wnd = vd->cfg->window;
     const video_format_t *fmt = vd->fmt;
     picture_t *pic = sys->buffers[sys->front_buf];
-    vout_display_place_t place;
-
-    vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
     struct drm_mode_set_plane sp = {
         .plane_id = sys->plane_id,
         .crtc_id = wnd->handle.crtc,
         .fb_id = vlc_drm_dumb_get_fb_id(pic),
-        .crtc_x = place.x,
-        .crtc_y = place.y,
-        .crtc_w = place.width,
-        .crtc_h = place.height,
+        .crtc_x = vd->place->x,
+        .crtc_y = vd->place->y,
+        .crtc_w = vd->place->width,
+        .crtc_h = vd->place->height,
         /* Source values as U16.16 fixed point */
         .src_x = fmt->i_x_offset << 16,
         .src_y = fmt->i_y_offset << 16,
