@@ -7,7 +7,7 @@ Platform support changes:
      - macOS 10.11 or later
      - iOS 9 or later
      - Android 4.1.x or later (API-16)
-     - GCC 5.0 or Clang 3.4 (or equivalent)
+     - GCC 8.0 or Clang 8 (or equivalent)
  * Windows on ARM is now supported
  * Universal Windows is only supported for Windows 10 (not Windows 8 anymore)
 
