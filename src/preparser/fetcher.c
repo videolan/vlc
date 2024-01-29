@@ -364,10 +364,7 @@ out:
     vlc_interrupt_set(NULL);
 
     if( fetched )
-    {
-        var_SetAddress( fetcher->owner, "item-change", task->item );
         input_item_SetArtFetched( task->item, true );
-    }
     free( psz_arturl );
     NotifyArtFetchEnded(task, fetched);
     FetcherRemoveTask(fetcher, task);
