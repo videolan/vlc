@@ -61,8 +61,8 @@ public slots:
     friend class    Singleton<AboutDialog>;
 
 protected:
-    virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
-    virtual void showEvent ( QShowEvent * ) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
+    void showEvent ( QShowEvent * ) Q_DECL_OVERRIDE;
 
 private:
     bool b_advanced;

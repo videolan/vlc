@@ -117,7 +117,7 @@ Q_OBJECT
 public:
     virtual int getValue() const = 0;
     virtual int getType() const override;
-    virtual void doApply() override;
+    void doApply() override;
 protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {}
