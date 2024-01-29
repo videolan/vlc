@@ -93,6 +93,8 @@ static int subpicture_Control(vout_display_t *vd, int query)
     switch (query)
     {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        vlc_gl_Resize(sub->gl, vd->cfg->display.width, vd->cfg->display.height);
+        // fallthrough
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     {
@@ -101,7 +103,6 @@ static int subpicture_Control(vout_display_t *vd, int query)
         FlipVerticalAlign(&dp);
         vout_display_PlacePicture(&sub->place, vd->source, &dp);
         sub->place_changed = true;
-        vlc_gl_Resize(sub->gl, dp.width, dp.height);
         return VLC_SUCCESS;
     }
 
