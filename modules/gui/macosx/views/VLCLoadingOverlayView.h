@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLoadingOverlayView : NSVisualEffectView
 
+@property (readonly) NSProgressIndicator *indicator;
+
 @end
 
 NS_ASSUME_NONNULL_END

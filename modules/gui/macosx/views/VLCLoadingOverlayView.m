@@ -55,6 +55,16 @@
 {
     self.blendingMode = NSVisualEffectBlendingModeWithinWindow;
     self.material = NSVisualEffectMaterialPopover;
+
+    _indicator = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0, 0, 48, 48)];
+    self.indicator.translatesAutoresizingMaskIntoConstraints = NO;
+    self.indicator.indeterminate = YES;
+    self.indicator.style = NSProgressIndicatorStyleSpinning;
+    [self addSubview:self.indicator];
+    [self addConstraints:@[
+        [self.indicator.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+        [self.indicator.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+    ]];
 }
 
 @end
