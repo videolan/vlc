@@ -41,20 +41,20 @@ namespace hls
             public:
                 HLSRepresentation( BaseAdaptationSet * );
                 virtual ~HLSRepresentation ();
-                virtual StreamFormat getStreamFormat() const override;
+                StreamFormat getStreamFormat() const override;
 
                 void setPlaylistUrl(const std::string &);
                 Url getPlaylistUrl() const;
                 bool isLive() const;
                 bool initialized() const;
-                virtual void scheduleNextUpdate(uint64_t, bool) override;
-                virtual bool needsUpdate(uint64_t) const override;
-                virtual void debug(vlc_object_t *, int) const override;
-                virtual bool runLocalUpdates(SharedResources *) override;
-                virtual bool canNoLongerUpdate() const override;
+                void scheduleNextUpdate(uint64_t, bool) override;
+                bool needsUpdate(uint64_t) const override;
+                void debug(vlc_object_t *, int) const override;
+                bool runLocalUpdates(SharedResources *) override;
+                bool canNoLongerUpdate() const override;
 
-                virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
-                virtual CodecDescription * makeCodecDescription(const std::string &) const override;
+                uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
+                CodecDescription * makeCodecDescription(const std::string &) const override;
 
                 void setChannelsCount(unsigned);
 

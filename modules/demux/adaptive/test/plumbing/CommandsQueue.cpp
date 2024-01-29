@@ -42,15 +42,15 @@ class TestEsOut : public AbstractFakeEsOut
     public:
         TestEsOut() {}
         virtual ~TestEsOut() { cleanup(); }
-        virtual void milestoneReached() override {}
-        virtual void recycle(AbstractFakeESOutID *) override {}
-        virtual void createOrRecycleRealEsID(AbstractFakeESOutID *) override {}
-        virtual void setPriority(int) override {}
-        virtual void sendData(AbstractFakeESOutID *id, block_t *b) override
+        void milestoneReached() override {}
+        void recycle(AbstractFakeESOutID *) override {}
+        void createOrRecycleRealEsID(AbstractFakeESOutID *) override {}
+        void setPriority(int) override {}
+        void sendData(AbstractFakeESOutID *id, block_t *b) override
         {
             output.push_back(OutputVal(id, b));
         }
-        virtual void sendMeta(int, const vlc_meta_t *) override {}
+        void sendMeta(int, const vlc_meta_t *) override {}
 
         std::list<OutputVal> output;
         void cleanup()
@@ -63,11 +63,11 @@ class TestEsOut : public AbstractFakeEsOut
         }
 
     private:
-        virtual es_out_id_t *esOutAdd(const es_format_t *) override { return nullptr; }
-        virtual int esOutSend(es_out_id_t *, block_t *) override { return VLC_SUCCESS; }
-        virtual void esOutDel(es_out_id_t *) override {}
-        virtual int esOutControl(int, va_list) override { return VLC_SUCCESS; }
-        virtual void esOutDestroy() override {}
+        es_out_id_t *esOutAdd(const es_format_t *) override { return nullptr; }
+        int esOutSend(es_out_id_t *, block_t *) override { return VLC_SUCCESS; }
+        void esOutDel(es_out_id_t *) override {}
+        int esOutControl(int, va_list) override { return VLC_SUCCESS; }
+        void esOutDestroy() override {}
 };
 
 class TestEsOutID : public AbstractFakeESOutID
@@ -75,14 +75,14 @@ class TestEsOutID : public AbstractFakeESOutID
     public:
         TestEsOutID(TestEsOut *out) { this->out = out; }
         virtual ~TestEsOutID() {}
-        virtual es_out_id_t * realESID() const override { return nullptr; }
-        virtual void create() override {}
-        virtual void release() override {}
-        virtual void sendData(block_t *b) override
+        es_out_id_t * realESID() const override { return nullptr; }
+        void create() override {}
+        void release() override {}
+        void sendData(block_t *b) override
         {
             out->sendData(this, b);
         }
-        virtual EsType esType() const override { return EsType::Other; }
+        EsType esType() const override { return EsType::Other; }
 
     private:
         TestEsOut *out;

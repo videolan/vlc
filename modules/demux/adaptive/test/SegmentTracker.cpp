@@ -55,8 +55,8 @@ class DummyLogic : public AbstractAdaptationLogic
     public:
         DummyLogic() : AbstractAdaptationLogic(nullptr), repindex(0) {}
         virtual ~DummyLogic() = default;
-        virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *set,
-                                                          BaseRepresentation *) override
+        BaseRepresentation* getNextRepresentation(BaseAdaptationSet *set,
+                                                  BaseRepresentation *) override
         {
             if(set->getRepresentations().size() <= repindex)
                 return nullptr;
@@ -72,16 +72,16 @@ class DummyChunkSource : public AbstractChunkSource
                          const std::string &content)
             : AbstractChunkSource(t, range), data(v), offset(0), contentType(content) {}
         virtual ~DummyChunkSource() = default;
-        virtual void recycle() override { delete this; }
-        virtual std::string getContentType  () const override
+        void recycle() override { delete this; }
+        std::string getContentType  () const override
         {
             return contentType;
         }
-        virtual RequestStatus getRequestStatus() const override
+        RequestStatus getRequestStatus() const override
         {
             return data.size() ? RequestStatus::Success : RequestStatus::GenericError;
         }
-        virtual block_t *   readBlock       ()  override
+        block_t *   readBlock       ()  override
         {
             std::size_t remain = data.size() - offset;
             block_t *b = block_Alloc(remain);
@@ -90,7 +90,7 @@ class DummyChunkSource : public AbstractChunkSource
             offset += remain;
             return b;
         }
-        virtual block_t *   read            (size_t sz)  override
+        block_t *   read            (size_t sz)  override
         {
             std::size_t remain = data.size() - offset;
             if(remain < sz)
@@ -102,8 +102,8 @@ class DummyChunkSource : public AbstractChunkSource
             return b;
         }
 
-        virtual bool        hasMoreData     () const  override { return offset < data.size(); }
-        virtual size_t      getBytesRead    () const  override { return offset; }
+        bool        hasMoreData     () const  override { return offset < data.size(); }
+        size_t      getBytesRead    () const  override { return offset; }
 
     private:
         std::vector<uint8_t> data;
@@ -116,11 +116,11 @@ class DummyConnectionManager : public AbstractConnectionManager
     public:
         DummyConnectionManager() : AbstractConnectionManager(nullptr) {}
         virtual ~DummyConnectionManager() = default;
-        virtual void closeAllConnections () override {}
-        virtual AbstractConnection * getConnection(ConnectionParams &) override { return nullptr; }
-        virtual AbstractChunkSource *makeSource(const std::string &uri,
-                                                const ID &, ChunkType t,
-                                                const BytesRange &br) override
+        void closeAllConnections () override {}
+        AbstractConnection * getConnection(ConnectionParams &) override { return nullptr; }
+        AbstractChunkSource *makeSource(const std::string &uri,
+                                        const ID &, ChunkType t,
+                                        const BytesRange &br) override
         {
             DummyChunkSource *d;
             auto it = data.find(uri);
@@ -130,9 +130,9 @@ class DummyConnectionManager : public AbstractConnectionManager
                 d = new DummyChunkSource(t, br, it->second, uri);
             return d;
         }
-        virtual void recycleSource(AbstractChunkSource *) override {}
-        virtual void start(AbstractChunkSource *) override {}
-        virtual void cancel(AbstractChunkSource *) override {}
+        void recycleSource(AbstractChunkSource *) override {}
+        void start(AbstractChunkSource *) override {}
+        void cancel(AbstractChunkSource *) override {}
 
         std::map<std::string, std::vector<uint8_t>> data;
 };
@@ -147,7 +147,7 @@ class SegmentTrackerListener : public SegmentTrackerListenerInterface
             reset();
         }
         virtual ~SegmentTrackerListener() = default;
-        virtual void trackerEvent(const TrackerEvent &event) override
+        void trackerEvent(const TrackerEvent &event) override
         {
             switch(event.getType())
             {
@@ -242,7 +242,7 @@ class DummyRepresentation : public BaseRepresentation
     public:
         DummyRepresentation(BaseAdaptationSet *set) : BaseRepresentation(set) {}
         virtual ~DummyRepresentation() = default;
-        virtual StreamFormat getStreamFormat() const override { return StreamFormat::Type::Unknown; }
+        StreamFormat getStreamFormat() const override { return StreamFormat::Type::Unknown; }
 };
 
 class DummyHLSRepresentation : public HLSRepresentation
@@ -251,9 +251,9 @@ class DummyHLSRepresentation : public HLSRepresentation
         DummyHLSRepresentation(BaseAdaptationSet *set, time_t duration) :
             HLSRepresentation(set) { targetDuration = duration; }
         virtual ~DummyHLSRepresentation() = default;
-        virtual StreamFormat getStreamFormat() const override { return StreamFormat::Type::Unknown; }
-        virtual bool needsUpdate(uint64_t) const override { return false; }
-        virtual bool runLocalUpdates(SharedResources *) override { return false; }
+        StreamFormat getStreamFormat() const override { return StreamFormat::Type::Unknown; }
+        bool needsUpdate(uint64_t) const override { return false; }
+        bool runLocalUpdates(SharedResources *) override { return false; }
 };
 
 static BaseAdaptationSet *CreatePlaylistPeriodAdaptationSet()

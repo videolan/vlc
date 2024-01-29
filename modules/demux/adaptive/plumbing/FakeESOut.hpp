@@ -98,14 +98,14 @@ namespace adaptive
             vlc_tick_t applyTimestampContinuity(vlc_tick_t);
             void declareEs( const es_format_t * );
 
-            virtual void milestoneReached() override;
+            void milestoneReached() override;
 
             /* Used by FakeES ID */
-            virtual void recycle( AbstractFakeESOutID *id ) override;
-            virtual void createOrRecycleRealEsID( AbstractFakeESOutID * ) override;
-            virtual void setPriority(int) override;
-            virtual void sendData( AbstractFakeESOutID *, block_t * ) override;
-            virtual void sendMeta( int, const vlc_meta_t * ) override;
+            void recycle( AbstractFakeESOutID *id ) override;
+            void createOrRecycleRealEsID( AbstractFakeESOutID * ) override;
+            void setPriority(int) override;
+            void sendData( AbstractFakeESOutID *, block_t * ) override;
+            void sendMeta( int, const vlc_meta_t * ) override;
 
             /**/
             void scheduleNecessaryMilestone();
@@ -123,11 +123,11 @@ namespace adaptive
         private:
             friend class LockedFakeESOut;
             vlc_mutex_t lock;
-            virtual es_out_id_t *esOutAdd( const es_format_t * ) override;
-            virtual int esOutSend( es_out_id_t *, block_t * ) override;
-            virtual void esOutDel( es_out_id_t * ) override;
-            virtual int esOutControl( int, va_list ) override;
-            virtual void esOutDestroy() override;
+            es_out_id_t *esOutAdd( const es_format_t * ) override;
+            int esOutSend( es_out_id_t *, block_t * ) override;
+            void esOutDel( es_out_id_t * ) override;
+            int esOutControl( int, va_list ) override;
+            void esOutDestroy() override;
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;

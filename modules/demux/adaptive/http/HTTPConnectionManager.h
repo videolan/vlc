@@ -80,15 +80,15 @@ namespace adaptive
                 HTTPConnectionManager           (vlc_object_t *p_object);
                 virtual ~HTTPConnectionManager  ();
 
-                virtual void    closeAllConnections ()  override;
-                virtual AbstractConnection * getConnection(ConnectionParams &)  override;
-                virtual AbstractChunkSource *makeSource(const std::string &,
-                                                        const ID &, ChunkType,
-                                                        const BytesRange &) override;
-                virtual void recycleSource(AbstractChunkSource *) override;
+                void    closeAllConnections ()  override;
+                AbstractConnection * getConnection(ConnectionParams &)  override;
+                AbstractChunkSource *makeSource(const std::string &,
+                                                const ID &, ChunkType,
+                                                const BytesRange &) override;
+                void recycleSource(AbstractChunkSource *) override;
 
-                virtual void start(AbstractChunkSource *)  override;
-                virtual void cancel(AbstractChunkSource *)  override;
+                void start(AbstractChunkSource *)  override;
+                void cancel(AbstractChunkSource *)  override;
                 void         setLocalConnectionsAllowed();
                 void         addFactory(AbstractConnectionFactory *);
 

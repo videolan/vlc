@@ -69,11 +69,11 @@ namespace adaptive
             public:
                 DefaultBufferingLogic();
                 virtual ~DefaultBufferingLogic() {}
-                virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const override;
-                virtual vlc_tick_t getMinBuffering(const BasePlaylist *) const override;
-                virtual vlc_tick_t getMaxBuffering(const BasePlaylist *) const override;
-                virtual vlc_tick_t getLiveDelay(const BasePlaylist *) const override;
-                virtual vlc_tick_t getStableBuffering(const BasePlaylist *) const override;
+                uint64_t getStartSegmentNumber(BaseRepresentation *) const override;
+                vlc_tick_t getMinBuffering(const BasePlaylist *) const override;
+                vlc_tick_t getMaxBuffering(const BasePlaylist *) const override;
+                vlc_tick_t getLiveDelay(const BasePlaylist *) const override;
+                vlc_tick_t getStableBuffering(const BasePlaylist *) const override;
                 static const unsigned SAFETY_BUFFERING_EDGE_OFFSET;
                 static const unsigned SAFETY_EXPURGING_OFFSET;
 

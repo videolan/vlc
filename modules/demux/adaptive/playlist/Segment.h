@@ -95,11 +95,11 @@ namespace adaptive
             public:
                 Segment( ICanonicalUrl *parent );
                 ~Segment();
-                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *) override;
+                SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *) override;
                 virtual void setSourceUrl( const std::string &url );
-                virtual Url getUrlSegment() const override;
+                Url getUrlSegment() const override;
                 virtual const std::vector<Segment*> & subSegments() const;
-                virtual void debug(vlc_object_t *,int = 0) const override;
+                void debug(vlc_object_t *,int = 0) const override;
                 virtual void addSubSegment(SubSegment *);
 
             protected:

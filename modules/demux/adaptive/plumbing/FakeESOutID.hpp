@@ -54,12 +54,12 @@ namespace adaptive
             FakeESOutID( FakeESOut *, const es_format_t *, const SrcID & );
             virtual ~FakeESOutID();
             void setRealESID( es_out_id_t * );
-            virtual es_out_id_t * realESID() const override;
+            es_out_id_t * realESID() const override;
             const es_format_t *getFmt() const;
-            virtual void create() override;
-            virtual void release() override;
-            virtual void sendData(block_t *) override;
-            virtual EsType esType() const override;
+            void create() override;
+            void release() override;
+            void sendData(block_t *) override;
+            EsType esType() const override;
             bool isCompatible( const FakeESOutID * ) const;
             /* Ensure we won't issue delete command twice */
             void setScheduledForDeletion();

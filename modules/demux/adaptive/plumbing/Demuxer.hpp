@@ -65,10 +65,10 @@ namespace adaptive
         public:
             Demuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~Demuxer();
-            virtual Status demux(vlc_tick_t) override;
-            virtual void drain() override;
-            virtual bool create() override;
-            virtual void destroy() override;
+            Status demux(vlc_tick_t) override;
+            void drain() override;
+            bool create() override;
+            void destroy() override;
 
         protected:
             AbstractSourceStream *sourcestream;
@@ -84,8 +84,8 @@ namespace adaptive
         public:
             SlaveDemuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~SlaveDemuxer();
-            virtual bool create() override;
-            virtual Status demux(vlc_tick_t) override;
+            bool create() override;
+            Status demux(vlc_tick_t) override;
 
         private:
             vlc_tick_t length;

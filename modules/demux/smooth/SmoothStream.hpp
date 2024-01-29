@@ -32,14 +32,14 @@ namespace smooth
             SmoothStream(demux_t *);
 
         protected:
-            virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                               es_out_t *, AbstractSourceStream *) const override;
+            AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
+                                       es_out_t *, AbstractSourceStream *) const override;
     };
 
     class SmoothStreamFactory : public AbstractStreamFactory
     {
         public:
-            virtual AbstractStream *create(demux_t*, const StreamFormat &,
+            AbstractStream *create(demux_t*, const StreamFormat &,
                                    SegmentTracker *) const override;
     };
 

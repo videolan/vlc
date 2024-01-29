@@ -51,12 +51,12 @@ class TestPlaylist : public BasePlaylist
 
         virtual ~TestPlaylist() {}
 
-        virtual bool isLive() const override
+        bool isLive() const override
         {
             return b_live;
         }
 
-        virtual bool isLowLatency() const override
+        bool isLowLatency() const override
         {
             return b_lowlatency;
         }

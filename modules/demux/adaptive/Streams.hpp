@@ -104,19 +104,19 @@ namespace adaptive
         bool runUpdates(bool = false);
 
         /* Used by demuxers fake streams */
-        virtual block_t *readNextBlock() override;
+        block_t *readNextBlock() override;
 
         /**/
-        virtual void fillExtraFMTInfo( es_format_t * ) const  override;
-        virtual void trackerEvent(const TrackerEvent &)  override;
+        void fillExtraFMTInfo( es_format_t * ) const  override;
+        void trackerEvent(const TrackerEvent &)  override;
 
     protected:
         bool seekAble() const;
         void setDisabled(bool);
         virtual block_t *checkBlock(block_t *, bool);
         AbstractDemuxer * createDemux(const StreamFormat &);
-        virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                           es_out_t *, AbstractSourceStream *) const  override;
+        AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
+                                   es_out_t *, AbstractSourceStream *) const  override;
         virtual bool startDemux();
         virtual bool restartDemux();
 

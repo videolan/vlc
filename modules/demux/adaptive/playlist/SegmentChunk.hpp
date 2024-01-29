@@ -51,7 +51,7 @@ namespace adaptive
 
         protected:
             bool         decrypt(block_t **);
-            virtual void onDownload(block_t **) override;
+            void onDownload(block_t **) override;
             BaseRepresentation *rep;
             StreamFormat format;
             CommonEncryptionSession *encryptionSession;

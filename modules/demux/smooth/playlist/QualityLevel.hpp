@@ -54,18 +54,18 @@ namespace smooth
                 QualityLevel(BaseAdaptationSet *);
                 virtual ~QualityLevel ();
 
-                virtual InitSegment * getInitSegment() const override;
-                virtual StreamFormat getStreamFormat() const override;
+                InitSegment * getInitSegment() const override;
+                StreamFormat getStreamFormat() const override;
 
                 /* for segment templates */
-                virtual std::string contextualize(size_t, const std::string &,
-                                                  const SegmentTemplate *) const override;
+                std::string contextualize(size_t, const std::string &,
+                                          const SegmentTemplate *) const override;
 
                 void setCodecParameters( const CodecParameters & );
                 const CodecParameters & getCodecParameters() const;
 
             protected:
-                virtual CodecDescription * makeCodecDescription(const std::string &) const override;
+                CodecDescription * makeCodecDescription(const std::string &) const override;
                 CodecParameters codecParameters;
         };
     }

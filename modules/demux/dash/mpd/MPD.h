@@ -47,10 +47,10 @@ namespace dash
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
-                virtual bool                    isLive() const override;
-                virtual bool                    isLowLatency() const override;
+                bool                            isLive() const override;
+                bool                            isLowLatency() const override;
                 void                            setLowLatency(bool);
-                virtual void                    debug() const override;
+                void                            debug() const override;
 
                 Property<ProgramInformation *>      programInfo;
 

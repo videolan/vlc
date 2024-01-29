@@ -99,7 +99,7 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
             if(http_mgr)
                 vlc_http_mgr_destroy(http_mgr);
         }
-        virtual block_t *readNextBlock() override
+        block_t *readNextBlock() override
         {
             if(http_res == nullptr)
                 return nullptr;

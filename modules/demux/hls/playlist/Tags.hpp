@@ -121,7 +121,7 @@ namespace hls
                 virtual ~ValuesListTag();
 
             protected:
-                virtual void parseAttributes(const std::string &) override;
+                void parseAttributes(const std::string &) override;
         };
 
         class TagFactory

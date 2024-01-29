@@ -51,14 +51,14 @@ namespace dash
                          logic::AbstractAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();
 
-            virtual bool needsUpdate() const override;
-            virtual bool updatePlaylist() override;
-            virtual void scheduleNextUpdate() override;
+            bool needsUpdate() const override;
+            bool updatePlaylist() override;
+            void scheduleNextUpdate() override;
             static bool isDASH(xml::Node *);
             static bool mimeMatched(const std::string &);
 
         protected:
-            virtual int doControl(int, va_list) override;
+            int doControl(int, va_list) override;
     };
 
 }

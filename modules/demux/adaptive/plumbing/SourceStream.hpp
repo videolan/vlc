@@ -41,8 +41,8 @@ namespace adaptive
         public:
             AbstractChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~AbstractChunksSourceStream();
-            virtual void Reset() override;
-            virtual stream_t *makeStream() override;
+            void Reset() override;
+            stream_t *makeStream() override;
 
         protected:
             virtual ssize_t Read(uint8_t *, size_t) = 0;
@@ -63,12 +63,12 @@ namespace adaptive
         public:
             ChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~ChunksSourceStream();
-            virtual void Reset() override;
+            void Reset() override;
 
         protected:
-            virtual ssize_t Read(uint8_t *, size_t) override;
-            virtual int     Seek(uint64_t) override;
-            virtual size_t  Peek(const uint8_t **, size_t) override;
+            ssize_t Read(uint8_t *, size_t) override;
+            int     Seek(uint64_t) override;
+            size_t  Peek(const uint8_t **, size_t) override;
 
         private:
             block_t *p_block;
@@ -79,12 +79,12 @@ namespace adaptive
         public:
             BufferedChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~BufferedChunksSourceStream();
-            virtual void Reset() override;
+            void Reset() override;
 
         protected:
-            virtual ssize_t Read(uint8_t *, size_t) override;
-            virtual int     Seek(uint64_t) override;
-            virtual size_t  Peek(const uint8_t **, size_t) override;
+            ssize_t Read(uint8_t *, size_t) override;
+            int     Seek(uint64_t) override;
+            size_t  Peek(const uint8_t **, size_t) override;
 
         private:
             ssize_t doRead(uint8_t *, size_t);

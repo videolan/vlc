@@ -77,11 +77,11 @@ namespace adaptive
             public:
                LibVLCHTTPConnection(vlc_object_t *, AuthStorage *);
                virtual ~LibVLCHTTPConnection();
-               virtual bool    canReuse     (const ConnectionParams &) const override;
-               virtual RequestStatus request(const std::string& path,
-                                             const BytesRange & = BytesRange()) override;
-               virtual ssize_t read         (void *p_buffer, size_t len) override;
-               virtual void    setUsed      ( bool ) override;
+               bool    canReuse     (const ConnectionParams &) const override;
+               RequestStatus request(const std::string& path,
+                                     const BytesRange & = BytesRange()) override;
+               ssize_t read         (void *p_buffer, size_t len) override;
+               void    setUsed      ( bool ) override;
 
             private:
                void reset();
@@ -98,13 +98,13 @@ namespace adaptive
                 StreamUrlConnection(vlc_object_t *);
                 virtual ~StreamUrlConnection();
 
-                virtual bool    canReuse     (const ConnectionParams &) const override;
+                bool    canReuse     (const ConnectionParams &) const override;
 
-                virtual RequestStatus request(const std::string& path,
-                                              const BytesRange & = BytesRange()) override;
-                virtual ssize_t read        (void *p_buffer, size_t len) override;
+                RequestStatus request(const std::string& path,
+                                      const BytesRange & = BytesRange()) override;
+                ssize_t read        (void *p_buffer, size_t len) override;
 
-                virtual void    setUsed( bool ) override;
+                void    setUsed( bool ) override;
 
             protected:
                 void reset();
@@ -124,7 +124,7 @@ namespace adaptive
            public:
                LibVLCHTTPConnectionFactory( AuthStorage * );
                virtual ~LibVLCHTTPConnectionFactory() = default;
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
+               AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
            private:
                AuthStorage *authStorage;
        };
@@ -134,7 +134,7 @@ namespace adaptive
            public:
                StreamUrlConnectionFactory();
                virtual ~StreamUrlConnectionFactory() {}
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
+               AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
        };
     }
 }

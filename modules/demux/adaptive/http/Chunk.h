@@ -76,8 +76,8 @@ namespace adaptive
                 const BytesRange &  getBytesRange   () const;
                 ChunkType           getChunkType    () const;
                 const StorageID &   getStorageID    () const;
-                virtual std::string getContentType  () const override;
-                virtual RequestStatus getRequestStatus() const override;
+                std::string getContentType  () const override;
+                RequestStatus getRequestStatus() const override;
                 virtual void        recycle() = 0;
 
             protected:
@@ -95,14 +95,14 @@ namespace adaptive
             public:
                 virtual ~AbstractChunk();
 
-                virtual std::string   getContentType        () const override;
-                virtual RequestStatus getRequestStatus      () const override;
-                virtual size_t        getBytesRead          () const override;
-                virtual bool          hasMoreData           () const override;
+                std::string   getContentType        () const override;
+                RequestStatus getRequestStatus      () const override;
+                size_t        getBytesRead          () const override;
+                bool          hasMoreData           () const override;
                 uint64_t              getStartByteInFile    () const;
 
-                virtual block_t *   readBlock       () override;
-                virtual block_t *   read            (size_t) override;
+                block_t *   readBlock       () override;
+                block_t *   read            (size_t) override;
 
             protected:
                 AbstractChunk(AbstractChunkSource *);
@@ -122,12 +122,12 @@ namespace adaptive
             public:
                 virtual ~HTTPChunkSource();
 
-                virtual block_t *   readBlock       ()  override;
-                virtual block_t *   read            (size_t)  override;
-                virtual bool        hasMoreData     () const  override;
-                virtual size_t      getBytesRead    () const  override;
-                virtual std::string getContentType  () const  override;
-                virtual void        recycle() override;
+                block_t *   readBlock       ()  override;
+                block_t *   read            (size_t)  override;
+                bool        hasMoreData     () const  override;
+                size_t      getBytesRead    () const  override;
+                std::string getContentType  () const  override;
+                void        recycle() override;
 
                 static const size_t CHUNK_SIZE = 32768;
                 static StorageID makeStorageID(const std::string &, const BytesRange &);
@@ -162,10 +162,10 @@ namespace adaptive
 
             public:
                 virtual ~HTTPChunkBufferedSource();
-                virtual block_t *  readBlock       ()  override;
-                virtual block_t *  read            (size_t)  override;
-                virtual bool       hasMoreData     () const  override;
-                virtual void        recycle() override;
+                block_t *  readBlock       ()  override;
+                block_t *  read            (size_t)  override;
+                bool       hasMoreData     () const  override;
+                void        recycle() override;
 
             protected:
                 HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
@@ -196,7 +196,7 @@ namespace adaptive
                 virtual ~HTTPChunk();
 
             protected:
-                virtual void        onDownload      (block_t **)  override {}
+                void        onDownload      (block_t **)  override {}
         };
 
         class ProbeableChunk : public ChunkInterface
@@ -205,13 +205,13 @@ namespace adaptive
                 ProbeableChunk(ChunkInterface *);
                 virtual ~ProbeableChunk();
 
-                virtual std::string getContentType  () const override;
-                virtual RequestStatus getRequestStatus() const override;
+                std::string getContentType  () const override;
+                RequestStatus getRequestStatus() const override;
 
-                virtual block_t *   readBlock       () override;
-                virtual block_t *   read            (size_t) override;
-                virtual bool        hasMoreData     () const override;
-                virtual size_t      getBytesRead    () const override;
+                block_t *   readBlock       () override;
+                block_t *   read            (size_t) override;
+                bool        hasMoreData     () const override;
+                size_t      getBytesRead    () const override;
 
                 size_t peek(const uint8_t **);
 

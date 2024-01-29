@@ -33,11 +33,11 @@ namespace hls
             virtual ~HLSStream();
 
         protected:
-            virtual block_t *checkBlock(block_t *, bool) override;
-            virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                               es_out_t *, AbstractSourceStream *) const override;
-            virtual bool setPosition(const StreamPosition &, bool) override;
-            virtual void trackerEvent(const TrackerEvent &)  override;
+            block_t *checkBlock(block_t *, bool) override;
+            AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
+                                       es_out_t *, AbstractSourceStream *) const override;
+            bool setPosition(const StreamPosition &, bool) override;
+            void trackerEvent(const TrackerEvent &)  override;
 
         private:
             static int ID3TAG_Parse_Handler(uint32_t, const uint8_t *, size_t, void *);
@@ -53,7 +53,7 @@ namespace hls
     class HLSStreamFactory : public AbstractStreamFactory
     {
         public:
-            virtual AbstractStream *create(demux_t *, const StreamFormat &,
+            AbstractStream *create(demux_t *, const StreamFormat &,
                                    SegmentTracker *) const override;
     };
 

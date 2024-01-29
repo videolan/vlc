@@ -34,11 +34,11 @@ namespace smooth
                 MemoryChunkSource(ChunkType, block_t *);
                 virtual ~MemoryChunkSource();
 
-                virtual block_t * readBlock() override;
-                virtual block_t * read(size_t) override;
-                virtual bool      hasMoreData() const override;
-                virtual size_t    getBytesRead() const  override;
-                virtual void      recycle() override;
+                block_t * readBlock() override;
+                block_t * read(size_t) override;
+                bool      hasMoreData() const override;
+                size_t    getBytesRead() const  override;
+                void      recycle() override;
 
             private:
                 block_t *data;

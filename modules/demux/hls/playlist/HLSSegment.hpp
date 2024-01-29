@@ -40,8 +40,8 @@ namespace hls
                 virtual ~HLSSegment();
 
             protected:
-                virtual bool prepareChunk(SharedResources *, SegmentChunk *,
-                                          BaseRepresentation *) override;
+                bool prepareChunk(SharedResources *, SegmentChunk *,
+                                  BaseRepresentation *) override;
         };
     }
 }

@@ -63,7 +63,7 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual ~EsOutSendCommand();
-            virtual void Execute( ) override;
+            void Execute() override;
 
         protected:
             EsOutSendCommand( AbstractFakeESOutID *, const SegmentTimes &, block_t * );
@@ -74,7 +74,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutDelCommand( AbstractFakeESOutID * );
@@ -85,7 +85,7 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual ~EsOutAddCommand();
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutAddCommand( AbstractFakeESOutID * );
@@ -95,7 +95,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutControlPCRCommand( int, const SegmentTimes &, vlc_tick_t );
@@ -106,7 +106,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutDestroyCommand();
@@ -116,7 +116,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutControlResetPCRCommand();
@@ -126,7 +126,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutMetaCommand( AbstractFakeEsOut *, int, vlc_meta_t * );
@@ -140,7 +140,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutMilestoneCommand( AbstractFakeEsOut * );
@@ -151,7 +151,7 @@ namespace adaptive
     {
          friend class CommandsFactory;
         public:
-            virtual void Execute() override;
+            void Execute() override;
 
         protected:
             EsOutMediaProgressCommand( const SegmentTimes & );
@@ -212,17 +212,17 @@ namespace adaptive
         public:
             CommandsQueue();
             virtual ~CommandsQueue();
-            virtual void Schedule( AbstractCommand *, EsType = EsType::Other ) override;
-            virtual Times Process( Times ) override;
-            virtual void Abort( bool b_reset ) override;
-            virtual void Commit() override;
-            virtual bool isEmpty() const override;
-            virtual void setDraining() override;
-            virtual Times getDemuxedAmount(Times) const override;
-            virtual Times getDemuxedMediaAmount(const Times &) const override;
-            virtual Times getBufferingLevel() const override;
-            virtual Times getFirstTimes() const override;
-            virtual Times getPCR() const override;
+            void Schedule( AbstractCommand *, EsType = EsType::Other ) override;
+            Times Process( Times ) override;
+            void Abort( bool b_reset ) override;
+            void Commit() override;
+            bool isEmpty() const override;
+            void setDraining() override;
+            Times getDemuxedAmount(Times) const override;
+            Times getDemuxedMediaAmount(const Times &) const override;
+            Times getBufferingLevel() const override;
+            Times getFirstTimes() const override;
+            Times getPCR() const override;
 
         private:
             void LockedCommit();
