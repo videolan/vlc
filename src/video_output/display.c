@@ -775,6 +775,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
         vlc_objres_clear(VLC_OBJECT(vd));
         video_format_Clean(&osys->display_fmt);
+        osys->display.info = (vout_display_info_t){};
     }
 
     msg_Dbg(vd, "no %s modules matched with name %s", "vout display", module);
