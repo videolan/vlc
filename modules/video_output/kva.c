@@ -409,11 +409,8 @@ static int Control( vout_display_t *vd, int query )
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {
-        vout_display_place_t place;
-        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
-
-        sys->kvas.ulAspectWidth  = place.width;
-        sys->kvas.ulAspectHeight = place.height;
+        sys->kvas.ulAspectWidth  = vd->place->width;
+        sys->kvas.ulAspectHeight = vd->place->height;
         kvaSetup( &sys->kvas );
         return VLC_SUCCESS;
     }
