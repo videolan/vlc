@@ -67,6 +67,7 @@ struct ts_psi_context_t
 {
     dvbpsi_t *p_handle;
     void (*pf_detach)(dvbpsi_t *);
+    en50221_capmt_info_t *p_capmt;
 };
 
 static void PIDFillFormat( demux_t *, ts_stream_t *p_pes, int i_stream_type, ts_transport_type_t * );
@@ -2100,11 +2101,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     /* Set CAM descrambling */
     if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
     {
-        en50221_capmt_info_t *p_en = CreateCAPMTInfo( p_dvbpsipmt );
-        if( p_en )
+        if( p_pmt->p_ctx->p_capmt )
         {
             if( vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
-                                    (void *)p_en ) != VLC_SUCCESS )
+                                    (void *)p_pmt->p_ctx->p_capmt ) != VLC_SUCCESS )
             {
                 if ( p_sys->standard == TS_STANDARD_ARIB && p_sys->stream == p_demux->s )
                 {
@@ -2120,7 +2120,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                     }
                 }
             }
-            en50221_capmt_Delete( p_en );
         }
     }
 
@@ -2212,6 +2211,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         msg_Warn( p_demux, "PCR not trusted for program %d, set up workaround using pid %d",
                   p_pmt->i_number, i_cand );
     }
+
+    if( p_pmt->p_ctx->p_capmt )
+        en50221_capmt_Delete( p_pmt->p_ctx->p_capmt );
+    p_pmt->p_ctx->p_capmt = CreateCAPMTInfo( p_dvbpsipmt );
 
     UpdatePESFilters( p_demux, p_sys->seltype == PROGRAM_ALL );
 
@@ -2376,6 +2379,8 @@ void ts_psi_context_Delete( ts_psi_context_t *p_ctx )
         assert( p_ctx->pf_detach );
         p_ctx->pf_detach( p_ctx->p_handle );
     }
+    if( p_ctx->p_capmt )
+        en50221_capmt_Delete( p_ctx->p_capmt );
     dvbpsi_delete( p_ctx->p_handle );
     free( p_ctx );
 }
@@ -2393,6 +2398,7 @@ ts_psi_context_t * ts_psi_context_New( demux_t *p_demux )
         }
         p_ctx->p_handle->p_sys = (void *) p_demux;
         p_ctx->pf_detach = NULL;
+        p_ctx->p_capmt = NULL;
     }
     return p_ctx;
 }
