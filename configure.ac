@@ -40,7 +40,7 @@ dnl Check for tools
 dnl
 AC_PROG_CC
 AC_USE_SYSTEM_EXTENSIONS
-VLC_PROG_CC_C11
+VLC_PROG_CC_C17
 AH_VERBATIM([FORTIFY_SOURCE],
   [/* Enable compile-time and run-time bounds-checking, and some warnings,
    without upsetting glibc 2.15+ or toolchains predefining _FORTIFY_SOURCE */

@@ -1,6 +1,6 @@
 project('VLC', ['c', 'cpp'],
     version: '4.0.0-dev',
-    default_options: ['c_std=gnu11', 'cpp_std=c++17'],
+    default_options: ['c_std=gnu17', 'cpp_std=c++17'],
     meson_version: '>=0.60.0')
 
 vlc_copyright_years = '1996-2018'
