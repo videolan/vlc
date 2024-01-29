@@ -577,7 +577,7 @@ static int Control (stream_t *access, int query, va_list args)
 
         case STREAM_SET_PRIVATE_ID_CA:
         {
-            en50221_capmt_info_t *pmt = va_arg(args, void *);
+            const en50221_capmt_info_t *pmt = va_arg(args, void *);
 
             if( !dvb_set_ca_pmt (dev, pmt) )
                 return VLC_EGENERIC;

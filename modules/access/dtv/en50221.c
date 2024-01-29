@@ -2179,10 +2179,11 @@ void en50221_Poll( cam_t * p_cam )
 /*****************************************************************************
  * en50221_SetCAPMT :
  *****************************************************************************/
-int en50221_SetCAPMT( cam_t * p_cam, en50221_capmt_info_t *p_info )
+int en50221_SetCAPMT( cam_t * p_cam, const en50221_capmt_info_t *p_info )
 {
     bool b_update = false;
     bool b_needs_descrambling = CAPMTNeedsDescrambling( p_info );
+    en50221_capmt_info_t *p_oldinfo = NULL;
 
     for ( unsigned i = 0; i < MAX_PROGRAMS; i++ )
     {
@@ -2192,34 +2193,37 @@ int en50221_SetCAPMT( cam_t * p_cam, en50221_capmt_info_t *p_info )
         {
             b_update = true;
 
+            /* Existing scrambled program went clear now */
             if ( !b_needs_descrambling )
             {
-                en50221_capmt_Delete( p_info );
-                p_info = p_cam->pp_selected_programs[i];
+                p_oldinfo = p_cam->pp_selected_programs[i];
                 p_cam->pp_selected_programs[i] = NULL;
             }
+            /* Existing scrambled program has been updated */
             else if( p_info != p_cam->pp_selected_programs[i] )
             {
                 en50221_capmt_Delete( p_cam->pp_selected_programs[i] );
-                p_cam->pp_selected_programs[i] = p_info;
+                p_cam->pp_selected_programs[i] = en50221_capmt_Duplicate( p_info );
             }
 
             break;
         }
     }
 
+    /* New selection of scrambled program */
     if ( !b_update && b_needs_descrambling )
     {
         for ( unsigned i = 0; i < MAX_PROGRAMS; i++ )
         {
             if ( p_cam->pp_selected_programs[i] == NULL )
             {
-                p_cam->pp_selected_programs[i] = p_info;
+                p_cam->pp_selected_programs[i] = en50221_capmt_Duplicate( p_info );
                 break;
             }
         }
     }
 
+    /* Serialization of CAPMT commands to CI */
     if ( b_update || b_needs_descrambling )
     {
         for ( unsigned i = 1; i <= MAX_SESSIONS; i++ )
@@ -2230,17 +2234,15 @@ int en50221_SetCAPMT( cam_t * p_cam, en50221_capmt_info_t *p_info )
                 if ( b_update && b_needs_descrambling )
                     CAPMTUpdate( p_cam, i, p_info );
                 else if ( b_update )
-                    CAPMTDelete( p_cam, i, p_info );
+                    CAPMTDelete( p_cam, i, p_oldinfo );
                 else
                     CAPMTAdd( p_cam, i, p_info );
             }
         }
     }
 
-    if ( !b_needs_descrambling )
-    {
-        en50221_capmt_Delete( p_info );
-    }
+    if( p_oldinfo )
+        en50221_capmt_Delete( p_oldinfo );
 
     return VLC_SUCCESS;
 }

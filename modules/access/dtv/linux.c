@@ -632,7 +632,7 @@ float dvb_get_snr (dvb_device_t *d)
     return snr / 65535.;
 }
 
-bool dvb_set_ca_pmt (dvb_device_t *d, en50221_capmt_info_t *p_capmtinfo)
+bool dvb_set_ca_pmt (dvb_device_t *d, const en50221_capmt_info_t *p_capmtinfo)
 {
     if (d->cam != NULL)
     {

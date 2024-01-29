@@ -2103,11 +2103,9 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         en50221_capmt_info_t *p_en = CreateCAPMTInfo( p_dvbpsipmt );
         if( p_en )
         {
-            /* DTV/CAM takes ownership of en50221_capmt_info_t on success */
             if( vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
                                     (void *)p_en ) != VLC_SUCCESS )
             {
-                en50221_capmt_Delete( p_en );
                 if ( p_sys->standard == TS_STANDARD_ARIB && p_sys->stream == p_demux->s )
                 {
                     stream_t *wrapper = ts_stream_wrapper_New( p_demux->s );
@@ -2122,6 +2120,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                     }
                 }
             }
+            en50221_capmt_Delete( p_en );
         }
     }
 

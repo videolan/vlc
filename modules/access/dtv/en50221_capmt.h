@@ -110,4 +110,40 @@ static inline en50221_capmt_info_t * en50221_capmt_New( uint8_t i_version, uint1
     return p_en;
 }
 
+static inline en50221_capmt_info_t * en50221_capmt_Duplicate( const en50221_capmt_info_t *p_src )
+{
+    en50221_capmt_info_t *p_en = en50221_capmt_New( p_src->i_version, p_src->i_program_number );
+    if( !p_en )
+        return NULL;
+    p_en->p_program_descriptors = calloc( p_src->i_program_descriptors, sizeof(uint8_t) );
+    if( !p_en->p_program_descriptors )
+        goto error;
+    memcpy( p_en->p_program_descriptors, p_src->p_program_descriptors, p_src->i_program_descriptors );
+    p_en->i_program_descriptors = p_src->i_program_descriptors;
+
+    p_en->p_es = calloc( p_src->i_es_count, sizeof(en50221_capmt_es_info_t) );
+    if( !p_en->p_es )
+        goto error;
+    memcpy( p_en->p_es, p_src->p_es, p_src->i_es_count );
+    p_en->i_es_count = p_src->i_es_count;
+
+    for( size_t i=0; i<p_en->i_es_count; i++ )
+    {
+        p_en->p_es[i].p_descriptors = malloc( p_src->p_es[i].i_descriptors );
+        if( !p_en->p_es[i].p_descriptors )
+        {
+            p_en->p_es[i].i_descriptors = 0;
+            continue;
+        }
+        memcpy( p_en->p_es[i].p_descriptors, p_src->p_es[i].p_descriptors, p_src->p_es[i].i_descriptors );
+        p_en->p_es[i].i_descriptors = p_src->p_es[i].i_descriptors;
+    }
+
+    return p_en;
+
+error:
+    en50221_capmt_Delete( p_en );
+    return NULL;
+}
+
 #endif

@@ -215,7 +215,7 @@ int dvb_fill_device_caps( dvb_device_t *, dvb_device_caps_t * )
     return -1;
 }
 
-bool dvb_set_ca_pmt (dvb_device_t *, en50221_capmt_info_t *)
+bool dvb_set_ca_pmt (dvb_device_t *, const en50221_capmt_info_t *)
 {
     return false;
 }
