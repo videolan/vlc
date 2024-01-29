@@ -300,7 +300,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     struct vout_display_placement dp = vd->cfg->display;
     dp.width = frame.fbo->params.w;
     dp.height = frame.fbo->params.h;
-    if (need_vflip) {
+    if (!need_vflip)
+        vout_display_PlacePicture(&place, vd->fmt, &dp);
+    else
+    {
         switch (dp.align.vertical) {
         case VLC_VIDEO_ALIGN_TOP:
             dp.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
@@ -311,9 +314,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         default:
             break;
         }
-    }
-    vout_display_PlacePicture(&place, vd->fmt, &dp);
-    if (need_vflip) {
+        vout_display_PlacePicture(&place, vd->fmt, &dp);
         place.y = frame.fbo->params.h - place.y;
         place.height = -place.height;
     }
