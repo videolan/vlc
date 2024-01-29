@@ -612,6 +612,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:_loadingOverlayView];
     self.libraryTargetView.subviews = views;
     [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+    [_loadingOverlayView.indicator startAnimation:self];
 }
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
@@ -625,6 +626,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
     [views removeObject:_loadingOverlayView];
     self.libraryTargetView.subviews = views.copy;
+    [_loadingOverlayView.indicator stopAnimation:self];
 }
 
 @end
