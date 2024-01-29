@@ -80,7 +80,7 @@ Widgets.StackViewExt {
     property int initialIndex: -1
 
     // used in custom focus management for explicit "focusReason" transfer
-    readonly property var setCurrentItemFocus: {
+    property var setCurrentItemFocus: {
         return Helpers.get(currentItem, "setCurrentItemFocus", setCurrentItemFocusDefault)
     }
 
