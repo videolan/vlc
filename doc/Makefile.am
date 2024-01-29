@@ -20,6 +20,18 @@ LIBVLC_SAMPLES = \
 	libvlc/appkit_player.m \
 	$(NULL)
 
+# Check that samples that depends only on LibVLC can build
+AUTOMAKE_OPTIONS = subdir-objects
+AM_LDFLAGS = -no-install $(LDFLAGS_vlc) -L../src/ -lvlccore -L../lib -lvlc
+
+samples_libvlc_example_SOURCES = libvlc/example.c
+samples_libvlc_thumb_SOURCES = libvlc/vlc-thumb.c
+
+check_PROGRAMS = \
+	samples_libvlc_example \
+	samples_libvlc_thumb \
+	$(NULL)
+
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
 
 doc_DATA = \
