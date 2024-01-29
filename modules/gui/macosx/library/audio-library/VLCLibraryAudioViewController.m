@@ -609,9 +609,17 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
+    _loadingOverlayView.wantsLayer = YES;
+    _loadingOverlayView.alphaValue = 0.0;
+
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:_loadingOverlayView];
     self.libraryTargetView.subviews = views;
     [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 0.5;
+        _loadingOverlayView.animator.alphaValue = 1.0;
+    } completionHandler:nil];
     [_loadingOverlayView.indicator startAnimation:self];
 }
 
@@ -622,11 +630,19 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
-    [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
-    NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
-    [views removeObject:_loadingOverlayView];
-    self.libraryTargetView.subviews = views.copy;
-    [_loadingOverlayView.indicator stopAnimation:self];
+    _loadingOverlayView.wantsLayer = YES;
+    _loadingOverlayView.alphaValue = 0.5;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        _loadingOverlayView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
+        [views removeObject:_loadingOverlayView];
+        self.libraryTargetView.subviews = views.copy;
+        [_loadingOverlayView.indicator stopAnimation:self];
+    }];
 }
 
 @end
