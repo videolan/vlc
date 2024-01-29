@@ -825,7 +825,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         const struct pl_shader_res *res = priv->pl_sh_res = pl_shader_finalize(sh);
 # if PL_API_VER >= 266
         msg_Dbg(priv->gl, "libplacebo shader: %s", res->info->description);
-# elif PL_API_VER >= 151
+# else
         msg_Dbg(priv->gl, "libplacebo shader: %s", res->description);
 # endif
 
