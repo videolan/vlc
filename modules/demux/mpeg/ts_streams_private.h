@@ -77,6 +77,9 @@ struct ts_pmt_t
     stime_t i_last_dts;
     uint64_t i_last_dts_byte;
 
+    /* CA */
+    //en50221_capmt_info_t *capmt;
+
     /* ARIB specific */
     struct
     {

@@ -95,6 +95,7 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 
     ARRAY_INIT( pmt->e_streams );
 
+    //pmt->pmtcache   = NULL;
     pmt->i_version  = -1;
     pmt->i_number   = -1;
     pmt->i_pid_pcr  = 0x1FFF;

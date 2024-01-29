@@ -1842,6 +1842,16 @@ static en50221_capmt_info_t * CreateCAPMTInfo( const dvbpsi_pmt_t *p_pmt )
     return p_en;
 }
 
+void SendCAPMTUpdate( demux_t *p_demux, const ts_pmt_t *p_pmt )
+{
+    demux_sys_t  *p_sys = p_demux->p_sys;
+    if( !p_pmt->p_ctx->p_capmt )
+        return;
+    if( vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
+                            (void *)p_pmt->p_ctx->p_capmt ) != VLC_SUCCESS )
+        msg_Warn( p_demux, "Impos");
+}
+
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 {
     demux_t      *p_demux = data;
@@ -1849,6 +1859,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
     ts_pid_t     *pmtpid = NULL;
     ts_pmt_t     *p_pmt = NULL;
+    bool          b_encryption = false;
 
     msg_Dbg( p_demux, "PMTCallBack called for program %d", p_dvbpsipmt->i_program_number );
 
@@ -1975,6 +1986,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 msg_Dbg( p_demux, "    - ES descriptor %s 0x%x", psz_desc, p_dr->i_tag );
             else
                 msg_Dbg( p_demux, "    - ES descriptor tag 0x%x", p_dr->i_tag );
+
+            b_encryption |= (p_dr->i_tag == 0x09);
         }
 
         const bool b_pid_inuse = ( pespid->type == TYPE_STREAM );
@@ -2030,6 +2043,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
             msg_Dbg( p_demux, "    - ES descriptor : CA (0x9) SysID 0x%x",
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
+            b_encryption = true;
         }
 
         const bool b_create_es = (p_pes->p_es->fmt.i_cat != UNKNOWN_ES);
@@ -2098,27 +2112,19 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             AddAndCreateES( p_demux, pespid, false );
     }
 
-    /* Set CAM descrambling */
-    if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
+
+
+    /* Install CAM descrambling */
+    if ( p_sys->standard == TS_STANDARD_ARIB && p_sys->stream == p_demux->s && b_encryption )
     {
-        if( p_pmt->p_ctx->p_capmt )
+        stream_t *wrapper = ts_stream_wrapper_New( p_demux->s );
+        if( wrapper )
         {
-            if( vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
-                                    (void *)p_pmt->p_ctx->p_capmt ) != VLC_SUCCESS )
+            p_sys->stream = vlc_stream_FilterNew( wrapper, "aribcam" );
+            if( !p_sys->stream )
             {
-                if ( p_sys->standard == TS_STANDARD_ARIB && p_sys->stream == p_demux->s )
-                {
-                    stream_t *wrapper = ts_stream_wrapper_New( p_demux->s );
-                    if( wrapper )
-                    {
-                        p_sys->stream = vlc_stream_FilterNew( wrapper, "aribcam" );
-                        if( !p_sys->stream )
-                        {
-                            vlc_stream_Delete( wrapper );
-                            p_sys->stream = p_demux->s;
-                        }
-                    }
-                }
+                vlc_stream_Delete( wrapper );
+                p_sys->stream = p_demux->s;
             }
         }
     }
@@ -2212,6 +2218,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                   p_pmt->i_number, i_cand );
     }
 
+    /* Create CAPMT for this ES */
     if( p_pmt->p_ctx->p_capmt )
         en50221_capmt_Delete( p_pmt->p_ctx->p_capmt );
     p_pmt->p_ctx->p_capmt = CreateCAPMTInfo( p_dvbpsipmt );

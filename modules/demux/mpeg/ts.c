@@ -845,11 +845,16 @@ void UpdatePESFilters( demux_t *p_demux, bool b_all )
     {
         ts_pid_t *p_pmt_pid = p_pat->programs.p_elems[i];
         ts_pmt_t *p_pmt = p_pmt_pid->u.p_pmt;
+        const bool b_prev_selection = p_pmt->b_selected;
 
         if( (p_sys->b_default_selection && !p_sys->b_access_control) || b_all )
              p_pmt->b_selected = true;
         else
              p_pmt->b_selected = ProgramIsSelected( p_sys, p_pmt->i_number );
+
+        /* Notify CI for program selection changes */
+        if( b_prev_selection != p_pmt->b_selected )
+            SendCAPMTUpdate( p_demux, p_pmt );
 
         if( p_pmt->b_selected )
         {
