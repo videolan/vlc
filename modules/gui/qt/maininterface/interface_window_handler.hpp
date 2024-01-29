@@ -52,7 +52,7 @@ protected slots:
 
     void requestActivate();
 
-    virtual bool eventFilter(QObject*, QEvent* event) override;
+    bool eventFilter(QObject*, QEvent* event) override;
 
 signals:
     void minimalViewToggled( bool );

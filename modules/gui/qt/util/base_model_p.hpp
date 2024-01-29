@@ -129,12 +129,12 @@ public:
     void resetCache() override;
     void invalidateCache() override;
 
-    virtual bool loading() const override;
+    bool loading() const override;
 
     const T* item(int signedidx) const;
 
-    virtual unsigned int getCount() const override;
-    virtual unsigned int getMaximumCount() const override;
+    unsigned int getCount() const override;
+    unsigned int getMaximumCount() const override;
 
     virtual std::unique_ptr<ListCacheLoader<T>> createLoader() const = 0;
 

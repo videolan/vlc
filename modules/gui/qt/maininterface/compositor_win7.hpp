@@ -48,13 +48,13 @@ public:
     virtual ~CompositorWin7();
 
     static bool preInit(qt_intf_t *p_intf);
-    virtual bool init() override;
+    bool init() override;
 
-    virtual bool makeMainInterface(MainCtx*) override;
-    virtual void destroyMainInterface() override;
-    virtual void unloadGUI() override;
-    virtual bool setupVoutWindow(vlc_window_t*, VoutDestroyCb destroyCb) override;
-    virtual QWindow* interfaceMainWindow() const override;
+    bool makeMainInterface(MainCtx*) override;
+    void destroyMainInterface() override;
+    void unloadGUI() override;
+    bool setupVoutWindow(vlc_window_t*, VoutDestroyCb destroyCb) override;
+    QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
 

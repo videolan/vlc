@@ -94,12 +94,12 @@ public:
     {
     }
 
-    virtual void cancelTask(size_t taskId) override
+    void cancelTask(size_t taskId) override
     {
         m_validTasks.erase(taskId);
     }
 
-    virtual size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override
+    size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override
     {
         return runTaskAsync([this, cb](size_t taskId) {
             updateData();
@@ -107,7 +107,7 @@ public:
         });
     }
 
-    virtual size_t loadTask(
+    size_t loadTask(
         size_t offset, size_t limit,
         std::function<void(size_t taskId, std::vector<ItemType>& data)> cb) override
     {
@@ -130,7 +130,7 @@ public:
         });
     }
 
-    virtual size_t countAndLoadTask(
+    size_t countAndLoadTask(
         size_t offset, size_t limit,
         std::function<void(size_t taskId, size_t count, std::vector<ItemType>& data)> cb) override
     {

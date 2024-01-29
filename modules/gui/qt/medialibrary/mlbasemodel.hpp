@@ -179,8 +179,8 @@ public:
     MLListCacheLoader(MediaLib* medialib, std::shared_ptr<MLOp> op, QObject* parent = nullptr);
     ~MLListCacheLoader() = default;
 
-    virtual void cancelTask(size_t taskId) override;
-    virtual size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override;
+    void cancelTask(size_t taskId) override;
+    size_t countTask(std::function<void(size_t taskId, size_t count)> cb) override;
     virtual size_t loadTask(size_t offset, size_t limit,
                             std::function<void(size_t taskId, std::vector<ItemType>& data)> cb) override;
     virtual size_t countAndLoadTask(size_t offset, size_t limit,

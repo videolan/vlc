@@ -50,13 +50,13 @@ class TrackListModel : public QAbstractListModel
 public:
     TrackListModel(vlc_player_t* player, QObject* parent = nullptr);
 
-    virtual Qt::ItemFlags flags(const QModelIndex &) const  override;
+    Qt::ItemFlags flags(const QModelIndex &) const  override;
 
-    virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
+    int rowCount(const QModelIndex & = QModelIndex()) const override;
 
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     void updateTracks(enum vlc_player_list_action action, const vlc_player_track *track_info);
 
@@ -116,13 +116,13 @@ public:
 
     TitleListModel(vlc_player_t* player, QObject* parent = nullptr);
 
-    virtual Qt::ItemFlags flags(const QModelIndex &) const  override;
+    Qt::ItemFlags flags(const QModelIndex &) const  override;
 
-    virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
+    int rowCount(const QModelIndex & = QModelIndex()) const override;
 
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     void setCurrent(int current);
 
@@ -171,13 +171,13 @@ public:
 public:
     ChapterListModel(vlc_player_t* player, QObject* parent = nullptr);
 
-    virtual Qt::ItemFlags flags(const QModelIndex &) const  override;
+    Qt::ItemFlags flags(const QModelIndex &) const  override;
 
-    virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
+    int rowCount(const QModelIndex & = QModelIndex()) const override;
 
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     QHash<int, QByteArray> roleNames() const override;
 

@@ -51,11 +51,11 @@ public:
     ~VLCVarChoiceModel();
 
     //QAbstractListModel overridden functions
-    virtual Qt::ItemFlags flags(const QModelIndex &) const  override;
+    Qt::ItemFlags flags(const QModelIndex &) const  override;
     QHash<int, QByteArray> roleNames() const override;
-    virtual int rowCount(const QModelIndex & = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    int rowCount(const QModelIndex & = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     /**
      * @brief resetObject change the observed object.

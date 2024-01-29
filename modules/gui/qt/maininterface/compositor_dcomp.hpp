@@ -49,7 +49,7 @@ public:
     void unloadGUI() override;
 
     bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) override;
-    virtual QWindow* interfaceMainWindow() const override;
+    QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
 

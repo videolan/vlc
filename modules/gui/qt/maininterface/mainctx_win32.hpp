@@ -36,7 +36,7 @@ public:
     virtual ~WinTaskbarWidget();
 
 private:
-    virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
     void createTaskBarButtons();
 
 private slots:
@@ -63,7 +63,7 @@ public:
     virtual ~MainCtxWin32() = default;
 
 public slots:
-    virtual void reloadPrefs() override;
+    void reloadPrefs() override;
 };
 
 class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstractNativeEventFilter
@@ -72,9 +72,9 @@ class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstr
 public:
     explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandlerWin32();
-    virtual void toggleWindowVisibility() override;
+    void toggleWindowVisibility() override;
 
-    virtual bool eventFilter(QObject*, QEvent* event) override;
+    bool eventFilter(QObject*, QEvent* event) override;
 
 protected:
     bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;

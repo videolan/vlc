@@ -108,23 +108,23 @@ public:
 protected:
     int qtMouseButton2VLC( Qt::MouseButton qtButton );
 
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
-    virtual void hoverMoveEvent(QHoverEvent *event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void hoverMoveEvent(QHoverEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 #if QT_CONFIG(wheelevent)
-    virtual void wheelEvent(QWheelEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 #endif
 
-    virtual void geometryChanged(const QRectF &newGeometry,
-                                 const QRectF &oldGeometry) override;
+    void geometryChanged(const QRectF &newGeometry,
+                         const QRectF &oldGeometry) override;
 
     Qt::CursorShape getCursorShape() const;
     void setCursorShape(Qt::CursorShape);
 
-    virtual QSGNode* updatePaintNode(QSGNode *, QQuickItem::UpdatePaintNodeData *) override;
+    QSGNode* updatePaintNode(QSGNode *, QQuickItem::UpdatePaintNodeData *) override;
 
 signals:
     void ctxChanged(MainCtx*);

@@ -67,7 +67,7 @@ public:
         Parent::validateCache();
     }
 
-    virtual std::unique_ptr<ListCacheLoader<std::unique_ptr<MLItem>>> createLoader() const override
+    std::unique_ptr<ListCacheLoader<std::unique_ptr<MLItem>>> createLoader() const override
     {
         Q_Q(const MLBaseModel);
         return q->createMLLoader();

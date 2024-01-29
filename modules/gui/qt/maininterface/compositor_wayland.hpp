@@ -43,21 +43,21 @@ public:
     virtual ~CompositorWayland();
 
     static bool preInit(qt_intf_t*);
-    virtual bool init() override;
+    bool init() override;
 
-    virtual bool makeMainInterface(MainCtx*) override;
+    bool makeMainInterface(MainCtx*) override;
 
     /**
      * @brief release all resources used by the compositor.
      * this includes the GUI and the video surfaces.
      */
-    virtual void destroyMainInterface() override;
+    void destroyMainInterface() override;
 
     /**
      * @brief unloadGUI unload the UI view from the composition
      * video view might still be active
      */
-    virtual void unloadGUI() override;
+    void unloadGUI() override;
 
 
     QWindow* interfaceMainWindow() const override;
@@ -72,12 +72,12 @@ public:
     bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) override;
     void windowDestroy() override;
 
-    virtual int windowEnable(const vlc_window_cfg_t *) override;
-    virtual void windowDisable() override;
+    int windowEnable(const vlc_window_cfg_t *) override;
+    void windowDisable() override;
 
 protected slots:
-    virtual void onSurfacePositionChanged(const QPointF&) override;
-    virtual void onSurfaceSizeChanged(const QSizeF&) override;
+    void onSurfacePositionChanged(const QPointF&) override;
+    void onSurfaceSizeChanged(const QSizeF&) override;
 
 
 protected:

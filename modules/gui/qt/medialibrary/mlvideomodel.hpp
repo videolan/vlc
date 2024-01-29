@@ -82,7 +82,7 @@ protected:
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 protected: // MLBaseModel reimplementation
-    virtual void onVlcMlEvent( const MLEvent &event ) override;
+    void onVlcMlEvent( const MLEvent &event ) override;
 
 private:
     void generateThumbnail(uint64_t id) const;

@@ -97,7 +97,7 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-    virtual QHash<int, QByteArray> roleNames() const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     QVector<int> getControls() const;
     void setControls(const QVector<int>& list);

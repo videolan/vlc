@@ -39,21 +39,21 @@ public:
     virtual ~CompositorDummy();
 
     static bool preInit(qt_intf_t*);
-    virtual bool init() override;
+    bool init() override;
 
-    virtual bool makeMainInterface(MainCtx*) override;
+    bool makeMainInterface(MainCtx*) override;
 
     /**
      * @brief release all resources used by the compositor.
      * this includes the GUI and the video surfaces.
      */
-    virtual void destroyMainInterface() override;
+    void destroyMainInterface() override;
 
     /**
      * @brief unloadGUI unload the UI view from the composition
      * video view might still be active
      */
-    virtual void unloadGUI() override;
+    void unloadGUI() override;
 
     bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) override;
 

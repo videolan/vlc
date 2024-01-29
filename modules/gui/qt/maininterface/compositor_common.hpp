@@ -40,7 +40,7 @@ public:
 
     explicit DummyRenderWindow(QWindow* parent = nullptr);
 
-    virtual QAccessibleInterface *accessibleRoot() const override;
+    QAccessibleInterface *accessibleRoot() const override;
 
 protected:
     bool event(QEvent *event) override;

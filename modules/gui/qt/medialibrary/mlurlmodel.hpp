@@ -72,7 +72,7 @@ protected:
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
-    virtual void onVlcMlEvent( const MLEvent &event ) override;
+    void onVlcMlEvent( const MLEvent &event ) override;
 
     struct Loader : public MLListCacheLoader::MLOp
     {

@@ -177,9 +177,9 @@ public:
     void clear() override;
     virtual void accept();
 #if defined( _WIN32 ) || defined( __OS2__ )
-    virtual void onFocus() override;
+    void onFocus() override;
 #endif
-    virtual void updateContext(int) override;
+    void updateContext(int) override;
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;

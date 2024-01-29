@@ -49,7 +49,7 @@ public:
     virtual ~CoverArtLabel();
 
 protected:
-    virtual void mouseDoubleClickEvent( QMouseEvent *event ) override;
+    void mouseDoubleClickEvent( QMouseEvent *event ) override;
 
 private:
     qt_intf_t *p_intf;

@@ -173,13 +173,13 @@ public: //discovery callbacks
 
 public: //LocalListCacheLoader implementation
 
-    virtual size_t getModelRevision() const override
+    size_t getModelRevision() const override
     {
         return m_revision;
     }
 
     //return the data matching the pattern
-    virtual SDItemList getModelData(const QString& pattern) const override
+    SDItemList getModelData(const QString& pattern) const override
     {
         if (pattern.isEmpty())
             return m_items;

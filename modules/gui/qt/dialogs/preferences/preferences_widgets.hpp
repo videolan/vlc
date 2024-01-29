@@ -112,8 +112,8 @@ class VIntConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    virtual void doApply() override;
-    virtual void storeValue() override;
+    void doApply() override;
+    void storeValue() override;
 protected:
     VIntConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };

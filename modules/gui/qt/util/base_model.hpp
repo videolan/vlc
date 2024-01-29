@@ -98,8 +98,8 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 protected:
-    virtual void classBegin() override;
-    virtual void componentComplete() override;
+    void classBegin() override;
+    void componentComplete() override;
 
 public:
     void onCacheDataChanged(int first, int last);
