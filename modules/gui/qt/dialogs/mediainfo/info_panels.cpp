@@ -183,7 +183,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 }
 
 /**
- * Update all the MetaData and art on an "item-changed" event
+ * Update all the MetaData and art
  **/
 void MetaPanel::update( const SharedInputItem& p_item )
 {
