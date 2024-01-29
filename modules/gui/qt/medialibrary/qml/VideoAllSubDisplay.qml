@@ -90,15 +90,6 @@ VideoAll {
         }
     }
 
-    // VideoAll reimplementation
-
-    function setCurrentItemFocus(reason) {
-        if (headerItem && headerItem.focus)
-            headerItem.forceActiveFocus(reason) // continue watching section
-        else
-            setCurrentItemFocusDefault(reason)
-    }
-
     // VideoAll events reimplementation
 
     function onAction(indexes) { _meta.onAction(indexes) }

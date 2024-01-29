@@ -45,7 +45,15 @@ FocusScope {
 
     implicitHeight: recentVideosColumn.height
 
-    focus: recentModel.count > 0
+    Navigation.navigable: recentModel.count > 0
+
+    function setCurrentItemFocus(reason) {
+        console.assert(root.Navigation.navigable)
+        if (reason === Qt.BacktabFocusReason)
+            view.setCurrentItemFocus(reason)
+        else
+            button.forceActiveFocus(reason)
+    }
 
     // Childs
 
@@ -112,6 +120,10 @@ FocusScope {
 
                 Navigation.parentItem: root
 
+                Navigation.downAction: function() {
+                    view.setCurrentItemFocus(Qt.TabFocusReason)
+                }
+
                 onClicked: History.push(["mc", "video", "all", "recentVideos"]);
             }
         }
@@ -130,7 +142,7 @@ FocusScope {
             leftPadding: root.leftPadding
             rightPadding: root.rightPadding
 
-            focus: recentModel.count !== 0
+            focus: true
 
             model: recentModel
 
@@ -143,6 +155,10 @@ FocusScope {
 
                 showPlayAsAudioAction: true
             }
+
+            Navigation.parentItem: root
+
+            Navigation.upItem: button
         }
 
         Widgets.SubtitleLabel {

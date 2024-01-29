@@ -101,10 +101,16 @@ MainInterface.MainViewLoader {
 
     // Private events
 
+    setCurrentItemFocus: function (reason) {
+        if (headerItem && headerItem.Navigation.navigable)
+            headerItem.setCurrentItemFocus(reason)
+        else
+            setCurrentItemFocusDefault(reason)
+    }
+
     function _onNavigationUp() {
-        // NOTE: We are calling the header focus function when we have one.
-        if (headerItem && headerItem.focus)
-            headerItem.forceActiveFocus(Qt.TabFocusReason)
+        if (headerItem && headerItem.Navigation.navigable)
+            headerItem.setCurrentItemFocus(Qt.BacktabFocusReason)
         else
             Navigation.defaultNavigationUp()
     }
