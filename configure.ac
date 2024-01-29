@@ -63,7 +63,7 @@ AC_PROG_YACC
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS([DESKTOP_FILE_VALIDATE], [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
 AC_ARG_VAR([BUILDCC], [Build system C11 or C99 compiler command])
-AC_CHECK_PROGS([BUILDCC], [c11-gcc c11 c99-gcc c99], [false])
+AC_CHECK_PROGS([BUILDCC], [c17-gcc c17 c11-gcc c11 c99-gcc c99], [false])
 AS_IF([test "$BUILDCC" = "false"], [
   AC_MSG_ERROR([Cannot find native C99 compiler: please define BUILDCC.])
 ])
