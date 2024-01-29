@@ -146,7 +146,7 @@ out:
 
 unsigned vlc_CPU(void)
 {
-    static atomic_uint cpu_flags = ATOMIC_VAR_INIT(-1U);
+    static atomic_uint cpu_flags = -1U;
     unsigned flags = atomic_load_explicit(&cpu_flags, memory_order_relaxed);
 
     if (unlikely(flags == -1U)) {

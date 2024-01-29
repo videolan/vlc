@@ -151,7 +151,7 @@ static void WindowUnsetFullscreen(vlc_window_t *wnd)
     WindowSetFullscreen(wnd, &windowed);
 }
 
-static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
+static atomic_bool b_intf_starting = false;
 
 static const struct vlc_window_operations ops = {
     WindowEnable,

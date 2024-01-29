@@ -163,9 +163,9 @@ typedef struct
  * In C++, consider using a global ::vlc::threads::mutex instance instead.
  */
 #define VLC_STATIC_MUTEX { \
-    .value = ATOMIC_VAR_INIT(0), \
-    .recursion = ATOMIC_VAR_INIT(0), \
-    .owner = ATOMIC_VAR_INIT(0), \
+    .value = 0, \
+    .recursion = 0, \
+    .owner = 0, \
 }
 
 /**
@@ -527,7 +527,7 @@ typedef struct
 /**
  * Static initializer for one-time initialization.
  */
-#define VLC_STATIC_ONCE { ATOMIC_VAR_INIT(0) }
+#define VLC_STATIC_ONCE { 0 }
 
 /**
  * Begins a one-time initialization.

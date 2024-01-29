@@ -67,7 +67,7 @@ vlc_module_begin()
     set_callback( OpenEncoder )
 vlc_module_end()
 
-static atomic_bool busy = ATOMIC_VAR_INIT(false);
+static atomic_bool busy = false;
 
 static int OpenEncoder( vlc_object_t *p_this )
 {

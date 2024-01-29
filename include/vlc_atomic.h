@@ -41,7 +41,7 @@ using std::memory_order_acq_rel;
 #include <time.h> /* vlc_atomic_timedwait_daytime */
 
 #define VLC_STATIC_RC { \
-    .refs = ATOMIC_VAR_INIT(0) \
+    .refs = 0 \
 }
 
 typedef struct vlc_atomic_rc_t {

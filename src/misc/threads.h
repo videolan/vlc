@@ -51,7 +51,7 @@ typedef struct {
     atomic_ulong owner;
 } vlc_queuedmutex_t;
 
-#define VLC_STATIC_QUEUEDMUTEX { ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0) }
+#define VLC_STATIC_QUEUEDMUTEX { 0, 0, 0 }
 
 void vlc_queuedmutex_init(vlc_queuedmutex_t *m);
 
