@@ -40,6 +40,8 @@
 #include <io.h>
 #include <shlobj.h>
 
+#include "../lib/libvlc_internal.h"
+
 #ifdef HAVE_BREAKPAD
 void CheckCrashDump( const wchar_t* crashdump_path );
 void* InstallCrashHandler( const wchar_t* crashdump_path );
@@ -242,12 +244,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     {
         HANDLE sem = CreateSemaphore(NULL, 0, 1, NULL);
 
-        libvlc_set_exit_handler(vlc, vlc_kill, &sem);
+        libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_kill, &sem);
         libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION,
                            PACKAGE_NAME);
         libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
-        libvlc_add_intf (vlc, NULL);
-        libvlc_playlist_play (vlc);
+        libvlc_InternalAddIntf (vlc->p_libvlc_int, NULL);
+        libvlc_InternalPlay (vlc->p_libvlc_int);
 
         WaitForSingleObject(sem, INFINITE);
         CloseHandle(sem);

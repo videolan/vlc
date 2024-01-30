@@ -26,7 +26,7 @@ endif
 #
 # Main VLC executable
 #
-vlc_LDADD = ../lib/libvlc.la
+vlc_LDADD = ../lib/libvlc.la ../src/libvlccore.la
 vlc_CPPFLAGS = $(AM_CPPFLAGS)
 if !HAVE_WIN32
 vlc_SOURCES = vlc.c override.c

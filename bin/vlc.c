@@ -40,6 +40,8 @@
 #endif
 #include <unistd.h>
 
+#include "../lib/libvlc_internal.h"
+
 #ifdef __OS2__
 # include <iconv.h>
 
@@ -232,17 +234,17 @@ int main(int argc, const char *argv[])
         return 1;
 
     int ret = 1;
-    libvlc_set_exit_handler (vlc, vlc_kill, &self);
+    libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_kill, &self);
     libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
-    if (libvlc_add_intf (vlc, NULL))
+    if (libvlc_InternalAddIntf (vlc->p_libvlc_int, NULL))
     {
         fprintf(stderr, "%s: cannot start any interface. Exiting.\n", argv[0]);
         goto out;
     }
 
-    libvlc_playlist_play (vlc);
+    libvlc_InternalPlay (vlc->p_libvlc_int);
 
     /* Qt insists on catching SIGCHLD via signal handler. To work around that,
      * unblock it after all our child threads are created. */

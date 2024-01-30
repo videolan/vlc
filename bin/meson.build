@@ -20,7 +20,7 @@ if build_vlc and (host_system != 'darwin' or have_osx)
 
     executable('vlc',
         vlc_sources,
-        link_with: [libvlc],
+        link_with: [libvlc, libvlccore],
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
         install: true,
@@ -32,7 +32,7 @@ if build_vlc and (host_system != 'darwin' or have_osx)
 
     executable('vlc-static',
         vlc_sources,
-        link_with: [libvlc],
+        link_with: [libvlc, libvlccore],
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
         c_args: [vlc_top_builddir_def, vlc_top_srcdir_def],

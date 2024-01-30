@@ -41,6 +41,7 @@
 #import <Breakpad/Breakpad.h>
 #endif
 
+#include "../lib/libvlc_internal.h"
 
 /**
  * Handler called when VLC asks to terminate the program.
@@ -269,15 +270,16 @@ int main(int i_argc, const char *ppsz_argv[])
         return 1;
 
     int ret = 1;
-    libvlc_set_exit_handler(vlc, vlc_terminate, NULL);
+    libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_terminate, NULL);
     libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
-    if (libvlc_add_intf(vlc, NULL)) {
+    if (libvlc_InternalAddIntf(vlc->p_libvlc_int, NULL)) {
         fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
         goto out;
     }
-    libvlc_playlist_play(vlc);
+
+    libvlc_InternalPlay(vlc->p_libvlc_int);
 
     /*
      * Run the main loop. If the mac interface is not initialized, only the CoreFoundation
