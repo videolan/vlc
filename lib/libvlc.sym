@@ -210,7 +210,6 @@ libvlc_media_set_meta_extra
 libvlc_media_get_meta_extra_names
 libvlc_media_meta_extra_names_release
 libvlc_new
-libvlc_playlist_play
 libvlc_release
 libvlc_renderer_item_name
 libvlc_renderer_item_type

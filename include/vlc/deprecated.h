@@ -28,28 +28,6 @@
 extern "C" {
 # endif
 
-/**
- * \ingroup libvlc
- * \defgroup libvlc_playlist LibVLC playlist (legacy)
- * @deprecated Use @ref libvlc_media_list instead.
- * @{
- * \file
- * LibVLC deprecated playlist API
- */
-
-/**
- * Start playing (if there is any item in the playlist).
- *
- * Additional playlist item options can be specified for addition to the
- * item before it is played.
- *
- * \param p_instance the playlist instance
- */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_playlist_play( libvlc_instance_t *p_instance );
-
-/** @}*/
-
 # ifdef __cplusplus
 }
 # endif
