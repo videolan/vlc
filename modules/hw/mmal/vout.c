@@ -539,12 +539,6 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
     MMAL_DISPLAYREGION_T display_region;
     MMAL_STATUS_T status;
 
-    if (!fmt)
-    {
-        msg_Err(vd, "Missing cfg & fmt");
-        return -EINVAL;
-    }
-
     isp_check(vd, sys);
 
     sys->input->format->es->video.par.num = fmt->i_sar_num;
