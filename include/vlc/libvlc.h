@@ -203,16 +203,6 @@ LIBVLC_API libvlc_instance_t *libvlc_retain( libvlc_instance_t *p_instance );
 LIBVLC_API int libvlc_abi_version(void);
 
 /**
- * Try to start a user interface for the libvlc instance.
- *
- * \param p_instance the instance
- * \param name interface name, or NULL for default
- * \return 0 on success, -1 on error.
- */
-LIBVLC_API
-int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
-
-/**
  * Registers a callback for the LibVLC exit event. This is mostly useful if
  * the VLC playlist and/or at least one interface are started with
  * libvlc_playlist_play() or libvlc_add_intf() respectively.
