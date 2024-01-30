@@ -547,21 +547,16 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
 
     isp_check(vd, sys);
 
-    if (fmt) {
-        sys->input->format->es->video.par.num = fmt->i_sar_num;
-        sys->input->format->es->video.par.den = fmt->i_sar_den;
+    sys->input->format->es->video.par.num = fmt->i_sar_num;
+    sys->input->format->es->video.par.den = fmt->i_sar_den;
 
-        status = mmal_port_format_commit(sys->input);
-        if (status != MMAL_SUCCESS) {
-            msg_Err(vd, "Failed to commit format for input port %s (status=%"PRIx32" %s)",
-                            sys->input->name, status, mmal_status_to_string(status));
-            return -EINVAL;
-        }
-        place_dest(vd, fmt);
-    } else {
-        fmt = vd->source;
-        place_dest(vd, vd->source);
+    status = mmal_port_format_commit(sys->input);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(vd, "Failed to commit format for input port %s (status=%"PRIx32" %s)",
+                        sys->input->name, status, mmal_status_to_string(status));
+        return -EINVAL;
     }
+    place_dest(vd, fmt);
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
