@@ -143,7 +143,6 @@ lib/media_list.c
 lib/media_list_path.h
 lib/media_list_player.c
 lib/media_player.c
-lib/playlist.c
 lib/video.c
 
 # modules

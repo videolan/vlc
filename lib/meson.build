@@ -4,7 +4,6 @@ libvlc_sources = [
     'renderer_discoverer.c',
     'error.c',
     'log.c',
-    'playlist.c',
     'video.c',
     'audio.c',
     'event.c',
