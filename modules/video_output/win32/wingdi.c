@@ -252,12 +252,16 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 
     video_format_TransformTo(fmt, ORIENT_NORMAL);
 
+    if (i_depth == 8)
+        /*
+         * We don't handle 256 color palettes, so let BitBlt()/StretchBlt()
+         * perform the conversion to 256 color palettes for us.
+         */
+        i_depth = 24;
+
     /* */
     msg_Dbg(vd, "GDI depth is %i", i_depth);
     switch (i_depth) {
-    case 8:
-        fmt->i_chroma = VLC_CODEC_RGB233;
-        break;
     case 16:
         fmt->i_chroma = VLC_CODEC_RGB555LE;
         break;
