@@ -203,26 +203,6 @@ LIBVLC_API libvlc_instance_t *libvlc_retain( libvlc_instance_t *p_instance );
 LIBVLC_API int libvlc_abi_version(void);
 
 /**
- * Registers a callback for the LibVLC exit event. This is mostly useful if
- * the VLC playlist and/or at least one interface are started with
- * libvlc_playlist_play() or libvlc_add_intf() respectively.
- * Typically, this function will wake up your application main loop (from
- * another thread).
- *
- * \note This function should be called before the playlist or interface are
- * started. Otherwise, there is a small race condition: the exit event could
- * be raised before the handler is registered.
- *
- * \param p_instance LibVLC instance
- * \param cb callback to invoke when LibVLC wants to exit,
- *           or NULL to disable the exit handler (as by default)
- * \param opaque data pointer for the callback
- */
-LIBVLC_API
-void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
-                              void (*cb) (void *), void *opaque );
-
-/**
  * Sets the application name. LibVLC passes this as the user agent string
  * when a protocol requires it.
  *

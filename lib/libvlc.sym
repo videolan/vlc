@@ -264,7 +264,6 @@ libvlc_video_set_teletext
 libvlc_video_take_snapshot
 libvlc_video_new_viewpoint
 libvlc_video_update_viewpoint
-libvlc_set_exit_handler
 libvlc_audio_filter_list_get
 libvlc_video_filter_list_get
 libvlc_module_description_list_release
