@@ -45,6 +45,7 @@
 #include <limits.h>
 
 #include "transcode.h"
+#include "../lib/libvlc_internal.h"
 
 static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
 
@@ -400,7 +401,7 @@ int main( int argc, char **argv )
 {
     (void)argc; (void)argv;
 #ifndef ENABLE_SOUT
-    (void) libvlc_playlist_play;
+    (void) libvlc_InternalPlay;
     return 77;
 #endif
     test_init();
@@ -412,8 +413,8 @@ int main( int argc, char **argv )
 
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(args), args);
 
-    libvlc_add_intf(vlc, MODULE_STRING);
-    libvlc_playlist_play(vlc);
+    libvlc_InternalAddIntf(vlc->p_libvlc_int, MODULE_STRING);
+    libvlc_InternalPlay(vlc->p_libvlc_int);
 
     libvlc_release(vlc);
     assert(transcode_scenarios_count == current_scenario);

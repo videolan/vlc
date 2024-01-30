@@ -41,6 +41,8 @@
 
 #include <limits.h>
 
+#include "../lib/libvlc_internal.h"
+
 const char vlc_module_name[] = MODULE_STRING;
 
 static int OpenIntf(vlc_object_t *root)
@@ -113,8 +115,8 @@ int main()
 
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(args), args);
 
-    libvlc_add_intf(vlc, MODULE_STRING);
-    libvlc_playlist_play(vlc);
+    libvlc_InternalAddIntf(vlc->p_libvlc_int, MODULE_STRING);
+    libvlc_InternalPlay(vlc->p_libvlc_int);
 
     libvlc_release(vlc);
 

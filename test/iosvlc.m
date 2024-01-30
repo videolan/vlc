@@ -38,6 +38,8 @@
 
 #include <TargetConditionals.h>
 
+#include "../lib/libvlc_internal.h"
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate> {
     @public
     libvlc_instance_t *_libvlc;
@@ -131,10 +133,11 @@
 #endif
 
     /* Start glue interface, see code below */
-    libvlc_add_intf(_libvlc, "ios_interface,none");
+
+    libvlc_InternalAddIntf(_libvlc->p_libvlc_int, "ios_interface,none");
 
     /* Start parsing arguments and eventual playback */
-    libvlc_playlist_play(_libvlc);
+    libvlc_InternalPlay(_libvlc);
 
     return YES;
 }

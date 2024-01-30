@@ -43,6 +43,7 @@
 #include <limits.h>
 
 #include "video_output.h"
+#include "../lib/libvlc_internal.h"
 
 static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
 
@@ -294,8 +295,9 @@ int main( int argc, char **argv )
 
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(args), args);
 
-    libvlc_add_intf(vlc, MODULE_STRING);
-    libvlc_playlist_play(vlc);
+
+    libvlc_InternalAddIntf(vlc->p_libvlc_int, MODULE_STRING);
+    libvlc_InternalPlay(vlc->p_libvlc_int);
 
     libvlc_release(vlc);
     assert(vout_scenarios_count == current_scenario);
