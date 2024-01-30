@@ -125,10 +125,16 @@ int screen_InitCaptureGDI( demux_t *p_demux )
     }
 
     i_bits_per_pixel = GetDeviceCaps( p_data->hdc_src, BITSPIXEL );
+
+    if (i_bits_per_pixel == 8)
+        /*
+         * We don't handle 256 color palettes, so let BitBlt() perform the
+         * conversion from 256 color palettes for us.
+         */
+        i_bits_per_pixel = 24;
+
     switch( i_bits_per_pixel )
     {
-    case 8: /* FIXME: set the palette */
-        i_chroma = VLC_CODEC_RGB233; break;
     case 16:    /* Yes it is really 15 bits (when using BI_RGB) */
         i_chroma = VLC_CODEC_BGR555LE; break;
     case 24:
