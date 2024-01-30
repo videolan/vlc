@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCLoadingOverlayView;
 @class VLCLibraryWindow;
 @class VLCLibraryVideoDataSource;
 
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
+@property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
 
