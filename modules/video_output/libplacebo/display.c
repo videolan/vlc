@@ -538,10 +538,6 @@ static int Control(vout_display_t *vd, int query)
     switch (query)
     {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-    case VOUT_DISPLAY_CHANGE_ZOOM: {
         /* The following resize should be automatic on most platforms but can
          * trigger bugs on some platform with some drivers, that have been seen
          * on Windows in particular. Doing it right now enforces the correct
@@ -549,7 +545,6 @@ static int Control(vout_display_t *vd, int query)
          * In addition, platforms like Wayland need the call as the size of the
          * window is defined by the size of the content, and not the opposite.
          * The swapchain creation won't be done twice with this call. */
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
         {
             int width = (int) vd->cfg->display.width;
             int height = (int) vd->cfg->display.height;
@@ -568,7 +563,11 @@ static int Control(vout_display_t *vd, int query)
             */
         }
         return VLC_SUCCESS;
-    }
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
+        return VLC_SUCCESS;
 
     default:
         msg_Err (vd, "Unknown request %d", query);
