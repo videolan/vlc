@@ -125,6 +125,7 @@ void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         CommonPlacePicture(vd, area);
         break;
 

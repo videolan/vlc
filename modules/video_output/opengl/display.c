@@ -328,6 +328,7 @@ static int Control (vout_display_t *vd, int query)
       case VOUT_DISPLAY_CHANGE_ZOOM:
       case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+      case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
       {
         struct vout_display_placement dp = vd->cfg->display;
 

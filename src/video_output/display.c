@@ -503,9 +503,16 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     osys->source.i_visible_height = bottom - top;
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
-    PlaceVideoInDisplay(osys);
+    bool place_changed = PlaceVideoInDisplay(osys);
 
-    return vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+    if (place_changed)
+    {
+        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (res2 != VLC_SUCCESS)
+            res1 = res2;
+    }
+    return res1;
 }
 
 static int vout_SetSourceAspect(vout_display_t *vd,
@@ -519,13 +526,20 @@ static int vout_SetSourceAspect(vout_display_t *vd,
         osys->source.i_sar_den = sar_den;
     }
 
-    PlaceVideoInDisplay(osys);
+    bool place_changed = PlaceVideoInDisplay(osys);
 
     err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
 
     /* If a crop ratio is requested, recompute the parameters */
     if (osys->crop.mode != VOUT_CROP_NONE)
         err2 = vout_UpdateSourceCrop(vd);
+
+    if (place_changed)
+    {
+        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (res2 != VLC_SUCCESS)
+            err1 = res2;
+    }
 
     if (err1 != VLC_SUCCESS)
         return err1;
@@ -584,9 +598,18 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
 
-    PlaceVideoInDisplay(osys);
+    bool place_changed = PlaceVideoInDisplay(osys);
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE) != VLC_SUCCESS)
+    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE);
+
+    if (place_changed)
+    {
+        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (res2 != VLC_SUCCESS)
+            res1 = res2;
+    }
+
+    if (res1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 
@@ -599,9 +622,18 @@ void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
 
     osys->cfg.display.fitting = fit;
 
-    PlaceVideoInDisplay(osys);
+    bool place_changed = PlaceVideoInDisplay(osys);
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED) != VLC_SUCCESS)
+    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED);
+
+    if (place_changed)
+    {
+        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (res2 != VLC_SUCCESS)
+            res1 = res2;
+    }
+
+    if (res1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 
@@ -619,9 +651,19 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
     if (onum * den == num * oden)
         return; /* zoom has not changed */
 
-    PlaceVideoInDisplay(osys);
+    bool place_changed = PlaceVideoInDisplay(osys);
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM) != VLC_SUCCESS)
+    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM);
+        vout_display_Reset(vd);
+
+    if (place_changed)
+    {
+        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (res2 != VLC_SUCCESS)
+            res1 = res2;
+    }
+
+    if (res1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 

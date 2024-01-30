@@ -81,6 +81,7 @@ static int Control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
             return VLC_SUCCESS;
     }
     return VLC_EGENERIC;
