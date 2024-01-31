@@ -34,8 +34,9 @@ Dialog {
     focus: true
     modal: true
 
-    x: (rootWindow.x + rootWindow.width - width) / 2
-    y: (rootWindow.y + rootWindow.height - height) / 2
+
+    anchors.centerIn: Overlay.overlay
+
     padding: VLCStyle.margin_normal
     margins: VLCStyle.margin_large
 
