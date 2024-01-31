@@ -76,14 +76,14 @@ Item {
     {
         target: dialogModel
 
-        onLogin: {
+        onLogin: (dialogId, title, text, defaultUsername, askStore) => {
             loginDialog.dialogId = dialogId
             loginDialog.title = title
             loginDialog.defaultUsername = defaultUsername
             loginDialog.open()
         }
 
-        onQuestion: {
+        onQuestion: (dialogId, title, text, type, cancel, action1, action2) => {
             questionDialog.dialogId = dialogId
             questionDialog.title = title
             questionDialog.text = text
@@ -93,15 +93,26 @@ Item {
             questionDialog.open()
         }
 
-        onProgress: {
-            console.warn("onProgressUpdated is not implemented")
+        onProgress: (dialogId, title, text, indeterminate, position, cancel) => {
+            progressDialog.dialogId = dialogId
+            progressDialog.title = title
+            progressDialog.text = text
+            progressDialog.cancelTxt = cancel
+            progressDialog.position = position
+            progressDialog.interderminate = indeterminate
+            progressDialog.open()
         }
 
-        onProgressUpdated: {
-            console.warn("onProgressUpdated is not implemented")
+        onProgressUpdated: (dialogId, position, text) => {
+            if (progressDialog.dialogId !== dialogId) {
+                console.warn("progress event on an inexisting dialog")
+                return
+            }
+            progressDialog.text = text
+            progressDialog.position = position
         }
 
-        onCancelled: {
+        onCancelled: (dialogId) => {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
                 questionDialog.dialogId = null
@@ -109,6 +120,10 @@ Item {
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
                 loginDialog.dialogId = null
+                dialogModel.dismiss(dialogId)
+            } else if (progressDialog.dialogId === dialogId) {
+                progressDialog.close()
+                progressDialog.dialogId = null
                 dialogModel.dismiss(dialogId)
             } else {
                 dialogModel.dismiss(dialogId)
@@ -383,6 +398,78 @@ Item {
             if (loginDialog.dialogId !== null) {
                 dialogModel.dismiss(loginDialog.dialogId)
                 loginDialog.dialogId = null
+            }
+        }
+    }
+
+    ModalDialog {
+        id: progressDialog
+
+        property var dialogId: null
+
+        property string text : ""
+        property string cancelTxt: ""
+        property bool interderminate: false
+        property real position: 0.0
+
+        onAboutToHide: restoreFocus()
+        rootWindow: root.bgContent
+
+        contentItem:  ColumnLayout {
+
+            readonly property ColorContext colorContext: ColorContext {
+                id: progressContentTheme
+                palette: VLCStyle.palette
+                colorSet: ColorContext.Window
+            }
+
+            Text {
+                focus: false
+                font.pixelSize: VLCStyle.fontSize_normal
+                color: progressContentTheme.fg.primary
+                text: progressDialog.text
+                wrapMode: Text.WordWrap
+            }
+
+            ProgressBar {
+                Layout.fillWidth:true
+
+                from: 0.0
+                to: 1.0
+
+                indeterminate: progressDialog.interderminate
+                value: progressDialog.position
+            }
+        }
+
+
+        footer: FocusScope {
+            focus: true
+            implicitHeight: VLCStyle.icon_normal
+
+            readonly property ColorContext colorContext: ColorContext {
+                palette: VLCStyle.palette
+                colorSet: ColorContext.Window
+            }
+
+            Rectangle {
+                color: questionDialog.colorContext.bg.primary
+                anchors.fill: parent
+                anchors.leftMargin: VLCStyle.margin_xxsmall
+                anchors.rightMargin: VLCStyle.margin_xxsmall
+
+                Widgets.TextToolButton {
+                    anchors.right: parent.right
+                    focus: true
+                    visible: text !== ""
+                    text: progressDialog.cancelTxt
+
+                    onClicked: {
+                        dialogModel.dismiss(progressDialog.dialogId)
+                        progressDialog.dialogId = null
+                        progressDialog.close()
+                    }
+                }
             }
         }
     }
