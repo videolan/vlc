@@ -1255,6 +1255,21 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         vlc_spu_regions_foreach(region, &subpic->regions) {
             spu_area_t area;
 
+            /* last minute text rendering */
+            subpicture_region_t *rendered_region = region;
+            if (unlikely(subpicture_region_IsText( region )))
+            {
+                subpicture_region_t *rendered_text =
+                    SpuRenderText(spu, region,
+                            i_original_width, i_original_height,
+                            chroma_list);
+                if ( rendered_text  == NULL)
+                    // not a rendering error for Text-To-Speech
+                    continue;
+                rendered_region = rendered_text;
+                region_FixFmt(rendered_text);
+            }
+
             /* Compute region scale AR */
             vlc_rational_t region_sar = (vlc_rational_t) {
                 .num = region->fmt.i_sar_num,
@@ -1293,21 +1308,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
-
-            /* last minute text rendering */
-            subpicture_region_t *rendered_region = region;
-            if (unlikely(subpicture_region_IsText( region )))
-            {
-                subpicture_region_t *rendered_text =
-                    SpuRenderText(spu, region,
-                            i_original_width, i_original_height,
-                            chroma_list);
-                if ( rendered_text  == NULL)
-                    // not a rendering error for Text-To-Speech
-                    continue;
-                rendered_region = rendered_text;
-                region_FixFmt(rendered_text);
-            }
 
             const bool do_external_scale = external_scale && !subpicture_region_IsText( region );
             spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
