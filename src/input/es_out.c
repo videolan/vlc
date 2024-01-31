@@ -1279,6 +1279,13 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
      * handle clock source selection when the first PCR is sent (from
      * ES_OUT_SET_PCR). */
 
+
+    static const struct vlc_input_clock_cbs clock_cbs =
+    {
+        .update = ClockListenerUpdate,
+        .reset = ClockListenerReset,
+    };
+
     switch( p_sys->user_clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
@@ -1299,12 +1306,6 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
         {
             p_pgrm->clocks.input =
                 vlc_clock_main_CreateInputMaster(p_pgrm->clocks.main);
-
-            static const struct vlc_input_clock_cbs clock_cbs =
-            {
-                .update = ClockListenerUpdate,
-                .reset = ClockListenerReset,
-            };
 
             if (p_pgrm->clocks.input == NULL)
                 break;
@@ -1327,6 +1328,18 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
         case VLC_CLOCK_MASTER_AUTO:
         default:
             vlc_assert_unreachable();
+    }
+
+    if (p_pgrm->active_clock_source != VLC_CLOCK_MASTER_INPUT)
+    {
+        p_pgrm->clocks.input = vlc_clock_main_CreateSlave(
+            p_pgrm->clocks.main, "pcr", UNKNOWN_ES, NULL, NULL);
+
+        if (p_pgrm->clocks.input != NULL)
+        {
+            input_clock_AttachListener(p_pgrm->p_input_clock, &clock_cbs,
+                                       p_pgrm);
+        }
     }
 
     msg_Dbg( p_input, "program(%d): using clock source: '%s'",
