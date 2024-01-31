@@ -92,16 +92,26 @@
                                    name:VLCLibraryModelVideoMediaItemDeleted
                                  object:nil];
 
-        NSString * const videoMediaLongLoadStartNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const videoMediaLongLoadFinishNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const videoMediaResetLongLoadStartNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const videoMediaResetLongLoadFinishNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const videoMediaDeletedLongLoadStartNotification = [VLCLibraryModelVideoMediaItemDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const videoMediaDeletedLongLoadFinishNotification = [VLCLibraryModelVideoMediaItemDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadStarted:)
-                                   name:videoMediaLongLoadStartNotification
+                                   name:videoMediaResetLongLoadStartNotification
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadFinished:)
-                                   name:videoMediaLongLoadFinishNotification
+                                   name:videoMediaResetLongLoadFinishNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadStarted:)
+                                   name:videoMediaDeletedLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:videoMediaDeletedLongLoadFinishNotification
                                  object:nil];
     }
 
