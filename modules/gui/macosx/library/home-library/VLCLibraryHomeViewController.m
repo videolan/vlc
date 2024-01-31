@@ -50,6 +50,7 @@
 @interface VLCLibraryHomeViewController ()
 {
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
+    NSMutableSet<NSString *> *_ongoingLongLoadingNotifications;
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 }
 @end
@@ -286,6 +287,12 @@
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
     NSLog(@"Home long load started");
+    if ([_ongoingLongLoadingNotifications containsObject:notification.name]) {
+        return;
+    }
+
+    [_ongoingLongLoadingNotifications addObject:notification.name];
+
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
@@ -307,6 +314,11 @@
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
     NSLog(@"Home long load finished");
+    [_ongoingLongLoadingNotifications removeObject:notification.name];
+    if (_ongoingLongLoadingNotifications.count > 0) {
+        return;
+    }
+
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
