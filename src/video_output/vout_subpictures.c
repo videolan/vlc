@@ -1245,9 +1245,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
 
-        vlc_spu_regions_foreach(region, &subpic->regions)
-            region_FixFmt(region);
-
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
          * first rendering to allow good subtitle overlap support.
@@ -1267,8 +1264,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     // not a rendering error for Text-To-Speech
                     continue;
                 rendered_region = rendered_text;
-                region_FixFmt(rendered_text);
             }
+            region_FixFmt(rendered_region);
 
             /* Compute region scale AR */
             vlc_rational_t region_sar = (vlc_rational_t) {
