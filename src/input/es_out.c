@@ -1251,12 +1251,12 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action,
     });
 }
 
-static void
+static vlc_tick_t
 ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
                     vlc_tick_t ck_stream, double rate)
 {
     es_out_pgrm_t *pgrm = opaque;
-    vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
+    return vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
 }
 
 static void

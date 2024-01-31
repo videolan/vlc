@@ -153,6 +153,8 @@ static void UpdateListener( input_clock_t *cl )
         ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
         cl->i_pts_delay + ClockGetTsOffset( cl );
 
+    /* The returned drift value is ignored for now since a different
+     * value is computed by the input_clock. */
     cl->listener.cbs->update(cl->listener.opaque, system_expected,
                              cl->last.stream, cl->rate);
 }
