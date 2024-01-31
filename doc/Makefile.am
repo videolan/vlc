@@ -18,6 +18,7 @@ LIBVLC_SAMPLES = \
 	libvlc/win_player.c \
 	libvlc/CMakeLists.txt \
 	libvlc/appkit_player.m \
+	libvlc/parser.c \
 	$(NULL)
 
 # Check that samples that depends only on LibVLC can build
@@ -26,10 +27,12 @@ AM_LDFLAGS = -no-install $(LDFLAGS_vlc) -L../src/ -lvlccore -L../lib -lvlc
 
 samples_libvlc_example_SOURCES = libvlc/example.c
 samples_libvlc_thumbnailer_SOURCES = libvlc/thumbnailer.c
+samples_libvlc_parser_SOURCES = libvlc/parser.c
 
 check_PROGRAMS = \
 	samples_libvlc_example \
 	samples_libvlc_thumbnailer \
+	samples_libvlc_parser \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
