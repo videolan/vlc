@@ -44,6 +44,8 @@ Dialog {
                     + (footer && footer.visible ? footer.implicitHeight + spacing : 0)
                     + (contentHeight > 0 ? contentHeight + topPadding + bottomPadding : 0)
 
+    closePolicy: Popup.CloseOnEscape
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         palette: VLCStyle.palette
