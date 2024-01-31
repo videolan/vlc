@@ -106,16 +106,26 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                    name:VLCLibraryModelAudioMediaItemDeleted
                                  object:nil];
 
-        NSString * const audioMediaLongLoadStartNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const audioMediaLongLoadFinishNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const audioMediaResetLongLoadStartNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const audioMediaResetLongLoadFinishNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const audioMediaDeletedLongLoadStartNotification = [VLCLibraryModelAudioMediaItemDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const audioMediaDeletedLongLoadFinishNotification = [VLCLibraryModelAudioMediaItemDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadStarted:)
-                                   name:audioMediaLongLoadStartNotification
+                                   name:audioMediaResetLongLoadStartNotification
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadFinished:)
-                                   name:audioMediaLongLoadFinishNotification
+                                   name:audioMediaResetLongLoadFinishNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadStarted:)
+                                   name:audioMediaDeletedLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:audioMediaDeletedLongLoadFinishNotification
                                  object:nil];
 
     }
