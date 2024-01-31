@@ -1275,9 +1275,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (region_sar.num <= 0 || region_sar.den <= 0) {
 
                 const uint64_t i_sar_num = (uint64_t)fmt_dst->i_visible_width  *
-                                           fmt_dst->i_sar_num * subpic->i_original_picture_height;
+                                           fmt_dst->i_sar_num * i_original_height;
                 const uint64_t i_sar_den = (uint64_t)fmt_dst->i_visible_height *
-                                           fmt_dst->i_sar_den * subpic->i_original_picture_width;
+                                           fmt_dst->i_sar_den * i_original_width;
 
                 vlc_ureduce(&region_sar.num, &region_sar.den,
                             i_sar_num, i_sar_den, 65536);
@@ -1285,16 +1285,16 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             /* Compute scaling from original size to destination size */
             // ensures that the heights match, the width being cropped.
-            spu_scale_t scale_h = spu_scale_createq((uint64_t)fmt_dst->i_visible_height         * fmt_dst->i_sar_den * region_sar.num,
-                                                  (uint64_t)subpic->i_original_picture_height * fmt_dst->i_sar_num * region_sar.den,
-                                                  fmt_dst->i_visible_height,
-                                                  subpic->i_original_picture_height);
+            spu_scale_t scale_h = spu_scale_createq((uint64_t)fmt_dst->i_visible_height * fmt_dst->i_sar_den * region_sar.num,
+                                                    (uint64_t)i_original_height         * fmt_dst->i_sar_num * region_sar.den,
+                                                    fmt_dst->i_visible_height,
+                                                    i_original_height);
 
             // ensures that the widths match, the height being cropped.
-            spu_scale_t scale_w = spu_scale_createq((uint64_t)fmt_dst->i_visible_width         * fmt_dst->i_sar_den * region_sar.num,
-                                      (uint64_t)subpic->i_original_picture_width * fmt_dst->i_sar_num * region_sar.den,
-                                      fmt_dst->i_visible_width,
-                                      subpic->i_original_picture_width);
+            spu_scale_t scale_w = spu_scale_createq((uint64_t)fmt_dst->i_visible_width * fmt_dst->i_sar_den * region_sar.num,
+                                                    (uint64_t)i_original_width         * fmt_dst->i_sar_num * region_sar.den,
+                                                    fmt_dst->i_visible_width,
+                                                    i_original_width);
 
             // take the scale that will crop the least
             spu_scale_t scale;
