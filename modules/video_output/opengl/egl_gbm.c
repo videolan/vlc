@@ -138,6 +138,17 @@ static EGLSurface CreateSurface(vlc_gl_t* gl, unsigned int width, unsigned int h
         width, height,
         sys->gbm.format,
         GBM_BO_USE_RENDERING | GBM_BO_USE_SCANOUT);
+
+    if (!sys->gbm.surface)
+    {
+        // Nvidia proprietary driver doesn't support creation flags
+        sys->gbm.surface =  gbm_surface_create(
+           sys->gbm.device,
+           width, height,
+           sys->gbm.format,
+           0);
+    }
+
     if (!sys->gbm.surface)
     {
         msg_Err(gl, "can't create gbm surface");
