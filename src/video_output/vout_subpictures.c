@@ -851,9 +851,6 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     video_format_t region_fmt;
     picture_t *region_picture;
 
-    /* Invalidate area by default */
-    *dst_area = spu_area_create(0,0, 0,0, scale_size);
-
     /* Force palette if requested
      * FIXME b_force_palette and force_crop are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
