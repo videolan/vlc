@@ -661,6 +661,33 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
     return 1;
 }
 
+static int MP4_ReadBox_mdia( stream_t *p_stream, MP4_Box_t *p_container )
+{
+    if( p_container->i_size &&
+        ( p_container->i_size <= (size_t)mp4_box_headersize(p_container ) + 8 ) )
+    {
+        /* container is empty, 8 stand for the first header in this box */
+        return 1;
+    }
+
+    /* enter box */
+    if ( MP4_Seek( p_stream, p_container->i_pos +
+                               mp4_box_headersize( p_container ) ) )
+        return 0;
+    int ret = MP4_ReadBoxContainerChildren( p_stream, p_container, NULL );
+    MP4_Box_t *stsd = MP4_BoxGet( p_container, "minf/stbl/stsd" );
+    if( stsd && stsd->i_handler == 0 )
+    {
+        /* Delayed parsing due to missing hdlr */
+        if( MP4_Seek( p_stream, stsd->i_pos ) ||
+            MP4_Box_Read_Specific( p_stream, stsd, stsd->p_father ) ||
+            stsd->i_handler == 0 )
+            msg_Warn( p_stream, "Failed to re-parse stsd" );
+    }
+
+    return ret;
+}
+
 static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
 {
     if( p_box->i_size < 8 || vlc_stream_Read( p_stream, NULL, 8 ) != 8 )
@@ -2920,6 +2947,11 @@ static int MP4_ReadBox_stsd( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_mdia == NULL || p_mdia->i_type != ATOM_mdia ||
         (p_hdlr = MP4_BoxGet( p_mdia, "hdlr" )) == NULL )
     {
+        if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) == VLC_SUCCESS )
+        {
+            msg_Warn( p_stream, "missing hdlr for stsd, delaying" );
+            MP4_READBOX_EXIT( 1 );
+        }
         MP4_READBOX_EXIT( 0 );
     }
 
@@ -4994,7 +5026,7 @@ static const struct
     { ATOM_moov,    MP4_ReadBoxContainer,     0 },
     { ATOM_trak,    MP4_ReadBoxContainer,     ATOM_moov },
     { ATOM_trak,    MP4_ReadBoxContainer,     ATOM_foov },
-    { ATOM_mdia,    MP4_ReadBoxContainer,     ATOM_trak },
+    { ATOM_mdia,    MP4_ReadBox_mdia,         ATOM_trak },
     { ATOM_moof,    MP4_ReadBoxContainer,     0 },
     { ATOM_minf,    MP4_ReadBoxContainer,     ATOM_mdia },
     { ATOM_stbl,    MP4_ReadBoxContainer,     ATOM_minf },
