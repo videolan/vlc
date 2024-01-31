@@ -43,11 +43,14 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCLoadingOverlayView.h"
+
 #import "windows/video/VLCMainVideoViewController.h"
 
 @interface VLCLibraryHomeViewController ()
 {
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
+    NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 }
 @end
 
@@ -59,6 +62,7 @@
 
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupLoadingOverlayView];
         [self setupGridViewController];
         [self setupHomePlaceholderView];
         [self setupHomeLibraryViews];
@@ -80,6 +84,28 @@
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelAudioMediaItemDeleted
                                  object:nil];
+
+        NSString * const videoMediaLongLoadStartNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const videoMediaLongLoadFinishNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const audioMediaLongLoadStartNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const audioMediaLongLoadFinishNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadStarted:)
+                                   name:videoMediaLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:videoMediaLongLoadFinishNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadStarted:)
+                                   name:audioMediaLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:audioMediaLongLoadFinishNotification
+                                 object:nil];
     }
 
     return self;
@@ -97,6 +123,42 @@
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
+}
+
+- (void)setupLoadingOverlayView
+{
+    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
+    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    _loadingOverlayViewConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1
+                                      constant:0]
+    ];
 }
 
 - (void)setupGridViewController
@@ -168,7 +230,11 @@
     }
 
     self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.libraryTargetView.subviews = @[self.emptyLibraryView];
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[self.emptyLibraryView];
+    }
     NSDictionary * const dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
@@ -180,7 +246,11 @@
 - (void)presentHomeLibraryView
 {
     self.homeLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.libraryTargetView.subviews = @[self.homeLibraryView];
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.homeLibraryView, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[self.homeLibraryView];
+    }
 
     NSDictionary * const dict = NSDictionaryOfVariableBindings(_homeLibraryView);
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_homeLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
@@ -211,6 +281,49 @@
 
         [self updatePresentedView];
     }
+}
+
+- (void)libraryModelLongLoadStarted:(NSNotification *)notification
+{
+    NSLog(@"Home long load started");
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    }
+
+    self.loadingOverlayView.wantsLayer = YES;
+    self.loadingOverlayView.alphaValue = 0.0;
+
+    NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
+    self.libraryTargetView.subviews = views;
+    [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 0.5;
+        self.loadingOverlayView.animator.alphaValue = 1.0;
+    } completionHandler:nil];
+    [self.loadingOverlayView.indicator startAnimation:self];
+}
+
+- (void)libraryModelLongLoadFinished:(NSNotification *)notification
+{
+    NSLog(@"Home long load finished");
+    if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    }
+
+    self.loadingOverlayView.wantsLayer = YES;
+    self.loadingOverlayView.alphaValue = 1.0;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        self.loadingOverlayView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
+        [views removeObject:self.loadingOverlayView];
+        self.libraryTargetView.subviews = views.copy;
+        [self.loadingOverlayView.indicator stopAnimation:self];
+    }];
 }
 
 @end
