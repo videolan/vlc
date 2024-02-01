@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryHomeViewAudioCarouselContainerView *audioRecentsView;
 
 - (void)reloadData;
+- (void)connectContainers;
+- (void)disconnectContainers;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end

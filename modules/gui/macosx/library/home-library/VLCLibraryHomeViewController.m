@@ -317,6 +317,8 @@
         return;
     }
 
+    [self.stackViewController disconnectContainers];
+
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
 
@@ -342,6 +344,8 @@
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
+
+    [self.stackViewController connectContainers];
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;

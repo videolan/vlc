@@ -191,6 +191,20 @@
     });
 }
 
+- (void)connectContainers
+{
+    for (NSView<VLCLibraryHomeViewContainerView> * const container in _containers) {
+        [container connect];
+    }
+}
+
+- (void)disconnectContainers
+{
+    for (NSView<VLCLibraryHomeViewContainerView> * const container in _containers) {
+        [container disconnect];
+    }
+}
+
 - (NSArray<NSLayoutConstraint*> *)setupViewConstraints:(NSView *)view
                                          withStackView:(NSStackView *)stackView
 {
