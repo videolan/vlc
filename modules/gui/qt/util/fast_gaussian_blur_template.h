@@ -7,6 +7,8 @@
 //
 #pragma once
 
+#include <cmath>
+
 //!
 //! \file fast_gaussian_blur_template.h
 //! \author Basile Fraboni
