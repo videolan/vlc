@@ -167,6 +167,52 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                     inVideoGroup:VLCMediaLibraryParentGroupTypeRecentVideos];
 }
 
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelVideoListReset:)
+                               name:VLCLibraryModelVideoMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelVideoItemUpdated:)
+                               name:VLCLibraryModelVideoMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelVideoItemDeleted:)
+                               name:VLCLibraryModelVideoMediaItemDeleted
+                             object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentsListReset:)
+                               name:VLCLibraryModelRecentsMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentsItemUpdated:)
+                               name:VLCLibraryModelRecentsMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentsItemDeleted:)
+                               name:VLCLibraryModelRecentsMediaItemDeleted
+                             object:nil];
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaListReset object:self];
+    [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaItemUpdated object:self];
+    [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaItemDeleted object:self];
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaListReset object:self];
+    [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaItemUpdated object:self];
+    [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaItemDeleted object:self];
+}
+
 - (void)reloadData
 {
     if(!_libraryModel) {
