@@ -22,8 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryCollectionViewDataSource.h"
+#import "library/VLCLibraryTableViewDataSource.h"
 
 #include "views/iCarousel/iCarousel.h"
 

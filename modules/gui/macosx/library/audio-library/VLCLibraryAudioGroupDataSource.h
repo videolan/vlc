@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
-#import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryTableViewDataSource.h"
 
 #import <vlc_media_library.h>
 

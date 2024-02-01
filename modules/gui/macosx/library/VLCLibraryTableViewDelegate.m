@@ -24,7 +24,7 @@
 
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableCellViewProtocol.h"
-#import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryTableViewDataSource.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
