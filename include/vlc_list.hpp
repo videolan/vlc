@@ -339,6 +339,11 @@ public:
     {
         return a._list != b._list;
     }
+
+    bool empty() const
+    {
+        return vlc_list_is_empty(_list);
+    }
 };
 
 /**
@@ -396,6 +401,24 @@ public:
             NodeType, vlc_list, iterator, const_iterator
         >(l, node_ptr) {};
 
+    template <typename IteratorType>
+    IteratorType erase(IteratorType it)
+    {
+        vlc_list_remove(&((*it).*(this->_node_ptr)));
+        return it;
+    }
+
+    void push_front(NodeType &item)
+    {
+        struct vlc_list *node = &(item.*(this->_node_ptr));
+        vlc_list_prepend(node, &this->_list);
+    }
+
+    void push_back(NodeType &item)
+    {
+        struct vlc_list *node = &(item.*(this->_node_ptr));
+        vlc_list_append(node, &this->_list);
+    }
 };
 
 /**
