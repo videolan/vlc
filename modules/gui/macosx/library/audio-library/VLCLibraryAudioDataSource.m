@@ -92,65 +92,6 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 {
     self = [super init];
     if(self) {
-        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAudioMediaItemsReset:)
-                                   name:VLCLibraryModelAudioMediaListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAudioMediaItemUpdated:)
-                                   name:VLCLibraryModelAudioMediaItemUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAudioMediaItemDeleted:)
-                                   name:VLCLibraryModelAudioMediaItemDeleted
-                                 object:nil];
-
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelArtistsReset:)
-                                   name:VLCLibraryModelArtistListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelArtistUpdated:)
-                                   name:VLCLibraryModelArtistUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelArtistDeleted:)
-                                   name:VLCLibraryModelArtistDeleted
-                                 object:nil];
-
-
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAlbumsReset:)
-                                   name:VLCLibraryModelAlbumListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAlbumUpdated:)
-                                   name:VLCLibraryModelAlbumUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelAlbumDeleted:)
-                                   name:VLCLibraryModelAlbumDeleted
-                                 object:nil];
-
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelGenresReset:)
-                                   name:VLCLibraryModelGenreListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelGenreUpdated:)
-                                   name:VLCLibraryModelGenreUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelGenreDeleted:)
-                                   name:VLCLibraryModelGenreDeleted
-                                 object:nil];
-
-        [notificationCenter addObserver:self
-                               selector:@selector(currentlyPlayingItemChanged:)
-                                   name:VLCPlayerCurrentMediaItemChanged
-                                 object:nil];
-
         _displayedCollectionUpdating = NO;
     }
 
@@ -369,6 +310,92 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     [self setupTableViews];
     // Force setAudioLibrarySegment to do something always on first try
     _audioLibrarySegment = VLCAudioLibraryUnknownSegment;
+}
+
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemsReset:)
+                               name:VLCLibraryModelAudioMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemUpdated:)
+                               name:VLCLibraryModelAudioMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemDeleted:)
+                               name:VLCLibraryModelAudioMediaItemDeleted
+                             object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelArtistsReset:)
+                               name:VLCLibraryModelArtistListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelArtistUpdated:)
+                               name:VLCLibraryModelArtistUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelArtistDeleted:)
+                               name:VLCLibraryModelArtistDeleted
+                             object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumsReset:)
+                               name:VLCLibraryModelAlbumListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumUpdated:)
+                               name:VLCLibraryModelAlbumUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumDeleted:)
+                               name:VLCLibraryModelAlbumDeleted
+                             object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGenresReset:)
+                               name:VLCLibraryModelGenreListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGenreUpdated:)
+                               name:VLCLibraryModelGenreUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGenreDeleted:)
+                               name:VLCLibraryModelGenreDeleted
+                             object:nil];
+
+    [notificationCenter addObserver:self
+                           selector:@selector(currentlyPlayingItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaItemUpdated object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaItemDeleted object:nil];
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelArtistListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelArtistUpdated object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelArtistDeleted object:nil];
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumUpdated object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumDeleted object:nil];
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelGenreListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelGenreUpdated object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelGenreDeleted object:nil];
+
+    [notificationCenter removeObserver:self name:VLCPlayerCurrentMediaItemChanged object:nil];
 }
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
