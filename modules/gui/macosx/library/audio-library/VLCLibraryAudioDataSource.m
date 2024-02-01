@@ -310,6 +310,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     [self setupTableViews];
     // Force setAudioLibrarySegment to do something always on first try
     _audioLibrarySegment = VLCAudioLibraryUnknownSegment;
+    [self connect];
 }
 
 - (void)connect

@@ -58,32 +58,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 {
     self = [super init];
     if(self) {
-        NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelVideoListReset:)
-                                   name:VLCLibraryModelVideoMediaListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelVideoItemUpdated:)
-                                   name:VLCLibraryModelVideoMediaItemUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelVideoItemDeleted:)
-                                   name:VLCLibraryModelVideoMediaItemDeleted
-                                 object:nil];
-
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelRecentsListReset:)
-                                   name:VLCLibraryModelRecentsMediaListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelRecentsItemUpdated:)
-                                   name:VLCLibraryModelRecentsMediaItemUpdated
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelRecentsItemDeleted:)
-                                   name:VLCLibraryModelRecentsMediaItemDeleted
-                                 object:nil];
+        [self connect];
     }
     return self;
 }

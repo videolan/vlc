@@ -174,8 +174,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioGroupDataSource.tableViews = @[_audioGroupSelectionTableView];
     _audioGroupDataSource.collectionViews = @[_audioLibraryGridModeSplitViewListSelectionCollectionView];
     _audioDataSource.audioGroupDataSource = _audioGroupDataSource;
-
-    [_audioDataSource connect];
 }
 
 - (void)setupAudioCollectionView
