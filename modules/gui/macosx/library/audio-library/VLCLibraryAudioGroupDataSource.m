@@ -74,12 +74,7 @@
 {
     [self addObserver:self forKeyPath:@"collectionViews" options:NSKeyValueObservingOptionNew context:nil];
     [self addObserver:self forKeyPath:@"tableViews" options:NSKeyValueObservingOptionNew context:nil];
-
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter addObserver:self
-                           selector:@selector(libraryModelAudioMediaItemsReset:)
-                               name:VLCLibraryModelAudioMediaListReset
-                             object:nil];
+    [self connect];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -101,6 +96,27 @@
 - (void)libraryModelAudioMediaItemsReset:(NSNotification *)notification
 {
     [self updateRepresentedListOfAlbums];
+}
+
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemsReset:)
+                               name:VLCLibraryModelAudioMediaListReset
+                             object:nil];
+    // TODO: Handle item deletion, update
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaListReset object:nil];
+    // TODO: Handle item deletion, update
 }
 
 - (void)reloadTableViews
