@@ -406,6 +406,8 @@
         return;
     }
 
+    [self.libraryVideoDataSource disconnect];
+
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
 
@@ -426,6 +428,8 @@
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
+
+    [self.libraryVideoDataSource connect];
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;
