@@ -36,6 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(nullable NSTableView *)tableView;
 
+@optional
+- (void)connect;
+- (void)disconnect;
+
 @end
 
 @interface VLCLibraryTableView : NSTableView<NSMenuDelegate>

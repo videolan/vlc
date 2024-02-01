@@ -37,6 +37,8 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 
 @implementation VLCLibraryAlbumTracksDataSource
 
+// TODO: Connect to library model
+
 - (VLCMediaLibraryAlbum*)representedAlbum
 {
     return self.internalAlbum;

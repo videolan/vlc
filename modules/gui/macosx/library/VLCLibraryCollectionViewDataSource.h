@@ -33,6 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (void)reloadData;
 
+@optional
+- (void)connect;
+- (void)disconnect;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -38,8 +38,6 @@ extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, assign) NSTableView *groupsTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 
-- (void)connect;
-- (void)disconnect;
 - (void)reloadData;
 - (void)setupCollectionView:(NSCollectionView *)collectionView;
 
