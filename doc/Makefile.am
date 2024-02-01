@@ -11,7 +11,7 @@ LIBVLC_SAMPLES = \
 	libvlc/QtGL/qtvlcwidget.cpp \
 	libvlc/QtGL/qtvlcwidget.h \
 	libvlc/QtGL/QtGl.pro \
-	libvlc/vlc-thumb.c \
+	libvlc/thumbnailer.c \
 	libvlc/wx_player.cpp \
 	libvlc/d3d11_player.cpp \
 	libvlc/d3d9_player.c \
@@ -25,11 +25,11 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_LDFLAGS = -no-install $(LDFLAGS_vlc) -L../src/ -lvlccore -L../lib -lvlc
 
 samples_libvlc_example_SOURCES = libvlc/example.c
-samples_libvlc_thumb_SOURCES = libvlc/vlc-thumb.c
+samples_libvlc_thumbnailer_SOURCES = libvlc/thumbnailer.c
 
 check_PROGRAMS = \
 	samples_libvlc_example \
-	samples_libvlc_thumb \
+	samples_libvlc_thumbnailer \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)

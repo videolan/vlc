@@ -6,7 +6,7 @@
    gcc -pedantic -Wall -Werror -Wextra `pkg-config --cflags --libs libvlc` -lpthread
 
   # to register the thumbnailer on gnome 3.x:
-  cp vlc-thumb.thumbnailer /usr/share/thumbnailers
+  cp thumb.thumbnailer /usr/share/thumbnailers
 
   # to register the thumbnailer on gnome 2.x:
   list=`grep ^Mime vlc.desktop|cut -d= -f2-|sed -e s/";"/\\\n/g -e s,/,@,g`
