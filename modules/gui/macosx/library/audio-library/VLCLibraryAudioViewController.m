@@ -174,6 +174,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioGroupDataSource.tableViews = @[_audioGroupSelectionTableView];
     _audioGroupDataSource.collectionViews = @[_audioLibraryGridModeSplitViewListSelectionCollectionView];
     _audioDataSource.audioGroupDataSource = _audioGroupDataSource;
+
+    [_audioDataSource connect];
 }
 
 - (void)setupAudioCollectionView
@@ -618,6 +620,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
+    [self.audioDataSource disconnect];
+
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
 
@@ -638,6 +642,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
+
+    [self.audioDataSource connect];
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;
