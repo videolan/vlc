@@ -79,6 +79,7 @@
 - (void)setup
 {
     [self setupView];
+    [self connect];
 }
 
 - (void)setupView
@@ -115,6 +116,16 @@
 
     self.carouselView.autoscroll = -.05;
     self.carouselView.reenablePostInteractAutoscrollTimeout = 3.;
+}
+
+- (void)connect
+{
+    [self.dataSource connect];
+}
+
+- (void)disconnect
+{
+    [self.dataSource disconnect];
 }
 
 - (void)updateCarouselViewHeight
