@@ -50,6 +50,7 @@
         [self setupView];
         [self setupDataSource];
         [self setupCollectionViewSizeChangeListener];
+        [self connect];
     }
 
     return self;
@@ -155,6 +156,16 @@
                            selector:@selector(collectionViewFrameChanged:)
                                name:NSViewFrameDidChangeNotification
                              object:nil];
+}
+
+- (void)connect
+{
+    [self.dataSource connect];
+}
+
+- (void)disconnect
+{
+    [self.dataSource disconnect];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
