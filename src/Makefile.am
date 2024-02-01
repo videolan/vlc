@@ -126,6 +126,7 @@ pluginsinclude_HEADERS.h = \
 
 pluginsinclude_HEADERS.hpp = \
 	../include/vlc_cxx_helpers.hpp \
+	../include/vlc_list.hpp \
 	$(NULL)
 
 pluginsinclude_HEADERS = \
@@ -757,6 +758,7 @@ $(checkheaders.hpp): CHECKCOMPILE=$(LTCXXCOMPILE)
 # Some exceptions for headers depending on other libraries
 checkheader_vlc_gcrypt.h.check: CHECK_CFLAGS = "-Dgcry_check_version(x)="
 checkheader_vlc_xlib.h.check: CHECK_CFLAGS = $(X_CFLAGS)
+checkheader_vlc_list.hpp.check: CHECK_CFLAGS = "-Drestrict="
 
 SKIPPED_CHECKHEADERS =
 if !HAVE_X
