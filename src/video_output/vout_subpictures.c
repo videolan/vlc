@@ -1008,7 +1008,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
              * still exist.  */
             y_offset -= secondary_margin;
         }
-        else
+        else if (subpic->b_subtitle)
         {
             /* Use an absolute margin for secondary subpictures that have
              * already been placed but have been moved by the user */
