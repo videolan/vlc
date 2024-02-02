@@ -637,7 +637,8 @@ check_PROGRAMS = \
 	test_media_source \
 	test_extensions \
 	test_thread \
-	test_diffutil
+	test_diffutil \
+	test_cpp_list
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -686,6 +687,7 @@ test_media_source_SOURCES = media_source/test.c \
 	media_source/media_source.c \
 	media_source/media_tree.c
 test_thread_SOURCES = test/thread.c
+test_cpp_list_SOURCES = test/list_cpp.cpp
 
 LDADD = libvlccore.la \
 	../compat/libcompat.la
