@@ -188,7 +188,10 @@ static int Mux(sout_mux_t *mux)
         }
 
         if (data)
+        {
+            data->i_flags |= BLOCK_FLAG_HEADER;
             sout_AccessOutWrite(mux->p_access, data);
+        }
         sys->header_done = true;
     }
 
