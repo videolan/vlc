@@ -37,7 +37,8 @@ DEPS_protobuf = zlib $(DEPS_zlib)
 PROTOBUFVARS := DIST_LANG="cpp"
 PROTOCVARS := DIST_LANG="cpp"
 
-PROTOCCONF += --enable-static --disable-shared
+PROTOBUF_COMMON_CONF := -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_DEBUG_POSTFIX:STRING=
+PROTOC_CONF := $(PROTOBUF_COMMON_CONF)
 
 .sum-protoc: .sum-protobuf
 	touch $@
@@ -45,22 +46,33 @@ PROTOCCONF += --enable-static --disable-shared
 protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
 	tar $(TAR_VERBOSE)xzfo "$<" -C $(UNPACK_DIR) --strip-components=1
-	# don't build benchmarks and conformance
-	sed -i.orig 's, conformance benchmarks,,' "$(UNPACK_DIR)/Makefile.am"
-	sed -i.orig 's, benchmarks/Makefile conformance/Makefile,,' "$(UNPACK_DIR)/configure.ac"
-	# don't use gmock or any sub project to configure
-	sed -i.orig 's,AC_CONFIG_SUBDIRS,dnl AC_CONFIG_SUBDIRS,' "$(UNPACK_DIR)/configure.ac"
-	# force include <algorithm>
-	sed -i.orig 's,#ifdef _MSC_VER,#if 1,' "$(UNPACK_DIR)/src/google/protobuf/repeated_field.h"
-	$(APPLY) $(SRC)/protobuf/protobuf-no-mingw-pthread.patch
+	# add a dummy install command to disable some installation
+	sed -i.old '1s;^;function (noinstall ...)\nendfunction()\n;' $(UNPACK_DIR)/cmake/install.cmake
+	# don't install pkg-config files (on top of the target ones)
+	sed -i.orig -e 's,install(FILES ,noinstall(FILES ,' $(UNPACK_DIR)/cmake/install.cmake
+	# don't install cmake exports/targets/folders except protoc
+	sed -i.orig -e 's,install(EXPORT ,noinstall(EXPORT ,' $(UNPACK_DIR)/cmake/install.cmake
+	sed -i.orig -e 's,install(DIRECTORY ,noinstall(DIRECTORY ,' $(UNPACK_DIR)/cmake/install.cmake
+	sed -i.orig -e 's,install(TARGETS ,noinstall(TARGETS ,' $(UNPACK_DIR)/cmake/install.cmake
+	sed -i.orig -e 's,noinstall(TARGETS protoc,install(TARGETS protoc,' $(UNPACK_DIR)/cmake/install.cmake
+	# set the binary prefix
+	echo "set_target_properties(protoc PROPERTIES PREFIX \"$(HOST)-\")" >> $(UNPACK_DIR)/cmake/install.cmake
+	# disable libprotobuf-ltie
+	# sed -i.orig -e 's,libprotobuf-lite, ,' $(UNPACK_DIR)/cmake/install.cmake
+	# sed -i.orig -e 's,include(libprotobuf-lite,#include(libprotobuf-lite,' $(UNPACK_DIR)/cmake/CMakeLists.txt
 	$(MOVE)
 
 .protoc: protoc
-	$(RECONF)
-	$(MAKEBUILDDIR)
-	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILD_SRC)/configure $(BUILDTOOLCONF) $(PROTOCVARS) $(PROTOCCONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	$(CMAKECLEAN)
+	$(BUILDVARS) cmake -S $</cmake \
+		-B $(BUILD_DIR) \
+		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+		-DCMAKE_INSTALL_PREFIX:STRING=$(BUILDPREFIX) \
+		-DBUILD_SHARED_LIBS:BOOL=OFF \
+		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
+		-DBUILD_TESTING:BOOL=OFF $(PROTOC_CONF)
+	+$(CMAKEBUILD)
+	env cmake --install $(BUILD_DIR) --prefix $(BUILDPREFIX)
 	touch $@
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
