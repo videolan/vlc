@@ -862,10 +862,10 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
     }
 
     subpicture_region_t *p_region = subpicture_region_New( &fmt );
+    fmt.p_palette = NULL;
+    video_format_Clean( &fmt );
     if( !p_region )
     {
-        fmt.p_palette = NULL;
-        video_format_Clean( &fmt );
         msg_Err( p_dec, "cannot allocate SPU region" );
         return VLC_EGENERIC;
     }
@@ -889,9 +889,6 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
             memset( p_p + i_x + i_y, i_color, i_len );
         }
     }
-
-    fmt.p_palette = NULL;
-    video_format_Clean( &fmt );
 
     return VLC_SUCCESS;
 }
