@@ -47,6 +47,7 @@ typedef struct
     block_t *begin;
     block_t **end;
     vlc_tick_t length;
+    block_t *last_header;
 } hls_block_chain_t;
 
 static inline void hls_block_chain_Reset(hls_block_chain_t *chain)
@@ -54,6 +55,7 @@ static inline void hls_block_chain_Reset(hls_block_chain_t *chain)
     chain->begin = NULL;
     chain->end = &chain->begin;
     chain->length = 0;
+    chain->last_header = NULL;
 }
 
 /**
@@ -549,6 +551,8 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
         {
             block_ChainLastAppend(&it->muxed_output.end, block);
             it->muxed_output.length += length;
+            if (block->i_flags & BLOCK_FLAG_HEADER)
+                it->muxed_output.last_header = block;
         }
 
         /* Check if muxed outputs have enough data to output a segment. */
