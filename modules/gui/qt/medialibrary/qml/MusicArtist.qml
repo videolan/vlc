@@ -1,4 +1,4 @@
-﻿/*****************************************************************************
+/*****************************************************************************
  * Copyright (C) 2020 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
@@ -474,7 +474,7 @@ FocusScope {
                 model: {
                     criteria: "duration",
 
-                    text: I18n.qtr("Album"),
+                    text: I18n.qtr("Duration"),
 
                     showSection: "",
 
