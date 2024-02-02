@@ -796,4 +796,6 @@ int main(int argc, const char *argv[])
 {
     test_init();
     run_scenarios(argc, argv, clock_scenarios, ARRAY_SIZE(clock_scenarios));
+
+    return EXIT_SUCCESS;
 }
