@@ -37,6 +37,7 @@
 #include <vlc_url.h>
 #include <vlc_meta.h>
 #include <vlc_input_item.h>
+#include <vlc_list.hpp>
 
 #include <QTreeWidget>
 #include <QTableWidget>
@@ -507,25 +508,19 @@ void InfoPanel::update( input_item_t *p_item)
 
     vlc_mutex_locker locker( &p_item->lock );
 
-    info_category_t *cat;
-    vlc_list_foreach(cat, &p_item->categories, node)
+    for (auto &cat : vlc::from(p_item->categories, &info_category_t::node))
     {
-        if (info_category_IsHidden(cat))
+        if (info_category_IsHidden(&cat))
             continue;
 
-        struct vlc_list *const head = &cat->infos;
-
         current_item = new QTreeWidgetItem();
-        current_item->setText( 0, qfu(cat->psz_name) );
+        current_item->setText(0, qfu(cat.psz_name));
         InfoTree->addTopLevelItem( current_item );
 
-        for (info_t *info = vlc_list_first_entry_or_null(head, info_t, node);
-             info != NULL;
-             info = vlc_list_next_entry_or_null(head, info, info_t, node))
+        for (auto &info : vlc::from(cat.infos, &info_t::node))
         {
             child_item = new QTreeWidgetItem ();
-            child_item->setText( 0, qfu(info->psz_name) + ": "
-                                    + qfu(info->psz_value));
+            child_item->setText(0, qfu(info.psz_name) + ": " + qfu(info.psz_value));
             current_item->addChild(child_item);
         }
         current_item->setExpanded( true );
