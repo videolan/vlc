@@ -1022,13 +1022,7 @@ static int ReadMeta( vlc_object_t* p_this)
         p_stream = p_filter;
 
     VlcIostream s( p_stream );
-#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
-    uint64_t dummy;
-    if( vlc_stream_GetSize( p_stream, &dummy ) != VLC_SUCCESS )
-        s.setMaxSequentialRead( 2048 );
-    else
-        s.setMaxSequentialRead( 1024 * 2048 );
-#endif
+
     FileRef f( &s, false, AudioProperties::ReadStyle::Fast );
 
     if( f.isNull() )
