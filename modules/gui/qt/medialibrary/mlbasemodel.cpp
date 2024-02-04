@@ -57,7 +57,7 @@ public:
         : Parent(pub)
     {}
 
-    void validateCache() const
+    void validateCache() const override
     {
         Q_Q(const MLBaseModel);
 
