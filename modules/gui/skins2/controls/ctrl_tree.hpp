@@ -36,7 +36,7 @@ class GenericBitmap;
 class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update>
 {
 public:
-    typedef VarTree::IteratorVisible Iterator;
+    using Iterator = VarTree::IteratorVisible;
 
     CtrlTree( intf_thread_t *pIntf,
               VarTree &rTree,
