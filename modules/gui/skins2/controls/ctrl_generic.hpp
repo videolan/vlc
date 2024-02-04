@@ -131,7 +131,7 @@ protected:
     virtual void onVarBoolUpdate( VarBool &rVar ) { (void)rVar; }
 
     /// Method called when an observed bool variable is changed
-    virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+    void onUpdate(Subject<VarBool> &rVariable , void*) override;
 
     /// Associated layout
     GenericLayout *m_pLayout;
