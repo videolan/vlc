@@ -42,7 +42,7 @@
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
                       X11Window *pParentWindow, GenericWindow::WindowType_t type ):
-    OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
+    OSWindow( pIntf ), m_rDisplay( rDisplay ),
     m_dragDrop( dragDrop ), m_pDropTarget( NULL ), m_type ( type )
 {
     XSetWindowAttributes attr;

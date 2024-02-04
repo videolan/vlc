@@ -91,8 +91,6 @@ private:
     Window m_wnd;
     /// Window ID
     Window m_wnd_parent;
-    /// Parent window
-    X11Window *m_pParent;
     /// Indicates whether the window handles drag&drop events
     bool m_dragDrop;
     /// Drop target
