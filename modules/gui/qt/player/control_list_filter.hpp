@@ -31,6 +31,8 @@ class ControlListModel;
 
 class ControlListFilter : public QSortFilterProxyModel
 {
+    using QSortFilterProxyModel::setSourceModel;
+
     Q_OBJECT
 
     Q_PROPERTY(ControlListModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged1 FINAL)
@@ -41,6 +43,7 @@ public:
     explicit ControlListFilter(QObject * parent = nullptr);
 
     void setSourceModel(ControlListModel* sourceModel);
+
     ControlListModel* sourceModel() const;
 
 protected: // QSortFilterProxyModel reimplementation
