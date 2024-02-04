@@ -51,22 +51,22 @@ public:
                   VarBool &rVariable, const UString &rHelp,
                   VarBool *pVisible);
 
-    virtual ~CtrlCheckbox();
+    ~CtrlCheckbox() override;
 
     /// Handle an event
-    virtual void handleEvent( EvtGeneric &rEvent );
+    void handleEvent(EvtGeneric &rEvent) override;
 
     /// Check whether coordinates are inside the control
-    virtual bool mouseOver( int x, int y ) const;
+    bool mouseOver(int x, int y) const override;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+    void draw(OSGraphics &rImage, int xDest, int yDest, int w, int h) override;
 
     /// Get the text of the tooltip XXX
-    virtual UString getTooltipText() const { return *m_pTooltip; }
+    UString getTooltipText() const override { return *m_pTooltip; }
 
     /// Get the type of control (custom RTTI)
-    virtual std::string getType() const { return "checkbox"; }
+    std::string getType() const override { return "checkbox"; }
 
 private:
     /// Finite state machine of the control
@@ -105,10 +105,10 @@ private:
     DEFINE_CALLBACK( CtrlCheckbox, HiddenUp )
 
     /// Method called when the observed variable is modified
-    virtual void onVarBoolUpdate( VarBool &rVariable );
+    void onVarBoolUpdate(VarBool &rVariable) override;
 
     /// Method called when an animated bitmap changes
-    virtual void onUpdate( Subject<AnimBitmap> &rBitmap, void* );
+    void onUpdate(Subject<AnimBitmap> &rBitmap, void*) override;
 
     /// Change the current image
     void setImage( AnimBitmap *pImg );
