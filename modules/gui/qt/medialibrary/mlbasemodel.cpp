@@ -470,7 +470,7 @@ size_t MLListCacheLoader::countTask(std::function<void(size_t taskId, size_t cou
             ctx.count = op->count(ml, &query);
         },
         //UI thread
-        [this, cb](quint64 taskId, Ctx& ctx)
+        [cb](quint64 taskId, Ctx& ctx)
         {
             cb(taskId,  ctx.count);
         });
@@ -492,7 +492,7 @@ size_t MLListCacheLoader::loadTask(size_t offset, size_t limit,
             ctx.list = op->load(ml, &query);
         },
         //UI thread
-        [this, cb](quint64 taskId, Ctx& ctx)
+        [cb](quint64 taskId, Ctx& ctx)
         {
             cb(taskId, ctx.list);
         });
@@ -508,14 +508,14 @@ size_t MLListCacheLoader::countAndLoadTask(size_t offset, size_t limit,
 
     return m_medialib->runOnMLThread<Ctx>(this,
         //ML thread
-        [this, offset, limit, op = m_op]
+        [offset, limit, op = m_op]
         (vlc_medialibrary_t* ml, Ctx& ctx) {
             auto query = op->getQueryParams(offset, limit);
             ctx.list = op->load(ml, &query);
             ctx.maximumCount = op->count(ml, &query);
         },
         //UI thread
-        [this, cb](quint64 taskId, Ctx& ctx) {
+        [cb](quint64 taskId, Ctx& ctx) {
             cb(taskId,  ctx.maximumCount, ctx.list);
         });
 }
@@ -589,7 +589,7 @@ size_t MLListCacheLoader::loadItemByIdTask(MLItemId itemId, std::function<void (
             ctx.item = op->loadItemById(ml, itemId);
         },
         //UI thread
-        [this, cb](qint64 taskId, Ctx& ctx) {
+        [cb](qint64 taskId, Ctx& ctx) {
             if (!ctx.item)
                 return;
             cb(taskId, std::move(ctx.item));
