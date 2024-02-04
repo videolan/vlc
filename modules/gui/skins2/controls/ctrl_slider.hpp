@@ -50,35 +50,35 @@ public:
                       VarBool *pVisible, const UString &rTooltip,
                       const UString &rHelp );
 
-    virtual ~CtrlSliderCursor();
+    ~CtrlSliderCursor() override;
 
     /// Handle an event
-    virtual void handleEvent( EvtGeneric &rEvent );
+    void handleEvent(EvtGeneric &rEvent) override;
 
     /// Return true if the control can be scrollable
-    virtual bool isScrollable() const { return true; }
+    bool isScrollable() const override { return true; }
 
     /// Check whether coordinates are inside the control
-    virtual bool mouseOver( int x, int y ) const;
+    bool mouseOver(int x, int y) const override;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+    void draw(OSGraphics &rImage, int xDest, int yDest, int w, int h) override;
 
     /// Called when the position is set
-    virtual void onPositionChange();
+    void onPositionChange() override;
 
     /// Method called when the control is resized
-    virtual void onResize();
+    void onResize() override;
 
     /// Method called to notify are to be updated
-    virtual void notifyLayout( int width = -1, int height = -1,
-                               int xOffSet = 0, int yOffSet = 0 );
+    void notifyLayout(int width = -1, int height = -1,
+                      int xOffSet = 0, int yOffSet = 0) override;
 
     /// Get the text of the tooltip
-    virtual UString getTooltipText() const { return m_tooltip; }
+    UString getTooltipText() const override { return m_tooltip; }
 
     /// Get the type of control (custom RTTI)
-    virtual std::string getType() const { return "slider_cursor"; }
+    std::string getType() const override { return "slider_cursor"; }
 
 private:
     /// Finite state machine of the control
@@ -112,7 +112,7 @@ private:
     const OSGraphics *m_pImg;
 
     /// Method called when the position variable is modified
-    virtual void onUpdate( Subject<VarPercent> &rVariable, void * );
+    void onUpdate(Subject<VarPercent> &rVariable, void *) override;
 
     /// Method to compute the resize factors
     void getResizeFactors( float &rFactorX, float &rFactorY ) const;
@@ -134,35 +134,35 @@ public:
                   int thickness, GenericBitmap *pBackground, int nbHoriz,
                   int nbVert, int padHoriz, int padVert, VarBool *pVisible,
                   const UString &rHelp );
-    virtual ~CtrlSliderBg();
+    ~CtrlSliderBg() override;
 
     /// Return true if the control can be scrollable
-    virtual bool isScrollable() const { return true; }
+    bool isScrollable() const override { return true; }
 
     /// Tell whether the mouse is over the control
-    virtual bool mouseOver( int x, int y ) const;
+    bool mouseOver(int x, int y) const override;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+    void draw(OSGraphics &rImage, int xDest, int yDest, int w, int h) override;
 
     /// Handle an event
-    virtual void handleEvent( EvtGeneric &rEvent );
+    void handleEvent(EvtGeneric &rEvent) override;
 
     /// Called when the position is set
-    virtual void onPositionChange();
+    void onPositionChange() override;
 
     /// Method called when the control is resized
-    virtual void onResize();
+    void onResize() override;
 
     /// Method called to notify are to be updated
-    virtual void notifyLayout( int width = -1, int height = -1,
-                               int xOffSet = 0, int yOffSet = 0 );
+    void notifyLayout(int width = -1, int height = -1,
+                      int xOffSet = 0, int yOffSet = 0) override;
 
     /// Get the type of control (custom RTTI)
-    virtual std::string getType() const { return "slider_bg"; }
+    std::string getType() const override { return "slider_bg"; }
 
     /// Associate a cursor to this background
-    void associateCursor( CtrlSliderCursor &rCursor );
+    void associateCursor(CtrlSliderCursor &rCursor);
 
 private:
     /// Cursor of the slider
@@ -189,7 +189,7 @@ private:
     int m_position;
 
     /// Method called when the observed variable is modified
-    virtual void onUpdate( Subject<VarPercent> &rVariable, void* );
+    void onUpdate(Subject<VarPercent> &rVariable, void*) override;
 
     /// Method to compute the resize factors
     void getResizeFactors( float &rFactorX, float &rFactorY ) const;
