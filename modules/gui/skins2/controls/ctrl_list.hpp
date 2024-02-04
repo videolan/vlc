@@ -43,28 +43,28 @@ public:
               uint32_t fgcolor, uint32_t playcolor, uint32_t bgcolor1,
               uint32_t bgcolor2, uint32_t selColor,
               const UString &rHelp, VarBool *pVisible );
-    virtual ~CtrlList();
+    ~CtrlList() override;
 
     /// Handle an event on the control.
-    virtual void handleEvent( EvtGeneric &rEvent );
+    void handleEvent(EvtGeneric &rEvent) override;
 
     /// Check whether coordinates are inside the control.
-    virtual bool mouseOver( int x, int y ) const;
+    bool mouseOver(int x, int y) const override;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+    void draw(OSGraphics &rImage, int xDest, int yDest, int w, int h) override;
 
     /// Called when the layout is resized
-    virtual void onResize();
+    void onResize() override;
 
     /// Return true if the control can gain the focus
-    virtual bool isFocusable() const { return true; }
+    bool isFocusable() const override { return true; }
 
     /// Return true if the control can be scrollable
-    virtual bool isScrollable() const { return true; }
+    bool isScrollable() const override { return true; }
 
     /// Get the type of control (custom RTTI)
-    virtual std::string getType() const { return "list"; }
+    std::string getType() const override { return "list"; }
 
 private:
     /// List associated to the control
@@ -90,13 +90,13 @@ private:
     int m_lastPos;
 
     /// Method called when the list variable is modified
-    virtual void onUpdate( Subject<VarList> &rList, void* );
+    void onUpdate(Subject<VarList> &rList, void*) override;
 
     /// Method called when the position variable of the list is modified
-    virtual void onUpdate( Subject<VarPercent> &rPercent, void*  );
+    void onUpdate(Subject<VarPercent> &rPercent, void*) override;
 
     /// Called when the position is set
-    virtual void onPositionChange();
+    void onPositionChange() override;
 
     /// Check if the list must be scrolled
     void autoScroll();
