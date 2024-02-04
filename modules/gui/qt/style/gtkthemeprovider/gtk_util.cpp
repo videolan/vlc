@@ -36,10 +36,6 @@ namespace gtk {
 
 namespace {
 
-
-
-const char kAuraTransientParent[] = "aura-transient-parent";
-
 GtkCssContext AppendCssNodeToStyleContextImpl(
         GtkCssContext context,
         GType gtype,
