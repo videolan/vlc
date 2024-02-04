@@ -53,28 +53,28 @@ public:
               const UString &rHelp,
               VarBool *pVisible,
               VarBool *pFlat );
-    virtual ~CtrlTree();
+    ~CtrlTree() override;
 
     /// Handle an event on the control
-    virtual void handleEvent( EvtGeneric &rEvent );
+    void handleEvent(EvtGeneric &rEvent) override;
 
     /// Check whether coordinates are inside the control
-    virtual bool mouseOver( int x, int y ) const;
+    bool mouseOver(int x, int y) const override;
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
+    void draw(OSGraphics &rImage, int xDest, int yDest, int w, int h) override;
 
     /// Called when the layout is resized
-    virtual void onResize();
+    void onResize() override;
 
     /// Return true if the control can gain the focus
-    virtual bool isFocusable() const { return true; }
+    bool isFocusable() const override { return true; }
 
     /// Return true if the control can be scrollable
-    virtual bool isScrollable() const { return true; }
+    bool isScrollable() const override { return true; }
 
     /// Get the type of control (custom RTTI)
-    virtual std::string getType() const { return "tree"; }
+    std::string getType() const override { return "tree"; }
 
     /// Make sure an item is visible
     /// \param item an iterator to a tree item
@@ -125,11 +125,10 @@ private:
     bool m_bRefreshOnDelete;
 
     /// Method called when the tree variable is modified
-    virtual void onUpdate( Subject<VarTree, tree_update> &rTree,
-                           tree_update *);
+    void onUpdate(Subject<VarTree, tree_update> &rTree, tree_update *) override;
 
     /// Called when the position is set
-    virtual void onPositionChange();
+    void onPositionChange() override;
 
     /// Compute the number of lines that can be displayed
     float maxItems();
