@@ -132,7 +132,7 @@ private:
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
 
-    class ListenerCb;
+    struct ListenerCb;
     Q_DECLARE_PRIVATE(NetworkDeviceModel)
 };
 
