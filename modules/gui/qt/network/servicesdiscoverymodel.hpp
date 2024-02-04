@@ -26,7 +26,7 @@
 #include "util/base_model.hpp"
 #include "maininterface/mainctx.hpp"
 
-struct ServicesDiscoveryModelPrivate;
+class ServicesDiscoveryModelPrivate;
 class ServicesDiscoveryModel : public BaseModel
 {
     Q_OBJECT
