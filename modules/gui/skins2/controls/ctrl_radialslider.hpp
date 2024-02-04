@@ -59,6 +59,9 @@ public:
     /// Get the type of control (custom RTTI)
     std::string getType() const override { return "radial_slider"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Finite state machine of the control
     FSM m_fsm;

@@ -80,6 +80,9 @@ public:
     /// Get the type of control (custom RTTI)
     std::string getType() const override { return "slider_cursor"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Finite state machine of the control
     FSM m_fsm;
@@ -163,6 +166,9 @@ public:
 
     /// Associate a cursor to this background
     void associateCursor(CtrlSliderCursor &rCursor);
+
+protected:
+    using CtrlGeneric::onUpdate;
 
 private:
     /// Cursor of the slider

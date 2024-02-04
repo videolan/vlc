@@ -81,6 +81,9 @@ public:
     /// \return true if it changed the position
     bool ensureVisible( const Iterator& it );
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Tree associated to the control
     VarTree &m_rTree;

@@ -64,6 +64,9 @@ public:
     /// Get the type of control (custom RTTI)
     std::string getType() const override { return "image"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Bitmap
     GenericBitmap* m_pBitmap;

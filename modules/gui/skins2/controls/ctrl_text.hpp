@@ -82,6 +82,9 @@ public:
     /// Get the type of control (custom RTTI)
     virtual std::string getType() const { return "text"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Finite state machine of the control
     FSM m_fsm;

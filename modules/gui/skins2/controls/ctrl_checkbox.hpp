@@ -68,6 +68,9 @@ public:
     /// Get the type of control (custom RTTI)
     std::string getType() const override { return "checkbox"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// Finite state machine of the control
     FSM m_fsm;

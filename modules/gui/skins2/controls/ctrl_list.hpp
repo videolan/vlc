@@ -66,6 +66,9 @@ public:
     /// Get the type of control (custom RTTI)
     std::string getType() const override { return "list"; }
 
+protected:
+    using CtrlGeneric::onUpdate;
+
 private:
     /// List associated to the control
     VarList &m_rList;
