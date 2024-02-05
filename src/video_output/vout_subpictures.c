@@ -1129,25 +1129,24 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
             crop_y + crop_height <= y_offset ||
             y_offset + (int)region_fmt.i_visible_height < crop_y) {
             /* No intersection */
-            region_fmt.i_visible_width  =
-            region_fmt.i_visible_height = 0;
-        } else {
-            int x, y, x_end, y_end;
-            x = __MAX(crop_x, x_offset);
-            y = __MAX(crop_y, y_offset);
-            x_end = __MIN(crop_x + crop_width,
-                          x_offset + (int)region_fmt.i_visible_width);
-            y_end = __MIN(crop_y + crop_height,
-                          y_offset + (int)region_fmt.i_visible_height);
-
-            region_fmt.i_x_offset       = x - x_offset;
-            region_fmt.i_y_offset       = y - y_offset;
-            region_fmt.i_visible_width  = x_end - x;
-            region_fmt.i_visible_height = y_end - y;
-
-            x_offset = __MAX(x, 0);
-            y_offset = __MAX(y, 0);
+            return NULL;
         }
+
+        int x, y, x_end, y_end;
+        x = __MAX(crop_x, x_offset);
+        y = __MAX(crop_y, y_offset);
+        x_end = __MIN(crop_x + crop_width,
+                        x_offset + (int)region_fmt.i_visible_width);
+        y_end = __MIN(crop_y + crop_height,
+                        y_offset + (int)region_fmt.i_visible_height);
+
+        region_fmt.i_x_offset       = x - x_offset;
+        region_fmt.i_y_offset       = y - y_offset;
+        region_fmt.i_visible_width  = x_end - x;
+        region_fmt.i_visible_height = y_end - y;
+
+        x_offset = __MAX(x, 0);
+        y_offset = __MAX(y, 0);
     }
 
     subpicture_region_t *dst = subpicture_region_ForPicture(&region_fmt, region_picture);
