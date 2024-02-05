@@ -228,11 +228,7 @@ static int Win32VoutCreateWindow( struct event_thread_t *p_event )
     msg_Dbg( p_event->obj, "created video window" );
 
     /* We don't want the window owner to overwrite our client area */
-    LONG  parent_style = GetWindowLong( p_event->hparent, GWL_STYLE );
-    if( !(parent_style & WS_CLIPCHILDREN) )
-        /* Hmmm, apparently this is a blocking call... */
-        SetWindowLong( p_event->hparent, GWL_STYLE,
-                       parent_style | WS_CLIPCHILDREN );
+    assert( GetWindowLong( p_event->hparent, GWL_STYLE ) & WS_CLIPCHILDREN );
 
 #ifdef HAVE_WIN32_SENSORS
     if (p_event->init_move != NULL)
