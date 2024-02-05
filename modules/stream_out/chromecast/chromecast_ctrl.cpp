@@ -451,12 +451,10 @@ bool intf_sys_t::isStateReady() const
 
 void intf_sys_t::setPacing(bool do_pace)
 {
-    {
-        vlc::threads::mutex_locker locker( m_lock );
-        if( m_pace == do_pace )
-            return;
-        m_pace = do_pace;
-    }
+    vlc::threads::mutex_locker locker( m_lock );
+    if( m_pace == do_pace )
+        return;
+    m_pace = do_pace;
     m_pace_cond.signal();
 }
 
