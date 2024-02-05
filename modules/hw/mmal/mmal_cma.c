@@ -209,9 +209,8 @@ static void cma_pool_fixed_put(cma_pool_fixed_t * const p, cma_buf_t * v, const 
     if (was_in_flight)
         --p->in_flight;
 
-    vlc_mutex_unlock(&p->lock);
-
     vlc_cond_signal(&p->flight_cond);
+    vlc_mutex_unlock(&p->lock);
 
     if (v != NULL)
         cma_pool_delete(v);
