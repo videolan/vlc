@@ -575,15 +575,16 @@ FocusScope {
 
     function _setupChild(id, ydelta) {
         const pos = getItemPos(id)
+        pos[1] += ydelta
 
         let item;
 
         if (_containsItem(id))
-            item = _repositionItem(id, pos[0], pos[1] + ydelta)
+            item = _repositionItem(id, pos[0], pos[1])
         else if (_unusedItemList.length > 0)
-            item = _recycleItem(id, pos[0], pos[1] + ydelta)
+            item = _recycleItem(id, pos[0], pos[1])
         else
-            item = _createItem(id, pos[0], pos[1] + ydelta)
+            item = _createItem(id, pos[0], pos[1])
 
         // NOTE: This makes sure we have the proper focus reason on the GridItem.
         if (activeFocus && currentIndex === item.index && expandIndex === -1)
