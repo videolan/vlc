@@ -46,13 +46,11 @@ void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
 {
     ThumbnailerCtx* ctx = static_cast<ThumbnailerCtx*>( data );
 
-    {
-        vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
-        ctx->done = true;
-        if (thumbnail != nullptr)
-            ctx->thumbnail = picture_Hold(thumbnail);
-        ctx->thumbnailer->m_currentContext = nullptr;
-    }
+    vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
+    ctx->done = true;
+    if (thumbnail != nullptr)
+        ctx->thumbnail = picture_Hold(thumbnail);
+    ctx->thumbnailer->m_currentContext = nullptr;
     ctx->thumbnailer->m_cond.signal();
 }
 
