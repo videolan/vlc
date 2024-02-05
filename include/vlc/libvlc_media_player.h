@@ -559,6 +559,8 @@ LIBVLC_API uint32_t libvlc_media_player_get_xwindow ( libvlc_media_player_t *p_m
  * render its video output. If LibVLC was built without Win32/Win64 API output
  * support, then this has no effects.
  *
+ * \warning the HWND must have the WS_CLIPCHILDREN set in its style.
+ *
  * \param p_mi the Media Player
  * \param drawable windows handle of the drawable
  */
