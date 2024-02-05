@@ -132,9 +132,9 @@ static bool set_and_test_enc_supported(vlc_object_t *obj, supported_mmal_enc_t *
     return is_enc_supported(support, fcc);
 }
 
-static MMAL_FOURCC_T vlc_to_mmal_es_fourcc(const unsigned int fcc)
+static MMAL_FOURCC_T vlc_to_mmal_es_fourcc(const es_format_t *es)
 {
-    switch (fcc){
+    switch (es->i_codec){
     case VLC_CODEC_MJPG:
         return MMAL_ENCODING_MJPEG;
     case VLC_CODEC_MP1V:
@@ -594,7 +594,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     int ret = VLC_EGENERIC;
     decoder_sys_t *sys;
     MMAL_STATUS_T status;
-    const MMAL_FOURCC_T in_fcc = vlc_to_mmal_es_fourcc(dec->fmt_in->i_codec);
+    const MMAL_FOURCC_T in_fcc = vlc_to_mmal_es_fourcc(dec->fmt_in);
     if (in_fcc == 0) {
         msg_Dbg(p_this, "codec %4.4s not supported", (const char*)&dec->fmt_in->i_codec);
         return VLC_EGENERIC;
