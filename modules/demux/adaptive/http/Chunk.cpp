@@ -428,6 +428,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         rate.size = buffered;
         rate.time = downloadEndTime - requestStartTime;
         rate.latency = responseTime - requestStartTime;
+        avail.signal();
     }
     else
     {
@@ -448,6 +449,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
             rate.time = downloadEndTime - requestStartTime;
             rate.latency = responseTime - requestStartTime;
         }
+        avail.signal();
     }
 
     if(rate.size && rate.time && type == ChunkType::Segment)
@@ -455,8 +457,6 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         connManager->updateDownloadRate(sourceid, rate.size,
                                         rate.time, rate.latency);
     }
-
-    avail.signal();
 }
 
 bool HTTPChunkBufferedSource::hasMoreData() const
