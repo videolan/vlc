@@ -1051,6 +1051,7 @@ static void maintain_live_chunks(
     hds_stream_t* hds_stream
     )
 {
+    vlc_mutex_lock( &hds_stream->dl_lock );
     if( ! hds_stream->chunks_head )
     {
         /* just start with the earliest in the abst
@@ -1095,6 +1096,7 @@ static void maintain_live_chunks(
         hds_stream->chunks_livereadpos = hds_stream->chunks_head;
 
     hds_stream->chunks_head = chunk;
+    vlc_mutex_unlock( &hds_stream->dl_lock );
 }
 
 
@@ -1718,9 +1720,11 @@ static void Close( vlc_object_t *p_this )
     hds_stream_t *stream = vlc_array_count(&p_sys->hds_streams) ?
         p_sys->hds_streams.pp_elems[0] : NULL;
 
+    vlc_mutex_lock( &stream->dl_lock );
     p_sys->closed = true;
     if (stream)
         vlc_cond_signal( & stream->dl_cond );
+    vlc_mutex_unlock( &stream->dl_lock );
 
     vlc_join( p_sys->dl_thread, NULL );
 
@@ -1817,6 +1821,7 @@ static unsigned read_chunk_data(
     /* new chunk generation is handled by a different thread in live case */
     if( ! sys->live )
     {
+        vlc_mutex_lock( &stream->dl_lock );
         chunk = stream->chunks_head;
         if( chunk )
         {
@@ -1842,6 +1847,7 @@ static unsigned read_chunk_data(
 
         if( dl )
             vlc_cond_signal( & stream->dl_cond );
+        vlc_mutex_unlock( &stream->dl_lock );
     }
 
     return ( ((uint8_t*)buffer) - ((uint8_t*)buffer_start));
