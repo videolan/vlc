@@ -156,6 +156,8 @@ libqt_plugin_la_SOURCES = \
 	maininterface/compositor_accessibility.hpp \
 	maininterface/compositor_dummy.hpp \
 	maininterface/compositor_dummy.cpp \
+	maininterface/compositor_platform.hpp \
+	maininterface/compositor_platform.cpp \
 	maininterface/interface_window_handler.cpp \
 	maininterface/interface_window_handler.hpp \
 	maininterface/mainctx.cpp \
@@ -396,6 +398,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	maininterface/compositor.moc.cpp \
 	maininterface/compositor_common.moc.cpp \
 	maininterface/compositor_dummy.moc.cpp \
+	maininterface/compositor_platform.moc.cpp \
 	maininterface/interface_window_handler.moc.cpp \
 	maininterface/mainctx.moc.cpp \
 	maininterface/mainctx_submodels.moc.cpp \

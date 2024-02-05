@@ -42,6 +42,8 @@
 
 #include "maininterface/windoweffects_module.hpp"
 
+#include "compositor_platform.hpp"
+
 #include <vlc_window.h>
 #include <vlc_modules.h>
 
@@ -57,10 +59,13 @@ struct {
     const char* name;
     Compositor* (*instantiate)(qt_intf_t *p_intf);
 } static compositorList[] = {
-#ifdef _WIN32
-#ifdef HAVE_DCOMP_H
+#if defined(_WIN32) && defined(HAVE_DCOMP_H)
     {"dcomp", &instanciateCompositor<CompositorDirectComposition> },
 #endif
+#if defined(_WIN32)
+    {"platform", &instanciateCompositor<CompositorPlatform> },
+#endif
+#if defined(_WIN32)
     {"win7", &instanciateCompositor<CompositorWin7> },
 #endif
 #ifdef QT_HAS_WAYLAND_COMPOSITOR
