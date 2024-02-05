@@ -148,6 +148,9 @@ void Mwindow::openFile() {
 #elif defined(Q_OS_UNIX)
     libvlc_media_player_set_xwindow(vlcPlayer, videoWidget->winId());
 #elif defined(Q_OS_WIN)
+    LONG style = GetWindowLong( videoWidget->winId(), GWL_STYLE );
+    if( !(style & WS_CLIPCHILDREN) )
+        SetWindowLong( videoWidget->winId(), GWL_STYLE, style | WS_CLIPCHILDREN );
     libvlc_media_player_set_hwnd(vlcPlayer, (HWND)videoWidget->winId());
 #endif
 
