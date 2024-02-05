@@ -84,7 +84,7 @@ MainWindow::MainWindow(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     this->SetSizer(vbox);
 
     //setup player widget
-    player_widget = new wxWindow(this, wxID_ANY);
+    player_widget = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN);
     player_widget->SetBackgroundColour(wxColour(wxT("black")));
     vbox->Add(player_widget, 1, wxEXPAND | wxALIGN_TOP);
 
@@ -140,6 +140,9 @@ void MainWindow::initVLC() {
     #ifdef __WXGTK__
         libvlc_media_player_set_xwindow(media_player, GET_XID(this->player_widget));
     #else
+        LONG style = GetWindowLong( player_widget->GetHandle(), GWL_STYLE );
+        if( !(style & WS_CLIPCHILDREN) )
+            SetWindowLong( player_widget->GetHandle(), GWL_STYLE, style | WS_CLIPCHILDREN );
         libvlc_media_player_set_hwnd(media_player, this->player_widget->GetHandle());
     #endif
 }
