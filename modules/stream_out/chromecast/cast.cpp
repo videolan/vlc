@@ -116,7 +116,7 @@ struct sout_stream_sys_t
     {
     }
 
-    bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
+    bool canDecodeVideo( const es_format_t * ) const;
     bool canDecodeAudio( sout_stream_t* p_stream, vlc_fourcc_t i_codec,
                          const audio_format_t* p_fmt ) const;
     bool startSoutChain(sout_stream_t* p_stream,
@@ -763,11 +763,11 @@ static void Del(sout_stream_t *p_stream, void *_id)
  * Supported formats: https://developers.google.com/cast/docs/media
  */
 
-bool sout_stream_sys_t::canDecodeVideo( vlc_fourcc_t i_codec ) const
+bool sout_stream_sys_t::canDecodeVideo( const es_format_t *es ) const
 {
     if( transcoding_state & TRANSCODING_VIDEO )
         return false;
-    switch( i_codec )
+    switch( es->i_codec )
     {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
@@ -986,7 +986,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         {
             if (p_es->i_cat == VIDEO_ES && p_original_video == NULL)
             {
-                if (!canDecodeVideo( p_es->i_codec ))
+                if (!canDecodeVideo( p_es ))
                 {
                     msg_Dbg( p_stream, "can't remux video track %d codec %4.4s",
                              p_es->i_id, (const char*)&p_es->i_codec );
