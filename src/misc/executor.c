@@ -266,10 +266,10 @@ vlc_executor_Delete(vlc_executor_t *executor)
     /* All the tasks must be canceled on delete */
     assert(vlc_list_is_empty(&executor->queue));
 
-    vlc_mutex_unlock(&executor->lock);
-
     /* "closing" is now true, this will wake up threads */
     vlc_cond_broadcast(&executor->queue_wait);
+
+    vlc_mutex_unlock(&executor->lock);
 
     /* The threads list may not be written at this point, so it is safe to read
      * it without mutex locked (the mutex must be released to join the
