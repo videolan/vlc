@@ -936,6 +936,13 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     x_offset = spu_scale_w(restrained.x, restrained.scale);
     y_offset = spu_scale_h(restrained.y, restrained.scale);
 
+    const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
+    const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
+
+    if (unlikely(dst_width == 0 || dst_height == 0))
+        return NULL;
+
+
     /* */
     if (force_palette) {
         video_palette_t *old_palette = region->fmt.p_palette;
@@ -995,9 +1002,6 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     /* Scale from rendered size to destination size */
     if (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || convert_chroma)
     {
-        const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
-        const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
-
         /* Destroy the cache if unusable */
         if (region->p_private) {
             subpicture_region_private_t *private = region->p_private;
@@ -1022,7 +1026,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         }
 
         /* Scale if needed into cache */
-        if (!region->p_private && dst_width > 0 && dst_height > 0) {
+        if (!region->p_private) {
             filter_t *scale = sys->scale;
 
             picture_t *picture = region->p_picture;
