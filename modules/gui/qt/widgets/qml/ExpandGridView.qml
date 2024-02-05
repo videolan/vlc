@@ -106,6 +106,11 @@ FocusScope {
     //      - set by ExpandGridView, this defines if the associated index is selected
     //        in selectionModel
     //
+    // optional properties -
+    // 'bool delayRemove'
+    //      - if defined and set, item will not be removed when it goes out of view
+    //        ExpandGridView will never modify this value
+    //
     property Component delegate: Item {
         property var model: null
         property int index: - 1
@@ -115,6 +120,7 @@ FocusScope {
     property var _idChildrenList: []
     property var _unusedItemList: []
     property var _currentRange: [0,0]
+    property var _delayedChildrenMap: ({})
 
     // Aliases
 
@@ -270,6 +276,9 @@ FocusScope {
             const iMin = topLeft.row
             const iMax = bottomRight.row + 1 // [] => [)
             const f_l = _currentRange
+
+            _refreshDelayedChildData(iMin, iMax)
+
             if (iMin < f_l[1] && f_l[0] < iMax) {
                 _refreshData(iMin, iMax)
             }
@@ -298,9 +307,15 @@ FocusScope {
         function _updateSelectedRange(topLeft, bottomRight, select) {
             let iMin = topLeft.row
             let iMax = bottomRight.row + 1 // [] => [)
+
+            // delayed children can be out of currentRange
+            _updateDelayedChildSelected(iMin, iMax, select)
+
             if (iMin < root._currentRange[1] && root._currentRange[0] < iMax) {
+                // only update item in the view
                 iMin = Math.max(iMin, root._currentRange[0])
                 iMax = Math.min(iMax, root._currentRange[1])
+
                 for (let j = iMin; j < iMax; j++) {
                     const item = root._getItem(j)
                     console.assert(item)
@@ -526,16 +541,28 @@ FocusScope {
         return rowCol[0] % 2 + 2 * (rowCol[1] % 2)
     }
 
-    function _repositionItem(id, x, y) {
-        const item = _getItem(id)
-        console.assert(item !== undefined, "wrong child: " + id)
-
+    function _updatePosition(id, item, x, y) {
         //theses properties are always defined in Item
         item.x = x
         item.y = y
         item.z = _indexToZ(id)
-        item.selected = selectionModel.isSelected(id)
 
+        // update required property (do we need this??)
+        item.selected = selectionModel.isSelected(id)
+    }
+
+    function _repositionItem(id, x, y) {
+        const item = _getItem(id)
+        console.assert(item !== undefined, "wrong child: " + id)
+
+        _updatePosition(id, item, x, y)
+        return item
+    }
+
+    function _repositionDelayedItem(id, x, y) {
+        const item = _delayedChildrenMap[id]
+
+        _updatePosition(id, item, x, y)
         return item
     }
 
@@ -573,6 +600,49 @@ FocusScope {
         return item
     }
 
+    function _takeDelayedChild(id) {
+        const item = _delayedChildrenMap[id]
+        console.assert(typeof item !== "undefined")
+        delete _delayedChildrenMap[id]
+        return item
+    }
+
+    function _shouldDelayRemove(item) {
+        return Helpers.get(item, "delayRemove", false)
+    }
+
+    function _delayRemove(id, item) {
+        _delayedChildrenMap[id] = item
+
+        item.delayRemoveChanged.connect(() => {
+            if (id in _delayedChildrenMap && !item.delayRemove) {
+                const removed = _takeDelayedChild(id)
+                console.assert(removed === item)
+                item.destroy()
+            }
+        })
+    }
+
+    function _refreshDelayedChildData(iMin, iMax) {
+        for (let i = iMin; i < iMax; ++i) {
+            if (!(i in _delayedChildrenMap))
+                continue
+
+            const item =  _delayedChildrenMap[i]
+            item.model = model.getDataAt(i)
+        }
+    }
+
+    function _updateDelayedChildSelected(iMin, iMax, select) {
+        for (let i = iMin; i < iMax; ++i) {
+            if (!(i in _delayedChildrenMap))
+                continue
+
+            const item =  _delayedChildrenMap[i]
+            item.selected = select
+        }
+    }
+
     function _setupChild(id, ydelta) {
         const pos = getItemPos(id)
         pos[1] += ydelta
@@ -581,6 +651,8 @@ FocusScope {
 
         if (_containsItem(id))
             item = _repositionItem(id, pos[0], pos[1])
+        else if (id in _delayedChildrenMap)
+            item = _repositionDelayedItem(id, pos[0], pos[1])
         else if (_unusedItemList.length > 0)
             item = _recycleItem(id, pos[0], pos[1])
         else
@@ -776,16 +848,29 @@ FocusScope {
 
             const newList = new Array(last - first)
 
+            // move items from currentRange still in view
             for (let i = overlapped[0]; i < overlapped[1]; ++i) {
                 newList[i - first] = root._getItem(i)
                 root._setItem(i, undefined)
             }
 
+            for (let id in _delayedChildrenMap) {
+                if (id >= first && id < last) {
+                    newList[id - first] = _takeDelayedChild(id)
+                }
+            }
+
+            // handle item from current range which are not in view
             for (let i = root._currentRange[0]; i < root._currentRange[1]; ++i) {
                 const item = root._getItem(i)
                 if (typeof item !== "undefined") {
-                    item.visible = false
-                    root._unusedItemList.push(item)
+                    if (_shouldDelayRemove(item)) {
+                        _delayRemove(i, item)
+                    } else {
+                        item.visible = false
+                        root._unusedItemList.push(item)
+                    }
+
                     //  root._setItem(i, undefined) // not needed the list will be reset following this loop
                 }
             }
@@ -828,6 +913,23 @@ FocusScope {
 
             // Place the delegates after the expandItem
             _setupIndexes(forceRelayout, [topGridEndId, lastId], root._expandItemVerticalSpace)
+
+            // handle delayedRemoveChildren
+            if (forceRelayout) {
+                for (let id in _delayedChildrenMap) {
+                    // check invariant: delayedRemove child must be reused when they come in view
+                    console.assert((id < root._currentRange[0]) || (id >= root._currentRange[1]))
+
+                    if (id >= root._count) {
+                        // index is no longer valid
+                        const item = _takeDelayedChild(id)
+                        item.destroy()
+                    } else {
+                        const yDelta = (id >= topGridEndId) ? root._expandItemVerticalSpace : 0
+                        _setupChild(id, yDelta)
+                    }
+                }
+            }
         }
 
         Connections {
