@@ -62,9 +62,8 @@ static void RunIncrement(void *userdata)
 
     vlc_mutex_lock(&data->lock);
     ++data->ended;
-    vlc_mutex_unlock(&data->lock);
-
     vlc_cond_signal(&data->cond);
+    vlc_mutex_unlock(&data->lock);
 }
 
 static void test_single_runnable(void)
