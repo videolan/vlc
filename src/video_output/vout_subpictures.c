@@ -1115,8 +1115,8 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         {
             crop_x = x_offset;
             crop_y = y_offset;
-            crop_width = region_fmt.i_visible_width;
-            crop_height = region_fmt.i_visible_height;
+            crop_width = dst_width;
+            crop_height = dst_height;
         }
 
         if(region->i_max_width && spu_scale_w(region->i_max_width, scale_size) < crop_width)
@@ -1127,9 +1127,9 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 
         /* Find the intersection */
         if (crop_x + crop_width <= x_offset ||
-            x_offset + (int)region_fmt.i_visible_width  < crop_x ||
+            x_offset + (int)dst_width  < crop_x ||
             crop_y + crop_height <= y_offset ||
-            y_offset + (int)region_fmt.i_visible_height < crop_y) {
+            y_offset + (int)dst_height < crop_y) {
             /* No intersection */
             return NULL;
         }
@@ -1137,10 +1137,8 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         int x, y, x_end, y_end;
         x = __MAX(crop_x, x_offset);
         y = __MAX(crop_y, y_offset);
-        x_end = __MIN(crop_x + crop_width,
-                        x_offset + (int)region_fmt.i_visible_width);
-        y_end = __MIN(crop_y + crop_height,
-                        y_offset + (int)region_fmt.i_visible_height);
+        x_end = __MIN(crop_x + crop_width,  x_offset + (int)dst_width);
+        y_end = __MIN(crop_y + crop_height, y_offset + (int)dst_height);
 
         region_fmt.i_x_offset       = x - x_offset;
         region_fmt.i_y_offset       = y - y_offset;
