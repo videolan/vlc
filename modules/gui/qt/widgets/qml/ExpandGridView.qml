@@ -57,6 +57,12 @@ FocusScope {
 
     readonly property int rowHeight: cellHeight + verticalSpacing
 
+    // This property enables you to reuse items that are instantiated for
+    // different indexes when particular index goes out of view
+    // not setting may result in large performance penalty
+    // default is true
+    property bool reuseItems: true
+
     property int rowX: 0
     property int horizontalSpacing: VLCStyle.column_spacing
     property int verticalSpacing: VLCStyle.column_spacing
@@ -194,6 +200,13 @@ FocusScope {
             expandItem.height = Math.max(_expandItemVerticalSpace - verticalSpacing, 0)
         }
         flickable.layout(true)
+    }
+
+    onReuseItemsChanged: {
+        if (!reuseItems) {
+            _unusedItemList.forEach((item) => { item.destroy() })
+            _unusedItemList = []
+        }
     }
 
     // Keys
@@ -653,7 +666,7 @@ FocusScope {
             item = _repositionItem(id, pos[0], pos[1])
         else if (id in _delayedChildrenMap)
             item = _repositionDelayedItem(id, pos[0], pos[1])
-        else if (_unusedItemList.length > 0)
+        else if (_unusedItemList.length > 0) // if reuseItems is false, _unusedItemList is always empty
             item = _recycleItem(id, pos[0], pos[1])
         else
             item = _createItem(id, pos[0], pos[1])
@@ -837,8 +850,13 @@ FocusScope {
 
         function _updateChildrenMap(first, last) {
             if (first >= last) {
-                root._idChildrenList.forEach(function(item) { item.visible = false; })
-                root._unusedItemList = root._idChildrenList
+                if (root.reuseItems) {
+                    root._idChildrenList.forEach((item) => { item.visible = false; })
+                    root._unusedItemList = root._idChildrenList
+                } else {
+                    root._idChildrenList.forEach((item) => { item.destroy() })
+                }
+
                 root._idChildrenList = []
                 root._currentRange = [0, 0]
                 return
@@ -866,9 +884,11 @@ FocusScope {
                 if (typeof item !== "undefined") {
                     if (_shouldDelayRemove(item)) {
                         _delayRemove(i, item)
-                    } else {
+                    } else if (root.reuseItems) {
                         item.visible = false
                         root._unusedItemList.push(item)
+                    } else {
+                        item.destroy()
                     }
 
                     //  root._setItem(i, undefined) // not needed the list will be reset following this loop
@@ -930,6 +950,9 @@ FocusScope {
                     }
                 }
             }
+
+            if (!root.reuseItems) // check invariant: correct cleanup if reuseItems is not set
+                console.assert(_unusedItemList.length == 0)
         }
 
         Connections {
