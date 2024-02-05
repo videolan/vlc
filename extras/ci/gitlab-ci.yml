@@ -21,8 +21,8 @@ default:
 variables:
     VLC_TEST_TIMEOUT: 60
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20240122094311
-    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20231104025754
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20231104025754
+    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20240205142500
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20240205142500
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20231013031209
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20231013040434
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20231013031754
