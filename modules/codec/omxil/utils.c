@@ -588,9 +588,12 @@ static const struct
     { VLC_CODEC_VYUY, OMX_COLOR_FormatCrYCbY, 4, 2, 0 },
 };
 
-OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( vlc_fourcc_t i_fourcc )
+OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( const es_format_t *es )
 {
-    i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
+    if ( unlikely( es->i_cat != VIDEO_ES ) )
+        return OMX_VIDEO_CodingUnused;
+
+    vlc_fourcc_t i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, es->i_codec );
 
     for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_fourcc == i_fourcc )
@@ -608,9 +611,12 @@ vlc_fourcc_t GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec )
     return 0;
 }
 
-static const char *GetOmxVideoRole( vlc_fourcc_t i_fourcc )
+static const char *GetOmxVideoRole( const es_format_t *es )
 {
-    i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, i_fourcc );
+    if ( unlikely( es->i_cat != VIDEO_ES ) )
+        return NULL;
+
+    vlc_fourcc_t i_fourcc = vlc_fourcc_GetCodec( VIDEO_ES, es->i_codec );
 
     for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_fourcc == i_fourcc )
@@ -682,7 +688,7 @@ const char *GetOmxRole( const es_format_t *es,
             GetOmxVideoEncRole( es->i_codec ) : GetOmxAudioEncRole( es->i_codec );
 
     return es->i_cat == VIDEO_ES ?
-        GetOmxVideoRole( es->i_codec ) : GetOmxAudioRole( es->i_codec );
+        GetOmxVideoRole( es ) : GetOmxAudioRole( es->i_codec );
 }
 
 OMX_COLOR_FORMATTYPE GetOmxChromaFormat( vlc_fourcc_t i_fourcc )
