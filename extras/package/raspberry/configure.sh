@@ -17,6 +17,7 @@ OPTIONS="
       --enable-libcddb
       --enable-zvbi --disable-telx
       --enable-nls
+      --disable-qt
 "
 
 sh "$(dirname $0)"/../../../configure ${OPTIONS}  "$@"
