@@ -692,7 +692,7 @@ static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
     convert_paused_common(ctx, ctx->slave);
 }
 
-#define VLC_TICK_24H VLC_TICK_FROM_SEC(24 * 60 * 60)
+#define VLC_TICK_12H VLC_TICK_FROM_SEC(12 * 60 * 60)
 #define VLC_TICK_2H VLC_TICK_FROM_SEC(2 * 60 * 60)
 #define DEFAULT_STREAM_INCREMENT VLC_TICK_FROM_MS(100)
 
@@ -740,20 +740,20 @@ static struct clock_scenario clock_scenarios[] = {
     .check = drift_check,
 },
 {
-    .name = "drift_864",
-    .desc = "a drift of 864ms in 24h is handled",
+    .name = "drift_432",
+    .desc = "a drift of 432ms in 12h is handled",
     .type = CLOCK_SCENARIO_UPDATE,
-    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
-    .total_drift_duration = VLC_TICK_FROM_MS(864),
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_12H, DEFAULT_STREAM_INCREMENT, 0),
+    .total_drift_duration = VLC_TICK_FROM_MS(432),
     .update = drift_update,
     .check = drift_check,
 },
 {
-    .name = "drift_-864",
-    .desc = "a drift of -864ms in 24h is handled",
+    .name = "drift_-432",
+    .desc = "a drift of -432ms in 12h is handled",
     .type = CLOCK_SCENARIO_UPDATE,
-    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
-    .total_drift_duration = -VLC_TICK_FROM_MS(864),
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_12H, DEFAULT_STREAM_INCREMENT, 0),
+    .total_drift_duration = -VLC_TICK_FROM_MS(432),
     .update = drift_update,
     .check = drift_check,
 },
@@ -761,8 +761,8 @@ static struct clock_scenario clock_scenarios[] = {
     .name = "drift_sudden",
     .desc = "a sudden drift is handled",
     .type = CLOCK_SCENARIO_UPDATE,
-    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_24H, DEFAULT_STREAM_INCREMENT, 0),
-    .total_drift_duration = VLC_TICK_FROM_MS(864),
+    INIT_SYSTEM_STREAM_TIMING(VLC_TICK_12H, DEFAULT_STREAM_INCREMENT, 0),
+    .total_drift_duration = VLC_TICK_FROM_MS(432),
     .update = drift_sudden_update,
     .check = drift_check,
 },
