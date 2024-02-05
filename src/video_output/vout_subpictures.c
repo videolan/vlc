@@ -1075,10 +1075,8 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
                 scale->fmt_out.video.i_width  = dst_width;
                 scale->fmt_out.video.i_height = dst_height;
 
-                scale->fmt_out.video.i_visible_width =
-                    spu_scale_w(region->fmt.i_visible_width, scale_size);
-                scale->fmt_out.video.i_visible_height =
-                    spu_scale_h(region->fmt.i_visible_height, scale_size);
+                scale->fmt_out.video.i_visible_width = dst_width;
+                scale->fmt_out.video.i_visible_height = dst_height;
 
                 picture = scale->ops->filter_video(scale, picture);
                 assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
