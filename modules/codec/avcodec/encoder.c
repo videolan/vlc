@@ -336,8 +336,7 @@ int InitVideoEnc( vlc_object_t *p_this )
                 psz_namecodec = "MPEG-1 video";
                 break;
             }
-            if( GetFfmpegCodec( VIDEO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
-                                &psz_namecodec ) )
+            if( GetFfmpegCodec( &p_enc->fmt_out, &i_codec_id, &psz_namecodec ) )
                 break;
             bool uv_flipped;
             if( FindFfmpegChroma( p_enc->fmt_out.i_codec, &uv_flipped ) != AV_PIX_FMT_NONE )
@@ -350,8 +349,7 @@ int InitVideoEnc( vlc_object_t *p_this )
 
         case AUDIO_ES:
             encoder_ops = &audio_ops;
-            if( GetFfmpegCodec( AUDIO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
-                                &psz_namecodec ) )
+            if( GetFfmpegCodec( &p_enc->fmt_out, &i_codec_id, &psz_namecodec ) )
                 break;
             /* fall through */
         default:

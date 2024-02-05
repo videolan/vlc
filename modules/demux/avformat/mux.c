@@ -204,7 +204,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input" );
 
-    if( !GetFfmpegCodec( fmt->i_cat, fmt->i_codec, &i_codec_id, NULL )
+    if( !GetFfmpegCodec( fmt, &i_codec_id, NULL )
      || i_codec_id == AV_CODEC_ID_NONE )
     {
         msg_Dbg( p_mux, "couldn't find codec for fourcc '%4.4s'",

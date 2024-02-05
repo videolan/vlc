@@ -230,8 +230,7 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
     const AVCodec *p_codec = NULL;
 
     /* *** determine codec type *** */
-    if( !GetFfmpegCodec( p_dec->fmt_in->i_cat, p_dec->fmt_in->i_codec,
-                         &i_codec_id, &psz_namecodec ) ||
+    if( !GetFfmpegCodec( p_dec->fmt_in, &i_codec_id, &psz_namecodec ) ||
          i_codec_id == AV_CODEC_ID_RAWVIDEO )
          return NULL;
 

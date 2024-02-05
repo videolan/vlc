@@ -556,13 +556,13 @@ static const struct vlc_avcodec_fourcc spu_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_ASS */
 };
 
-bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
+bool GetFfmpegCodec( const es_format_t *es,
                      enum AVCodecID *pi_ffmpeg_codec, const char **ppsz_name )
 {
     const struct vlc_avcodec_fourcc *base;
     size_t count;
 
-    switch( cat )
+    switch( es->i_cat )
     {
         case VIDEO_ES:
             base = video_codecs;
@@ -581,7 +581,7 @@ bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
             count = 0;
     }
 
-    i_fourcc = vlc_fourcc_GetCodec( cat, i_fourcc );
+    vlc_fourcc_t i_fourcc = vlc_fourcc_GetCodec( es->i_cat, es->i_codec );
 
     for( size_t i = 0; i < count; i++ )
     {
@@ -590,7 +590,7 @@ bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
             if( pi_ffmpeg_codec != NULL )
                 *pi_ffmpeg_codec = base[i].i_codec;
             if( ppsz_name )
-                *ppsz_name = vlc_fourcc_GetDescription( cat, i_fourcc );
+                *ppsz_name = vlc_fourcc_GetDescription( es->i_cat, i_fourcc );
             return true;
         }
     }
