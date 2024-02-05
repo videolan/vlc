@@ -94,8 +94,23 @@ FocusScope {
 
     property int _currentFocusReason: Qt.OtherFocusReason
 
-    //delegate to display the extended item
-    property Component delegate: Item{}
+    // The delegate provides a template defining each item instantiated by the view.
+    // 'delegate' must have following properties defined -
+    // 'var model'
+    //      - set by ExpandGridView, this defines model data associated with item
+    //        index data can be accesses by the model roles
+    // 'int index'
+    //      - set by ExpandGridView, this defines the index to which this delegate
+    //        is associated to
+    // 'bool selected'
+    //      - set by ExpandGridView, this defines if the associated index is selected
+    //        in selectionModel
+    //
+    property Component delegate: Item {
+        property var model: null
+        property int index: - 1
+        property bool selected: false
+    }
 
     property var _idChildrenList: []
     property var _unusedItemList: []
