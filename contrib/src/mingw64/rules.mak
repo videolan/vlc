@@ -12,9 +12,9 @@ ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 PKGS += alloweduwp
 endif
-PKGS += dxva dxvahd mingw11-fixes
+PKGS += dxva dxvahd mingw11-fixes mft10
 ifeq ($(call mingw_at_least, 10), true)
-PKGS_FOUND += dxva
+PKGS_FOUND += dxva mft10
 endif # MINGW 10
 ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
@@ -31,7 +31,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads dxva dxvahd mingw11-fixes alloweduwp
+PKGS_ALL += winpthreads dxva dxvahd mingw11-fixes alloweduwp mft10
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -85,6 +85,16 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 .mingw11-fixes: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/crt/process.h "$(PREFIX)/include"
+	touch $@
+
+.sum-mft10: .sum-mingw64
+	touch $@
+
+MINGW_HEADERS_MFT := mfidl.h mfapi.h mftransform.h mferror.h mfobjects.h mmreg.h
+
+.mft10: mingw64
+	install -d "$(PREFIX)/include"
+	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_MFT)) "$(PREFIX)/include"
 	touch $@
 
 .sum-dxva: .sum-mingw64
