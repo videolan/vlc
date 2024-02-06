@@ -1145,7 +1145,6 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         }
     }
 
-    assert(video_format_IsSameChroma( &region_fmt, &region_picture->format ));
     subpicture_region_t *dst = subpicture_region_ForPicture(&region_fmt, region_picture);
     if (dst == NULL)
         return NULL;

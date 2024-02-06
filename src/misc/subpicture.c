@@ -278,6 +278,7 @@ subpicture_region_t *subpicture_region_NewText( void )
 
 subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic )
 {
+    assert( video_format_IsSameChroma( p_fmt, &pic->format ) );
     if ( !video_format_IsSameChroma( p_fmt, &pic->format ) )
         return NULL;
 
