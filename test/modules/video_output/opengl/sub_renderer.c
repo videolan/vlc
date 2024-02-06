@@ -178,7 +178,7 @@ static void test_opengl_offscreen(
     subpicture->i_original_picture_width = 4;
     subpicture->i_original_picture_height = 4;
 
-    subpicture_region_t *p_region = subpicture_region_ForPicture(&fmt, picture);
+    subpicture_region_t *p_region = subpicture_region_ForPicture(NULL, picture);
     assert(p_region != NULL);
     vlc_spu_regions_push( &subpicture->regions, p_region );
 
