@@ -147,7 +147,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     p_subpic->i_original_picture_width  = fmt_out.i_visible_width;
     p_subpic->i_original_picture_height = fmt_out.i_visible_height;
 
-    subpicture_region_t *p_region = subpicture_region_ForPicture( &fmt_out, p_pip );
+    subpicture_region_t *p_region = subpicture_region_ForPicture( NULL, p_pip );
     picture_Release( p_pip );
 
     if (likely(p_region == NULL))
