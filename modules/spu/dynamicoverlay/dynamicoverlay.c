@@ -353,12 +353,12 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
     vlc_vector_foreach(p_overlay, &p_sys->overlays)
     {
-        if (!p_overlay->b_active || p_overlay->format.i_chroma == 0)
+        if (!p_overlay->b_active || p_overlay->type == OVERLAY_UNSET)
             continue;
 
         subpicture_region_t *p_region;
 
-        if( p_overlay->format.i_chroma == 0 )
+        if( p_overlay->type == OVERLAY_IS_TEXT )
             p_region = subpicture_region_NewText();
         else
             p_region = subpicture_region_ForPicture( NULL, p_overlay->data.p_pic );
@@ -368,12 +368,13 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         }
 
         msg_Dbg( p_filter, "Displaying overlay: %4.4s, %d, %d, %d",
-                 (char*)&p_overlay->format.i_chroma, p_overlay->i_x, p_overlay->i_y,
+                 p_overlay->type == OVERLAY_IS_TEXT ? "TEXT" : (char*)&p_overlay->data.p_pic->format.i_chroma,
+                 p_overlay->i_x, p_overlay->i_y,
                  p_overlay->i_alpha );
 
-        if( p_overlay->format.i_chroma == 0 )
+        if( p_overlay->type == OVERLAY_IS_TEXT )
         {
-            video_format_Copy( &p_region->fmt, &p_overlay->format );
+            video_format_Setup( &p_region->fmt, 0, 0, 0, 0, 0, 0, 1 );
             p_region->p_text = text_segment_New( p_overlay->data.p_text );
             p_region->p_text->style = text_style_Duplicate( p_overlay->p_fontstyle );
         }

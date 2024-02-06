@@ -133,7 +133,11 @@ typedef struct overlay_t
     int i_alpha;
     bool b_active;
 
-    video_format_t format;
+    enum {
+        OVERLAY_UNSET,
+        OVERLAY_IS_TEXT,
+        OVERLAY_IS_PICTURE,
+    } type;
     text_style_t *p_fontstyle;
     union {
         picture_t *p_pic;
