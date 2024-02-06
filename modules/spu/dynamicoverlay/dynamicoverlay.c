@@ -361,7 +361,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         if( p_overlay->format.i_chroma == 0 )
             p_region = subpicture_region_NewText();
         else
-            p_region = subpicture_region_ForPicture( &p_overlay->format, p_overlay->data.p_pic );
+            p_region = subpicture_region_ForPicture( NULL, p_overlay->data.p_pic );
         if( unlikely(p_region == NULL) )
         {
             break;
