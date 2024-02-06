@@ -185,23 +185,26 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
 
     /* Handle category */
     psz_value = vlc_sdp_attr_value(p_sdp, "cat");
+    char *str = NULL;
     if (psz_value != NULL)
     {
         /* a=cat provides a dot-separated hierarchy.
          * For the time being only replace dots with pipe. TODO: FIXME */
-        char *str = strdup(psz_value);
+        str = strdup(psz_value);
         if (likely(str != NULL))
+        {
             for (char *p = strchr(str, '.'); p != NULL; p = strchr(p, '.'))
                 *(p++) = '|';
-        services_discovery_AddItemCat(p_sd, p_input, str ? str : psz_value);
-        free(str);
+            psz_value = str;
+        }
     }
     else
     {
         /* backward compatibility with VLC 0.7.3-2.0.0 senders */
         psz_value = vlc_sdp_attr_value(p_sdp, "x-plgroup");
-        services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
+    services_discovery_AddItemCat(p_sd, p_input, psz_value);
+    free(str);
 
     vlc_sdp_free(p_sdp);
     return p_sap;
