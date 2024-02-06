@@ -311,7 +311,7 @@ typedef struct
 } pair_format_guid;
 
 #if defined(__MINGW64_VERSION_MAJOR)
-# if __MINGW64_VERSION_MAJOR < 10
+# if __MINGW64_VERSION_MAJOR < 10 && !defined(CODECAPI_AVDecVideoAcceleration_H264)
 // 8-bit luminance only
 // Older versions of mingw-w64 lack this GUID, but it was added in mingw-w64
 // git on 2021-07-11 (during __MINGW64_VERSION_MAJOR 10). Use a local
