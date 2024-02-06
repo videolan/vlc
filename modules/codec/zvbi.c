@@ -181,7 +181,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
 
 static void EventHandler( vbi_event *ev, void *user_data );
 static int OpaquePage( picture_t *p_src, const vbi_page *p_page,
-                       const video_format_t *p_fmt, bool b_opaque, const int text_offset );
+                       bool b_opaque, const int text_offset );
 static int get_first_visible_row( vbi_char *p_text, int rows, int columns);
 static int get_last_visible_row( vbi_char *p_text, int rows, int columns);
 
@@ -502,7 +502,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         memcpy( p_sys->nav_link, &p_page.nav_link, sizeof( p_sys->nav_link )) ;
         vlc_mutex_unlock( &p_sys->lock );
 
-        OpaquePage( p_pic, &p_page, &p_region->fmt, b_opaque, i_first_row * p_page.columns );
+        OpaquePage( p_pic, &p_page, b_opaque, i_first_row * p_page.columns );
     }
 
 exit:
@@ -641,16 +641,16 @@ static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
 }
 
 static int OpaquePage( picture_t *p_src, const vbi_page *p_page,
-                       const video_format_t *p_fmt, bool b_opaque, const int text_offset )
+                       bool b_opaque, const int text_offset )
 {
     unsigned int    x, y;
 
-    assert( p_fmt->i_chroma == VLC_CODEC_RGBA );
+    assert( p_src->format.i_chroma == VLC_CODEC_RGBA );
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    for( y = 0; y < p_fmt->i_height; y++ )
+    for( y = 0; y < p_src->format.i_height; y++ )
     {
-        for( x = 0; x < p_fmt->i_width; x++ )
+        for( x = 0; x < p_src->format.i_width; x++ )
         {
             const vbi_opacity opacity = p_page->text[ text_offset + y/10 * p_page->columns + x/12 ].opacity;
             const int background = p_page->text[ text_offset + y/10 * p_page->columns + x/12 ].background;
