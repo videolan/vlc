@@ -58,12 +58,8 @@ struct vlc_media_source_provider_t
 /* A new item has been added to a certain services discovery */
 static void
 services_discovery_item_added(services_discovery_t *sd,
-                              input_item_t *parent, input_item_t *media,
-                              const char *cat)
+                              input_item_t *parent, input_item_t *media)
 {
-    assert(!parent || !cat);
-    VLC_UNUSED(cat);
-
     vlc_media_source_t *ms = sd->owner.sys;
     vlc_media_tree_t *tree = ms->tree;
 

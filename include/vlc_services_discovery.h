@@ -42,7 +42,7 @@ extern "C" {
 struct services_discovery_callbacks
 {
     void (*item_added)(struct services_discovery_t *sd, input_item_t *parent,
-                       input_item_t *item, const char *category);
+                       input_item_t *item);
     void (*item_removed)(struct services_discovery_t *sd, input_item_t *item);
 };
 
@@ -163,7 +163,7 @@ VLC_API void vlc_sd_Destroy( services_discovery_t * );
 static inline void services_discovery_AddItem(services_discovery_t *sd,
                                               input_item_t *item)
 {
-    sd->owner.cbs->item_added(sd, NULL, item, NULL);
+    sd->owner.cbs->item_added(sd, NULL, item);
 }
 
 /**
@@ -188,23 +188,7 @@ static inline void services_discovery_AddSubItem(services_discovery_t *sd,
                                                  input_item_t *parent,
                                                  input_item_t *item)
 {
-    sd->owner.cbs->item_added(sd, parent, item, NULL);
-}
-
-/**
- * Added service backward compatibility callback.
- *
- * @param sd the service discovery instance exposing the item
- * @param item the item to expose from the service
- * @param category Optional name of a group that the item belongs in
- *                 (for backward compatibility with legacy modules)
- */
-VLC_DEPRECATED
-static inline void services_discovery_AddItemCat(services_discovery_t *sd,
-                                                 input_item_t *item,
-                                                 const char *category)
-{
-    sd->owner.cbs->item_added(sd, NULL, item, category);
+    sd->owner.cbs->item_added(sd, parent, item);
 }
 
 /**

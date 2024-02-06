@@ -44,7 +44,6 @@ struct libvlc_media_discoverer_t
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
-    vlc_dictionary_t         catname_to_submedialist;
     char                     name[];
 };
 
@@ -58,8 +57,7 @@ struct libvlc_media_discoverer_t
 
 static void services_discovery_item_added( services_discovery_t *sd,
                                            input_item_t *parent,
-                                           input_item_t *p_item,
-                                           const char *psz_cat )
+                                           input_item_t *p_item )
 {
     libvlc_media_t * p_md;
     libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
@@ -67,36 +65,7 @@ static void services_discovery_item_added( services_discovery_t *sd,
 
     p_md = libvlc_media_new_from_input_item( p_item );
 
-    if( parent != NULL )
-    {
-        /* Flatten items list for now. TODO: tree support. */
-    }
-    else
-    /* If we have a category, that mean we have to group the items having
-     * that category in a media_list. */
-    if( psz_cat )
-    {
-        p_mlist = vlc_dictionary_value_for_key( &p_mdis->catname_to_submedialist, psz_cat );
-
-        if( p_mlist == kVLCDictionaryNotFound )
-        {
-            libvlc_media_t * p_catmd;
-            p_catmd = libvlc_media_new_as_node( psz_cat );
-            p_mlist = libvlc_media_subitems( p_catmd );
-
-            /* Insert the newly created mlist in our dictionary */
-            vlc_dictionary_insert( &p_mdis->catname_to_submedialist, psz_cat, p_mlist );
-
-            /* Insert the md into the root list */
-            libvlc_media_list_lock( p_mdis->p_mlist );
-            libvlc_media_list_internal_add_media( p_mdis->p_mlist, p_catmd );
-            libvlc_media_list_unlock( p_mdis->p_mlist );
-
-            /* We don't release the mlist cause the dictionary
-             * doesn't retain the object. But we release the md. */
-            libvlc_media_release( p_catmd );
-        }
-    }
+    (void) parent; /* Flatten items list for now. TODO: tree support. */
 
     libvlc_media_list_lock( p_mlist );
     libvlc_media_list_internal_add_media( p_mlist, p_md );
@@ -160,8 +129,6 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
     p_mdis->p_mlist->b_read_only = true;
     p_mdis->p_sd = NULL;
 
-    vlc_dictionary_init( &p_mdis->catname_to_submedialist, 0 );
-
     libvlc_retain( p_inst );
     strcpy( p_mdis->name, psz_name );
     return p_mdis;
@@ -213,12 +180,6 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 /**************************************************************************
  * release (Public)
  **************************************************************************/
-static void
-MediaListDictValueRelease( void* mlist, void* obj )
-{
-    libvlc_media_list_release( mlist );
-    (void)obj;
-}
 
 void
 libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
@@ -227,9 +188,6 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
         libvlc_media_discoverer_stop( p_mdis );
 
     libvlc_media_list_release( p_mdis->p_mlist );
-
-    vlc_dictionary_clear( &p_mdis->catname_to_submedialist,
-        MediaListDictValueRelease, NULL );
 
     libvlc_release( p_mdis->p_libvlc_instance );
 
