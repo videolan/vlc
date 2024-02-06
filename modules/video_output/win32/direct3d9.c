@@ -894,8 +894,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             d3d_region_t *cache = &sys->d3dregion[j];
             if (cache->texture &&
                 cache->format == sys->d3dregion_format &&
-                cache->width  == r->fmt.i_width &&
-                cache->height == r->fmt.i_height) {
+                cache->width  == r->p_picture->format.i_width &&
+                cache->height == r->p_picture->format.i_height) {
                 *d3dr = *cache;
                 memset(cache, 0, sizeof(*cache));
                 break;
@@ -903,8 +903,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
         if (!d3dr->texture) {
             d3dr->format = sys->d3dregion_format;
-            d3dr->width  = r->fmt.i_width;
-            d3dr->height = r->fmt.i_height;
+            d3dr->width  = r->p_picture->format.i_width;
+            d3dr->height = r->p_picture->format.i_height;
             hr = IDirect3DDevice9_CreateTexture(sys->d3d9_device->d3ddev.dev,
                                                 d3dr->width, d3dr->height,
                                                 1,
@@ -922,7 +922,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             }
 #ifndef NDEBUG
             msg_Dbg(vd, "Created %dx%d texture for OSD",
-                    r->fmt.i_width, r->fmt.i_height);
+                    r->p_picture->format.i_width, r->p_picture->format.i_height);
 #endif
         }
 
@@ -936,16 +936,16 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
             if (d3dr->format == D3DFMT_A8B8G8R8) {
                 if (dst_pitch == r->p_picture->p->i_pitch) {
-                    memcpy(dst_data, src_data, r->fmt.i_height * dst_pitch);
+                    memcpy(dst_data, src_data, r->p_picture->format.i_height * dst_pitch);
                 } else {
                     int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_pitch);
-                    for (unsigned y = 0; y < r->fmt.i_height; y++) {
+                    for (unsigned y = 0; y < r->p_picture->format.i_height; y++) {
                         memcpy(&dst_data[y * dst_pitch], &src_data[y * src_pitch], copy_pitch);
                     }
                 }
             } else {
                 int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_pitch);
-                for (unsigned y = 0; y < r->fmt.i_height; y++) {
+                for (unsigned y = 0; y < r->p_picture->format.i_height; y++) {
                     for (int x = 0; x < copy_pitch; x += 4) {
                         dst_data[y * dst_pitch + x + 0] = src_data[y * src_pitch + x + 2];
                         dst_data[y * dst_pitch + x + 1] = src_data[y * src_pitch + x + 1];
@@ -978,9 +978,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT texture_rect;
         texture_rect.left   = 0;
-        texture_rect.right  = r->fmt.i_width;
+        texture_rect.right  = r->p_picture->format.i_width;
         texture_rect.top    = 0;
-        texture_rect.bottom = r->fmt.i_height;
+        texture_rect.bottom = r->p_picture->format.i_height;
 
         RECT texture_visible_rect;
         texture_visible_rect.left   = r->fmt.i_x_offset;
