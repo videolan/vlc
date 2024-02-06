@@ -886,7 +886,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)hideControlsBar
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 1.0;
+        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+        context.duration = 0.5;
         self.controlsBarHeightConstraint.animator.constant = 0;
     } completionHandler:nil];
 }
@@ -894,7 +895,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showControlsBar
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 1.0;
+        context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+        context.duration = 0.5;
         self.controlsBarHeightConstraint.animator.constant = 48;
     } completionHandler:nil];
 }
