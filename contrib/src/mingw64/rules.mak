@@ -14,7 +14,7 @@ PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += d3d9 dcomp
 endif # !HAVE_WINSTORE
-PKGS += dxva dxvahd mingw11-fixes
+PKGS += dxva dxvahd mingw11-fixes mft10
 
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9
@@ -25,7 +25,7 @@ PKGS_FOUND += winrt_headers
 endif # HAVE_WINSTORE
 endif # MINGW 9
 ifeq ($(call mingw_at_least, 10), true)
-PKGS_FOUND += dxva
+PKGS_FOUND += dxva mft10
 endif # MINGW 10
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dcomp
@@ -45,7 +45,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp
+PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp mft10
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -139,6 +139,16 @@ MINGW_HEADERS_WINRT := \
 .dcomp: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dcomp.h "$(PREFIX)/include"
+	touch $@
+
+.sum-mft10: .sum-mingw64
+	touch $@
+
+MINGW_HEADERS_MFT := mfidl.h mfapi.h mftransform.h mferror.h mfobjects.h mmreg.h
+
+.mft10: mingw64
+	install -d "$(PREFIX)/include"
+	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_MFT)) "$(PREFIX)/include"
 	touch $@
 
 .sum-d3d9: .sum-mingw64
