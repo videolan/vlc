@@ -586,12 +586,12 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows;
         i_col = i_real_index % p_sys->i_cols ;
 
-        video_format_Init( &fmt_in, 0 );
         video_format_Init( &fmt_out, 0 );
 
         p_converted = vlc_picture_chain_PeekFront( &p_es->pictures );
         if ( !p_sys->b_keep )
         {
+            video_format_Init( &fmt_in, 0 );
             /* Convert the images */
             fmt_in.i_chroma = p_converted->format.i_chroma;
             fmt_in.i_height = p_converted->format.i_height;
@@ -625,20 +625,20 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
             p_converted = image_Convert( p_sys->p_image, p_converted,
                                          &fmt_in, &fmt_out );
+            video_format_Clean( &fmt_in );
             if( !p_converted )
             {
                 msg_Warn( p_filter,
                            "image resizing and chroma conversion failed" );
-                video_format_Clean( &fmt_in );
                 video_format_Clean( &fmt_out );
                 continue;
             }
         }
         else
         {
-            fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
-            fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
-            fmt_in.i_chroma = fmt_out.i_chroma = p_converted->format.i_chroma;
+            fmt_out.i_width = p_converted->format.i_width;
+            fmt_out.i_height = p_converted->format.i_height;
+            fmt_out.i_chroma = p_converted->format.i_chroma;
             fmt_out.i_visible_width = fmt_out.i_width;
             fmt_out.i_visible_height = fmt_out.i_height;
         }
@@ -649,7 +649,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
         if( !p_region )
         {
-            video_format_Clean( &fmt_in );
             video_format_Clean( &fmt_out );
             msg_Err( p_filter, "cannot allocate SPU region" );
             subpicture_Delete( p_spu );
@@ -711,7 +710,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
         vlc_spu_regions_push(&p_spu->regions, p_region);
 
-        video_format_Clean( &fmt_in );
         video_format_Clean( &fmt_out );
     }
 
