@@ -319,7 +319,6 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
 
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
-    video_format_t fmt;
     picture_t *p_pic;
     logo_t *p_logo;
 
@@ -362,13 +361,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
         goto exit;
 
     /* Create new SPU region */
-    video_format_Copy(&fmt, &p_pic->format);
-    fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.i_width = fmt.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;
-    fmt.i_height = fmt.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region = subpicture_region_ForPicture( &fmt, p_pic );
-    video_format_Clean(&fmt);
+    p_region = subpicture_region_ForPicture( NULL, p_pic );
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
