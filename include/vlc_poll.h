@@ -31,7 +31,7 @@
 
 /**
  * \ingroup os
- * \defgroup thread Poll implementations
+ * \defgroup thread_poll Poll implementations
  * @{
  * \file
  * Poll implementations
@@ -95,5 +95,7 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 #else /* POSIX threads */
 
 #endif
+
+/** @} */
 
 #endif /* !VLC_POLL_H_ */
