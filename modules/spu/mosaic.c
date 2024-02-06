@@ -643,7 +643,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             fmt_out.i_visible_height = fmt_out.i_height;
         }
 
-        p_region = subpicture_region_ForPicture( &fmt_out, p_converted );
+        p_region = subpicture_region_ForPicture( NULL, p_converted );
         if( !p_sys->b_keep )
             picture_Release( p_converted );
 
