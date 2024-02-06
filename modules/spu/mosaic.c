@@ -669,7 +669,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         }
         else
         {
-            if( fmt_out.i_width > col_inner_width ||
+            if( p_converted->format.i_width > col_inner_width ||
                 p_sys->b_ar || p_sys->b_keep )
             {
                 /* we don't have to center the video since it takes the
@@ -684,10 +684,10 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
                 p_region->i_x = p_sys->i_xoffset
                         + i_col * ( p_sys->i_width / p_sys->i_cols )
                         + ( i_col * p_sys->i_borderw ) / p_sys->i_cols
-                        + ( col_inner_width - fmt_out.i_width ) / 2;
+                        + ( col_inner_width - p_converted->format.i_width ) / 2;
             }
 
-            if( fmt_out.i_height > row_inner_height
+            if( p_converted->format.i_height > row_inner_height
                 || p_sys->b_ar || p_sys->b_keep )
             {
                 /* we don't have to center the video since it takes the
@@ -702,7 +702,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
                 p_region->i_y = p_sys->i_yoffset
                         + i_row * ( p_sys->i_height / p_sys->i_rows )
                         + ( i_row * p_sys->i_borderh ) / p_sys->i_rows
-                        + ( row_inner_height - fmt_out.i_height ) / 2;
+                        + ( row_inner_height - p_converted->format.i_height ) / 2;
             }
         }
         p_region->i_align = p_sys->i_align;
