@@ -111,7 +111,7 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2021 changelogs doc
+.PHONY: ChangeLog-2024 changelogs doc
 
 changelogs: $(CHANGELOGS)
 
