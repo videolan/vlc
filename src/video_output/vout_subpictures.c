@@ -983,7 +983,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 
     bool convert_chroma = true;
     for (int i = 0; chroma_list[i] && convert_chroma; i++) {
-        if (region_fmt.i_chroma == chroma_list[i])
+        if (region->fmt.i_chroma == chroma_list[i])
             convert_chroma = false;
     }
 
