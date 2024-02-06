@@ -385,7 +385,7 @@ static subpicture_region_t *RenderText( filter_t *p_filter,
     if (p_picture == NULL)
         return NULL;
 
-    subpicture_region_t *p_region_out = subpicture_region_ForPicture(&p_picture->format, p_picture);
+    subpicture_region_t *p_region_out = subpicture_region_ForPicture(NULL, p_picture);
     picture_Release(p_picture);
     if (unlikely(p_region_out == NULL))
         return NULL;
