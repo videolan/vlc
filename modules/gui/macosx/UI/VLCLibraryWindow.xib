@@ -563,6 +563,7 @@
                             </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="height" constant="48" id="Fps-hR-AFq"/>
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="Uo1-sD-OXk"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="YVB-nY-sHE"/>
                             <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" id="aBH-H2-ykp"/>
@@ -759,6 +760,7 @@
                 <outlet property="clearPlaylistButton" destination="cih-xp-HmY" id="PoU-co-0kn"/>
                 <outlet property="clearPlaylistSeparator" destination="nAW-KH-ipk" id="Af9-fg-u7m"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
+                <outlet property="controlsBarHeightConstraint" destination="Fps-hR-AFq" id="E4g-JQ-fgx"/>
                 <outlet property="dragDropImageBackgroundBox" destination="AXk-h7-dZ0" id="h3h-Wh-0op"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
                 <outlet property="flexibleSpaceToolbarItem" destination="89f-AL-zuU" id="3p9-t8-79g"/>

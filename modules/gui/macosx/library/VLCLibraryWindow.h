@@ -63,6 +63,7 @@ extern const CGFloat VLCLibraryWindowMinimalHeight;
 extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
