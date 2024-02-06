@@ -79,6 +79,21 @@
 #define SAP_V4_LINK_ADDRESS     "224.0.0.255"
 #define ADD_SESSION 1
 
+typedef struct
+{
+    vlc_thread_t thread;
+
+    /* Socket descriptors */
+    int i_fd;
+    int *pi_fd;
+
+    /* Table of announces */
+    int i_announces;
+    struct sap_announce_t **pp_announces;
+
+    vlc_tick_t i_timeout;
+} services_discovery_sys_t;
+
 static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
 {
 #ifdef HAVE_ZLIB
@@ -213,21 +228,6 @@ error:
     vlc_sdp_free(p_sdp);
     return NULL;
 }
-
-typedef struct
-{
-    vlc_thread_t thread;
-
-    /* Socket descriptors */
-    int i_fd;
-    int *pi_fd;
-
-    /* Table of announces */
-    int i_announces;
-    struct sap_announce_t **pp_announces;
-
-    vlc_tick_t i_timeout;
-} services_discovery_sys_t;
 
 static int RemoveAnnounce( services_discovery_t *p_sd,
                            sap_announce_t *p_announce )
