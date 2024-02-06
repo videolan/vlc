@@ -270,8 +270,8 @@
                             <real value="250"/>
                         </holdingPriorities>
                     </splitView>
-                    <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
-                        <rect key="frame" x="0.0" y="0.0" width="896" height="45"/>
+                    <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
+                        <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MQH-bI-Zdh" customClass="VLCDragDropView">
                                 <rect key="frame" x="0.0" y="0.0" width="896" height="45"/>
