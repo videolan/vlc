@@ -1349,8 +1349,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 i++;
                 continue;
             }
-            d3dquad->generic.i_width  = r->fmt.i_width;
-            d3dquad->generic.i_height = r->fmt.i_height;
+            d3dquad->generic.i_width  = r->p_picture->format.i_width;
+            d3dquad->generic.i_height = r->p_picture->format.i_height;
 
             d3dquad->generic.textureFormat = sys->regionQuad.generic.textureFormat;
             err = D3D11_AllocateQuad(vd, sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
@@ -1363,7 +1363,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->fmt, d3dquad, &sys->display );
+            err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->p_picture->format, d3dquad, &sys->display );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
@@ -1380,7 +1380,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             (*region)[i] = picture_NewFromResource(&r->p_picture->format, &picres);
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
-                        r->fmt.i_width, r->fmt.i_height);
+                        r->p_picture->format.i_width, r->p_picture->format.i_height);
                 d3dquad->Reset();
                 i++;
                 continue;
