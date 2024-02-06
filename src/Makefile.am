@@ -20,7 +20,7 @@ SUFFIXES = .pc.in .pc .rc.in .rc
 
 pluginsincludedir = $(pkgincludedir)/plugins
 
-pluginsinclude_HEADERS = \
+pluginsinclude_HEADERS.h = \
 	../include/vlc_access.h \
 	../include/vlc_actions.h \
 	../include/vlc_addons.h \
@@ -41,7 +41,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_config_cat.h \
 	../include/vlc_configuration.h \
 	../include/vlc_cpu.h \
-	../include/vlc_cxx_helpers.hpp \
 	../include/vlc_clock.h \
 	../include/vlc_decoder.h \
 	../include/vlc_demux.h \
@@ -124,6 +123,14 @@ pluginsinclude_HEADERS = \
 	../include/vlc_xlib.h \
 	../include/vlc_xml.h \
 	$(NULL)
+
+pluginsinclude_HEADERS.hpp = \
+	../include/vlc_cxx_helpers.hpp \
+	$(NULL)
+
+pluginsinclude_HEADERS = \
+	$(pluginsinclude_HEADERS.h) \
+	$(pluginsinclude_HEADERS.hpp)
 nodist_pluginsinclude_HEADERS = ../include/vlc_about.h
 
 noinst_HEADERS = \
