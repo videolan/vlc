@@ -147,6 +147,10 @@ VLC_API subpicture_region_t * subpicture_region_NewText( void );
  * The chroma of the format must match the one of the picture.
  * The dimensions of the format should not exceed the ones of the picture. This
  * is not checked explicitly in the function.
+ *
+ * \param p_fmt format for the subpicture cropping/SAR (may be NULL)
+ *
+ * \note if p_fmt is NULL, the format of the picture will be used.
  */
 VLC_API subpicture_region_t * subpicture_region_ForPicture( const video_format_t *p_fmt, picture_t *pic );
 
