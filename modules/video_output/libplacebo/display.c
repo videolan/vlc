@@ -405,8 +405,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
             sys->overlays[i] = (struct pl_overlay) {
                 .tex   = sys->overlay_tex[i],
                 .mode  = PL_OVERLAY_NORMAL,
-                .color = vlc_placebo_ColorSpace(&r->fmt),
-                .repr  = vlc_placebo_ColorRepr(&r->fmt),
+                .color = vlc_placebo_ColorSpace(&r->p_picture->format),
+                .repr  = vlc_placebo_ColorRepr(&r->p_picture->format),
                 .parts = &sys->overlay_parts[i],
                 .num_parts = 1,
             };
