@@ -53,7 +53,10 @@ extern "C" {
 #include <mfidl.h>
 
 
-#if !defined(CODECAPI_AVDecVideoAcceleration_H264) // MINGW < 8
+#if !defined(CODECAPI_AVDecVideoAcceleration_H264) // MINGW < 8.0.1
+DEFINE_CODECAPI_GUID(AVDecVideoAcceleration_H264,  "f7db8a2f-4f48-4ee8-ae31-8b6ebe558ae2", 0xf7db8a2f, 0x4f48, 0x4ee8, 0xae, 0x31, 0x8b, 0x6e, 0xbe, 0x55, 0x8a, 0xe2)
+DEFINE_CODECAPI_GUID(AVDecVideoAcceleration_VC1,   "f7db8a30-4f48-4ee8-ae31-8b6ebe558ae2", 0xf7db8a30, 0x4f48, 0x4ee8, 0xae, 0x31, 0x8b, 0x6e, 0xbe, 0x55, 0x8a, 0xe2)
+DEFINE_CODECAPI_GUID(AVDecVideoAcceleration_MPEG2, "f7db8a2e-4f48-4ee8-ae31-8b6ebe558ae2", 0xf7db8a2e, 0x4f48, 0x4ee8, 0xae, 0x31, 0x8b, 0x6e, 0xbe, 0x55, 0x8a, 0xe2)
 #define CODECAPI_AVDecVideoAcceleration_H264  DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_H264)
 #define CODECAPI_AVDecVideoAcceleration_VC1   DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_VC1)
 #define CODECAPI_AVDecVideoAcceleration_MPEG2 DEFINE_CODECAPI_GUIDNAMED(AVDecVideoAcceleration_MPEG2)
