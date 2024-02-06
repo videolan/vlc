@@ -147,9 +147,6 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     p_subpic->i_original_picture_width  = fmt_out.i_visible_width;
     p_subpic->i_original_picture_height = fmt_out.i_visible_height;
 
-    fmt_out.i_sar_num =
-    fmt_out.i_sar_den = 0;
-
     subpicture_region_t *p_region = subpicture_region_ForPicture( &fmt_out, p_pip );
     picture_Release( p_pip );
 
@@ -158,6 +155,10 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
         subpicture_Delete(p_subpic);
         return NULL;
     }
+
+    p_region->fmt.i_sar_num =
+    p_region->fmt.i_sar_den = 0;
+
 
     vlc_spu_regions_push( &p_subpic->regions, p_region );
     return p_subpic;
