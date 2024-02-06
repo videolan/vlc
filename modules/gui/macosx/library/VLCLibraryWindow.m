@@ -158,7 +158,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
     self.videoViewController.displayLibraryControls = YES;
-    [self hideControlsBar];
+    self.controlsBarHeightConstraint.constant = 0;
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
@@ -885,19 +885,18 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)hideControlsBar
 {
-    _controlsBar.bottomBarView.hidden = YES;
-    _videoViewBottomConstraint.priority = 1;
-    _splitViewBottomConstraintToBottomBar.priority = 1;
-    _splitViewBottomConstraintToSuperView.priority = 999;
-
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        self.controlsBarHeightConstraint.animator.constant = 0;
+    } completionHandler:nil];
 }
 
 - (void)showControlsBar
 {
-    _controlsBar.bottomBarView.hidden = NO;
-    _videoViewBottomConstraint.priority = 999;
-    _splitViewBottomConstraintToBottomBar.priority = 999;
-    _splitViewBottomConstraintToSuperView.priority = 1;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        self.controlsBarHeightConstraint.animator.constant = 48;
+    } completionHandler:nil];
 }
 
 - (void)presentExternalWindows
