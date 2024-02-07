@@ -113,9 +113,15 @@ OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window)
 {
     AWindowHandler *awh;
     if (window && window->type == VLC_WINDOW_TYPE_ANDROID_NATIVE)
+    {
         awh = window->display.anativewindow;
+    }
     else
+    {
         awh = AWindowHandler_new(VLC_OBJECT(device), NULL, NULL);
+        if (awh == NULL)
+            return VLC_ENOMEM;
+    }
 
     static const struct vlc_decoder_device_operations ops =
     {
