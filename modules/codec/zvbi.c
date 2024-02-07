@@ -483,7 +483,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         picture_t *p_pic = p_region->p_picture;
 
         /* ZVBI is stupid enough to assume pitch == width */
-        p_pic->p->i_pitch = 4 * p_region->fmt.i_width;
+        p_pic->p->i_pitch = 4 * p_region->p_picture->format.i_width;
 
         /* Maintain subtitle position */
         p_region->i_y = i_first_row*10;
