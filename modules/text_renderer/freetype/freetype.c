@@ -363,27 +363,27 @@ static void RenderYUVP( const subpicture_region_t *p_region_in,
     YUVFromXRGB( p_line->p_character[0].p_style->i_font_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
-    p_region->fmt.p_palette->i_entries = 16;
+    p_region->p_picture->format.p_palette->i_entries = 16;
     for( i = 0; i < 8; i++ )
     {
-        p_region->fmt.p_palette->palette[i][0] = 0;
-        p_region->fmt.p_palette->palette[i][1] = 0x80;
-        p_region->fmt.p_palette->palette[i][2] = 0x80;
-        p_region->fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
+        p_region->p_picture->format.p_palette->palette[i][0] = 0;
+        p_region->p_picture->format.p_palette->palette[i][1] = 0x80;
+        p_region->p_picture->format.p_palette->palette[i][2] = 0x80;
+        p_region->p_picture->format.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
-    for( i = 8; i < p_region->fmt.p_palette->i_entries; i++ )
+    for( i = 8; i < p_region->p_picture->format.p_palette->i_entries; i++ )
     {
-        p_region->fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
-        p_region->fmt.p_palette->palette[i][1] = i_u;
-        p_region->fmt.p_palette->palette[i][2] = i_v;
-        p_region->fmt.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
+        p_region->p_picture->format.p_palette->palette[i][0] = i * 16 * i_y / 256;
+        p_region->p_picture->format.p_palette->palette[i][1] = i_u;
+        p_region->p_picture->format.p_palette->palette[i][2] = i_v;
+        p_region->p_picture->format.p_palette->palette[i][3] = (int)pi_gamma[i] * i_alpha / 255;
     }
 
     p_dst = p_region->p_picture->Y_PIXELS;
     i_pitch = p_region->p_picture->Y_PITCH;
 
     /* Initialize the region pixels */
-    memset( p_dst, 0, i_pitch * p_region->fmt.i_height );
+    memset( p_dst, 0, i_pitch * p_region->p_picture->format.i_height );
 
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
@@ -416,13 +416,13 @@ static void RenderYUVP( const subpicture_region_t *p_region_in,
         uint8_t *p_top = p_dst; /* Use 1st line as a cache */
         uint8_t left, current;
 
-        for( y = 1; y < p_region->fmt.i_height - 1; y++ )
+        for( y = 1; y < p_region->p_picture->format.i_height - 1; y++ )
         {
-            if( y > 1 ) memcpy( p_top, p_dst, p_region->fmt.i_width );
+            if( y > 1 ) memcpy( p_top, p_dst, p_region->p_picture->format.i_width );
             p_dst += p_region->p_picture->Y_PITCH;
             left = 0;
 
-            for( x = 1; x < p_region->fmt.i_width - 1; x++ )
+            for( x = 1; x < p_region->p_picture->format.i_width - 1; x++ )
             {
                 current = p_dst[x];
                 p_dst[x] = ( 8 * (int)p_dst[x] + left + p_dst[x+1] + p_top[x -1]+ p_top[x] + p_top[x+1] +
@@ -430,7 +430,7 @@ static void RenderYUVP( const subpicture_region_t *p_region_in,
                 left = current;
             }
         }
-        memset( p_top, 0, p_region->fmt.i_width );
+        memset( p_top, 0, p_region->p_picture->format.i_width );
     }
 }
 
