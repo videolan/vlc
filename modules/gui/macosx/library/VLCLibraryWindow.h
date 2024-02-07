@@ -64,7 +64,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
@@ -134,7 +133,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *togglePlaylistToolbarItem;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *splitViewBottomConstraintToBottomBar;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *splitViewBottomConstraintToSuperView;
 
 @property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
 @property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
