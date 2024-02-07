@@ -118,8 +118,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     xcb_connection_t *conn = sys->conn;
     const vout_display_place_t *place = &sys->place;
     picture_t *pic = reg->p_picture;
-    unsigned sw = reg->fmt.i_width;
-    unsigned sh = reg->fmt.i_height;
+    unsigned sw = pic->format.i_width;
+    unsigned sh = pic->format.i_height;
     xcb_rectangle_t rects[] = { { 0, 0, sw, sh }, };
 
     xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root, sw, sh);
