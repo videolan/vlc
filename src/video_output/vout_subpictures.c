@@ -863,7 +863,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
      * FIXME b_force_palette and force_crop are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
      */
-    const bool using_palette = region->fmt.i_chroma == VLC_CODEC_YUVP;
+    const bool using_palette = region->p_picture->format.i_chroma == VLC_CODEC_YUVP;
     const bool force_palette = using_palette && sys->palette.i_entries > 0;
     const bool crop_requested = (force_palette && sys->force_crop) ||
                                 region->i_max_width || region->i_max_height;
@@ -942,10 +942,9 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     if (unlikely(dst_width == 0 || dst_height == 0))
         return NULL;
 
-
     /* */
     if (force_palette) {
-        video_palette_t *old_palette = region->fmt.p_palette;
+        video_palette_t *old_palette = region->p_picture->format.p_palette;
         video_palette_t new_palette;
         bool b_opaque = false;
         bool b_old_opaque = false;
@@ -995,7 +994,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
 
     bool convert_chroma = true;
     for (int i = 0; chroma_list[i] && convert_chroma; i++) {
-        if (region->fmt.i_chroma == chroma_list[i])
+        if (region->p_picture->format.i_chroma == chroma_list[i])
             convert_chroma = false;
     }
 
@@ -1036,9 +1035,9 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
             if (using_palette) {
                 filter_t *scale_yuvp = sys->scale_yuvp;
 
-                scale_yuvp->fmt_in.video = region->fmt;
+                scale_yuvp->fmt_in.video = region->p_picture->format;
 
-                scale_yuvp->fmt_out.video = region->fmt;
+                scale_yuvp->fmt_out.video = region->p_picture->format;
                 scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
                 scale_yuvp->fmt_out.video.p_palette = NULL;
 

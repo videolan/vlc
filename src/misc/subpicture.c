@@ -354,8 +354,17 @@ unsigned picture_BlendSubpicture(picture_t *dst,
     subpicture_region_t *r;
     vlc_spu_regions_foreach(r, &src->regions) {
         assert(r->p_picture && r->i_align == 0);
+
+        video_format_t blend_fmt = r->p_picture->format;
+        blend_fmt.i_x_offset = r->fmt.i_x_offset;
+        blend_fmt.i_y_offset = r->fmt.i_y_offset;
+        blend_fmt.i_visible_width = r->fmt.i_visible_width;
+        blend_fmt.i_visible_height = r->fmt.i_visible_height;
+        blend_fmt.i_sar_num = r->fmt.i_sar_num;
+        blend_fmt.i_sar_den = r->fmt.i_sar_den;
+
         if (filter_ConfigureBlend(blend, dst->format.i_width,
-                                  dst->format.i_height,  &r->fmt)
+                                  dst->format.i_height,  &blend_fmt)
          || filter_Blend(blend, dst, r->i_x, r->i_y, r->p_picture,
                          src->i_alpha * r->i_alpha / 255))
             msg_Err(blend, "blending %4.4s to %4.4s failed",
