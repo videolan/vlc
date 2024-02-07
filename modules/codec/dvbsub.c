@@ -1740,7 +1740,7 @@ static void YuvaYuvp( subpicture_t *p_subpic )
 
     vlc_spu_regions_foreach(p_region, &p_subpic->regions)
     {
-        video_format_t *p_fmt = &p_region->fmt;
+        video_format_t *p_fmt = &p_region->p_picture->format;
         int i = 0, j = 0, n = 0, p = 0;
         int i_max_entries = 256;
 
@@ -1943,24 +1943,24 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
      *  VLC_CODEC_YUVP
      */
     p_region = vlc_spu_regions_first_or_null(&p_subpic->regions);
-    if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
+    /* Sanity check */
+    if( !p_region ) return NULL;
+
+    if( !subpicture_region_IsText( p_region ) && p_region->p_picture->format.i_chroma == VLC_CODEC_YUVA )
     {
         YuvaYuvp( p_subpic );
     }
 
-    /* Sanity check */
-    if( !p_region ) return NULL;
-
     if( (!subpicture_region_IsText( p_region )) &&
-        ( p_region->fmt.i_chroma != VLC_CODEC_YUVP ) )
+        ( p_region->p_picture->format.i_chroma != VLC_CODEC_YUVP ) )
     {
-        msg_Err( p_enc, "chroma %4.4s not supported", (char *)&p_region->fmt.i_chroma );
+        msg_Err( p_enc, "chroma %4.4s not supported", (char *)&p_region->p_picture->format.i_chroma );
         return NULL;
     }
 
-    if( p_region->fmt.p_palette )
+    if( !subpicture_region_IsText( p_region ) && p_region->p_picture->format.p_palette )
     {
-        switch( p_region->fmt.p_palette->i_entries )
+        switch( p_region->p_picture->format.p_palette->i_entries )
         {
             case 0:
             case 4:
@@ -1969,7 +1969,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
                 break;
             default:
                 msg_Err( p_enc, "subpicture palette (%d) not handled",
-                            p_region->fmt.p_palette->i_entries );
+                            p_region->p_picture->format.p_palette->i_entries );
                 return NULL;
         }
     }
@@ -2134,9 +2134,9 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_region_t *p_regio
     /* Sanity check */
     if( !p_region ) return;
 
-    if( p_region->fmt.i_chroma == VLC_CODEC_YUVP )
+    if( !subpicture_region_IsText( p_region ) && p_region->p_picture->format.i_chroma == VLC_CODEC_YUVP )
     {
-        p_pal = p_region->fmt.p_palette;
+        p_pal = p_region->p_picture->format.p_palette;
     }
     else
         p_pal = &empty_palette;
@@ -2181,7 +2181,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
 
         if( !b_text )
         {
-            video_palette_t *p_pal = p_region->fmt.p_palette;
+            video_palette_t *p_pal = p_region->p_picture->format.p_palette;
 
             if( !p_pal )
             {
@@ -2264,12 +2264,12 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         /* object coding method */
         if (subpicture_region_IsText( p_region ))
             bs_write( s, 2, 1 );
-        else if ( p_region->fmt.i_chroma == VLC_CODEC_YUVP )
+        else if ( p_region->p_picture->format.i_chroma == VLC_CODEC_YUVP )
             bs_write( s, 2, 0 );
         else
         {
             msg_Err( p_enc, "FOURCC %4.4s not supported by encoder.",
-                     (const char*)&p_region->fmt.i_chroma );
+                     (const char*)&p_region->p_picture->format.i_chroma );
             i_region++;
             continue;
         }
@@ -2341,14 +2341,11 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
 {
     unsigned int i_line;
 
-    /* Sanity check */
-    if( p_region->fmt.i_chroma != VLC_CODEC_YUVP ) return;
-
     /* Encode line by line */
     for( i_line = !b_top; i_line < p_region->fmt.i_visible_height;
          i_line += 2 )
     {
-        switch( p_region->fmt.p_palette->i_entries )
+        switch( p_region->p_picture->format.p_palette->i_entries )
         {
         case 0:
             break;
@@ -2370,7 +2367,7 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
 
         default:
             msg_Err( p_enc, "subpicture palette (%i) not handled",
-                     p_region->fmt.p_palette->i_entries );
+                     p_region->p_picture->format.p_palette->i_entries );
             break;
         }
 
