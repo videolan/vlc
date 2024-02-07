@@ -434,7 +434,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
     const subpicture_region_t *r;
     vlc_spu_regions_foreach_const(r, &subpicture->regions) {
-        CFIndex length = r->fmt.i_height * r->p_picture->p->i_pitch;
+        CFIndex length = r->p_picture->format.i_height * r->p_picture->p->i_pitch;
         const size_t pixels_offset =
                 r->fmt.i_y_offset * r->p_picture->p->i_pitch +
                 r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
