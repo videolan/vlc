@@ -1896,9 +1896,9 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
     vlc_spu_regions_foreach(p_reg, &ov->regions) {
         if (p_reg->i_x == eventov->x &&
             p_reg->i_y == eventov->y &&
-            p_reg->fmt.i_width == eventov->w &&
-            p_reg->fmt.i_height == eventov->h &&
-            p_reg->fmt.i_chroma == VLC_CODEC_YUVP)
+            p_reg->p_picture->format.i_width == eventov->w &&
+            p_reg->p_picture->format.i_height == eventov->h &&
+            p_reg->p_picture->format.i_chroma == VLC_CODEC_YUVP)
             break;
     }
 
@@ -1943,12 +1943,12 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
         }
 
     if (eventov->palette) {
-        p_reg->fmt.p_palette->i_entries = 256;
+        p_reg->p_picture->format.p_palette->i_entries = 256;
         for (int i = 0; i < 256; ++i) {
-            p_reg->fmt.p_palette->palette[i][0] = eventov->palette[i].Y;
-            p_reg->fmt.p_palette->palette[i][1] = eventov->palette[i].Cb;
-            p_reg->fmt.p_palette->palette[i][2] = eventov->palette[i].Cr;
-            p_reg->fmt.p_palette->palette[i][3] = eventov->palette[i].T;
+            p_reg->p_picture->format.p_palette->palette[i][0] = eventov->palette[i].Y;
+            p_reg->p_picture->format.p_palette->palette[i][1] = eventov->palette[i].Cb;
+            p_reg->p_picture->format.p_palette->palette[i][2] = eventov->palette[i].Cr;
+            p_reg->p_picture->format.p_palette->palette[i][3] = eventov->palette[i].T;
         }
     }
 
@@ -2044,7 +2044,7 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
     }
 
     /* Find a region to update */
-    if (p_reg->fmt.i_chroma != rgbchroma) {
+    if (p_reg->p_picture->format.i_chroma != rgbchroma) {
         vlc_mutex_unlock(&ov->lock);
         return;
     }
