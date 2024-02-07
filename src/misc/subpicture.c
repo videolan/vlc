@@ -234,15 +234,24 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
         return NULL;
 
     video_format_Copy( &p_region->fmt, p_fmt );
+    p_region->p_picture = picture_NewFromFormat( p_fmt );
+    if( !p_region->p_picture )
+    {
+        video_format_Clean( &p_region->fmt );
+        free( p_region );
+        return NULL;
+    }
+
     if ( p_fmt->i_chroma == VLC_CODEC_YUVP || p_fmt->i_chroma == VLC_CODEC_RGBP )
     {
         /* YUVP/RGBP should have a palette */
-        if( p_region->fmt.p_palette == NULL )
+        if( p_region->p_picture->format.p_palette == NULL )
         {
-            p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
-            if( p_region->fmt.p_palette == NULL )
+            p_region->p_picture->format.p_palette = calloc( 1, sizeof(*p_region->p_picture->format.p_palette) );
+            if( p_region->p_picture->format.p_palette == NULL )
             {
                 video_format_Clean( &p_region->fmt );
+                picture_Release( p_region->p_picture );
                 free( p_region );
                 return NULL;
             }
@@ -251,14 +260,6 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     else
     {
         assert(p_fmt->p_palette == NULL);
-    }
-
-    p_region->p_picture = picture_NewFromFormat( p_fmt );
-    if( !p_region->p_picture )
-    {
-        video_format_Clean( &p_region->fmt );
-        free( p_region );
-        return NULL;
     }
 
     return p_region;
@@ -291,15 +292,15 @@ subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, 
         p_fmt = &pic->format;
 
     video_format_Copy( &p_region->fmt, p_fmt );
-    if ( p_fmt->i_chroma == VLC_CODEC_YUVP || p_fmt->i_chroma == VLC_CODEC_RGBP )
+    if ( pic->format.i_chroma == VLC_CODEC_YUVP || pic->format.i_chroma == VLC_CODEC_RGBP )
     {
         /* YUVP/RGBP should have a palette */
-        if( p_region->fmt.p_palette == NULL )
+        if( pic->format.p_palette == NULL )
         {
-            p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
-            if( p_region->fmt.p_palette == NULL )
+            pic->format.p_palette = calloc( 1, sizeof(*pic->format.p_palette) );
+            if( pic->format.p_palette == NULL )
             {
-                video_format_Clean( &p_region->fmt );
+                video_format_Clean( &pic->format );
                 free( p_region );
                 return NULL;
             }
@@ -307,7 +308,7 @@ subpicture_region_t *subpicture_region_ForPicture( const video_format_t *p_fmt, 
     }
     else
     {
-        assert(p_fmt->p_palette == NULL);
+        assert(pic->format.p_palette == NULL);
     }
 
     p_region->p_picture = picture_Hold(pic);
