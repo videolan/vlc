@@ -546,6 +546,9 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         fmt.i_height = fmt.i_visible_height = i_rows * 10;
         fmt.i_sar_num = fmt.i_sar_den = 0; /* let the vout set the correct AR */
         p_region = subpicture_region_New( &fmt );
+
+        p_spu->i_original_picture_width = fmt.i_visible_width;
+        p_spu->i_original_picture_height = fmt.i_visible_height;
     }
     else
     {
@@ -567,8 +570,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
 
     if( !b_text )
         p_region->i_align = i_align;
-    p_spu->i_original_picture_width = p_region->fmt.i_width;
-    p_spu->i_original_picture_height = p_region->fmt.i_height;
 
     return p_spu;
 }
