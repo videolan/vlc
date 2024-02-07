@@ -201,7 +201,7 @@ static const struct
     {VLC_CODEC_GBRA_PLANAR_16B, AV_PIX_FMT_GBRAP16BE,  COLOR_RANGE_UNDEF },
 
     /* XYZ */
-    {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12BE,  COLOR_RANGE_UNDEF },
+    {VLC_CODEC_XYZ_12B, AV_PIX_FMT_XYZ12BE,  COLOR_RANGE_UNDEF },
 };
 
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )

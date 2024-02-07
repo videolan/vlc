@@ -663,7 +663,7 @@ opengl_interop_init(struct vlc_gl_interop *interop,
     interop->fmt_out.space = yuv_space;
     interop->tex_target = GL_TEXTURE_2D;
 
-    if (chroma == VLC_CODEC_XYZ12)
+    if (chroma == VLC_CODEC_XYZ_12B)
     {
         interop_xyz12_init(interop);
         return VLC_SUCCESS;
@@ -731,7 +731,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
         space = interop->fmt_in.space;
     }
-    else if (interop->fmt_in.i_chroma == VLC_CODEC_XYZ12)
+    else if (interop->fmt_in.i_chroma == VLC_CODEC_XYZ_12B)
     {
         list = NULL;
         space = COLOR_SPACE_UNDEF;

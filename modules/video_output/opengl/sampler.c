@@ -737,7 +737,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     if (expose_planes)
         return sampler_planes_init(sampler);
 
-    if (chroma == VLC_CODEC_XYZ12)
+    if (chroma == VLC_CODEC_XYZ_12B)
         return xyz12_shader_init(sampler);
 
     if (is_yuv)

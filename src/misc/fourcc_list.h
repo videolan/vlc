@@ -975,7 +975,7 @@ static const staticentry_t p_list_video[] = {
 
 
     /* XYZ color space */
-    B(VLC_CODEC_XYZ12, "Packed XYZ 12-bit BE"),
+    B(VLC_CODEC_XYZ_12B, "Packed XYZ 12-bit BE"),
         A("XY12"),
 
     /* Videogames Codecs */

@@ -674,7 +674,7 @@
 #define VLC_CODEC_WEBVTT    VLC_FOURCC('w','v','t','t')
 
 /* XYZ colorspace 12 bits packed in 16 bits, organisation |XXX0|YYY0|ZZZ0| */
-#define VLC_CODEC_XYZ12     VLC_FOURCC('X','Y','1','2')
+#define VLC_CODEC_XYZ_12B   VLC_FOURCC('X','Y','c','B')
 
 
 /* Special endian dependent values
