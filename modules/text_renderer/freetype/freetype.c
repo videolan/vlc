@@ -1075,10 +1075,6 @@ static subpicture_region_t *Render( filter_t *p_filter,
     fmt.i_height         =
     fmt.i_visible_height = regionbbox.yMax - regionbbox.yMin;
     fmt.i_sar_num = fmt.i_sar_den = 1;
-    fmt.transfer  = p_region_in->fmt.transfer;
-    fmt.primaries = p_region_in->fmt.primaries;
-    fmt.space     = p_region_in->fmt.space;
-    fmt.mastering = p_region_in->fmt.mastering;
 
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
     {
@@ -1087,6 +1083,11 @@ static subpicture_region_t *Render( filter_t *p_filter,
         region = subpicture_region_New(&fmt);
         if (unlikely(region == NULL))
             continue;
+
+        region->p_picture->format.transfer  = p_region_in->fmt.transfer;
+        region->p_picture->format.primaries = p_region_in->fmt.primaries;
+        region->p_picture->format.space     = p_region_in->fmt.space;
+        region->p_picture->format.mastering = p_region_in->fmt.mastering;
 
         region->fmt.i_sar_num = p_region_in->fmt.i_sar_num;
         region->fmt.i_sar_den = p_region_in->fmt.i_sar_den;
