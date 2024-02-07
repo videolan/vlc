@@ -892,22 +892,22 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-        context.duration = 0.5;
+        context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
         self.controlsBarHeightConstraint.animator.constant = 0;
     } completionHandler:nil];
 }
 
 - (void)showControlsBarImmediately
 {
-    self.controlsBarHeightConstraint.constant = 48;
+    self.controlsBarHeightConstraint.constant = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
 }
 
 - (void)showControlsBar
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
-        context.duration = 0.5;
-        self.controlsBarHeightConstraint.animator.constant = 48;
+        context.duration = VLCLibraryUIUnits.controlsFadeAnimationDuration;
+        self.controlsBarHeightConstraint.animator.constant = VLCLibraryUIUnits.libraryWindowControlsBarHeight;
     } completionHandler:nil];
 }
 

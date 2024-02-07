@@ -186,4 +186,9 @@
     return 400.;
 }
 
++ (const CGFloat)libraryWindowControlsBarHeight
+{
+    return 48.;
+}
+
 @end

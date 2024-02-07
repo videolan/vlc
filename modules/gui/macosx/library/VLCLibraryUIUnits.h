@@ -62,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, readonly) const CGFloat controlsFadeAnimationDuration;
 
+@property (class, readonly) const CGFloat libraryWindowControlsBarHeight;
+
 @property (class, readonly) const CGFloat librarySplitViewMainViewMinimumWidth;
 
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
