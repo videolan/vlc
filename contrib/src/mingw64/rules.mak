@@ -14,12 +14,13 @@ PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += d3d9 dcomp
 endif # !HAVE_WINSTORE
-PKGS += dxva dxvahd mingw11-fixes mft10
+PKGS += dxva dxvahd mingw11-fixes mft10 d3d12
 
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9
 endif # MINGW 8
 ifeq ($(call mingw_at_least, 9), true)
+PKGS_FOUND += d3d12
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
 endif # HAVE_WINSTORE
@@ -45,7 +46,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp mft10
+PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp mft10 d3d12
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -169,18 +170,18 @@ MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 
-MINGW64_UWP_CONF := --without-headers --with-crt --without-libraries --without-tools
+MINGW64_MINIMALCRT_CONF := --without-headers --with-crt --without-libraries --without-tools
 ifeq ($(ARCH),x86_64)
-MINGW64_UWP_CONF +=--disable-lib32 --enable-lib64
+MINGW64_MINIMALCRT_CONF +=--disable-lib32 --enable-lib64
 MINGW64_BUILDDIR := lib64
 else ifeq ($(ARCH),i386)
-MINGW64_UWP_CONF +=--enable-lib32 --disable-lib64
+MINGW64_MINIMALCRT_CONF +=--enable-lib32 --disable-lib64
 MINGW64_BUILDDIR := lib32
 else ifeq ($(ARCH),aarch64)
-MINGW64_UWP_CONF +=--disable-lib32 --disable-lib64 --enable-libarm64
+MINGW64_MINIMALCRT_CONF +=--disable-lib32 --disable-lib64 --enable-libarm64
 MINGW64_BUILDDIR := libarm64
 else ifeq ($(ARCH),arm)
-MINGW64_UWP_CONF +=--disable-lib32 --disable-lib64 --enable-libarm32
+MINGW64_MINIMALCRT_CONF +=--disable-lib32 --disable-lib64 --enable-libarm32
 MINGW64_BUILDDIR := libarm32
 endif
 
@@ -200,9 +201,25 @@ endif
 
 	# Trick mingw-w64 into just building libwindowsapp.a
 	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(MINGW64_UWP_CONF)
+	$(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
 	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
 	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a DATA= HEADERS=
 	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a install-$(MINGW64_BUILDDIR)LIBRARIES
 	touch $@
 
+.sum-d3d12: .sum-mingw64
+	touch $@
+
+.d3d12: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/d3d12.h             "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/d3d12sdklayers.h    "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/d3d12shader.h       "$(PREFIX)/include"
+
+	# Trick mingw-w64 into just building libd3d12.a
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
+	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
+	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a DATA= HEADERS=
+	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a install-$(MINGW64_BUILDDIR)LIBRARIES
+	touch $@
