@@ -108,7 +108,7 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
                          subpicture_region_t *p_region )
 {
     plane_t *p_plane = &p_region->p_picture->p[0];
-    video_palette_t *p_palette = p_region->fmt.p_palette;
+    video_palette_t *p_palette = p_region->p_picture->format.p_palette;
 
     if( !p_dec->fmt_in->subs.spu.b_palette )
         return;
