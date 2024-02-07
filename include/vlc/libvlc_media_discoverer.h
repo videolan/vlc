@@ -29,7 +29,6 @@
 extern "C" {
 # endif
 
-typedef struct libvlc_media_list_t libvlc_media_list_t;
 typedef struct libvlc_media_t libvlc_media_t;
 
 /**
@@ -164,17 +163,6 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis );
  */
 LIBVLC_API void
 libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
-
-/**
- * Get media service discover media list.
- *
- * \param p_mdis media service discover object
- * \return list of media items
- * \note the caller is responsible for releasing the returned list
- *       with libvlc_media_list_release().
- */
-LIBVLC_API libvlc_media_list_t *
-libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
 
 /**
  * Query if media service discover object is running.

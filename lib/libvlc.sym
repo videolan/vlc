@@ -57,7 +57,6 @@ libvlc_log_unset
 libvlc_media_add_option
 libvlc_media_add_option_flag
 libvlc_media_discoverer_is_running
-libvlc_media_discoverer_media_list
 libvlc_media_discoverer_new
 libvlc_media_discoverer_release
 libvlc_media_discoverer_list_get
