@@ -158,7 +158,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
     self.videoViewController.displayLibraryControls = YES;
-    self.controlsBarHeightConstraint.constant = 0;
+    [self hideControlsBarImmediately];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
@@ -883,6 +883,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self enableVideoPlaybackAppearance];
 }
 
+- (void)hideControlsBarImmediately
+{
+    self.controlsBarHeightConstraint.constant = 0;
+}
+
 - (void)hideControlsBar
 {
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
@@ -890,6 +895,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         context.duration = 0.5;
         self.controlsBarHeightConstraint.animator.constant = 0;
     } completionHandler:nil];
+}
+
+- (void)showControlsBarImmediately
+{
+    self.controlsBarHeightConstraint.constant = 48;
 }
 
 - (void)showControlsBar
@@ -980,7 +990,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.backwardsNavigationButton setEnabled:YES];
 
     [self enableVideoTitleBarMode];
-    [self hideControlsBar];
+    [self hideControlsBarImmediately];
     [self.videoViewController showControls];
 }
 
@@ -1005,7 +1015,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setViewForSelectedSegment];
 
     [self disableVideoTitleBarMode];
-    [self showControlsBar];
+    [self showControlsBarImmediately];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
