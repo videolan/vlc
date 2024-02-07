@@ -1946,31 +1946,33 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     /* Sanity check */
     if( !p_region ) return NULL;
 
-    if( !subpicture_region_IsText( p_region ) && p_region->p_picture->format.i_chroma == VLC_CODEC_YUVA )
+    if( !subpicture_region_IsText( p_region ) )
     {
-        YuvaYuvp( p_subpic );
-    }
-
-    if( (!subpicture_region_IsText( p_region )) &&
-        ( p_region->p_picture->format.i_chroma != VLC_CODEC_YUVP ) )
-    {
-        msg_Err( p_enc, "chroma %4.4s not supported", (char *)&p_region->p_picture->format.i_chroma );
-        return NULL;
-    }
-
-    if( !subpicture_region_IsText( p_region ) && p_region->p_picture->format.p_palette )
-    {
-        switch( p_region->p_picture->format.p_palette->i_entries )
+        if( p_region->p_picture->format.i_chroma == VLC_CODEC_YUVA )
         {
-            case 0:
-            case 4:
-            case 16:
-            case 256:
-                break;
-            default:
-                msg_Err( p_enc, "subpicture palette (%d) not handled",
-                            p_region->p_picture->format.p_palette->i_entries );
-                return NULL;
+            YuvaYuvp( p_subpic );
+        }
+
+        if( p_region->p_picture->format.i_chroma != VLC_CODEC_YUVP )
+        {
+            msg_Err( p_enc, "chroma %4.4s not supported", (char *)&p_region->p_picture->format.i_chroma );
+            return NULL;
+        }
+
+        if( p_region->p_picture->format.p_palette )
+        {
+            switch( p_region->p_picture->format.p_palette->i_entries )
+            {
+                case 0:
+                case 4:
+                case 16:
+                case 256:
+                    break;
+                default:
+                    msg_Err( p_enc, "subpicture palette (%d) not handled",
+                                p_region->p_picture->format.p_palette->i_entries );
+                    return NULL;
+            }
         }
     }
     /* End of hack */
