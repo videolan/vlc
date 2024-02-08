@@ -1122,14 +1122,14 @@ static vlc_render_subpicture *RenderSPUs(vout_thread_sys_t *sys,
                                 const vlc_fourcc_t *subpicture_chromas,
                                 const video_format_t *spu_frame,
                                 vlc_tick_t system_now, vlc_tick_t render_subtitle_date,
-                                bool ignore_osd,
+                                bool ignore_osd, bool spu_in_full_window,
                                 const vout_display_place_t *video_position)
 {
     if (unlikely(sys->spu == NULL))
         return NULL;
     return spu_Render(sys->spu,
                       subpicture_chromas, spu_frame,
-                      sys->display->source, video_position,
+                      sys->display->source, spu_in_full_window, video_position,
                       system_now, render_subtitle_date,
                       ignore_osd);
 }
@@ -1165,6 +1165,8 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     const bool vd_does_blending = !do_snapshot &&
                                    vd->info.subpicture_chromas &&
                                    *vd->info.subpicture_chromas != 0;
+    const bool spu_in_full_window = vd->cfg->display.full_fill &&
+                                    vd_does_blending;
 
     //FIXME: Denying blending_before_converter if vd->source->orientation != ORIENT_NORMAL
     //will have the effect that snapshots miss the subpictures. We do this
@@ -1226,7 +1228,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     if (!vd_does_blending && blending_before_converter && sys->spu_blend) {
         vlc_render_subpicture *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
                                           system_now, render_subtitle_date,
-                                          do_snapshot, video_place);
+                                          do_snapshot, spu_in_full_window, video_place);
         if (subpic) {
             picture_t *blent = picture_pool_Get(sys->private_pool);
             if (blent) {
@@ -1276,7 +1278,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     {
         vlc_render_subpicture *subpic = RenderSPUs(sys, NULL, &fmt_spu_rot,
                                           system_now, render_subtitle_date,
-                                          do_snapshot, video_place);
+                                          do_snapshot, spu_in_full_window, video_place);
         if (subpic)
         {
             picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
@@ -1288,7 +1290,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     if (vd_does_blending)
         *out_subpic = RenderSPUs(sys, vd->info.subpicture_chromas, &fmt_spu_rot,
                                  system_now, render_subtitle_date,
-                                 false, video_place);
+                                 false, spu_in_full_window, video_place);
     else
         *out_subpic = NULL;
 

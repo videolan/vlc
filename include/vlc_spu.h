@@ -83,6 +83,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  */
 VLC_API struct vlc_render_subpicture * spu_Render( spu_t *spu, const vlc_fourcc_t *p_chroma_list,
                                    const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src,
+                                   bool spu_in_full_window,
                                    const struct vout_display_place_t *video_position,
                                    vlc_tick_t system_now, vlc_tick_t pts,
                                    bool ignore_osd );

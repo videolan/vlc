@@ -135,6 +135,7 @@ struct spu_private_t {
         subpicture_t   *p_processed;
         video_format_t  fmtsrc;
         video_format_t  fmtdst;
+        bool            spu_in_full_window;
         vout_display_place_t video_position;
         vlc_fourcc_t    chroma_list[SPU_CHROMALIST_COUNT+1];
         bool            live;
@@ -1316,6 +1317,23 @@ static void spu_UpdateOriginalSize(spu_t *spu, subpicture_t *subpic,
     }
 }
 
+static bool IsSubpicInVideo(const subpicture_t *subpic, bool spu_in_full_window)
+{
+    // no spu outside video allowed
+    if (!spu_in_full_window)
+        return true;
+
+    // absolute spu in video coordinates
+    if (subpic->b_absolute)
+        return true;
+
+    // only subtitle SPUs allowed outside video
+    if (!subpic->b_subtitle)
+        return true;
+
+    return false;
+}
+
 /**
  * This function renders all sub picture units in the list.
  */
@@ -1325,6 +1343,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                                           const vlc_fourcc_t *chroma_list,
                                           const video_format_t *fmt_dst,
                                           const video_format_t *fmt_src,
+                                          bool spu_in_full_window,
                                           const vout_display_place_t *video_position,
                                           vlc_tick_t system_now,
                                           vlc_tick_t render_subtitle_date,
@@ -1379,10 +1398,16 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
+        const bool subpic_in_video = IsSubpicInVideo(subpic, spu_in_full_window);
 
         unsigned output_width, output_height;
-        output_width  = video_position->width;
-        output_height = video_position->height;
+        if (subpic_in_video) {
+            output_width  = video_position->width;
+            output_height = video_position->height;
+        } else {
+            output_width  = fmt_dst->i_visible_width;
+            output_height = fmt_dst->i_visible_height;
+        }
 
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
@@ -1459,9 +1484,11 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
-            // place the region inside the video area
-            output_last_ptr->place.x += video_position->x;
-            output_last_ptr->place.y += video_position->y;
+            if (subpic_in_video) {
+                // place the region inside the video area
+                output_last_ptr->place.x += video_position->x;
+                output_last_ptr->place.y += video_position->y;
+            }
 
             vlc_vector_push(&output->regions, output_last_ptr);
 
@@ -1613,6 +1640,7 @@ static int SubSourceDelProxyCallbacks(filter_t *filter, void *opaque)
 static void spu_PrerenderWake(spu_private_t *sys,
                               const video_format_t *fmt_dst,
                               const video_format_t *fmt_src,
+                              bool spu_in_full_window,
                               const vout_display_place_t *video_position,
                               const vlc_fourcc_t *chroma_list)
 {
@@ -1627,6 +1655,7 @@ static void spu_PrerenderWake(spu_private_t *sys,
         video_format_Clean(&sys->prerender.fmtsrc);
         video_format_Copy(&sys->prerender.fmtsrc, fmt_src);
     }
+    sys->prerender.spu_in_full_window = spu_in_full_window;
     sys->prerender.video_position = *video_position;
 
     for(size_t i=0; i<SPU_CHROMALIST_COUNT; i++)
@@ -1749,9 +1778,12 @@ static void * spu_PrerenderThread(void *priv)
         video_format_Copy(&fmtdst, &sys->prerender.fmtdst);
         video_format_Copy(&fmtsrc, &sys->prerender.fmtsrc);
 
-        fmtdst.i_width  = fmtdst.i_visible_width  = sys->prerender.video_position.width;
-        fmtdst.i_height = fmtdst.i_visible_height = sys->prerender.video_position.height;
-        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        if (IsSubpicInVideo(sys->prerender.p_processed, sys->prerender.spu_in_full_window))
+        {
+            fmtdst.i_width  = fmtdst.i_visible_width  = sys->prerender.video_position.width;
+            fmtdst.i_height = fmtdst.i_visible_height = sys->prerender.video_position.height;
+            fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        }
 
         vlc_mutex_unlock(&sys->prerender.lock);
 
@@ -2146,6 +2178,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
                          const vlc_fourcc_t *chroma_list,
                          const video_format_t *fmt_dst,
                          const video_format_t *fmt_src,
+                         bool spu_in_full_window,
                          const vout_display_place_t *video_position,
                          vlc_tick_t system_now,
                          vlc_tick_t render_subtitle_date,
@@ -2218,7 +2251,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
     }
 
     /* wake up prerenderer, we have some video size and chroma */
-    spu_PrerenderWake(sys, fmt_dst, fmt_src, video_position, chroma_list);
+    spu_PrerenderWake(sys, fmt_dst, fmt_src, spu_in_full_window, video_position, chroma_list);
 
     vlc_mutex_lock(&sys->lock);
 
@@ -2246,9 +2279,12 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         subpic->i_stop = entry->stop;
 
         video_format_t fmtdst = *fmt_dst;
-        fmtdst.i_width  = fmtdst.i_visible_width  = video_position->width;
-        fmtdst.i_height = fmtdst.i_visible_height = video_position->height;
-        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        if (IsSubpicInVideo(subpic, spu_in_full_window))
+        {
+            fmtdst.i_width  = fmtdst.i_visible_width  = video_position->width;
+            fmtdst.i_height = fmtdst.i_visible_height = video_position->height;
+            fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        }
 
         subpicture_Update(subpic,
                           fmt_src, &fmtdst,
@@ -2265,6 +2301,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
                                                 chroma_list,
                                                 fmt_dst,
                                                 fmt_src,
+                                                spu_in_full_window,
                                                 video_position,
                                                 system_now,
                                                 render_subtitle_date,
