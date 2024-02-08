@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
@@ -27,7 +28,7 @@ import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///util/" as Util
 
-Slider {
+T.ProgressBar {
     id: control
 
     readonly property real _hoveredScalingFactor: 1.8
@@ -41,7 +42,7 @@ Slider {
     readonly property real _scaledSeekPointsRadius: _seekPointsRadius * _hoveredScalingFactor
 
     property bool _currentChapterHovered: false
-    property real _tooltipPosition: timeTooltip.pos.x / sliderRectMouseArea.width
+    property real _tooltipPosition: timeTooltip.pos.x / width
 
     property color backgroundColor: theme.bg.primary
 
@@ -62,12 +63,12 @@ Slider {
 
         enabled: control.enabled
         focused: control.visualFocus
-        hovered: control.hovered
+        hovered: hoverHandler.hovered
     }
 
     Timer {
         id: seekpointTimer
-        running: Player.hasChapters && !control.hovered && _isSeekPointsShown
+        running: Player.hasChapters && !hoverHandler.hovered && _isSeekPointsShown
         interval: 3000
         onTriggered: control._isSeekPointsShown = false
     }
@@ -78,12 +79,12 @@ Slider {
         //tooltip is a Popup, palette should be passed explicitly
         colorContext.palette: theme.palette
 
-        visible: control.hovered || control.visualFocus
+        visible: hoverHandler.hovered || control.visualFocus
 
         text: {
             let _text
 
-            if (sliderRectMouseArea.containsMouse)
+            if (hoverHandler.hovered)
                 _text = Player.length.scale(pos.x / control.width).formatHMS()
             else
                 _text = Player.time.formatHMS()
@@ -94,7 +95,7 @@ Slider {
             return _text
         }
 
-        pos: Qt.point(sliderRectMouseArea.containsMouse ? Helpers.clamp(sliderRectMouseArea.mouseX, 0, sliderRectMouseArea.width)
+        pos: Qt.point(hoverHandler.hovered ? Helpers.clamp(hoverHandler.point.position.x, 0, control.availableWidth)
                                                         : (control.visualPosition * control.width), 0)
     }
 
@@ -203,7 +204,63 @@ Slider {
 
     padding: 0
 
-    stepSize: 0.01
+    //we use our own HoverHandler
+    hoverEnabled: false
+
+    HoverHandler {
+        id: hoverHandler
+
+        onHoveredChanged: () => {
+            if (hovered) {
+                if(Player.hasChapters)
+                    control._isSeekPointsShown = true
+            } else {
+                if(Player.hasChapters)
+                    seekpointTimer.restart()
+            }
+        }
+    }
+
+    contentItem: Item {
+        implicitHeight: control.implicitHeight
+        implicitWidth: control.implicitWidth
+
+        //placing the TapHandler directly in the Control doesn't work with 6.2
+        TapHandler {
+            acceptedButtons: Qt.LeftButton
+
+            //clicked but not dragged
+            onTapped: (point, button) => {
+                fsm.pressControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
+                fsm.releaseControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
+            }
+        }
+
+        DragHandler {
+            id: dragHandler
+            acceptedButtons: Qt.LeftButton
+
+            target: null
+            dragThreshold: 0
+
+            onActiveChanged: {
+                if (active) {
+                    fsm.pressControl(centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
+                } else {
+                    fsm.releaseControl( centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
+                }
+            }
+        }
+
+        Connections {
+            //FIXME Qt6.5 use xAxis.onActiveValueChanged in the DragHandler
+            target: dragHandler
+
+            function onCentroidChanged() {
+                fsm.moveControl(dragHandler.centroid.position.x / control.width, dragHandler.centroid.modifiers === Qt.ShiftModifier)
+            }
+        }
+    }
 
     background: Item {
         width: control.availableWidth
@@ -216,33 +273,6 @@ Slider {
             color: control.backgroundColor
             anchors.fill: parent
             radius: implicitHeight
-        }
-
-        MouseArea {
-            id: sliderRectMouseArea
-
-            width: control.availableWidth
-            height: control._scaledBarHeight
-            y: control._scaledY
-
-            hoverEnabled: true
-
-            preventStealing: true
-
-            onPressed: (mouse) => { fsm.pressControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
-
-            onReleased: (mouse) => { fsm.releaseControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
-
-            onPositionChanged: (mouse) => { fsm.moveControl(mouse.x / width, mouse.modifiers === Qt.ShiftModifier) }
-
-            onEntered: {
-                if(Player.hasChapters)
-                    control._isSeekPointsShown = true
-            }
-            onExited: {
-                if(Player.hasChapters)
-                    seekpointTimer.restart()
-            }
         }
 
         Repeater {
@@ -272,8 +302,8 @@ Slider {
                             control._currentChapterHovered = _currentChapter === 0
                     }
 
-                    readonly property bool _hovered: control.hovered &&
-                                            (sliderRectMouseArea.mouseX > x && sliderRectMouseArea.mouseX < x+width)
+                    readonly property bool _hovered: hoverHandler.hovered &&
+                                            (hoverHandler.point.position.x > x && hoverHandler.point.position.x < x+width)
 
                     color: _currentChapter < 0 ? theme.fg.primary : control.backgroundColor
                     width: sliderRect.width * seekpointsRect.endPosition - x - control._seekPointsDistance
@@ -328,7 +358,7 @@ Slider {
                     }
                 ]
 
-                state: (seekpointsRect._hovered || (seekpointsRect._currentChapter === 0 && fsm._state == fsm.fsmHeld))
+                state: (seekpointsRect._hovered || (seekpointsRect._currentChapter === 0 && fsm._state === fsm.fsmHeld))
                        ? "visibleLarge"
                        : "visible"
             }
@@ -428,7 +458,7 @@ Slider {
         }
     }
 
-    handle: Rectangle {
+    Rectangle {
         id: sliderHandle
 
         property int _size: control.barHeight * 3
@@ -477,8 +507,8 @@ Slider {
             }
         ]
 
-        state: (control.hovered || control.activeFocus)
-               ? ((control._currentChapterHovered || (Player.hasChapters && fsm._state == fsm.fsmHeld)) ? "visibleLarge" : "visible")
+        state: (hoverHandler.hovered || control.visualFocus)
+               ? ((control._currentChapterHovered || (Player.hasChapters && fsm._state === fsm.fsmHeld)) ? "visibleLarge" : "visible")
                : "hidden"
     }
 }
