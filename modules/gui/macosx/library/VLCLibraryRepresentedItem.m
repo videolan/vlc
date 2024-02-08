@@ -240,6 +240,12 @@
 
     NSArray<VLCMediaLibraryMediaItem *> * const parentItems = self.parentMediaArray;
     const NSUInteger parentItemCount = parentItems.count;
+
+    if (parentItemCount == 0) {
+        [self playIndividualModeImmediately:playImmediately];
+        return;
+    }
+
     const NSUInteger itemIndexInParent = self.itemIndexInParent;
     const NSUInteger startingIndex = itemIndexInParent == NSNotFound ? 0 : itemIndexInParent;
 
