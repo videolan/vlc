@@ -100,7 +100,7 @@ static libvlc_instance_t *create_libvlc(void)
 }
 
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  wait;
+static pthread_cond_t  wait_callback;
 static bool done;
 
 static void callback(const libvlc_event_t *ev, void *param)
@@ -113,7 +113,7 @@ static void callback(const libvlc_event_t *ev, void *param)
         if (*pic != NULL)
             libvlc_picture_retain(*pic);
         done = true;
-        pthread_cond_signal(&wait);
+        pthread_cond_signal(&wait_callback);
         pthread_mutex_unlock(&lock);
     }
 }
@@ -142,7 +142,7 @@ static void snapshot(libvlc_instance_t *vlc, libvlc_media_t *m,
     }
     pthread_mutex_lock(&lock);
     while (!done)
-        pthread_cond_wait(&wait, &lock);
+        pthread_cond_wait(&wait_callback, &lock);
     pthread_mutex_unlock(&lock);
     libvlc_media_thumbnail_request_destroy(req);
     libvlc_event_detach(em, libvlc_MediaThumbnailGenerated, callback, &pic);
@@ -175,7 +175,7 @@ int main(int argc, const char **argv)
 
     cmdline(argc, argv, &in, &out, &out_with_ext, &width);
 
-    pthread_cond_init(&wait, NULL);
+    pthread_cond_init(&wait_callback, NULL);
 
     /* starts vlc */
     libvlc = create_libvlc();
@@ -197,7 +197,7 @@ int main(int argc, const char **argv)
     libvlc_media_release(m);
     libvlc_release(libvlc);
 
-    pthread_cond_destroy(&wait);
+    pthread_cond_destroy(&wait_callback);
 
     return 0;
 }
