@@ -120,7 +120,7 @@ static void ProcessHeader(decoder_t *p_dec)
         p_extra += 8;
     }
 
-    if (p_dec->fmt_in->i_extra < FLAC_STREAMINFO_SIZE)
+    if (i_extra < FLAC_STREAMINFO_SIZE)
         return;
 
     FLAC_ParseStreamInfo( (uint8_t *) p_extra, &p_sys->stream_info );
