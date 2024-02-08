@@ -663,7 +663,7 @@ dnl Check for broken versions of mingw-runtime compatability library
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
 #if defined(__MINGW64_VERSION_MAJOR)
-# if __MINGW64_VERSION_MAJOR < 5
+# if __MINGW64_VERSION_MAJOR < 6
 #  error Update your mingw-w64! This one is too old.
 # endif
 #else
@@ -673,7 +673,7 @@ dnl Check for broken versions of mingw-runtime compatability library
         AC_MSG_RESULT([ok])
     ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires Mingw-w64 version 5.0 or higher!])
+        AC_MSG_ERROR([LibVLC requires Mingw-w64 version 6.0 or higher!])
     ])
 
     AS_IF([test "${win_ucrt_build}" = "no"], [
@@ -1176,9 +1176,6 @@ AS_IF([test "${SYS}" = "mingw32"], [
   AC_MSG_CHECKING(for if_nametoindex availability)
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
       [[#include <windows.h>
-        #if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
-        # include <wincrypt.h>
-        #endif
         #include <iphlpapi.h>
         static void test (void) {
           if_nametoindex("");

@@ -38,9 +38,6 @@
 #include <vlc_network.h>
 
 #ifdef _WIN32
-#   if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
-#    include <wincrypt.h>
-#   endif
 #   include <iphlpapi.h>
 #else
 #   include <unistd.h>

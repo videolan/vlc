@@ -359,12 +359,12 @@ windows_version_test = '''
             prefix: '#include <_mingw.h>')
 
         if mingw_version_major == ''
-            error('Cannot compile with MinGW, use MinGW-w64 >= 5.0 instead.')
+            error('Cannot compile with MinGW, use MinGW-w64 >= 6.0 instead.')
         endif
 
-        # Check that MinGW w64 is at least 5.0
-        if mingw_version_major.to_int() < 5
-            error('MinGW-w64 5.0 or higher required!')
+        # Check that MinGW w64 is at least 6.0
+        if mingw_version_major.to_int() < 6
+            error('MinGW-w64 6.0 or higher required!')
         endif
 
         have_mingw = true
