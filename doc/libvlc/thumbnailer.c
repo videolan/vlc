@@ -28,13 +28,6 @@
 #include <pthread.h>
 #include <errno.h>
 #include <time.h>
-
-#if !defined (_POSIX_CLOCK_SELECTION)
-#  define _POSIX_CLOCK_SELECTION (-1)
-#endif
-
-static_assert (_POSIX_CLOCK_SELECTION >= 0, "Clock selection unavailable!");
-
 #include <vlc/vlc.h>
 
 /* position at which the snapshot is taken */
