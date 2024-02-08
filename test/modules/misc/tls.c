@@ -34,6 +34,8 @@
 #endif
 #include <poll.h>
 
+#include "../../libvlc/test.h"
+
 #include <vlc_common.h>
 #include <vlc_poll.h>
 #include <vlc_modules.h>
@@ -131,7 +133,7 @@ int main(void)
     char *alp;
     int val;
 
-    setenv("VLC_PLUGIN_PATH", "../modules", 1);
+    test_setup();
 
     /*** Tests with normal certs database - server cert not acceptable. ***/
     vlc = libvlc_new(0, NULL);
