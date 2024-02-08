@@ -147,6 +147,7 @@ vlc_tests += {
     'sources' : files('misc/keystore.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['memory_keystore', 'file_keystore'],
 }
 
 if host_system == 'darwin'
