@@ -804,6 +804,7 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_Y410,                  PACKED_FMT(4, 32) },
 
     { VLC_CODEC_Y211,                 1, { {{1,4}, {1,1}} }, 4, 32 },
+    { VLC_CODEC_XYZ_12L,               PACKED_FMT(6, 48) },
     { VLC_CODEC_XYZ_12B,               PACKED_FMT(6, 48) },
 
     { VLC_CODEC_VDPAU_VIDEO,           FAKE_FMT() },

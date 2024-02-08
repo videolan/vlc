@@ -435,7 +435,8 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
     enum pl_color_system sys;
     if (likely(vlc_fourcc_IsYUV(fmt->i_chroma))) {
         sys = yuv_systems[fmt->space];
-    } else if (unlikely(fmt->i_chroma == VLC_CODEC_XYZ_12B)) {
+    } else if (unlikely(fmt->i_chroma == VLC_CODEC_XYZ_12L||
+                        fmt->i_chroma == VLC_CODEC_XYZ_12B)) {
         sys = PL_COLOR_SYSTEM_XYZ;
     } else {
         sys = PL_COLOR_SYSTEM_RGB;
