@@ -763,8 +763,8 @@ if !HAVE_X
 SKIPPED_CHECKHEADERS += vlc_xlib.h
 endif
 
-$(SKIPPED_CHECKHEADERS:%=checkheader_%): checkheader_verbose_0 = $(skip_checkheader_verbose_0)
-$(SKIPPED_CHECKHEADERS:%=checkheader_%): CHECKCOMPILE = exit 0;
+$(SKIPPED_CHECKHEADERS:%=checkheader_%.check): checkheader_verbose_0 = $(skip_checkheader_verbose_0)
+$(SKIPPED_CHECKHEADERS:%=checkheader_%.check): CHECKCOMPILE = exit 0;
 
 dist_check_SCRIPTS = check_headers check_symbols
 
