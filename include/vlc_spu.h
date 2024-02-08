@@ -32,6 +32,8 @@
 extern "C" {
 #endif
 
+struct vout_display_place_t;
+
 /**
  * \defgroup spu Sub-picture channels
  * \ingroup video_output
@@ -72,6 +74,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  * \param p_chroma_list is a list of supported chroma for the output (can be NULL)
  * \param p_fmt_dst is the format of the picture on which the return subpicture will be rendered.
  * \param p_fmt_src is the format of the original(source) video.
+ * \param video_position position of the video inside the display or NULL to fit in p_fmt_dst
  * \param system_now the reference current time
  * \param pts the timestamp of the rendered frame
  * \param ignore_osd whether we display the OSD or not
@@ -80,6 +83,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  */
 VLC_API struct vlc_render_subpicture * spu_Render( spu_t *spu, const vlc_fourcc_t *p_chroma_list,
                                    const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src,
+                                   const struct vout_display_place_t *video_position,
                                    vlc_tick_t system_now, vlc_tick_t pts,
                                    bool ignore_osd );
 

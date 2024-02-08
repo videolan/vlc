@@ -37,6 +37,7 @@
 #include <vlc_filter.h>
 #include <vlc_spu.h>
 #include <vlc_vector.h>
+#include <vlc_vout_display.h>
 
 #include "../libvlc.h"
 #include "vout_internal.h"
@@ -1243,6 +1244,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                                           const vlc_fourcc_t *chroma_list,
                                           const video_format_t *fmt_dst,
                                           const video_format_t *fmt_src,
+                                          const vout_display_place_t *video_position,
                                           vlc_tick_t system_now,
                                           vlc_tick_t render_subtitle_date,
                                           bool external_scale)
@@ -1337,10 +1339,13 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
              * FIXME The current scaling ensure that the heights match, the width being
              * cropped.
              */
-            spu_scale_t scale = spu_scale_createq((uint64_t)fmt_dst->i_visible_height * fmt_dst->i_sar_den * region_sar.num,
-                                                  (uint64_t)i_original_height         * fmt_dst->i_sar_num * region_sar.den,
-                                                  fmt_dst->i_visible_height,
-                                                  i_original_height);
+            // position the rendered video, rather than the whole output format
+            // expand the width using the SAR
+            spu_scale_t scale;
+            scale = spu_scale_createq((uint64_t)video_position->height * fmt_dst->i_sar_den * region_sar.num,
+                                      (uint64_t)i_original_height      * fmt_dst->i_sar_num * region_sar.den,
+                                      video_position->height,
+                                      i_original_height);
 
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
@@ -2036,6 +2041,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
                          const vlc_fourcc_t *chroma_list,
                          const video_format_t *fmt_dst,
                          const video_format_t *fmt_src,
+                         const vout_display_place_t *video_position,
                          vlc_tick_t system_now,
                          vlc_tick_t render_subtitle_date,
                          bool ignore_osd)
@@ -2096,6 +2102,16 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         chroma_list = vlc_fourcc_IsYUV(fmt_dst->i_chroma) ? chroma_list_default_yuv
                                                           : chroma_list_default_rgb;
 
+    vout_display_place_t place;
+    if (video_position == NULL)
+    {
+        video_position = &place;
+        place.x      = 0;
+        place.y      = 0;
+        place.width  = fmt_dst->i_visible_width;
+        place.height = fmt_dst->i_visible_height;
+    }
+
     /* wake up prerenderer, we have some video size and chroma */
     spu_PrerenderWake(sys, fmt_dst, fmt_src, chroma_list);
 
@@ -2139,6 +2155,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
                                                 chroma_list,
                                                 fmt_dst,
                                                 fmt_src,
+                                                video_position,
                                                 system_now,
                                                 render_subtitle_date,
                                                 external_scale);

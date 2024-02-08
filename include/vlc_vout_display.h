@@ -497,7 +497,7 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
  *
  * This structure stores the result of a vout_display_PlacePicture() call.
  */
-typedef struct {
+typedef struct vout_display_place_t {
     int x; /*< Relative pixel offset from the display left edge */
     int y; /*< Relative pixel offset from the display top edge */
     unsigned width; /*< Picture pixel width */
