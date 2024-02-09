@@ -12,6 +12,9 @@ Audio Output:
 Contrib:
  - Update FFmpeg to 4.4.4
 
+libVLC:
+ - the HWND passed to libvlc_media_player_set_hwnd must have the WS_CLIPCHILDREN
+   style set.
 
 Changes between 3.0.19 and 3.0.20:
 ----------------------------------
