@@ -366,8 +366,8 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 {
     [VLCLibraryAudioDataSource setupCollectionView:self.collectionView];
     [self setupTableViews];
-
-    _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
+    // Force setAudioLibrarySegment to do something always on first try
+    _audioLibrarySegment = VLCAudioLibraryUnknownSegment;
 }
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
