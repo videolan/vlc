@@ -1038,16 +1038,27 @@ static void RequestReload( vlc_input_decoder_t *p_owner )
 
 static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 {
+    struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(&p_owner->dec));
     vlc_fifo_Assert(p_owner->p_fifo);
 
     if( p_owner->b_waiting )
     {
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "DEC", p_owner->psz_id, "start wait");
         p_owner->b_has_data = true;
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
+    bool did_wait = false;
     while (p_owner->b_waiting && p_owner->b_has_data && !p_owner->flushing)
+    {
         vlc_fifo_WaitCond(p_owner->p_fifo, &p_owner->wait_request);
+        /* We should not start the clock if we ended up flushing. */
+        did_wait = !p_owner->flushing;
+    }
+
+    if (tracer != NULL && did_wait)
+        vlc_tracer_TraceEvent(tracer, "DEC", p_owner->psz_id, "stop wait");
 
     if (p_owner->flushing)
     {
