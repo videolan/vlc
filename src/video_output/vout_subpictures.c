@@ -1779,8 +1779,8 @@ static void * spu_PrerenderThread(void *priv)
         }
         vlc_vector_remove(&sys->prerender.vector, i_idx);
         memcpy(chroma_list, sys->prerender.chroma_list, SPU_CHROMALIST_COUNT);
-        video_format_Copy(&fmtdst, &sys->prerender.fmtdst);
-        video_format_Copy(&fmtsrc, &sys->prerender.fmtsrc);
+        fmtdst = sys->prerender.fmtdst;
+        fmtsrc = sys->prerender.fmtsrc;
 
         if (IsSubpicInVideo(sys->prerender.p_processed, sys->prerender.spu_in_full_window))
         {
@@ -1799,9 +1799,6 @@ static void * spu_PrerenderThread(void *priv)
                           p_subpic->b_subtitle ? p_subpic->i_start : vlc_tick_now());
 
         spu_PrerenderText(spu, p_subpic, chroma_list);
-
-        video_format_Clean(&fmtdst);
-        video_format_Clean(&fmtsrc);
 
         vlc_mutex_lock(&sys->prerender.lock);
         sys->prerender.p_processed = NULL;
