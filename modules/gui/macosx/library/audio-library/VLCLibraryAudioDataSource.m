@@ -209,8 +209,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)libraryModelAudioMediaItemsReset:(NSNotification * const)aNotification
 {
+    NSLog(@"Pre aa currentParentType %i %i %i", self.currentParentType, VLCMediaLibraryParentGroupTypeAudioLibrary, VLCMediaLibraryParentGroupTypeRecentAudios);
     if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
-        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
+        && self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
@@ -260,7 +261,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (void)libraryModelAudioMediaItemUpdated:(NSNotification * const)aNotification
 {
     if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
-        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
+        && self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
@@ -310,7 +311,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (void)libraryModelAudioMediaItemDeleted:(NSNotification * const)aNotification
 {
     if (self.currentParentType != VLCMediaLibraryParentGroupTypeAudioLibrary
-        || self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
+        && self.currentParentType != VLCMediaLibraryParentGroupTypeRecentAudios) {
         return;
     }
 
