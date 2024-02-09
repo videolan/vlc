@@ -116,7 +116,7 @@ static void DrawTriangle(subpicture_region_t *r, int fill, uint8_t color,
  */
 static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
 {
-    if( width == 0 || height == 0 )
+    if( unlikely( width == 0 || height == 0 ) )
         return NULL;
 
     video_palette_t palette;
@@ -205,20 +205,21 @@ static subpicture_region_t *OSDSlider(int type, int position,
  */
 static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
 {
-    const float size_ratio   = 0.05f;
-    const float margin_ratio = 0.07f;
+    const unsigned int size_ratio = 20;
+    const unsigned int margin_ratio = 14;
 
-    const int size   = __MAX(fmt->i_visible_width, fmt->i_visible_height);
-    const int width  = size * size_ratio;
-    const int height = size * size_ratio;
-    const int x      = fmt->i_x_offset + fmt->i_visible_width - margin_ratio * size - width;
-    const int y      = fmt->i_y_offset                        + margin_ratio * size;
-
-    if( width < 1 || height < 1 )
+    const unsigned int size   = __MAX(fmt->i_visible_width, fmt->i_visible_height);
+    if( size < size_ratio )
         return NULL;
 
+    const unsigned int width  = size / size_ratio;
+    const unsigned int height = width;
+    const unsigned int margin = size / margin_ratio;
+    const int x      = fmt->i_x_offset + fmt->i_visible_width - margin - width;
+    const int y      = fmt->i_y_offset                        + margin;
+
     subpicture_region_t *r = OSDRegion(__MAX(x, 0),
-                                       __MIN(y, (int)fmt->i_visible_height - height),
+                                       __MIN(y, (int)fmt->i_visible_height - (int)height),
                                        width, height);
     if (!r)
         return NULL;
@@ -241,7 +242,7 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
         DrawRect(r, STYLE_FILLED, COL_WHITE, delta, mid / 2, width - delta, height - 1 - mid / 2);
         DrawTriangle(r, STYLE_FILLED, COL_WHITE, width - delta, 0, delta, y2);
         if (type == OSD_MUTE_ICON) {
-            for(int y1 = 0; y1 <= height -1; y1++)
+            for(unsigned y1 = 0; y1 < height; y1++)
                 DrawRect(r, STYLE_FILLED, COL_FILL, y1, y1, __MIN(y1 + delta, width - 1), y1);
         }
     }
