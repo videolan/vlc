@@ -1416,7 +1416,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             spu_area_t area;
 
             /* last minute text rendering */
-            subpicture_region_t *rendered_region = region;
             if (unlikely(subpicture_region_IsText( region )))
             {
                 subpicture_region_t *rendered_text =
@@ -1426,9 +1425,12 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 if ( rendered_text  == NULL)
                     // not a rendering error for Text-To-Speech
                     continue;
-                rendered_region = rendered_text;
+                // replace the text region with the rendered region
+                vlc_list_replace(&region->node, &rendered_text->node);
+                subpicture_region_Delete(region);
+                region = rendered_text;
             }
-            region_FixFmt(rendered_region);
+            region_FixFmt(region);
 
             /* Compute region scale AR */
             vlc_rational_t region_sar = (vlc_rational_t) {
@@ -1463,23 +1465,21 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             subpicture_t forced_subpic = *subpic;
             struct subtitle_position_cache *cache_pos =
-                subtitles_positions_FindRegion(&spu->p->subs_pos, subpic, rendered_region);
+                subtitles_positions_FindRegion(&spu->p->subs_pos, subpic, region);
             if (cache_pos != NULL)
             {
-                rendered_region->i_x = cache_pos->x;
-                rendered_region->i_y = cache_pos->y;
+                region->i_x = cache_pos->x;
+                region->i_y = cache_pos->y;
                 forced_subpic.b_absolute = true;
             }
 
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
                             &forced_subpic, entry->channel_order,
-                            rendered_region, scale, !external_scale,
+                            region, scale, !external_scale,
                             chroma_list, output_width, output_height,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
-            if (rendered_region != region)
-                subpicture_region_Delete( rendered_region );
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
