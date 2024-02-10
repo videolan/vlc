@@ -269,7 +269,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioGroupSelectionTableView.rowHeight = VLCLibraryAlbumTableCellView.defaultHeight;
 
     const NSEdgeInsets defaultContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const CGFloat topAudioScrollViewContentInset = defaultContentInsets.top + _optionBarView.frame.size.height;
+    const CGFloat optionBarHeight = self.optionBarView.frame.size.height;
+    const CGFloat topAudioScrollViewContentInset = defaultContentInsets.top + optionBarHeight;
     const NSEdgeInsets audioScrollViewContentInsets = NSEdgeInsetsMake(topAudioScrollViewContentInset,
                                                                        defaultContentInsets.left,
                                                                        defaultContentInsets.bottom,
@@ -293,6 +294,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewContentInsets;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+
+    const CGFloat songsTableTopInset = self.libraryWindow.titlebarHeight + optionBarHeight;
+    _audioSongTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioSongTableViewScrollView.contentInsets = NSEdgeInsetsMake(songsTableTopInset,
+                                                                   0,
+                                                                   0,
+                                                                   0);
 }
 
 #pragma mark - Show the audio view
