@@ -331,6 +331,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                     multiplier:1
                                       constant:0],
     ]];
+    
+    self.optionBarView.hidden = NO;
 }
 
 - (void)presentPlaceholderAudioView

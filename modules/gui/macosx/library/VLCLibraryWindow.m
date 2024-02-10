@@ -623,7 +623,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:NO];
-    _optionBarView.hidden = YES;
+    self.optionBarView.hidden = YES;
 
     [_libraryHomeViewController presentHomeView];
 }
@@ -634,6 +634,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:YES];
+    self.optionBarView.hidden = YES;
 
     [_libraryVideoViewController presentVideoView];
 }
