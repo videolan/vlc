@@ -64,6 +64,11 @@
     return self;
 }
 
+- (NSInteger)childCount
+{
+    return [self childNodes].count;
+}
+
 - (NSString *)displayStringForType:(VLCLibrarySegmentType)segmentType
 {
     switch (segmentType) {

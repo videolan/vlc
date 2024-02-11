@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
 @property (readonly) VLCLibrarySegmentType segmentType;
 @property (readonly) NSString *displayString;
 @property (readonly) NSImage *displayImage;
+@property (readonly) NSInteger childCount;
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType;
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
