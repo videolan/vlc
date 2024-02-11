@@ -64,6 +64,20 @@
     return self;
 }
 
+- (NSArray<NSTreeNode *> *)childNodes
+{
+    if (self.segmentType != VLCLibraryMusicSegment) {
+        return nil;
+    }
+    
+    return @[
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
+    ];
+}
+
 - (NSInteger)childCount
 {
     return [self childNodes].count;
