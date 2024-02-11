@@ -76,6 +76,14 @@
             return _NS("Home");
         case VLCLibraryMusicSegment:
             return _NS("Music");
+        case VLCLibraryArtistsMusicSubSegment:
+            return _NS("Artists");
+        case VLCLibraryAlbumsMusicSubSegment:
+            return _NS("Albums");
+        case VLCLibrarySongsMusicSubSegment:
+            return _NS("Songs");
+        case VLCLibraryGenresMusicSubSegment:
+            return _NS("Genres");
         case VLCLibraryVideoSegment:
             return _NS("Videos");
         case VLCLibraryBrowseSegment:
@@ -96,6 +104,10 @@
         case VLCLibraryHomeSegment:
             return [NSImage imageNamed:@"bw-home"];
         case VLCLibraryMusicSegment:
+        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryAlbumsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryVideoSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
@@ -119,6 +131,18 @@
         case VLCLibraryMusicSegment:
             return [NSImage imageWithSystemSymbolName:@"music.note"
                               accessibilityDescription:@"Music icon"];
+        case VLCLibraryArtistsMusicSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"music.mic"
+                             accessibilityDescription:@"Music artists icon"];
+        case VLCLibraryAlbumsMusicSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"square.stack"
+                             accessibilityDescription:@"Music albums icon"];
+        case VLCLibrarySongsMusicSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"music.note"
+                             accessibilityDescription:@"Music songs icon"];
+        case VLCLibraryGenresMusicSubSegment:
+                return [NSImage imageWithSystemSymbolName:@"guitars"
+                                 accessibilityDescription:@"Music genres icon"];
         case VLCLibraryVideoSegment:
             return [NSImage imageWithSystemSymbolName:@"film.stack"
                              accessibilityDescription:@"Video icon"];
