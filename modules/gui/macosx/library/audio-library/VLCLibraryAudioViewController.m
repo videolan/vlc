@@ -290,7 +290,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         constraint.active = YES;
     }
 
-    const NSInteger selectedLibrarySegment = self.currentSegmentType;
+    const NSInteger selectedLibrarySegment = self.audioDataSource.audioLibrarySegment;
+    NSAssert(selectedLibrarySegment != VLCAudioLibraryRecentsSegment &&
+             selectedLibrarySegment != VLCAudioLibraryUnknownSegment,
+             @"Received invalid audio library segment from audio data source!");
 
     if(selectedLibrarySegment < _placeholderImageNames.count && selectedLibrarySegment >= 0) {
         _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]];
