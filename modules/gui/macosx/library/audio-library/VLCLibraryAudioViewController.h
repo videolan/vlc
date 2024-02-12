@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibrarySegment.h"
+
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
 @class VLCLibraryWindow;
@@ -54,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
 @property (readonly) NSVisualEffectView *optionBarView;
+@property (readwrite, nonatomic) VLCLibrarySegmentType currentSegmentType;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;
 @property (readonly) VLCLibraryAudioGroupDataSource *audioGroupDataSource;

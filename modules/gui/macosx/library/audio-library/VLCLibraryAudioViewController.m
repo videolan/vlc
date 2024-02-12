@@ -74,7 +74,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     self = [super init];
 
-    if(self) {
+    if (self) {
+        _currentSegmentType = VLCLibraryLowSentinelSegment;
+
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupAudioDataSource];
 
@@ -352,7 +354,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         constraint.active = YES;
     }
 
-    const NSInteger selectedLibrarySegment = _audioSegmentedControl.selectedSegment;
+    const NSInteger selectedLibrarySegment = self.currentSegmentType;
 
     if(selectedLibrarySegment < _placeholderImageNames.count && selectedLibrarySegment >= 0) {
         _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]];
@@ -390,8 +392,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentAudioGridModeView
 {
-    if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
-        _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
+    const VLCLibrarySegmentType selectedSegment = self.currentSegmentType;
+    if (selectedSegment == VLCLibrarySongsMusicSubSegment ||
+        selectedSegment == VLCLibraryAlbumsMusicSubSegment) {
 
         [_audioLibraryCollectionView deselectAll:self];
         [(VLCLibraryCollectionViewFlowLayout *)_audioLibraryCollectionView.collectionViewLayout resetLayout];
@@ -404,7 +407,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentAudioTableView
 {
-    if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
+    if (self.currentSegmentType == VLCLibrarySongsMusicSubSegment) {
         _audioSongTableViewScrollView.hidden = NO;
     } else {
         _audioLibrarySplitView.hidden = NO;
@@ -415,17 +418,35 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
-    switch (_audioSegmentedControl.selectedSegment) {
-        case VLCAudioLibraryArtistsSegment:
+    switch (self.currentSegmentType) {
+        case VLCLibraryArtistsMusicSubSegment:
             return libraryWindowPrefs.artistLibraryViewMode;
-        case VLCAudioLibraryGenresSegment:
+        case VLCLibraryGenresMusicSubSegment:
             return libraryWindowPrefs.genreLibraryViewMode;
-        case VLCAudioLibrarySongsSegment:
+        case VLCLibrarySongsMusicSubSegment:
             return libraryWindowPrefs.songsLibraryViewMode;
-        case VLCAudioLibraryAlbumsSegment:
+        case VLCLibraryAlbumsMusicSubSegment:
             return libraryWindowPrefs.albumLibraryViewMode;
         default:
             return VLCLibraryGridViewModeSegment;
+    }
+}
+
+- (VLCAudioLibrarySegment)currentLibrarySegmentToAudioLibrarySegment
+{
+    switch (self.currentSegmentType) {
+        case VLCLibraryMusicSegment:
+        case VLCLibraryArtistsMusicSubSegment:
+            return VLCAudioLibraryArtistsSegment;
+        case VLCLibraryAlbumsMusicSubSegment:
+            return VLCAudioLibraryAlbumsSegment;
+        case VLCLibrarySongsMusicSubSegment:
+            return VLCAudioLibrarySongsSegment;
+        case VLCLibraryGenresMusicSubSegment:
+            return VLCAudioLibraryGenresSegment;
+        default:
+            NSAssert(false, @"Non-audio or unknown library subsegment received");
+            return VLCAudioLibraryUnknownSegment;
     }
 }
 
@@ -437,7 +458,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
-        _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+        _audioDataSource.audioLibrarySegment = [self currentLibrarySegmentToAudioLibrarySegment];
         const VLCLibraryViewModeSegment viewModeSegment = [self viewModeSegmentForCurrentLibrarySegment];
 
         if (viewModeSegment == VLCLibraryListViewModeSegment) {
@@ -454,8 +475,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     [self presentOptionBar];
 }
 
-- (IBAction)segmentedControlAction:(id)sender
+- (void)setCurrentSegmentType:(VLCLibrarySegmentType)currentSegmentType
 {
+    if (self.currentSegmentType == currentSegmentType) {
+        return;
+    }
+
+    _currentSegmentType = currentSegmentType;
     [self updatePresentedView];
 }
 
@@ -540,13 +566,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     // If the library item is a media item, we need to select the corresponding segment
     // in the segmented control. We then need to update the presented view.
     if ([libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
-        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryAlbumsSegment];
+        self.currentSegmentType = VLCLibraryAlbumsMusicSubSegment;
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryArtist.class]) {
-        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryArtistsSegment];
+        self.currentSegmentType = VLCLibraryArtistsMusicSubSegment;
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class]) {
-        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibraryGenresSegment];
+        self.currentSegmentType = VLCLibraryGenresMusicSubSegment;
     } else {
-        [self.audioSegmentedControl setSelectedSegment:VLCAudioLibrarySongsSegment];
+        self.currentSegmentType = VLCLibrarySongsMusicSubSegment;
     }
 
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -567,7 +593,11 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSAssert(model, @"Notification object should be a VLCLibraryModel");
     const NSUInteger audioCount = model.numberOfAudioMedia;
 
-    if (_libraryWindow.librarySegmentType == VLCLibraryMusicSegment &&
+    if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegment) &&
         ((audioCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
          (audioCount > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView])) &&
         _libraryWindow.videoViewController.view.hidden) {
