@@ -2161,6 +2161,20 @@ AS_IF([test "$enable_nvdec" != "no"], [
 AM_CONDITIONAL([HAVE_NVDEC], [test "${have_nvdec}" != "no"])
 
 dnl
+dnl  AMD Advanced Media Framework API
+dnl
+AC_ARG_ENABLE([amf-scaler], AS_HELP_STRING([--disable-amf-scaler],
+  [disable AMD AMF API (default auto)]))
+have_amf_scaler="no"
+AS_IF([test "$enable_amf_scaler" != "no"], [
+  AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/HQScaler.h], [
+    have_amf_scaler="yes"
+    AC_DEFINE(HAVE_AMF_SCALER, 1, AMD HQScaler supported)
+  ])
+])
+AM_CONDITIONAL([HAVE_AMF_SCALER], [test "${have_amf_scaler}" != "no"])
+
+dnl
 dnl special access module for Blackmagic SDI cards
 dnl
 AC_ARG_ENABLE([decklink],
