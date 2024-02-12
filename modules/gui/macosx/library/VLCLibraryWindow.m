@@ -392,26 +392,18 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _currentSelectedViewModeSegment = preferences.videoLibraryViewMode;
         break;
     case VLCLibraryMusicSegment:
-    {
-        const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
-        switch (selectedAudioSegment) {
-        case VLCAudioLibraryArtistsSegment:
-            _currentSelectedViewModeSegment = preferences.artistLibraryViewMode;
-            break;
-        case VLCAudioLibraryGenresSegment:
-            _currentSelectedViewModeSegment = preferences.genreLibraryViewMode;
-            break;
-        case VLCAudioLibraryAlbumsSegment:
-            _currentSelectedViewModeSegment = preferences.albumLibraryViewMode;
-            break;
-        case VLCAudioLibrarySongsSegment:
-            _currentSelectedViewModeSegment = preferences.songsLibraryViewMode;
-            break;
-        default:
-            break;
-        }
+    case VLCLibraryArtistsMusicSubSegment:
+        _currentSelectedViewModeSegment = preferences.artistLibraryViewMode;
         break;
-    }
+    case VLCLibraryGenresMusicSubSegment:
+        _currentSelectedViewModeSegment = preferences.genreLibraryViewMode;
+        break;
+    case VLCLibraryAlbumsMusicSubSegment:
+        _currentSelectedViewModeSegment = preferences.albumLibraryViewMode;
+        break;
+    case VLCLibrarySongsMusicSubSegment:
+        _currentSelectedViewModeSegment = preferences.songsLibraryViewMode;
+        break;
     case VLCLibraryBrowseSegment:
         _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
         break;
@@ -435,6 +427,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showVideoLibrary];
         break;
     case VLCLibraryMusicSegment:
+    case VLCLibraryArtistsMusicSubSegment:
+    case VLCLibraryAlbumsMusicSubSegment:
+    case VLCLibrarySongsMusicSubSegment:
+    case VLCLibraryGenresMusicSubSegment:
         [self showAudioLibrary];
         break;
     case VLCLibraryBrowseSegment:
@@ -477,26 +473,18 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         preferences.videoLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryMusicSegment:
-    {
-        const VLCAudioLibrarySegment selectedAudioSegment = _audioSegmentedControl.selectedSegment;
-        switch (selectedAudioSegment) {
-        case VLCAudioLibraryArtistsSegment:
-            preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
-            break;
-        case VLCAudioLibraryGenresSegment:
-            preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
-            break;
-        case VLCAudioLibraryAlbumsSegment:
-            preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
-            break;
-        case VLCAudioLibrarySongsSegment:
-            preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
-            break;
-        default:
-            break;
-        }
+    case VLCLibraryArtistsMusicSubSegment:
+        preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
         break;
-    }
+    case VLCLibraryGenresMusicSubSegment:
+        preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    case VLCLibraryAlbumsMusicSubSegment:
+        preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
+    case VLCLibrarySongsMusicSubSegment:
+        preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
+        break;
     case VLCLibraryBrowseSegment:
         preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
         break;
@@ -646,7 +634,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:YES];
 
-    [_libraryAudioViewController presentAudioView];
+    self.libraryAudioViewController.currentSegmentType = self.librarySegmentType;
 }
 
 - (void)showMediaSourceLibrary
