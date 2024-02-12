@@ -72,6 +72,7 @@ parts:
     source-type: git
     plugin: autotools
     override-build: |
+      false
       sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
       cd extras/tools
       ./bootstrap
