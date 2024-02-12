@@ -223,6 +223,9 @@ endif
 if HAVE_NVDEC
 libdirect3d11_plugin_la_SOURCES += hw/nvdec/nvdec_fmt.h
 endif
+if HAVE_AMF_SCALER
+libdirect3d11_plugin_la_SOURCES += hw/amf/amf_helper.c hw/amf/amf_helper.h
+endif
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la

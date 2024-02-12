@@ -15,6 +15,24 @@
 #include <vlc_common.h>
 
 #include "d3d11_scaler.h"
+#ifdef HAVE_AMF_SCALER
+#include "../../hw/amf/amf_helper.h"
+#include <AMF/components/HQScaler.h>
+
+amf::AMF_SURFACE_FORMAT DXGIToAMF(DXGI_FORMAT fmt)
+{
+    switch (fmt)
+    {
+        case DXGI_FORMAT_NV12: return amf::AMF_SURFACE_NV12;
+        case DXGI_FORMAT_P010: return amf::AMF_SURFACE_P010;
+        case DXGI_FORMAT_P016: return amf::AMF_SURFACE_P016;
+        case DXGI_FORMAT_B8G8R8A8_UNORM: return amf::AMF_SURFACE_BGRA;
+        case DXGI_FORMAT_R8G8B8A8_UNORM: return amf::AMF_SURFACE_RGBA;
+        case DXGI_FORMAT_R10G10B10A2_UNORM: return amf::AMF_SURFACE_R10G10B10A2;
+        default: return amf::AMF_SURFACE_UNKNOWN;
+    }
+}
+#endif
 
 #include <new>
 #include <wrl/client.h>
@@ -35,6 +53,13 @@ struct d3d11_scaler
     ComPtr<ID3D11VideoProcessor>            processor;
     ComPtr<ID3D11VideoProcessorOutputView>  outputView;
     ID3D11ShaderResourceView                *SRVs[DXGI_MAX_SHADER_VIEW] = {};
+#ifdef HAVE_AMF_SCALER
+    vlc_amf_context                 amf = {};
+    amf::AMFComponent               *amf_scaler = nullptr;
+    amf::AMFSurface                 *amfInput = nullptr;
+    ComPtr<ID3D11Texture2D>         amfStaging;
+    d3d11_device_t                  *d3d_dev = nullptr;
+#endif
 };
 
 static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_src_chroma)
@@ -47,7 +72,17 @@ static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_devi
 d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma,
                                    bool super_res, const d3d_format_t **out_fmt)
 {
+    if ((*out_fmt)->formatTexture == DXGI_FORMAT_UNKNOWN)
+    {
+        msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
+        return nullptr;
+    }
+
     bool canProcess = !super_res;
+#ifdef HAVE_AMF_SCALER
+    struct vlc_amf_context amf = {};
+    amf::AMFComponent *amf_scaler = nullptr;
+#endif
     // NVIDIA 530+ driver
     if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA &&
         (d3d_dev->WDDM.revision * 10000 + d3d_dev->WDDM.build) > 153000)
@@ -60,20 +95,43 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         // TODO refine which GPU and drivers can do it
         canProcess = true;
     }
+#ifdef HAVE_AMF_SCALER
+    else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_AMD && !canProcess)
+    {
+        int res = vlc_AMFCreateContext(&amf);
+        if (res == VLC_SUCCESS)
+        {
+            AMF_RESULT res = amf.pFactory->CreateComponent(amf.Context, AMFHQScaler, &amf_scaler);
+            if (res == AMF_OK && amf_scaler)
+            {
+                res = amf.Context->InitDX11(d3d_dev->d3ddevice);
+                canProcess = res == AMF_OK;
+            }
+        }
+    }
+#endif
 
+    d3d11_scaler *scaleProc = nullptr;
+    const d3d_format_t *fmt = nullptr;
     if (!canProcess)
     {
         msg_Err(vd, "Super Resolution filter not supported");
-        return nullptr;
+        goto error;
     }
 
-    if ((*out_fmt)->formatTexture == DXGI_FORMAT_UNKNOWN)
+#ifdef HAVE_AMF_SCALER
+    if (amf_scaler != nullptr)
     {
-        msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
-        return nullptr;
+        auto amf_fmt = DXGIToAMF((*out_fmt)->formatTexture);
+        if (amf_fmt == amf::AMF_SURFACE_UNKNOWN)
+        {
+            msg_Warn(vd, "upscale of DXGI %s not supported", DxgiFormatToStr((*out_fmt)->formatTexture));
+            goto error;
+        }
+        fmt = *out_fmt;
     }
-    const d3d_format_t *fmt = nullptr;
-    if ((*out_fmt)->bitsPerChannel > 10)
+#endif
+    if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 10)
         fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA64);
     if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 8)
         fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA10LE);
@@ -84,13 +142,23 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
     if (fmt == nullptr || fmt->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
-        return nullptr;
+        goto error;
     }
 
-    d3d11_scaler *scaleProc = new (std::nothrow) d3d11_scaler;
+    scaleProc = new (std::nothrow) d3d11_scaler;
     if (unlikely(scaleProc == nullptr))
-        return nullptr;
+        goto error;
 
+#ifdef HAVE_AMF_SCALER
+    if (amf_scaler != nullptr)
+    {
+        scaleProc->amf = amf;
+        scaleProc->amf_scaler = amf_scaler;
+        scaleProc->d3d_dev = d3d_dev;
+    }
+    else
+    {
+#endif
     HRESULT hr;
     hr = d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&scaleProc->d3dviddev));
     if (unlikely(FAILED(hr)))
@@ -105,12 +173,21 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         msg_Err(vd, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
         goto error;
     }
+#ifdef HAVE_AMF_SCALER
+    }
+#endif
 
     scaleProc->d3d_fmt = fmt;
     scaleProc->super_res = super_res;
     *out_fmt = scaleProc->d3d_fmt;
     return scaleProc;
 error:
+#ifdef HAVE_AMF_SCALER
+    if (amf_scaler)
+        amf_scaler->Release();
+    if (amf.Context)
+        vlc_AMFReleaseContext(&amf);
+#endif
     delete scaleProc;
     return nullptr;
 }
@@ -163,6 +240,9 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
 
     scaleProc->usable = false;
 
+#ifdef HAVE_AMF_SCALER
+    if (!scaleProc->amf_scaler)
+#endif
     if (scaleProc->enumerator.Get() == nullptr)
     {
         d3d11_device_lock(d3d_dev);
@@ -207,7 +287,6 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         ZeroMemory(&texDesc, sizeof(texDesc));
         texDesc.MipLevels = 1;
         texDesc.SampleDesc.Count = 1;
-        texDesc.MiscFlags = 0;
         texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
         texDesc.Usage = D3D11_USAGE_DEFAULT;
         texDesc.CPUAccessFlags = 0;
@@ -215,6 +294,11 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         texDesc.Format = scaleProc->d3d_fmt->formatTexture;
         texDesc.Width = scaleProc->Width;
         texDesc.Height = scaleProc->Height;
+        texDesc.MiscFlags = 0;
+#ifdef HAVE_AMF_SCALER
+        if (scaleProc->amf_scaler)
+            texDesc.MiscFlags |= D3D11_RESOURCE_MISC_SHARED;
+#endif
         hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, upscaled.GetAddressOf());
         if (FAILED(hr))
         {
@@ -226,6 +310,37 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
         outDesc.Texture2D.MipSlice = 0;
 
+#ifdef HAVE_AMF_SCALER
+        if (scaleProc->amf_scaler)
+        {
+            AMF_RESULT res;
+
+            if (scaleProc->amfInput != nullptr)
+            {
+                scaleProc->amfInput->Release();
+                scaleProc->amfInput = nullptr;
+            }
+
+            texDesc.Width  = fmt->i_x_offset + fmt->i_visible_width;
+            texDesc.Height = fmt->i_y_offset + fmt->i_visible_height;
+            hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, scaleProc->amfStaging.ReleaseAndGetAddressOf());
+            if (FAILED(hr))
+            {
+                msg_Err(vd, "Failed to create the staging texture. (hr=0x%lX)", hr);
+                goto done_super;
+            }
+            res = scaleProc->amf.Context->CreateSurfaceFromDX11Native(scaleProc->amfStaging.Get(),
+                                                                      &scaleProc->amfInput,
+                                                                      nullptr);
+            if (unlikely(res != AMF_OK || scaleProc->amfInput == nullptr))
+            {
+                msg_Err(vd, "Failed to wrap D3D11 output texture. %d", res);
+                goto done_super;
+            }
+        }
+        else
+        {
+#endif
         hr = scaleProc->d3dviddev->CreateVideoProcessorOutputView(
                                                                 upscaled.Get(),
                                                                 scaleProc->enumerator.Get(),
@@ -236,6 +351,9 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
             goto done_super;
         }
+#ifdef HAVE_AMF_SCALER
+        }
+#endif
 
         ReleaseSRVs(scaleProc);
         _upscaled[0] = upscaled.Get();
@@ -247,6 +365,29 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             goto done_super;
     }
 
+#ifdef HAVE_AMF_SCALER
+    if (scaleProc->amf_scaler)
+    {
+        AMF_RESULT res;
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_OUTPUT_SIZE, ::AMFConstructSize(out_width, out_height));
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ENGINE_TYPE, amf::AMF_MEMORY_DX11);
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ALGORITHM, AMF_HQ_SCALER_ALGORITHM_VIDEOSR1_0);
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FROM_SRGB, 0);
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_SHARPNESS, 0.5);
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL, 1);
+        AMFColor black{0,0,0,255};
+        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL_COLOR, black);
+        // res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FRAME_RATE, oFrameRate);
+        auto amf_fmt = DXGIToAMF(scaleProc->d3d_fmt->formatTexture);
+        res = scaleProc->amf_scaler->Init(amf_fmt,
+            fmt->i_x_offset + fmt->i_visible_width,
+            fmt->i_y_offset + fmt->i_visible_height);
+        if (res != AMF_OK)
+            return false;
+    }
+    else
+    {
+#endif
     RECT srcRect;
     srcRect.left   = fmt->i_x_offset;
     srcRect.top    = fmt->i_y_offset;
@@ -365,6 +506,9 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         }
     }
     d3d11_device_unlock(d3d_dev);
+#ifdef HAVE_AMF_SCALER
+    }
+#endif
 
     if (scaleProc->upscaling != upscale)
     {
@@ -384,6 +528,20 @@ done_super:
 void D3D11_UpscalerDestroy(d3d11_scaler *scaleProc)
 {
     ReleaseSRVs(scaleProc);
+#ifdef HAVE_AMF_SCALER
+    if (scaleProc->amfInput != nullptr)
+    {
+        scaleProc->amfInput->Release();
+        scaleProc->amfInput = nullptr;
+    }
+    if (scaleProc->amf_scaler)
+    {
+        scaleProc->amf_scaler->Terminate();
+        scaleProc->amf_scaler->Release();
+    }
+    if (scaleProc->amf.Context)
+        vlc_AMFReleaseContext(&scaleProc->amf);
+#endif
     delete scaleProc;
 }
 
@@ -420,6 +578,62 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_d
 {
     HRESULT hr;
 
+#ifdef HAVE_AMF_SCALER
+    if (scaleProc->amf_scaler)
+    {
+        AMF_RESULT res;
+        amf::AMFSurface *submitSurface;
+
+        D3D11_TEXTURE2D_DESC texDesc;
+        p_sys->texture[0]->GetDesc(&texDesc);
+        // copy source into staging as it may not be shared
+        d3d11_device_lock( scaleProc->d3d_dev );
+        scaleProc->d3d_dev->d3dcontext->CopySubresourceRegion(scaleProc->amfStaging.Get(),
+                                                0,
+                                                0, 0, 0,
+                                                p_sys->resource[KNOWN_DXGI_INDEX],
+                                                p_sys->slice_index,
+                                                NULL);
+        d3d11_device_unlock( scaleProc->d3d_dev );
+        submitSurface = scaleProc->amfInput;
+
+        res = scaleProc->amf_scaler->SubmitInput(submitSurface);
+        if (res == AMF_INPUT_FULL)
+        {
+            msg_Dbg(vd, "scaler input full, skip this frame");
+            return VLC_SUCCESS;
+        }
+        if (res != AMF_OK)
+            return VLC_EGENERIC;
+
+        amf::AMFData *amfOutput = nullptr;
+        res = scaleProc->amf_scaler->QueryOutput(&amfOutput);
+        if (res != AMF_OK)
+            return VLC_EGENERIC;
+
+        assert(amfOutput->GetMemoryType() == amf::AMF_MEMORY_DX11);
+        amf::AMFSurface *amfOutputSurface = reinterpret_cast<amf::AMFSurface*>(amfOutput);
+        auto packed = amfOutputSurface->GetPlane(amf::AMF_PLANE_PACKED);
+
+        ID3D11Texture2D *out = reinterpret_cast<ID3D11Texture2D *>(packed->GetNative());
+
+        ReleaseSRVs(scaleProc);
+        ID3D11Texture2D *_upscaled[DXGI_MAX_SHADER_VIEW];
+        _upscaled[0] = out;
+        _upscaled[1] = out;
+        _upscaled[2] = out;
+        _upscaled[3] = out;
+        if (D3D11_AllocateResourceView(vlc_object_logger(vd), scaleProc->d3d_dev->d3ddevice, scaleProc->d3d_fmt,
+                                    _upscaled, 0, scaleProc->SRVs) != VLC_SUCCESS)
+        {
+            return VLC_ENOTSUP;
+        }
+
+        amfOutput->Release();
+
+        return VLC_SUCCESS;
+    }
+#endif
     if (assert_ProcessorInput(vd, scaleProc, p_sys) != VLC_SUCCESS)
     {
         msg_Err(vd, "fail to create upscaler input");
