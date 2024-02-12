@@ -439,7 +439,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         break;
     case VLCLibraryBrowseSegment:
     case VLCLibraryStreamsSegment:
-        [self showMediaSourceLibraryWithSegment:_librarySegmentType];
+        [self showMediaSourceLibrary];
         break;
     default:
         break;
@@ -649,19 +649,18 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_libraryAudioViewController presentAudioView];
 }
 
-- (void)showMediaSourceLibraryWithSegment:(VLCLibrarySegmentType)segment
+- (void)showMediaSourceLibrary
 {
-    NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
-
     [self.navigationStack clear];
     [self setForwardsBackwardsToolbarItemsVisible:YES];
     [self setSortOrderToolbarItemVisible:NO];
     [self setLibrarySearchToolbarItemVisible:NO];
     [self setViewModeToolbarItemVisible:YES];
 
-    if (segment == VLCLibraryBrowseSegment) {
+    const VLCLibrarySegmentType segmentType = self.librarySegmentType;
+    if (segmentType == VLCLibraryBrowseSegment) {
         [_libraryMediaSourceViewController presentBrowseView];
-    } else if (segment == VLCLibraryStreamsSegment) {
+    } else if (segmentType == VLCLibraryStreamsSegment) {
         [_libraryMediaSourceViewController presentStreamsView];
     }
 }
