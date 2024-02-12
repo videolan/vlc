@@ -66,7 +66,6 @@
     NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
 
     [libraryWindow.navSidebarController selectSegment:rememberedSelectedLibrarySegment];
-    [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
     if (rememberedSelectedLibrarySegment == VLCLibraryMusicSegment) {
         [libraryWindow.libraryAudioViewController segmentedControlAction:self];

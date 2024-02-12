@@ -114,35 +114,6 @@
                             <customView id="iSp-bV-w6B" customClass="VLCBasicView">
                                 <rect key="frame" x="53" y="0.0" width="362" height="408"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="6gW-0d-ymm" userLabel="Option Bar">
-                                        <rect key="frame" x="0.0" y="376" width="362" height="32"/>
-                                        <subviews>
-                                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
-                                                <rect key="frame" x="70" y="4" width="223" height="24"/>
-                                                <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="j8T-nk-7Ny">
-                                                    <font key="font" metaFont="system"/>
-                                                    <segments>
-                                                        <segment label="Artists"/>
-                                                        <segment label="Albums" selected="YES" tag="1"/>
-                                                        <segment label="Songs"/>
-                                                        <segment label="Genres"/>
-                                                    </segments>
-                                                </segmentedCell>
-                                            </segmentedControl>
-                                        </subviews>
-                                        <constraints>
-                                            <constraint firstItem="8iI-b7-Eag" firstAttribute="centerY" secondItem="6gW-0d-ymm" secondAttribute="centerY" id="e6d-I1-v9E"/>
-                                            <constraint firstItem="8iI-b7-Eag" firstAttribute="centerX" secondItem="6gW-0d-ymm" secondAttribute="centerX" id="fa4-Mc-ZXU"/>
-                                            <constraint firstAttribute="height" constant="32" id="r96-Dx-fwx"/>
-                                        </constraints>
-                                    </visualEffectView>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="leading" secondItem="iSp-bV-w6B" secondAttribute="leading" id="Lud-a9-9OB"/>
-                                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="iSp-bV-w6B" secondAttribute="top" id="Lwi-r4-Src"/>
-                                    <constraint firstAttribute="trailing" secondItem="6gW-0d-ymm" secondAttribute="trailing" id="WCu-Ne-7Oz"/>
-                                </constraints>
                             </customView>
                             <customView identifier="VLCLibraryWindowPlaylistSidebarIdentifier" id="dus-WQ-AmE">
                                 <rect key="frame" x="416" y="0.0" width="480" height="408"/>
@@ -686,8 +657,6 @@
                     </visualEffectView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="top" id="33P-it-9HX"/>
-                    <constraint firstItem="6gW-0d-ymm" firstAttribute="trailing" secondItem="iSp-bV-w6B" secondAttribute="trailing" id="DZK-gL-4Jh"/>
                     <constraint firstAttribute="bottom" secondItem="u8g-jy-S4e" secondAttribute="bottom" priority="250" id="DQQ-ji-YSy"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="QH8-mU-6ZP"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="Sse-bx-ewr"/>
@@ -833,7 +802,6 @@
                 <outlet property="audioLibrarySongsTableViewScrollView" destination="QqV-hX-sZw" id="1t5-D3-CeM"/>
                 <outlet property="audioLibrarySplitView" destination="llh-BF-BEJ" id="gvt-K1-cGw"/>
                 <outlet property="audioLibraryView" destination="lpg-UW-pTq" id="FYD-PV-Ce2"/>
-                <outlet property="audioSegmentedControl" destination="8iI-b7-Eag" id="ERG-nc-ziq"/>
                 <outlet property="backwardsNavigationButton" destination="Bzq-ZV-i8j" id="Bac-Kb-ut"/>
                 <outlet property="backwardsToolbarItem" destination="6Ie-eu-GDn" id="q3s-rt-8gy"/>
                 <outlet property="clearPlaylistButton" destination="cih-xp-HmY" id="PoU-co-0kn"/>
@@ -868,7 +836,6 @@
                 <outlet property="mediaToolBar" destination="pr3-TD-J2z" id="Chi-03-Fgd"/>
                 <outlet property="navSidebarOutlineView" destination="YHZ-TC-1xj" id="nCx-hB-6sf"/>
                 <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
-                <outlet property="optionBarView" destination="6gW-0d-ymm" id="ERG-nc-ziz"/>
                 <outlet property="placeholderGoToBrowseButton" destination="V2G-WY-Ewc" id="oeg-Uf-wwE"/>
                 <outlet property="placeholderImageView" destination="fgK-fZ-95P" id="WwE-eN-rSA"/>
                 <outlet property="placeholderLabel" destination="adK-Pc-tnU" id="6Zw-IF-czx"/>

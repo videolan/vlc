@@ -89,7 +89,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
-        [self setupAudioSegmentedControl];
         [self setupAudioLibraryViews];
 
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
@@ -128,11 +127,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
     _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
 
-    _audioSegmentedControl = libraryWindow.audioSegmentedControl;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
-    _optionBarView = libraryWindow.optionBarView;
 }
 
 - (void)setupAudioDataSource
@@ -248,35 +245,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     ];
 }
 
-- (void)setupAudioSegmentedControl
-{
-    _audioSegmentedControl.segmentCount = 4;
-    [_audioSegmentedControl setLabel:_NS("Artists") forSegment:VLCAudioLibraryArtistsSegment];
-    [_audioSegmentedControl setLabel:_NS("Albums") forSegment:VLCAudioLibraryAlbumsSegment];
-    [_audioSegmentedControl setLabel:_NS("Songs") forSegment:VLCAudioLibrarySongsSegment];
-    [_audioSegmentedControl setLabel:_NS("Genres") forSegment:VLCAudioLibraryGenresSegment];
-    _audioSegmentedControl.selectedSegment = 0;
-}
-
-- (void)configureAudioSegmentedControl
-{
-    [_audioSegmentedControl setTarget:self];
-    [_audioSegmentedControl setAction:@selector(segmentedControlAction:)];
-}
-
 - (void)setupAudioLibraryViews
 {
     _audioCollectionSelectionTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     _audioLibraryGridModeSplitViewListTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     _audioGroupSelectionTableView.rowHeight = VLCLibraryAlbumTableCellView.defaultHeight;
 
-    const NSEdgeInsets defaultContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    const CGFloat optionBarHeight = self.optionBarView.frame.size.height;
-    const CGFloat topAudioScrollViewContentInset = defaultContentInsets.top + optionBarHeight;
-    const NSEdgeInsets audioScrollViewContentInsets = NSEdgeInsetsMake(topAudioScrollViewContentInset,
-                                                                       defaultContentInsets.left,
-                                                                       defaultContentInsets.bottom,
-                                                                       defaultContentInsets.right);
+    const NSEdgeInsets audioScrollViewContentInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets audioScrollViewScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
     _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
@@ -296,13 +271,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewContentInsets;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
-
-    const CGFloat songsTableTopInset = self.libraryWindow.titlebarHeight + optionBarHeight;
-    _audioSongTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioSongTableViewScrollView.contentInsets = NSEdgeInsetsMake(songsTableTopInset,
-                                                                   0,
-                                                                   0,
-                                                                   0);
 }
 
 #pragma mark - Show the audio view
@@ -310,39 +278,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)presentAudioView
 {
     _libraryTargetView.subviews = @[];
-
-    [self configureAudioSegmentedControl];
-    [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
-}
-
-- (void)presentOptionBar
-{
-    _libraryTargetView.subviews = [_libraryTargetView.subviews arrayByAddingObject:_optionBarView];
-    [_libraryTargetView addConstraints:@[
-        [NSLayoutConstraint constraintWithItem:_optionBarView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:_libraryWindow.titlebarHeight],
-        [NSLayoutConstraint constraintWithItem:_optionBarView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:_optionBarView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0],
-    ]];
-    
-    self.optionBarView.hidden = NO;
+    [self updatePresentedView];
 }
 
 - (void)presentPlaceholderAudioView
@@ -471,8 +407,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
         [VLCMain.sharedInstance.libraryWindow updateGridVsListViewModeSegmentedControl];
     }
-
-    [self presentOptionBar];
 }
 
 - (void)setCurrentSegmentType:(VLCLibrarySegmentType)currentSegmentType

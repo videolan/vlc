@@ -51,11 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *audioLibraryGridModeSplitViewListTableView;
 @property (readonly) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readonly) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
-@property (readonly) NSSegmentedControl *audioSegmentedControl;
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
-@property (readonly) NSVisualEffectView *optionBarView;
 @property (readwrite, nonatomic) VLCLibrarySegmentType currentSegmentType;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;

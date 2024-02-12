@@ -285,7 +285,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super encodeRestorableStateWithCoder:coder];
     [coder encodeInteger:_librarySegmentType forKey:@"macosx-library-selected-segment"];
-    [coder encodeInteger:_audioSegmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
 }
 
 #pragma mark - appearance setters
@@ -611,7 +610,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:NO];
-    self.optionBarView.hidden = YES;
 
     [_libraryHomeViewController presentHomeView];
 }
@@ -622,7 +620,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setSortOrderToolbarItemVisible:YES];
     [self setLibrarySearchToolbarItemVisible:YES];
     [self setViewModeToolbarItemVisible:YES];
-    self.optionBarView.hidden = YES;
 
     [_libraryVideoViewController presentVideoView];
 }
@@ -928,7 +925,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self presentVideoView];
 
-    [self.optionBarView setHidden:YES];
     [self.forwardsNavigationButton setHidden:YES];
     [self.gridVsListSegmentedControl setHidden:YES];
     [self.librarySortButton setHidden:YES];
