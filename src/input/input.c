@@ -70,6 +70,8 @@ static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
 static inline int ControlPop( input_thread_t *, int *, input_control_param_t *, vlc_tick_t i_deadline, bool b_postpone_seek );
+static int ControlPopEarly(input_thread_t *input, int *type,
+                           input_control_param_t *param);
 static void       ControlRelease( int i_type, const input_control_param_t *p_param );
 static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, input_control_param_t );
@@ -1307,6 +1309,16 @@ static int Init( input_thread_t * p_input )
     if( priv->p_es_out == NULL )
         goto error;
 
+    /* Handle all early controls */
+    for (;;)
+    {
+        int type;
+        input_control_param_t param;
+        if (ControlPopEarly(p_input, &type, &param))
+            break;
+        Control(p_input, type, param);
+    }
+
     /* */
     master = priv->master;
     if( master == NULL )
@@ -1608,6 +1620,50 @@ static bool ControlIsSeekRequest( int i_type )
     }
 }
 
+static bool ControlTypeIsEarly(int type)
+{
+    /* These controls can and should be processed before the access/demux
+     * is created for optimization purpose. */
+    switch (type)
+    {
+        /* \warning Make sure the control implementation is not referencing the
+         * demux before adding it here. */
+        case INPUT_CONTROL_SET_PROGRAM:
+        case INPUT_CONTROL_SET_CATEGORY_DELAY:
+        case INPUT_CONTROL_SET_ES_CAT_IDS:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static int ControlPopEarly(input_thread_t *input, int *type,
+                           input_control_param_t *param)
+{
+    input_thread_private_t *sys = input_priv(input);
+
+    vlc_mutex_lock(&sys->lock_control);
+
+    for (size_t i = 0; i < sys->i_control; ++i)
+    {
+        if (ControlTypeIsEarly(sys->control[i].i_type))
+        {
+            *type = sys->control[i].i_type;
+            *param = sys->control[i].param;
+
+            sys->i_control--;
+            if (sys->i_control > i)
+                memmove(&sys->control[i], &sys->control[i+1],
+                        sizeof(*sys->control) * sys->i_control - i);
+            vlc_mutex_unlock(&sys->lock_control);
+            return VLC_SUCCESS;
+        }
+    }
+
+    vlc_mutex_unlock(&sys->lock_control);
+    return VLC_EGENERIC;
+}
+
 static void ControlRelease( int i_type, const input_control_param_t *p_param )
 {
     if( p_param == NULL )
@@ -1777,64 +1833,27 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
 void input_SetProgramId(input_thread_t *input, int group_id)
 
 {
-    input_thread_private_t *sys = input_priv(input);
-
-    if (!sys->is_running && !sys->is_stopped)
-    {
-        /* Not running, send the control synchronously since we are sure that
-         * it won't block */
-        es_out_Control(sys->p_es_out_display, ES_OUT_SET_GROUP, group_id);
-    }
-    else
-    {
-        input_ControlPushHelper(input, INPUT_CONTROL_SET_PROGRAM,
-                                &(vlc_value_t) { .i_int = group_id });
-    }
+    input_ControlPushHelper(input, INPUT_CONTROL_SET_PROGRAM,
+                            &(vlc_value_t) { .i_int = group_id });
 }
 
 int input_SetEsCatDelay(input_thread_t *input, enum es_format_category_e cat,
                         vlc_tick_t delay)
 {
-    input_thread_private_t *sys = input_priv(input);
-    /* A failure can only happen in the input_ControlPush section. */
-    int ret = VLC_SUCCESS;
-
-    if (!sys->is_running && !sys->is_stopped)
-    {
-        /* Not running, send the control synchronously since we are sure that
-         * it won't block */
-        es_out_SetDelay(sys->p_es_out_display, cat, delay);
-    }
-    else
-    {
-        const input_control_param_t param = {
-            .cat_delay = { cat, delay }
-        };
-        ret = input_ControlPush(input, INPUT_CONTROL_SET_CATEGORY_DELAY,
-                                &param);
-    }
-
-    return ret;
+    const input_control_param_t param = {
+        .cat_delay = { cat, delay }
+    };
+    return input_ControlPush(input, INPUT_CONTROL_SET_CATEGORY_DELAY,
+                             &param);
 }
 
 void input_SetEsCatIds(input_thread_t *input, enum es_format_category_e cat,
                        const char *str_ids)
 {
-    input_thread_private_t *sys = input_priv(input);
-
-    if (!sys->is_running && !sys->is_stopped)
-    {
-        /* Not running, send the control synchronously since we are sure that
-         * it won't block */
-        es_out_SetEsCatIds(sys->p_es_out_display, cat, str_ids);
-    }
-    else
-    {
-        const input_control_param_t param = {
-            .cat_ids = { cat, str_ids ? strdup(str_ids) : NULL }
-        };
-        input_ControlPush(input, INPUT_CONTROL_SET_ES_CAT_IDS, &param);
-    }
+    const input_control_param_t param = {
+        .cat_ids = { cat, str_ids ? strdup(str_ids) : NULL }
+    };
+    input_ControlPush(input, INPUT_CONTROL_SET_ES_CAT_IDS, &param);
 }
 
 static void ControlSetEsList(input_thread_t *input,
@@ -2072,6 +2091,10 @@ static bool Control( input_thread_t *p_input,
             /* No need to force update, es_out does it if needed */
             es_out_Control( priv->p_es_out,
                             ES_OUT_SET_GROUP, (int)param.val.i_int );
+
+            if( priv->master->p_demux == NULL )
+                break; /* Possible when called early, the group will be set on
+                        * the demux from InitPrograms() */
 
             if( param.val.i_int == 0 )
                 demux_Control( priv->master->p_demux,
