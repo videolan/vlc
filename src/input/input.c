@@ -739,9 +739,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 break; /* Wake-up time reached */
             }
 
-#ifndef NDEBUG
-            msg_Dbg( p_input, "control type=%d", i_type );
-#endif
             if( Control( p_input, i_type, param ) )
             {
                 if( ControlIsSeekRequest( i_type ) )
@@ -1901,6 +1898,10 @@ static bool Control( input_thread_t *p_input,
     const vlc_tick_t i_control_date = vlc_tick_now();
     /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
+
+#ifndef NDEBUG
+    msg_Dbg( p_input, "control type=%d", i_type );
+#endif
 
     switch( i_type )
     {
