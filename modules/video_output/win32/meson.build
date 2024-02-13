@@ -6,6 +6,7 @@
 d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_scaler.cpp', 'd3d11_shaders.cpp', 'd3d_shaders.c', 'd3d_dynamic_shader.c', 'common.c')
 d3d11_link_with = [ d3d11_common_lib ]
 d3d11_cargs = []
+d3d11_cxxargs = [ libcom_cppflags ]
 d3d11_deps = []
 if get_option('winstore_app')
     d3d11_deps += [
@@ -26,6 +27,7 @@ vlc_modules += {
     'sources' : d3d11_sources,
     'link_with' : d3d11_link_with,
     'c_args' : d3d11_cargs,
+    'cpp_args' : d3d11_cxxargs,
     'dependencies' : d3d11_deps
 }
 
