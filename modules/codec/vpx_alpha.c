@@ -461,6 +461,7 @@ int OpenDecoder(vlc_object_t *o)
         fmt.i_codec = VLC_CODEC_VP8;
     else
         fmt.i_codec = VLC_CODEC_VP9;
+    fmt.i_level = 0;
     decoder_Init( &p_sys->opaque->dec, &p_sys->opaque->fmt_in, &fmt );
     vlc_picture_chain_Init(&p_sys->opaque->decoded);
     es_format_Init(&p_sys->opaque->fmt_out, VIDEO_ES, 0);
