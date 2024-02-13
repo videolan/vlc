@@ -452,8 +452,9 @@ codec_LTLIBRARIES += libdxva2_plugin.la
 endif
 endif
 
-libd3d11_common_la_SOURCES = video_chroma/d3d11_fmt.c video_chroma/d3d11_fmt.h \
+libd3d11_common_la_SOURCES = video_chroma/d3d11_fmt.cpp video_chroma/d3d11_fmt.h \
 	video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h
+libd3d11_common_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libd3d11_common_la_LDFLAGS = -static
 if HAVE_WIN32
 noinst_LTLIBRARIES += libd3d11_common.la

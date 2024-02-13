@@ -653,10 +653,11 @@ endif
 if host_system == 'windows'
     d3d11_common_lib = static_library('d3d11_common',
         files(
-            '../video_chroma/d3d11_fmt.c',
+            '../video_chroma/d3d11_fmt.cpp',
             '../video_chroma/dxgi_fmt.c',
             ),
         include_directories: [vlc_include_dirs],
+        cpp_args : libcom_cppflags,
         pic: true,
         install: false,
         dependencies: [
