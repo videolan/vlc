@@ -414,10 +414,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)setCurrentSegmentType:(VLCLibrarySegmentType)currentSegmentType
 {
-    if (self.currentSegmentType == currentSegmentType) {
-        return;
-    }
-
     _currentSegmentType = currentSegmentType;
     [self updatePresentedView];
 }
