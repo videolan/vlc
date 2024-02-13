@@ -67,10 +67,6 @@
 
     [libraryWindow.navSidebarController selectSegment:rememberedSelectedLibrarySegment];
 
-    if (rememberedSelectedLibrarySegment == VLCLibraryMusicSegment) {
-        [libraryWindow.libraryAudioViewController segmentedControlAction:self];
-    }
-
     completionHandler(libraryWindow, nil);
 }
 
