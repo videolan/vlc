@@ -46,13 +46,13 @@
 #include <vlc/libvlc_media_player.h>
 
 #define COBJMACROS
-#include <d3d11.h>
-#include <assert.h>
 #include <initguid.h>
+#include <d3d11.h>
 #include <dxgi1_2.h>
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
 # include <dxgidebug.h>
 #endif
+#include <assert.h>
 
 #include "d3d11_fmt.h"
 
