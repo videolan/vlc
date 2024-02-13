@@ -168,6 +168,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     switch (fmt->i_chroma)
     {
     case VLC_CODEC_D3D11_OPAQUE:
+    case VLC_CODEC_D3D11_OPAQUE_ALPHA:
         cfg.bitdepth = 8;
         break;
     case VLC_CODEC_D3D11_OPAQUE_RGBA:
@@ -950,6 +951,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
             case VLC_CODEC_ABGR:
             case VLC_CODEC_D3D11_OPAQUE_RGBA:
             case VLC_CODEC_D3D11_OPAQUE_BGRA:
+            case VLC_CODEC_D3D11_OPAQUE_ALPHA:
                 alpha_bits = 8;
                 break;
             case VLC_CODEC_YUVA_444_10L:

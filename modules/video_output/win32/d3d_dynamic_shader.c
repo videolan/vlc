@@ -90,6 +90,7 @@ struct PS_INPUT\n\
 #define SAMPLE_RGBA_TO_NV_GB        13\n\
 #define SAMPLE_PLANAR_YUVA_TO_NV_Y  14\n\
 #define SAMPLE_PLANAR_YUVA_TO_NV_UV 15\n\
+#define SAMPLE_NV12A_TO_YUVA        16\n\
 \n\
 #if (TONE_MAPPING==TONE_MAP_HABLE)\n\
 /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
@@ -177,6 +178,10 @@ inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
     sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\n\
     sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_NV12A_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\n\
+    sample.a  = shaderTexture[2].Sample(samplerState, coords).x;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_YUY2_TO_YUVA)\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
     sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n\
@@ -481,8 +486,19 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
-            psz_sampler[0] = "SAMPLE_NV12_TO_YUVA";
-            psz_shader_resource_views[0] = "2"; shader_views[0] = 2;
+            switch(dxgi_fmt->alphaTexture)
+            {
+            case DXGI_FORMAT_UNKNOWN:
+                psz_sampler[0] = "SAMPLE_NV12_TO_YUVA";
+                psz_shader_resource_views[0] = "2"; shader_views[0] = 2;
+                break;
+            case DXGI_FORMAT_NV12:
+                psz_sampler[0] = "SAMPLE_NV12A_TO_YUVA";
+                psz_shader_resource_views[0] = "4"; shader_views[0] = 4;
+                break;
+            default:
+                vlc_assert_unreachable();
+            }
             break;
         case DXGI_FORMAT_YUY2:
             psz_sampler[0] = "SAMPLE_YUY2_TO_YUVA";
