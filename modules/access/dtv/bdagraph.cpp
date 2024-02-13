@@ -2054,7 +2054,7 @@ HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
      * available, so return with an error. */
 
     long l_adapter = -1;
-    l_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    l_adapter = var_InheritInteger( p_access, "dvb-adapter" );
     if( l_tuner_used < 0 && l_adapter >= 0 )
         l_tuner_used = l_adapter - 1;
 
