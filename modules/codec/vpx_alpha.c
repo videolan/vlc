@@ -438,7 +438,7 @@ int OpenDecoder(vlc_object_t *o)
     decoder_t *dec = container_of(o, decoder_t, obj);
     if (dec->fmt_in->i_codec != VLC_CODEC_VP8 && dec->fmt_in->i_codec != VLC_CODEC_VP9)
         return VLC_ENOTSUP;
-    if (dec->fmt_in->i_level == 0)
+    if (dec->fmt_in->i_level == 0 || dec->fmt_in->i_level == -1)
         return VLC_ENOTSUP;
 
     vpx_alpha *p_sys = vlc_obj_calloc(o, 1, sizeof(*p_sys));

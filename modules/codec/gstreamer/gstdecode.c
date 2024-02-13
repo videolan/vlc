@@ -408,12 +408,12 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
                 "systemstream", G_TYPE_BOOLEAN, FALSE, NULL );
         break;
     case VLC_CODEC_VP8:
-        if (p_fmt->i_level) // contains alpha extradata
+        if (p_fmt->i_level != 0 && p_fmt->i_level != -1) // contains alpha extradata
             return NULL;
         p_str = gst_structure_new_empty( "video/x-vp8" );
         break;
     case VLC_CODEC_VP9:
-        if (p_fmt->i_level) // contains alpha extradata
+        if (p_fmt->i_level != 0 && p_fmt->i_level != -1) // contains alpha extradata
             return NULL;
         p_str = gst_structure_new_empty( "video/x-vp9" );
         break;

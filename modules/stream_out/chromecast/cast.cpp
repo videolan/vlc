@@ -773,11 +773,11 @@ bool sout_stream_sys_t::canDecodeVideo( const es_format_t *es ) const
         case VLC_CODEC_HEVC:
             return true;
         case VLC_CODEC_VP8:
-            if (es->i_level) // contains alpha extradata
+            if (es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 return false;
             return true;
         case VLC_CODEC_VP9:
-            if (es->i_level) // contains alpha extradata
+            if (es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 return false;
             return true;
         default:

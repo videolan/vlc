@@ -563,9 +563,9 @@ bool GetFfmpegCodec( const es_format_t *es,
     const struct vlc_avcodec_fourcc *base;
     size_t count;
 
-    if (es->i_codec == VLC_CODEC_VP8 && es->i_level) // contains alpha extradata
+    if (es->i_codec == VLC_CODEC_VP8 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
         return false;
-    if (es->i_codec == VLC_CODEC_VP9 && es->i_level) // contains alpha extradata
+    if (es->i_codec == VLC_CODEC_VP9 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
         return false;
 
     switch( es->i_cat )

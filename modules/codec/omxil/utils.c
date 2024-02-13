@@ -598,9 +598,9 @@ OMX_VIDEO_CODINGTYPE GetOmxVideoFormat( const es_format_t *es )
     for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_fourcc == i_fourcc )
         {
-            if (es->i_codec == VLC_CODEC_VP8 && es->i_level) // contains alpha extradata
+            if (es->i_codec == VLC_CODEC_VP8 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 continue;
-            if (es->i_codec == VLC_CODEC_VP9 && es->i_level) // contains alpha extradata
+            if (es->i_codec == VLC_CODEC_VP9 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 continue;
 
             return video_format_table[i].i_codec;
@@ -628,9 +628,9 @@ static const char *GetOmxVideoRole( const es_format_t *es )
     for( size_t i = 0; i < ARRAY_SIZE(video_format_table); i++ )
         if( video_format_table[i].i_fourcc == i_fourcc )
         {
-            if (es->i_codec == VLC_CODEC_VP8 && es->i_level) // contains alpha extradata
+            if (es->i_codec == VLC_CODEC_VP8 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 continue;
-            if (es->i_codec == VLC_CODEC_VP9 && es->i_level) // contains alpha extradata
+            if (es->i_codec == VLC_CODEC_VP9 && es->i_level != 0 && es->i_level != -1) // contains alpha extradata
                 continue;
 
             return video_format_table[i].psz_role;
