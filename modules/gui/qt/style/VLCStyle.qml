@@ -221,8 +221,8 @@ QtObject {
     readonly property int gridView_spacing: margin_small + margin_xxxsmall
     readonly property int tableView_spacing: gridView_spacing + margin_large
 
-    readonly property int layoutTitle_top_padding: margin_large
-    readonly property int layoutTitle_bottom_padding: margin_normal
+    readonly property int layoutTitle_top_padding: margin_large + margin_xxsmall
+    readonly property int layoutTitle_bottom_padding: margin_normal + margin_xxxsmall
 
     readonly property int table_cover_border: MainCtx.dp(2, scale)
 
