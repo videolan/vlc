@@ -1063,17 +1063,18 @@ static subpicture_region_t *Render( filter_t *p_filter,
     /* Avoid useless pixels:
         *        reshrink/trim Region Box to padded text one,
         *        but update offsets to keep position and have same rendering */
-//        if( (bboxcolor & 0xFF) == 0 )
-    {
-        regionbbox = paddedbbox;
-    }
+    FT_BBox renderbbox;
+    // if( (bboxcolor & 0xFF) == 0 )
+        renderbbox = paddedbbox;
+    // else
+    //     renderbbox = regionbbox;
 
     video_format_t fmt;
     video_format_Init( &fmt, 0 );
     fmt.i_width          =
-    fmt.i_visible_width  = regionbbox.xMax - regionbbox.xMin;
+    fmt.i_visible_width  = renderbbox.xMax - renderbbox.xMin;
     fmt.i_height         =
-    fmt.i_visible_height = regionbbox.yMax - regionbbox.yMin;
+    fmt.i_visible_height = renderbbox.yMax - renderbbox.yMin;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 
     for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
@@ -1094,7 +1095,7 @@ static subpicture_region_t *Render( filter_t *p_filter,
 
         if( *p_chroma == VLC_CODEC_YUVP )
             RenderYUVP( p_region_in, region, text_block.p_laid,
-                                &regionbbox, &bbox );
+                                &renderbbox, &bbox );
         else
         {
             const ft_drawing_functions *func;
@@ -1132,14 +1133,11 @@ static subpicture_region_t *Render( filter_t *p_filter,
             }
 
             RenderAXYZ( p_filter, p_region_in, region, text_block.p_laid,
-                                 &regionbbox, &paddedbbox, &bbox,
+                                 &renderbbox, &paddedbbox, &bbox,
                                  *p_chroma,
                                  func );
         }
 
-        /* Avoid useless pixels:
-         *        reshrink/trim Region Box to padded text one,
-         *        but update offsets to keep position and have same rendering */
 //      if( (bboxcolor & 0xFF) == 0 )
         {
             region->i_x = (paddedbbox.xMin - regionbbox.xMin) + p_region_in->i_x;
