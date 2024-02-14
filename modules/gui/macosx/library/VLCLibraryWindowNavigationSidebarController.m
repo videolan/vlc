@@ -72,9 +72,17 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
              segmentType < VLCLibraryHighSentinelSegment,
              @"Invalid segment type value provided");
-    [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentType] byExtendingSelection:NO];
+
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     self.libraryWindow.librarySegmentType = segment.segmentType;
+
+    if (segmentType >= VLCLibraryMusicSegment) {
+        NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:VLCLibraryMusicSegment];
+        [self.outlineView expandItem:itemNode];
+    }
+
+    [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentType]
+                  byExtendingSelection:NO];
 }
 
 # pragma mark - NSOutlineView delegation
