@@ -1309,6 +1309,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         Ogg_ReadSkeletonIndex( p_demux, p_oggpacket );
         return;
     }
+    else if ( p_stream == p_sys->p_skelstream ) {
+        // skeleton streams do not have any data packets
+        return;
+    }
     else if( p_stream->fmt.i_codec == VLC_CODEC_VP8 &&
              p_oggpacket->bytes >= 7 &&
              !memcmp( p_oggpacket->packet, "OVP80\x02\x20", 7 ) )
