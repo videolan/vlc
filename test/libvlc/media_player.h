@@ -66,8 +66,7 @@ struct mp_event
 
 struct mp_event_ctx
 {
-    vlc_mutex_t lock;
-    vlc_cond_t wait;
+    libvlc_media_player_t *mp;
 
     struct vlc_list events;
 };
@@ -92,9 +91,14 @@ static inline void mp_event_delete(struct mp_event *ev)
 
 static inline void mp_event_ctx_init(struct mp_event_ctx *ctx)
 {
-    vlc_mutex_init(&ctx->lock);
-    vlc_cond_init(&ctx->wait);
+    ctx->mp = NULL;
     vlc_list_init(&ctx->events);
+}
+
+static inline void mp_event_ctx_set_mp(struct mp_event_ctx *ctx,
+                                       libvlc_media_player_t *mp)
+{
+    ctx->mp = mp;
 }
 
 static inline void mp_event_ctx_destroy(struct mp_event_ctx *ctx)
@@ -106,15 +110,16 @@ static inline void mp_event_ctx_destroy(struct mp_event_ctx *ctx)
 
 static inline struct mp_event *mp_event_ctx_wait_event(struct mp_event_ctx *ctx)
 {
-    vlc_mutex_lock(&ctx->lock);
+    assert(ctx->mp != NULL);
+    libvlc_media_player_lock(ctx->mp);
     struct mp_event *event;
 
     while ((event = vlc_list_first_entry_or_null(&ctx->events, struct mp_event,
                                                  node)) == NULL)
-        vlc_cond_wait(&ctx->wait, &ctx->lock);
+        libvlc_media_player_wait(ctx->mp);
 
     vlc_list_remove(&event->node);
-    vlc_mutex_unlock(&ctx->lock);
+    libvlc_media_player_unlock(ctx->mp);
 
     return event;
 }
@@ -126,10 +131,13 @@ static inline void mp_event_ctx_push_event(struct mp_event_ctx *ctx,
     assert(dup != NULL);
     *dup = *ev;
 
-    vlc_mutex_lock(&ctx->lock);
+    /* The lock is already held from the event, but it's a good occasion to
+     * test recursive locks */
+    assert(ctx->mp != NULL);
+    libvlc_media_player_lock(ctx->mp);
     vlc_list_append(&dup->node, &ctx->events);
-    vlc_cond_signal(&ctx->wait);
-    vlc_mutex_unlock(&ctx->lock);
+    libvlc_media_player_signal(ctx->mp);
+    libvlc_media_player_unlock(ctx->mp);
 }
 
 static inline void mp_event_ctx_wait_state(struct mp_event_ctx *ctx,

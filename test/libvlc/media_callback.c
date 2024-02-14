@@ -182,6 +182,7 @@ static void test_media_callback(libvlc_instance_t *vlc)
     libvlc_media_player_t *player =
         libvlc_media_player_new(vlc, &player_cbs, &ctx);
     assert(player != NULL);
+    mp_event_ctx_set_mp(&ctx, player);
 
     libvlc_media_player_set_media(player, media);
     libvlc_media_player_play(player);
