@@ -1230,6 +1230,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                               logical_stream_t *p_stream,
                               ogg_packet *p_oggpacket )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
     bool b_selected;
     int i_header_len = 0;
@@ -1256,6 +1257,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         ! memcmp ( p_oggpacket->packet, "index", 6 ) )
     {
         Ogg_ReadSkeletonIndex( p_demux, p_oggpacket );
+        return;
+    }
+    else if ( p_stream == p_sys->p_skelstream ) {
+        // skeleton streams do not have any data packets
         return;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_VP8 &&
