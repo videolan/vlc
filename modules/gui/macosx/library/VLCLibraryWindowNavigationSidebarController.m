@@ -69,7 +69,12 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)selectSegment:(NSInteger)segmentType
 {
+    NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
+             segmentType < VLCLibraryHighSentinelSegment,
+             @"Invalid segment type value provided");
     [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentType] byExtendingSelection:NO];
+    VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
+    self.libraryWindow.librarySegmentType = segment.segmentType;
 }
 
 # pragma mark - NSOutlineView delegation
