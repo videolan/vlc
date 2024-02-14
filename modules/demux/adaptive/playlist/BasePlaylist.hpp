@@ -21,6 +21,7 @@
 #ifndef BASEPLAYLIST_HPP_
 #define BASEPLAYLIST_HPP_
 
+#include <ctime>
 #include <vector>
 #include <string>
 
