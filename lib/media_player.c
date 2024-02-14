@@ -777,6 +777,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
                                 NULL, NULL);
     if (unlikely(!mp->player))
         goto error1;
+    vlc_cond_init(&mp->wait);
 
     vlc_player_Lock(mp->player);
 
@@ -888,6 +889,26 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
         return;
 
     libvlc_media_player_destroy( p_mi );
+}
+
+void libvlc_media_player_lock( libvlc_media_player_t *mp )
+{
+    vlc_player_Lock(mp->player);
+}
+
+void libvlc_media_player_unlock( libvlc_media_player_t *mp )
+{
+    vlc_player_Unlock(mp->player);
+}
+
+void libvlc_media_player_wait( libvlc_media_player_t *mp )
+{
+    vlc_player_CondWait(mp->player, &mp->wait);
+}
+
+void libvlc_media_player_signal( libvlc_media_player_t *mp )
+{
+    vlc_cond_broadcast(&mp->wait);
 }
 
 /**************************************************************************
