@@ -1466,10 +1466,6 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         }
         else
         {
-            for (int i = 0; i < 6; i++)
-                bo_add_8(text, 0);        // reserved;
-            bo_add_16be(text, 1);         // data-reference-index
-
             bo_add_32be(text, 0);         // display flags
             bo_add_32be(text, 0);         // justification
             for (int i = 0; i < 3; i++)
