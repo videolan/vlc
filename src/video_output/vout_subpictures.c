@@ -379,6 +379,14 @@ static void region_FixFmt(subpicture_region_t *region)
         region->fmt.space = COLOR_SPACE_SRGB;
     if (region->fmt.color_range == COLOR_RANGE_UNDEF)
         region->fmt.color_range = COLOR_RANGE_FULL;
+    if (region->p_picture->format.transfer == TRANSFER_FUNC_UNDEF)
+        region->p_picture->format.transfer = TRANSFER_FUNC_SRGB;
+    if (region->p_picture->format.primaries == COLOR_PRIMARIES_UNDEF)
+        region->p_picture->format.primaries = COLOR_PRIMARIES_SRGB;
+    if (region->p_picture->format.space == COLOR_SPACE_UNDEF)
+        region->p_picture->format.space = COLOR_SPACE_SRGB;
+    if (region->p_picture->format.color_range == COLOR_RANGE_UNDEF)
+        region->p_picture->format.color_range = COLOR_RANGE_FULL;
 }
 
 static subpicture_region_t *SpuRenderText(spu_t *spu,
