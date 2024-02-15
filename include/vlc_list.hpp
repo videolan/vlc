@@ -128,7 +128,7 @@ protected:
 
     constexpr std::ptrdiff_t offset() const {
         return reinterpret_cast<std::ptrdiff_t>(
-            &(reinterpret_cast<NodeType const volatile*>(NULL)->*_node_ptr)
+            &(static_cast<NodeType const volatile*>(NULL)->*_node_ptr)
         );
     }
 
