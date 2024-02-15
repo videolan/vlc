@@ -7,7 +7,7 @@ QT5COMPAT_URL := $(QT)/$(QT5COMPAT_VERSION_MAJOR)/$(QT5COMPAT_VERSION)/submodule
 DEPS_qt5compat += qtdeclarative $(DEPS_qtdeclarative) qtshadertools $(DEPS_qtshadertools)
 
 ifdef HAVE_WIN32
-#PKGS += qt5compat
+PKGS += qt5compat
 endif
 
 ifeq ($(call need_pkg,"Qt6Core5Compat >= 6.6"),)

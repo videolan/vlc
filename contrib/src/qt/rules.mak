@@ -10,7 +10,7 @@ ifdef HAVE_MACOSX
 #PKGS += qt
 endif
 ifdef HAVE_WIN32
-#PKGS += qt
+PKGS += qt
 endif
 
 DEPS_qt += freetype2 $(DEPS_freetype2) harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)

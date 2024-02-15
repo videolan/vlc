@@ -7,7 +7,7 @@ QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSIO
 DEPS_qtdeclarative += qt $(DEPS_qt) qtshadertools $(DEPS_qtshadertools)
 
 ifdef HAVE_WIN32
-#PKGS += qtdeclarative
+PKGS += qtdeclarative
 endif
 
 ifeq ($(call need_pkg,"Qt6Qml >= 6.6 Qt6Quick >= 6.6 Qt6QuickControls2 >= 6.6 Qt6QuickDialogs2 >= 6.6 Qt6QuickLayouts >= 6.6"),)

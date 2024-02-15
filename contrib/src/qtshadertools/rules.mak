@@ -11,7 +11,7 @@ DEPS_qtshadertools += fxc2 $(DEPS_fxc2)
 endif
 
 ifdef HAVE_WIN32
-#PKGS += qtshadertools
+PKGS += qtshadertools
 endif
 
 ifeq ($(call need_pkg,"Qt6ShaderTools >= 6.6"),)
