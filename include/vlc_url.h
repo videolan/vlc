@@ -67,7 +67,7 @@ VLC_API char *vlc_uri2path(const char *url) VLC_MALLOC;
  * \warning <b>This function does NOT decode entire URIs.</b>
  * URI can only be decoded (and encoded) one component at a time
  * (e.g. the host name, one directory, the file name).
- * Complete URIs are always "encoded" (or they are syntaxically invalid).
+ * Complete URIs are always "encoded" (or they are syntactically invalid).
  * See IETF RFC3986, especially §2.4 for details.
  *
  * \note URI encoding is <b>different</b> from Javascript escaping. Especially,

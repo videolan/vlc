@@ -386,7 +386,7 @@ static inline void aout_HotplugReport(audio_output_t *aout,
  * Request a change of software audio amplification.
  * \param aout the audio output instance requesting software gain
  * \param gain linear amplitude gain (must be positive)
- * \warning Values in excess 1.0 may cause overflow and distorsion.
+ * \warning Values in excess 1.0 may cause overflow and distortion.
  */
 static inline int aout_GainRequest(audio_output_t *aout, float gain)
 {

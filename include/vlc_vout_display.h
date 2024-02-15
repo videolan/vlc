@@ -423,7 +423,7 @@ VLC_API void vout_display_Delete(vout_display_t *);
  *
  * \bug Currently, only one picture can be prepared at a time. It must be
  * displayed with vout_display_Display() before any picture is prepared or
- * before the display is destroyd with vout_display_Delete().
+ * before the display is destroyed with vout_display_Delete().
  *
  \ bug Rendering subpictures is not supported with this function yet.
  * \c subpic must be @c NULL .

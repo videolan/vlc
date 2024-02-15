@@ -292,7 +292,7 @@ struct sout_stream_t
  *
  * \param parent The parent object of the stream output.
  * \param config A valid config chain of the object, of the form
- *               "objname{option=*,otion=*,...}"
+ *               "objname{option=*,option=*,...}"
  *
  * \retval An empty allocated Stream Output object.
  * \retval NULL on allocation error.

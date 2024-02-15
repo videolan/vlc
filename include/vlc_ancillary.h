@@ -96,7 +96,7 @@ vlc_ancillary_Create(void *data, vlc_ancillary_id id)
 /**
  * Release an ancillary
  *
- * If the refcount reachs 0, the free_cb provided by
+ * If the refcount reaches 0, the free_cb provided by
  * vlc_ancillary_CreateWithFreeCb() is called.
  *
  * @param ancillary ancillary to release

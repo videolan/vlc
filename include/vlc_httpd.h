@@ -78,7 +78,7 @@ typedef struct
 
 typedef struct httpd_message_t
 {
-    httpd_client_t *cl; /* NULL if not throught a connection e vlc internal */
+    httpd_client_t *cl; /* NULL if not through a connection e vlc internal */
 
     uint8_t i_type;
     uint8_t i_proto;

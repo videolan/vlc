@@ -29,7 +29,7 @@
  */
 
 /* A helper macro that will expand to either of the arguments
-   depanding on platform. The arguments are supposed to be:
+   depending on platform. The arguments are supposed to be:
    1. dir: a string containing "directory"
    2. folder: a string with the same meaning but with directory
               substituted with "folder"

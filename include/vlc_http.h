@@ -89,7 +89,7 @@ VLC_API bool vlc_http_cookies_store( vlc_http_cookie_jar_t *jar,
  * Returns a cookie value that match the given URL.
  *
  * @param jar a cookie jar
- * @param secure whether a secure connexion will be used or not
+ * @param secure whether a secure connection will be used or not
  * @param host the hostname for which the cookie was stored
  * @param path the cookie name to fetch
  * @return A string consisting of semicolon-separated cookie NAME=VALUE pairs.

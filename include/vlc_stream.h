@@ -159,8 +159,8 @@ struct stream_t
      *
      * Callback to read data from the stream into a caller-supplied buffer.
      *
-     * This is the legacy implementor, using \ref vlc_stream_operations
-     * should be prefered.
+     * This is the legacy implementer, using \ref vlc_stream_operations
+     * should be preferred.
      *
      * This may be NULL if the stream is actually a directory rather than a
      * byte stream, or if \ref stream_t.pf_block is non-NULL.
@@ -183,8 +183,8 @@ struct stream_t
      * for buffers. In such case, this callback should be provided instead of
      * \ref stream_t.pf_read; otherwise, this should be NULL.
      *
-     * This is the legacy implementor, using \ref vlc_stream_operations
-     * should be prefered.
+     * This is the legacy implementer, using \ref vlc_stream_operations
+     * should be preferred.
      *
      * \param eof storage space for end-of-stream flag [OUT]
      * (*eof is always false when invoking pf_block(); pf_block() should set
@@ -201,8 +201,8 @@ struct stream_t
      * Callback to fill an item node from a directory
      * (see doc/browsing.txt for details).
      *
-     * This is the legacy implementor, using \ref vlc_stream_operations
-     * should be prefered.
+     * This is the legacy implementer, using \ref vlc_stream_operations
+     * should be preferred.
      *
      * NULL if the stream is not a directory.
      */
@@ -215,8 +215,8 @@ struct stream_t
      *
      * Callback to set the stream pointer (in bytes from start).
      *
-     * This is the legacy implementor, using \ref vlc_stream_operations
-     * should be prefered.
+     * This is the legacy implementer, using \ref vlc_stream_operations
+     * should be preferred.
      *
      * May be NULL if seeking is not supported.
      */
@@ -226,7 +226,7 @@ struct stream_t
      * Stream control.
      *
      * Legacy way of implementing callbacks.
-     * \ref vlc_stream_operations should be prefered.
+     * \ref vlc_stream_operations should be preferred.
      *
      * \see stream_query_e
      */

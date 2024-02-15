@@ -443,7 +443,7 @@ typedef void (*libvlc_video_cleanup_cb)(void *opaque);
  * \warning Rendering video into custom memory buffers is considerably less
  * efficient than rendering in a custom window as normal.
  *
- * For optimal perfomances, VLC media player renders into a custom window, and
+ * For optimal performances, VLC media player renders into a custom window, and
  * does not use this function and associated callbacks. It is <b>highly
  * recommended</b> that other LibVLC-based application do likewise.
  * To embed video in a window, use libvlc_media_player_set_xwindow() or
@@ -758,8 +758,8 @@ typedef enum libvlc_video_output_mouse_button_t {
  * is (width,height) as reported by \ref libvlc_video_output_resize_cb.
  *
  * \param opaque parameter passed to \ref libvlc_video_output_set_window_cb. [IN]
- * \param x horizontal mouse positon in \ref libvlc_video_output_resize_cb coordinates. [IN]
- * \param y vertical mouse positon in \ref libvlc_video_output_resize_cb coordinates. [IN]
+ * \param x horizontal mouse position in \ref libvlc_video_output_resize_cb coordinates. [IN]
+ * \param y vertical mouse position in \ref libvlc_video_output_resize_cb coordinates. [IN]
  */
 typedef void (*libvlc_video_output_mouse_move_cb)(void *opaque, int x, int y);
 
@@ -792,7 +792,7 @@ typedef void (*libvlc_video_output_mouse_release_cb)(void *opaque, libvlc_video_
  *
  * It may be called before the \ref libvlc_video_output_setup_cb callback.
  *
- * \warning These callbacks cannot be called concurently, the caller is responsible for serialization
+ * \warning These callbacks cannot be called concurrently, the caller is responsible for serialization
  *
  * \param[in] opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb()
  * \param[in] report_size_change callback which must be called when the host size changes.
@@ -1184,7 +1184,7 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
  * - "S32N" for signed 32-bit PCM
  * - "FL32" for single precision IEEE 754
  *
- * All supported formats use the native endianess.
+ * All supported formats use the native endianness.
  * If there are more than one channel, samples are interleaved.
  *
  * \param mp the media player
@@ -2256,7 +2256,7 @@ LIBVLC_API int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
  * starting (arg !0) or stopping (arg 0) the adjust filter.
  *
  * \param p_mi libvlc media player instance
- * \param option adust option to set, values of libvlc_video_adjust_option_t
+ * \param option adjust option to set, values of libvlc_video_adjust_option_t
  * \param value adjust option value
  * \version LibVLC 1.1.1 and later.
  */
@@ -2278,7 +2278,7 @@ LIBVLC_API float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
  * are ignored.
  *
  * \param p_mi libvlc media player instance
- * \param option adust option to set, values of libvlc_video_adjust_option_t
+ * \param option adjust option to set, values of libvlc_video_adjust_option_t
  * \param value adjust option value
  * \version LibVLC 1.1.1 and later.
  */
@@ -2413,7 +2413,7 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * \param device_id device identifier string
  *               (see \ref libvlc_audio_output_device_t::psz_device)
  *
- * \return If the change of device was requested succesfully, zero is returned
+ * \return If the change of device was requested successfully, zero is returned
  * (the actual change is asynchronous and not guaranteed to succeed).
  * On error, a non-zero value is returned.
  */

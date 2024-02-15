@@ -90,7 +90,7 @@ enum es_out_query_e
 
     /* Stop any buffering being done, and ask if es_out has no more data to
      * play.
-     * It will not block and so MUST be used carrefully. The only good reason
+     * It will not block and so MUST be used carefully. The only good reason
      * is for interactive playback (like for DVD menu).
      * XXX You SHALL call ES_OUT_RESET_PCR before any other es_out_Control/Send calls. */
     ES_OUT_GET_EMPTY,       /* arg1=bool*   res=cannot fail */

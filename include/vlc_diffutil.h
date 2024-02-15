@@ -24,7 +24,7 @@
 #include <vlc_vector.h>
 
 /**
- * this struture defines callback to access and compare elements from
+ * this structure defines callback to access and compare elements from
  * the old and the new list
  */
 typedef struct {
@@ -58,7 +58,7 @@ typedef struct {
     void (*remove)(void* opaque, const void* listOld, uint32_t posOld, const void* listNew,  uint32_t posNew);
     /**
      * notify that the item as @a posOld from the old list @a listOld is unchanged, the respective item
-     * position in the new list is at the positoin @a posNew in @a listNew
+     * position in the new list is at the position @a posNew in @a listNew
      */
     void (*equal)(void* opaque, const void* listOld, uint32_t posOld, const void* listNew, uint32_t posNew);
 } vlc_diffutil_snake_callback_t;
@@ -78,7 +78,7 @@ enum vlc_diffutil_op_type {
 
 
 /**
- * The data positionned at newModel[ y ] is inserted at position index
+ * The data positioned at newModel[ y ] is inserted at position index
  * in the current model.
  *
  * @code
@@ -99,7 +99,7 @@ struct vlc_diffutil_insert {
 
 
 /**
- * The data positionned at oldModel[ y ] is removed at position index
+ * The data positioned at oldModel[ y ] is removed at position index
  * in the current model.
  *
  * @code
@@ -168,13 +168,13 @@ typedef struct {
 typedef struct VLC_VECTOR(vlc_diffutil_change_t) vlc_diffutil_changelist_t;
 
 enum vlc_diffutil_result_flag {
-    /// try to transform an insertion with a matching supression into a move operation
+    /// try to transform an insertion with a matching suppression into a move operation
     VLC_DIFFUTIL_RESULT_MOVE = 0x1,
     /**
-     * aggreate similar consecutive operations into a single operation
+     * aggregate similar consecutive operations into a single operation
      * for instance this:
      *  [{INSERT, i=5}{INSERT, x=6}{REMOVE, i=10}{REMOVE, i=10}{REMOVE, i=10}]
-     * would be tranformed into:
+     * would be transformed into:
      *  [{INSERT, i=5, count=2}{REMOVE, i=10, count=3}]
      */
     VLC_DIFFUTIL_RESULT_AGGREGATE = 0x2,
