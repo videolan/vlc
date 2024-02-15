@@ -47,6 +47,8 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
 {
     m_mainCtx = mainCtx;
 
+    QQuickWindow::setDefaultAlphaBuffer(false);
+
     m_qmlWidget = std::make_unique<QQuickView>();
     if (m_mainCtx->useClientSideDecoration())
         m_qmlWidget->setFlag(Qt::FramelessWindowHint);
