@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_threads.h>
+#include <vlc_poll.h>
 #include <vlc_plugin.h>
 #include <assert.h>
 
