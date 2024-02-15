@@ -177,8 +177,6 @@ public:
 protected:
     bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 
-    void timerEvent(QTimerEvent *event) override;
-
 private:
     bool init(ID3D11Device *device);
     bool loadFunctions();
@@ -191,7 +189,6 @@ private:
     void sync();
     void updateVisual();
     void commitChanges();
-    void requestReset();
 
     void setActive(bool newActive);
 
@@ -228,7 +225,6 @@ private:
     qt_intf_t *m_intf = nullptr;
     CompositorDirectComposition *m_compositor = nullptr;
     MainCtx *m_mainCtx = nullptr;
-    QBasicTimer m_resetTimer;
     bool m_resetPending = false;
     bool m_active = false;
     bool m_transparencyEnabled = false;

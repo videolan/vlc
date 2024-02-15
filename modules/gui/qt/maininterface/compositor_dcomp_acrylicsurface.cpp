@@ -425,15 +425,6 @@ void CompositorDCompositionAcrylicSurface::commitChanges()
     DwmFlush();
 }
 
-void CompositorDCompositionAcrylicSurface::requestReset()
-{
-    if (m_resetPending)
-        return;
-
-    m_resetPending = true;
-    m_resetTimer.start(5, Qt::PreciseTimer, this);
-}
-
 void CompositorDCompositionAcrylicSurface::setActive(const bool newActive)
 {
     if (newActive == m_active)
@@ -465,22 +456,6 @@ HWND CompositorDCompositionAcrylicSurface::hwnd()
         return w->handle() ? (HWND)w->winId() : nullptr;
 
     return nullptr;
-}
-
-void CompositorDCompositionAcrylicSurface::timerEvent(QTimerEvent *event)
-{
-    if (!event)
-        return;
-
-    if (event->timerId() == m_resetTimer.timerId())
-    {
-        m_resetPending = false;
-        m_resetTimer.stop();
-
-        updateVisual();
-        sync();
-        commitChanges();
-    }
 }
 
 }
