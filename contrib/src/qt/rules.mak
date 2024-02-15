@@ -10,7 +10,7 @@ ifdef HAVE_MACOSX
 #PKGS += qt
 endif
 ifdef HAVE_WIN32
-PKGS += qt
+#PKGS += qt
 DEPS_qt = fxc2 $(DEPS_fxc2) d3d9 $(DEPS_d3d9)
 ifneq ($(call mingw_at_least, 8), true)
 DEPS_qt += dcomp $(DEPS_dcomp)

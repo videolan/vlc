@@ -7,7 +7,7 @@ QTGE_URL := $(QT)/$(QTGE_VERSION_MAJOR)/$(QTGE_VERSION)/submodules/qtgraphicalef
 DEPS_qtgraphicaleffects += qtdeclarative $(DEPS_qtdeclarative)
 
 ifdef HAVE_WIN32
-PKGS += qtgraphicaleffects
+#PKGS += qtgraphicaleffects
 endif
 
 ifeq ($(call need_pkg,"Qt5QuickControls2"),)

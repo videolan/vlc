@@ -7,7 +7,7 @@ QTSVG_URL := $(QT)/$(QTSVG_VERSION_MAJOR)/$(QTSVG_VERSION)/submodules/qtsvg-ever
 DEPS_qtsvg += qt $(DEPS_qt)
 
 ifdef HAVE_WIN32
-PKGS += qtsvg
+#PKGS += qtsvg
 endif
 
 ifeq ($(call need_pkg,"Qt5Svg"),)

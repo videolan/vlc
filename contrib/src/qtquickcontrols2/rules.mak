@@ -5,7 +5,7 @@ QTQC2_VERSION := $(QTQC2_VERSION_MAJOR).8
 QTQC2_URL := $(QT)/$(QTQC2_VERSION_MAJOR)/$(QTQC2_VERSION)/submodules/qtquickcontrols2-everywhere-opensource-src-$(QTQC2_VERSION).tar.xz
 
 ifdef HAVE_WIN32
-PKGS += qtquickcontrols2
+#PKGS += qtquickcontrols2
 endif
 
 ifeq ($(call need_pkg,"Qt5QuickControls2"),)

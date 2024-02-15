@@ -7,7 +7,7 @@ QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSIO
 DEPS_qtdeclarative += qt $(DEPS_qt)
 
 ifdef HAVE_WIN32
-PKGS += qtdeclarative
+#PKGS += qtdeclarative
 endif
 
 ifeq ($(call need_pkg,"Qt5Quick"),)
