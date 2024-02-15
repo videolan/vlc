@@ -106,6 +106,16 @@ CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_in
     {
         setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
     });
+
+    // CSDWin32EventHandler updates frame when window is maximized
+    connect(window(), &QWindow::windowStateChanged, this, [this]()
+    {
+        sync();
+        commitChanges();
+    }
+    // CSDWin32EventHandler changes client rect on window state change
+    // use queued connection so that we can get correct state.
+    , Qt::QueuedConnection);
 }
 
 CompositorDCompositionAcrylicSurface::~CompositorDCompositionAcrylicSurface()
@@ -132,8 +142,6 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &,
 
         sync();
         commitChanges();
-
-        requestReset(); // in case z-order changed
         break;
     }
     case WM_SETTINGCHANGE:
