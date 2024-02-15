@@ -5,12 +5,12 @@ stages:
 default:
     before_script:
         - set -x
-        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh ${CI_JOB_NAME##nightly-})"
         - export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc-3.0/${CI_JOB_NAME##nightly-}/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.zst"
         - if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
         - export BUILD_NIGHTLY="$(extras/ci/is-installer-needed.sh ${CI_JOB_NAME})"
     after_script:
-        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh ${CI_JOB_NAME##nightly-})"
         - mv contrib/vlc-contrib-*.tar.zst contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.zst 2>/dev/null || true
     interruptible: true
 
