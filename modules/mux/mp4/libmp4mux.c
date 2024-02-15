@@ -30,6 +30,7 @@
 #include "../../packetizer/h264_nal.h" /* h264_AnnexB_get_spspps */
 #include "../../packetizer/hxxx_nal.h"
 #include "../../packetizer/iso_color_tables.h"
+#include "../../codec/ttml/ttml.h"
 
 #include <vlc_arrays.h>
 #include <vlc_es.h>
@@ -1563,6 +1564,12 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             return NULL;
 
         FillSampleDescBoxHeader(stpp, 1);
+
+        bo_add_mem(stpp, sizeof(TT_NS)-1, TT_NS);
+        bo_add_8(stpp, ' ');
+        bo_add_mem(stpp, sizeof(TT_NS_STYLING), TT_NS_STYLING);
+        bo_add_8(stpp, '\0'); // schema
+        bo_add_8(stpp, '\0'); // ext-mime
 
         return stpp;
     }
