@@ -212,6 +212,21 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
                              vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
+
+        if (D3D11_UpscalerUsed(sys->scaleProc))
+        {
+            D3D11_UpscalerGetSize(sys->scaleProc, &sys->picQuad.quad_fmt.i_width, &sys->picQuad.quad_fmt.i_height);
+
+            sys->picQuad.quad_fmt.i_x_offset       = 0;
+            sys->picQuad.quad_fmt.i_y_offset       = 0;
+            sys->picQuad.quad_fmt.i_visible_width  = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.quad_fmt.i_visible_height = sys->picQuad.quad_fmt.i_height;
+
+            sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
+
+            CommonPlacePicture(vd, &sys->area);
+        }
     }
 
     display_info_t new_display = { };
@@ -1127,10 +1142,10 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     }
 
     RECT source_rect;
-    source_rect.left   = fmt->i_x_offset;
-    source_rect.right  = fmt->i_x_offset + fmt->i_visible_width;
-    source_rect.top    = fmt->i_y_offset;
-    source_rect.bottom = fmt->i_y_offset + fmt->i_visible_height;
+    source_rect.left   = sys->picQuad.quad_fmt.i_x_offset;
+    source_rect.right  = sys->picQuad.quad_fmt.i_x_offset + sys->picQuad.quad_fmt.i_visible_width;
+    source_rect.top    = sys->picQuad.quad_fmt.i_y_offset;
+    source_rect.bottom = sys->picQuad.quad_fmt.i_y_offset + sys->picQuad.quad_fmt.i_visible_height;
     if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
                                   video_format_GetTransform(sys->picQuad.quad_fmt.orientation, sys->display.orientation)))
     {
