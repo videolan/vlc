@@ -190,7 +190,7 @@ and reuse prebuilt contribs:
 ```sh
 mkdir build
 cd build
-export VLC_CONTRIB_SHA="$(cd ../vlc; extras/ci/get-contrib-sha.sh)"
+export VLC_CONTRIB_SHA="$(cd ../vlc; extras/ci/get-contrib-sha.sh win32)"
 export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/win64/vlc-contrib-x86_64-w64-mingw32-${VLC_CONTRIB_SHA}.tar.bz2"
 ../vlc/extras/package/win32/build.sh -a x86_64 -p
 ```
@@ -203,7 +203,7 @@ and reuse prebuilt contribs. The name of the prebuilt tarball is the same, but t
 ```sh
 mkdir build
 cd build
-export VLC_CONTRIB_SHA="$(cd ../vlc; extras/ci/get-contrib-sha.sh)"
+export VLC_CONTRIB_SHA="$(cd ../vlc; extras/ci/get-contrib-sha.sh win32)"
 export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/win64-llvm/vlc-contrib-x86_64-w64-mingw32-$VLC_CONTRIB_SHA.tar.bz2"
 time ../vlc/extras/package/win32/build.sh -a x86_64 -p
 ```
