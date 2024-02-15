@@ -1104,6 +1104,13 @@ static bo_t *GetSratBox(uint32_t i_sample_rate)
     return srat;
 }
 
+static void FillSampleDescBoxHeader(bo_t *bo, uint16_t reference_index)
+{
+    for (int i = 0; i < 6; i++)
+        bo_add_8(bo, 0); // reserved;
+    bo_add_16be(bo, reference_index);// data-reference-index
+}
+
 static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
     VLC_UNUSED(p_obj);
@@ -1249,9 +1256,7 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     bo_t *soun = box_new(fcc);
     if(!soun)
         return NULL;
-    for (int i = 0; i < 6; i++)
-        bo_add_8(soun, 0);        // reserved;
-    bo_add_16be(soun, 1);         // data-reference-index
+    FillSampleDescBoxHeader(soun, 1);
 
     /* SoundDescription */
     bo_add_16be(soun, i_qt_version);
@@ -1357,9 +1362,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     bo_t *vide = box_new(fcc);
     if(!vide)
         return NULL;
-    for (int i = 0; i < 6; i++)
-        bo_add_8(vide, 0);        // reserved;
-    bo_add_16be(vide, 1);         // data-reference-index
+    FillSampleDescBoxHeader(vide, 1);
 
     bo_add_16be(vide, 0);         // predefined;
     bo_add_16be(vide, 0);         // reserved;
@@ -1454,10 +1457,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!text)
             return NULL;
 
-        /* Sample Entry Header */
-        for (int i = 0; i < 6; i++)
-            bo_add_8(text, 0);        // reserved;
-        bo_add_16be(text, 1);         // data-reference-index
+        FillSampleDescBoxHeader(text, 1);
 
         if(p_track->fmt.i_extra >= 44)
         {
@@ -1498,10 +1498,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!tx3g)
             return NULL;
 
-        /* Sample Entry Header */
-        for (int i = 0; i < 6; i++)
-            bo_add_8(tx3g, 0);        // reserved;
-        bo_add_16be(tx3g, 1);         // data-reference-index
+        FillSampleDescBoxHeader(tx3g, 1);
 
         if(p_track->fmt.i_codec == VLC_CODEC_TX3G &&
            p_track->fmt.i_extra >= 32)
@@ -1556,10 +1553,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!wvtt)
             return NULL;
 
-        /* Sample Entry Header */
-        for (int i = 0; i < 6; i++)
-            bo_add_8(wvtt, 0);        // reserved;
-        bo_add_16be(wvtt, 1);         // data-reference-index
+        FillSampleDescBoxHeader(wvtt, 1);
 
         bo_t *ftab = box_new("vttc");
         box_gather(wvtt, ftab);
@@ -1572,10 +1566,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         if(!stpp)
             return NULL;
 
-        /* Sample Entry Header */
-        for (int i = 0; i < 6; i++)
-            bo_add_8(stpp, 0);        // reserved;
-        bo_add_16be(stpp, 1);         // data-reference-index
+        FillSampleDescBoxHeader(stpp, 1);
 
         return stpp;
     }
