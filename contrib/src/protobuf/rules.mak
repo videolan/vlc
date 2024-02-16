@@ -35,7 +35,6 @@ $(TARBALLS)/protoc-$(PROTOBUF_VERSION)-cpp.tar.gz: $(TARBALLS)/protobuf-$(PROTOB
 DEPS_protobuf = zlib $(DEPS_zlib)
 
 PROTOBUFVARS := DIST_LANG="cpp"
-PROTOCVARS := DIST_LANG="cpp"
 
 PROTOBUF_COMMON_CONF := -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_DEBUG_POSTFIX:STRING=
 PROTOC_CONF := $(PROTOBUF_COMMON_CONF)
@@ -62,17 +61,12 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	# sed -i.orig -e 's,include(libprotobuf-lite,#include(libprotobuf-lite,' $(UNPACK_DIR)/cmake/CMakeLists.txt
 	$(MOVE)
 
+.protoc: BUILD_DIR=$</vlc_native
 .protoc: protoc
 	$(CMAKECLEAN)
-	$(BUILDVARS) cmake -S $</cmake \
-		-B $(BUILD_DIR) \
-		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-		-DCMAKE_INSTALL_PREFIX:STRING=$(BUILDPREFIX) \
-		-DBUILD_SHARED_LIBS:BOOL=OFF \
-		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
-		-DBUILD_TESTING:BOOL=OFF $(PROTOC_CONF)
+	$(BUILDVARS) $(CMAKE_NATIVE) -S $</cmake $(PROTOC_CONF)
 	+$(CMAKEBUILD)
-	env cmake --install $(BUILD_DIR) --prefix $(BUILDPREFIX)
+	$(CMAKEINSTALL)
 	touch $@
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
