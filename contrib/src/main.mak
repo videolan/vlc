@@ -437,7 +437,7 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 BUILD_DIR = $</vlc_build
 BUILD_SRC := ..
 # build directory relative to UNPACK_DIR
-BUILD_DIRUNPACK = vlc_build
+BUILD_DIRUNPACK := vlc_build
 
 MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status && test ! -f $</config.status || $(MAKE) -C $< distclean
 MAKEBUILD = $(MAKE) -C $(BUILD_DIR)
@@ -449,15 +449,23 @@ MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
 CMAKEBUILD = env cmake --build $(BUILD_DIR)
-CMAKEINSTALL = env cmake --install $(BUILD_DIR) --prefix $(PREFIX)
+CMAKEINSTALL = env cmake --install $(BUILD_DIR)
 CMAKECLEAN = rm -f $(BUILD_DIR)/CMakeCache.txt
-CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
-		-B $(BUILD_DIR) \
+CMAKECONFIG = cmake -S $< -B $(BUILD_DIR) \
 		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
-		-DBUILD_TESTING:BOOL=OFF
+		-DBUILD_TESTING:BOOL=OFF \
+		-G $(CMAKE_GENERATOR)
+ifeq ($(V),1)
+CMAKECONFIG += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+endif
+
+CMAKE = $(CMAKECONFIG) \
+		-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
+		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX)
+CMAKE_NATIVE = $(CMAKECONFIG) \
+		-DCMAKE_INSTALL_PREFIX:STRING=$(BUILDPREFIX)
 ifdef HAVE_WIN32
 CMAKE += -DCMAKE_DEBUG_POSTFIX:STRING=
 endif
@@ -467,11 +475,6 @@ endif
 ifdef MSYS_BUILD
 CMAKE = PKG_CONFIG_LIBDIR="$(PKG_CONFIG_PATH)" $(CMAKE)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
-endif
-CMAKE += -G $(CMAKE_GENERATOR)
-
-ifeq ($(V),1)
-CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
 MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
