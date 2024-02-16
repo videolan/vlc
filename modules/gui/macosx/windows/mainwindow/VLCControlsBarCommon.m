@@ -452,6 +452,7 @@
 
     [self.forwardButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
     [self.backwardButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
+    [self updateCurrentItemDisplayControls:aNotification];
 }
 
 - (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification

@@ -204,6 +204,7 @@
 
     [self.prevButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
     [self.nextButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
+    [self updateCurrentItemDisplayControls:aNotification];
 }
 
 @end
