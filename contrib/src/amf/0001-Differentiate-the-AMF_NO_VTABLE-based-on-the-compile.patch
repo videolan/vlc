@@ -1,0 +1,47 @@
+From cf190d084644d3d3e2ea1ffbb740ad8e7aede760 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 08:18:19 +0100
+Subject: [PATCH] Differentiate the AMF_NO_VTABLE based on the compiler
+
+This is a Microsoft specific extension: https://learn.microsoft.com/en-us/cpp/cpp/novtable
+Clang and gcc can compile for Windows but don't support this.
+---
+ amf/public/include/core/Platform.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/amf/public/include/core/Platform.h b/amf/public/include/core/Platform.h
+index d6496d4..378f789 100644
+--- a/amf/public/include/core/Platform.h
++++ b/amf/public/include/core/Platform.h
+@@ -100,6 +100,12 @@ typedef signed int HRESULT;
+ #include <stdint.h>
+ #include <string.h>
+ 
++#if defined(_MSC_VER)
++    #define AMF_NO_VTABLE           __declspec(novtable)
++#else
++    #define AMF_NO_VTABLE
++#endif
++
+ #if defined(_WIN32)
+ 
+ 
+@@ -116,7 +122,6 @@ typedef signed int HRESULT;
+     #define AMF_INLINE              __inline
+     #define AMF_FORCEINLINE         __forceinline
+ #endif
+-    #define AMF_NO_VTABLE           __declspec(novtable)
+ 
+ #else // !WIN32 - Linux and Mac
+ 
+@@ -130,7 +135,6 @@ typedef signed int HRESULT;
+     #define AMF_INLINE              __inline__
+     #define AMF_FORCEINLINE         __inline__
+ #endif
+-    #define AMF_NO_VTABLE
+ 
+ #endif // WIN32
+ 
+-- 
+2.37.3.windows.1
+

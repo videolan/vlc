@@ -1,0 +1,70 @@
+From 4069f86effdc36ba3f12d120212c8f077b96cdb0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 07:50:03 +0100
+Subject: [PATCH 3/4] Define AMFPRI(d|ud|x)64 using the standard C++ format for
+ C+11 and up
+
+See https://en.cppreference.com/w/cpp/types/integer
+
+When compiled in C, it depends whether it's the Microsoft flavor or the standard C format. Not
+whether it's Win32 or not. Clang or GCC use the proper string formats on windows.
+---
+ amf/public/include/core/Platform.h | 29 ++++++++++++++++++++---------
+ 1 file changed, 20 insertions(+), 9 deletions(-)
+
+diff --git a/amf/public/include/core/Platform.h b/amf/public/include/core/Platform.h
+index 12ee75c..d6496d4 100644
+--- a/amf/public/include/core/Platform.h
++++ b/amf/public/include/core/Platform.h
+@@ -118,12 +118,6 @@ typedef signed int HRESULT;
+ #endif
+     #define AMF_NO_VTABLE           __declspec(novtable)
+ 
+-    #define AMFPRId64   "I64d"
+-
+-    #define AMFPRIud64   "Iu64d"
+-
+-    #define AMFPRIx64   "I64x"
+-
+ #else // !WIN32 - Linux and Mac
+ 
+     #define AMF_STD_CALL
+@@ -138,15 +132,32 @@ typedef signed int HRESULT;
+ #endif
+     #define AMF_NO_VTABLE
+ 
++#endif // WIN32
++
++#if defined(__cplusplus) && (__cplusplus >= 201103L)
++    #include <cinttypes>
++    #define AMFPRId64   PRId64
++
++    #define AMFPRIud64  PRIu64
++
++    #define AMFPRIx64   PRIx64
++#else
++#if defined(_MSC_VER)
++    #define AMFPRId64   "I64d"
++
++    #define AMFPRIud64  "Iu64d"
++
++    #define AMFPRIx64   "I64x"
++#else
+     #if !defined(AMFPRId64)
+         #define AMFPRId64    "lld"
+ 
+-        #define AMFPRIud64    "ulld"
++        #define AMFPRIud64   "ulld"
+ 
+         #define AMFPRIx64    "llx"
+     #endif
+-
+-#endif // WIN32
++#endif
++#endif
+ 
+ #define LPRId64   AMF_UNICODE(AMFPRId64)
+ #define LPRIud64  AMF_UNICODE(AMFPRIud64)
+-- 
+2.37.3.windows.1
+
