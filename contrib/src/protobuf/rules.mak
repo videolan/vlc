@@ -34,9 +34,8 @@ $(TARBALLS)/protoc-$(PROTOBUF_VERSION)-cpp.tar.gz: $(TARBALLS)/protobuf-$(PROTOB
 
 DEPS_protobuf = zlib $(DEPS_zlib)
 
-PROTOBUFVARS := DIST_LANG="cpp"
-
 PROTOBUF_COMMON_CONF := -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_DEBUG_POSTFIX:STRING=
+PROTOBUF_CONF := $(PROTOBUF_COMMON_CONF)
 PROTOC_CONF := $(PROTOBUF_COMMON_CONF)
 
 .sum-protoc: .sum-protobuf
@@ -73,24 +72,25 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
 	$(RM) -Rf $(UNPACK_DIR)
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
-	# don't build benchmarks and conformance
-	sed -i.orig 's, conformance benchmarks,,' "$(UNPACK_DIR)/Makefile.am"
-	sed -i.orig 's, benchmarks/Makefile conformance/Makefile,,' "$(UNPACK_DIR)/configure.ac"
-	# don't use gmock or any sub project to configure
-	sed -i.orig 's,AC_CONFIG_SUBDIRS,dnl AC_CONFIG_SUBDIRS,' "$(UNPACK_DIR)/configure.ac"
+	# add a dummy install command to disable some installation
+	sed -i.old '1s;^;function (noinstall ...)\nendfunction()\n;' $(UNPACK_DIR)/cmake/install.cmake
+	# don't build libprotoc
+	sed -i.orig -e 's,include(libprotoc,#include(libprotoc,' $(UNPACK_DIR)/cmake/CMakeLists.txt
 	# don't build protoc
-	sed -i.orig 's,bin_PROGRAMS,#bin_PROGRAMS,' "$(UNPACK_DIR)/src/Makefile.am"
-	sed -i.orig 's,BUILT_SOURCES,#BUILT_SOURCES,' "$(UNPACK_DIR)/src/Makefile.am"
-	sed -i.orig 's,libprotobuf-lite.la libprotobuf.la libprotoc.la,libprotobuf-lite.la libprotobuf.la,' "$(UNPACK_DIR)/src/Makefile.am"
+	sed -i.orig -e 's,include(protoc,#include(protoc,' $(UNPACK_DIR)/cmake/CMakeLists.txt
+	# don't install libprotoc
+	sed -i.orig -e 's, libprotoc protoc, ,' $(UNPACK_DIR)/cmake/install.cmake
+	sed -i.orig -e 's, libprotoc, ,' $(UNPACK_DIR)/cmake/install.cmake
+	# don't install protoc
+	sed -i.orig -e 's,install(TARGETS protoc,noinstall(TARGETS protoc,' $(UNPACK_DIR)/cmake/install.cmake
 	# force include <algorithm>
 	sed -i.orig 's,#ifdef _MSC_VER,#if 1,' "$(UNPACK_DIR)/src/google/protobuf/repeated_field.h"
 	$(APPLY) $(SRC)/protobuf/protobuf-no-mingw-pthread.patch
 	$(MOVE)
 
-.protobuf: protobuf
-	$(RECONF)
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(PROTOBUFVARS)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.protobuf: protobuf toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) -S $</cmake $(PROTOBUF_CONF)
+	+$(CMAKEBUILD)
+	$(CMAKEINSTALL)
 	touch $@
