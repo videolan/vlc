@@ -152,6 +152,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     _scrollToItemBoundary = YES;
     _ignorePerpendicularSwipes = YES;
     _centerItemWhenSelected = YES;
+    _disableAutoscrollOnInteract = YES;
 
     _contentView = [[UIView alloc] initWithFrame:self.bounds];
 
@@ -2210,6 +2211,10 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
+    if (self.disableAutoscrollOnInteract) {
+        self.autoscroll = 0;
+    }
+
     _didDrag = YES;
     if (_scrollEnabled)
     {
