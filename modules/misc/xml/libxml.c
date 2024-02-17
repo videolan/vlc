@@ -117,6 +117,7 @@ typedef struct
 {
     xmlTextReaderPtr xml;
     char *node;
+    char *namespace;
 } xml_reader_sys_t;
 
 static int ReaderUseDTD ( xml_reader_t *p_reader )
@@ -131,16 +132,19 @@ static int ReaderUseDTD ( xml_reader_t *p_reader )
     return VLC_SUCCESS;
 }
 
-static int ReaderNextNode( xml_reader_t *p_reader, const char **pval )
+static int ReaderNextNode( xml_reader_t *p_reader, const char **pval,
+                             const char **pnamespace )
 {
     xml_reader_sys_t *p_sys = p_reader->p_sys;
-    const xmlChar *node;
+    const xmlChar *node, *namespace = NULL;
     int ret;
 
+    skip:
     free( p_sys->node );
+    free( p_sys->namespace );
     p_sys->node = NULL;
+    p_sys->namespace = NULL;
 
-skip:
     switch( xmlTextReaderRead( p_sys->xml ) )
     {
         case 0: /* EOF */
@@ -153,11 +157,13 @@ skip:
     {
         case XML_READER_TYPE_ELEMENT:
             node = xmlTextReaderConstName( p_sys->xml );
+            namespace = xmlTextReaderConstNamespaceUri( p_sys->xml );
             ret = XML_READER_STARTELEM;
             break;
 
         case XML_READER_TYPE_END_ELEMENT:
             node = xmlTextReaderConstName( p_sys->xml );
+            namespace = xmlTextReaderConstNamespaceUri( p_sys->xml );
             ret = XML_READER_ENDELEM;
             break;
 
@@ -177,13 +183,18 @@ skip:
     if( unlikely(node == NULL) )
         return XML_READER_ERROR;
 
-    p_sys->node = strdup( (const char *)node );
+    p_sys->node = strdup( (const char *) node );
+    if( namespace )
+        p_sys->namespace = strdup( (const char *) namespace );
     if( pval != NULL )
         *pval = p_sys->node;
+    if( pnamespace != NULL )
+        *pnamespace = p_sys->namespace;
     return likely(p_sys->node != NULL) ? ret : XML_READER_ERROR;
 }
 
-static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
+static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval,
+                                     const char **pnamespace )
 {
     xml_reader_sys_t *p_sys = p_reader->p_sys;
     xmlTextReaderPtr xml = p_sys->xml;
@@ -194,8 +205,11 @@ static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
      || (value = xmlTextReaderConstValue( xml )) == NULL )
         return NULL;
 
+    if( pnamespace )
+        *pnamespace = (const char *) xmlTextReaderConstNamespaceUri( xml );
+
     *pval = (const char *)value;
-    return (const char *)name;
+    return (const char *) name;
 }
 
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
@@ -244,6 +258,7 @@ static int ReaderOpen( vlc_object_t *p_this )
 
     p_sys->xml = p_libxml_reader;
     p_sys->node = NULL;
+    p_sys->namespace = NULL;
     p_reader->p_sys = p_sys;
     p_reader->pf_next_node = ReaderNextNode;
     p_reader->pf_next_attr = ReaderNextAttr;
@@ -260,6 +275,7 @@ static void ReaderClose( vlc_object_t *p_this )
 
     xmlFreeTextReader( p_sys->xml );
     free( p_sys->node );
+    free( p_sys->namespace );
     free( p_sys );
 
     /* /!\
