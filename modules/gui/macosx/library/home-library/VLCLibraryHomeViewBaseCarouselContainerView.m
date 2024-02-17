@@ -112,6 +112,8 @@
 
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];
+
+    self.carouselView.autoscroll = -.05;
 }
 
 - (void)updateCarouselViewHeight
