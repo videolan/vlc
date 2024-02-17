@@ -294,7 +294,6 @@ vlc_vaLog
 vlc_tracer_Create
 vlc_tracer_Destroy
 vlc_tracer_TraceWithTs
-vlc_tracer_vaTraceWithTs
 vlc_LogHeaderCreate
 vlc_LogDestroy
 vlc_strerror

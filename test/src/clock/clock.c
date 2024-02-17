@@ -176,13 +176,12 @@ static void tracer_ctx_PushStatus(struct tracer_ctx *ctx,
     assert(ret);
 }
 
-static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
+static void TracerTrace(void *opaque, vlc_tick_t ts,
+                        const struct vlc_tracer_trace *trace)
 {
     struct vlc_tracer *libvlc_tracer = opaque;
-    va_list copy;
-    va_copy(copy, entries);
 
-    struct vlc_tracer_entry entry = va_arg(entries, struct vlc_tracer_entry);
+    const struct vlc_tracer_entry *entry = trace->entries;
 
     bool is_render = false, is_render_video = false, is_status = false;
     unsigned nb_update = 0;
@@ -191,55 +190,55 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
     vlc_tick_t render_video_pts = VLC_TICK_INVALID;
     enum tracer_event_status status = 0;
 
-    while (entry.key != NULL)
+    while (entry->key != NULL)
     {
-        switch (entry.type)
+        switch (entry->type)
         {
             case VLC_TRACER_INT:
                 if (!is_render)
                     continue;
                 assert(!is_status);
 
-                if (strcmp(entry.key, "offset") == 0)
+                if (strcmp(entry->key, "offset") == 0)
                 {
                     nb_update++;
-                    offset = VLC_TICK_FROM_NS(entry.value.integer);
+                    offset = VLC_TICK_FROM_NS(entry->value.integer);
                 }
-                else if (strcmp(entry.key, "render_pts") == 0)
-                    render_video_pts = VLC_TICK_FROM_NS(entry.value.integer);
+                else if (strcmp(entry->key, "render_pts") == 0)
+                    render_video_pts = VLC_TICK_FROM_NS(entry->value.integer);
                 break;
             case VLC_TRACER_DOUBLE:
                 if (!is_render)
                     continue;
                 assert(!is_status);
 
-                if (strcmp(entry.key, "coeff") == 0)
+                if (strcmp(entry->key, "coeff") == 0)
                 {
                     nb_update++;
-                    coeff = entry.value.double_;
+                    coeff = entry->value.double_;
                 }
                 break;
             case VLC_TRACER_STRING:
-                if (strcmp(entry.key, "type") == 0)
+                if (strcmp(entry->key, "type") == 0)
                 {
-                    if (strcmp(entry.value.string, "RENDER") == 0)
+                    if (strcmp(entry->value.string, "RENDER") == 0)
                         is_render = true;
                 }
-                else if (strcmp(entry.key, "id") == 0)
+                else if (strcmp(entry->key, "id") == 0)
                 {
-                    if (strcmp(entry.value.string, "video") == 0)
+                    if (strcmp(entry->value.string, "video") == 0)
                         is_render_video= true;
                 }
 
                 if (!is_render)
                     continue;
                 /* Assert that there is no "reset_bad_source" */
-                if (strcmp(entry.key, "event") == 0)
+                if (strcmp(entry->key, "event") == 0)
                 {
                     is_status = true;
-                    if (strcmp(entry.value.string, "reset_bad_source") == 0)
+                    if (strcmp(entry->value.string, "reset_bad_source") == 0)
                         status = TRACER_EVENT_STATUS_RESET_BADSOURCE;
-                    else if (strcmp(entry.value.string, "reset_user") == 0)
+                    else if (strcmp(entry->value.string, "reset_user") == 0)
                         status = TRACER_EVENT_STATUS_RESET_USER;
                     else
                         vlc_assert_unreachable();
@@ -248,7 +247,7 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
                 break;
             default: vlc_assert_unreachable();
         }
-        entry = va_arg(entries, struct vlc_tracer_entry);
+        entry++;
     }
 
     if (libvlc_tracer != NULL)
@@ -260,9 +259,8 @@ static void TracerTrace(void *opaque, vlc_tick_t ts, va_list entries)
         /* Use the original ts for the "render_pts" entry */
         vlc_tick_t tracer_ts = render_video_pts != VLC_TICK_INVALID ?
                                ts : tracer_ctx.forced_ts;
-        vlc_tracer_vaTraceWithTs(libvlc_tracer, tracer_ts, copy);
+        (vlc_tracer_TraceWithTs)(libvlc_tracer, tracer_ts, trace);
     }
-    va_end(copy);
 
     if (!is_render)
         return;

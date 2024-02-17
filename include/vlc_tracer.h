@@ -74,6 +74,20 @@ struct vlc_tracer_entry
 struct vlc_tracer;
 
 /**
+ * Trace record containing the key-values from the trace.
+ */
+struct vlc_tracer_trace
+{
+    /**
+     * Defines the list of key-value in the trace. The entries must link
+     * towards an array terminated by a VLC_TRACE_END entry, which remains
+     * valid as long as the trace itself should remain valid.
+     **/
+    const struct vlc_tracer_entry *entries;
+};
+
+
+/**
  * Tracer operations returned by the module probe function
  */
 struct vlc_tracer_operations
@@ -86,7 +100,7 @@ struct vlc_tracer_operations
      * \param entries can only be \ref vlc_tracer_entry and the va-args list
      * should be ended by a \ref vlc_tracer_entry with a NULL key.
      */
-    void (*trace)(void *sys, vlc_tick_t ts, va_list entries);
+    void (*trace)(void *sys, vlc_tick_t ts, const struct vlc_tracer_trace *trace);
 
     /**
      * Called to clean module specific resources
@@ -138,23 +152,19 @@ VLC_API void vlc_tracer_Destroy(struct vlc_tracer *tracer);
  *
  * \param tracer tracer emitting the traces
  * \param ts timestamp of the current trace
- * \param entries  list of key / value parameters.
- * Key must be a not NULL string.
- * Value has to be defined with one of the type defined
- * in the \ref vlc_tracer_entry union.
+ * \param trace the trace to register with its list of key / value parameters.
+ *              Key must be a not NULL string. Value has to be defined with
+ *              one of the type defined in the \ref vlc_tracer_entry union.
  */
-VLC_API void vlc_tracer_vaTraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts,
-                                      va_list entries);
 
-/**
- * Emit traces
- *
- * cf. vlc_tracer_vaTraceWithTs()
- *
- * \param tracer tracer emitting the traces
- * \param ts timestamp of the current trace
- */
-VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ...);
+VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts,
+                                    const struct vlc_tracer_trace *trace);
+#define vlc_tracer_TraceWithTs(tracer, ts, ...) \
+    (vlc_tracer_TraceWithTs)(tracer, ts, &(const struct vlc_tracer_trace) { \
+        .entries = (const struct vlc_tracer_entry[]) { \
+            __VA_ARGS__ \
+        } \
+    })
 
 #define vlc_tracer_Trace(tracer, ...) \
     vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), __VA_ARGS__)
