@@ -126,6 +126,8 @@
 @property (nonatomic, assign, getter = isDragging) BOOL dragging;
 @property (nonatomic, assign) BOOL didDrag;
 @property (nonatomic, assign) NSTimeInterval toggleTime;
+@property NSTimer *postInteractTimer;
+@property CGFloat priorAutoscroll;
 
 NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *self);
 
@@ -153,6 +155,8 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     _ignorePerpendicularSwipes = YES;
     _centerItemWhenSelected = YES;
     _disableAutoscrollOnInteract = YES;
+    _reenablePostInteractAutoscrollTimeout = 0.0;
+    _priorAutoscroll = 0.0;
 
     _contentView = [[UIView alloc] initWithFrame:self.bounds];
 
@@ -2211,8 +2215,20 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    if (self.disableAutoscrollOnInteract) {
+    if (self.disableAutoscrollOnInteract && self.autoscroll != 0.0) {
+        self.priorAutoscroll = self.autoscroll;
         self.autoscroll = 0;
+
+        if (self.reenablePostInteractAutoscrollTimeout > 0.0) {
+            if (self.postInteractTimer != nil && self.postInteractTimer.valid) {
+                [self.postInteractTimer invalidate];
+                self.postInteractTimer = nil;
+            }
+
+            self.postInteractTimer = [NSTimer scheduledTimerWithTimeInterval:self.reenablePostInteractAutoscrollTimeout repeats:NO block:^(NSTimer * const timer){
+                self.autoscroll = self.priorAutoscroll;
+            }];
+        }
     }
 
     _didDrag = YES;

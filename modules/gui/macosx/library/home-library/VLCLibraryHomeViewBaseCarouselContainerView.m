@@ -114,6 +114,7 @@
     [self updateCarouselOffset];
 
     self.carouselView.autoscroll = -.05;
+    self.carouselView.reenablePostInteractAutoscrollTimeout = 3.;
 }
 
 - (void)updateCarouselViewHeight
