@@ -2226,6 +2226,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
             }
 
             self.postInteractTimer = [NSTimer scheduledTimerWithTimeInterval:self.reenablePostInteractAutoscrollTimeout repeats:NO block:^(NSTimer * const timer){
+                self.lastTime = CACurrentMediaTime();
                 self.autoscroll = self.priorAutoscroll;
             }];
         }
