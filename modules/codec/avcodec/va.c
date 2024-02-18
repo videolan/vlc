@@ -35,69 +35,10 @@ bool vlc_va_MightDecode(enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt)
     switch (hwfmt)
     {
         case AV_PIX_FMT_VAAPI:
-            switch (swfmt)
-            {
-                case AV_PIX_FMT_YUVJ420P:
-                case AV_PIX_FMT_YUV420P:
-                case AV_PIX_FMT_YUV420P10LE:
-                    return true;
-                default:
-                    return false;
-            }
         case AV_PIX_FMT_DXVA2_VLD:
-            switch (swfmt)
-            {
-                case AV_PIX_FMT_YUV420P10LE:
-                case AV_PIX_FMT_YUVJ420P:
-                case AV_PIX_FMT_YUV420P:
-                case AV_PIX_FMT_YUV444P:
-                case AV_PIX_FMT_YUV420P12:
-                case AV_PIX_FMT_YUV444P10:
-                case AV_PIX_FMT_YUV444P12:
-                case AV_PIX_FMT_YUV422P10:
-                case AV_PIX_FMT_YUV422P12:
-                    return true;
-                default:
-                    return false;
-            }
-            break;
-
         case AV_PIX_FMT_D3D11VA_VLD:
-            switch (swfmt)
-            {
-                case AV_PIX_FMT_YUV420P10LE:
-                case AV_PIX_FMT_YUVJ420P:
-                case AV_PIX_FMT_YUV420P:
-                case AV_PIX_FMT_YUV444P:
-                case AV_PIX_FMT_YUV420P12:
-                case AV_PIX_FMT_YUV444P10:
-                case AV_PIX_FMT_YUV444P12:
-                case AV_PIX_FMT_YUV422P10:
-                case AV_PIX_FMT_YUV422P12:
-                    return true;
-                default:
-                    return false;
-            }
-        break;
-
         case AV_PIX_FMT_VDPAU:
-            switch (swfmt)
-            {
-                case AV_PIX_FMT_YUVJ444P:
-                case AV_PIX_FMT_YUV444P:
-                case AV_PIX_FMT_YUV444P10:
-                case AV_PIX_FMT_YUV444P12:
-                case AV_PIX_FMT_YUVJ422P:
-                case AV_PIX_FMT_YUV422P:
-                case AV_PIX_FMT_YUVJ420P:
-                case AV_PIX_FMT_YUV420P:
-                case AV_PIX_FMT_YUV420P10:
-                case AV_PIX_FMT_YUV420P12:
-                    return true;
-                default:
-                    return false;
-            }
-            break;
+            return true;
         default:
             return false;
     }
