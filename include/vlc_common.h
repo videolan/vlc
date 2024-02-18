@@ -64,13 +64,6 @@
  * unoptimized fallbacks for other C11/C++11 conforming compilers.
  * @{
  */
-#ifdef __GNUC__
-# define VLC_GCC_VERSION(maj,min) \
-    ((__GNUC__ > (maj)) || (__GNUC__ == (maj) && __GNUC_MINOR__ >= (min)))
-#else
-/** GCC version check */
-# define VLC_GCC_VERSION(maj,min) (0)
-#endif
 
 /* Function attributes for compiler warnings */
 #if defined __has_attribute
@@ -167,11 +160,7 @@
 
 
 #ifdef __GNUC__
-# if VLC_GCC_VERSION(6,0)
-#  define VLC_DEPRECATED_ENUM __attribute__((deprecated))
-# else
-#  define VLC_DEPRECATED_ENUM
-# endif
+# define VLC_DEPRECATED_ENUM __attribute__((deprecated))
 
 # if defined( _WIN32 ) && !defined( __clang__ )
 #  define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
@@ -764,7 +753,7 @@ static inline uint64_t vlc_bswap64(uint64_t x)
  */
 static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_uadd_overflow(a, b, res);
 #else
      *res = a + b;
@@ -775,7 +764,7 @@ static inline bool uadd_overflow(unsigned a, unsigned b, unsigned *res)
 static inline bool uaddl_overflow(unsigned long a, unsigned long b,
                                   unsigned long *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_uaddl_overflow(a, b, res);
 #else
      *res = a + b;
@@ -786,7 +775,7 @@ static inline bool uaddl_overflow(unsigned long a, unsigned long b,
 static inline bool uaddll_overflow(unsigned long long a, unsigned long long b,
                                    unsigned long long *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_uaddll_overflow(a, b, res);
 #else
      *res = a + b;
@@ -832,13 +821,13 @@ static inline bool add_overflow(unsigned long long a, unsigned long long b,
 }
 #endif
 
-#if !(VLC_GCC_VERSION(5,0) || defined(__clang__))
+#if !(defined(__GNUC__) || defined(__clang__))
 # include <limits.h>
 #endif
 
 static inline bool umul_overflow(unsigned a, unsigned b, unsigned *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_umul_overflow(a, b, res);
 #else
      *res = a * b;
@@ -849,7 +838,7 @@ static inline bool umul_overflow(unsigned a, unsigned b, unsigned *res)
 static inline bool umull_overflow(unsigned long a, unsigned long b,
                                   unsigned long *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_umull_overflow(a, b, res);
 #else
      *res = a * b;
@@ -860,7 +849,7 @@ static inline bool umull_overflow(unsigned long a, unsigned long b,
 static inline bool umulll_overflow(unsigned long long a, unsigned long long b,
                                    unsigned long long *res)
 {
-#if VLC_GCC_VERSION(5,0) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
      return __builtin_umulll_overflow(a, b, res);
 #else
      *res = a * b;
