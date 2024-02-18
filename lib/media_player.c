@@ -25,6 +25,7 @@
 #endif
 
 #include <assert.h>
+#include <stdckdint.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_renderer_discoverer.h>
@@ -2122,9 +2123,8 @@ libvlc_media_player_get_programlist( libvlc_media_player_t *p_mi )
         goto error;
 
     size_t size;
-    if( mul_overflow( count, sizeof(libvlc_player_program_t *), &size) )
-        goto error;
-    if( add_overflow( size, sizeof(libvlc_player_programlist_t), &size) )
+    if (ckd_mul(&size, count, sizeof (libvlc_player_program_t *)) ||
+        ckd_add(&size, sizeof (libvlc_player_programlist_t), size))
         goto error;
 
     libvlc_player_programlist_t *list = malloc( size );

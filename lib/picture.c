@@ -24,6 +24,8 @@
 # include "config.h"
 #endif
 
+#include <stdckdint.h>
+
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
 #include "libvlc_internal.h"
@@ -213,9 +215,8 @@ libvlc_picture_list_t* libvlc_picture_list_from_attachments( input_attachment_t*
 {
     size_t size = 0;
     libvlc_picture_list_t* list;
-    if ( mul_overflow( nb_attachments, sizeof( libvlc_picture_t* ), &size ) )
-        return NULL;
-    if ( add_overflow( size, sizeof( *list ), &size ) )
+    if (ckd_mul(&size, nb_attachments, sizeof (libvlc_picture_t *)) ||
+        ckd_add(&size, sizeof (*list), size))
         return NULL;
 
     list = malloc( size );

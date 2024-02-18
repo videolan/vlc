@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdckdint.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
@@ -173,9 +174,8 @@ static libvlc_media_tracklist_t *
 libvlc_media_tracklist_alloc( size_t count )
 {
     size_t size;
-    if( mul_overflow( count, sizeof(libvlc_media_trackpriv_t *), &size) )
-        return NULL;
-    if( add_overflow( size, sizeof(libvlc_media_tracklist_t), &size) )
+    if (ckd_mul(&size, count, sizeof (libvlc_media_trackpriv_t *)) ||
+        ckd_add(&size, size, sizeof (libvlc_media_tracklist_t)))
         return NULL;
 
     libvlc_media_tracklist_t *list = malloc( size );
