@@ -26,6 +26,8 @@
 # include "config.h"
 #endif
 
+#include <stdckdint.h>
+
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_poll.h>
@@ -202,8 +204,8 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
 
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
-    if ( umul_overflow( p_gdi->width, p_gdi->height, &p_sys->i_framebuffersize ) &&
-         umul_overflow( p_sys->i_framebuffersize, i_colordepth >> 3, &p_sys->i_framebuffersize) )
+    if (ckd_mul(&p_sys->i_framebuffersize, p_gdi->width, p_gdi->height) &&
+        ckd_mul(&p_sys->i_framebuffersize, p_sys->i_framebuffersize, i_colordepth >> 3) )
     {
         msg_Err( p_vlccontext->p_demux, "framebuffer size overflow");
         return FALSE;
