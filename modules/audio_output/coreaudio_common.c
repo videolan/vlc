@@ -22,6 +22,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdckdint.h>
 #include "coreaudio_common.h"
 #include <CoreAudio/CoreAudioTypes.h>
 
@@ -699,9 +700,8 @@ MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     unsigned channels = aout_FormatNbChannels(fmt);
 
     size_t size;
-    if (mul_overflow(channels, sizeof(AudioChannelDescription), &size))
-        return VLC_ENOMEM;
-    if (add_overflow(size, sizeof(AudioChannelLayout), &size))
+    if (ckd_mul(&size, channels, sizeof(AudioChannelDescription)) ||
+        ckd_add(&size, size, sizeof(AudioChannelLayout)))
         return VLC_ENOMEM;
     AudioChannelLayout *inlayout = malloc(size);
     if (inlayout == NULL)
