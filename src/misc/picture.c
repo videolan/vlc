@@ -32,6 +32,7 @@
 #endif
 #include <assert.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 #include <vlc_common.h>
 #include "picture.h"
@@ -161,8 +162,8 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 
     unsigned width, height;
 
-    if (unlikely(add_overflow(fmt->i_width, i_modulo_w - 1, &width))
-     || unlikely(add_overflow(fmt->i_height, i_modulo_h - 1, &height)))
+    if (unlikely(ckd_add(&width, fmt->i_width, i_modulo_w - 1))
+     || unlikely(ckd_add(&height, fmt->i_height, i_modulo_h - 1)))
         return VLC_EGENERIC;
 
     width = width / i_modulo_w * i_modulo_w;
@@ -298,8 +299,8 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     {
         const plane_t *p = &pic->p[i];
 
-        if (unlikely(mul_overflow(p->i_pitch, p->i_lines, &plane_sizes[i]))
-         || unlikely(add_overflow(pic_size, plane_sizes[i], &pic_size)))
+        if (unlikely(ckd_mul(&plane_sizes[i], p->i_pitch, p->i_lines))
+         || unlikely(ckd_add(&pic_size, pic_size, plane_sizes[i])))
             goto error;
     }
 

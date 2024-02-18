@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include <stdckdint.h>
+
 #include <vlc_common.h>
 #include <vlc_memstream.h>
 
@@ -147,8 +149,8 @@ size_t vlc_memstream_write(struct vlc_memstream *ms, const void *ptr,
     if (len == 0)
         return 0;
 
-    if (unlikely(add_overflow(ms->length, len, &newlen))
-     || unlikely(add_overflow(newlen, 1, &newlen)))
+    if (unlikely(ckd_add(&newlen, ms->length, len))
+     || unlikely(ckd_add(&newlen, newlen, 1)))
         goto error;
 
     char *base = realloc(ms->ptr, newlen);
@@ -190,8 +192,8 @@ int vlc_memstream_vprintf(struct vlc_memstream *ms, const char *fmt,
     va_end(ap);
 
     if (len < 0
-     || unlikely(add_overflow(ms->length, len, &newlen))
-     || unlikely(add_overflow(newlen, 1, &newlen)))
+     || unlikely(ckd_add(&newlen, ms->length, len))
+     || unlikely(ckd_add(&newlen, newlen, 1)))
         goto error;
 
     ptr = realloc(ms->ptr, newlen);

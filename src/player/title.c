@@ -23,6 +23,7 @@
 #endif
 
 #include <limits.h>
+#include <stdckdint.h>
 
 #include <vlc_common.h>
 #include "player.h"
@@ -103,9 +104,9 @@ vlc_player_title_list_Create(input_title_t *const *array, size_t count,
 
     /* Allocate the struct + the whole list */
     size_t size;
-    if (mul_overflow(count, sizeof(struct vlc_player_title), &size))
+    if (ckd_mul(&size, count, sizeof(struct vlc_player_title)))
         return NULL;
-    if (add_overflow(size, sizeof(struct vlc_player_title_list), &size))
+    if (ckd_add(&size, size, sizeof(struct vlc_player_title_list)))
         return NULL;
     struct vlc_player_title_list *titles = malloc(size);
     if (!titles)

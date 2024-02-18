@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdckdint.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -47,7 +48,7 @@ static struct vlc_res **vlc_obj_res(vlc_object_t *obj)
 
 void *vlc_objres_new(size_t size, void (*release)(void *))
 {
-    if (unlikely(add_overflow(sizeof (struct vlc_res), size, &size)))
+    if (unlikely(ckd_add(&size, sizeof (struct vlc_res), size)))
     {
         errno = ENOMEM;
         return NULL;
@@ -145,7 +146,7 @@ void *(vlc_obj_malloc)(vlc_object_t *obj, size_t size)
 void *(vlc_obj_calloc)(vlc_object_t *obj, size_t nmemb, size_t size)
 {
     size_t tabsize;
-    if (unlikely(mul_overflow(nmemb, size, &tabsize)))
+    if (unlikely(ckd_mul(&tabsize, nmemb, size)))
     {
         errno = ENOMEM;
         return NULL;
