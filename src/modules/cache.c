@@ -258,7 +258,7 @@ static int vlc_cache_load_plugin_config(vlc_plugin_t *plugin, block_t *file)
     /* Allocate memory */
     if (lines)
     {
-        plugin->conf.params = calloc(sizeof (struct vlc_param), lines);
+        plugin->conf.params = calloc(lines, sizeof (struct vlc_param));
         if (unlikely(plugin->conf.params == NULL))
         {
             plugin->conf.size = 0;
