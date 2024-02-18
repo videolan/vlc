@@ -34,6 +34,7 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <stdckdint.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -1303,7 +1304,7 @@ static int  mms_ParsePacket( stream_t *p_access,
     if( i_packet_id == p_sys->i_header_packet_id_type )
     {
         size_t new_header_size;
-        if( add_overflow( p_sys->i_header, i_packet_length, &new_header_size ) )
+        if (ckd_add(&new_header_size, p_sys->i_header, i_packet_length))
             return -1;
         uint8_t *p_reaced = realloc( p_sys->p_header, new_header_size );
         if( !p_reaced )
