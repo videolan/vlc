@@ -208,6 +208,7 @@ endif
 
 check_c_headers = [
     ['stdbit.h'],
+    ['stdckdint.h'],
     ['arpa/inet.h'],
     ['threads.h'],
     ['netinet/tcp.h'],
@@ -268,6 +269,9 @@ endforeach
 
 if not cdata.has('HAVE_STDBIT_H')
     list_inc_dirs += 'compat/stdbit'
+endif
+if not cdata.has('HAVE_STDCKDINT_H')
+    list_inc_dirs += 'compat/stdckdint'
 endif
 vlc_include_dirs = include_directories(list_inc_dirs)
 
