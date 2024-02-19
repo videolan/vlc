@@ -318,27 +318,37 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         {
             AMF_RESULT res;
 
-            if (scaleProc->amfInput != nullptr)
-            {
-                scaleProc->amfInput->Release();
-                scaleProc->amfInput = nullptr;
-            }
-
             texDesc.Width  = fmt->i_x_offset + fmt->i_visible_width;
             texDesc.Height = fmt->i_y_offset + fmt->i_visible_height;
-            hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, scaleProc->amfStaging.ReleaseAndGetAddressOf());
-            if (FAILED(hr))
+            if (scaleProc->amfInput != nullptr)
             {
-                msg_Err(vd, "Failed to create the staging texture. (hr=0x%lX)", hr);
-                goto done_super;
+                D3D11_TEXTURE2D_DESC stagingDesc;
+                scaleProc->amfStaging->GetDesc(&stagingDesc);
+                if (stagingDesc.Width != texDesc.Width || stagingDesc.Height != texDesc.Height)
+                {
+                    scaleProc->amfInput->Release();
+                    scaleProc->amfInput = nullptr;
+                    scaleProc->amfStaging.Reset();
+                }
             }
-            res = scaleProc->amf.Context->CreateSurfaceFromDX11Native(scaleProc->amfStaging.Get(),
-                                                                      &scaleProc->amfInput,
-                                                                      nullptr);
-            if (unlikely(res != AMF_OK || scaleProc->amfInput == nullptr))
+
+            if (scaleProc->amfInput == nullptr)
             {
-                msg_Err(vd, "Failed to wrap D3D11 output texture. %d", res);
-                goto done_super;
+                hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, scaleProc->amfStaging.ReleaseAndGetAddressOf());
+                if (FAILED(hr))
+                {
+                    msg_Err(vd, "Failed to create the staging texture. (hr=0x%lX)", hr);
+                    goto done_super;
+                }
+                res = scaleProc->amf.Context->CreateSurfaceFromDX11Native(scaleProc->amfStaging.Get(),
+                                                                        &scaleProc->amfInput,
+                                                                        nullptr);
+                if (unlikely(res != AMF_OK || scaleProc->amfInput == nullptr))
+                {
+                    msg_Err(vd, "Failed to wrap D3D11 output texture. %d", res);
+                    scaleProc->amfStaging.Reset();
+                    goto done_super;
+                }
             }
         }
         else
