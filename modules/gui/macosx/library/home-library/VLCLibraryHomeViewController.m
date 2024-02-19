@@ -306,7 +306,6 @@
 
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
-    NSLog(@"Home long load started");
     if ([_ongoingLongLoadingNotifications containsObject:notification.name]) {
         return;
     }
@@ -335,7 +334,6 @@
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
-    NSLog(@"Home long load finished");
     [_ongoingLongLoadingNotifications removeObject:notification.name];
     if (_ongoingLongLoadingNotifications.count > 0) {
         return;

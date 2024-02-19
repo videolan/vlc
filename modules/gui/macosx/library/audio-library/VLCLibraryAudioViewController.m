@@ -613,7 +613,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
-    NSLog(@"Audio long load started");
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
@@ -637,7 +636,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
-    NSLog(@"Audio long load finished");
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }

@@ -399,7 +399,6 @@
 
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
-    NSLog(@"Video long load started");
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
@@ -422,7 +421,6 @@
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
-    NSLog(@"Video long load finished");
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
