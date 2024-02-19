@@ -17,11 +17,6 @@ endif
 endif
 endif
 
-$(TARBALLS)/AMF-$(AMF_VERSION).tar.gz:
-	$(call download_pkg,$(AMF_URL),AMF)
-
-# .sum-amf: AMF-$(AMF_VERSION).tar.gz
-
 $(TARBALLS)/AMF-$(AMF_GITVERSION).tar.xz:
 	rm -rf "$@" "$(@:.tar.xz=.githash)"
 	rm -rf "$(@:.tar.xz=)"
@@ -37,6 +32,7 @@ $(TARBALLS)/AMF-$(AMF_GITVERSION).tar.xz:
 
 .sum-amf: AMF-$(AMF_GITVERSION).tar.xz
 	$(call check_githash,$(AMF_GITVERSION))
+	touch "$@"
 
 # amf: AMF-$(AMF_VERSION).tar.gz .sum-amf
 amf: AMF-$(AMF_GITVERSION).tar.xz .sum-amf
