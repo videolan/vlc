@@ -56,6 +56,15 @@ struct tt_searchkey
     tt_time_t *p_last;
 };
 
+/* namespaces */
+#define TT_NS             "http://www.w3.org/ns/ttml"
+#define TT_NS_PARAMETER   TT_NS "#parameter"
+#define TT_NS_STYLING     TT_NS "#styling"
+#define TT_NS_METADATA    TT_NS "#metadata"
+#define TT_NS_PROFILE     TT_NS "/profile/"
+#define TT_NS_FEATURE     TT_NS "/feature/"
+#define TT_NS_EXTENSION   TT_NS "/extension/"
+
 enum
 {
     TT_NODE_TYPE_ELEMENT,
