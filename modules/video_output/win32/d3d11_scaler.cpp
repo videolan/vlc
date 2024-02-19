@@ -58,7 +58,6 @@ struct d3d11_scaler
     vlc_amf_context                 amf = {};
     amf::AMFComponent               *amf_scaler = nullptr;
     amf::AMFSurface                 *amfInput = nullptr;
-    ComPtr<ID3D11Texture2D>         amfStaging;
     d3d11_device_t                  *d3d_dev = nullptr;
 #endif
 };
@@ -323,30 +322,25 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             if (scaleProc->amfInput != nullptr)
             {
                 D3D11_TEXTURE2D_DESC stagingDesc;
-                scaleProc->amfStaging->GetDesc(&stagingDesc);
+                auto packed = scaleProc->amfInput->GetPlane(amf::AMF_PLANE_PACKED);
+                ID3D11Texture2D *amfStaging = reinterpret_cast<ID3D11Texture2D *>(packed->GetNative());
+                amfStaging->GetDesc(&stagingDesc);
                 if (stagingDesc.Width != texDesc.Width || stagingDesc.Height != texDesc.Height)
                 {
                     scaleProc->amfInput->Release();
                     scaleProc->amfInput = nullptr;
-                    scaleProc->amfStaging.Reset();
                 }
             }
 
             if (scaleProc->amfInput == nullptr)
             {
-                hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, scaleProc->amfStaging.ReleaseAndGetAddressOf());
-                if (FAILED(hr))
-                {
-                    msg_Err(vd, "Failed to create the staging texture. (hr=0x%lX)", hr);
-                    goto done_super;
-                }
-                res = scaleProc->amf.Context->CreateSurfaceFromDX11Native(scaleProc->amfStaging.Get(),
-                                                                        &scaleProc->amfInput,
-                                                                        nullptr);
+                res = scaleProc->amf.Context->AllocSurface(amf::AMF_MEMORY_DX11,
+                                                           DXGIToAMF(scaleProc->d3d_fmt->formatTexture),
+                                                           texDesc.Width, texDesc.Height,
+                                                           &scaleProc->amfInput);
                 if (unlikely(res != AMF_OK || scaleProc->amfInput == nullptr))
                 {
                     msg_Err(vd, "Failed to wrap D3D11 output texture. %d", res);
-                    scaleProc->amfStaging.Reset();
                     goto done_super;
                 }
             }
@@ -597,11 +591,11 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_t
         AMF_RESULT res;
         amf::AMFSurface *submitSurface;
 
-        D3D11_TEXTURE2D_DESC texDesc;
-        p_sys->texture[0]->GetDesc(&texDesc);
+        auto packedStaging = scaleProc->amfInput->GetPlane(amf::AMF_PLANE_PACKED);
+        ID3D11Texture2D *amfStaging = reinterpret_cast<ID3D11Texture2D *>(packedStaging->GetNative());
         // copy source into staging as it may not be shared
         d3d11_device_lock( scaleProc->d3d_dev );
-        scaleProc->d3d_dev->d3dcontext->CopySubresourceRegion(scaleProc->amfStaging.Get(),
+        scaleProc->d3d_dev->d3dcontext->CopySubresourceRegion(amfStaging,
                                                 0,
                                                 0, 0, 0,
                                                 p_sys->resource[KNOWN_DXGI_INDEX],
