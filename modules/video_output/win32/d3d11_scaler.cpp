@@ -370,29 +370,32 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
         if ((D3D11_AllocateShaderView)(vd, d3d_dev->d3ddevice, scaleProc->d3d_fmt,
                                     _upscaled, 0, scaleProc->SRVs) != VLC_SUCCESS)
             goto done_super;
+
+#ifdef HAVE_AMF_SCALER
+        if (scaleProc->amf_scaler)
+        {
+            AMF_RESULT res;
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_OUTPUT_SIZE, ::AMFConstructSize(out_width, out_height));
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ENGINE_TYPE, amf::AMF_MEMORY_DX11);
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ALGORITHM, AMF_HQ_SCALER_ALGORITHM_VIDEOSR1_0);
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FROM_SRGB, 0);
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_SHARPNESS, 0.5);
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL, 1);
+            AMFColor black{0,0,0,255};
+            res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL_COLOR, black);
+            // res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FRAME_RATE, oFrameRate);
+            auto amf_fmt = DXGIToAMF(scaleProc->d3d_fmt->formatTexture);
+            res = scaleProc->amf_scaler->Init(amf_fmt,
+                fmt->i_x_offset + fmt->i_visible_width,
+                fmt->i_y_offset + fmt->i_visible_height);
+            if (res != AMF_OK)
+                return false;
+        }
+#endif
     }
 
 #ifdef HAVE_AMF_SCALER
-    if (scaleProc->amf_scaler)
-    {
-        AMF_RESULT res;
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_OUTPUT_SIZE, ::AMFConstructSize(out_width, out_height));
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ENGINE_TYPE, amf::AMF_MEMORY_DX11);
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_ALGORITHM, AMF_HQ_SCALER_ALGORITHM_VIDEOSR1_0);
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FROM_SRGB, 0);
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_SHARPNESS, 0.5);
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL, 1);
-        AMFColor black{0,0,0,255};
-        res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL_COLOR, black);
-        // res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FRAME_RATE, oFrameRate);
-        auto amf_fmt = DXGIToAMF(scaleProc->d3d_fmt->formatTexture);
-        res = scaleProc->amf_scaler->Init(amf_fmt,
-            fmt->i_x_offset + fmt->i_visible_width,
-            fmt->i_y_offset + fmt->i_visible_height);
-        if (res != AMF_OK)
-            return false;
-    }
-    else
+    if (!scaleProc->amf_scaler)
     {
 #endif
     RECT srcRect;
