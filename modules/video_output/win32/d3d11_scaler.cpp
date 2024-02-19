@@ -57,6 +57,7 @@ struct d3d11_scaler
 #ifdef HAVE_AMF_SCALER
     vlc_amf_context                 amf = {};
     amf::AMFComponent               *amf_scaler = nullptr;
+    bool                            amf_initialized{false};
     amf::AMFSurface                 *amfInput = nullptr;
     d3d11_device_t                  *d3d_dev = nullptr;
 #endif
@@ -385,11 +386,20 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL_COLOR, black);
             // res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FRAME_RATE, oFrameRate);
             auto amf_fmt = DXGIToAMF(scaleProc->d3d_fmt->formatTexture);
-            res = scaleProc->amf_scaler->Init(amf_fmt,
-                fmt->i_x_offset + fmt->i_visible_width,
-                fmt->i_y_offset + fmt->i_visible_height);
+            if (scaleProc->amf_initialized)
+                res = scaleProc->amf_scaler->ReInit(
+                    fmt->i_x_offset + fmt->i_visible_width,
+                    fmt->i_y_offset + fmt->i_visible_height);
+            else
+                res = scaleProc->amf_scaler->Init(amf_fmt,
+                    fmt->i_x_offset + fmt->i_visible_width,
+                    fmt->i_y_offset + fmt->i_visible_height);
             if (res != AMF_OK)
+            {
+                msg_Err(vd, "Failed to (re)initialize scaler, (err=%d)", res);
                 return false;
+            }
+            scaleProc->amf_initialized = true;
         }
 #endif
     }
