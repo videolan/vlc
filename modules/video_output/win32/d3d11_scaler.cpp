@@ -62,11 +62,11 @@ struct d3d11_scaler
 #endif
 };
 
-static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_src_chroma)
+static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_device_t *d3d_dev, uint8_t bits_per_channel, uint8_t alpha_bits)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
-    return (FindD3D11Format)( vd, d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
-                            DXGI_CHROMA_CPU|DXGI_CHROMA_GPU, supportFlags );
+    return (FindD3D11Format)( vd, d3d_dev, 0, DXGI_RGB_FORMAT, bits_per_channel, 0, 0, alpha_bits,
+                            DXGI_CHROMA_GPU, supportFlags );
 }
 
 d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vlc_fourcc_t i_chroma,
@@ -131,14 +131,16 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         fmt = *out_fmt;
     }
 #endif
+    if (fmt == nullptr)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, (*out_fmt)->bitsPerChannel, (*out_fmt)->bitsPerChannel);
+    if (fmt == nullptr)
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, (*out_fmt)->bitsPerChannel, 0);
     if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 10)
-        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA64);
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, 10, 10);
     if (fmt == nullptr && (*out_fmt)->bitsPerChannel > 8)
-        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA10LE);
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, 8, 8);
     if (fmt == nullptr)
-        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_RGBA);
-    if (fmt == nullptr)
-        fmt = GetDirectRenderingFormat(vd, d3d_dev, VLC_CODEC_BGRA);
+        fmt = GetDirectRenderingFormat(vd, d3d_dev, 8, 0);
     if (fmt == nullptr || fmt->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         msg_Warn(vd, "chroma upscale of %4.4s not supported", (char*)&i_chroma);
