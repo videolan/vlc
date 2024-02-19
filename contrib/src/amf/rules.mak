@@ -1,10 +1,10 @@
 # AMF
 
-AMF_VERSION := 1.4.30
+AMF_VERSION := 1.4.33
 AMF_URL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF/archive/refs/tags/v$(AMF_VERSION).tar.gz
 AMF_GITURL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF.git
 AMF_BRANCH := v$(AMF_VERSION)
-AMF_GITVERSION := a118570647cfa579af8875c3955a314c3ddd7058
+AMF_GITVERSION := e8c7cd7c10d4e05c1913aa8dfd2be9f9dbdb03d6
 
 ifeq ($(ARCH),x86_64)
 ifdef HAVE_WIN32
