@@ -263,7 +263,6 @@ debian-contrib:
         - contrib/*
         - extras/tools/*
         - extras/ci/*
-        - extras/package/linux/*
     script: |
         export NCPU=$(getconf _NPROCESSORS_ONLN)
         echo "Building branch '${CI_COMMIT_BRANCH}' (default: '${CI_DEFAULT_BRANCH}')"

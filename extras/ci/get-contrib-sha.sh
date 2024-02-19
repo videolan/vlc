@@ -34,7 +34,7 @@ case $1 in
         VLC_BUILD_TARGET="extras/package/win32"
         ;;
     debian*)
-        VLC_BUILD_TARGET="extras/package/linux"
+        VLC_BUILD_TARGET=""
         ;;
     ios*|tvos*)
         VLC_BUILD_TARGET="extras/package/apple"
