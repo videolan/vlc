@@ -1,0 +1,38 @@
+From a9ee7691cf2535f58695769893e92a634f810523 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 07:43:32 +0100
+Subject: [PATCH 1/4] Move AMF_UNICODE into Platform.h
+
+It's a common macro that can be used in other places.
+---
+ amf/public/include/core/Platform.h | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/amf/public/include/core/Platform.h b/amf/public/include/core/Platform.h
+index 3f997fe..cdab1b2 100644
+--- a/amf/public/include/core/Platform.h
++++ b/amf/public/include/core/Platform.h
+@@ -66,6 +66,20 @@
+ 
+ #define AMF_TODO(_todo) (__FILE__ "(" AMF_MACRO_STRING(__LINE__) "): TODO: "_todo)
+ 
++/**
++*******************************************************************************
++*   AMF_UNICODE
++*
++*   @brief
++*       Macro to convert string constant into wide char string constant
++*
++*   Auxilary AMF_UNICODE_ macro is needed as otherwise it is not possible to use AMF_UNICODE(__FILE__)
++*   Microsoft macro _T also uses 2 passes to accomplish that
++*******************************************************************************
++*/
++#define AMF_UNICODE(s) AMF_UNICODE_(s)
++#define AMF_UNICODE_(s) L ## s
++
+ 
+  #if defined(__GNUC__) || defined(__clang__)
+      #define AMF_ALIGN(n) __attribute__((aligned(n)))
+-- 
+2.37.3.windows.1
+

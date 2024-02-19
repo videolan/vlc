@@ -1,0 +1,29 @@
+From 17cc77f3185ca562c7c0aa4e439c8f4bace1360a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 08:12:20 +0100
+Subject: [PATCH 1/2] Fix const on return by value AMF_DECLARE_IID()
+
+The returned value won't be const in C.
+
+Fixes this kind of warning:
+include/AMF/core/../components/Component.h:326:5: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
+---
+ amf/public/include/core/Interface.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/amf/public/include/core/Interface.h b/amf/public/include/core/Interface.h
+index 9ac7e41..96117f0 100644
+--- a/amf/public/include/core/Interface.h
++++ b/amf/public/include/core/Interface.h
+@@ -49,7 +49,7 @@ namespace amf
+         }
+ #else
+ #define AMF_DECLARE_IID(name, _data1, _data2, _data3, _data41, _data42, _data43, _data44, _data45, _data46, _data47, _data48) \
+-        AMF_INLINE static const AMFGuid IID_##name(void) \
++        AMF_INLINE static AMFGuid IID_##name(void) \
+         { \
+             AMFGuid uid = {_data1, _data2, _data3, _data41, _data42, _data43, _data44, _data45, _data46, _data47, _data48}; \
+             return uid; \
+-- 
+2.37.3.windows.1
+

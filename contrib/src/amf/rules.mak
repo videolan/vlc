@@ -37,6 +37,14 @@ $(TARBALLS)/AMF-$(AMF_GITVERSION).tar.xz:
 # amf: AMF-$(AMF_VERSION).tar.gz .sum-amf
 amf: AMF-$(AMF_GITVERSION).tar.xz .sum-amf
 	$(UNPACK)
+	$(APPLY) $(SRC)/amf/0001-Move-AMF_UNICODE-into-Platform.h.patch
+	$(APPLY) $(SRC)/amf/0002-Define-LPRI-d-ud-x-64-as-Unicode-wide-versions-of-AM.patch
+	$(APPLY) $(SRC)/amf/0003-Define-AMFPRI-d-ud-x-64-using-the-standard-C-format-.patch
+	$(APPLY) $(SRC)/amf/0001-Don-t-cast-amf_int64-when-using-a-format-string.patch
+	$(APPLY) $(SRC)/amf/0001-Differentiate-the-AMF_NO_VTABLE-based-on-the-compile.patch
+	$(APPLY) $(SRC)/amf/0001-Fix-const-on-return-by-value-AMF_DECLARE_IID.patch
+	$(APPLY) $(SRC)/amf/0002-Fix-const-on-return-by-value-Variant-values.patch
+	$(APPLY) $(SRC)/amf/0001-Fix-warning-when-_MSC_VER-is-not-defined.patch
 	$(MOVE)
 
 .amf: amf

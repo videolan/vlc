@@ -1,0 +1,54 @@
+From 7a0df0c174dce8d383be26e7b96d410865c62cf1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 07:45:25 +0100
+Subject: [PATCH 2/4] Define LPRI(d|ud|x)64 as Unicode (wide) versions of
+ AMFPRI(d|ud|x)64
+
+It's always true for all platforms.
+---
+ amf/public/include/core/Platform.h | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/amf/public/include/core/Platform.h b/amf/public/include/core/Platform.h
+index cdab1b2..12ee75c 100644
+--- a/amf/public/include/core/Platform.h
++++ b/amf/public/include/core/Platform.h
+@@ -119,13 +119,10 @@ typedef signed int HRESULT;
+     #define AMF_NO_VTABLE           __declspec(novtable)
+ 
+     #define AMFPRId64   "I64d"
+-    #define LPRId64    L"I64d"
+ 
+     #define AMFPRIud64   "Iu64d"
+-    #define LPRIud64    L"Iu64d"
+ 
+     #define AMFPRIx64   "I64x"
+-    #define LPRIx64    L"I64x"
+ 
+ #else // !WIN32 - Linux and Mac
+ 
+@@ -143,17 +140,18 @@ typedef signed int HRESULT;
+ 
+     #if !defined(AMFPRId64)
+         #define AMFPRId64    "lld"
+-        #define LPRId64     L"lld"
+ 
+         #define AMFPRIud64    "ulld"
+-        #define LPRIud64     L"ulld"
+ 
+         #define AMFPRIx64    "llx"
+-        #define LPRIx64     L"llx"
+     #endif
+ 
+ #endif // WIN32
+ 
++#define LPRId64   AMF_UNICODE(AMFPRId64)
++#define LPRIud64  AMF_UNICODE(AMFPRIud64)
++#define LPRIx64   AMF_UNICODE(AMFPRIx64)
++
+ 
+ #if defined(_WIN32)
+ #define AMF_WEAK __declspec( selectany )
+-- 
+2.37.3.windows.1
+

@@ -1,0 +1,49 @@
+From 18c87b557f7d5b9f1850a66705b551ac482e47e3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolabs.io>
+Date: Fri, 16 Feb 2024 08:50:28 +0100
+Subject: [PATCH 2/2] Fix const on return by value Variant values
+
+Fix const on return by value AMF_DECLARE_IID()
+
+The returned value won't be const in C.
+
+Fixes this kind of warning:
+include/AMF/core/Variant.h:135:23: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
+---
+ amf/public/include/core/Variant.h | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/amf/public/include/core/Variant.h b/amf/public/include/core/Variant.h
+index edf14ae..a0a7eb8 100644
+--- a/amf/public/include/core/Variant.h
++++ b/amf/public/include/core/Variant.h
+@@ -132,16 +132,16 @@ namespace amf
+     static AMF_INLINE const AMFRatio&      AMF_STD_CALL AMFVariantGetRatio(const AMFVariantStruct* _variant) { return (_variant)->ratioValue; }
+     static AMF_INLINE const AMFColor&      AMF_STD_CALL AMFVariantGetColor(const AMFVariantStruct* _variant) { return (_variant)->colorValue; }
+ #else // #if defined(__cplusplus)
+-    static AMF_INLINE const AMFRect        AMF_STD_CALL AMFVariantGetRect (const AMFVariantStruct* _variant) { return (_variant)->rectValue; }
+-    static AMF_INLINE const AMFSize        AMF_STD_CALL AMFVariantGetSize (const AMFVariantStruct* _variant) { return (_variant)->sizeValue; }
+-    static AMF_INLINE const AMFPoint       AMF_STD_CALL AMFVariantGetPoint(const AMFVariantStruct* _variant) { return (_variant)->pointValue; }
+-    static AMF_INLINE const AMFFloatSize  AMF_STD_CALL AMFVariantGetFloatSize(const AMFVariantStruct* _variant) { return (_variant)->floatSizeValue; }
+-    static AMF_INLINE const AMFFloatPoint2D  AMF_STD_CALL AMFVariantGetFloatPoint2D(const AMFVariantStruct* _variant) { return (_variant)->floatPoint2DValue; }
+-    static AMF_INLINE const AMFFloatPoint3D  AMF_STD_CALL AMFVariantGetFloatPoint3D(const AMFVariantStruct* _variant) { return (_variant)->floatPoint3DValue; }
+-    static AMF_INLINE const AMFFloatVector4D  AMF_STD_CALL AMFVariantGetFloatVector4D(const AMFVariantStruct* _variant) { return (_variant)->floatVector4DValue; }
+-    static AMF_INLINE const AMFRate        AMF_STD_CALL AMFVariantGetRate (const AMFVariantStruct* _variant) { return (_variant)->rateValue; }
+-    static AMF_INLINE const AMFRatio       AMF_STD_CALL AMFVariantGetRatio(const AMFVariantStruct* _variant) { return (_variant)->ratioValue; }
+-    static AMF_INLINE const AMFColor       AMF_STD_CALL AMFVariantGetColor(const AMFVariantStruct* _variant) { return (_variant)->colorValue; }
++    static AMF_INLINE AMFRect        AMF_STD_CALL AMFVariantGetRect (const AMFVariantStruct* _variant) { return (_variant)->rectValue; }
++    static AMF_INLINE AMFSize        AMF_STD_CALL AMFVariantGetSize (const AMFVariantStruct* _variant) { return (_variant)->sizeValue; }
++    static AMF_INLINE AMFPoint       AMF_STD_CALL AMFVariantGetPoint(const AMFVariantStruct* _variant) { return (_variant)->pointValue; }
++    static AMF_INLINE AMFFloatSize  AMF_STD_CALL AMFVariantGetFloatSize(const AMFVariantStruct* _variant) { return (_variant)->floatSizeValue; }
++    static AMF_INLINE AMFFloatPoint2D  AMF_STD_CALL AMFVariantGetFloatPoint2D(const AMFVariantStruct* _variant) { return (_variant)->floatPoint2DValue; }
++    static AMF_INLINE AMFFloatPoint3D  AMF_STD_CALL AMFVariantGetFloatPoint3D(const AMFVariantStruct* _variant) { return (_variant)->floatPoint3DValue; }
++    static AMF_INLINE AMFFloatVector4D  AMF_STD_CALL AMFVariantGetFloatVector4D(const AMFVariantStruct* _variant) { return (_variant)->floatVector4DValue; }
++    static AMF_INLINE AMFRate        AMF_STD_CALL AMFVariantGetRate (const AMFVariantStruct* _variant) { return (_variant)->rateValue; }
++    static AMF_INLINE AMFRatio       AMF_STD_CALL AMFVariantGetRatio(const AMFVariantStruct* _variant) { return (_variant)->ratioValue; }
++    static AMF_INLINE AMFColor       AMF_STD_CALL AMFVariantGetColor(const AMFVariantStruct* _variant) { return (_variant)->colorValue; }
+ #endif // #if defined(__cplusplus)
+ 
+ 
+-- 
+2.37.3.windows.1
+
