@@ -107,6 +107,8 @@ tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const ch
 void tt_node_RecursiveDelete( tt_node_t *p_node );
 int  tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern );
 bool tt_node_HasChild( const tt_node_t *p_node );
+int  tt_node_AddAttribute( tt_node_t *p_node, const char *key, const char *value );
+void tt_node_RemoveAttribute( tt_node_t *p_node, const char *key );
 
 int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node );
 

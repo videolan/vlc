@@ -183,6 +183,20 @@ void tt_node_RecursiveDelete( tt_node_t *p_node )
     tt_node_Delete( p_node );
 }
 
+void tt_node_RemoveAttribute( tt_node_t *p_node, const char *key )
+{
+    vlc_dictionary_remove_value_for_key( &p_node->attr_dict, key,
+                                        tt_node_FreeDictValue, NULL );
+}
+
+int tt_node_AddAttribute( tt_node_t *p_node, const char *key, const char *value )
+{
+    char *p_dup = strdup( value );
+    if( p_dup )
+        vlc_dictionary_insert( &p_node->attr_dict, key, p_dup );
+    return p_dup ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static void tt_node_ParentAddChild( tt_node_t* p_parent, tt_basenode_t *p_child )
 {
     tt_basenode_t **pp_node = &p_parent->p_child;
