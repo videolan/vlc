@@ -5,6 +5,9 @@ Decoders:
  - Improve Opus ambisonic support
  - Fix some ASS subtitle rendering issues
 
+Video Output:
+ * Super Resolution scaling with AMD GPUs
+
 Audio Output:
  - Fix regression on macOS causing crashes when using audio devices
    with more than 9 channels
