@@ -611,12 +611,18 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_t
             return VLC_SUCCESS;
         }
         if (res != AMF_OK)
+        {
+            msg_Err(vd, "scaler input failed, (err=%d)", res);
             return VLC_EGENERIC;
+        }
 
         amf::AMFData *amfOutput = nullptr;
         res = scaleProc->amf_scaler->QueryOutput(&amfOutput);
         if (res != AMF_OK)
+        {
+            msg_Err(vd, "scaler gave no output full, (err=%d)", res);
             return VLC_EGENERIC;
+        }
 
         assert(amfOutput->GetMemoryType() == amf::AMF_MEMORY_DX11);
         amf::AMFSurface *amfOutputSurface = reinterpret_cast<amf::AMFSurface*>(amfOutput);
