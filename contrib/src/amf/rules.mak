@@ -22,8 +22,8 @@ $(TARBALLS)/AMF-$(AMF_GITVERSION).tar.xz:
 	rm -rf "$(@:.tar.xz=)"
 	mkdir "$(@:.tar.xz=)"
 	# clone the top of the branch and only checkout amf/public/include
-	cd "$(@:.tar.xz=)" && git clone -n --depth=1 --filter=tree:0 --branch $(AMF_BRANCH) $(AMF_GITURL) "$(notdir $(@:.tar.xz=))"
-	cd "$(@:.tar.xz=)/$(notdir $(@:.tar.xz=))" && git sparse-checkout set --no-cone amf/public/include && git checkout
+	cd "$(@:.tar.xz=)" && git clone -n --depth=1 --no-checkout --branch $(AMF_BRANCH) $(AMF_GITURL) "$(notdir $(@:.tar.xz=))"
+	cd "$(@:.tar.xz=)/$(notdir $(@:.tar.xz=))" && git config core.sparseCheckout true && echo "amf/public/include" >> .git/info/sparse-checkout && git checkout
 	cd "$(@:.tar.xz=)" && tar cJf "$(notdir $(@))" --exclude=$(notdir $(@:.tar.xz=))/.git $(notdir $(@:.tar.xz=))
 	cd "$(@:.tar.xz=)/$(notdir $(@:.tar.xz=))" && echo "`git rev-parse HEAD` $(@)" > "../tmp.githash"
 	mv -f -- "$(@:.tar.xz=)/tmp.githash" "$(@:.tar.xz=.githash)"
