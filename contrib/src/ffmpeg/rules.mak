@@ -6,8 +6,8 @@
 
 ifndef USE_LIBAV
 FFMPEG_HASH=71fb6132637a2a430375c24afc381fff8b854fe7
-FFMPEG_MAJVERSION := 5.1
-FFMPEG_REVISION := 4
+FFMPEG_MAJVERSION := 6.1
+FFMPEG_REVISION := 1
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
@@ -252,9 +252,7 @@ ifdef USE_FFMPEG
 	# replace Vista checks with XP SP1 checks so we don't actually change _WIN32_WINNT
 	sed -i.orig 's,< 0x0600,< 0x0501,g' $(UNPACK_DIR)/configure
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-vulkan-Fix-win-i386-calling-convention.patch
-	$(APPLY) $(SRC)/ffmpeg/0002-lavu-vulkan-fix-handle-type-for-32-bit-targets.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-w32pthread-fix-signature-of-WinRT-version-of-thread-.patch
+	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch

@@ -1,8 +1,17 @@
+From e5945a2bbe0dcd1d467cfd556fb7b5acca339cbb Mon Sep 17 00:00:00 2001
+From: Jean-Baptiste Kempf <jb@videolan.org>
+Date: Wed, 6 Dec 2017 23:46:29 +0100
+Subject: [PATCH 01/10] fix compilation for ARMv7 on Android
+
+---
+ libavcodec/arm/hevcdsp_idct_neon.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/libavcodec/arm/hevcdsp_idct_neon.S b/libavcodec/arm/hevcdsp_idct_neon.S
-index 139029a256..5ac730c075 100644
+index 66ed1c6785..cff4eb0899 100644
 --- a/libavcodec/arm/hevcdsp_idct_neon.S
 +++ b/libavcodec/arm/hevcdsp_idct_neon.S
-@@ -1017,8 +1017,8 @@ endfunc
+@@ -938,8 +938,8 @@ endfunc
  tr_16x4 firstpass, 7, 512, 1
  tr_16x4 secondpass_8, 20 - 8, 512, 1
  tr_16x4 secondpass_10, 20 - 10, 512, 1
@@ -12,3 +21,6 @@ index 139029a256..5ac730c075 100644
  tr_32x4 firstpass, 7
  tr_32x4 secondpass_8, 20 - 8
  tr_32x4 secondpass_10, 20 - 10
+-- 
+2.37.3.windows.1
+

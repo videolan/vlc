@@ -1,8 +1,8 @@
-From 1c727e8cbbd91391c5eb769c525a07ce5e058e20 Mon Sep 17 00:00:00 2001
+From 44f913546d4b0aa29ef30f72428eef38f2b6d4ed Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 12 Feb 2021 08:20:56 +0100
-Subject: [PATCH 1/2] avcodec/mpeg12dec: don't call hw->end_frame when starting
- second field decoding
+Subject: [PATCH 07/10] avcodec/mpeg12dec: don't call hw->end_frame when
+ starting second field decoding
 
 This call is unbalanced with a hwaccel->start_frame. It fixes some crashes
 because this call ends up using uninitialized memory. Decoding works as
@@ -12,15 +12,15 @@ expected after this patch.
  1 file changed, 8 deletions(-)
 
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 94221da2c1..335c3713c2 100644
+index 5dac83ebcd..be8e74eb53 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
-@@ -1667,14 +1667,6 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
+@@ -1614,14 +1614,6 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
              return AVERROR_INVALIDDATA;
          }
  
 -        if (s->avctx->hwaccel) {
--            if ((ret = s->avctx->hwaccel->end_frame(s->avctx)) < 0) {
+-            if ((ret = FF_HW_SIMPLE_CALL(s->avctx, end_frame)) < 0) {
 -                av_log(avctx, AV_LOG_ERROR,
 -                       "hardware accelerator failed to decode first field\n");
 -                return ret;
@@ -31,5 +31,5 @@ index 94221da2c1..335c3713c2 100644
              s->current_picture.f->data[i] = s->current_picture_ptr->f->data[i];
              if (s->picture_structure == PICT_BOTTOM_FIELD)
 -- 
-2.27.0.windows.1
+2.37.3.windows.1
 

@@ -1,32 +1,50 @@
---- ffmpeg/libavcodec/dxva2_vc1.c	2017-12-19 14:46:36.070857200 +0100
-+++ ffmpeg/libavcodec/dxva2_vc1.c.refcrash	2017-12-19 14:36:57.157973200 +0100
-@@ -58,11 +58,11 @@ static void fill_picture_parameters(AVCo
-     memset(pp, 0, sizeof(*pp));
-     pp->wDecodedPictureIndex    =
-     pp->wDeblockedPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
--    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_picture.f->buf[0])
-         pp->wForwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
-     else
-         pp->wForwardRefPictureIndex = 0xffff;
--    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_picture.f->buf[0])
-         pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
-     else
-         pp->wBackwardRefPictureIndex = 0xffff;
---- ffmpeg/libavcodec/dxva2_mpeg2.c	2018-01-23 12:58:14.672161600 +0100
-+++ ffmpeg/libavcodec/dxva2_mpeg2.c.ref	2018-01-23 12:56:45.439743300 +0100
-@@ -51,11 +51,11 @@ static void fill_picture_parameters(AVCo
+From f119b395362c9207f70bb86c561d9f4325beb744 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 23 Jan 2018 13:01:22 +0100
+Subject: [PATCH 02/10] fix crash on bogus frame reference in VC1/MPEG-2 with
+ DXVA
+
+---
+ libavcodec/dxva2_mpeg2.c | 4 ++--
+ libavcodec/dxva2_vc1.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/dxva2_mpeg2.c b/libavcodec/dxva2_mpeg2.c
+index 75c416654f..5476db245d 100644
+--- a/libavcodec/dxva2_mpeg2.c
++++ b/libavcodec/dxva2_mpeg2.c
+@@ -51,11 +51,11 @@ static void fill_picture_parameters(AVCodecContext *avctx,
      memset(pp, 0, sizeof(*pp));
      pp->wDecodedPictureIndex         = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
      pp->wDeblockedPictureIndex       = 0;
 -    if (s->pict_type != AV_PICTURE_TYPE_I)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_picture.f->buf[0])
++    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_picture.f->data[0])
          pp->wForwardRefPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
      else
          pp->wForwardRefPictureIndex  = 0xffff;
 -    if (s->pict_type == AV_PICTURE_TYPE_B)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture.f->buf[0])
++    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture.f->data[0])
          pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
      else
          pp->wBackwardRefPictureIndex = 0xffff;
+diff --git a/libavcodec/dxva2_vc1.c b/libavcodec/dxva2_vc1.c
+index b35fb115f7..f8fe47117e 100644
+--- a/libavcodec/dxva2_vc1.c
++++ b/libavcodec/dxva2_vc1.c
+@@ -59,11 +59,11 @@ static void fill_picture_parameters(AVCodecContext *avctx,
+     memset(pp, 0, sizeof(*pp));
+     pp->wDecodedPictureIndex    =
+     pp->wDeblockedPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
+-    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
++    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_picture.f->data[0])
+         pp->wForwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
+     else
+         pp->wForwardRefPictureIndex = 0xffff;
+-    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type)
++    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_picture.f->data[0])
+         pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
+     else
+         pp->wBackwardRefPictureIndex = 0xffff;
+-- 
+2.37.3.windows.1
+

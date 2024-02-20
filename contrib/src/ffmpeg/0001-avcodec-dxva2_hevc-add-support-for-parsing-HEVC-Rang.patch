@@ -1,7 +1,7 @@
-From 833195704700ba3fa326473292e91524964eeeaa Mon Sep 17 00:00:00 2001
+From 575d81193f7cc308e2a397cd660011fecf67915e Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 3 Oct 2019 14:05:40 +0200
-Subject: [PATCH 1/3] avcodec/dxva2_hevc: add support for parsing HEVC Range
+Subject: [PATCH 04/10] avcodec/dxva2_hevc: add support for parsing HEVC Range
  Extension data
 
 ---
@@ -35,12 +35,12 @@ index 22c93992f2..024999239d 100644
  /**
   * This structure is used to provides the necessary configurations and data
 diff --git a/libavcodec/dxva2_hevc.c b/libavcodec/dxva2_hevc.c
-index dbb701fb1c..98b3e74bd7 100644
+index b6c08943f0..d29ae05b55 100644
 --- a/libavcodec/dxva2_hevc.c
 +++ b/libavcodec/dxva2_hevc.c
-@@ -26,10 +26,47 @@
- #include "hevc_data.h"
+@@ -29,10 +29,47 @@
  #include "hevcdec.h"
+ #include "hwaccel_internal.h"
  
 +#pragma pack(push, 1)
 +typedef struct
@@ -87,7 +87,7 @@ index dbb701fb1c..98b3e74bd7 100644
      DXVA_Qmatrix_HEVC     qm;
      unsigned              slice_count;
      DXVA_Slice_HEVC_Short slice_short[MAX_SLICES];
-@@ -55,18 +92,48 @@ static int get_refpic_index(const DXVA_PicParams_HEVC *pp, int surface_index)
+@@ -58,18 +95,48 @@ static int get_refpic_index(const DXVA_PicParams_HEVC *pp, int surface_index)
  }
  
  static void fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, const HEVCContext *h,
@@ -138,7 +138,7 @@ index dbb701fb1c..98b3e74bd7 100644
      pp->wFormatAndSequenceInfoFlags = (sps->chroma_format_idc             <<  0) |
                                        (sps->separate_colour_plane_flag    <<  2) |
                                        ((sps->bit_depth - 8)               <<  3) |
-@@ -402,16 +469,18 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
+@@ -405,16 +472,18 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
  
  static int dxva2_hevc_end_frame(AVCodecContext *avctx)
  {
@@ -160,5 +160,5 @@ index dbb701fb1c..98b3e74bd7 100644
                                      commit_bitstream_and_slice_buffer);
      return ret;
 -- 
-2.27.0.windows.1
+2.37.3.windows.1
 
