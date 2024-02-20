@@ -83,6 +83,7 @@ struct PS_INPUT\n\
 #define SAMPLE_TRIPLANAR_TO_YUVA     7\n\
 #define SAMPLE_TRIPLANAR10_TO_YUVA   8\n\
 #define SAMPLE_PLANAR_YUVA_TO_YUVA   9\n\
+#define SAMPLE_BGRX_TO_RGBA         17\n\
 \n\
 #define SAMPLE_NV12_TO_NV_Y         10\n\
 #define SAMPLE_NV12_TO_NV_UV        11\n\
@@ -204,6 +205,9 @@ inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     sample.a  = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_RGBA)\n\
     sample = shaderTexture[0].Sample(samplerState, coords);\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_BGRX_TO_RGBA)\n\
+    sample = shaderTexture[0].Sample(samplerState, coords);\n\
+    sample.a  = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANAR_TO_YUVA)\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
     sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n\
@@ -518,11 +522,14 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
-        case DXGI_FORMAT_B8G8R8X8_UNORM:
         case DXGI_FORMAT_R10G10B10A2_UNORM:
         case DXGI_FORMAT_R16G16B16A16_UNORM:
         case DXGI_FORMAT_B5G6R5_UNORM:
             psz_sampler[0] = "SAMPLE_RGBA_TO_RGBA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
+            break;
+        case DXGI_FORMAT_B8G8R8X8_UNORM:
+            psz_sampler[0] = "SAMPLE_BGRX_TO_RGBA";
             psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_UNKNOWN:
