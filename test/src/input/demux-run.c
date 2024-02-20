@@ -425,6 +425,7 @@ int vlc_demux_process_memory(const struct vlc_run_args *args,
     f(demux_au) \
     f(demux_avi_avi) \
     f(demux_caf) \
+    f(demux_demux_cdg) \
     f(demux_mpeg_es) \
     f(demux_flacsys) \
     f(demux_mpeg_h26x) \
