@@ -1,7 +1,8 @@
-From 57c0b0ffa1508f6400ea034d6c0403e686794fdf Mon Sep 17 00:00:00 2001
+From 2583c7346227b5967f3626f5f5ff97f4db2748ef Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 12 Feb 2021 11:10:03 +0100
-Subject: [PATCH 2/2] avcodec/mpeg12dec: don't end a slice without first_slice
+Subject: [PATCH 08/10] avcodec/mpeg12dec: don't end a slice without
+ first_slice
 
 If first_slice is set that means the first slice/field is not started yet. We
 should not end the slice. In particular calling hwaccel->end_frame may crash as
@@ -14,10 +15,10 @@ for this check to work.
  1 file changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 335c3713c2..42c580b8a5 100644
+index be8e74eb53..a78ca29b66 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
-@@ -2484,13 +2484,19 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
+@@ -2425,13 +2425,19 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
                          s2->er.error_count += s2->thread_context[i]->er.error_count;
                  }
  
@@ -45,5 +46,5 @@ index 335c3713c2..42c580b8a5 100644
              }
              s2->pict_type = 0;
 -- 
-2.27.0.windows.1
+2.37.3.windows.1
 

@@ -1,0 +1,49 @@
+From 308c7e89093e370082ea7341bdb0d4eb7a6bc52a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 20 Feb 2024 13:21:36 +0100
+Subject: [PATCH 11/11] avcodec/videotoolboxenc: disable calls on unsupported
+ iOS/tvOS version
+
+VTCopySupportedPropertyDictionaryForEncoder and kVTCompressionPropertyKey_EncoderID are not
+available.
+
+"supported_props" seems to be read but never used.
+We don't need to dump encoder data for debugging in those cases.
+---
+ libavcodec/videotoolboxenc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libavcodec/videotoolboxenc.c b/libavcodec/videotoolboxenc.c
+index b0e827d14a..5d1bc8cba8 100644
+--- a/libavcodec/videotoolboxenc.c
++++ b/libavcodec/videotoolboxenc.c
+@@ -1159,7 +1159,7 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+     }
+ 
+ #if defined (MAC_OS_X_VERSION_10_13) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_13)
+-    if (__builtin_available(macOS 10.13, *)) {
++    if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, *)) {
+         status = VTCopySupportedPropertyDictionaryForEncoder(avctx->width,
+                                                              avctx->height,
+                                                              codec_type,
+@@ -1171,8 +1171,6 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+             av_log(avctx, AV_LOG_ERROR,"Error retrieving the supported property dictionary err=%"PRId64"\n", (int64_t)status);
+             return AVERROR_EXTERNAL;
+         }
+-    }
+-#endif
+ 
+     // Dump the init encoder
+     {
+@@ -1201,6 +1199,8 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+         if (encoderID != NULL)
+             CFRelease(encoderID);
+     }
++    }
++#endif
+ 
+     if (avctx->flags & AV_CODEC_FLAG_QSCALE && !vtenc_qscale_enabled()) {
+         av_log(avctx, AV_LOG_ERROR, "Error: -q:v qscale not available for encoder. Use -b:v bitrate instead.\n");
+-- 
+2.37.3.windows.1
+
