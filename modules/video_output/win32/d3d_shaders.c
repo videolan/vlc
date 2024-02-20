@@ -419,7 +419,7 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
 
     FLOAT itu_black_level = 0.f;
     FLOAT itu_achromacy   = 0.f;
-    if (!RGB_src_shader)
+    if (!RGB_src_shader || fmt->color_range == COLOR_RANGE_LIMITED)
     {
         switch (quad->textureFormat->bitsPerChannel)
         {
@@ -486,6 +486,9 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     if (RGB_src_shader == DxgiIsRGBFormat(displayFormat->pixelFormat))
     {
         ppColorspace = IDENTITY_4X3;
+        WhitePoint[0*4 + 3] = -itu_black_level;
+        WhitePoint[1*4 + 3] = -itu_black_level;
+        WhitePoint[2*4 + 3] = -itu_black_level;
     }
     else if (RGB_src_shader)
     {
