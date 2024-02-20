@@ -64,7 +64,7 @@ struct d3d11_scaler
 
 static const d3d_format_t *GetDirectRenderingFormat(vlc_object_t *vd, d3d11_device_t *d3d_dev, uint8_t bits_per_channel, uint8_t alpha_bits)
 {
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
     return (FindD3D11Format)( vd, d3d_dev, 0, DXGI_RGB_FORMAT, bits_per_channel, 0, 0, alpha_bits,
                             DXGI_CHROMA_GPU, supportFlags );
 }
