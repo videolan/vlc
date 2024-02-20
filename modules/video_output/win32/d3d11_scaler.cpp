@@ -83,12 +83,50 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
     struct vlc_amf_context amf = {};
     amf::AMFComponent *amf_scaler = nullptr;
 #endif
+    if (super_res)
+    {
     // NVIDIA 530+ driver
     if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA &&
         (d3d_dev->WDDM.revision * 10000 + d3d_dev->WDDM.build) > 153000)
     {
-        // TODO refine which GPU can do it
-        canProcess = true;
+        constexpr GUID kNvidiaPPEInterfaceGUID{ 0xd43ce1b3, 0x1f4b, 0x48ac, {0xba, 0xee, 0xc3, 0xc2, 0x53, 0x75, 0xe6, 0xf7} };
+        HRESULT hr;
+        UINT available = 0;
+        D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc{};
+
+        ComPtr<ID3D11VideoContext>              d3dvidctx;
+        ComPtr<ID3D11VideoDevice>               d3dviddev;
+        ComPtr<ID3D11VideoProcessorEnumerator>  enumerator;
+        ComPtr<ID3D11VideoProcessor>            processor;
+
+        d3d11_device_lock(d3d_dev);
+        hr = d3d_dev->d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3dvidctx));
+        if (unlikely(FAILED(hr)))
+            goto checked;
+        hr = d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3dviddev));
+        if (unlikely(FAILED(hr)))
+            goto checked;
+
+        processorDesc.InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE;
+        processorDesc.InputFrameRate = { 1, 25 };
+        processorDesc.InputWidth   = 1280;
+        processorDesc.InputHeight  = 720;
+        processorDesc.OutputWidth  = 1920;
+        processorDesc.OutputHeight = 1080;
+        processorDesc.OutputFrameRate = { 1, 25 };
+        processorDesc.Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL;
+        hr = d3dviddev->CreateVideoProcessorEnumerator(&processorDesc, &enumerator);
+        if (unlikely(FAILED(hr)))
+            goto checked;
+        hr = d3dviddev->CreateVideoProcessor(enumerator.Get(), 0, &processor);
+        if (unlikely(FAILED(hr)))
+            goto checked;
+
+        hr = d3dvidctx->VideoProcessorGetStreamExtension(processor.Get(),
+                    0, &kNvidiaPPEInterfaceGUID, sizeof(available), &available);
+        d3d11_device_unlock(d3d_dev);
+checked:
+        canProcess = available != 0;
     }
     else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL)
     {
@@ -96,7 +134,7 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         canProcess = true;
     }
 #ifdef HAVE_AMF_SCALER
-    else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_AMD && !canProcess)
+    else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_AMD)
     {
         int res = vlc_AMFCreateContext(&amf);
         if (res == VLC_SUCCESS)
@@ -110,6 +148,7 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
         }
     }
 #endif
+    }
 
     d3d11_scaler *scaleProc = nullptr;
     const d3d_format_t *fmt = nullptr;
