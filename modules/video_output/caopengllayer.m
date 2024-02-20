@@ -479,6 +479,7 @@ static void Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     atomic_store(&sys->is_ready, false);
+    [sys->videoLayer vlcClose];
     [sys->videoView vlcClose];
 
     if (sys->vgl && !vlc_gl_MakeCurrent(sys->gl)) {
@@ -623,7 +624,6 @@ static int Control (vout_display_t *vd, int query)
 - (void)vlcClose
 {
     @synchronized (self) {
-        [(VLCCAOpenGLLayer *)self.layer vlcClose];
         _vlc_vd = NULL;
     }
 }
