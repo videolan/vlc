@@ -983,7 +983,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         texture_visible_rect.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
         Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
-                              &rect_in_display, subpicture->i_alpha * r->i_alpha / 255, ORIENT_NORMAL);
+                              &rect_in_display, r->i_alpha, ORIENT_NORMAL);
         i++;
     }
 }

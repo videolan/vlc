@@ -262,7 +262,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                 glr->tex_width  = 1.0;
                 glr->tex_height = 1.0;
             }
-            glr->alpha  = (float)subpicture->i_alpha * r->i_alpha / 255 / 255;
+            glr->alpha  = (float)r->i_alpha / 255;
             glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
             glr->top    = -2.0 * (r->i_y                          ) / subpicture->i_original_picture_height + 1.0;
             glr->right  =  2.0 * (r->i_x + r->fmt.i_visible_width ) / subpicture->i_original_picture_width  - 1.0;

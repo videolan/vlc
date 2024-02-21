@@ -151,9 +151,9 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                                ARRAY_SIZE(rects), rects);
 
     /* Multiply by region and subpicture alpha factors */
-    static const float alpha_fixed = 0xffffp0f / (0xffp0f * 0xffp0f);
+    static const float alpha_fixed = 0xffffp0f / 0xffp0f;
     xcb_render_color_t alpha_color = {
-        0, 0, 0, lroundf(reg->i_alpha * subpic->i_alpha * alpha_fixed) };
+        0, 0, 0, lroundf(reg->i_alpha * alpha_fixed) };
 
     xcb_render_fill_rectangles(conn, XCB_RENDER_PICT_OP_IN_REVERSE,
                                sys->picture.subpic, alpha_color,
