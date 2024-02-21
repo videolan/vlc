@@ -209,7 +209,6 @@ typedef struct subpicture_private_t subpicture_private_t;
 struct vlc_render_subpicture
 {
     vlc_spu_regions regions;                  /**< list of regions to render */
-    int          i_alpha;                                  /**< transparency */
     int64_t      i_order;                    /** an increasing unique number */
     unsigned     i_original_picture_width;  /**< original width of the movie */
     unsigned     i_original_picture_height;/**< original height of the movie */
