@@ -120,7 +120,7 @@ typedef struct
 
     int          i_sequence;
 
-    int          i_extra;
+    size_t       i_extra;
     uint8_t      *p_extra;
     bool         b_extended;
 
@@ -352,7 +352,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             int i_blockalign = p_input->p_fmt->audio.i_blockalign;
             int i_bitspersample = p_input->p_fmt->audio.i_bitspersample;
-            int i_extra = 0;
+            size_t i_extra = 0;
 
             switch( p_input->p_fmt->i_codec )
             {
@@ -491,7 +491,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             const es_format_t *p_fmt = p_input->p_fmt;
             uint8_t *p_codec_extra = NULL;
-            int     i_codec_extra = 0;
+            size_t     i_codec_extra = 0;
 
             if( p_fmt->i_codec == VLC_CODEC_MP4V )
             {
