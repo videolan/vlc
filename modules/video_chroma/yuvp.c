@@ -128,7 +128,9 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
     video_palette_t rgbp;
     int r, g, b, a;
 
-    GetPackedRgbIndexes(p_filter->fmt_out.video.i_chroma, &r, &g, &b, &a);
+    if (GetPackedRgbIndexes(p_filter->fmt_out.video.i_chroma, &r, &g, &b, &a) != VLC_SUCCESS)
+        vlc_assert_unreachable();
+
     /* Create a RGBA palette */
     rgbp.i_entries = p_yuvp->i_entries;
     for( int i = 0; i < p_yuvp->i_entries; i++ )
