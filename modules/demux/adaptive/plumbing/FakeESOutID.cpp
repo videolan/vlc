@@ -101,7 +101,7 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
         fmt.i_original_fourcc != p_other->fmt.i_original_fourcc )
         return false;
 
-    if((fmt.i_extra > 0) ^ (p_other->fmt.i_extra > 0))
+    if((fmt.i_extra > 0) != (p_other->fmt.i_extra > 0))
         return false;
 
     if(fmt.i_profile != p_other->fmt.i_profile ||
