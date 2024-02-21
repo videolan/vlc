@@ -323,7 +323,7 @@ static int HEVCSetCSD(decoder_t *p_dec, bool *p_size_changed)
     return VLC_SUCCESS;
 }
 
-static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, size_t i_extra)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
@@ -342,7 +342,7 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     return VLC_SUCCESS;
 }
 
-static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, size_t i_extra)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
@@ -361,10 +361,10 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     return VLC_SUCCESS;
 }
 
-static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, size_t i_extra)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int offset = 0;
+    size_t offset = 0;
 
     if (i_extra < 4)
         return VLC_EGENERIC;
@@ -386,7 +386,7 @@ static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     return CSDDup(p_sys, p_extra + offset, i_extra - offset);
 }
 
-static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+static int ParseVideoExtraWmv3(decoder_t *p_dec, uint8_t *p_extra, size_t i_extra)
 {
     /* WMV3 initialisation data :
      * 8 fixed bytes
@@ -423,7 +423,7 @@ static int ParseExtra(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_extra = p_dec->fmt_in->p_extra;
-    int i_extra = p_dec->fmt_in->i_extra;
+    size_t i_extra = p_dec->fmt_in->i_extra;
 
     switch (p_dec->fmt_in->i_codec)
     {
