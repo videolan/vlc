@@ -122,46 +122,44 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
                 p_a[x] = p_yuvp->palette[v][3];
             }
         }
+        return;
     }
-    else
+
+    video_palette_t rgbp;
+    int r, g, b, a;
+
+    GetPackedRgbIndexes(p_filter->fmt_out.video.i_chroma, &r, &g, &b, &a);
+    /* Create a RGBA palette */
+    rgbp.i_entries = p_yuvp->i_entries;
+    for( int i = 0; i < p_yuvp->i_entries; i++ )
     {
-        video_palette_t rgbp;
-        int r, g, b, a;
-
-        GetPackedRgbIndexes(p_filter->fmt_out.video.i_chroma, &r, &g, &b, &a);
-        /* Create a RGBA palette */
-        rgbp.i_entries = p_yuvp->i_entries;
-        for( int i = 0; i < p_yuvp->i_entries; i++ )
+        if( p_yuvp->palette[i][3] == 0 )
         {
-            if( p_yuvp->palette[i][3] == 0 )
-            {
-                memset( rgbp.palette[i], 0, sizeof( rgbp.palette[i] ) );
+            memset( rgbp.palette[i], 0, sizeof( rgbp.palette[i] ) );
+            continue;
+        }
+        Yuv2Rgb( &rgbp.palette[i][r], &rgbp.palette[i][g], &rgbp.palette[i][b],
+                 p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
+        rgbp.palette[i][a] = p_yuvp->palette[i][3];
+    }
+
+    for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
+    {
+        const uint8_t *p_line = &p_source->p->p_pixels[y*p_source->p->i_pitch];
+        uint8_t *p_pixels = &p_dest->p->p_pixels[y*p_dest->p->i_pitch];
+
+        for( unsigned int x = 0; x < p_filter->fmt_in.video.i_width; x++ )
+        {
+            const int v = p_line[x];
+
+            if( v >= rgbp.i_entries )  /* maybe assert ? */
                 continue;
-            }
-            Yuv2Rgb( &rgbp.palette[i][r], &rgbp.palette[i][g], &rgbp.palette[i][b],
-                     p_yuvp->palette[i][0], p_yuvp->palette[i][1], p_yuvp->palette[i][2] );
-            rgbp.palette[i][a] = p_yuvp->palette[i][3];
+
+            p_pixels[4*x+0] = rgbp.palette[v][0];
+            p_pixels[4*x+1] = rgbp.palette[v][1];
+            p_pixels[4*x+2] = rgbp.palette[v][2];
+            p_pixels[4*x+3] = rgbp.palette[v][3];
         }
-
-        for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
-        {
-            const uint8_t *p_line = &p_source->p->p_pixels[y*p_source->p->i_pitch];
-            uint8_t *p_pixels = &p_dest->p->p_pixels[y*p_dest->p->i_pitch];
-
-            for( unsigned int x = 0; x < p_filter->fmt_in.video.i_width; x++ )
-            {
-                const int v = p_line[x];
-
-                if( v >= rgbp.i_entries )  /* maybe assert ? */
-                    continue;
-
-                p_pixels[4*x+0] = rgbp.palette[v][0];
-                p_pixels[4*x+1] = rgbp.palette[v][1];
-                p_pixels[4*x+2] = rgbp.palette[v][2];
-                p_pixels[4*x+3] = rgbp.palette[v][3];
-            }
-        }
-
     }
 }
 
