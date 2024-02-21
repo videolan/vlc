@@ -23,9 +23,6 @@
 
 #include "srt_common.h"
 
-const char * const srt_key_length_names[] = { N_( "16 bytes" ), N_(
-        "24 bytes" ), N_( "32 bytes" ), };
-
 typedef struct parsed_param {
     char *key;
     char *val;

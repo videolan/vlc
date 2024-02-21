@@ -60,8 +60,8 @@
 #define SRT_KEY_LENGTH_TEXT N_("Crypto key length in bytes")
 #define SRT_DEFAULT_KEY_LENGTH 16
 static const int srt_key_lengths[] = { 16, 24, 32, };
-
-extern const char * const srt_key_length_names[];
+static const char * const srt_key_length_names[] = { N_( "16 bytes" ), N_(
+        "24 bytes" ), N_( "32 bytes" ), };
 
 typedef struct srt_params {
     int latency;
