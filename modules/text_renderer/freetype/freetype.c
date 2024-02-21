@@ -616,7 +616,6 @@ static inline void RenderAXYZ( filter_t *p_filter,
                               const FT_BBox *p_regionbbox,
                               const FT_BBox *p_paddedtextbbox,
                               const FT_BBox *p_textbbox,
-                              vlc_fourcc_t i_chroma,
                               const ft_drawing_functions *draw )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -1133,9 +1132,7 @@ static subpicture_region_t *Render( filter_t *p_filter,
             }
 
             RenderAXYZ( p_filter, p_region_in, region, text_block.p_laid,
-                                 &renderbbox, &paddedbbox, &bbox,
-                                 *p_chroma,
-                                 func );
+                                 &renderbbox, &paddedbbox, &bbox, func );
         }
 
 //      if( (bboxcolor & 0xFF) == 0 )
