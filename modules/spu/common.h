@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_subpicture.h>
+
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency), " \
   "from 0 for fully transparent to 255 for fully opaque." )
@@ -34,7 +36,18 @@
   "also use combinations of these values, e.g. 6 = top-right).")
 
 /* Excluding absolute, these values correspond to SUBPICTURE_ALIGN_* flags */
-static const int pi_pos_values[] = { -1, 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const int pi_pos_values[] = {
+    -1,
+    0,
+    SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_TOP,
+    SUBPICTURE_ALIGN_BOTTOM,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT,
+};
 static const char *const ppsz_pos_descriptions[] =
 { N_("Absolute"),
   N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),

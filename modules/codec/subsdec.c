@@ -161,7 +161,7 @@ static const char *const ppsz_encoding_names[] = {
     N_("Vietnamese (Windows-1258)"),
 };
 
-static const int  pi_justification[] = { -1, 0, 1, 2 };
+static const int  pi_justification[] = { -1, 0, SUBPICTURE_ALIGN_LEFT, SUBPICTURE_ALIGN_RIGHT };
 static const char *const ppsz_justification_text[] = {
     N_("Auto"),N_("Center"),N_("Left"),N_("Right")
 };
