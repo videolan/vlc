@@ -12,13 +12,10 @@ ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
-PKGS += d3d9 dcomp
+PKGS += dcomp
 endif # !HAVE_WINSTORE
 PKGS += dxva dxvahd mingw11-fixes mft10 d3d12
 
-ifeq ($(call mingw_at_least, 8), true)
-PKGS_FOUND += d3d9
-endif # MINGW 8
 ifeq ($(call mingw_at_least, 9), true)
 PKGS_FOUND += d3d12
 ifdef HAVE_WINSTORE
@@ -46,7 +43,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp mingw11-fixes alloweduwp mft10 d3d12
+PKGS_ALL += winpthreads winrt_headers dxva dxvahd dcomp mingw11-fixes alloweduwp mft10 d3d12
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -150,16 +147,6 @@ MINGW_HEADERS_MFT := mfidl.h mfapi.h mftransform.h mferror.h mfobjects.h mmreg.h
 .mft10: mingw64
 	install -d "$(PREFIX)/include"
 	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_MFT)) "$(PREFIX)/include"
-	touch $@
-
-.sum-d3d9: .sum-mingw64
-	touch $@
-
-MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
-
-.d3d9: mingw64
-	install -d "$(PREFIX)/include"
-	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_D3D9)) "$(PREFIX)/include"
 	touch $@
 
 .sum-dxva: .sum-mingw64
