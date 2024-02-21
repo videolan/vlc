@@ -389,7 +389,7 @@ static int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int
     return p.pos;
 }
 
-int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const char *vendor)
+int opus_write_header(uint8_t **p_extra, size_t *i_extra, OpusHeader *header, const char *vendor)
 {
     unsigned char header_data[100];
     const int packet_size = opus_header_to_packet(header, header_data,

@@ -353,7 +353,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
 
-    int i_extra = p_dec->fmt_in->i_extra;
+    size_t i_extra = p_dec->fmt_in->i_extra;
     const uint8_t *p_extra = p_dec->fmt_in->p_extra;
     uint8_t *p_alloc = NULL;
 

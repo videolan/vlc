@@ -850,7 +850,7 @@ static int Demux( demux_t *p_demux )
     if( side_data_size_query > 0 ) {
         // ignore new extradata which is the same as previous version
         size_t side_data_size = (size_t)side_data_size_query;
-        if( side_data_size != (size_t)p_track->es_format.i_extra ||
+        if (side_data_size != p_track->es_format.i_extra ||
             memcmp( side_data, p_track->es_format.p_extra, side_data_size ) != 0 )
         {
             msg_Warn( p_demux, "New extra data found, seek may not work as expected" );

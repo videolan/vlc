@@ -523,7 +523,7 @@ static void ProcessHeader( decoder_t *p_dec )
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    int i_extra = p_dec->fmt_in->i_extra;
+    size_t i_extra = p_dec->fmt_in->i_extra;
 
     static const char header[4] = { 'f', 'L', 'a', 'C' };
 

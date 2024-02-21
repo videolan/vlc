@@ -281,8 +281,9 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
             bits_write( &bits, 8,   0x05 ); /* tag */
             bits_write( &bits, 24, GetDescriptorLength24b(
                         p_stream->fmt->i_extra ) );
-            for (int j = 0; j < p_stream->fmt->i_extra; j++ )
+            for (size_t j = 0; j < p_stream->fmt->i_extra; j++ )
             {
+            // TODO checks
                 bits_write( &bits, 8,
                     ((uint8_t*)p_stream->fmt->p_extra)[j] );
             }

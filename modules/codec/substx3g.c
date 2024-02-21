@@ -569,11 +569,13 @@ static int OpenDecoder( vlc_object_t *p_this )
  * Encoder entry/exit
  *****************************************************************************/
 #ifdef ENABLE_SOUT
-static void FillExtradataTx3g( void **pp_extra, int *pi_extra )
+static void FillExtradataTx3g(void **pp_extra, size_t *pi_extra)
 {
     size_t i_extra = 32 + 37;
     uint8_t *p_extra = calloc( 1, i_extra );
-    if( p_extra )
+    if (p_extra == NULL)
+        return;
+
     {
         p_extra[4] = 0x01;/* 1  center, horizontal */
         p_extra[5] = 0xFF;/* -1 bottom, vertical */

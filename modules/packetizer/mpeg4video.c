@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_out.i_extra )
     {
         /* We have a vol */
-        msg_Dbg( p_dec, "opening with vol size: %d", p_dec->fmt_out.i_extra );
+        msg_Dbg( p_dec, "opening with vol size: %zu", p_dec->fmt_out.i_extra );
         ParseVOL( p_dec, &p_dec->fmt_out,
                   p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
     }

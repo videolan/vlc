@@ -93,7 +93,7 @@ struct nvdec_ctx {
     CUvideoparser               cuparser;
     union {
         struct hxxx_helper      hh;
-        int                     vc1_header_offset;
+        size_t                  vc1_header_offset;
     };
     bool                        b_is_hxxx;
     bool                        b_xps_pushed; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)

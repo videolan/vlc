@@ -441,7 +441,7 @@ static int ParseGSI(decoder_t *dec, decoder_sys_t *p_sys)
     }
 
     if (GSI_BLOCK_SIZE != dec->fmt_in->i_extra) {
-        msg_Err(dec, "EBU header is not in expected size (%d)\n", dec->fmt_in->i_extra);
+        msg_Err(dec, "EBU header is not in expected size (%zu)\n", dec->fmt_in->i_extra);
         return VLC_EGENERIC;
     }
 

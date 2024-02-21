@@ -330,7 +330,7 @@ static void BuildExtraData( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     es_format_t *p_es = &p_dec->fmt_out;
-    int i_extra;
+    size_t i_extra;
     if( !p_sys->b_sequence_header || !p_sys->b_entry_point )
         return;
 

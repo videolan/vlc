@@ -73,7 +73,7 @@ typedef struct logical_stream_s
     int              i_packets_backup;
     int32_t          i_extra_headers_packets;
     void             *p_headers;
-    int              i_headers;
+    size_t           i_headers;
     ogg_int64_t      i_granulepos_offset;/* first granule offset */
 
     /* program clock reference (in units of 90kHz) derived from the previous
@@ -88,7 +88,7 @@ typedef struct logical_stream_s
     int i_next_block_flags;
 
     /* Opus has a starting offset in the headers. */
-    int i_pre_skip;
+    size_t i_pre_skip;
     enum
     {
         OGGPAGE_HEADER,

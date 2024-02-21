@@ -666,7 +666,7 @@ struct es_format_t
     int      i_level;         /**< codec specific information: indicates maximum restrictions on the stream (resolution, bitrate, codec features ...) */
 
     bool     b_packetized;  /**< whether the data is packetized (ie. not truncated) */
-    int     i_extra;        /**< length in bytes of extra data pointer */
+    size_t   i_extra;       /**< length in bytes of extra data pointer */
     void    *p_extra;       /**< extra data needed by some decoders or muxers */
 
 };

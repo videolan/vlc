@@ -2483,7 +2483,7 @@ parseOpusConfigStr(char const* configStr, size_t& configSize, audio_format_t& fm
     fmt.i_rate = header.input_sample_rate;
     /* Build extradata with the proper params */
     opus_prepare_header( header.channels, header.input_sample_rate, &header );
-    int i_extra;
+    size_t i_extra;
     uint8_t *p_extra;
     if( opus_write_header( &p_extra, &i_extra, &header, NULL ) )
     {
@@ -2491,7 +2491,7 @@ parseOpusConfigStr(char const* configStr, size_t& configSize, audio_format_t& fm
         i_extra = 0;
     }
     opus_header_clean(&header);
-    configSize = (size_t)i_extra;
+    configSize = i_extra;
     return p_extra;
 }
 

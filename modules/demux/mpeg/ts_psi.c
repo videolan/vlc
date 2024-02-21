@@ -1170,7 +1170,7 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
 
     if (h.channels) {
         uint8_t *p_extra = NULL;
-        int i_extra = 0;
+        size_t i_extra = 0;
         opus_write_header(&p_extra, &i_extra, &h, NULL /* FIXME */);
         if (p_extra) {
             es_format_Change(p_fmt, AUDIO_ES, VLC_CODEC_OPUS);
@@ -1466,7 +1466,7 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_es_t *p_es,
         p_fmt->p_extra = malloc( p_fmt->i_extra );
         if( p_fmt->p_extra )
             memcpy( p_fmt->p_extra, &p_dr->p_data[10],
-                    __MIN( p_fmt->i_extra, p_dr->i_length - 10 ) );
+                    __MIN( p_fmt->i_extra, (size_t)(p_dr->i_length - 10) ) );
         else
             p_fmt->i_extra = 0;
     }

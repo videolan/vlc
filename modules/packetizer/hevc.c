@@ -568,7 +568,7 @@ static void SetsToAnnexB(decoder_sys_t *p_sys,
                          const hevc_picture_parameter_set_t *p_pps,
                          const hevc_sequence_parameter_set_t *p_sps,
                          const hevc_video_parameter_set_t *p_vps,
-                         uint8_t **pp_out, int *pi_out)
+                         uint8_t **pp_out, size_t *pi_out)
 {
     uint8_t *p_data = NULL;
     size_t i_data = 0;

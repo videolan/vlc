@@ -120,7 +120,7 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
         buf + idlen + cmtlen
     };
     void *extra;
-    int  extra_size;
+    size_t extra_size;
     if (xiph_PackHeaders (&extra_size, &extra, sizes, payloads, 3))
         return -1;
     *pextra = extra;

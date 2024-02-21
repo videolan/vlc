@@ -154,7 +154,7 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 static void Ogg_ResetStream( logical_stream_t *p_stream );
 
 /* */
-static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers );
+static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, size_t i_headers );
 
 /* Logical bitstream headers */
 static bool Ogg_ReadDaalaHeader( logical_stream_t *, ogg_packet * );
@@ -2564,7 +2564,7 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 }
 
 static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
-                                 const void *p_headers, unsigned i_headers )
+                                 const void *p_headers, size_t i_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
     int i_cover_score = 0;
@@ -2621,7 +2621,7 @@ static inline uint32_t GetDW24BE( const uint8_t *p )
 }
 
 static void Ogg_ExtractFlacComments( demux_t *p_demux, es_format_t *p_fmt,
-                                     const uint8_t *p_headers, unsigned i_headers )
+                                     const uint8_t *p_headers, size_t i_headers )
 {
     /* Skip Streaminfo 42 bytes / 1st page */
     if(i_headers <= 46)
@@ -2636,7 +2636,7 @@ static void Ogg_ExtractFlacComments( demux_t *p_demux, es_format_t *p_fmt,
 }
 
 static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
-                                 const void *p_headers, unsigned i_headers, unsigned i_skip )
+                                 const void *p_headers, size_t i_headers, unsigned i_skip )
 {
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
@@ -2653,7 +2653,7 @@ static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
     }
 }
 
-static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, int i_headers )
+static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t *p_headers, size_t i_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
 

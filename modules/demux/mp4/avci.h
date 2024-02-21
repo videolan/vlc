@@ -179,10 +179,12 @@ static uint8_t * AVCi_create_avcC( uint16_t i_res, bool b_interlaced, int *pi_av
 }
 #endif
 
-static uint8_t * AVCi_create_AnnexB( uint16_t i_res, bool b_interlaced, int *pi_avcC )
+static uint8_t * AVCi_create_AnnexB(uint16_t i_res, bool b_interlaced, size_t *pi_avcC)
 {
     const uint8_t *p_pps, *p_sps;
     uint8_t i_sps, i_pps;
+
+    // TODO: early return
     uint8_t *p_data = NULL;
     const uint8_t rgi_startcode[] = {0,0,0,1};
     if( AVCi_lookup( i_res, b_interlaced,

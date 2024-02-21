@@ -25,7 +25,7 @@
 #define XIPH_MAX_HEADER_COUNT (256)
 
 /* Temp ffmpeg vorbis format */
-static inline bool xiph_IsLavcFormat(const void *extra, unsigned i_extra,
+static inline bool xiph_IsLavcFormat(const void *extra, size_t i_extra,
                                      vlc_fourcc_t i_codec)
 {
     switch(i_codec)
@@ -39,7 +39,7 @@ static inline bool xiph_IsLavcFormat(const void *extra, unsigned i_extra,
     }
 }
 
-static inline unsigned xiph_CountLavcHeaders(const void *p_extra, unsigned i_extra)
+static inline unsigned xiph_CountLavcHeaders(const void *p_extra, size_t i_extra)
 {
     const uint8_t *p = (const uint8_t*) p_extra;
     const uint8_t *p_end = &p[i_extra];
@@ -56,7 +56,7 @@ static inline unsigned xiph_CountLavcHeaders(const void *p_extra, unsigned i_ext
     return 3;
 }
 
-static inline unsigned xiph_CountHeaders(const void *p_extra, unsigned i_extra)
+static inline unsigned xiph_CountHeaders(const void *p_extra, size_t i_extra)
 {
     const uint8_t *p = (const uint8_t*) p_extra;
     if (!i_extra)
@@ -105,7 +105,7 @@ static inline int xiph_SplitLavcHeaders(unsigned packet_size[],
 
 static inline int xiph_SplitHeaders(unsigned packet_size[],
                                     const void *packet[], unsigned *packet_count,
-                                    unsigned i_extra, const void *p_extra)
+                                    size_t i_extra, const void *p_extra)
 {
     const uint8_t *current = (const uint8_t *)p_extra;
     const uint8_t *end = &current[i_extra];
@@ -158,7 +158,7 @@ static inline int xiph_SplitHeaders(unsigned packet_size[],
     return VLC_SUCCESS;
 }
 
-static inline int xiph_PackHeaders(int *extra_size, void **extra,
+static inline int xiph_PackHeaders(size_t *extra_size, void **extra,
                                    unsigned packet_size[],
                                    const void *const packet[],
                                    unsigned packet_count)
@@ -208,7 +208,7 @@ static inline int xiph_PackHeaders(int *extra_size, void **extra,
     return VLC_SUCCESS;
 }
 
-static inline int xiph_AppendHeaders(int *extra_size, void **extra,
+static inline int xiph_AppendHeaders(size_t *extra_size, void **extra,
                                      unsigned size, const void *data)
 {
     unsigned packet_size[XIPH_MAX_HEADER_COUNT];
@@ -236,7 +236,7 @@ static inline int xiph_AppendHeaders(int *extra_size, void **extra,
 
     free(old);
 
-    if (*extra_size <= 0)
+    if (*extra_size == 0)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
