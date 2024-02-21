@@ -55,7 +55,7 @@ char *BufferGetToken( buffer_t *p_buffer );
 /** struct commandparams_t - command params structure */
 typedef struct commandparams_t
 {
-    int32_t i_id;       /*< overlay id */
+    size_t  i_id;       /*< overlay id */
     int32_t i_shmid;    /*< shared memory identifier */
 
     vlc_fourcc_t fourcc;/*< chroma */

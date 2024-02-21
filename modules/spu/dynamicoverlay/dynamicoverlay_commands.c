@@ -108,6 +108,15 @@ static int parse_digit( char **psz_command, int32_t *value )
     return VLC_SUCCESS;
 }
 
+static int parse_param_id(char **psz_command, size_t *value)
+{
+    int32_t digit;
+    if (parse_digit(psz_command, &digit) == VLC_EGENERIC || digit < 0)
+        return VLC_EGENERIC;
+    *value = digit;
+    return VLC_SUCCESS;
+}
+
 static int parse_char( char **psz_command, char **psz_end,
                        int count, char *psz_value )
 {
@@ -128,7 +137,7 @@ static int parser_DataSharedMem( char *psz_command,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -166,7 +175,7 @@ static int parser_Id( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -188,7 +197,7 @@ static int parser_SetAlpha( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC  )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -207,7 +216,7 @@ static int parser_SetPosition( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -232,7 +241,7 @@ static int parser_SetTextAlpha( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -257,7 +266,7 @@ static int parser_SetTextColor( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -289,7 +298,7 @@ static int parser_SetTextSize( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -308,7 +317,7 @@ static int parser_SetVisibility( char *psz_command, char *psz_end,
     skip_space( &psz_command );
     if( isdigit( (unsigned char)*psz_command ) )
     {
-        if( parse_digit( &psz_command, &p_params->i_id ) == VLC_EGENERIC )
+        if (parse_param_id( &psz_command, &p_params->i_id) == VLC_EGENERIC)
             return VLC_EGENERIC;
     }
     skip_space( &psz_command );
@@ -337,7 +346,7 @@ static int unparse_default( const commandparams_t *p_results,
 static int unparse_GenImage( const commandparams_t *p_results,
                              buffer_t *p_output )
 {
-    int ret = BufferPrintf( p_output, " %d", p_results->i_id );
+    int ret = BufferPrintf( p_output, " %zu", p_results->i_id );
     if( ret != VLC_SUCCESS )
         return ret;
 
@@ -441,7 +450,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
     p_ovl = ListGet( &p_sys->overlays, p_params->i_id );
     if( p_ovl == NULL )
     {
-        msg_Err( p_filter, "Invalid overlay: %d", p_params->i_id );
+        msg_Err( p_filter, "Invalid overlay: %zu", p_params->i_id );
         return VLC_EGENERIC;
     }
 
