@@ -165,7 +165,7 @@ typedef struct
     vlc_demux_chained_t *p_out_muxed;    /* for muxed stream */
 
     uint8_t         *p_buffer;
-    unsigned int    i_buffer;
+    size_t          i_buffer;
 
     bool            b_rtcp_sync;
     bool            b_flushing_discontinuity;
@@ -282,12 +282,33 @@ static void TaskInterruptRTSP( void * );
 static void TimeoutPrevention( void * );
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
-                                          unsigned int& configSize );
+                                          size_t& configSize );
 static unsigned char* parseVorbisConfigStr( char const* configStr,
-                                            unsigned int& configSize );
+                                            size_t& configSize );
 static unsigned char* parseOpusConfigStr( char const* configStr,
-                                          unsigned int& configSize,
+                                          size_t& configSize,
                                           audio_format_t& fmt );
+
+#if SIZE_MAX != UINT_MAX
+namespace {
+uint8_t* parseGeneralConfigStr(char const *configStr, size_t &configSize)
+{
+    unsigned size;
+    unsigned char *data = ::parseGeneralConfigStr(configStr, size);
+    configSize = size;
+    return data;
+}
+
+
+uint8_t* parseStreamMuxConfigStr(char const *configStr, size_t &configSize)
+{
+    unsigned size;
+    unsigned char *data = ::parseStreamMuxConfigStr(configStr, size);
+    configSize = size;
+    return data;
+}
+}
+#endif
 
 static char *passwordLessURL( const vlc_url_t *url );
 
@@ -987,8 +1008,8 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "MP4A-LATM" ) )
                 {
-                    unsigned int i_extra;
-                    uint8_t      *p_extra;
+                    size_t i_extra;
+                    uint8_t *p_extra;
 
                     tk->fmt.i_codec = VLC_CODEC_MP4A;
 
@@ -1005,8 +1026,8 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "MPEG4-GENERIC" ) )
                 {
-                    unsigned int i_extra;
-                    uint8_t      *p_extra;
+                    size_t i_extra;
+                    uint8_t *p_extra;
 
                     tk->fmt.i_codec = VLC_CODEC_MP4A;
 
@@ -1037,8 +1058,8 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "VORBIS" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_VORBIS;
-                    unsigned int i_extra;
-                    unsigned char *p_extra;
+                    size_t i_extra;
+                    uint8_t *p_extra;
                     if( ( p_extra=parseVorbisConfigStr( sub->fmtp_config(),
                                                         i_extra ) ) )
                     {
@@ -1050,8 +1071,8 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "OPUS" ) )
                 {
-                    unsigned int i_extra;
-                    void *p_extra = parseOpusConfigStr( sub->fmtp_config(), i_extra, tk->fmt.audio );
+                    size_t i_extra;
+                    uint8_t *p_extra = parseOpusConfigStr( sub->fmtp_config(), i_extra, tk->fmt.audio );
                     tk->fmt.i_codec = VLC_CODEC_OPUS;
                     if( p_extra )
                     {
@@ -1082,8 +1103,8 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "H264" ) )
                 {
-                    unsigned int i_extra = 0;
-                    uint8_t      *p_extra = NULL;
+                    size_t i_extra = 0;
+                    uint8_t *p_extra = NULL;
 
                     tk->fmt.i_codec = VLC_CODEC_H264;
                     tk->fmt.b_packetized = false;
@@ -1100,11 +1121,11 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     struct
                     {
-                        unsigned int i_data;
+                        size_t i_data;
                         uint8_t * p_data;
                     } xps[3] = {{0, NULL},{0, NULL},{0, NULL}};
-                    unsigned int i_extraTot = 0;
-                    uint8_t      *p_extra;
+                    size_t i_extraTot = 0;
+                    uint8_t *p_extra;
 
                     tk->fmt.i_codec = VLC_CODEC_HEVC;
                     tk->fmt.b_packetized = false;
@@ -1137,13 +1158,13 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "MP4V-ES" ) )
                 {
-                    unsigned int i_extra;
-                    uint8_t      *p_extra;
+                    size_t i_extra;
+                    uint8_t *p_extra;
 
                     tk->fmt.i_codec = VLC_CODEC_MP4V;
 
-                    if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(),
-                                                           i_extra ) ) )
+                    if( ( p_extra = parseGeneralConfigStr(sub->fmtp_config(),
+                                                          i_extra ) ) )
                     {
                         copyExtradata( p_extra, i_extra, &tk->fmt );
                         delete[] p_extra;
@@ -1195,8 +1216,8 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "THEORA" ) )
                 {
                     tk->fmt.i_codec = VLC_CODEC_THEORA;
-                    unsigned int i_extra;
-                    unsigned char *p_extra;
+                    size_t i_extra;
+                    uint8_t *p_extra;
                     if( ( p_extra=parseVorbisConfigStr( sub->fmtp_config(),
                                                         i_extra ) ) )
                     {
@@ -2040,7 +2061,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         {
             void *p_tmp;
             msg_Dbg( p_demux, "lost %d bytes", i_truncated_bytes );
-            msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
+            msg_Dbg( p_demux, "increasing buffer size to %zu", tk->i_buffer * 2 );
             p_tmp = realloc( tk->p_buffer, tk->i_buffer * 2 );
             if( p_tmp == NULL )
             {
@@ -2347,8 +2368,8 @@ static int ParseASF( demux_t *p_demux )
 }
 
 
-static unsigned char* parseH264ConfigStr( char const* configStr,
-                                          unsigned int& configSize )
+static unsigned char*
+parseH264ConfigStr(char const* configStr, size_t& configSize)
 {
     char *dup, *psz;
     size_t i_records = 1;
@@ -2389,22 +2410,27 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
     return cfg;
 }
 
-static uint8_t *parseVorbisConfigStr( char const* configStr,
-                                      unsigned int& configSize )
+static uint8_t *
+parseVorbisConfigStr(char const* configStr, size_t& configSize)
 {
     configSize = 0;
     if( configStr == NULL || *configStr == '\0' )
         return NULL;
+
+    /* LiveMedia needs an unsigned for decoding. */
+    unsigned decoded;
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1332115200 // 2012.03.20
-    unsigned char *p_cfg = base64Decode( configStr, configSize );
+    unsigned char *p_cfg = base64Decode(configStr, decoded);
 #else
     char* configStr_dup = strdup( configStr );
-    unsigned char *p_cfg = base64Decode( configStr_dup, configSize );
+    unsigned char *p_cfg = base64Decode(configStr_dup, decoded);
     free( configStr_dup );
 #endif
+    configSize = decoded;
+
     uint8_t *p_extra = NULL;
     /* skip header count, ident number and length (cf. RFC 5215) */
-    const unsigned int headerSkip = 9;
+    const size_t headerSkip = 9;
     if( configSize > headerSkip && ((uint8_t*)p_cfg)[3] == 1 )
     {
         p_extra = (uint8_t *) std::malloc( configSize - headerSkip );
@@ -2419,9 +2445,8 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
     return p_extra;
 }
 
-static unsigned char* parseOpusConfigStr( char const* configStr,
-                                          unsigned int& configSize,
-                                          audio_format_t& fmt )
+static uint8_t*
+parseOpusConfigStr(char const* configStr, size_t& configSize, audio_format_t& fmt)
 {
     OpusHeader header;
     opus_header_init( &header );
@@ -2466,7 +2491,7 @@ static unsigned char* parseOpusConfigStr( char const* configStr,
         i_extra = 0;
     }
     opus_header_clean(&header);
-    configSize = i_extra;
+    configSize = (size_t)i_extra;
     return p_extra;
 }
 
