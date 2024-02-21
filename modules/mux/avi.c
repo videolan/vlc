@@ -463,9 +463,7 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     free( p_input->p_sys );
 }
 
-static int PrepareSamples( const avi_stream_t *p_stream,
-                           const es_format_t *p_fmt,
-                           block_t **pp_block )
+static int PrepareSamples(const avi_stream_t *p_stream, block_t **pp_block)
 {
     if( p_stream->i_frames == 0 && p_stream->i_cat == VIDEO_ES )
     {
@@ -529,8 +527,7 @@ static int Mux      ( sout_mux_t *p_mux )
                 p_data->i_length = p_next->i_dts - p_data->i_dts;
             }
 
-            if( PrepareSamples( p_stream, &p_mux->pp_inputs[i]->fmt,
-                                &p_data ) != VLC_SUCCESS )
+            if (PrepareSamples(p_stream, &p_data) != VLC_SUCCESS)
             {
                 p_data = p_next;
                 continue;
