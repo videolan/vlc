@@ -134,7 +134,7 @@ static void SetupESDS( demux_t *p_demux, const mp4_track_t *p_track,
     if( p_fmt->i_codec == VLC_CODEC_SPU &&
             p_fmt->i_extra >= sizeof(p_fmt->subs.spu.palette) )
     {
-        for( int i = 0; i < ARRAY_SIZE(p_fmt->subs.spu.palette); i++ )
+        for (size_t i = 0; i < ARRAY_SIZE(p_fmt->subs.spu.palette); i++)
         {
             p_fmt->subs.spu.palette[i] = GetDWBE((char*)p_fmt->p_extra + i * 4);
         }
