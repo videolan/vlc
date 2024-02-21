@@ -2376,9 +2376,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
         return !b_fragmented;
     case VLC_CODEC_TTML:
-        /* Special case with smooth headers where we need to force frag TTML */
-        /* TTML currently not supported in sout, until we can keep original timestamps */
-            return i_brand == BRAND_smoo;
+        return true;
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
     case VLC_CODEC_WEBVTT:
