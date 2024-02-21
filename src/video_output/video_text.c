@@ -51,8 +51,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
 
     vlc_spu_regions_Clear( &subpic->regions );
 
-    if( fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0 )
-        return;
+    assert(fmt_dst->i_sar_den && fmt_dst->i_sar_num);
 
     subpic->b_absolute = false;
     subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;

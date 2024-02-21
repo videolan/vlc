@@ -60,10 +60,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     assert( vlc_spu_regions_is_empty( &subpic->regions ) );
 
-    if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
-    {
-        return;
-    }
+    assert(fmt_dst->i_sar_num && fmt_dst->i_sar_den);
 
     subpicture_region_t *r;
     arib_text_region_t *p_region;
