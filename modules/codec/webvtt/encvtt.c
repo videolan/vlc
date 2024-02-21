@@ -113,8 +113,8 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
     if( !bo_init( &box, 8 ) )
         return NULL;
 
-    subpicture_region_t *p_region;
-    vlc_spu_regions_foreach(p_region, &p_spu->regions)
+    const subpicture_region_t *p_region;
+    vlc_spu_regions_foreach_const(p_region, &p_spu->regions)
     {
         if(!subpicture_region_IsText( p_region )||
             p_region->p_text == NULL ||

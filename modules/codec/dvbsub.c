@@ -1692,10 +1692,10 @@ typedef struct
 } encoder_sys_t;
 
 #ifdef ENABLE_SOUT
-static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );
+static void encode_page_composition( encoder_t *, bs_t *, const subpicture_t * );
 static void encode_clut( encoder_t *, bs_t *, subpicture_region_t * );
-static void encode_region_composition( encoder_t *, bs_t *, subpicture_t * );
-static void encode_object( encoder_t *, bs_t *, subpicture_t * );
+static void encode_region_composition( encoder_t *, bs_t *, const subpicture_t * );
+static void encode_object( encoder_t *, bs_t *, const subpicture_t * );
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score
@@ -1746,9 +1746,9 @@ static int OpenEncoder( vlc_object_t *p_this )
  */
 static void YuvaYuvp( subpicture_t *p_subpic )
 {
-    subpicture_region_t *p_region = NULL;
+    const subpicture_region_t *p_region;
 
-    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
+    vlc_spu_regions_foreach_const(p_region, &p_subpic->regions)
     {
         video_format_t *p_fmt = &p_region->p_picture->format;
         int i = 0, j = 0, n = 0, p = 0;
@@ -2053,10 +2053,10 @@ static void CloseEncoder( encoder_t *p_enc )
 }
 
 static void encode_page_composition( encoder_t *p_enc, bs_t *s,
-                                     subpicture_t *p_subpic )
+                                     const subpicture_t *p_subpic )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    subpicture_region_t *p_region;
+    const subpicture_region_t *p_region;
     bool b_mode_change = false;
     unsigned int i_regions;
     int i_timeout;
@@ -2067,7 +2067,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 
     i_regions = 0;
     if (p_subpic)
-    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
+    vlc_spu_regions_foreach_const(p_region, &p_subpic->regions)
     {
         if( i_regions >= p_sys->i_regions )
         {
@@ -2120,7 +2120,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 
     i_regions = 0;
     if (p_subpic)
-    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
+    vlc_spu_regions_foreach_const(p_region, &p_subpic->regions)
     {
         bs_write( s, 8, i_regions );
         bs_write( s, 8, 0 ); /* Reserved */
@@ -2179,14 +2179,14 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_region_t *p_regio
 }
 
 static void encode_region_composition( encoder_t *p_enc, bs_t *s,
-                                       subpicture_t *p_subpic )
+                                       const subpicture_t *p_subpic )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    subpicture_region_t *p_region;
+    const subpicture_region_t *p_region;
     unsigned int i_region;
 
     i_region = 0;
-    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
+    vlc_spu_regions_foreach_const(p_region, &p_subpic->regions)
     {
         int i_entries = 4, i_depth = 0x1, i_bg = 0;
         bool b_text = subpicture_region_IsText( p_region );
@@ -2250,19 +2250,19 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
 }
 
 static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
-                               subpicture_region_t *p_region,
+                               const subpicture_region_t *p_region,
                                bool b_top );
 
-static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
+static void encode_object( encoder_t *p_enc, bs_t *s, const subpicture_t *p_subpic )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
-    subpicture_region_t *p_region;
+    const subpicture_region_t *p_region;
     int i_region;
 
     int i_length_pos, i_update_pos, i_pixel_data_pos;
 
     i_region = 0;
-    vlc_spu_regions_foreach(p_region, &p_subpic->regions)
+    vlc_spu_regions_foreach_const(p_region, &p_subpic->regions)
     {
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_OBJECT_DATA ); /* Segment type */
@@ -2341,14 +2341,14 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     }
 }
 
-static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_2bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line );
-static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_4bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line );
-static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_8bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line );
 static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
-                               subpicture_region_t *p_region,
+                               const subpicture_region_t *p_region,
                                bool b_top )
 {
     unsigned int i_line;
@@ -2387,7 +2387,7 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
     }
 }
 
-static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_2bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
@@ -2478,7 +2478,7 @@ static void encode_pixel_line_2bp( bs_t *s, subpicture_region_t *p_region,
     bs_align_0( s );
 }
 
-static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_4bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
@@ -2576,7 +2576,7 @@ static void encode_pixel_line_4bp( bs_t *s, subpicture_region_t *p_region,
     bs_align_0( s );
 }
 
-static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
+static void encode_pixel_line_8bp( bs_t *s, const subpicture_region_t *p_region,
                                    int i_line )
 {
     unsigned int i, i_length = 0;
