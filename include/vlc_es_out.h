@@ -23,8 +23,6 @@
 #ifndef VLC_ES_OUT_H
 #define VLC_ES_OUT_H 1
 
-#include <assert.h>
-
 #include <vlc_es.h>
 
 #include <vlc_tick.h>
