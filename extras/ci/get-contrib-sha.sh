@@ -28,37 +28,33 @@ VLC_SRC_ROOT_DIR=$(git rev-parse --show-toplevel)
 [ -n "${VLC_SRC_ROOT_DIR}" ] || abort_err "This script must be run in the VLC Git repo and git must be available"
 [ -f "${VLC_SRC_ROOT_DIR}/src/libvlc.h" ] || abort_err "This script must be run in the VLC Git repository"
 
-VLC_BUILD_TARGET="extras/package"
 case $1 in
     win32*|win64*|uwp*)
-        VLC_BUILD_TARGET="extras/package/win32"
-        ;;
-    debian*)
-        VLC_BUILD_TARGET=""
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/win32" )
         ;;
     ios*|tvos*)
-        VLC_BUILD_TARGET="extras/package/apple"
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/apple" )
         ;;
     macos*)
-        VLC_BUILD_TARGET="extras/package/macosx"
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/macos" )
         ;;
     raspbian*)
-        VLC_BUILD_TARGET="extras/package/raspberry"
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/raspberry" )
         ;;
     snap*)
-        VLC_BUILD_TARGET="extras/package/snap"
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/snap" )
         ;;
     wasm*)
-        VLC_BUILD_TARGET="extras/package/wasm-emscripten"
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/wasm-emscripten" )
         ;;
-    android*)
-        VLC_BUILD_TARGET=""
+    debian*|android*)
         ;;
+    *)
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package" )
 esac
 
 VLC_LAST_CONTRIB_SHA=$(
-    cd "$VLC_SRC_ROOT_DIR" &&
-    git rev-list -1 "${VLC_START_REVISION}" -- "${VLC_CONTRIB_REBUILD_PATHS[@]}" "${VLC_BUILD_TARGET}"
+    cd "${VLC_SRC_ROOT_DIR} && git rev-list -1 "${VLC_START_REVISION}" -- "${VLC_CONTRIB_REBUILD_PATHS[@]}"
 )
 
 [ -n "${VLC_LAST_CONTRIB_SHA}" ] || abort_err "Failed to determine last contrib SHA using Git!"
