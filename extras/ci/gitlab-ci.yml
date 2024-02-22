@@ -383,6 +383,8 @@ debian-meson:
                 coverage_format: cobertura
                 path: cobertura.xml
         paths:
+            - ${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json
+            - cobertura.xml
             - html-coverage/
             - ${CI_PROJECT_DIR}/build-meson/meson-logs/testlog.junit.xml
 
