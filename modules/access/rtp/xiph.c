@@ -111,7 +111,7 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
     setuplen = len - (idlen + cmtlen);
 
     /* Create the VLC extra format header */
-    unsigned sizes[3] = {
+    size_t sizes[3] = {
         idlen, cmtlen, setuplen
     };
     const void *payloads[3] = {

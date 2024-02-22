@@ -2079,7 +2079,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             }
             const uint8_t tags[16] = {'O','p','u','s','T','a','g','s',
                                        0, 0, 0, 0, 0, 0, 0, 0};
-            unsigned ps[2] = { vars.p_tk->i_extra_data, 16 };
+            size_t ps[2] = { vars.p_tk->i_extra_data, 16 };
             const void *pkt[2] = { static_cast<const void *>( vars.p_tk->p_extra_data ),
                                    static_cast<const void *>( tags ) };
 

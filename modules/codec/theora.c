@@ -256,9 +256,9 @@ static int ProcessHeaders( decoder_t *p_dec )
     th_setup_info *ts = NULL; /* theora setup information */
     int i_max_pp, i_pp;
 
-    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_count;
+    size_t i_count;
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                            p_dec->fmt_in->i_extra, p_dec->fmt_in->p_extra) )
         return VLC_EGENERIC;

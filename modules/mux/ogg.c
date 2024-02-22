@@ -1026,9 +1026,9 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
                 p_stream->fmt.i_codec == VLC_CODEC_DAALA )
             {
                 /* First packet in order: vorbis/speex/opus/theora/daala info */
-                unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+                size_t pi_size[XIPH_MAX_HEADER_COUNT];
                 const void *pp_data[XIPH_MAX_HEADER_COUNT];
-                unsigned i_count;
+                size_t i_count;
 
                 if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                                        p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )
@@ -1193,9 +1193,9 @@ static bool OggCreateHeaders( sout_mux_t *p_mux )
             p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
             p_stream->fmt.i_codec == VLC_CODEC_DAALA )
         {
-            unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+            size_t pi_size[XIPH_MAX_HEADER_COUNT];
             const void *pp_data[XIPH_MAX_HEADER_COUNT];
-            unsigned i_count;
+            size_t i_count;
 
             if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
                                    p_input->p_fmt->i_extra, p_input->p_fmt->p_extra ) )

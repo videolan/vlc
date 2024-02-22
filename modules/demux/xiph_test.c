@@ -44,12 +44,12 @@ static const uint8_t xiphlavc0[] = { 0x00,   30,
 struct params_s
 {
     const void *packets[XIPH_MAX_HEADER_COUNT];
-    unsigned packets_sizes[XIPH_MAX_HEADER_COUNT];
-    unsigned packets_count;
+    size_t packets_sizes[XIPH_MAX_HEADER_COUNT];
+    size_t packets_count;
     bool lavc;
     vlc_fourcc_t codec;
     void *p_append;
-    int i_append;
+    size_t i_append;
 };
 
 #define BAILOUT(run) { fprintf(stderr, "failed %s line %d\n", run, __LINE__); \
@@ -87,8 +87,8 @@ static int test_xiph_CountLavcHeaders(const char *run,
 }
 
 static int SplitCompare(const char *run,
-                        unsigned packet_size[],
-                        const void *packet[], unsigned packet_count,
+                        size_t packet_size[],
+                        const void *packet[], size_t packet_count,
                         const struct params_s *source)
 {
     EXPECT(source->packets_count == packet_count);
@@ -105,8 +105,8 @@ static int test_xiph_SplitHeaders(const char *run,
                  const struct params_s *source)
 {
     const void *packets[XIPH_MAX_HEADER_COUNT];
-    unsigned packet_sizes[XIPH_MAX_HEADER_COUNT];
-    unsigned packet_count;
+    size_t packet_sizes[XIPH_MAX_HEADER_COUNT];
+    size_t packet_count;
     int ret = xiph_SplitHeaders(packet_sizes, packets, &packet_count,
                                 i_extra, p_extra);
     if(ret == VLC_SUCCESS)
@@ -119,8 +119,8 @@ static int test_xiph_SplitLavcHeaders(const char *run,
                  const struct params_s *source)
 {
     const void *packets[XIPH_MAX_HEADER_COUNT];
-    unsigned packet_sizes[XIPH_MAX_HEADER_COUNT];
-    unsigned packet_count;
+    size_t packet_sizes[XIPH_MAX_HEADER_COUNT];
+    size_t packet_count;
     int ret = xiph_SplitLavcHeaders(packet_sizes, packets, &packet_count,
                                     i_extra, p_extra);
     if(ret == VLC_SUCCESS)
@@ -130,13 +130,13 @@ static int test_xiph_SplitLavcHeaders(const char *run,
 
 static int test_xiph_PackHeaders(const char *run,
                  const uint8_t *p_extra, size_t i_extra,
-                 const struct params_s *source)
+                 struct params_s *source)
 {
     void *p_result;
-    int i_result;
+    size_t i_result;
 
     int ret = xiph_PackHeaders(&i_result, &p_result,
-                               (unsigned *) source->packets_sizes,
+                               source->packets_sizes,
                                source->packets, source->packets_count);
     if(ret == VLC_SUCCESS)
     {

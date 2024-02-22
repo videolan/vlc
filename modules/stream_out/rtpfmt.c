@@ -75,9 +75,9 @@ static int rtp_xiph_pack_headers(size_t room, void *p_extra, size_t i_extra,
                                  uint8_t **p_buffer, size_t *i_buffer,
                                  uint8_t *theora_pixel_fmt)
 {
-    unsigned packet_size[XIPH_MAX_HEADER_COUNT];
+    size_t packet_size[XIPH_MAX_HEADER_COUNT];
     const void *packet[XIPH_MAX_HEADER_COUNT];
-    unsigned packet_count;
+    size_t packet_count;
 
     if (xiph_SplitHeaders(packet_size, packet, &packet_count,
                                 i_extra, p_extra))

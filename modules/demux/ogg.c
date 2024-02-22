@@ -2431,22 +2431,22 @@ static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_strea
  */
 static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_format_t *p_old )
 {
-    unsigned pi_new_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_new_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_new_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_new_count;
+    size_t i_new_count;
 
-    if( xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
+    if (xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra))
         i_new_count = 0;
 
-    unsigned pi_old_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_old_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_old_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_old_count;
+    size_t i_old_count;
 
-    if( xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra ) )
+    if (xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra))
         i_old_count = 0;
 
     bool b_match = i_new_count == i_old_count;
-    for( unsigned i = 0; i < i_new_count && b_match; i++ )
+    for (size_t i = 0; i < i_new_count && b_match; i++)
     {
         /* Ignore vorbis comment */
         if( i == 1 )
@@ -2462,16 +2462,16 @@ static bool Ogg_IsVorbisFormatCompatible( const es_format_t *p_new, const es_for
 static bool Ogg_IsOpusFormatCompatible( const es_format_t *p_new,
                                         const es_format_t *p_old )
 {
-    unsigned pi_new_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_new_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_new_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_new_count;
+    size_t i_new_count;
 
-    if( xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
+    if(xiph_SplitHeaders(pi_new_size, pp_new_data, &i_new_count, p_new->i_extra, p_new->p_extra ) )
         i_new_count = 0;
 
-    unsigned pi_old_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_old_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_old_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_old_count;
+    size_t i_old_count;
 
     if( xiph_SplitHeaders(pi_old_size, pp_old_data, &i_old_count, p_old->i_extra, p_old->p_extra ) )
         i_old_count = 0;
@@ -2638,9 +2638,9 @@ static void Ogg_ExtractFlacComments( demux_t *p_demux, es_format_t *p_fmt,
 static void Ogg_ExtractXiphMeta( demux_t *p_demux, es_format_t *p_fmt,
                                  const void *p_headers, size_t i_headers, unsigned i_skip )
 {
-    unsigned pi_size[XIPH_MAX_HEADER_COUNT];
+    size_t pi_size[XIPH_MAX_HEADER_COUNT];
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
-    unsigned i_count;
+    size_t i_count;
 
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count, i_headers, p_headers ) )
         return;

@@ -637,9 +637,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
 
             if( cp->codec_id == AV_CODEC_ID_THEORA && b_ogg )
             {
-                unsigned pi_size[3];
+                size_t pi_size[3];
                 const void *pp_data[3];
-                unsigned i_count;
+                size_t i_count;
                 for( i_count = 0; i_count < 3; i_count++ )
                 {
                     if( i_extra < 2 )
@@ -665,7 +665,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                     0, 0, 0, 0,
                     0, 0, 0, 0,
                 };
-                unsigned pi_size[2];
+                size_t pi_size[2];
                 const void *pp_data[2];
 
                 pi_size[0] = i_extra;
@@ -691,7 +691,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                     0, 0, 0, 0, /* User Comment List Length */
 
                 };
-                unsigned pi_size[2];
+                size_t pi_size[2];
                 const void *pp_data[2];
 
                 pi_size[0] = i_extra;

@@ -76,9 +76,9 @@ static inline unsigned xiph_CountUnknownHeaders(const void *p_extra, unsigned i_
         return xiph_CountHeaders(p_extra, i_extra);
 }
 
-static inline int xiph_SplitLavcHeaders(unsigned packet_size[],
-                                        const void *packet[], unsigned *packet_count,
-                                        unsigned i_extra, const void *p_extra)
+static inline int xiph_SplitLavcHeaders(size_t packet_size[],
+                                        const void *packet[], size_t *packet_count,
+                                        size_t i_extra, const void *p_extra)
 {
     const uint8_t *current = (const uint8_t *)p_extra;
     const uint8_t *end = &current[i_extra];
@@ -103,8 +103,8 @@ static inline int xiph_SplitLavcHeaders(unsigned packet_size[],
     return VLC_SUCCESS;
 }
 
-static inline int xiph_SplitHeaders(unsigned packet_size[],
-                                    const void *packet[], unsigned *packet_count,
+static inline int xiph_SplitHeaders(size_t packet_size[],
+                                    const void *packet[], size_t *packet_count,
                                     size_t i_extra, const void *p_extra)
 {
     const uint8_t *current = (const uint8_t *)p_extra;
@@ -159,17 +159,17 @@ static inline int xiph_SplitHeaders(unsigned packet_size[],
 }
 
 static inline int xiph_PackHeaders(size_t *extra_size, void **extra,
-                                   unsigned packet_size[],
+                                   size_t packet_size[],
                                    const void *const packet[],
-                                   unsigned packet_count)
+                                   size_t packet_count)
 {
     if (packet_count <= 0 || packet_count > XIPH_MAX_HEADER_COUNT)
         return VLC_EGENERIC;
 
     /* Compute the size needed for the whole extra data */
-    unsigned payload_size = 0;
-    unsigned header_size = 1;
-    for (unsigned i = 0; i < packet_count; i++) {
+    size_t payload_size = 0;
+    size_t header_size = 1;
+    for (size_t i = 0; i < packet_count; i++) {
         payload_size += packet_size[i];
         if (i < packet_count - 1)
             header_size += 1 + packet_size[i] / 255;
@@ -184,8 +184,8 @@ static inline int xiph_PackHeaders(size_t *extra_size, void **extra,
     /* Write the header */
     uint8_t *current = (uint8_t*)*extra;
     *current++ = packet_count - 1;
-    for (unsigned i = 0; i < packet_count - 1; i++) {
-        unsigned t = packet_size[i];
+    for (size_t i = 0; i < packet_count - 1; i++) {
+        size_t t = packet_size[i];
         for (;;) {
             if (t >= 255) {
                 *current++ = 255;
@@ -198,7 +198,7 @@ static inline int xiph_PackHeaders(size_t *extra_size, void **extra,
     }
 
     /* Copy the payloads */
-    for (unsigned i = 0; i < packet_count; i++) {
+    for (size_t i = 0; i < packet_count; i++) {
         if (packet_size[i] > 0) {
             memcpy(current, packet[i], packet_size[i]);
             current += packet_size[i];
@@ -209,11 +209,11 @@ static inline int xiph_PackHeaders(size_t *extra_size, void **extra,
 }
 
 static inline int xiph_AppendHeaders(size_t *extra_size, void **extra,
-                                     unsigned size, const void *data)
+                                     size_t size, const void *data)
 {
-    unsigned packet_size[XIPH_MAX_HEADER_COUNT];
+    size_t packet_size[XIPH_MAX_HEADER_COUNT];
     const void *packet[XIPH_MAX_HEADER_COUNT];
-    unsigned count;
+    size_t count;
 
     if (*extra_size > 0 && *extra) {
         if (xiph_SplitHeaders(packet_size, packet, &count, *extra_size, *extra))

@@ -909,7 +909,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
                 p_vCtd && p_vCtd->data.p_binary &&
                 p_vCtC && p_vCtC->data.p_binary )
             {
-                unsigned headers_sizes[3] = {
+                size_t headers_sizes[3] = {
                     p_vCtH->data.p_binary->i_blob,
                     p_vCtd->data.p_binary->i_blob,
                     p_vCtC->data.p_binary->i_blob
