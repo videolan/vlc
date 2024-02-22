@@ -890,6 +890,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
                 cache->height == r->p_picture->format.i_height) {
                 *d3dr = *cache;
                 memset(cache, 0, sizeof(*cache));
+                sys->clear_scene = true;
                 break;
             }
         }
@@ -1065,7 +1066,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     if (sys->startEndRenderingCb && !sys->startEndRenderingCb( sys->outside_opaque, true ))
         return;
 
-    if (sys->clear_scene) {
+    if (sys->clear_scene || sys->d3dregion_count != subpicture_count) {
         /* Clear the backbuffer and the zbuffer */
         hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
                                   D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
