@@ -1748,7 +1748,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 vars.p_fmt->i_codec       = GetFOURCC( &p_bih->biCompression );
 
                 /* Very unlikely yet possible: bug #5659*/
-                const unsigned int min_extra = std::min(GetDWLE( &p_bih->biSize ), vars.p_tk->i_extra_data);
+                const size_t min_extra = std::min(static_cast<size_t>(GetDWLE(&p_bih->biSize)),
+                                                  vars.p_tk->i_extra_data);
                 if ( min_extra > sizeof( VLC_BITMAPINFOHEADER ))
                 {
                     vars.p_fmt->i_extra = min_extra - sizeof( VLC_BITMAPINFOHEADER );

@@ -201,7 +201,7 @@ class mkv_track_t
         bool         b_forced;
         track_id_t   i_number;
 
-        unsigned int i_extra_data;
+        size_t       i_extra_data;
         uint8_t      *p_extra_data;
 
         std::string  codec;
