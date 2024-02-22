@@ -28,8 +28,6 @@
 
 # include <vlc_plugin.h>
 
-# include <assert.h>
-
 #define MAIN_TITLE N_( "VLC preferences" )
 
 /*  - Titles -
