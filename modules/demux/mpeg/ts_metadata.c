@@ -33,6 +33,8 @@
 #include "../../meta_engine/ID3Tag.h"
 #include "../../meta_engine/ID3Meta.h"
 
+#include <assert.h>
+
 static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload,
                                  size_t i_payload, void *p_priv )
 {
