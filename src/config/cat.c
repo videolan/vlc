@@ -30,6 +30,8 @@
 #include <vlc_common.h>
 #include <vlc_config_cat.h>
 
+#include <assert.h>
+
 static const struct config_category_t categories_array[] =
 {
     { CAT_PLAYLIST,   SUBCAT_PLAYLIST_GENERAL,   PLAYLIST_HELP  },
