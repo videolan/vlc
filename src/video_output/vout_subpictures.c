@@ -1197,13 +1197,10 @@ static void spu_UpdateOriginalSize(spu_t *spu, subpicture_t *subpic,
 {
     if (subpic->i_original_picture_width  == 0 ||
         subpic->i_original_picture_height == 0) {
-        if (subpic->i_original_picture_width  > 0 ||
-            subpic->i_original_picture_height > 0)
-            msg_Err(spu, "original picture size %ux%u is unsupported",
-                    subpic->i_original_picture_width,
-                    subpic->i_original_picture_height);
-        else
-            msg_Dbg(spu, "original picture size is undefined");
+        // detect SPU sources filling original picture half-way
+        assert(subpic->i_original_picture_width == 0 &&
+               subpic->i_original_picture_height == 0);
+        msg_Dbg(spu, "original picture size is undefined");
 
         subpic->i_original_picture_width  = fmtsrc->i_visible_width;
         subpic->i_original_picture_height = fmtsrc->i_visible_height;
