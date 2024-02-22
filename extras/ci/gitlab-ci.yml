@@ -327,6 +327,7 @@ nightly-debian:
 #
 debian-meson:
     extends: .base-template
+    coverage: '/^coverage result: (\d+.\d+)$/'
     image:
         name: $VLC_DEBIAN_IMAGE
     script:
@@ -377,7 +378,11 @@ debian-meson:
             # Ensure that sources are reported from CI_PROJECT_DIR directory so
             # that gitlab can associate the files correctly.
             sed -i 's,<source>.*</source>,<source>'"${CI_PROJECT_DIR}"'</source>,' cobertura.xml
-
+        # Expose the line coverage percentage to gitlab from the cobertura XML.
+        - >
+            grep -Eo 'line-rate="[^"]+"' cobertura.xml | head -n 1 |
+            grep -Eo '[0-9.]+' | awk '{ print "coverage result:", $1 * 100 } ' ||
+            true
     allow_failure: true
     variables: *variables-debian
     artifacts:
