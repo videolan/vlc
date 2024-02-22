@@ -533,9 +533,9 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    const unsigned int kALAC_NEW_KUKI_SIZE = 24;
-    const unsigned int kALAC_LIB_REQ_KUKI_SIZE = 36;
-    int i_extra;
+    const size_t kALAC_NEW_KUKI_SIZE = 24;
+    const size_t kALAC_LIB_REQ_KUKI_SIZE = 36;
+    size_t i_extra;
 
     if( i_size == kALAC_NEW_KUKI_SIZE || i_size == kALAC_LIB_REQ_KUKI_SIZE )
     {
@@ -544,7 +544,7 @@ static int ProcessALACCookie( demux_t *p_demux, const uint8_t *p, uint64_t i_siz
     else
     {
         msg_Warn( p_demux, "Unknown alac magic cookie. Passing it on to the decoder as is and hoping for the best." );
-        i_extra = ( int )i_size;
+        i_extra = i_size;
     }
 
     p_sys->fmt.i_extra = i_extra;
@@ -676,7 +676,7 @@ aac_kuki_finish:
         i_offset = 0;
     }
 
-    p_sys->fmt.i_extra = (int)i_kuki_size;
+    p_sys->fmt.i_extra = i_kuki_size;
     p_sys->fmt.p_extra = malloc( i_kuki_size );
 
     if( !p_sys->fmt.p_extra )
@@ -718,7 +718,7 @@ static int ReadKukiChunk( demux_t *p_demux, uint64_t i_size )
     }
     else
     {
-        p_sys->fmt.i_extra = (int)i_size;
+        p_sys->fmt.i_extra = i_size;
         p_sys->fmt.p_extra = malloc( i_size );
 
         if( !p_sys->fmt.p_extra )
