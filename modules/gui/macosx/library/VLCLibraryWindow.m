@@ -89,6 +89,8 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
     NSInteger _currentSelectedViewModeSegment;
 }
 
+@property NSTimer *searchInputTimer;
+
 - (IBAction)goToBrowseSection:(id)sender;
 
 @end
@@ -567,8 +569,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     if (!visible) {
         [self hideToolbarItem:_librarySearchToolbarItem];
+        [self stopSearchTimer];
         _librarySearchField.stringValue = @"";
-        [VLCMain.sharedInstance.libraryController filterByString:@""];
+        [self updateFilterString];
         return;
     }
 
@@ -716,15 +719,32 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [NSMenu popUpContextMenu:_librarySortingMenuController.librarySortingMenu withEvent:[NSApp currentEvent] forView:sender];
 }
 
+- (void)stopSearchTimer
+{
+    [self.searchInputTimer invalidate];
+    self.searchInputTimer = nil;
+}
+
 - (IBAction)filterLibrary:(id)sender
+{
+    [self stopSearchTimer];
+    self.searchInputTimer = [NSTimer scheduledTimerWithTimeInterval:0.3
+                                                            target:self
+                                                           selector:@selector(updateFilterString)
+                                                           userInfo:nil
+                                                            repeats:NO];
+}
+
+- (void)updateFilterString
 {
     [VLCMain.sharedInstance.libraryController filterByString:_librarySearchField.stringValue];
 }
 
 - (void)clearLibraryFilterString
 {
+    [self stopSearchTimer];
     _librarySearchField.stringValue = @"";
-    [self filterLibrary:self];
+    [self updateFilterString];
 }
 
 - (IBAction)openMedia:(id)sender
