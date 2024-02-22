@@ -34,6 +34,8 @@
 #include <vlc_subpicture.h>
 #include "subpicture.h"
 
+#include <limits.h>
+
 struct subpicture_private_t
 {
     video_format_t src;
@@ -222,6 +224,8 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     p_region->zoom_h.den = p_region->zoom_h.num = 1;
     p_region->zoom_v.den = p_region->zoom_v.num = 1;
     p_region->i_alpha = 0xff;
+    p_region->i_x = INT_MAX;
+    p_region->i_y = INT_MAX;
 
     return p_region;
 }
