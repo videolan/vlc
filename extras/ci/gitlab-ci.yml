@@ -373,6 +373,10 @@ debian-meson:
             --xml="cobertura.xml"
             --html="html-coverage/vlc.html"
             --html-details -s -j$NCPU
+        - |
+            # Ensure that sources are reported from CI_PROJECT_DIR directory so
+            # that gitlab can associate the files correctly.
+            sed -i 's,<source>.*</source>,<source>'"${CI_PROJECT_DIR}"'</source>,' cobertura.xml
 
     allow_failure: true
     variables: *variables-debian
