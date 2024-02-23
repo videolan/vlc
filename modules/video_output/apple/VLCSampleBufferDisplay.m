@@ -441,7 +441,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
             length - pixels_offset);
         CGDataProviderRef provider = CGDataProviderCreateWithCFData(data);
         CGImageRef image = CGImageCreate(
-            r->place.width, r->place.height,
+            r->p_picture->format.i_visible_width, r->p_picture->format.i_visible_height,
             8, 32, r->p_picture->p->i_pitch,
             space, kCGImageAlphaFirst,
             provider, NULL, true, kCGRenderingIntentDefault
