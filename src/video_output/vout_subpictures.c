@@ -1188,7 +1188,7 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
             fade_alpha = 255 * (subpic->i_stop - render_date) /
                                 (subpic->i_stop - fade_start);
     }
-    dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / 65025;
+    dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / (255 * 255);
     return dst;
 }
 
