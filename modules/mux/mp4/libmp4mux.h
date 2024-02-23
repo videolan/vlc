@@ -45,6 +45,7 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *, unsigned id,
                                       const es_format_t *fmt, uint32_t timescale);
 /* Track properties */
 uint32_t   mp4mux_track_GetID(const mp4mux_trackinfo_t *);
+void       mp4mux_track_ChangeID(mp4mux_trackinfo_t *, uint32_t);
 uint32_t   mp4mux_track_GetTimescale(const mp4mux_trackinfo_t *);
 vlc_tick_t mp4mux_track_GetDuration(const mp4mux_trackinfo_t *);
 void       mp4mux_track_ForceDuration(mp4mux_trackinfo_t *, vlc_tick_t); /* Used by frag */

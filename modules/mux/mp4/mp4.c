@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_sort.h>
 
 #include <assert.h>
 #include <time.h>
@@ -224,6 +225,29 @@ static block_t *ConvertSUBT(block_t *);
 static bool CreateCurrentEdit(mp4_stream_t *, vlc_tick_t, bool);
 static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream, block_t *p_data);
 
+static int stream_cmp(const void *a, const void *b, void *priv)
+{
+    const mp4_stream_t *p_a = *((const mp4_stream_t **)a);
+    const mp4_stream_t *p_b = *((const mp4_stream_t **)b);
+    static const uint8_t order[ES_CATEGORY_COUNT] = {
+        [VIDEO_ES] = 4,
+        [AUDIO_ES] = 3,
+        [SPU_ES] = 2,
+        [DATA_ES] = 1,
+        [UNKNOWN_ES] = 0,
+    };
+    return order[mp4mux_track_GetFmt(p_b->tinfo)->i_cat] -
+           order[mp4mux_track_GetFmt(p_a->tinfo)->i_cat];
+}
+
+static void ReorderStreams(mp4_stream_t **pp_streams, unsigned int i_streams)
+{
+    /* reorder and change ID of tracks. Must be done before fragments references */
+    vlc_qsort( pp_streams, i_streams, sizeof(*pp_streams), stream_cmp, NULL );
+    for(unsigned int i=0; i<i_streams; i++)
+        mp4mux_track_ChangeID(pp_streams[i]->tinfo, i+1);
+}
+
 static int WriteSlowStartHeader(sout_mux_t *p_mux)
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -321,6 +345,8 @@ static void Close(vlc_object_t *p_this)
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
 
     msg_Dbg(p_mux, "Close");
+
+    ReorderStreams(p_sys->pp_streams, p_sys->i_nb_streams);
 
     /* Update mdat size */
     bo_t bo;
@@ -1350,7 +1376,10 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
     }
 
     if (!p_sys->b_header_sent)
+    {
+        ReorderStreams(p_sys->pp_streams, p_sys->i_nb_streams);
         FlushHeader(p_mux);
+    }
 
     if (b_has_samples)
         moof = GetMoofBox(p_mux, &i_mdat_size, (b_flush)?0:i_barrier_time, p_sys->i_pos);

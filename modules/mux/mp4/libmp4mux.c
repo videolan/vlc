@@ -288,6 +288,11 @@ uint32_t mp4mux_track_GetID(const mp4mux_trackinfo_t *t)
     return t->i_track_id;
 }
 
+void mp4mux_track_ChangeID(mp4mux_trackinfo_t *t, uint32_t id)
+{
+    t->i_track_id = id;
+}
+
 void mp4mux_track_SetInterlacing(mp4mux_trackinfo_t *t, enum mp4mux_interlacing i)
 {
     t->e_interlace = i;
