@@ -94,6 +94,7 @@ struct tt_node_t
     char *psz_node_name;
     tt_timings_t timings;
     vlc_dictionary_t attr_dict;
+    char *psz_namespace;
 };
 
 typedef struct
@@ -104,8 +105,9 @@ typedef struct
 
 tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text );
 tt_textnode_t *tt_subtextnode_New( tt_node_t *p_parent, const char *psz_text, size_t );
-tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name );
-tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name );
+tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name, const char *psz_namespace );
+tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name,
+                             const char *psz_namespace );
 void tt_node_RecursiveDelete( tt_node_t *p_node );
 int  tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern );
 bool tt_node_HasChild( const tt_node_t *p_node );

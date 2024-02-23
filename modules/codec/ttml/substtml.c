@@ -710,12 +710,12 @@ static ttml_style_t * InheritTTMLStyles( ttml_context_t *p_ctx, tt_node_t *p_nod
 
 static int ParseTTMLChunk( xml_reader_t *p_reader, tt_node_t **pp_rootnode )
 {
-    const char* psz_node_name;
+    const char *psz_node_name, *psz_node_namespace;
 
     do
     {
-        int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
-
+        int i_type = xml_ReaderNextNodeNS( p_reader, &psz_node_name, &psz_node_namespace );
+        fprintf(stderr, "Parse %s %s \n", psz_node_name, psz_node_namespace);
         if( i_type <= XML_READER_NONE )
             break;
 
@@ -729,7 +729,8 @@ static int ParseTTMLChunk( xml_reader_t *p_reader, tt_node_t **pp_rootnode )
                     *pp_rootnode != NULL )
                     return VLC_EGENERIC;
 
-                *pp_rootnode = tt_node_NewRead( p_reader, NULL, psz_node_name );
+                *pp_rootnode = tt_node_NewRead( p_reader, NULL, psz_node_name,
+                                                psz_node_namespace );
                 if( !*pp_rootnode ||
                     tt_nodes_Read( p_reader, *pp_rootnode ) != VLC_SUCCESS )
                     return VLC_EGENERIC;

@@ -157,11 +157,11 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
 static int ReadTTML( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-    const char* psz_node_name;
+    const char* psz_node_name, *psz_namespace;
 
     do
     {
-        int i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_node_name );
+        int i_type = xml_ReaderNextNodeNS( p_sys->p_reader, &psz_node_name, &psz_namespace );
         bool b_empty = xml_ReaderIsEmptyElement( p_sys->p_reader );
 
         if( i_type <= XML_READER_NONE )
@@ -177,7 +177,8 @@ static int ReadTTML( demux_t* p_demux )
                     p_sys->p_rootnode != NULL )
                     return VLC_EGENERIC;
 
-                p_sys->p_rootnode = tt_node_NewRead( p_sys->p_reader, NULL, psz_node_name );
+                p_sys->p_rootnode = tt_node_NewRead( p_sys->p_reader, NULL, psz_node_name,
+                                                     psz_namespace );
                 if( b_empty )
                     break;
                 if( !p_sys->p_rootnode ||

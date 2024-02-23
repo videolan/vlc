@@ -65,6 +65,15 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
+static const char * tt_node_InheritNS( const tt_node_t *p_node )
+{
+    for( ; p_node ; p_node = p_node->p_parent )
+    {
+        if( p_node->psz_namespace )
+            return p_node->psz_namespace;
+    }
+    return NULL;
+}
 
 int tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern )
 {
@@ -171,6 +180,7 @@ static void tt_node_FreeDictValue( void* p_value, void* p_obj )
 static void tt_node_Delete( tt_node_t *p_node )
 {
     free( p_node->psz_node_name );
+    free( p_node->psz_namespace );
     vlc_dictionary_clear( &p_node->attr_dict, tt_node_FreeDictValue, NULL );
     free( p_node );
 }
@@ -240,7 +250,9 @@ tt_textnode_t *tt_subtextnode_New( tt_node_t *p_parent, const char *psz_text, si
     return tt_textnode_NewImpl( p_parent, strndup( psz_text, len ) );
 }
 
-tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name )
+tt_node_t * tt_node_New( tt_node_t* p_parent,
+                         const char* psz_node_name,
+                         const char *psz_namespace )
 {
     tt_node_t *p_node = calloc( 1, sizeof( *p_node ) );
     if( !p_node )
@@ -248,6 +260,13 @@ tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name )
 
     p_node->i_type = TT_NODE_TYPE_ELEMENT;
     p_node->psz_node_name = strdup( psz_node_name );
+    const char *psz_parent_ns = tt_node_InheritNS( p_parent );
+    /* set new namespace if not same as parent */
+    if( psz_namespace &&
+        (!psz_parent_ns || strcmp( psz_namespace, psz_parent_ns )) )
+        p_node->psz_namespace = strdup( psz_namespace );
+    else
+        p_node->psz_namespace = NULL;
     if( unlikely( p_node->psz_node_name == NULL ) )
     {
         free( p_node );
@@ -264,17 +283,19 @@ tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name )
     return p_node;
 }
 
-tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name )
+tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent,
+                             const char* psz_node_name, const char *psz_namespace )
 {
-    tt_node_t *p_node = tt_node_New( p_parent, psz_node_name );
+    tt_node_t *p_node = tt_node_New( p_parent, psz_node_name, psz_namespace );
     if( !p_node )
         return NULL;
 
-    const char* psz_value = NULL;
-    for( const char* psz_key = xml_ReaderNextAttr( reader, &psz_value );
+    const char* psz_value = NULL, *psz_ns = NULL;
+    for( const char* psz_key = xml_ReaderNextAttrNS( reader, &psz_value, &psz_ns );
          psz_key != NULL;
-         psz_key = xml_ReaderNextAttr( reader, &psz_value ) )
+         psz_key = xml_ReaderNextAttrNS( reader, &psz_value, &psz_ns ) )
     {
+        fprintf(stderr,"ATTR %s %s %s\n", psz_key, psz_value, psz_ns);
         char *psz_val = strdup( psz_value );
         if( psz_val )
         {
@@ -358,8 +379,8 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 
     do
     {
-        const char* psz_node_name;
-        int i_type = xml_ReaderNextNode( p_reader, &psz_node_name );
+        const char *psz_node_name, *psz_node_namespace;
+        int i_type = xml_ReaderNextNodeNS( p_reader, &psz_node_name, &psz_node_namespace );
         /* !warn read empty state now as attributes reading will **** it up */
         bool b_empty = xml_ReaderIsEmptyElement( p_reader );
 
@@ -373,7 +394,8 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 
             case XML_READER_STARTELEM:
             {
-                tt_node_t *p_newnode = tt_node_NewRead( p_reader, p_node, psz_node_name );
+                tt_node_t *p_newnode = tt_node_NewRead( p_reader, p_node, psz_node_name,
+                                                        psz_node_namespace );
                 if( !p_newnode )
                     return VLC_EGENERIC;
                 if( !b_empty )

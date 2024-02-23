@@ -48,7 +48,7 @@ static void AddTextNode( tt_node_t *p_parent, const char *psz_text )
         if( nl )
         {
             tt_subtextnode_New( p_parent, psz, nl - psz );
-            tt_node_New( p_parent, "br" );
+            tt_node_New( p_parent, "br", NULL );
             psz += nl - psz + 1;
             if( *psz == '\0' )
                 break;
@@ -67,21 +67,21 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
     if( p_spu == NULL )
         return NULL;
 
-    tt_node_t *p_root = tt_node_New( NULL, "tt" );
+    tt_node_t *p_root = tt_node_New( NULL, "tt", TT_NS );
     if( !p_root )
         return NULL;
 
     tt_node_AddAttribute( p_root, "xmlns", TT_NS );
     tt_node_AddAttribute( p_root, "xmlns:tts", TT_NS_STYLING );
 
-    tt_node_t *p_body = tt_node_New( p_root, "body" );
+    tt_node_t *p_body = tt_node_New( p_root, "body", NULL );
     if( !p_body )
     {
         tt_node_RecursiveDelete( p_root );
         return NULL;
     }
 
-    tt_node_t *p_div = tt_node_New( p_body, "div" );
+    tt_node_t *p_div = tt_node_New( p_body, "div", NULL );
     if( !p_div )
     {
         tt_node_RecursiveDelete( p_root );
@@ -96,7 +96,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
             p_region->p_text->psz_text == NULL )
             continue;
 
-        tt_node_t *p_par = tt_node_New( p_div, "p" );
+        tt_node_t *p_par = tt_node_New( p_div, "p", NULL );
         if( !p_par )
             continue;
 
@@ -117,7 +117,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
             const text_style_t *style = p_segment->style;
             if( style && style->i_features )
             {
-                tt_node_t *p_span = tt_node_New( p_par, "span" );
+                tt_node_t *p_span = tt_node_New( p_par, "span", NULL );
                 if( !p_span )
                     continue;
 
