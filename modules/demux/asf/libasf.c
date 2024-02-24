@@ -918,6 +918,7 @@ static void ASF_FreeObject_extended_stream_properties( asf_object_t *p_obj)
         FREENULL( p_esp->ppsz_stream_name[i] );
     FREENULL( p_esp->pi_stream_name_language );
     FREENULL( p_esp->ppsz_stream_name );
+    FREENULL( p_esp->p_sp );
 }
 
 static int ASF_ReadObject_extended_stream_properties( stream_t *s,
