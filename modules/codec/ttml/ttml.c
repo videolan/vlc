@@ -75,6 +75,22 @@ static const char * tt_node_InheritNS( const tt_node_t *p_node )
     return NULL;
 }
 
+bool tt_node_Match( const tt_node_t *p_node, const char *psz_name, const char *psz_namespace )
+{
+    /* compare local part first (should have less chars) */
+    const char *psz_nodelocal = tt_LocalName( p_node->psz_node_name );
+    const char *psz_namelocal = tt_LocalName( psz_name );
+    if( strcmp( psz_namelocal, psz_nodelocal ) )
+        return false;
+
+    const char *psz_nodens = p_node->psz_namespace;
+    if( !psz_nodens )
+        psz_nodens = tt_node_InheritNS( p_node->p_parent );
+    if( psz_namespace && psz_nodens )
+        return !strcmp( psz_namespace, psz_nodens );
+    return !!psz_namespace == !!psz_nodens;
+}
+
 int tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern )
 {
     if( !strncasecmp( "tt:", psz_tagname, 3 ) )

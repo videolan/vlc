@@ -103,12 +103,19 @@ typedef struct
     char *psz_text;
 } tt_textnode_t;
 
+static inline const char *tt_LocalName( const char *psz_qname )
+{
+    const char *psz_local = strchr( psz_qname, ':' );
+    return psz_local ? psz_local + 1 : psz_qname;
+}
+
 tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text );
 tt_textnode_t *tt_subtextnode_New( tt_node_t *p_parent, const char *psz_text, size_t );
 tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name, const char *psz_namespace );
 tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name,
                              const char *psz_namespace );
 void tt_node_RecursiveDelete( tt_node_t *p_node );
+bool tt_node_Match( const tt_node_t *p_node, const char* psz_name, const char* psz_namespace );
 int  tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern );
 bool tt_node_HasChild( const tt_node_t *p_node );
 int  tt_node_AddAttribute( tt_node_t *p_node, const char *key, const char *value );
