@@ -113,10 +113,7 @@
 
 - (void)disconnect
 {
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-
-    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaListReset object:nil];
-    // TODO: Handle item deletion, update
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)reloadTableViews

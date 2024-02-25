@@ -378,24 +378,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)disconnect
 {
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaItemUpdated object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelAudioMediaItemDeleted object:nil];
-
-    [notificationCenter removeObserver:self name:VLCLibraryModelArtistListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelArtistUpdated object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelArtistDeleted object:nil];
-
-    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumUpdated object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelAlbumDeleted object:nil];
-
-    [notificationCenter removeObserver:self name:VLCLibraryModelGenreListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelGenreUpdated object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelGenreDeleted object:nil];
-
-    [notificationCenter removeObserver:self name:VLCPlayerCurrentMediaItemChanged object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
