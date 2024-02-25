@@ -65,6 +65,92 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
+struct tt_namespace_s
+{
+    char *psz_prefix;
+    char *psz_uri;
+    struct vlc_list links;
+};
+
+void tt_namespaces_Clean( tt_namespaces_t *nss )
+{
+    struct tt_namespace_s *ns;
+    vlc_list_foreach( ns, &nss->nodes, links )
+    {
+        free( ns->psz_prefix );
+        free( ns->psz_uri );
+        free( ns );
+    }
+}
+
+void tt_namespaces_Init( tt_namespaces_t *nss )
+{
+    vlc_list_init( &nss->nodes );
+}
+
+const char * tt_namespaces_GetURI( const tt_namespaces_t *nss,
+                                   const char *psz_qn )
+{
+    const struct tt_namespace_s *ns;
+    vlc_list_foreach_const( ns, &nss->nodes, links )
+    {
+        /* compares prefixed name against raw prefix */
+        for( size_t i=0; ; i++ )
+        {
+            if( ns->psz_prefix[i] == psz_qn[i] )
+            {
+                if( psz_qn[i] == '\0' )
+                    return ns->psz_uri;
+            }
+            else
+            {
+                if( ns->psz_prefix[i] == '\0' && psz_qn[i] == ':' )
+                    return ns->psz_uri;
+                else
+                    break;
+            }
+        }
+    }
+    return NULL;
+}
+
+const char * tt_namespaces_GetPrefix( const tt_namespaces_t *nss,
+                                      const char *psz_uri )
+{
+    const struct tt_namespace_s *ns;
+    vlc_list_foreach_const( ns, &nss->nodes, links )
+    {
+        if( !strcmp( ns->psz_uri, psz_uri ) )
+            return ns->psz_prefix;
+    }
+    return NULL;
+}
+
+void tt_namespaces_Register( tt_namespaces_t *nss, const char *psz_prefix,
+                             const char *psz_uri )
+{
+    if( tt_namespaces_GetPrefix( nss, psz_uri ) )
+        return;
+    struct tt_namespace_s *ns = malloc(sizeof(*ns));
+    if( ns )
+    {
+        const char *sep = strchr( psz_prefix, ':' );
+        if( sep )
+            ns->psz_prefix = strndup( psz_prefix, sep - psz_prefix );
+        else
+            ns->psz_prefix = strdup("");
+        ns->psz_uri = strdup( psz_uri );
+        if( !ns->psz_prefix || !ns->psz_uri )
+        {
+            free( ns->psz_prefix );
+            free( ns->psz_uri );
+            free( ns );
+            return;
+        }
+        vlc_list_append( &ns->links, &nss->nodes );
+    }
+}
+
 static const char * tt_node_InheritNS( const tt_node_t *p_node )
 {
     for( ; p_node ; p_node = p_node->p_parent )

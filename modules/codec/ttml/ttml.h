@@ -21,6 +21,7 @@
 #include <vlc_tick.h>
 #include <vlc_arrays.h>
 #include <vlc_memstream.h>
+#include <vlc_list.h>
 
 int tt_OpenDemux( vlc_object_t* p_this );
 void tt_CloseDemux( vlc_object_t* p_demux );
@@ -67,6 +68,20 @@ struct tt_searchkey
 #define TT_NS_PROFILE     TT_NS "/profile/"
 #define TT_NS_FEATURE     TT_NS "/feature/"
 #define TT_NS_EXTENSION   TT_NS "/extension/"
+
+typedef struct
+{
+    struct vlc_list nodes;
+} tt_namespaces_t;
+
+void tt_namespaces_Init( tt_namespaces_t *nss );
+void tt_namespaces_Clean( tt_namespaces_t *nss );
+void tt_namespaces_Register( tt_namespaces_t *nss, const char *psz_prefix,
+                             const char *psz_uri );
+const char * tt_namespaces_GetURI( const tt_namespaces_t *nss,
+                                   const char *psz_qn ); /* qn or prefix */
+const char * tt_namespaces_GetPrefix( const tt_namespaces_t *nss,
+                                      const char *psz_uri );
 
 enum
 {
