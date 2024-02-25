@@ -54,7 +54,7 @@ case $1 in
 esac
 
 VLC_LAST_CONTRIB_SHA=$(
-    cd "${VLC_SRC_ROOT_DIR} && git rev-list -1 "${VLC_START_REVISION}" -- "${VLC_CONTRIB_REBUILD_PATHS[@]}"
+    cd "${VLC_SRC_ROOT_DIR}" && git rev-list -1 "${VLC_START_REVISION}" -- "${VLC_CONTRIB_REBUILD_PATHS[@]}"
 )
 
 [ -n "${VLC_LAST_CONTRIB_SHA}" ] || abort_err "Failed to determine last contrib SHA using Git!"
