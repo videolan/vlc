@@ -75,3 +75,26 @@ if have_ios or have_tvos
         ],
     }
 endif
+
+if have_osx or have_ios or have_tvos
+    avsamplebuffer_sources = files(
+        'apple/avsamplebuffer.m',
+        'apple/channel_layout.c',
+    )
+    if have_ios or have_tvos
+        avsamplebuffer_sources += files(
+            'apple/avaudiosession_common.m',
+        )
+    endif
+
+    vlc_modules += {
+        'name' : 'avsamplebuffer',
+        'sources' : avsamplebuffer_sources,
+        'dependencies' : [
+            frameworks['CoreMedia'],
+            frameworks['Foundation'],
+            frameworks['AVFoundation'],
+        ]
+        'objc_args' : ['-fobjc-arc']
+    }
+endif
