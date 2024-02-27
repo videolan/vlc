@@ -131,23 +131,7 @@ player_get_next_media(vlc_player_t *player, void *userdata)
 {
     VLC_UNUSED(player);
     vlc_playlist_t *playlist = userdata;
-    switch (playlist->stopped_action)
-    {
-        case VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE:
-        case VLC_PLAYLIST_MEDIA_STOPPED_PAUSE:
-        case VLC_PLAYLIST_MEDIA_STOPPED_EXIT:
-        {
-            input_item_t *next = vlc_playlist_GetNextMedia(playlist);
-            vlc_player_SetNextMedia(player, next);
-            if (next != NULL)
-                input_item_Release(next);
-            /* fall through */
-        }
-        case VLC_PLAYLIST_MEDIA_STOPPED_STOP:
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+    vlc_playlist_UpdateNextMedia(playlist);
 }
 
 static const struct vlc_player_media_provider player_media_provider = {
@@ -233,6 +217,6 @@ vlc_playlist_SetMediaStoppedAction(vlc_playlist_t *playlist,
     playlist->stopped_action = action;
     var_SetBool(playlist->player, "play-and-pause",
                 action == VLC_PLAYLIST_MEDIA_STOPPED_PAUSE);
-    vlc_player_InvalidateNextMedia(playlist->player);
+    vlc_playlist_UpdateNextMedia(playlist);
     vlc_playlist_Notify(playlist, on_media_stopped_action_changed, action);
 }

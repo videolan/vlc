@@ -34,7 +34,7 @@ vlc_playlist_ComputeHasNext(vlc_playlist_t *playlist);
 int
 vlc_playlist_SetCurrentMedia(vlc_playlist_t *playlist, ssize_t index);
 
-input_item_t *
-vlc_playlist_GetNextMedia(vlc_playlist_t *playlist);
+void
+vlc_playlist_UpdateNextMedia(vlc_playlist_t *playlist);
 
 #endif

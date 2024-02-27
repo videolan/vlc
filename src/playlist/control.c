@@ -429,17 +429,29 @@ vlc_playlist_GetNextMediaIndex(vlc_playlist_t *playlist)
     return (ssize_t)vlc_playlist_GetNextIndex(playlist);
 }
 
-input_item_t *
-vlc_playlist_GetNextMedia(vlc_playlist_t *playlist)
+void
+vlc_playlist_UpdateNextMedia(vlc_playlist_t *playlist)
 {
     /* the playlist and the player share the lock */
     vlc_playlist_AssertLocked(playlist);
+    input_item_t *media = NULL;
 
-    ssize_t index = vlc_playlist_GetNextMediaIndex(playlist);
-    if (index == -1)
-        return NULL;
+    switch (playlist->stopped_action)
+    {
+        case VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE:
+        case VLC_PLAYLIST_MEDIA_STOPPED_PAUSE:
+        case VLC_PLAYLIST_MEDIA_STOPPED_EXIT:
+        {
+            ssize_t index = vlc_playlist_GetNextMediaIndex(playlist);
+            if (index != -1)
+                media = playlist->items.data[index]->media;
+            /* fall through */
+        }
+        case VLC_PLAYLIST_MEDIA_STOPPED_STOP:
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
 
-    input_item_t *media = playlist->items.data[index]->media;
-    input_item_Hold(media);
-    return media;
+    vlc_player_SetNextMedia(playlist->player, media);
 }

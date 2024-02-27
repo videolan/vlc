@@ -40,7 +40,6 @@ typedef struct input_item_t input_item_t;
 # define vlc_player_RemoveListener(a,b) free(b)
 # define vlc_player_SetCurrentMedia(a,b) (VLC_UNUSED(b), VLC_SUCCESS)
 # define vlc_player_SetNextMedia(a,b) (VLC_UNUSED(b), VLC_SUCCESS)
-# define vlc_player_InvalidateNextMedia(p) VLC_UNUSED(p)
 # define vlc_player_osd_Message(p, fmt...) VLC_UNUSED(p)
 #endif /* TEST_PLAYLIST */
 
