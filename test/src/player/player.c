@@ -272,25 +272,21 @@ get_ctx(vlc_player_t *player, void *data)
     return ctx;
 }
 
-static input_item_t *
+static void
 player_get_next(vlc_player_t *player, void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
-    input_item_t *next_media;
-    if (ctx->next_medias.size > 0)
-    {
-        next_media = ctx->next_medias.data[0];
-        vlc_vector_remove(&ctx->next_medias, 0);
+    if (ctx->next_medias.size == 0)
+        return;
 
-        input_item_Hold(next_media);
-        bool success = vlc_vector_push(&ctx->added_medias, next_media);
-        assert(success);
-        success = vlc_vector_push(&ctx->played_medias, next_media);
-        assert(success);
-    }
-    else
-        next_media = NULL;
-    return next_media;
+    input_item_t *next_media = ctx->next_medias.data[0];
+    vlc_vector_remove(&ctx->next_medias, 0);
+
+    bool success = vlc_vector_push(&ctx->added_medias, next_media);
+    assert(success);
+    success = vlc_vector_push(&ctx->played_medias, next_media);
+    assert(success);
+    vlc_player_SetNextMedia(player, next_media);
 }
 
 #define VEC_PUSH(vec, item) do { \

@@ -102,13 +102,13 @@ struct vlc_player_media_provider
     /**
      * Called when the player requires a new media
      *
-     * @note The returned media must be already held with input_item_Hold()
+     * The user has to set the next media via vlc_player_SetNextMedia() from
+     * the current callback or anytime before the current media is stopped.
      *
      * @param player locked player instance
      * @param data opaque pointer set from vlc_player_New()
-     * @return the next media to play, held by the callee with input_item_Hold()
      */
-    input_item_t *(*get_next)(vlc_player_t *player, void *data);
+    void (*get_next)(vlc_player_t *player, void *data);
 };
 
 /**
@@ -378,6 +378,20 @@ VLC_API int
 vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media);
 
 /**
+ * Set the next media
+ *
+ * This function replaces the next media to be played.
+ * The user should set the next media from the
+ * vlc_player_media_provider.get_next callback or anytime before the current
+ * media is stopped.
+ *
+ * @param player locked player instance
+ * @param media next media to play (will be held by the player)
+ */
+VLC_API void
+vlc_player_SetNextMedia(vlc_player_t *player, input_item_t *media);
+
+/**
  * Get the current played media.
  *
  * @see vlc_player_cbs.on_current_media_changed
@@ -387,6 +401,17 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media);
  */
 VLC_API input_item_t *
 vlc_player_GetCurrentMedia(vlc_player_t *player);
+
+/**
+ * Get the next played media.
+ *
+ * This function return the media set by vlc_player_SetNextMedia()
+ *
+ * @param player locked player instance
+ * @return a valid media or NULL (if no next media is set)
+ */
+VLC_API input_item_t *
+vlc_player_GetNextMedia(vlc_player_t *player);
 
 /**
  * Helper that hold the current media

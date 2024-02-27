@@ -61,8 +61,7 @@ vlc_player_PrepareNextMedia(vlc_player_t *player)
         return;
 
     assert(player->next_media == NULL);
-    player->next_media =
-        player->media_provider->get_next(player, player->media_provider_data);
+    player->media_provider->get_next(player, player->media_provider_data);
     player->next_media_requested = true;
 }
 
@@ -1043,6 +1042,29 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media)
 
     /* We can switch to the next media directly */
     return vlc_player_OpenNextMedia(player);
+}
+
+void
+vlc_player_SetNextMedia(vlc_player_t *player, input_item_t *media)
+{
+    vlc_player_assert_locked(player);
+
+    /* Order is important, hold the new media before releasing the old one */
+    input_item_t *next_media = media != NULL ? input_item_Hold(media) : NULL;
+
+    if (player->next_media != NULL)
+        input_item_Release(player->next_media);
+
+    player->next_media = next_media;
+    player->next_media_requested = true;
+}
+
+input_item_t *
+vlc_player_GetNextMedia(vlc_player_t *player)
+{
+    vlc_player_assert_locked(player);
+
+    return player->next_media;
 }
 
 input_item_t *

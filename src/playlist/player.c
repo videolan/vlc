@@ -126,7 +126,7 @@ on_player_media_subitems_changed(vlc_player_t *player, input_item_t *media,
     vlc_playlist_ExpandItemFromNode(playlist, subitems);
 }
 
-static input_item_t *
+static void
 player_get_next_media(vlc_player_t *player, void *userdata)
 {
     VLC_UNUSED(player);
@@ -136,9 +136,15 @@ player_get_next_media(vlc_player_t *player, void *userdata)
         case VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE:
         case VLC_PLAYLIST_MEDIA_STOPPED_PAUSE:
         case VLC_PLAYLIST_MEDIA_STOPPED_EXIT:
-            return vlc_playlist_GetNextMedia(playlist);
+        {
+            input_item_t *next = vlc_playlist_GetNextMedia(playlist);
+            vlc_player_SetNextMedia(player, next);
+            if (next != NULL)
+                input_item_Release(next);
+            /* fall through */
+        }
         case VLC_PLAYLIST_MEDIA_STOPPED_STOP:
-            return NULL;
+            break;
         default:
             vlc_assert_unreachable();
     }
