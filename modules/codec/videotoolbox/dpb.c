@@ -154,7 +154,7 @@ static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_
     {
         bool b_output = false;
 
-        if(p_info->b_flush && dpb->i_size > 0)
+        if(p_info->b_flush && dpb->i_stored_fields > 0)
             b_output = true;
         else if(dpb->i_size >= p_info->i_max_pics_buffering)
             b_output = true;
