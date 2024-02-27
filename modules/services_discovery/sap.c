@@ -285,7 +285,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
         /* backward compatibility with VLC 0.7.3-2.0.0 senders */
         psz_value = vlc_sdp_attr_value(p_sdp, "x-plgroup");
     }
-    input_item_t *cat = AddCategory(p_sd, psz_value);
+    input_item_t *cat = psz_value == NULL ? NULL : AddCategory(p_sd, psz_value);
     free(str);
     services_discovery_AddSubItem(p_sd, cat, p_input);
 
