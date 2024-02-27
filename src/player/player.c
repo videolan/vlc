@@ -1001,6 +1001,18 @@ vlc_player_RemoveListener(vlc_player_t *player,
     free(id);
 }
 
+static void
+vlc_player_InvalidateNextMedia(vlc_player_t *player)
+{
+    vlc_player_assert_locked(player);
+    if (player->next_media)
+    {
+        input_item_Release(player->next_media);
+        player->next_media = NULL;
+    }
+    player->next_media_requested = false;
+}
+
 int
 vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media)
 {
@@ -1145,19 +1157,6 @@ vlc_player_GetAssociatedSubsFPS(vlc_player_t *player)
 {
     vlc_player_assert_locked(player);
     return var_GetFloat(player, "sub-fps");
-}
-
-void
-vlc_player_InvalidateNextMedia(vlc_player_t *player)
-{
-    vlc_player_assert_locked(player);
-    if (player->next_media)
-    {
-        input_item_Release(player->next_media);
-        player->next_media = NULL;
-    }
-    player->next_media_requested = false;
-
 }
 
 int

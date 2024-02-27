@@ -888,7 +888,6 @@ vlc_player_GetTrackCount
 vlc_player_GetV4l2Object
 vlc_player_HasTeletextMenu
 vlc_player_IncrementRate
-vlc_player_InvalidateNextMedia
 vlc_player_IsRecording
 vlc_player_IsTeletextEnabled
 vlc_player_IsTeletextTransparent

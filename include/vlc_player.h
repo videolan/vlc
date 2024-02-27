@@ -432,21 +432,6 @@ vlc_player_HoldCurrentMedia(vlc_player_t *player)
 }
 
 /**
- * Invalidate the next media.
- *
- * This function can be used to invalidate the media returned by the
- * vlc_player_media_provider.get_next callback. This can be used when the next
- * item from a playlist was changed by the user.
- *
- * Calling this function will trigger the
- * vlc_player_media_provider.get_next callback to be called again.
- *
- * @param player locked player instance
- */
-VLC_API void
-vlc_player_InvalidateNextMedia(vlc_player_t *player);
-
-/**
  * Start the playback of the current media.
  *
  * @param player locked player instance
@@ -2788,7 +2773,6 @@ struct vlc_player_cbs
      * vlc_player_SetCurrentMedia() or from an internal transition).
      *
      * @see vlc_player_SetCurrentMedia()
-     * @see vlc_player_InvalidateNextMedia()
      *
      * @param player locked player instance
      * @param new_media new media currently played or NULL (when there is no
