@@ -150,7 +150,7 @@ static picture_t * BumpDPB(struct dpb_s *dpb, date_t *ptsdate, const frame_info_
     picture_t *p_output = NULL;
     picture_t **pp_output_next = &p_output;
 
-    for(;;)
+    for(;dpb->i_stored_fields;)
     {
         bool b_output = false;
 
