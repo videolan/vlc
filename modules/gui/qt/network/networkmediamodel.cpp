@@ -56,6 +56,11 @@ struct NetworkMediaItem
 using NetworkMediaItemPtr = std::shared_ptr<NetworkMediaItem>;
 using NetworkMediaItemSet = std::unordered_set<NetworkMediaItemPtr>;
 
+inline bool isADir(const NetworkMediaItemPtr& x)
+{
+    return (x->type == NetworkMediaModel::ItemType::TYPE_DIRECTORY);
+}
+
 }
 
 // ListCache specialisation
@@ -233,10 +238,12 @@ public:
         {
             if (m_sortOrder == Qt::SortOrder::DescendingOrder)
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return QString::compare(a->mainMrl.toString(), b->mainMrl.toString()) > 0;
                 };
             else
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return QString::compare(a->mainMrl.toString(), b->mainMrl.toString()) < 0;
                 };
         }
@@ -244,10 +251,12 @@ public:
         {
             if (m_sortOrder == Qt::SortOrder::DescendingOrder)
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return a->fileSize < b->fileSize;
                 };
             else
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return a->fileSize > b->fileSize;
                 };
         }
@@ -255,10 +264,12 @@ public:
         {
             if (m_sortOrder == Qt::SortOrder::DescendingOrder)
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return a->fileModified < b->fileModified;
                 };
             else
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return a->fileModified > b->fileModified;
                 };
         }
@@ -266,10 +277,12 @@ public:
         {
             if (m_sortOrder == Qt::SortOrder::DescendingOrder)
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return QString::compare(a->name, b->name, Qt::CaseInsensitive) > 0;
                 };
             else
                 return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool {
+                    if(isADir(a) != isADir(b)) return isADir(a);
                     return QString::compare(a->name, b->name, Qt::CaseInsensitive) < 0;
                 };
         }
