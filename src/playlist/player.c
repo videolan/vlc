@@ -48,8 +48,10 @@ player_on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
                         ? playlist->items.data[playlist->current]->media
                         : NULL;
     if (new_media == media)
-        /* nothing to do */
+    {
+        vlc_playlist_UpdateNextMedia(playlist);
         return;
+    }
 
     ssize_t index;
     if (new_media)
@@ -73,6 +75,8 @@ player_on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
     playlist->has_next = vlc_playlist_ComputeHasNext(playlist);
 
     vlc_playlist_state_NotifyChanges(playlist, &state);
+
+    vlc_playlist_UpdateNextMedia(playlist);
 }
 
 static void
@@ -126,18 +130,6 @@ on_player_media_subitems_changed(vlc_player_t *player, input_item_t *media,
     vlc_playlist_ExpandItemFromNode(playlist, subitems);
 }
 
-static void
-player_get_next_media(vlc_player_t *player, void *userdata)
-{
-    VLC_UNUSED(player);
-    vlc_playlist_t *playlist = userdata;
-    vlc_playlist_UpdateNextMedia(playlist);
-}
-
-static const struct vlc_player_media_provider player_media_provider = {
-    .get_next = player_get_next_media,
-};
-
 static const struct vlc_player_cbs player_callbacks = {
     .on_current_media_changed = player_on_current_media_changed,
     .on_state_changed = on_player_state_changed,
@@ -149,8 +141,7 @@ static const struct vlc_player_cbs player_callbacks = {
 bool
 vlc_playlist_PlayerInit(vlc_playlist_t *playlist, vlc_object_t *parent)
 {
-    playlist->player = vlc_player_New(parent, VLC_PLAYER_LOCK_NORMAL,
-                                      &player_media_provider, playlist);
+    playlist->player = vlc_player_New(parent, VLC_PLAYER_LOCK_NORMAL);
     if (unlikely(!playlist->player))
         return false;
 

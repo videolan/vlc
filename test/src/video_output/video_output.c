@@ -211,7 +211,7 @@ static void play_scenario(intf_thread_t *intf, struct vout_scenario *scenario)
     var_SetString(intf, "window", MODULE_STRING);
 
     vlc_player_t *player = vlc_player_New(&intf->obj,
-        VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
+        VLC_PLAYER_LOCK_NORMAL);
     assert(player);
 
     vlc_player_Lock(player);

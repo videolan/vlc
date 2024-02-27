@@ -88,30 +88,6 @@ enum vlc_player_lock_type
 };
 
 /**
- * Callbacks for the owner of the player.
- *
- * These callbacks are needed to control the player flow (via the
- * vlc_playlist_t as a owner for example). It can only be set when creating the
- * player via vlc_player_New().
- *
- * All callbacks are called with the player locked (cf. vlc_player_Lock()), and
- * from any thread (even the current one).
- */
-struct vlc_player_media_provider
-{
-    /**
-     * Called when the player requires a new media
-     *
-     * The user has to set the next media via vlc_player_SetNextMedia() from
-     * the current callback or anytime before the current media is stopped.
-     *
-     * @param player locked player instance
-     * @param data opaque pointer set from vlc_player_New()
-     */
-    void (*get_next)(vlc_player_t *player, void *data);
-};
-
-/**
  * Create a new player instance
  *
  * @param parent parent VLC object
@@ -122,9 +98,7 @@ struct vlc_player_media_provider
  * @return a pointer to a valid player instance or NULL in case of error
  */
 VLC_API vlc_player_t *
-vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
-               const struct vlc_player_media_provider *media_provider,
-               void *media_provider_data);
+vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type);
 
 /**
  * Delete a player instance
@@ -385,7 +359,7 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media);
  *
  * This function replaces the next media to be played.
  * The user should set the next media from the
- * vlc_player_media_provider.get_next callback or anytime before the current
+ * vlc_player_cbs.current_media_changed callback or anytime before the current
  * media is stopped.
  *
  * @note The media won't be opened directly by this function. If there is no
@@ -2772,6 +2746,9 @@ struct vlc_player_cbs
      * the next media internally) or from the STOPPED state (from
      * vlc_player_SetCurrentMedia() or from an internal transition).
      *
+     * The user could set the next media via vlc_player_SetNextMedia() from
+     * the current callback or anytime before the current media is stopped.
+
      * @see vlc_player_SetCurrentMedia()
      *
      * @param player locked player instance

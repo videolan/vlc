@@ -285,12 +285,8 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             vlc_player_UpdateTimerState(player, NULL,
                                         VLC_PLAYER_TIMER_STATE_PLAYING,
                                         input->pause_date);
-            if (player->started &&
-                player->global_state == VLC_PLAYER_STATE_PLAYING)
-                send_event = false;
-            break;
+            /* fall through */
         case VLC_PLAYER_STATE_STARTED:
-            vlc_player_PrepareNextMedia(player);
             if (player->started &&
                 player->global_state == VLC_PLAYER_STATE_PLAYING)
                 send_event = false;

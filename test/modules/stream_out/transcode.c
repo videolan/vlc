@@ -304,7 +304,7 @@ static void play_scenario(intf_thread_t *intf, struct transcode_scenario *scenar
     var_SetString(intf, "sout-transcode-vcodec", "test");
 
     vlc_player_t *player = vlc_player_New(&intf->obj,
-        VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
+        VLC_PLAYER_LOCK_NORMAL);
     assert(player);
 
     static const struct vlc_player_cbs player_cbs = {

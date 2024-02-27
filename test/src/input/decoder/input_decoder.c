@@ -365,7 +365,7 @@ static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *sc
         input_item_AddOption(media, scenario->item_option, VLC_INPUT_OPTION_TRUSTED);
 
     vlc_player_t *player = vlc_player_New(&intf->obj,
-        VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
+        VLC_PLAYER_LOCK_NORMAL);
     assert(player);
 
     intf->p_sys = (intf_sys_t *)player;

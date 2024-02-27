@@ -31,8 +31,7 @@ typedef struct input_item_t input_item_t;
 
 #ifdef TEST_PLAYLIST
 /* mock the player in tests */
-# define vlc_player_New(a,b,c,d) (VLC_UNUSED(a), VLC_UNUSED(b), VLC_UNUSED(c), \
-                                 malloc(1))
+# define vlc_player_New(a,b) (VLC_UNUSED(a), malloc(1))
 # define vlc_player_Delete(p) free(p)
 # define vlc_player_Lock(p) VLC_UNUSED(p)
 # define vlc_player_Unlock(p) VLC_UNUSED(p)

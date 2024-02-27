@@ -241,9 +241,6 @@ struct vlc_player_t
 
     bool start_paused;
 
-    const struct vlc_player_media_provider *media_provider;
-    void *media_provider_data;
-
     bool pause_on_cork;
     bool corked;
 
@@ -259,7 +256,6 @@ struct vlc_player_t
     struct vlc_player_input *input;
 
     bool releasing_media;
-    bool next_media_requested;
     input_item_t *next_media;
 
     char *video_string_ids;
@@ -346,9 +342,6 @@ vlc_player_GetObject(vlc_player_t *player);
 
 int
 vlc_player_OpenNextMedia(vlc_player_t *player);
-
-void
-vlc_player_PrepareNextMedia(vlc_player_t *player);
 
 void
 vlc_player_destructor_AddStoppingInput(vlc_player_t *player,

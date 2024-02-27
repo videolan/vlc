@@ -592,7 +592,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_media_sys_t *p_media,
     p_instance->i_index = 0;
 
     p_instance->player = vlc_player_New(VLC_OBJECT(p_media->vlm),
-                                        VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
+                                        VLC_PLAYER_LOCK_NORMAL);
     if (!p_instance->player)
         goto error;
 

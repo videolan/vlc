@@ -272,23 +272,6 @@ get_ctx(vlc_player_t *player, void *data)
     return ctx;
 }
 
-static void
-player_get_next(vlc_player_t *player, void *data)
-{
-    struct ctx *ctx = get_ctx(player, data);
-    if (ctx->next_medias.size == 0)
-        return;
-
-    input_item_t *next_media = ctx->next_medias.data[0];
-    vlc_vector_remove(&ctx->next_medias, 0);
-
-    bool success = vlc_vector_push(&ctx->added_medias, next_media);
-    assert(success);
-    success = vlc_vector_push(&ctx->played_medias, next_media);
-    assert(success);
-    vlc_player_SetNextMedia(player, next_media);
-}
-
 #define VEC_PUSH(vec, item) do { \
     bool success = vlc_vector_push(&ctx->report.vec, item); \
     assert(success); \
@@ -303,6 +286,18 @@ player_on_current_media_changed(vlc_player_t *player,
     if (new_media)
         input_item_Hold(new_media);
     VEC_PUSH(on_current_media_changed, new_media);
+
+    if (ctx->next_medias.size == 0)
+        return;
+
+    input_item_t *next_media = ctx->next_medias.data[0];
+    vlc_vector_remove(&ctx->next_medias, 0);
+
+    bool success = vlc_vector_push(&ctx->added_medias, next_media);
+    assert(success);
+    success = vlc_vector_push(&ctx->played_medias, next_media);
+    assert(success);
+    vlc_player_SetNextMedia(player, next_media);
 }
 
 static void
@@ -2113,8 +2108,7 @@ static void
 test_delete_while_playback(vlc_object_t *obj, bool start)
 {
     test_log("delete_while_playback (start: %d)\n", start);
-    vlc_player_t *player = vlc_player_New(obj, VLC_PLAYER_LOCK_NORMAL,
-                                          NULL, NULL);
+    vlc_player_t *player = vlc_player_New(obj, VLC_PLAYER_LOCK_NORMAL);
 
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(10));
     input_item_t *media = create_mock_media("media1", &params);
@@ -2250,10 +2244,6 @@ ctx_init(struct ctx *ctx, enum ctx_flags flags)
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
 
-    static const struct vlc_player_media_provider provider = {
-        .get_next = player_get_next,
-    };
-
 #define X(type, name) .name = player_##name,
     static const struct vlc_player_cbs cbs = {
 REPORT_LIST
@@ -2277,7 +2267,7 @@ REPORT_LIST
     assert(ret == VLC_SUCCESS);
 
     ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int),
-                                 VLC_PLAYER_LOCK_NORMAL, &provider, ctx);
+                                 VLC_PLAYER_LOCK_NORMAL);
     assert(ctx->player);
 
     vlc_player_Lock(ctx->player);

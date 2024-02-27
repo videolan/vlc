@@ -773,8 +773,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;
     /* use a reentrant lock to allow calling libvlc functions from callbacks */
-    mp->player = vlc_player_New(VLC_OBJECT(mp), VLC_PLAYER_LOCK_REENTRANT,
-                                NULL, NULL);
+    mp->player = vlc_player_New(VLC_OBJECT(mp), VLC_PLAYER_LOCK_REENTRANT);
     if (unlikely(!mp->player))
         goto error1;
     vlc_cond_init(&mp->wait);

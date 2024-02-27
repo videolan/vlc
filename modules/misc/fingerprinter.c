@@ -229,7 +229,7 @@ static int Open(vlc_object_t *p_this)
     var_Create(p_fingerprinter, "aout", VLC_VAR_STRING);
     var_SetString(p_fingerprinter, "aout", "dummy");
     p_sys->player = vlc_player_New(VLC_OBJECT(p_fingerprinter),
-                                   VLC_PLAYER_LOCK_NORMAL, NULL, NULL );
+                                   VLC_PLAYER_LOCK_NORMAL);
     if (!p_sys->player)
     {
         free(p_sys);

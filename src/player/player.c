@@ -51,26 +51,10 @@ static_assert(VLC_PLAYER_TITLE_MENU == INPUT_TITLE_MENU &&
 #define vlc_player_foreach_inputs(it) \
     for (struct vlc_player_input *it = player->input; it != NULL; it = NULL)
 
-void
-vlc_player_PrepareNextMedia(vlc_player_t *player)
-{
-    vlc_player_assert_locked(player);
-
-    if (!player->media_provider
-     || player->next_media_requested)
-        return;
-
-    assert(player->next_media == NULL);
-    player->media_provider->get_next(player, player->media_provider_data);
-    player->next_media_requested = true;
-}
-
 int
 vlc_player_OpenNextMedia(vlc_player_t *player)
 {
     assert(player->input == NULL);
-
-    player->next_media_requested = false;
 
     /* Tracks string ids are only remembered for one media */
     free(player->video_string_ids);
@@ -1010,7 +994,6 @@ vlc_player_InvalidateNextMedia(vlc_player_t *player)
         input_item_Release(player->next_media);
         player->next_media = NULL;
     }
-    player->next_media_requested = false;
 }
 
 int
@@ -1027,14 +1010,12 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media)
         /* Switch to this new media when the current input is stopped */
         player->next_media = input_item_Hold(media);
         player->releasing_media = false;
-        player->next_media_requested = true;
     }
     else if (player->media)
     {
         /* The current media will be set to NULL once the current input is
          * stopped */
         player->releasing_media = true;
-        player->next_media_requested = false;
     }
     else
         return VLC_SUCCESS;
@@ -1068,7 +1049,6 @@ vlc_player_SetNextMedia(vlc_player_t *player, input_item_t *media)
         input_item_Release(player->next_media);
 
     player->next_media = next_media;
-    player->next_media_requested = true;
 }
 
 input_item_t *
@@ -1184,7 +1164,6 @@ vlc_player_Start(vlc_player_t *player)
             player->started = true;
             player->next_media = input_item_Hold(player->media);
             player->releasing_media = false;
-            player->next_media_requested = true;
             return VLC_SUCCESS;
         }
         else
@@ -1923,16 +1902,12 @@ vlc_player_Delete(vlc_player_t *player)
 }
 
 vlc_player_t *
-vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
-               const struct vlc_player_media_provider *media_provider,
-               void *media_provider_data)
+vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type)
 {
     audio_output_t *aout = NULL;
     vlc_player_t *player = vlc_custom_create(parent, sizeof(*player), "player");
     if (!player)
         return NULL;
-
-    assert(!media_provider || media_provider->get_next);
 
     vlc_list_init(&player->listeners);
     vlc_list_init(&player->metadata_listeners);
@@ -1945,8 +1920,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     player->pause_on_cork = false;
     player->corked = false;
     player->renderer = NULL;
-    player->media_provider = media_provider;
-    player->media_provider_data = media_provider_data;
     player->media = NULL;
     player->input = NULL;
     player->global_state = VLC_PLAYER_STATE_STOPPED;
@@ -1956,7 +1929,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     player->eos_burst_count = 0;
 
     player->releasing_media = false;
-    player->next_media_requested = false;
     player->next_media = NULL;
 
     player->video_string_ids = player->audio_string_ids =
