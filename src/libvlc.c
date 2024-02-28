@@ -481,7 +481,8 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                            int timeout, void *id)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
-    assert(i_options & META_REQUEST_OPTION_SCOPE_ANY);
+    assert(i_options & META_REQUEST_OPTION_SCOPE_ANY ||
+           i_options & META_REQUEST_OPTION_FETCH_ANY);
 
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
