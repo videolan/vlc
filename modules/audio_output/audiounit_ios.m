@@ -548,7 +548,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     aout_sys_t *p_sys = p_aout->sys;
     OSStatus err;
     OSStatus status;
-    AudioChannelLayout *layout = NULL;
 
     if (aout_FormatNbChannels(fmt) == 0 || AOUT_FMT_HDMI(fmt))
         return VLC_EGENERIC;
@@ -647,7 +646,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (p_sys->b_muted)
         Pause(p_aout, true, 0);
 
-    free(layout);
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->pause = Pause;
 
