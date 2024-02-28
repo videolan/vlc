@@ -388,9 +388,9 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
     }
     else
     {
-        static const struct input_item_parser_cbs_t cbs = {
-            // on_ended
-            []( input_item_t * const item, const int status, void * const userData ) {
+        static const struct vlc_metadata_cbs cbs = {
+            // on_preparse_ended
+            []( input_item_t * const item, enum input_item_preparse_status status, void * const userData ) {
                 const auto dp = static_cast<DialogsProvider *>( userData );
 
                 if ( status == ITEM_PREPARSE_TIMEOUT || status == ITEM_PREPARSE_FAILED )
@@ -402,14 +402,24 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
                         dp->mediaInfoDialog( sharedInputItem );
                     }, Qt::QueuedConnection );
             },
+            // on_art_fetch_ended
+            NULL,
             // on_subtree_added
             NULL,
             // on_attachments_added
-            NULL,
+            NULL
         };
 
-        input_item_parser_id_t * const parser = input_item_Parse( inputItem, VLC_OBJECT( p_intf ), &cbs, this );
-        assert( parser );
+        const int result = libvlc_MetadataRequest( vlc_object_instance( p_intf ),
+                                                   inputItem,
+                                                   static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED),
+                                                   &cbs,
+                                                   this,
+                                                   0,
+                                                   NULL );
+        if( Q_UNLIKELY( result != VLC_SUCCESS ) )
+            msg_Warn( p_intf, "libvlc_MetadataRequest() failed for input item %p (%s, %s)",
+                      inputItem, inputItem->psz_name, inputItem->psz_uri );
     }
 }
 
