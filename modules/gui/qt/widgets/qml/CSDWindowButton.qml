@@ -33,6 +33,8 @@ T.Button {
     property bool showHovered: false
     property bool isThemeDark: false
 
+    readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
+
     readonly property bool _paintHovered: control.hovered || showHovered
 
     padding: 0
@@ -65,6 +67,14 @@ T.Button {
             id: icon
             anchors.centerIn: parent
             text: control.iconTxt
+
+            font.family:{
+                if (useWinIcons)
+                 return "Segoe Fluent Icons, Segoe MDL2 Assets"
+
+                return VLCIcons.fontFamily
+            }
+
             font.pixelSize: VLCStyle.icon_CSD
             color: control.color
         }

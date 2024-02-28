@@ -123,6 +123,10 @@ class MainCtx : public QObject
 
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
 
+    //Property to get Operating System info
+    Q_PROPERTY(OsType osName READ getOSName CONSTANT)
+    Q_PROPERTY(int osVersion READ getOSVersion CONSTANT)
+
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
 
@@ -170,8 +174,14 @@ public:
         GROUPING_NAME,
         GROUPING_FOLDER
     };
-
     Q_ENUM(Grouping)
+
+    enum OsType
+    {
+        Windows,
+        Unknown
+    };
+    Q_ENUM(OsType)
 
     inline bool isInterfaceFullScreen() const { return m_windowVisibility == QWindow::FullScreen; }
     inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
@@ -214,6 +224,9 @@ public:
     inline int maxVolume() const { return m_maxVolume; }
 
     inline float safeArea() const { return m_safeArea; }
+
+    inline OsType getOSName() const {return m_osName;}
+    inline int getOSVersion() const {return m_osVersion;}
 
     inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
     inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
@@ -326,6 +339,9 @@ protected:
     int m_maxVolume = 125;
 
     float m_safeArea = 0.0;
+
+    OsType m_osName;
+    int m_osVersion;
 
     bool m_windowSuportExtendedFrame = false;
     unsigned m_windowExtendedMargin = 0;

@@ -66,20 +66,39 @@ Row {
 
             isThemeDark: theme.palette.isDark
 
-            iconTxt: {
+            iconTxt:{
                 switch (modelData.type) {
                 case CSDButton.Minimize:
-                    return VLCIcons.window_minimize
+                {
+                    if (useWinIcons)
+                        return "\uE921"
 
-                case CSDButton.MaximizeRestore:
-                    return (MainCtx.intfMainWindow.visibility === Window.Maximized)
-                            ? VLCIcons.window_restore
-                            : VLCIcons.window_maximize
-
-                case CSDButton.Close:
-                    return VLCIcons.window_close
+                    else
+                        return VLCIcons.window_minimize
                 }
 
+                case CSDButton.MaximizeRestore:
+                {
+                    if (useWinIcons)
+                        return (MainCtx.intfMainWindow.visibility === Window.Maximized)
+                                ? "\uE923"
+                                : "\uE922"
+
+                    else
+                        return (MainCtx.intfMainWindow.visibility === Window.Maximized)
+                                ? VLCIcons.window_restore
+                                : VLCIcons.window_maximize
+                }
+
+                case CSDButton.Close:
+                {
+                    if (useWinIcons)
+                        return "\uE8BB"
+
+                    else
+                        return VLCIcons.window_close
+                }
+                }
                 console.assert(false, "unreachable")
             }
 

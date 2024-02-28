@@ -62,6 +62,9 @@
 
 #include <QWindow>
 #include <QScreen>
+
+#include <QOperatingSystemVersion>
+
 #ifdef _WIN32
 #include <QFileInfo>
 #endif
@@ -128,6 +131,19 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     m_sort = new SortCtx(this);
     m_search = new SearchCtx(this);
+
+    // getOSInfo();
+    QOperatingSystemVersion currentOS = QOperatingSystemVersion::current();
+    switch (currentOS.type()) {
+    case QOperatingSystemVersion::OSType::Windows:
+        m_osName = Windows;
+        break;
+
+    default:
+        m_osName = Unknown;
+        break;
+    }
+    m_osVersion = (currentOS.majorVersion());
 
     loadPrefs(false);
     loadFromSettingsImpl(false);
