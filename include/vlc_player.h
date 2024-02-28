@@ -88,22 +88,6 @@ enum vlc_player_lock_type
 };
 
 /**
- * Action when the player is stopped
- *
- * @see vlc_player_SetMediaStoppedAction()
- */
-enum vlc_player_media_stopped_action {
-    /** Continue (or stop if there is no next media), default behavior */
-    VLC_PLAYER_MEDIA_STOPPED_CONTINUE,
-    /** Pause when reaching the end of file */
-    VLC_PLAYER_MEDIA_STOPPED_PAUSE,
-    /** Stop, even if there is a next media to play */
-    VLC_PLAYER_MEDIA_STOPPED_STOP,
-    /** Exit VLC */
-    VLC_PLAYER_MEDIA_STOPPED_EXIT,
-};
-
-/**
  * Callbacks for the owner of the player.
  *
  * These callbacks are needed to control the player flow (via the
@@ -185,16 +169,6 @@ vlc_player_Unlock(vlc_player_t *player);
  */
 VLC_API void
 vlc_player_CondWait(vlc_player_t *player, vlc_cond_t *cond);
-
-/**
- * Setup an action when a media is stopped
- *
- * @param player locked player instance
- * @param action action to do when a media is stopped
- */
-VLC_API void
-vlc_player_SetMediaStoppedAction(vlc_player_t *player,
-                                 enum vlc_player_media_stopped_action action);
 
 /**
  * Ask to start in a paused state
@@ -3142,18 +3116,6 @@ struct vlc_player_cbs
     void (*on_atobloop_changed)(vlc_player_t *player,
         enum vlc_player_abloop new_state, vlc_tick_t time, double pos,
         void *data);
-
-    /**
-     * Called when media stopped action has changed
-     *
-     * @see vlc_player_SetMediaStoppedAction()
-     *
-     * @param player locked player instance
-     * @param new_action action to execute when a media is stopped
-     * @param data opaque pointer set by vlc_player_AddListener()
-     */
-    void (*on_media_stopped_action_changed)(vlc_player_t *player,
-        enum vlc_player_media_stopped_action new_action, void *data);
 
     /**
      * Called when the media meta and/or info has changed

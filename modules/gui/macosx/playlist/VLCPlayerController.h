@@ -299,13 +299,6 @@ extern const CGFloat VLCVolumeDefault;
 - (int)disableABLoop;
 
 /**
- * Define the action to perform after playback of the current media stopped (for any reason)
- * Options are: continue with next time, pause on last frame, stop even if there is a next item and quit VLC
- * @see the vlc_player_media_stopped_action enum for details
- */
-@property (readwrite, nonatomic) enum vlc_player_media_stopped_action actionAfterStop;
-
-/**
  * Move on to the next video frame and pause
  * @warning this relies on a gross hack in the core and will work for 20 consecutive frames maximum only
  */

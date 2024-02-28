@@ -49,6 +49,7 @@ struct vlc_playlist
 {
     vlc_player_t *player;
     libvlc_int_t *libvlc;
+    enum vlc_playlist_media_stopped_action stopped_action;
     bool auto_preparse;
     /* all remaining fields are protected by the lock of the player */
     struct vlc_player_listener_id *player_listener;

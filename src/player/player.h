@@ -239,7 +239,6 @@ struct vlc_player_t
     vlc_mutex_t vout_listeners_lock;
     vlc_cond_t start_delay_cond;
 
-    enum vlc_player_media_stopped_action media_stopped_action;
     bool start_paused;
 
     const struct vlc_player_media_provider *media_provider;

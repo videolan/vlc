@@ -57,7 +57,6 @@ vlc_player_PrepareNextMedia(vlc_player_t *player)
     vlc_player_assert_locked(player);
 
     if (!player->media_provider
-     || player->media_stopped_action == VLC_PLAYER_MEDIA_STOPPED_STOP
      || player->next_media_requested)
         return;
 
@@ -1218,17 +1217,6 @@ vlc_player_Stop(vlc_player_t *player)
 }
 
 void
-vlc_player_SetMediaStoppedAction(vlc_player_t *player,
-                                 enum vlc_player_media_stopped_action action)
-{
-    vlc_player_assert_locked(player);
-    player->media_stopped_action = action;
-    var_SetBool(player, "play-and-pause",
-                action == VLC_PLAYER_MEDIA_STOPPED_PAUSE);
-    vlc_player_SendEvent(player, on_media_stopped_action_changed, action);
-}
-
-void
 vlc_player_SetStartPaused(vlc_player_t *player, bool start_paused)
 {
     vlc_player_assert_locked(player);
@@ -1921,7 +1909,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     vlc_list_init(&player->destructor.inputs);
     vlc_list_init(&player->destructor.stopping_inputs);
     vlc_list_init(&player->destructor.joinable_inputs);
-    player->media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
     player->start_paused = false;
     player->pause_on_cork = false;
     player->corked = false;

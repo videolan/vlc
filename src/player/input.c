@@ -23,7 +23,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 #include <vlc_memstream.h>
 #include "player.h"
 
@@ -222,7 +221,6 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
      && state != VLC_PLAYER_STATE_STOPPED)
         return;
 
-    enum vlc_player_state last_state = input->state;
     input->state = state;
 
     /* Override the global state if the player is still playing and has a next
@@ -258,33 +256,13 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             player->last_eos = vlc_tick_now();
 
             if (!player->deleting)
+            {
                 vlc_player_OpenNextMedia(player);
+                if (player->input)
+                    vlc_player_input_Start(player->input);
+            }
             if (!player->input)
                 player->started = false;
-
-            /* If the last input was not even started, always play the next
-             * media */
-            enum vlc_player_media_stopped_action stopped_action;
-            if (last_state == VLC_PLAYER_STATE_STOPPED)
-                stopped_action = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
-            else
-                stopped_action = player->media_stopped_action;
-
-            switch (stopped_action)
-            {
-                case VLC_PLAYER_MEDIA_STOPPED_EXIT:
-                    if (player->input && player->started)
-                        vlc_player_input_Start(player->input);
-                    else
-                        libvlc_Quit(vlc_object_instance(player));
-                    break;
-                case VLC_PLAYER_MEDIA_STOPPED_CONTINUE:
-                    if (player->input && player->started)
-                        vlc_player_input_Start(player->input);
-                    break;
-                default:
-                    break;
-            }
 
             send_event = !player->started;
             break;

@@ -43,6 +43,8 @@ vlc_playlist_NotifyCurrentState(vlc_playlist_t *playlist,
                                 playlist->has_prev);
     vlc_playlist_NotifyListener(playlist, listener, on_has_next_changed,
                                 playlist->has_next);
+    vlc_playlist_NotifyListener(playlist, listener, on_media_stopped_action_changed,
+                                playlist->stopped_action);
 }
 
 vlc_playlist_listener_id *

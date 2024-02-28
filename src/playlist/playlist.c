@@ -43,6 +43,7 @@ vlc_playlist_New(vlc_object_t *parent)
         free(playlist);
         return NULL;
     }
+    playlist->stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
 
     vlc_vector_init(&playlist->items);
     randomizer_Init(&playlist->randomizer);

@@ -95,15 +95,6 @@ public:
     };
     Q_ENUM(PlayingState)
 
-    enum MediaStopAction
-    {
-        MEDIA_STOPPED_CONTINUE = VLC_PLAYER_MEDIA_STOPPED_CONTINUE,
-        MEDIA_STOPPED_PAUSE = VLC_PLAYER_MEDIA_STOPPED_PAUSE,
-        MEDIA_STOPPED_STOP = VLC_PLAYER_MEDIA_STOPPED_STOP,
-        MEDIA_STOPPED_EXIT = VLC_PLAYER_MEDIA_STOPPED_EXIT
-    };
-    Q_ENUM(MediaStopAction)
-
     enum Telekeys{
         TELE_RED = VLC_PLAYER_TELETEXT_KEY_RED,
         TELE_GREEN = VLC_PLAYER_TELETEXT_KEY_GREEN,
@@ -119,7 +110,6 @@ public:
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
     Q_PROPERTY(float buffering READ getBuffering  NOTIFY bufferingChanged FINAL)
     Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateChanged FINAL)
-    Q_PROPERTY(MediaStopAction mediaStopAction READ getMediaStopAction WRITE setMediaStopAction NOTIFY mediaStopActionChanged FINAL)
 
     Q_PROPERTY(VLCTick time READ getTime WRITE setTime NOTIFY timeChanged FINAL)
     Q_PROPERTY(VLCTick remainingTime READ getRemainingTime NOTIFY remainingTimeChanged FINAL)
@@ -289,8 +279,6 @@ public slots:
     float getBuffering() const;
     float getRate() const;
     void setRate( float );
-    MediaStopAction getMediaStopAction() const;
-    void setMediaStopAction(MediaStopAction );
     VLCTick getTime() const;
     void setTime(VLCTick);
     VLCTick getRemainingTime() const;
@@ -408,7 +396,6 @@ signals:
     void nameChanged( const QString& );
     void bufferingChanged( float );
     void rateChanged( float );
-    void mediaStopActionChanged( MediaStopAction );
 
     void timeChanged( VLCTick );
     void remainingTimeChanged( VLCTick );

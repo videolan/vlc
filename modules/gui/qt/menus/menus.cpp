@@ -215,10 +215,14 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
         ":/menu/stream.svg", &DialogsProvider::openAndStreamingDialogs, "Ctrl+S" );
     menu->addSeparator();
 
-    action = addMPLStaticEntry( p_intf, menu, qtr( "Quit at the end of playlist" ), "",
-                               &PlaylistController::playAndExitChanged );
+    action = menu->addAction( qtr( "Quit at the end of playlist" ), [playlist = THEMPL](bool checked){
+        if (checked)
+            playlist->setMediaStopAction(PlaylistController::MEDIA_STOPPED_EXIT);
+        else
+            playlist->setMediaStopAction(PlaylistController::MEDIA_STOPPED_CONTINUE);
+    });
     action->setCheckable( true );
-    action->setChecked( THEMPL->isPlayAndExit() );
+    action->setChecked( THEMPL->getMediaStopAction() ==  PlaylistController::MEDIA_STOPPED_EXIT);
 
     if( mi && mi->getSysTray() )
     {

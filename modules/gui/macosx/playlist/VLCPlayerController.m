@@ -129,7 +129,6 @@ const CGFloat VLCVolumeDefault = 1.;
 - (void)programListChanged;
 - (void)programSelectionChanged:(int)selectedID;
 - (void)ABLoopStateChanged:(enum vlc_player_abloop)abLoopState;
-- (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 - (void)metaDataChangedForInput:(input_item_t *)inputItem;
 - (void)voutListUpdated;
 
@@ -430,17 +429,6 @@ static void cb_player_atobloop_changed(vlc_player_t *p_player,
     });
 }
 
-static void cb_player_media_stopped_action_changed(vlc_player_t *p_player,
-                                                   enum vlc_player_media_stopped_action newAction,
-                                                   void *p_data)
-{
-    VLC_UNUSED(p_player);
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
-        [playerController stopActionChanged:newAction];
-    });
-}
-
 static void cb_player_item_meta_changed(vlc_player_t *p_player,
                                         input_item_t *p_mediaItem,
                                         void *p_data)
@@ -501,7 +489,6 @@ static const struct vlc_player_cbs player_callbacks = {
     .on_signal_changed = NULL,
     .on_statistics_changed = cb_player_stats_changed,
     .on_atobloop_changed = cb_player_atobloop_changed,
-    .on_media_stopped_action_changed = cb_player_media_stopped_action_changed,
     .on_media_meta_changed = cb_player_item_meta_changed,
     .on_media_epg_changed = NULL,
     .on_media_subitems_changed = NULL,
@@ -722,18 +709,6 @@ static int BossCallback(vlc_object_t *p_this,
 {
     vlc_player_Lock(_p_player);
     vlc_player_Stop(_p_player);
-    vlc_player_Unlock(_p_player);
-}
-
-- (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction
-{
-    _actionAfterStop = stoppedAction;
-}
-
-- (void)setActionAfterStop:(enum vlc_player_media_stopped_action)actionAfterStop
-{
-    vlc_player_Lock(_p_player);
-    vlc_player_SetMediaStoppedAction(_p_player, actionAfterStop);
     vlc_player_Unlock(_p_player);
 }
 

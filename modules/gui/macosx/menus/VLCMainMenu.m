@@ -890,10 +890,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
-    if (_playerController.actionAfterStop != VLC_PLAYER_MEDIA_STOPPED_EXIT) {
-        _playerController.actionAfterStop = VLC_PLAYER_MEDIA_STOPPED_EXIT;
+    if (_playlistController.actionAfterStop != VLC_PLAYLIST_MEDIA_STOPPED_EXIT) {
+        _playlistController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
     } else {
-        _playerController.actionAfterStop = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
+        _playlistController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
     }
 }
 
@@ -1964,7 +1964,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
         [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
     } else if (mi == _quitAfterPB) {
-        BOOL state = _playerController.actionAfterStop == VLC_PLAYER_MEDIA_STOPPED_EXIT;
+        BOOL state = _playlistController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
         [mi setState: state ? NSOnState : NSOffState];
     } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
         enabled = _playerController.seekable;

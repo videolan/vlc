@@ -55,7 +55,7 @@ public:
     bool m_hasPrev = false;
     PlaylistController::PlaybackRepeat m_repeat = PlaylistController::PLAYBACK_REPEAT_NONE;
     bool m_random = false;
-    bool m_isPlayAndExit = false;
+    PlaylistController::MediaStopAction m_mediaStopAction = PlaylistController::MEDIA_STOPPED_CONTINUE;
     bool m_empty = true;
     size_t m_count = 0;
     PlaylistController::SortKey m_sortKey = PlaylistController::SORT_KEY_NONE;

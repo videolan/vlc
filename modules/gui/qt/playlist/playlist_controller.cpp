@@ -303,6 +303,23 @@ on_playlist_has_next_changed(vlc_playlist_t *playlist, bool has_next,
     });
 }
 
+static void
+on_media_stopped_action_changed(vlc_playlist_t *playlist,
+                          enum vlc_playlist_media_stopped_action new_action,
+                          void *userdata)
+{
+    PlaylistControllerPrivate *that = static_cast<PlaylistControllerPrivate *>(userdata);
+    that->callAsync([=](){
+        auto action = static_cast<PlaylistController::MediaStopAction>(new_action);
+        if (that->m_playlist != playlist)
+            return;
+        if (that->m_mediaStopAction == action)
+            return;
+        that->m_mediaStopAction = action;
+        emit that->q_func()->mediaStopActionChanged(action);
+    });
+}
+
 } // extern "C"
 
 static const struct vlc_playlist_callbacks playlist_callbacks = []{
@@ -317,6 +334,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = []{
     cbs.on_current_index_changed = on_playlist_current_item_changed;
     cbs.on_has_next_changed = on_playlist_has_next_changed;
     cbs.on_has_prev_changed = on_playlist_has_prev_changed;
+    cbs.on_media_stopped_action_changed = on_media_stopped_action_changed;
     return cbs;
 }();
 
@@ -729,19 +747,17 @@ void PlaylistController::setRepeatMode(PlaylistController::PlaybackRepeat mode)
     vlc_playlist_SetPlaybackRepeat( d->m_playlist, static_cast<vlc_playlist_playback_repeat>(mode) );
 }
 
-
-bool PlaylistController::isPlayAndExit() const
+PlaylistController::MediaStopAction PlaylistController::getMediaStopAction() const
 {
     Q_D(const PlaylistController);
-    return d->m_isPlayAndExit;
+    return d->m_mediaStopAction;
 }
 
-void PlaylistController::setPlayAndExit(bool enable)
+void PlaylistController::setMediaStopAction(PlaylistController::MediaStopAction action)
 {
     Q_D(PlaylistController);
     vlc_playlist_locker lock{ d->m_playlist };
-    vlc_player_t* player = vlc_playlist_GetPlayer( d->m_playlist );
-    vlc_player_SetMediaStoppedAction( player, enable ? VLC_PLAYER_MEDIA_STOPPED_EXIT :  VLC_PLAYER_MEDIA_STOPPED_CONTINUE );
+    vlc_playlist_SetMediaStoppedAction(d->m_playlist, static_cast<vlc_playlist_media_stopped_action>(action) );
 }
 
 bool PlaylistController::isEmpty() const

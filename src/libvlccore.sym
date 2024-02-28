@@ -932,7 +932,6 @@ vlc_player_SetAtoBLoop
 vlc_player_SetCategoryDelay
 vlc_player_SetCurrentMedia
 vlc_player_SetEsIdDelay
-vlc_player_SetMediaStoppedAction
 vlc_player_SetRecordingEnabled
 vlc_player_SetRenderer
 vlc_player_SetStartPaused
@@ -1006,6 +1005,7 @@ vlc_playlist_Pause
 vlc_playlist_Resume
 vlc_playlist_Preparse
 vlc_playlist_Export
+vlc_playlist_SetMediaStoppedAction
 vlc_intf_GetMainPlaylist
 vlc_media_source_Hold
 vlc_media_source_Release

@@ -76,7 +76,6 @@ public:
     QString         m_name;
     float           m_buffering = 0.f;
     float           m_rate = 1.f;
-    PlayerController::MediaStopAction m_mediaStopAction = PlayerController::MEDIA_STOPPED_CONTINUE;
 
     VLCTick      m_time = 0;
     VLCTick      m_remainingTime = 0;

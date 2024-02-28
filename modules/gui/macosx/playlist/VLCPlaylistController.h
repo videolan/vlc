@@ -107,6 +107,14 @@ extern NSString *VLCPlaylistItemsRemoved;
 @property (readwrite) BOOL libraryPlaylistMode;
 
 /**
+ * Define the action to perform after playback of the current media stopped (for any reason)
+ * Options are: continue with next time, pause on last frame, stop even if there is a next item and quit VLC
+ * @see the vlc_playlist_media_stopped_action enum for details
+ */
+@property (readwrite, nonatomic) enum vlc_playlist_media_stopped_action actionAfterStop;
+
+
+/**
  * Simplified version to add new items to the end of the current playlist
  * @param array array of items. Each item is an instance of VLCOpenInputMetadata.
  */

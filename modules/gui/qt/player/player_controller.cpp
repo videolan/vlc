@@ -746,15 +746,6 @@ static void on_player_atobloop_changed(vlc_player_t *, enum vlc_player_abloop st
     });
 }
 
-static void on_player_media_stopped_action_changed(vlc_player_t *, enum vlc_player_media_stopped_action new_action, void *data)
-{
-    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
-    that->callAsync([that,new_action] () {
-        that->m_mediaStopAction = static_cast<PlayerController::MediaStopAction>(new_action);
-        emit that->q_func()->mediaStopActionChanged(that->m_mediaStopAction);
-    });
-}
-
 static void on_player_media_meta_changed(vlc_player_t *, input_item_t *media, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
@@ -1049,7 +1040,6 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_signal_changed,
     on_player_stats_changed,
     on_player_atobloop_changed,
-    on_player_media_stopped_action_changed,
     on_player_media_meta_changed,
     on_player_media_epg_changed,
     on_player_subitems_changed,
@@ -1205,13 +1195,6 @@ void PlayerController::setRate( float new_rate )
     vlc_player_locker lock{ d->m_player };
     if ( vlc_player_CanChangeRate( d->m_player ) )
         vlc_player_ChangeRate( d->m_player, new_rate );
-}
-
-void PlayerController::setMediaStopAction(PlayerController::MediaStopAction action)
-{
-    Q_D(PlayerController);
-    vlc_player_locker lock{ d->m_player };
-    vlc_player_SetMediaStoppedAction( d->m_player, static_cast<vlc_player_media_stopped_action>(action) );
 }
 
 void PlayerController::slower()
@@ -2091,7 +2074,6 @@ PRIMITIVETYPE_GETTER(bool, canRestorePlayback, m_canRestorePlayback);
 PRIMITIVETYPE_GETTER(float, getSubtitleFPS, m_subtitleFPS)
 PRIMITIVETYPE_GETTER(bool, hasVideoOutput, m_hasVideo)
 PRIMITIVETYPE_GETTER(float, getBuffering, m_buffering)
-PRIMITIVETYPE_GETTER(PlayerController::MediaStopAction, getMediaStopAction, m_mediaStopAction)
 PRIMITIVETYPE_GETTER(float, getVolume, m_volume)
 PRIMITIVETYPE_GETTER(bool, isMuted, m_muted)
 PRIMITIVETYPE_GETTER(bool, isFullscreen, m_fullscreen)

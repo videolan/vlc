@@ -60,6 +60,7 @@ NSString *VLCPlaylistItemsRemoved = @"VLCPlaylistItemsRemoved";
 - (void)currentPlaylistItemIndexChanged:(size_t)index;
 - (void)playlistHasPreviousItem:(BOOL)hasPrevious;
 - (void)playlistHasNextItem:(BOOL)hasNext;
+- (void)stopActionChanged:(enum vlc_playlist_media_stopped_action)stoppedAction;
 
 @end
 
@@ -194,6 +195,18 @@ cb_playlist_has_next_changed(vlc_playlist_t *playlist,
     });
 }
 
+static void
+cb_playlist_media_stopped_action_changed(vlc_playlist_t *p_playlist,
+                                         enum vlc_playlist_media_stopped_action newAction,
+                                         void *p_data)
+{
+    VLC_UNUSED(p_playlist);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController stopActionChanged:newAction];
+    });
+}
+
 static const struct vlc_playlist_callbacks playlist_callbacks = {
     cb_playlist_items_reset,
     cb_playlist_items_added,
@@ -205,6 +218,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     cb_playlist_current_item_index_changed,
     cb_playlist_has_prev_changed,
     cb_playlist_has_next_changed,
+    cb_playlist_media_stopped_action_changed,
 };
 
 #pragma mark -
@@ -688,6 +702,18 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
                                   exportModule.moduleName.UTF8String);
     vlc_playlist_Unlock(_p_playlist);
     return ret;
+}
+
+- (void)stopActionChanged:(enum vlc_playlist_media_stopped_action)stoppedAction
+{
+    _actionAfterStop = stoppedAction;
+}
+
+- (void)setActionAfterStop:(enum vlc_playlist_media_stopped_action)actionAfterStop
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_SetMediaStoppedAction(_p_playlist, actionAfterStop);
+    vlc_playlist_Unlock(_p_playlist);
 }
 
 @end

@@ -81,6 +81,15 @@ public:
     };
     Q_ENUM(SortOrder)
 
+    enum MediaStopAction
+    {
+        MEDIA_STOPPED_CONTINUE = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE,
+        MEDIA_STOPPED_PAUSE = VLC_PLAYLIST_MEDIA_STOPPED_PAUSE,
+        MEDIA_STOPPED_STOP = VLC_PLAYLIST_MEDIA_STOPPED_STOP,
+        MEDIA_STOPPED_EXIT = VLC_PLAYLIST_MEDIA_STOPPED_EXIT
+    };
+    Q_ENUM(MediaStopAction)
+
     Q_PROPERTY(QVariantList sortKeyTitleList READ getSortKeyTitleList CONSTANT FINAL)
 
     Q_PROPERTY(Playlist playlist READ getPlaylist WRITE setPlaylist NOTIFY playlistChanged FINAL)
@@ -91,11 +100,12 @@ public:
     Q_PROPERTY(bool hasPrev READ hasPrev NOTIFY hasPrevChanged FINAL)
     Q_PROPERTY(bool random READ isRandom WRITE setRandom NOTIFY randomChanged  FINAL)
     Q_PROPERTY(PlaybackRepeat repeatMode READ getRepeatMode WRITE setRepeatMode NOTIFY repeatModeChanged FINAL)
-    Q_PROPERTY(bool playAndExit READ isPlayAndExit WRITE setPlayAndExit NOTIFY playAndExitChanged FINAL)
     Q_PROPERTY(bool empty READ isEmpty NOTIFY isEmptyChanged FINAL)
     Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
     Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged FINAL)
     Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged FINAL)
+    Q_PROPERTY(MediaStopAction mediaStopAction READ getMediaStopAction WRITE setMediaStopAction NOTIFY mediaStopActionChanged FINAL)
+
 
 public:
     Q_INVOKABLE void play();
@@ -144,11 +154,11 @@ public slots:
     bool isRandom() const;
     void setRandom( bool );
 
+    MediaStopAction getMediaStopAction() const;
+    void setMediaStopAction(MediaStopAction );
+
     PlaybackRepeat getRepeatMode() const;
     void setRepeatMode( PlaybackRepeat mode );
-
-    bool isPlayAndExit() const;
-    void setPlayAndExit(bool );
 
     bool isEmpty() const;
     int count() const;
@@ -174,7 +184,7 @@ signals:
     void hasNextChanged( bool );
     void hasPrevChanged( bool );
     void randomChanged( bool );
-    void playAndExitChanged( bool );
+    void mediaStopActionChanged( MediaStopAction );
     void repeatModeChanged( PlaybackRepeat );
     void isEmptyChanged( bool empty );
     void countChanged(int);
