@@ -32,6 +32,8 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
+#import "library/video-library/VLCLibraryVideoDataSource.h"
+
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
 static const NSUInteger kWrapAroundValue = (NSUInteger)-1;
@@ -268,6 +270,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         
     } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryHomeViewVideoContainerViewDataSource class]]) {
         VLCLibraryHomeViewVideoContainerViewDataSource *videoDataSource = (VLCLibraryHomeViewVideoContainerViewDataSource *)self.collectionView.dataSource;
+        [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
+    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
+        VLCLibraryVideoDataSource *videoDataSource = (VLCLibraryVideoDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
 
