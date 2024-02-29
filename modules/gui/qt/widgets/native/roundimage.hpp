@@ -88,19 +88,17 @@ private slots:
     void onRequestCompleted(Status status, const QImage& image);
 
 private:
+    Status m_status = Status::Null;
+    bool m_QSGCustomGeometry = false;
+    bool m_dirty = false;
+    bool m_enqueuedGeneration = false;
+
     QUrl m_source;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
-    Status m_status = Status::Null;
-
-    bool m_QSGCustomGeometry = false;
 
     QImage m_roundImage;
-    bool m_dirty = false;
-
     std::shared_ptr<RoundImageRequest> m_activeImageResponse;
-
-    bool m_enqueuedGeneration = false;
 };
 
 #endif
