@@ -78,7 +78,10 @@ typedef struct
 
     /* Clock for this program */
     input_clock_t    *p_input_clock;
-    vlc_clock_main_t *p_main_clock;
+    struct {
+        vlc_clock_main_t *main;
+    } clocks;
+
     /* Weak reference to the master ES clock */
     const vlc_clock_t *p_master_es_clock;
     enum vlc_clock_master_source active_clock_source;
@@ -591,7 +594,7 @@ static void EsOutDelete( es_out_t *out )
 static void ProgramDelete( es_out_pgrm_t *p_pgrm )
 {
     input_clock_Delete( p_pgrm->p_input_clock );
-    vlc_clock_main_Delete( p_pgrm->p_main_clock );
+    vlc_clock_main_Delete(p_pgrm->clocks.main);
     if( p_pgrm->p_meta )
         vlc_meta_Delete( p_pgrm->p_meta );
     input_source_Release( p_pgrm->source );
@@ -1041,11 +1044,11 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
      * frames and not from EsOutChangePosition(), like the input clock. Indeed,
      * flush is asynchronous and the output used by the decoder may still need
      * a valid reference of the clock to output their last frames. */
-    vlc_clock_main_Reset( p_sys->p_pgrm->p_main_clock );
+    vlc_clock_main_Reset(p_sys->p_pgrm->clocks.main);
 
     /* Send the first PCR to the output clock. This will be used as a reference
      * point for the sync point. */
-    vlc_clock_main_SetFirstPcr(p_sys->p_pgrm->p_main_clock, update,
+    vlc_clock_main_SetFirstPcr(p_sys->p_pgrm->clocks.main, update,
                                i_stream_start);
 
     foreach_es_then_es_slaves(p_es)
@@ -1106,7 +1109,7 @@ static void EsOutProgramChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_
     vlc_list_foreach(pgrm, &p_sys->programs, node)
     {
         input_clock_ChangePause(pgrm->p_input_clock, b_paused, i_date);
-        vlc_clock_main_ChangePause(pgrm->p_main_clock, i_date, b_paused);
+        vlc_clock_main_ChangePause(pgrm->clocks.main, i_date, b_paused);
     }
 }
 
@@ -1276,7 +1279,7 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
         case VLC_CLOCK_MASTER_INPUT:
         {
             vlc_clock_t *p_master_clock =
-                vlc_clock_main_CreateInputMaster( p_pgrm->p_main_clock );
+                vlc_clock_main_CreateInputMaster(p_pgrm->clocks.main);
 
             if( p_master_clock != NULL )
                 input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
@@ -1445,8 +1448,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_input->obj );
-    p_pgrm->p_main_clock = vlc_clock_main_New( p_input->obj.logger, tracer );
-    if( !p_pgrm->p_main_clock )
+    p_pgrm->clocks.main = vlc_clock_main_New(p_input->obj.logger, tracer);
+    if (p_pgrm->clocks.main == NULL)
     {
         free( p_pgrm );
         return NULL;
@@ -1455,7 +1458,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
     if( !p_pgrm->p_input_clock )
     {
-        vlc_clock_main_Delete( p_pgrm->p_main_clock );
+        vlc_clock_main_Delete(p_pgrm->clocks.main);
         free( p_pgrm );
         return NULL;
     }
@@ -1465,13 +1468,13 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     const vlc_tick_t pts_delay = p_sys->i_pts_delay + p_sys->i_pts_jitter
                                + p_sys->i_tracks_pts_delay;
     input_clock_SetJitter( p_pgrm->p_input_clock, pts_delay, p_sys->i_cr_average );
-    vlc_clock_main_SetInputDejitter( p_pgrm->p_main_clock, pts_delay );
+    vlc_clock_main_SetInputDejitter(p_pgrm->clocks.main, pts_delay );
 
     /* In case of low delay: don't use any output dejitter. This may result on
      * some audio/video glitches when starting, but low-delay is more important
      * than the visual quality if the user chose this option. */
     if (input_priv(p_input)->b_low_delay)
-        vlc_clock_main_SetDejitter(p_pgrm->p_main_clock, 0);
+        vlc_clock_main_SetDejitter(p_pgrm->clocks.main, 0);
 
     /* Append it */
     vlc_list_append(&p_pgrm->node, &p_sys->programs);
@@ -2235,17 +2238,17 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     {
         p_es->master = true;
         p_es->p_pgrm->p_master_es_clock = p_es->p_clock =
-            vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock,
-                                         p_es->id.str_id,
-                                         &clock_cbs, p_es );
+            vlc_clock_main_CreateMaster(p_es->p_pgrm->clocks.main,
+                                        p_es->id.str_id,
+                                        &clock_cbs, p_es);
     }
     else
     {
         p_es->master = false;
-        p_es->p_clock = vlc_clock_main_CreateSlave( p_es->p_pgrm->p_main_clock,
-                                                    p_es->id.str_id,
-                                                    p_es->fmt.i_cat,
-                                                    &clock_cbs, p_es );
+        p_es->p_clock = vlc_clock_main_CreateSlave(p_es->p_pgrm->clocks.main,
+                                                   p_es->id.str_id,
+                                                   p_es->fmt.i_cat,
+                                                   &clock_cbs, p_es);
     }
 
     if( !p_es->p_clock )
@@ -3886,7 +3889,7 @@ static int EsOutVaPrivControlLocked( es_out_t *out, input_source_t *source,
         {
             input_clock_SetJitter(pgrm->p_input_clock,
                                   i_pts_delay, i_cr_average);
-            vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
+            vlc_clock_main_SetInputDejitter(pgrm->clocks.main, i_pts_delay);
         }
         return VLC_SUCCESS;
     }
