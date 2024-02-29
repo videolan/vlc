@@ -146,7 +146,8 @@ int vlc_clock_RegisterEvents(vlc_clock_t *clock,
 }
 
 static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
-                               const char *id, vlc_tick_t now, vlc_tick_t pts)
+                               const char *id, vlc_tick_t now, vlc_tick_t pts,
+                               vlc_tick_t drift)
 {
     if (now != VLC_TICK_MAX && now != VLC_TICK_INVALID)
     {
@@ -155,11 +156,13 @@ static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
                                VLC_TRACE("id", id),
                                VLC_TRACE_TICK_NS("pts", pts),
                                VLC_TRACE_TICK_NS("render_ts", now),
+                               VLC_TRACE_TICK_NS("drift", drift),
                                VLC_TRACE_END);
         vlc_tracer_TraceWithTs(tracer, now,
                                VLC_TRACE("type", type),
                                VLC_TRACE("id", id),
                                VLC_TRACE_TICK_NS("render_pts", pts),
+                               VLC_TRACE_TICK_NS("drift", drift),
                                VLC_TRACE_END);
 
     }
@@ -194,7 +197,9 @@ static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
 
 static inline void vlc_clock_on_update(vlc_clock_t *clock,
                                        vlc_tick_t system_now,
-                                       vlc_tick_t ts, double rate,
+                                       vlc_tick_t ts,
+                                       vlc_tick_t drift,
+                                       double rate,
                                        unsigned frame_rate,
                                        unsigned frame_rate_base)
 {
@@ -203,9 +208,10 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
         clock->cbs->on_update(system_now, ts, rate, frame_rate, frame_rate_base,
                               clock->cbs_data);
 
-    if (main_clock->tracer != NULL && clock->track_str_id != NULL)
+    if (main_clock->tracer != NULL && clock->track_str_id != NULL &&
+        system_now != VLC_TICK_INVALID && system_now != VLC_TICK_MAX)
         TraceRender(main_clock->tracer, "RENDER", clock->track_str_id,
-                    system_now, ts);
+                    system_now, ts, drift);
 }
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
@@ -306,9 +312,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
     if (clock->delay > 0 && main_clock->delay < 0 && ts > -main_clock->delay)
         ts += main_clock->delay;
 
-    vlc_clock_on_update(clock, system_now, ts,
+    vlc_tick_t drift = VLC_TICK_INVALID;
+    vlc_clock_on_update(clock, system_now, ts, drift,
                         rate, frame_rate, frame_rate_base);
-    return VLC_TICK_INVALID;
+    return drift;
 }
 
 static void vlc_clock_master_reset(vlc_clock_t *clock)
@@ -341,7 +348,7 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.f, 0, 0);
+    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.f, 0, 0);
 }
 
 static vlc_tick_t vlc_clock_master_set_delay(vlc_clock_t *clock, vlc_tick_t delay)
@@ -452,8 +459,8 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
     {
         /* If system_now is VLC_TICK_MAX, the update is forced, don't modify
          * anything but only notify the new clock point. */
-        vlc_clock_on_update(clock, VLC_TICK_MAX, ts, rate, frame_rate,
-                            frame_rate_base);
+        vlc_clock_on_update(clock, VLC_TICK_MAX, ts, VLC_TICK_INVALID,
+                            rate, frame_rate, frame_rate_base);
         return VLC_TICK_MAX;
     }
 
@@ -463,8 +470,10 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, computed, ts, rate, frame_rate, frame_rate_base);
-    return computed - system_now;
+    vlc_tick_t drift = computed - system_now;
+    vlc_clock_on_update(clock, computed, ts, drift, rate,
+                        frame_rate, frame_rate_base);
+    return drift;
 }
 
 static void vlc_clock_slave_reset(vlc_clock_t *clock)
@@ -477,7 +486,8 @@ static void vlc_clock_slave_reset(vlc_clock_t *clock)
 
     vlc_mutex_unlock(&main_clock->lock);
 
-    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID, 1.0f, 0, 0);
+    vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID,
+                        VLC_TICK_INVALID, 1.0f, 0, 0);
 }
 
 static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay)
