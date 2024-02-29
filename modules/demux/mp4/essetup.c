@@ -815,6 +815,10 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
             break;
     }
 
+    /* Codec like QTRLE will need to provide depth. */
+    if (p_fmt->i_profile == -1 && p_fmt->i_level == -1 &&
+        p_fmt->video.i_chroma == 0)
+        p_fmt->i_level = p_vide->i_depth;
     return 1;
 }
 
