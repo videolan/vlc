@@ -177,11 +177,22 @@ bool tt_node_Match( const tt_node_t *p_node, const char *psz_name, const char *p
     return !!psz_namespace == !!psz_nodens;
 }
 
-int tt_node_NameCompare( const char* psz_tagname, const char* psz_pattern )
+const char * tt_node_GetAttribute( tt_namespaces_t *p_nss, const tt_node_t *p_node,
+                                   const char *psz_name, const char *psz_namespace )
 {
-    if( !strncasecmp( "tt:", psz_tagname, 3 ) )
-        psz_tagname += 3;
-    return strcasecmp( psz_tagname, psz_pattern );
+    const void *value;
+    char *alloc = NULL;
+    if( psz_namespace )
+    {
+        const char *psz_prefix = tt_namespaces_GetPrefix( p_nss, psz_namespace );
+        if( psz_prefix == NULL ||
+            asprintf( &alloc, "%s:%s", psz_prefix, psz_name ) < 1 )
+            return NULL;
+        psz_name = alloc;
+    }
+    value = vlc_dictionary_value_for_key( &p_node->attr_dict, psz_name );
+    free( alloc );
+    return value != kVLCDictionaryNotFound ? (const char *)value : NULL;
 }
 
 bool tt_node_HasChild( const tt_node_t *p_node )
@@ -385,7 +396,8 @@ tt_node_t * tt_node_New( tt_node_t* p_parent,
     return p_node;
 }
 
-tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent,
+tt_node_t * tt_node_NewRead( xml_reader_t* reader,
+                             tt_namespaces_t *p_nss, tt_node_t* p_parent,
                              const char* psz_node_name, const char *psz_namespace )
 {
     tt_node_t *p_node = tt_node_New( p_parent, psz_node_name, psz_namespace );
@@ -397,7 +409,8 @@ tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent,
          psz_key != NULL;
          psz_key = xml_ReaderNextAttrNS( reader, &psz_value, &psz_ns ) )
     {
-        fprintf(stderr,"ATTR %s %s %s\n", psz_key, psz_value, psz_ns);
+        if( psz_ns && psz_key )
+        tt_namespaces_Register( p_nss, psz_key, psz_ns );
         char *psz_val = strdup( psz_value );
         if( psz_val )
         {
@@ -474,7 +487,7 @@ static int tt_node_Skip( xml_reader_t *p_reader, const char *psz_skipped )
     return VLC_EGENERIC;
 }
 #endif
-int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
+int tt_nodes_Read( xml_reader_t *p_reader, tt_namespaces_t *p_nss, tt_node_t *p_root_node )
 {
     size_t i_depth = 0;
     tt_node_t *p_node = p_root_node;
@@ -496,7 +509,9 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 
             case XML_READER_STARTELEM:
             {
-                tt_node_t *p_newnode = tt_node_NewRead( p_reader, p_node, psz_node_name,
+                tt_namespaces_Register( p_nss, psz_node_name, psz_node_namespace );
+                tt_node_t *p_newnode = tt_node_NewRead( p_reader, p_nss, p_node,
+                                                        psz_node_name,
                                                         psz_node_namespace );
                 if( !p_newnode )
                     return VLC_EGENERIC;
@@ -517,7 +532,7 @@ int tt_nodes_Read( xml_reader_t *p_reader, tt_node_t *p_root_node )
 
             case XML_READER_ENDELEM:
             {
-                if( strcmp( psz_node_name, p_node->psz_node_name ) )
+                if( !tt_node_Match( p_node, psz_node_name, psz_node_namespace ) )
                     return VLC_EGENERIC;
 
                 if( i_depth == 0 )

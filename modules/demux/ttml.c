@@ -51,6 +51,7 @@ typedef struct
     bool            b_first_time;
 
     tt_node_t         *p_rootnode;
+    tt_namespaces_t   namespaces;
 
     tt_timings_t    temporal_extent;
 
@@ -157,11 +158,11 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
 static int ReadTTML( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-    const char* psz_node_name, *psz_namespace;
+    const char* psz_node_name, *psz_node_namespace;
 
     do
     {
-        int i_type = xml_ReaderNextNodeNS( p_sys->p_reader, &psz_node_name, &psz_namespace );
+        int i_type = xml_ReaderNextNodeNS( p_sys->p_reader, &psz_node_name, &psz_node_namespace );
         bool b_empty = xml_ReaderIsEmptyElement( p_sys->p_reader );
 
         if( i_type <= XML_READER_NONE )
@@ -173,22 +174,25 @@ static int ReadTTML( demux_t* p_demux )
                 break;
 
             case XML_READER_STARTELEM:
-                if( tt_node_NameCompare( psz_node_name, "tt" ) ||
+                if( strcmp( psz_node_namespace, TT_NS ) ||
+                    strcmp( tt_LocalName( psz_node_name ), "tt" ) ||
                     p_sys->p_rootnode != NULL )
                     return VLC_EGENERIC;
 
-                p_sys->p_rootnode = tt_node_NewRead( p_sys->p_reader, NULL, psz_node_name,
-                                                     psz_namespace );
+                p_sys->p_rootnode = tt_node_NewRead( p_sys->p_reader, &p_sys->namespaces, NULL,
+                                                     psz_node_name,
+                                                     psz_node_namespace );
                 if( b_empty )
                     break;
                 if( !p_sys->p_rootnode ||
-                    tt_nodes_Read( p_sys->p_reader, p_sys->p_rootnode ) != VLC_SUCCESS )
+                    tt_nodes_Read( p_sys->p_reader,
+                                  &p_sys->namespaces, p_sys->p_rootnode ) != VLC_SUCCESS )
                     return VLC_EGENERIC;
                 break;
 
             case XML_READER_ENDELEM:
                 if( !p_sys->p_rootnode ||
-                    tt_node_NameCompare( psz_node_name, p_sys->p_rootnode->psz_node_name ) )
+                    strcmp( psz_node_name, p_sys->p_rootnode->psz_node_name ) )
                     return VLC_EGENERIC;
                 break;
         }
@@ -342,6 +346,7 @@ int tt_OpenDemux( vlc_object_t* p_this )
     tt_time_Init( &p_sys->temporal_extent.end );
     tt_time_Init( &p_sys->temporal_extent.dur );
     p_sys->temporal_extent.begin.base = 0;
+    tt_namespaces_Init( &p_sys->namespaces );
 
     p_sys->p_xml = xml_Create( p_demux );
     if( !p_sys->p_xml )
@@ -418,6 +423,8 @@ void tt_CloseDemux( vlc_object_t* p_this )
 
     if( p_sys->p_xml )
         xml_Delete( p_sys->p_xml );
+
+    tt_namespaces_Clean( &p_sys->namespaces );
 
     free( p_sys->times.p_array );
 
