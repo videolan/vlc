@@ -68,6 +68,8 @@ struct tt_searchkey
 #define TT_NS_PROFILE     TT_NS "/profile/"
 #define TT_NS_FEATURE     TT_NS "/feature/"
 #define TT_NS_EXTENSION   TT_NS "/extension/"
+#define TT_NS_XML             "http://www.w3.org/XML/1998/namespace"
+#define TT_NS_SMPTE_TT_EXT    "http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt"
 
 typedef struct
 {
