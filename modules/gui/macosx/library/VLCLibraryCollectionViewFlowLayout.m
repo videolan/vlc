@@ -249,8 +249,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     const id<NSCollectionViewDataSource> dataSource = self.collectionView.dataSource;
 
-    if ([dataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
-        VLCLibraryAudioDataSource *audioDataSource = (VLCLibraryAudioDataSource *)self.collectionView.dataSource;
+    if ([dataSource isKindOfClass:VLCLibraryAudioDataSource.class]) {
+        VLCLibraryAudioDataSource * const audioDataSource = (VLCLibraryAudioDataSource *)dataSource;
         // Add detail view to the attributes set -- detail view about to be shown
         switch(audioDataSource.audioLibrarySegment) {
             case VLCAudioLibraryArtistsSegment:
@@ -265,7 +265,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
-    } else if ([dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
+    } else if ([dataSource isKindOfClass:VLCLibraryAudioGroupDataSource.class]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     } else if ([dataSource isKindOfClass:VLCLibraryHomeViewVideoContainerViewDataSource.class] ||
                [dataSource isKindOfClass:VLCLibraryVideoDataSource.class]) {
