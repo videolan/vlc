@@ -846,7 +846,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
         else if(mp4mux_track_GetFmt(p_stream->tinfo)->i_codec == VLC_CODEC_TTML)
         {
             const char emptyttml[] = "<tt xmlns=\"" TT_NS "\"/>";
-            p_empty = block_Alloc(sizeof(emptyttml));
+            p_empty = block_Alloc(sizeof(emptyttml) - 1);
             if(p_empty)
                 memcpy(p_empty->p_buffer, emptyttml, p_empty->i_buffer);
         }
