@@ -34,6 +34,8 @@ public:
         const auto painter = static_cast<QPainter *>(m_window->rendererInterface()->getResource(m_window, QSGRendererInterface::PainterResource));
         assert(painter);
 
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+
         const auto clipRegion = renderState->clipRegion();
         if (clipRegion && !clipRegion->isEmpty())
             painter->setClipRegion(*clipRegion, Qt::ReplaceClip);
