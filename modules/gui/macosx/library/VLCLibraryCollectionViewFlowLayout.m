@@ -267,11 +267,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         }
     } else if ([dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
-    } else if ([dataSource isKindOfClass:[VLCLibraryHomeViewVideoContainerViewDataSource class]]) {
-        VLCLibraryHomeViewVideoContainerViewDataSource *videoDataSource = (VLCLibraryHomeViewVideoContainerViewDataSource *)self.collectionView.dataSource;
-        [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
-    } else if ([dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource *videoDataSource = (VLCLibraryVideoDataSource *)self.collectionView.dataSource;
+    } else if ([dataSource isKindOfClass:VLCLibraryHomeViewVideoContainerViewDataSource.class] ||
+               [dataSource isKindOfClass:VLCLibraryVideoDataSource.class]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
 
