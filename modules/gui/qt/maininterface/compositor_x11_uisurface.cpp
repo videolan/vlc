@@ -28,6 +28,8 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLExtraFunctions>
 #include <QThread>
+#include <QBackingStore>
+#include <QPainter>
 
 #include "compositor_x11_uisurface.hpp"
 #include "compositor_common.hpp"
@@ -38,47 +40,60 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     : QWindow(screen)
     , m_renderWindow(window)
 {
-    setSurfaceType(QWindow::OpenGLSurface);
-
-    m_renderWindow->installEventFilter(this);
-
-    QSurfaceFormat format;
-    // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
-    format.setDepthBufferSize(16);
-    format.setStencilBufferSize(8);
-    format.setAlphaBufferSize(8);
-    format.setSwapInterval(0);
-
-    // UI is renderred on offscreen, no need for double bufferring
-    format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
-
-    // Check if this is XWayland:
-    if (Q_UNLIKELY(QApplication::platformName() == QLatin1String("xcb") &&
-                   qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland")))
+    if (qgetenv("QT_QUICK_BACKEND").compare("software"))
     {
-        applyNvidiaWorkaround(format);
+        setSurfaceType(QWindow::OpenGLSurface);
+
+        QSurfaceFormat format;
+        // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
+        format.setDepthBufferSize(16);
+        format.setStencilBufferSize(8);
+        format.setAlphaBufferSize(8);
+        format.setSwapInterval(0);
+
+        // UI is renderred on offscreen, no need for double bufferring
+        format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
+
+        // Check if this is XWayland:
+        if (Q_UNLIKELY(QApplication::platformName() == QLatin1String("xcb") &&
+                       qEnvironmentVariable("XDG_SESSION_TYPE") == QLatin1String("wayland")))
+        {
+            applyNvidiaWorkaround(format);
+        }
+
+        setFormat(format);
+
+        m_context = new QOpenGLContext();
+        m_context->setScreen(this->screen());
+        m_context->setFormat(format);
+        m_context->create();
+    }
+    else
+    {
+        m_backingStore = new QBackingStore(this);
+        m_backingStorePainter = new QPainter;
+        m_backingStorePainter->setCompositionMode(QPainter::CompositionMode_Source);
     }
 
-    setFormat(format);
-
-    m_context = new QOpenGLContext();
-    m_context->setScreen(this->screen());
-    m_context->setFormat(format);
-    m_context->create();
+    m_renderWindow->installEventFilter(this);
 
     m_uiRenderControl = new CompositorX11RenderControl(window);
 
     m_uiWindow = new CompositorOffscreenWindow(m_uiRenderControl);
     m_uiWindow->setDefaultAlphaBuffer(true);
-    m_uiWindow->setFormat(format);
+    m_uiWindow->setFormat(format());
     m_uiWindow->setColor(Qt::transparent);
 
     m_qmlEngine = new QQmlEngine();
     if (!m_qmlEngine->incubationController())
         m_qmlEngine->setIncubationController(m_uiWindow->incubationController());
 
-    connect(m_uiWindow, &QQuickWindow::sceneGraphInitialized, this, &CompositorX11UISurface::createFbo);
-    connect(m_uiWindow, &QQuickWindow::sceneGraphInvalidated, this, &CompositorX11UISurface::destroyFbo);
+    if (m_context)
+    {
+        connect(m_uiWindow, &QQuickWindow::sceneGraphInitialized, this, &CompositorX11UISurface::createFbo);
+        connect(m_uiWindow, &QQuickWindow::sceneGraphInvalidated, this, &CompositorX11UISurface::destroyFbo);
+    }
+
     connect(m_uiWindow, &QQuickWindow::beforeRendering, this, &CompositorX11UISurface::beforeRendering);
     connect(m_uiWindow, &QQuickWindow::afterRendering, this, &CompositorX11UISurface::afterRendering);
 
@@ -92,30 +107,33 @@ CompositorX11UISurface::~CompositorX11UISurface()
 {
     m_renderWindow->removeEventFilter(this);
 
-    auto surface = new QOffscreenSurface();
-    surface->setFormat(m_context->format());
-    surface->create();
+    QOffscreenSurface *surface = nullptr;
+    if (m_context)
+    {
+        surface = new QOffscreenSurface();
+        surface->setFormat(m_context->format());
+        surface->create();
 
-    // Make sure the context is current while doing cleanup. Note that we use the
-    // offscreen surface here because passing 'this' at this point is not safe: the
-    // underlying platform window may already be destroyed. To avoid all the trouble, use
-    // another surface that is valid for sure.
-    m_context->makeCurrent(surface);
+        // Make sure the context is current while doing cleanup. Note that we use the
+        // offscreen surface here because passing 'this' at this point is not safe: the
+        // underlying platform window may already be destroyed. To avoid all the trouble, use
+        // another surface that is valid for sure.
+        m_context->makeCurrent(surface);
+    }
 
     delete m_rootItem;
     delete m_uiRenderControl;
     delete m_uiWindow;
     delete m_qmlEngine;
 
-    if (m_textureId)
-        m_context->functions()->glDeleteTextures(1, &m_textureId);
-
-    if (m_fboId)
-        m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
-
-    m_context->doneCurrent();
+    if (m_context)
+    {
+        destroyFbo();
+        m_context->doneCurrent();
+    }
 
     delete m_context;
+    delete m_backingStorePainter;
 }
 
 
@@ -129,9 +147,12 @@ void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
 
     m_rootItem->forceActiveFocus();
 
-    m_context->makeCurrent(this);
-    m_uiWindow->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(m_context));
-    m_uiRenderControl->initialize();
+    if (m_context)
+    {
+        m_context->makeCurrent(this);
+        m_uiWindow->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(m_context));
+        m_uiRenderControl->initialize();
+    }
 
     initialized = true;
 }
@@ -186,29 +207,42 @@ void CompositorX11UISurface::render()
     if (!isExposed())
         return;
 
-    const bool current = m_context->makeCurrent(this);
-    assert(current);
+    if (m_context)
+    {
+        const bool current = m_context->makeCurrent(this);
+        assert(current);
+        m_uiRenderControl->beginFrame();
+    }
 
-    m_uiRenderControl->beginFrame();
     m_uiRenderControl->polishItems();
     m_uiRenderControl->sync();
 
     // TODO: investigate multithreaded renderer
     m_uiRenderControl->render();
 
-    m_uiRenderControl->endFrame();
+    if (m_context)
+    {
+        m_uiRenderControl->endFrame();
+        QOpenGLFramebufferObject::bindDefault();
+        m_context->functions()->glFlush();
 
-    //m_uiWindow->resetOpenGLState();
+        const QSize fboSize = size() * devicePixelRatio();
 
-    QOpenGLFramebufferObject::bindDefault();
-    m_context->functions()->glFlush();
+        m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
+        m_context->functions()->glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
+        m_context->extraFunctions()->glBlitFramebuffer(0, 0, fboSize.width(), fboSize.height(), 0, 0, fboSize.width(), fboSize.height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        m_context->swapBuffers(this);
+    }
+    else
+    {
+        m_backingStore->beginPaint(geometry());
+        m_backingStorePainter->begin(m_backingStore->paintDevice());
+        m_backingStorePainter->drawImage(QPoint(0, 0), m_uiWindow->grabWindow());
+        m_backingStorePainter->end();
+        m_backingStore->endPaint();
+        m_backingStore->flush(geometry());
+    }
 
-    const QSize fboSize = size() * devicePixelRatio();
-
-    m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
-    m_context->functions()->glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
-    m_context->extraFunctions()->glBlitFramebuffer(0, 0, fboSize.width(), fboSize.height(), 0, 0, fboSize.width(), fboSize.height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    m_context->swapBuffers(this);
 
     emit updated();
 }
@@ -219,6 +253,9 @@ void CompositorX11UISurface::updateSizes()
     QSize windowSize = size();
 
     m_onscreenSize = windowSize * dpr;
+
+    if (m_backingStore)
+        m_backingStore->resize(m_onscreenSize);
 
     // Behave like SizeRootObjectToView.
     m_rootItem->setSize(windowSize);
@@ -280,7 +317,9 @@ bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
         QResizeEvent* resizeEvent = static_cast<QResizeEvent*>(event);
         m_uiWindow->resize(resizeEvent->size());
         resize( resizeEvent->size() );
-        resizeFbo();
+        if (m_context)
+            resizeFbo();
+        updateSizes();
         break;
     }
 
@@ -411,14 +450,18 @@ void CompositorX11UISurface::applyNvidiaWorkaround(QSurfaceFormat &format)
 void CompositorX11UISurface::resizeEvent(QResizeEvent *)
 {
     if (m_onscreenSize != size() * devicePixelRatio())
-        resizeFbo();
+    {
+        if (m_context)
+            resizeFbo();
+        updateSizes();
+    }
 }
 
 void CompositorX11UISurface::exposeEvent(QExposeEvent *)
 {
     if (isExposed())
     {
-        if (!initialized)
+        if (!m_backingStore && !initialized)
         {
             m_uiRenderControl->initialize();
         }

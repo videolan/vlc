@@ -98,6 +98,8 @@ private:
 
     QQuickItem* m_rootItem = nullptr;
     QOpenGLContext *m_context = nullptr;
+    QBackingStore *m_backingStore = nullptr;
+    QPainter *m_backingStorePainter = nullptr;
     CompositorOffscreenWindow* m_uiWindow = nullptr;
     QQmlEngine* m_qmlEngine = nullptr;
     QWindow* m_renderWindow = nullptr;
