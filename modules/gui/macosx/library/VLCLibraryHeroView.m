@@ -79,9 +79,10 @@
 - (VLCMediaLibraryMediaItem *)randomItem
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    const size_t videoCount = libraryModel.numberOfVideoMedia;
+    NSArray * const videos = libraryModel.listOfVideoMedia;
+    const NSInteger videoCount = videos.count;
     const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
-    return [libraryModel.listOfVideoMedia objectAtIndex:randIdx];
+    return [videos objectAtIndex:randIdx];
 }
 
 - (VLCMediaLibraryMediaItem *)latestPartiallyPlayedItem
