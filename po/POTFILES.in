@@ -250,9 +250,9 @@ modules/audio_output/alsa.c
 modules/audio_output/amem.c
 modules/audio_output/android/device.c
 modules/audio_output/android/opensles.c
-modules/audio_output/audiounit_ios.m
-modules/audio_output/auhal.c
-modules/audio_output/coreaudio_common.c
+modules/audio_output/apple/audiounit_ios.m
+modules/audio_output/apple/auhal.c
+modules/audio_output/apple/coreaudio_common.c
 modules/audio_output/file.c
 modules/audio_output/jack.c
 modules/audio_output/kai.c
