@@ -22,8 +22,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <stdckdint.h>
 #include "coreaudio_common.h"
+#include "channel_layout.h"
 #include <CoreAudio/CoreAudioTypes.h>
 
 #define TIMING_REPORT_DELAY_TICKS VLC_TICK_FROM_MS(1000)
@@ -554,39 +554,6 @@ AudioChannelLabelToVlcChan(AudioChannelLabel chan, bool swap_rear_surround)
     }
 }
 
-static AudioChannelLabel
-VlcChanToAudioChannelLabel(unsigned chan, bool swap_rear_surround)
-{
-    /* maps auhal channels to vlc ones */
-    switch (chan)
-    {
-        case AOUT_CHAN_LEFT:
-            return kAudioChannelLabel_Left;
-        case AOUT_CHAN_RIGHT:
-            return kAudioChannelLabel_Right;
-        case AOUT_CHAN_CENTER:
-            return kAudioChannelLabel_Center;
-        case AOUT_CHAN_LFE:
-            return kAudioChannelLabel_LFEScreen;
-        case AOUT_CHAN_REARLEFT:
-            return swap_rear_surround ? kAudioChannelLabel_RearSurroundLeft
-                                      : kAudioChannelLabel_LeftSurround;
-        case AOUT_CHAN_REARRIGHT:
-            return swap_rear_surround ? kAudioChannelLabel_RearSurroundRight
-                                      : kAudioChannelLabel_RightSurround;
-        case AOUT_CHAN_MIDDLELEFT:
-            return swap_rear_surround ? kAudioChannelLabel_LeftSurround
-                                      : kAudioChannelLabel_RearSurroundLeft;
-        case AOUT_CHAN_MIDDLERIGHT:
-            return swap_rear_surround ? kAudioChannelLabel_RightSurround
-                                      : kAudioChannelLabel_RearSurroundRight;
-        case AOUT_CHAN_REARCENTER:
-            return kAudioChannelLabel_CenterSurround;
-        default:
-            vlc_assert_unreachable();
-    }
-}
-
 static int
 MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 const AudioChannelLayout *outlayout, bool *warn_configuration)
@@ -693,48 +660,6 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
     return VLC_SUCCESS;
 }
 
-static int
-MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-               AudioChannelLayout **inlayoutp, size_t *inlayout_size)
-{
-    unsigned channels = aout_FormatNbChannels(fmt);
-
-    size_t size;
-    if (ckd_mul(&size, channels, sizeof(AudioChannelDescription)) ||
-        ckd_add(&size, size, sizeof(AudioChannelLayout)))
-        return VLC_ENOMEM;
-    AudioChannelLayout *inlayout = malloc(size);
-    if (inlayout == NULL)
-        return VLC_ENOMEM;
-
-    *inlayoutp = inlayout;
-    *inlayout_size = size;
-    inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelDescriptions;
-    inlayout->mNumberChannelDescriptions = aout_FormatNbChannels(fmt);
-
-    bool swap_rear_surround = (fmt->i_physical_channels & AOUT_CHANS_7_0) == AOUT_CHANS_7_0;
-    if (swap_rear_surround)
-        msg_Dbg(p_aout, "swapping Surround and RearSurround channels "
-                "for 7.1 Rear Surround");
-    unsigned chan_idx = 0;
-    for (unsigned i = 0; i < AOUT_CHAN_MAX; ++i)
-    {
-        unsigned vlcchan = pi_vlc_chan_order_wg4[i];
-        if ((vlcchan & fmt->i_physical_channels) == 0)
-            continue;
-
-        inlayout->mChannelDescriptions[chan_idx].mChannelLabel =
-            VlcChanToAudioChannelLabel(vlcchan, swap_rear_surround);
-        inlayout->mChannelDescriptions[chan_idx].mChannelFlags =
-            kAudioChannelFlags_AllOff;
-        chan_idx++;
-    }
-
-    msg_Dbg(p_aout, "VLC keeping the same input layout");
-
-    return VLC_SUCCESS;
-}
-
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
               const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_ticks,
@@ -764,7 +689,8 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         else
         {
             aout_FormatPrepare(fmt);
-            ret = MapInputLayout(p_aout, fmt, &inlayout_buf, &inlayout_size);
+            ret = channel_layout_MapFromVLC(p_aout, fmt, &inlayout_buf,
+                                            &inlayout_size);
             if (ret != VLC_SUCCESS)
                 return ret;
             inlayout = inlayout_buf;

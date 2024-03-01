@@ -50,7 +50,8 @@ endif
 if have_osx
     vlc_modules += {
         'name' : 'auhal',
-        'sources' : files('apple/auhal.c', 'apple/coreaudio_common.c'),
+        'sources' : files('apple/auhal.c', 'apple/coreaudio_common.c',
+                          'apple/channel_layout.c'),
         'dependencies' : [
             frameworks['CoreFoundation'],
             frameworks['AudioUnit'],
@@ -64,7 +65,8 @@ endif
 if have_ios or have_tvos
     vlc_modules += {
         'name' : 'audiounit_ios',
-        'sources' : files('apple/audiounit_ios.m', 'apple/coreaudio_common.c'),
+        'sources' : files('apple/audiounit_ios.m', 'apple/coreaudio_common.c',
+                          'apple/channel_layout.c'),
         'dependencies' : [
             frameworks['Foundation'],
             frameworks['AVFoundation'],
