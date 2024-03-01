@@ -247,9 +247,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         layoutAttributesArray[i] = attributes;
     }
 
-    if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
-        VLCLibraryAudioDataSource *audioDataSource = (VLCLibraryAudioDataSource *)self.collectionView.dataSource;
+    const id<NSCollectionViewDataSource> dataSource = self.collectionView.dataSource;
 
+    if ([dataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
+        VLCLibraryAudioDataSource *audioDataSource = (VLCLibraryAudioDataSource *)self.collectionView.dataSource;
         // Add detail view to the attributes set -- detail view about to be shown
         switch(audioDataSource.audioLibrarySegment) {
             case VLCAudioLibraryArtistsSegment:
@@ -264,14 +265,12 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
-
-    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
+    } else if ([dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
-        
-    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryHomeViewVideoContainerViewDataSource class]]) {
+    } else if ([dataSource isKindOfClass:[VLCLibraryHomeViewVideoContainerViewDataSource class]]) {
         VLCLibraryHomeViewVideoContainerViewDataSource *videoDataSource = (VLCLibraryHomeViewVideoContainerViewDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
-    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
+    } else if ([dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
         VLCLibraryVideoDataSource *videoDataSource = (VLCLibraryVideoDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
