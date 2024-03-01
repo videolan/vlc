@@ -101,6 +101,7 @@ typedef struct
 } tt_textnode_t;
 
 tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text );
+tt_textnode_t *tt_subtextnode_New( tt_node_t *p_parent, const char *psz_text, size_t );
 tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name );
 tt_node_t * tt_node_NewRead( xml_reader_t* reader, tt_node_t* p_parent, const char* psz_node_name );
 void tt_node_RecursiveDelete( tt_node_t *p_node );

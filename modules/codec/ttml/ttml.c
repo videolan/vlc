@@ -191,17 +191,32 @@ static void tt_node_ParentAddChild( tt_node_t* p_parent, tt_basenode_t *p_child 
     *pp_node = p_child;
 }
 
-tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text )
+static tt_textnode_t *tt_textnode_NewImpl( tt_node_t *p_parent, char *psz )
 {
+    if( !psz )
+        return NULL;
     tt_textnode_t *p_node = calloc( 1, sizeof( *p_node ) );
     if( !p_node )
+    {
+        free( psz );
         return NULL;
+    }
+    p_node->psz_text = psz;
     p_node->i_type = TT_NODE_TYPE_TEXT;
     p_node->p_parent = p_parent;
     if( p_parent )
         tt_node_ParentAddChild( p_parent, (tt_basenode_t *) p_node );
-    p_node->psz_text = strdup( psz_text );
     return p_node;
+}
+
+tt_textnode_t *tt_textnode_New( tt_node_t *p_parent, const char *psz_text )
+{
+    return tt_textnode_NewImpl( p_parent, strdup( psz_text ) );
+}
+
+tt_textnode_t *tt_subtextnode_New( tt_node_t *p_parent, const char *psz_text, size_t len )
+{
+    return tt_textnode_NewImpl( p_parent, strndup( psz_text, len ) );
 }
 
 tt_node_t * tt_node_New( tt_node_t* p_parent, const char* psz_node_name )
