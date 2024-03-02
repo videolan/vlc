@@ -27,6 +27,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -48,6 +49,7 @@
         [self setupCollectionView];
         [self setupMediaSourceLibraryViews];
         [self setupPlaceholderLabel];
+        [self setupPathControlView];
 
         NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
         [defaultCenter addObserver:self 
@@ -65,6 +67,7 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
+    _libraryWindow = libraryWindow;
     _libraryTargetView = libraryWindow.libraryTargetView;
     _mediaSourceView = libraryWindow.mediaSourceView;
     _mediaSourceTableView = libraryWindow.mediaSourceTableView;
@@ -141,6 +144,19 @@
         [self.placeholderLabel.centerYAnchor constraintEqualToAnchor:self.mediaSourceView.centerYAnchor],
     ]];
     [self updatePlaceholderLabel:nil];
+}
+
+- (void)setupPathControlView
+{
+    _pathControlViewTopConstraintToSuperview = [NSLayoutConstraint constraintWithItem:self.pathControlVisualEffectView
+                                                                                    attribute:NSLayoutAttributeTop
+                                                                                    relatedBy:NSLayoutRelationEqual
+                                                                                       toItem:self.mediaSourceView
+                                                                                    attribute:NSLayoutAttributeTop
+                                                                                   multiplier:1.
+                                                                                     constant:self.libraryWindow.titlebarHeight];
+    [self.mediaSourceView addConstraint:_pathControlViewTopConstraintToSuperview];
+    _pathControlViewTopConstraintToSuperview.active = YES;
 }
 
 - (void)updatePlaceholderLabel:(NSNotification *)notification

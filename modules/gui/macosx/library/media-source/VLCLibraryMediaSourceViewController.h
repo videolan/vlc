@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryMediaSourceViewController : NSObject
 
+@property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *mediaSourceView;
 @property (readonly) NSTableView *mediaSourceTableView;
@@ -42,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSVisualEffectView *pathControlVisualEffectView;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readonly) NSTextField *placeholderLabel;
+@property (readonly) NSLayoutConstraint *pathControlViewTopConstraintToSuperview;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
 
