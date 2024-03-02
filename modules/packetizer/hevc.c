@@ -134,29 +134,36 @@ static inline void InitQueue( block_t **pp_head, block_t ***ppp_tail )
 static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
 {
     block_t *p_output = NULL;
+    block_t *p_xps = NULL;
     block_t **pp_output_last = &p_output;
     uint32_t i_flags = 0; /* Because block_ChainGather does not merge flags or times */
+
+    if(p_sys->b_recovery_point && p_sys->sets != SENT)
+        p_xps = GetXPSCopy(p_sys);
 
     if(p_sys->pre.p_chain)
     {
         i_flags |= p_sys->pre.p_chain->i_flags;
-        if(p_sys->b_recovery_point && p_sys->sets != SENT)
+
+        if(p_sys->pre.p_chain->i_buffer >= 5 &&
+            hevc_getNALType(&p_sys->pre.p_chain->p_buffer[4]) == HEVC_NAL_AUD)
         {
-            if(p_sys->pre.p_chain->i_buffer >= 5 &&
-               hevc_getNALType(&p_sys->pre.p_chain->p_buffer[4]) == HEVC_NAL_AUD)
-            {
-                block_t *p_au = p_sys->pre.p_chain;
-                p_sys->pre.p_chain = p_sys->pre.p_chain->p_next;
-                p_au->p_next = NULL;
-                block_ChainLastAppend(&pp_output_last, p_au);
-            }
-            block_t *p_xps = GetXPSCopy(p_sys);
-            if(p_xps)
-                block_ChainLastAppend(&pp_output_last, p_xps);
+            block_t *p_au = p_sys->pre.p_chain;
+            p_sys->pre.p_chain = p_sys->pre.p_chain->p_next;
+            p_au->p_next = NULL;
+            block_ChainLastAppend(&pp_output_last, p_au);
         }
+
+        if(p_xps)
+            block_ChainLastAppend(&pp_output_last, p_xps);
+
         if(p_sys->pre.p_chain)
             block_ChainLastAppend(&pp_output_last, p_sys->pre.p_chain);
         INITQ(pre);
+    }
+    else if(p_xps)
+    {
+        block_ChainLastAppend(&pp_output_last, p_xps);
     }
 
     if(p_sys->frame.p_chain)
