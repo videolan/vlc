@@ -466,7 +466,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     const CGFloat scrollViewsTopSpace = visible ? pathControlVisualEffectViewHeight + VLCLibraryUIUnits.mediumSpacing : VLCLibraryUIUnits.mediumSpacing;
     
     NSEdgeInsets collectionViewScrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    collectionViewScrollViewInsets.top = scrollViewsTopSpace;
+    collectionViewScrollViewInsets.top += scrollViewsTopSpace;
+
+    _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = collectionViewScrollViewInsets;
 
     NSEdgeInsets tableViewScrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
