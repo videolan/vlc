@@ -38,6 +38,8 @@ MainInterface.MainViewLoader {
     readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
     readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
 
+    property bool fadingEdgeList: true
+
     // NOTE: Specify an optional header for the view.
     property Component header: null
 
@@ -193,6 +195,8 @@ MainInterface.MainViewLoader {
             activeFocusOnTab: true
 
             section.property: root.sectionProperty
+
+            fadingEdge.enableEndFade: root.fadingEdgeList
 
             // Navigation
 

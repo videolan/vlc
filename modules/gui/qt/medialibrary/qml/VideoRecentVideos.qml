@@ -127,6 +127,8 @@ FocusScope {
 
             sectionProperty: ""
 
+            fadingEdgeList: false
+
             sortModel: []
 
             contextMenu: Util.MLContextMenu {
