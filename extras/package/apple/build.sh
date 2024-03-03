@@ -187,6 +187,12 @@ set_deployment_target()
     VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}"
     VLC_DEPLOYMENT_TARGET_CFLAG="-m$VLC_HOST_OS"
 
+    if [ "$VLC_HOST_OS" = "macosx" ]; then
+        VLC_DEPLOYMENT_TARGET_LDFLAG="macos"
+    else
+        VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}"
+    fi
+
     if [ -n "$VLC_HOST_PLATFORM_SIMULATOR" ]; then
         VLC_DEPLOYMENT_TARGET_LDFLAG="${VLC_HOST_OS}-simulator"
         VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-simulator"
