@@ -1,0 +1,29 @@
+From 2311fb266a9791901d0829f80060e6ecde35861a Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Tue, 5 Mar 2024 09:11:30 -0500
+Subject: [PATCH 1/1] dnn: vec_neon: avoid redefinition of vcvtnq_s32_f32
+
+clang exposes this intrinsic even in 32-bit mode, if targeting >= armv8,
+whereas gcc does not, see:
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95399
+---
+ dnn/vec_neon.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnn/vec_neon.h b/dnn/vec_neon.h
+index acf49f47..e6432e2f 100644
+--- a/dnn/vec_neon.h
++++ b/dnn/vec_neon.h
+@@ -34,7 +34,7 @@
+ #include <arm_neon.h>
+ #include "os_support.h"
+ 
+-#if defined(__arm__) && !defined(__aarch64__)
++#if defined(__arm__) && !defined(__aarch64__) && (__ARM_ARCH < 8 || !defined(__clang__))
+ /* Emulate vcvtnq_s32_f32() for ARMv7 Neon. */
+ static OPUS_INLINE int32x4_t vcvtnq_s32_f32(float32x4_t x) {
+   return vrshrq_n_s32(vcvtq_n_s32_f32(x, 8), 8);
+-- 
+2.40.1
+
