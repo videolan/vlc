@@ -145,6 +145,31 @@ int vlc_clock_RegisterEvents(vlc_clock_t *clock,
             event->cbs->on_##event(event->data); \
 }
 
+static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
+                               const char *id, vlc_tick_t now, vlc_tick_t pts)
+{
+    if (now != VLC_TICK_MAX && now != VLC_TICK_INVALID)
+    {
+        vlc_tracer_TraceWithTs(tracer, vlc_tick_now(),
+                               VLC_TRACE("type", type),
+                               VLC_TRACE("id", id),
+                               VLC_TRACE_TICK_NS("pts", pts),
+                               VLC_TRACE_TICK_NS("render_ts", now),
+                               VLC_TRACE_END);
+        vlc_tracer_TraceWithTs(tracer, now,
+                               VLC_TRACE("type", type),
+                               VLC_TRACE("id", id),
+                               VLC_TRACE_TICK_NS("render_pts", pts),
+                               VLC_TRACE_END);
+
+    }
+    else
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
+                                 VLC_TRACE("id", id),
+                                 VLC_TRACE_TICK_NS("pts", pts),
+                                 VLC_TRACE_END);
+}
+
 static vlc_tick_t main_stream_to_system(vlc_clock_main_t *main_clock,
                                         vlc_tick_t ts)
 {
@@ -179,8 +204,8 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
                               clock->cbs_data);
 
     if (main_clock->tracer != NULL && clock->track_str_id != NULL)
-        vlc_tracer_TraceRender(main_clock->tracer, "RENDER", clock->track_str_id,
-                               system_now, ts);
+        TraceRender(main_clock->tracer, "RENDER", clock->track_str_id,
+                    system_now, ts);
 }
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
