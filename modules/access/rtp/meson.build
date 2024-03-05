@@ -58,6 +58,11 @@ vlc_modules += {
 }
 
 vlc_modules += {
+    'name': 'rtp_h265',
+    'sources': files('h265.c', 'h26x.h'),
+}
+
+vlc_modules += {
     'name': 'rtp_opus',
     'sources': files('opus.c')
 }
