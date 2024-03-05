@@ -114,7 +114,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                 {
                     if( unlikely( !l->ValidateSize() ) )
                     {
-                        msg_Err( &sys.demuxer,"%s too big... skipping it",  typeid(*l).name() );
+                        msg_Err( &sys.demuxer,"%s too big... skipping it",  EBML_NAME(l) );
                         continue;
                     }
                     if( MKV_IS_ID( l, KaxSeekID ) )
@@ -132,13 +132,13 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                     else if ( !MKV_IS_ID( l, EbmlVoid ) && !MKV_IS_ID( l, EbmlCrc32 ))
                     {
                         /* Many mkvmerge files hit this case. It seems to be a broken SeekHead */
-                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
+                        msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", EBML_NAME(l) );
                     }
                 }
             }
             catch(...)
             {
-                msg_Err( &sys.demuxer,"Error while reading %s",  typeid(*l).name() );
+                msg_Err( &sys.demuxer,"Error while reading %s",  EBML_NAME(l) );
             }
             eparser.Up();
 
@@ -191,7 +191,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
             }
         }
         else if ( !MKV_IS_ID( l, EbmlVoid ) && !MKV_IS_ID( l, EbmlCrc32 ))
-            msg_Dbg( &sys.demuxer, "|   |   + ParseSeekHead Unknown (%s)", typeid(*l).name() );
+            msg_Dbg( &sys.demuxer, "|   |   + ParseSeekHead Unknown (%s)", EBML_NAME(l) );
     }
 }
 
@@ -873,7 +873,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
           VLC_UNUSED( vars );
         }
         E_CASE_DEFAULT(element) {
-            debug( vars, "Unknown (%s)", typeid(element).name() );
+            debug( vars, "Unknown (%s)", EBML_NAME(&element) );
         }
     };
 
@@ -960,7 +960,7 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
             VLC_UNUSED( vars );
         }
         E_CASE_DEFAULT(element) {
-            MkvTree( *vars.p_demuxer, 2, "Unknown (%s)", typeid(element).name() );
+            MkvTree( *vars.p_demuxer, 2, "Unknown (%s)", EBML_NAME(&element) );
         }
     };
 
@@ -1141,7 +1141,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE_DEFAULT(element)
         {
-            debug( vars, "Unknown (%s)", typeid(element).name() );
+            debug( vars, "Unknown (%s)", EBML_NAME(&element) );
         }
     };
 
@@ -1430,7 +1430,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                 }
                 E_CASE_DEFAULT( el )
                 {
-                    msg_Dbg( vars.p_demuxer, "|   |   |   + Unknown (%s)", typeid(el).name() );
+                    msg_Dbg( vars.p_demuxer, "|   |   |   + Unknown (%s)", EBML_NAME(&el) );
                 }
             };
             KaxEditionHandler::Dispatcher().iterate( entry.begin(), entry.end(), &data );
@@ -1443,7 +1443,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         }
         E_CASE_DEFAULT( el )
         {
-            msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", typeid(el).name() );
+            msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", EBML_NAME(&el) );
         }
     };
 
