@@ -84,16 +84,9 @@ Item {
             }
         }
 
-        Rectangle{
-            id: parentRectangle
-
+        Item {
             Layout.preferredHeight: VLCStyle.controlLayoutHeight * 1.5
             Layout.fillWidth: true
-
-            color: theme.bg.primary
-
-            border.color: theme.border
-            border.width: VLCStyle.border
 
             TextMetrics {
                 id: leftMetric
@@ -190,15 +183,19 @@ Item {
                                 return true
                             }
 
-                            Layout.minimumWidth: !!item && item.visible ? Math.max(leftMetric.width,
-                                                                                   centerMetric.width,
-                                                                                   rightMetric.width) * 1.25
-                                                                        : 0
-                            Layout.margins: parentRectangle.border.width
+                            Layout.minimumWidth: (!!item && item.visible && item.count <= 0) ? Math.max(leftMetric.width,
+                                                                                                      centerMetric.width,
+                                                                                                      rightMetric.width) * 1.25
+                                                                                             : 0
 
                             readonly property int count: !!item ? item.count : 0
 
-                            sourceComponent: Item {
+                            sourceComponent: Rectangle {
+                                color: theme.bg.primary
+
+                                border.color: theme.border
+                                border.width: VLCStyle.border
+
                                 property alias count: dndView.count
 
                                 Connections {
