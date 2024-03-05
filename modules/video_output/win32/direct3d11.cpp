@@ -1473,10 +1473,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
 
         RECT spuViewport;
-        spuViewport.left   = (FLOAT) r->i_x * sys->area.place.width  / subpicture->i_original_picture_width;
-        spuViewport.top    = (FLOAT) r->i_y * sys->area.place.height / subpicture->i_original_picture_height;
-        spuViewport.right  = (FLOAT) (r->i_x + r->fmt.i_visible_width)  * sys->area.place.width  / subpicture->i_original_picture_width;
-        spuViewport.bottom = (FLOAT) (r->i_y + r->fmt.i_visible_height) * sys->area.place.height / subpicture->i_original_picture_height;
+        spuViewport.left   = (FLOAT) r->place.x * sys->area.place.width  / subpicture->i_original_picture_width;
+        spuViewport.top    = (FLOAT) r->place.y * sys->area.place.height / subpicture->i_original_picture_height;
+        spuViewport.right  = (FLOAT) (r->place.x + r->fmt.i_visible_width)  * sys->area.place.width  / subpicture->i_original_picture_width;
+        spuViewport.bottom = (FLOAT) (r->place.y + r->fmt.i_visible_height) * sys->area.place.height / subpicture->i_original_picture_height;
 
         if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
         {

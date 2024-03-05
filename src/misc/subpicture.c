@@ -372,7 +372,7 @@ unsigned picture_BlendSubpicture(picture_t *dst,
 
         if (filter_ConfigureBlend(blend, dst->format.i_width,
                                   dst->format.i_height,  &blend_fmt)
-         || filter_Blend(blend, dst, r->i_x, r->i_y, r->p_picture, r->i_alpha))
+         || filter_Blend(blend, dst, r->place.x, r->place.y, r->p_picture, r->i_alpha))
             msg_Err(blend, "blending %4.4s to %4.4s failed",
                     (char *)&blend->fmt_in.video.i_chroma,
                     (char *)&blend->fmt_out.video.i_chroma );

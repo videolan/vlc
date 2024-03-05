@@ -958,9 +958,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         const float scale_h = (float)(sys->area.place.height) / subpicture->i_original_picture_height;
 
         RECT rect_in_display;
-        rect_in_display.left   =            scale_w * r->i_x,
+        rect_in_display.left   =            scale_w * r->place.x,
         rect_in_display.right  = rect_in_display.left + scale_w * r->fmt.i_visible_width,
-        rect_in_display.top    =            scale_h * r->i_y,
+        rect_in_display.top    =            scale_h * r->place.y,
         rect_in_display.bottom = rect_in_display.top  + scale_h * r->fmt.i_visible_height;
 
         rect_in_display.left   += sys->area.place.x;

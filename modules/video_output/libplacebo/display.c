@@ -415,10 +415,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                     .y1 = r->fmt.i_visible_height,
                 },
                 .dst = {
-                    .x0 = place.x + r->i_x,
-                    .y0 = place.y + r->i_y * ysign,
-                    .x1 = place.x + r->i_x + r->fmt.i_visible_width,
-                    .y1 = place.y + (r->i_y + r->fmt.i_visible_height) * ysign,
+                    .x0 = place.x + r->place.x,
+                    .y0 = place.y + r->place.y * ysign,
+                    .x1 = place.x + r->place.x + r->fmt.i_visible_width,
+                    .y1 = place.y + (r->place.y + r->fmt.i_visible_height) * ysign,
                 },
             };
             i++;

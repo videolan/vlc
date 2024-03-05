@@ -162,13 +162,13 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
-    int_fast16_t dx = place->x + reg->i_x * place->width
+    int_fast16_t dx = place->x + reg->place.x * place->width
                       / subpic->i_original_picture_width;
-    int_fast16_t dy = place->y + reg->i_y * place->height
+    int_fast16_t dy = place->y + reg->place.y * place->height
                       / subpic->i_original_picture_height;
-    uint_fast16_t dw = (reg->i_x + reg->fmt.i_visible_width) * place->width
+    uint_fast16_t dw = (reg->place.x + reg->fmt.i_visible_width) * place->width
                        / subpic->i_original_picture_width;
-    uint_fast16_t dh = (reg->i_y + reg->fmt.i_visible_height) * place->height
+    uint_fast16_t dh = (reg->place.y + reg->fmt.i_visible_height) * place->height
                        / subpic->i_original_picture_height;
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,

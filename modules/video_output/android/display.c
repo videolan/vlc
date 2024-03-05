@@ -150,7 +150,7 @@ static bool subpicture_NeedDraw(vout_display_t *vd,
         vlc_vector_foreach(r, &subpicture->regions)
         {
             struct sub_region *cmp = &sub->regions.data[i++];
-            if (cmp->x != r->i_x || cmp->y != r->i_y
+            if (cmp->x != r->place.x || cmp->y != r->place.y
              || cmp->width != r->fmt.i_visible_width
              || cmp->height != r->fmt.i_visible_height)
             {
@@ -180,8 +180,8 @@ end:
     vlc_vector_foreach(r, &subpicture->regions)
     {
         struct sub_region reg = {
-            .x = r->i_x,
-            .y = r->i_y,
+            .x = r->place.x,
+            .y = r->place.y,
             .width = r->fmt.i_visible_width,
             .height = r->fmt.i_visible_height,
         };

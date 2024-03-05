@@ -261,10 +261,10 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                 glr->tex_height = 1.0;
             }
             glr->alpha  = (float)r->i_alpha / 255;
-            glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
-            glr->top    = -2.0 * (r->i_y                          ) / subpicture->i_original_picture_height + 1.0;
-            glr->right  =  2.0 * (r->i_x + r->fmt.i_visible_width ) / subpicture->i_original_picture_width  - 1.0;
-            glr->bottom = -2.0 * (r->i_y + r->fmt.i_visible_height) / subpicture->i_original_picture_height + 1.0;
+            glr->left   =  2.0 * (r->place.x                          ) / subpicture->i_original_picture_width  - 1.0;
+            glr->top    = -2.0 * (r->place.y                          ) / subpicture->i_original_picture_height + 1.0;
+            glr->right  =  2.0 * (r->place.x + r->fmt.i_visible_width ) / subpicture->i_original_picture_width  - 1.0;
+            glr->bottom = -2.0 * (r->place.y + r->fmt.i_visible_height) / subpicture->i_original_picture_height + 1.0;
 
             glr->texture = 0;
             /* Try to recycle the textures allocated by the previous

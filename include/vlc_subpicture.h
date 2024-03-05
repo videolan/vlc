@@ -32,6 +32,7 @@
 #include <vlc_text_style.h>
 #include <vlc_list.h>
 #include <vlc_vector.h>
+#include <vlc_vout_display.h>
 
 /**
  * \defgroup subpicture Video sub-pictures
@@ -209,8 +210,7 @@ struct subpicture_region_rendered
     video_format_t  fmt;                          /**< format of the picture */
     picture_t       *p_picture;          /**< picture comprising this region */
 
-    int             i_x;      /**< position of region, relative to alignment */
-    int             i_y;      /**< position of region, relative to alignment */
+    vout_display_place_t place;    // position of region, relative to alignment
     int             i_alpha;                               /**< transparency */
     vlc_rational_t  zoom_h;
     vlc_rational_t  zoom_v;

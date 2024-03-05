@@ -411,10 +411,10 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
     const float scale_h = (float)(sys->place.height) / subpicture->i_original_picture_height;
 
     // Invert y coords for CoreGraphics
-    const float y = subpicture->i_original_picture_height - r->fmt.i_visible_height - r->i_y;
+    const float y = subpicture->i_original_picture_height - r->fmt.i_visible_height - r->place.y;
 
     return CGRectMake(
-        scale_w * r->i_x + sys->place.x,
+        scale_w * r->place.x + sys->place.x,
         scale_h * y + sys->place.y,
         scale_w * r->fmt.i_visible_width,
         scale_h * r->fmt.i_visible_height
