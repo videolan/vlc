@@ -206,6 +206,18 @@ typedef struct
 
 typedef struct subpicture_private_t subpicture_private_t;
 
+struct subpicture_region_rendered
+{
+    video_format_t  fmt;                          /**< format of the picture */
+    picture_t       *p_picture;          /**< picture comprising this region */
+
+    int             i_x;      /**< position of region, relative to alignment */
+    int             i_y;      /**< position of region, relative to alignment */
+    int             i_alpha;                               /**< transparency */
+    vlc_rational_t  zoom_h;
+    vlc_rational_t  zoom_v;
+};
+
 struct vlc_render_subpicture
 {
     vlc_spu_regions regions;                  /**< list of regions to render */
