@@ -239,8 +239,8 @@ static void rtp_h265_decode (struct vlc_rtp_pt *pt, void *data, block_t *block,
             block->p_buffer[0] = (block->p_buffer[0] & 0x81) | (cType << 1);
             block->p_buffer[4 + PHSize - 2 + 0] = block->p_buffer[0];
             block->p_buffer[4 + PHSize - 2 + 1] = block->p_buffer[1];
-            block->p_buffer -= 4 + PHSize;
-            block->i_buffer += 4 + PHSize;
+            block->p_buffer += 4 + PHSize;
+            block->i_buffer -= 4 + PHSize;
             /* pass to original payload handler */
             rtp_h265_decode(pt, data, block, info);
             break;
