@@ -212,8 +212,7 @@ next:
 
         if( m_el[mi_level] == NULL )
         {
-            vlc_stream_io_callback *io_callback = dynamic_cast<vlc_stream_io_callback *>(&m_es->I_O());
-            if ( i_max_read != UINT64_MAX && io_callback != NULL && !io_callback->IsEOF() )
+            if ( i_max_read != UINT64_MAX && !m_es->I_O().IsEOF() )
             {
                 msg_Dbg(p_demux, "found nothing, go up");
                 i_ulev = 1;
