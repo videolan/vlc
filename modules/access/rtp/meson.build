@@ -54,7 +54,7 @@ vlc_modules += {
 
 vlc_modules += {
     'name': 'rtp_h264',
-    'sources': files('h264.c')
+    'sources': files('h264.c', 'h26x.h'),
 }
 
 vlc_modules += {
