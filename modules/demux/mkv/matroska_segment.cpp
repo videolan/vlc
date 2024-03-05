@@ -145,7 +145,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                             if( unlikely( !el->ValidateSize() ) )
                             {
                                 eparser.Up();
-                                msg_Err( &sys.demuxer, "Error %s too big, aborting", typeid(*el).name() );
+                                msg_Err( &sys.demuxer, "Error %s too big, aborting", EBML_NAME(el) );
                                 b_invalid_cue = true;
                                 break;
                             }
@@ -190,14 +190,14 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 #endif
                             else
                             {
-                                msg_Dbg( &sys.demuxer, "         * Unknown (%s)", typeid(*el).name() );
+                                msg_Dbg( &sys.demuxer, "         * Unknown (%s)", EBML_NAME(el) );
                             }
                         }
                     }
                     catch(...)
                     {
                         eparser.Up();
-                        msg_Err( &sys.demuxer, "Error while reading %s", typeid(*el).name() );
+                        msg_Err( &sys.demuxer, "Error while reading %s", EBML_NAME(el) );
                         b_invalid_cue = true;
                         break;
                     }
@@ -205,7 +205,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                 }
                 else
                 {
-                    msg_Dbg( &sys.demuxer, "     * Unknown (%s)", typeid(*el).name() );
+                    msg_Dbg( &sys.demuxer, "     * Unknown (%s)", EBML_NAME(el) );
                 }
             }
             eparser.Up();
@@ -227,7 +227,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
         }
         else
         {
-            msg_Dbg( &sys.demuxer, " * Unknown (%s)", typeid(*el).name() );
+            msg_Dbg( &sys.demuxer, " * Unknown (%s)", EBML_NAME(el) );
         }
     }
     b_cues = true;
@@ -423,7 +423,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
                         }
                         E_CASE_DEFAULT( el )
                         {
-                            msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", typeid(el).name() );
+                            msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", EBML_NAME(&el) );
                         }
                     };
 
@@ -438,7 +438,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
                 }
                 E_CASE_DEFAULT( el )
                 {
-                    msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", typeid(el).name() );
+                    msg_Dbg( &vars.sys.demuxer, "|   |   + Unknown (%s)", EBML_NAME(&el) );
                 }
             };
 
@@ -447,7 +447,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags_ )
         }
         E_CASE_DEFAULT( el )
         {
-            msg_Dbg( &vars.sys.demuxer, "|   + LoadTag Unknown (%s)", typeid(el).name() );
+            msg_Dbg( &vars.sys.demuxer, "|   + LoadTag Unknown (%s)", EBML_NAME(&el) );
         }
     };
 
@@ -679,7 +679,7 @@ bool matroska_segment_c::Preload( )
         else if( MKV_IS_ID ( el, EbmlVoid ) )
             msg_Dbg( &sys.demuxer, "|   + Void" );
         else
-            msg_Dbg( &sys.demuxer, "|   + Preload Unknown (%s)", typeid(*el).name() );
+            msg_Dbg( &sys.demuxer, "|   + Preload Unknown (%s)", EBML_NAME(el) );
     }
 
     ComputeTrackPriority();
@@ -783,7 +783,7 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     }
     else
     {
-        msg_Dbg( &sys.demuxer, "|   + LoadSeekHeadItem Unknown (%s)", typeid(*el).name() );
+        msg_Dbg( &sys.demuxer, "|   + LoadSeekHeadItem Unknown (%s)", EBML_NAME(el) );
     }
     delete el;
 
@@ -1220,7 +1220,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         E_CASE_DEFAULT(element)
         {
-            msg_Dbg( vars.p_demuxer, "Unknown (%s)", typeid (element).name () );
+            msg_Dbg( vars.p_demuxer, "Unknown (%s)", EBML_NAME(&element) );
         }
     };
 
@@ -1334,7 +1334,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             VLC_UNUSED(element);
 
             msg_Warn( vars.p_demuxer, "unknown element at { fpos: %" PRId64 ", '%s' }",
-              element.GetElementPosition(), typeid( element ).name() );
+              element.GetElementPosition(), EBML_NAME( &element ) );
         }
     };
 
@@ -1424,7 +1424,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 case 3:
                     if( unlikely( !el->ValidateSize() || ( el->IsFiniteSize() && el->GetSize() >= SIZE_MAX ) ) )
                     {
-                        msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
+                        msg_Err( &sys.demuxer, "Error while reading %s... upping level", EBML_NAME(el));
                         ep.Up();
 
                         if ( i_level == 2 )
@@ -1455,7 +1455,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
         catch (...)
         {
-            msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
+            msg_Err( &sys.demuxer, "Error while reading %s... upping level", EBML_NAME(el));
             ep.Up();
             ep.Unkeep();
             pp_simpleblock = NULL;
