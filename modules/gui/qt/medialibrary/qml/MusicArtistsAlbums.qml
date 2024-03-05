@@ -127,7 +127,7 @@ FocusScope {
 
       visible: artistModel.count > 0
       width: artistList.width
-      height: artistList.height
+      height: artistList.height + artistList.displayMarginEnd
 
       tintColor: artistList.colorContext.bg.secondary
 
