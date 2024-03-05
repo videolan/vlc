@@ -570,20 +570,34 @@ static void SpuAreaFixOverlap(spu_area_t *dst,
 static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
 {
     spu_area_t a = spu_area_scaled(*area);
+    bool modified = false;
 
     const int i_error_x = (a.x + a.width) - boundary->width;
     if (i_error_x > 0)
+    {
         a.x -= i_error_x;
+        modified = true;
+    }
     if (a.x < 0)
+    {
         a.x = 0;
+        modified = true;
+    }
 
     const int i_error_y = (a.y + a.height) - boundary->height;
     if (i_error_y > 0)
+    {
         a.y -= i_error_y;
+        modified = true;
+    }
     if (a.y < 0)
+    {
         a.y = 0;
+        modified = true;
+    }
 
-    *area = spu_area_unscaled(a, area->scale);
+    if (modified)
+        *area = spu_area_unscaled(a, area->scale);
 }
 
 /**
