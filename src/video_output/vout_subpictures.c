@@ -1017,7 +1017,10 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
     bool convert_chroma = true;
     for (int i = 0; chroma_list[i] && convert_chroma; i++) {
         if (region->p_picture->format.i_chroma == chroma_list[i])
+        {
             convert_chroma = false;
+            break;
+        }
     }
 
     /* Scale from rendered size to destination size */
