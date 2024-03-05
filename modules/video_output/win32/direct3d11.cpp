@@ -1332,10 +1332,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     if (sys->regionQuad.generic.textureFormat == NULL)
         return VLC_EGENERIC;
 
-    int count = 0;
-    const subpicture_region_t *r;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions)
-        count++;
+    size_t count = subpicture->regions.size;
+    const struct subpicture_region_rendered *r;
 
     *region = static_cast<picture_t**>(calloc(count, sizeof(picture_t *)));
     if (unlikely(*region==NULL))
@@ -1343,7 +1341,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     *subpicture_region_count = count;
 
     int i = 0;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions) {
+    vlc_vector_foreach(r, &subpicture->regions) {
         if (!r->fmt.i_visible_width || !r->fmt.i_visible_height)
         {
             i++;

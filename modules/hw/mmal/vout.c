@@ -744,17 +744,17 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
     }
 
     // Attempt to import the subpics
-    const subpicture_region_t *sreg;
-    vlc_spu_regions_foreach_const(sreg, &spic->regions) {
-        picture_t *const src = sreg->p_picture;
+    const struct subpicture_region_rendered *r;
+    vlc_vector_foreach(r, &spic->regions) {
+        picture_t *const src = r->p_picture;
 
         // At this point I think the subtitles are being placed in the
         // coord space of the cfg rectangle
         if ((sys->subpic_bufs[n] = hw_mmal_vzc_buf_from_pic(sys->vzc,
             src,
             (MMAL_RECT_T){.width = vd->cfg->display.width, .height=vd->cfg->display.height},
-            sreg->i_x, sreg->i_y,
-            sreg->i_alpha,
+            r->i_x, r->i_y,
+            r->i_alpha,
             n == 0)) == NULL)
         {
             msg_Err(vd, "Failed to allocate vzc buffer for subpic");

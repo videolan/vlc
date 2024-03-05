@@ -866,10 +866,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    size_t count = 0;
-    const subpicture_region_t *r;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions)
-        count++;
+    size_t count = subpicture->regions.size;
+    const struct subpicture_region_rendered *r;
 
     *count_ptr = count;
     *region    = calloc(count, sizeof(**region));
@@ -879,7 +877,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
     }
 
     int i = 0;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions) {
+    vlc_vector_foreach(r, &subpicture->regions) {
         d3d_region_t *d3dr = &(*region)[i];
         HRESULT hr;
 

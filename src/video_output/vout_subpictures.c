@@ -862,7 +862,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 /**
  * It will transform the provided region into another region suitable for rendering.
  */
-static subpicture_region_t *SpuRenderRegion(spu_t *spu,
+static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             spu_area_t *dst_area,
                             const spu_render_entry_t *entry, subpicture_region_t *region,
                             const spu_scale_t scale_size,
@@ -1173,13 +1173,20 @@ static subpicture_region_t *SpuRenderRegion(spu_t *spu,
         y_offset = __MAX(y, 0);
     }
 
-    subpicture_region_t *dst = subpicture_region_ForPicture(&region_fmt, region_picture);
-    if (dst == NULL)
+    struct subpicture_region_rendered *dst = calloc(1, sizeof(*dst));
+    if (unlikely(dst == NULL))
         return NULL;
-
+    dst->p_picture = picture_Hold(region_picture);
+    if (unlikely(dst->p_picture == NULL))
+    {
+        free(dst);
+        return NULL;
+    }
+    dst->fmt       = region_fmt;
     dst->i_x       = x_offset;
     dst->i_y       = y_offset;
-    dst->i_align   = 0;
+    dst->zoom_h.den = dst->zoom_h.num = 1;
+    dst->zoom_v.den = dst->zoom_v.num = 1;
     int fade_alpha = 255;
     if (subpic->b_fade) {
         vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
@@ -1245,7 +1252,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
     output->i_order = p_entries[i_subpicture - 1].subpic->i_order;
     output->i_original_picture_width  = fmt_dst->i_visible_width;
     output->i_original_picture_height = fmt_dst->i_visible_height;
-    subpicture_region_t *output_last_ptr;
+    struct subpicture_region_rendered *output_last_ptr;
 
     /* Allocate area array for subtitle overlap */
     spu_area_t subtitle_area_buffer[100];
@@ -1348,7 +1355,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 }
             }
 
-            vlc_spu_regions_push(&output->regions, output_last_ptr);
+            vlc_vector_push(&output->regions, output_last_ptr);
 
             if (subpic->b_subtitle) {
                 area = spu_area_unscaled(area, scale);

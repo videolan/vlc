@@ -112,7 +112,7 @@ static void PictureDetach(vout_display_t *vd)
 }
 
 static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic,
-                         const subpicture_region_t *reg)
+                         const struct subpicture_region_rendered *reg)
 {
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
@@ -236,8 +236,8 @@ static void Prepare(vout_display_t *vd, picture_t *pic,
     /* Blend subpictures */
     if (subpic != NULL)
     {
-        const subpicture_region_t *r;
-        vlc_spu_regions_foreach_const(r, &subpic->regions)
+        const struct subpicture_region_rendered *r;
+        vlc_vector_foreach(r, &subpic->regions)
             RenderRegion(vd, subpic, r);
     }
 

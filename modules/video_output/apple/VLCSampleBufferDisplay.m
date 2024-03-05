@@ -405,7 +405,7 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 
 static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
                                  const vlc_render_subpicture *subpicture,
-                                 const subpicture_region_t *r)
+                                 const struct subpicture_region_rendered *r)
 {
     const float scale_w = (float)(sys->place.width)  / subpicture->i_original_picture_width;
     const float scale_h = (float)(sys->place.height) / subpicture->i_original_picture_height;
@@ -432,8 +432,8 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
 
     NSMutableArray *regions = [NSMutableArray new];
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
-    const subpicture_region_t *r;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions) {
+    const struct subpicture_region_rendered *r;
+    vlc_vector_foreach(r, &subpicture->regions) {
         CFIndex length = r->p_picture->format.i_height * r->p_picture->p->i_pitch;
         const size_t pixels_offset =
                 r->fmt.i_y_offset * r->p_picture->p->i_pitch +
@@ -479,10 +479,8 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, const vlc_render_subpictu
         return true;
     }
 
-    size_t count = 0;
-    const subpicture_region_t *r;
-    vlc_spu_regions_foreach_const(r, &subpicture->regions)
-        count++;
+    size_t count = subpicture->regions.size;
+    const struct subpicture_region_rendered *r;
 
     if (!sys.subpicture || subpicture->i_order != sys.subpicture.order)
     {
@@ -499,7 +497,7 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, const vlc_render_subpictu
     if (count == sys.subpicture.regions.count)
     {
         size_t i = 0;
-        vlc_spu_regions_foreach_const(r, &subpicture->regions)
+        vlc_vector_foreach(r, &subpicture->regions)
         {
             VLCSampleBufferSubpictureRegion *region =
                 sys.subpicture.regions[i++];

@@ -31,6 +31,7 @@
 #include <vlc_picture.h>
 #include <vlc_text_style.h>
 #include <vlc_list.h>
+#include <vlc_vector.h>
 
 /**
  * \defgroup subpicture Video sub-pictures
@@ -220,7 +221,7 @@ struct subpicture_region_rendered
 
 struct vlc_render_subpicture
 {
-    vlc_spu_regions regions;                  /**< list of regions to render */
+    struct VLC_VECTOR(struct subpicture_region_rendered *) regions; /**< list of regions to render */
     int64_t      i_order;                    /** an increasing unique number */
     unsigned     i_original_picture_width;  /**< original width of the movie */
     unsigned     i_original_picture_height;/**< original height of the movie */

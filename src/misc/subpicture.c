@@ -105,13 +105,19 @@ vlc_render_subpicture *vlc_render_subpicture_New( void )
         return NULL;
     p_subpic->i_original_picture_width = 0;
     p_subpic->i_original_picture_height = 0;
-    vlc_spu_regions_init(&p_subpic->regions);
+    vlc_vector_init(&p_subpic->regions);
     return p_subpic;
 }
 
 void vlc_render_subpicture_Delete( vlc_render_subpicture *p_subpic )
 {
-    vlc_spu_regions_Clear( &p_subpic->regions );
+    struct subpicture_region_rendered *p_region;
+    vlc_vector_foreach(p_region, &p_subpic->regions)
+    {
+        picture_Release( p_region->p_picture );
+        free( p_region );
+    }
+    vlc_vector_clear( &p_subpic->regions );
     free( p_subpic );
 }
 
@@ -354,9 +360,9 @@ unsigned picture_BlendSubpicture(picture_t *dst,
 
     assert(src);
 
-    subpicture_region_t *r;
-    vlc_spu_regions_foreach(r, &src->regions) {
-        assert(r->p_picture && r->i_align == 0);
+    struct subpicture_region_rendered *r;
+    vlc_vector_foreach(r, &src->regions) {
+        assert(r->p_picture);
 
         video_format_t blend_fmt = r->p_picture->format;
         blend_fmt.i_x_offset = r->fmt.i_x_offset;
