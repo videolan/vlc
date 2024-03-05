@@ -110,10 +110,7 @@ static block_t * h265_deaggregate_AP(block_t *block, bool b_donl, bool b_annexb)
         }
         size_t nalsz = GetWBE(p);
         if(nalsz + 2 > sz)
-        {
-            vlc_assert_unreachable();
             break;
-        }
         total += nalsz + 4;
         sz -= (nalsz + 2);
         p += (nalsz + 2);
