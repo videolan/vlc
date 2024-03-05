@@ -1380,14 +1380,15 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     else
     {
         sys->displayed.date = system_now;
-        /* Tell the clock that the pts was forced */
-        system_pts = VLC_TICK_MAX;
     }
-    vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
-                                             frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
+    vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock,
+                                             vlc_tick_now(),
+                                             pts, sys->rate,
+                                             frame_rate, frame_rate_base);
+
     vlc_queuedmutex_unlock(&sys->display_lock);
 
     picture_Release(todisplay);
