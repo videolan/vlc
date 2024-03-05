@@ -100,7 +100,7 @@ static block_t * h265_deaggregate_AP(block_t *block, bool b_donl, bool b_annexb)
     size_t sz = block->i_buffer;
 
     /* first pass, compute final size */
-    while(sz > (b_donl ? 2 : 1))
+    while(sz > (b_donl ? 3 : 2))
     {
         /* skip 1/2 DONL or DOND here */
         if(b_donl)
@@ -121,7 +121,7 @@ static block_t * h265_deaggregate_AP(block_t *block, bool b_donl, bool b_annexb)
         uint8_t *dst = newblock->p_buffer;
         p = block->p_buffer;
         sz = block->i_buffer;
-        while(sz > (b_donl ? 2 : 1))
+        while(sz > (b_donl ? 3 : 2))
         {
             /* skip 1/2 DONL or DOND here */
             if(b_donl)
