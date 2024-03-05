@@ -30,7 +30,7 @@ namespace mkv {
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
-EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux ) :
+EbmlParser::EbmlParser( matroska_iostream_c *es, EbmlElement *el_start, demux_t *p_demux ) :
     p_demux( p_demux ),
     m_es( es ),
     mi_level( 1 ),
@@ -62,7 +62,7 @@ EbmlParser::~EbmlParser( void )
     }
 }
 
-void EbmlParser::reconstruct( EbmlStream* es, EbmlElement* el_start, demux_t* p_demux )
+void EbmlParser::reconstruct( matroska_iostream_c* es, EbmlElement* el_start, demux_t* p_demux )
 {
     this->~EbmlParser();
 

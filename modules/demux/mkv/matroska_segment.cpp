@@ -33,7 +33,7 @@
 
 namespace mkv {
 
-matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream, KaxSegment *p_seg )
+matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, matroska_iostream_c & estream, KaxSegment *p_seg )
     :segment(p_seg)
     ,es(estream)
     ,i_timescale(MKVD_TIMECODESCALE)

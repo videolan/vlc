@@ -134,7 +134,7 @@ struct matroska_stream_c
     bool isUsed() const;
 
     vlc_stream_io_callback io_callback;
-    EbmlStream         estream;
+    matroska_iostream_c    estream;
 
     std::vector<matroska_segment_c*> segments;
 };

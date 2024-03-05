@@ -82,11 +82,11 @@ public:
     typedef std::map<mkv_track_t::track_id_t, std::unique_ptr<mkv_track_t>> tracks_map_t;
     typedef std::vector<Tag>            tags_t;
 
-    matroska_segment_c( demux_sys_t &, EbmlStream &, KaxSegment * );
+    matroska_segment_c( demux_sys_t &, matroska_iostream_c &, KaxSegment * );
     virtual ~matroska_segment_c();
 
     KaxSegment              *segment;
-    EbmlStream              & es;
+    matroska_iostream_c     & es;
 
     /* time scale */
     uint64_t                i_timescale;

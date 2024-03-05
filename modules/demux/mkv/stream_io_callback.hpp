@@ -31,6 +31,7 @@
 #include <vlc_demux.h>
 
 #include <ebml/IOCallback.h>
+#include <ebml/EbmlStream.h>
 
 using namespace libebml;
 
@@ -63,6 +64,23 @@ class vlc_stream_io_callback: public IOCallback
     uint64_t getFilePointer  ( void ) override;
     void     close           ( void ) override { return; }
 };
+
+class matroska_iostream_c : public EbmlStream
+{
+public:
+    matroska_iostream_c(vlc_stream_io_callback & io)
+        :EbmlStream(io)
+    {}
+
+    inline vlc_stream_io_callback & I_O() {
+        return static_cast<vlc_stream_io_callback &>(EbmlStream::I_O());
+    }
+
+private:
+    // hide generic method
+    using EbmlStream::I_O;
+};
+
 
 } // namespace
 
