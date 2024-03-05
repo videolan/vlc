@@ -411,13 +411,13 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
     const float scale_h = (float)(sys->place.height) / subpicture->i_original_picture_height;
 
     // Invert y coords for CoreGraphics
-    const float y = subpicture->i_original_picture_height - r->fmt.i_visible_height - r->place.y;
+    const float y = subpicture->i_original_picture_height - r->place.height - r->place.y;
 
     return CGRectMake(
         scale_w * r->place.x + sys->place.x,
         scale_h * y + sys->place.y,
-        scale_w * r->fmt.i_visible_width,
-        scale_h * r->fmt.i_visible_height
+        scale_w * r->place.width,
+        scale_h * r->place.height
     );
 }
 
@@ -445,7 +445,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
             length - pixels_offset);
         CGDataProviderRef provider = CGDataProviderCreateWithCFData(data);
         CGImageRef image = CGImageCreate(
-            r->fmt.i_visible_width, r->fmt.i_visible_height,
+            r->place.width, r->place.height,
             8, 32, r->p_picture->p->i_pitch,
             space, kCGImageAlphaFirst,
             provider, NULL, true, kCGRenderingIntentDefault

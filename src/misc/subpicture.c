@@ -365,8 +365,8 @@ unsigned picture_BlendSubpicture(picture_t *dst,
         video_format_t blend_fmt = r->p_picture->format;
         blend_fmt.i_x_offset = r->fmt.i_x_offset;
         blend_fmt.i_y_offset = r->fmt.i_y_offset;
-        blend_fmt.i_visible_width = r->fmt.i_visible_width;
-        blend_fmt.i_visible_height = r->fmt.i_visible_height;
+        blend_fmt.i_visible_width = r->place.width;
+        blend_fmt.i_visible_height = r->place.height;
         blend_fmt.i_sar_num = r->fmt.i_sar_num;
         blend_fmt.i_sar_den = r->fmt.i_sar_den;
 

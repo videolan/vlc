@@ -411,14 +411,14 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
             sys->overlay_parts[i] = (struct pl_overlay_part) {
                 .src = {
-                    .x1 = r->fmt.i_visible_width,
-                    .y1 = r->fmt.i_visible_height,
+                    .x1 = r->place.width,
+                    .y1 = r->place.height,
                 },
                 .dst = {
                     .x0 = place.x + r->place.x,
                     .y0 = place.y + r->place.y * ysign,
-                    .x1 = place.x + r->place.x + r->fmt.i_visible_width,
-                    .y1 = place.y + (r->place.y + r->fmt.i_visible_height) * ysign,
+                    .x1 = place.x + r->place.x + r->place.width,
+                    .y1 = place.y + (r->place.y + r->place.height) * ysign,
                 },
             };
             i++;

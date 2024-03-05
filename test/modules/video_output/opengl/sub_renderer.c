@@ -180,8 +180,9 @@ static void test_opengl_offscreen(
 
     struct subpicture_region_rendered *p_region = calloc(1, sizeof(*p_region));
     assert(p_region != NULL);
-    p_region->fmt = picture->format;
     p_region->p_picture = picture_Hold(picture);
+    p_region->place.width  = picture->format.i_visible_width;
+    p_region->place.height = picture->format.i_visible_height;
     p_region->i_alpha = 255;
     p_region->zoom_h.num = p_region->zoom_h.num = 1;
     p_region->zoom_v.num = p_region->zoom_v.num = 1;

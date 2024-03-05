@@ -1342,7 +1342,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
     int i = 0;
     vlc_vector_foreach(r, &subpicture->regions) {
-        if (!r->fmt.i_visible_width || !r->fmt.i_visible_height)
+        if (!r->place.width || !r->place.height)
         {
             i++;
             continue; // won't render anything, keep the cache for later
@@ -1465,9 +1465,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         RECT output;
         output.left   = r->fmt.i_x_offset;
-        output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        output.right  = r->fmt.i_x_offset + r->place.width;
         output.top    = r->fmt.i_y_offset;
-        output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+        output.bottom = r->fmt.i_y_offset + r->place.height;
 
         D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output,
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
@@ -1475,8 +1475,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         RECT spuViewport;
         spuViewport.left   = (FLOAT) r->place.x * sys->area.place.width  / subpicture->i_original_picture_width;
         spuViewport.top    = (FLOAT) r->place.y * sys->area.place.height / subpicture->i_original_picture_height;
-        spuViewport.right  = (FLOAT) (r->place.x + r->fmt.i_visible_width)  * sys->area.place.width  / subpicture->i_original_picture_width;
-        spuViewport.bottom = (FLOAT) (r->place.y + r->fmt.i_visible_height) * sys->area.place.height / subpicture->i_original_picture_height;
+        spuViewport.right  = (FLOAT) (r->place.x + r->place.width)  * sys->area.place.width  / subpicture->i_original_picture_width;
+        spuViewport.bottom = (FLOAT) (r->place.y + r->place.height) * sys->area.place.height / subpicture->i_original_picture_height;
 
         if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
         {

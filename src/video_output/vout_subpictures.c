@@ -1185,6 +1185,8 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     dst->fmt       = region_fmt;
     dst->place.x    = x_offset;
     dst->place.y    = y_offset;
+    dst->place.width  = region_fmt.i_visible_width;
+    dst->place.height = region_fmt.i_visible_height;
     dst->zoom_h.den = dst->zoom_h.num = 1;
     dst->zoom_v.den = dst->zoom_v.num = 1;
     int fade_alpha = 255;

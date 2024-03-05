@@ -959,9 +959,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT rect_in_display;
         rect_in_display.left   =            scale_w * r->place.x,
-        rect_in_display.right  = rect_in_display.left + scale_w * r->fmt.i_visible_width,
+        rect_in_display.right  = rect_in_display.left + scale_w * r->place.width,
         rect_in_display.top    =            scale_h * r->place.y,
-        rect_in_display.bottom = rect_in_display.top  + scale_h * r->fmt.i_visible_height;
+        rect_in_display.bottom = rect_in_display.top  + scale_h * r->place.height;
 
         rect_in_display.left   += sys->area.place.x;
         rect_in_display.right  += sys->area.place.x;
@@ -976,9 +976,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT texture_visible_rect;
         texture_visible_rect.left   = r->fmt.i_x_offset;
-        texture_visible_rect.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        texture_visible_rect.right  = r->fmt.i_x_offset + r->place.width;
         texture_visible_rect.top    = r->fmt.i_y_offset;
-        texture_visible_rect.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+        texture_visible_rect.bottom = r->fmt.i_y_offset + r->place.height;
 
         Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
                               &rect_in_display, r->i_alpha, ORIENT_NORMAL);
