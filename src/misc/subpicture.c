@@ -226,8 +226,6 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     if( unlikely(p_region == NULL) )
         return NULL;
 
-    p_region->zoom_h.den = p_region->zoom_h.num = 1;
-    p_region->zoom_v.den = p_region->zoom_v.num = 1;
     p_region->i_alpha = 0xff;
     p_region->i_x = INT_MAX;
     p_region->i_y = INT_MAX;

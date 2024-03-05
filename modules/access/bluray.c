@@ -1670,8 +1670,6 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
         // fields not modified on the source
         p_dst->i_align  = p_src->i_align;
         p_dst->i_alpha  = p_src->i_alpha;
-        p_dst->zoom_h   = p_src->zoom_h;
-        p_dst->zoom_v   = p_src->zoom_v;
 
         vlc_spu_regions_push(&p_subpic->regions, p_dst);
     }
