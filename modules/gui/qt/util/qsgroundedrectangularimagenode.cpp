@@ -183,7 +183,12 @@ QSGGeometry* QSGRoundedRectangularImageNode::rebuildGeometry(const Shape& shape,
         else
         {
             QPainterPath painterPath;
-            painterPath.addRoundedRect(0, 0, key.first.first, key.first.second, key.second, key.second);
+            constexpr const short extrapolationFactor = 2;
+            painterPath.addRoundedRect(0, 0,
+                                       key.first.first * extrapolationFactor,
+                                       key.first.second * extrapolationFactor,
+                                       key.second * extrapolationFactor,
+                                       key.second * extrapolationFactor);
             painterPath = painterPath.simplified();
 
             upPath = std::make_unique<QVector<QPointF>>(painterPath.elementCount());
@@ -201,7 +206,7 @@ QSGGeometry* QSGRoundedRectangularImageNode::rebuildGeometry(const Shape& shape,
 
                 // Symmetry based triangulation based on ordered painter path.
                 (*path)[i] = (painterPath.elementAt((i % 2) ? (i)
-                                                            : (elementCount - i - 1)));
+                                                            : (elementCount - i - 1))) / extrapolationFactor;
             }
 
             paths.insert(key, new QVector<QPointF>(*path));
