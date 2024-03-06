@@ -167,7 +167,7 @@ static int Open(vout_display_t *vd,
     };
 
     vd->info.subpicture_chromas = subfmts;
-
+    vd->info.can_scale_spu = true;
     vd->ops = &ops;
 
     UpdateParams(vd);
@@ -417,10 +417,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                     .y1 = r->source_offset_y + r->place.height,
                 },
                 .dst = {
-                    .x0 = place.x + r->place.x,
-                    .y0 = place.y + r->place.y * ysign,
-                    .x1 = place.x + r->place.x + r->place.width,
-                    .y1 = place.y + (r->place.y + r->place.height) * ysign,
+                    .x0 = place.x + r->place.x * r->zoom_h.num / r->zoom_h.den,
+                    .y0 = place.y + r->place.y * r->zoom_v.num / r->zoom_v.den * ysign,
+                    .x1 = place.x + (r->place.x + r->place.width ) * r->zoom_h.num / r->zoom_h.den,
+                    .y1 = place.y + (r->place.y + r->place.height) * r->zoom_v.num / r->zoom_v.den * ysign,
                 },
             };
             i++;
