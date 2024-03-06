@@ -1380,7 +1380,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.generic.textureFormat, &r->p_picture->format,
                                  false, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
-                        r->fmt.i_visible_width, r->fmt.i_visible_height);
+                        r->p_picture->format.i_width, r->p_picture->format.i_height);
                 for (int j=0; j<DXGI_MAX_SHADER_VIEW; j++)
                     if (d3dquad->picSys.texture[j])
                         d3dquad->picSys.texture[j]->Release();
@@ -1393,7 +1393,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                                            d3dquad->picSys.texture, 0,
                                            d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
-                        r->fmt.i_visible_width, r->fmt.i_visible_height);
+                        r->p_picture->format.i_width, r->p_picture->format.i_height);
                 delete d3dquad;
                 i++;
                 continue;
@@ -1406,7 +1406,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (err != VLC_SUCCESS)
             {
                 msg_Err(vd, "Failed to allocate %dx%d quad for OSD",
-                             r->fmt.i_visible_width, r->fmt.i_visible_height);
+                             r->p_picture->format.i_width, r->p_picture->format.i_height);
                 delete d3dquad;
                 i++;
                 continue;
@@ -1415,7 +1415,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->p_picture->format, d3dquad, &sys->display );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
-                        r->fmt.i_visible_width, r->fmt.i_visible_height);
+                        r->p_picture->format.i_width, r->p_picture->format.i_height);
                 delete d3dquad;
                 i++;
                 continue;
