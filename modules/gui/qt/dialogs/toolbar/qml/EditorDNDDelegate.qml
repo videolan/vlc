@@ -136,8 +136,7 @@ Control {
         color: "transparent"
 
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: containsMouse && !pressed ? theme.border
-                                                : "transparent"
+        border.color: theme.border
     }
 
     contentItem: Item {
