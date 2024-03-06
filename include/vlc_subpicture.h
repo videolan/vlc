@@ -207,7 +207,6 @@ typedef struct subpicture_private_t subpicture_private_t;
 
 struct subpicture_region_rendered
 {
-    video_format_t  fmt;                          /**< format of the picture */
     picture_t       *p_picture;          /**< picture comprising this region */
 
     unsigned             source_offset_x;
