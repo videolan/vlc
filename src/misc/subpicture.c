@@ -367,8 +367,6 @@ unsigned picture_BlendSubpicture(picture_t *dst,
         blend_fmt.i_y_offset = r->source_offset_y;
         blend_fmt.i_visible_width = r->place.width;
         blend_fmt.i_visible_height = r->place.height;
-        blend_fmt.i_sar_num = r->fmt.i_sar_num;
-        blend_fmt.i_sar_den = r->fmt.i_sar_den;
 
         if (filter_ConfigureBlend(blend, dst->format.i_width,
                                   dst->format.i_height,  &blend_fmt)
