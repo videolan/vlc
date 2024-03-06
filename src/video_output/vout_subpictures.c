@@ -866,7 +866,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             spu_area_t *dst_area,
                             const spu_render_entry_t *entry, subpicture_region_t *region,
-                            const spu_scale_t scale_size,
+                            const spu_scale_t scale_size, bool apply_scale,
                             const vlc_fourcc_t *chroma_list,
                             const video_format_t *fmt,
                             const spu_area_t *subtitle_area, size_t subtitle_area_count,
@@ -875,6 +875,9 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     assert(!subpicture_region_IsText( region ));
     subpicture_t *subpic = entry->subpic;
     spu_private_t *sys = spu->p;
+
+    if (scale_size.h == SCALE_UNIT && scale_size.w == SCALE_UNIT)
+        apply_scale = false;
 
     int x_offset;
     int y_offset;
@@ -899,7 +902,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
      * to ensure that overlap does not occur. */
     int y_margin = 0;
     if (!crop_requested && subpic->b_subtitle)
-        y_margin = spu_invscale_h(sys->margin, scale_size);
+        y_margin = apply_scale ? spu_invscale_h(sys->margin, scale_size) : sys->margin;
 
     /* Place the picture
      * We compute the position in the rendered size */
@@ -914,7 +917,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if (entry->channel_order == VLC_VOUT_ORDER_SECONDARY)
     {
         int secondary_margin =
-            spu_invscale_h(sys->secondary_margin, scale_size);
+            apply_scale ? spu_invscale_h(sys->secondary_margin, scale_size) : sys->secondary_margin;
         if (!subpic->b_absolute)
         {
             /* Move the secondary subtitles by the secondary margin before
@@ -935,7 +938,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     *dst_area = spu_area_create(x_offset, y_offset,
                                 region->fmt.i_visible_width,
                                 region->fmt.i_visible_height,
-                                scale_size);
+                                apply_scale ? scale_size : spu_scale_unit());
 
     /* Handle overlapping subtitles when possible */
     if (subpic->b_subtitle && !subpic->b_absolute)
@@ -959,8 +962,8 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     x_offset = spu_scale_w(restrained.x, restrained.scale);
     y_offset = spu_scale_h(restrained.y, restrained.scale);
 
-    const unsigned dst_width  = spu_scale_w(region->fmt.i_visible_width,  scale_size);
-    const unsigned dst_height = spu_scale_h(region->fmt.i_visible_height, scale_size);
+    const unsigned dst_width  = apply_scale ? spu_scale_w(region->fmt.i_visible_width,  scale_size) : region->fmt.i_visible_width;
+    const unsigned dst_height = apply_scale ? spu_scale_h(region->fmt.i_visible_height, scale_size) : region->fmt.i_visible_height;
 
     if (unlikely(dst_width == 0 || dst_height == 0))
         return NULL;
@@ -1025,7 +1028,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     }
 
     /* Scale from rendered size to destination size */
-    if (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT || convert_chroma)
+    if ((apply_scale && (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT)) || convert_chroma)
     {
         /* Destroy the cache if unusable */
         if (region->p_private) {
@@ -1131,10 +1134,10 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if (crop_requested) {
         int crop_x, crop_y, crop_width, crop_height;
         if(sys->force_crop){
-            crop_x     = spu_scale_w(sys->crop.x, scale_size);
-            crop_y     = spu_scale_h(sys->crop.y, scale_size);
-            crop_width = spu_scale_w(sys->crop.width,  scale_size);
-            crop_height= spu_scale_h(sys->crop.height, scale_size);
+            crop_x     = apply_scale ? spu_scale_w(sys->crop.x, scale_size) : sys->crop.x;
+            crop_y     = apply_scale ? spu_scale_h(sys->crop.y, scale_size) : sys->crop.y;
+            crop_width = apply_scale ? spu_scale_w(sys->crop.width,  scale_size) : sys->crop.width;
+            crop_height= apply_scale ? spu_scale_h(sys->crop.height, scale_size) : sys->crop.height;
         }
         else
         {
@@ -1202,6 +1205,17 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                                 (subpic->i_stop - fade_start);
     }
     dst->i_alpha   = fade_alpha * subpic->i_alpha * region->i_alpha / (255 * 255);
+
+    if (!apply_scale && scale_size.h != SCALE_UNIT)
+    {
+        dst->place.x      = spu_scale_w(dst->place.x,     scale_size);
+        dst->place.width  = spu_scale_w(dst->place.width, scale_size);
+    }
+    if (!apply_scale && scale_size.w != SCALE_UNIT)
+    {
+        dst->place.y      = spu_scale_h(dst->place.y,     scale_size);
+        dst->place.height = spu_scale_h(dst->place.height, scale_size);
+    }
     return dst;
 }
 
@@ -1333,11 +1347,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
 
-            spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
-
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
-                            entry, rendered_region, virtual_scale,
+                            entry, rendered_region, scale, !external_scale,
                             chroma_list, fmt_dst,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
@@ -1345,20 +1357,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 subpicture_region_Delete( rendered_region );
             if (unlikely(output_last_ptr == NULL))
                 continue;
-
-            if (external_scale)
-            {
-                if (scale.h != SCALE_UNIT)
-                {
-                    output_last_ptr->place.x      = spu_scale_w(output_last_ptr->place.x,     scale);
-                    output_last_ptr->place.width  = spu_scale_w(output_last_ptr->place.width, scale);
-                }
-                if (scale.w != SCALE_UNIT)
-                {
-                    output_last_ptr->place.y      = spu_scale_h(output_last_ptr->place.y,     scale);
-                    output_last_ptr->place.height = spu_scale_h(output_last_ptr->place.height, scale);
-                }
-            }
 
             vlc_vector_push(&output->regions, output_last_ptr);
 
