@@ -1646,10 +1646,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
 
         RECT spuViewport;
-        spuViewport.left   = (FLOAT) r->place.x * sys->area.place.width  / subpicture->i_original_picture_width;
-        spuViewport.top    = (FLOAT) r->place.y * sys->area.place.height / subpicture->i_original_picture_height;
-        spuViewport.right  = (FLOAT) (r->place.x + r->place.width)  * sys->area.place.width  / subpicture->i_original_picture_width;
-        spuViewport.bottom = (FLOAT) (r->place.y + r->place.height) * sys->area.place.height / subpicture->i_original_picture_height;
+        spuViewport.left   = r->place.x;
+        spuViewport.top    = r->place.y;
+        spuViewport.right  = r->place.x + r->place.width;
+        spuViewport.bottom = r->place.y + r->place.height;
 
         /* move the SPU inside the video area */
         spuViewport.left   += sys->area.place.x;
