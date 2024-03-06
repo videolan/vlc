@@ -362,14 +362,8 @@ unsigned picture_BlendSubpicture(picture_t *dst,
     vlc_vector_foreach(r, &src->regions) {
         assert(r->p_picture);
 
-        video_format_t blend_fmt = r->p_picture->format;
-        blend_fmt.i_x_offset = r->p_picture->format.i_x_offset;
-        blend_fmt.i_y_offset = r->p_picture->format.i_y_offset;
-        blend_fmt.i_visible_width = r->p_picture->format.i_visible_width;
-        blend_fmt.i_visible_height = r->p_picture->format.i_visible_height;
-
         if (filter_ConfigureBlend(blend, dst->format.i_width,
-                                  dst->format.i_height,  &blend_fmt)
+                                  dst->format.i_height,  &r->p_picture->format)
          || filter_Blend(blend, dst, r->place.x, r->place.y, r->p_picture, r->i_alpha))
             msg_Err(blend, "blending %4.4s to %4.4s failed",
                     (char *)&blend->fmt_in.video.i_chroma,
