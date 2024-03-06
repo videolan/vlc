@@ -44,9 +44,8 @@ static ssize_t Read (stream_t *p_access, void *buffer, size_t size) {
 
     if (offset >= js_file_size)
         return 0;
-    if (size > offset + js_file_size) {
+    if (size + offset > js_file_size)
         size = js_file_size - offset;
-    }
     EM_ASM({
         const offset = $0;
         const buffer = $1;
