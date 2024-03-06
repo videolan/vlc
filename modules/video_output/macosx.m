@@ -240,6 +240,7 @@ static int Open (vout_display_t *vd,
 
         /* Setup vout_display_t once everything is fine */
         vd->info.subpicture_chromas = subpicture_chromas;
+        vd->info.can_scale_spu = true;
 
         vd->ops = &ops;
 
