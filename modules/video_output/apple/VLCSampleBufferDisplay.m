@@ -407,15 +407,15 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
                                  const vlc_render_subpicture *subpicture,
                                  const struct subpicture_region_rendered *r)
 {
-    const float scale_w = (float)(sys->place.width)  / subpicture->i_original_picture_width;
-    const float scale_h = (float)(sys->place.height) / subpicture->i_original_picture_height;
+    const float scale_w = (float)(sys->place.width  * r->zoom_h.num) / (subpicture->i_original_picture_width  * r->zoom_h.den);
+    const float scale_h = (float)(sys->place.height * r->zoom_v.num) / (subpicture->i_original_picture_height * r->zoom_v.den);
 
     // Invert y coords for CoreGraphics
-    const float y = subpicture->i_original_picture_height - r->place.height - r->place.y;
+    const float y = subpicture->i_original_picture_height - scale_h * (r->place.height + r->place.y);
 
     return CGRectMake(
         scale_w * r->place.x + sys->place.x,
-        scale_h * y + sys->place.y,
+        /*scale_h */ y + sys->place.y,
         scale_w * r->place.width,
         scale_h * r->place.height
     );
@@ -673,6 +673,7 @@ static int Open (vout_display_t *vd,
         };
 
         vd->info.subpicture_chromas = subfmts;
+        vd->info.can_scale_spu = true;
 
         return VLC_SUCCESS;
     }
