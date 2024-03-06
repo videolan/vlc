@@ -68,6 +68,7 @@ struct vlc_gl_sub_renderer
 
     gl_region_t *regions;
     unsigned region_count;
+    unsigned output_width, output_height;
 
     GLuint program_id;
     struct {
@@ -130,6 +131,8 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     sr->api = api;
     sr->vt = vt;
     sr->region_count = 0;
+    sr->output_width = 0;
+    sr->output_height = 0;
     sr->regions = NULL;
 
     static const char *const VERTEX_SHADER_SRC =
@@ -223,11 +226,22 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr)
     free(sr);
 }
 
+void
+vlc_gl_sub_renderer_SetOutputSize(struct vlc_gl_sub_renderer *sr,
+                                  unsigned width, unsigned height)
+{
+    sr->output_width = width;
+    sr->output_height = height;
+}
+
 int
 vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                             const vlc_render_subpicture *subpicture)
 {
     GL_ASSERT_NOERROR(sr->vt);
+
+    if (unlikely(sr->output_width == 0 || sr->output_height == 0))
+        return VLC_EINVAL;
 
     const struct vlc_gl_interop *interop = sr->interop;
 
@@ -261,10 +275,10 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                 glr->tex_height = 1.0;
             }
             glr->alpha  = (float)r->i_alpha / 255;
-            glr->left   =  2.0 * (r->place.x                  ) / subpicture->i_original_picture_width  - 1.0;
-            glr->top    = -2.0 * (r->place.y                  ) / subpicture->i_original_picture_height + 1.0;
-            glr->right  =  2.0 * (r->place.x + r->place.width ) / subpicture->i_original_picture_width  - 1.0;
-            glr->bottom = -2.0 * (r->place.y + r->place.height) / subpicture->i_original_picture_height + 1.0;
+            glr->left   =  2.0 * (r->place.x                  ) / sr->output_width  - 1.0;
+            glr->top    = -2.0 * (r->place.y                  ) / sr->output_height + 1.0;
+            glr->right  =  2.0 * (r->place.x + r->place.width ) / sr->output_width  - 1.0;
+            glr->bottom = -2.0 * (r->place.y + r->place.height) / sr->output_height + 1.0;
 
             glr->texture = 0;
             /* Try to recycle the textures allocated by the previous

@@ -173,6 +173,8 @@ static void test_opengl_offscreen(
     memcpy(&picture->p[0].p_pixels[0 * 4 + picture->p[0].i_pitch], blue, sizeof(blue));
     memcpy(&picture->p[0].p_pixels[1 * 4 + picture->p[0].i_pitch], white, sizeof(white));
 
+    vlc_gl_sub_renderer_SetOutputSize(sr, 4, 4);
+
     vlc_render_subpicture *subpicture = vlc_render_subpicture_New();
     assert(subpicture != NULL);
     subpicture->i_original_picture_width = 4;

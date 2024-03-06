@@ -358,6 +358,7 @@ void vout_display_opengl_SetOutputSize(vout_display_opengl_t *vgl,
     /* The renderer, last filter in the chain, necessarily accepts the new
      * output size */
     assert(ret == VLC_SUCCESS);
+    vlc_gl_sub_renderer_SetOutputSize(vgl->sub_renderer, width, height);
     (void) ret;
 }
 

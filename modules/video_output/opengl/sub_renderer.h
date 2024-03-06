@@ -73,6 +73,13 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                             const struct vlc_render_subpicture *subpicture);
 
 /**
+ * Change the output size
+ */
+void
+vlc_gl_sub_renderer_SetOutputSize(struct vlc_gl_sub_renderer *sr,
+                                  unsigned width, unsigned height);
+
+/**
  * Draw the prepared subpicture
  *
  * \param sr the renderer
