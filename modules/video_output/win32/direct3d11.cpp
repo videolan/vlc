@@ -1567,10 +1567,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         }
 
         RECT output;
-        output.left   = r->source_offset_x;
-        output.right  = r->source_offset_x + r->place.width;
-        output.top    = r->source_offset_y;
-        output.bottom = r->source_offset_y + r->place.height;
+        output.left   = r->p_picture->format.i_x_offset;
+        output.right  = r->p_picture->format.i_x_offset + r->p_picture->format.i_visible_width;
+        output.top    = r->p_picture->format.i_y_offset;
+        output.bottom = r->p_picture->format.i_y_offset + r->p_picture->format.i_visible_height;
 
         D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output,
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));

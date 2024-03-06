@@ -145,7 +145,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
                          sys->picture.subpic, XCB_RENDER_PICTURE_NONE,
                          sys->picture.subpic_crop,
-                         reg->source_offset_x, reg->source_offset_y, 0, 0,
+                         reg->p_picture->format.i_x_offset, reg->p_picture->format.i_y_offset, 0, 0,
                          0, 0, reg->place.width, reg->place.height);
 
     /* Copy alpha channel */

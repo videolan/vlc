@@ -1177,14 +1177,18 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     struct subpicture_region_rendered *dst = calloc(1, sizeof(*dst));
     if (unlikely(dst == NULL))
         return NULL;
-    dst->p_picture = picture_Hold(region_picture);
+    dst->p_picture = picture_Clone(region_picture);
     if (unlikely(dst->p_picture == NULL))
     {
         free(dst);
         return NULL;
     }
-    dst->source_offset_x = region_fmt.i_x_offset;
-    dst->source_offset_y = region_fmt.i_y_offset;
+    assert(region_fmt.i_x_offset + region_fmt.i_visible_width  <= dst->p_picture->format.i_width);
+    assert(region_fmt.i_y_offset + region_fmt.i_visible_height <= dst->p_picture->format.i_height);
+    dst->p_picture->format.i_x_offset       = region_fmt.i_x_offset;
+    dst->p_picture->format.i_y_offset       = region_fmt.i_y_offset;
+    dst->p_picture->format.i_visible_width  = region_fmt.i_visible_width;
+    dst->p_picture->format.i_visible_height = region_fmt.i_visible_height;
     dst->place.x    = x_offset;
     dst->place.y    = y_offset;
     dst->place.width  = region_fmt.i_visible_width;

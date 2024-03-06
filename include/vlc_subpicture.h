@@ -208,9 +208,6 @@ typedef struct subpicture_private_t subpicture_private_t;
 struct subpicture_region_rendered
 {
     picture_t       *p_picture;          /**< picture comprising this region */
-
-    unsigned             source_offset_x;
-    unsigned             source_offset_y;
     vout_display_place_t place;    // position of region, relative to alignment
     int             i_alpha;                               /**< transparency */
     vlc_rational_t  zoom_h;

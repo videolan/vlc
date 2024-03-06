@@ -363,10 +363,10 @@ unsigned picture_BlendSubpicture(picture_t *dst,
         assert(r->p_picture);
 
         video_format_t blend_fmt = r->p_picture->format;
-        blend_fmt.i_x_offset = r->source_offset_x;
-        blend_fmt.i_y_offset = r->source_offset_y;
-        blend_fmt.i_visible_width = r->place.width;
-        blend_fmt.i_visible_height = r->place.height;
+        blend_fmt.i_x_offset = r->p_picture->format.i_x_offset;
+        blend_fmt.i_y_offset = r->p_picture->format.i_y_offset;
+        blend_fmt.i_visible_width = r->p_picture->format.i_visible_width;
+        blend_fmt.i_visible_height = r->p_picture->format.i_visible_height;
 
         if (filter_ConfigureBlend(blend, dst->format.i_width,
                                   dst->format.i_height,  &blend_fmt)

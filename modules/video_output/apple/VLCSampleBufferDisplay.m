@@ -436,8 +436,8 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
     vlc_vector_foreach(r, &subpicture->regions) {
         CFIndex length = r->p_picture->format.i_height * r->p_picture->p->i_pitch;
         const size_t pixels_offset =
-                r->source_offset_y * r->p_picture->p->i_pitch +
-                r->source_offset_x * r->p_picture->p->i_pixel_pitch;
+                r->p_picture->format.i_y_offset * r->p_picture->p->i_pitch +
+                r->p_picture->format.i_x_offset * r->p_picture->p->i_pixel_pitch;
 
         CFDataRef data = CFDataCreate(
             NULL,

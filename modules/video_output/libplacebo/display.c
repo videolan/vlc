@@ -411,10 +411,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
             sys->overlay_parts[i] = (struct pl_overlay_part) {
                 .src = {
-                    .x0 = r->source_offset_x,
-                    .y0 = r->source_offset_y,
-                    .x1 = r->source_offset_x + r->place.width,
-                    .y1 = r->source_offset_y + r->place.height,
+                    .x1 = r->p_picture->format.i_visible_width,
+                    .y1 = r->p_picture->format.i_visible_height,
                 },
                 .dst = {
                     .x0 = place.x + r->place.x * r->zoom_h.num / r->zoom_h.den,
