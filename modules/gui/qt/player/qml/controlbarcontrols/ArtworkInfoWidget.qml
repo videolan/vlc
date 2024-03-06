@@ -94,11 +94,11 @@ AbstractButton {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
 
-        Widgets.ScaledImage {
+        Image {
             id: coverImage
 
             Layout.fillHeight: true
-            Layout.preferredWidth: root.height
+            Layout.preferredWidth: height
 
             source: {
                 if (!paintOnly && Player.artwork && Player.artwork.toString())
@@ -106,6 +106,8 @@ AbstractButton {
                 else
                     return VLCStyle.noArtAlbumCover
             }
+
+            sourceSize.height: root.height * MainCtx.screen.devicePixelRatio
 
             fillMode: Image.PreserveAspectFit
 
