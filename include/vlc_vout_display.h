@@ -129,7 +129,6 @@ typedef struct vout_display_cfg {
  *
  */
 typedef struct {
-    bool can_scale_spu;                     /* Handles subpictures with a non default zoom factor */
     const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
 

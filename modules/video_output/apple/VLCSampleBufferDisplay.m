@@ -673,7 +673,6 @@ static int Open (vout_display_t *vd,
         };
 
         vd->info.subpicture_chromas = subfmts;
-        vd->info.can_scale_spu = true;
 
         return VLC_SUCCESS;
     }

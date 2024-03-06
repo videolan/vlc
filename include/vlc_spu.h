@@ -75,14 +75,13 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
  * \param system_now the reference current time
  * \param pts the timestamp of the rendered frame
  * \param ignore_osd whether we display the OSD or not
- * \param external_scale whether scaling picture is done by the client or this function
  *
  * The returned value if non NULL must be released by subpicture_Delete().
  */
 VLC_API struct vlc_render_subpicture * spu_Render( spu_t *spu, const vlc_fourcc_t *p_chroma_list,
                                    const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src,
                                    vlc_tick_t system_now, vlc_tick_t pts,
-                                   bool ignore_osd, bool external_scale );
+                                   bool ignore_osd );
 
 /**
  * It registers a new SPU channel.

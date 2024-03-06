@@ -491,8 +491,6 @@ static int Open(vout_display_t *vd,
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 display adapter successfully initialized");
 
-    vd->info.can_scale_spu        = true;
-
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
         sys->regionQuad.generic.textureFormat != NULL)
     {

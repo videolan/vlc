@@ -1258,7 +1258,6 @@ static int OpenMmalVout(vout_display_t *vd,
 
     vd->info = (vout_display_info_t){
         .subpicture_chromas = hw_mmal_vzc_subpicture_chromas,
-        .can_scale_spu = true,
     };
 
     vd->ops = &ops;

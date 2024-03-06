@@ -370,7 +370,6 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
         0
     };
     vd->info.subpicture_chromas = gl_subpicture_chromas;
-    vd->info.can_scale_spu = true;
 
     return 0;
 

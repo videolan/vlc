@@ -2042,10 +2042,10 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
                          const video_format_t *fmt_src,
                          vlc_tick_t system_now,
                          vlc_tick_t render_subtitle_date,
-                         bool ignore_osd,
-                         bool external_scale)
+                         bool ignore_osd)
 {
     spu_private_t *sys = spu->p;
+    const bool external_scale = chroma_list != NULL;
 
     /* Update sub-source chain */
     vlc_mutex_lock(&sys->lock);

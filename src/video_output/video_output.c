@@ -1129,7 +1129,7 @@ static vlc_render_subpicture *RenderSPUs(vout_thread_sys_t *sys,
                       subpicture_chromas, spu_frame,
                       sys->display->source,
                       system_now, render_subtitle_date,
-                      ignore_osd, sys->display->info.can_scale_spu);
+                      ignore_osd);
 }
 
 static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,

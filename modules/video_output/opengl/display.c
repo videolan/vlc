@@ -262,7 +262,6 @@ static int Open(vout_display_t *vd,
     sys->viewpoint = vd->cfg->viewpoint;
 
     vd->info.subpicture_chromas = spu_chromas;
-    vd->info.can_scale_spu = true;
     vd->ops = &ops;
     return VLC_SUCCESS;
 

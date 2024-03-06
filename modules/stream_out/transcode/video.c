@@ -469,7 +469,7 @@ static picture_t * RenderSubpictures( sout_stream_id_sys_t *id, picture_t *p_pic
 
     vlc_render_subpicture *p_subpic = spu_Render( id->p_spu, NULL, &fmt,
                                          &outfmt, vlc_tick_now(), p_pic->date,
-                                         false, false );
+                                         false );
 
     /* Overlay subpicture */
     if( p_subpic )

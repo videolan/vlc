@@ -1834,8 +1834,6 @@ static int Open(vout_display_t *vd,
         goto error;
     }
 
-    vd->info.can_scale_spu        = true;
-
     /* Setup vout_display now that everything is fine */
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&

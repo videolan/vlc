@@ -462,7 +462,6 @@ static int Open (vout_display_t *vd,
         }
 
         vd->info.subpicture_chromas = spu_chromas;
-        vd->info.can_scale_spu = true;
 
         vd->ops = &ops;
 
