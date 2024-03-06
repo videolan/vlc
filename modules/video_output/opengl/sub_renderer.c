@@ -251,13 +251,13 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
         vlc_spu_regions_foreach_const(r, &subpicture->regions) {
             gl_region_t *glr = &sr->regions[i];
 
-            glr->width  = r->fmt.i_visible_width;
-            glr->height = r->fmt.i_visible_height;
+            glr->width  = r->p_picture->format.i_visible_width;
+            glr->height = r->p_picture->format.i_visible_height;
             if (!sr->api->supports_npot) {
-                glr->width  = stdc_bit_ceil((unsigned)glr->width);
-                glr->height = stdc_bit_ceil((unsigned)glr->height);
-                glr->tex_width  = (float) r->fmt.i_visible_width  / glr->width;
-                glr->tex_height = (float) r->fmt.i_visible_height / glr->height;
+                glr->width  = stdc_bit_ceil(r->p_picture->format.i_visible_width);
+                glr->height = stdc_bit_ceil(r->p_picture->format.i_visible_height);
+                glr->tex_width  = (float) r->p_picture->format.i_visible_width  / glr->width;
+                glr->tex_height = (float) r->p_picture->format.i_visible_height / glr->height;
             } else {
                 glr->tex_width  = 1.0;
                 glr->tex_height = 1.0;
@@ -294,11 +294,11 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
                     break;
             }
             /* Use the visible pitch of the region */
-            r->p_picture->p[0].i_visible_pitch = r->fmt.i_visible_width
+            r->p_picture->p[0].i_visible_pitch = r->p_picture->format.i_visible_width
                                                * r->p_picture->p[0].i_pixel_pitch;
 
-            GLsizei width = r->fmt.i_visible_width;
-            GLsizei height = r->fmt.i_visible_height;
+            GLsizei width = r->p_picture->format.i_visible_width;
+            GLsizei height = r->p_picture->format.i_visible_height;
             int ret = interop->ops->update_textures(interop, &glr->texture,
                                                     &width, &height,
                                                     r->p_picture, &pixels_offset);
