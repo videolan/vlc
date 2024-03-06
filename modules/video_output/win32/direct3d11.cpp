@@ -1581,16 +1581,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         spuViewport.right  = (FLOAT) (r->place.x + r->place.width)  * sys->area.place.width  / subpicture->i_original_picture_width;
         spuViewport.bottom = (FLOAT) (r->place.y + r->place.height) * sys->area.place.height / subpicture->i_original_picture_height;
 
-        if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
-        {
-            spuViewport.left   = (FLOAT) spuViewport.left   * r->zoom_h.num / r->zoom_h.den;
-            spuViewport.right  = (FLOAT) spuViewport.right  * r->zoom_h.num / r->zoom_h.den;
-        }
-        if (r->zoom_v.num != 0 && r->zoom_v.den != 0)
-        {
-            spuViewport.top    = (FLOAT) spuViewport.top    * r->zoom_v.num / r->zoom_v.den;
-            spuViewport.bottom = (FLOAT) spuViewport.bottom * r->zoom_v.num / r->zoom_v.den;
-        }
+        assert(r->zoom_h.num != 0 && r->zoom_h.den != 0);
+        assert(r->zoom_v.num != 0 && r->zoom_v.den != 0);
+        spuViewport.left   = (FLOAT) spuViewport.left   * r->zoom_h.num / r->zoom_h.den;
+        spuViewport.right  = (FLOAT) spuViewport.right  * r->zoom_h.num / r->zoom_h.den;
+        spuViewport.top    = (FLOAT) spuViewport.top    * r->zoom_v.num / r->zoom_v.den;
+        spuViewport.bottom = (FLOAT) spuViewport.bottom * r->zoom_v.num / r->zoom_v.den;
 
         /* move the SPU inside the video area */
         spuViewport.left   += sys->area.place.x;
