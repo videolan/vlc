@@ -146,7 +146,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                          sys->picture.subpic, XCB_RENDER_PICTURE_NONE,
                          sys->picture.subpic_crop,
                          reg->p_picture->format.i_x_offset, reg->p_picture->format.i_y_offset, 0, 0,
-                         0, 0, reg->place.width, reg->place.height);
+                         0, 0, reg->p_picture->format.i_visible_width, reg->p_picture->format.i_visible_height);
 
     /* Copy alpha channel */
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
@@ -172,8 +172,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                                sys->picture.subpic_crop, alpha_color,
                                ARRAY_SIZE(rects), rects);
 
-    const float scale_w = (float)(place->width  * reg->zoom_h.num) / (subpic->i_original_picture_width  * reg->zoom_h.den);
-    const float scale_h = (float)(place->height * reg->zoom_v.num) / (subpic->i_original_picture_height * reg->zoom_v.den);
+    const float scale_w = (float)(place->width ) / (subpic->i_original_picture_width );
+    const float scale_h = (float)(place->height) / (subpic->i_original_picture_height);
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
@@ -188,8 +188,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
         /* Multiply z by width and height to compensate for x and y above */
         0, 0, 10000,
     };
-    transform.matrix11 = 10000 / scale_h;
-    transform.matrix22 = 10000 / scale_w;
+    transform.matrix11 = 10000 * reg->p_picture->format.i_visible_width  / reg->place.width;
+    transform.matrix22 = 10000 * reg->p_picture->format.i_visible_height / reg->place.height;
 
     xcb_render_set_picture_transform(conn, sys->picture.subpic_crop, transform);
     xcb_render_set_picture_transform(conn, sys->picture.alpha,       transform);

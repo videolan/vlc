@@ -407,8 +407,8 @@ static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
                                  const vlc_render_subpicture *subpicture,
                                  const struct subpicture_region_rendered *r)
 {
-    const float scale_w = (float)(sys->place.width  * r->zoom_h.num) / (subpicture->i_original_picture_width  * r->zoom_h.den);
-    const float scale_h = (float)(sys->place.height * r->zoom_v.num) / (subpicture->i_original_picture_height * r->zoom_v.den);
+    const float scale_w = (float)(sys->place.width ) / (subpicture->i_original_picture_width );
+    const float scale_h = (float)(sys->place.height) / (subpicture->i_original_picture_height);
 
     // Invert y coords for CoreGraphics
     const float y = subpicture->i_original_picture_height - scale_h * (r->place.height + r->place.y);

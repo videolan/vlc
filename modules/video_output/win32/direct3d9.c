@@ -926,7 +926,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
             uint8_t  *src_data   = r->p_picture->p->p_pixels;
             int       src_pitch  = r->p_picture->p->i_pitch;
 
-            if (d3dr->format == D3DFMT_A8B8G8R8) {
+            if (d3dr->format == D3DFMT_A8B8G8R8 /*|| d3dr->format == D3DFMT_A8R8G8B8*/) {
                 if (dst_pitch == r->p_picture->p->i_pitch) {
                     memcpy(dst_data, src_data, r->p_picture->format.i_height * dst_pitch);
                 } else {
@@ -954,8 +954,8 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
 
         /* Map the subpicture to sys->sys.sys.place */
-        const float scale_w = (float)(sys->area.place.width  * r->zoom_h.num) / (subpicture->i_original_picture_width  * r->zoom_h.den);
-        const float scale_h = (float)(sys->area.place.height * r->zoom_v.num) / (subpicture->i_original_picture_height * r->zoom_v.den);
+        const float scale_w = (float)(sys->area.place.width ) / subpicture->i_original_picture_width;
+        const float scale_h = (float)(sys->area.place.height) / subpicture->i_original_picture_height;
 
         RECT rect_in_display;
         rect_in_display.left   = scale_w * r->place.x;
@@ -976,9 +976,9 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
 
         RECT texture_visible_rect;
         texture_visible_rect.left   = r->p_picture->format.i_x_offset;
-        texture_visible_rect.right  = r->p_picture->format.i_x_offset + r->place.width;
+        texture_visible_rect.right  = r->p_picture->format.i_x_offset + r->p_picture->format.i_visible_width;
         texture_visible_rect.top    = r->p_picture->format.i_y_offset;
-        texture_visible_rect.bottom = r->p_picture->format.i_y_offset + r->place.height;
+        texture_visible_rect.bottom = r->p_picture->format.i_y_offset + r->p_picture->format.i_visible_height;
 
         Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
                               &rect_in_display, r->i_alpha, ORIENT_NORMAL);

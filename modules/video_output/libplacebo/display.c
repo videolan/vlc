@@ -415,10 +415,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                     .y1 = r->p_picture->format.i_visible_height,
                 },
                 .dst = {
-                    .x0 = place.x + r->place.x * r->zoom_h.num / r->zoom_h.den,
-                    .y0 = place.y + r->place.y * r->zoom_v.num / r->zoom_v.den * ysign,
-                    .x1 = place.x + (r->place.x + r->place.width ) * r->zoom_h.num / r->zoom_h.den,
-                    .y1 = place.y + (r->place.y + r->place.height) * r->zoom_v.num / r->zoom_v.den * ysign,
+                    .x0 = place.x + r->place.x,
+                    .y0 = place.y + r->place.y * ysign,
+                    .x1 = place.x + (r->place.x + r->place.width ),
+                    .y1 = place.y + (r->place.y + r->place.height) * ysign,
                 },
             };
             i++;

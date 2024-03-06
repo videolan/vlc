@@ -1193,8 +1193,6 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     dst->place.y    = y_offset;
     dst->place.width  = region_fmt.i_visible_width;
     dst->place.height = region_fmt.i_visible_height;
-    dst->zoom_h.den = dst->zoom_h.num = 1;
-    dst->zoom_v.den = dst->zoom_v.num = 1;
     int fade_alpha = 255;
     if (subpic->b_fade) {
         vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
@@ -1353,13 +1351,13 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             {
                 if (scale.h != SCALE_UNIT)
                 {
-                    output_last_ptr->zoom_v.num = scale.h;
-                    output_last_ptr->zoom_v.den = SCALE_UNIT;
+                    output_last_ptr->place.x      = spu_scale_w(output_last_ptr->place.x,     scale);
+                    output_last_ptr->place.width  = spu_scale_w(output_last_ptr->place.width, scale);
                 }
                 if (scale.w != SCALE_UNIT)
                 {
-                    output_last_ptr->zoom_h.num = scale.w;
-                    output_last_ptr->zoom_h.den = SCALE_UNIT;
+                    output_last_ptr->place.y      = spu_scale_h(output_last_ptr->place.y,     scale);
+                    output_last_ptr->place.height = spu_scale_h(output_last_ptr->place.height, scale);
                 }
             }
 

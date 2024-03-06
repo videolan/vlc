@@ -210,8 +210,6 @@ struct subpicture_region_rendered
     picture_t       *p_picture;          /**< picture comprising this region */
     vout_display_place_t place;    // position of region, relative to alignment
     int             i_alpha;                               /**< transparency */
-    vlc_rational_t  zoom_h;
-    vlc_rational_t  zoom_v;
 };
 
 struct vlc_render_subpicture

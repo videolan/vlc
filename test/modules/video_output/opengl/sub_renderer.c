@@ -184,8 +184,6 @@ static void test_opengl_offscreen(
     p_region->place.width  = picture->format.i_visible_width;
     p_region->place.height = picture->format.i_visible_height;
     p_region->i_alpha = 255;
-    p_region->zoom_h.num = p_region->zoom_h.den = 1;
-    p_region->zoom_v.num = p_region->zoom_h.den = 1;
     vlc_vector_push( &subpicture->regions, p_region );
 
     ret = vlc_gl_sub_renderer_Prepare(sr, subpicture);

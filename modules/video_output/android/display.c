@@ -150,10 +150,10 @@ static bool subpicture_NeedDraw(vout_display_t *vd,
         vlc_vector_foreach(r, &subpicture->regions)
         {
             struct sub_region *cmp = &sub->regions.data[i++];
-            if (cmp->x != r->place.x * r->zoom_h.num / * r->zoom_h.den
-             || cmp->y != r->place.y * r->zoom_v.num / * r->zoom_v.den
-             || cmp->width != r->place.width * r->zoom_h.num / * r->zoom_h.den
-             || cmp->height != r->place.height * r->zoom_v.num / * r->zoom_v.den)
+            if (cmp->x != r->place.x
+             || cmp->y != r->place.y
+             || cmp->width != r->place.width
+             || cmp->height != r->place.height)
             {
                 /* Subpicture regions are different */
                 draw = true;
@@ -181,10 +181,10 @@ end:
     vlc_vector_foreach(r, &subpicture->regions)
     {
         struct sub_region reg = {
-            .x = r->place.x * r->zoom_h.num / * r->zoom_h.den,
-            .y = r->place.y * r->zoom_v.num / * r->zoom_v.den,
-            .width = r->place.width * r->zoom_h.num / * r->zoom_h.den,
-            .height = r->place.height * r->zoom_v.num / * r->zoom_v.den,
+            .x = r->place.x,
+            .y = r->place.y,
+            .width = r->place.width,
+            .height = r->place.height,
         };
         bool res = vlc_vector_push(&sub->regions, reg);
         /* Already checked with vlc_vector_reserve */

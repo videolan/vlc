@@ -753,10 +753,10 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
         if ((sys->subpic_bufs[n] = hw_mmal_vzc_buf_from_pic(sys->vzc,
             src,
             (MMAL_RECT_T){.width = vd->cfg->display.width, .height=vd->cfg->display.height},
-            r->place.x * r->zoom_h.num / r->zoom_h.den,
-            r->place.y * r->zoom_v.num / r->zoom_v.den,
-            r->place.width  * r->zoom_h.num / r->zoom_h.den,
-            r->place.height * r->zoom_v.num / r->zoom_v.den,
+            r->place.x,
+            r->place.y,
+            r->place.width,
+            r->place.height,
             r->i_alpha,
             n == 0)) == NULL)
         {
