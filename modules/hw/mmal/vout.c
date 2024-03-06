@@ -754,6 +754,7 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
             src,
             (MMAL_RECT_T){.width = vd->cfg->display.width, .height=vd->cfg->display.height},
             r->place.x, r->place.y,
+            r->place.width, r->place.height,
             r->i_alpha,
             n == 0)) == NULL)
         {

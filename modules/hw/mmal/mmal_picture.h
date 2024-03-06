@@ -126,6 +126,7 @@ typedef struct vzc_pool_ctl_s vzc_pool_ctl_t;
 MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc, picture_t * const pic,
                                                 const MMAL_RECT_T dst_pic_rect,
                                                 const int x_offset, const int y_offset,
+                                                const unsigned width, const unsigned height,
                                                 const unsigned int alpha, const bool is_first);
 
 void hw_mmal_vzc_pool_flush(vzc_pool_ctl_t * const pc);
