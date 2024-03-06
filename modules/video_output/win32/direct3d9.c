@@ -960,11 +960,6 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         rect_in_display.top    = r->place.y;
         rect_in_display.bottom = r->place.y + r->place.height;
 
-        rect_in_display.left   += sys->area.place.x;
-        rect_in_display.right  += sys->area.place.x;
-        rect_in_display.top    += sys->area.place.y;
-        rect_in_display.bottom += sys->area.place.y;
-
         RECT texture_rect;
         texture_rect.left   = 0;
         texture_rect.right  = r->p_picture->format.i_width;

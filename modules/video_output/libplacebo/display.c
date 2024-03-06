@@ -414,10 +414,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                     .y1 = r->p_picture->format.i_visible_height,
                 },
                 .dst = {
-                    .x0 = place.x + r->place.x,
-                    .y0 = place.y + r->place.y * ysign,
-                    .x1 = place.x + (r->place.x + r->place.width ),
-                    .y1 = place.y + (r->place.y + r->place.height) * ysign,
+                    .x0 = r->place.x,
+                    .y0 = r->place.y * ysign,
+                    .x1 = (r->place.x + r->place.width ),
+                    .y1 = (r->place.y + r->place.height) * ysign,
                 },
             };
             i++;
@@ -429,13 +429,13 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     }
 
     // If we don't cover the entire output, clear it first
-    struct pl_rect2d full = {0, 0, frame.fbo->params.w, frame.fbo->params.h };
-    struct pl_rect2d norm = {place.x, place.y, place.x + place.width, place.y + place.height };
-    pl_rect2d_normalize(&norm);
-    if (!pl_rect2d_eq(norm, full)) {
+    // struct pl_rect2d full = {0, 0, frame.fbo->params.w, frame.fbo->params.h };
+    // struct pl_rect2d norm = {place.x, place.y, place.x + place.width, place.y + place.height };
+    // pl_rect2d_normalize(&norm);
+    // if (!pl_rect2d_eq(norm, full)) {
         // TODO: make background color configurable?
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 0.0, 0.0, 0.0, 0.0 });
-    }
+    // }
 
     switch (sys->lut_mode) {
     case LUT_DECODING:

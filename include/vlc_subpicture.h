@@ -208,7 +208,7 @@ typedef struct subpicture_private_t subpicture_private_t;
 struct subpicture_region_rendered
 {
     picture_t       *p_picture;          /**< picture comprising this region */
-    vout_display_place_t place;    // position of region, relative to alignment
+    vout_display_place_t place;     /**< visible area in display coordinates */
     int             i_alpha;                               /**< transparency */
 };
 

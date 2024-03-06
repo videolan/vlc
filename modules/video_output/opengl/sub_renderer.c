@@ -350,6 +350,8 @@ vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
     vt->Enable(GL_BLEND);
     vt->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    vt->Viewport(0, 0, sr->output_width, sr->output_height);
+
     /* We need two buffer objects for each region: for vertex and texture coordinates. */
     if (2 * sr->region_count > sr->buffer_object_count) {
         if (sr->buffer_object_count > 0)

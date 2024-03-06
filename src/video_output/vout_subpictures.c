@@ -1361,6 +1361,10 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
+            // place the region inside the video area
+            output_last_ptr->place.x += video_position->x;
+            output_last_ptr->place.y += video_position->y;
+
             vlc_vector_push(&output->regions, output_last_ptr);
 
             if (subpic->b_subtitle) {

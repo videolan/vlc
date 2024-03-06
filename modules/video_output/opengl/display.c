@@ -302,8 +302,8 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
         sys->vt.Flush();
         if (sys->place_changed)
         {
-            vout_display_opengl_SetOutputSize(sys->vgl, sys->place.width,
-                                                        sys->place.height);
+            vout_display_opengl_SetOutputSize(sys->vgl, vd->cfg->display.width,
+                                                        vd->cfg->display.height);
             vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
                                          sys->place.width, sys->place.height);
             sys->place_changed = false;

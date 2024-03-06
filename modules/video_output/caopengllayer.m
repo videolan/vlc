@@ -792,7 +792,7 @@ shouldInheritContentsScale:(CGFloat)newScale
         // Ensure viewport and aspect ratio is correct
         vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
                                      sys->place.width, sys->place.height);
-        vout_display_opengl_SetOutputSize(sys->vgl, sys->place.width, sys->place.height);
+        vout_display_opengl_SetOutputSize(sys->vgl, sys->cfg.display.width, sys->cfg.display.height);
 
         vout_display_opengl_Display(sys->vgl);
         vlc_gl_ReleaseCurrent(sys->gl);

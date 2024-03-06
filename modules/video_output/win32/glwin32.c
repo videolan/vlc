@@ -256,11 +256,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
         vout_display_PlacePicture(&place, vd->source, &place_cfg);
 
-        const int width  = place.width;
-        const int height = place.height;
-        vlc_gl_Resize (sys->gl, width, height);
-        vout_display_opengl_SetOutputSize(sys->vgl, width, height);
-        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, width, height);
+        vlc_gl_Resize (sys->gl, place.width, place.height);
+        vout_display_opengl_SetOutputSize(sys->vgl, vd->cfg->display.width, vd->cfg->display.height);
+        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, place.width, place.height);
         sys->area.place_changed = false;
     }
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);

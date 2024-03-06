@@ -201,8 +201,8 @@ static void subpicture_Prepare(vout_display_t *vd, const vlc_render_subpicture *
 
     if (sub->place_changed)
     {
-        sub->api.vt.Viewport(sub->place.x, sub->place.y,
-                             sub->place.width, sub->place.height);
+        sub->api.vt.Viewport(0, 0,
+                             vd->cfg->display.width, vd->cfg->display.height);
         sub->place_changed = false;
     }
 
@@ -322,7 +322,7 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
     FlipVerticalAlign(&dp);
     vout_display_PlacePicture(&sub->place, vd->source, &dp);
     sub->place_changed = true;
-    vlc_gl_Resize(sub->gl, dp.width, dp.height);
+    vlc_gl_Resize(sub->gl, vd->cfg->display.width, vd->cfg->display.height);
 
     if (vlc_gl_MakeCurrent(sub->gl))
         goto delete_gl;

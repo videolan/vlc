@@ -1651,12 +1651,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         spuViewport.right  = r->place.x + r->place.width;
         spuViewport.bottom = r->place.y + r->place.height;
 
-        /* move the SPU inside the video area */
-        spuViewport.left   += sys->area.place.x;
-        spuViewport.right  += sys->area.place.x;
-        spuViewport.top    += sys->area.place.y;
-        spuViewport.bottom += sys->area.place.y;
-
         quad->UpdateViewport( &spuViewport, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );

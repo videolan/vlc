@@ -565,7 +565,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
                                  sys->place.width, sys->place.height);
-    vout_display_opengl_SetOutputSize(sys->vgl, sys->place.width, sys->place.height);
+    vout_display_opengl_SetOutputSize(sys->vgl, sys->cfg.display.width, sys->cfg.display.height);
 
     if (sys->has_first_frame)
         vout_display_opengl_Display (sys->vgl);

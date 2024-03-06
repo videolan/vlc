@@ -118,13 +118,12 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
-    const vout_display_place_t *place = &sys->place;
     picture_t *pic = reg->p_picture;
     unsigned sw = reg->place.width;
     unsigned sh = reg->place.height;
     xcb_rectangle_t rects[] = { { 0, 0, sw, sh }, };
 
-    xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root, 
+    xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root,
         pic->format.i_width, pic->format.i_height);
     xcb_create_pixmap(conn, 32, sys->drawable.subpic_crop, sys->root, sw, sh);
     xcb_create_pixmap(conn, 8, sys->drawable.alpha, sys->root, sw, sh);
@@ -175,8 +174,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
-    int_fast16_t dx = place->x + reg->place.x;
-    int_fast16_t dy = place->y + reg->place.y;
+    int_fast16_t dx = reg->place.x;
+    int_fast16_t dy = reg->place.y;
     uint_fast16_t dw = reg->place.width;
     uint_fast16_t dh = reg->place.height;
 
@@ -200,7 +199,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
         xcb_render_set_picture_filter(conn, sys->picture.alpha,
                                       strlen(sys->filter), sys->filter,
                                       0, NULL);
-    } 
+    }
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
                          sys->picture.subpic_crop, sys->picture.alpha,
