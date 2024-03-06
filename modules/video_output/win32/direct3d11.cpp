@@ -1426,7 +1426,11 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 res.pf_destroy = DestroyPictureQuad;
                 return res;
             }((picture_sys_d3d11_t *) d3dquad);
-            (*region)[i] = picture_NewFromResource(&r->p_picture->format, &picres);
+            video_format_t no_crop = r->p_picture->format;
+            no_crop.i_x_offset = no_crop.i_y_offset = 0;
+            no_crop.i_visible_width = no_crop.i_width;
+            no_crop.i_visible_height = no_crop.i_height;
+            (*region)[i] = picture_NewFromResource(&no_crop, &picres);
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
                         r->p_picture->format.i_width, r->p_picture->format.i_height);
