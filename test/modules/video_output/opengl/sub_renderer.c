@@ -177,8 +177,6 @@ static void test_opengl_offscreen(
 
     vlc_render_subpicture *subpicture = vlc_render_subpicture_New();
     assert(subpicture != NULL);
-    subpicture->i_original_picture_width = 4;
-    subpicture->i_original_picture_height = 4;
 
     struct subpicture_region_rendered *p_region = calloc(1, sizeof(*p_region));
     assert(p_region != NULL);

@@ -216,8 +216,6 @@ struct vlc_render_subpicture
 {
     struct VLC_VECTOR(struct subpicture_region_rendered *) regions; /**< list of regions to render */
     int64_t      i_order;                    /** an increasing unique number */
-    unsigned     i_original_picture_width;  /**< original width of the movie */
-    unsigned     i_original_picture_height;/**< original height of the movie */
 };
 
 typedef struct vlc_render_subpicture vlc_render_subpicture;

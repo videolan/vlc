@@ -103,8 +103,6 @@ vlc_render_subpicture *vlc_render_subpicture_New( void )
     vlc_render_subpicture *p_subpic = malloc( sizeof(*p_subpic) );
     if( unlikely(p_subpic == NULL ) )
         return NULL;
-    p_subpic->i_original_picture_width = 0;
-    p_subpic->i_original_picture_height = 0;
     vlc_vector_init(&p_subpic->regions);
     return p_subpic;
 }

@@ -1270,8 +1270,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
     if (unlikely(output == NULL))
         return NULL;
     output->i_order = p_entries[i_subpicture - 1].subpic->i_order;
-    output->i_original_picture_width  = fmt_dst->i_visible_width;
-    output->i_original_picture_height = fmt_dst->i_visible_height;
     struct subpicture_region_rendered *output_last_ptr;
 
     /* Allocate area array for subtitle overlap */
