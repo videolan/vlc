@@ -404,20 +404,16 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 }
 
 static CGRect RegionBackingFrame(VLCSampleBufferDisplay* sys,
-                                 const vlc_render_subpicture *subpicture,
                                  const struct subpicture_region_rendered *r)
 {
-    const float scale_w = (float)(sys->place.width ) / (subpicture->i_original_picture_width );
-    const float scale_h = (float)(sys->place.height) / (subpicture->i_original_picture_height);
-
     // Invert y coords for CoreGraphics
-    const float y = subpicture->i_original_picture_height - scale_h * (r->place.height + r->place.y);
+    const float y = sys->place.height - r->place.height - r->place.y;
 
     return CGRectMake(
-        scale_w * r->place.x + sys->place.x,
-        /*scale_h */ y + sys->place.y,
-        scale_w * r->place.width,
-        scale_h * r->place.height
+        r->place.x + sys->place.x,
+        y + sys->place.y,
+        r->place.width,
+        r->place.height
     );
 }
 
@@ -455,7 +451,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
         region.subpicture = sys.subpicture;
         region.image = image;
 
-        region.backingFrame = RegionBackingFrame(sys, subpicture, r);
+        region.backingFrame = RegionBackingFrame(sys, r);
         [regions addObject:region];
         CGDataProviderRelease(provider);
         CFRelease(data);
@@ -502,7 +498,7 @@ static bool IsSubpictureDrawNeeded(vout_display_t *vd, const vlc_render_subpictu
             VLCSampleBufferSubpictureRegion *region =
                 sys.subpicture.regions[i++];
 
-            CGRect newRegion = RegionBackingFrame(sys, subpicture, r);
+            CGRect newRegion = RegionBackingFrame(sys, r);
 
             if ( !CGRectEqualToRect(region.backingFrame, newRegion) )
             {
