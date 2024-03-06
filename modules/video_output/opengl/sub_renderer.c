@@ -280,8 +280,8 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr,
             }
 
             const size_t pixels_offset =
-                r->fmt.i_y_offset * r->p_picture->p->i_pitch +
-                r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
+                r->source_offset_y * r->p_picture->p->i_pitch +
+                r->source_offset_x * r->p_picture->p->i_pixel_pitch;
             if (!glr->texture)
             {
                 /* Could not recycle a previous texture, generate a new one. */

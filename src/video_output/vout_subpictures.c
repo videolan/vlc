@@ -1182,7 +1182,8 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
         free(dst);
         return NULL;
     }
-    dst->fmt       = region_fmt;
+    dst->source_offset_x = region_fmt.i_x_offset;
+    dst->source_offset_y = region_fmt.i_y_offset;
     dst->place.x    = x_offset;
     dst->place.y    = y_offset;
     dst->place.width  = region_fmt.i_visible_width;

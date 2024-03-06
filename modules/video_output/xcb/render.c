@@ -174,8 +174,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
                          sys->picture.subpic, sys->picture.alpha,
                          sys->picture.scale,
-                         reg->fmt.i_x_offset, reg->fmt.i_y_offset,
-                         reg->fmt.i_x_offset, reg->fmt.i_y_offset,
+                         reg->source_offset_x, reg->source_offset_y,
+                         reg->source_offset_x, reg->source_offset_y,
                          dx, dy, dw, dh);
 
     xcb_render_free_picture(conn, sys->picture.alpha);
