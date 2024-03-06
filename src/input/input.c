@@ -608,7 +608,7 @@ static void MainLoopStatistics( input_thread_t *p_input )
 
     InputSourceStatistics( priv->master, priv->p_item, priv->p_es_out );
 
-    for( int i = 0; i < priv->i_slave; i++ )
+    for (size_t i = 0; i < priv->i_slave; i++)
     {
         input_source_t *in = priv->slave[i];
         InputSourceStatistics( in, NULL, in->p_slave_es_out );
@@ -1203,7 +1203,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
 
     /* Get max pts delay from input source */
     vlc_tick_t i_pts_delay = p_sys->master->i_pts_delay;
-    for( int i = 0; i < p_sys->i_slave; i++ )
+    for (size_t i = 0; i < p_sys->i_slave; i++)
         i_pts_delay = __MAX( i_pts_delay, p_sys->slave[i]->i_pts_delay );
 
     if( i_pts_delay < 0 )
@@ -1374,7 +1374,7 @@ static int Init( input_thread_t * p_input )
             InputSourceMeta( p_input, master, p_meta );
 
             /* And from slave */
-            for( int i = 0; i < priv->i_slave; i++ )
+            for (size_t i = 0; i < priv->i_slave; i++)
                 InputSourceMeta( p_input, priv->slave[i], p_meta );
 
             es_out_ControlSetMeta( priv->p_es_out, p_meta );
@@ -1430,7 +1430,7 @@ static void End( input_thread_t * p_input )
     es_out_SetMode( priv->p_es_out, ES_OUT_MODE_NONE );
 
     /* Delete slave */
-    for( int i = 0; i < priv->i_slave; i++ )
+    for (size_t i = 0; i < priv->i_slave; i++)
     {
         InputSourceDestroy( priv->slave[i] );
         input_source_Release( priv->slave[i] );
@@ -1882,7 +1882,7 @@ static void ControlSetEsList(input_thread_t *input,
     if (!array)
         return;
 
-    for (int i = 0; i < priv->i_slave + 1; ++ i)
+    for (size_t i = 0; i < priv->i_slave + 1; ++ i)
     {
         /* For master and all slaves */
         input_source_t *source = i == 0 ? priv->master : priv->slave[i - 1];
@@ -2898,7 +2898,6 @@ static void SlaveDemux( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
     vlc_tick_t i_time;
-    int i;
 
     if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_GET_TIME, &i_time ) )
     {
@@ -2906,7 +2905,7 @@ static void SlaveDemux( input_thread_t *p_input )
         return;
     }
 
-    for( i = 0; i < input_priv(p_input)->i_slave; i++ )
+    for (size_t i = 0; i < input_priv(p_input)->i_slave; i++)
     {
         input_source_t *in = input_priv(p_input)->slave[i];
         int i_ret;
@@ -2935,8 +2934,8 @@ static void SlaveDemux( input_thread_t *p_input )
                 vlc_tick_t i_stime;
                 if( demux_Control( in->p_demux, DEMUX_GET_TIME, &i_stime ) )
                 {
-                    msg_Err( p_input, "slave[%d] doesn't like "
-                             "DEMUX_GET_TIME -> EOF", i );
+                    msg_Err(p_input, "slave[%zu] doesn't like "
+                            "DEMUX_GET_TIME -> EOF", i);
                     i_ret = 0;
                     break;
                 }
@@ -2958,7 +2957,7 @@ static void SlaveDemux( input_thread_t *p_input )
 
         if( i_ret <= 0 )
         {
-            msg_Dbg( p_input, "slave %d EOF", i );
+            msg_Dbg(p_input, "slave %zu EOF", i);
             in->b_eof = true;
         }
     }
@@ -2967,7 +2966,6 @@ static void SlaveDemux( input_thread_t *p_input )
 static void SlaveSeek( input_thread_t *p_input )
 {
     vlc_tick_t i_time;
-    int i;
 
     if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_GET_TIME, &i_time ) )
     {
@@ -2975,14 +2973,14 @@ static void SlaveSeek( input_thread_t *p_input )
         return;
     }
 
-    for( i = 0; i < input_priv(p_input)->i_slave; i++ )
+    for (size_t i = 0; i < input_priv(p_input)->i_slave; i++)
     {
         input_source_t *in = input_priv(p_input)->slave[i];
 
         if( demux_Control( in->p_demux, DEMUX_SET_TIME, i_time, true ) )
         {
             if( !in->b_eof )
-                msg_Err( p_input, "seek failed for slave %d -> EOF", i );
+                msg_Err(p_input, "seek failed for slave %zu -> EOF", i);
             in->b_eof = true;
         }
         else

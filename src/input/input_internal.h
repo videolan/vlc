@@ -522,7 +522,7 @@ typedef struct input_thread_private_t
     /* Main source */
     input_source_t *master;
     /* Slave sources (subs, and others) */
-    int            i_slave;
+    size_t         i_slave;
     input_source_t **slave;
     float          slave_subs_rate;
 
