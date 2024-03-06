@@ -1178,14 +1178,12 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
         fmt_spu = *vd->source;
-        if (fmt_spu.i_width * fmt_spu.i_height < place.width * place.height) {
-            fmt_spu.i_sar_num = vd->cfg->display.sar.num;
-            fmt_spu.i_sar_den = vd->cfg->display.sar.den;
-            fmt_spu.i_width          =
-            fmt_spu.i_visible_width  = place.width;
-            fmt_spu.i_height         =
-            fmt_spu.i_visible_height = place.height;
-        }
+        fmt_spu.i_sar_num = vd->cfg->display.sar.num;
+        fmt_spu.i_sar_den = vd->cfg->display.sar.den;
+        fmt_spu.i_width          =
+        fmt_spu.i_visible_width  = place.width;
+        fmt_spu.i_height         =
+        fmt_spu.i_visible_height = place.height;
     } else {
         if (blending_before_converter) {
             fmt_spu = *vd->source;
