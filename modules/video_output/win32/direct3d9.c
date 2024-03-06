@@ -954,14 +954,14 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
 
         /* Map the subpicture to sys->sys.sys.place */
-        const float scale_w = (float)(sys->area.place.width)  / subpicture->i_original_picture_width;
-        const float scale_h = (float)(sys->area.place.height) / subpicture->i_original_picture_height;
+        const float scale_w = (float)(sys->area.place.width  * r->zoom_h.num) / (subpicture->i_original_picture_width  * r->zoom_h.den);
+        const float scale_h = (float)(sys->area.place.height * r->zoom_v.num) / (subpicture->i_original_picture_height * r->zoom_v.den);
 
         RECT rect_in_display;
-        rect_in_display.left   =            scale_w * r->place.x,
-        rect_in_display.right  = rect_in_display.left + scale_w * r->place.width,
-        rect_in_display.top    =            scale_h * r->place.y,
-        rect_in_display.bottom = rect_in_display.top  + scale_h * r->place.height;
+        rect_in_display.left   = scale_w * r->place.x;
+        rect_in_display.right  = scale_w * (r->place.x + r->place.width);
+        rect_in_display.top    = scale_h * r->place.y;
+        rect_in_display.bottom = scale_h * (r->place.y + r->place.height);
 
         rect_in_display.left   += sys->area.place.x;
         rect_in_display.right  += sys->area.place.x;
@@ -1833,6 +1833,8 @@ static int Open(vout_display_t *vd,
         msg_Err(vd, "Direct3D9 could not be opened");
         goto error;
     }
+
+    vd->info.can_scale_spu        = true;
 
     /* Setup vout_display now that everything is fine */
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
