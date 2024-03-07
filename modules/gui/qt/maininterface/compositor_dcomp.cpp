@@ -34,8 +34,6 @@
 #warning "QSystemLibrary private header is required for DirectComposition compositor."
 #endif
 
-#include <QOperatingSystemVersion>
-
 #include <QtGui/qpa/qplatformnativeinterface.h>
 #include <QtCore/private/qsystemlibrary_p.h>
 
@@ -61,8 +59,6 @@
 
 #include "compositor_dcomp_acrylicsurface.hpp"
 #include "maininterface/interface_window_handler.hpp"
-
-#include <dwmapi.h>
 
 namespace vlc {
 
@@ -201,7 +197,7 @@ void CompositorDirectComposition::setup()
 
     m_dcompDevice->Commit();
 
-    if (!m_nativeAcrylicAvailable)
+    if (!m_blurBehind)
     {
         try
         {
@@ -258,31 +254,11 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                 eventLoop.quit();
         }, Qt::SingleShotConnection);
 
-    CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP;
-
-    // If Windows 11 Build 22621, enable acrylic effect:
-    m_nativeAcrylicAvailable = QOperatingSystemVersion::current()
-                                 >= QOperatingSystemVersion(QOperatingSystemVersion::Windows, 11, 0, 22621);
-    if (m_nativeAcrylicAvailable)
-    {
-        flags |= CompositorVideo::HAS_ACRYLIC;
-    }
-
-    const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, flags);
+    CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC;
 
     m_quickView->create();
 
-    if (m_nativeAcrylicAvailable)
-    {
-        enum BackdropType
-        {
-            DWMSBT_TRANSIENTWINDOW = 3
-        } backdropType = DWMSBT_TRANSIENTWINDOW;
-        DwmSetWindowAttribute(reinterpret_cast<HWND>(m_quickView->winId()),
-                              38 /* DWMWA_SYSTEMBACKDROP_TYPE */,
-                              &backdropType,
-                              sizeof(backdropType));
-    }
+    const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, flags);
 
     m_quickView->show();
 

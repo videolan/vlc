@@ -87,8 +87,6 @@ private:
     Microsoft::WRL::ComPtr<IDCompositionVisual> m_videoVisual;
     IDCompositionVisual *m_uiVisual = nullptr;
 
-    bool m_nativeAcrylicAvailable = false;
-
     QPointer<class CompositorDCompositionAcrylicSurface> m_acrylicSurface;
 };
 
