@@ -245,9 +245,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         return;
     if (sys->area.place_changed)
     {
-        vout_display_place_t place;
+        vout_display_place_t place = *vd->place;
 
-        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
         /* Reverse vertical alignment as the GL tex are Y inverted */
         place.y = vd->cfg->display.height - (place.y + place.height);
 
