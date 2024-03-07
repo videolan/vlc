@@ -90,6 +90,15 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_player_monotonic_clock',
+    'sources' : files('player/player.c'),
+    'suite' : ['src', 'test_src'],
+    'c_args' : ['-DTEST_CLOCK_MONOTONIC'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
     'name' : 'test_src_video_output',
     'sources' : files(
         'video_output/video_output.c',
