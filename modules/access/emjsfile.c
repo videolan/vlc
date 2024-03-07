@@ -156,9 +156,9 @@ EM_ASYNC_JS(int, init_js_file, (stream_t *p_access, long id), {
         self.addEventListener('message', handleFileResult);
     });
     let timer = undefined;
-    let timeout = new Promise(function (resolve, reject) {
-            timer = setTimeout(resolve, 1000, 'timeout')
-        });
+    let timeout = new Promise((resolve) => {
+        timer = setTimeout(resolve, 1000, 'timeout');
+    });
     let promises = [p, timeout];
     /* id must be unique */
     self.postMessage({ cmd: "customCmd", type: "requestFile", id: id});
