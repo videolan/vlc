@@ -280,6 +280,7 @@ foreach module : vlc_modules
         'cpp_args',
         'objc_args',
         'extra_files',
+        'enabled',
     ]
     foreach key : module.keys()
         if key not in valid_dict_keys
@@ -287,6 +288,10 @@ foreach module : vlc_modules
                 .format(key, module['name']))
         endif
     endforeach
+
+    if not module.get('enabled', true)
+        continue
+    endif
 
     common_args = [
         '-DMODULE_STRING="@0@"'.format(module['name']),
