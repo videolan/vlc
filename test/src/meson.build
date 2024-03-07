@@ -19,6 +19,16 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_clock_clock',
+    'sources' : files(
+        'clock/clock.c',
+        '../../src/clock/clock.c',
+        '../../src/clock/clock_internal.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+}
+
+vlc_tests += {
     'name' : 'test_src_misc_variables',
     'sources' : files('misc/variables.c'),
     'suite' : ['src', 'test_src'],
