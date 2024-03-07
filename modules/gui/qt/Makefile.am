@@ -188,6 +188,7 @@ libqt_plugin_la_SOURCES = \
 	maininterface/videosurface.hpp \
 	maininterface/video_window_handler.cpp \
 	maininterface/video_window_handler.hpp \
+	maininterface/windoweffects_module.hpp \
 	medialibrary/medialib.cpp \
 	medialibrary/medialib.hpp \
 	medialibrary/mlalbum.cpp \
@@ -528,7 +529,9 @@ libqt_plugin_la_SOURCES += \
 	maininterface/mainctx_win32.hpp \
 	maininterface/compositor_win7.cpp \
 	maininterface/compositor_win7.hpp \
-	style/windowsthemeprovider.cpp
+	style/windowsthemeprovider.cpp \
+	maininterface/win32windoweffects_module.cpp \
+	maininterface/win32windoweffects_module.hpp
 
 nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
 	maininterface/compositor_win7.moc.cpp
@@ -610,6 +613,22 @@ if ENABLE_QT
 gui_LTLIBRARIES += libqt_wayland_plugin.la
 endif
 
+endif
+endif
+endif
+
+if !HAVE_WIN32
+if HAVE_KF6WINDOWSYSTEM
+
+libqt_plugin_la_CPPFLAGS += -DQT_HAS_KWINDOWSYSTEM_PLUGIN
+
+libqt_kwindowsystem_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(KF6WINDOWSYSTEM_CFLAGS)
+libqt_kwindowsystem_plugin_la_LIBADD =  $(KF6WINDOWSYSTEM_LIBS)
+libqt_kwindowsystem_plugin_la_SOURCES = \
+	maininterface/kwindowsystem_module.cpp
+
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_kwindowsystem_plugin.la
 endif
 endif
 endif

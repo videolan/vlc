@@ -292,6 +292,7 @@ some_sources = files(
     'maininterface/videosurface.hpp',
     'maininterface/video_window_handler.cpp',
     'maininterface/video_window_handler.hpp',
+    'maininterface/windoweffects_module.hpp',
     'medialibrary/medialib.cpp',
     'medialibrary/medialib.hpp',
     'medialibrary/mlalbum.cpp',
@@ -646,6 +647,25 @@ if qt6_dep.found()
             }
 
             qt_extra_flags += '-DQT_HAS_GTK'
+        endif
+    endif
+
+    if host_system == 'windows'
+        some_sources += files('maininterface/win32windoweffects_module.cpp',
+                              'maininterface/win32windoweffects_module.hpp')
+    else
+        kf6WindowSystem_dep = dependency('KF6WindowSystem',
+                                         version: '>=6.0.0',
+                                         required: false)
+        if (kf6WindowSystem_dep.found())
+            vlc_modules += {
+                'name' : 'qtwindoweffects',
+                'sources' : files(
+                    'maininterface/windoweffects_module.hpp',
+                    'maininterface/kwindowsystem_module.cpp',
+                ),
+                'dependencies' : [kf6WindowSystem_dep, qt6_dep]
+            }
         endif
     endif
 

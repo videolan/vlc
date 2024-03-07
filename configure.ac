@@ -3945,6 +3945,16 @@ dnl
 EXTEND_HELP_STRING([Interface plugins:])
 
 dnl
+dnl  KF6WindowSystem
+dnl
+PKG_CHECK_MODULES([KF6WINDOWSYSTEM], [KF6WindowSystem >= 6.0.0], [
+  have_kf6windowsystem="yes"
+], [
+  have_kf6windowsystem="no"
+])
+AM_CONDITIONAL([HAVE_KF6WINDOWSYSTEM], [test "${have_kf6windowsystem}" = "yes"])
+
+dnl
 dnl QT
 dnl
 AC_ARG_ENABLE([qt],

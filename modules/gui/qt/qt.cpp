@@ -66,6 +66,7 @@ extern "C" char **environ;
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 # include "maininterface/mainctx_win32.hpp"
+#include "maininterface/win32windoweffects_module.hpp"
 #else
 # include "maininterface/mainctx.hpp"   /* MainCtx creation */
 #endif
@@ -439,6 +440,12 @@ vlc_module_begin ()
         set_callback( WindowsThemeProviderOpen )
         set_description( "Qt Windows theme" )
         add_shortcut("qt-themeprovider-windows")
+
+    add_submodule ()
+        add_shortcut( "QtWin32WindowEffects" )
+        set_description( "Provides window effects on Windows." )
+        set_capability( "qtwindoweffects", 10 )
+        set_callback( QtWin32WindowEffectsOpen )
 #endif
     add_submodule()
         set_capability("qt theme provider", 1)
